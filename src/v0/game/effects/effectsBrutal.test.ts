@@ -399,7 +399,6 @@ const createActiveEffectConfig = () => {
 				durationMs: 500,
 				name: "Activate speed",
 				placement: "board_then_inventory",
-				requirementIds: [],
 				tags: [],
 				visibility: "visible",
 			},

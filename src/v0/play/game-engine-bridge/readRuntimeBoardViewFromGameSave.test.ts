@@ -147,7 +147,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					requirements: [],
 					resultItemId: "item:plank",
 				},
 			},
@@ -262,70 +261,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
-	it("marks producer product lines blocked until stored requirements are stocked", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:producer-axe": {
-					capacity: 1,
-					itemId: "item:axe",
-					quantity: 1,
-					type: "stored",
-				},
-			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:producer-axe",
-					],
-				},
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-
-		const missingBoard = readRuntimeBoardViewFromGameSave({
-			config,
-			nowMs: 0,
-			save,
-		});
-		const missingLine = missingBoard.byId["item-instance:1"]?.activation?.productLines?.find(
-			(line) => line.productId === "product:test",
-		);
-
-		expect(missingLine).toMatchObject({
-			missingRequirementItemIds: [
-				"item:axe",
-			],
-			requirementsReady: false,
-		});
-
-		save.storedRequirements["item-instance:1"] = {
-			items: {
-				"item:axe": 1,
-			},
-		};
-		const stockedBoard = readRuntimeBoardViewFromGameSave({
-			config,
-			nowMs: 0,
-			save,
-		});
-		const stockedLine = stockedBoard.byId["item-instance:1"]?.activation?.productLines?.find(
-			(line) => line.productId === "product:test",
-		);
-
-		expect(stockedLine).toMatchObject({
-			missingRequirementItemIds: [],
-			requirementsReady: true,
-		});
-	});
-
-	it("shows proximity product requirements as gates without duration mutation", () => {
+	it("shows local product grants as gates without duration mutation", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -335,23 +271,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					width: 3,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 2,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			products: {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
 				},
 			},
 			startingState: {
@@ -386,13 +309,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 
 		expect(line).toMatchObject({
 			durationMs: 1000,
-			requirements: [
-				{
-					matchedDistance: 2,
-					satisfied: true,
-					type: "proximity",
-				},
-			],
 		});
 	});
 
@@ -828,7 +744,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
-	it("shows craft proximity requirements as gates without duration mutation", () => {
+	it("shows craft local grants as gates without duration mutation", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -842,15 +758,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				...baseConfig.craftRecipes,
 				"item:craft-table": {
 					...baseConfig.craftRecipes["item:craft-table"],
-					requirements: [
-						{
-							distance: 2,
-							itemIds: [
-								"item:rock",
-							],
-							type: "proximity",
-						},
-					],
 				},
 			},
 			items: {
@@ -894,13 +801,6 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 
 		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
 			durationMs: 1000,
-			requirements: [
-				{
-					matchedDistance: 2,
-					satisfied: true,
-					type: "proximity",
-				},
-			],
 		});
 	});
 

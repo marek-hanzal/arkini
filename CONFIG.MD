@@ -16,7 +16,6 @@ Canonical game config keys:
   "assets": {},
   "items": {},
   "merge": {},
-  "requirements": {},
   "effects": {},
   "producers": {},
   "products": {},
@@ -61,7 +60,7 @@ A producer capability is keyed by the owning item id and owns ordered product id
 }
 ```
 
-`maxQueueSize` defaults to `1`; `requirementIds` defaults to `[]`. A producer may also define finite `charges` and `onChargesDepleted` (`stop` or `remove`). Product lines may define `chargeCost`; if omitted, the product costs no charges. There is no `type: "producer"` field because the section already says the thing is a producer. Humans, tragically, can infer this too.
+`maxQueueSize` defaults to `1`. Producer shells do not own gates; product-line availability is resolved through Effect grants. A producer may also define finite `charges` and `onChargesDepleted` (`stop` or `remove`). Product lines may define `chargeCost`; if omitted, the product costs no charges. There is no `type: "producer"` field because the section already says the thing is a producer. Humans, tragically, can infer this too.
 
 A product line owns its inputs and output inline:
 
@@ -89,7 +88,7 @@ A product line owns its inputs and output inline:
 }
 ```
 
-`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`; `requirementIds` defaults to `[]`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
+`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `grantSelector` is the product-line capability gate resolved by the Effect engine; omit it when the line is always available. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
 
 Product input `quantity` defaults to `1`. Missing input `mode` means `exact`: the product needs and consumes exactly `quantity` items for each run. `mode: "upTo"` changes `quantity` into the per-run maximum: the product can start with at least one stored/selected input and consumes `1..quantity` for the same fixed output. Use this for sink/cleanup lines such as a purifier that can absorb up to four pollution tiles per activation without scaling the output. `capacity` still means how many items may be parked on that product input slot.
 
@@ -122,7 +121,7 @@ Quantity may be a number or `{ "min": number, "max": number }`. Output entries m
 
 ## Stashes
 
-A stash is an authoring-level producer facade for finite loot/container behavior. It is keyed by the owning item id, has exactly one `productId`, and uses the same product-line execution path as producers. The product line owns inputs, output, placement, requirements, duration, effects, and `chargeCost`. The stash owns the finite charges and depletion mode.
+A stash is an authoring-level producer facade for finite loot/container behavior. It is keyed by the owning item id, has exactly one `productId`, and uses the same product-line execution path as producers. The product line owns inputs, output, placement, grant gates, duration, effects, and `chargeCost`. The stash owns the finite charges and depletion mode.
 
 ```json
 {
@@ -169,19 +168,23 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. B
 }
 ```
 
-## Requirements
+## Effect grants
 
-Requirements can be passive, stored, or proximity-based. Product/producers reference reusable requirements through `requirementIds`. Craft/stash requirements are inline. Requirement `durationFactor` defaults to `1`; write it only when it actually changes duration.
+World conditions are modeled as Effect grants. A source item/building emits `grant.add`; target items, craft recipes, and product lines declare `grantSelector`. This is the only domain gate model. Consumable materials stay as `inputs`; ambient ownership, proximity, era unlocks, path locks, and local access belong to Effect grants or other Effect operations.
 
 ```json
-{ "type": "passive", "itemId": "item:well", "quantity": 1, "scope": "board_or_inventory" }
-{ "type": "stored", "itemId": "item:water", "quantity": 1, "capacity": 2 }
-{ "type": "proximity", "itemIds": ["item:purifier"], "distance": 2 }
+{ "kind": "grant.add", "grantId": "grant:era:basic-buildings", "target": { "items": { "anyOf": [{ "tag": "era-1-blueprint" }] } } }
 ```
+
+```json
+{ "grantSelector": { "allOf": [{ "id": "grant:era:basic-buildings" }] } }
+```
+
+A global source can unlock a whole era, while a local source can grant a nearby product line access to a tree, deposit, purifier, shrine, or whatever other tiny zoning law we invent next.
 
 ## Effects
 
-Effects are hard gameplay rules and runtime product-line mutators. They never mutate `GameConfig`; runtime computes an effective view for a concrete producer/product/source situation.
+Effects are hard gameplay rules, grant sources, and runtime product-line mutators. They never mutate `GameConfig`; runtime computes an effective view for a concrete producer/product/source situation.
 
 Effect source fields:
 
@@ -196,7 +199,7 @@ Effect source fields:
 
 `sourceScope` is `board`, `inventory`, or `both`; omitted means `board`. Local effects must be board-sourced because distance needs a board cell. `duration.proximityPenalty` is local-only and multiplies duration per nearby source item; closer sources apply a stronger penalty and multiple source instances stack.
 
-Operation targets use domain selectors. Product-line operations may target `producers`, `productLines`, or both; if both are present, both must match. Item creation operations target `items`. Source selectors use one vocabulary everywhere: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each authoring ref is either `{ "id": "..." }` or `{ "tag": "..." }`. Tags are authoring sugar: compile expands refs into concrete `{ "ids": [...] }` clauses while keeping the same selector shape, so runtime evaluates a boring deterministic predicate instead of doing tag archaeology in the middle of gameplay. Empty target objects are invalid, because apparently even configs need boundaries.
+Operation targets use domain selectors. Product-line operations may target `producers`, `productLines`, or both; if both are present, both must match. Grant operations may target `items`, `craftRecipes`, `producers`, and `productLines`. Item creation operations target `items`. Source selectors use one vocabulary everywhere: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each authoring ref is either `{ "id": "..." }` or `{ "tag": "..." }`. Tags are authoring sugar: compile expands refs into concrete `{ "ids": [...] }` clauses while keeping the same selector shape, so runtime evaluates a boring deterministic predicate instead of doing tag archaeology in the middle of gameplay. Empty target objects are invalid, because apparently even configs need boundaries.
 
 Supported operations:
 
@@ -213,10 +216,11 @@ Supported operations:
 { "kind": "loot.dropChance.add", "delta": -0.2, "target": { "productLines": { "mode": "all" } } }
 { "kind": "loot.quantity.add", "value": 1, "target": { "productLines": { "anyOf": [{ "tag": "resource-output" }] } } }
 { "kind": "loot.extraOutputChance.add", "chance": 0.35, "quantity": 1, "target": { "productLines": { "mode": "all" } }, "outputItems": { "items": { "anyOf": [{ "tag": "tier-1-resource" }] } } }
+{ "kind": "grant.add", "grantId": "grant:woodcutting:tree-nearby", "target": { "productLines": { "anyOf": [{ "tag": "woodcutting" }] } } }
 { "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "items": { "anyOf": [{ "tag": "faith" }] } } }
 ```
 
-`line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `loot.quantity.add` increases every matched output directly, so use it sparingly unless you enjoy printing resources like a doomed central bank. `loot.extraOutputChance.add` is the safer bounty form: it targets product lines, then only adds a chance-based extra drop for produced output items matching `outputItems`. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.
+`grant.add` contributes a domain capability to matching targets; targets opt into it through `grantSelector`. `line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `loot.quantity.add` increases every matched output directly, so use it sparingly unless you enjoy printing resources like a doomed central bank. `loot.extraOutputChance.add` is the safer bounty form: it targets product lines, then only adds a chance-based extra drop for produced output items matching `outputItems`. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.
 
 ## Time model
 

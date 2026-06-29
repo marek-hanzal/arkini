@@ -13,10 +13,6 @@ export type ItemToBoardItemInteractionPlan =
 	  }
 	| {
 			feedbackVariant: ItemInteractionFeedbackVariant;
-			type: "stored-requirement";
-	  }
-	| {
-			feedbackVariant: ItemInteractionFeedbackVariant;
 			type: "craft-input";
 	  }
 	| {

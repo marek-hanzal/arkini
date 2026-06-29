@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { planActivationInputRefsFx } from "~/v0/game/requirements/planActivationInputRefsFx";
+import { planActivationInputRefsFx } from "~/v0/game/activation/planActivationInputRefsFx";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
 
 export namespace planCraftAutoFillInputRefsFx {

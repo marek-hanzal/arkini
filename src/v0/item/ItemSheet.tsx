@@ -2,7 +2,7 @@ import { type FC, useMemo } from "react";
 import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
-import { ItemRequirementRulesCard } from "~/v0/item/ui/ItemRequirementRulesCard";
+import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
 import { ItemGeneratedEffectsCard } from "~/v0/item/ui/ItemGeneratedEffectsCard";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
@@ -49,7 +49,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const liveProductLines = liveBoardItem?.activation?.productLines ?? [];
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
-	const craftHasRules = Boolean(liveCraft?.requirements?.length);
 
 	if (!liveBoardItem || !item) {
 		return (
@@ -133,13 +132,6 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 				) : null}
 				<ItemSummaryCard item={item} />
 				<ItemGeneratedEffectsCard effects={item.generatedEffects} />
-				{craftHasRules && liveCraft ? (
-					<ItemRequirementRulesCard
-						items={items}
-						requirements={liveCraft.requirements}
-						title="Craft rules"
-					/>
-				) : null}
 				{liveCraft ? (
 					<ItemCraftCard
 						craft={liveCraft}
@@ -156,16 +148,14 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 						items={items}
 					/>
 				) : null}
-				{liveBoardItem.activation?.inputs.length ||
-				liveBoardItem.activation?.requirements.length ? (
-					<ItemRequirementRulesCard
+				{liveBoardItem.activation?.inputs.length ? (
+					<ItemActivationInputsCard
 						inputs={liveBoardItem.activation.inputs}
 						items={items}
-						requirements={liveBoardItem.activation.requirements}
 						title={
 							liveBoardItem.activation.kind === "stash"
-								? "Stash rules"
-								: "Producer rules"
+								? "Stash inputs"
+								: "Producer inputs"
 						}
 					/>
 				) : null}

@@ -31,6 +31,8 @@ export interface EffectiveProducerProductLine {
 	blocked: boolean;
 	blockReasons: AppliedGameEffectOperation[];
 	durationMs: number;
+	grantIds?: string[];
+	grantsReady?: boolean;
 	lootPlan: {
 		appendOutputs: EffectiveOutputAppend[];
 		baseDropChance: number;

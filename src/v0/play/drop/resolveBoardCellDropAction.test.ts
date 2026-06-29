@@ -527,7 +527,7 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
-	it("does not treat passive requirements as droppable stored slots", () => {
+	it("does not treat passive grants as droppable stored slots", () => {
 		const source = boardItem({
 			id: "source",
 			itemId: "item:twig",
@@ -543,15 +543,6 @@ describe("resolveBoardCellDropAction", () => {
 			activation: {
 				inputs: [],
 				kind: "producer",
-				requirements: [
-					{
-						type: "passive",
-						itemId: "item:twig",
-						quantity: 1,
-						capacity: 1,
-						stored: 0,
-					},
-				],
 				trigger: "click",
 			},
 		} satisfies BoardViewItem;
@@ -579,136 +570,6 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
-	it("applies board items to stored requirement slots", () => {
-		const source = boardItem({
-			id: "source",
-			itemId: "item:twig",
-			x: 0,
-			y: 0,
-		});
-		const target = {
-			id: "target",
-			itemId: "item:lumber-camp-1",
-			state: {},
-			x: 1,
-			y: 0,
-			activation: {
-				inputs: [],
-				kind: "producer",
-				requirements: [
-					{
-						capacity: 1,
-						itemId: "item:twig",
-						quantity: 1,
-						stored: 0,
-						type: "stored",
-					},
-				],
-				trigger: "click",
-			},
-		} satisfies BoardViewItem;
-
-		expect(
-			resolveBoardCellDropAction({
-				config,
-				inventory: emptyInventory,
-				board: rebuildBoardView([
-					source,
-					target,
-				]),
-				source: boardSource(source),
-				target: {
-					kind: "cell",
-					x: 1,
-					y: 0,
-					boardItemId: target.id,
-				},
-			}),
-		).toEqual({
-			type: "apply-board-item-to-board-item",
-			feedback: {
-				cellKey: "1:0",
-				kind: "cell-feedback",
-				variant: "primary",
-			},
-			input: boardPairInput(source, target),
-		});
-	});
-
-	it("applies board items to missing product-line stored requirements", () => {
-		const source = boardItem({
-			id: "source",
-			itemId: "item:twig",
-			x: 0,
-			y: 0,
-		});
-		const target = {
-			id: "target",
-			itemId: "item:lumber-camp-1",
-			state: {},
-			x: 1,
-			y: 0,
-			activation: {
-				inputs: [],
-				kind: "producer",
-				productLines: [
-					{
-						durationMs: 1000,
-						inProgress: false,
-						isDefault: true,
-						inputItemIds: [],
-						inputs: [],
-						inputsReady: true,
-						inputsAvailable: true,
-						missingRequirementItemIds: [
-							"item:twig",
-						],
-						name: "Test product",
-						producerQueuedJobs: 0,
-						productId: "product:test",
-						progress: undefined,
-						queueFull: false,
-						blocked: false,
-						blockReasonEffectIds: [],
-						queuedJobs: 0,
-						queueSize: 1,
-						requirementItemIds: [
-							"item:twig",
-						],
-						requirementsReady: false,
-					},
-				],
-				requirements: [],
-				trigger: "click",
-			},
-		} satisfies BoardViewItem;
-
-		expect(
-			resolveBoardCellDropAction({
-				config,
-				inventory: emptyInventory,
-				board: rebuildBoardView([
-					source,
-					target,
-				]),
-				source: boardSource(source),
-				target: {
-					kind: "cell",
-					x: 1,
-					y: 0,
-					boardItemId: target.id,
-				},
-			}),
-		).toEqual({
-			type: "apply-board-item-to-board-item",
-			feedback: {
-				cellKey: "1:0",
-				kind: "cell-feedback",
-				variant: "primary",
-			},
-			input: boardPairInput(source, target),
-		});
-	});
 	it("applies board items to stash inputs", () => {
 		const source = boardItem({
 			id: "source",
@@ -733,7 +594,6 @@ describe("resolveBoardCellDropAction", () => {
 					},
 				],
 				kind: "stash",
-				requirements: [],
 				trigger: "click",
 			},
 		} satisfies BoardViewItem;

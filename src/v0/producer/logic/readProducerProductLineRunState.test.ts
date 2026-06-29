@@ -12,15 +12,12 @@ const line = (overrides: Partial<ProducerProductLineView> = {}): ProducerProduct
 	inputsAvailable: true,
 	inputsReady: true,
 	isDefault: false,
-	missingRequirementItemIds: [],
 	name: "Test product",
 	producerQueuedJobs: 0,
 	productId: "product:test",
 	queueFull: false,
 	queuedJobs: 0,
 	queueSize: 2,
-	requirementItemIds: [],
-	requirementsReady: true,
 	...overrides,
 });
 

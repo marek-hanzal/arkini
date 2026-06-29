@@ -263,7 +263,6 @@ const createOutputCreatesRealtimeSourceConfig = () => {
 					},
 				],
 				placement: "board_then_inventory",
-				requirementIds: [],
 				tags: [],
 				visibility: "visible",
 			},
@@ -295,7 +294,6 @@ const createCraftCreatesRealtimeSourceConfig = () => {
 			"item:craft-table": {
 				durationMs: 1000,
 				inputs: [],
-				requirements: [],
 				resultItemId: "item:axe",
 			},
 		},

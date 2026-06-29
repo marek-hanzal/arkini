@@ -553,7 +553,6 @@ describe("applyGameActionFx Craft", () => {
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
-					requirements: [],
 					resultItemId: "item:plank",
 				},
 			},
@@ -741,9 +740,45 @@ describe("applyGameActionFx Craft", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
-	it("rechecks craft passive requirements after auto-filled inputs are consumed", () => {
+	it("rechecks craft grants after auto-filled inputs are consumed", () => {
 		const baseConfig = createEngineTestConfig();
+		const twigGrantId = "grant:test:owned-twig";
 		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:test:owned-twig-grant": {
+					name: "Owned Twig Craft Grant",
+					operations: [
+						{
+							grantId: twigGrantId,
+							kind: "grant.add",
+							target: {
+								craftRecipes: {
+									anyOf: [
+										{
+											ids: [
+												"item:craft-table",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "both",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						...(baseConfig.items["item:twig"].passiveEffectIds ?? []),
+						"effect:test:owned-twig-grant",
+					],
+				},
+			},
 			game: {
 				...baseConfig.game,
 				board: {
@@ -755,19 +790,20 @@ describe("applyGameActionFx Craft", () => {
 				...baseConfig.craftRecipes,
 				"item:craft-table": {
 					...baseConfig.craftRecipes["item:craft-table"],
+					grantSelector: {
+						allOf: [
+							{
+								ids: [
+									twigGrantId,
+								],
+							},
+						],
+					},
 					inputs: [
 						{
 							consume: true,
 							itemId: "item:twig",
 							quantity: 1,
-						},
-					],
-					requirements: [
-						{
-							itemId: "item:twig",
-							quantity: 1,
-							scope: "board",
-							type: "passive",
 						},
 					],
 				},
@@ -808,7 +844,7 @@ describe("applyGameActionFx Craft", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "missing_requirement",
+				reason: "effect:missing-grant",
 			});
 		}
 		expect(save.board.items["item-instance:2"]).toMatchObject({

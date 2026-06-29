@@ -1,4 +1,4 @@
-import { isBoardItemConsumableAsInput } from "~/v0/game/requirements/isBoardItemConsumableAsInput";
+import { isBoardItemConsumableAsInput } from "~/v0/game/activation/isBoardItemConsumableAsInput";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 

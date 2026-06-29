@@ -5,7 +5,6 @@ import { readWorldActiveEffectFacts } from "~/v0/game/world/readWorldActiveEffec
 import { readWorldCraftJobFacts } from "~/v0/game/world/readWorldCraftJobFacts";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import { readWorldProcessableJobFacts } from "~/v0/game/world/readWorldProcessableJobFacts";
-import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readWorldReplacementSafetyFacts } from "~/v0/game/world/readWorldReplacementSafetyFacts";
 import { readWorldWakePlanFx } from "~/v0/game/world/readWorldWakePlanFx";
 import type { WorldSnapshotFacts } from "~/v0/game/world/WorldSnapshotFacts";
@@ -27,17 +26,6 @@ export const readWorldSnapshotFactsFx = Effect.fn("readWorldSnapshotFactsFx")(fu
 		nowMs,
 		save,
 	});
-	const producerRequirements = [];
-	for (const producerJobFacts of producerJobs) {
-		producerRequirements.push(
-			yield* readWorldProducerRequirementFactsFx({
-				config,
-				job: producerJobFacts.job,
-				save,
-			}),
-		);
-	}
-
 	return {
 		activeEffects: readWorldActiveEffectFacts({
 			config,
@@ -54,7 +42,6 @@ export const readWorldSnapshotFactsFx = Effect.fn("readWorldSnapshotFactsFx")(fu
 			save,
 		}),
 		producerJobs,
-		producerRequirements,
 		replacementSafety: readWorldReplacementSafetyFacts({
 			save,
 		}),

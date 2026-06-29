@@ -336,6 +336,10 @@ export const readRuntimeEffectOperationSummary = ({
 		)}.`;
 	}
 
+	if (operation.kind === "grant.add") {
+		return `Grants ${operation.grantId} to matching targets.`;
+	}
+
 	return `Blocks creating ${target}${operation.reason ? `: ${operation.reason}` : ""}.`;
 };
 

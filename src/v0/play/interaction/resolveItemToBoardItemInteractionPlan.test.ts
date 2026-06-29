@@ -27,7 +27,6 @@ const productLine = (
 		inputsAvailable: true,
 		inputsReady: false,
 		isDefault: false,
-		missingRequirementItemIds: [],
 		name: productId,
 		productId,
 		producerQueuedJobs: 0,
@@ -36,9 +35,6 @@ const productLine = (
 		blockReasonEffectIds: [],
 		queueSize: 1,
 		queuedJobs: 0,
-		requirementItemIds: [],
-		requirements: [],
-		requirementsReady: true,
 		...rest,
 	};
 };
@@ -48,7 +44,6 @@ const producerTarget = (productLines: ProducerProductLineView[]): BoardViewItem 
 		inputs: [],
 		kind: "producer",
 		productLines,
-		requirements: [],
 		trigger: "click",
 	},
 	id: "producer",
@@ -71,7 +66,6 @@ const stashTarget = (productLines: ProducerProductLineView[]): BoardViewItem => 
 		],
 		kind: "stash",
 		productLines,
-		requirements: [],
 		trigger: "click",
 	},
 	id: "stash",
@@ -152,25 +146,13 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 		});
 	});
 
-	it("does not show producer product passive requirements as droppable stored requirements", () => {
+	it("does not show producer product passive grants as droppable stored slots", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),
 			sourceItemId: "item:water",
 			targetItem: producerTarget([
 				productLine({
-					missingRequirementItemIds: [
-						"item:water",
-					],
 					productId: "product:watered",
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:water",
-							quantity: 1,
-							stored: 0,
-							type: "passive",
-						},
-					],
 				}),
 			]),
 		});
@@ -180,30 +162,6 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 		});
 	});
 
-	it("shows producer product stored requirements as droppable", () => {
-		const plan = resolveItemToBoardItemInteractionPlan({
-			config: createEngineTestConfig(),
-			sourceItemId: "item:water",
-			targetItem: producerTarget([
-				productLine({
-					productId: "product:watered",
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:water",
-							quantity: 1,
-							stored: 0,
-							type: "stored",
-						},
-					],
-				}),
-			]),
-		});
-
-		expect(plan).toMatchObject({
-			type: "stored-requirement",
-		});
-	});
 	it("does not route replacement merges into producer-like targets with runtime jobs", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),

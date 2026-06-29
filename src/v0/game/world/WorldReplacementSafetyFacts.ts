@@ -5,8 +5,7 @@ export type WorldReplacementBlockReason =
 	| "craft_job"
 	| "producer_job"
 	| "producer_runtime_state"
-	| "stash_runtime_state"
-	| "stored_requirement_state";
+	| "stash_runtime_state";
 
 export interface WorldReplacementSafetyFacts {
 	blockReasons: WorldReplacementBlockReason[];

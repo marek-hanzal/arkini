@@ -446,7 +446,6 @@ describe("runtime invariants", () => {
 							type: "guaranteed",
 						},
 					],
-					requirementIds: [],
 				},
 			},
 		});
@@ -548,7 +547,6 @@ describe("runtime invariants", () => {
 					name: "Timed",
 					tags: [],
 					visibility: "visible",
-					requirementIds: [],
 				},
 			},
 		});
@@ -657,7 +655,6 @@ describe("runtime invariants", () => {
 					name: "Self timed",
 					tags: [],
 					visibility: "visible",
-					requirementIds: [],
 				},
 			},
 		});

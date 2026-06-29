@@ -111,13 +111,6 @@ export const resolveBoardDropFeedback = ({
 		targetItem,
 	});
 
-	if (intent.type === "stored-requirement") {
-		return {
-			effect: "merge",
-			variant: "primary",
-		};
-	}
-
 	if (
 		intent.type === "craft-input" ||
 		intent.type === "producer-input" ||

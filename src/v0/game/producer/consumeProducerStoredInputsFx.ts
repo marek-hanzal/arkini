@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
-import { readActivationInputMode } from "~/v0/game/requirements/readActivationInputMode";
+import type { GameActivationInput } from "~/v0/game/activation/GameActivationInput";
+import { readActivationInputMode } from "~/v0/game/activation/readActivationInputMode";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace consumeProducerStoredInputsFx {

@@ -17,8 +17,6 @@ import { withdrawCraftInputFx } from "~/v0/game/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/producer/withdrawProducerInputFx";
 import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
-import { storeStoredRequirementFx } from "~/v0/game/requirements/storeStoredRequirementFx";
-import { withdrawStoredRequirementFx } from "~/v0/game/requirements/withdrawStoredRequirementFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import { processWorldSnapshotFx } from "~/v0/game/world/processWorldSnapshotFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -153,20 +151,6 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		stashOpen: (openAction) =>
 			openStashFx({
 				action: openAction,
-				config,
-				nowMs,
-				save,
-			}),
-		storedRequirementStore: (storeAction) =>
-			storeStoredRequirementFx({
-				action: storeAction,
-				config,
-				nowMs,
-				save,
-			}),
-		storedRequirementWithdraw: (withdrawAction) =>
-			withdrawStoredRequirementFx({
-				action: withdrawAction,
 				config,
 				nowMs,
 				save,

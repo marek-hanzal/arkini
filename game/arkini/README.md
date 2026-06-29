@@ -22,7 +22,7 @@ Everything is movable and storable by default unless a concrete mechanic says ot
 
 - Default storage policy should be `both`.
 - Board proximity only counts things currently placed on the board.
-- Items in inventory do not satisfy board proximity requirements.
+- Local board effects need source and target board cells; inventory can satisfy only global/both-scope effect grants.
 - Source items like `tree` and `rock` are normal movable/storable items, not permanent terrain.
 - Board-only restrictions are reserved for explicit danger/effect mechanics, such as future fire, fog, enemies, pollution, or other hazards.
 
@@ -51,7 +51,7 @@ producer:academy      Era VII mining expansion, Era VIII dirty-processing/materi
 producer:university   Era IX Master Knowledge / Heroes Guild blueprint, Era X prestige plans, House IV, and Choose The Path blueprints
 ```
 
-Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and requires ownership of every physical building/place unlocked by the current era. Ownership is checked with passive `board_or_inventory` requirements, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
+Townhall tier progression is a one-way era gate. Crafting the next Town Hall consumes the current Town Hall tier and needs ownership grants for every physical building/place unlocked by the current era. Those grants are emitted by owned items with `sourceScope: "both"`, so the player may keep those buildings on the board or store them in inventory. The goal is to prove the era was actually built, not to force the player to stage an inspection parade on the board like some tiny bureaucratic nightmare.
 
 Higher Town Hall tiers do not re-issue lower-era blueprints. If the player wants duplicate lower-era infrastructure, they should build it before moving to the next era. Missing duplicates should slow later economy, not soft-lock progression.
 

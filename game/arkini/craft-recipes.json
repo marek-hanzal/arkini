@@ -35,20 +35,20 @@
 					"itemId": "item:morale-t2"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:library-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t2"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-armory-t1": {
 			"durationMs": 1000,
@@ -80,26 +80,25 @@
 					"itemId": "item:iron-ingot"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:blacksmith-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tannery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tailor-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:blacksmith-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tailor-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tannery-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-bakery-t1": {
 			"durationMs": 1000,
@@ -156,26 +155,25 @@
 					"quantity": 8
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:smelter-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:smelter-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-brewery-t1": {
 			"durationMs": 1000,
@@ -222,26 +220,25 @@
 					"itemId": "item:building-permit"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:clay-pit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:clay-pit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-cathedral": {
 			"durationMs": 1000,
@@ -292,38 +289,35 @@
 					"itemId": "item:morale-t3"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-cattle-farm-t1": {
 			"durationMs": 1000,
@@ -378,20 +372,20 @@
 					"itemId": "item:advanced-knowledge"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-chicken-coop-t1": {
 			"durationMs": 1000,
@@ -453,20 +447,20 @@
 					"itemId": "item:advanced-knowledge"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:clay-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:clay-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-coal-mine-t1": {
 			"durationMs": 1000,
@@ -495,20 +489,20 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:coal-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:coal-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-construction-yard-t1": {
 			"durationMs": 1000,
@@ -554,32 +548,30 @@
 					"itemId": "item:morale-t3"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:brickyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glassworks",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:roof-tile-factory",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:smelter-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:brickyard"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glassworks"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:roof-tile-factory"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:smelter-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-cookhouse-t1": {
 			"durationMs": 1000,
@@ -649,14 +641,15 @@
 					"itemId": "item:building-permit"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:weaver-hut-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:weaver-hut-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-farm-t1": {
 			"durationMs": 1000,
@@ -704,26 +697,25 @@
 					"itemId": "item:building-permit"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:sand-pit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:sand-pit"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-glazier-workshop-t1": {
 			"durationMs": 1000,
@@ -758,32 +750,30 @@
 					"itemId": "item:coin-stack"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glassworks",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:dye-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:dye-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glassworks"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-gold-mine-t1": {
 			"durationMs": 1000,
@@ -812,20 +802,20 @@
 					"quantity": 4
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:gold-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:gold-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-goldsmith-t1": {
 			"durationMs": 1000,
@@ -858,26 +848,25 @@
 					"quantity": 8
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:smelter-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:smelter-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-heroes-guild-t1": {
 			"durationMs": 1000,
@@ -914,32 +903,30 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:goldsmith-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:armory-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:armory-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:goldsmith-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-house-of-engineers": {
 			"durationMs": 1000,
@@ -992,38 +979,35 @@
 					"itemId": "item:morale-t3"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:blacksmith-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:blacksmith-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-house-t1": {
 			"durationMs": 1000,
@@ -1047,14 +1031,15 @@
 					"itemId": "item:water"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:well-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:well-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-house-t2": {
 			"durationMs": 1000,
@@ -1087,20 +1072,20 @@
 					"itemId": "item:morale-t1"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:bakery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:market-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:bakery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:market-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-house-t3": {
 			"durationMs": 1000,
@@ -1132,20 +1117,20 @@
 					"itemId": "item:morale-t2"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tailor-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tailor-workshop-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-house-t4": {
 			"durationMs": 1000,
@@ -1179,26 +1164,25 @@
 					"itemId": "item:morale-t3"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-iron-mine-t1": {
 			"durationMs": 1000,
@@ -1227,20 +1211,20 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:iron-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:iron-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-lumberjack-t1": {
 			"durationMs": 1000,
@@ -1307,38 +1291,35 @@
 					"itemId": "item:morale-t3"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:heroes-guild-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:heroes-guild-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-market-t1": {
 			"durationMs": 1000,
@@ -1385,14 +1366,15 @@
 					"quantity": 3
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-paper-mill-t1": {
 			"durationMs": 1000,
@@ -1490,14 +1472,15 @@
 					"quantity": 4
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-purifier-t1": {
 			"durationMs": 1000,
@@ -1536,20 +1519,20 @@
 					"quantity": 4
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-quarry-t1": {
 			"durationMs": 1000,
@@ -1589,20 +1572,20 @@
 					"itemId": "item:coin-stack"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:marble-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:marble-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-roof-tile-factory": {
 			"durationMs": 1000,
@@ -1631,32 +1614,30 @@
 					"itemId": "item:building-permit"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:clay-pit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:brickyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:brickyard"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:clay-pit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-sand-pit": {
 			"durationMs": 1000,
@@ -1680,20 +1661,20 @@
 					"itemId": "item:advanced-knowledge"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:sand-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:sand-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-sawmill-t1": {
 			"durationMs": 1000,
@@ -1731,14 +1712,15 @@
 					"itemId": "item:coin"
 				}
 			],
-			"requirements": [
-				{
-					"type": "passive",
-					"itemId": "producer:library-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:library-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-sheep-pasture-t1": {
 			"durationMs": 1000,
@@ -1808,26 +1790,25 @@
 					"itemId": "item:advanced-knowledge"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-stonemason-t1": {
 			"durationMs": 1000,
@@ -1867,20 +1848,20 @@
 					"itemId": "item:coin-stack"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:quarry-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:quarry-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-tailor-workshop-t1": {
 			"durationMs": 1000,
@@ -1908,20 +1889,20 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:tannery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:weaver-hut-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:tannery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:weaver-hut-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-tannery-t1": {
 			"durationMs": 1000,
@@ -1991,38 +1972,35 @@
 					"itemId": "item:water"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:lumberjack-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:sawmill-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:quarry-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:well-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:lumberjack-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:quarry-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:sawmill-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:well-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-townhall-t3": {
 			"durationMs": 1000,
@@ -2054,50 +2032,45 @@
 					"itemId": "item:morale-t1"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:wheat-field",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:farm-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:pig-farm-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:cattle-farm-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:chicken-coop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:sheep-pasture-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:vegetable-garden-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:wheat-field"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:cattle-farm-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:chicken-coop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:farm-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:pig-farm-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:sheep-pasture-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:vegetable-garden-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-townhall-t4": {
 			"durationMs": 1000,
@@ -2134,74 +2107,65 @@
 					"itemId": "item:morale-t1"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:windmill-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:bakery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:slaughterhouse-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:dairy-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:cookhouse-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "item:hop-field",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:brewery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tavern-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "item:vineyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:winery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:market-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:hop-field"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:item:vineyard"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:bakery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:brewery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:cookhouse-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:dairy-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:market-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:slaughterhouse-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tavern-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:windmill-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:winery-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-university": {
 			"durationMs": 1000,
@@ -2252,32 +2216,30 @@
 					"itemId": "item:morale-t2"
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:construction-yard-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glassworks",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:roof-tile-factory",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:library-t3",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			]
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:construction-yard-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glassworks"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t3"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:roof-tile-factory"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-vegetable-garden-t1": {
 			"durationMs": 1000,
@@ -2545,27 +2507,26 @@
 					"quantity": 3
 				}
 			],
-			"requirements": [
-				{
-					"type": "passive",
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:charcoal-burner-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			],
-			"resultItemId": "producer:waste-processor-t2"
+			"resultItemId": "producer:waste-processor-t2",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:charcoal-burner-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					}
+				]
+			}
 		},
 		"item:blueprint-bio-waste-processor-t2": {
 			"durationMs": 1000,
@@ -2597,27 +2558,26 @@
 					"quantity": 3
 				}
 			],
-			"requirements": [
-				{
-					"type": "passive",
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:charcoal-burner-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				},
-				{
-					"type": "passive",
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory"
-				}
-			],
-			"resultItemId": "producer:bio-waste-processor-t2"
+			"resultItemId": "producer:bio-waste-processor-t2",
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:charcoal-burner-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					}
+				]
+			}
 		}
 	}
 }

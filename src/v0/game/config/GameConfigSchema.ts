@@ -38,16 +38,12 @@ import { z } from "zod";
  * - Activation inputs always say whether they are consumed. Product-line/stash/craft
  *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
  *   Product inputs may use `mode: "upTo"` when a run should consume 1..quantity items for the same fixed output.
- * - Passive requirements always declare their search scope (`board`, `inventory`, or
- *   `board_or_inventory`). They model explicit product-line/craft gates that are still
- *   better expressed as stored or owned items than as ambient world mutators.
  * - Ambient world rules such as proximity unlocks, speed boosts, pollution pressure,
- *   path locks, and aura-style modifiers belong to `effects`. Effects are resolved
+ *   path locks, craft gates, and aura-style modifiers belong to `effects`. Effects are resolved
  *   against concrete product-line targets at runtime; producer shells do not own
- *   top-level requirement gates.
- * - Product/craft proximity requirements still use Chebyshev grid distance, so radius 1
- *   includes diagonals around the target tile. Production duration changes should be
- *   authored as duration effects, not requirement-owned multipliers.
+ *   top-level gates.
+ * - Local effects use Chebyshev grid distance, so radius 1 includes diagonals around
+ *   the target tile. Production duration changes are authored as duration effects.
  * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
@@ -84,19 +80,7 @@ import { z } from "zod";
  *       "resultItemId": "item:stick"
  *     }
  *   },
- *   "requirements": {
- *     "requirement:near-townhall": {
- *       "type": "proximity",
- *       "itemIds": ["item:townhall"],
- *       "distance": 1
- *     },
- *     "requirement:saw-license": {
- *       "type": "passive",
- *       "itemId": "item:saw-license",
- *       "quantity": 1,
- *       "scope": "board_or_inventory"
- *     }
- *   }
+ *   "effects": {}
  * }
  * ```
  *
@@ -117,7 +101,6 @@ import { z } from "zod";
  *       "durationMs": 5000,
  *       "placement": "board_then_inventory",
  *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }],
- *       "requirementIds": ["requirement:saw-license"],
  *       "output": [{ "type": "guaranteed", "itemId": "item:plank", "quantity": 1 }]
  *     }
  *   }
@@ -206,58 +189,7 @@ const CraftRecipeInputSchema = z
 	})
 	.strict();
 
-/**
- * Stored requirement means the item is placed onto the target capability and gates use.
- * It is not an activation input. Craft consumes stored requirements into its final replacement result.
- */
-const StoredItemRequirementSchema = z
-	.object({
-		type: z.literal("stored"),
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-		capacity: PositiveIntegerSchema,
-	})
-	.strict();
-
-/** Passive requirement gates by ownership/presence in an explicit scope. */
-const PassiveItemScopeSchema = z.enum([
-	"board",
-	"inventory",
-	"board_or_inventory",
-]);
-
-const PassiveItemRequirementSchema = z
-	.object({
-		type: z.literal("passive"),
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-		scope: PassiveItemScopeSchema,
-	})
-	.strict();
-
 const ActivationInputSchema = z.array(ItemStackInputSchema);
-
-/**
- * Proximity requirement gates an activation by nearby board items.
- * Distance uses Chebyshev grid radius, so distance 1 includes diagonals.
- * Requirement proximity is only a gate; production duration/layout boosts belong to
- * local duration effects so all ambient mutators resolve through the same engine.
- */
-const ProximityItemRequirementSchema = z
-	.object({
-		type: z.literal("proximity"),
-		itemIds: z.array(IdSchema).min(1),
-		distance: PositiveIntegerSchema,
-	})
-	.strict();
-
-const ActivationRequirementSchema = z.array(
-	z.discriminatedUnion("type", [
-		StoredItemRequirementSchema,
-		PassiveItemRequirementSchema,
-		ProximityItemRequirementSchema,
-	]),
-);
 
 const TagSchema = z.string().min(1);
 
@@ -326,6 +258,41 @@ const GameEffectProductLineAuthoringTargetSchema = z
 		productLines: AuthoringDomainSelectorSchema.optional(),
 	})
 	.strict();
+
+/** Selects which craft recipes an effect operation may satisfy. */
+const GameEffectCraftRecipeTargetSchema = z
+	.object({
+		craftRecipes: ResolvedDomainSelectorSchema,
+	})
+	.strict();
+
+const GameEffectCraftRecipeAuthoringTargetSchema = z
+	.object({
+		craftRecipes: AuthoringDomainSelectorSchema,
+	})
+	.strict();
+
+/** Selects targets that should receive a grant from an effect source. */
+const GameEffectGrantTargetSchema = z
+	.object({
+		craftRecipes: ResolvedDomainSelectorSchema.optional(),
+		items: ResolvedDomainSelectorSchema.optional(),
+		producers: ResolvedDomainSelectorSchema.optional(),
+		productLines: ResolvedDomainSelectorSchema.optional(),
+	})
+	.strict();
+
+const GameEffectGrantAuthoringTargetSchema = z
+	.object({
+		craftRecipes: AuthoringDomainSelectorSchema.optional(),
+		items: AuthoringDomainSelectorSchema.optional(),
+		producers: AuthoringDomainSelectorSchema.optional(),
+		productLines: AuthoringDomainSelectorSchema.optional(),
+	})
+	.strict();
+
+/** Grant selectors describe domain capabilities, not concrete source items. */
+const GameGrantSelectorSchema = ResolvedDomainSelectorSchema;
 
 /** Selects which item definitions an effect operation may touch. */
 const GameEffectItemTargetSchema = z
@@ -401,10 +368,20 @@ const createGameEffectOperationSchema = <
 	TProductLineTarget extends
 		| typeof GameEffectProductLineTargetSchema
 		| typeof GameEffectProductLineAuthoringTargetSchema,
+	TCraftRecipeTarget extends
+		| typeof GameEffectCraftRecipeTargetSchema
+		| typeof GameEffectCraftRecipeAuthoringTargetSchema,
+	TGrantTarget extends
+		| typeof GameEffectGrantTargetSchema
+		| typeof GameEffectGrantAuthoringTargetSchema,
 >({
+	craftRecipeTarget,
+	grantTarget,
 	itemTarget,
 	productLineTarget,
 }: {
+	craftRecipeTarget: TCraftRecipeTarget;
+	grantTarget: TGrantTarget;
 	itemTarget: TItemTarget;
 	productLineTarget: TProductLineTarget;
 }) => {
@@ -412,8 +389,14 @@ const createGameEffectOperationSchema = <
 		stacking: GameEffectOperationStackingSchema.optional(),
 		target: productLineTarget,
 	};
+	const craftRecipeOperationBaseSchema = {
+		target: craftRecipeTarget,
+	};
 	const itemOperationBaseSchema = {
 		target: itemTarget,
+	};
+	const grantOperationBaseSchema = {
+		target: grantTarget,
 	};
 
 	return z.discriminatedUnion("kind", [
@@ -506,6 +489,13 @@ const createGameEffectOperationSchema = <
 			.strict(),
 		z
 			.object({
+				...grantOperationBaseSchema,
+				grantId: IdSchema,
+				kind: z.literal("grant.add"),
+			})
+			.strict(),
+		z
+			.object({
 				...itemOperationBaseSchema,
 				kind: z.literal("item.blockCreate"),
 				reason: z.string().min(1).optional(),
@@ -516,12 +506,16 @@ const createGameEffectOperationSchema = <
 
 /** Runtime-only product-line and loot mutator operation. */
 const GameEffectOperationSchema = createGameEffectOperationSchema({
+	craftRecipeTarget: GameEffectCraftRecipeTargetSchema,
+	grantTarget: GameEffectGrantTargetSchema,
 	itemTarget: GameEffectItemTargetSchema,
 	productLineTarget: GameEffectProductLineTargetSchema,
 });
 
 /** Source-only effect operation accepted before compile-time selector resolution. */
 const GameEffectAuthoringOperationSchema = createGameEffectOperationSchema({
+	craftRecipeTarget: GameEffectCraftRecipeAuthoringTargetSchema,
+	grantTarget: GameEffectGrantAuthoringTargetSchema,
 	itemTarget: GameEffectItemAuthoringTargetSchema,
 	productLineTarget: GameEffectProductLineAuthoringTargetSchema,
 });
@@ -568,13 +562,6 @@ const GameEffectDefinitionSchema = createGameEffectDefinitionSchema(GameEffectOp
 const GameEffectAuthoringDefinitionSchema = createGameEffectDefinitionSchema(
 	GameEffectAuthoringOperationSchema,
 );
-
-/** Central reusable requirement table entry referenced by product-line or craft gates. */
-const GameRequirementDefinitionSchema = z.discriminatedUnion("type", [
-	StoredItemRequirementSchema,
-	PassiveItemRequirementSchema,
-	ProximityItemRequirementSchema,
-]);
 
 /** Package-level board/inventory dimensions and human-readable title. */
 const GameMetaSchema = z
@@ -661,6 +648,7 @@ const ItemDefinitionSchema = z
 		tags: z.array(z.string().min(1)).default([]),
 		mergeIds: z.array(IdSchema).optional(),
 		passiveEffectIds: z.array(IdSchema).optional(),
+		grantSelector: GameGrantSelectorSchema.optional(),
 		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
 	.strict();
@@ -714,7 +702,7 @@ const CraftRecipeSchema = z
 	.object({
 		resultItemId: IdSchema,
 		inputs: z.array(CraftRecipeInputSchema),
-		requirements: ActivationRequirementSchema.default([]),
+		grantSelector: GameGrantSelectorSchema.optional(),
 		durationMs: NonNegativeIntegerSchema,
 	})
 	.strict();
@@ -739,11 +727,11 @@ const ProductDefinitionSchema = z
 				"hidden",
 			])
 			.default("visible"),
+		grantSelector: GameGrantSelectorSchema.optional(),
 		durationMs: NonNegativeIntegerSchema,
 		placement: PlacementSchema,
 		chargeCost: NonNegativeNumberSchema.default(0),
 		inputs: ActivationInputSchema.optional(),
-		requirementIds: z.array(IdSchema).default([]),
 		output: ActivationOutputSchema.min(1).optional(),
 		activatesEffectId: IdSchema.optional(),
 	})
@@ -788,7 +776,6 @@ const GameConfigFragmentSchema = z
 		assets: z.record(IdSchema, AssetDefinitionFragmentSchema).optional(),
 		items: z.record(IdSchema, ItemDefinitionFragmentSchema).optional(),
 		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
-		requirements: z.record(IdSchema, GameRequirementDefinitionSchema).optional(),
 		effects: z.record(IdSchema, GameEffectAuthoringDefinitionSchema).optional(),
 		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
 		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
@@ -807,7 +794,6 @@ const BaseGameConfigSchema = z
 		assets: z.record(IdSchema, AssetDefinitionSchema),
 		items: z.record(IdSchema, ItemDefinitionSchema),
 		merge: z.record(IdSchema, MergeDefinitionSchema),
-		requirements: z.record(IdSchema, GameRequirementDefinitionSchema),
 		effects: z.record(IdSchema, GameEffectDefinitionSchema).default({}),
 		producers: z.record(IdSchema, ProducerDefinitionSchema),
 		stashes: z.record(IdSchema, StashDefinitionSchema),
@@ -829,7 +815,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
 	const hasMerge = createRecordGuard(value.merge);
-	const hasRequirement = createRecordGuard(value.requirements);
 	const hasEffect = createRecordGuard(value.effects);
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
@@ -838,6 +823,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const producerIds = Object.keys(value.producers);
 	const productIds = Object.keys(value.products);
 	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
+	const grantIds = readGameEffectGrantIds(value);
 
 	for (const [assetId, asset] of Object.entries(value.assets)) {
 		if (!hasResource(asset.resourceId)) {
@@ -939,6 +925,19 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 		}
 
+		if (item.grantSelector) {
+			validateGameGrantSelector(
+				ctx,
+				[
+					"items",
+					itemId,
+					"grantSelector",
+				],
+				item.grantSelector,
+				grantIds,
+			);
+		}
+
 		for (const [index, removal] of (item.removeBy ?? []).entries()) {
 			if (!hasItem(removal.itemId)) {
 				addIssue(
@@ -982,18 +981,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
-	for (const [requirementId, requirement] of Object.entries(value.requirements)) {
-		validateGameRequirement(
-			ctx,
-			[
-				"requirements",
-				requirementId,
-			],
-			requirement,
-			hasItem,
-		);
-	}
-
 	for (const [effectId, effect] of Object.entries(value.effects)) {
 		if (
 			effect.scope === "local" &&
@@ -1022,6 +1009,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				validateGameEffectItemTarget(ctx, targetPath, operation.target, {
 					entityIds: itemIds,
 					hasEntity: hasItem,
+				});
+			} else if (operation.kind === "grant.add") {
+				validateGameEffectGrantTarget(ctx, targetPath, operation.target, {
+					craftRecipeIds: Object.keys(value.craftRecipes),
+					hasCraftRecipe,
+					itemIds,
+					hasItem,
+					producerIds,
+					hasProducer,
+					productIds,
+					hasProduct,
 				});
 			} else {
 				validateGameEffectProductLineTarget(ctx, targetPath, operation.target, {
@@ -1234,16 +1232,18 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			recipe.inputs,
 			hasItem,
 		);
-		validateItemRequirements(
-			ctx,
-			[
-				"craftRecipes",
-				craftRecipeId,
-				"requirements",
-			],
-			recipe.requirements,
-			hasItem,
-		);
+		if (recipe.grantSelector) {
+			validateGameGrantSelector(
+				ctx,
+				[
+					"craftRecipes",
+					craftRecipeId,
+					"grantSelector",
+				],
+				recipe.grantSelector,
+				grantIds,
+			);
+		}
 	}
 
 	for (const [productId, product] of Object.entries(value.products)) {
@@ -1259,16 +1259,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				hasItem,
 			);
 		}
-		validateRequirementIds(
-			ctx,
-			[
-				"products",
-				productId,
-				"requirementIds",
-			],
-			product.requirementIds,
-			hasRequirement,
-		);
 		validateUniqueStringList(
 			ctx,
 			[
@@ -1279,6 +1269,19 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			product.tags,
 			(value) => `Duplicate tag "${value}".`,
 		);
+		if (product.grantSelector) {
+			validateGameGrantSelector(
+				ctx,
+				[
+					"products",
+					productId,
+					"grantSelector",
+				],
+				product.grantSelector,
+				grantIds,
+			);
+		}
+
 		if (product.output) {
 			validateActivationOutput(
 				ctx,
@@ -1522,6 +1525,419 @@ const validateUniqueStringList = (
 	}
 };
 
+const validateItemInputs = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	inputs: readonly {
+		capacity: number;
+		itemId: string;
+		quantity: number;
+	}[],
+	hasItem: (itemId: string) => boolean,
+) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		inputs.map((input) => input.itemId),
+		(value) => `Duplicate input item "${value}".`,
+	);
+
+	for (const [index, input] of inputs.entries()) {
+		if (!hasItem(input.itemId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"itemId",
+				],
+				`Missing item "${input.itemId}".`,
+			);
+		}
+
+		if (input.capacity < input.quantity) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"capacity",
+				],
+				`Capacity must be >= quantity (${input.quantity}).`,
+			);
+		}
+	}
+};
+
+const validateCraftRecipeInputs = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	inputs: readonly {
+		consume: boolean;
+		itemId: string;
+	}[],
+	hasItem: (itemId: string) => boolean,
+) => {
+	validateUniqueStringList(
+		ctx,
+		path,
+		inputs.map((input) => input.itemId),
+		(value) => `Duplicate craft input item "${value}".`,
+	);
+
+	for (const [index, input] of inputs.entries()) {
+		if (!hasItem(input.itemId)) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"itemId",
+				],
+				`Missing item "${input.itemId}".`,
+			);
+		}
+
+		if (!input.consume) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					index,
+					"consume",
+				],
+				"Craft inputs must currently be consumed because craft start clears stored input state and completion replaces the board target.",
+			);
+		}
+	}
+};
+
+const doesResolvedDomainSelectorMatchId = (
+	entityId: string,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema> | undefined,
+) => {
+	if (!selector || "mode" in selector) return true;
+	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	if (selector.noneOf?.some((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	return true;
+};
+
+const readDomainSelectorIds = (selector: z.infer<typeof ResolvedDomainSelectorSchema>) => {
+	if ("mode" in selector) return [];
+	return [
+		...(selector.anyOf ?? []),
+		...(selector.allOf ?? []),
+		...(selector.noneOf ?? []),
+	].flatMap((clause) => clause.ids);
+};
+
+const validateResolvedDomainSelectorClauses = ({
+	clauses,
+	ctx,
+	hasEntity,
+	label,
+	path,
+}: {
+	clauses: readonly z.infer<typeof ResolvedDomainSelectorClauseSchema>[] | undefined;
+	ctx: z.RefinementCtx;
+	hasEntity: (entityId: string) => boolean;
+	label: string;
+	path: GameConfigIssuePath;
+}) => {
+	for (const [clauseIndex, clause] of (clauses ?? []).entries()) {
+		validateUniqueStringList(
+			ctx,
+			[
+				...path,
+				clauseIndex,
+				"ids",
+			],
+			clause.ids,
+			(value) => `Duplicate ${label} "${value}".`,
+		);
+
+		for (const [index, entityId] of clause.ids.entries()) {
+			if (hasEntity(entityId)) continue;
+			addIssue(
+				ctx,
+				[
+					...path,
+					clauseIndex,
+					"ids",
+					index,
+				],
+				`Missing ${label} "${entityId}".`,
+			);
+		}
+	}
+};
+
+const validateResolvedDomainSelector = ({
+	ctx,
+	entityIds,
+	hasEntity,
+	label,
+	path,
+	selector,
+}: {
+	ctx: z.RefinementCtx;
+	entityIds: readonly string[];
+	hasEntity: (entityId: string) => boolean;
+	label: string;
+	path: GameConfigIssuePath;
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
+}) => {
+	if ("mode" in selector) return;
+
+	const selectorCount =
+		(selector.anyOf ? 1 : 0) + (selector.allOf ? 1 : 0) + (selector.noneOf ? 1 : 0);
+	if (selectorCount === 0) {
+		addIssue(ctx, path, `Domain selector must define anyOf, allOf, noneOf, or mode: "all".`);
+	}
+
+	validateResolvedDomainSelectorClauses({
+		clauses: selector.anyOf,
+		ctx,
+		hasEntity,
+		label,
+		path: [
+			...path,
+			"anyOf",
+		],
+	});
+	validateResolvedDomainSelectorClauses({
+		clauses: selector.allOf,
+		ctx,
+		hasEntity,
+		label,
+		path: [
+			...path,
+			"allOf",
+		],
+	});
+	validateResolvedDomainSelectorClauses({
+		clauses: selector.noneOf,
+		ctx,
+		hasEntity,
+		label,
+		path: [
+			...path,
+			"noneOf",
+		],
+	});
+
+	if (!entityIds.some((entityId) => doesResolvedDomainSelectorMatchId(entityId, selector))) {
+		addIssue(ctx, path, `Domain selector matched no ${label}s.`);
+	}
+};
+
+const validateGameGrantSelector = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	selector: z.infer<typeof GameGrantSelectorSchema>,
+	grantIds: readonly string[],
+) => {
+	if ("mode" in selector) return;
+
+	const selectorCount =
+		(selector.anyOf ? 1 : 0) + (selector.allOf ? 1 : 0) + (selector.noneOf ? 1 : 0);
+	if (selectorCount === 0) {
+		addIssue(ctx, path, `Grant selector must define anyOf, allOf, noneOf, or mode: "all".`);
+	}
+
+	const hasGrant = (grantId: string) => grantIds.includes(grantId);
+	validateResolvedDomainSelectorClauses({
+		clauses: selector.anyOf,
+		ctx,
+		hasEntity: hasGrant,
+		label: "grant",
+		path: [
+			...path,
+			"anyOf",
+		],
+	});
+	validateResolvedDomainSelectorClauses({
+		clauses: selector.allOf,
+		ctx,
+		hasEntity: hasGrant,
+		label: "grant",
+		path: [
+			...path,
+			"allOf",
+		],
+	});
+	validateResolvedDomainSelectorClauses({
+		clauses: selector.noneOf,
+		ctx,
+		hasEntity: hasGrant,
+		label: "grant",
+		path: [
+			...path,
+			"noneOf",
+		],
+	});
+};
+
+const validateGameEffectProductLineTarget = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	target: z.infer<typeof GameEffectProductLineTargetSchema>,
+	entities: {
+		producerIds: readonly string[];
+		hasProducer: (producerId: string) => boolean;
+		productIds: readonly string[];
+		hasProduct: (productId: string) => boolean;
+	},
+) => {
+	if (!target.producers && !target.productLines) {
+		addIssue(ctx, path, `Effect product-line target must define at least one domain selector.`);
+	}
+
+	if (target.producers) {
+		validateResolvedDomainSelector({
+			ctx,
+			entityIds: entities.producerIds,
+			hasEntity: entities.hasProducer,
+			label: "producer",
+			path: [
+				...path,
+				"producers",
+			],
+			selector: target.producers,
+		});
+	}
+
+	if (target.productLines) {
+		validateResolvedDomainSelector({
+			ctx,
+			entityIds: entities.productIds,
+			hasEntity: entities.hasProduct,
+			label: "product line",
+			path: [
+				...path,
+				"productLines",
+			],
+			selector: target.productLines,
+		});
+	}
+};
+
+const validateGameEffectItemTarget = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	target: z.infer<typeof GameEffectItemTargetSchema>,
+	entities: {
+		entityIds: readonly string[];
+		hasEntity: (itemId: string) => boolean;
+	},
+) => {
+	validateResolvedDomainSelector({
+		ctx,
+		entityIds: entities.entityIds,
+		hasEntity: entities.hasEntity,
+		label: "item",
+		path: [
+			...path,
+			"items",
+		],
+		selector: target.items,
+	});
+};
+
+const validateGameEffectGrantTarget = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	target: z.infer<typeof GameEffectGrantTargetSchema>,
+	entities: {
+		craftRecipeIds: readonly string[];
+		hasCraftRecipe: (craftRecipeId: string) => boolean;
+		itemIds: readonly string[];
+		hasItem: (itemId: string) => boolean;
+		producerIds: readonly string[];
+		hasProducer: (producerId: string) => boolean;
+		productIds: readonly string[];
+		hasProduct: (productId: string) => boolean;
+	},
+) => {
+	if (!target.craftRecipes && !target.items && !target.producers && !target.productLines) {
+		addIssue(ctx, path, `Effect grant target must define at least one domain selector.`);
+	}
+
+	if (target.craftRecipes) {
+		validateResolvedDomainSelector({
+			ctx,
+			entityIds: entities.craftRecipeIds,
+			hasEntity: entities.hasCraftRecipe,
+			label: "craft recipe",
+			path: [
+				...path,
+				"craftRecipes",
+			],
+			selector: target.craftRecipes,
+		});
+	}
+	if (target.items) {
+		validateResolvedDomainSelector({
+			ctx,
+			entityIds: entities.itemIds,
+			hasEntity: entities.hasItem,
+			label: "item",
+			path: [
+				...path,
+				"items",
+			],
+			selector: target.items,
+		});
+	}
+	if (target.producers) {
+		validateResolvedDomainSelector({
+			ctx,
+			entityIds: entities.producerIds,
+			hasEntity: entities.hasProducer,
+			label: "producer",
+			path: [
+				...path,
+				"producers",
+			],
+			selector: target.producers,
+		});
+	}
+	if (target.productLines) {
+		validateResolvedDomainSelector({
+			ctx,
+			entityIds: entities.productIds,
+			hasEntity: entities.hasProduct,
+			label: "product line",
+			path: [
+				...path,
+				"productLines",
+			],
+			selector: target.productLines,
+		});
+	}
+};
+
+const readGameEffectGrantIds = (config: z.infer<typeof BaseGameConfigSchema>) => [
+	...new Set(
+		Object.values(config.effects).flatMap((effect) =>
+			effect.operations.flatMap((operation) =>
+				operation.kind === "grant.add"
+					? [
+							operation.grantId,
+						]
+					: [],
+			),
+		),
+	),
+];
+
 const validateProductLineOwnership = (
 	ctx: z.RefinementCtx,
 	config: z.infer<typeof BaseGameConfigSchema>,
@@ -1731,15 +2147,16 @@ const collectCraftRecipeBlueprintDependencies = ({
 			});
 		}
 
-		collectInlineRequirementDependencyItems({
+		collectGrantSelectorDependencyItems({
 			addDependencyItem,
+			config,
 			fromBlueprintItemId: craftRecipeId,
+			grantSelector: recipe.grantSelector,
 			path: [
 				"craftRecipes",
 				craftRecipeId,
-				"requirements",
+				"grantSelector",
 			],
-			requirements: recipe.requirements,
 		});
 	}
 };
@@ -1794,16 +2211,16 @@ const collectProductBlueprintDependencies = ({
 				});
 			}
 
-			collectRequirementIdDependencyItems({
+			collectGrantSelectorDependencyItems({
 				addDependencyItem,
 				config,
 				fromBlueprintItemId,
+				grantSelector: product.grantSelector,
 				path: [
 					"products",
 					productId,
-					"requirementIds",
+					"grantSelector",
 				],
-				requirementIds: product.requirementIds,
 			});
 		}
 	}
@@ -1909,12 +2326,12 @@ const readOutputBlueprintItemIds = (
 	return outputBlueprintItemIds;
 };
 
-const collectRequirementIdDependencyItems = ({
+const collectGrantSelectorDependencyItems = ({
 	addDependencyItem,
 	config,
 	fromBlueprintItemId,
+	grantSelector,
 	path,
-	requirementIds,
 }: {
 	addDependencyItem: (props: {
 		fromBlueprintItemId: string;
@@ -1923,91 +2340,39 @@ const collectRequirementIdDependencyItems = ({
 	}) => void;
 	config: z.infer<typeof BaseGameConfigSchema>;
 	fromBlueprintItemId: string;
+	grantSelector: z.infer<typeof GameGrantSelectorSchema> | undefined;
 	path: GameConfigIssuePath;
-	requirementIds: readonly string[];
 }) => {
-	for (const [requirementIndex, requirementId] of requirementIds.entries()) {
-		const requirement = config.requirements[requirementId];
-		if (!requirement) continue;
+	if (!grantSelector) return;
 
-		collectRequirementDependencyItems({
-			addDependencyItem,
-			fromBlueprintItemId,
-			path: [
-				...path,
-				requirementIndex,
-			],
-			requirement,
-		});
-	}
-};
-
-const collectInlineRequirementDependencyItems = ({
-	addDependencyItem,
-	fromBlueprintItemId,
-	path,
-	requirements,
-}: {
-	addDependencyItem: (props: {
-		fromBlueprintItemId: string;
-		itemId: string;
-		path: GameConfigIssuePath;
-	}) => void;
-	fromBlueprintItemId: string;
-	path: GameConfigIssuePath;
-	requirements: z.infer<typeof ActivationRequirementSchema>;
-}) => {
-	for (const [requirementIndex, requirement] of requirements.entries()) {
-		collectRequirementDependencyItems({
-			addDependencyItem,
-			fromBlueprintItemId,
-			path: [
-				...path,
-				requirementIndex,
-			],
-			requirement,
-		});
-	}
-};
-
-const collectRequirementDependencyItems = ({
-	addDependencyItem,
-	fromBlueprintItemId,
-	path,
-	requirement,
-}: {
-	addDependencyItem: (props: {
-		fromBlueprintItemId: string;
-		itemId: string;
-		path: GameConfigIssuePath;
-	}) => void;
-	fromBlueprintItemId: string;
-	path: GameConfigIssuePath;
-	requirement: z.infer<typeof GameRequirementDefinitionSchema>;
-}) => {
-	if (requirement.type === "proximity") {
-		for (const [itemIndex, itemId] of requirement.itemIds.entries()) {
+	const grantSourceItemIdsByGrantId = readPassiveGrantSourceItemIdsByGrantId(config);
+	for (const grantId of readDomainSelectorIds(grantSelector)) {
+		for (const itemId of grantSourceItemIdsByGrantId.get(grantId) ?? []) {
 			addDependencyItem({
 				fromBlueprintItemId,
 				itemId,
-				path: [
-					...path,
-					"itemIds",
-					itemIndex,
-				],
+				path,
 			});
 		}
-		return;
 	}
+};
 
-	addDependencyItem({
-		fromBlueprintItemId,
-		itemId: requirement.itemId,
-		path: [
-			...path,
-			"itemId",
-		],
-	});
+const readPassiveGrantSourceItemIdsByGrantId = (config: z.infer<typeof BaseGameConfigSchema>) => {
+	const result = new Map<string, string[]>();
+	for (const [itemId, item] of Object.entries(config.items)) {
+		for (const effectId of item.passiveEffectIds ?? []) {
+			const effect = config.effects[effectId];
+			if (!effect) continue;
+			for (const operation of effect.operations) {
+				if (operation.kind !== "grant.add") continue;
+				result.set(operation.grantId, [
+					...(result.get(operation.grantId) ?? []),
+					itemId,
+				]);
+			}
+		}
+	}
+	return result;
 };
 
 const readBlueprintDependencyCycles = ({
@@ -2098,464 +2463,6 @@ const readBlueprintItemDisplayName = (
 	config: z.infer<typeof BaseGameConfigSchema>,
 	itemId: string,
 ) => config.items[itemId]?.name ?? itemId;
-
-const validateItemInputs = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	inputs: readonly {
-		capacity: number;
-		itemId: string;
-		quantity: number;
-	}[],
-	hasItem: (itemId: string) => boolean,
-) => {
-	validateUniqueStringList(
-		ctx,
-		path,
-		inputs.map((input) => input.itemId),
-		(value) => `Duplicate input item "${value}".`,
-	);
-
-	for (const [index, input] of inputs.entries()) {
-		if (!hasItem(input.itemId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"itemId",
-				],
-				`Missing item "${input.itemId}".`,
-			);
-		}
-
-		if (input.capacity < input.quantity) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"capacity",
-				],
-				`Capacity must be >= quantity (${input.quantity}).`,
-			);
-		}
-	}
-};
-
-const validateCraftRecipeInputs = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	inputs: readonly {
-		consume: boolean;
-		itemId: string;
-	}[],
-	hasItem: (itemId: string) => boolean,
-) => {
-	validateUniqueStringList(
-		ctx,
-		path,
-		inputs.map((input) => input.itemId),
-		(value) => `Duplicate craft input item "${value}".`,
-	);
-
-	for (const [index, input] of inputs.entries()) {
-		if (!hasItem(input.itemId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"itemId",
-				],
-				`Missing item "${input.itemId}".`,
-			);
-		}
-
-		if (!input.consume) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"consume",
-				],
-				"Craft inputs must currently be consumed because craft start clears stored input state and completion replaces the board target.",
-			);
-		}
-	}
-};
-
-const validateRequirementIds = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	requirementIds: readonly string[],
-	hasRequirement: (requirementId: string) => boolean,
-) => {
-	validateUniqueStringList(
-		ctx,
-		path,
-		requirementIds,
-		(value) => `Duplicate requirement id "${value}".`,
-	);
-
-	for (const [index, requirementId] of requirementIds.entries()) {
-		if (!hasRequirement(requirementId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-				],
-				`Missing requirement "${requirementId}".`,
-			);
-		}
-	}
-};
-
-const doesResolvedDomainSelectorMatchId = (
-	entityId: string,
-	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
-) => {
-	if ("mode" in selector) return true;
-	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	if (selector.noneOf?.some((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	return true;
-};
-
-const validateResolvedDomainSelectorClauses = ({
-	ctx,
-	hasEntity,
-	label,
-	path,
-	clauses,
-}: {
-	ctx: z.RefinementCtx;
-	hasEntity: (entityId: string) => boolean;
-	label: string;
-	path: GameConfigIssuePath;
-	clauses: readonly z.infer<typeof ResolvedDomainSelectorClauseSchema>[] | undefined;
-}) => {
-	for (const [clauseIndex, clause] of (clauses ?? []).entries()) {
-		validateUniqueStringList(
-			ctx,
-			[
-				...path,
-				clauseIndex,
-				"ids",
-			],
-			clause.ids,
-			(value) => `Duplicate ${label} "${value}".`,
-		);
-
-		for (const [index, entityId] of clause.ids.entries()) {
-			if (hasEntity(entityId)) continue;
-
-			addIssue(
-				ctx,
-				[
-					...path,
-					clauseIndex,
-					"ids",
-					index,
-				],
-				`Missing ${label} "${entityId}".`,
-			);
-		}
-	}
-};
-
-const validateResolvedDomainSelector = ({
-	ctx,
-	entityIds,
-	hasEntity,
-	label,
-	path,
-	selector,
-}: {
-	ctx: z.RefinementCtx;
-	entityIds: readonly string[];
-	hasEntity: (entityId: string) => boolean;
-	label: string;
-	path: GameConfigIssuePath;
-	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
-}) => {
-	if ("mode" in selector) return;
-
-	const selectorCount =
-		(selector.anyOf ? 1 : 0) + (selector.allOf ? 1 : 0) + (selector.noneOf ? 1 : 0);
-	if (selectorCount === 0) {
-		addIssue(ctx, path, `Domain selector must define anyOf, allOf, noneOf, or mode: "all".`);
-	}
-
-	validateResolvedDomainSelectorClauses({
-		ctx,
-		hasEntity,
-		label,
-		path: [
-			...path,
-			"anyOf",
-		],
-		clauses: selector.anyOf,
-	});
-	validateResolvedDomainSelectorClauses({
-		ctx,
-		hasEntity,
-		label,
-		path: [
-			...path,
-			"allOf",
-		],
-		clauses: selector.allOf,
-	});
-	validateResolvedDomainSelectorClauses({
-		ctx,
-		hasEntity,
-		label,
-		path: [
-			...path,
-			"noneOf",
-		],
-		clauses: selector.noneOf,
-	});
-
-	if (!entityIds.some((entityId) => doesResolvedDomainSelectorMatchId(entityId, selector))) {
-		addIssue(ctx, path, `Domain selector matched no ${label}s.`);
-	}
-};
-
-const validateGameEffectProductLineTarget = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	target: z.infer<typeof GameEffectProductLineTargetSchema>,
-	entities: {
-		producerIds: readonly string[];
-		hasProducer: (producerId: string) => boolean;
-		productIds: readonly string[];
-		hasProduct: (productId: string) => boolean;
-	},
-) => {
-	if (!target.producers && !target.productLines) {
-		addIssue(ctx, path, `Effect product-line target must define at least one domain selector.`);
-	}
-
-	if (target.producers) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.producerIds,
-			hasEntity: entities.hasProducer,
-			label: "producer",
-			path: [
-				...path,
-				"producers",
-			],
-			selector: target.producers,
-		});
-	}
-
-	if (target.productLines) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.productIds,
-			hasEntity: entities.hasProduct,
-			label: "product line",
-			path: [
-				...path,
-				"productLines",
-			],
-			selector: target.productLines,
-		});
-	}
-};
-
-const validateGameEffectItemTarget = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	target: z.infer<typeof GameEffectItemTargetSchema>,
-	entities: {
-		entityIds: readonly string[];
-		hasEntity: (itemId: string) => boolean;
-	},
-) => {
-	validateResolvedDomainSelector({
-		ctx,
-		entityIds: entities.entityIds,
-		hasEntity: entities.hasEntity,
-		label: "item",
-		path: [
-			...path,
-			"items",
-		],
-		selector: target.items,
-	});
-};
-
-const validateItemIds = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	itemIds: readonly string[],
-	hasItem: (itemId: string) => boolean,
-) => {
-	validateUniqueStringList(ctx, path, itemIds, (value) => `Duplicate item "${value}".`);
-
-	for (const [index, itemId] of itemIds.entries()) {
-		if (!hasItem(itemId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-				],
-				`Missing item "${itemId}".`,
-			);
-		}
-	}
-};
-
-const validateGameRequirement = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	requirement: z.infer<typeof GameRequirementDefinitionSchema>,
-	hasItem: (itemId: string) => boolean,
-) => {
-	if (requirement.type === "proximity") {
-		validateUniqueStringList(
-			ctx,
-			[
-				...path,
-				"itemIds",
-			],
-			requirement.itemIds,
-			(value) => `Duplicate proximity item "${value}".`,
-		);
-
-		for (const [index, itemId] of requirement.itemIds.entries()) {
-			if (!hasItem(itemId)) {
-				addIssue(
-					ctx,
-					[
-						...path,
-						"itemIds",
-						index,
-					],
-					`Missing item "${itemId}".`,
-				);
-			}
-		}
-		return;
-	}
-
-	validateItemRequirements(
-		ctx,
-		path,
-		[
-			requirement,
-		],
-		hasItem,
-	);
-};
-
-type ValidatedItemRequirement =
-	| {
-			capacity?: number;
-			itemId: string;
-			quantity: number;
-			scope?: string;
-			type: "passive" | "stored";
-	  }
-	| {
-			distance: number;
-			itemIds: readonly string[];
-			type: "proximity";
-	  };
-
-const readRequirementItemIdsKey = (itemIds: readonly string[]) =>
-	[
-		...itemIds,
-	]
-		.sort()
-		.join("|");
-
-const readItemRequirementUniqueKey = (requirement: ValidatedItemRequirement) => {
-	if (requirement.type === "passive") {
-		return `${requirement.type}:${requirement.itemId}:${requirement.scope}`;
-	}
-
-	if (requirement.type === "proximity") {
-		return `${requirement.type}:${readRequirementItemIdsKey(requirement.itemIds)}:${requirement.distance}`;
-	}
-
-	return `${requirement.type}:${requirement.itemId}`;
-};
-
-const validateItemRequirements = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	requirements: readonly ValidatedItemRequirement[],
-	hasItem: (itemId: string) => boolean,
-) => {
-	validateUniqueStringList(
-		ctx,
-		path,
-		requirements.map(readItemRequirementUniqueKey),
-		(value) => `Duplicate requirement "${value}".`,
-	);
-
-	for (const [index, requirement] of requirements.entries()) {
-		if (requirement.type === "proximity") {
-			for (const [itemIndex, itemId] of requirement.itemIds.entries()) {
-				if (hasItem(itemId)) continue;
-
-				addIssue(
-					ctx,
-					[
-						...path,
-						index,
-						"itemIds",
-						itemIndex,
-					],
-					`Missing item "${itemId}".`,
-				);
-			}
-			continue;
-		}
-
-		if (!hasItem(requirement.itemId)) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"itemId",
-				],
-				`Missing item "${requirement.itemId}".`,
-			);
-		}
-
-		if (
-			requirement.type === "stored" &&
-			typeof requirement.capacity === "number" &&
-			requirement.capacity < requirement.quantity
-		) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"capacity",
-				],
-				`Capacity must be >= quantity (${requirement.quantity}).`,
-			);
-		}
-	}
-};
 
 const validateActivationOutput = (
 	ctx: z.RefinementCtx,

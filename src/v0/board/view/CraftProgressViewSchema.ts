@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
-import { ActivationRequirementViewSchema } from "./ActivationRequirementViewSchema";
 import { ItemTargetLimitViewSchema } from "./ItemTargetLimitViewSchema";
 
 export const CraftProgressViewSchema = z.object({
@@ -16,13 +15,13 @@ export const CraftProgressViewSchema = z.object({
 		}),
 	),
 	delivered: z.record(z.string(), z.number().int().nonnegative()),
-	requirements: z.array(ActivationRequirementViewSchema).optional(),
 	inputProgress: z.number(),
 	timeProgress: z.number(),
 	progress: z.number(),
 	phase: CraftProgressPhaseSchema,
 	complete: z.boolean(),
 	canAcceptInputs: z.boolean(),
+	grantsReady: z.boolean().optional(),
 	startAtMs: z.number().optional(),
 	readyAtMs: z.number().optional(),
 	pausedAtMs: z.number().optional(),

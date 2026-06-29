@@ -13,7 +13,6 @@ const collectionKeys = [
 	"assets",
 	"items",
 	"merge",
-	"requirements",
 	"effects",
 	"producers",
 	"stashes",
@@ -252,6 +251,7 @@ const normalizePackage = (value: unknown): unknown => {
 	}
 
 	const normalizedEffects = normalizeEffectDefinitions({
+		craftRecipes: normalizedCraftRecipes,
 		effects,
 		items: normalizedItems,
 		producers: asRecord(packageValue.producers),
@@ -331,17 +331,24 @@ type DomainIndex = {
 };
 
 const normalizeEffectDefinitions = ({
+	craftRecipes,
 	effects,
 	items,
 	producers,
 	products,
 }: {
+	craftRecipes: Readonly<Record<string, unknown>>;
 	effects: Readonly<Record<string, unknown>>;
 	items: Readonly<Record<string, unknown>>;
 	producers: Readonly<Record<string, unknown>>;
 	products: Readonly<Record<string, unknown>>;
 }) => {
 	const domainIndexes = {
+		craftRecipes: createTaggedDomainIndex({
+			entries: craftRecipes,
+			ids: Object.keys(craftRecipes),
+			label: "craft recipe",
+		}),
 		items: createTaggedDomainIndex({
 			entries: items,
 			ids: Object.keys(items),
@@ -416,6 +423,7 @@ const normalizeEffectOperationTarget = ({
 	target,
 }: {
 	domainIndexes: {
+		craftRecipes: DomainIndex;
 		items: DomainIndex;
 		producers: DomainIndex;
 		productLines: DomainIndex;
@@ -435,6 +443,21 @@ const normalizeEffectOperationTarget = ({
 	}
 
 	const normalizedTarget: Record<string, unknown> = {};
+	if (target.craftRecipes !== undefined) {
+		normalizedTarget.craftRecipes = normalizeAuthoringDomainSelector({
+			domain: domainIndexes.craftRecipes,
+			path: `${path}.craftRecipes`,
+			selector: asAuthoringDomainSelector(target.craftRecipes),
+		});
+	}
+	if (target.items !== undefined) {
+		normalizedTarget.items = normalizeAuthoringDomainSelector({
+			domain: domainIndexes.items,
+			path: `${path}.items`,
+			selector: asAuthoringDomainSelector(target.items),
+		});
+	}
+
 	if (target.producers !== undefined) {
 		normalizedTarget.producers = normalizeAuthoringDomainSelector({
 			domain: domainIndexes.producers,
@@ -791,7 +814,6 @@ const createEmptyPackage = (): MergedGameConfig => ({
 	assets: {},
 	items: {},
 	merge: {},
-	requirements: {},
 	producers: {},
 	stashes: {},
 	craftRecipes: {},

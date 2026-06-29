@@ -21,7 +21,6 @@ const craft = (overrides: Partial<CraftProgressView> = {}): CraftProgressView =>
 	],
 	phase: "collecting_inputs",
 	progress: 0,
-	requirements: [],
 	resultItemId: "item:stick",
 	timeProgress: 0,
 	...overrides,
@@ -63,24 +62,16 @@ describe("readCraftRunState", () => {
 		});
 	});
 
-	it("blocks collecting crafts while requirements are missing", () => {
+	it("blocks collecting crafts while grants are missing", () => {
 		expect(
 			readCraftRunState({
 				craft: craft({
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:water",
-							quantity: 1,
-							stored: 0,
-							type: "passive",
-						},
-					],
+					grantsReady: false,
 				}),
 			}),
 		).toMatchObject({
 			canRunAction: false,
-			label: "Requirements missing",
+			label: "Grants missing",
 		});
 	});
 

@@ -5,6 +5,8 @@ import type { AppliedGameEffectOperation } from "~/v0/game/effects/EffectiveProd
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { compareGameEffectSourceInstances } from "~/v0/game/effects/compareGameEffectSourceInstances";
 import { doesGameEffectTargetProductLine } from "~/v0/game/effects/doesGameEffectTargetProductLine";
+import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
+import { readGameEffectTargetGrantIds } from "~/v0/game/effects/readGameEffectTargetGrantIds";
 import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolvedDomainSelectorMatchId";
 import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
@@ -202,10 +204,10 @@ const isStackingLimitReached = ({
 	operation,
 }: {
 	appliedCountsByCategory: ReadonlyMap<string, number>;
-	operation: Exclude<
+	operation: Extract<
 		GameConfig["effects"][string]["operations"][number],
 		{
-			kind: "item.blockCreate";
+			stacking?: unknown;
 		}
 	>;
 }) => {
@@ -220,10 +222,10 @@ const countStackingApplication = ({
 	operation,
 }: {
 	appliedCountsByCategory: Map<string, number>;
-	operation: Exclude<
+	operation: Extract<
 		GameConfig["effects"][string]["operations"][number],
 		{
-			kind: "item.blockCreate";
+			stacking?: unknown;
 		}
 	>;
 }) => {
@@ -286,12 +288,31 @@ export const readEffectiveProducerProductLine = ({
 			}),
 		);
 
+	const grantIds = readGameEffectTargetGrantIds({
+		config,
+		ignoredProducerJobIds,
+		nowMs,
+		save,
+		target: {
+			kind: "productLine",
+			producerId,
+			productId,
+			targetCell,
+		},
+	});
+	const grantsReady = product.grantSelector
+		? doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: product.grantSelector,
+			})
+		: true;
+
 	for (const source of sources) {
 		const effect = config.effects[source.effectId];
 		if (!effect) continue;
 
 		for (const operation of effect.operations) {
-			if (operation.kind === "item.blockCreate") continue;
+			if (operation.kind === "item.blockCreate" || operation.kind === "grant.add") continue;
 
 			if (
 				!doesGameEffectTargetProductLine({
@@ -470,6 +491,10 @@ export const readEffectiveProducerProductLine = ({
 			baseOutput,
 			chanceItems,
 		},
-		visible: revealed && !hidden,
+		grantIds: [
+			...grantIds,
+		].sort(),
+		grantsReady,
+		visible: revealed && !hidden && grantsReady,
 	};
 };

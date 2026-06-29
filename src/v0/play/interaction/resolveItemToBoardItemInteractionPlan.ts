@@ -2,7 +2,6 @@ import { match, P } from "ts-pattern";
 import { isBoardViewItemRuntimeBusy } from "~/v0/board/logic/isBoardViewItemRuntimeBusy";
 import { isBoardViewItemRuntimeStatePreserved } from "~/v0/board/logic/isBoardViewItemRuntimeStatePreserved";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
@@ -15,23 +14,6 @@ export namespace resolveItemToBoardItemInteractionPlan {
 		targetItem: BoardViewItem;
 	}
 }
-
-const lineCanSupplyStoredRequirement = ({
-	line,
-	sourceItemId,
-}: {
-	line: ProducerProductLineView;
-	sourceItemId: ItemId | string;
-}) => {
-	if (!line.requirements) return line.missingRequirementItemIds.includes(sourceItemId as ItemId);
-
-	return line.requirements.some(
-		(requirement) =>
-			requirement.type === "stored" &&
-			requirement.itemId === sourceItemId &&
-			requirement.stored < requirement.capacity,
-	);
-};
 
 export const resolveItemToBoardItemInteractionPlan = ({
 	config,
@@ -47,26 +29,6 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		!isBoardViewItemRuntimeBusy(targetItem) &&
 		!isBoardViewItemRuntimeStatePreserved(targetItem);
 	const canMerge = Boolean(mergeRule && canReplaceTarget);
-	const canSupplyStoredRequirement = Boolean(
-		targetItem.activation?.requirements.some(
-			(requirement) =>
-				requirement.type === "stored" &&
-				requirement.itemId === sourceItemId &&
-				requirement.stored < requirement.capacity,
-		) ||
-			targetItem.activation?.productLines?.some((line) =>
-				lineCanSupplyStoredRequirement({
-					line,
-					sourceItemId,
-				}),
-			) ||
-			targetItem.craft?.requirements?.some(
-				(requirement) =>
-					requirement.type === "stored" &&
-					requirement.itemId === sourceItemId &&
-					requirement.stored < requirement.capacity,
-			),
-	);
 	const canCraft = Boolean(
 		targetItem.craft?.canAcceptInputs &&
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
@@ -97,7 +59,6 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		canCraft,
 		canMerge,
 		canSupplyStashInput,
-		canSupplyStoredRequirement,
 		mergeRule,
 		producerInputProductId,
 	})
@@ -108,15 +69,6 @@ export const resolveItemToBoardItemInteractionPlan = ({
 			({ mergeRule }) => ({
 				resultItemId: mergeRule?.merge.resultItemId,
 				type: "merge" as const,
-			}),
-		)
-		.with(
-			{
-				canSupplyStoredRequirement: true,
-			},
-			() => ({
-				feedbackVariant: "primary" as const,
-				type: "stored-requirement" as const,
 			}),
 		)
 		.with(

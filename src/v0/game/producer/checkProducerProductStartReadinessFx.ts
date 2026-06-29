@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import { checkActivationInputsFx } from "~/v0/game/requirements/checkActivationInputsFx";
+import { checkActivationInputsFx } from "~/v0/game/activation/checkActivationInputsFx";
 import { planProducerProductAutoFillInputRefsFx } from "~/v0/game/producer/planProducerProductAutoFillInputRefsFx";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
-import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
 import { readBoardItemRuntimeStateStatus } from "~/v0/game/board/readBoardItemRuntimeStateStatus";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
@@ -12,6 +9,8 @@ import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDef
 import { readProducerEffectLineLocked } from "~/v0/game/producer/readProducerEffectLineLocked";
 import { readProductFx } from "~/v0/game/producer/readProductFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -91,6 +90,30 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 	if (!visibleProductIds.includes(productId)) {
+		const hiddenProduct = config.products[productId];
+		if (hiddenProduct) {
+			const effectiveProductLine = readEffectiveProducerProductLine({
+				baseDurationMs: readProducerProductDurationMs({
+					product: hiddenProduct,
+				}),
+				config,
+				nowMs,
+				producerId,
+				producerItemId: producerItem.itemId,
+				producerItemInstanceId: action.producerItemInstanceId,
+				product: hiddenProduct,
+				productId,
+				save,
+			});
+			if (hiddenProduct.grantSelector && !effectiveProductLine.grantsReady) {
+				return yield* Effect.fail(
+					GameEngineError.actionRejected(
+						"effect:missing-grant",
+						`Product "${productId}" is missing effect grants for the current game state.`,
+					),
+				);
+			}
+		}
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
@@ -117,7 +140,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"producer_queue_full",
-				`Producer item "${action.producerItemInstanceId}" queue is paused by unmet requirements.`,
+				`Producer item "${action.producerItemInstanceId}" queue is paused by unmet effect grants or blockers.`,
 			),
 		);
 	}
@@ -151,21 +174,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			),
 		);
 	}
-	const storedItems = yield* readStoredRequirementQuantitiesFx({
-		save,
-		targetItemInstanceId: action.producerItemInstanceId,
-	});
-
-	const requirements = resolveGameRequirements({
-		config,
-		requirementIds: product.requirementIds,
-	});
-	yield* checkGameRequirementsFx({
-		requirements,
-		save,
-		storedItems,
-		targetItemInstanceId: action.producerItemInstanceId,
-	});
 	yield* match(product.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
@@ -214,6 +222,5 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		product,
 		productId,
 		productInputs,
-		requirements,
 	};
 });

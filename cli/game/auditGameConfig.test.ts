@@ -57,7 +57,6 @@ const createConfigValue = () => ({
 		},
 	},
 	merge: {},
-	requirements: {},
 	producers: {
 		"item:producer": {
 			maxQueueSize: 1,
@@ -88,7 +87,6 @@ const createConfigValue = () => ({
 				},
 			],
 			placement: "board_then_inventory",
-			requirementIds: [],
 		},
 	},
 	startingState: {
@@ -118,38 +116,6 @@ describe("auditGameConfig", () => {
 				id: "item:pollution",
 			}),
 		]);
-	});
-
-	it("warns about duplicate central definition shapes", () => {
-		const config: any = createConfigValue();
-		config.requirements = {
-			"requirement:near-a": {
-				distance: 1,
-				itemIds: [
-					"item:fuel",
-				],
-				type: "proximity",
-			},
-			"requirement:near-b": {
-				distance: 1,
-				itemIds: [
-					"item:fuel",
-				],
-				type: "proximity",
-			},
-		};
-		config.products["product:test"].requirementIds = [
-			"requirement:near-a",
-		];
-
-		const warnings = auditGameConfig(parseGameConfig(config));
-
-		expect(warnings).toContainEqual(
-			expect.objectContaining({
-				code: "duplicate-definition-shape",
-				section: "requirements",
-			}),
-		);
 	});
 
 	it("does not warn about produced items used as passive effect sources", () => {

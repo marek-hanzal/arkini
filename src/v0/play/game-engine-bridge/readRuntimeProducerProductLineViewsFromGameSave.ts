@@ -1,6 +1,5 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
@@ -9,7 +8,6 @@ import { readProducerEffectLineLocked } from "~/v0/game/producer/readProducerEff
 import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
@@ -18,16 +16,11 @@ import {
 	readRuntimeProductLineActiveEffectBonusLines,
 } from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 import {
-	readRuntimeActivationRequirementViewsFromGameSave,
-	readRuntimeMissingRequirementItemIdsFromGameSave,
-	readRuntimeRequirementsReadyFromGameSave,
-} from "~/v0/play/game-engine-bridge/readRuntimeActivationRequirementViewsFromGameSave";
-import {
 	readGameTimeDurationMs,
 	readGameTimeProgress,
 	readGameTimeRemainingMs,
 } from "~/v0/game/time/GameTime";
-import { readActivationInputRequiredQuantity } from "~/v0/game/requirements/readActivationInputRequiredQuantity";
+import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readActivationInputRequiredQuantity";
 import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 import { readRuntimeProductLineOutputViews } from "~/v0/play/game-engine-bridge/readRuntimeProductLineOutputViews";
@@ -114,36 +107,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				? productId === selectedDefaultEffectProductId
 				: productId === selectedDefaultProductId;
 
-		const requirements = resolveGameRequirements({
-			config,
-			requirementIds: product.requirementIds,
-		});
-		const requirementViews = readRuntimeActivationRequirementViewsFromGameSave({
-			requirements,
-			save,
-			targetItemInstanceId,
-		});
-		const requirementItemIds = [
-			...new Set(
-				requirements.flatMap((requirement) =>
-					requirement.type === "proximity"
-						? requirement.itemIds.map((itemId) => itemId as ItemId)
-						: [
-								requirement.itemId as ItemId,
-							],
-				),
-			),
-		];
-		const missingRequirements = readRuntimeMissingRequirementItemIdsFromGameSave({
-			requirements,
-			save,
-			targetItemInstanceId,
-		});
-		const requirementsReady = readRuntimeRequirementsReadyFromGameSave({
-			requirements,
-			save,
-			targetItemInstanceId,
-		});
 		const effectLocked = readProducerEffectLineLocked({
 			config,
 			nowMs,
@@ -260,13 +223,12 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					: undefined,
 				effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,
 				inProgress: jobs.length > 0,
-				inputItemIds: inputs.map((input) => input.itemId as ItemId),
+				inputItemIds: inputs.map((input) => input.itemId),
 				isDefault,
 				lineKind,
 				inputs,
 				inputsReady,
 				inputsAvailable,
-				missingRequirementItemIds: missingRequirements as ItemId[],
 				name: product.name,
 				outputs: readRuntimeProductLineOutputViews({
 					effectiveProductLine,
@@ -282,9 +244,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				queuedJobs: jobs.length,
 				readyAtMs: activeJob?.readyAtMs,
 				remainingMs,
-				requirementItemIds,
-				requirements: requirementViews,
-				requirementsReady,
 				targetLimits: targetLimits.length ? targetLimits : undefined,
 				startAtMs: activeJob?.startAtMs,
 			},

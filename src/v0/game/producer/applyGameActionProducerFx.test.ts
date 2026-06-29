@@ -17,6 +17,135 @@ import {
 const runTick = (props: runGameTickFx.Props) =>
 	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
+const readOwnedTwigGrantConfig = (
+	baseConfig: ReturnType<typeof createEngineTestConfig>,
+	productIds: readonly string[],
+) => {
+	const grantId = "grant:test:owned-twig";
+	const effectId = "effect:test:owned-twig-grant";
+	return {
+		effects: {
+			...baseConfig.effects,
+			[effectId]: {
+				name: "Owned Twig Grant",
+				operations: [
+					{
+						grantId,
+						kind: "grant.add",
+						target: {
+							productLines: {
+								anyOf: productIds.map((productId) => ({
+									ids: [
+										productId,
+									],
+								})),
+							},
+						},
+					},
+				],
+				scope: "global",
+				sourceScope: "both",
+			},
+		},
+		items: {
+			...baseConfig.items,
+			"item:twig": {
+				...baseConfig.items["item:twig"],
+				passiveEffectIds: [
+					...(baseConfig.items["item:twig"].passiveEffectIds ?? []),
+					effectId,
+				],
+			},
+		},
+		products: {
+			...baseConfig.products,
+			...Object.fromEntries(
+				productIds.map((productId) => [
+					productId,
+					{
+						...baseConfig.products[productId],
+						grantSelector: {
+							allOf: [
+								{
+									ids: [
+										grantId,
+									],
+								},
+							],
+						},
+					},
+				]),
+			),
+		},
+	} satisfies Partial<ReturnType<typeof createEngineTestConfig>>;
+};
+
+const readLocalTwigGrantConfig = (
+	baseConfig: ReturnType<typeof createEngineTestConfig>,
+	props: {
+		productIds: readonly string[];
+		radius: number;
+	},
+) => {
+	const grantId = "grant:test:near-twig";
+	const effectId = `effect:test:near-twig-grant:${props.radius}:${props.productIds.join("+")}`;
+	return {
+		effects: {
+			...baseConfig.effects,
+			[effectId]: {
+				name: "Near Twig Grant",
+				operations: [
+					{
+						grantId,
+						kind: "grant.add",
+						target: {
+							productLines: {
+								anyOf: props.productIds.map((productId) => ({
+									ids: [
+										productId,
+									],
+								})),
+							},
+						},
+					},
+				],
+				radius: props.radius,
+				scope: "local",
+			},
+		},
+		items: {
+			...baseConfig.items,
+			"item:twig": {
+				...baseConfig.items["item:twig"],
+				passiveEffectIds: [
+					...(baseConfig.items["item:twig"].passiveEffectIds ?? []),
+					effectId,
+				],
+			},
+		},
+		products: {
+			...baseConfig.products,
+			...Object.fromEntries(
+				props.productIds.map((productId) => [
+					productId,
+					{
+						...baseConfig.products[productId],
+						grantSelector: {
+							allOf: [
+								{
+									ids: [
+										grantId,
+									],
+								},
+							],
+						},
+					},
+				]),
+			),
+		},
+	} satisfies Partial<ReturnType<typeof createEngineTestConfig>>;
+};
+
 describe("applyGameActionFx Producer", () => {
 	it("starts a no-input producer product as an Effect action", () => {
 		const config = createEngineTestConfig();
@@ -154,7 +283,6 @@ describe("applyGameActionFx Producer", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					requirements: [],
 					resultItemId: "item:plank",
 				},
 			},
@@ -277,7 +405,6 @@ describe("applyGameActionFx Producer", () => {
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
-					requirements: [],
 					resultItemId: "item:plank",
 				},
 			},
@@ -642,26 +769,17 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
-	it("rechecks product-line requirements after auto-filled inputs are consumed", () => {
+	it("rechecks product-line grants after auto-filled inputs are consumed", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
+			"product:shred",
+		]);
 		const config = createEngineTestConfig({
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
+			...grantConfig,
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:shred": {
-					...baseConfig.products["product:shred"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:shred"],
 				},
 			},
 			startingState: {
@@ -701,7 +819,7 @@ describe("applyGameActionFx Producer", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "missing_requirement",
+				reason: "effect:missing-grant",
 			});
 		}
 		expect(save.board.items["item-instance:2"]).toMatchObject({
@@ -1078,9 +1196,16 @@ describe("applyGameActionFx Producer", () => {
 		);
 	});
 
-	it("accepts producer proximity requirements from diagonal neighbors", () => {
+	it("accepts local product grants from diagonal neighbors", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
@@ -1088,23 +1213,10 @@ describe("applyGameActionFx Producer", () => {
 					width: 2,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 			startingState: {
@@ -1232,9 +1344,16 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(2500);
 	});
 
-	it("pauses a running producer while its proximity requirement source is out of range", () => {
+	it("pauses a running producer while its local grant source is out of range", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 2,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
@@ -1242,23 +1361,10 @@ describe("applyGameActionFx Producer", () => {
 					width: 4,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 2,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 			startingState: {
@@ -1366,22 +1472,19 @@ describe("applyGameActionFx Producer", () => {
 
 	it("keeps already queued producer jobs behind a newly paused head job until the head resumes", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
 					height: 1,
 					width: 4,
-				},
-			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
 				},
 			},
 			producers: {
@@ -1396,12 +1499,9 @@ describe("applyGameActionFx Producer", () => {
 				},
 			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:test"],
 				},
 				"product:backup": {
 					chargeCost: 0,
@@ -1415,7 +1515,6 @@ describe("applyGameActionFx Producer", () => {
 						},
 					],
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},
@@ -1526,7 +1625,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
-	it("pauses a queued producer job when a block effect appears before its scheduled start", () => {
+	it("pauses a running producer head when a block effect appears before a queued start", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -1617,18 +1716,16 @@ describe("applyGameActionFx Producer", () => {
 			save: queued.save,
 		});
 
-		const result = runTick({
-			config,
-			nowMs: 1000,
-			save: blockedBeforeStart.save,
-		});
-		const remainingJob = readOnlyRecordValue(result.save.producerJobs);
+		const result = blockedBeforeStart;
+		const remainingJob = Object.values(result.save.producerJobs).find(
+			(job) => job.pausedAtMs === 500 && job.startAtMs === 0,
+		);
 
 		expect(remainingJob).toMatchObject({
-			pausedAtMs: 1000,
+			pausedAtMs: 500,
 			productId: "product:test",
-			remainingMs: 1000,
-			startAtMs: 1000,
+			remainingMs: 500,
+			startAtMs: 0,
 		});
 		expect(result.nextWakeAtMs).toBeNull();
 
@@ -1649,17 +1746,19 @@ describe("applyGameActionFx Producer", () => {
 			nowMs: 1500,
 			save: result.save,
 		});
-		const resumedJob = readOnlyRecordValue(resumed.save.producerJobs);
+		const resumedJob = Object.values(resumed.save.producerJobs).find(
+			(job) => job.startAtMs === 1000 && job.readyAtMs === 2000,
+		);
 		expect(resumedJob).toMatchObject({
 			pausedAtMs: undefined,
-			readyAtMs: 2500,
+			readyAtMs: 2000,
 			remainingMs: undefined,
-			startAtMs: 1500,
+			startAtMs: 1000,
 		});
-		expect(resumed.nextWakeAtMs).toBe(2500);
+		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
-	it("pauses an overdue queued producer start with full remaining time when a block effect is active", () => {
+	it("keeps queued producer jobs behind a blocked running head", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -1755,14 +1854,16 @@ describe("applyGameActionFx Producer", () => {
 			nowMs: 1500,
 			save: blockedBeforeStart.save,
 		});
-		const remainingJob = readOnlyRecordValue(result.save.producerJobs);
+		const remainingJob = Object.values(result.save.producerJobs).find(
+			(job) => job.pausedAtMs === 500 && job.startAtMs === 0,
+		);
 
 		expect(remainingJob).toMatchObject({
-			pausedAtMs: 1500,
+			pausedAtMs: 500,
 			productId: "product:test",
-			readyAtMs: 2500,
-			remainingMs: 1000,
-			startAtMs: 1500,
+			readyAtMs: 1000,
+			remainingMs: 500,
+			startAtMs: 0,
 		});
 		expect(result.nextWakeAtMs).toBeNull();
 
@@ -1783,34 +1884,33 @@ describe("applyGameActionFx Producer", () => {
 			nowMs: 1600,
 			save: result.save,
 		});
-		const resumedJob = readOnlyRecordValue(resumed.save.producerJobs);
+		const resumedJob = Object.values(resumed.save.producerJobs).find(
+			(job) => job.startAtMs === 1100 && job.readyAtMs === 2100,
+		);
 		expect(resumedJob).toMatchObject({
 			pausedAtMs: undefined,
-			readyAtMs: 2600,
+			readyAtMs: 2100,
 			remainingMs: undefined,
-			startAtMs: 1600,
+			startAtMs: 1100,
 		});
-		expect(resumed.nextWakeAtMs).toBe(2600);
+		expect(resumed.nextWakeAtMs).toBe(2100);
 	});
 
-	it("rejects starting another producer job behind a requirement-paused first job", () => {
+	it("rejects starting another producer job behind a grant-paused first job", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
 					height: 1,
 					width: 4,
-				},
-			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
 				},
 			},
 			producers: {
@@ -1825,12 +1925,9 @@ describe("applyGameActionFx Producer", () => {
 				},
 			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:test"],
 				},
 				"product:backup": {
 					chargeCost: 0,
@@ -1844,7 +1941,6 @@ describe("applyGameActionFx Producer", () => {
 						},
 					],
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},
@@ -1919,8 +2015,16 @@ describe("applyGameActionFx Producer", () => {
 
 	it("does not apply queued active effects while their job is blocked behind a paused queue head", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:gate",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			effects: {
+				...grantConfig.effects,
 				"effect:block-test": {
 					name: "Block test",
 					operations: [
@@ -1949,16 +2053,6 @@ describe("applyGameActionFx Producer", () => {
 					width: 5,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			producers: {
 				...baseConfig.producers,
 				"item:producer": {
@@ -1972,14 +2066,16 @@ describe("applyGameActionFx Producer", () => {
 				},
 			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:gate": {
-					...baseConfig.products["product:test"],
+					...grantConfig.products["product:gate"],
+					chargeCost: 0,
+					durationMs: 1000,
 					name: "Gate",
 					output: undefined,
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					placement: "board_then_inventory",
+					tags: [],
+					visibility: "visible",
 				},
 				"product:blocker": {
 					activatesEffectId: "effect:block-test",
@@ -1988,7 +2084,6 @@ describe("applyGameActionFx Producer", () => {
 					name: "Blocker",
 					output: undefined,
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},
@@ -2080,9 +2175,16 @@ describe("applyGameActionFx Producer", () => {
 		).toBe(true);
 	});
 
-	it("pauses a running producer when the producer moves outside its proximity requirement", () => {
+	it("pauses a running producer when the producer moves outside its local grant", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
@@ -2090,23 +2192,10 @@ describe("applyGameActionFx Producer", () => {
 					width: 5,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 			startingState: {
@@ -2193,10 +2282,18 @@ describe("applyGameActionFx Producer", () => {
 		expect(movedBack.nextWakeAtMs).toBe(2000);
 	});
 
-	it("does not expire active producer effects while their requirement-paused job is stopped", () => {
+	it("does not expire active producer effects while their grant-paused job is stopped", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			effects: {
+				...grantConfig.effects,
 				"effect:test": {
 					name: "Test effect",
 					operations: [
@@ -2227,24 +2324,11 @@ describe("applyGameActionFx Producer", () => {
 				},
 			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
+					...grantConfig.products["product:test"],
 					activatesEffectId: "effect:test",
 					output: undefined,
-					requirementIds: [
-						"requirement:near-twig",
-					],
-				},
-			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
 				},
 			},
 			startingState: {
@@ -2331,10 +2415,18 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
-	it("pauses activated effects when product requirements break", () => {
+	it("pauses activated effects when product grants break", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:boost",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			effects: {
+				...grantConfig.effects,
 				"effect:boost": {
 					name: "Boost",
 					operations: [
@@ -2364,15 +2456,6 @@ describe("applyGameActionFx Producer", () => {
 					width: 5,
 				},
 			},
-			requirements: {
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			producers: {
 				...baseConfig.producers,
 				"item:producer": {
@@ -2383,16 +2466,14 @@ describe("applyGameActionFx Producer", () => {
 				},
 			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:boost": {
+					...grantConfig.products["product:boost"],
 					activatesEffectId: "effect:boost",
 					chargeCost: 0,
 					durationMs: 1000,
 					name: "Boost",
 					placement: "board_then_inventory",
-					requirementIds: [
-						"requirement:near-twig",
-					],
 					tags: [],
 					visibility: "visible",
 				},
@@ -2478,9 +2559,16 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumed.nextWakeAtMs).toBe(2000);
 	});
 
-	it("keeps product-line proximity requirements as gates instead of duration mutators", () => {
+	it("keeps product-line local grants as gates instead of duration mutators", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 2,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
@@ -2488,30 +2576,10 @@ describe("applyGameActionFx Producer", () => {
 					width: 3,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 2,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-				"requirement:near-rock": {
-					distance: 1,
-					itemIds: [
-						"item:rock",
-					],
-					type: "proximity",
-				},
-			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-rock",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 			startingState: {
@@ -2758,9 +2826,16 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("rejects missing product proximity requirements", () => {
+	it("rejects missing product local grants", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
+			productIds: [
+				"product:test",
+			],
+			radius: 1,
+		});
 		const config = createEngineTestConfig({
+			...grantConfig,
 			game: {
 				...baseConfig.game,
 				board: {
@@ -2768,23 +2843,10 @@ describe("applyGameActionFx Producer", () => {
 					width: 2,
 				},
 			},
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:near-twig": {
-					distance: 1,
-					itemIds: [
-						"item:twig",
-					],
-					type: "proximity",
-				},
-			},
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-twig",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 		});
@@ -2809,7 +2871,7 @@ describe("applyGameActionFx Producer", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "missing_requirement",
+				reason: "effect:missing-grant",
 			});
 		}
 	});
@@ -3808,25 +3870,17 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("accepts passive requirements from inventory", () => {
+	it("accepts owned grants from inventory", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
+			"product:test",
+		]);
 		const config = createEngineTestConfig({
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:twig-passive": {
-					itemId: "item:twig",
-					quantity: 1,
-					scope: "board_or_inventory",
-					type: "passive",
-				},
-			},
+			...grantConfig,
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:twig-passive",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 		});
@@ -3858,25 +3912,17 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
-	it("fails through the typed error channel when a passive requirement is missing", () => {
+	it("fails through the typed error channel when a passive grant is missing", () => {
 		const baseConfig = createEngineTestConfig();
+		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
+			"product:test",
+		]);
 		const config = createEngineTestConfig({
-			requirements: {
-				...baseConfig.requirements,
-				"requirement:twig-passive": {
-					itemId: "item:twig",
-					quantity: 1,
-					scope: "inventory",
-					type: "passive",
-				},
-			},
+			...grantConfig,
 			products: {
-				...baseConfig.products,
+				...grantConfig.products,
 				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:twig-passive",
-					],
+					...grantConfig.products["product:test"],
 				},
 			},
 		});
@@ -3901,7 +3947,7 @@ describe("applyGameActionFx Producer", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "missing_requirement",
+				reason: "effect:missing-grant",
 			});
 		}
 	});
@@ -4090,7 +4136,6 @@ describe("applyGameActionFx Producer", () => {
 					durationMs: 1000,
 					name: "Boost",
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},
@@ -4169,7 +4214,6 @@ describe("applyGameActionFx Producer", () => {
 					durationMs: 1000,
 					name: "Boost",
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},
@@ -4260,7 +4304,6 @@ describe("applyGameActionFx Producer", () => {
 					durationMs: 1000,
 					name: "Boost",
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},

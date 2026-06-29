@@ -19,10 +19,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 1,
-	requirementsReady: true,
-	missingRequirementItemIds: [],
 	readyAtMs: 1000,
-	requirementItemIds: [],
 	startAtMs: 0,
 	...overrides,
 });

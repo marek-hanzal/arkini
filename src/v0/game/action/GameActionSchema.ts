@@ -14,8 +14,6 @@ import { GameActionProducerInputWithdrawSchema } from "~/v0/game/action/GameActi
 import { GameActionProducerProductLineSetDefaultSchema } from "~/v0/game/action/GameActionProducerProductLineSetDefaultSchema";
 import { GameActionProducerProductStartSchema } from "~/v0/game/action/GameActionProducerProductStartSchema";
 import { GameActionStashOpenSchema } from "~/v0/game/action/GameActionStashOpenSchema";
-import { GameActionStoredRequirementStoreSchema } from "~/v0/game/action/GameActionStoredRequirementStoreSchema";
-import { GameActionStoredRequirementWithdrawSchema } from "~/v0/game/action/GameActionStoredRequirementWithdrawSchema";
 import { GameActionTileRemoveSchema } from "~/v0/game/action/GameActionTileRemoveSchema";
 
 export const GameActionSchema = z.discriminatedUnion("type", [
@@ -34,8 +32,6 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionProducerProductLineSetDefaultSchema,
 	GameActionProducerProductStartSchema,
 	GameActionStashOpenSchema,
-	GameActionStoredRequirementStoreSchema,
-	GameActionStoredRequirementWithdrawSchema,
 	GameActionTileRemoveSchema,
 ]);
 

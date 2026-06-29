@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
-import type { GameActivationInput } from "~/v0/game/requirements/GameActivationInput";
+import type { GameActivationInput } from "~/v0/game/activation/GameActivationInput";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { consumeResolvedInputRefFx } from "~/v0/game/requirements/consumeResolvedInputRefFx";
+import { consumeResolvedInputRefFx } from "~/v0/game/activation/consumeResolvedInputRefFx";
 import { planProducerProductAutoFillInputRefsFx } from "~/v0/game/producer/planProducerProductAutoFillInputRefsFx";
-import { resolveInputRefsFx } from "~/v0/game/requirements/resolveInputRefsFx";
+import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 
 export namespace autoFillProducerProductInputsFx {
 	export interface Props {

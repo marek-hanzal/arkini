@@ -60,7 +60,6 @@ describe("validateWorldSnapshotFx", () => {
 					durationMs: 1000,
 					name: "Queued",
 					placement: "board_then_inventory",
-					requirementIds: [],
 					tags: [],
 					visibility: "visible",
 				},
@@ -184,95 +183,6 @@ describe("validateWorldSnapshotFx", () => {
 		);
 	});
 
-	it("normalizes producer requirement failures in the same snapshot report", () => {
-		const baseConfig = createEngineTestConfig();
-		const config = createEngineTestConfig({
-			game: {
-				...baseConfig.game,
-				board: {
-					height: 1,
-					width: 4,
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:tree": {
-					assetId: "asset:test",
-					description: "Tree",
-					maxStackSize: 1,
-					name: "Tree",
-					tags: [],
-					tier: 0,
-					storage: "both",
-				},
-			},
-			requirements: {
-				"requirement:near-tree": {
-					distance: 1,
-					itemIds: [
-						"item:tree",
-					],
-					type: "proximity",
-				},
-			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					requirementIds: [
-						"requirement:near-tree",
-					],
-				},
-			},
-			startingState: {
-				board: [
-					{
-						itemId: "item:producer",
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "item:tree",
-						x: 3,
-						y: 0,
-					},
-				],
-				inventory: [],
-			},
-		});
-		const save = runInitialSave({
-			config,
-			nowMs: 0,
-		});
-		save.producerJobs["job:producer"] = {
-			id: "job:producer",
-			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
-			readyAtMs: 1000,
-			startAtMs: 0,
-		};
-
-		const facts = runWorldFacts({
-			config,
-			nowMs: 500,
-			save,
-		});
-
-		expect(facts.producerRequirements).toMatchObject([
-			{
-				jobId: "job:producer",
-				ready: false,
-				requirements: [
-					{
-						matchedDistance: 3,
-						requiredDistance: 1,
-						status: "out_of_range",
-					},
-				],
-			},
-		]);
-	});
-
 	it("normalizes craft job lifecycle and wake reasons in the same snapshot report", () => {
 		const config = createEngineCraftTableTestConfig();
 		const save = runInitialSave({
@@ -375,7 +285,6 @@ describe("validateWorldSnapshotFx", () => {
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
-					requirements: [],
 					resultItemId: "item:plank",
 				},
 			},

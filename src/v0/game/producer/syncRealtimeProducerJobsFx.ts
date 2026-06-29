@@ -14,7 +14,6 @@ import {
 import { readProducerJobEffectiveTimingFx } from "~/v0/game/producer/readProducerJobEffectiveTimingFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
-import { readWorldProducerRequirementFactsFx } from "~/v0/game/world/readWorldProducerRequirementFactsFx";
 import { readProducerJobStartGateReadyFx } from "~/v0/game/producer/readProducerJobStartGateReadyFx";
 import { groupWorldProducerJobs } from "~/v0/game/world/groupWorldProducerJobs";
 
@@ -108,13 +107,6 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 			}
 
 			const startAtMs = Math.max(job.startAtMs, cursorAtMs);
-			const requirementFacts = yield* readWorldProducerRequirementFactsFx({
-				config,
-				job,
-				save: nextSave ?? save,
-			});
-			const requirementsReady = requirementFacts.ready;
-
 			if (isWorldProducerJobPaused(job)) {
 				const startGateReady = yield* readProducerJobStartGateReadyFx({
 					config,
@@ -123,7 +115,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 					job,
 					save: nextSave ?? save,
 				});
-				if (!requirementsReady || !startGateReady) break;
+				if (!startGateReady) break;
 
 				const remainingMs = job.remainingMs ?? 0;
 				const effectiveTiming = yield* readProducerJobEffectiveTimingFx({
@@ -167,7 +159,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 			}
 
 			const shouldCheckStartGate =
-				startAtMs === nowMs || (hasPreviousNonDeliveryQueueJob && startAtMs <= nowMs);
+				startAtMs <= nowMs || (hasPreviousNonDeliveryQueueJob && startAtMs <= nowMs);
 			const startGateReady = shouldCheckStartGate
 				? yield* readProducerJobStartGateReadyFx({
 						config,
@@ -177,9 +169,10 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 						save: nextSave ?? save,
 					})
 				: true;
-			if ((!requirementsReady || !startGateReady) && startAtMs <= nowMs) {
-				const pausedStartAtMs = startGateReady ? startAtMs : nowMs;
-				const remainingMs = startGateReady
+			if (!startGateReady && startAtMs <= nowMs) {
+				const isRunningAtPause = startAtMs < nowMs && !hasPreviousNonDeliveryQueueJob;
+				const pausedStartAtMs = isRunningAtPause ? startAtMs : nowMs;
+				const remainingMs = isRunningAtPause
 					? readGamePausableJobRemainingMsAtPause({
 							job,
 							nowMs,

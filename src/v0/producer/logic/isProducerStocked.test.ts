@@ -12,7 +12,6 @@ const productLine = (
 	inputsAvailable: true,
 	inputsReady: true,
 	isDefault: false,
-	missingRequirementItemIds: [],
 	name: "Product",
 	producerQueuedJobs: 0,
 	productId: "product:test",
@@ -21,8 +20,6 @@ const productLine = (
 	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 0,
-	requirementItemIds: [],
-	requirementsReady: true,
 	...overrides,
 });
 
@@ -32,7 +29,6 @@ const producerActivation = (
 	inputs: [],
 	kind: "producer",
 	productLines,
-	requirements: [],
 	trigger: "click",
 });
 
@@ -167,7 +163,6 @@ describe("isProducerStocked", () => {
 					},
 				],
 				kind: "stash",
-				requirements: [],
 				trigger: "click",
 			}),
 		).toBe(true);
@@ -187,7 +182,6 @@ describe("isProducerStocked", () => {
 					},
 				],
 				kind: "stash",
-				requirements: [],
 				trigger: "click",
 			}),
 		).toBe(false);
@@ -202,7 +196,6 @@ describe("isProducerStocked", () => {
 						queueBlockedReason: "paused",
 					}),
 				],
-				requirements: [],
 				trigger: "click",
 			}),
 		).toBe(false);

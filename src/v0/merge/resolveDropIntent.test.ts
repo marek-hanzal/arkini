@@ -33,7 +33,6 @@ const productLine = (
 	inputs: [],
 	inputsReady: true,
 	inputsAvailable: true,
-	missingRequirementItemIds: [],
 	name: "Test product",
 	producerQueuedJobs: 0,
 	productId: "product:test",
@@ -43,8 +42,6 @@ const productLine = (
 	blockReasonEffectIds: [],
 	queuedJobs: 0,
 	queueSize: 1,
-	requirementItemIds: [],
-	requirementsReady: true,
 	...overrides,
 });
 
@@ -93,44 +90,6 @@ describe("resolveDropIntent", () => {
 		});
 	});
 
-	it("routes a missing stored requirement before consumable activation inputs", () => {
-		expect(
-			resolveDropIntent({
-				config,
-				sourceItemId: "item:twig",
-				targetItem: activationTarget({
-					inputs: [],
-					kind: "producer",
-					productLines: [
-						productLine({
-							inputs: [
-								{
-									capacity: 1,
-									itemId: "item:twig",
-									quantity: 1,
-									consume: true,
-									stored: 0,
-								},
-							],
-						}),
-					],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:twig",
-							quantity: 1,
-							stored: 0,
-							type: "stored",
-						},
-					],
-					trigger: "click",
-				}),
-			}),
-		).toEqual({
-			type: "stored-requirement",
-		});
-	});
-
 	it("prefers the default producer product line when multiple lines accept the same input", () => {
 		expect(
 			resolveItemToBoardItemInteractionPlan({
@@ -167,7 +126,6 @@ describe("resolveDropIntent", () => {
 							productId: "product:shred",
 						}),
 					],
-					requirements: [],
 					trigger: "click",
 				}),
 			}),
@@ -178,119 +136,6 @@ describe("resolveDropIntent", () => {
 		});
 	});
 
-	it("falls through to consumable activation inputs after the stored requirement is full", () => {
-		expect(
-			resolveDropIntent({
-				config,
-				sourceItemId: "item:twig",
-				targetItem: activationTarget({
-					inputs: [],
-					kind: "producer",
-					productLines: [
-						productLine({
-							inputs: [
-								{
-									capacity: 1,
-									itemId: "item:twig",
-									quantity: 1,
-									consume: true,
-									stored: 0,
-								},
-							],
-						}),
-					],
-					requirements: [
-						{
-							capacity: 1,
-							itemId: "item:twig",
-							quantity: 1,
-							stored: 1,
-							type: "stored",
-						},
-					],
-					trigger: "click",
-				}),
-			}),
-		).toEqual({
-			type: "producer-input",
-		});
-	});
-
-	it("routes product-line missing requirements as stored requirements", () => {
-		expect(
-			resolveDropIntent({
-				config,
-				sourceItemId: "item:twig",
-				targetItem: activationTarget({
-					inputs: [],
-					kind: "producer",
-					productLines: [
-						productLine({
-							missingRequirementItemIds: [
-								"item:twig",
-							],
-							requirementItemIds: [
-								"item:twig",
-							],
-							requirementsReady: false,
-						}),
-					],
-					requirements: [],
-					trigger: "click",
-				}),
-			}),
-		).toEqual({
-			type: "stored-requirement",
-		});
-	});
-
-	it("routes missing stored requirements before craft inputs", () => {
-		expect(
-			resolveDropIntent({
-				config,
-				sourceItemId: "item:twig",
-				targetItem: {
-					...activationTarget({
-						inputs: [],
-						kind: "producer",
-						requirements: [
-							{
-								capacity: 1,
-								itemId: "item:twig",
-								quantity: 1,
-								stored: 0,
-								type: "stored",
-							},
-						],
-						trigger: "click",
-					}),
-					craft: {
-						acceptedInputItemIds: [
-							"item:twig",
-						],
-						canAcceptInputs: true,
-						complete: false,
-						delivered: {},
-						durationMs: 1000,
-						id: "craft:test",
-						inputProgress: 0,
-						inputs: [
-							{
-								itemId: "item:twig",
-								quantity: 1,
-							},
-						],
-						phase: "collecting_inputs",
-						progress: 0,
-						resultItemId: "item:plank",
-						timeProgress: 0,
-					},
-				},
-			}),
-		).toEqual({
-			type: "stored-requirement",
-		});
-	});
 	it("routes stash inputs before the swap fallback", () => {
 		expect(
 			resolveDropIntent({
@@ -307,7 +152,6 @@ describe("resolveDropIntent", () => {
 						},
 					],
 					kind: "stash",
-					requirements: [],
 					trigger: "click",
 				}),
 			}),

@@ -4,9 +4,6 @@ import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
-import { checkGameRequirementsFx } from "~/v0/game/requirements/checkGameRequirementsFx";
-import type { GameRequirement } from "~/v0/game/requirements/GameRequirement";
-import { readStoredRequirementQuantitiesFx } from "~/v0/game/requirements/readStoredRequirementQuantitiesFx";
 import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
 
 export namespace checkProducerProductStartRuntimeConstraintsFx {
@@ -17,7 +14,6 @@ export namespace checkProducerProductStartRuntimeConstraintsFx {
 		producerItemInstanceId: string;
 		product: GameConfig["products"][string];
 		productId: string;
-		requirements: readonly GameRequirement[];
 		save: GameSave;
 		startAtMs: number;
 	}
@@ -32,21 +28,9 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 	producerItemInstanceId,
 	product,
 	productId,
-	requirements,
 	save,
 	startAtMs,
 }: checkProducerProductStartRuntimeConstraintsFx.Props) {
-	const storedItems = yield* readStoredRequirementQuantitiesFx({
-		save,
-		targetItemInstanceId: producerItemInstanceId,
-	});
-	yield* checkGameRequirementsFx({
-		requirements,
-		save,
-		storedItems,
-		targetItemInstanceId: producerItemInstanceId,
-	});
-
 	const effectiveProductLine = readEffectiveProducerProductLine({
 		baseDurationMs: readProducerProductDurationMs({
 			product,
@@ -64,8 +48,12 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 	if (!effectiveProductLine.visible) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
-				"invalid_actor",
-				`Product "${productId}" is hidden by an active effect at its scheduled start.`,
+				product.grantSelector && !effectiveProductLine.grantsReady
+					? "effect:missing-grant"
+					: "invalid_actor",
+				product.grantSelector && !effectiveProductLine.grantsReady
+					? `Product "${productId}" is missing effect grants at its scheduled start.`
+					: `Product "${productId}" is hidden by an active effect at its scheduled start.`,
 			),
 		);
 	}

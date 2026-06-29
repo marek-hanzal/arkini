@@ -36,24 +36,39 @@ describe("defaultGameConfig", () => {
 		expect(readItemResourceData("producer:library-t4")).toMatch(/^iVBOR/);
 	});
 
-	const expectPassiveOwnedRequirements = (
+	const readOwnedGrantId = (itemId: string) => `grant:owned:${itemId}`;
+	const readOwnedGrantEffectId = (itemId: string) =>
+		`effect:grant-owned:${itemId
+			.replace(/[^a-zA-Z0-9]+/g, "-")
+			.replace(/^-|-$/g, "")
+			.toLowerCase()}`;
+
+	const expectPassiveOwnedGrants = (
 		craftRecipeId: string,
 		expectedItemIds: readonly string[],
 	) => {
 		const recipe = defaultGameConfig.craftRecipes[craftRecipeId];
 		if (!recipe) throw new Error(`Missing craft recipe ${craftRecipeId}`);
 
-		expect(recipe.requirements).toEqual(
-			expectedItemIds.map((itemId) => ({
-				itemId,
-				quantity: 1,
-				scope: "board_or_inventory",
-				type: "passive",
-			})),
-		);
+		expect(recipe.grantSelector).toEqual({
+			allOf: [
+				...expectedItemIds,
+			]
+				.sort()
+				.map((itemId) => ({
+					ids: [
+						readOwnedGrantId(itemId),
+					],
+				})),
+		});
+		for (const itemId of expectedItemIds) {
+			expect(defaultGameConfig.items[itemId]?.passiveEffectIds).toContain(
+				readOwnedGrantEffectId(itemId),
+			);
+		}
 	};
 
-	it("wires tiered libraries as school requirements and townhall blueprints", () => {
+	it("wires tiered libraries as school grants and townhall blueprints", () => {
 		expect(defaultGameConfig.items["producer:library-t1"]).toMatchObject({
 			maxCount: 1,
 		});
@@ -85,14 +100,14 @@ describe("defaultGameConfig", () => {
 			defaultGameConfig.products["product:library-t4:blueprint-cathedral"],
 		).toBeUndefined();
 
-		expectPassiveOwnedRequirements("item:blueprint-school", [
+		expectPassiveOwnedGrants("item:blueprint-school", [
 			"producer:library-t1",
 		]);
-		expectPassiveOwnedRequirements("item:blueprint-academy", [
+		expectPassiveOwnedGrants("item:blueprint-academy", [
 			"producer:civic-office-t1",
 			"producer:library-t2",
 		]);
-		expectPassiveOwnedRequirements("item:blueprint-university", [
+		expectPassiveOwnedGrants("item:blueprint-university", [
 			"producer:construction-yard-t1",
 			"producer:glassworks",
 			"producer:roof-tile-factory",
@@ -236,20 +251,20 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.items["item:clay-deposit"].passiveEffectIds).toContain(
 			"effect:proximity:clay-pit:clay-deposit",
 		);
-		expect(defaultGameConfig.products["product:clay-pit:clay"].visibility).toBe("hidden");
+		expect(defaultGameConfig.products["product:clay-pit:clay"].visibility).toBe("visible");
 		expect(defaultGameConfig.items["item:sand-deposit"].passiveEffectIds).toContain(
 			"effect:proximity:sand-pit:sand-deposit",
 		);
-		expect(defaultGameConfig.products["product:sand-pit:sand"].visibility).toBe("hidden");
+		expect(defaultGameConfig.products["product:sand-pit:sand"].visibility).toBe("visible");
 
 		expect(defaultGameConfig.items["producer:purifier-t1"].passiveEffectIds).toContain(
 			"effect:proximity:dirty-processing:purifier",
 		);
 		expect(defaultGameConfig.products["product:charcoal-burner-t1:charcoal"].visibility).toBe(
-			"hidden",
+			"visible",
 		);
 		expect(defaultGameConfig.products["product:smelter-t1:iron-ingot"].visibility).toBe(
-			"hidden",
+			"visible",
 		);
 
 		expect(defaultGameConfig.producers["producer:purifier-t1"].productIds).toEqual([
@@ -367,7 +382,7 @@ describe("defaultGameConfig", () => {
 			itemId: "producer:bio-waste-processor-t1",
 			quantity: 1,
 		});
-		expectPassiveOwnedRequirements("item:blueprint-waste-processor-t2", [
+		expectPassiveOwnedGrants("item:blueprint-waste-processor-t2", [
 			"producer:coal-mine-t1",
 			"producer:charcoal-burner-t1",
 			"producer:academy",
@@ -428,11 +443,15 @@ describe("defaultGameConfig", () => {
 			"product:heroes-guild-t1:treasure-chest-morale-t4",
 		]);
 
-		expect(defaultGameConfig.products["product:blacksmith-t1:nails"].visibility).toBe("hidden");
-		expect(defaultGameConfig.products["product:armory-t1:iron-armor"].visibility).toBe(
-			"hidden",
+		expect(defaultGameConfig.products["product:blacksmith-t1:nails"].visibility).toBe(
+			"visible",
 		);
-		expect(defaultGameConfig.products["product:goldsmith-t1:key-t4"].visibility).toBe("hidden");
+		expect(defaultGameConfig.products["product:armory-t1:iron-armor"].visibility).toBe(
+			"visible",
+		);
+		expect(defaultGameConfig.products["product:goldsmith-t1:key-t4"].visibility).toBe(
+			"visible",
+		);
 
 		expect(readProductInputs("product:heroes-guild-t1:treasure-chest")).toContainEqual({
 			capacity: 4,
@@ -472,7 +491,7 @@ describe("defaultGameConfig", () => {
 		);
 		expect(
 			defaultGameConfig.products["product:glazier-workshop-t1:stained-glass"].visibility,
-		).toBe("hidden");
+		).toBe("visible");
 
 		expect(readProductInputs("product:glazier-workshop-t1:stained-glass")).toContainEqual({
 			capacity: 4,
@@ -520,7 +539,7 @@ describe("defaultGameConfig", () => {
 		expect(defaultGameConfig.items["item:marble-deposit"].passiveEffectIds).toContain(
 			"effect:proximity:quarry-t2:marble-deposit",
 		);
-		expect(defaultGameConfig.products["product:quarry-t2:marble"].visibility).toBe("hidden");
+		expect(defaultGameConfig.products["product:quarry-t2:marble"].visibility).toBe("visible");
 		expect(defaultGameConfig.producers["producer:stonemason-t2"].productIds).toEqual([
 			"product:stonemason-t2:stone-block",
 			"product:stonemason-t2:marble-block",
@@ -530,7 +549,7 @@ describe("defaultGameConfig", () => {
 			"effect:proximity:stonemason-t2:quarry-t2",
 		);
 		expect(defaultGameConfig.products["product:stonemason-t2:marble-block"].visibility).toBe(
-			"hidden",
+			"visible",
 		);
 
 		expect(defaultGameConfig.craftRecipes["item:blueprint-quarry-t2"].inputs).toContainEqual({
@@ -665,21 +684,21 @@ describe("defaultGameConfig", () => {
 			quantity: 1,
 		});
 
-		expectPassiveOwnedRequirements("item:blueprint-house-of-engineers", [
+		expectPassiveOwnedGrants("item:blueprint-house-of-engineers", [
 			"producer:university",
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
 			"producer:blacksmith-t1",
 			"producer:library-t4",
 		]);
-		expectPassiveOwnedRequirements("item:blueprint-cathedral", [
+		expectPassiveOwnedGrants("item:blueprint-cathedral", [
 			"producer:university",
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
 			"producer:civic-office-t1",
 			"producer:library-t4",
 		]);
-		expectPassiveOwnedRequirements("item:blueprint-mage-lodge", [
+		expectPassiveOwnedGrants("item:blueprint-mage-lodge", [
 			"producer:university",
 			"producer:stonemason-t2",
 			"producer:glazier-workshop-t1",
@@ -851,7 +870,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("requires complete era ownership before townhall tier progression", () => {
-		expectPassiveOwnedRequirements("item:blueprint-townhall-t2", [
+		expectPassiveOwnedGrants("item:blueprint-townhall-t2", [
 			"producer:lumberjack-t1",
 			"producer:sawmill-t1",
 			"producer:quarry-t1",
@@ -859,7 +878,7 @@ describe("defaultGameConfig", () => {
 			"producer:well-t1",
 		]);
 
-		expectPassiveOwnedRequirements("item:blueprint-townhall-t3", [
+		expectPassiveOwnedGrants("item:blueprint-townhall-t3", [
 			"item:wheat-field",
 			"producer:farm-t1",
 			"producer:pig-farm-t1",
@@ -869,7 +888,7 @@ describe("defaultGameConfig", () => {
 			"producer:vegetable-garden-t1",
 		]);
 
-		expectPassiveOwnedRequirements("item:blueprint-townhall-t4", [
+		expectPassiveOwnedGrants("item:blueprint-townhall-t4", [
 			"producer:windmill-t1",
 			"producer:bakery-t1",
 			"producer:slaughterhouse-t1",

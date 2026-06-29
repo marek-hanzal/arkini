@@ -3,7 +3,6 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
-import { resolveGameRequirements } from "~/v0/game/requirements/resolveGameRequirements";
 
 export namespace readWorldProducerJobSubjectFx {
 	export interface Props {
@@ -46,14 +45,9 @@ export const readWorldProducerJobSubjectFx = Effect.fn("readWorldProducerJobSubj
 		);
 	}
 
-	const requirements = resolveGameRequirements({
-		config,
-		requirementIds: product.requirementIds,
-	});
 	return {
 		producerDefinition,
 		producerItem,
 		product,
-		requirements,
 	};
 });

@@ -1005,6 +1005,20 @@
 	"craftRecipes": {
 		"item:blueprint-academy": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t2"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1042,24 +1056,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:library-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:academy"
 		},
 		"item:blueprint-armory-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:blacksmith-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tailor-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tannery-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1092,26 +1111,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:blacksmith-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tannery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tailor-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:armory-t1"
 		},
 		"item:blueprint-bakery-t1": {
@@ -1138,7 +1137,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:bakery-t1"
 		},
 		"item:blueprint-bio-waste-processor-t1": {
@@ -1165,11 +1163,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:bio-waste-processor-t1"
 		},
 		"item:blueprint-bio-waste-processor-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:charcoal-burner-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1202,30 +1218,29 @@
 					"quantity": 3
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:charcoal-burner-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:bio-waste-processor-t2"
 		},
 		"item:blueprint-blacksmith-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:smelter-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1258,26 +1273,6 @@
 					"quantity": 8
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:smelter-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:blacksmith-t1"
 		},
 		"item:blueprint-brewery-t1": {
@@ -1299,11 +1294,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:brewery-t1"
 		},
 		"item:blueprint-brickyard": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:clay-pit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1331,30 +1344,39 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:clay-pit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:brickyard"
 		},
 		"item:blueprint-cathedral": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1407,38 +1429,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:cathedral"
 		},
 		"item:blueprint-cattle-farm-t1": {
@@ -1465,11 +1455,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:cattle-farm-t1"
 		},
 		"item:blueprint-charcoal-burner-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1502,20 +1505,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:charcoal-burner-t1"
 		},
 		"item:blueprint-chicken-coop-t1": {
@@ -1532,7 +1521,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:chicken-coop-t1"
 		},
 		"item:blueprint-civic-office-t1": {
@@ -1559,11 +1547,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:civic-office-t1"
 		},
 		"item:blueprint-clay-pit": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:clay-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1586,24 +1587,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:clay-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:clay-pit"
 		},
 		"item:blueprint-coal-mine-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:coal-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1631,24 +1632,34 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:coal-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:coal-mine-t1"
 		},
 		"item:blueprint-construction-yard-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:brickyard"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glassworks"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:roof-tile-factory"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:smelter-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1696,32 +1707,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:brickyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glassworks",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:roof-tile-factory",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:smelter-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:construction-yard-t1"
 		},
 		"item:blueprint-cookhouse-t1": {
@@ -1748,7 +1733,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:cookhouse-t1"
 		},
 		"item:blueprint-dairy-t1": {
@@ -1770,11 +1754,19 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:dairy-t1"
 		},
 		"item:blueprint-dye-workshop-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:weaver-hut-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1802,14 +1794,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:weaver-hut-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:dye-workshop-t1"
 		},
 		"item:blueprint-farm-t1": {
@@ -1826,11 +1810,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:farm-t1"
 		},
 		"item:blueprint-glassworks": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:sand-pit"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1863,30 +1865,34 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:sand-pit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:glassworks"
 		},
 		"item:blueprint-glazier-workshop-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:dye-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glassworks"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1924,36 +1930,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glassworks",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:dye-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:glazier-workshop-t1"
 		},
 		"item:blueprint-gold-mine-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:gold-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -1981,24 +1975,29 @@
 					"quantity": 4
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:gold-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:gold-mine-t1"
 		},
 		"item:blueprint-goldsmith-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:smelter-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2031,30 +2030,34 @@
 					"quantity": 8
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:smelter-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:goldsmith-t1"
 		},
 		"item:blueprint-heroes-guild-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:armory-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:goldsmith-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2092,36 +2095,39 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:goldsmith-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:armory-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:heroes-guild-t1"
 		},
 		"item:blueprint-house-of-engineers": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:blacksmith-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2179,42 +2185,19 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:blacksmith-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:house-of-engineers"
 		},
 		"item:blueprint-house-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:well-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2237,18 +2220,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:well-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:house-t1"
 		},
 		"item:blueprint-house-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:bakery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:market-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2281,24 +2270,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:bakery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:market-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:house-t2"
 		},
 		"item:blueprint-house-t3": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tailor-workshop-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2331,24 +2320,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tailor-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:house-t3"
 		},
 		"item:blueprint-house-t4": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2386,30 +2380,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:house-t4"
 		},
 		"item:blueprint-iron-mine-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:iron-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2437,20 +2425,6 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:iron-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:iron-mine-t1"
 		},
 		"item:blueprint-library-t1": {
@@ -2472,7 +2446,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:library-t1"
 		},
 		"item:blueprint-library-t2": {
@@ -2499,7 +2472,6 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:library-t2"
 		},
 		"item:blueprint-library-t3": {
@@ -2536,7 +2508,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:library-t3"
 		},
 		"item:blueprint-library-t4": {
@@ -2568,7 +2539,6 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:library-t4"
 		},
 		"item:blueprint-lumberjack-t1": {
@@ -2585,11 +2555,39 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:lumberjack-t1"
 		},
 		"item:blueprint-mage-lodge": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:glazier-workshop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:heroes-guild-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t4"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2647,38 +2645,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glazier-workshop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:heroes-guild-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:library-t4",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:mage-lodge"
 		},
 		"item:blueprint-market-t1": {
@@ -2705,11 +2671,19 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:market-t1"
 		},
 		"item:blueprint-market-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:civic-office-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2730,14 +2704,6 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 3
-				}
-			],
-			"requirements": [
-				{
-					"itemId": "producer:civic-office-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
 				}
 			],
 			"resultItemId": "producer:market-t2"
@@ -2766,7 +2732,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:paper-mill-t1"
 		},
 		"item:blueprint-pig-farm-t1": {
@@ -2788,7 +2753,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:pig-farm-t1"
 		},
 		"item:blueprint-prospector-guild-t1": {
@@ -2820,11 +2784,19 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:prospector-guild-t1"
 		},
 		"item:blueprint-prospector-guild-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2852,18 +2824,24 @@
 					"quantity": 4
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:prospector-guild-t2"
 		},
 		"item:blueprint-purifier-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2901,20 +2879,6 @@
 					"quantity": 4
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:purifier-t1"
 		},
 		"item:blueprint-quarry-t1": {
@@ -2931,11 +2895,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:quarry-t1"
 		},
 		"item:blueprint-quarry-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:marble-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -2963,24 +2940,34 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:marble-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:quarry-t2"
 		},
 		"item:blueprint-roof-tile-factory": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:brickyard"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:clay-pit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3008,36 +2995,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:clay-pit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:brickyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:roof-tile-factory"
 		},
 		"item:blueprint-sand-pit": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:sand-deposit"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3060,20 +3035,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:sand-deposit",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:sand-pit"
 		},
 		"item:blueprint-sawmill-t1": {
@@ -3090,11 +3051,19 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:sawmill-t1"
 		},
 		"item:blueprint-school": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:library-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3115,14 +3084,6 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 1
-				}
-			],
-			"requirements": [
-				{
-					"itemId": "producer:library-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
 				}
 			],
 			"resultItemId": "producer:school"
@@ -3151,7 +3112,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:sheep-pasture-t1"
 		},
 		"item:blueprint-slaughterhouse-t1": {
@@ -3173,11 +3133,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:slaughterhouse-t1"
 		},
 		"item:blueprint-smelter-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:purifier-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3205,26 +3183,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:purifier-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:smelter-t1"
 		},
 		"item:blueprint-stonemason-t1": {
@@ -3241,11 +3199,24 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:stonemason-t1"
 		},
 		"item:blueprint-stonemason-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:quarry-t2"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:university"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3273,24 +3244,24 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:quarry-t2",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:university",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:stonemason-t2"
 		},
 		"item:blueprint-tailor-workshop-t1": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:tannery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:weaver-hut-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3316,20 +3287,6 @@
 					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 2
-				}
-			],
-			"requirements": [
-				{
-					"itemId": "producer:tannery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:weaver-hut-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
 				}
 			],
 			"resultItemId": "producer:tailor-workshop-t1"
@@ -3363,7 +3320,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:tannery-t1"
 		},
 		"item:blueprint-tavern-t1": {
@@ -3385,11 +3341,39 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:tavern-t1"
 		},
 		"item:blueprint-townhall-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:lumberjack-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:quarry-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:sawmill-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:stonemason-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:well-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3412,42 +3396,49 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:lumberjack-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:sawmill-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:quarry-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:stonemason-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:well-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:townhall-t2"
 		},
 		"item:blueprint-townhall-t3": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:wheat-field"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:cattle-farm-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:chicken-coop-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:farm-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:pig-farm-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:sheep-pasture-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:vegetable-garden-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3480,54 +3471,69 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "item:wheat-field",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:farm-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:pig-farm-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:cattle-farm-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:chicken-coop-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:sheep-pasture-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:vegetable-garden-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:townhall-t3"
 		},
 		"item:blueprint-townhall-t4": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:item:hop-field"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:item:vineyard"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:bakery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:brewery-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:cookhouse-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:dairy-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:market-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:slaughterhouse-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:tavern-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:windmill-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:winery-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3565,78 +3571,34 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:windmill-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:bakery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:slaughterhouse-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:dairy-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:cookhouse-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "item:hop-field",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:brewery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:tavern-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "item:vineyard",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:winery-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:market-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:townhall-t4"
 		},
 		"item:blueprint-university": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:construction-yard-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:glassworks"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:library-t3"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:roof-tile-factory"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3689,32 +3651,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:construction-yard-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:glassworks",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:roof-tile-factory",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:library-t3",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:university"
 		},
 		"item:blueprint-vegetable-garden-t1": {
@@ -3731,7 +3667,6 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:vegetable-garden-t1"
 		},
 		"item:blueprint-waste-processor-t1": {
@@ -3753,11 +3688,29 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:waste-processor-t1"
 		},
 		"item:blueprint-waste-processor-t2": {
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:owned:producer:academy"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:charcoal-burner-t1"
+						]
+					},
+					{
+						"ids": [
+							"grant:owned:producer:coal-mine-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"consume": true,
@@ -3790,26 +3743,6 @@
 					"quantity": 3
 				}
 			],
-			"requirements": [
-				{
-					"itemId": "producer:coal-mine-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:charcoal-burner-t1",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				},
-				{
-					"itemId": "producer:academy",
-					"quantity": 1,
-					"scope": "board_or_inventory",
-					"type": "passive"
-				}
-			],
 			"resultItemId": "producer:waste-processor-t2"
 		},
 		"item:blueprint-weaver-hut-t1": {
@@ -3836,7 +3769,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:weaver-hut-t1"
 		},
 		"item:blueprint-well-t1": {
@@ -3853,7 +3785,6 @@
 					"quantity": 2
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:well-t1"
 		},
 		"item:blueprint-windmill-t1": {
@@ -3875,7 +3806,6 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:windmill-t1"
 		},
 		"item:blueprint-winery-t1": {
@@ -3897,11 +3827,922 @@
 					"quantity": 1
 				}
 			],
-			"requirements": [],
 			"resultItemId": "producer:winery-t1"
 		}
 	},
 	"effects": {
+		"effect:grant-owned:item-clay-deposit": {
+			"name": "Owned Clay Deposit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:clay-deposit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-coal-deposit": {
+			"name": "Owned Coal Deposit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:coal-deposit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-gold-deposit": {
+			"name": "Owned Gold Deposit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:gold-deposit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-hop-field": {
+			"name": "Owned Hop Field grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:hop-field",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-iron-deposit": {
+			"name": "Owned Iron Deposit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:iron-deposit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-marble-deposit": {
+			"name": "Owned Marble Deposit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:marble-deposit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-sand-deposit": {
+			"name": "Owned Sand Deposit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:sand-deposit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-vineyard": {
+			"name": "Owned Vineyard grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:vineyard",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-wheat-field": {
+			"name": "Owned Wheat Field grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:item:wheat-field",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-academy": {
+			"name": "Owned Academy grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:academy",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-armory-t1": {
+			"name": "Owned Armory I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:armory-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-bakery-t1": {
+			"name": "Owned Bakery I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:bakery-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-blacksmith-t1": {
+			"name": "Owned Blacksmith I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:blacksmith-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-brewery-t1": {
+			"name": "Owned Brewery I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:brewery-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-brickyard": {
+			"name": "Owned Brickyard grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:brickyard",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-cattle-farm-t1": {
+			"name": "Owned Cattle Farm I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:cattle-farm-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-charcoal-burner-t1": {
+			"name": "Owned Charcoal Burner I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:charcoal-burner-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-chicken-coop-t1": {
+			"name": "Owned Chicken Coop I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:chicken-coop-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-civic-office-t1": {
+			"name": "Owned Civic Office I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:civic-office-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-clay-pit": {
+			"name": "Owned Clay Pit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:clay-pit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-coal-mine-t1": {
+			"name": "Owned Coal Mine I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:coal-mine-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-construction-yard-t1": {
+			"name": "Owned Construction Yard I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:construction-yard-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-cookhouse-t1": {
+			"name": "Owned Cookhouse I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:cookhouse-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-dairy-t1": {
+			"name": "Owned Dairy I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:dairy-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-dye-workshop-t1": {
+			"name": "Owned Dye Workshop I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:dye-workshop-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-farm-t1": {
+			"name": "Owned Farm I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:farm-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-glassworks": {
+			"name": "Owned Glassworks grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:glassworks",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-glazier-workshop-t1": {
+			"name": "Owned Glazier Workshop I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:glazier-workshop-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-goldsmith-t1": {
+			"name": "Owned Goldsmith I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:goldsmith-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-heroes-guild-t1": {
+			"name": "Owned Heroes Guild I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:heroes-guild-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t1": {
+			"name": "Owned Library I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:library-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t2": {
+			"name": "Owned Library II grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:library-t2",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t3": {
+			"name": "Owned Library III grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:library-t3",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t4": {
+			"name": "Owned Library IV grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:library-t4",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-lumberjack-t1": {
+			"name": "Owned Lumberjack I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:lumberjack-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-market-t1": {
+			"name": "Owned Market grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:market-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-pig-farm-t1": {
+			"name": "Owned Pig Farm I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:pig-farm-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-purifier-t1": {
+			"name": "Owned Purifier I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:purifier-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-quarry-t1": {
+			"name": "Owned Quarry I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:quarry-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-quarry-t2": {
+			"name": "Owned Quarry grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:quarry-t2",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-roof-tile-factory": {
+			"name": "Owned Roof Tile Factory grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:roof-tile-factory",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-sand-pit": {
+			"name": "Owned Sand Pit grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:sand-pit",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-sawmill-t1": {
+			"name": "Owned Sawmill I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:sawmill-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-sheep-pasture-t1": {
+			"name": "Owned Sheep Pasture I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:sheep-pasture-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-slaughterhouse-t1": {
+			"name": "Owned Slaughterhouse I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:slaughterhouse-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-smelter-t1": {
+			"name": "Owned Smelter I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:smelter-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-stonemason-t1": {
+			"name": "Owned Stonemason I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:stonemason-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-stonemason-t2": {
+			"name": "Owned Stonemason grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:stonemason-t2",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-tailor-workshop-t1": {
+			"name": "Owned Tailor Workshop I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:tailor-workshop-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-tannery-t1": {
+			"name": "Owned Tannery I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:tannery-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-tavern-t1": {
+			"name": "Owned Tavern I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:tavern-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-university": {
+			"name": "Owned University grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:university",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-vegetable-garden-t1": {
+			"name": "Owned Vegetable Garden I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:vegetable-garden-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-weaver-hut-t1": {
+			"name": "Owned Weaver Hut I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:weaver-hut-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-well-t1": {
+			"name": "Owned Well I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:well-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-windmill-t1": {
+			"name": "Owned Windmill I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:windmill-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-winery-t1": {
+			"name": "Owned Winery I grant",
+			"operations": [
+				{
+					"grantId": "grant:owned:producer:winery-t1",
+					"kind": "grant.add",
+					"target": {
+						"craftRecipes": {
+							"mode": "all"
+						}
+					}
+				}
+			],
+			"scope": "global",
+			"sourceScope": "both"
+		},
 		"effect:path-engineers-locks-counter-keystones": {
 			"name": "Engineers path locks Faith and Mages keystone plans",
 			"operations": [
@@ -4132,7 +4973,8 @@
 			"name": "Nearby item:hop-field enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:brewery-t1:hop-field",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4163,7 +5005,8 @@
 			"name": "Nearby item:clay-deposit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:clay-pit:clay-deposit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4184,7 +5027,8 @@
 			"name": "Nearby producer:clay-pit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:clay-pit:nearby",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4210,7 +5054,8 @@
 			"name": "Nearby item:coal-deposit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:coal-mine-t1:coal-deposit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4231,7 +5076,8 @@
 			"name": "Nearby producer:purifier-t1 enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:dirty-processing:purifier",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4332,7 +5178,8 @@
 			"name": "Nearby item:wheat-field enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:farm-t1:wheat-field",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4358,7 +5205,8 @@
 			"name": "Nearby producer:sand-pit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:glassworks:sand-pit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4379,7 +5227,8 @@
 			"name": "Nearby producer:glassworks enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:glazier-workshop-t1:glassworks",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4405,7 +5254,8 @@
 			"name": "Nearby item:gold-deposit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:gold-mine-t1:gold-deposit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4426,7 +5276,8 @@
 			"name": "Nearby item:iron-deposit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:iron-mine-t1:iron-deposit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4447,7 +5298,8 @@
 			"name": "Nearby item:tree enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:lumberjack-t1:tree",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4487,7 +5339,8 @@
 			"name": "Nearby item:rock enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:quarry-t1:rock",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4508,7 +5361,8 @@
 			"name": "Nearby item:marble-deposit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:quarry-t2:marble-deposit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4534,7 +5388,8 @@
 			"name": "Nearby item:sand-deposit enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:sand-pit:sand-deposit",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4555,7 +5410,8 @@
 			"name": "Nearby producer:lumberjack-t1 enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:sawmill-t1:lumberjack-t1",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4576,7 +5432,8 @@
 			"name": "Nearby producer:quarry-t1 enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:stonemason-t1:quarry-t1",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4597,7 +5454,8 @@
 			"name": "Nearby producer:quarry-t2 enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:stonemason-t2:quarry-t2",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -4628,7 +5486,8 @@
 			"name": "Nearby item:vineyard enables production",
 			"operations": [
 				{
-					"kind": "line.reveal",
+					"grantId": "grant:proximity:winery-t1:vineyard",
+					"kind": "grant.add",
 					"target": {
 						"productLines": {
 							"anyOf": [
@@ -6255,6 +7114,7 @@
 			"maxStackSize": 10,
 			"name": "Clay Deposit",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-clay-deposit",
 				"effect:proximity:clay-pit:clay-deposit"
 			],
 			"storage": "both",
@@ -6289,6 +7149,7 @@
 			"maxStackSize": 10,
 			"name": "Coal Deposit",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-coal-deposit",
 				"effect:proximity:coal-mine-t1:coal-deposit"
 			],
 			"storage": "both",
@@ -6469,6 +7330,7 @@
 			"maxStackSize": 10,
 			"name": "Gold Deposit",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-gold-deposit",
 				"effect:proximity:gold-mine-t1:gold-deposit"
 			],
 			"storage": "both",
@@ -6566,6 +7428,7 @@
 			"maxStackSize": 10,
 			"name": "Hop Field",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-hop-field",
 				"effect:proximity:brewery-t1:hop-field"
 			],
 			"storage": "both",
@@ -6630,6 +7493,7 @@
 			"maxStackSize": 10,
 			"name": "Iron Deposit",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-iron-deposit",
 				"effect:proximity:iron-mine-t1:iron-deposit"
 			],
 			"storage": "both",
@@ -6848,6 +7712,7 @@
 			"maxStackSize": 10,
 			"name": "Marble Deposit",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-marble-deposit",
 				"effect:proximity:quarry-t2:marble-deposit"
 			],
 			"storage": "both",
@@ -6894,7 +7759,7 @@
 		},
 		"item:morale-t1": {
 			"assetId": "asset:item:morale-t1",
-			"description": "Tier I social morale generated by housing and spent as an optional boost currency or prestige requirement.",
+			"description": "Tier I social morale generated by housing and spent as an optional boost currency or prestige cost.",
 			"maxStackSize": 50,
 			"name": "Morale I",
 			"storage": "both",
@@ -6908,7 +7773,7 @@
 		},
 		"item:morale-t2": {
 			"assetId": "asset:item:morale-t2",
-			"description": "Tier II social morale generated by housing and spent as an optional boost currency or prestige requirement.",
+			"description": "Tier II social morale generated by housing and spent as an optional boost currency or prestige cost.",
 			"maxStackSize": 50,
 			"name": "Morale II",
 			"storage": "both",
@@ -6922,7 +7787,7 @@
 		},
 		"item:morale-t3": {
 			"assetId": "asset:item:morale-t3",
-			"description": "Tier III social morale generated by housing and spent as an optional boost currency or prestige requirement.",
+			"description": "Tier III social morale generated by housing and spent as an optional boost currency or prestige cost.",
 			"maxStackSize": 50,
 			"name": "Morale III",
 			"storage": "both",
@@ -6936,7 +7801,7 @@
 		},
 		"item:morale-t4": {
 			"assetId": "asset:item:morale-t4",
-			"description": "Tier IV social morale generated by housing and spent as an optional boost currency or prestige requirement.",
+			"description": "Tier IV social morale generated by housing and spent as an optional boost currency or prestige cost.",
 			"maxStackSize": 50,
 			"name": "Morale IV",
 			"storage": "both",
@@ -7142,6 +8007,7 @@
 			"maxStackSize": 10,
 			"name": "Sand Deposit",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-sand-deposit",
 				"effect:proximity:sand-pit:sand-deposit"
 			],
 			"storage": "both",
@@ -7325,6 +8191,7 @@
 			"maxStackSize": 10,
 			"name": "Vineyard",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-vineyard",
 				"effect:proximity:winery-t1:vineyard"
 			],
 			"storage": "both",
@@ -7358,6 +8225,7 @@
 			"maxStackSize": 10,
 			"name": "Wheat Field",
 			"passiveEffectIds": [
+				"effect:grant-owned:item-wheat-field",
 				"effect:proximity:farm-t1:wheat-field"
 			],
 			"storage": "both",
@@ -7418,6 +8286,9 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Academy",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-academy"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7433,6 +8304,9 @@
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
 			"maxStackSize": 1,
 			"name": "Armory I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-armory-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7449,6 +8323,9 @@
 			"description": "Consumes flour and water to bake bread.",
 			"maxStackSize": 1,
 			"name": "Bakery I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-bakery-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7500,6 +8377,9 @@
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-blacksmith-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7516,6 +8396,9 @@
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"maxStackSize": 1,
 			"name": "Brewery I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-brewery-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7530,6 +8413,9 @@
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"maxStackSize": 1,
 			"name": "Brickyard",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-brickyard"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -7566,6 +8452,9 @@
 			"description": "Consumes grain and water to produce milk.",
 			"maxStackSize": 1,
 			"name": "Cattle Farm I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-cattle-farm-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7580,6 +8469,9 @@
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-charcoal-burner-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -7596,6 +8488,9 @@
 			"description": "Consumes grain and water to produce eggs.",
 			"maxStackSize": 1,
 			"name": "Chicken Coop I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-chicken-coop-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7610,6 +8505,9 @@
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
 			"maxStackSize": 1,
 			"name": "Civic Office I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-civic-office-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7626,6 +8524,7 @@
 			"maxStackSize": 1,
 			"name": "Clay Pit",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-clay-pit",
 				"effect:proximity:clay-pit:nearby"
 			],
 			"storage": "both",
@@ -7644,6 +8543,9 @@
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-coal-mine-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7659,6 +8561,9 @@
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
 			"maxStackSize": 1,
 			"name": "Construction Yard I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-construction-yard-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -7675,6 +8580,9 @@
 			"description": "Combines processed food into feasts.",
 			"maxStackSize": 1,
 			"name": "Cookhouse I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-cookhouse-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7689,6 +8597,9 @@
 			"description": "Processes milk into cheese.",
 			"maxStackSize": 1,
 			"name": "Dairy I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-dairy-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7703,6 +8614,9 @@
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
 			"maxStackSize": 1,
 			"name": "Dye Workshop I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-dye-workshop-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7719,6 +8633,9 @@
 			"description": "Consumes water and produces grain when placed near a wheat field.",
 			"maxStackSize": 1,
 			"name": "Farm I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-farm-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7734,6 +8651,7 @@
 			"maxStackSize": 1,
 			"name": "Glassworks",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-glassworks",
 				"effect:proximity:glazier-workshop-t1:glassworks"
 			],
 			"storage": "both",
@@ -7752,6 +8670,9 @@
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
 			"maxStackSize": 1,
 			"name": "Glazier Workshop I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-glazier-workshop-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7784,6 +8705,9 @@
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-goldsmith-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7801,6 +8725,9 @@
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"maxStackSize": 1,
 			"name": "Heroes Guild I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-heroes-guild-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7921,6 +8848,9 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-library-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7938,6 +8868,9 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library II",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-library-t2"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7955,6 +8888,9 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library III",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-library-t3"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7972,6 +8908,9 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library IV",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-library-t4"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -7989,6 +8928,7 @@
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-lumberjack-t1",
 				"effect:proximity:sawmill-t1:lumberjack-t1"
 			],
 			"storage": "both",
@@ -8025,6 +8965,9 @@
 			"description": "First trade producer that converts processed food and drink into coins.",
 			"maxStackSize": 1,
 			"name": "Market",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-market-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8069,6 +9012,9 @@
 			"description": "Consumes grain and water to produce piglets.",
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-pig-farm-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8118,6 +9064,7 @@
 			"maxStackSize": 1,
 			"name": "Purifier I",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-purifier-t1",
 				"effect:proximity:dirty-processing:purifier"
 			],
 			"storage": "both",
@@ -8136,6 +9083,7 @@
 			"maxStackSize": 1,
 			"name": "Quarry I",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-quarry-t1",
 				"effect:proximity:stonemason-t1:quarry-t1"
 			],
 			"storage": "both",
@@ -8153,6 +9101,7 @@
 			"maxStackSize": 1,
 			"name": "Quarry",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-quarry-t2",
 				"effect:proximity:stonemason-t2:quarry-t2"
 			],
 			"storage": "both",
@@ -8173,6 +9122,9 @@
 			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-roof-tile-factory"
+			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -8190,6 +9142,7 @@
 			"maxStackSize": 1,
 			"name": "Sand Pit",
 			"passiveEffectIds": [
+				"effect:grant-owned:producer-sand-pit",
 				"effect:proximity:glassworks:sand-pit"
 			],
 			"storage": "both",
@@ -8209,6 +9162,9 @@
 			"description": "Turns logs into planks when placed near a lumberjack.",
 			"maxStackSize": 1,
 			"name": "Sawmill I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-sawmill-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8238,6 +9194,9 @@
 			"description": "Consumes grain and water to produce wool.",
 			"maxStackSize": 1,
 			"name": "Sheep Pasture I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-sheep-pasture-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8267,6 +9226,9 @@
 			"description": "Processes piglets into sausage and leather.",
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-slaughterhouse-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8282,6 +9244,9 @@
 			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
 			"maxStackSize": 1,
 			"name": "Smelter I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-smelter-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8296,6 +9261,9 @@
 			"description": "Turns stone into stone blocks when placed near a quarry.",
 			"maxStackSize": 1,
 			"name": "Stonemason I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-stonemason-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8310,6 +9278,9 @@
 			"label": "2",
 			"maxStackSize": 1,
 			"name": "Stonemason",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-stonemason-t2"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8328,6 +9299,9 @@
 			"description": "Clothing producer that sews common and luxury clothing.",
 			"maxStackSize": 1,
 			"name": "Tailor Workshop I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-tailor-workshop-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8343,6 +9317,9 @@
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
 			"maxStackSize": 1,
 			"name": "Tannery I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-tannery-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8358,6 +9335,9 @@
 			"description": "Serves beer barrels as individual beers.",
 			"maxStackSize": 1,
 			"name": "Tavern I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-tavern-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8429,6 +9409,9 @@
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "University",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-university"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8445,6 +9428,9 @@
 			"description": "Consumes water to produce vegetables.",
 			"maxStackSize": 1,
 			"name": "Vegetable Garden I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-vegetable-garden-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8494,6 +9480,9 @@
 			"description": "Textile producer that weaves wool into common cloth.",
 			"maxStackSize": 1,
 			"name": "Weaver Hut I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-weaver-hut-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8509,6 +9498,9 @@
 			"description": "Produces water.",
 			"maxStackSize": 1,
 			"name": "Well I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-well-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8523,6 +9515,9 @@
 			"description": "Mills grain into flour.",
 			"maxStackSize": 1,
 			"name": "Windmill I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-windmill-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -8538,6 +9533,9 @@
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
 			"maxStackSize": 1,
 			"name": "Winery I",
+			"passiveEffectIds": [
+				"effect:grant-owned:producer-winery-t1"
+			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -9159,7 +10157,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9189,7 +10186,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9243,7 +10239,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9291,7 +10286,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9345,7 +10339,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9393,7 +10386,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9447,7 +10439,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9489,7 +10480,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9531,7 +10521,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9585,7 +10574,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9633,7 +10621,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9675,7 +10662,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9729,7 +10715,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9771,7 +10756,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9813,7 +10797,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9861,7 +10844,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9909,7 +10891,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9951,7 +10932,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -9999,7 +10979,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10059,7 +11038,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10107,13 +11085,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:armory-t1:iron-armor": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10161,9 +11147,8 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:armory-t1:leather-armor": {
 			"chargeCost": 0,
@@ -10197,7 +11182,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10227,7 +11211,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10263,7 +11246,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10301,7 +11283,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10319,7 +11300,6 @@
 			],
 			"name": "Compost Bio Waste",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10357,7 +11337,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10395,7 +11374,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10433,7 +11411,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10451,13 +11428,21 @@
 			],
 			"name": "Compost Bio Waste",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:blacksmith-t1:axe": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 6,
@@ -10499,13 +11484,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:blacksmith-t1:nails": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 6,
@@ -10541,13 +11534,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:blacksmith-t1:sword": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 6,
@@ -10589,13 +11590,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:brewery-t1:hop-field"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10619,16 +11628,24 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:brewery-t1:hop-field"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10646,16 +11663,24 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:brewery-t1:hops": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:brewery-t1:hop-field"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10673,16 +11698,29 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:brickyard:bricks": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:clay-pit:nearby"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 8,
@@ -10724,9 +11762,8 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:cattle-farm-t1:milk": {
 			"chargeCost": 0,
@@ -10754,7 +11791,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
@@ -10764,6 +11800,15 @@
 		"product:charcoal-burner-t1:charcoal": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 8,
@@ -10793,9 +11838,8 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:chest-t1:open": {
 			"chargeCost": 1,
@@ -10832,7 +11876,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10877,7 +11920,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10922,7 +11964,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10967,7 +12008,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -10997,7 +12037,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
@@ -11048,7 +12087,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11084,7 +12122,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11126,7 +12163,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11174,13 +12210,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:clay-pit:clay": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:clay-pit:clay-deposit"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11198,13 +12242,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:coal-mine-t1:coal": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:coal-mine-t1:coal-deposit"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11234,9 +12286,8 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:construction-yard-t1:construction-bundle": {
 			"chargeCost": 0,
@@ -11288,7 +12339,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11348,7 +12398,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11396,7 +12445,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11420,7 +12468,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11456,7 +12503,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -11486,13 +12532,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:farm-t1:grain": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:farm-t1:wheat-field"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11510,17 +12564,25 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:farm-t1:grain-morale-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:farm-t1:wheat-field"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11544,16 +12606,29 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:glassworks:glass": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:glassworks:sand-pit"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11589,13 +12664,26 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:glazier-workshop-t1:stained-glass": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:glazier-workshop-t1:glassworks"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11643,13 +12731,26 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:glazier-workshop-t1:glassworks"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11703,13 +12804,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:gold-mine-t1:gold-ore": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:gold-mine-t1:gold-deposit"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11739,13 +12848,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:coin-stack": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 6,
@@ -11781,13 +12898,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t1": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 6,
@@ -11835,13 +12960,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t2": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11889,13 +13022,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t3": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11943,13 +13084,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:goldsmith-t1:key-t4": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11997,9 +13146,8 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:heroes-guild-t1:chest-t1": {
 			"chargeCost": 0,
@@ -12039,7 +13187,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12081,7 +13228,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12129,7 +13275,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12183,7 +13328,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12255,7 +13399,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12345,7 +13488,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12375,7 +13517,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12416,7 +13557,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12468,7 +13608,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12525,13 +13664,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:iron-mine-t1:iron-ore": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:iron-mine-t1:iron-deposit"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12561,13 +13708,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:lumberjack-t1:log": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:lumberjack-t1:tree"
+						]
+					}
+				]
+			},
 			"name": "Log",
 			"output": [
 				{
@@ -12577,11 +13732,10 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:market-t1:coin-from-beer": {
 			"chargeCost": 0,
@@ -12603,7 +13757,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12627,7 +13780,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12651,7 +13803,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12675,7 +13826,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12699,7 +13849,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12723,7 +13872,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12747,7 +13895,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12771,7 +13918,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12795,7 +13941,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12819,7 +13964,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12849,7 +13993,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12879,7 +14022,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
@@ -12918,7 +14060,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12954,7 +14095,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -12990,7 +14130,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13032,7 +14171,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13074,7 +14212,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13116,7 +14253,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13158,7 +14294,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13194,7 +14329,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13212,13 +14346,21 @@
 			],
 			"name": "Purify Pollution",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:quarry-t1:stone": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:quarry-t1:rock"
+						]
+					}
+				]
+			},
 			"name": "Stone",
 			"output": [
 				{
@@ -13228,15 +14370,23 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:quarry-t2:marble": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:quarry-t2:marble-deposit"
+						]
+					}
+				]
+			},
 			"name": "Marble",
 			"output": [
 				{
@@ -13246,13 +14396,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:quarry-t2:stone": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:quarry-t2:marble-deposit"
+						]
+					}
+				]
+			},
 			"name": "Stone",
 			"output": [
 				{
@@ -13262,13 +14420,26 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:roof-tile-factory:roof-tiles": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:clay-pit:nearby"
+						]
+					},
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 8,
@@ -13310,13 +14481,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:sand-pit:sand": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:sand-pit:sand-deposit"
+						]
+					}
+				]
+			},
 			"name": "Sand",
 			"output": [
 				{
@@ -13326,13 +14505,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:sawmill-t1:plank": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:sawmill-t1:lumberjack-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13350,11 +14537,10 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"shrine:haste-target"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:school:basic-knowledge": {
 			"chargeCost": 0,
@@ -13382,7 +14568,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13418,7 +14603,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13448,7 +14632,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2"
@@ -13481,7 +14664,6 @@
 			],
 			"name": "Bountiful Offering",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"shrine:effect"
 			],
@@ -13507,7 +14689,6 @@
 			],
 			"name": "Minor Haste",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"shrine:effect"
 			],
@@ -13538,13 +14719,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:smelter-t1:gold-ingot": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13586,13 +14775,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:smelter-t1:iron-ingot": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:dirty-processing:purifier"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13634,13 +14831,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:stonemason-t1:stone-block": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t1:quarry-t1"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13658,13 +14863,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:stonemason-t2:marble-block": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t2:quarry-t2"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13688,13 +14901,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t2:quarry-t2"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13724,13 +14945,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:stonemason-t2:stone-block": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:stonemason-t2:quarry-t2"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13748,9 +14977,8 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:tailor-workshop-t1:common-clothing": {
 			"chargeCost": 0,
@@ -13778,7 +15006,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13814,7 +15041,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13856,7 +15082,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13886,7 +15111,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13910,7 +15134,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13934,7 +15157,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13970,7 +15192,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -13994,7 +15215,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14018,7 +15238,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14042,7 +15261,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14066,7 +15284,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14102,7 +15319,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14126,7 +15342,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14162,7 +15377,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14198,7 +15412,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14228,7 +15441,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14258,7 +15470,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14288,7 +15499,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14318,7 +15528,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14354,7 +15563,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14396,7 +15604,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14426,7 +15633,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14462,7 +15668,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14510,7 +15715,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14534,7 +15738,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14564,7 +15767,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14600,7 +15802,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14636,7 +15837,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14666,7 +15866,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14702,7 +15901,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14738,7 +15936,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14768,7 +15965,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14798,7 +15994,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14840,7 +16035,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14870,7 +16064,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14906,7 +16099,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14936,7 +16128,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -14966,7 +16157,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15002,7 +16192,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15044,7 +16233,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15086,7 +16274,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15122,7 +16309,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15158,7 +16344,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15194,7 +16379,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15230,7 +16414,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15266,7 +16449,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15302,7 +16484,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15332,7 +16513,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15374,7 +16554,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15410,7 +16589,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15446,7 +16624,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15476,7 +16653,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15500,7 +16676,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15566,7 +16741,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15614,7 +16788,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15668,7 +16841,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15734,7 +16906,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15776,7 +16947,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15842,7 +17012,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15884,7 +17053,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15926,7 +17094,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -15968,7 +17135,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16016,7 +17182,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16040,7 +17205,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-2",
@@ -16082,7 +17246,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16100,7 +17263,6 @@
 			],
 			"name": "Recycle Trash",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16138,7 +17300,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16176,7 +17337,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16214,7 +17374,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16232,7 +17391,6 @@
 			],
 			"name": "Recycle Trash",
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16256,7 +17414,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
@@ -16272,7 +17429,6 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"shrine:haste-target"
 			],
@@ -16298,13 +17454,21 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [],
 			"visibility": "visible"
 		},
 		"product:winery-t1:grapes": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:winery-t1:vineyard"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16322,16 +17486,24 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:winery-t1:vineyard"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16355,16 +17527,24 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		},
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"chargeCost": 0,
 			"durationMs": 1000,
+			"grantSelector": {
+				"allOf": [
+					{
+						"ids": [
+							"grant:proximity:winery-t1:vineyard"
+						]
+					}
+				]
+			},
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16382,15 +17562,13 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"requirementIds": [],
 			"tags": [
 				"pollution-sensitive",
 				"pollution-sensitive:radius-3"
 			],
-			"visibility": "hidden"
+			"visibility": "visible"
 		}
 	},
-	"requirements": {},
 	"startingState": {
 		"board": [
 			{

@@ -1,11 +1,8 @@
-import type { FC, ReactNode } from "react";
+import type { FC } from "react";
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
-import { readActivationRequirementViewReady } from "~/v0/board/logic/readActivationRequirementViewReady";
-import type { ActivationRequirementView } from "~/v0/board/view/ActivationRequirementViewSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
-import { ItemInlineAssetGroup } from "~/v0/item/ui/ItemInlineAssetGroup";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
@@ -95,59 +92,6 @@ const readLineActionLabel = ({
 		.join(" · ");
 };
 
-const renderRequirementAsset = (
-	requirement: ActivationRequirementView,
-	items: ItemCatalogView,
-): ReactNode => {
-	if (requirement.type === "proximity") {
-		return (
-			<ItemInlineAssetGroup
-				itemIds={requirement.itemIds}
-				items={items}
-				assetClassName="h-7 w-7"
-			/>
-		);
-	}
-
-	return (
-		<ItemInlineAsset
-			item={items[requirement.itemId]}
-			className="h-9 w-9"
-		/>
-	);
-};
-
-const readRequirementLabel = (requirement: ActivationRequirementView, items: ItemCatalogView) => {
-	if (requirement.type === "proximity") {
-		return requirement.itemIds.map((itemId) => readItemName(itemId, items)).join(" / ");
-	}
-
-	return readItemName(requirement.itemId, items);
-};
-
-const readRequirementMeta = (requirement: ActivationRequirementView) => {
-	if (requirement.type === "stored") {
-		return `${requirement.stored}/${requirement.quantity} stored${
-			requirement.capacity > requirement.quantity ? ` · cap ${requirement.capacity}` : ""
-		}`;
-	}
-
-	if (requirement.type === "passive") {
-		return `${requirement.stored}/${requirement.quantity} available`;
-	}
-
-	const nearestLabel =
-		requirement.matchedDistance === undefined
-			? undefined
-			: `nearest ${requirement.matchedDistance}`;
-	return [
-		`within ${requirement.distance}`,
-		nearestLabel,
-	]
-		.filter(Boolean)
-		.join(" · ");
-};
-
 const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
 
 const readLineProgressDisplay = (line: ProducerProductLineView) => {
@@ -201,10 +145,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 					>
 						<div className="grid gap-2.5">
 							{group.lines.map((line) => {
-								const unmetRequirements = (line.requirements ?? []).filter(
-									(requirement) =>
-										!readActivationRequirementViewReady(requirement),
-								);
 								const runState = readProducerProductLineRunState({
 									line,
 								});
@@ -359,42 +299,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 														),
 													)}
 												</ul>
-											</div>
-										) : null}
-
-										{unmetRequirements.length ? (
-											<div className="mt-2.5 grid gap-1.5">
-												{unmetRequirements.map(
-													(requirement, requirementIndex) => {
-														return (
-															<div
-																key={`${requirementIndex}:${readRequirementLabel(requirement, items)}`}
-																className="flex min-w-0 items-start gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
-															>
-																{renderRequirementAsset(
-																	requirement,
-																	items,
-																)}
-																<div className="min-w-0 flex-1">
-																	<p className="break-words font-semibold text-ak-text">
-																		{readRequirementLabel(
-																			requirement,
-																			items,
-																		)}
-																	</p>
-																	<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
-																		{readRequirementMeta(
-																			requirement,
-																		)}
-																	</p>
-																</div>
-																<span className="mt-0.5 shrink-0 text-ak-text-muted">
-																	missing
-																</span>
-															</div>
-														);
-													},
-												)}
 											</div>
 										) : null}
 

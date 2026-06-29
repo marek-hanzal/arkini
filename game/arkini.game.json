@@ -345,6 +345,10 @@
 			"render": "plain",
 			"resourceId": "item-charcoal"
 		},
+		"asset:item:cheat": {
+			"render": "plain",
+			"resourceId": "item-cheat"
+		},
 		"asset:item:cheese": {
 			"render": "plain",
 			"resourceId": "item-cheese"
@@ -457,6 +461,10 @@
 			"render": "plain",
 			"resourceId": "item-hops"
 		},
+		"asset:item:inventory": {
+			"render": "plain",
+			"resourceId": "item-inventory"
+		},
 		"asset:item:iron-armor": {
 			"render": "plain",
 			"resourceId": "item-iron-armor"
@@ -548,6 +556,10 @@
 		"asset:item:nails": {
 			"render": "plain",
 			"resourceId": "item-nails"
+		},
+		"asset:item:nuke-save": {
+			"render": "plain",
+			"resourceId": "item-nuke-save"
 		},
 		"asset:item:paper": {
 			"render": "plain",
@@ -5054,6 +5066,21 @@
 			],
 			"tier": 6
 		},
+		"item:cheat": {
+			"assetId": "asset:item:cheat",
+			"description": "A shameless little toolkit that opens the cheat inventory for testing.",
+			"label": "Cheats",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Cheat Kit",
+			"storage": "board",
+			"tags": [
+				"special:cheat",
+				"utility",
+				"ui"
+			],
+			"tier": 0
+		},
 		"item:cheese": {
 			"assetId": "asset:item:cheese",
 			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
@@ -5478,6 +5505,21 @@
 			],
 			"tier": 0
 		},
+		"item:inventory": {
+			"assetId": "asset:item:inventory",
+			"description": "A trusty backpack that opens the shared inventory from the board.",
+			"label": "Inventory",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Backpack",
+			"storage": "board",
+			"tags": [
+				"special:inventory",
+				"utility",
+				"ui"
+			],
+			"tier": 0
+		},
 		"item:iron-armor": {
 			"assetId": "asset:item:iron-armor",
 			"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
@@ -5826,6 +5868,21 @@
 				"tier-4-resource"
 			],
 			"tier": 4
+		},
+		"item:nuke-save": {
+			"assetId": "asset:item:nuke-save",
+			"description": "A dangerous reset charge that opens the save nuke confirmation.",
+			"label": "Nuke",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Save Nuke",
+			"storage": "board",
+			"tags": [
+				"special:nuke-save",
+				"utility",
+				"ui"
+			],
+			"tier": 0
 		},
 		"item:paper": {
 			"assetId": "asset:item:paper",
@@ -14572,6 +14629,21 @@
 	},
 	"startingState": {
 		"board": [
+			{
+				"itemId": "item:nuke-save",
+				"x": 4,
+				"y": 0
+			},
+			{
+				"itemId": "item:cheat",
+				"x": 5,
+				"y": 0
+			},
+			{
+				"itemId": "item:inventory",
+				"x": 6,
+				"y": 0
+			},
 			{
 				"itemId": "item:tree",
 				"x": 0,

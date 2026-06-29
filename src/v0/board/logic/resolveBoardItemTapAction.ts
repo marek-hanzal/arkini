@@ -3,7 +3,9 @@ import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { isCheatBoardItemId } from "~/v0/inventory/CheatBoardItem";
 import { isInventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
+import { isNukeSaveBoardItemId } from "~/v0/inventory/NukeSaveBoardItem";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace resolveBoardItemTapAction {
@@ -35,6 +37,14 @@ export namespace resolveBoardItemTapAction {
 		| {
 				type: "open-inventory";
 				boardItemId: string;
+		  }
+		| {
+				type: "open-cheat-inventory";
+				boardItemId: string;
+		  }
+		| {
+				type: "open-nuke-save";
+				boardItemId: string;
 		  };
 }
 
@@ -46,6 +56,20 @@ export const resolveBoardItemTapAction = ({
 		return {
 			boardItemId: boardItem.id,
 			type: "open-inventory",
+		};
+	}
+
+	if (isCheatBoardItemId(boardItem.itemId)) {
+		return {
+			boardItemId: boardItem.id,
+			type: "open-cheat-inventory",
+		};
+	}
+
+	if (isNukeSaveBoardItemId(boardItem.itemId)) {
+		return {
+			boardItemId: boardItem.id,
+			type: "open-nuke-save",
 		};
 	}
 

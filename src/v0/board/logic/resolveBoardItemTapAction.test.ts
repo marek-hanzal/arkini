@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { cheatBoardItemId } from "~/v0/inventory/CheatBoardItem";
 import { inventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
+import { nukeSaveBoardItemId } from "~/v0/inventory/NukeSaveBoardItem";
 
 const baseBoardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 	id: "board:item",
@@ -70,6 +72,48 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 });
 
 describe("resolveBoardItemTapAction", () => {
+	it("opens inventory for the dedicated inventory board item", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					itemId: inventoryBoardItemId,
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-inventory",
+		});
+	});
+
+	it("opens cheat inventory for the dedicated cheat board item", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					itemId: cheatBoardItemId,
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-cheat-inventory",
+		});
+	});
+
+	it("opens save nuke confirmation for the dedicated nuke board item", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					itemId: nukeSaveBoardItemId,
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			boardItemId: "board:item",
+			type: "open-nuke-save",
+		});
+	});
+
 	it("claims finished crafts before considering activation", () => {
 		expect(
 			resolveBoardItemTapAction({

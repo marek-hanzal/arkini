@@ -494,5 +494,5 @@ const hasConfiguredInteraction = (
 			config.craftRecipes[itemId] ||
 			(item?.mergeIds && item.mergeIds.length > 0) ||
 			(item?.removeBy && item.removeBy.length > 0) ||
-			(item?.tags && item.tags.includes("special:inventory")),
+			(item?.tags && item.tags.some((tag) => tag.startsWith("special:"))),
 	);

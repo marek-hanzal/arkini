@@ -6,8 +6,10 @@ export namespace BoardSurface {
 		feedback: Feedback.Type;
 		feedbackFlags: ReadonlySet<string>;
 		onOpenItem(boardItemId: string): void;
+		onOpenCheatInventory(): void;
 		onOpenInventory(): void;
 		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
+		onOpenNukeSave(): void;
 		disabled?: boolean;
 	}
 

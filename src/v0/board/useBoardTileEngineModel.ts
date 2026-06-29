@@ -19,14 +19,18 @@ import {
 } from "~/v0/play/runtime";
 import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
+import { isCheatBoardItemId } from "~/v0/inventory/CheatBoardItem";
 import { isInventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
+import { isNukeSaveBoardItemId } from "~/v0/inventory/NukeSaveBoardItem";
 
 export namespace useBoardTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
+		onOpenCheatInventory(): void;
 		onOpenInventory(): void;
 		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
 		onOpenItem(boardItemId: string): void;
+		onOpenNukeSave(): void;
 	}
 
 	export interface Result {
@@ -44,9 +48,11 @@ const transientTileStyle = {
 
 export const useBoardTileEngineModel = ({
 	feedback,
+	onOpenCheatInventory,
 	onOpenInventory,
 	onOpenInventoryPlacementTarget,
 	onOpenItem,
+	onOpenNukeSave,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
 	const board = useGameBoardView();
 	const actions = useGameRuntimeDropActions();
@@ -161,6 +167,16 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
+			if (action.type === "open-cheat-inventory") {
+				onOpenCheatInventory();
+				return;
+			}
+
+			if (action.type === "open-nuke-save") {
+				onOpenNukeSave();
+				return;
+			}
+
 			if (action.type !== "activate") return;
 
 			const activation = liveBoardItem.activation;
@@ -206,8 +222,10 @@ export const useBoardTileEngineModel = ({
 		},
 		[
 			feedback.showError,
+			onOpenCheatInventory,
 			onOpenInventory,
 			onOpenItem,
+			onOpenNukeSave,
 			runtimeStore,
 		],
 	);
@@ -223,6 +241,8 @@ export const useBoardTileEngineModel = ({
 				if (!boardItem) return undefined;
 
 				const opensInventory = isInventoryBoardItemId(boardItem.itemId);
+				const opensCheatInventory = isCheatBoardItemId(boardItem.itemId);
+				const opensNukeSave = isNukeSaveBoardItemId(boardItem.itemId);
 
 				return {
 					id: `board:${boardItem.id}`,
@@ -235,7 +255,11 @@ export const useBoardTileEngineModel = ({
 					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
 					onLongActivate: opensInventory
 						? onOpenInventory
-						: () => onOpenItem(boardItem.id),
+						: opensCheatInventory
+							? onOpenCheatInventory
+							: opensNukeSave
+								? onOpenNukeSave
+								: () => onOpenItem(boardItem.id),
 				};
 			},
 			slot(slot, targetTile) {
@@ -292,9 +316,11 @@ export const useBoardTileEngineModel = ({
 			board,
 			feedback,
 			runtimeStore,
+			onOpenCheatInventory,
 			onOpenInventory,
 			onOpenInventoryPlacementTarget,
 			onOpenItem,
+			onOpenNukeSave,
 		],
 	);
 

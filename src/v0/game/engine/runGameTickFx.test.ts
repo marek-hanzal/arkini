@@ -754,6 +754,83 @@ describe("runGameTickFx", () => {
 		expect(result.nextWakeAtMs).toBe(2000);
 	});
 
+	it("keeps craft completion blocked when the result item creation grant is missing", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: true,
+		});
+		config.effects["effect:grant-plank"] = {
+			name: "Grant plank",
+			operations: [
+				{
+					grantId: "grant:plank",
+					kind: "grant.add",
+					target: {
+						items: {
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
+							],
+						},
+					},
+				},
+			],
+			scope: "global",
+		};
+		config.items["item:plank"] = {
+			...config.items["item:plank"],
+			grantSelector: {
+				allOf: [
+					{
+						ids: [
+							"grant:plank",
+						],
+					},
+				],
+			},
+		};
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:craft"] = {
+			readyAtMs: 1000,
+			id: "job:craft",
+			recipeId: "item:craft-table",
+			targetItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.craftJobs["job:craft"]).toMatchObject({
+			delivery: {
+				lastBlockedAtMs: 1000,
+				nextAttemptAtMs: 2000,
+			},
+		});
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			itemId: "item:craft-table",
+		});
+		expect(result.events).toEqual([
+			{
+				atMs: 1000,
+				jobId: "job:craft",
+				reason: "effect:missing-grant",
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.blocked",
+			},
+		]);
+		expect(result.nextWakeAtMs).toBe(2000);
+	});
+
 	it("completes delayed sink products without output", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

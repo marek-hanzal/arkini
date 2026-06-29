@@ -6,6 +6,7 @@ import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoard
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
+import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/board/BoardCell";
@@ -17,37 +18,86 @@ type GameSaveSingleItemPlacementResult = {
 	type: "placed";
 };
 
-const checkPlacementEffectBlocksFx = Effect.fn("checkPlacementEffectBlocksFx")(function* ({
-	config,
-	itemId,
-	nowMs,
-	save,
-	targetCell,
-}: {
-	config: GameConfig;
-	itemId: string;
-	nowMs: number;
-	save: GameSave;
-	targetCell?: BoardCell;
-}) {
-	const blockReasons = readGameEffectItemCreateBlockReasons({
+const checkInventoryCreateEffectAccessFx = Effect.fn("checkInventoryCreateEffectAccessFx")(
+	function* ({
+		config,
+		itemId,
+		nowMs,
+		save,
+	}: {
+		config: GameConfig;
+		itemId: string;
+		nowMs: number;
+		save: GameSave;
+	}) {
+		if (
+			readGameEffectItemCreateMissingGrant({
+				config,
+				itemId,
+				nowMs,
+				save,
+			})
+		) {
+			return yield* Effect.fail(
+				GameEngineError.placementFailed(
+					"effect:missing-grant",
+					`Item "${itemId}" is missing a required effect grant.`,
+				),
+			);
+		}
+
+		const blockReasons = readGameEffectItemCreateBlockReasons({
+			config,
+			itemId,
+			nowMs,
+			save,
+		});
+		if (blockReasons.length === 0) return;
+
+		const [firstReason] = blockReasons;
+		return yield* Effect.fail(
+			GameEngineError.placementFailed(
+				"effect:block-create",
+				firstReason?.reason ??
+					`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
+			),
+		);
+	},
+);
+
+const checkGlobalPlacementEffectBlocksFx = Effect.fn("checkGlobalPlacementEffectBlocksFx")(
+	function* ({
 		config,
 		itemId,
 		nowMs,
 		save,
 		targetCell,
-	});
-	if (blockReasons.length === 0) return;
+	}: {
+		config: GameConfig;
+		itemId: string;
+		nowMs: number;
+		save: GameSave;
+		targetCell?: BoardCell;
+	}) {
+		const blockReasons = readGameEffectItemCreateBlockReasons({
+			config,
+			itemId,
+			nowMs,
+			save,
+			targetCell,
+		});
+		if (blockReasons.length === 0) return;
 
-	const [firstReason] = blockReasons;
-	return yield* Effect.fail(
-		GameEngineError.placementFailed(
-			"effect:block-create",
-			firstReason?.reason ??
-				`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
-		),
-	);
-});
+		const [firstReason] = blockReasons;
+		return yield* Effect.fail(
+			GameEngineError.placementFailed(
+				"effect:block-create",
+				firstReason?.reason ??
+					`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
+			),
+		);
+	},
+);
 
 export namespace placeSingleGameSaveItemRequestFx {
 	export interface Props {
@@ -77,7 +127,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			);
 		}
 
-		yield* checkPlacementEffectBlocksFx({
+		yield* checkGlobalPlacementEffectBlocksFx({
 			config,
 			itemId: item.itemId,
 			nowMs,
@@ -88,6 +138,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			item.createdAtMs ?? (itemDefinition.passiveEffectIds?.length ? nowMs : undefined);
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
+		let boardBlockedByMissingGrant = false;
 		let boardHitMaxCount = false;
 		let boardRanOutOfSpace = false;
 		const canPlaceOnBoard = isItemStorageAllowed({
@@ -132,6 +183,15 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				seedCell,
 			});
 			if (!emptyCell) {
+				boardBlockedByMissingGrant = emptyCells.some((targetCell) =>
+					readGameEffectItemCreateMissingGrant({
+						config,
+						itemId: item.itemId,
+						nowMs,
+						save,
+						targetCell,
+					}),
+				);
 				boardBlockedByEffect = true;
 				break;
 			}
@@ -165,13 +225,24 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		}
 
 		const inventoryPlaced = canPlaceInInventory
-			? yield* placeGameSaveInventoryRemainderFx({
-					createdAtMs,
-					events,
-					item,
-					maxStackSize: itemDefinition.maxStackSize,
-					remainingQuantity,
-					slots: save.inventory.slots,
+			? yield* Effect.gen(function* () {
+					if (remainingQuantity > 0) {
+						yield* checkInventoryCreateEffectAccessFx({
+							config,
+							itemId: item.itemId,
+							nowMs,
+							save,
+						});
+					}
+
+					return yield* placeGameSaveInventoryRemainderFx({
+						createdAtMs,
+						events,
+						item,
+						maxStackSize: itemDefinition.maxStackSize,
+						remainingQuantity,
+						slots: save.inventory.slots,
+					});
 				})
 			: remainingQuantity === 0;
 
@@ -184,17 +255,21 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		const reason =
 			canPlaceOnBoard &&
 			(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-			boardBlockedByEffect
-				? "effect:block-create"
+			boardBlockedByMissingGrant
+				? "effect:missing-grant"
 				: canPlaceOnBoard &&
 						(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-						boardHitMaxCount
-					? "board:max-count"
+						boardBlockedByEffect
+					? "effect:block-create"
 					: canPlaceOnBoard &&
 							(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-							boardRanOutOfSpace
-						? "board:full"
-						: "inventory:full";
+							boardHitMaxCount
+						? "board:max-count"
+						: canPlaceOnBoard &&
+								(!canPlaceInInventory || boardPlacedQuantity === 0) &&
+								boardRanOutOfSpace
+							? "board:full"
+							: "inventory:full";
 
 		return yield* Effect.fail(
 			GameEngineError.placementFailed(reason, "Placement target is full."),

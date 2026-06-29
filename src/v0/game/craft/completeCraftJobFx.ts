@@ -6,6 +6,7 @@ import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
 import { blockedCraftCompletionRetryDelayMs } from "~/v0/game/craft/craftCompletionTiming";
 import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
+import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import type { GameEngineCompletionResult } from "~/v0/game/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
@@ -147,6 +148,29 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 			job: liveJob,
 			nowMs,
 			reason: "storage:inventory-forbidden",
+			save,
+		});
+	}
+
+	if (
+		readGameEffectItemCreateMissingGrant({
+			config,
+			ignoredSourceIds: new Set([
+				liveJob.targetItemInstanceId,
+			]),
+			itemId: recipe.resultItemId,
+			nowMs,
+			save,
+			targetCell: {
+				x: liveTarget.x,
+				y: liveTarget.y,
+			},
+		})
+	) {
+		return yield* completeBlockedCraftJobFx({
+			job: liveJob,
+			nowMs,
+			reason: "effect:missing-grant",
 			save,
 		});
 	}

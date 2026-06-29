@@ -83,3 +83,13 @@ button:focus-visible,
 		transform: scaleX(1);
 	}
 }
+
+@keyframes ui-progress-button-empty-to-start {
+	from {
+		transform: scaleX(var(--ui-progress-button-start, 1));
+	}
+
+	to {
+		transform: scaleX(0);
+	}
+}

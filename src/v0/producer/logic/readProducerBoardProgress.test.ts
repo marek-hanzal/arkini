@@ -13,6 +13,32 @@ const producerActivation = (
 	trigger: "click",
 });
 
+type ProductLine = NonNullable<ActivationView["productLines"]>[number];
+
+const createLine = (overrides: Partial<ProductLine> = {}): ProductLine => ({
+	durationMs: 1000,
+	inProgress: true,
+	isDefault: true,
+	inputItemIds: [],
+	inputs: [],
+	inputsReady: true,
+	inputsAvailable: true,
+	missingRequirementItemIds: [],
+	name: "Twig",
+	productId: "product:twig",
+	producerQueuedJobs: 1,
+	queueFull: true,
+	blocked: false,
+	blockReasonEffectIds: [],
+	queueSize: 1,
+	queuedJobs: 1,
+	readyAtMs: 2000,
+	requirementItemIds: [],
+	requirementsReady: true,
+	startAtMs: 1000,
+	...overrides,
+});
+
 describe("readProducerBoardProgress", () => {
 	it("returns live progress for the currently running producer line", () => {
 		expect(
@@ -79,6 +105,43 @@ describe("readProducerBoardProgress", () => {
 					"stash",
 				),
 				nowMs: 1500,
+			}),
+		).toEqual({
+			progress: 0.5,
+		});
+	});
+
+	it("counts active effect progress down for board tiles", () => {
+		expect(
+			readProducerBoardProgress({
+				activation: producerActivation([
+					createLine({
+						lineKind: "effect",
+						name: "Minor Haste",
+						productId: "product:shrine-t1:minor-haste",
+					}),
+				]),
+				nowMs: 1250,
+			}),
+		).toEqual({
+			progress: 0.75,
+		});
+	});
+
+	it("prefers active effect countdown over product progress on board tiles", () => {
+		expect(
+			readProducerBoardProgress({
+				activation: producerActivation([
+					createLine(),
+					createLine({
+						lineKind: "effect",
+						name: "Minor Haste",
+						productId: "product:shrine-t1:minor-haste",
+						readyAtMs: 3000,
+						startAtMs: 2000,
+					}),
+				]),
+				nowMs: 2500,
 			}),
 		).toEqual({
 			progress: 0.5,

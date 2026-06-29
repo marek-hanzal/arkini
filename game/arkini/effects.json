@@ -9,9 +9,13 @@
 					"reason": "Engineers path is already chosen.",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:university:blueprint-cathedral",
-								"product:university:blueprint-mage-lodge"
+							"anyOf": [
+								{
+									"id": "product:university:blueprint-cathedral"
+								},
+								{
+									"id": "product:university:blueprint-mage-lodge"
+								}
 							]
 						}
 					}
@@ -21,11 +25,19 @@
 					"reason": "Engineers path is already chosen.",
 					"target": {
 						"items": {
-							"ids": [
-								"item:blueprint-cathedral",
-								"item:blueprint-mage-lodge",
-								"producer:cathedral",
-								"producer:mage-lodge"
+							"anyOf": [
+								{
+									"id": "item:blueprint-cathedral"
+								},
+								{
+									"id": "item:blueprint-mage-lodge"
+								},
+								{
+									"id": "producer:cathedral"
+								},
+								{
+									"id": "producer:mage-lodge"
+								}
 							]
 						}
 					}
@@ -42,9 +54,13 @@
 					"reason": "Faith path is already chosen.",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:university:blueprint-house-of-engineers",
-								"product:university:blueprint-mage-lodge"
+							"anyOf": [
+								{
+									"id": "product:university:blueprint-house-of-engineers"
+								},
+								{
+									"id": "product:university:blueprint-mage-lodge"
+								}
 							]
 						}
 					}
@@ -54,11 +70,19 @@
 					"reason": "Faith path is already chosen.",
 					"target": {
 						"items": {
-							"ids": [
-								"item:blueprint-house-of-engineers",
-								"item:blueprint-mage-lodge",
-								"producer:house-of-engineers",
-								"producer:mage-lodge"
+							"anyOf": [
+								{
+									"id": "item:blueprint-house-of-engineers"
+								},
+								{
+									"id": "item:blueprint-mage-lodge"
+								},
+								{
+									"id": "producer:house-of-engineers"
+								},
+								{
+									"id": "producer:mage-lodge"
+								}
 							]
 						}
 					}
@@ -75,9 +99,13 @@
 					"reason": "Mages path is already chosen.",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:university:blueprint-house-of-engineers",
-								"product:university:blueprint-cathedral"
+							"anyOf": [
+								{
+									"id": "product:university:blueprint-house-of-engineers"
+								},
+								{
+									"id": "product:university:blueprint-cathedral"
+								}
 							]
 						}
 					}
@@ -87,11 +115,19 @@
 					"reason": "Mages path is already chosen.",
 					"target": {
 						"items": {
-							"ids": [
-								"item:blueprint-house-of-engineers",
-								"item:blueprint-cathedral",
-								"producer:house-of-engineers",
-								"producer:cathedral"
+							"anyOf": [
+								{
+									"id": "item:blueprint-house-of-engineers"
+								},
+								{
+									"id": "item:blueprint-cathedral"
+								},
+								{
+									"id": "producer:house-of-engineers"
+								},
+								{
+									"id": "producer:cathedral"
+								}
 							]
 						}
 					}
@@ -109,8 +145,10 @@
 					"durationFactor": 0.5,
 					"target": {
 						"productLines": {
-							"anyTags": [
-								"pollution-sensitive:radius-2"
+							"anyOf": [
+								{
+									"tag": "pollution-sensitive:radius-2"
+								}
 							]
 						}
 					}
@@ -127,8 +165,10 @@
 					"durationFactor": 0.5,
 					"target": {
 						"productLines": {
-							"anyTags": [
-								"pollution-sensitive:radius-3"
+							"anyOf": [
+								{
+									"tag": "pollution-sensitive:radius-3"
+								}
 							]
 						}
 					}

@@ -253,8 +253,12 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 							kind: "duration.proximityPenalty",
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -386,8 +390,12 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 							kind: "line.reveal",
 							target: {
 								productLines: {
-									ids: [
-										"product:shred",
+									anyOf: [
+										{
+											ids: [
+												"product:shred",
+											],
+										},
 									],
 								},
 							},

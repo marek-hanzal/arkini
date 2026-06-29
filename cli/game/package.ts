@@ -292,13 +292,37 @@ const asRecord = (value: unknown): Record<string, unknown> =>
 		? (value as Record<string, unknown>)
 		: {};
 
-type AuthoringDomainSelector = {
-	all?: true;
-	ids?: string[];
-	anyTags?: string[];
-	allTags?: string[];
-	noneTags?: string[];
+type AuthoringDomainSelectorRef =
+	| {
+			id: string;
+	  }
+	| {
+			tag: string;
+	  };
+
+type AuthoringDomainSelector =
+	| {
+			mode: "all";
+	  }
+	| {
+			anyOf?: AuthoringDomainSelectorRef[];
+			allOf?: AuthoringDomainSelectorRef[];
+			noneOf?: AuthoringDomainSelectorRef[];
+	  };
+
+type ResolvedDomainSelectorClause = {
+	ids: string[];
 };
+
+type ResolvedDomainSelector =
+	| {
+			mode: "all";
+	  }
+	| {
+			anyOf?: ResolvedDomainSelectorClause[];
+			allOf?: ResolvedDomainSelectorClause[];
+			noneOf?: ResolvedDomainSelectorClause[];
+	  };
 
 type DomainIndex = {
 	ids: readonly string[];
@@ -455,56 +479,135 @@ const normalizeAuthoringDomainSelector = ({
 	domain: DomainIndex;
 	path: string;
 	selector: AuthoringDomainSelector;
-}) => {
-	const ids = selector.ids ?? [];
-	const anyTags = selector.anyTags ?? [];
-	const allTags = selector.allTags ?? [];
-	const noneTags = selector.noneTags ?? [];
-	const hasAnySelector =
-		ids.length > 0 || anyTags.length > 0 || allTags.length > 0 || noneTags.length > 0;
-
-	if (selector.all && hasAnySelector) {
-		throw new Error(`${path}: all: true must not be combined with ids or tags.`);
-	}
-	if (selector.all)
+}): ResolvedDomainSelector => {
+	if ("mode" in selector) {
 		return {
-			all: true,
+			mode: "all",
 		};
-	if (!hasAnySelector) {
-		throw new Error(`${path}: selector must define ids, tags, or all: true.`);
 	}
 
-	validateUniqueValues(ids, `${path}.ids`, (value) => `Duplicate ${domain.label} "${value}".`);
-	validateUniqueValues(anyTags, `${path}.anyTags`, (value) => `Duplicate tag "${value}".`);
-	validateUniqueValues(allTags, `${path}.allTags`, (value) => `Duplicate tag "${value}".`);
-	validateUniqueValues(noneTags, `${path}.noneTags`, (value) => `Duplicate tag "${value}".`);
-	validateKnownTags(domain, anyTags, `${path}.anyTags`);
-	validateKnownTags(domain, allTags, `${path}.allTags`);
-	validateKnownTags(domain, noneTags, `${path}.noneTags`);
-
-	const domainIdSet = new Set(domain.ids);
-	for (const [index, id] of ids.entries()) {
-		if (domainIdSet.has(id)) continue;
-		throw new Error(`${path}.ids.${index}: Missing ${domain.label} "${id}".`);
-	}
-
-	const candidates = ids.length > 0 ? ids : domain.ids;
-	const resolvedIds = candidates.filter((id) => {
-		const tags = domain.tagsById.get(id) ?? new Set<string>();
-		if (anyTags.length > 0 && !anyTags.some((tag) => tags.has(tag))) return false;
-		if (allTags.length > 0 && !allTags.every((tag) => tags.has(tag))) return false;
-		if (noneTags.length > 0 && noneTags.some((tag) => tags.has(tag))) return false;
-		return true;
+	const anyOf = normalizeAuthoringDomainSelectorRefs({
+		domain,
+		path: `${path}.anyOf`,
+		refs: selector.anyOf,
 	});
+	const allOf = normalizeAuthoringDomainSelectorRefs({
+		domain,
+		path: `${path}.allOf`,
+		refs: selector.allOf,
+	});
+	const noneOf = normalizeAuthoringDomainSelectorRefs({
+		domain,
+		path: `${path}.noneOf`,
+		refs: selector.noneOf,
+	});
+	const normalizedSelector: ResolvedDomainSelector = {
+		...(anyOf
+			? {
+					anyOf,
+				}
+			: {}),
+		...(allOf
+			? {
+					allOf,
+				}
+			: {}),
+		...(noneOf
+			? {
+					noneOf,
+				}
+			: {}),
+	};
 
-	if (resolvedIds.length === 0) {
+	if (!anyOf && !allOf && !noneOf) {
+		throw new Error(`${path}: selector must define anyOf, allOf, noneOf, or mode: "all".`);
+	}
+
+	const matchedIds = domain.ids.filter((id) =>
+		doesResolvedDomainSelectorMatchId(id, normalizedSelector),
+	);
+	if (matchedIds.length === 0) {
 		throw new Error(`${path}: selector matched no ${domain.label}s.`);
 	}
 
-	return {
-		ids: resolvedIds,
-	};
+	return normalizedSelector;
 };
+
+const normalizeAuthoringDomainSelectorRefs = ({
+	domain,
+	path,
+	refs,
+}: {
+	domain: DomainIndex;
+	path: string;
+	refs: readonly AuthoringDomainSelectorRef[] | undefined;
+}): ResolvedDomainSelectorClause[] | undefined => {
+	if (!refs) return undefined;
+	validateUniqueSelectorRefs(refs, path);
+
+	return refs.map((ref, index) => ({
+		ids: resolveAuthoringDomainSelectorRef({
+			domain,
+			path: `${path}.${index}`,
+			ref,
+		}),
+	}));
+};
+
+const resolveAuthoringDomainSelectorRef = ({
+	domain,
+	path,
+	ref,
+}: {
+	domain: DomainIndex;
+	path: string;
+	ref: AuthoringDomainSelectorRef;
+}) => {
+	if ("id" in ref) {
+		if (domain.ids.includes(ref.id)) {
+			return [
+				ref.id,
+			];
+		}
+
+		throw new Error(`${path}.id: Missing ${domain.label} "${ref.id}".`);
+	}
+
+	validateKnownTags(
+		domain,
+		[
+			ref.tag,
+		],
+		`${path}.tag`,
+	);
+
+	return domain.ids.filter((id) => domain.tagsById.get(id)?.has(ref.tag));
+};
+
+const doesResolvedDomainSelectorMatchId = (entityId: string, selector: ResolvedDomainSelector) => {
+	if ("mode" in selector) return true;
+	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	if (selector.noneOf?.some((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	return true;
+};
+
+const validateUniqueSelectorRefs = (refs: readonly AuthoringDomainSelectorRef[], path: string) => {
+	validateUniqueValues(
+		refs.map(readAuthoringDomainSelectorRefKey),
+		path,
+		(value) => `Duplicate selector reference "${value}".`,
+	);
+};
+
+const readAuthoringDomainSelectorRefKey = (ref: AuthoringDomainSelectorRef) =>
+	"id" in ref ? `id:${ref.id}` : `tag:${ref.tag}`;
 
 const validateKnownTags = (domain: DomainIndex, tags: readonly string[], path: string) => {
 	for (const [index, tag] of tags.entries()) {

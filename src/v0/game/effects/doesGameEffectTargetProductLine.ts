@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolvedDomainSelectorMatchId";
 
 type ProductLineEffectOperation = Exclude<
 	GameConfig["effects"][string]["operations"][number],
@@ -6,8 +7,6 @@ type ProductLineEffectOperation = Exclude<
 		kind: "item.blockCreate";
 	}
 >;
-
-type ResolvedDomainSelector = NonNullable<ProductLineEffectOperation["target"]["producers"]>;
 
 export namespace doesGameEffectTargetProductLine {
 	export interface Props {
@@ -17,18 +16,16 @@ export namespace doesGameEffectTargetProductLine {
 	}
 }
 
-const matchesResolvedDomainSelector = (
-	entityId: string,
-	selector: ResolvedDomainSelector | undefined,
-) => {
-	if (!selector || selector.all) return true;
-	return selector.ids?.includes(entityId) ?? false;
-};
-
 export const doesGameEffectTargetProductLine = ({
 	producerId,
 	productId,
 	target,
 }: doesGameEffectTargetProductLine.Props) =>
-	matchesResolvedDomainSelector(producerId, target.producers) &&
-	matchesResolvedDomainSelector(productId, target.productLines);
+	doesResolvedDomainSelectorMatchId({
+		entityId: producerId,
+		selector: target.producers,
+	}) &&
+	doesResolvedDomainSelectorMatchId({
+		entityId: productId,
+		selector: target.productLines,
+	});

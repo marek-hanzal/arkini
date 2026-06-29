@@ -391,8 +391,12 @@ describe("placeGameSaveItemsFx", () => {
 							kind: "item.blockCreate",
 							target: {
 								items: {
-									ids: [
-										"item:plank",
+									anyOf: [
+										{
+											ids: [
+												"item:plank",
+											],
+										},
 									],
 								},
 							},
@@ -469,8 +473,12 @@ describe("placeGameSaveItemsFx", () => {
 					reason: "Plank creation is blocked.",
 					target: {
 						items: {
-							ids: [
-								"item:plank",
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
 							],
 						},
 					},

@@ -59,8 +59,12 @@ const createInventorySelfBlockConfig = ({ quantity }: { quantity: number }) => {
 						reason: "inventory axe blocks axe creation",
 						target: {
 							items: {
-								ids: [
-									"item:axe",
+								anyOf: [
+									{
+										ids: [
+											"item:axe",
+										],
+									},
 								],
 							},
 						},
@@ -114,8 +118,12 @@ const createInventoryOnlySpeedConfig = () => {
 						multiplier: 0.1,
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},
@@ -188,8 +196,12 @@ const createStackedInventorySpeedConfig = () => {
 						multiplier: 0.5,
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},
@@ -263,8 +275,12 @@ const createBoardSpeedConfig = ({ sourceScope }: { sourceScope?: "both" }) => {
 						multiplier: 0.1,
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},
@@ -341,8 +357,12 @@ const createActiveEffectConfig = () => {
 						multiplier: 0.1,
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},
@@ -432,8 +452,12 @@ const createLocalLootAppendConfig = () => {
 						],
 						target: {
 							productLines: {
-								ids: [
-									"product:test",
+								anyOf: [
+									{
+										ids: [
+											"product:test",
+										],
+									},
 								],
 							},
 						},
@@ -506,8 +530,12 @@ const createLocalBlockCreateConfig = () => {
 						reason: "twigs blocked near axe",
 						target: {
 							items: {
-								ids: [
-									"item:twig",
+								anyOf: [
+									{
+										ids: [
+											"item:twig",
+										],
+									},
 								],
 							},
 						},

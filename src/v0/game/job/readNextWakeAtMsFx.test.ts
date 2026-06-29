@@ -91,7 +91,7 @@ describe("readNextWakeAtMsFx", () => {
 							kind: "duration.addMs",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 							valueMs: 0,

@@ -428,8 +428,12 @@ describe("GameConfigSchema", () => {
 					kind: "duration.proximityPenalty",
 					target: {
 						productLines: {
-							ids: [
-								"product:test",
+							anyOf: [
+								{
+									ids: [
+										"product:test",
+									],
+								},
 							],
 						},
 					},
@@ -452,8 +456,12 @@ describe("GameConfigSchema", () => {
 					kind: "duration.proximityPenalty",
 					target: {
 						productLines: {
-							ids: [
-								"product:test",
+							anyOf: [
+								{
+									ids: [
+										"product:test",
+									],
+								},
 							],
 						},
 					},
@@ -474,8 +482,12 @@ describe("GameConfigSchema", () => {
 					kind: "line.blockStart",
 					target: {
 						productLines: {
-							ids: [
-								"product:test",
+							anyOf: [
+								{
+									ids: [
+										"product:test",
+									],
+								},
 							],
 						},
 					},
@@ -508,7 +520,7 @@ describe("GameConfigSchema", () => {
 					kind: "line.blockStart",
 					target: {
 						productLines: {
-							all: true,
+							mode: "all",
 						},
 					},
 				},
@@ -518,7 +530,7 @@ describe("GameConfigSchema", () => {
 
 		expect(parseGameConfig(config).effects["effect:test"]?.operations[0]?.target).toEqual({
 			productLines: {
-				all: true,
+				mode: "all",
 			},
 		});
 	});
@@ -548,9 +560,13 @@ describe("GameConfigSchema", () => {
 					kind: "line.blockStart",
 					target: {
 						productLines: {
-							all: true,
-							ids: [
-								"product:test",
+							mode: "all",
+							anyOf: [
+								{
+									ids: [
+										"product:test",
+									],
+								},
 							],
 						},
 					},
@@ -559,7 +575,7 @@ describe("GameConfigSchema", () => {
 			scope: "global",
 		};
 
-		expect(() => parseGameConfig(config)).toThrow(/must not be combined/);
+		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key/);
 	});
 
 	it("rejects local effects that claim inventory source scope", () => {
@@ -571,8 +587,12 @@ describe("GameConfigSchema", () => {
 					kind: "item.blockCreate",
 					target: {
 						items: {
-							ids: [
-								"item:plank",
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
 							],
 						},
 					},
@@ -596,8 +616,12 @@ describe("GameConfigSchema", () => {
 					multiplier: 0.5,
 					target: {
 						productLines: {
-							ids: [
-								"product:test",
+							anyOf: [
+								{
+									ids: [
+										"product:test",
+									],
+								},
 							],
 						},
 					},
@@ -621,8 +645,12 @@ describe("GameConfigSchema", () => {
 					kind: "line.blockStart",
 					target: {
 						productLines: {
-							ids: [
-								"product:test",
+							anyOf: [
+								{
+									ids: [
+										"product:test",
+									],
+								},
 							],
 						},
 					},
@@ -880,8 +908,12 @@ describe("GameConfigSchema", () => {
 					reason: "No planks today.",
 					target: {
 						items: {
-							ids: [
-								"item:plank",
+							anyOf: [
+								{
+									ids: [
+										"item:plank",
+									],
+								},
 							],
 						},
 					},
@@ -905,8 +937,12 @@ describe("GameConfigSchema", () => {
 					kind: "item.blockCreate",
 					target: {
 						items: {
-							ids: [
-								"item:ghost",
+							anyOf: [
+								{
+									ids: [
+										"item:ghost",
+									],
+								},
 							],
 						},
 					},

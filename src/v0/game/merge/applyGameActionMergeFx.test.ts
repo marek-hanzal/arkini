@@ -162,8 +162,12 @@ describe("applyGameActionFx merge", () => {
 							reason: "plank blocked by merge participant",
 							target: {
 								items: {
-									ids: [
-										"item:plank",
+									anyOf: [
+										{
+											ids: [
+												"item:plank",
+											],
+										},
 									],
 								},
 							},

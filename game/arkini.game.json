@@ -3492,9 +3492,17 @@
 					"reason": "Engineers path is already chosen.",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:university:blueprint-cathedral",
-								"product:university:blueprint-mage-lodge"
+							"anyOf": [
+								{
+									"ids": [
+										"product:university:blueprint-cathedral"
+									]
+								},
+								{
+									"ids": [
+										"product:university:blueprint-mage-lodge"
+									]
+								}
 							]
 						}
 					}
@@ -3504,11 +3512,27 @@
 					"reason": "Engineers path is already chosen.",
 					"target": {
 						"items": {
-							"ids": [
-								"item:blueprint-cathedral",
-								"item:blueprint-mage-lodge",
-								"producer:cathedral",
-								"producer:mage-lodge"
+							"anyOf": [
+								{
+									"ids": [
+										"item:blueprint-cathedral"
+									]
+								},
+								{
+									"ids": [
+										"item:blueprint-mage-lodge"
+									]
+								},
+								{
+									"ids": [
+										"producer:cathedral"
+									]
+								},
+								{
+									"ids": [
+										"producer:mage-lodge"
+									]
+								}
 							]
 						}
 					}
@@ -3525,9 +3549,17 @@
 					"reason": "Faith path is already chosen.",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:university:blueprint-house-of-engineers",
-								"product:university:blueprint-mage-lodge"
+							"anyOf": [
+								{
+									"ids": [
+										"product:university:blueprint-house-of-engineers"
+									]
+								},
+								{
+									"ids": [
+										"product:university:blueprint-mage-lodge"
+									]
+								}
 							]
 						}
 					}
@@ -3537,11 +3569,27 @@
 					"reason": "Faith path is already chosen.",
 					"target": {
 						"items": {
-							"ids": [
-								"item:blueprint-house-of-engineers",
-								"item:blueprint-mage-lodge",
-								"producer:house-of-engineers",
-								"producer:mage-lodge"
+							"anyOf": [
+								{
+									"ids": [
+										"item:blueprint-house-of-engineers"
+									]
+								},
+								{
+									"ids": [
+										"item:blueprint-mage-lodge"
+									]
+								},
+								{
+									"ids": [
+										"producer:house-of-engineers"
+									]
+								},
+								{
+									"ids": [
+										"producer:mage-lodge"
+									]
+								}
 							]
 						}
 					}
@@ -3558,9 +3606,17 @@
 					"reason": "Mages path is already chosen.",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:university:blueprint-house-of-engineers",
-								"product:university:blueprint-cathedral"
+							"anyOf": [
+								{
+									"ids": [
+										"product:university:blueprint-house-of-engineers"
+									]
+								},
+								{
+									"ids": [
+										"product:university:blueprint-cathedral"
+									]
+								}
 							]
 						}
 					}
@@ -3570,11 +3626,27 @@
 					"reason": "Mages path is already chosen.",
 					"target": {
 						"items": {
-							"ids": [
-								"item:blueprint-house-of-engineers",
-								"item:blueprint-cathedral",
-								"producer:house-of-engineers",
-								"producer:cathedral"
+							"anyOf": [
+								{
+									"ids": [
+										"item:blueprint-house-of-engineers"
+									]
+								},
+								{
+									"ids": [
+										"item:blueprint-cathedral"
+									]
+								},
+								{
+									"ids": [
+										"producer:house-of-engineers"
+									]
+								},
+								{
+									"ids": [
+										"producer:cathedral"
+									]
+								}
 							]
 						}
 					}
@@ -3591,17 +3663,21 @@
 					"kind": "duration.proximityPenalty",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:brewery-t1:beer-barrel",
-								"product:brewery-t1:beer-barrel-from-beer",
-								"product:brewery-t1:hops",
-								"product:cattle-farm-t1:milk",
-								"product:chicken-coop-t1:egg",
-								"product:farm-t1:grain",
-								"product:farm-t1:grain-morale-t1",
-								"product:pig-farm-t1:piglet",
-								"product:sheep-pasture-t1:wool",
-								"product:vegetable-garden-t1:vegetables"
+							"anyOf": [
+								{
+									"ids": [
+										"product:brewery-t1:beer-barrel",
+										"product:brewery-t1:beer-barrel-from-beer",
+										"product:brewery-t1:hops",
+										"product:cattle-farm-t1:milk",
+										"product:chicken-coop-t1:egg",
+										"product:farm-t1:grain",
+										"product:farm-t1:grain-morale-t1",
+										"product:pig-farm-t1:piglet",
+										"product:sheep-pasture-t1:wool",
+										"product:vegetable-garden-t1:vegetables"
+									]
+								}
 							]
 						}
 					}
@@ -3618,10 +3694,14 @@
 					"kind": "duration.proximityPenalty",
 					"target": {
 						"productLines": {
-							"ids": [
-								"product:winery-t1:grapes",
-								"product:winery-t1:wine-barrel",
-								"product:winery-t1:wine-barrel-from-wine-glasses"
+							"anyOf": [
+								{
+									"ids": [
+										"product:winery-t1:grapes",
+										"product:winery-t1:wine-barrel",
+										"product:winery-t1:wine-barrel-from-wine-glasses"
+									]
+								}
 							]
 						}
 					}

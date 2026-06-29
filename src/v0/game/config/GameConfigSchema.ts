@@ -258,24 +258,56 @@ const ActivationRequirementSchema = z.array(
 
 const TagSchema = z.string().min(1);
 
-/** Canonical runtime selector. Tags are resolved to ids during package normalization. */
-const ResolvedDomainSelectorSchema = z
+const ResolvedDomainSelectorClauseSchema = z
 	.object({
-		all: z.literal(true).optional(),
-		ids: z.array(IdSchema).min(1).optional(),
+		ids: z.array(IdSchema).min(1),
 	})
 	.strict();
 
+/** Canonical runtime selector. Tags are resolved to id clauses during package normalization. */
+const ResolvedDomainSelectorSchema = z.union([
+	z
+		.object({
+			mode: z.literal("all"),
+		})
+		.strict(),
+	z
+		.object({
+			anyOf: z.array(ResolvedDomainSelectorClauseSchema).min(1).optional(),
+			allOf: z.array(ResolvedDomainSelectorClauseSchema).min(1).optional(),
+			noneOf: z.array(ResolvedDomainSelectorClauseSchema).min(1).optional(),
+		})
+		.strict(),
+]);
+
+const AuthoringDomainSelectorRefSchema = z.union([
+	z
+		.object({
+			id: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			tag: TagSchema,
+		})
+		.strict(),
+]);
+
 /** Source-only selector accepted by game package fragments before compile-time tag expansion. */
-const AuthoringDomainSelectorSchema = z
-	.object({
-		all: z.literal(true).optional(),
-		ids: z.array(IdSchema).min(1).optional(),
-		anyTags: z.array(TagSchema).min(1).optional(),
-		allTags: z.array(TagSchema).min(1).optional(),
-		noneTags: z.array(TagSchema).min(1).optional(),
-	})
-	.strict();
+const AuthoringDomainSelectorSchema = z.union([
+	z
+		.object({
+			mode: z.literal("all"),
+		})
+		.strict(),
+	z
+		.object({
+			anyOf: z.array(AuthoringDomainSelectorRefSchema).min(1).optional(),
+			allOf: z.array(AuthoringDomainSelectorRefSchema).min(1).optional(),
+			noneOf: z.array(AuthoringDomainSelectorRefSchema).min(1).optional(),
+		})
+		.strict(),
+]);
 
 /** Selects which producer product lines an effect operation may touch. */
 const GameEffectProductLineTargetSchema = z
@@ -348,14 +380,19 @@ const ActivationOutputSchema = z.array(
 	]),
 );
 
-const createGameEffectOperationSchema = ({
+const createGameEffectOperationSchema = <
+	TItemTarget extends
+		| typeof GameEffectItemTargetSchema
+		| typeof GameEffectItemAuthoringTargetSchema,
+	TProductLineTarget extends
+		| typeof GameEffectProductLineTargetSchema
+		| typeof GameEffectProductLineAuthoringTargetSchema,
+>({
 	itemTarget,
 	productLineTarget,
 }: {
-	itemTarget: typeof GameEffectItemTargetSchema | typeof GameEffectItemAuthoringTargetSchema;
-	productLineTarget:
-		| typeof GameEffectProductLineTargetSchema
-		| typeof GameEffectProductLineAuthoringTargetSchema;
+	itemTarget: TItemTarget;
+	productLineTarget: TProductLineTarget;
 }) => {
 	const productLineOperationBaseSchema = {
 		target: productLineTarget,
@@ -464,8 +501,12 @@ const GameEffectSourceScopeSchema = z.enum([
 	"both",
 ]);
 
-const createGameEffectDefinitionSchema = (
-	operationSchema: typeof GameEffectOperationSchema | typeof GameEffectAuthoringOperationSchema,
+const createGameEffectDefinitionSchema = <
+	TOperationSchema extends
+		| typeof GameEffectOperationSchema
+		| typeof GameEffectAuthoringOperationSchema,
+>(
+	operationSchema: TOperationSchema,
 ) => {
 	const commonFields = {
 		name: z.string().min(1),
@@ -763,6 +804,9 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasProducer = createRecordGuard(value.producers);
 	const hasProduct = createRecordGuard(value.products);
 	const hasStash = createRecordGuard(value.stashes);
+	const itemIds = Object.keys(value.items);
+	const producerIds = Object.keys(value.producers);
+	const productIds = Object.keys(value.products);
 	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
 
 	for (const [assetId, asset] of Object.entries(value.assets)) {
@@ -945,15 +989,17 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				"target",
 			];
 			if (operation.kind === "item.blockCreate") {
-				validateGameEffectItemTarget(ctx, targetPath, operation.target, hasItem);
+				validateGameEffectItemTarget(ctx, targetPath, operation.target, {
+					entityIds: itemIds,
+					hasEntity: hasItem,
+				});
 			} else {
-				validateGameEffectProductLineTarget(
-					ctx,
-					targetPath,
-					operation.target,
+				validateGameEffectProductLineTarget(ctx, targetPath, operation.target, {
+					producerIds,
 					hasProducer,
+					productIds,
 					hasProduct,
-				);
+				});
 			}
 
 			if (operation.kind === "duration.proximityPenalty" && effect.scope !== "local") {
@@ -2141,49 +2187,121 @@ const validateRequirementIds = (
 	}
 };
 
+const doesResolvedDomainSelectorMatchId = (
+	entityId: string,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
+) => {
+	if ("mode" in selector) return true;
+	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	if (selector.noneOf?.some((clause) => clause.ids.includes(entityId))) {
+		return false;
+	}
+	return true;
+};
+
+const validateResolvedDomainSelectorClauses = ({
+	ctx,
+	hasEntity,
+	label,
+	path,
+	clauses,
+}: {
+	ctx: z.RefinementCtx;
+	hasEntity: (entityId: string) => boolean;
+	label: string;
+	path: GameConfigIssuePath;
+	clauses: readonly z.infer<typeof ResolvedDomainSelectorClauseSchema>[] | undefined;
+}) => {
+	for (const [clauseIndex, clause] of (clauses ?? []).entries()) {
+		validateUniqueStringList(
+			ctx,
+			[
+				...path,
+				clauseIndex,
+				"ids",
+			],
+			clause.ids,
+			(value) => `Duplicate ${label} "${value}".`,
+		);
+
+		for (const [index, entityId] of clause.ids.entries()) {
+			if (hasEntity(entityId)) continue;
+
+			addIssue(
+				ctx,
+				[
+					...path,
+					clauseIndex,
+					"ids",
+					index,
+				],
+				`Missing ${label} "${entityId}".`,
+			);
+		}
+	}
+};
+
 const validateResolvedDomainSelector = ({
 	ctx,
+	entityIds,
 	hasEntity,
 	label,
 	path,
 	selector,
 }: {
 	ctx: z.RefinementCtx;
+	entityIds: readonly string[];
 	hasEntity: (entityId: string) => boolean;
 	label: string;
 	path: GameConfigIssuePath;
 	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
 }) => {
-	const selectorCount = selector.ids ? 1 : 0;
-	if (!selector.all && selectorCount === 0) {
-		addIssue(ctx, path, `Domain selector must define ids or explicit all: true.`);
-	}
-	if (selector.all && selectorCount > 0) {
-		addIssue(ctx, path, `Domain selector all: true must not be combined with ids.`);
+	if ("mode" in selector) return;
+
+	const selectorCount =
+		(selector.anyOf ? 1 : 0) + (selector.allOf ? 1 : 0) + (selector.noneOf ? 1 : 0);
+	if (selectorCount === 0) {
+		addIssue(ctx, path, `Domain selector must define anyOf, allOf, noneOf, or mode: "all".`);
 	}
 
-	validateUniqueStringList(
+	validateResolvedDomainSelectorClauses({
 		ctx,
-		[
+		hasEntity,
+		label,
+		path: [
 			...path,
-			"ids",
+			"anyOf",
 		],
-		selector.ids ?? [],
-		(value) => `Duplicate ${label} "${value}".`,
-	);
+		clauses: selector.anyOf,
+	});
+	validateResolvedDomainSelectorClauses({
+		ctx,
+		hasEntity,
+		label,
+		path: [
+			...path,
+			"allOf",
+		],
+		clauses: selector.allOf,
+	});
+	validateResolvedDomainSelectorClauses({
+		ctx,
+		hasEntity,
+		label,
+		path: [
+			...path,
+			"noneOf",
+		],
+		clauses: selector.noneOf,
+	});
 
-	for (const [index, entityId] of (selector.ids ?? []).entries()) {
-		if (hasEntity(entityId)) continue;
-
-		addIssue(
-			ctx,
-			[
-				...path,
-				"ids",
-				index,
-			],
-			`Missing ${label} "${entityId}".`,
-		);
+	if (!entityIds.some((entityId) => doesResolvedDomainSelectorMatchId(entityId, selector))) {
+		addIssue(ctx, path, `Domain selector matched no ${label}s.`);
 	}
 };
 
@@ -2191,8 +2309,12 @@ const validateGameEffectProductLineTarget = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
 	target: z.infer<typeof GameEffectProductLineTargetSchema>,
-	hasProducer: (producerId: string) => boolean,
-	hasProduct: (productId: string) => boolean,
+	entities: {
+		producerIds: readonly string[];
+		hasProducer: (producerId: string) => boolean;
+		productIds: readonly string[];
+		hasProduct: (productId: string) => boolean;
+	},
 ) => {
 	if (!target.producers && !target.productLines) {
 		addIssue(ctx, path, `Effect product-line target must define at least one domain selector.`);
@@ -2201,7 +2323,8 @@ const validateGameEffectProductLineTarget = (
 	if (target.producers) {
 		validateResolvedDomainSelector({
 			ctx,
-			hasEntity: hasProducer,
+			entityIds: entities.producerIds,
+			hasEntity: entities.hasProducer,
 			label: "producer",
 			path: [
 				...path,
@@ -2214,7 +2337,8 @@ const validateGameEffectProductLineTarget = (
 	if (target.productLines) {
 		validateResolvedDomainSelector({
 			ctx,
-			hasEntity: hasProduct,
+			entityIds: entities.productIds,
+			hasEntity: entities.hasProduct,
 			label: "product line",
 			path: [
 				...path,
@@ -2229,11 +2353,15 @@ const validateGameEffectItemTarget = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
 	target: z.infer<typeof GameEffectItemTargetSchema>,
-	hasItem: (itemId: string) => boolean,
+	entities: {
+		entityIds: readonly string[];
+		hasEntity: (itemId: string) => boolean;
+	},
 ) => {
 	validateResolvedDomainSelector({
 		ctx,
-		hasEntity: hasItem,
+		entityIds: entities.entityIds,
+		hasEntity: entities.hasEntity,
 		label: "item",
 		path: [
 			...path,

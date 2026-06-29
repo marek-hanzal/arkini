@@ -196,22 +196,22 @@ Effect source fields:
 
 `sourceScope` is `board`, `inventory`, or `both`; omitted means `board`. Local effects must be board-sourced because distance needs a board cell. `duration.proximityPenalty` is local-only and multiplies duration per nearby source item; closer sources apply a stronger penalty and multiple source instances stack.
 
-Operation targets use domain selectors. Product-line operations may target `producers`, `productLines`, or both; if both are present, both must match. Item creation operations target `items`. A selector may use `ids`, `anyTags`, `allTags`, `noneTags`, or `all: true`. Tags are authoring sugar: compile expands them to concrete `ids` while keeping the selector shape, so runtime evaluates a boring deterministic predicate instead of doing tag archaeology in the middle of gameplay. Empty target objects are invalid, because apparently even configs need boundaries.
+Operation targets use domain selectors. Product-line operations may target `producers`, `productLines`, or both; if both are present, both must match. Item creation operations target `items`. Source selectors use one vocabulary everywhere: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each authoring ref is either `{ "id": "..." }` or `{ "tag": "..." }`. Tags are authoring sugar: compile expands refs into concrete `{ "ids": [...] }` clauses while keeping the same selector shape, so runtime evaluates a boring deterministic predicate instead of doing tag archaeology in the middle of gameplay. Empty target objects are invalid, because apparently even configs need boundaries.
 
 Supported operations:
 
 ```json
-{ "kind": "line.reveal", "target": { "productLines": { "anyTags": ["engineers"] } } }
-{ "kind": "line.hide", "target": { "productLines": { "ids": ["product:secret"] } } }
-{ "kind": "line.blockStart", "reason": "Wrong path.", "target": { "productLines": { "anyTags": ["faith"] } } }
-{ "kind": "duration.addMs", "valueMs": 1000, "target": { "productLines": { "all": true } } }
-{ "kind": "duration.multiply", "multiplier": 0.5, "target": { "productLines": { "anyTags": ["engineers"] } } }
-{ "kind": "duration.proximityPenalty", "durationFactor": 0.5, "target": { "productLines": { "ids": ["product:farm-t1:grain"] } } }
-{ "kind": "loot.appendOutput", "chance": 0.2, "output": [{ "type": "guaranteed", "itemId": "item:pollution", "quantity": 1 }], "target": { "productLines": { "all": true } } }
-{ "kind": "loot.replaceOutput", "output": [{ "type": "guaranteed", "itemId": "item:void-splinter", "quantity": 1 }], "target": { "productLines": { "ids": ["product:test"] } } }
-{ "kind": "loot.addChanceItem", "itemId": "item:pollution", "chance": 0.1, "quantity": 1, "target": { "productLines": { "all": true } } }
-{ "kind": "loot.dropChance.add", "delta": -0.2, "target": { "productLines": { "all": true } } }
-{ "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "items": { "anyTags": ["faith"] } } }
+{ "kind": "line.reveal", "target": { "productLines": { "anyOf": [{ "tag": "engineers" }] } } }
+{ "kind": "line.hide", "target": { "productLines": { "anyOf": [{ "id": "product:secret" }] } } }
+{ "kind": "line.blockStart", "reason": "Wrong path.", "target": { "productLines": { "anyOf": [{ "tag": "faith" }] } } }
+{ "kind": "duration.addMs", "valueMs": 1000, "target": { "productLines": { "mode": "all" } } }
+{ "kind": "duration.multiply", "multiplier": 0.5, "target": { "productLines": { "anyOf": [{ "tag": "engineers" }] } } }
+{ "kind": "duration.proximityPenalty", "durationFactor": 0.5, "target": { "productLines": { "anyOf": [{ "id": "product:farm-t1:grain" }] } } }
+{ "kind": "loot.appendOutput", "chance": 0.2, "output": [{ "type": "guaranteed", "itemId": "item:pollution", "quantity": 1 }], "target": { "productLines": { "mode": "all" } } }
+{ "kind": "loot.replaceOutput", "output": [{ "type": "guaranteed", "itemId": "item:void-splinter", "quantity": 1 }], "target": { "productLines": { "anyOf": [{ "id": "product:test" }] } } }
+{ "kind": "loot.addChanceItem", "itemId": "item:pollution", "chance": 0.1, "quantity": 1, "target": { "productLines": { "mode": "all" } } }
+{ "kind": "loot.dropChance.add", "delta": -0.2, "target": { "productLines": { "mode": "all" } } }
+{ "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "items": { "anyOf": [{ "tag": "faith" }] } } }
 ```
 
 `line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.

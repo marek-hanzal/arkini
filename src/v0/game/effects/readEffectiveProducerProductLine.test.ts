@@ -14,8 +14,12 @@ const createSaveWithEffectSource = () => {
 						kind: "line.reveal",
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -24,8 +28,12 @@ const createSaveWithEffectSource = () => {
 						kind: "line.hide",
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -35,8 +43,12 @@ const createSaveWithEffectSource = () => {
 						reason: "test block",
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -45,8 +57,12 @@ const createSaveWithEffectSource = () => {
 						kind: "duration.addMs",
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -57,8 +73,12 @@ const createSaveWithEffectSource = () => {
 						multiplier: 2,
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -75,8 +95,12 @@ const createSaveWithEffectSource = () => {
 						],
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -88,8 +112,12 @@ const createSaveWithEffectSource = () => {
 						quantity: 2,
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -99,8 +127,12 @@ const createSaveWithEffectSource = () => {
 						kind: "loot.dropChance.add",
 						target: {
 							productLines: {
-								ids: [
-									"product:shred",
+								anyOf: [
+									{
+										ids: [
+											"product:shred",
+										],
+									},
 								],
 							},
 						},
@@ -201,8 +233,12 @@ describe("readEffectiveProducerProductLine", () => {
 							multiplier: 0,
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -268,7 +304,7 @@ describe("readEffectiveProducerProductLine", () => {
 							kind: "line.reveal",
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 						},
@@ -333,8 +369,12 @@ describe("readEffectiveProducerProductLine", () => {
 							kind: "line.reveal",
 							target: {
 								productLines: {
-									ids: [
-										"product:shred",
+									anyOf: [
+										{
+											ids: [
+												"product:shred",
+											],
+										},
 									],
 								},
 							},
@@ -398,8 +438,12 @@ describe("readEffectiveProducerProductLine", () => {
 							kind: "line.reveal",
 							target: {
 								productLines: {
-									ids: [
-										"product:shred",
+									anyOf: [
+										{
+											ids: [
+												"product:shred",
+											],
+										},
 									],
 								},
 							},
@@ -487,8 +531,12 @@ describe("readEffectiveProducerProductLine", () => {
 							],
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -511,8 +559,12 @@ describe("readEffectiveProducerProductLine", () => {
 							],
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -633,8 +685,12 @@ describe("readEffectiveProducerProductLine", () => {
 							],
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},
@@ -657,8 +713,12 @@ describe("readEffectiveProducerProductLine", () => {
 							],
 							target: {
 								productLines: {
-									ids: [
-										"product:test",
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
 									],
 								},
 							},

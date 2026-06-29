@@ -25,16 +25,45 @@ const readResolvedSelectorSummary = (
 	label: string,
 	selector:
 		| {
-				all?: true;
-				ids?: readonly string[];
+				mode: "all";
+		  }
+		| {
+				anyOf?: readonly {
+					ids: readonly string[];
+				}[];
+				allOf?: readonly {
+					ids: readonly string[];
+				}[];
+				noneOf?: readonly {
+					ids: readonly string[];
+				}[];
 		  }
 		| undefined,
 	formatId: (id: string) => string = (id) => id,
 ) => {
 	if (!selector) return undefined;
-	if (selector.all) return `${label}: all`;
-	if (selector.ids?.length) return `${label}: ${selector.ids.map(formatId).join(", ")}`;
-	return `${label}: targeted`;
+	if ("mode" in selector) return `${label}: all`;
+
+	const parts = [
+		readSelectorClauseSummary("any", selector.anyOf, formatId),
+		readSelectorClauseSummary("all", selector.allOf, formatId),
+		readSelectorClauseSummary("none", selector.noneOf, formatId),
+	].filter((part): part is string => Boolean(part));
+
+	return parts.length ? `${label}: ${parts.join("; ")}` : `${label}: targeted`;
+};
+
+const readSelectorClauseSummary = (
+	label: string,
+	clauses:
+		| readonly {
+				ids: readonly string[];
+		  }[]
+		| undefined,
+	formatId: (id: string) => string,
+) => {
+	if (!clauses?.length) return undefined;
+	return `${label}(${clauses.map((clause) => clause.ids.map(formatId).join(", ")).join(" | ")})`;
 };
 
 const readEffectTargetSummary = (

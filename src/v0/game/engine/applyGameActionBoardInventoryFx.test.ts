@@ -328,7 +328,7 @@ describe("applyGameActionFx BoardInventory", () => {
 							multiplier: 1,
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 						},
@@ -391,7 +391,7 @@ describe("applyGameActionFx BoardInventory", () => {
 							multiplier: 1,
 							target: {
 								productLines: {
-									all: true,
+									mode: "all",
 								},
 							},
 						},
@@ -596,8 +596,12 @@ describe("applyGameActionFx BoardInventory", () => {
 							kind: "item.blockCreate",
 							target: {
 								items: {
-									ids: [
-										"item:plank",
+									anyOf: [
+										{
+											ids: [
+												"item:plank",
+											],
+										},
 									],
 								},
 							},

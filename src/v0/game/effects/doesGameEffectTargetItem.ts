@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolvedDomainSelectorMatchId";
 
 type ItemEffectOperation = Extract<
 	GameConfig["effects"][string]["operations"][number],
@@ -14,8 +15,8 @@ export namespace doesGameEffectTargetItem {
 	}
 }
 
-export const doesGameEffectTargetItem = ({ itemId, target }: doesGameEffectTargetItem.Props) => {
-	const selector = target.items;
-	if (selector.all) return true;
-	return selector.ids?.includes(itemId) ?? false;
-};
+export const doesGameEffectTargetItem = ({ itemId, target }: doesGameEffectTargetItem.Props) =>
+	doesResolvedDomainSelectorMatchId({
+		entityId: itemId,
+		selector: target.items,
+	});

@@ -126,6 +126,11 @@ const readRequirementMeta = (requirement: ActivationRequirementView) => {
 
 const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
 
+const readLineProgressDisplay = (line: ProducerProductLineView) => {
+	const progress = line.progress ?? 0;
+	return readLineKind(line) === "effect" ? 1 - progress : progress;
+};
+
 const readSectionCopy = (lineKind: NonNullable<ProducerProductLineView["lineKind"]>) =>
 	lineKind === "effect"
 		? {
@@ -352,11 +357,16 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												}
 												progress={
 													runState.showProgress
-														? (line.progress ?? 0)
+														? readLineProgressDisplay(line)
 														: undefined
 												}
 												progressAutoCompleteMs={
 													runState.progressAutoCompleteMs
+												}
+												progressAutoCompleteTo={
+													readLineKind(line) === "effect"
+														? "empty"
+														: "full"
 												}
 												tone={
 													runState.showProgress || runState.canRunAction

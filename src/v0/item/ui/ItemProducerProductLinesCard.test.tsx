@@ -112,6 +112,32 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).toContain("transform:scaleX(0.2)");
 	});
 
+	it("counts active effect progress down in the action button", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						lineKind: "effect",
+						name: "Minor Haste",
+						pausedAtMs: undefined,
+						remainingMs: 800,
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Active · 1s");
+		expect(html).toContain("--ui-progress-button-start:0.8");
+		expect(html).toContain("animation:ui-progress-button-empty-to-start 800ms linear forwards");
+		expect(html).toContain("transform:scaleX(0.8)");
+		expect(html).not.toContain("ui-progress-button-fill-to-end");
+	});
+
 	it("keeps queued producer jobs in the action button", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

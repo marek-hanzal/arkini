@@ -7,6 +7,7 @@ export namespace UiProgressButton {
 		children: ReactNode;
 		progress?: number;
 		progressAutoCompleteMs?: number;
+		progressAutoCompleteTo?: "empty" | "full";
 	}
 }
 
@@ -15,18 +16,27 @@ const clampProgress = (progress: number) => Math.min(1, Math.max(0, progress));
 const readProgressFillStyle = ({
 	progress,
 	progressAutoCompleteMs,
+	progressAutoCompleteTo = "full",
 }: {
 	progress: number;
 	progressAutoCompleteMs?: number;
+	progressAutoCompleteTo?: "empty" | "full";
 }) => {
 	const clampedProgress = clampProgress(progress);
 	const shouldAutoComplete =
-		progressAutoCompleteMs !== undefined && progressAutoCompleteMs > 0 && clampedProgress < 1;
+		progressAutoCompleteMs !== undefined &&
+		progressAutoCompleteMs > 0 &&
+		(progressAutoCompleteTo === "empty" ? clampedProgress > 0 : clampedProgress < 1);
+
+	const autoCompleteAnimation =
+		progressAutoCompleteTo === "empty"
+			? "ui-progress-button-empty-to-start"
+			: "ui-progress-button-fill-to-end";
 
 	return {
 		"--ui-progress-button-start": clampedProgress,
 		animation: shouldAutoComplete
-			? `ui-progress-button-fill-to-end ${Math.ceil(progressAutoCompleteMs)}ms linear forwards`
+			? `${autoCompleteAnimation} ${Math.ceil(progressAutoCompleteMs)}ms linear forwards`
 			: undefined,
 		transform: `scaleX(${clampedProgress})`,
 	} satisfies CSSProperties & Record<"--ui-progress-button-start", number>;
@@ -37,6 +47,7 @@ export const UiProgressButton: FC<UiProgressButton.Props> = ({
 	className,
 	progress,
 	progressAutoCompleteMs,
+	progressAutoCompleteTo = "full",
 	tone = "primary",
 	...props
 }) => {
@@ -46,6 +57,7 @@ export const UiProgressButton: FC<UiProgressButton.Props> = ({
 			: readProgressFillStyle({
 					progress,
 					progressAutoCompleteMs,
+					progressAutoCompleteTo,
 				});
 
 	return (

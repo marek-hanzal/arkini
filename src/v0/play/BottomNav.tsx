@@ -58,14 +58,7 @@ export const BottomNav: FC<BottomNav.Props> = memo(({ activeSheet, onOpen }) => 
 			zIndex: "var(--ak-layer-bottom-nav)",
 		}}
 	>
-		<div className="mx-auto grid h-full w-full max-w-[min(100%,560px)] grid-cols-3 gap-[clamp(0.4rem,1.75dvw,0.7rem)]">
-			<NavButton
-				active={activeSheet === "inventory"}
-				label="Inventory"
-				icon="🎒"
-				tone="inventory"
-				onOpen={onOpen}
-			/>
+		<div className="mx-auto grid h-full w-full max-w-[min(100%,420px)] grid-cols-2 gap-[clamp(0.4rem,1.75dvw,0.7rem)]">
 			<NavButton
 				active={activeSheet === "cheat-inventory"}
 				label="Cheats"

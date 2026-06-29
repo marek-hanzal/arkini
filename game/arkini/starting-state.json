@@ -2,6 +2,11 @@
 	"startingState": {
 		"board": [
 			{
+				"itemId": "item:inventory",
+				"x": 6,
+				"y": 0
+			},
+			{
 				"itemId": "item:tree",
 				"x": 0,
 				"y": 1

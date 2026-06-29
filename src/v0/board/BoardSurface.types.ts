@@ -6,6 +6,7 @@ export namespace BoardSurface {
 		feedback: Feedback.Type;
 		feedbackFlags: ReadonlySet<string>;
 		onOpenItem(boardItemId: string): void;
+		onOpenInventory(): void;
 		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
 		disabled?: boolean;
 	}

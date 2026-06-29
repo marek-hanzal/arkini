@@ -21,6 +21,7 @@ export const BoardSurface = memo(
 	({
 		feedback,
 		feedbackFlags,
+		onOpenInventory,
 		onOpenInventoryPlacementTarget,
 		onOpenItem,
 		disabled = false,
@@ -28,6 +29,7 @@ export const BoardSurface = memo(
 		const boardDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const { blockedCellKeys, columns, drag, slots, tiles } = useBoardTileEngineModel({
 			feedback,
+			onOpenInventory,
 			onOpenInventoryPlacementTarget,
 			onOpenItem,
 		});

@@ -19,10 +19,12 @@ import {
 } from "~/v0/play/runtime";
 import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
+import { isInventoryBoardItemId } from "~/v0/inventory/InventoryBoardItem";
 
 export namespace useBoardTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
+		onOpenInventory(): void;
 		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
 		onOpenItem(boardItemId: string): void;
 	}
@@ -42,6 +44,7 @@ const transientTileStyle = {
 
 export const useBoardTileEngineModel = ({
 	feedback,
+	onOpenInventory,
 	onOpenInventoryPlacementTarget,
 	onOpenItem,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
@@ -153,6 +156,11 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
+			if (action.type === "open-inventory") {
+				onOpenInventory();
+				return;
+			}
+
 			if (action.type !== "activate") return;
 
 			const activation = liveBoardItem.activation;
@@ -198,6 +206,7 @@ export const useBoardTileEngineModel = ({
 		},
 		[
 			feedback.showError,
+			onOpenInventory,
 			onOpenItem,
 			runtimeStore,
 		],
@@ -213,6 +222,8 @@ export const useBoardTileEngineModel = ({
 				const boardItem = board.byId[tile.data.boardItemId];
 				if (!boardItem) return undefined;
 
+				const opensInventory = isInventoryBoardItemId(boardItem.itemId);
+
 				return {
 					id: `board:${boardItem.id}`,
 					data: {
@@ -222,7 +233,9 @@ export const useBoardTileEngineModel = ({
 						boardItem,
 					},
 					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
-					onLongActivate: () => onOpenItem(boardItem.id),
+					onLongActivate: opensInventory
+						? onOpenInventory
+						: () => onOpenItem(boardItem.id),
 				};
 			},
 			slot(slot, targetTile) {
@@ -279,6 +292,7 @@ export const useBoardTileEngineModel = ({
 			board,
 			feedback,
 			runtimeStore,
+			onOpenInventory,
 			onOpenInventoryPlacementTarget,
 			onOpenItem,
 		],

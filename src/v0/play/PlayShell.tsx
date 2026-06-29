@@ -45,6 +45,13 @@ const PlayShellContent: FC = () => {
 			}),
 		[],
 	);
+	const openInventory = useCallback(
+		() =>
+			setActiveSheet({
+				type: "inventory",
+			}),
+		[],
+	);
 	const openInventoryPlacementTarget = useCallback(
 		(placementTarget: { x: number; y: number }) =>
 			setActiveSheet({
@@ -161,6 +168,7 @@ const PlayShellContent: FC = () => {
 						<BoardSurface
 							feedback={feedback}
 							feedbackFlags={feedbackFlags.flags}
+							onOpenInventory={openInventory}
 							onOpenInventoryPlacementTarget={openInventoryPlacementTarget}
 							onOpenItem={openItem}
 							disabled={Boolean(activeSheet)}

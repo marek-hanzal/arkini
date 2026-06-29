@@ -371,6 +371,97 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(effective.appliedEffects).toHaveLength(2);
 	});
 
+	it("applies capped local effect sources from the closest board source first", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:local-pollution": {
+					name: "Local pollution",
+					operations: [
+						{
+							durationFactor: 1,
+							kind: "duration.proximityPenalty",
+							stacking: {
+								category: "test:pollution",
+								maxSources: 1,
+							},
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					radius: 2,
+					scope: "local",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 4,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					passiveEffectIds: [
+						"effect:local-pollution",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		const effective = readEffectiveProducerProductLine({
+			baseDurationMs: 100,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+
+		expect(effective.durationMs).toBe(300);
+		expect(effective.appliedEffects).toHaveLength(1);
+		expect(effective.appliedEffects[0]?.sourceItemInstanceId).toBe("item-instance:2");
+	});
+
 	it("applies active effects only between activation and expiration", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

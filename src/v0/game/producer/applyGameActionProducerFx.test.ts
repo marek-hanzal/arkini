@@ -4472,4 +4472,138 @@ describe("applyGameActionFx Producer", () => {
 			]),
 		);
 	});
+
+	it("keeps remove-on-depleted producer effects available while delivering its final output", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:producer-output-grant": {
+					name: "Producer output grant",
+					operations: [
+						{
+							grantId: "grant:producer-output",
+							kind: "grant.add",
+							target: {
+								items: {
+									anyOf: [
+										{
+											ids: [
+												"item:twig",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+			items: {
+				...baseConfig.items,
+				"item:producer": {
+					...baseConfig.items["item:producer"],
+					passiveEffectIds: [
+						"effect:producer-output-grant",
+					],
+				},
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					grantSelector: {
+						anyOf: [
+							{
+								ids: [
+									"grant:producer-output",
+								],
+							},
+						],
+					},
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					charges: 1,
+					onChargesDepleted: "remove",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					chargeCost: 1,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const completed = runTick({
+			config,
+			nowMs: started.nextWakeAtMs ?? 1000,
+			save: started.save,
+		});
+
+		expect(completed.events).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					fromItemId: "item:producer",
+					itemInstanceId: "item-instance:1",
+					reason: "producer-depleted",
+					toItemId: "item:twig",
+					type: "item.replaced",
+				}),
+			]),
+		);
+		expect(Object.values(completed.save.board.items)).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					id: "item-instance:1",
+					itemId: "item:twig",
+					x: 0,
+					y: 0,
+				}),
+				expect.objectContaining({
+					itemId: "item:twig",
+					x: 1,
+					y: 0,
+				}),
+			]),
+		);
+		expect(completed.save.producerJobs).toEqual({});
+	});
 });

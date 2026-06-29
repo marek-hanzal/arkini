@@ -9,6 +9,7 @@ import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx
 export namespace planItemBoardPlacementCellsFx {
 	export interface Props {
 		config: GameConfig;
+		freedBoardItemInstanceIds?: ReadonlySet<string>;
 		itemId: string;
 		nowMs?: number;
 		save: GameSave;
@@ -18,6 +19,7 @@ export namespace planItemBoardPlacementCellsFx {
 
 export const planItemBoardPlacementCellsFx = Effect.fn("planItemBoardPlacementCellsFx")(function* ({
 	config,
+	freedBoardItemInstanceIds,
 	itemId,
 	nowMs,
 	save,
@@ -25,6 +27,7 @@ export const planItemBoardPlacementCellsFx = Effect.fn("planItemBoardPlacementCe
 }: planItemBoardPlacementCellsFx.Props) {
 	const emptyCells = yield* planEmptyBoardCellsFx({
 		config,
+		freedBoardItemInstanceIds,
 		save,
 		seedCell,
 	});

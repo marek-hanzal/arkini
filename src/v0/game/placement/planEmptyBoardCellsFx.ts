@@ -19,6 +19,7 @@ const compareBoardCellsBySeedDistance =
 export namespace planEmptyBoardCellsFx {
 	export interface Props {
 		config: GameConfig;
+		freedBoardItemInstanceIds?: ReadonlySet<string>;
 		save: GameSave;
 		seedCell?: BoardCell;
 	}
@@ -26,10 +27,15 @@ export namespace planEmptyBoardCellsFx {
 
 export const planEmptyBoardCellsFx = Effect.fn("planEmptyBoardCellsFx")(function* ({
 	config,
+	freedBoardItemInstanceIds,
 	save,
 	seedCell,
 }: planEmptyBoardCellsFx.Props) {
-	const occupiedCells = new Set(Object.values(save.board.items).map(boardCellKey));
+	const occupiedCells = new Set(
+		Object.entries(save.board.items)
+			.filter(([itemInstanceId]) => !freedBoardItemInstanceIds?.has(itemInstanceId))
+			.map(([, item]) => boardCellKey(item)),
+	);
 	const emptyCells: BoardCell[] = [];
 
 	for (let y = 0; y < config.game.board.height; y += 1) {

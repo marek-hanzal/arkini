@@ -11,6 +11,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace placeGameSaveItemsFx {
 	export interface Props {
 		config: GameConfig;
+		freedBoardItemInstanceIds?: ReadonlySet<string>;
 		save: GameSave;
 		items: GameSaveItemPlacementRequest[];
 		nowMs: number;
@@ -20,6 +21,7 @@ export namespace placeGameSaveItemsFx {
 
 export const placeGameSaveItemsFx = Effect.fn("placeGameSaveItemsFx")(function* ({
 	config,
+	freedBoardItemInstanceIds,
 	save,
 	items,
 	nowMs,
@@ -34,6 +36,7 @@ export const placeGameSaveItemsFx = Effect.fn("placeGameSaveItemsFx")(function* 
 		yield* placeSingleGameSaveItemRequestFx({
 			config,
 			events,
+			freedBoardItemInstanceIds,
 			item,
 			nowMs,
 			save: nextSave,

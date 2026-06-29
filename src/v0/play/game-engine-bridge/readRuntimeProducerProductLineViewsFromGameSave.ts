@@ -1,7 +1,5 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readProductOutputItemIds } from "~/v0/game/config/readProductOutputItemIds";
-import { readGameSaveItemQuantityByScope } from "~/v0/game/requirements/readGameSaveItemQuantityByScope";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
@@ -32,6 +30,7 @@ import {
 import { readActivationInputRequiredQuantity } from "~/v0/game/requirements/readActivationInputRequiredQuantity";
 import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
+import { readRuntimeProductLineOutputViews } from "~/v0/play/game-engine-bridge/readRuntimeProductLineOutputViews";
 
 export namespace readRuntimeProducerProductLineViewsFromGameSave {
 	export interface Props {
@@ -207,15 +206,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					})
 				: undefined;
 
-		const outputItemIds = [
-			...new Set(
-				readProductOutputItemIds({
-					config,
-					productId,
-				}),
-			),
-		];
-
 		const inputs = (product.inputs ?? []).map((input) =>
 			readRuntimeActivationInputView({
 				available: readRuntimeActivationInputAvailableQuantityFromGameSave({
@@ -286,14 +276,10 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				inputsAvailable,
 				missingRequirementItemIds: missingRequirements as ItemId[],
 				name: product.name,
-				outputs: outputItemIds.map((itemId) => ({
-					itemId: itemId as ItemId,
-					ownedQuantity: readGameSaveItemQuantityByScope({
-						itemId,
-						save,
-						scope: "board_or_inventory",
-					}),
-				})),
+				outputs: readRuntimeProductLineOutputViews({
+					effectiveProductLine,
+					save,
+				}),
 				productId,
 				producerQueuedJobs,
 				pausedAtMs: activeJob?.pausedAtMs,

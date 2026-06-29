@@ -67,6 +67,67 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).toContain("Owned 7");
 		expect(html).toContain("grain.svg");
 	});
+
+	it("shows every potential product-line output with chance and quantity metadata", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{
+					"item:pollution": {
+						assetSrc: "pollution.svg",
+						description: "Pollution",
+						generatedEffects: [],
+						id: "item:pollution",
+						maxStackSize: 99,
+						name: "Pollution",
+						storage: "board",
+						tags: [],
+					},
+					"item:trash": {
+						assetSrc: "trash.svg",
+						description: "Trash",
+						generatedEffects: [],
+						id: "item:trash",
+						maxStackSize: 99,
+						name: "Trash",
+						storage: "both",
+						tags: [],
+					},
+				}}
+				lines={[
+					createLine({
+						name: "Burn Trash",
+						outputs: [
+							{
+								itemId: "item:trash",
+								kind: "guaranteed",
+								ownedQuantity: 4,
+								quantity: 2,
+							},
+							{
+								itemId: "item:pollution",
+								kind: "chance",
+								ownedQuantity: 0,
+								probability: 0.25,
+								quantity: 1,
+							},
+						],
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Outputs");
+		expect(html).toContain("Trash");
+		expect(html).toContain("2× · guaranteed · Owned 4");
+		expect(html).toContain("Pollution");
+		expect(html).toContain("25% chance");
+		expect(html).toContain("pollution.svg");
+	});
+
 	it("shows paused producer jobs with frozen remaining time", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

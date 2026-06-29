@@ -872,6 +872,7 @@ Output entries define:
 - `quantity`, omitted when it is `1`
 - `chance`, for chance entries
 - `entries` and optional `rolls`, for weighted entries; `rolls` is omitted when it is `1`
+- optional `sort`, used only for deterministic UI ordering of multiple potential outputs
 
 ### 12.3 Higher-tier output
 

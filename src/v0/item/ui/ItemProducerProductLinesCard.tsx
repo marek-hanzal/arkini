@@ -30,18 +30,36 @@ const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "
 const readItemName = (itemId: string, items: ItemCatalogView) =>
 	items[itemId]?.name ?? itemId.replace(/^item:/, "").replace(/^producer:/, "");
 
-const readProductLineOutputOwnedLabel = (
-	outputs: NonNullable<ProducerProductLineView["outputs"]>,
-	items: ItemCatalogView,
-) => {
-	if (outputs.length === 0) return undefined;
-
-	if (outputs.length === 1) return `Owned ${outputs[0]?.ownedQuantity ?? 0}`;
-
-	return outputs
-		.map((output) => `${readItemName(output.itemId, items)} ${output.ownedQuantity}`)
-		.join(" · ");
+const formatPercent = (value: number) => {
+	const percent = value * 100;
+	const rounded = Math.round(percent * 10) / 10;
+	return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)}%`;
 };
+
+const readProductLineOutputQuantityLabel = (
+	quantity: NonNullable<ProducerProductLineView["outputs"]>[number]["quantity"],
+) => {
+	const resolvedQuantity = quantity ?? 1;
+	return typeof resolvedQuantity === "number"
+		? `${resolvedQuantity}×`
+		: `${resolvedQuantity.min}-${resolvedQuantity.max}×`;
+};
+
+const readProductLineOutputMeta = (
+	output: NonNullable<ProducerProductLineView["outputs"]>[number],
+) =>
+	[
+		readProductLineOutputQuantityLabel(output.quantity),
+		output.probability === undefined
+			? output.kind === "guaranteed"
+				? "guaranteed"
+				: undefined
+			: `${formatPercent(output.probability)} chance`,
+		output.rollLabel,
+		`Owned ${output.ownedQuantity}`,
+	]
+		.filter(Boolean)
+		.join(" · ");
 
 const readTargetLimitLabel = (
 	limit: NonNullable<ProducerProductLineView["targetLimits"]>[number],
@@ -199,11 +217,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								const targetLimits = line.targetLimits ?? [];
 								const effectBenefits = line.effectBenefits ?? [];
 								const effectBonusLines = line.effectBonusLines ?? [];
-								const outputOwnedLabel = readProductLineOutputOwnedLabel(
-									outputs,
-									items,
-								);
-
 								return (
 									<div
 										key={line.productId}
@@ -213,10 +226,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											<div className="flex min-w-0 items-start gap-2">
 												<div className="flex min-w-0 flex-1 items-start gap-2">
 													{outputs.length ? (
-														<div className="flex shrink-0 gap-1">
-															{outputs.slice(0, 3).map((output) => (
+														<div className="flex max-w-24 shrink-0 flex-wrap gap-1">
+															{outputs.map((output, outputIndex) => (
 																<ItemInlineAsset
-																	key={output.itemId}
+																	key={`${output.itemId}:${outputIndex}`}
 																	item={items[output.itemId]}
 																	className="h-8 w-8"
 																/>
@@ -231,11 +244,6 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 														<p className="break-words text-base font-bold leading-6 text-ak-text">
 															{line.name}
 														</p>
-														{outputOwnedLabel ? (
-															<p className="mt-0.5 break-words text-xs leading-5 text-ak-text-muted">
-																{outputOwnedLabel}
-															</p>
-														) : null}
 														<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
 															{readLineKind(line) === "effect"
 																? "Window"
@@ -263,6 +271,45 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												) : null}
 											</div>
 										</div>
+
+										{outputs.length ? (
+											<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+												<p className="font-semibold text-ak-text">
+													Outputs
+												</p>
+												<ul className="mt-1 grid gap-1.5">
+													{outputs.map((output, outputIndex) => {
+														const outputItem = items[output.itemId];
+
+														return (
+															<li
+																key={`${line.productId}:output:${output.itemId}:${outputIndex}`}
+																className="flex min-w-0 items-center gap-2"
+															>
+																<ItemInlineAsset
+																	item={outputItem}
+																	className="h-7 w-7"
+																/>
+																<div className="min-w-0 flex-1">
+																	<p className="break-words font-semibold text-ak-text">
+																		{outputItem?.name ??
+																			readItemName(
+																				output.itemId,
+																				items,
+																			)}
+																	</p>
+																	<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+																		{readProductLineOutputMeta(
+																			output,
+																		)}
+																	</p>
+																</div>
+															</li>
+														);
+													})}
+												</ul>
+											</div>
+										) : null}
 
 										{targetLimits.length ? (
 											<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">

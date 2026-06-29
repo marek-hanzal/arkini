@@ -177,6 +177,8 @@ const QuantitySchema = z.union([
 		}),
 ]);
 
+const SortSchema = z.number().finite();
+
 /**
  * Input slot for activations that can be gradually filled by product lines.
  * `consume` is required because config authors must see whether a fed item disappears. Missing quantity defaults to 1 because needing one item is the boring common case, not a revelation.
@@ -350,6 +352,7 @@ const ActivationOutputSchema = z.array(
 				type: z.literal("guaranteed"),
 				itemId: IdSchema,
 				quantity: QuantitySchema.default(1),
+				sort: SortSchema.optional(),
 			})
 			.strict(),
 		z
@@ -358,12 +361,14 @@ const ActivationOutputSchema = z.array(
 				itemId: IdSchema,
 				chance: z.number().min(0).max(1),
 				quantity: QuantitySchema.default(1),
+				sort: SortSchema.optional(),
 			})
 			.strict(),
 		z
 			.object({
 				type: z.literal("weighted"),
 				rolls: QuantitySchema.default(1),
+				sort: SortSchema.optional(),
 				entries: z
 					.array(
 						z
@@ -371,6 +376,7 @@ const ActivationOutputSchema = z.array(
 								itemId: IdSchema,
 								weight: PositiveIntegerSchema,
 								quantity: QuantitySchema.default(1),
+								sort: SortSchema.optional(),
 							})
 							.strict(),
 					)

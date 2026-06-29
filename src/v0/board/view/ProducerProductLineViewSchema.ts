@@ -5,9 +5,30 @@ import { ItemTargetLimitViewSchema } from "~/v0/board/view/ItemTargetLimitViewSc
 
 const IdSchema = z.string().min(1);
 
+const ProducerProductLineOutputQuantityViewSchema = z.union([
+	z.number().int().positive(),
+	z
+		.object({
+			min: z.number().int().positive(),
+			max: z.number().int().positive(),
+		})
+		.strict(),
+]);
+
 const ProducerProductLineOutputViewSchema = z.object({
 	itemId: IdSchema,
 	ownedQuantity: z.number().int().nonnegative(),
+	kind: z
+		.enum([
+			"chance",
+			"guaranteed",
+			"weighted",
+		])
+		.optional(),
+	probability: z.number().min(0).max(1).optional(),
+	quantity: ProducerProductLineOutputQuantityViewSchema.optional(),
+	rollLabel: z.string().min(1).optional(),
+	sort: z.number().optional(),
 });
 
 export const ProducerProductLineViewSchema = z.object({

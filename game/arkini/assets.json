@@ -4,7 +4,7 @@
 			"resourceId": "producer-prospector-guild-t1"
 		},
 		"asset:producer:shrine-t1": {
-			"resourceId": "producer-cathedral"
+			"resourceId": "producer-shrine-t1"
 		}
 	}
 }

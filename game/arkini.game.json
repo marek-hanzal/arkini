@@ -839,7 +839,7 @@
 		},
 		"asset:producer:shrine-t1": {
 			"render": "plain",
-			"resourceId": "producer-cathedral"
+			"resourceId": "producer-shrine-t1"
 		},
 		"asset:producer:slaughterhouse-t1": {
 			"render": "plain",

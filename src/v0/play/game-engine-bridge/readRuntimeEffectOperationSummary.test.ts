@@ -75,4 +75,59 @@ describe("readRuntimeEffectBenefitLines", () => {
 			"Bountiful Offering: 35% chance for +1× Log.",
 		]);
 	});
+
+	it("aggregates stacked active product-line bonuses into resulting numbers", () => {
+		expect(
+			readRuntimeProductLineActiveEffectBonusLines({
+				baseDurationMs: 1000,
+				config: defaultGameConfig,
+				effectiveProductLine: {
+					appliedEffects: [
+						{
+							effectId: "effect:shrine-minor-haste",
+							effectName: "Minor Haste",
+							kind: "duration.multiply",
+							sourceId: "effect-source:1",
+							sourceItemInstanceId: "item-instance:shrine-a",
+						},
+						{
+							effectId: "effect:shrine-minor-haste",
+							effectName: "Minor Haste",
+							kind: "duration.multiply",
+							sourceId: "effect-source:2",
+							sourceItemInstanceId: "item-instance:shrine-b",
+						},
+					],
+					blocked: false,
+					blockReasons: [],
+					durationMs: 563,
+					lootPlan: {
+						appendOutputs: [],
+						baseDropChance: 1,
+						baseOutput: [],
+						chanceItems: [
+							{
+								chance: 0.35,
+								effectId: "effect:shrine-bountiful-offering",
+								effectName: "Bountiful Offering",
+								itemId: "item:log",
+								quantity: 1,
+							},
+							{
+								chance: 0.35,
+								effectId: "effect:shrine-bountiful-offering",
+								effectName: "Bountiful Offering",
+								itemId: "item:log",
+								quantity: 1,
+							},
+						],
+					},
+					visible: true,
+				},
+			}),
+		).toEqual([
+			"Minor Haste ×2: 44% faster production.",
+			"Bountiful Offering ×2: 58% chance for at least +1× Log (2 rolls, max +2×).",
+		]);
+	});
 });

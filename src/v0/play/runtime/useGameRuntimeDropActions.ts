@@ -135,6 +135,18 @@ export const useGameRuntimeDropActions = (): DropActions => {
 					},
 				});
 			},
+			storeBoardItem(input) {
+				const boardItem = readBoardView(store.getSnapshot()).byId[input.boardItemId];
+				if (!boardItem || boardItem.itemId !== input.expectedItemId)
+					return Promise.resolve();
+
+				return store.dispatch({
+					action: {
+						boardItemId: input.boardItemId,
+						type: "board.item.stash",
+					},
+				});
+			},
 			placeInventoryItem(input) {
 				const stack = readInventoryView(store.getSnapshot()).bySlotIndex[
 					String(input.slotIndex)

@@ -1,10 +1,13 @@
 import { cellKey } from "~/v0/board/cellKey";
+import { isInventoryBoardItemId } from "~/v0/board/BoardUtilityItem";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import { readBoardItemInventoryStorageReadiness } from "~/v0/play/drop/readBoardItemInventoryStorageReadiness";
 
 export type BoardCellDropAction =
 	| {
@@ -63,6 +66,18 @@ export type BoardCellDropAction =
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
 			};
+	  }
+	| {
+			type: "store-board-item-in-inventory";
+			feedback: {
+				kind: "cell-feedback";
+				cellKey: string;
+				variant: TileEngine.DropFeedbackVariant;
+			};
+			input: {
+				boardItemId: string;
+				expectedItemId: string;
+			};
 	  };
 
 export namespace resolveBoardCellDropAction {
@@ -81,12 +96,14 @@ export namespace resolveBoardCellDropAction {
 		>;
 		board: BoardView;
 		config: GameConfig;
+		inventory: InventoryView;
 	}
 }
 
 export const resolveBoardCellDropAction = ({
 	board,
 	config,
+	inventory,
 	source,
 	target,
 }: resolveBoardCellDropAction.Props): BoardCellDropAction => {
@@ -130,6 +147,37 @@ export const resolveBoardCellDropAction = ({
 				x: target.x,
 				y: target.y,
 			},
+		};
+	}
+
+	if (isInventoryBoardItemId(targetItem.itemId)) {
+		const readiness = readBoardItemInventoryStorageReadiness({
+			config,
+			inventory,
+			sourceItem,
+		});
+
+		if (!readiness.canStore) {
+			return {
+				feedback: {
+					cellKey: targetCellKey,
+					kind: "board-cell",
+				},
+				type: "reject",
+			};
+		}
+
+		return {
+			feedback: {
+				cellKey: targetCellKey,
+				kind: "cell-feedback",
+				variant: "primary",
+			},
+			input: {
+				boardItemId: source.boardItemId,
+				expectedItemId: sourceItem.itemId,
+			},
+			type: "store-board-item-in-inventory",
 		};
 	}
 

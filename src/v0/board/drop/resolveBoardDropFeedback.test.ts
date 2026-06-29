@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { inventoryBoardItemId } from "~/v0/board/BoardUtilityItem";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
@@ -30,6 +31,11 @@ const context = (
 
 const config = createEngineTestConfig();
 const emptyInventory = rebuildInventoryView([]);
+const inventoryWithEmptySlot = rebuildInventoryView([
+	{
+		slotIndex: 0,
+	},
+]);
 
 describe("resolveBoardDropFeedback", () => {
 	it("marks empty board cells as empty feedback", () => {
@@ -229,6 +235,107 @@ describe("resolveBoardDropFeedback", () => {
 			}),
 		).toEqual({
 			effect: "merge",
+		});
+	});
+
+	it("marks inventory board item targets as primary merge feedback when the source can be stored", () => {
+		const source = boardItem({
+			id: "a",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "inventory",
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				inventory: inventoryWithEmptySlot,
+				board: boardView([
+					source,
+					target,
+				]),
+				context: context({
+					source: {
+						kind: "board",
+						boardItemId: source.id,
+						itemId: source.itemId,
+						boardItem: source,
+					},
+					target: {
+						kind: "cell",
+						x: target.x,
+						y: target.y,
+						boardItemId: target.id,
+					},
+					targetTile: {
+						id: target.id,
+						slotId: "1:0",
+						data: {
+							kind: "board-item",
+							boardItemId: target.id,
+						},
+					},
+				}),
+			}),
+		).toEqual({
+			effect: "merge",
+			variant: "primary",
+		});
+	});
+
+	it("blocks inventory board item targets when the source cannot be stored", () => {
+		const source = boardItem({
+			id: "a",
+			itemId: inventoryBoardItemId,
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "inventory",
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardDropFeedback({
+				config,
+				inventory: inventoryWithEmptySlot,
+				board: boardView([
+					source,
+					target,
+				]),
+				context: context({
+					source: {
+						kind: "board",
+						boardItemId: source.id,
+						itemId: source.itemId,
+						boardItem: source,
+					},
+					target: {
+						kind: "cell",
+						x: target.x,
+						y: target.y,
+						boardItemId: target.id,
+					},
+					targetTile: {
+						id: target.id,
+						slotId: "1:0",
+						data: {
+							kind: "board-item",
+							boardItemId: target.id,
+						},
+					},
+				}),
+			}),
+		).toEqual({
+			effect: "blocked",
 		});
 	});
 

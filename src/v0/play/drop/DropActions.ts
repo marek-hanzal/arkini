@@ -18,6 +18,7 @@ export interface DropActions {
 		x: number;
 		y: number;
 	}): Promise<unknown>;
+	storeBoardItem(input: { boardItemId: string; expectedItemId: string }): Promise<unknown>;
 	placeInventoryItem(input: {
 		expectedItemId: string;
 		expectedStackId: string;

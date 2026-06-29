@@ -76,6 +76,7 @@ export const resolveDrop = ({
 						target,
 						board,
 						config,
+						inventory,
 						feedback,
 						actions,
 					}),

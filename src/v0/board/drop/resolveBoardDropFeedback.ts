@@ -1,6 +1,7 @@
 import type { BoardCellView } from "~/v0/board/boardCells";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
 import { cellKey } from "~/v0/board/cellKey";
+import { isInventoryBoardItemId } from "~/v0/board/BoardUtilityItem";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
@@ -9,6 +10,7 @@ import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
+import { readBoardItemInventoryStorageReadiness } from "~/v0/play/drop/readBoardItemInventoryStorageReadiness";
 
 export namespace resolveBoardDropFeedback {
 	export interface Props {
@@ -72,6 +74,36 @@ export const resolveBoardDropFeedback = ({
 	}
 
 	if (source.kind === "board" && targetItem.id === source.boardItemId) return null;
+
+	if (isInventoryBoardItemId(targetItem.itemId)) {
+		if (source.kind !== "board") {
+			return {
+				effect: "blocked",
+			};
+		}
+
+		const sourceItem = board.byId[source.boardItemId];
+		if (!sourceItem) {
+			return {
+				effect: "blocked",
+			};
+		}
+
+		const readiness = readBoardItemInventoryStorageReadiness({
+			config,
+			inventory,
+			sourceItem,
+		});
+
+		return readiness.canStore
+			? {
+					effect: "merge",
+					variant: "primary",
+				}
+			: {
+					effect: "blocked",
+				};
+	}
 
 	const intent = resolveDropIntent({
 		config,

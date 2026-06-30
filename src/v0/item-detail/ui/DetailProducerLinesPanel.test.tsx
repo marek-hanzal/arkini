@@ -102,7 +102,7 @@ describe("DetailProducerLinesPanel", () => {
 		);
 
 		expect(html.match(/data-ui="detail producer line separator"/g)?.length).toBe(1);
-		expect(html).toContain("border-b border-ak-border/70");
+		expect(html).toContain("border-b border-violet-300/25");
 	});
 
 	it("keeps product-line icons only in outputs, not duplicated in the header", () => {

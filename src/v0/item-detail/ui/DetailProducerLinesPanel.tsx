@@ -392,7 +392,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 						{index > 0 ? (
 							<div
 								aria-hidden="true"
-								className="border-b border-ak-border/70"
+								className="border-b border-violet-300/25"
 								data-ui="detail producer line separator"
 							/>
 						) : null}

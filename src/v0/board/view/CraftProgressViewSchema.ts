@@ -21,7 +21,7 @@ export const CraftProgressViewSchema = z.object({
 	phase: CraftProgressPhaseSchema,
 	complete: z.boolean(),
 	canAcceptInputs: z.boolean(),
-	grantsReady: z.boolean().optional(),
+	startRequirementsReady: z.boolean().optional(),
 	effectBlocked: z.boolean().optional(),
 	effectBlockReasons: z.array(z.string().min(1)).optional(),
 	startAtMs: z.number().optional(),

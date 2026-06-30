@@ -95,7 +95,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		complete: phase === "ready",
 		effectBlocked: effectState.blocked,
 		effectBlockReasons: effectState.blockReasons.length ? effectState.blockReasons : undefined,
-		grantsReady: effectState.grantsReady,
+		startRequirementsReady: effectState.startRequirementsReady,
 		deliveryBlocked,
 		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
 		targetLimits: targetLimits.length ? targetLimits : undefined,

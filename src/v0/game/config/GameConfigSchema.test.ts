@@ -366,6 +366,101 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/polarity/);
 	});
 
+	it("rejects extra output chance effects that match no concrete base output", () => {
+		const config: any = createValidConfigValue();
+		config.effects = {
+			"effect:test": {
+				polarity: "buff",
+				grantIds: [
+					"grant:test",
+				],
+				name: "Test Grant",
+			},
+		};
+		config.products["product:test"].effects = [
+			{
+				chance: 0.5,
+				display: "whenActive",
+				kind: "grant.loot.extraOutputChance.add",
+				outputItems: {
+					items: {
+						anyOf: [
+							{
+								ids: [
+									"item:plank",
+								],
+							},
+						],
+					},
+				},
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/selector must match/);
+	});
+	it("rejects extra output chance effects on output-less or weighted-only lines", () => {
+		const config: any = createValidConfigValue();
+		config.effects = {
+			"effect:test": {
+				polarity: "buff",
+				grantIds: [
+					"grant:test",
+				],
+				name: "Test Grant",
+			},
+		};
+		config.products["product:test"].output = [
+			{
+				entries: [
+					{
+						itemId: "item:twig",
+						weight: 1,
+					},
+				],
+				rolls: 1,
+				type: "weighted",
+			},
+		];
+		config.products["product:test"].effects = [
+			{
+				chance: 0.5,
+				display: "whenActive",
+				kind: "grant.loot.extraOutputChance.add",
+				outputItems: {
+					items: {
+						anyOf: [
+							{
+								ids: [
+									"item:twig",
+								],
+							},
+						],
+					},
+				},
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/non-weighted base output/);
+	});
+
 	it("rejects craft effects that the craft runtime does not support", () => {
 		const config: any = createValidConfigValue();
 		config.craftRecipes["item:craft-target"].effects = [

@@ -501,7 +501,7 @@ describe("resolveBoardItemTapAction", () => {
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					craft: craft({
-						grantsReady: false,
+						startRequirementsReady: false,
 						phase: "collecting_inputs",
 						readyAtMs: undefined,
 					}),

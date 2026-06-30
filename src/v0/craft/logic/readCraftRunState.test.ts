@@ -62,16 +62,16 @@ describe("readCraftRunState", () => {
 		});
 	});
 
-	it("blocks collecting crafts while grants are missing", () => {
+	it("blocks collecting crafts while start requirements are missing", () => {
 		expect(
 			readCraftRunState({
 				craft: craft({
-					grantsReady: false,
+					startRequirementsReady: false,
 				}),
 			}),
 		).toMatchObject({
 			canRunAction: false,
-			label: "Grants missing",
+			label: "Requirements missing",
 		});
 	});
 

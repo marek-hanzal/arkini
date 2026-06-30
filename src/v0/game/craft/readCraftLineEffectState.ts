@@ -23,7 +23,7 @@ export const readCraftLineEffectState = ({
 		nowMs,
 		save,
 	});
-	let grantsReady = true;
+	let startRequirementsReady = true;
 	let blocked = false;
 	const blockReasons: string[] = [];
 
@@ -33,7 +33,7 @@ export const readCraftLineEffectState = ({
 				grantIds,
 				selector: lineEffect.selector,
 			});
-			if (lineEffect.phase === "start" && !ready) grantsReady = false;
+			if (lineEffect.phase === "start" && !ready) startRequirementsReady = false;
 			continue;
 		}
 
@@ -55,7 +55,7 @@ export const readCraftLineEffectState = ({
 		blocked,
 		blockReasons,
 		grantIds,
-		grantsReady,
-		startGateReady: grantsReady && !blocked,
+		startRequirementsReady,
+		startGateReady: startRequirementsReady && !blocked,
 	};
 };

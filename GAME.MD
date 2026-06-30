@@ -248,7 +248,7 @@ Stash consumable inputs are currently open-time inputs, not persistent stash inp
 
 Product lines own their output inline. Stashes emit through their single product line. There is no top-level loot-table indirection in the current config model. Reintroduce shared output IDs only if the same output table is intentionally reused enough to beat the extra reference hop, not because humans miss paperwork for some reason.
 
-Better output should usually be modeled as another product/building tier with its own inline output. Line-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls against already-produced output items, not for rewriting the base output table.
+Better output should usually be modeled as another product/building tier with its own inline output. Line-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls against already-produced same-line non-weighted output items, not for rewriting the base output table. Config validation rejects output-less, weighted-only, or no-match bonus loot effects because silent no-op bonuses are cursed confetti, not content.
 
 ### 4.14 Blueprint
 
@@ -671,7 +671,7 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, line-owned effects, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. There are no legacy product input/output reference tables; product-specific data lives on the product itself.
 
-Product lines can start as `visibility: "hidden"` and be revealed by their own visibility-phase requirements. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. Start-phase requirements keep the line visible but disabled until satisfied. `grant.blockStart` keeps the line visible but blocks new production while the blocking grant is active. Running jobs are not paused or cancelled by block effects, because the game already has enough ways to generate admin work without inventing time-travel bookkeeping.
+Product lines can start as `visibility: "hidden"` and be revealed by their own visibility-phase requirements. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. Start-phase requirements keep the line visible but disabled until satisfied. `grant.blockStart` keeps the line visible but blocks new production while the blocking grant is active. Running producer and craft jobs resynchronize from the current start gate and pause/resume when effect requirements or blockers change, because stale background progress is how tiny lies become save-corrupting goblins.
 
 ### 10.6 Runtime effects
 
@@ -679,7 +679,7 @@ Runtime effect definitions publish global grant facts. They do not patch or rewr
 
 Product and craft lines own their own interpretation of those grants. A producer line asks for its effective view and gets visibility, start readiness, blockers, duration multiplier effects, and extra chance loot. Craft recipes intentionally support only start-gate effects: `grant.require` with `phase: "start"` and `grant.blockStart`. Config validation rejects producer-only duration/nearby/loot effects on craft recipes, because silent no-op config is just technical debt wearing perfume.
 
-Current line-owned effect kinds are `grant.require`, `grant.blockStart`, `nearby.require`, `nearby.duration.multiply`, `grant.duration.multiply`, and `grant.loot.extraOutputChance.add`. Nearby effects use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; grant duration and loot effects activate once their grant selector is satisfied. Modifier effects are UI bonuses, not requirement rows. Hidden missing requirements still block starts even when `display: "never"`, because display is not gameplay logic.
+Current line-owned effect kinds are `grant.require`, `grant.blockStart`, `nearby.require`, `nearby.duration.multiply`, `grant.duration.multiply`, and `grant.loot.extraOutputChance.add`. Nearby effects use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; grant duration and loot effects activate once their grant selector is satisfied. Extra chance loot must match at least one same-line non-weighted base output item. Modifier effects are UI bonuses, not requirement rows. Hidden missing requirements still block starts even when `display: "never"`, because display is not gameplay logic.
 
 ### Board max count
 

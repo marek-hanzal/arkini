@@ -62,7 +62,7 @@ export const UiProgressButton: FC<UiProgressButton.Props> = ({
 
 	return (
 		<UiButton
-			className={cn("relative overflow-hidden disabled:opacity-100", className)}
+			className={cn("relative overflow-hidden", className)}
 			tone={tone}
 			{...props}
 		>

@@ -104,6 +104,43 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("Water");
 	});
 
+	it("uses short default labels and missing-item copy", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					createLine({
+						inputItemIds: [
+							"item:water",
+						],
+						inputs: [
+							{
+								available: 0,
+								capacity: 1,
+								consume: true,
+								itemId: "item:water",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+						inputsAvailable: false,
+						inputsReady: false,
+						isDefault: true,
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Missing items");
+		expect(html).toContain(">Un-default<");
+		expect(html).not.toContain("Feed items by drag");
+		expect(html).not.toContain("Default product");
+	});
+
 	it("shows active blockers as blocked requirements", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

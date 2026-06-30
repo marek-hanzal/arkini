@@ -36,7 +36,7 @@ const readInputAvailabilityLabel = ({
 	if (line.inputsReady) return "input ready";
 	if (line.inputsAvailable) return "auto-fill ready";
 	if (inputsPartiallyAvailable) return "partial fill ready";
-	return "needs input";
+	return "missing items";
 };
 
 const readStatusMetaLabel = (line: ProducerProductLineView) => {
@@ -180,7 +180,7 @@ export const readProducerProductLineRunState = ({
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
-			label: "Feed items by drag",
+			label: "Missing items",
 			line,
 		});
 	}
@@ -215,7 +215,7 @@ export const readProducerProductLineRunState = ({
 	return withCommonState({
 		canRunAction,
 		inputsPartiallyAvailable,
-		label: "Feed items by drag",
+		label: "Missing items",
 		line,
 	});
 };

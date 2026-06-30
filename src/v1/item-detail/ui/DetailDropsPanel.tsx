@@ -64,7 +64,7 @@ export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items
 								return (
 									<article
 										key={`${group.label}:${index}:${drop.itemId}:${drop.chanceLabel}`}
-										className="flex min-w-0 items-center gap-2 rounded-sm border border-ak-border/70 bg-ak-surface px-2.5 py-2 text-sm"
+										className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface/80 px-2.5 py-2 text-sm"
 									>
 										<ItemInlineAsset
 											item={item}

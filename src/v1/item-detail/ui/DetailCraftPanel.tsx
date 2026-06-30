@@ -1,22 +1,19 @@
 import type { FC } from "react";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
-import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { craftStatusLabel } from "~/v0/item/logic/craftStatusLabel";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { cn } from "~/v0/ui/cn";
+import type { DetailCraftControl } from "~/v1/item-detail/control/DetailCraftControl";
 import { DetailCard, DetailMutedPill } from "~/v1/item-detail/ui/DetailCard";
 
 export namespace DetailCraftPanel {
 	export interface Props {
+		control: DetailCraftControl;
 		craft: CraftProgressView;
 		items: ItemCatalogView;
-		pending: boolean;
-		onClaim(): void;
-		onStart(): void;
-		onWithdrawInput(itemId: string): void;
 	}
 }
 
@@ -31,17 +28,7 @@ const readTargetLimitLabel = (
 		: baseLabel;
 };
 
-export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
-	craft,
-	items,
-	onClaim,
-	onStart,
-	onWithdrawInput,
-	pending,
-}) => {
-	const runState = readCraftRunState({
-		craft,
-	});
+export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, items }) => {
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
 	const effectBlockReasons = craft.effectBlockReasons ?? [];
@@ -112,7 +99,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 				<div className="grid max-h-72 gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
 					{craft.inputs.map((input) => {
 						const delivered = craft.delivered[input.itemId] ?? 0;
-						const canWithdraw = craft.phase === "collecting_inputs" && delivered > 0;
+						const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
 						const inputItem = items[input.itemId];
 						const ready = delivered >= input.quantity;
 						return (
@@ -142,14 +129,15 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 											: ""}
 									</p>
 								</div>
-								{canWithdraw ? (
+								{withdrawAction ? (
 									<UiButton
 										data-ui="withdraw action"
-										disabled={pending}
+										disabled={withdrawAction.disabled}
 										fullWidth={false}
-										onClick={() => onWithdrawInput(input.itemId)}
+										tone={withdrawAction.tone}
+										onClick={withdrawAction.onClick}
 									>
-										Withdraw
+										{withdrawAction.label}
 									</UiButton>
 								) : null}
 							</div>
@@ -158,12 +146,12 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 				</div>
 			</div>
 			<UiButton
-				disabled={(!runState.canRunAction && !runState.canClaim) || pending}
-				tone="primary"
+				disabled={control.primaryAction.disabled}
+				tone={control.primaryAction.tone}
 				className="mt-3"
-				onClick={runState.canClaim ? onClaim : onStart}
+				onClick={control.primaryAction.onClick}
 			>
-				{runState.label}
+				{control.primaryAction.label}
 			</UiButton>
 		</DetailCard>
 	);

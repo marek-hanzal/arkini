@@ -2,6 +2,7 @@ import type { FC } from "react";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
+import { useItemDetailControls } from "~/v1/item-detail/control/useItemDetailControls";
 import { DetailCraftPanel } from "~/v1/item-detail/ui/DetailCraftPanel";
 import { DetailDropsPanel } from "~/v1/item-detail/ui/DetailDropsPanel";
 import { DetailGeneratedEffectsPanel } from "~/v1/item-detail/ui/DetailGeneratedEffectsPanel";
@@ -42,7 +43,17 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 }) => {
 	const item = boardItem ? items[boardItem.itemId] : undefined;
 	const activation = boardItem?.activation;
-	const productLines = activation?.productLines ?? [];
+	const { craftControl, producerLineModels } = useItemDetailControls({
+		boardItem,
+		canSetDefaultLines,
+		isPending,
+		onClaimCraft,
+		onSetDefaultProductLine,
+		onStartCraft,
+		onStartProductLine,
+		onWithdrawCraftInput,
+		onWithdrawProductLineInput,
+	});
 
 	if (!boardItem || !item) {
 		return (
@@ -78,14 +89,11 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 				) : null}
 				<DetailHeroCard item={item} />
 				<DetailGeneratedEffectsPanel effects={item.generatedEffects} />
-				{boardItem.craft ? (
+				{boardItem.craft && craftControl ? (
 					<DetailCraftPanel
+						control={craftControl}
 						craft={boardItem.craft}
 						items={items}
-						pending={isPending}
-						onClaim={onClaimCraft}
-						onStart={onStartCraft}
-						onWithdrawInput={onWithdrawCraftInput}
 					/>
 				) : null}
 				{activation?.kind === "stash" ? (
@@ -101,15 +109,10 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 						title={activation.kind === "stash" ? "Needed to open" : "Shared inputs"}
 					/>
 				) : null}
-				{productLines.length ? (
+				{producerLineModels.length ? (
 					<DetailProducerLinesPanel
-						canSetDefault={canSetDefaultLines}
 						items={items}
-						lines={productLines}
-						pending={isPending}
-						onSetDefault={onSetDefaultProductLine}
-						onStart={onStartProductLine}
-						onWithdrawInput={onWithdrawProductLineInput}
+						lines={producerLineModels}
 					/>
 				) : null}
 			</div>

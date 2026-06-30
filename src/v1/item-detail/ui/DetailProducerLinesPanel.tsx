@@ -104,7 +104,7 @@ const DetailLineNoteList: FC<{
 			)}
 		>
 			<p className="font-black text-ak-text">{title}</p>
-			<ul className="mt-1 max-h-28 space-y-1 overflow-y-auto pr-1 leading-5 text-ak-text-muted [scrollbar-width:thin]">
+			<ul className="mt-1 space-y-1 leading-5 text-ak-text-muted">
 				{items.map((item, index) => (
 					<li
 						key={`${title}:${index}:${item}`}
@@ -128,7 +128,7 @@ const DetailLineOutputs: FC<{
 	return (
 		<div className="rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs">
 			<p className="font-black text-ak-text">Outputs</p>
-			<div className="mt-1.5 grid max-h-40 gap-1.5 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="mt-1.5 grid gap-1.5">
 				{outputs.map((output, outputIndex) => {
 					const outputItem = items[output.itemId];
 					return (
@@ -164,7 +164,7 @@ const DetailLineInputs: FC<{
 	if (line.inputs.length === 0) return null;
 
 	return (
-		<div className="grid max-h-64 gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
+		<div className="grid gap-2">
 			{line.inputs.map((input) => {
 				const inputItem = items[input.itemId];
 				const fillableQuantity = readActivationInputViewFillableQuantity(input);
@@ -360,7 +360,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 					onSelect={setSelectedGroupId}
 				/>
 			) : null}
-			<div className="mt-2 grid max-h-[30rem] gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="mt-2 grid gap-2">
 				{activeGroup.lines.map((model) => (
 					<DetailProducerLineCard
 						key={model.line.productId}

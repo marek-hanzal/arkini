@@ -32,7 +32,7 @@ export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ item }) => (
 					{item.description}
 				</p>
 				{item.tags.length ? (
-					<div className="mt-3 flex max-h-16 flex-wrap gap-1 overflow-y-auto pr-1 [scrollbar-width:thin]">
+					<div className="mt-3 flex flex-wrap gap-1">
 						{item.tags.map((tag) => (
 							<DetailMutedPill key={tag}>{tag}</DetailMutedPill>
 						))}

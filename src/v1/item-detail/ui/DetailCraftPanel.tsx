@@ -96,7 +96,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 					</div>
 				) : null}
 
-				<div className="grid max-h-72 gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
+				<div className="grid gap-2">
 					{craft.inputs.map((input) => {
 						const delivered = craft.delivered[input.itemId] ?? 0;
 						const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];

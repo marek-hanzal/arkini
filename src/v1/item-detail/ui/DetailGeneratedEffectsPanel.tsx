@@ -51,7 +51,7 @@ export const DetailGeneratedEffectsPanel: FC<DetailGeneratedEffectsPanel.Props> 
 					}
 				/>
 			) : null}
-			<div className="mt-2 max-h-72 space-y-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="mt-2 space-y-2">
 				{activeGroup.effects.map((effect) => (
 					<article
 						key={effect.id}

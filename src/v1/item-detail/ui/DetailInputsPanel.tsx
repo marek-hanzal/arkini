@@ -37,7 +37,7 @@ export const DetailInputsPanel: FC<DetailInputsPanel.Props> = ({
 			title={title}
 			action={<DetailMutedPill>{rows.length}</DetailMutedPill>}
 		>
-			<div className="grid max-h-72 gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="grid gap-2">
 				{rows.map(({ input, ready }) => {
 					const item = items[input.itemId];
 					const fillableQuantity = readActivationInputViewFillableQuantity(input);

@@ -38,15 +38,13 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		config,
 		nowMs,
 		recipe: target.recipe,
-		recipeId: action.recipeId,
 		save,
-		targetItem: target.targetItem,
 	});
 	if (!effectState.grantsReady) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"effect:missing-grant",
-				`Craft recipe "${action.recipeId}" is missing a required effect grant.`,
+				`Craft recipe "${action.recipeId}" is missing a required effect requirement.`,
 			),
 		);
 	}

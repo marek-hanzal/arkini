@@ -43,7 +43,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	return [
 		...readUnusedDefinitionWarnings(config, usage),
 		...readDuplicateDefinitionShapeWarnings(config),
-		...readTerminalItemWarnings(config, itemFlow),
+		...readTerminalItemWarnings(config, itemFlow, usage),
 	].sort(compareGameConfigAuditWarnings);
 };
 
@@ -369,10 +369,12 @@ const readUnusedDefinitionWarnings = (
 const readTerminalItemWarnings = (
 	config: GameConfig,
 	itemFlow: ItemFlowIndex,
+	usage: UsageIndex,
 ): GameConfigAuditWarning[] =>
 	Object.keys(config.items)
 		.filter((itemId) => itemFlow.producedItemIds.has(itemId))
 		.filter((itemId) => !itemFlow.consumedItemIds.has(itemId))
+		.filter((itemId) => !usage.items.has(itemId))
 		.filter((itemId) => !hasConfiguredInteraction(config, itemId, config.items[itemId]))
 		.map((itemId) => ({
 			code: "terminal-item",

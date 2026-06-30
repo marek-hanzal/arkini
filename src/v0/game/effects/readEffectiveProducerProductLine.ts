@@ -192,7 +192,7 @@ export const readEffectiveProducerProductLine = ({
 	save,
 }: readEffectiveProducerProductLine.Props): EffectiveProducerProductLine => {
 	let visible = product.visibility !== "hidden";
-	let grantsReady = true;
+	let startRequirementsReady = true;
 	let hasVisibilityRequirement = false;
 	let visibilityReady = true;
 	let blocked = false;
@@ -232,7 +232,7 @@ export const readEffectiveProducerProductLine = ({
 			hasVisibilityRequirement = true;
 			if (!ready) visibilityReady = false;
 		}
-		if (phase === "start" && !ready) grantsReady = false;
+		if (phase === "start" && !ready) startRequirementsReady = false;
 		requirements.push({
 			display,
 			kind,
@@ -381,7 +381,7 @@ export const readEffectiveProducerProductLine = ({
 		grantIds: [
 			...grantIds,
 		].sort(),
-		grantsReady,
+		startRequirementsReady,
 		lootPlan: {
 			baseOutput,
 			chanceItems,

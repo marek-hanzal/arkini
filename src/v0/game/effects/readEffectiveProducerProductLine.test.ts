@@ -83,7 +83,7 @@ describe("readEffectiveProducerProductLine", () => {
 		});
 
 		expect(line.visible).toBe(true);
-		expect(line.grantsReady).toBe(false);
+		expect(line.startRequirementsReady).toBe(false);
 		expect(line.requirements).toEqual([
 			{
 				display: "always",
@@ -247,7 +247,7 @@ describe("readEffectiveProducerProductLine", () => {
 			save,
 		});
 
-		expect(line.grantsReady).toBe(true);
+		expect(line.startRequirementsReady).toBe(true);
 		expect(line.durationMs).toBe(3000);
 		expect(line.requirements.map((requirement) => requirement.label)).toEqual([
 			"Nearby Twig",

@@ -110,6 +110,202 @@ describe("applyGameActionFx Craft", () => {
 		}
 	});
 
+	it("rejects and surfaces craft start blockers from active effects", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:blocker": {
+					grantIds: [
+						"grant:test:blocker",
+					],
+					name: "Craft Blocker",
+					polarity: "debuff",
+					sourceScope: "board",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:test:blocker",
+					],
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					effects: [
+						{
+							display: "whenActive",
+							kind: "grant.blockStart",
+							label: "Craft Blocker",
+							reason: "Craft is blocked by a test effect.",
+							selector: {
+								allOf: [
+									{
+										ids: [
+											"grant:test:blocker",
+										],
+									},
+								],
+							},
+						},
+					],
+					inputs: [],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "GameActionRejected",
+				message: "Craft is blocked by a test effect.",
+				reason: "blocked",
+			});
+		}
+	});
+
+	it("pauses running craft jobs when a start blocker becomes active", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:blocker": {
+					grantIds: [
+						"grant:test:blocker",
+					],
+					name: "Craft Blocker",
+					polarity: "debuff",
+					sourceScope: "board",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:test:blocker",
+					],
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:craft-table": {
+					...baseConfig.craftRecipes["item:craft-table"],
+					effects: [
+						{
+							display: "whenActive",
+							kind: "grant.blockStart",
+							reason: "Craft is blocked by a test effect.",
+							selector: {
+								allOf: [
+									{
+										ids: [
+											"grant:test:blocker",
+										],
+									},
+								],
+							},
+						},
+					],
+					inputs: [],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const started = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		started.save.board.items["item-instance:blocker"] = {
+			createdAtMs: 250,
+			id: "item-instance:blocker",
+			itemId: "item:axe",
+			x: 1,
+			y: 0,
+		};
+
+		const paused = runTick({
+			config,
+			nowMs: 500,
+			save: started.save,
+		});
+		const pausedJob = readOnlyRecordValue(paused.save.craftJobs);
+
+		expect(pausedJob).toMatchObject({
+			pausedAtMs: 500,
+			readyAtMs: 1000,
+			remainingMs: 500,
+			startAtMs: 0,
+		});
+
+		delete paused.save.board.items["item-instance:blocker"];
+		const resumed = runTick({
+			config,
+			nowMs: 700,
+			save: paused.save,
+		});
+		const resumedJob = readOnlyRecordValue(resumed.save.craftJobs);
+
+		expect(resumedJob).toMatchObject({
+			readyAtMs: 1200,
+			startAtMs: 200,
+		});
+		expect(resumedJob.pausedAtMs).toBeUndefined();
+		expect(resumedJob.remainingMs).toBeUndefined();
+	});
+
 	it("stores craft inputs gradually and starts only after required inputs are complete", () => {
 		const config = createEngineCraftTableTestConfig({
 			noRecipeInputs: false,

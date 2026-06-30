@@ -82,20 +82,20 @@ export const readRuntimeCraftViewFromGameSave = ({
 		itemId: recipe.resultItemId,
 		save,
 	});
-	const grantsReady = readCraftLineEffectState({
+	const effectState = readCraftLineEffectState({
 		config,
 		nowMs,
 		recipe,
-		recipeId,
 		save,
-		targetItem: boardItem,
-	}).grantsReady;
+	});
 
 	return {
 		acceptedInputItemIds,
 		canAcceptInputs: acceptedInputItemIds.length > 0,
 		complete: phase === "ready",
-		grantsReady,
+		effectBlocked: effectState.blocked,
+		effectBlockReasons: effectState.blockReasons.length ? effectState.blockReasons : undefined,
+		grantsReady: effectState.grantsReady,
 		deliveryBlocked,
 		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
 		targetLimits: targetLimits.length ? targetLimits : undefined,

@@ -146,6 +146,41 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
+	it("does not call produced items terminal when line-owned effects reference them", () => {
+		const config: any = createConfigValue();
+		config.products["product:test"].effects = [
+			{
+				bands: [
+					{
+						minDistance: 0,
+						multiplier: 2,
+					},
+				],
+				display: "whenActive",
+				items: {
+					anyOf: [
+						{
+							ids: [
+								"item:pollution",
+							],
+						},
+					],
+				},
+				kind: "nearby.duration.multiply",
+				radius: 1,
+			},
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "terminal-item",
+				id: "item:pollution",
+			}),
+		);
+	});
+
 	it("warns about unused asset definitions", () => {
 		const config: any = createConfigValue();
 		config.resources["resource:unused"] = {

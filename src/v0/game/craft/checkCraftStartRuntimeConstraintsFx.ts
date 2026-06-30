@@ -29,15 +29,13 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 			config,
 			nowMs,
 			recipe,
-			recipeId: targetItem.itemId,
 			save,
-			targetItem,
 		});
 		if (!effectState.grantsReady) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"effect:missing-grant",
-					`Craft recipe for "${targetItem.itemId}" is missing a required effect grant.`,
+					`Craft recipe for "${targetItem.itemId}" is missing a required effect requirement.`,
 				),
 			);
 		}

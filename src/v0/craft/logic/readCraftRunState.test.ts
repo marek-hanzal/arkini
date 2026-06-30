@@ -75,6 +75,19 @@ describe("readCraftRunState", () => {
 		});
 	});
 
+	it("blocks collecting crafts while a start-block effect is active", () => {
+		expect(
+			readCraftRunState({
+				craft: craft({
+					effectBlocked: true,
+				}),
+			}),
+		).toMatchObject({
+			canRunAction: false,
+			label: "Blocked",
+		});
+	});
+
 	it("labels blocked delivery without allowing another start", () => {
 		expect(
 			readCraftRunState({

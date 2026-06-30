@@ -1,4 +1,4 @@
-import { type FC, useState } from "react";
+import { Fragment, type FC, useState } from "react";
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
@@ -386,13 +386,21 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 					onSelect={setSelectedGroupId}
 				/>
 			) : null}
-			<div className="mt-2 grid gap-4">
-				{activeGroup.lines.map((model) => (
-					<DetailProducerLineCard
-						key={model.line.productId}
-						items={items}
-						model={model}
-					/>
+			<div className="mt-2 flex flex-col gap-3">
+				{activeGroup.lines.map((model, index) => (
+					<Fragment key={model.line.productId}>
+						{index > 0 ? (
+							<div
+								aria-hidden="true"
+								className="border-b border-ak-border/70"
+								data-ui="detail producer line separator"
+							/>
+						) : null}
+						<DetailProducerLineCard
+							items={items}
+							model={model}
+						/>
+					</Fragment>
 				))}
 			</div>
 		</DetailCard>

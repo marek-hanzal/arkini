@@ -341,6 +341,197 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
+	it("does not block maxCount preflight for base output with zero effective drop chance", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:no-base-drop": {
+					name: "No base drop",
+					operations: [
+						{
+							delta: -1,
+							kind: "loot.dropChance.add",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:plank",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:no-base-drop"] = {
+			endAtMs: 10_000,
+			effectId: "effect:no-base-drop",
+			id: "effect-instance:no-base-drop",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const result = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(Object.values(result.save.producerJobs)).toHaveLength(1);
+	});
+
+	it("blocks maxCount preflight for guaranteed appended effect output", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:append-plank": {
+					name: "Append plank",
+					operations: [
+						{
+							kind: "loot.appendOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:plank",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.activeEffects["effect-instance:append-plank"] = {
+			endAtMs: 10_000,
+			effectId: "effect:append-plank",
+			id: "effect-instance:append-plank",
+			sourceItemInstanceId: "item-instance:1",
+			startAtMs: 0,
+		};
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			},
+		});
+	});
+
 	it("expires zero-duration activated effects in the same action", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

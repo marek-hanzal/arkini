@@ -21,7 +21,7 @@ import {
 	readGameTimeRemainingMs,
 } from "~/v0/game/time/GameTime";
 import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readActivationInputRequiredQuantity";
-import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
+import { readEffectiveOutputTargetLimits } from "~/v0/game/limit/readEffectiveOutputTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 import { readRuntimeProductLineOutputViews } from "~/v0/play/game-engine-bridge/readRuntimeProductLineOutputViews";
 
@@ -195,9 +195,9 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			config,
 			effectiveProductLine,
 		});
-		const targetLimits = readOutputTargetLimits({
+		const targetLimits = readEffectiveOutputTargetLimits({
 			config,
-			output: effectiveProductLine.lootPlan.baseOutput,
+			lootPlan: effectiveProductLine.lootPlan,
 			save,
 		});
 

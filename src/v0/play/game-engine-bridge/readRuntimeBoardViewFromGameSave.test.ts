@@ -1169,6 +1169,135 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			progress: 1,
 		});
 	});
+
+	it("shows effect-mutated stash drop previews from the full loot plan", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:stash-loot": {
+					name: "Stash loot",
+					operations: [
+						{
+							delta: -0.5,
+							kind: "loot.dropChance.add",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:stash",
+											],
+										},
+									],
+								},
+							},
+						},
+						{
+							chance: 1,
+							kind: "loot.appendOutput",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:stash",
+											],
+										},
+									],
+								},
+							},
+						},
+						{
+							chance: 0.25,
+							itemId: "item:key",
+							kind: "loot.addChanceItem",
+							quantity: 2,
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:stash",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:stash": {
+					...baseConfig.items["item:stash"],
+					passiveEffectIds: [
+						"effect:stash-loot",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation?.drops).toMatchObject([
+			{
+				chanceLabel: "50%",
+				itemId: "item:twig",
+				quantityLabel: "1",
+			},
+			{
+				chanceLabel: "100%",
+				itemId: "item:plank",
+				quantityLabel: "1",
+			},
+			{
+				chanceLabel: "25%",
+				itemId: "item:key",
+				quantityLabel: "2",
+			},
+		]);
+	});
+
 	it("shows stash drop previews with probabilities", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

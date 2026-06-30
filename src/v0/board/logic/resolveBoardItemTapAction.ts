@@ -5,7 +5,7 @@ import { readProducerProductLineRunState } from "~/v0/producer/logic/readProduce
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
-import { readCheatSpeedModeFromItemId } from "~/v0/game/cheat/GameCheatSpeedItem";
+import { readCheatSpeedToggleModeFromItemId } from "~/v0/game/cheat/GameCheatSpeedItem";
 import type { GameCheatSpeedMode } from "~/v0/game/cheat/GameCheatSpeedMode";
 
 export namespace resolveBoardItemTapAction {
@@ -44,7 +44,7 @@ export const resolveBoardItemTapAction = ({
 	boardItem,
 	nowMs,
 }: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
-	const cheatSpeedMode = readCheatSpeedModeFromItemId(boardItem.itemId);
+	const cheatSpeedMode = readCheatSpeedToggleModeFromItemId(boardItem.itemId);
 	if (cheatSpeedMode) {
 		return {
 			mode: cheatSpeedMode,

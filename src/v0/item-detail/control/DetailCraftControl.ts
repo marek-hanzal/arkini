@@ -1,6 +1,10 @@
-import type { DetailActionControl } from "~/v0/item-detail/control/DetailActionControl";
+import type {
+	DetailActionControl,
+	DetailProgressActionControl,
+} from "~/v0/item-detail/control/DetailActionControl";
 
 export interface DetailCraftControl {
-	primaryAction: DetailActionControl;
+	primaryAction: DetailProgressActionControl;
+	statusLabel: string;
 	withdrawInputActionsByItemId: Readonly<Record<string, DetailActionControl | undefined>>;
 }

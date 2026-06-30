@@ -64,4 +64,47 @@ describe("readDetailCraftControl", () => {
 
 		expect(onWithdrawInput).toHaveBeenCalledWith("item:log");
 	});
+
+	it("packages craft status and progress for the action button", () => {
+		const control = readDetailCraftControl({
+			craft: createCraft({
+				delivered: {
+					"item:log": 1,
+				},
+				inputProgress: 0.5,
+				inputs: [
+					{
+						itemId: "item:log",
+						quantity: 2,
+					},
+				],
+				progress: 0.5,
+			}),
+			onClaim: () => undefined,
+			onStart: () => undefined,
+			onWithdrawInput: () => undefined,
+			pending: false,
+		});
+
+		expect(control.statusLabel).toBe("Collecting inputs");
+		expect(control.primaryAction.progress).toBe(0.5);
+		expect(control.primaryAction.progressAutoCompleteMs).toBeUndefined();
+	});
+
+	it("auto-completes waiting craft button progress over remaining time", () => {
+		const control = readDetailCraftControl({
+			craft: createCraft({
+				phase: "waiting",
+				progress: 0.25,
+				remainingMs: 750,
+			}),
+			onClaim: () => undefined,
+			onStart: () => undefined,
+			onWithdrawInput: () => undefined,
+			pending: false,
+		});
+
+		expect(control.primaryAction.progress).toBe(0.25);
+		expect(control.primaryAction.progressAutoCompleteMs).toBe(750);
+	});
 });

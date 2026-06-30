@@ -1,13 +1,13 @@
 import type { FC } from "react";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
-import { craftStatusLabel } from "~/v0/item-detail/logic/craftStatusLabel";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
+import { UiProgressButton } from "~/v0/ui/UiProgressButton";
 import { cn } from "~/v0/ui/cn";
 import type { DetailCraftControl } from "~/v0/item-detail/control/DetailCraftControl";
-import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
+import { DetailCard } from "~/v0/item-detail/ui/DetailCard";
 
 export namespace DetailCraftPanel {
 	export interface Props {
@@ -28,6 +28,22 @@ const readTargetLimitLabel = (
 		: baseLabel;
 };
 
+const readCraftInputRowClassName = ({
+	available,
+	fulfilled,
+}: {
+	available: boolean;
+	fulfilled: boolean;
+}) =>
+	cn(
+		"flex min-w-0 items-center gap-2 rounded-sm border px-2.5 py-2 text-sm transition-[background,border-color,box-shadow]",
+		fulfilled
+			? "border-emerald-300/30 bg-emerald-400/10 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.07)]"
+			: available
+				? "border-fuchsia-300/35 bg-fuchsia-400/10 shadow-[inset_0_0_0_1px_rgba(236,72,153,0.07)]"
+				: "border-transparent bg-ak-surface/80",
+	);
+
 export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, items }) => {
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
@@ -37,13 +53,6 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 		<DetailCard
 			eyebrow="Craft"
 			title={resultItem?.name ?? craft.resultItemId}
-			action={
-				<DetailMutedPill>
-					{craftStatusLabel({
-						craft,
-					})}
-				</DetailMutedPill>
-			}
 		>
 			<div className="grid gap-3">
 				<div className="flex min-w-0 gap-3">
@@ -52,15 +61,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 						className="h-14 w-14"
 					/>
 					<div className="min-w-0 flex-1">
-						<div className="h-2 overflow-hidden rounded-full bg-ak-surface-soft">
-							<div
-								className="h-full rounded-full bg-ak-primary transition-[width] duration-200 ease-linear"
-								style={{
-									width: `${Math.round(craft.progress * 100)}%`,
-								}}
-							/>
-						</div>
-						<p className="mt-2 break-words text-xs leading-5 text-ak-text-muted">
+						<p className="break-words text-xs leading-5 text-ak-text-muted">
 							Creates{" "}
 							<strong className="text-ak-text">
 								{resultItem?.name ?? craft.resultItemId}
@@ -102,10 +103,17 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 						const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
 						const inputItem = items[input.itemId];
 						const ready = delivered >= input.quantity;
+						const fillableQuantity = Math.min(
+							Math.max(0, input.quantity - delivered),
+							input.available ?? 0,
+						);
 						return (
 							<div
 								key={input.itemId}
-								className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface/80 px-2.5 py-2 text-sm"
+								className={readCraftInputRowClassName({
+									available: fillableQuantity > 0,
+									fulfilled: ready,
+								})}
 							>
 								<ItemInlineAsset
 									item={inputItem}
@@ -124,8 +132,8 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 										)}
 									>
 										{delivered}/{input.quantity}
-										{!ready && input.available
-											? ` · +${Math.min(input.quantity - delivered, input.available)} available`
+										{!ready && fillableQuantity > 0
+											? ` · +${fillableQuantity} available`
 											: ""}
 									</p>
 								</div>
@@ -145,14 +153,21 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 					})}
 				</div>
 			</div>
-			<UiButton
+			<UiProgressButton
 				disabled={control.primaryAction.disabled}
+				progress={control.primaryAction.progress}
+				progressAutoCompleteMs={control.primaryAction.progressAutoCompleteMs}
 				tone={control.primaryAction.tone}
-				className="mt-3"
+				className="mt-3 min-h-12 py-2.5"
 				onClick={control.primaryAction.onClick}
 			>
-				{control.primaryAction.label}
-			</UiButton>
+				<span className="flex min-w-0 flex-col items-center justify-center gap-1 leading-none">
+					<span className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/75">
+						{control.statusLabel}
+					</span>
+					<span>{control.primaryAction.label}</span>
+				</span>
+			</UiProgressButton>
 		</DetailCard>
 	);
 };

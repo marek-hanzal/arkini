@@ -2,6 +2,7 @@ import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema"
 import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import type { DetailActionControl } from "~/v0/item-detail/control/DetailActionControl";
 import type { DetailCraftControl } from "~/v0/item-detail/control/DetailCraftControl";
+import { craftStatusLabel } from "~/v0/item-detail/logic/craftStatusLabel";
 
 export namespace readDetailCraftControl {
 	export interface Props {
@@ -46,6 +47,9 @@ const readWithdrawInputActionsByItemId = ({
 		}),
 	) satisfies Readonly<Record<string, DetailActionControl | undefined>>;
 
+const readCraftProgressAutoCompleteMs = (craft: CraftProgressView) =>
+	craft.phase === "waiting" ? craft.remainingMs : undefined;
+
 export const readDetailCraftControl = ({
 	craft,
 	onClaim,
@@ -70,8 +74,13 @@ export const readDetailCraftControl = ({
 				}
 				onStart();
 			},
+			progress: craft.progress,
+			progressAutoCompleteMs: readCraftProgressAutoCompleteMs(craft),
 			tone: "primary",
 		},
+		statusLabel: craftStatusLabel({
+			craft,
+		}),
 		withdrawInputActionsByItemId: readWithdrawInputActionsByItemId({
 			craft,
 			onWithdrawInput,

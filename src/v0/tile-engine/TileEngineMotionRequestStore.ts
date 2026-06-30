@@ -1,5 +1,4 @@
 import { useSyncExternalStore } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import type { TileEngineMotionSchema } from "~/v0/tile-engine/TileEngineMotionSchema";
 import type { TileEngineMotionRequest } from "~/v0/tile-engine/TileEngineMotionRequest";
 
@@ -61,16 +60,6 @@ const clearTileEngineMotionRequest = ({
 		motions.set(tileId, nextTileMotion);
 	}
 
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.request.settle",
-		detail: {
-			engineId,
-			groupId: motion.groupId,
-			kind,
-			tileId,
-		},
-	});
 	storeEngineMotionMap(engineId, motions);
 };
 
@@ -169,15 +158,6 @@ export const registerTileEngineMotionRequests = ({
 
 	if (!changed) return;
 
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.request.register",
-		detail: {
-			engineId,
-			count: requests.length,
-			requests,
-		},
-	});
 	storeEngineMotionMap(engineId, motions);
 
 	for (const request of requests) {
@@ -226,14 +206,6 @@ const clearTileEngineMotionRequestsByGroup = ({
 
 	if (!changed) return;
 
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.request.clear",
-		detail: {
-			engineId,
-			groupId,
-		},
-	});
 	storeEngineMotionMap(engineId, motions);
 };
 

@@ -1,5 +1,4 @@
 import { type RefObject, useLayoutEffect } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
@@ -45,19 +44,6 @@ export const useTileActorExitMotion = ({
 		const actorElement = actorRef.current;
 		const element = readActorVisual(actorElement);
 		if (!actorElement || !element) return;
-
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "motion.exit.start",
-			detail: {
-				groupId,
-				kind,
-				tileId,
-				delayMs,
-				durationMs,
-				toTileId,
-			},
-		});
 
 		const scope = tilePresenceMotionScope(tileId);
 		const token = createTilePresenceMotionToken({
@@ -123,14 +109,6 @@ export const useTileActorExitMotion = ({
 		}).then((result) => {
 			clearPresenceMotion();
 			if (result.status !== "completed") return;
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.exit.end",
-				detail: {
-					groupId,
-					tileId,
-				},
-			});
 		});
 
 		return () => {

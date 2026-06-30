@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { animateElementToRect } from "~/v0/tile-engine/animateElementToRect";
 import { createTileDropHandoffs } from "~/v0/tile-engine/createTileDropHandoffs";
 import { findTileEngineActorElement } from "~/v0/tile-engine/findTileEngineActorElement";
@@ -50,22 +49,6 @@ export const runTileDropMotion = async <TTile, TSlot, TDrag, TDrop>({
 				})
 			: null;
 
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "drop.motion.start",
-		detail: {
-			motionId,
-			animation,
-			sourceTileId: sourceTile.id,
-			sourceFromSlotId: sourceTile.slotId,
-			sourceToSlotId: resolved.slot?.id,
-			targetTileId: resolved.targetTile?.id,
-			targetFromSlotId: resolved.targetTile?.slotId,
-			targetToSlotId: sourceTile.slotId,
-			parallel: Boolean(targetActorElement),
-		},
-	});
-
 	const [sourceMotionCompleted, targetMotionCompleted] = await Promise.all([
 		animateToTarget(rectFromElement(resolved.element), {
 			motionId,
@@ -91,31 +74,11 @@ export const runTileDropMotion = async <TTile, TSlot, TDrag, TDrop>({
 	]);
 
 	if (!sourceMotionCompleted || (targetActorElement && !targetMotionCompleted)) {
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "drop.motion.cancelled",
-			detail: {
-				motionId,
-				animation,
-				sourceMotionCompleted,
-				targetMotionCompleted,
-			},
-		});
 		return {
 			completed: false,
 			handoffs: [],
 		};
 	}
-
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "drop.motion.end",
-		detail: {
-			motionId,
-			animation,
-			parallel: Boolean(targetActorElement),
-		},
-	});
 
 	return {
 		completed: true,

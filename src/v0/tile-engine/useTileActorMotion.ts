@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { type RefObject, useCallback } from "react";
 import { startTileTransformMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";
@@ -49,16 +48,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 		const session = dragSessionRef.current;
 		const element = actorRef.current;
 		if (!session || !element) return false;
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "motion.reject.start",
-			detail: {
-				tileId: tile.id,
-				slotId: tile.slotId,
-				currentX: session.currentX,
-				currentY: session.currentY,
-			},
-		});
+
 		const result = await startTileTransformMotion({
 			scope: tileMotionScope(tile.id),
 			element,
@@ -73,14 +63,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 			},
 		});
 		if (result.status !== "completed") return false;
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "motion.reject.end",
-			detail: {
-				tileId: tile.id,
-				slotId: tile.slotId,
-			},
-		});
+
 		return true;
 	}, [
 		actorRef,
@@ -100,24 +83,6 @@ export const useTileActorMotion = <TTile, TDrag>({
 				target: targetRect,
 			});
 
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.snap.start",
-				detail: {
-					motionId: meta.motionId,
-					animation: meta.animation,
-					role: meta.role ?? "source",
-					tileId: tile.id,
-					fromSlotId: meta.fromSlotId ?? tile.slotId,
-					toSlotId: meta.toSlotId,
-					slotId: tile.slotId,
-					fromX: session.currentX,
-					fromY: session.currentY,
-					targetX: target.x,
-					targetY: target.y,
-					targetRect,
-				},
-			});
 			const result = await startTileTransformMotion({
 				scope: tileMotionScope(tile.id),
 				element,
@@ -136,21 +101,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 			if (result.status !== "completed") return false;
 			session.currentX = target.x;
 			session.currentY = target.y;
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.snap.end",
-				detail: {
-					motionId: meta.motionId,
-					animation: meta.animation,
-					role: meta.role ?? "source",
-					tileId: tile.id,
-					fromSlotId: meta.fromSlotId ?? tile.slotId,
-					toSlotId: meta.toSlotId,
-					slotId: tile.slotId,
-					targetX: target.x,
-					targetY: target.y,
-				},
-			});
+
 			return true;
 		},
 		[

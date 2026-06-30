@@ -1,5 +1,4 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import { actorStyle } from "~/v0/tile-engine/actorStyle";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
@@ -13,7 +12,6 @@ import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
 import { cancelTileMotionForElement } from "~/v0/tile-engine/TileMotionRuntime";
 import { useLatestRef } from "~/v0/react/useLatestRef";
 import { sameTileEngineActorProps } from "~/v0/tile-engine/sameTileEngineActorProps";
-import { useTileActorFeedbackDebug } from "~/v0/tile-engine/useTileActorFeedbackDebug";
 
 export namespace TileEngineActor {
 	export type Props<
@@ -48,10 +46,6 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 }: TileEngineActor.Props<TTile, TSlot, TDrag, TDrop>) => {
 	const actorRef = useRef<HTMLDivElement | null>(null);
 	const dragSessionRef = useRef<TileEngineActorType.DragSession<TDrag> | null>(null);
-	const initialTileRef = useRef({
-		id: tile.id,
-		slotId: tile.slotId,
-	});
 	const lastTapRef = useRef<TileEngineActorType.LastTap | null>(null);
 	const timers = useTileActorTimers();
 	const binding = dragRef.current?.tile(tile);
@@ -63,25 +57,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 
 	useEffect(() => {
 		const element = actorRef.current;
-		const initialTile = initialTileRef.current;
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "actor.lifecycle.mount",
-			detail: {
-				tileId: initialTile.id,
-				slotId: initialTile.slotId,
-			},
-		});
-
 		return () => {
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "actor.lifecycle.unmount",
-				detail: {
-					tileId: initialTile.id,
-					slotId: initialTile.slotId,
-				},
-			});
 			cancelTileMotionForElement(element, "actor-unmount");
 		};
 	}, []);
@@ -99,14 +75,6 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		actorRef,
 		feedback,
 		tileId: tile.id,
-	});
-
-	useTileActorFeedbackDebug({
-		actorRef,
-		dragging,
-		dropFeedback,
-		tileId: tile.id,
-		slotId: tile.slotId,
 	});
 
 	const tap = useTileActorTap({

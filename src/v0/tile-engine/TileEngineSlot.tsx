@@ -4,7 +4,6 @@ import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 import { sameTileEngineSlotProps } from "~/v0/tile-engine/sameTileEngineSlotProps";
 import type { TileEngineSlot as TileEngineSlotType } from "~/v0/tile-engine/TileEngineSlot.types";
 import { readTileEngineSlotVisibleFeedback } from "~/v0/tile-engine/readTileEngineSlotVisibleFeedback";
-import { useTileSlotFeedbackDebug } from "~/v0/tile-engine/useTileSlotFeedbackDebug";
 import { useTileSlotLongPress } from "~/v0/tile-engine/useTileSlotLongPress";
 
 const dropFeedbackOverlayClassName = (feedback: TileEngine.ActiveDropFeedback | null): string => {
@@ -72,15 +71,6 @@ const TileEngineSlotComponent = <TTile, TSlot, TDrop>({
 		slot,
 		targetTile,
 	]);
-
-	useTileSlotFeedbackDebug({
-		ref,
-		slotId: slot.id,
-		dropId,
-		isOver,
-		slotFeedback,
-		targetTile,
-	});
 
 	return (
 		<div

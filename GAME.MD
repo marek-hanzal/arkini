@@ -511,7 +511,7 @@ Relevant detail content includes, when applicable:
 - possible output drops and their rules/probabilities, when known to the player
 - explicit actions available from the detail
 
-Satisfied grants and inputs should be omitted from normal item detail sections. They may exist in diagnostic tooling, but player-facing sheets should not become a checklist museum once an expectation is already fulfilled.
+Satisfied grants and inputs should be omitted from normal item detail sections. Internal audits may inspect them, but player-facing sheets should not become a checklist museum once an expectation is already fulfilled.
 
 Item detail leaf components must be presentational. Start/claim/default/withdraw decisions belong in the item-detail control/view-model bridge, which passes ready button controls (`label`, `disabled`, `tone`, and `onClick`) into the cards. Detail cards must not branch between runtime actions locally, because that turns UI into a tiny second engine with better fonts and worse tests.
 
@@ -685,7 +685,7 @@ Current line-owned effect kinds are `grant.require`, `grant.blockStart`, `nearby
 
 ### Board max count
 
-Items may define `maxCount` to cap how many copies of that item can exist on the board at once. Missing `maxCount` means unlimited. The cap is board-only for the item itself: inventory stacks and stored inputs of that final item are not counted. Runtime placement, debug spawn, merge results, craft completion, and save/config validation all honor the limit. Craft source items, such as blueprints, inherit the target item's limit for producer output and job reservation checks, so a pending blueprint or queued craft/producer job can reserve the target capacity before the final item exists. Board-and-inventory outputs may spill remainder into inventory; board-only outputs fail with `board:max-count`. This is mainly for buildings like wells, path keystones, or other content that should not be spammed across the board like a zoning disaster with icons.
+Items may define `maxCount` to cap how many copies of that item can exist on the board at once. Missing `maxCount` means unlimited. The cap is board-only for the item itself: inventory stacks and stored inputs of that final item are not counted. Runtime placement, cheat inventory spawn, merge results, craft completion, and save/config validation all honor the limit. Craft source items, such as blueprints, inherit the target item's limit for producer output and job reservation checks, so a pending blueprint or queued craft/producer job can reserve the target capacity before the final item exists. Board-and-inventory outputs may spill remainder into inventory; board-only outputs fail with `board:max-count`. This is mainly for buildings like wells, path keystones, or other content that should not be spammed across the board like a zoning disaster with icons.
 
 Runtime save state may store a default product line per concrete producer item instance. The default affects:
 
@@ -1041,7 +1041,7 @@ Until a concrete animation spec exists, implementation should choose minimal loc
 
 ### 16.4 Current merge/feed animation rules
 
-Same-item board merge, mixed consumption, producer drops, stash dumps, debug spawn, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there. Board placement helpers skip locally effect-blocked cells and continue to the first allowed cell, so local hard rules constrain placement areas without making the whole board unusable.
+Same-item board merge, mixed consumption, producer drops, stash dumps, cheat inventory spawn, and inventory placement all use the same visual rule: the final board/inventory item actor is the real actor. There is no separate duplicate overlay representation for the same item. Cells/slots provide geometry and feedback; items live in stable item layers and animate transform/priority there. Board placement helpers skip locally effect-blocked cells and continue to the first allowed cell, so local hard rules constrain placement areas without making the whole board unusable.
 
 Newly committed actors may be staged from a source rectangle through `useVisualItemMotions`. During that transient phase they can render above their source with raised priority, then settle back to normal priority when Motion completes. Drag/drop keeps the active source hidden until the durable command and query invalidation settle, preventing the source actor from reappearing on its old slot and then animating a second time.
 

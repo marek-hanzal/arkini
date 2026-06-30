@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import {
 	freezeElementVisualState,
 	readTileVisualSnapshot,
@@ -237,19 +236,6 @@ export const cancelTileMotion = (
 		snapshot,
 	});
 
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.cancel",
-		detail: {
-			motionId: active.id,
-			scope: active.scope,
-			reason,
-			transform: snapshot.transform,
-			translateX: snapshot.translateX,
-			translateY: snapshot.translateY,
-		},
-	});
-
 	return snapshot;
 };
 
@@ -270,19 +256,6 @@ export const startTileStyleMotion = ({
 	let resolveResult!: (result: TileMotionRuntime.Result) => void;
 	const result = new Promise<TileMotionRuntime.Result>((resolve) => {
 		resolveResult = resolve;
-	});
-
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.runtime.start",
-		detail: {
-			...meta,
-			motionId,
-			scope,
-			delay,
-			duration,
-			keyframes: resolvedKeyframes,
-		},
 	});
 
 	const control = startElementAnimation({
@@ -310,16 +283,6 @@ export const startTileStyleMotion = ({
 			resolveResult({
 				status: "completed",
 				snapshot: finalSnapshot,
-			});
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.runtime.end",
-				detail: {
-					...meta,
-					motionId,
-					scope,
-					transform: finalSnapshot.transform,
-				},
 			});
 		})
 		.catch(() => {

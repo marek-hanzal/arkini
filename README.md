@@ -13,7 +13,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Direction
 
-Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, and runtime/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
+Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, and testing utilities. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
 The game has one gameplay source of truth: compiled JSON parsed by `src/v0/game/config/GameConfigSchema.ts`. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
 
@@ -37,7 +37,7 @@ Effect now belongs to the standalone tick/action engine, not to UI-facing persis
 
 The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
 
-Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and debug gameplay UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
+Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and testing utility UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
 
 Time-sensitive runtime updates are handled by the runtime auto-ticker and engine `nextWakeAtMs`. Randomness is provided through `RandomServiceFx`; gameplay rolling must not call `Math.random()` directly.
 
@@ -122,7 +122,7 @@ src/v0/game/config/             Canonical compiled JSON config schema, ID value 
 game/arkini/                    Source JSON game package compiled into canonical runtime config/assets.
 src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.
 src/v0/date/                    Active Luxon date Effect service.
-src/v0/debug/                   Dev-only structured timeline buffer for drag/drop/action reports.
+src/v0/debug/                   Cheat/testing utility sheets kept out of player-facing progression.
 src/v0/hash/                    Active WebCrypto hash Effect service.
 src/v0/id/                      Active CUID2 id Effect service.
 src/v0/random/                  Active random Effect service and weighted helpers.
@@ -193,18 +193,6 @@ VITE_BASE=/arkini/ npm run build
 ```
 
 The router uses hash history, so static hosts do not need SPA rewrite rules.
-
-## Debug timeline
-
-Dev builds expose a small structured timeline buffer for drag/drop/action/runtime bug reports:
-
-```js
-window.__ARKINI_DEBUG_TIMELINE__.dump();
-window.__ARKINI_DEBUG_TIMELINE__.clear();
-window.__ARKINI_DEBUG_TIMELINE__.entries();
-```
-
-Use this before adding visual debug overlays. JSON logs are easier to paste back into chat than “it kinda jumped left and then maybe swapped”, a phrase that has destroyed more engineering hours than anyone deserves.
 
 ## GitHub Pages deploy
 

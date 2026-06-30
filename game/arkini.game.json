@@ -4192,6 +4192,7 @@
 				"grant:owned:item:clay-deposit"
 			],
 			"name": "Owned Clay Deposit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-coal-deposit": {
@@ -4199,6 +4200,7 @@
 				"grant:owned:item:coal-deposit"
 			],
 			"name": "Owned Coal Deposit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-gold-deposit": {
@@ -4206,6 +4208,7 @@
 				"grant:owned:item:gold-deposit"
 			],
 			"name": "Owned Gold Deposit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-hop-field": {
@@ -4213,6 +4216,7 @@
 				"grant:owned:item:hop-field"
 			],
 			"name": "Owned Hop Field grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-iron-deposit": {
@@ -4220,6 +4224,7 @@
 				"grant:owned:item:iron-deposit"
 			],
 			"name": "Owned Iron Deposit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-marble-deposit": {
@@ -4227,6 +4232,7 @@
 				"grant:owned:item:marble-deposit"
 			],
 			"name": "Owned Marble Deposit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-sand-deposit": {
@@ -4234,6 +4240,7 @@
 				"grant:owned:item:sand-deposit"
 			],
 			"name": "Owned Sand Deposit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-vineyard": {
@@ -4241,6 +4248,7 @@
 				"grant:owned:item:vineyard"
 			],
 			"name": "Owned Vineyard grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-wheat-field": {
@@ -4248,6 +4256,7 @@
 				"grant:owned:item:wheat-field"
 			],
 			"name": "Owned Wheat Field grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-academy": {
@@ -4255,6 +4264,7 @@
 				"grant:owned:producer:academy"
 			],
 			"name": "Owned Academy grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-armory-t1": {
@@ -4262,6 +4272,7 @@
 				"grant:owned:producer:armory-t1"
 			],
 			"name": "Owned Armory I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-bakery-t1": {
@@ -4269,6 +4280,7 @@
 				"grant:owned:producer:bakery-t1"
 			],
 			"name": "Owned Bakery I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-blacksmith-t1": {
@@ -4276,6 +4288,7 @@
 				"grant:owned:producer:blacksmith-t1"
 			],
 			"name": "Owned Blacksmith I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-brewery-t1": {
@@ -4283,6 +4296,7 @@
 				"grant:owned:producer:brewery-t1"
 			],
 			"name": "Owned Brewery I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-brickyard": {
@@ -4290,6 +4304,7 @@
 				"grant:owned:producer:brickyard"
 			],
 			"name": "Owned Brickyard grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-cattle-farm-t1": {
@@ -4297,6 +4312,7 @@
 				"grant:owned:producer:cattle-farm-t1"
 			],
 			"name": "Owned Cattle Farm I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-charcoal-burner-t1": {
@@ -4304,6 +4320,7 @@
 				"grant:owned:producer:charcoal-burner-t1"
 			],
 			"name": "Owned Charcoal Burner I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-chicken-coop-t1": {
@@ -4311,6 +4328,7 @@
 				"grant:owned:producer:chicken-coop-t1"
 			],
 			"name": "Owned Chicken Coop I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-civic-office-t1": {
@@ -4318,6 +4336,7 @@
 				"grant:owned:producer:civic-office-t1"
 			],
 			"name": "Owned Civic Office I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-clay-pit": {
@@ -4325,6 +4344,7 @@
 				"grant:owned:producer:clay-pit"
 			],
 			"name": "Owned Clay Pit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-coal-mine-t1": {
@@ -4332,6 +4352,7 @@
 				"grant:owned:producer:coal-mine-t1"
 			],
 			"name": "Owned Coal Mine I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-construction-yard-t1": {
@@ -4339,6 +4360,7 @@
 				"grant:owned:producer:construction-yard-t1"
 			],
 			"name": "Owned Construction Yard I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-cookhouse-t1": {
@@ -4346,6 +4368,7 @@
 				"grant:owned:producer:cookhouse-t1"
 			],
 			"name": "Owned Cookhouse I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-dairy-t1": {
@@ -4353,6 +4376,7 @@
 				"grant:owned:producer:dairy-t1"
 			],
 			"name": "Owned Dairy I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-dye-workshop-t1": {
@@ -4360,6 +4384,7 @@
 				"grant:owned:producer:dye-workshop-t1"
 			],
 			"name": "Owned Dye Workshop I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-farm-t1": {
@@ -4367,6 +4392,7 @@
 				"grant:owned:producer:farm-t1"
 			],
 			"name": "Owned Farm I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-glassworks": {
@@ -4374,6 +4400,7 @@
 				"grant:owned:producer:glassworks"
 			],
 			"name": "Owned Glassworks grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-glazier-workshop-t1": {
@@ -4381,6 +4408,7 @@
 				"grant:owned:producer:glazier-workshop-t1"
 			],
 			"name": "Owned Glazier Workshop I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-goldsmith-t1": {
@@ -4388,6 +4416,7 @@
 				"grant:owned:producer:goldsmith-t1"
 			],
 			"name": "Owned Goldsmith I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-heroes-guild-t1": {
@@ -4395,6 +4424,7 @@
 				"grant:owned:producer:heroes-guild-t1"
 			],
 			"name": "Owned Heroes Guild I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t1": {
@@ -4402,6 +4432,7 @@
 				"grant:owned:producer:library-t1"
 			],
 			"name": "Owned Library I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t2": {
@@ -4409,6 +4440,7 @@
 				"grant:owned:producer:library-t2"
 			],
 			"name": "Owned Library II grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t3": {
@@ -4416,6 +4448,7 @@
 				"grant:owned:producer:library-t3"
 			],
 			"name": "Owned Library III grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t4": {
@@ -4423,6 +4456,7 @@
 				"grant:owned:producer:library-t4"
 			],
 			"name": "Owned Library IV grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-lumberjack-t1": {
@@ -4430,6 +4464,7 @@
 				"grant:owned:producer:lumberjack-t1"
 			],
 			"name": "Owned Lumberjack I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-market-t1": {
@@ -4437,6 +4472,7 @@
 				"grant:owned:producer:market-t1"
 			],
 			"name": "Owned Market grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-pig-farm-t1": {
@@ -4444,6 +4480,7 @@
 				"grant:owned:producer:pig-farm-t1"
 			],
 			"name": "Owned Pig Farm I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-purifier-t1": {
@@ -4451,6 +4488,7 @@
 				"grant:owned:producer:purifier-t1"
 			],
 			"name": "Owned Purifier I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-quarry-t1": {
@@ -4458,6 +4496,7 @@
 				"grant:owned:producer:quarry-t1"
 			],
 			"name": "Owned Quarry I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-quarry-t2": {
@@ -4465,6 +4504,7 @@
 				"grant:owned:producer:quarry-t2"
 			],
 			"name": "Owned Quarry grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-roof-tile-factory": {
@@ -4472,6 +4512,7 @@
 				"grant:owned:producer:roof-tile-factory"
 			],
 			"name": "Owned Roof Tile Factory grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-sand-pit": {
@@ -4479,6 +4520,7 @@
 				"grant:owned:producer:sand-pit"
 			],
 			"name": "Owned Sand Pit grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-sawmill-t1": {
@@ -4486,6 +4528,7 @@
 				"grant:owned:producer:sawmill-t1"
 			],
 			"name": "Owned Sawmill I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-sheep-pasture-t1": {
@@ -4493,6 +4536,7 @@
 				"grant:owned:producer:sheep-pasture-t1"
 			],
 			"name": "Owned Sheep Pasture I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-slaughterhouse-t1": {
@@ -4500,6 +4544,7 @@
 				"grant:owned:producer:slaughterhouse-t1"
 			],
 			"name": "Owned Slaughterhouse I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-smelter-t1": {
@@ -4507,6 +4552,7 @@
 				"grant:owned:producer:smelter-t1"
 			],
 			"name": "Owned Smelter I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-stonemason-t1": {
@@ -4514,6 +4560,7 @@
 				"grant:owned:producer:stonemason-t1"
 			],
 			"name": "Owned Stonemason I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-stonemason-t2": {
@@ -4521,6 +4568,7 @@
 				"grant:owned:producer:stonemason-t2"
 			],
 			"name": "Owned Stonemason grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-tailor-workshop-t1": {
@@ -4528,6 +4576,7 @@
 				"grant:owned:producer:tailor-workshop-t1"
 			],
 			"name": "Owned Tailor Workshop I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-tannery-t1": {
@@ -4535,6 +4584,7 @@
 				"grant:owned:producer:tannery-t1"
 			],
 			"name": "Owned Tannery I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-tavern-t1": {
@@ -4542,6 +4592,7 @@
 				"grant:owned:producer:tavern-t1"
 			],
 			"name": "Owned Tavern I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-university": {
@@ -4549,6 +4600,7 @@
 				"grant:owned:producer:university"
 			],
 			"name": "Owned University grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-vegetable-garden-t1": {
@@ -4556,6 +4608,7 @@
 				"grant:owned:producer:vegetable-garden-t1"
 			],
 			"name": "Owned Vegetable Garden I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-weaver-hut-t1": {
@@ -4563,6 +4616,7 @@
 				"grant:owned:producer:weaver-hut-t1"
 			],
 			"name": "Owned Weaver Hut I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-well-t1": {
@@ -4570,6 +4624,7 @@
 				"grant:owned:producer:well-t1"
 			],
 			"name": "Owned Well I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-windmill-t1": {
@@ -4577,6 +4632,7 @@
 				"grant:owned:producer:windmill-t1"
 			],
 			"name": "Owned Windmill I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-winery-t1": {
@@ -4584,6 +4640,7 @@
 				"grant:owned:producer:winery-t1"
 			],
 			"name": "Owned Winery I grant",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:path-engineers-locks-counter-keystones": {
@@ -4591,6 +4648,7 @@
 				"grant:path:engineers"
 			],
 			"name": "Engineers path locks Faith and Mages keystone plans",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:path-faith-locks-counter-keystones": {
@@ -4598,6 +4656,7 @@
 				"grant:path:faith"
 			],
 			"name": "Faith path locks Engineers and Mages keystone plans",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:path-mages-locks-counter-keystones": {
@@ -4605,6 +4664,7 @@
 				"grant:path:mages"
 			],
 			"name": "Mages path locks Engineers and Faith keystone plans",
+			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:shrine-bountiful-offering": {
@@ -4612,6 +4672,7 @@
 				"grant:active:shrine-bountiful-offering"
 			],
 			"name": "Bountiful Offering",
+			"polarity": "buff",
 			"sourceScope": "board"
 		},
 		"effect:shrine-minor-haste": {
@@ -4619,6 +4680,7 @@
 				"grant:active:shrine-minor-haste"
 			],
 			"name": "Minor Haste",
+			"polarity": "buff",
 			"sourceScope": "board"
 		}
 	},

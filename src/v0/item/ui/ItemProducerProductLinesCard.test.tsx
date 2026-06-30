@@ -196,6 +196,52 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).not.toContain("ui-progress-button-fill-to-end");
 	});
 
+	it("groups effect lines by configured polarity", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						effectPolarity: "debuff",
+						lineKind: "effect",
+						name: "Smoke Cloud",
+						productId: "product:effect:smoke",
+					}),
+					createLine({
+						effectPolarity: "buff",
+						lineKind: "effect",
+						name: "Minor Haste",
+						productId: "product:effect:haste",
+					}),
+					createLine({
+						effectPolarity: "mixed",
+						lineKind: "effect",
+						name: "Overdrive",
+						productId: "product:effect:overdrive",
+					}),
+					createLine({
+						effectPolarity: "neutral",
+						lineKind: "effect",
+						name: "Path Choice",
+						productId: "product:effect:path",
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html.indexOf("Buffs")).toBeLessThan(html.indexOf("Debuffs"));
+		expect(html.indexOf("Debuffs")).toBeLessThan(html.indexOf("Neutral effects"));
+		expect(html.indexOf("Neutral effects")).toBeLessThan(html.indexOf("Mixed effects"));
+		expect(html).toContain("Buff");
+		expect(html).toContain("Debuff");
+		expect(html).toContain("Neutral");
+		expect(html).toContain("Mixed");
+	});
+
 	it("shows effect benefits before the offering inputs", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

@@ -51,6 +51,7 @@ describe("readEffectiveProducerProductLine", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:townhall": {
+					polarity: "neutral",
 					grantIds: [
 						"grant:test:townhall",
 					],
@@ -102,6 +103,7 @@ describe("readEffectiveProducerProductLine", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				[effectId]: {
+					polarity: "buff",
 					grantIds: [
 						grantId,
 					],
@@ -263,6 +265,7 @@ describe("readEffectiveProducerProductLine", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				[effectId]: {
+					polarity: "buff",
 					grantIds: [
 						grantId,
 					],

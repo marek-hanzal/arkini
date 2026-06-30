@@ -8,6 +8,7 @@ describe("line-owned effect runtime guards", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:missing": {
+					polarity: "neutral",
 					grantIds: [
 						"grant:test:missing",
 					],

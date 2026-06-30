@@ -305,6 +305,13 @@ const GameEffectSourceScopeSchema = z.enum([
 	"both",
 ]);
 
+const GameEffectPolaritySchema = z.enum([
+	"buff",
+	"debuff",
+	"neutral",
+	"mixed",
+]);
+
 const GameLineEffectDisplaySchema = z
 	.enum([
 		"always",
@@ -423,6 +430,7 @@ const GameLineEffectAuthoringSchema = createGameLineEffectSchema(
 const GameEffectDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
+		polarity: GameEffectPolaritySchema,
 		grantIds: z.array(IdSchema).min(1),
 		sourceScope: GameEffectSourceScopeSchema.optional(),
 	})

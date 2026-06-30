@@ -9,6 +9,7 @@ describe("line-owned effect expectations", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:grant": {
+					polarity: "neutral",
 					grantIds: [
 						"grant:test:available",
 					],

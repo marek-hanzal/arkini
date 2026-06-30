@@ -60,7 +60,7 @@ The current board size is `7 x 11` cells.
 
 An item may be on the board when it occupies one board cell. If multi-cell items are introduced later, their footprint must be defined in the central game configuration.
 
-Board is an active location. Producers, stashes, craft timers, construction timers, and growth timers can run only while the relevant item is on the board and its own rules allow it. Active board timers use real-world wall-clock time, including time while the app is closed.
+Board is an active location. Producers, stashes, craft timers, construction timers, and growth timers can run only while the relevant item is on the board and its own rules allow it. Active board timers use real-world wall-clock time, including time while the app is closed. Cheat speed mode is the explicit exception for testing: when enabled from the speed watch item, positive producer and craft timings are treated as one-second jobs and queued producer jobs are pulled forward accordingly.
 
 ### 4.2 Inventory
 
@@ -188,6 +188,8 @@ Invalid direction example:
 This is invalid because a normal stone chain must not become a diamond chain without an explicit geology/refining/transmutation rule.
 
 Current concrete economy balance lives in `game/arkini/products.json` and `game/arkini/craft-recipes.json`. Product lines should avoid lazy 1:1 transformations when a real process has yield or compression: one log can become multiple planks, multiple stones become one stone block, farms can produce small bonus yields, and refined/premium goods should take longer than raw collection. These ratios are authored data, not runtime heuristics. Blueprint-producing product lines should stay as planning/research/discovery costs and must not repeat the same expensive construction inputs that the resulting blueprint craft recipe asks for. Building materials, labor food, permits, guild charters, construction bundles, and prestige sinks belong primarily to the actual craft/construction step, so creating a plan does not double-tax the player before the build even starts.
+
+Cheat/testing items may deliberately bypass this pacing. `item:cheat:speed-enable` switches save-level timing into instant mode where positive producer and craft durations resolve as one second; `item:cheat:speed-disable` switches back to authored timing. These are explicit cheat items, not economy balance data, so do not hide normal progression behind them like a goblin accountant.
 
 ### 4.10 Producer
 

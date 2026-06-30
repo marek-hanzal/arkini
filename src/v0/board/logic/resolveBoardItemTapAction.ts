@@ -5,6 +5,8 @@ import { readProducerProductLineRunState } from "~/v0/producer/logic/readProduce
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
+import { readCheatSpeedModeFromItemId } from "~/v0/game/cheat/GameCheatSpeedItem";
+import type { GameCheatSpeedMode } from "~/v0/game/cheat/GameCheatSpeedMode";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -31,6 +33,10 @@ export namespace resolveBoardItemTapAction {
 		| {
 				type: "open-sheet";
 				sheet: ActiveSheetState;
+		  }
+		| {
+				type: "set-cheat-speed-mode";
+				mode: GameCheatSpeedMode;
 		  };
 }
 
@@ -38,6 +44,14 @@ export const resolveBoardItemTapAction = ({
 	boardItem,
 	nowMs,
 }: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
+	const cheatSpeedMode = readCheatSpeedModeFromItemId(boardItem.itemId);
+	if (cheatSpeedMode) {
+		return {
+			mode: cheatSpeedMode,
+			type: "set-cheat-speed-mode",
+		};
+	}
+
 	const utilitySheet = readBoardUtilityItemSheet(boardItem.itemId);
 	if (utilitySheet) {
 		return {

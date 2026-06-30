@@ -165,6 +165,19 @@ export const useBoardTileEngineModel = ({
 				return;
 			}
 
+			if (action.type === "set-cheat-speed-mode") {
+				void runtimeStore
+					.dispatch({
+						action: {
+							mode: action.mode,
+							type: "cheat.speed_mode.set",
+						},
+						nowMs,
+					})
+					.catch(feedback.showError);
+				return;
+			}
+
 			if (action.type !== "activate") return;
 
 			const activation = liveBoardItem.activation;

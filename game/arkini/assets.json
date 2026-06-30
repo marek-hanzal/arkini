@@ -1,5 +1,11 @@
 {
 	"assets": {
+		"asset:item:cheat:speed-disable": {
+			"resourceId": "item-cheat-speed-disable"
+		},
+		"asset:item:cheat:speed-enable": {
+			"resourceId": "item-cheat-speed-enable"
+		},
 		"asset:producer:prospector-guild-t2": {
 			"resourceId": "producer-prospector-guild-t1"
 		},

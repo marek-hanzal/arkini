@@ -13,6 +13,7 @@ export namespace matchGameAction {
 		boardItemMove: (action: GameActionOfType<"board.item.move">) => Result;
 		boardItemStash: (action: GameActionOfType<"board.item.stash">) => Result;
 		boardItemsSwap: (action: GameActionOfType<"board.items.swap">) => Result;
+		cheatSpeedModeSet: (action: GameActionOfType<"cheat.speed_mode.set">) => Result;
 		craftInputStore: (action: GameActionOfType<"craft.input.store">) => Result;
 		craftInputWithdraw: (action: GameActionOfType<"craft.input.withdraw">) => Result;
 		craftStart: (action: GameActionOfType<"craft.start">) => Result;
@@ -53,6 +54,12 @@ export const matchGameAction = <Result>(
 				type: "board.items.swap",
 			},
 			cases.boardItemsSwap,
+		)
+		.with(
+			{
+				type: "cheat.speed_mode.set",
+			},
+			cases.cheatSpeedModeSet,
 		)
 		.with(
 			{

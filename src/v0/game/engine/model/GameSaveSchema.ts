@@ -171,6 +171,17 @@ const GameSaveProducerChargeStateSchema = z
 	})
 	.strict();
 
+const GameSaveCheatStateSchema = z
+	.object({
+		speedMode: z
+			.enum([
+				"normal",
+				"instant",
+			])
+			.default("normal"),
+	})
+	.strict();
+
 const GameSaveProducerLineStateSchema = z
 	.object({
 		defaultProductId: IdSchema.optional(),
@@ -264,6 +275,7 @@ const GameSaveSchema = z
 			.strict(),
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
 		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
+		cheats: GameSaveCheatStateSchema.optional(),
 		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),

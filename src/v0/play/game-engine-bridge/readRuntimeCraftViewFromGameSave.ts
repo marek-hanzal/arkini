@@ -41,6 +41,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		totalInputQuantity === 0 ? 1 : deliveredInputQuantity / totalInputQuantity;
 	const durationMs = readCraftRecipeDurationMs({
 		recipe,
+		save,
 	});
 	const startAtMs = runningJob?.startAtMs;
 	const readyAtMs = runningJob?.readyAtMs;

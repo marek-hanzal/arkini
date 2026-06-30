@@ -5,39 +5,8 @@ import { resolveExecutableItemMergeRule } from "~/v0/game/engine/logic/resolveEx
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionItemMerge } from "~/v0/game/action/GameActionItemMerge";
-import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-
-const readMergeIgnoredEffectSourceIds = ({
-	save,
-	source,
-	targetItemInstanceId,
-}: {
-	save: GameSave;
-	source: GameActionResolvedInputRef;
-	targetItemInstanceId: string;
-}) => {
-	const ignoredSourceIds = new Set<string>([
-		targetItemInstanceId,
-	]);
-
-	if (source.kind === "board") {
-		ignoredSourceIds.add(source.itemInstanceId);
-		return ignoredSourceIds;
-	}
-
-	const slot = save.inventory.slots[source.slotIndex];
-	if (!slot) return ignoredSourceIds;
-	if ("kind" in slot && slot.kind === "instance") {
-		ignoredSourceIds.add(slot.id);
-		return ignoredSourceIds;
-	}
-
-	ignoredSourceIds.add(`inventory-slot:${source.slotIndex}:${source.itemId}:0`);
-	return ignoredSourceIds;
-};
 
 export namespace checkItemMergeReadinessFx {
 	export interface Props {
@@ -105,19 +74,6 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 			GameEngineError.configReferenceMissing(`Missing merge result "${merge.resultItemId}".`),
 		);
 	}
-	const ignoredEffectSourceIds = readMergeIgnoredEffectSourceIds({
-		save,
-		source,
-		targetItemInstanceId: target.id,
-	});
-	yield* checkItemCreateBlockedByEffectsFx({
-		config,
-		ignoredSourceIds: ignoredEffectSourceIds,
-		itemId: merge.resultItemId,
-		nowMs,
-		save,
-		targetCell: target,
-	});
 	if (
 		readBoardItemMaxCountCapacity({
 			config,
@@ -151,7 +107,6 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 	}
 
 	return {
-		ignoredEffectSourceIds,
 		merge,
 		source,
 		target,

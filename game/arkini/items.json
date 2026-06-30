@@ -908,8 +908,7 @@
 				"era:VI"
 			],
 			"passiveEffectIds": [
-				"effect:grant-owned:item-clay-deposit",
-				"effect:proximity:clay-pit:clay-deposit"
+				"effect:grant-owned:item-clay-deposit"
 			]
 		},
 		"item:coal": {
@@ -938,8 +937,7 @@
 			],
 			"tier": 7,
 			"passiveEffectIds": [
-				"effect:grant-owned:item-coal-deposit",
-				"effect:proximity:coal-mine-t1:coal-deposit"
+				"effect:grant-owned:item-coal-deposit"
 			]
 		},
 		"item:coin": {
@@ -1089,8 +1087,7 @@
 			],
 			"tier": 7,
 			"passiveEffectIds": [
-				"effect:grant-owned:item-gold-deposit",
-				"effect:proximity:gold-mine-t1:gold-deposit"
+				"effect:grant-owned:item-gold-deposit"
 			]
 		},
 		"item:gold-ingot": {
@@ -1171,8 +1168,7 @@
 				"era:III"
 			],
 			"passiveEffectIds": [
-				"effect:grant-owned:item-hop-field",
-				"effect:proximity:brewery-t1:hop-field"
+				"effect:grant-owned:item-hop-field"
 			]
 		},
 		"item:hops": {
@@ -1212,8 +1208,7 @@
 			],
 			"tier": 7,
 			"passiveEffectIds": [
-				"effect:grant-owned:item-iron-deposit",
-				"effect:proximity:iron-mine-t1:iron-deposit"
+				"effect:grant-owned:item-iron-deposit"
 			]
 		},
 		"item:iron-ingot": {
@@ -1403,8 +1398,7 @@
 			],
 			"tier": 10,
 			"passiveEffectIds": [
-				"effect:grant-owned:item-marble-deposit",
-				"effect:proximity:quarry-t2:marble-deposit"
+				"effect:grant-owned:item-marble-deposit"
 			]
 		},
 		"item:master-knowledge": {
@@ -1554,11 +1548,7 @@
 				"pollution",
 				"era:VIII"
 			],
-			"tier": 7,
-			"passiveEffectIds": [
-				"effect:pollution-slows-nearby-radius-2",
-				"effect:pollution-slows-nearby-radius-3"
-			]
+			"tier": 7
 		},
 		"item:raw-hide": {
 			"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",
@@ -1581,9 +1571,6 @@
 				"source",
 				"stone",
 				"era:I"
-			],
-			"passiveEffectIds": [
-				"effect:proximity:quarry-t1:rock"
 			]
 		},
 		"item:roof-tiles": {
@@ -1638,8 +1625,7 @@
 				"era:VI"
 			],
 			"passiveEffectIds": [
-				"effect:grant-owned:item-sand-deposit",
-				"effect:proximity:sand-pit:sand-deposit"
+				"effect:grant-owned:item-sand-deposit"
 			]
 		},
 		"item:sapphire": {
@@ -1750,9 +1736,6 @@
 				"source",
 				"wood",
 				"era:I"
-			],
-			"passiveEffectIds": [
-				"effect:proximity:lumberjack-t1:tree"
 			]
 		},
 		"item:vegetables": {
@@ -1777,8 +1760,7 @@
 				"era:III"
 			],
 			"passiveEffectIds": [
-				"effect:grant-owned:item-vineyard",
-				"effect:proximity:winery-t1:vineyard"
+				"effect:grant-owned:item-vineyard"
 			]
 		},
 		"item:water": {
@@ -1803,8 +1785,7 @@
 				"era:II"
 			],
 			"passiveEffectIds": [
-				"effect:grant-owned:item-wheat-field",
-				"effect:proximity:farm-t1:wheat-field"
+				"effect:grant-owned:item-wheat-field"
 			]
 		},
 		"item:wine-barrel": {
@@ -2034,8 +2015,7 @@
 			],
 			"tier": 3,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-clay-pit",
-				"effect:proximity:clay-pit:nearby"
+				"effect:grant-owned:producer-clay-pit"
 			]
 		},
 		"producer:coal-mine-t1": {
@@ -2147,8 +2127,7 @@
 			],
 			"tier": 4,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-glassworks",
-				"effect:proximity:glazier-workshop-t1:glassworks"
+				"effect:grant-owned:producer-glassworks"
 			]
 		},
 		"producer:glazier-workshop-t1": {
@@ -2319,8 +2298,7 @@
 			],
 			"tier": 1,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-lumberjack-t1",
-				"effect:proximity:sawmill-t1:lumberjack-t1"
+				"effect:grant-owned:producer-lumberjack-t1"
 			]
 		},
 		"producer:mage-lodge": {
@@ -2441,8 +2419,7 @@
 			],
 			"tier": 7,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-purifier-t1",
-				"effect:proximity:dirty-processing:purifier"
+				"effect:grant-owned:producer-purifier-t1"
 			]
 		},
 		"producer:quarry-t1": {
@@ -2456,8 +2433,7 @@
 			],
 			"tier": 1,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-quarry-t1",
-				"effect:proximity:stonemason-t1:quarry-t1"
+				"effect:grant-owned:producer-quarry-t1"
 			]
 		},
 		"producer:quarry-t2": {
@@ -2477,8 +2453,7 @@
 			],
 			"tier": 10,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-quarry-t2",
-				"effect:proximity:stonemason-t2:quarry-t2"
+				"effect:grant-owned:producer-quarry-t2"
 			]
 		},
 		"producer:roof-tile-factory": {
@@ -2513,8 +2488,7 @@
 			],
 			"tier": 4,
 			"passiveEffectIds": [
-				"effect:grant-owned:producer-sand-pit",
-				"effect:proximity:glassworks:sand-pit"
+				"effect:grant-owned:producer-sand-pit"
 			]
 		},
 		"producer:sawmill-t1": {

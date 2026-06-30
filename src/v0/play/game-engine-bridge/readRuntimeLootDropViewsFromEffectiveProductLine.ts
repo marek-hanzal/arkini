@@ -45,29 +45,25 @@ const readRollLabel = (rolls: LootQuantity | undefined) => {
 
 const readWeightedChanceLabel = ({
 	entry,
-	probabilityMultiplier,
 	totalWeight,
 }: {
 	entry: WeightedLootEntry;
-	probabilityMultiplier: number;
 	totalWeight: number;
 }) => {
 	if (totalWeight <= 0) return "0%/roll";
-	return `${formatPercent(probabilityMultiplier * (entry.weight / totalWeight))}/roll`;
+	return `${formatPercent(entry.weight / totalWeight)}/roll`;
 };
 
 const collectDropViews = ({
 	output,
-	probabilityMultiplier,
 }: {
 	output: NonNullable<GameConfig["products"][string]["output"]>;
-	probabilityMultiplier: number;
 }): ActivationDropView[] =>
 	output.flatMap((entry) => {
 		if (entry.type === "guaranteed") {
 			return [
 				{
-					chanceLabel: formatPercent(probabilityMultiplier),
+					chanceLabel: formatPercent(1),
 					itemId: entry.itemId,
 					quantityLabel: readQuantityLabel(entry.quantity),
 				},
@@ -77,7 +73,7 @@ const collectDropViews = ({
 		if (entry.type === "chance") {
 			return [
 				{
-					chanceLabel: formatPercent(probabilityMultiplier * entry.chance),
+					chanceLabel: formatPercent(entry.chance),
 					itemId: entry.itemId,
 					quantityLabel: readQuantityLabel(entry.quantity),
 				},
@@ -93,7 +89,6 @@ const collectDropViews = ({
 		return entry.entries.map((weightedEntry) => ({
 			chanceLabel: readWeightedChanceLabel({
 				entry: weightedEntry,
-				probabilityMultiplier,
 				totalWeight,
 			}),
 			itemId: weightedEntry.itemId,
@@ -109,18 +104,8 @@ export const readRuntimeLootDropViewsFromEffectiveProductLine = ({
 	drops.push(
 		...collectDropViews({
 			output: effectiveProductLine.lootPlan.baseOutput,
-			probabilityMultiplier: effectiveProductLine.lootPlan.baseDropChance,
 		}),
 	);
-
-	for (const appendOutput of effectiveProductLine.lootPlan.appendOutputs) {
-		drops.push(
-			...collectDropViews({
-				output: appendOutput.output,
-				probabilityMultiplier: appendOutput.chance,
-			}),
-		);
-	}
 
 	for (const chanceItem of effectiveProductLine.lootPlan.chanceItems) {
 		drops.push({

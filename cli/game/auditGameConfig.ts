@@ -211,74 +211,37 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 		if (product.activatesEffectId) {
 			usage.effects.add(product.activatesEffectId);
 		}
+		collectLineEffectUsage(product.effects ?? [], config, usage, itemFlow);
 	}
 
-	for (const effect of Object.values(config.effects)) {
-		for (const operation of effect.operations) {
-			if (operation.kind === "loot.appendOutput" || operation.kind === "loot.replaceOutput") {
-				collectLootOutputUsage(operation.output, itemFlow);
-			}
+	for (const recipe of Object.values(config.craftRecipes)) {
+		collectLineEffectUsage(recipe.effects ?? [], config, usage, itemFlow);
+	}
+};
 
-			if (operation.kind === "loot.addChanceItem") {
-				usage.items.add(operation.itemId);
-				itemFlow.producedItemIds.add(operation.itemId);
+const collectLineEffectUsage = (
+	effects: readonly NonNullable<GameConfig["products"][string]["effects"]>[number][],
+	config: GameConfig,
+	usage: UsageIndex,
+	itemFlow: ItemFlowIndex,
+) => {
+	for (const effect of effects) {
+		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
+			for (const itemId of readResolvedSelectorIds(
+				effect.items as Parameters<typeof readResolvedSelectorIds>[0],
+				config.items,
+			)) {
+				usage.items.add(itemId);
 			}
+		}
 
-			if (operation.kind === "loot.extraOutputChance.add") {
-				for (const itemId of readResolvedSelectorIds(
-					operation.outputItems.items,
-					config.items,
-				)) {
-					usage.items.add(itemId);
-					itemFlow.producedItemIds.add(itemId);
-				}
-			}
-
-			if (operation.kind === "item.blockCreate") {
-				for (const itemId of readResolvedSelectorIds(
-					operation.target.items,
-					config.items,
-				)) {
-					usage.items.add(itemId);
-					itemFlow.consumedItemIds.add(itemId);
-				}
-				continue;
-			}
-
-			if (operation.kind === "grant.add") {
-				if (operation.target.items) {
-					for (const itemId of readResolvedSelectorIds(
-						operation.target.items,
-						config.items,
-					)) {
-						usage.items.add(itemId);
-					}
-				}
-				if (operation.target.craftRecipes) {
-					for (const craftRecipeId of readResolvedSelectorIds(
-						operation.target.craftRecipes,
-						config.craftRecipes,
-					)) {
-						usage.craftRecipes.add(craftRecipeId);
-					}
-				}
-			}
-
-			if ("producers" in operation.target) {
-				for (const producerId of readResolvedSelectorIds(
-					operation.target.producers,
-					config.producers,
-				)) {
-					usage.producers.add(producerId);
-				}
-			}
-			if ("productLines" in operation.target) {
-				for (const productId of readResolvedSelectorIds(
-					operation.target.productLines,
-					config.products,
-				)) {
-					usage.products.add(productId);
-				}
+		if (effect.kind === "grant.loot.extraOutputChance.add") {
+			for (const itemId of readResolvedSelectorIds(
+				effect.outputItems.items as Parameters<typeof readResolvedSelectorIds>[0],
+				config.items,
+			)) {
+				usage.items.add(itemId);
+				itemFlow.producedItemIds.add(itemId);
 			}
 		}
 	}

@@ -1,18 +1,13 @@
-import { match } from "ts-pattern";
+import type { BoardCell } from "~/v0/game/board/BoardCell";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { AppliedGameEffectOperation } from "~/v0/game/effects/EffectiveProducerProductLine";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
-import { compareGameEffectSourceInstances } from "~/v0/game/effects/compareGameEffectSourceInstances";
-import { doesGameEffectTargetProductLine } from "~/v0/game/effects/doesGameEffectTargetProductLine";
 import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
-import { readGameEffectTargetGrantIds } from "~/v0/game/effects/readGameEffectTargetGrantIds";
 import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolvedDomainSelectorMatchId";
-import { doesGameEffectSourceApplyToBoardCell } from "~/v0/game/effects/doesGameEffectSourceApplyToBoardCell";
 import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
-import { readGameEffectSourceInstances } from "~/v0/game/effects/readGameEffectSourceInstances";
-import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
+import { readGameWorldGrantIds } from "~/v0/game/effects/readGameWorldGrantIds";
 
 export namespace readEffectiveProducerProductLine {
 	export interface Props {
@@ -29,49 +24,7 @@ export namespace readEffectiveProducerProductLine {
 	}
 }
 
-const clampProbability = (value: number) => Math.max(0, Math.min(1, value));
-
-const addQuantityValue = <
-	TQuantity extends
-		| number
-		| {
-				min: number;
-				max: number;
-		  }
-		| undefined,
->(
-	quantity: TQuantity,
-	value: number,
-): TQuantity => {
-	if (quantity === undefined) return (1 + value) as TQuantity;
-	if (typeof quantity === "number") return (quantity + value) as TQuantity;
-	return {
-		min: quantity.min + value,
-		max: quantity.max + value,
-	} as TQuantity;
-};
-
 type ProducerProductLineOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
-
-const addLootOutputQuantity = <TOutput extends ProducerProductLineOutput>(
-	output: TOutput,
-	value: number,
-): TOutput => {
-	if (output.type === "weighted") {
-		return {
-			...output,
-			entries: output.entries.map((entry) => ({
-				...entry,
-				quantity: addQuantityValue(entry.quantity, value),
-			})),
-		} as TOutput;
-	}
-
-	return {
-		...output,
-		quantity: addQuantityValue(output.quantity, value),
-	} as TOutput;
-};
 
 const doesOutputItemTargetMatch = ({
 	itemId,
@@ -79,30 +32,32 @@ const doesOutputItemTargetMatch = ({
 }: {
 	itemId: string;
 	target: Extract<
-		GameConfig["effects"][string]["operations"][number],
+		NonNullable<GameConfig["products"][string]["effects"]>[number],
 		{
-			kind: "loot.extraOutputChance.add";
+			kind: "grant.loot.extraOutputChance.add";
 		}
 	>["outputItems"];
 }) =>
 	doesResolvedDomainSelectorMatchId({
 		entityId: itemId,
-		selector: target.items,
+		selector: target.items as Parameters<
+			typeof doesResolvedDomainSelectorMatchId
+		>[0]["selector"],
 	});
 
 const readExtraOutputChanceItems = ({
 	baseOutput,
-	effectId,
-	effectName,
-	operation,
+	lineEffectId,
+	lineEffectName,
+	lineEffect,
 }: {
 	baseOutput: NonNullable<GameConfig["products"][string]["output"]>;
-	effectId: string;
-	effectName: string;
-	operation: Extract<
-		GameConfig["effects"][string]["operations"][number],
+	lineEffectId: string;
+	lineEffectName: string;
+	lineEffect: Extract<
+		NonNullable<GameConfig["products"][string]["effects"]>[number],
 		{
-			kind: "loot.extraOutputChance.add";
+			kind: "grant.loot.extraOutputChance.add";
 		}
 	>;
 }): EffectiveProducerProductLine["lootPlan"]["chanceItems"] =>
@@ -111,7 +66,7 @@ const readExtraOutputChanceItems = ({
 		if (
 			!doesOutputItemTargetMatch({
 				itemId: output.itemId,
-				target: operation.outputItems,
+				target: lineEffect.outputItems,
 			})
 		) {
 			return [];
@@ -119,168 +74,112 @@ const readExtraOutputChanceItems = ({
 
 		return [
 			{
-				chance: operation.chance,
-				effectId,
-				effectName,
+				chance: lineEffect.chance,
+				effectId: lineEffectId,
+				effectName: lineEffectName,
 				itemId: output.itemId,
-				quantity: operation.quantity,
+				quantity: lineEffect.quantity,
 			},
 		];
 	});
 
-const readEffectSourceAppliesToTarget = ({
-	config,
-	save,
-	source,
-	targetItemInstanceId,
+const readLineEffectLabel = ({
+	fallback,
+	lineEffect,
 }: {
-	config: GameConfig;
-	save: GameSave;
-	source: GameEffectSourceInstance;
-	targetItemInstanceId: string;
-}) =>
-	doesGameEffectSourceApplyToBoardCell({
-		config,
-		save,
-		source,
-		targetCell: readGameEffectSourceCell({
-			save,
-			sourceItemInstanceId: targetItemInstanceId,
-		}),
-	});
-
-const readSourceSupportsStackingCategory = ({
-	category,
-	config,
-	producerId,
-	productId,
-	source,
-}: {
-	category: string;
-	config: GameConfig;
-	producerId: string;
-	productId: string;
-	source: GameEffectSourceInstance;
-}) => {
-	const effect = config.effects[source.effectId];
-	if (!effect) return false;
-
-	return effect.operations.some((operation) => {
-		if (operation.kind === "item.blockCreate" || operation.kind === "grant.add") {
-			return false;
-		}
-		if (operation.stacking?.category !== category) return false;
-
-		return doesGameEffectTargetProductLine({
-			producerId,
-			productId,
-			target: operation.target,
-		});
-	});
-};
-
-const readProximityPenaltyMultiplier = ({
-	config,
-	save,
-	source,
-	targetCell,
-	operation,
-}: {
-	config: GameConfig;
-	save: GameSave;
-	source: GameEffectSourceInstance;
-	targetCell: ReturnType<typeof readGameEffectSourceCell>;
-	operation: Extract<
-		GameConfig["effects"][string]["operations"][number],
-		{
-			kind: "duration.proximityPenalty";
-		}
-	>;
-}) => {
-	const effect = config.effects[source.effectId];
-	if (!effect || effect.scope !== "local" || !targetCell) return 1;
-
-	const sourceCell = readGameEffectSourceCell({
-		save,
-		sourceItemInstanceId: source.sourceItemInstanceId,
-	});
-	if (!sourceCell) return 1;
-
-	const distance = readChebyshevDistance(sourceCell, targetCell);
-	const proximityStrength = effect.radius - distance + 1;
-	return Math.max(1, 1 + proximityStrength * operation.durationFactor);
-};
+	fallback: string;
+	lineEffect: {
+		label?: string;
+	};
+}) => lineEffect.label ?? fallback;
 
 const createAppliedOperation = ({
-	effectId,
-	effectName,
 	kind,
-	source,
+	lineEffectId,
+	lineEffectName,
+	producerItemInstanceId,
 }: {
-	effectId: string;
-	effectName: string;
 	kind: AppliedGameEffectOperation["kind"];
-	source: GameEffectSourceInstance;
+	lineEffectId: string;
+	lineEffectName: string;
+	producerItemInstanceId: string;
 }): AppliedGameEffectOperation => ({
-	effectId,
-	effectName,
+	effectId: lineEffectId,
+	effectName: lineEffectName,
 	kind,
-	sourceId: source.sourceId,
-	sourceItemInstanceId: source.sourceItemInstanceId,
+	sourceId: lineEffectId,
+	sourceItemInstanceId: producerItemInstanceId,
 });
 
-const isStackingLimitReached = ({
+const readNearbyMatches = ({
 	config,
-	operation,
-	producerId,
-	productId,
-	source,
-	sources,
-	targetCell,
+	items,
+	radius,
 	save,
+	targetCell,
 }: {
 	config: GameConfig;
-	operation: Extract<
-		GameConfig["effects"][string]["operations"][number],
+	items: Extract<
+		NonNullable<GameConfig["products"][string]["effects"]>[number],
 		{
-			stacking?: unknown;
+			kind: "nearby.require" | "nearby.duration.multiply";
 		}
-	>;
-	producerId: string;
-	productId: string;
-	source: GameEffectSourceInstance;
-	sources: readonly GameEffectSourceInstance[];
-	targetCell: ReturnType<typeof readGameEffectSourceCell>;
+	>["items"];
+	radius: number;
 	save: GameSave;
+	targetCell?: BoardCell;
 }) => {
-	const stacking = operation.stacking;
-	if (!stacking?.maxSources) return false;
+	if (!targetCell) return [];
 
-	const selectedSourceIds = sources
-		.filter((candidate) =>
-			readSourceSupportsStackingCategory({
-				category: stacking.category,
-				config,
-				producerId,
-				productId,
-				source: candidate,
-			}),
-		)
-		.sort((left, right) =>
-			compareGameEffectSourceInstances({
-				config,
-				distanceOrder: "closest-first",
-				left,
-				right,
+	return Object.values(save.board.items)
+		.flatMap((item) => {
+			const cell = readGameEffectSourceCell({
 				save,
-				targetCell,
-			}),
-		)
-		.slice(0, stacking.maxSources)
-		.map((candidate) => candidate.sourceId);
-
-	return !selectedSourceIds.includes(source.sourceId);
+				sourceItemInstanceId: item.id,
+			});
+			if (!cell) return [];
+			if (
+				!doesResolvedDomainSelectorMatchId({
+					entityId: item.itemId,
+					selector: items as Parameters<
+						typeof doesResolvedDomainSelectorMatchId
+					>[0]["selector"],
+				})
+			) {
+				return [];
+			}
+			const distance = readChebyshevDistance(cell, targetCell);
+			if (distance > radius) return [];
+			return [
+				{
+					distance,
+					item,
+				},
+			];
+		})
+		.sort(
+			(left, right) =>
+				left.distance - right.distance || left.item.id.localeCompare(right.item.id),
+		);
 };
+
+const readDistanceMultiplier = ({
+	bands,
+	distance,
+}: {
+	bands: Extract<
+		NonNullable<GameConfig["products"][string]["effects"]>[number],
+		{
+			kind: "nearby.duration.multiply";
+		}
+	>["bands"];
+	distance: number;
+}) =>
+	bands.find(
+		(band) =>
+			distance >= band.minDistance &&
+			(band.maxDistance === undefined || distance <= band.maxDistance),
+	)?.multiplier;
 
 export const readEffectiveProducerProductLine = ({
 	baseDurationMs,
@@ -288,263 +187,198 @@ export const readEffectiveProducerProductLine = ({
 	ignoredProducerJobIds,
 	nowMs,
 	producerId,
-	producerItemId,
 	producerItemInstanceId,
 	product,
 	productId,
 	save,
 }: readEffectiveProducerProductLine.Props): EffectiveProducerProductLine => {
-	let visibility: "visible" | "hidden" =
-		product.visibility === "hidden" && !product.grantSelector ? "hidden" : "visible";
+	let visible = product.visibility !== "hidden";
+	let grantsReady = true;
+	let hasVisibilityRequirement = false;
+	let visibilityReady = true;
 	let blocked = false;
-	let durationAddMs = 0;
 	let durationMultiplier = 1;
-	let baseDropChance = 1;
-	let baseOutput = product.output ?? [];
-	const appendOutputs: EffectiveProducerProductLine["lootPlan"]["appendOutputs"] = [];
+	const baseOutput = product.output ?? [];
 	const chanceItems: EffectiveProducerProductLine["lootPlan"]["chanceItems"] = [];
 	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const blockReasons: AppliedGameEffectOperation[] = [];
+	const requirements: EffectiveProducerProductLine["requirements"] = [];
 	const targetCell = readGameEffectSourceCell({
 		save,
 		sourceItemInstanceId: producerItemInstanceId,
 	});
-
-	const sources = readGameEffectSourceInstances({
+	const grantIds = readGameWorldGrantIds({
 		config,
 		ignoredProducerJobIds,
 		nowMs,
 		save,
-	})
-		.filter((source) =>
-			readEffectSourceAppliesToTarget({
+	});
+
+	for (const [lineEffectIndex, lineEffect] of (product.effects ?? []).entries()) {
+		const lineEffectId = `${productId}:effect:${lineEffectIndex}`;
+		const lineEffectName = readLineEffectLabel({
+			fallback: lineEffect.kind,
+			lineEffect,
+		});
+		const appliedOperation = createAppliedOperation({
+			kind: lineEffect.kind,
+			lineEffectId,
+			lineEffectName,
+			producerItemInstanceId,
+		});
+
+		if (lineEffect.kind === "grant.require") {
+			const ready = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: lineEffect.selector,
+			});
+			if (lineEffect.phase === "visibility") {
+				hasVisibilityRequirement = true;
+				if (!ready) visibilityReady = false;
+			}
+			if (lineEffect.phase === "start" && !ready) grantsReady = false;
+			requirements.push({
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffectName,
+				ready,
+			});
+			if (ready) appliedEffects.push(appliedOperation);
+			continue;
+		}
+
+		if (lineEffect.kind === "grant.blockStart") {
+			const active = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: lineEffect.selector,
+			});
+			if (active) {
+				blocked = true;
+				blockReasons.push(appliedOperation);
+				appliedEffects.push(appliedOperation);
+			}
+			requirements.push({
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffectName,
+				ready: !active,
+			});
+			continue;
+		}
+
+		if (lineEffect.kind === "nearby.require") {
+			const ready =
+				readNearbyMatches({
+					config,
+					items: lineEffect.items,
+					radius: lineEffect.radius,
+					save,
+					targetCell,
+				}).length > 0;
+			if (lineEffect.phase === "visibility") {
+				hasVisibilityRequirement = true;
+				if (!ready) visibilityReady = false;
+			}
+			if (lineEffect.phase === "start" && !ready) grantsReady = false;
+			requirements.push({
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffectName,
+				ready,
+			});
+			if (ready) appliedEffects.push(appliedOperation);
+			continue;
+		}
+
+		if (lineEffect.kind === "nearby.duration.multiply") {
+			const matches = readNearbyMatches({
 				config,
-				save,
-				source,
-				targetItemInstanceId: producerItemInstanceId,
-			}),
-		)
-		.sort((left, right) =>
-			compareGameEffectSourceInstances({
-				config,
-				left,
-				right,
+				items: lineEffect.items,
+				radius: lineEffect.radius,
 				save,
 				targetCell,
-			}),
-		);
-
-	const grantIds = readGameEffectTargetGrantIds({
-		config,
-		ignoredProducerJobIds,
-		nowMs,
-		save,
-		target: {
-			kind: "productLine",
-			producerId,
-			productId,
-			targetCell,
-		},
-	});
-	const grantsReady = product.grantSelector
-		? doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: product.grantSelector,
-			})
-		: true;
-
-	for (const source of sources) {
-		const effect = config.effects[source.effectId];
-		if (!effect) continue;
-
-		for (const operation of effect.operations) {
-			if (operation.kind === "item.blockCreate" || operation.kind === "grant.add") continue;
-
-			if (
-				!doesGameEffectTargetProductLine({
-					producerId,
-					productId,
-					target: operation.target,
-				})
-			) {
-				continue;
+			}).slice(0, lineEffect.maxSources ?? Number.POSITIVE_INFINITY);
+			let active = false;
+			for (const match of matches) {
+				const multiplier = readDistanceMultiplier({
+					bands: lineEffect.bands,
+					distance: match.distance,
+				});
+				if (multiplier === undefined) continue;
+				durationMultiplier *= multiplier;
+				active = true;
 			}
-
-			if (
-				isStackingLimitReached({
-					config,
-					operation,
-					producerId,
-					productId,
-					save,
-					source,
-					sources,
-					targetCell,
-				})
-			) {
-				continue;
-			}
-
-			const extraOutputChanceItems =
-				operation.kind === "loot.extraOutputChance.add"
-					? readExtraOutputChanceItems({
-							baseOutput,
-							effectId: source.effectId,
-							effectName: effect.name,
-							operation,
-						})
-					: [];
-			if (
-				operation.kind === "loot.extraOutputChance.add" &&
-				extraOutputChanceItems.length === 0
-			) {
-				continue;
-			}
-
-			const appliedOperation = createAppliedOperation({
-				effectId: source.effectId,
-				effectName: effect.name,
-				kind: operation.kind,
-				source,
+			if (active) appliedEffects.push(appliedOperation);
+			requirements.push({
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffectName,
+				ready: !active,
 			});
-			appliedEffects.push(appliedOperation);
+			continue;
+		}
 
-			match(operation)
-				.with(
-					{
-						kind: "line.reveal",
-					},
-					() => {
-						visibility = "visible";
-					},
-				)
-				.with(
-					{
-						kind: "line.hide",
-					},
-					() => {
-						visibility = "hidden";
-					},
-				)
-				.with(
-					{
-						kind: "line.blockStart",
-					},
-					() => {
-						blocked = true;
-						blockReasons.push(appliedOperation);
-					},
-				)
-				.with(
-					{
-						kind: "duration.addMs",
-					},
-					(operation) => {
-						durationAddMs += operation.valueMs;
-					},
-				)
-				.with(
-					{
-						kind: "duration.multiply",
-					},
-					(operation) => {
-						durationMultiplier *= operation.multiplier;
-					},
-				)
-				.with(
-					{
-						kind: "duration.proximityPenalty",
-					},
-					(operation) => {
-						durationMultiplier *= readProximityPenaltyMultiplier({
-							config,
-							operation,
-							save,
-							source,
-							targetCell,
-						});
-					},
-				)
-				.with(
-					{
-						kind: "loot.appendOutput",
-					},
-					(operation) => {
-						appendOutputs.push({
-							chance: operation.chance ?? 1,
-							output: operation.output,
-						});
-					},
-				)
-				.with(
-					{
-						kind: "loot.replaceOutput",
-					},
-					(operation) => {
-						baseOutput = operation.output;
-					},
-				)
-				.with(
-					{
-						kind: "loot.addChanceItem",
-					},
-					(operation) => {
-						chanceItems.push({
-							chance: operation.chance,
-							effectId: source.effectId,
-							effectName: effect.name,
-							itemId: operation.itemId,
-							quantity: operation.quantity,
-						});
-					},
-				)
-				.with(
-					{
-						kind: "loot.dropChance.add",
-					},
-					(operation) => {
-						baseDropChance += operation.delta;
-					},
-				)
-				.with(
-					{
-						kind: "loot.quantity.add",
-					},
-					(operation) => {
-						baseOutput = baseOutput.map((output) =>
-							addLootOutputQuantity(output, operation.value),
-						);
-					},
-				)
-				.with(
-					{
-						kind: "loot.extraOutputChance.add",
-					},
-					() => {
-						chanceItems.push(...extraOutputChanceItems);
-					},
-				)
-				.exhaustive();
+		if (lineEffect.kind === "grant.duration.multiply") {
+			const active = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: lineEffect.selector,
+			});
+			if (active) {
+				durationMultiplier *= lineEffect.multiplier;
+				appliedEffects.push(appliedOperation);
+			}
+			requirements.push({
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffectName,
+				ready: !active,
+			});
+			continue;
+		}
+
+		if (lineEffect.kind === "grant.loot.extraOutputChance.add") {
+			const active = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: lineEffect.selector,
+			});
+			if (active) {
+				const extraOutputChanceItems = readExtraOutputChanceItems({
+					baseOutput,
+					lineEffect,
+					lineEffectId,
+					lineEffectName,
+				});
+				if (extraOutputChanceItems.length) {
+					chanceItems.push(...extraOutputChanceItems);
+					appliedEffects.push(appliedOperation);
+				}
+			}
+			requirements.push({
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffectName,
+				ready: !active,
+			});
+			continue;
 		}
 	}
+
+	if (hasVisibilityRequirement) visible = visibilityReady;
 
 	return {
 		appliedEffects,
 		blocked,
 		blockReasons,
-		durationMs: Math.max(0, Math.ceil((baseDurationMs + durationAddMs) * durationMultiplier)),
-		lootPlan: {
-			appendOutputs,
-			baseDropChance: clampProbability(baseDropChance),
-			baseOutput,
-			chanceItems,
-		},
+		durationMs: Math.max(0, Math.ceil(baseDurationMs * durationMultiplier)),
 		grantIds: [
 			...grantIds,
 		].sort(),
 		grantsReady,
-		visible:
-			visibility === "visible" &&
-			!(product.visibility === "hidden" && product.grantSelector && !grantsReady),
+		lootPlan: {
+			baseOutput,
+			chanceItems,
+		},
+		requirements,
+		visible,
 	};
 };

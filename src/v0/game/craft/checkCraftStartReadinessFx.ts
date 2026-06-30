@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import { checkCraftTargetIdleFx } from "~/v0/game/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/v0/game/craft/readCraftBoardItemFx";
-import { checkGameEffectGrantSelectorFx } from "~/v0/game/effects/checkGameEffectGrantSelectorFx";
+import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
+import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -33,18 +34,30 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
 
-	yield* checkGameEffectGrantSelectorFx({
+	const effectState = readCraftLineEffectState({
 		config,
-		missingReason: `Craft recipe "${action.recipeId}" is missing a required effect grant.`,
 		nowMs,
+		recipe: target.recipe,
+		recipeId: action.recipeId,
 		save,
-		selector: target.recipe.grantSelector,
-		target: {
-			kind: "craftRecipe",
-			craftRecipeId: action.recipeId,
-			targetCell: target.targetItem,
-		},
+		targetItem: target.targetItem,
 	});
+	if (!effectState.grantsReady) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"effect:missing-grant",
+				`Craft recipe "${action.recipeId}" is missing a required effect grant.`,
+			),
+		);
+	}
+	if (effectState.blocked) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"blocked",
+				effectState.blockReasons[0] ?? `Craft recipe "${action.recipeId}" is blocked.`,
+			),
+		);
+	}
 	return {
 		recipe: target.recipe,
 		targetItem: target.targetItem,

@@ -233,6 +233,17 @@ const normalizePackage = (value: unknown): unknown => {
 		};
 
 		craftRecipe.resultItemId ??= readCraftResultItemIdFromCraftTargetId(craftRecipeId);
+		craftRecipe.effects = normalizeLineEffects({
+			domainIndexes: {
+				items: createTaggedDomainIndex({
+					entries: normalizedItems,
+					ids: Object.keys(normalizedItems),
+					label: "item",
+				}),
+			},
+			effects: craftRecipe.effects,
+			path: `craftRecipes.${craftRecipeId}.effects`,
+		});
 		normalizedCraftRecipes[craftRecipeId] = craftRecipe;
 	}
 
@@ -247,6 +258,17 @@ const normalizePackage = (value: unknown): unknown => {
 		};
 
 		product.name ??= readProductNameFromPrimaryOutput(product, normalizedItems);
+		product.effects = normalizeLineEffects({
+			domainIndexes: {
+				items: createTaggedDomainIndex({
+					entries: normalizedItems,
+					ids: Object.keys(normalizedItems),
+					label: "item",
+				}),
+			},
+			effects: product.effects,
+			path: `products.${productId}.effects`,
+		});
 		normalizedProducts[productId] = product;
 	}
 
@@ -297,6 +319,9 @@ type AuthoringDomainSelectorRef =
 			id: string;
 	  }
 	| {
+			ids: string[];
+	  }
+	| {
 			tag: string;
 	  };
 
@@ -331,11 +356,7 @@ type DomainIndex = {
 };
 
 const normalizeEffectDefinitions = ({
-	craftRecipes,
 	effects,
-	items,
-	producers,
-	products,
 }: {
 	craftRecipes: Readonly<Record<string, unknown>>;
 	effects: Readonly<Record<string, unknown>>;
@@ -343,28 +364,6 @@ const normalizeEffectDefinitions = ({
 	producers: Readonly<Record<string, unknown>>;
 	products: Readonly<Record<string, unknown>>;
 }) => {
-	const domainIndexes = {
-		craftRecipes: createTaggedDomainIndex({
-			entries: craftRecipes,
-			ids: Object.keys(craftRecipes),
-			label: "craft recipe",
-		}),
-		items: createTaggedDomainIndex({
-			entries: items,
-			ids: Object.keys(items),
-			label: "item",
-		}),
-		producers: createTaggedDomainIndex({
-			entries: items,
-			ids: Object.keys(producers),
-			label: "producer",
-		}),
-		productLines: createTaggedDomainIndex({
-			entries: products,
-			ids: Object.keys(products),
-			label: "product line",
-		}),
-	};
 	const normalizedEffects: Record<string, unknown> = {};
 
 	for (const [effectId, effectEntry] of Object.entries(effects)) {
@@ -376,104 +375,53 @@ const normalizeEffectDefinitions = ({
 		const effect = {
 			...(effectEntry as Record<string, unknown>),
 		};
-		const operations = Array.isArray(effect.operations) ? effect.operations : [];
-		effect.operations = operations.map((operationEntry, operationIndex) => {
-			if (
-				!operationEntry ||
-				typeof operationEntry !== "object" ||
-				Array.isArray(operationEntry)
-			) {
-				return operationEntry;
-			}
-
-			const operation = {
-				...(operationEntry as Record<string, unknown>),
-			};
-			const path = `effects.${effectId}.operations.${operationIndex}.target`;
-			operation.target = normalizeEffectOperationTarget({
-				domainIndexes,
-				kind: operation.kind,
-				path,
-				target: asRecord(operation.target),
-			});
-
-			if (operation.kind === "loot.extraOutputChance.add") {
-				const outputItems = asRecord(operation.outputItems);
-				operation.outputItems = {
-					items: normalizeAuthoringDomainSelector({
-						domain: domainIndexes.items,
-						path: `effects.${effectId}.operations.${operationIndex}.outputItems.items`,
-						selector: asAuthoringDomainSelector(outputItems.items),
-					}),
-				};
-			}
-
-			return operation;
-		});
 		normalizedEffects[effectId] = effect;
 	}
 
 	return normalizedEffects;
 };
 
-const normalizeEffectOperationTarget = ({
+const normalizeLineEffects = ({
 	domainIndexes,
-	kind,
+	effects,
 	path,
-	target,
 }: {
 	domainIndexes: {
-		craftRecipes: DomainIndex;
 		items: DomainIndex;
-		producers: DomainIndex;
-		productLines: DomainIndex;
 	};
-	kind: unknown;
+	effects: unknown;
 	path: string;
-	target: Readonly<Record<string, unknown>>;
 }) => {
-	if (kind === "item.blockCreate") {
-		return {
-			items: normalizeAuthoringDomainSelector({
-				domain: domainIndexes.items,
-				path: `${path}.items`,
-				selector: asAuthoringDomainSelector(target.items),
-			}),
+	if (!Array.isArray(effects)) return effects;
+	return effects.map((effectEntry, effectIndex) => {
+		if (!effectEntry || typeof effectEntry !== "object" || Array.isArray(effectEntry)) {
+			return effectEntry;
+		}
+		const effect = {
+			...(effectEntry as Record<string, unknown>),
 		};
-	}
-
-	const normalizedTarget: Record<string, unknown> = {};
-	if (target.craftRecipes !== undefined) {
-		normalizedTarget.craftRecipes = normalizeAuthoringDomainSelector({
-			domain: domainIndexes.craftRecipes,
-			path: `${path}.craftRecipes`,
-			selector: asAuthoringDomainSelector(target.craftRecipes),
-		});
-	}
-	if (target.items !== undefined) {
-		normalizedTarget.items = normalizeAuthoringDomainSelector({
-			domain: domainIndexes.items,
-			path: `${path}.items`,
-			selector: asAuthoringDomainSelector(target.items),
-		});
-	}
-
-	if (target.producers !== undefined) {
-		normalizedTarget.producers = normalizeAuthoringDomainSelector({
-			domain: domainIndexes.producers,
-			path: `${path}.producers`,
-			selector: asAuthoringDomainSelector(target.producers),
-		});
-	}
-	if (target.productLines !== undefined) {
-		normalizedTarget.productLines = normalizeAuthoringDomainSelector({
-			domain: domainIndexes.productLines,
-			path: `${path}.productLines`,
-			selector: asAuthoringDomainSelector(target.productLines),
-		});
-	}
-
-	return normalizedTarget;
+		if (
+			(effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") &&
+			effect.items !== undefined
+		) {
+			effect.items = normalizeAuthoringDomainSelector({
+				domain: domainIndexes.items,
+				path: `${path}.${effectIndex}.items`,
+				selector: asAuthoringDomainSelector(effect.items),
+			});
+		}
+		if (effect.kind === "grant.loot.extraOutputChance.add") {
+			const outputItems = asRecord(effect.outputItems);
+			effect.outputItems = {
+				items: normalizeAuthoringDomainSelector({
+					domain: domainIndexes.items,
+					path: `${path}.${effectIndex}.outputItems.items`,
+					selector: asAuthoringDomainSelector(outputItems.items),
+				}),
+			};
+		}
+		return effect;
+	});
 };
 
 const asAuthoringDomainSelector = (value: unknown): AuthoringDomainSelector =>
@@ -607,6 +555,15 @@ const resolveAuthoringDomainSelectorRef = ({
 		throw new Error(`${path}.id: Missing ${domain.label} "${ref.id}".`);
 	}
 
+	if ("ids" in ref) {
+		for (const id of ref.ids) {
+			if (!domain.ids.includes(id)) {
+				throw new Error(`${path}.ids: Missing ${domain.label} "${id}".`);
+			}
+		}
+		return ref.ids;
+	}
+
 	validateKnownTags(
 		domain,
 		[
@@ -641,7 +598,7 @@ const validateUniqueSelectorRefs = (refs: readonly AuthoringDomainSelectorRef[],
 };
 
 const readAuthoringDomainSelectorRefKey = (ref: AuthoringDomainSelectorRef) =>
-	"id" in ref ? `id:${ref.id}` : `tag:${ref.tag}`;
+	"id" in ref ? `id:${ref.id}` : "ids" in ref ? `ids:${ref.ids.join(",")}` : `tag:${ref.tag}`;
 
 const validateKnownTags = (domain: DomainIndex, tags: readonly string[], path: string) => {
 	for (const [index, tag] of tags.entries()) {

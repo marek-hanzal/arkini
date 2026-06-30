@@ -38,12 +38,12 @@ import { z } from "zod";
  * - Activation inputs always say whether they are consumed. Product-line/stash/craft
  *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
  *   Product inputs may use `mode: "upTo"` when a run should consume 1..quantity items for the same fixed output.
- * - Ambient world rules such as proximity unlocks, speed boosts, pollution pressure,
- *   path locks, craft gates, and aura-style modifiers belong to `effects`. Effects are resolved
- *   against concrete product-line targets at runtime; producer shells do not own
- *   top-level gates.
- * - Local effects use Chebyshev grid distance, so radius 1 includes diagonals around
- *   the target tile. Production duration changes are authored as duration effects.
+ * - Passive and active `effects` only publish global grant facts. They do not target,
+ *   mutate, or reach into product lines. Product and craft lines own their own
+ *   visibility requirements, start requirements, proximity checks, and modifiers.
+ * - Nearby line effects use Chebyshev grid distance, so radius 1 includes diagonals
+ *   around the producer/craft tile. Duration changes are authored as explicit
+ *   line-owned distance bands or grant-driven multipliers.
  * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
@@ -223,6 +223,11 @@ const AuthoringDomainSelectorRefSchema = z.union([
 		.strict(),
 	z
 		.object({
+			ids: z.array(IdSchema).min(1),
+		})
+		.strict(),
+	z
+		.object({
 			tag: TagSchema,
 		})
 		.strict(),
@@ -244,75 +249,8 @@ const AuthoringDomainSelectorSchema = z.union([
 		.strict(),
 ]);
 
-/** Selects which producer product lines an effect operation may touch. */
-const GameEffectProductLineTargetSchema = z
-	.object({
-		producers: ResolvedDomainSelectorSchema.optional(),
-		productLines: ResolvedDomainSelectorSchema.optional(),
-	})
-	.strict();
-
-const GameEffectProductLineAuthoringTargetSchema = z
-	.object({
-		producers: AuthoringDomainSelectorSchema.optional(),
-		productLines: AuthoringDomainSelectorSchema.optional(),
-	})
-	.strict();
-
-/** Selects which craft recipes an effect operation may satisfy. */
-const GameEffectCraftRecipeTargetSchema = z
-	.object({
-		craftRecipes: ResolvedDomainSelectorSchema,
-	})
-	.strict();
-
-const GameEffectCraftRecipeAuthoringTargetSchema = z
-	.object({
-		craftRecipes: AuthoringDomainSelectorSchema,
-	})
-	.strict();
-
-/** Selects targets that should receive a grant from an effect source. */
-const GameEffectGrantTargetSchema = z
-	.object({
-		craftRecipes: ResolvedDomainSelectorSchema.optional(),
-		items: ResolvedDomainSelectorSchema.optional(),
-		producers: ResolvedDomainSelectorSchema.optional(),
-		productLines: ResolvedDomainSelectorSchema.optional(),
-	})
-	.strict();
-
-const GameEffectGrantAuthoringTargetSchema = z
-	.object({
-		craftRecipes: AuthoringDomainSelectorSchema.optional(),
-		items: AuthoringDomainSelectorSchema.optional(),
-		producers: AuthoringDomainSelectorSchema.optional(),
-		productLines: AuthoringDomainSelectorSchema.optional(),
-	})
-	.strict();
-
 /** Grant selectors describe domain capabilities, not concrete source items. */
 const GameGrantSelectorSchema = ResolvedDomainSelectorSchema;
-
-/** Selects which item definitions an effect operation may touch. */
-const GameEffectItemTargetSchema = z
-	.object({
-		items: ResolvedDomainSelectorSchema,
-	})
-	.strict();
-
-const GameEffectItemAuthoringTargetSchema = z
-	.object({
-		items: AuthoringDomainSelectorSchema,
-	})
-	.strict();
-
-const GameEffectOperationStackingSchema = z
-	.object({
-		category: z.string().min(1),
-		maxSources: PositiveIntegerSchema.optional(),
-	})
-	.strict();
 
 /**
  * Loot output model.
@@ -361,207 +299,136 @@ const ActivationOutputSchema = z.array(
 	]),
 );
 
-const createGameEffectOperationSchema = <
-	TItemTarget extends
-		| typeof GameEffectItemTargetSchema
-		| typeof GameEffectItemAuthoringTargetSchema,
-	TProductLineTarget extends
-		| typeof GameEffectProductLineTargetSchema
-		| typeof GameEffectProductLineAuthoringTargetSchema,
-	TCraftRecipeTarget extends
-		| typeof GameEffectCraftRecipeTargetSchema
-		| typeof GameEffectCraftRecipeAuthoringTargetSchema,
-	TGrantTarget extends
-		| typeof GameEffectGrantTargetSchema
-		| typeof GameEffectGrantAuthoringTargetSchema,
->({
-	craftRecipeTarget,
-	grantTarget,
-	itemTarget,
-	productLineTarget,
-}: {
-	craftRecipeTarget: TCraftRecipeTarget;
-	grantTarget: TGrantTarget;
-	itemTarget: TItemTarget;
-	productLineTarget: TProductLineTarget;
-}) => {
-	const productLineOperationBaseSchema = {
-		stacking: GameEffectOperationStackingSchema.optional(),
-		target: productLineTarget,
-	};
-	const craftRecipeOperationBaseSchema = {
-		target: craftRecipeTarget,
-	};
-	const itemOperationBaseSchema = {
-		target: itemTarget,
-	};
-	const grantOperationBaseSchema = {
-		target: grantTarget,
-	};
-
-	return z.discriminatedUnion("kind", [
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("line.reveal"),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("line.hide"),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("line.blockStart"),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("duration.addMs"),
-				valueMs: SignedIntegerSchema,
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("duration.multiply"),
-				multiplier: z.number().min(0),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("duration.proximityPenalty"),
-				durationFactor: z.number().min(0),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("loot.appendOutput"),
-				output: ActivationOutputSchema.min(1),
-				chance: ProbabilitySchema.optional(),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("loot.replaceOutput"),
-				output: ActivationOutputSchema.min(1),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("loot.addChanceItem"),
-				itemId: IdSchema,
-				chance: ProbabilitySchema,
-				quantity: QuantitySchema.default(1),
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("loot.dropChance.add"),
-				delta: ProbabilityDeltaSchema,
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("loot.quantity.add"),
-				value: PositiveIntegerSchema,
-			})
-			.strict(),
-		z
-			.object({
-				...productLineOperationBaseSchema,
-				kind: z.literal("loot.extraOutputChance.add"),
-				chance: ProbabilitySchema,
-				outputItems: itemTarget,
-				quantity: QuantitySchema.default(1),
-			})
-			.strict(),
-		z
-			.object({
-				...grantOperationBaseSchema,
-				grantId: IdSchema,
-				kind: z.literal("grant.add"),
-			})
-			.strict(),
-		z
-			.object({
-				...itemOperationBaseSchema,
-				kind: z.literal("item.blockCreate"),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-	]);
-};
-
-/** Runtime-only product-line and loot mutator operation. */
-const GameEffectOperationSchema = createGameEffectOperationSchema({
-	craftRecipeTarget: GameEffectCraftRecipeTargetSchema,
-	grantTarget: GameEffectGrantTargetSchema,
-	itemTarget: GameEffectItemTargetSchema,
-	productLineTarget: GameEffectProductLineTargetSchema,
-});
-
-/** Source-only effect operation accepted before compile-time selector resolution. */
-const GameEffectAuthoringOperationSchema = createGameEffectOperationSchema({
-	craftRecipeTarget: GameEffectCraftRecipeAuthoringTargetSchema,
-	grantTarget: GameEffectGrantAuthoringTargetSchema,
-	itemTarget: GameEffectItemAuthoringTargetSchema,
-	productLineTarget: GameEffectProductLineAuthoringTargetSchema,
-});
-
 const GameEffectSourceScopeSchema = z.enum([
 	"board",
 	"inventory",
 	"both",
 ]);
 
-const createGameEffectDefinitionSchema = <
-	TOperationSchema extends
-		| typeof GameEffectOperationSchema
-		| typeof GameEffectAuthoringOperationSchema,
->(
-	operationSchema: TOperationSchema,
-) => {
-	const commonFields = {
-		name: z.string().min(1),
-		operations: z.array(operationSchema).min(1),
-		sourceScope: GameEffectSourceScopeSchema.optional(),
-	};
+const GameLineEffectDisplaySchema = z
+	.enum([
+		"always",
+		"whenActive",
+		"whenMissing",
+		"never",
+	])
+	.default("whenActive");
 
-	return z.discriminatedUnion("scope", [
+const GameLineEffectPhaseSchema = z
+	.enum([
+		"visibility",
+		"start",
+	])
+	.default("start");
+
+const GameLineEffectDistanceBandSchema = z
+	.object({
+		minDistance: NonNegativeIntegerSchema.default(0),
+		maxDistance: NonNegativeIntegerSchema.optional(),
+		multiplier: z.number().min(0),
+	})
+	.strict()
+	.refine((value) => value.maxDistance === undefined || value.maxDistance >= value.minDistance, {
+		message: "maxDistance must be >= minDistance",
+	});
+
+const GameNearbyItemSelectorSchema = z
+	.object({
+		items: ResolvedDomainSelectorSchema,
+	})
+	.strict();
+
+const GameNearbyItemAuthoringSelectorSchema = z
+	.object({
+		items: AuthoringDomainSelectorSchema,
+	})
+	.strict();
+
+const createGameLineEffectSchema = <
+	TItemSelectorSchema extends
+		| typeof GameNearbyItemSelectorSchema
+		| typeof GameNearbyItemAuthoringSelectorSchema,
+>(
+	itemSelectorSchema: TItemSelectorSchema,
+) =>
+	z.discriminatedUnion("kind", [
 		z
 			.object({
-				...commonFields,
-				scope: z.literal("global"),
+				kind: z.literal("grant.require"),
+				selector: GameGrantSelectorSchema,
+				phase: GameLineEffectPhaseSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
 			})
 			.strict(),
 		z
 			.object({
-				...commonFields,
-				scope: z.literal("local"),
-				radius: PositiveIntegerSchema,
+				kind: z.literal("grant.blockStart"),
+				selector: GameGrantSelectorSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("nearby.require"),
+				...itemSelectorSchema.shape,
+				radius: NonNegativeIntegerSchema,
+				phase: GameLineEffectPhaseSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("nearby.duration.multiply"),
+				...itemSelectorSchema.shape,
+				radius: NonNegativeIntegerSchema,
+				bands: z.array(GameLineEffectDistanceBandSchema).min(1),
+				maxSources: PositiveIntegerSchema.optional(),
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.duration.multiply"),
+				selector: GameGrantSelectorSchema,
+				multiplier: z.number().min(0),
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.loot.extraOutputChance.add"),
+				selector: GameGrantSelectorSchema,
+				outputItems: itemSelectorSchema,
+				chance: ProbabilitySchema,
+				quantity: QuantitySchema.default(1),
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
 			})
 			.strict(),
 	]);
-};
 
-/** Runtime mutator definition. Effects never mutate GameConfig; they shape runtime views. */
-const GameEffectDefinitionSchema = createGameEffectDefinitionSchema(GameEffectOperationSchema);
-
-const GameEffectAuthoringDefinitionSchema = createGameEffectDefinitionSchema(
-	GameEffectAuthoringOperationSchema,
+const GameLineEffectSchema = createGameLineEffectSchema(GameNearbyItemSelectorSchema);
+const GameLineEffectAuthoringSchema = createGameLineEffectSchema(
+	GameNearbyItemAuthoringSelectorSchema,
 );
+
+const GameEffectDefinitionSchema = z
+	.object({
+		name: z.string().min(1),
+		grantIds: z.array(IdSchema).min(1),
+		sourceScope: GameEffectSourceScopeSchema.optional(),
+	})
+	.strict();
+
+const GameEffectAuthoringDefinitionSchema = GameEffectDefinitionSchema;
 
 /** Package-level board/inventory dimensions and human-readable title. */
 const GameMetaSchema = z
@@ -648,7 +515,6 @@ const ItemDefinitionSchema = z
 		tags: z.array(z.string().min(1)).default([]),
 		mergeIds: z.array(IdSchema).optional(),
 		passiveEffectIds: z.array(IdSchema).optional(),
-		grantSelector: GameGrantSelectorSchema.optional(),
 		removeBy: z.array(RemoveByDefinitionSchema).optional(),
 	})
 	.strict();
@@ -702,21 +568,23 @@ const CraftRecipeSchema = z
 	.object({
 		resultItemId: IdSchema,
 		inputs: z.array(CraftRecipeInputSchema),
-		grantSelector: GameGrantSelectorSchema.optional(),
+		effects: z.array(GameLineEffectSchema).optional(),
 		durationMs: NonNegativeIntegerSchema,
 	})
 	.strict();
 
 const CraftRecipeFragmentSchema = CraftRecipeSchema.extend({
 	resultItemId: IdSchema.optional(),
+	effects: z.array(GameLineEffectAuthoringSchema).optional(),
 });
 
 /**
  * Producer product line.
  *
  * Missing `output` means a valid delayed sink/destructor product.
- * `visibility: "hidden"` makes the line hidden until an effect reveals it, or until
- * its grant selector is satisfied when the line is intentionally authored as an unlock.
+ * `visibility: "hidden"` keeps the line hidden until its own visibility-phase line
+ * effects are satisfied. Start-phase effects keep visible lines disabled instead of
+ * pretending the line does not exist.
  */
 const ProductDefinitionSchema = z
 	.object({
@@ -728,7 +596,7 @@ const ProductDefinitionSchema = z
 				"hidden",
 			])
 			.default("visible"),
-		grantSelector: GameGrantSelectorSchema.optional(),
+		effects: z.array(GameLineEffectSchema).optional(),
 		durationMs: NonNegativeIntegerSchema,
 		placement: PlacementSchema,
 		chargeCost: NonNegativeNumberSchema.default(0),
@@ -740,6 +608,7 @@ const ProductDefinitionSchema = z
 
 const ProductDefinitionFragmentSchema = ProductDefinitionSchema.extend({
 	name: z.string().min(1).optional(),
+	effects: z.array(GameLineEffectAuthoringSchema).optional(),
 });
 
 /** New-game seed. Board entries are individual tiles; inventory entries may stack. */
@@ -926,19 +795,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			}
 		}
 
-		if (item.grantSelector) {
-			validateGameGrantSelector(
-				ctx,
-				[
-					"items",
-					itemId,
-					"grantSelector",
-				],
-				item.grantSelector,
-				grantIds,
-			);
-		}
-
 		for (const [index, removal] of (item.removeBy ?? []).entries()) {
 			if (!hasItem(removal.itemId)) {
 				addIssue(
@@ -983,115 +839,16 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [effectId, effect] of Object.entries(value.effects)) {
-		if (
-			effect.scope === "local" &&
-			(effect.sourceScope === "inventory" || effect.sourceScope === "both")
-		) {
-			addIssue(
-				ctx,
-				[
-					"effects",
-					effectId,
-					"sourceScope",
-				],
-				`Local effect "${effectId}" must use board source scope because inventory sources have no board cell.`,
-			);
-		}
-
-		for (const [operationIndex, operation] of effect.operations.entries()) {
-			const targetPath: GameConfigIssuePath = [
+		validateUniqueStringList(
+			ctx,
+			[
 				"effects",
 				effectId,
-				"operations",
-				operationIndex,
-				"target",
-			];
-			if (operation.kind === "item.blockCreate") {
-				validateGameEffectItemTarget(ctx, targetPath, operation.target, {
-					entityIds: itemIds,
-					hasEntity: hasItem,
-				});
-			} else if (operation.kind === "grant.add") {
-				validateGameEffectGrantTarget(ctx, targetPath, operation.target, {
-					craftRecipeIds: Object.keys(value.craftRecipes),
-					hasCraftRecipe,
-					itemIds,
-					hasItem,
-					producerIds,
-					hasProducer,
-					productIds,
-					hasProduct,
-				});
-			} else {
-				validateGameEffectProductLineTarget(ctx, targetPath, operation.target, {
-					producerIds,
-					hasProducer,
-					productIds,
-					hasProduct,
-				});
-			}
-
-			if (operation.kind === "duration.proximityPenalty" && effect.scope !== "local") {
-				addIssue(
-					ctx,
-					[
-						"effects",
-						effectId,
-						"operations",
-						operationIndex,
-						"kind",
-					],
-					`Effect operation "duration.proximityPenalty" requires a local effect scope.`,
-				);
-			}
-
-			if (operation.kind === "loot.appendOutput" || operation.kind === "loot.replaceOutput") {
-				validateActivationOutput(
-					ctx,
-					[
-						"effects",
-						effectId,
-						"operations",
-						operationIndex,
-						"output",
-					],
-					operation.output,
-					hasItem,
-				);
-			}
-
-			if (operation.kind === "loot.addChanceItem" && !hasItem(operation.itemId)) {
-				addIssue(
-					ctx,
-					[
-						"effects",
-						effectId,
-						"operations",
-						operationIndex,
-						"itemId",
-					],
-					`Missing item "${operation.itemId}".`,
-				);
-			}
-
-			if (operation.kind === "loot.extraOutputChance.add") {
-				validateGameEffectItemTarget(
-					ctx,
-					[
-						"effects",
-						effectId,
-						"operations",
-						operationIndex,
-						"outputItems",
-					],
-					operation.outputItems,
-					{
-						entityIds: itemIds,
-						hasEntity: hasItem,
-					},
-				);
-			}
-		}
+				"grantIds",
+			],
+			effect.grantIds,
+			(value) => `Duplicate grant id "${value}".`,
+		);
 	}
 
 	for (const producerId of Object.keys(value.producers)) {
@@ -1233,18 +990,20 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			recipe.inputs,
 			hasItem,
 		);
-		if (recipe.grantSelector) {
-			validateGameGrantSelector(
-				ctx,
-				[
-					"craftRecipes",
-					craftRecipeId,
-					"grantSelector",
-				],
-				recipe.grantSelector,
+		validateGameLineEffects(
+			ctx,
+			[
+				"craftRecipes",
+				craftRecipeId,
+				"effects",
+			],
+			recipe.effects ?? [],
+			{
 				grantIds,
-			);
-		}
+				hasItem,
+				itemIds,
+			},
+		);
 	}
 
 	for (const [productId, product] of Object.entries(value.products)) {
@@ -1270,18 +1029,20 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			product.tags,
 			(value) => `Duplicate tag "${value}".`,
 		);
-		if (product.grantSelector) {
-			validateGameGrantSelector(
-				ctx,
-				[
-					"products",
-					productId,
-					"grantSelector",
-				],
-				product.grantSelector,
+		validateGameLineEffects(
+			ctx,
+			[
+				"products",
+				productId,
+				"effects",
+			],
+			product.effects ?? [],
+			{
 				grantIds,
-			);
-		}
+				hasItem,
+				itemIds,
+			},
+		);
 
 		if (product.output) {
 			validateActivationOutput(
@@ -1786,54 +1547,10 @@ const validateGameGrantSelector = (
 	});
 };
 
-const validateGameEffectProductLineTarget = (
+const validateGameLineItemSelector = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	target: z.infer<typeof GameEffectProductLineTargetSchema>,
-	entities: {
-		producerIds: readonly string[];
-		hasProducer: (producerId: string) => boolean;
-		productIds: readonly string[];
-		hasProduct: (productId: string) => boolean;
-	},
-) => {
-	if (!target.producers && !target.productLines) {
-		addIssue(ctx, path, `Effect product-line target must define at least one domain selector.`);
-	}
-
-	if (target.producers) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.producerIds,
-			hasEntity: entities.hasProducer,
-			label: "producer",
-			path: [
-				...path,
-				"producers",
-			],
-			selector: target.producers,
-		});
-	}
-
-	if (target.productLines) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.productIds,
-			hasEntity: entities.hasProduct,
-			label: "product line",
-			path: [
-				...path,
-				"productLines",
-			],
-			selector: target.productLines,
-		});
-	}
-};
-
-const validateGameEffectItemTarget = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	target: z.infer<typeof GameEffectItemTargetSchema>,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
 	entities: {
 		entityIds: readonly string[];
 		hasEntity: (itemId: string) => boolean;
@@ -1844,99 +1561,77 @@ const validateGameEffectItemTarget = (
 		entityIds: entities.entityIds,
 		hasEntity: entities.hasEntity,
 		label: "item",
-		path: [
-			...path,
-			"items",
-		],
-		selector: target.items,
+		path,
+		selector,
 	});
 };
 
-const validateGameEffectGrantTarget = (
+const validateGameLineEffects = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	target: z.infer<typeof GameEffectGrantTargetSchema>,
+	effects: readonly z.infer<typeof GameLineEffectSchema>[],
 	entities: {
-		craftRecipeIds: readonly string[];
-		hasCraftRecipe: (craftRecipeId: string) => boolean;
-		itemIds: readonly string[];
+		grantIds: readonly string[];
 		hasItem: (itemId: string) => boolean;
-		producerIds: readonly string[];
-		hasProducer: (producerId: string) => boolean;
-		productIds: readonly string[];
-		hasProduct: (productId: string) => boolean;
+		itemIds: readonly string[];
 	},
 ) => {
-	if (!target.craftRecipes && !target.items && !target.producers && !target.productLines) {
-		addIssue(ctx, path, `Effect grant target must define at least one domain selector.`);
-	}
+	for (const [effectIndex, effect] of effects.entries()) {
+		if (
+			effect.kind === "grant.require" ||
+			effect.kind === "grant.blockStart" ||
+			effect.kind === "grant.duration.multiply" ||
+			effect.kind === "grant.loot.extraOutputChance.add"
+		) {
+			validateGameGrantSelector(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"selector",
+				],
+				effect.selector,
+				entities.grantIds,
+			);
+		}
 
-	if (target.craftRecipes) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.craftRecipeIds,
-			hasEntity: entities.hasCraftRecipe,
-			label: "craft recipe",
-			path: [
-				...path,
-				"craftRecipes",
-			],
-			selector: target.craftRecipes,
-		});
-	}
-	if (target.items) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.itemIds,
-			hasEntity: entities.hasItem,
-			label: "item",
-			path: [
-				...path,
-				"items",
-			],
-			selector: target.items,
-		});
-	}
-	if (target.producers) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.producerIds,
-			hasEntity: entities.hasProducer,
-			label: "producer",
-			path: [
-				...path,
-				"producers",
-			],
-			selector: target.producers,
-		});
-	}
-	if (target.productLines) {
-		validateResolvedDomainSelector({
-			ctx,
-			entityIds: entities.productIds,
-			hasEntity: entities.hasProduct,
-			label: "product line",
-			path: [
-				...path,
-				"productLines",
-			],
-			selector: target.productLines,
-		});
+		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
+			validateGameLineItemSelector(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"items",
+				],
+				effect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+				{
+					entityIds: entities.itemIds,
+					hasEntity: entities.hasItem,
+				},
+			);
+		}
+
+		if (effect.kind === "grant.loot.extraOutputChance.add") {
+			validateGameLineItemSelector(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"outputItems",
+					"items",
+				],
+				effect.outputItems.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+				{
+					entityIds: entities.itemIds,
+					hasEntity: entities.hasItem,
+				},
+			);
+		}
 	}
 };
 
 const readGameEffectGrantIds = (config: z.infer<typeof BaseGameConfigSchema>) => [
-	...new Set(
-		Object.values(config.effects).flatMap((effect) =>
-			effect.operations.flatMap((operation) =>
-				operation.kind === "grant.add"
-					? [
-							operation.grantId,
-						]
-					: [],
-			),
-		),
-	),
+	...new Set(Object.values(config.effects).flatMap((effect) => effect.grantIds)),
 ];
 
 const validateProductLineOwnership = (
@@ -2148,15 +1843,15 @@ const collectCraftRecipeBlueprintDependencies = ({
 			});
 		}
 
-		collectGrantSelectorDependencyItems({
+		collectLineEffectDependencyItems({
 			addDependencyItem,
 			config,
 			fromBlueprintItemId: craftRecipeId,
-			grantSelector: recipe.grantSelector,
+			lineEffects: recipe.effects ?? [],
 			path: [
 				"craftRecipes",
 				craftRecipeId,
-				"grantSelector",
+				"effects",
 			],
 		});
 	}
@@ -2212,15 +1907,15 @@ const collectProductBlueprintDependencies = ({
 				});
 			}
 
-			collectGrantSelectorDependencyItems({
+			collectLineEffectDependencyItems({
 				addDependencyItem,
 				config,
 				fromBlueprintItemId,
-				grantSelector: product.grantSelector,
+				lineEffects: product.effects ?? [],
 				path: [
 					"products",
 					productId,
-					"grantSelector",
+					"effects",
 				],
 			});
 		}
@@ -2327,11 +2022,11 @@ const readOutputBlueprintItemIds = (
 	return outputBlueprintItemIds;
 };
 
-const collectGrantSelectorDependencyItems = ({
+const collectLineEffectDependencyItems = ({
 	addDependencyItem,
 	config,
 	fromBlueprintItemId,
-	grantSelector,
+	lineEffects,
 	path,
 }: {
 	addDependencyItem: (props: {
@@ -2341,13 +2036,63 @@ const collectGrantSelectorDependencyItems = ({
 	}) => void;
 	config: z.infer<typeof BaseGameConfigSchema>;
 	fromBlueprintItemId: string;
-	grantSelector: z.infer<typeof GameGrantSelectorSchema> | undefined;
+	lineEffects: readonly z.infer<typeof GameLineEffectSchema>[];
 	path: GameConfigIssuePath;
 }) => {
-	if (!grantSelector) return;
+	for (const [lineEffectIndex, lineEffect] of lineEffects.entries()) {
+		if (lineEffect.kind === "grant.require") {
+			collectGrantDependencyItems({
+				addDependencyItem,
+				config,
+				fromBlueprintItemId,
+				selector: lineEffect.selector,
+				path: [
+					...path,
+					lineEffectIndex,
+					"selector",
+				],
+			});
+		}
+
+		if (lineEffect.kind === "nearby.require") {
+			for (const itemId of readDomainSelectorIds(
+				lineEffect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+			)) {
+				addDependencyItem({
+					fromBlueprintItemId,
+					itemId,
+					path: [
+						...path,
+						lineEffectIndex,
+						"items",
+					],
+				});
+			}
+		}
+	}
+};
+
+const collectGrantDependencyItems = ({
+	addDependencyItem,
+	config,
+	fromBlueprintItemId,
+	selector,
+	path,
+}: {
+	addDependencyItem: (props: {
+		fromBlueprintItemId: string;
+		itemId: string;
+		path: GameConfigIssuePath;
+	}) => void;
+	config: z.infer<typeof BaseGameConfigSchema>;
+	fromBlueprintItemId: string;
+	selector: z.infer<typeof GameGrantSelectorSchema> | undefined;
+	path: GameConfigIssuePath;
+}) => {
+	if (!selector) return;
 
 	const grantSourceItemIdsByGrantId = readPassiveGrantSourceItemIdsByGrantId(config);
-	for (const grantId of readDomainSelectorIds(grantSelector)) {
+	for (const grantId of readDomainSelectorIds(selector)) {
 		for (const itemId of grantSourceItemIdsByGrantId.get(grantId) ?? []) {
 			addDependencyItem({
 				fromBlueprintItemId,
@@ -2364,10 +2109,9 @@ const readPassiveGrantSourceItemIdsByGrantId = (config: z.infer<typeof BaseGameC
 		for (const effectId of item.passiveEffectIds ?? []) {
 			const effect = config.effects[effectId];
 			if (!effect) continue;
-			for (const operation of effect.operations) {
-				if (operation.kind !== "grant.add") continue;
-				result.set(operation.grantId, [
-					...(result.get(operation.grantId) ?? []),
+			for (const grantId of effect.grantIds) {
+				result.set(grantId, [
+					...(result.get(grantId) ?? []),
 					itemId,
 				]);
 			}

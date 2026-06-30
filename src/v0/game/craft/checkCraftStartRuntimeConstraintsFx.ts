@@ -1,10 +1,9 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
-import { checkGameEffectGrantSelectorFx } from "~/v0/game/effects/checkGameEffectGrantSelectorFx";
+import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
 
 export namespace checkCraftStartRuntimeConstraintsFx {
 	export interface Props {
@@ -26,28 +25,31 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 		targetItem,
 		targetItemInstanceId,
 	}: checkCraftStartRuntimeConstraintsFx.Props) {
-		yield* checkGameEffectGrantSelectorFx({
+		const effectState = readCraftLineEffectState({
 			config,
-			missingReason: `Craft recipe for "${targetItem.itemId}" is missing a required effect grant.`,
 			nowMs,
+			recipe,
+			recipeId: targetItem.itemId,
 			save,
-			selector: recipe.grantSelector,
-			target: {
-				kind: "craftRecipe",
-				craftRecipeId: targetItem.itemId,
-				targetCell: targetItem,
-			},
+			targetItem,
 		});
-		yield* checkItemCreateBlockedByEffectsFx({
-			config,
-			ignoredSourceIds: new Set([
-				targetItemInstanceId,
-			]),
-			itemId: recipe.resultItemId,
-			nowMs,
-			save,
-			targetCell: targetItem,
-		});
+		if (!effectState.grantsReady) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"effect:missing-grant",
+					`Craft recipe for "${targetItem.itemId}" is missing a required effect grant.`,
+				),
+			);
+		}
+		if (effectState.blocked) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"blocked",
+					effectState.blockReasons[0] ??
+						`Craft recipe for "${targetItem.itemId}" is blocked.`,
+				),
+			);
+		}
 		if (
 			readBoardItemMaxCountCapacity({
 				config,

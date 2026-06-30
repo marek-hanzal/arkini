@@ -32,18 +32,9 @@ export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItem
 	const random = yield* RandomServiceFx;
 	const items: LootTableRollResult["items"] = [];
 
-	if (lootPlan.baseOutput.length > 0 && random.chance(lootPlan.baseDropChance)) {
+	if (lootPlan.baseOutput.length > 0) {
 		const rolled = yield* rollLootOutputFx({
 			output: lootPlan.baseOutput,
-		});
-		items.push(...rolled.items);
-	}
-
-	for (const appendOutput of lootPlan.appendOutputs) {
-		if (!random.chance(appendOutput.chance)) continue;
-
-		const rolled = yield* rollLootOutputFx({
-			output: appendOutput.output,
 		});
 		items.push(...rolled.items);
 	}

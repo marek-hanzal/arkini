@@ -118,50 +118,6 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
-	it("does not warn about produced items used as passive effect sources", () => {
-		const config = createConfigValue();
-		const warnings = auditGameConfig(
-			parseGameConfig({
-				...config,
-				effects: {
-					"effect:pollution-slow": {
-						name: "Pollution slow",
-						operations: [
-							{
-								durationFactor: 0.5,
-								kind: "duration.proximityPenalty",
-								target: {
-									productLines: {
-										anyOf: [
-											{
-												ids: [
-													"product:test",
-												],
-											},
-										],
-									},
-								},
-							},
-						],
-						radius: 2,
-						scope: "local",
-					},
-				},
-				items: {
-					...config.items,
-					"item:pollution": {
-						...config.items["item:pollution"],
-						passiveEffectIds: [
-							"effect:pollution-slow",
-						],
-					},
-				},
-			}),
-		);
-
-		expect(warnings).toEqual([]);
-	});
-
 	it("tracks product-owned inline inputs and outputs", () => {
 		const config: any = createConfigValue();
 		config.products["product:test"].inputs = [

@@ -1,10 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 
-interface EffectiveOutputAppend {
-	output: NonNullable<GameConfig["products"][string]["output"]>;
-	chance: number;
-}
-
 interface EffectiveChanceItemEntry {
 	effectId?: string;
 	effectName?: string;
@@ -21,9 +16,16 @@ interface EffectiveChanceItemEntry {
 export interface AppliedGameEffectOperation {
 	effectId: string;
 	effectName: string;
-	kind: GameConfig["effects"][string]["operations"][number]["kind"];
+	kind: NonNullable<GameConfig["products"][string]["effects"]>[number]["kind"];
 	sourceId: string;
 	sourceItemInstanceId: string;
+}
+
+interface RuntimeLineEffectRequirement {
+	label: string;
+	ready: boolean;
+	display: NonNullable<GameConfig["products"][string]["effects"]>[number]["display"];
+	kind: NonNullable<GameConfig["products"][string]["effects"]>[number]["kind"];
 }
 
 export interface EffectiveProducerProductLine {
@@ -34,10 +36,9 @@ export interface EffectiveProducerProductLine {
 	grantIds?: string[];
 	grantsReady?: boolean;
 	lootPlan: {
-		appendOutputs: EffectiveOutputAppend[];
-		baseDropChance: number;
 		baseOutput: NonNullable<GameConfig["products"][string]["output"]>;
 		chanceItems: EffectiveChanceItemEntry[];
 	};
+	requirements: RuntimeLineEffectRequirement[];
 	visible: boolean;
 }

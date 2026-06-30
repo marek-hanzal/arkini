@@ -1,1725 +1,438 @@
 {
 	"effects": {
+		"effect:grant-owned:item-clay-deposit": {
+			"name": "Owned Clay Deposit grant",
+			"grantIds": [
+				"grant:owned:item:clay-deposit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-coal-deposit": {
+			"name": "Owned Coal Deposit grant",
+			"grantIds": [
+				"grant:owned:item:coal-deposit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-gold-deposit": {
+			"name": "Owned Gold Deposit grant",
+			"grantIds": [
+				"grant:owned:item:gold-deposit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-hop-field": {
+			"name": "Owned Hop Field grant",
+			"grantIds": [
+				"grant:owned:item:hop-field"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-iron-deposit": {
+			"name": "Owned Iron Deposit grant",
+			"grantIds": [
+				"grant:owned:item:iron-deposit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-marble-deposit": {
+			"name": "Owned Marble Deposit grant",
+			"grantIds": [
+				"grant:owned:item:marble-deposit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-sand-deposit": {
+			"name": "Owned Sand Deposit grant",
+			"grantIds": [
+				"grant:owned:item:sand-deposit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-vineyard": {
+			"name": "Owned Vineyard grant",
+			"grantIds": [
+				"grant:owned:item:vineyard"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:item-wheat-field": {
+			"name": "Owned Wheat Field grant",
+			"grantIds": [
+				"grant:owned:item:wheat-field"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-academy": {
+			"name": "Owned Academy grant",
+			"grantIds": [
+				"grant:owned:producer:academy"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-armory-t1": {
+			"name": "Owned Armory I grant",
+			"grantIds": [
+				"grant:owned:producer:armory-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-bakery-t1": {
+			"name": "Owned Bakery I grant",
+			"grantIds": [
+				"grant:owned:producer:bakery-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-blacksmith-t1": {
+			"name": "Owned Blacksmith I grant",
+			"grantIds": [
+				"grant:owned:producer:blacksmith-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-brewery-t1": {
+			"name": "Owned Brewery I grant",
+			"grantIds": [
+				"grant:owned:producer:brewery-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-brickyard": {
+			"name": "Owned Brickyard grant",
+			"grantIds": [
+				"grant:owned:producer:brickyard"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-cattle-farm-t1": {
+			"name": "Owned Cattle Farm I grant",
+			"grantIds": [
+				"grant:owned:producer:cattle-farm-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-charcoal-burner-t1": {
+			"name": "Owned Charcoal Burner I grant",
+			"grantIds": [
+				"grant:owned:producer:charcoal-burner-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-chicken-coop-t1": {
+			"name": "Owned Chicken Coop I grant",
+			"grantIds": [
+				"grant:owned:producer:chicken-coop-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-civic-office-t1": {
+			"name": "Owned Civic Office I grant",
+			"grantIds": [
+				"grant:owned:producer:civic-office-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-clay-pit": {
+			"name": "Owned Clay Pit grant",
+			"grantIds": [
+				"grant:owned:producer:clay-pit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-coal-mine-t1": {
+			"name": "Owned Coal Mine I grant",
+			"grantIds": [
+				"grant:owned:producer:coal-mine-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-construction-yard-t1": {
+			"name": "Owned Construction Yard I grant",
+			"grantIds": [
+				"grant:owned:producer:construction-yard-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-cookhouse-t1": {
+			"name": "Owned Cookhouse I grant",
+			"grantIds": [
+				"grant:owned:producer:cookhouse-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-dairy-t1": {
+			"name": "Owned Dairy I grant",
+			"grantIds": [
+				"grant:owned:producer:dairy-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-dye-workshop-t1": {
+			"name": "Owned Dye Workshop I grant",
+			"grantIds": [
+				"grant:owned:producer:dye-workshop-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-farm-t1": {
+			"name": "Owned Farm I grant",
+			"grantIds": [
+				"grant:owned:producer:farm-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-glassworks": {
+			"name": "Owned Glassworks grant",
+			"grantIds": [
+				"grant:owned:producer:glassworks"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-glazier-workshop-t1": {
+			"name": "Owned Glazier Workshop I grant",
+			"grantIds": [
+				"grant:owned:producer:glazier-workshop-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-goldsmith-t1": {
+			"name": "Owned Goldsmith I grant",
+			"grantIds": [
+				"grant:owned:producer:goldsmith-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-heroes-guild-t1": {
+			"name": "Owned Heroes Guild I grant",
+			"grantIds": [
+				"grant:owned:producer:heroes-guild-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t1": {
+			"name": "Owned Library I grant",
+			"grantIds": [
+				"grant:owned:producer:library-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t2": {
+			"name": "Owned Library II grant",
+			"grantIds": [
+				"grant:owned:producer:library-t2"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t3": {
+			"name": "Owned Library III grant",
+			"grantIds": [
+				"grant:owned:producer:library-t3"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-library-t4": {
+			"name": "Owned Library IV grant",
+			"grantIds": [
+				"grant:owned:producer:library-t4"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-lumberjack-t1": {
+			"name": "Owned Lumberjack I grant",
+			"grantIds": [
+				"grant:owned:producer:lumberjack-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-market-t1": {
+			"name": "Owned Market grant",
+			"grantIds": [
+				"grant:owned:producer:market-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-pig-farm-t1": {
+			"name": "Owned Pig Farm I grant",
+			"grantIds": [
+				"grant:owned:producer:pig-farm-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-purifier-t1": {
+			"name": "Owned Purifier I grant",
+			"grantIds": [
+				"grant:owned:producer:purifier-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-quarry-t1": {
+			"name": "Owned Quarry I grant",
+			"grantIds": [
+				"grant:owned:producer:quarry-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-quarry-t2": {
+			"name": "Owned Quarry grant",
+			"grantIds": [
+				"grant:owned:producer:quarry-t2"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-roof-tile-factory": {
+			"name": "Owned Roof Tile Factory grant",
+			"grantIds": [
+				"grant:owned:producer:roof-tile-factory"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-sand-pit": {
+			"name": "Owned Sand Pit grant",
+			"grantIds": [
+				"grant:owned:producer:sand-pit"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-sawmill-t1": {
+			"name": "Owned Sawmill I grant",
+			"grantIds": [
+				"grant:owned:producer:sawmill-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-sheep-pasture-t1": {
+			"name": "Owned Sheep Pasture I grant",
+			"grantIds": [
+				"grant:owned:producer:sheep-pasture-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-slaughterhouse-t1": {
+			"name": "Owned Slaughterhouse I grant",
+			"grantIds": [
+				"grant:owned:producer:slaughterhouse-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-smelter-t1": {
+			"name": "Owned Smelter I grant",
+			"grantIds": [
+				"grant:owned:producer:smelter-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-stonemason-t1": {
+			"name": "Owned Stonemason I grant",
+			"grantIds": [
+				"grant:owned:producer:stonemason-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-stonemason-t2": {
+			"name": "Owned Stonemason grant",
+			"grantIds": [
+				"grant:owned:producer:stonemason-t2"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-tailor-workshop-t1": {
+			"name": "Owned Tailor Workshop I grant",
+			"grantIds": [
+				"grant:owned:producer:tailor-workshop-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-tannery-t1": {
+			"name": "Owned Tannery I grant",
+			"grantIds": [
+				"grant:owned:producer:tannery-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-tavern-t1": {
+			"name": "Owned Tavern I grant",
+			"grantIds": [
+				"grant:owned:producer:tavern-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-university": {
+			"name": "Owned University grant",
+			"grantIds": [
+				"grant:owned:producer:university"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-vegetable-garden-t1": {
+			"name": "Owned Vegetable Garden I grant",
+			"grantIds": [
+				"grant:owned:producer:vegetable-garden-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-weaver-hut-t1": {
+			"name": "Owned Weaver Hut I grant",
+			"grantIds": [
+				"grant:owned:producer:weaver-hut-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-well-t1": {
+			"name": "Owned Well I grant",
+			"grantIds": [
+				"grant:owned:producer:well-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-windmill-t1": {
+			"name": "Owned Windmill I grant",
+			"grantIds": [
+				"grant:owned:producer:windmill-t1"
+			],
+			"sourceScope": "both"
+		},
+		"effect:grant-owned:producer-winery-t1": {
+			"name": "Owned Winery I grant",
+			"grantIds": [
+				"grant:owned:producer:winery-t1"
+			],
+			"sourceScope": "both"
+		},
 		"effect:path-engineers-locks-counter-keystones": {
 			"name": "Engineers path locks Faith and Mages keystone plans",
-			"scope": "global",
-			"operations": [
-				{
-					"kind": "line.blockStart",
-					"reason": "Engineers path is already chosen.",
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:university:blueprint-cathedral"
-								},
-								{
-									"id": "product:university:blueprint-mage-lodge"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "item.blockCreate",
-					"reason": "Engineers path is already chosen.",
-					"target": {
-						"items": {
-							"anyOf": [
-								{
-									"id": "item:blueprint-cathedral"
-								},
-								{
-									"id": "item:blueprint-mage-lodge"
-								},
-								{
-									"id": "producer:cathedral"
-								},
-								{
-									"id": "producer:mage-lodge"
-								}
-							]
-						}
-					}
-				}
+			"grantIds": [
+				"grant:path:engineers"
 			],
 			"sourceScope": "both"
 		},
 		"effect:path-faith-locks-counter-keystones": {
 			"name": "Faith path locks Engineers and Mages keystone plans",
-			"scope": "global",
-			"operations": [
-				{
-					"kind": "line.blockStart",
-					"reason": "Faith path is already chosen.",
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:university:blueprint-house-of-engineers"
-								},
-								{
-									"id": "product:university:blueprint-mage-lodge"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "item.blockCreate",
-					"reason": "Faith path is already chosen.",
-					"target": {
-						"items": {
-							"anyOf": [
-								{
-									"id": "item:blueprint-house-of-engineers"
-								},
-								{
-									"id": "item:blueprint-mage-lodge"
-								},
-								{
-									"id": "producer:house-of-engineers"
-								},
-								{
-									"id": "producer:mage-lodge"
-								}
-							]
-						}
-					}
-				}
+			"grantIds": [
+				"grant:path:faith"
 			],
 			"sourceScope": "both"
 		},
 		"effect:path-mages-locks-counter-keystones": {
 			"name": "Mages path locks Engineers and Faith keystone plans",
-			"scope": "global",
-			"operations": [
-				{
-					"kind": "line.blockStart",
-					"reason": "Mages path is already chosen.",
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:university:blueprint-house-of-engineers"
-								},
-								{
-									"id": "product:university:blueprint-cathedral"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "item.blockCreate",
-					"reason": "Mages path is already chosen.",
-					"target": {
-						"items": {
-							"anyOf": [
-								{
-									"id": "item:blueprint-house-of-engineers"
-								},
-								{
-									"id": "item:blueprint-cathedral"
-								},
-								{
-									"id": "producer:house-of-engineers"
-								},
-								{
-									"id": "producer:cathedral"
-								}
-							]
-						}
-					}
-				}
+			"grantIds": [
+				"grant:path:mages"
 			],
 			"sourceScope": "both"
 		},
-		"effect:pollution-slows-nearby-radius-2": {
-			"name": "Pollution slows nearby sensitive production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"kind": "duration.proximityPenalty",
-					"durationFactor": 0.5,
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"tag": "pollution-sensitive:radius-2"
-								}
-							]
-						}
-					}
-				}
-			]
-		},
-		"effect:pollution-slows-nearby-radius-3": {
-			"name": "Pollution slows wider winery production",
-			"scope": "local",
-			"radius": 3,
-			"operations": [
-				{
-					"kind": "duration.proximityPenalty",
-					"durationFactor": 0.5,
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"tag": "pollution-sensitive:radius-3"
-								}
-							]
-						}
-					}
-				}
-			]
+		"effect:shrine-bountiful-offering": {
+			"name": "Bountiful Offering",
+			"grantIds": [
+				"grant:active:shrine-bountiful-offering"
+			],
+			"sourceScope": "board"
 		},
 		"effect:shrine-minor-haste": {
 			"name": "Minor Haste",
-			"scope": "global",
-			"operations": [
-				{
-					"kind": "duration.multiply",
-					"multiplier": 0.75,
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"tag": "shrine:haste-target"
-								}
-							]
-						}
-					}
-				}
+			"grantIds": [
+				"grant:active:shrine-minor-haste"
 			],
 			"sourceScope": "board"
-		},
-		"effect:shrine-bountiful-offering": {
-			"name": "Bountiful Offering",
-			"scope": "global",
-			"operations": [
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.35,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-1-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.3,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-2-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.25,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-3-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.2,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-4-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.15,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-5-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.12,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-6-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.1,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-7-resource"
-								}
-							]
-						}
-					}
-				},
-				{
-					"kind": "loot.extraOutputChance.add",
-					"chance": 0.05,
-					"quantity": 1,
-					"target": {
-						"productLines": {
-							"mode": "all"
-						}
-					},
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"tag": "tier-10-resource"
-								}
-							]
-						}
-					}
-				}
-			],
-			"sourceScope": "board"
-		},
-		"effect:proximity:brewery-t1:hop-field": {
-			"name": "Nearby item:hop-field enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:brewery-t1:beer-barrel"
-								},
-								{
-									"id": "product:brewery-t1:beer-barrel-from-beer"
-								},
-								{
-									"id": "product:brewery-t1:hops"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:brewery-t1:hop-field"
-				}
-			]
-		},
-		"effect:proximity:clay-pit:clay-deposit": {
-			"name": "Nearby item:clay-deposit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:clay-pit:clay"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:clay-pit:clay-deposit"
-				}
-			]
-		},
-		"effect:proximity:clay-pit:nearby": {
-			"name": "Nearby producer:clay-pit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:brickyard:bricks"
-								},
-								{
-									"id": "product:roof-tile-factory:roof-tiles"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:clay-pit:nearby"
-				}
-			]
-		},
-		"effect:proximity:coal-mine-t1:coal-deposit": {
-			"name": "Nearby item:coal-deposit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:coal-mine-t1:coal"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:coal-mine-t1:coal-deposit"
-				}
-			]
-		},
-		"effect:proximity:dirty-processing:purifier": {
-			"name": "Nearby producer:purifier-t1 enables production",
-			"scope": "local",
-			"radius": 3,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:armory-t1:iron-armor"
-								},
-								{
-									"id": "product:blacksmith-t1:axe"
-								},
-								{
-									"id": "product:blacksmith-t1:nails"
-								},
-								{
-									"id": "product:blacksmith-t1:sword"
-								},
-								{
-									"id": "product:brickyard:bricks"
-								},
-								{
-									"id": "product:charcoal-burner-t1:charcoal"
-								},
-								{
-									"id": "product:glassworks:glass"
-								},
-								{
-									"id": "product:glazier-workshop-t1:stained-glass"
-								},
-								{
-									"id": "product:glazier-workshop-t1:stained-glass-morale-t4"
-								},
-								{
-									"id": "product:goldsmith-t1:coin-stack"
-								},
-								{
-									"id": "product:goldsmith-t1:key-t1"
-								},
-								{
-									"id": "product:goldsmith-t1:key-t2"
-								},
-								{
-									"id": "product:goldsmith-t1:key-t3"
-								},
-								{
-									"id": "product:goldsmith-t1:key-t4"
-								},
-								{
-									"id": "product:roof-tile-factory:roof-tiles"
-								},
-								{
-									"id": "product:smelter-t1:gold-ingot"
-								},
-								{
-									"id": "product:smelter-t1:iron-ingot"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:dirty-processing:purifier"
-				}
-			]
-		},
-		"effect:proximity:farm-t1:wheat-field": {
-			"name": "Nearby item:wheat-field enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:farm-t1:grain"
-								},
-								{
-									"id": "product:farm-t1:grain-morale-t1"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:farm-t1:wheat-field"
-				}
-			]
-		},
-		"effect:proximity:glassworks:sand-pit": {
-			"name": "Nearby producer:sand-pit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:glassworks:glass"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:glassworks:sand-pit"
-				}
-			]
-		},
-		"effect:proximity:glazier-workshop-t1:glassworks": {
-			"name": "Nearby producer:glassworks enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:glazier-workshop-t1:stained-glass"
-								},
-								{
-									"id": "product:glazier-workshop-t1:stained-glass-morale-t4"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:glazier-workshop-t1:glassworks"
-				}
-			]
-		},
-		"effect:proximity:gold-mine-t1:gold-deposit": {
-			"name": "Nearby item:gold-deposit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:gold-mine-t1:gold-ore"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:gold-mine-t1:gold-deposit"
-				}
-			]
-		},
-		"effect:proximity:iron-mine-t1:iron-deposit": {
-			"name": "Nearby item:iron-deposit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:iron-mine-t1:iron-ore"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:iron-mine-t1:iron-deposit"
-				}
-			]
-		},
-		"effect:proximity:lumberjack-t1:tree": {
-			"name": "Nearby item:tree enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:lumberjack-t1:log"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:lumberjack-t1:tree"
-				},
-				{
-					"kind": "duration.multiply",
-					"multiplier": 0.9,
-					"stacking": {
-						"category": "woodcutting:nearby-tree-speed",
-						"maxSources": 5
-					},
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:lumberjack-t1:log"
-								}
-							]
-						}
-					}
-				}
-			]
-		},
-		"effect:proximity:quarry-t1:rock": {
-			"name": "Nearby item:rock enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:quarry-t1:stone"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:quarry-t1:rock"
-				}
-			]
-		},
-		"effect:proximity:quarry-t2:marble-deposit": {
-			"name": "Nearby item:marble-deposit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:quarry-t2:marble"
-								},
-								{
-									"id": "product:quarry-t2:stone"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:quarry-t2:marble-deposit"
-				}
-			]
-		},
-		"effect:proximity:sand-pit:sand-deposit": {
-			"name": "Nearby item:sand-deposit enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:sand-pit:sand"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:sand-pit:sand-deposit"
-				}
-			]
-		},
-		"effect:proximity:sawmill-t1:lumberjack-t1": {
-			"name": "Nearby producer:lumberjack-t1 enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:sawmill-t1:plank"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:sawmill-t1:lumberjack-t1"
-				}
-			]
-		},
-		"effect:proximity:stonemason-t1:quarry-t1": {
-			"name": "Nearby producer:quarry-t1 enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:stonemason-t1:stone-block"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:stonemason-t1:quarry-t1"
-				}
-			]
-		},
-		"effect:proximity:stonemason-t2:quarry-t2": {
-			"name": "Nearby producer:quarry-t2 enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:stonemason-t2:marble-block"
-								},
-								{
-									"id": "product:stonemason-t2:marble-block-morale-t4"
-								},
-								{
-									"id": "product:stonemason-t2:stone-block"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:stonemason-t2:quarry-t2"
-				}
-			]
-		},
-		"effect:proximity:winery-t1:vineyard": {
-			"name": "Nearby item:vineyard enables production",
-			"scope": "local",
-			"radius": 2,
-			"operations": [
-				{
-					"target": {
-						"productLines": {
-							"anyOf": [
-								{
-									"id": "product:winery-t1:grapes"
-								},
-								{
-									"id": "product:winery-t1:wine-barrel"
-								},
-								{
-									"id": "product:winery-t1:wine-barrel-from-wine-glasses"
-								}
-							]
-						}
-					},
-					"kind": "grant.add",
-					"grantId": "grant:proximity:winery-t1:vineyard"
-				}
-			]
-		},
-		"effect:grant-owned:item-clay-deposit": {
-			"name": "Owned Clay Deposit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:clay-deposit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-coal-deposit": {
-			"name": "Owned Coal Deposit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:coal-deposit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-gold-deposit": {
-			"name": "Owned Gold Deposit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:gold-deposit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-hop-field": {
-			"name": "Owned Hop Field grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:hop-field",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-iron-deposit": {
-			"name": "Owned Iron Deposit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:iron-deposit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-marble-deposit": {
-			"name": "Owned Marble Deposit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:marble-deposit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-sand-deposit": {
-			"name": "Owned Sand Deposit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:sand-deposit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-vineyard": {
-			"name": "Owned Vineyard grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:vineyard",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:item-wheat-field": {
-			"name": "Owned Wheat Field grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:item:wheat-field",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-academy": {
-			"name": "Owned Academy grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:academy",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-armory-t1": {
-			"name": "Owned Armory I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:armory-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-bakery-t1": {
-			"name": "Owned Bakery I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:bakery-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-blacksmith-t1": {
-			"name": "Owned Blacksmith I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:blacksmith-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-brewery-t1": {
-			"name": "Owned Brewery I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:brewery-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-brickyard": {
-			"name": "Owned Brickyard grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:brickyard",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-cattle-farm-t1": {
-			"name": "Owned Cattle Farm I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:cattle-farm-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-charcoal-burner-t1": {
-			"name": "Owned Charcoal Burner I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:charcoal-burner-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-chicken-coop-t1": {
-			"name": "Owned Chicken Coop I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:chicken-coop-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-civic-office-t1": {
-			"name": "Owned Civic Office I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:civic-office-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-clay-pit": {
-			"name": "Owned Clay Pit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:clay-pit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-coal-mine-t1": {
-			"name": "Owned Coal Mine I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:coal-mine-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-construction-yard-t1": {
-			"name": "Owned Construction Yard I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:construction-yard-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-cookhouse-t1": {
-			"name": "Owned Cookhouse I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:cookhouse-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-dairy-t1": {
-			"name": "Owned Dairy I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:dairy-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-dye-workshop-t1": {
-			"name": "Owned Dye Workshop I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:dye-workshop-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-farm-t1": {
-			"name": "Owned Farm I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:farm-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-glassworks": {
-			"name": "Owned Glassworks grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:glassworks",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-glazier-workshop-t1": {
-			"name": "Owned Glazier Workshop I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:glazier-workshop-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-goldsmith-t1": {
-			"name": "Owned Goldsmith I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:goldsmith-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-heroes-guild-t1": {
-			"name": "Owned Heroes Guild I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:heroes-guild-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-library-t1": {
-			"name": "Owned Library I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:library-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-library-t2": {
-			"name": "Owned Library II grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:library-t2",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-library-t3": {
-			"name": "Owned Library III grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:library-t3",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-library-t4": {
-			"name": "Owned Library IV grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:library-t4",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-lumberjack-t1": {
-			"name": "Owned Lumberjack I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:lumberjack-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-market-t1": {
-			"name": "Owned Market grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:market-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-pig-farm-t1": {
-			"name": "Owned Pig Farm I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:pig-farm-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-purifier-t1": {
-			"name": "Owned Purifier I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:purifier-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-quarry-t1": {
-			"name": "Owned Quarry I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:quarry-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-quarry-t2": {
-			"name": "Owned Quarry grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:quarry-t2",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-roof-tile-factory": {
-			"name": "Owned Roof Tile Factory grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:roof-tile-factory",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-sand-pit": {
-			"name": "Owned Sand Pit grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:sand-pit",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-sawmill-t1": {
-			"name": "Owned Sawmill I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:sawmill-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-sheep-pasture-t1": {
-			"name": "Owned Sheep Pasture I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:sheep-pasture-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-slaughterhouse-t1": {
-			"name": "Owned Slaughterhouse I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:slaughterhouse-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-smelter-t1": {
-			"name": "Owned Smelter I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:smelter-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-stonemason-t1": {
-			"name": "Owned Stonemason I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:stonemason-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-stonemason-t2": {
-			"name": "Owned Stonemason grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:stonemason-t2",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-tailor-workshop-t1": {
-			"name": "Owned Tailor Workshop I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:tailor-workshop-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-tannery-t1": {
-			"name": "Owned Tannery I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:tannery-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-tavern-t1": {
-			"name": "Owned Tavern I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:tavern-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-university": {
-			"name": "Owned University grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:university",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-vegetable-garden-t1": {
-			"name": "Owned Vegetable Garden I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:vegetable-garden-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-weaver-hut-t1": {
-			"name": "Owned Weaver Hut I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:weaver-hut-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-well-t1": {
-			"name": "Owned Well I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:well-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-windmill-t1": {
-			"name": "Owned Windmill I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:windmill-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
-		},
-		"effect:grant-owned:producer-winery-t1": {
-			"name": "Owned Winery I grant",
-			"scope": "global",
-			"sourceScope": "both",
-			"operations": [
-				{
-					"kind": "grant.add",
-					"grantId": "grant:owned:producer:winery-t1",
-					"target": {
-						"craftRecipes": {
-							"mode": "all"
-						}
-					}
-				}
-			]
 		}
 	}
 }

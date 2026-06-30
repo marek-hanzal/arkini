@@ -1,6 +1,7 @@
 import { type FC, useState } from "react";
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
+import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
@@ -87,6 +88,22 @@ const readTargetLimitLabel = (
 		: baseLabel;
 };
 
+const readProducerInputRowClassName = ({
+	available,
+	fulfilled,
+}: {
+	available: boolean;
+	fulfilled: boolean;
+}) =>
+	cn(
+		"flex min-w-0 items-center gap-2 rounded-sm border px-2.5 py-2 text-xs transition-[background,border-color,box-shadow]",
+		fulfilled
+			? "border-emerald-300/30 bg-emerald-400/10 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.07)]"
+			: available
+				? "border-fuchsia-300/35 bg-fuchsia-400/10 shadow-[inset_0_0_0_1px_rgba(236,72,153,0.07)]"
+				: "border-transparent bg-ak-surface/80",
+	);
+
 const DetailLineNoteList: FC<{
 	items: readonly string[];
 	title: string;
@@ -168,6 +185,7 @@ const DetailLineInputs: FC<{
 			{line.inputs.map((input) => {
 				const inputItem = items[input.itemId];
 				const fillableQuantity = readActivationInputViewFillableQuantity(input);
+				const ready = readActivationInputViewReady(input);
 				const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
 				const meta = [
 					readActivationInputViewLabel(input),
@@ -180,7 +198,10 @@ const DetailLineInputs: FC<{
 				return (
 					<div
 						key={input.itemId}
-						className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs"
+						className={readProducerInputRowClassName({
+							available: fillableQuantity > 0,
+							fulfilled: ready,
+						})}
 					>
 						<ItemInlineAsset
 							item={inputItem}
@@ -190,7 +211,12 @@ const DetailLineInputs: FC<{
 							<p className="break-words font-black text-ak-text">
 								{inputItem?.name ?? readItemName(input.itemId, items)}
 							</p>
-							<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+							<p
+								className={cn(
+									"mt-0.5 break-words leading-5",
+									ready ? "font-bold text-emerald-300" : "text-ak-text-muted",
+								)}
+							>
 								{meta}
 							</p>
 						</div>

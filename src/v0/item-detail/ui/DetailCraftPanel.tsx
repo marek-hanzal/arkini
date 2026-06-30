@@ -48,6 +48,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
 	const effectBlockReasons = craft.effectBlockReasons ?? [];
+	const showInputs = craft.phase === "collecting_inputs" && craft.inputProgress < 1;
 
 	return (
 		<DetailCard
@@ -97,61 +98,64 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 					</div>
 				) : null}
 
-				<div className="grid gap-2">
-					{craft.inputs.map((input) => {
-						const delivered = craft.delivered[input.itemId] ?? 0;
-						const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
-						const inputItem = items[input.itemId];
-						const ready = delivered >= input.quantity;
-						const fillableQuantity = Math.min(
-							Math.max(0, input.quantity - delivered),
-							input.available ?? 0,
-						);
-						return (
-							<div
-								key={input.itemId}
-								className={readCraftInputRowClassName({
-									available: fillableQuantity > 0,
-									fulfilled: ready,
-								})}
-							>
-								<ItemInlineAsset
-									item={inputItem}
-									className="h-9 w-9"
-								/>
-								<div className="min-w-0 flex-1">
-									<p className="break-words font-black text-ak-text">
-										{inputItem?.name ?? input.itemId}
-									</p>
-									<p
-										className={cn(
-											"mt-0.5 text-xs leading-5",
-											ready
-												? "font-bold text-emerald-300"
-												: "text-ak-text-muted",
-										)}
-									>
-										{delivered}/{input.quantity}
-										{!ready && fillableQuantity > 0
-											? ` · +${fillableQuantity} available`
-											: ""}
-									</p>
+				{showInputs ? (
+					<div className="grid gap-2">
+						{craft.inputs.map((input) => {
+							const delivered = craft.delivered[input.itemId] ?? 0;
+							const withdrawAction =
+								control.withdrawInputActionsByItemId[input.itemId];
+							const inputItem = items[input.itemId];
+							const ready = delivered >= input.quantity;
+							const fillableQuantity = Math.min(
+								Math.max(0, input.quantity - delivered),
+								input.available ?? 0,
+							);
+							return (
+								<div
+									key={input.itemId}
+									className={readCraftInputRowClassName({
+										available: fillableQuantity > 0,
+										fulfilled: ready,
+									})}
+								>
+									<ItemInlineAsset
+										item={inputItem}
+										className="h-9 w-9"
+									/>
+									<div className="min-w-0 flex-1">
+										<p className="break-words font-black text-ak-text">
+											{inputItem?.name ?? input.itemId}
+										</p>
+										<p
+											className={cn(
+												"mt-0.5 text-xs leading-5",
+												ready
+													? "font-bold text-emerald-300"
+													: "text-ak-text-muted",
+											)}
+										>
+											{delivered}/{input.quantity}
+											{!ready && fillableQuantity > 0
+												? ` · +${fillableQuantity} available`
+												: ""}
+										</p>
+									</div>
+									{withdrawAction ? (
+										<UiButton
+											data-ui="withdraw action"
+											disabled={withdrawAction.disabled}
+											fullWidth={false}
+											tone={withdrawAction.tone}
+											onClick={withdrawAction.onClick}
+										>
+											{withdrawAction.label}
+										</UiButton>
+									) : null}
 								</div>
-								{withdrawAction ? (
-									<UiButton
-										data-ui="withdraw action"
-										disabled={withdrawAction.disabled}
-										fullWidth={false}
-										tone={withdrawAction.tone}
-										onClick={withdrawAction.onClick}
-									>
-										{withdrawAction.label}
-									</UiButton>
-								) : null}
-							</div>
-						);
-					})}
-				</div>
+							);
+						})}
+					</div>
+				) : null}
 			</div>
 			<UiProgressButton
 				disabled={control.primaryAction.disabled}

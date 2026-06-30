@@ -23,7 +23,6 @@ export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ item }) => (
 					<h2 className="mr-auto break-words text-xl font-black leading-7 text-ak-text">
 						{item.name}
 					</h2>
-					<DetailMutedPill>{item.storage}</DetailMutedPill>
 					{item.maxStackSize > 1 ? (
 						<DetailMutedPill>Stack {item.maxStackSize}</DetailMutedPill>
 					) : null}

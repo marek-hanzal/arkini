@@ -205,6 +205,9 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		});
 		const targetLimits = readEffectiveOutputTargetLimits({
 			config,
+			includePendingCraftJobs: true,
+			includePendingCraftSourceItems: true,
+			includePendingProducerJobs: true,
 			lootPlan: effectiveProductLine.lootPlan,
 			save,
 		});

@@ -110,6 +110,57 @@ describe("applyGameActionFx Craft", () => {
 		}
 	});
 
+	it("rejects craft start when another craft job already reserves the result maxCount", () => {
+		const baseConfig = createEngineCraftTableTestConfig({
+			boardItemCount: 2,
+		});
+		const config = createEngineTestConfig({
+			game: baseConfig.game,
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+			},
+			craftRecipes: baseConfig.craftRecipes,
+			startingState: baseConfig.startingState,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const first = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const second = runActionEither({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:2",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 200,
+			save: first.save,
+		});
+
+		expect(second._tag).toBe("Left");
+		if (second._tag === "Left") {
+			expect(second.left).toMatchObject({
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			});
+		}
+	});
+
 	it("rejects and surfaces craft start blockers from active effects", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

@@ -1,12 +1,21 @@
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-
 export namespace doesGameGrantSelectorMatchIds {
 	export interface Props {
 		grantIds: ReadonlySet<string>;
-		selector: NonNullable<
-			| GameConfig["items"][string]["grantSelector"]
-			| GameConfig["products"][string]["grantSelector"]
-		>;
+		selector:
+			| {
+					mode: "all";
+			  }
+			| {
+					anyOf?: readonly {
+						ids: readonly string[];
+					}[];
+					allOf?: readonly {
+						ids: readonly string[];
+					}[];
+					noneOf?: readonly {
+						ids: readonly string[];
+					}[];
+			  };
 	}
 }
 

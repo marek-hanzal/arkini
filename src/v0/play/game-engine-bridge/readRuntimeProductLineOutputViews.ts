@@ -63,12 +63,10 @@ const readRollLabel = (rolls: ProductLineOutputQuantity) => {
 
 const collectOutputViews = ({
 	output,
-	probabilityMultiplier,
 	save,
 	sourceIndexOffset,
 }: {
 	output: ProductOutput;
-	probabilityMultiplier: number;
 	save: GameSave;
 	sourceIndexOffset: number;
 }): IndexedProductLineOutputView[] =>
@@ -84,7 +82,7 @@ const collectOutputViews = ({
 						itemId: weightedEntry.itemId,
 						save,
 					}),
-					probability: probabilityMultiplier < 1 ? probabilityMultiplier : undefined,
+					probability: undefined,
 					quantity: readOutputQuantity(weightedEntry.quantity),
 					rollLabel: readRollLabel(entry.rolls ?? 1),
 					sort: readOutputEntrySort(entry, weightedEntry.sort),
@@ -101,10 +99,7 @@ const collectOutputViews = ({
 					itemId: entry.itemId,
 					save,
 				}),
-				probability:
-					entry.type === "chance" || probabilityMultiplier < 1
-						? probabilityMultiplier * (entry.type === "chance" ? entry.chance : 1)
-						: undefined,
+				probability: entry.type === "chance" ? entry.chance : undefined,
 				quantity: readOutputQuantity(entry.quantity),
 				sort: entry.sort,
 				sourceIndex,
@@ -131,24 +126,11 @@ export const readRuntimeProductLineOutputViews = ({
 	outputs.push(
 		...collectOutputViews({
 			output: effectiveProductLine.lootPlan.baseOutput,
-			probabilityMultiplier: effectiveProductLine.lootPlan.baseDropChance,
 			save,
 			sourceIndexOffset,
 		}),
 	);
 	sourceIndexOffset += effectiveProductLine.lootPlan.baseOutput.length * 1000 + 1000;
-
-	for (const appendOutput of effectiveProductLine.lootPlan.appendOutputs) {
-		outputs.push(
-			...collectOutputViews({
-				output: appendOutput.output,
-				probabilityMultiplier: appendOutput.chance,
-				save,
-				sourceIndexOffset,
-			}),
-		);
-		sourceIndexOffset += appendOutput.output.length * 1000 + 1000;
-	}
 
 	for (const [chanceIndex, chanceItem] of effectiveProductLine.lootPlan.chanceItems.entries()) {
 		outputs.push(

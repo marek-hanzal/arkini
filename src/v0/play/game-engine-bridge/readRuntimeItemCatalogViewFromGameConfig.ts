@@ -2,7 +2,6 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
-import { readRuntimeEffectOperationSummary } from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
 const catalogCache = new WeakMap<GameConfig, ItemCatalogView>();
 
@@ -31,15 +30,10 @@ const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: 
 			{
 				id: effectId,
 				name: effect.name,
-				operations: effect.operations.map((operation) => ({
-					kind: operation.kind,
-					summary: readRuntimeEffectOperationSummary({
-						config,
-						operation,
-					}),
+				grants: effect.grantIds.map((grantId) => ({
+					id: grantId,
+					summary: `Grants ${grantId}.`,
 				})),
-				radius: effect.scope === "local" ? effect.radius : undefined,
-				scope: effect.scope,
 				sourceScope: effect.sourceScope ?? "board",
 			},
 		];

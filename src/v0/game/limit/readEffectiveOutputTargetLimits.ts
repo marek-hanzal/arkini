@@ -37,30 +37,12 @@ export const readEffectiveOutputTargetLimits = ({
 	ignoredBoardItemInstanceIds,
 	lootPlan,
 	save,
-}: readEffectiveOutputTargetLimits.Props): ItemTargetLimit[] => {
-	const guaranteedOutputs = [
-		...(lootPlan.baseDropChance >= 1
-			? [
-					lootPlan.baseOutput,
-				]
-			: []),
-		...lootPlan.appendOutputs.flatMap((appendOutput) =>
-			appendOutput.chance >= 1
-				? [
-						appendOutput.output,
-					]
-				: [],
-		),
-	];
-
-	return mergeLimits(
-		guaranteedOutputs.flatMap((output) =>
-			readOutputTargetLimits({
-				config,
-				ignoredBoardItemInstanceIds,
-				output,
-				save,
-			}),
-		),
+}: readEffectiveOutputTargetLimits.Props): ItemTargetLimit[] =>
+	mergeLimits(
+		readOutputTargetLimits({
+			config,
+			ignoredBoardItemInstanceIds,
+			output: lootPlan.baseOutput,
+			save,
+		}),
 	);
-};

@@ -1,18 +1,22 @@
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-
-type ProductLineEffectOperation = Exclude<
-	GameConfig["effects"][string]["operations"][number],
-	{
-		kind: "item.blockCreate";
-	}
->;
-
-type ResolvedDomainSelector = NonNullable<ProductLineEffectOperation["target"]["producers"]>;
-
 export namespace doesResolvedDomainSelectorMatchId {
 	export interface Props {
 		entityId: string;
-		selector: ResolvedDomainSelector | undefined;
+		selector:
+			| {
+					mode: "all";
+			  }
+			| {
+					anyOf?: readonly {
+						ids: readonly string[];
+					}[];
+					allOf?: readonly {
+						ids: readonly string[];
+					}[];
+					noneOf?: readonly {
+						ids: readonly string[];
+					}[];
+			  }
+			| undefined;
 	}
 }
 

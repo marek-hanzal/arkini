@@ -5,8 +5,6 @@ import { readGameConfigItemDefinitionFx } from "~/v0/game/config/readGameConfigI
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import type { GameActionInventoryItemPlaceSchema } from "~/v0/game/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
-import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import {
@@ -67,39 +65,6 @@ const readBoardPlacementBlockReason = ({
 	}) <= 0
 		? "board:max-count"
 		: "board:full";
-
-const readBoardEffectPlacementBlockReasonFx = Effect.fn(
-	"checkInventoryItemPlaceReadinessFx.readBoardEffectPlacementBlockReasonFx",
-)(function* ({
-	config,
-	itemId,
-	nowMs,
-	save,
-	seedCell,
-}: {
-	config: GameConfig;
-	itemId: string;
-	nowMs?: number;
-	save: GameSave;
-	seedCell: {
-		x: number;
-		y: number;
-	};
-}) {
-	const emptyCells = yield* planEmptyBoardCellsFx({
-		config,
-		save,
-		seedCell,
-	});
-
-	return readBoardItemCreateEffectFailureReason({
-		candidateCells: emptyCells,
-		config,
-		itemId,
-		nowMs,
-		save,
-	});
-});
 
 const readInventoryStackCapacity = ({
 	itemId,
@@ -245,17 +210,6 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				);
 			}
 
-			yield* checkItemCreateBlockedByEffectsFx({
-				config,
-				itemId: slot.itemId,
-				nowMs,
-				save: saveAfterInventoryRemoval,
-				targetCell: {
-					x: action.x,
-					y: action.y,
-				},
-			});
-
 			return {
 				itemDefinition,
 				slot,
@@ -312,17 +266,8 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			if (!targetCell) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						yield* readBoardEffectPlacementBlockReasonFx({
-							config,
-							itemId: liveSlot.itemId,
-							nowMs,
-							save: saveAfterInventoryRemoval,
-							seedCell: {
-								x: action.x,
-								y: action.y,
-							},
-						}),
-						"No board placement target is allowed by active effects.",
+						"board:full",
+						"No board placement target available.",
 					),
 				);
 			}
@@ -353,26 +298,15 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				: [];
 		const allowedBoardCapacity = Math.min(boardCapacity, boardPlacementCells.length);
 		if (allowedBoardCapacity === 0) {
-			const reason =
-				boardCapacity === 0
-					? readBoardPlacementBlockReason({
-							config,
-							itemId: liveSlot.itemId,
-							save,
-						})
-					: yield* readBoardEffectPlacementBlockReasonFx({
-							config,
-							itemId: liveSlot.itemId,
-							nowMs,
-							save: saveAfterInventoryRemoval,
-							seedCell: {
-								x: action.x,
-								y: action.y,
-							},
-						});
-
 			return yield* Effect.fail(
-				GameEngineError.actionRejected(reason, "No board placement target available."),
+				GameEngineError.actionRejected(
+					readBoardPlacementBlockReason({
+						config,
+						itemId: liveSlot.itemId,
+						save,
+					}),
+					"No board placement target available.",
+				),
 			);
 		}
 
@@ -390,18 +324,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 							itemId: liveSlot.itemId,
 							save,
 						})
-					: allowedBoardCapacity === 0
-						? yield* readBoardEffectPlacementBlockReasonFx({
-								config,
-								itemId: liveSlot.itemId,
-								nowMs,
-								save: saveAfterInventoryRemoval,
-								seedCell: {
-									x: action.x,
-									y: action.y,
-								},
-							})
-						: "inventory:full";
+					: "inventory:full";
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(reason, "No placement target available."),
 			);

@@ -31,8 +31,6 @@ describe("readRuntimeProductLineOutputViews", () => {
 			blockReasons: [],
 			durationMs: 1000,
 			lootPlan: {
-				appendOutputs: [],
-				baseDropChance: 1,
 				baseOutput: [
 					{
 						chance: 0.25,
@@ -55,6 +53,7 @@ describe("readRuntimeProductLineOutputViews", () => {
 					},
 				],
 			},
+			requirements: [],
 			visible: true,
 		};
 

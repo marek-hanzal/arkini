@@ -2,11 +2,9 @@ import { Effect } from "effect";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
-import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import type { GameActionDebugItemSpawn } from "~/v0/game/action/GameActionDebugItemSpawn";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -94,7 +92,6 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 			const simulatedSave = yield* cloneGameSaveFx({
 				save,
 			});
-			let effectFailureReason: "effect:block-create" | "effect:missing-grant" | undefined;
 			for (let index = 0; index < quantity; index += 1) {
 				const emptyCells = yield* planEmptyBoardCellsFx({
 					config,
@@ -116,14 +113,12 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 					save: simulatedSave,
 				});
 				if (!targetCell) {
-					effectFailureReason = readBoardItemCreateEffectFailureReason({
-						candidateCells: emptyCells,
-						config,
-						itemId: action.itemId,
-						nowMs,
-						save: simulatedSave,
-					});
-					break;
+					return yield* Effect.fail(
+						GameEngineError.actionRejected(
+							"board:full",
+							"Board has no space for debug item.",
+						),
+					);
 				}
 
 				simulatedSave.board.items[`debug-readiness:${index}`] = {
@@ -138,26 +133,8 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 					y: targetCell.y,
 				};
 			}
-
-			if (effectFailureReason) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						effectFailureReason,
-						effectFailureReason === "effect:missing-grant"
-							? "No board placement target has the required effect grant."
-							: "No board placement target is allowed by active effects.",
-					),
-				);
-			}
 			return;
 		}
-
-		yield* checkItemCreateBlockedByEffectsFx({
-			config,
-			itemId: action.itemId,
-			nowMs,
-			save,
-		});
 
 		if (
 			!hasInventoryCapacity({

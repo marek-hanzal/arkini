@@ -3,7 +3,6 @@ import { checkCraftInputStoreReadinessFx } from "~/v0/game/craft/checkCraftInput
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/v0/game/activation/consumeResolvedInputRefFx";
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
-import { checkItemCreateBlockedByEffectsFx } from "~/v0/game/effects/checkItemCreateBlockedByEffectsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameActionCraftInputStore } from "~/v0/game/action/GameActionCraftInputStore";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
@@ -41,17 +40,6 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 		nextSave,
 		reason: "craft-input-store",
 		ref: checked.resolvedRef,
-	});
-
-	yield* checkItemCreateBlockedByEffectsFx({
-		config,
-		ignoredSourceIds: new Set([
-			action.targetItemInstanceId,
-		]),
-		itemId: checked.target.recipe.resultItemId,
-		nowMs,
-		save: nextSave,
-		targetCell: checked.target.targetItem,
 	});
 
 	const craftInputState = (nextSave.craftInputs[action.targetItemInstanceId] ??= {

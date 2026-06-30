@@ -5,9 +5,6 @@ import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx
 import { planItemBoardPlacementCellsFx } from "~/v0/game/placement/planItemBoardPlacementCellsFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
-import { readGameEffectItemCreateBlockReasons } from "~/v0/game/effects/readGameEffectItemCreateBlockReasons";
-import { readGameEffectItemCreateMissingGrant } from "~/v0/game/effects/readGameEffectItemCreateMissingGrant";
-import { readBoardItemCreateEffectFailureReason } from "~/v0/game/placement/readBoardItemCreateEffectFailureReason";
 import { placeGameSaveInventoryRemainderFx } from "~/v0/game/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { BoardCell } from "~/v0/game/board/BoardCell";
@@ -18,87 +15,6 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 type GameSaveSingleItemPlacementResult = {
 	type: "placed";
 };
-
-const checkInventoryCreateEffectAccessFx = Effect.fn("checkInventoryCreateEffectAccessFx")(
-	function* ({
-		config,
-		itemId,
-		nowMs,
-		save,
-	}: {
-		config: GameConfig;
-		itemId: string;
-		nowMs: number;
-		save: GameSave;
-	}) {
-		if (
-			readGameEffectItemCreateMissingGrant({
-				config,
-				itemId,
-				nowMs,
-				save,
-			})
-		) {
-			return yield* Effect.fail(
-				GameEngineError.placementFailed(
-					"effect:missing-grant",
-					`Item "${itemId}" is missing a required effect grant.`,
-				),
-			);
-		}
-
-		const blockReasons = readGameEffectItemCreateBlockReasons({
-			config,
-			itemId,
-			nowMs,
-			save,
-		});
-		if (blockReasons.length === 0) return;
-
-		const [firstReason] = blockReasons;
-		return yield* Effect.fail(
-			GameEngineError.placementFailed(
-				"effect:block-create",
-				firstReason?.reason ??
-					`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
-			),
-		);
-	},
-);
-
-const checkGlobalPlacementEffectBlocksFx = Effect.fn("checkGlobalPlacementEffectBlocksFx")(
-	function* ({
-		config,
-		itemId,
-		nowMs,
-		save,
-		targetCell,
-	}: {
-		config: GameConfig;
-		itemId: string;
-		nowMs: number;
-		save: GameSave;
-		targetCell?: BoardCell;
-	}) {
-		const blockReasons = readGameEffectItemCreateBlockReasons({
-			config,
-			itemId,
-			nowMs,
-			save,
-			targetCell,
-		});
-		if (blockReasons.length === 0) return;
-
-		const [firstReason] = blockReasons;
-		return yield* Effect.fail(
-			GameEngineError.placementFailed(
-				"effect:block-create",
-				firstReason?.reason ??
-					`Item "${itemId}" cannot be created while effect "${firstReason?.effectName ?? "unknown"}" is active.`,
-			),
-		);
-	},
-);
 
 export namespace placeSingleGameSaveItemRequestFx {
 	export interface Props {
@@ -130,18 +46,10 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			);
 		}
 
-		yield* checkGlobalPlacementEffectBlocksFx({
-			config,
-			itemId: item.itemId,
-			nowMs,
-			save,
-		});
-
 		const createdAtMs =
 			item.createdAtMs ?? (itemDefinition.passiveEffectIds?.length ? nowMs : undefined);
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
-		let boardBlockedByMissingGrant = false;
 		let boardHitMaxCount = false;
 		let boardRanOutOfSpace = false;
 		const canPlaceOnBoard = isItemStorageAllowed({
@@ -155,7 +63,6 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			location: "inventory",
 		});
 
-		let boardBlockedByEffect = false;
 		while (canPlaceOnBoard && remainingQuantity > 0) {
 			if (
 				readBoardItemMaxCountCapacity({
@@ -189,15 +96,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 				seedCell,
 			});
 			if (!emptyCell) {
-				const effectFailureReason = readBoardItemCreateEffectFailureReason({
-					candidateCells: emptyCells,
-					config,
-					itemId: item.itemId,
-					nowMs,
-					save,
-				});
-				boardBlockedByMissingGrant = effectFailureReason === "effect:missing-grant";
-				boardBlockedByEffect = true;
+				boardRanOutOfSpace = true;
 				break;
 			}
 
@@ -230,24 +129,13 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		}
 
 		const inventoryPlaced = canPlaceInInventory
-			? yield* Effect.gen(function* () {
-					if (remainingQuantity > 0) {
-						yield* checkInventoryCreateEffectAccessFx({
-							config,
-							itemId: item.itemId,
-							nowMs,
-							save,
-						});
-					}
-
-					return yield* placeGameSaveInventoryRemainderFx({
-						createdAtMs,
-						events,
-						item,
-						maxStackSize: itemDefinition.maxStackSize,
-						remainingQuantity,
-						slots: save.inventory.slots,
-					});
+			? yield* placeGameSaveInventoryRemainderFx({
+					createdAtMs,
+					events,
+					item,
+					maxStackSize: itemDefinition.maxStackSize,
+					remainingQuantity,
+					slots: save.inventory.slots,
 				})
 			: remainingQuantity === 0;
 
@@ -260,21 +148,13 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		const reason =
 			canPlaceOnBoard &&
 			(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-			boardBlockedByMissingGrant
-				? "effect:missing-grant"
+			boardHitMaxCount
+				? "board:max-count"
 				: canPlaceOnBoard &&
 						(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-						boardBlockedByEffect
-					? "effect:block-create"
-					: canPlaceOnBoard &&
-							(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-							boardHitMaxCount
-						? "board:max-count"
-						: canPlaceOnBoard &&
-								(!canPlaceInInventory || boardPlacedQuantity === 0) &&
-								boardRanOutOfSpace
-							? "board:full"
-							: "inventory:full";
+						boardRanOutOfSpace
+					? "board:full"
+					: "inventory:full";
 
 		return yield* Effect.fail(
 			GameEngineError.placementFailed(reason, "Placement target is full."),

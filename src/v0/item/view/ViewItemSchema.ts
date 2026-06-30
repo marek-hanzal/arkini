@@ -1,20 +1,15 @@
 import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
-const ViewItemGeneratedEffectOperationSchema = z.object({
-	kind: z.string(),
+const ViewItemGeneratedEffectGrantSchema = z.object({
+	id: z.string(),
 	summary: z.string(),
 });
 
 const ViewItemGeneratedEffectSchema = z.object({
 	id: z.string().min(1),
 	name: z.string(),
-	operations: z.array(ViewItemGeneratedEffectOperationSchema),
-	radius: z.number().int().positive().optional(),
-	scope: z.enum([
-		"global",
-		"local",
-	]),
+	grants: z.array(ViewItemGeneratedEffectGrantSchema),
 	sourceScope: z.enum([
 		"board",
 		"inventory",

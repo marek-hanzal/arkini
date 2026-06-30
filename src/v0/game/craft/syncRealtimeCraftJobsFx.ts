@@ -8,8 +8,7 @@ import {
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
-import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
-import { readGameEffectTargetGrantIds } from "~/v0/game/effects/readGameEffectTargetGrantIds";
+import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 
 export namespace syncRealtimeCraftJobsFx {
@@ -34,24 +33,15 @@ const readCraftGrantsReady = ({
 	recipe: GameConfig["craftRecipes"][string];
 	save: GameSave;
 	targetItem: GameSave["board"]["items"][string];
-}) => {
-	if (!recipe.grantSelector) return true;
-
-	const grantIds = readGameEffectTargetGrantIds({
+}) =>
+	readCraftLineEffectState({
 		config,
 		nowMs,
+		recipe,
+		recipeId: job.recipeId,
 		save,
-		target: {
-			kind: "craftRecipe",
-			craftRecipeId: job.recipeId,
-			targetCell: targetItem,
-		},
-	});
-	return doesGameGrantSelectorMatchIds({
-		grantIds,
-		selector: recipe.grantSelector,
-	});
-};
+		targetItem,
+	}).grantsReady;
 
 export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(function* ({
 	config,

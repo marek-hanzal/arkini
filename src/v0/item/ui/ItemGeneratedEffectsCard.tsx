@@ -8,9 +8,6 @@ export namespace ItemGeneratedEffectsCard {
 	}
 }
 
-const readScopeLabel = (effect: ViewItemGeneratedEffect) =>
-	effect.scope === "global" ? "Global" : `Local radius ${effect.radius ?? "?"}`;
-
 const readSourceScopeLabel = (effect: ViewItemGeneratedEffect) => {
 	if (effect.sourceScope === "both") return "Active from board or inventory";
 	if (effect.sourceScope === "inventory") return "Active while stored in inventory";
@@ -37,22 +34,20 @@ export const ItemGeneratedEffectsCard: FC<ItemGeneratedEffectsCard.Props> = ({ e
 								{effect.name}
 							</p>
 							<span className="shrink-0 rounded-full border border-ak-border px-2 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-ak-text-muted">
-								{readScopeLabel(effect)}
+								Global grant
 							</span>
 						</div>
 						<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
 							{readSourceScopeLabel(effect)}
 						</p>
 						<ul className="mt-2 grid gap-1.5">
-							{effect.operations.map((operation, index) => (
+							{effect.grants.map((grant, index) => (
 								<li
-									key={`${effect.id}:${operation.kind}:${index}`}
+									key={`${effect.id}:${grant.id}:${index}`}
 									className="break-words text-xs leading-5 text-ak-text-muted"
 								>
-									<span className="font-semibold text-ak-text">
-										{operation.kind}
-									</span>
-									: {operation.summary}
+									<span className="font-semibold text-ak-text">{grant.id}</span>:{" "}
+									{grant.summary}
 								</li>
 							))}
 						</ul>

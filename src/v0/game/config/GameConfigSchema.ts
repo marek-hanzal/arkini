@@ -715,7 +715,8 @@ const CraftRecipeFragmentSchema = CraftRecipeSchema.extend({
  * Producer product line.
  *
  * Missing `output` means a valid delayed sink/destructor product.
- * `visibility: "hidden"` makes the line hidden until an effect reveals it.
+ * `visibility: "hidden"` makes the line hidden until an effect reveals it, or until
+ * its grant selector is satisfied when the line is intentionally authored as an unlock.
  */
 const ProductDefinitionSchema = z
 	.object({

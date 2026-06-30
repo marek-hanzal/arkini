@@ -90,30 +90,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 	if (!visibleProductIds.includes(productId)) {
-		const hiddenProduct = config.products[productId];
-		if (hiddenProduct) {
-			const effectiveProductLine = readEffectiveProducerProductLine({
-				baseDurationMs: readProducerProductDurationMs({
-					product: hiddenProduct,
-				}),
-				config,
-				nowMs,
-				producerId,
-				producerItemId: producerItem.itemId,
-				producerItemInstanceId: action.producerItemInstanceId,
-				product: hiddenProduct,
-				productId,
-				save,
-			});
-			if (hiddenProduct.grantSelector && !effectiveProductLine.grantsReady) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						"effect:missing-grant",
-						`Product "${productId}" is missing effect grants for the current game state.`,
-					),
-				);
-			}
-		}
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
@@ -157,6 +133,27 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	const product = yield* readProductFx({
 		productId,
 	});
+	const effectiveProductLine = readEffectiveProducerProductLine({
+		baseDurationMs: readProducerProductDurationMs({
+			product,
+		}),
+		config,
+		nowMs,
+		producerId,
+		producerItemId: producerItem.itemId,
+		producerItemInstanceId: action.producerItemInstanceId,
+		product,
+		productId,
+		save,
+	});
+	if (!effectiveProductLine.grantsReady) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"effect:missing-grant",
+				`Product "${productId}" is missing effect grants for the current game state.`,
+			),
+		);
+	}
 	if (
 		product.activatesEffectId &&
 		readProducerEffectLineLocked({

@@ -31,6 +31,8 @@ const readInputAvailabilityLabel = ({
 	inputsPartiallyAvailable: boolean;
 	line: ProducerProductLineView;
 }) => {
+	if (line.effectRequirementsReady === false) return "requirements missing";
+
 	const actionLabel = readLineKind(line) === "effect" ? "activate" : "run";
 	if (line.inputItemIds.length === 0) return `tap to ${actionLabel}`;
 	if (line.inputsReady) return "input ready";
@@ -46,6 +48,7 @@ const readStatusMetaLabel = (line: ProducerProductLineView) => {
 	if (line.queueBlockedReason === "paused") return "queue paused";
 	if (line.pausedAtMs !== undefined) return "paused";
 	if (line.queueFull) return "queue full";
+	if (line.effectRequirementsReady === false) return "requirements missing";
 	if (line.effectLocked) return readLineKind(line) === "effect" ? "effect active" : "locked";
 	if (line.outputLimitBlocked) return "limit reached";
 	if (line.blocked) return "blocked by effect";
@@ -97,6 +100,7 @@ export const readProducerProductLineRunState = ({
 		line.pausedAtMs === undefined &&
 		!line.deliveryBlocked &&
 		!queueBlocked &&
+		line.effectRequirementsReady !== false &&
 		!line.effectLocked &&
 		!line.outputLimitBlocked &&
 		!line.blocked &&
@@ -134,6 +138,15 @@ export const readProducerProductLineRunState = ({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Queue full",
+			line,
+		});
+	}
+
+	if (line.effectRequirementsReady === false) {
+		return withCommonState({
+			canRunAction,
+			inputsPartiallyAvailable,
+			label: "Requirements missing",
 			line,
 		});
 	}

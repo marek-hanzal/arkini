@@ -14,6 +14,13 @@ const ProducerProductLineOutputQuantityViewSchema = z.union([
 		.strict(),
 ]);
 
+const ProducerProductLineEffectRequirementViewSchema = z
+	.object({
+		label: z.string().min(1),
+		ready: z.boolean(),
+	})
+	.strict();
+
 const ProducerProductLineOutputViewSchema = z.object({
 	itemId: IdSchema,
 	ownedQuantity: z.number().int().nonnegative(),
@@ -69,6 +76,8 @@ export const ProducerProductLineViewSchema = z.object({
 	effectDurationMultiplier: z.number().min(1).optional(),
 	effectBenefits: z.array(z.string().min(1)).optional(),
 	effectBonusLines: z.array(z.string().min(1)).optional(),
+	effectRequirementsReady: z.boolean().optional(),
+	effectRequirements: z.array(ProducerProductLineEffectRequirementViewSchema).optional(),
 	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
 	outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
 });

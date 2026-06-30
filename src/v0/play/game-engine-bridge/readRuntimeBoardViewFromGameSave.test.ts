@@ -630,6 +630,111 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
+	it("shows visible product lines with missing effect requirements", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:nearby-twig-grant": {
+					name: "Nearby Twig enables production",
+					operations: [
+						{
+							grantId: "grant:test:nearby-twig",
+							kind: "grant.add",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					radius: 1,
+					scope: "local",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:nearby-twig-grant",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					grantSelector: {
+						allOf: [
+							{
+								ids: [
+									"grant:test:nearby-twig",
+								],
+							},
+						],
+					},
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
+			{
+				effectRequirements: [
+					{
+						label: "Nearby Twig",
+						ready: false,
+					},
+				],
+				effectRequirementsReady: false,
+				productId: "product:test",
+			},
+			{
+				productId: "product:shred",
+			},
+		]);
+
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		};
+
+		const readyBoard = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(readyBoard.byId["item-instance:1"]?.activation?.productLines?.[0]).toMatchObject({
+			effectRequirements: [
+				{
+					label: "Nearby Twig",
+					ready: true,
+				},
+			],
+			effectRequirementsReady: true,
+			productId: "product:test",
+		});
+	});
+
 	it("marks producer activation danger when delivery is blocked", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -1296,6 +1401,45 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				quantityLabel: "2",
 			},
 		]);
+	});
+
+	it("does not leak hidden stash product drops or inputs", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			products: {
+				...baseConfig.products,
+				"product:stash": {
+					...baseConfig.products["product:stash"],
+					visibility: "hidden",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:stash",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
+			drops: undefined,
+			inputs: [],
+			productLines: [],
+		});
 	});
 
 	it("shows stash drop previews with probabilities", () => {

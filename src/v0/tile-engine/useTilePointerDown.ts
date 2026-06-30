@@ -1,5 +1,4 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import { cancelTileMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
 import { rectFromElement } from "~/v0/tile-engine/rect";
@@ -52,17 +51,6 @@ export const useTilePointerDown = <TTile, TDrag>({
 			resetElementTransform(element);
 			element.setPointerCapture(event.pointerId);
 
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "pointer.down",
-				detail: {
-					pointerId: event.pointerId,
-					x: event.clientX,
-					y: event.clientY,
-					source: binding.data,
-				},
-			});
-
 			dragSessionRef.current = {
 				pointerId: event.pointerId,
 				startX: event.clientX,
@@ -83,14 +71,7 @@ export const useTilePointerDown = <TTile, TDrag>({
 					}
 					session.longFired = true;
 					longTimerRef.current = null;
-					DebugTimeline.record({
-						scope: "tile-engine",
-						event: "pointer.long-activate",
-						detail: {
-							pointerId: event.pointerId,
-							source: session.source,
-						},
-					});
+
 					bindingRef.current?.onLongActivate?.();
 				}, TileEngineTiming.longPressMs);
 			}

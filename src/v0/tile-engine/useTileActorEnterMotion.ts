@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { type RefObject, useLayoutEffect } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
@@ -46,18 +45,6 @@ export const useTileActorEnterMotion = ({
 		const actorElement = actorRef.current;
 		const visualElement = readActorVisual(actorElement);
 		if (!actorElement || !visualElement) return;
-
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "motion.enter.start",
-			detail: {
-				kind,
-				tileId,
-				delayMs,
-				durationMs,
-				sequenceIndex,
-			},
-		});
 
 		const originElement =
 			fromTileId && fromTileId !== tileId ? findTileEngineActorById(fromTileId) : null;
@@ -136,14 +123,6 @@ export const useTileActorEnterMotion = ({
 			if (result.status !== "completed") return;
 			visualElement.style.opacity = "";
 			visualElement.style.transform = "";
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.enter.end",
-				detail: {
-					groupId,
-					tileId,
-				},
-			});
 		});
 
 		return () => {

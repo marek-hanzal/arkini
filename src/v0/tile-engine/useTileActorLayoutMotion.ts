@@ -1,5 +1,4 @@
 import { type RefObject, useLayoutEffect, useRef } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import {
@@ -53,18 +52,6 @@ export const useTileActorLayoutMotion = <TTile>({
 		const deltaY = previous.top - current.top;
 		if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5) return;
 
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "motion.layout.start",
-			detail: {
-				tileId: tile.id,
-				fromSlotId: previousSlotId,
-				toSlotId: tile.slotId,
-				deltaX,
-				deltaY,
-			},
-		});
-
 		void startTileTransformMotion({
 			scope: tileMotionScope(tile.id),
 			element,
@@ -80,14 +67,6 @@ export const useTileActorLayoutMotion = <TTile>({
 			},
 		}).then((result) => {
 			if (result.status !== "completed") return;
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.layout.end",
-				detail: {
-					tileId: tile.id,
-					toSlotId: tile.slotId,
-				},
-			});
 		});
 	}, [
 		actorRef,

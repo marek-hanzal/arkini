@@ -1,5 +1,4 @@
 import type { PointerEvent as ReactPointerEvent, RefObject } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { resetElementTransform } from "~/v0/tile-engine/resetElementTransform";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";
 
@@ -20,15 +19,6 @@ export const finishTileTapRelease = <TDrag>({
 	dragSessionRef,
 	handleTap,
 }: finishTileTapRelease.Props<TDrag>) => {
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "pointer.tap-release",
-		detail: {
-			pointerId: event.pointerId,
-			longFired: session.longFired,
-			source: session.source,
-		},
-	});
 	const longFired = session.longFired;
 	dragSessionRef.current = null;
 	resetElementTransform(element);

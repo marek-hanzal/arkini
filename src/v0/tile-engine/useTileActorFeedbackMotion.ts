@@ -1,5 +1,4 @@
 import { type RefObject, useLayoutEffect } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { TileEngineTiming } from "~/v0/tile-engine/TileEngineTiming";
 import type { TileFeedbackMotionSchema } from "~/v0/tile-engine/TileFeedbackMotionSchema";
 import {
@@ -37,16 +36,6 @@ export const useTileActorFeedbackMotion = ({
 		const actorElement = actorRef.current;
 		const element = readActorVisual(actorElement);
 		if (!actorElement || !element) return;
-
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "motion.feedback.start",
-			detail: {
-				groupId,
-				kind,
-				tileId,
-			},
-		});
 
 		const scope = tileFeedbackMotionScope(tileId);
 		const filterPattern = [
@@ -92,14 +81,6 @@ export const useTileActorFeedbackMotion = ({
 			if (result.status !== "completed") return;
 			element.style.filter = "";
 			element.style.transform = "";
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "motion.feedback.end",
-				detail: {
-					groupId,
-					tileId,
-				},
-			});
 		});
 
 		return () => {

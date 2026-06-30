@@ -1,5 +1,4 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
 import { createTileDropMotionId } from "~/v0/tile-engine/createTileDropMotionId";
 import { dropOutcomeAnimation } from "~/v0/tile-engine/dropOutcomeAnimation";
@@ -79,19 +78,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 
 			const releaseRect = element ? rectFromElement(element) : dragSessionRect(session);
 			const resolved = resolveDrop(releaseRect);
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "drop.resolved",
-				detail: {
-					pointerId: event.pointerId,
-					dropId: resolved?.dropId ?? null,
-					hasSlot: Boolean(resolved?.slot),
-					hasTargetTile: Boolean(resolved?.targetTile),
-					releaseRect,
-					source: session.source,
-					target: resolved?.payload ?? null,
-				},
-			});
+
 			setActiveDropId(null);
 
 			void (async () => {
@@ -114,20 +101,6 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					const kind = dropOutcomeKind(outcome);
 					const animation = dropOutcomeAnimation(outcome);
 					const commit = dropOutcomeCommit(outcome);
-					DebugTimeline.record({
-						scope: "tile-engine",
-						event: "drop.outcome",
-						detail: {
-							motionId,
-							kind,
-							animation,
-							hasCommit: Boolean(commit),
-							sourceTileId: sourceTile.id,
-							sourceSlotId: sourceTile.slotId,
-							targetTileId: resolved?.targetTile?.id,
-							targetSlotId: resolved?.slot?.id,
-						},
-					});
 
 					if (kind === "accept" && animation === "parallel-merge") {
 						if (
@@ -181,10 +154,6 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					setHandoff(null);
 					resetAfterMotion = await animateBack();
 				} catch {
-					DebugTimeline.record({
-						scope: "tile-engine",
-						event: "drop.error",
-					});
 					setHandoff(null);
 					resetAfterMotion = await animateBack();
 				} finally {

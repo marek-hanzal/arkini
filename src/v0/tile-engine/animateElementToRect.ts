@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
 import { startTileTransformMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";
@@ -32,18 +31,6 @@ export const animateElementToRect = async ({
 		target,
 	});
 
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.peer-snap.start",
-		detail: {
-			...meta,
-			fromRect,
-			targetRect: target,
-			deltaX: delta.x,
-			deltaY: delta.y,
-		},
-	});
-
 	const result = await startTileTransformMotion({
 		scope: tileMotionScope(meta.tileId ?? `peer:${meta.motionId ?? "unknown"}`),
 		element,
@@ -58,15 +45,6 @@ export const animateElementToRect = async ({
 	});
 
 	if (result.status !== "completed") return false;
-
-	DebugTimeline.record({
-		scope: "tile-engine",
-		event: "motion.peer-snap.end",
-		detail: {
-			...meta,
-			targetRect: target,
-		},
-	});
 
 	return true;
 };

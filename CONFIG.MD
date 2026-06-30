@@ -170,7 +170,7 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. B
 
 ## Effects
 
-Effect definitions are deliberately boring now: an effect only publishes one or more global grants while its source exists. The source is an item/building with `passiveEffectIds`, or a timed active producer line with `activatesEffectId`. Each effect must declare `polarity`: `buff`, `debuff`, `neutral`, or `mixed`. Runtime logic does not infer meaning from math or labels; UI groups effects by this explicit authoring truth, because guessing intent from JSON is how software gets haunted. The effect definition also decides where passive item sources count through `sourceScope`: `board`, `inventory`, or `both`; omitted means board-only. Each grant has a stable `id` used by runtime selectors and a player-readable `name` used by detail UI, so UI must not print raw grant ids unless it is a diagnostic tool.
+Effect definitions are deliberately boring now: an effect only publishes one or more global grants while its source exists. The source is an item/building with `passiveEffectIds`, or a timed active producer line with `activatesEffectId`. Each effect must declare `polarity`: `buff`, `debuff`, `neutral`, or `mixed`. Runtime logic does not infer meaning from math or labels; UI groups effects by this explicit authoring truth, because guessing intent from JSON is how software gets haunted. The effect definition also decides where passive item sources count through `sourceScope`: `board`, `inventory`, or `both`; omitted means board-only. Each grant has a stable `id` used by runtime selectors and a player-readable `name` used by detail UI, so UI must not print raw grant ids in player-facing surfaces.
 
 ```json
 {

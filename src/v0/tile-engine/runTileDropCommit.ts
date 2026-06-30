@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
 export namespace runTileDropCommit {
@@ -10,56 +9,11 @@ export namespace runTileDropCommit {
 	}
 }
 
-export const runTileDropCommit = async ({
-	motionId,
-	animation,
-	commit,
-	immediate,
-}: runTileDropCommit.Props) => {
+export const runTileDropCommit = async ({ commit }: runTileDropCommit.Props) => {
 	try {
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "drop.commit.start",
-			detail: {
-				motionId,
-				animation,
-				hasCommit: Boolean(commit),
-				...(immediate
-					? {
-							immediate,
-						}
-					: {}),
-			},
-		});
 		await commit?.();
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "drop.commit.ok",
-			detail: {
-				motionId,
-				animation,
-				...(immediate
-					? {
-							immediate,
-						}
-					: {}),
-			},
-		});
 		return true;
 	} catch {
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "drop.commit.error",
-			detail: {
-				motionId,
-				animation,
-				...(immediate
-					? {
-							immediate,
-						}
-					: {}),
-			},
-		});
 		return false;
 	}
 };

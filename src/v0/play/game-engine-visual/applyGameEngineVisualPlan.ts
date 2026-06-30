@@ -1,4 +1,3 @@
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import {
 	removeBoardTransientTilesByGroup,
@@ -39,24 +38,7 @@ export const applyGameEngineVisualPlan = ({ plan }: applyGameEngineVisualPlan.Pr
 	}
 
 	for (const [groupId, cleanupDelayMs] of Object.entries(cleanupDelayMsByGroup)) {
-		DebugTimeline.record({
-			detail: {
-				cleanupDelayMs,
-				groupId,
-			},
-			event: "game-visual-transient.register",
-			scope: "game-engine-runtime",
-		});
-
 		globalThis.setTimeout(() => {
-			DebugTimeline.record({
-				detail: {
-					cleanupDelayMs,
-					groupId,
-				},
-				event: "game-visual-transient.cleanup",
-				scope: "game-engine-runtime",
-			});
 			removeBoardTransientTilesByGroup(groupId);
 		}, cleanupDelayMs);
 	}

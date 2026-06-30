@@ -1,9 +1,8 @@
 import { match } from "ts-pattern";
-import { type FC, useCallback, useEffect, useMemo, useState } from "react";
+import { type FC, useCallback, useMemo, useState } from "react";
 import { BoardSurface } from "~/v0/board/BoardSurface";
 import { CheatInventorySheet } from "~/v0/debug/CheatInventorySheet";
 import { NukeSaveSheet } from "~/v0/debug/NukeSaveSheet";
-import { registerDebugBugReport } from "~/v0/debug/DebugBugReport";
 import { InventorySurface } from "~/v0/inventory/InventorySurface";
 import { ItemSheet } from "~/v0/item/ItemSheet";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
@@ -11,10 +10,9 @@ import { BottomSheet } from "~/v0/play/sheet/BottomSheet";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import { useFeedbackFlags } from "~/v0/play/feedback/useFeedbackFlags";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
-import { GameRuntimeProvider, useGameRuntimeStore } from "~/v0/play/runtime";
+import { GameRuntimeProvider } from "~/v0/play/runtime";
 
 const PlayShellContent: FC = () => {
-	const runtimeStore = useGameRuntimeStore();
 	const feedbackFlags = useFeedbackFlags();
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
@@ -43,29 +41,6 @@ const PlayShellContent: FC = () => {
 			feedbackFlags.pulse,
 		],
 	);
-
-	useEffect(() => {
-		registerDebugBugReport({
-			getContext: () => {
-				const runtime = runtimeStore.getSnapshot();
-				return {
-					activeSheet: activeSheet?.type,
-					lastError,
-					runtime: {
-						boardItems: Object.keys(runtime.runtime.save.board.items).length,
-						inventoryStacks:
-							runtime.runtime.save.inventory.slots.filter(Boolean).length,
-						nextWakeAtMs: runtime.runtime.nextWakeAtMs,
-						revision: runtime.revision,
-					},
-				};
-			},
-		});
-	}, [
-		activeSheet?.type,
-		lastError,
-		runtimeStore,
-	]);
 
 	const sheetContent = activeSheet
 		? match(activeSheet)

@@ -1,8 +1,6 @@
 import { type FC, useEffect } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { applyGameEngineVisualPlan } from "~/v0/play/game-engine-visual/applyGameEngineVisualPlan";
 import { createGameEngineVisualPlan } from "~/v0/play/game-engine-visual/createGameEngineVisualPlan";
-import { summarizeGameEngineVisualPlan } from "~/v0/play/game-engine-visual/summarizeGameEngineVisualPlan";
 import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 
@@ -21,16 +19,6 @@ export const GameRuntimeVisualEffects: FC<GameRuntimeVisualEffects.Props> = ({ s
 					currentInventory: readInventoryView(update.current),
 					events: update.result.events,
 					previousBoard: readBoardView(update.previous),
-				});
-
-				DebugTimeline.record({
-					detail: {
-						domainCount: update.result.events.length,
-						domainTypes: update.result.events.map((event) => event.type),
-						visualPlan: summarizeGameEngineVisualPlan(plan),
-					},
-					event: "runtime-result.visual-plan.apply",
-					scope: "game-engine-runtime",
 				});
 
 				if (

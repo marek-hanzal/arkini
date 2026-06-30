@@ -1,5 +1,4 @@
 import { type RefObject, useCallback, useRef } from "react";
-import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { dragSessionRect } from "~/v0/tile-engine/dragSessionRect";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import type { TileEngineActor } from "~/v0/tile-engine/TileEngineActor.types";
@@ -64,43 +63,11 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 
 		if (lastDropIdRef.current !== nextDropId) {
 			lastDropIdRef.current = nextDropId;
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "drop.hover",
-				detail: {
-					dropId: nextDropId,
-					source: session.source,
-					sourceTileId,
-					sourceSlotId,
-					target: resolved?.payload ?? null,
-					targetSlotId: resolved?.slot?.id,
-					targetTileId: resolved?.targetTile?.id,
-					hasSlot: Boolean(resolved?.slot),
-					hasTargetTile: Boolean(resolved?.targetTile),
-				},
-			});
 		}
 
 		if (lastFeedbackKeyRef.current !== feedbackKey) {
 			const previousFeedbackKey = lastFeedbackKeyRef.current;
 			lastFeedbackKeyRef.current = feedbackKey;
-			DebugTimeline.record({
-				scope: "tile-engine",
-				event: "drag.feedback.resolve",
-				detail: {
-					previousFeedbackKey,
-					feedbackKey,
-					dropId: nextDropId,
-					feedback: activeFeedback,
-					source: session.source,
-					sourceTileId,
-					sourceSlotId,
-					target: resolved?.payload ?? null,
-					targetSlotId: resolved?.slot?.id,
-					targetTileId: resolved?.targetTile?.id,
-					targetTileSlotId: resolved?.targetTile?.slotId,
-				},
-			});
 		}
 
 		setActiveDropId(nextDropId);

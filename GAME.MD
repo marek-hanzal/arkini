@@ -248,7 +248,7 @@ Stash consumable inputs are currently open-time inputs, not persistent stash inp
 
 Product lines own their output inline. Stashes emit through their single product line. There is no top-level loot-table indirection in the current config model. Reintroduce shared output IDs only if the same output table is intentionally reused enough to beat the extra reference hop, not because humans miss paperwork for some reason.
 
-Better output should usually be modeled as another product/building tier with its own inline output. Line-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls against already-produced same-line non-weighted output items, not for rewriting the base output table. Config validation rejects output-less, weighted-only, or no-match bonus loot effects because silent no-op bonuses are cursed confetti, not content.
+Better output should usually be modeled as another product/building tier with its own inline output. Line-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls against already-produced same-line non-weighted output items, not for rewriting the base output table. Config validation rejects output-less, weighted-only, zero-chance, or no-match bonus loot effects because silent no-op bonuses are cursed confetti, not content.
 
 ### 4.14 Blueprint
 
@@ -679,7 +679,7 @@ Runtime effect definitions publish global grant facts. They do not patch or rewr
 
 Product and craft lines own their own interpretation of those grants. A producer line asks for its effective view and gets visibility, start readiness, blockers, duration multiplier effects, and extra chance loot. Craft recipes intentionally support only start-gate effects: `grant.require` with `phase: "start"` and `grant.blockStart`. Config validation rejects producer-only duration/nearby/loot effects on craft recipes, because silent no-op config is just technical debt wearing perfume.
 
-Current line-owned effect kinds are `grant.require`, `grant.blockStart`, `nearby.require`, `nearby.duration.multiply`, `grant.duration.multiply`, and `grant.loot.extraOutputChance.add`. Nearby effects use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; grant duration and loot effects activate once their grant selector is satisfied. Extra chance loot must match at least one same-line non-weighted base output item. Modifier effects are UI bonuses, not requirement rows. Hidden missing requirements still block starts even when `display: "never"`, because display is not gameplay logic.
+Current line-owned effect kinds are `grant.require`, `grant.blockStart`, `nearby.require`, `nearby.duration.multiply`, `grant.duration.multiply`, and `grant.loot.extraOutputChance.add`. Nearby effects use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; at least one band must actually change duration. Grant duration and loot effects activate once their grant selector is satisfied. Grant duration multiplier `1`, all-neutral nearby duration bands, zero-chance bonus loot, and extra chance loot that does not match at least one same-line non-weighted base output item are rejected at config validation. Modifier effects are UI bonuses, not requirement rows. Hidden missing requirements still block starts even when `display: "never"`, because display is not gameplay logic.
 
 ### Board max count
 

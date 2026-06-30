@@ -16,7 +16,6 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	progress: 0,
 	queueFull: true,
 	blocked: false,
-	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 1,
 	readyAtMs: 1000,

@@ -407,6 +407,105 @@ describe("GameConfigSchema", () => {
 
 		expect(() => parseGameConfig(config)).toThrow(/selector must match/);
 	});
+
+	it("rejects line-owned modifier effects that would be runtime no-ops", () => {
+		const config: any = createValidConfigValue();
+		config.effects = {
+			"effect:test": {
+				polarity: "buff",
+				grantIds: [
+					"grant:test",
+				],
+				name: "Test Grant",
+			},
+		};
+		config.products["product:test"].effects = [
+			{
+				display: "whenActive",
+				kind: "grant.duration.multiply",
+				multiplier: 1,
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/no-op/);
+
+		config.products["product:test"].effects = [
+			{
+				display: "whenActive",
+				kind: "nearby.duration.multiply",
+				items: {
+					anyOf: [
+						{
+							ids: [
+								"item:twig",
+							],
+						},
+					],
+				},
+				radius: 1,
+				bands: [
+					{
+						minDistance: 0,
+						multiplier: 1,
+					},
+				],
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/non-1 multiplier/);
+	});
+
+	it("rejects zero-chance extra output effects", () => {
+		const config: any = createValidConfigValue();
+		config.effects = {
+			"effect:test": {
+				polarity: "buff",
+				grantIds: [
+					"grant:test",
+				],
+				name: "Test Grant",
+			},
+		};
+		config.products["product:test"].effects = [
+			{
+				chance: 0,
+				display: "whenActive",
+				kind: "grant.loot.extraOutputChance.add",
+				outputItems: {
+					items: {
+						anyOf: [
+							{
+								ids: [
+									"item:twig",
+								],
+							},
+						],
+					},
+				},
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Too small/);
+	});
+
 	it("rejects extra output chance effects on output-less or weighted-only lines", () => {
 		const config: any = createValidConfigValue();
 		config.effects = {

@@ -39,7 +39,6 @@ const productLine = (
 	progress: undefined,
 	queueFull: false,
 	blocked: false,
-	blockReasonEffectIds: [],
 	queuedJobs: 0,
 	queueSize: 1,
 	...overrides,

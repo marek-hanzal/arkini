@@ -63,7 +63,6 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 	progress: undefined,
 	queueFull: false,
 	blocked: false,
-	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 0,
 	...overrides,

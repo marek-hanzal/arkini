@@ -187,7 +187,7 @@ Invalid direction example:
 
 This is invalid because a normal stone chain must not become a diamond chain without an explicit geology/refining/transmutation rule.
 
-Current concrete economy balance lives in `game/arkini/products.json` and `game/arkini/craft-recipes.json`. Product lines should avoid lazy 1:1 transformations when a real process has yield or compression: one log can become multiple planks, multiple stones become one stone block, farms can produce small bonus yields, and refined/premium goods should take longer than raw collection. These ratios are authored data, not runtime heuristics.
+Current concrete economy balance lives in `game/arkini/products.json` and `game/arkini/craft-recipes.json`. Product lines should avoid lazy 1:1 transformations when a real process has yield or compression: one log can become multiple planks, multiple stones become one stone block, farms can produce small bonus yields, and refined/premium goods should take longer than raw collection. These ratios are authored data, not runtime heuristics. Blueprint-producing product lines should stay as planning/research/discovery costs and must not repeat the same expensive construction inputs that the resulting blueprint craft recipe asks for. Building materials, labor food, permits, guild charters, construction bundles, and prestige sinks belong primarily to the actual craft/construction step, so creating a plan does not double-tax the player before the build even starts.
 
 ### 4.10 Producer
 

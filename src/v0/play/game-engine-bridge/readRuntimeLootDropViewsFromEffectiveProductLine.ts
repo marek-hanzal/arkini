@@ -1,11 +1,6 @@
 import type { ActivationDropView } from "~/v0/board/view/ActivationDropViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-
-export namespace readRuntimeLootDropViewsFromGameConfig {
-	export interface Props {
-		output: NonNullable<GameConfig["products"][string]["output"]>;
-	}
-}
+import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 
 type LootOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
 type LootQuantity = NonNullable<
@@ -22,6 +17,12 @@ type WeightedLootEntry = Extract<
 		type: "weighted";
 	}
 >["entries"][number];
+
+export namespace readRuntimeLootDropViewsFromEffectiveProductLine {
+	export interface Props {
+		effectiveProductLine: EffectiveProducerProductLine;
+	}
+}
 
 const formatPercent = (value: number) => {
 	const percent = value * 100;
@@ -42,19 +43,31 @@ const readRollLabel = (rolls: LootQuantity | undefined) => {
 	return `${rolls.min}-${rolls.max} rolls`;
 };
 
-const readWeightedChanceLabel = (entry: WeightedLootEntry, totalWeight: number) => {
+const readWeightedChanceLabel = ({
+	entry,
+	probabilityMultiplier,
+	totalWeight,
+}: {
+	entry: WeightedLootEntry;
+	probabilityMultiplier: number;
+	totalWeight: number;
+}) => {
 	if (totalWeight <= 0) return "0%/roll";
-	return `${formatPercent(entry.weight / totalWeight)}/roll`;
+	return `${formatPercent(probabilityMultiplier * (entry.weight / totalWeight))}/roll`;
 };
 
-export const readRuntimeLootDropViewsFromGameConfig = ({
+const collectDropViews = ({
 	output,
-}: readRuntimeLootDropViewsFromGameConfig.Props): ActivationDropView[] =>
+	probabilityMultiplier,
+}: {
+	output: NonNullable<GameConfig["products"][string]["output"]>;
+	probabilityMultiplier: number;
+}): ActivationDropView[] =>
 	output.flatMap((entry) => {
 		if (entry.type === "guaranteed") {
 			return [
 				{
-					chanceLabel: "100%",
+					chanceLabel: formatPercent(probabilityMultiplier),
 					itemId: entry.itemId,
 					quantityLabel: readQuantityLabel(entry.quantity),
 				},
@@ -64,7 +77,7 @@ export const readRuntimeLootDropViewsFromGameConfig = ({
 		if (entry.type === "chance") {
 			return [
 				{
-					chanceLabel: formatPercent(entry.chance),
+					chanceLabel: formatPercent(probabilityMultiplier * entry.chance),
 					itemId: entry.itemId,
 					quantityLabel: readQuantityLabel(entry.quantity),
 				},
@@ -78,9 +91,44 @@ export const readRuntimeLootDropViewsFromGameConfig = ({
 		const rollLabel = readRollLabel(entry.rolls);
 
 		return entry.entries.map((weightedEntry) => ({
-			chanceLabel: readWeightedChanceLabel(weightedEntry, totalWeight),
+			chanceLabel: readWeightedChanceLabel({
+				entry: weightedEntry,
+				probabilityMultiplier,
+				totalWeight,
+			}),
 			itemId: weightedEntry.itemId,
 			quantityLabel: readQuantityLabel(weightedEntry.quantity),
 			rollLabel,
 		}));
 	});
+
+export const readRuntimeLootDropViewsFromEffectiveProductLine = ({
+	effectiveProductLine,
+}: readRuntimeLootDropViewsFromEffectiveProductLine.Props): ActivationDropView[] => {
+	const drops: ActivationDropView[] = [];
+	drops.push(
+		...collectDropViews({
+			output: effectiveProductLine.lootPlan.baseOutput,
+			probabilityMultiplier: effectiveProductLine.lootPlan.baseDropChance,
+		}),
+	);
+
+	for (const appendOutput of effectiveProductLine.lootPlan.appendOutputs) {
+		drops.push(
+			...collectDropViews({
+				output: appendOutput.output,
+				probabilityMultiplier: appendOutput.chance,
+			}),
+		);
+	}
+
+	for (const chanceItem of effectiveProductLine.lootPlan.chanceItems) {
+		drops.push({
+			chanceLabel: formatPercent(chanceItem.chance),
+			itemId: chanceItem.itemId,
+			quantityLabel: readQuantityLabel(chanceItem.quantity),
+		});
+	}
+
+	return drops;
+};

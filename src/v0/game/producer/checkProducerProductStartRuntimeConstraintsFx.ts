@@ -4,7 +4,7 @@ import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
-import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
+import { readEffectiveOutputTargetLimits } from "~/v0/game/limit/readEffectiveOutputTargetLimits";
 
 export namespace checkProducerProductStartRuntimeConstraintsFx {
 	export interface Props {
@@ -67,9 +67,9 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 		);
 	}
 
-	const blockedLimit = readOutputTargetLimits({
+	const blockedLimit = readEffectiveOutputTargetLimits({
 		config,
-		output: effectiveProductLine.lootPlan.baseOutput,
+		lootPlan: effectiveProductLine.lootPlan,
 		save,
 	}).find((limit) => limit.remainingQuantity < limit.requiredQuantity);
 

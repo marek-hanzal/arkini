@@ -6,7 +6,7 @@ import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerPr
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
-import { readRuntimeLootDropViewsFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromGameConfig";
+import { readRuntimeLootDropViewsFromEffectiveProductLine } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromEffectiveProductLine";
 import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
 import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
 
@@ -61,8 +61,8 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 
 	return {
 		deliveryBlocked,
-		drops: readRuntimeLootDropViewsFromGameConfig({
-			output: effectiveProductLine.lootPlan.baseOutput,
+		drops: readRuntimeLootDropViewsFromEffectiveProductLine({
+			effectiveProductLine,
 		}),
 		inputs: (product.inputs ?? []).map((input) =>
 			readRuntimeActivationInputView({

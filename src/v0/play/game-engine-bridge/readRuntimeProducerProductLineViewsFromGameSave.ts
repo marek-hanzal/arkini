@@ -197,7 +197,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		});
 		const targetLimits = readOutputTargetLimits({
 			config,
-			output: product.output,
+			output: effectiveProductLine.lootPlan.baseOutput,
 			save,
 		});
 

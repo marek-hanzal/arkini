@@ -37,6 +37,7 @@ export const readGameEffectItemCreateBlockReasons = ({
 		.sort((left, right) =>
 			compareGameEffectSourceInstances({
 				config,
+				distanceOrder: "closest-first",
 				left,
 				right,
 				save,

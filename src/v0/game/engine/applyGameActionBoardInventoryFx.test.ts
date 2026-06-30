@@ -622,6 +622,63 @@ describe("applyGameActionFx BoardInventory", () => {
 		expect(result.save.inventory.slots[0]).toBeNull();
 	});
 
+	it("rejects nearest inventory placement when no board cell can receive the item", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 1,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				placementMode: "nearest_by_manhattan",
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 0,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:full",
+			},
+		});
+		expect(save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+	});
+
 	it("places nearest inventory items into the first effect-allowed board cell", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

@@ -352,6 +352,30 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 					})
 				: [];
 		const allowedBoardCapacity = Math.min(boardCapacity, boardPlacementCells.length);
+		if (allowedBoardCapacity === 0) {
+			const reason =
+				boardCapacity === 0
+					? readBoardPlacementBlockReason({
+							config,
+							itemId: liveSlot.itemId,
+							save,
+						})
+					: yield* readBoardEffectPlacementBlockReasonFx({
+							config,
+							itemId: liveSlot.itemId,
+							nowMs,
+							save: saveAfterInventoryRemoval,
+							seedCell: {
+								x: action.x,
+								y: action.y,
+							},
+						});
+
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(reason, "No board placement target available."),
+			);
+		}
+
 		const inventoryCapacity = readInventoryStackCapacity({
 			itemId: liveSlot.itemId,
 			maxStackSize: itemDefinition.maxStackSize,

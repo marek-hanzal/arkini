@@ -30,6 +30,7 @@ const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: 
 			{
 				id: effectId,
 				name: effect.name,
+				polarity: effect.polarity,
 				grants: effect.grantIds.map((grantId) => ({
 					id: grantId,
 					summary: `Grants ${grantId}.`,

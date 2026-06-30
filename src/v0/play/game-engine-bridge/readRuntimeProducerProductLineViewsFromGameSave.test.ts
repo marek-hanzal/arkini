@@ -60,6 +60,7 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:missing": {
+					polarity: "neutral",
 					grantIds: [
 						"grant:test:missing",
 					],
@@ -101,6 +102,7 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:haste": {
+					polarity: "buff",
 					grantIds: [
 						"grant:test:haste",
 					],
@@ -169,5 +171,41 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			"Inventory Haste: 50% faster production.",
 			"Extra Twig: 25% chance for +1× Twig.",
 		]);
+	});
+
+	it("surfaces activated effect polarity on effect product lines", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:overdrive": {
+					polarity: "mixed",
+					grantIds: [
+						"grant:test:overdrive",
+					],
+					name: "Overdrive",
+					sourceScope: "board",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					activatesEffectId: "effect:test:overdrive",
+					output: undefined,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readTestLine({
+			config,
+			save,
+		});
+
+		expect(line.lineKind).toBe("effect");
+		expect(line.effectPolarity).toBe("mixed");
 	});
 });

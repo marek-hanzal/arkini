@@ -27,6 +27,7 @@ const readOwnedTwigGrantConfig = (
 		effects: {
 			...baseConfig.effects,
 			[effectId]: {
+				polarity: "neutral" as const,
 				grantIds: [
 					grantId,
 				],

@@ -232,6 +232,9 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			{
 				blocked: effectiveProductLine.blocked,
 				effectLocked,
+				effectPolarity: product.activatesEffectId
+					? config.effects[product.activatesEffectId]?.polarity
+					: undefined,
 				blockReasonEffectIds: effectiveProductLine.blockReasons.map(
 					(effect) => effect.effectId,
 				),

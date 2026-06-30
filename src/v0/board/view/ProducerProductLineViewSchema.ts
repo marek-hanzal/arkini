@@ -28,6 +28,13 @@ const ProducerProductLineEffectRequirementViewSchema = z
 	})
 	.strict();
 
+const EffectPolarityViewSchema = z.enum([
+	"buff",
+	"debuff",
+	"neutral",
+	"mixed",
+]);
+
 const ProducerProductLineOutputViewSchema = z.object({
 	itemId: IdSchema,
 	ownedQuantity: z.number().int().nonnegative(),
@@ -53,6 +60,7 @@ export const ProducerProductLineViewSchema = z.object({
 			"product",
 		])
 		.optional(),
+	effectPolarity: EffectPolarityViewSchema.optional(),
 	isDefault: z.boolean(),
 	durationMs: z.number().int().nonnegative(),
 	inProgress: z.boolean(),

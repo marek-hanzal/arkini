@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
+const ViewEffectPolaritySchema = z.enum([
+	"buff",
+	"debuff",
+	"neutral",
+	"mixed",
+]);
+
 const ViewItemGeneratedEffectGrantSchema = z.object({
 	id: z.string(),
 	summary: z.string(),
@@ -9,6 +16,7 @@ const ViewItemGeneratedEffectGrantSchema = z.object({
 const ViewItemGeneratedEffectSchema = z.object({
 	id: z.string().min(1),
 	name: z.string(),
+	polarity: ViewEffectPolaritySchema,
 	grants: z.array(ViewItemGeneratedEffectGrantSchema),
 	sourceScope: z.enum([
 		"board",

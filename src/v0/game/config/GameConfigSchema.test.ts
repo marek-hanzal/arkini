@@ -352,6 +352,20 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
 	});
 
+	it("rejects effects without explicit polarity", () => {
+		const config = createValidConfigValue();
+		config.effects = {
+			"effect:test": {
+				grantIds: [
+					"grant:test",
+				],
+				name: "Test Grant",
+			},
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/polarity/);
+	});
+
 	it("rejects craft effects that the craft runtime does not support", () => {
 		const config: any = createValidConfigValue();
 		config.craftRecipes["item:craft-target"].effects = [
@@ -385,6 +399,7 @@ describe("GameConfigSchema", () => {
 		const config: any = createValidConfigValue();
 		config.effects = {
 			"effect:test": {
+				polarity: "neutral",
 				grantIds: [
 					"grant:test",
 				],

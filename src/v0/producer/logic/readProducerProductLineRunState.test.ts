@@ -4,7 +4,6 @@ import { readProducerProductLineRunState } from "~/v0/producer/logic/readProduce
 
 const line = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
 	blocked: false,
-	blockReasonEffectIds: [],
 	durationMs: 1000,
 	inProgress: false,
 	inputItemIds: [],

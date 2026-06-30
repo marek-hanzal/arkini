@@ -5,7 +5,6 @@ import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLi
 
 const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
 	blocked: false,
-	blockReasonEffectIds: [],
 	durationMs: 5000,
 	inProgress: true,
 	inputItemIds: [],

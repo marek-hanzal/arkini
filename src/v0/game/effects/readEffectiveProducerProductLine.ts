@@ -4,7 +4,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { AppliedGameEffectOperation } from "~/v0/game/effects/EffectiveProducerProductLine";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
-import { doesResolvedDomainSelectorMatchId } from "~/v0/game/effects/doesResolvedDomainSelectorMatchId";
+import { doesResolvedDomainSelectorMatchId } from "~/v0/game/selector/doesResolvedDomainSelectorMatchId";
 import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/v0/game/effects/readGameWorldGrantIds";

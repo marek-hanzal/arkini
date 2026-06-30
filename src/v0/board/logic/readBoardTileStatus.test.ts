@@ -7,7 +7,6 @@ const productLine = (
 	overrides: Partial<ProducerProductLineView> = {},
 ): ProducerProductLineView => ({
 	blocked: false,
-	blockReasonEffectIds: [],
 	durationMs: 1000,
 	inProgress: false,
 	inputItemIds: [],

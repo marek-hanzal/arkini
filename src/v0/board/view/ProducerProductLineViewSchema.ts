@@ -68,7 +68,6 @@ export const ProducerProductLineViewSchema = z.object({
 	queueFull: z.boolean(),
 	blocked: z.boolean(),
 	effectLocked: z.boolean().optional(),
-	blockReasonEffectIds: z.array(IdSchema),
 	deliveryBlocked: z.boolean().optional(),
 	outputLimitBlocked: z.boolean().optional(),
 	queueBlockedReason: z

@@ -121,9 +121,7 @@ const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
 const NonNegativeNumberSchema = z.number().min(0);
 const PositiveNumberSchema = z.number().positive();
-const SignedIntegerSchema = z.number().int();
-const ProbabilitySchema = z.number().min(0).max(1);
-const ProbabilityDeltaSchema = z.number().min(-1).max(1);
+const PositiveProbabilitySchema = z.number().gt(0).max(1);
 const ActivationInputModeSchema = z.enum([
 	"exact",
 	"upTo",
@@ -329,6 +327,13 @@ const GameLineEffectPhaseSchema = z
 	])
 	.default("start");
 
+const DurationMultiplierSchema = z
+	.number()
+	.min(0)
+	.refine((value) => value !== 1, {
+		message: "Duration multiplier must change timing; 1 is a no-op.",
+	});
+
 const GameLineEffectDistanceBandSchema = z
 	.object({
 		minDistance: NonNegativeIntegerSchema.default(0),
@@ -405,7 +410,7 @@ const createGameLineEffectSchema = <
 			.object({
 				kind: z.literal("grant.duration.multiply"),
 				selector: GameGrantSelectorSchema,
-				multiplier: z.number().min(0),
+				multiplier: DurationMultiplierSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 			})
@@ -415,7 +420,7 @@ const createGameLineEffectSchema = <
 				kind: z.literal("grant.loot.extraOutputChance.add"),
 				selector: GameGrantSelectorSchema,
 				outputItems: itemSelectorSchema,
-				chance: ProbabilitySchema,
+				chance: PositiveProbabilitySchema,
 				quantity: QuantitySchema.default(1),
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
@@ -1625,6 +1630,21 @@ const validateGameLineEffects = (
 					entityIds: entities.itemIds,
 					hasEntity: entities.hasItem,
 				},
+			);
+		}
+
+		if (
+			effect.kind === "nearby.duration.multiply" &&
+			effect.bands.every((band) => band.multiplier === 1)
+		) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"bands",
+				],
+				"Nearby duration effect must contain at least one non-1 multiplier band.",
 			);
 		}
 

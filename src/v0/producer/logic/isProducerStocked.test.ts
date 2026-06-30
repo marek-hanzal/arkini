@@ -17,7 +17,6 @@ const productLine = (
 	productId: "product:test",
 	queueFull: false,
 	blocked: false,
-	blockReasonEffectIds: [],
 	queueSize: 1,
 	queuedJobs: 0,
 	...overrides,

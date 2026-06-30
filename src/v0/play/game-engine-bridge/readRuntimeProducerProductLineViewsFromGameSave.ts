@@ -237,9 +237,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				effectPolarity: product.activatesEffectId
 					? config.effects[product.activatesEffectId]?.polarity
 					: undefined,
-				blockReasonEffectIds: effectiveProductLine.blockReasons.map(
-					(effect) => effect.effectId,
-				),
 				deliveryBlocked,
 				outputLimitBlocked: readTargetLimitBlocked(targetLimits),
 				durationMs,

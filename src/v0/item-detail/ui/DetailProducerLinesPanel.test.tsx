@@ -2,8 +2,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { readDetailProducerLineControl } from "~/v1/item-detail/control/readDetailProducerLineControl";
-import { DetailProducerLinesPanel } from "~/v1/item-detail/ui/DetailProducerLinesPanel";
+import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDetailProducerLineControl";
+import { DetailProducerLinesPanel } from "~/v0/item-detail/ui/DetailProducerLinesPanel";
 
 const item = (id: string, name: string, assetSrc: string) => ({
 	assetSrc,

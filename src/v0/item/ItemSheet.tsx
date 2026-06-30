@@ -8,7 +8,7 @@ import {
 	useGameItemCatalogView,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
-import { ItemDetailSheet } from "~/v1/item-detail/ItemDetailSheet";
+import { ItemDetailSheet } from "~/v0/item-detail/ItemDetailSheet";
 
 export namespace ItemSheet {
 	export interface Props {

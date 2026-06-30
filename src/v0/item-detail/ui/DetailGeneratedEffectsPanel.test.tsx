@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { DetailGeneratedEffectsPanel } from "~/v1/item-detail/ui/DetailGeneratedEffectsPanel";
+import { DetailGeneratedEffectsPanel } from "~/v0/item-detail/ui/DetailGeneratedEffectsPanel";
 
 describe("DetailGeneratedEffectsPanel", () => {
 	it("renders authored grant names instead of raw grant ids", () => {

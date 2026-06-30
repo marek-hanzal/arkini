@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
-import { DetailCard, DetailMutedPill } from "~/v1/item-detail/ui/DetailCard";
+import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
 
 export namespace DetailHeroCard {
 	export interface Props {

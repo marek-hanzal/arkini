@@ -8,14 +8,14 @@ import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiProgressButton } from "~/v0/ui/UiProgressButton";
 import { cn } from "~/v0/ui/cn";
-import type { DetailProducerLineModel } from "~/v1/item-detail/control/DetailProducerLineModel";
-import { DetailCard, DetailMutedPill, DetailTabs } from "~/v1/item-detail/ui/DetailCard";
+import type { DetailProducerLineModel } from "~/v0/item-detail/control/DetailProducerLineModel";
+import { DetailCard, DetailMutedPill, DetailTabs } from "~/v0/item-detail/ui/DetailCard";
 import {
 	effectDetailPolarityTabs,
 	readEffectDetailPolarityClassName,
 	readEffectDetailPolarityLabel,
 	type EffectDetailPolarity,
-} from "~/v1/item-detail/ui/effectDetailPresentation";
+} from "~/v0/item-detail/ui/effectDetailPresentation";
 
 export namespace DetailProducerLinesPanel {
 	export interface Props {

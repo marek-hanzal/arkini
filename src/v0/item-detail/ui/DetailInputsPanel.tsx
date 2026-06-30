@@ -6,7 +6,7 @@ import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSch
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { cn } from "~/v0/ui/cn";
-import { DetailCard, DetailMutedPill } from "~/v1/item-detail/ui/DetailCard";
+import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
 
 export namespace DetailInputsPanel {
 	export interface Props {

@@ -2,13 +2,13 @@ import type { FC } from "react";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
-import { useItemDetailControls } from "~/v1/item-detail/control/useItemDetailControls";
-import { DetailCraftPanel } from "~/v1/item-detail/ui/DetailCraftPanel";
-import { DetailDropsPanel } from "~/v1/item-detail/ui/DetailDropsPanel";
-import { DetailGeneratedEffectsPanel } from "~/v1/item-detail/ui/DetailGeneratedEffectsPanel";
-import { DetailHeroCard } from "~/v1/item-detail/ui/DetailHeroCard";
-import { DetailInputsPanel } from "~/v1/item-detail/ui/DetailInputsPanel";
-import { DetailProducerLinesPanel } from "~/v1/item-detail/ui/DetailProducerLinesPanel";
+import { useItemDetailControls } from "~/v0/item-detail/control/useItemDetailControls";
+import { DetailCraftPanel } from "~/v0/item-detail/ui/DetailCraftPanel";
+import { DetailDropsPanel } from "~/v0/item-detail/ui/DetailDropsPanel";
+import { DetailGeneratedEffectsPanel } from "~/v0/item-detail/ui/DetailGeneratedEffectsPanel";
+import { DetailHeroCard } from "~/v0/item-detail/ui/DetailHeroCard";
+import { DetailInputsPanel } from "~/v0/item-detail/ui/DetailInputsPanel";
+import { DetailProducerLinesPanel } from "~/v0/item-detail/ui/DetailProducerLinesPanel";
 
 export namespace ItemDetailSheet {
 	export interface Props {

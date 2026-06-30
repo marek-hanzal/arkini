@@ -200,12 +200,33 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			lootPlan: effectiveProductLine.lootPlan,
 			save,
 		});
-		const effectRequirements = effectiveProductLine.requirements.filter((requirement) => {
-			if (requirement.display === "never") return false;
-			if (requirement.display === "always") return true;
-			if (requirement.display === "whenActive") return !requirement.ready;
-			return !requirement.ready;
-		});
+		const hasEffectStartRequirements = effectiveProductLine.requirements.some(
+			(requirement) =>
+				requirement.kind === "grant.require" || requirement.kind === "nearby.require",
+		);
+		const effectRequirementsReady =
+			effectiveProductLine.grantsReady === false
+				? false
+				: hasEffectStartRequirements
+					? true
+					: undefined;
+		const effectRequirements = effectiveProductLine.requirements
+			.filter((requirement) => {
+				if (requirement.display === "never") return false;
+				if (requirement.display === "always") return true;
+				if (requirement.display === "whenActive") return !requirement.ready;
+				return !requirement.ready;
+			})
+			.map((requirement) => ({
+				kind:
+					requirement.kind === "grant.require" ||
+					requirement.kind === "grant.blockStart" ||
+					requirement.kind === "nearby.require"
+						? requirement.kind
+						: undefined,
+				label: requirement.label,
+				ready: requirement.ready,
+			}));
 
 		return [
 			{
@@ -229,9 +250,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					: undefined,
 				effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,
 				effectRequirements: effectRequirements.length ? effectRequirements : undefined,
-				effectRequirementsReady: effectRequirements.length
-					? effectiveProductLine.grantsReady
-					: undefined,
+				effectRequirementsReady,
 				inProgress: jobs.length > 0,
 				inputItemIds: inputs.map((input) => input.itemId),
 				isDefault,

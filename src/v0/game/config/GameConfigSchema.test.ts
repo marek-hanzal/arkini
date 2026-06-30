@@ -352,6 +352,65 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
 	});
 
+	it("rejects craft effects that the craft runtime does not support", () => {
+		const config: any = createValidConfigValue();
+		config.craftRecipes["item:craft-target"].effects = [
+			{
+				bands: [
+					{
+						maxDistance: 1,
+						minDistance: 0,
+						multiplier: 0.5,
+					},
+				],
+				display: "whenActive",
+				items: {
+					anyOf: [
+						{
+							ids: [
+								"item:twig",
+							],
+						},
+					],
+				},
+				kind: "nearby.duration.multiply",
+				radius: 1,
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/producer product-line effect/);
+	});
+
+	it("rejects craft visibility requirements because craft targets have no line visibility", () => {
+		const config: any = createValidConfigValue();
+		config.effects = {
+			"effect:test": {
+				grantIds: [
+					"grant:test",
+				],
+				name: "Test Grant",
+			},
+		};
+		config.craftRecipes["item:craft-target"].effects = [
+			{
+				display: "never",
+				kind: "grant.require",
+				phase: "visibility",
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Craft recipe grant requirements/);
+	});
+
 	it("rejects craft results that cannot replace the board target", () => {
 		const config = createValidConfigValue();
 		setItemStorage(config, "item:plank", "inventory");

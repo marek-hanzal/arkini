@@ -268,6 +268,34 @@ describe("ItemProducerProductLinesCard", () => {
 		expect(html).toContain("Bountiful Offering: 35% chance for +1× Log.");
 	});
 
+	it("labels active block-start effects as blockers instead of missing requirements", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						blocked: true,
+						effectRequirements: [
+							{
+								kind: "grant.blockStart",
+								label: "Engineers path chosen",
+								ready: false,
+							},
+						],
+						name: "Cathedral Blueprint",
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Blocked Engineers path chosen");
+		expect(html).not.toContain("Missing Engineers path chosen");
+	});
+
 	it("keeps queued producer jobs in the action button", () => {
 		const html = renderToStaticMarkup(
 			<ItemProducerProductLinesCard

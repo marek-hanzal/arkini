@@ -16,6 +16,13 @@ const ProducerProductLineOutputQuantityViewSchema = z.union([
 
 const ProducerProductLineEffectRequirementViewSchema = z
 	.object({
+		kind: z
+			.enum([
+				"grant.blockStart",
+				"grant.require",
+				"nearby.require",
+			])
+			.optional(),
 		label: z.string().min(1),
 		ready: z.boolean(),
 	})

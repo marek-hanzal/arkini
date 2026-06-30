@@ -88,7 +88,7 @@ A product line owns its inputs and output inline:
 }
 ```
 
-`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `grantSelector` is the product-line capability gate resolved by the Effect engine; omit it when the line is always available. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
+`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product-line gates and modifiers live in the line-owned `effects` array. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence.
 
 Product input `quantity` defaults to `1`. Missing input `mode` means `exact`: the product needs and consumes exactly `quantity` items for each run. `mode: "upTo"` changes `quantity` into the per-run maximum: the product can start with at least one stored/selected input and consumes `1..quantity` for the same fixed output. Use this for sink/cleanup lines such as a purifier that can absorb up to four pollution tiles per activation without scaling the output. `capacity` still means how many items may be parked on that product input slot.
 
@@ -153,7 +153,7 @@ For the current chest implementation, depletion mode is `remove`: when the produ
 
 ## Craft recipes
 
-Craft recipes are keyed by the craft target item id, usually a blueprint item. Blueprint recipes may omit `resultItemId`; the compiler derives `producer:<suffix>` from `item:blueprint-<suffix>`. Inputs are stored through the normal DnD interaction model. Input `quantity` defaults to `1`; keep it only when the recipe needs more than one item. A blueprint recipe must not require its own blueprint item, directly or through another blueprint/building chain; `game:validate` and `game:compile` reject blueprint dependency cycles.
+Craft recipes are keyed by the craft target item id, usually a blueprint item. Blueprint recipes may omit `resultItemId`; the compiler derives `producer:<suffix>` from `item:blueprint-<suffix>`. Inputs are stored through the normal DnD interaction model. Input `quantity` defaults to `1`; keep it only when the recipe needs more than one item. Craft `effects` intentionally support only runtime start gates: `grant.require` with `phase: "start"` and `grant.blockStart`. Producer-only nearby/duration/loot effects are rejected on craft recipes so config cannot describe behavior the craft runtime silently ignores. A blueprint recipe must not require its own blueprint item, directly or through another blueprint/building chain; `game:validate` and `game:compile` reject blueprint dependency cycles.
 
 ```json
 {
@@ -168,59 +168,62 @@ Craft recipes are keyed by the craft target item id, usually a blueprint item. B
 }
 ```
 
-## Effect grants
-
-World conditions are modeled as Effect grants. A source item/building emits `grant.add`; target items, craft recipes, and product lines declare `grantSelector`. This is the only domain gate model. Consumable materials stay as `inputs`; ambient ownership, proximity, era unlocks, path locks, and local access belong to Effect grants or other Effect operations.
-
-```json
-{ "kind": "grant.add", "grantId": "grant:era:basic-buildings", "target": { "items": { "anyOf": [{ "tag": "era-1-blueprint" }] } } }
-```
-
-```json
-{ "grantSelector": { "allOf": [{ "id": "grant:era:basic-buildings" }] } }
-```
-
-A global source can unlock a whole era, while a local source can grant a nearby product line access to a tree, deposit, purifier, shrine, or whatever other tiny zoning law we invent next.
-
 ## Effects
 
-Effects are hard gameplay rules, grant sources, and runtime product-line mutators. They never mutate `GameConfig`; runtime computes an effective view for a concrete producer/product/source situation.
-
-Effect source fields:
+Effect definitions are deliberately boring now: an effect only publishes one or more global grant ids while its source exists. The source is an item/building with `passiveEffectIds`, or a timed active producer line with `activatesEffectId`. The effect definition decides where passive item sources count through `sourceScope`: `board`, `inventory`, or `both`; omitted means board-only.
 
 ```json
 {
-  "name": "Engineers path lock",
-  "scope": "global",
-  "sourceScope": "both",
-  "operations": []
+  "effects": {
+    "effect:path:engineers": {
+      "name": "Engineers path",
+      "sourceScope": "both",
+      "grantIds": ["grant:path:engineers"]
+    }
+  },
+  "items": {
+    "producer:house-of-engineers": {
+      "passiveEffectIds": ["effect:path:engineers"]
+    }
+  }
 }
 ```
 
-`sourceScope` is `board`, `inventory`, or `both`; omitted means `board`. Local effects must be board-sourced because distance needs a board cell. `duration.proximityPenalty` is local-only and multiplies duration per nearby source item; closer sources apply a stronger penalty and multiple source instances stack.
+Effects do not contain operations, targets, product-line selectors, or config patches. Product lines and craft recipes own the question “what does this grant or nearby source do to me?” in their own `effects` arrays. Centralized grants are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
 
-Operation targets use domain selectors. Product-line operations may target `producers`, `productLines`, or both; if both are present, both must match. Grant operations may target `items`, `craftRecipes`, `producers`, and `productLines`. Item creation operations target `items`. Source selectors use one vocabulary everywhere: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each authoring ref is either `{ "id": "..." }` or `{ "tag": "..." }`. Tags are authoring sugar: compile expands refs into concrete `{ "ids": [...] }` clauses while keeping the same selector shape, so runtime evaluates a boring deterministic predicate instead of doing tag archaeology in the middle of gameplay. Empty target objects are invalid, because apparently even configs need boundaries.
+Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each source ref is `{ "id": "..." }`, `{ "ids": ["..."] }`, or `{ "tag": "..." }`. Compile expands tags into deterministic runtime `{ "ids": [...] }` clauses.
 
-Supported operations:
+## Product-line effects
+
+Producer and stash product lines may declare line-owned `effects`. These are evaluated for the concrete product line at runtime and produce an effective view: visibility, start readiness, blockers, duration, and extra chance loot.
+
+Supported product-line effect kinds:
 
 ```json
-{ "kind": "line.reveal", "target": { "productLines": { "anyOf": [{ "tag": "engineers" }] } } }
-{ "kind": "line.hide", "target": { "productLines": { "anyOf": [{ "id": "product:secret" }] } } }
-{ "kind": "line.blockStart", "reason": "Wrong path.", "target": { "productLines": { "anyOf": [{ "tag": "faith" }] } } }
-{ "kind": "duration.addMs", "valueMs": 1000, "target": { "productLines": { "mode": "all" } } }
-{ "kind": "duration.multiply", "multiplier": 0.5, "target": { "productLines": { "anyOf": [{ "tag": "engineers" }] } } }
-{ "kind": "duration.proximityPenalty", "durationFactor": 0.5, "target": { "productLines": { "anyOf": [{ "id": "product:farm-t1:grain" }] } } }
-{ "kind": "loot.appendOutput", "chance": 0.2, "output": [{ "type": "guaranteed", "itemId": "item:pollution", "quantity": 1 }], "target": { "productLines": { "mode": "all" } } }
-{ "kind": "loot.replaceOutput", "output": [{ "type": "guaranteed", "itemId": "item:void-splinter", "quantity": 1 }], "target": { "productLines": { "anyOf": [{ "id": "product:test" }] } } }
-{ "kind": "loot.addChanceItem", "itemId": "item:pollution", "chance": 0.1, "quantity": 1, "target": { "productLines": { "mode": "all" } } }
-{ "kind": "loot.dropChance.add", "delta": -0.2, "target": { "productLines": { "mode": "all" } } }
-{ "kind": "loot.quantity.add", "value": 1, "target": { "productLines": { "anyOf": [{ "tag": "resource-output" }] } } }
-{ "kind": "loot.extraOutputChance.add", "chance": 0.35, "quantity": 1, "target": { "productLines": { "mode": "all" } }, "outputItems": { "items": { "anyOf": [{ "tag": "tier-1-resource" }] } } }
-{ "kind": "grant.add", "grantId": "grant:woodcutting:tree-nearby", "target": { "productLines": { "anyOf": [{ "tag": "woodcutting" }] } } }
-{ "kind": "item.blockCreate", "reason": "Counter path locked.", "target": { "items": { "anyOf": [{ "tag": "faith" }] } } }
+{ "kind": "grant.require", "phase": "start", "display": "always", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
+{ "kind": "grant.blockStart", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
+{ "kind": "nearby.require", "phase": "start", "display": "always", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 1 }
+{ "kind": "nearby.duration.multiply", "display": "whenActive", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 3, "maxSources": 5, "bands": [{ "minDistance": 0, "maxDistance": 3, "multiplier": 0.9 }] }
+{ "kind": "grant.duration.multiply", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:minor-haste" }] }, "multiplier": 0.75 }
+{ "kind": "grant.loot.extraOutputChance.add", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:bountiful-offering" }] }, "outputItems": { "items": { "anyOf": [{ "tag": "tier-1-resource" }] } }, "chance": 0.35, "quantity": 1 }
 ```
 
-`grant.add` contributes a domain capability to matching targets; targets opt into it through `grantSelector`. `line.blockStart` blocks new enqueue/start attempts. Already queued jobs keep their chance; the output can still be affected or voided by hard create rules at completion. `loot.quantity.add` increases every matched output directly, so use it sparingly unless you enjoy printing resources like a doomed central bank. `loot.extraOutputChance.add` is the safer bounty form: it targets product lines, then only adds a chance-based extra drop for produced output items matching `outputItems`. `item.blockCreate` is hard: immediate creation actions reject, delayed producer/craft/spawn outputs are discarded instead of retrying forever.
+`phase: "visibility"` hides or reveals a hidden product line based on a requirement. `phase: "start"` leaves the line visible but prevents starting it until the requirement is satisfied. `grant.blockStart` is the opposite shape: if the selector is active, the line is blocked. This is used for path exclusivity and similar “you chose the other door, genius” rules.
+
+`nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`. Grant duration and loot effects are global and only activate when the line’s selector is satisfied. Modifier effects are reported as active bonuses in UI, not as missing requirements.
+
+`display` controls only UI visibility for requirement-like rows: `always`, `whenActive`, `whenMissing`, or `never`. It must not change runtime validation. Hidden missing requirements still block starts, because otherwise the UI would be decorative nonsense with buttons attached.
+
+## Craft recipe effects
+
+Craft recipe `effects` are intentionally narrower than product-line effects. They support only start-gating semantics:
+
+```json
+{ "kind": "grant.require", "phase": "start", "display": "always", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
+{ "kind": "grant.blockStart", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
+```
+
+Craft targets do not have multiple visible product lines, output loot plans, or duration bonus summaries. Validation rejects producer-only line effects on craft recipes instead of silently pretending everything is fine like a tiny bureaucrat with a clipboard.
 
 ## Time model
 

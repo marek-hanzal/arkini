@@ -4188,496 +4188,682 @@
 	},
 	"effects": {
 		"effect:grant-owned:item-clay-deposit": {
-			"grantIds": [
-				"grant:owned:item:clay-deposit"
+			"grants": [
+				{
+					"id": "grant:owned:item:clay-deposit",
+					"name": "Owns Clay Deposit"
+				}
 			],
 			"name": "Owned Clay Deposit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-coal-deposit": {
-			"grantIds": [
-				"grant:owned:item:coal-deposit"
+			"grants": [
+				{
+					"id": "grant:owned:item:coal-deposit",
+					"name": "Owns Coal Deposit"
+				}
 			],
 			"name": "Owned Coal Deposit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-gold-deposit": {
-			"grantIds": [
-				"grant:owned:item:gold-deposit"
+			"grants": [
+				{
+					"id": "grant:owned:item:gold-deposit",
+					"name": "Owns Gold Deposit"
+				}
 			],
 			"name": "Owned Gold Deposit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-hop-field": {
-			"grantIds": [
-				"grant:owned:item:hop-field"
+			"grants": [
+				{
+					"id": "grant:owned:item:hop-field",
+					"name": "Owns Hop Field"
+				}
 			],
 			"name": "Owned Hop Field grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-iron-deposit": {
-			"grantIds": [
-				"grant:owned:item:iron-deposit"
+			"grants": [
+				{
+					"id": "grant:owned:item:iron-deposit",
+					"name": "Owns Iron Deposit"
+				}
 			],
 			"name": "Owned Iron Deposit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-marble-deposit": {
-			"grantIds": [
-				"grant:owned:item:marble-deposit"
+			"grants": [
+				{
+					"id": "grant:owned:item:marble-deposit",
+					"name": "Owns Marble Deposit"
+				}
 			],
 			"name": "Owned Marble Deposit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-sand-deposit": {
-			"grantIds": [
-				"grant:owned:item:sand-deposit"
+			"grants": [
+				{
+					"id": "grant:owned:item:sand-deposit",
+					"name": "Owns Sand Deposit"
+				}
 			],
 			"name": "Owned Sand Deposit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-vineyard": {
-			"grantIds": [
-				"grant:owned:item:vineyard"
+			"grants": [
+				{
+					"id": "grant:owned:item:vineyard",
+					"name": "Owns Vineyard"
+				}
 			],
 			"name": "Owned Vineyard grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:item-wheat-field": {
-			"grantIds": [
-				"grant:owned:item:wheat-field"
+			"grants": [
+				{
+					"id": "grant:owned:item:wheat-field",
+					"name": "Owns Wheat Field"
+				}
 			],
 			"name": "Owned Wheat Field grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-academy": {
-			"grantIds": [
-				"grant:owned:producer:academy"
+			"grants": [
+				{
+					"id": "grant:owned:producer:academy",
+					"name": "Owns Academy"
+				}
 			],
 			"name": "Owned Academy grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-armory-t1": {
-			"grantIds": [
-				"grant:owned:producer:armory-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:armory-t1",
+					"name": "Owns Armory I"
+				}
 			],
 			"name": "Owned Armory I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-bakery-t1": {
-			"grantIds": [
-				"grant:owned:producer:bakery-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:bakery-t1",
+					"name": "Owns Bakery I"
+				}
 			],
 			"name": "Owned Bakery I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-blacksmith-t1": {
-			"grantIds": [
-				"grant:owned:producer:blacksmith-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:blacksmith-t1",
+					"name": "Owns Blacksmith I"
+				}
 			],
 			"name": "Owned Blacksmith I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-brewery-t1": {
-			"grantIds": [
-				"grant:owned:producer:brewery-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:brewery-t1",
+					"name": "Owns Brewery I"
+				}
 			],
 			"name": "Owned Brewery I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-brickyard": {
-			"grantIds": [
-				"grant:owned:producer:brickyard"
+			"grants": [
+				{
+					"id": "grant:owned:producer:brickyard",
+					"name": "Owns Brickyard"
+				}
 			],
 			"name": "Owned Brickyard grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-cattle-farm-t1": {
-			"grantIds": [
-				"grant:owned:producer:cattle-farm-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:cattle-farm-t1",
+					"name": "Owns Cattle Farm I"
+				}
 			],
 			"name": "Owned Cattle Farm I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-charcoal-burner-t1": {
-			"grantIds": [
-				"grant:owned:producer:charcoal-burner-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:charcoal-burner-t1",
+					"name": "Owns Charcoal Burner I"
+				}
 			],
 			"name": "Owned Charcoal Burner I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-chicken-coop-t1": {
-			"grantIds": [
-				"grant:owned:producer:chicken-coop-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:chicken-coop-t1",
+					"name": "Owns Chicken Coop I"
+				}
 			],
 			"name": "Owned Chicken Coop I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-civic-office-t1": {
-			"grantIds": [
-				"grant:owned:producer:civic-office-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:civic-office-t1",
+					"name": "Owns Civic Office I"
+				}
 			],
 			"name": "Owned Civic Office I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-clay-pit": {
-			"grantIds": [
-				"grant:owned:producer:clay-pit"
+			"grants": [
+				{
+					"id": "grant:owned:producer:clay-pit",
+					"name": "Owns Clay Pit"
+				}
 			],
 			"name": "Owned Clay Pit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-coal-mine-t1": {
-			"grantIds": [
-				"grant:owned:producer:coal-mine-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:coal-mine-t1",
+					"name": "Owns Coal Mine I"
+				}
 			],
 			"name": "Owned Coal Mine I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-construction-yard-t1": {
-			"grantIds": [
-				"grant:owned:producer:construction-yard-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:construction-yard-t1",
+					"name": "Owns Construction Yard I"
+				}
 			],
 			"name": "Owned Construction Yard I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-cookhouse-t1": {
-			"grantIds": [
-				"grant:owned:producer:cookhouse-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:cookhouse-t1",
+					"name": "Owns Cookhouse I"
+				}
 			],
 			"name": "Owned Cookhouse I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-dairy-t1": {
-			"grantIds": [
-				"grant:owned:producer:dairy-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:dairy-t1",
+					"name": "Owns Dairy I"
+				}
 			],
 			"name": "Owned Dairy I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-dye-workshop-t1": {
-			"grantIds": [
-				"grant:owned:producer:dye-workshop-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:dye-workshop-t1",
+					"name": "Owns Dye Workshop I"
+				}
 			],
 			"name": "Owned Dye Workshop I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-farm-t1": {
-			"grantIds": [
-				"grant:owned:producer:farm-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:farm-t1",
+					"name": "Owns Farm I"
+				}
 			],
 			"name": "Owned Farm I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-glassworks": {
-			"grantIds": [
-				"grant:owned:producer:glassworks"
+			"grants": [
+				{
+					"id": "grant:owned:producer:glassworks",
+					"name": "Owns Glassworks"
+				}
 			],
 			"name": "Owned Glassworks grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-glazier-workshop-t1": {
-			"grantIds": [
-				"grant:owned:producer:glazier-workshop-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:glazier-workshop-t1",
+					"name": "Owns Glazier Workshop I"
+				}
 			],
 			"name": "Owned Glazier Workshop I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-goldsmith-t1": {
-			"grantIds": [
-				"grant:owned:producer:goldsmith-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:goldsmith-t1",
+					"name": "Owns Goldsmith I"
+				}
 			],
 			"name": "Owned Goldsmith I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-heroes-guild-t1": {
-			"grantIds": [
-				"grant:owned:producer:heroes-guild-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:heroes-guild-t1",
+					"name": "Owns Heroes Guild I"
+				}
 			],
 			"name": "Owned Heroes Guild I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t1": {
-			"grantIds": [
-				"grant:owned:producer:library-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:library-t1",
+					"name": "Owns Library I"
+				}
 			],
 			"name": "Owned Library I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t2": {
-			"grantIds": [
-				"grant:owned:producer:library-t2"
+			"grants": [
+				{
+					"id": "grant:owned:producer:library-t2",
+					"name": "Owns Library II"
+				}
 			],
 			"name": "Owned Library II grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t3": {
-			"grantIds": [
-				"grant:owned:producer:library-t3"
+			"grants": [
+				{
+					"id": "grant:owned:producer:library-t3",
+					"name": "Owns Library III"
+				}
 			],
 			"name": "Owned Library III grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-library-t4": {
-			"grantIds": [
-				"grant:owned:producer:library-t4"
+			"grants": [
+				{
+					"id": "grant:owned:producer:library-t4",
+					"name": "Owns Library IV"
+				}
 			],
 			"name": "Owned Library IV grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-lumberjack-t1": {
-			"grantIds": [
-				"grant:owned:producer:lumberjack-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:lumberjack-t1",
+					"name": "Owns Lumberjack I"
+				}
 			],
 			"name": "Owned Lumberjack I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-market-t1": {
-			"grantIds": [
-				"grant:owned:producer:market-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:market-t1",
+					"name": "Owns Market"
+				}
 			],
 			"name": "Owned Market grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-pig-farm-t1": {
-			"grantIds": [
-				"grant:owned:producer:pig-farm-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:pig-farm-t1",
+					"name": "Owns Pig Farm I"
+				}
 			],
 			"name": "Owned Pig Farm I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-purifier-t1": {
-			"grantIds": [
-				"grant:owned:producer:purifier-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:purifier-t1",
+					"name": "Owns Purifier I"
+				}
 			],
 			"name": "Owned Purifier I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-quarry-t1": {
-			"grantIds": [
-				"grant:owned:producer:quarry-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:quarry-t1",
+					"name": "Owns Quarry I"
+				}
 			],
 			"name": "Owned Quarry I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-quarry-t2": {
-			"grantIds": [
-				"grant:owned:producer:quarry-t2"
+			"grants": [
+				{
+					"id": "grant:owned:producer:quarry-t2",
+					"name": "Owns Quarry"
+				}
 			],
 			"name": "Owned Quarry grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-roof-tile-factory": {
-			"grantIds": [
-				"grant:owned:producer:roof-tile-factory"
+			"grants": [
+				{
+					"id": "grant:owned:producer:roof-tile-factory",
+					"name": "Owns Roof Tile Factory"
+				}
 			],
 			"name": "Owned Roof Tile Factory grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-sand-pit": {
-			"grantIds": [
-				"grant:owned:producer:sand-pit"
+			"grants": [
+				{
+					"id": "grant:owned:producer:sand-pit",
+					"name": "Owns Sand Pit"
+				}
 			],
 			"name": "Owned Sand Pit grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-sawmill-t1": {
-			"grantIds": [
-				"grant:owned:producer:sawmill-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:sawmill-t1",
+					"name": "Owns Sawmill I"
+				}
 			],
 			"name": "Owned Sawmill I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-sheep-pasture-t1": {
-			"grantIds": [
-				"grant:owned:producer:sheep-pasture-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:sheep-pasture-t1",
+					"name": "Owns Sheep Pasture I"
+				}
 			],
 			"name": "Owned Sheep Pasture I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-slaughterhouse-t1": {
-			"grantIds": [
-				"grant:owned:producer:slaughterhouse-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:slaughterhouse-t1",
+					"name": "Owns Slaughterhouse I"
+				}
 			],
 			"name": "Owned Slaughterhouse I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-smelter-t1": {
-			"grantIds": [
-				"grant:owned:producer:smelter-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:smelter-t1",
+					"name": "Owns Smelter I"
+				}
 			],
 			"name": "Owned Smelter I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-stonemason-t1": {
-			"grantIds": [
-				"grant:owned:producer:stonemason-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:stonemason-t1",
+					"name": "Owns Stonemason I"
+				}
 			],
 			"name": "Owned Stonemason I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-stonemason-t2": {
-			"grantIds": [
-				"grant:owned:producer:stonemason-t2"
+			"grants": [
+				{
+					"id": "grant:owned:producer:stonemason-t2",
+					"name": "Owns Stonemason"
+				}
 			],
 			"name": "Owned Stonemason grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-tailor-workshop-t1": {
-			"grantIds": [
-				"grant:owned:producer:tailor-workshop-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:tailor-workshop-t1",
+					"name": "Owns Tailor Workshop I"
+				}
 			],
 			"name": "Owned Tailor Workshop I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-tannery-t1": {
-			"grantIds": [
-				"grant:owned:producer:tannery-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:tannery-t1",
+					"name": "Owns Tannery I"
+				}
 			],
 			"name": "Owned Tannery I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-tavern-t1": {
-			"grantIds": [
-				"grant:owned:producer:tavern-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:tavern-t1",
+					"name": "Owns Tavern I"
+				}
 			],
 			"name": "Owned Tavern I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-university": {
-			"grantIds": [
-				"grant:owned:producer:university"
+			"grants": [
+				{
+					"id": "grant:owned:producer:university",
+					"name": "Owns University"
+				}
 			],
 			"name": "Owned University grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-vegetable-garden-t1": {
-			"grantIds": [
-				"grant:owned:producer:vegetable-garden-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:vegetable-garden-t1",
+					"name": "Owns Vegetable Garden I"
+				}
 			],
 			"name": "Owned Vegetable Garden I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-weaver-hut-t1": {
-			"grantIds": [
-				"grant:owned:producer:weaver-hut-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:weaver-hut-t1",
+					"name": "Owns Weaver Hut I"
+				}
 			],
 			"name": "Owned Weaver Hut I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-well-t1": {
-			"grantIds": [
-				"grant:owned:producer:well-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:well-t1",
+					"name": "Owns Well I"
+				}
 			],
 			"name": "Owned Well I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-windmill-t1": {
-			"grantIds": [
-				"grant:owned:producer:windmill-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:windmill-t1",
+					"name": "Owns Windmill I"
+				}
 			],
 			"name": "Owned Windmill I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:grant-owned:producer-winery-t1": {
-			"grantIds": [
-				"grant:owned:producer:winery-t1"
+			"grants": [
+				{
+					"id": "grant:owned:producer:winery-t1",
+					"name": "Owns Winery I"
+				}
 			],
 			"name": "Owned Winery I grant",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:path-engineers-locks-counter-keystones": {
-			"grantIds": [
-				"grant:path:engineers"
+			"grants": [
+				{
+					"id": "grant:path:engineers",
+					"name": "Engineers path chosen"
+				}
 			],
 			"name": "Engineers path locks Faith and Mages keystone plans",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:path-faith-locks-counter-keystones": {
-			"grantIds": [
-				"grant:path:faith"
+			"grants": [
+				{
+					"id": "grant:path:faith",
+					"name": "Faith path chosen"
+				}
 			],
 			"name": "Faith path locks Engineers and Mages keystone plans",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:path-mages-locks-counter-keystones": {
-			"grantIds": [
-				"grant:path:mages"
+			"grants": [
+				{
+					"id": "grant:path:mages",
+					"name": "Mages path chosen"
+				}
 			],
 			"name": "Mages path locks Engineers and Faith keystone plans",
 			"polarity": "neutral",
 			"sourceScope": "both"
 		},
 		"effect:shrine-bountiful-offering": {
-			"grantIds": [
-				"grant:active:shrine-bountiful-offering"
+			"grants": [
+				{
+					"id": "grant:active:shrine-bountiful-offering",
+					"name": "Bountiful Offering active"
+				}
 			],
 			"name": "Bountiful Offering",
 			"polarity": "buff",
 			"sourceScope": "board"
 		},
 		"effect:shrine-minor-haste": {
-			"grantIds": [
-				"grant:active:shrine-minor-haste"
+			"grants": [
+				{
+					"id": "grant:active:shrine-minor-haste",
+					"name": "Minor Haste active"
+				}
 			],
 			"name": "Minor Haste",
 			"polarity": "buff",

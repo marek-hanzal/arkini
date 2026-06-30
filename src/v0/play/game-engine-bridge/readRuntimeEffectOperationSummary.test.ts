@@ -13,7 +13,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 				effectId: "effect:shrine-minor-haste",
 			}),
 		).toEqual([
-			"Grants grant:active:shrine-minor-haste.",
+			"Minor Haste active",
 		]);
 	});
 
@@ -24,7 +24,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 				effectId: "effect:shrine-bountiful-offering",
 			}),
 		).toEqual([
-			"Grants grant:active:shrine-bountiful-offering.",
+			"Bountiful Offering active",
 		]);
 	});
 

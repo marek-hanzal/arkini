@@ -1,0 +1,133 @@
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import { DetailProducerLinesPanel } from "~/v1/item-detail/ui/DetailProducerLinesPanel";
+
+const item = (id: string, name: string, assetSrc: string) => ({
+	assetSrc,
+	description: name,
+	generatedEffects: [],
+	id,
+	maxStackSize: 99,
+	name,
+	storage: "both" as const,
+	tags: [],
+});
+
+const items: ItemCatalogView = {
+	"item:grain": item("item:grain", "Grain", "grain.svg"),
+	"item:water": item("item:water", "Water", "water.svg"),
+};
+
+const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
+	blocked: false,
+	durationMs: 5000,
+	inProgress: false,
+	inputItemIds: [],
+	inputs: [],
+	inputsAvailable: true,
+	inputsReady: true,
+	isDefault: false,
+	lineKind: "product",
+	name: "Grain",
+	producerQueuedJobs: 0,
+	productId: "product:farm:grain",
+	queueFull: false,
+	queuedJobs: 0,
+	queueSize: 1,
+	...overrides,
+});
+
+describe("DetailProducerLinesPanel", () => {
+	it("keeps product-line icons only in outputs, not duplicated in the header", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					createLine({
+						outputs: [
+							{
+								itemId: "item:grain",
+								kind: "guaranteed",
+								ownedQuantity: 7,
+								quantity: 1,
+							},
+						],
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Outputs");
+		expect(html.match(/<img[^>]+src="grain\.svg"/g)?.length).toBe(1);
+	});
+
+	it("hides fulfilled effect requirements and the parent requirement box", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					createLine({
+						effectRequirements: [
+							{
+								kind: "grant.require",
+								label: "Owns Water",
+								ready: true,
+							},
+						],
+						inputs: [
+							{
+								available: 1,
+								capacity: 1,
+								consume: true,
+								itemId: "item:water",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).not.toContain("Owns Water");
+		expect(html).not.toContain("Blocked requirements");
+		expect(html).toContain("Water");
+	});
+
+	it("shows active blockers as blocked requirements", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					createLine({
+						blocked: true,
+						effectRequirements: [
+							{
+								kind: "grant.blockStart",
+								label: "Engineers path chosen",
+								ready: false,
+							},
+						],
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Blocked requirements");
+		expect(html).toContain("Blocked by Engineers path chosen");
+	});
+});

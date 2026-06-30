@@ -59,8 +59,11 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			effects: {
 				"effect:test:missing": {
 					polarity: "neutral",
-					grantIds: [
-						"grant:test:missing",
+					grants: [
+						{
+							id: "grant:test:missing",
+							name: "Missing",
+						},
 					],
 					name: "Missing Grant",
 				},
@@ -101,15 +104,21 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			effects: {
 				"effect:test:present": {
 					polarity: "neutral",
-					grantIds: [
-						"grant:test:present",
+					grants: [
+						{
+							id: "grant:test:present",
+							name: "Present",
+						},
 					],
 					name: "Present Grant",
 				},
 				"effect:test:missing": {
 					polarity: "neutral",
-					grantIds: [
-						"grant:test:missing",
+					grants: [
+						{
+							id: "grant:test:missing",
+							name: "Missing",
+						},
 					],
 					name: "Missing Grant",
 				},
@@ -195,8 +204,11 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			effects: {
 				"effect:test:haste": {
 					polarity: "buff",
-					grantIds: [
-						"grant:test:haste",
+					grants: [
+						{
+							id: "grant:test:haste",
+							name: "Haste",
+						},
 					],
 					name: "Haste Grant",
 					sourceScope: "inventory",
@@ -271,8 +283,11 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			effects: {
 				"effect:test:overdrive": {
 					polarity: "mixed",
-					grantIds: [
-						"grant:test:overdrive",
+					grants: [
+						{
+							id: "grant:test:overdrive",
+							name: "Overdrive",
+						},
 					],
 					name: "Overdrive",
 					sourceScope: "board",

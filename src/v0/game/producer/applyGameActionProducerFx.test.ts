@@ -28,8 +28,11 @@ const readOwnedTwigGrantConfig = (
 			...baseConfig.effects,
 			[effectId]: {
 				polarity: "neutral" as const,
-				grantIds: [
-					grantId,
+				grants: [
+					{
+						id: grantId,
+						name: "Test grant",
+					},
 				],
 				name: "Owned Twig Grant",
 				sourceScope: "both" as const,

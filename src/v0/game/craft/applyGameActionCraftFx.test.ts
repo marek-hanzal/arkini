@@ -115,8 +115,11 @@ describe("applyGameActionFx Craft", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:blocker": {
-					grantIds: [
-						"grant:test:blocker",
+					grants: [
+						{
+							id: "grant:test:blocker",
+							name: "Blocker",
+						},
 					],
 					name: "Craft Blocker",
 					polarity: "debuff",
@@ -203,8 +206,11 @@ describe("applyGameActionFx Craft", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:blocker": {
-					grantIds: [
-						"grant:test:blocker",
+					grants: [
+						{
+							id: "grant:test:blocker",
+							name: "Blocker",
+						},
 					],
 					name: "Craft Blocker",
 					polarity: "debuff",

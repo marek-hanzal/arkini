@@ -356,8 +356,11 @@ describe("GameConfigSchema", () => {
 		const config = createValidConfigValue();
 		config.effects = {
 			"effect:test": {
-				grantIds: [
-					"grant:test",
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test",
+					},
 				],
 				name: "Test Grant",
 			},
@@ -371,8 +374,11 @@ describe("GameConfigSchema", () => {
 		config.effects = {
 			"effect:test": {
 				polarity: "buff",
-				grantIds: [
-					"grant:test",
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test",
+					},
 				],
 				name: "Test Grant",
 			},
@@ -413,8 +419,11 @@ describe("GameConfigSchema", () => {
 		config.effects = {
 			"effect:test": {
 				polarity: "buff",
-				grantIds: [
-					"grant:test",
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test",
+					},
 				],
 				name: "Test Grant",
 			},
@@ -469,8 +478,11 @@ describe("GameConfigSchema", () => {
 		config.effects = {
 			"effect:test": {
 				polarity: "buff",
-				grantIds: [
-					"grant:test",
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test",
+					},
 				],
 				name: "Test Grant",
 			},
@@ -511,8 +523,11 @@ describe("GameConfigSchema", () => {
 		config.effects = {
 			"effect:test": {
 				polarity: "buff",
-				grantIds: [
-					"grant:test",
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test",
+					},
 				],
 				name: "Test Grant",
 			},
@@ -594,8 +609,11 @@ describe("GameConfigSchema", () => {
 		config.effects = {
 			"effect:test": {
 				polarity: "neutral",
-				grantIds: [
-					"grant:test",
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test",
+					},
 				],
 				name: "Test Grant",
 			},

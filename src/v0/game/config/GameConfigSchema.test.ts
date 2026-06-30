@@ -798,6 +798,267 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint A/);
 	});
 
+	it("rejects producer progression that is cross-locked behind another future producer", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:blueprint-a"] = {
+			assetId: "asset:item",
+			description: "Blueprint A",
+			maxStackSize: 1,
+			name: "Blueprint A",
+			tags: [
+				"blueprint",
+			],
+			tier: 0,
+		};
+		config.items["item:blueprint-b"] = {
+			assetId: "asset:item",
+			description: "Blueprint B",
+			maxStackSize: 1,
+			name: "Blueprint B",
+			tags: [
+				"blueprint",
+			],
+			tier: 0,
+		};
+		config.items["item:a-part"] = {
+			assetId: "asset:item",
+			description: "Part A",
+			maxStackSize: 1,
+			name: "Part A",
+			tags: [],
+			tier: 1,
+		};
+		config.items["item:b-part"] = {
+			assetId: "asset:item",
+			description: "Part B",
+			maxStackSize: 1,
+			name: "Part B",
+			tags: [],
+			tier: 1,
+		};
+		config.items["producer:a"] = {
+			assetId: "asset:item",
+			description: "Producer A",
+			maxStackSize: 1,
+			name: "Producer A",
+			tags: [
+				"producer",
+			],
+			tier: 1,
+		};
+		config.items["producer:b"] = {
+			assetId: "asset:item",
+			description: "Producer B",
+			maxStackSize: 1,
+			name: "Producer B",
+			tags: [
+				"producer",
+			],
+			tier: 1,
+		};
+		config.products["product:blueprint-a"] = {
+			durationMs: 1000,
+			name: "Blueprint A",
+			output: [
+				{
+					itemId: "item:blueprint-a",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		};
+		config.products["product:blueprint-b"] = {
+			durationMs: 1000,
+			name: "Blueprint B",
+			output: [
+				{
+					itemId: "item:blueprint-b",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		};
+		config.producers["item:producer"].productIds.push(
+			"product:blueprint-a",
+			"product:blueprint-b",
+		);
+		config.craftRecipes["item:blueprint-a"] = {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "item:b-part",
+					quantity: 1,
+				},
+			],
+			resultItemId: "producer:a",
+		};
+		config.craftRecipes["item:blueprint-b"] = {
+			durationMs: 1000,
+			inputs: [
+				{
+					consume: true,
+					itemId: "item:a-part",
+					quantity: 1,
+				},
+			],
+			resultItemId: "producer:b",
+		};
+		config.products["product:a-part"] = {
+			durationMs: 1000,
+			name: "Part A",
+			output: [
+				{
+					itemId: "item:a-part",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		};
+		config.products["product:b-part"] = {
+			durationMs: 1000,
+			name: "Part B",
+			output: [
+				{
+					itemId: "item:b-part",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		};
+		config.producers["producer:a"] = {
+			maxQueueSize: 1,
+			productIds: [
+				"product:a-part",
+			],
+		};
+		config.producers["producer:b"] = {
+			maxQueueSize: 1,
+			productIds: [
+				"product:b-part",
+			],
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/Soft-lock risk.*producer:a.*item:b-part/s);
+	});
+
+	it("rejects progression grant requirements that no item or product can provide", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:producer"].tags = [
+			"producer",
+		];
+		config.effects = {
+			"effect:test": {
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test Grant",
+					},
+				],
+				name: "Test Effect",
+				polarity: "neutral",
+			},
+		};
+		config.products["product:test"].effects = [
+			{
+				display: "whenMissing",
+				kind: "grant.require",
+				phase: "start",
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/can never be satisfied/);
+	});
+
+	it("rejects line effects that require and block the same grant", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:producer"].tags = [
+			"producer",
+		];
+		config.effects = {
+			"effect:test": {
+				grants: [
+					{
+						id: "grant:test",
+						name: "Test Grant",
+					},
+				],
+				name: "Test Effect",
+				polarity: "neutral",
+			},
+		};
+		config.items["item:twig"].passiveEffectIds = [
+			"effect:test",
+		];
+		config.products["product:test"].effects = [
+			{
+				display: "whenMissing",
+				kind: "grant.require",
+				phase: "start",
+				selector: {
+					allOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+			{
+				display: "whenActive",
+				kind: "grant.blockStart",
+				selector: {
+					anyOf: [
+						{
+							ids: [
+								"grant:test",
+							],
+						},
+					],
+				},
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/requires and blocks the same/);
+	});
+
+	it("rejects nearby requirements that only match inventory-only items", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:producer"].tags = [
+			"producer",
+		];
+		config.items["item:twig"].storage = "inventory";
+		config.products["product:test"].effects = [
+			{
+				display: "always",
+				items: {
+					anyOf: [
+						{
+							ids: [
+								"item:twig",
+							],
+						},
+					],
+				},
+				kind: "nearby.require",
+				phase: "start",
+				radius: 1,
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/matches no board-placeable item/);
+	});
+
 	it("keeps structural checks for queue size and non-empty inline output", () => {
 		const config = createValidConfigValue();
 		config.producers["item:producer"].maxQueueSize = 0;

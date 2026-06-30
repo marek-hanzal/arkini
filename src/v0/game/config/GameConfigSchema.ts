@@ -1138,6 +1138,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 
 	validateProductLineOwnership(ctx, value);
 	validateBlueprintDependencyCycles(ctx, value);
+	validateGameplaySoftLockRisks(ctx, value);
 	if (value.startingState.inventory.length > value.game.inventory.slots) {
 		addIssue(
 			ctx,
@@ -2339,6 +2340,857 @@ const readBlueprintItemDisplayName = (
 	config: z.infer<typeof BaseGameConfigSchema>,
 	itemId: string,
 ) => config.items[itemId]?.name ?? itemId;
+
+type GameplayReachableEntityKind = "grant" | "item";
+
+type GameplayRequirement =
+	| {
+			itemId: string;
+			kind: "item";
+			path: GameConfigIssuePath;
+	  }
+	| {
+			kind: "grantSelector";
+			path: GameConfigIssuePath;
+			selector: z.infer<typeof GameGrantSelectorSchema>;
+	  }
+	| {
+			kind: "nearbyItemSelector";
+			path: GameConfigIssuePath;
+			selector: z.infer<typeof ResolvedDomainSelectorSchema>;
+	  };
+
+type GameplaySource = {
+	label: string;
+	path: GameConfigIssuePath;
+	requirements: GameplayRequirement[];
+	sourceId: string;
+	targetId: string;
+	targetKind: GameplayReachableEntityKind;
+};
+
+type GameplayReachability = {
+	reachableGrantIds: Set<string>;
+	reachableItemIds: Set<string>;
+};
+
+const validateGameplaySoftLockRisks = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+) => {
+	const sources = createGameplaySources(config);
+	const reachability = readGameplayReachability(config, sources);
+
+	validateNearbyRequirementsHaveBoardSource(ctx, config);
+	validateGrantRequirementsHavePossibleSource(ctx, config, sources);
+	validateGrantRequirementBlockerContradictions(ctx, config);
+	validateProducerGameplayReachability(ctx, config, sources, reachability);
+};
+
+const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => {
+	const sources: GameplaySource[] = [];
+	const productOwnerByProductId = readProductOwnerByProductId(config);
+	const addItemSource = ({
+		label,
+		path,
+		requirements,
+		sourceId,
+		targetId,
+	}: {
+		label: string;
+		path: GameConfigIssuePath;
+		requirements: GameplayRequirement[];
+		sourceId: string;
+		targetId: string;
+	}) => {
+		sources.push({
+			label,
+			path,
+			requirements,
+			sourceId,
+			targetId,
+			targetKind: "item",
+		});
+	};
+	const addGrantSource = ({
+		label,
+		path,
+		requirements,
+		sourceId,
+		targetId,
+	}: {
+		label: string;
+		path: GameConfigIssuePath;
+		requirements: GameplayRequirement[];
+		sourceId: string;
+		targetId: string;
+	}) => {
+		sources.push({
+			label,
+			path,
+			requirements,
+			sourceId,
+			targetId,
+			targetKind: "grant",
+		});
+	};
+
+	for (const [index, entry] of config.startingState.board.entries()) {
+		addItemSource({
+			label: `starting board slot ${index}`,
+			path: [
+				"startingState",
+				"board",
+				index,
+				"itemId",
+			],
+			requirements: [],
+			sourceId: `starting:board:${index}:${entry.itemId}`,
+			targetId: entry.itemId,
+		});
+	}
+
+	for (const [index, entry] of config.startingState.inventory.entries()) {
+		addItemSource({
+			label: `starting inventory stack ${index}`,
+			path: [
+				"startingState",
+				"inventory",
+				index,
+				"itemId",
+			],
+			requirements: [],
+			sourceId: `starting:inventory:${index}:${entry.itemId}`,
+			targetId: entry.itemId,
+		});
+	}
+
+	for (const [itemId, item] of Object.entries(config.items)) {
+		for (const [effectIndex, effectId] of (item.passiveEffectIds ?? []).entries()) {
+			const effect = config.effects[effectId];
+			if (!effect) continue;
+
+			for (const grant of effect.grants) {
+				addGrantSource({
+					label: `passive effect "${effectId}" on ${formatItemLabel(config, itemId)}`,
+					path: [
+						"items",
+						itemId,
+						"passiveEffectIds",
+						effectIndex,
+					],
+					requirements: [
+						createItemRequirement({
+							itemId,
+							path: [
+								"items",
+								itemId,
+							],
+						}),
+					],
+					sourceId: `passive:${itemId}:${effectId}:${grant.id}`,
+					targetId: grant.id,
+				});
+			}
+		}
+
+		for (const [mergeIndex, mergeId] of (item.mergeIds ?? []).entries()) {
+			const merge = config.merge[mergeId];
+			if (!merge) continue;
+
+			addItemSource({
+				label: `merge "${mergeId}" from ${formatItemLabel(config, itemId)}`,
+				path: [
+					"items",
+					itemId,
+					"mergeIds",
+					mergeIndex,
+				],
+				requirements: [
+					createItemRequirement({
+						itemId,
+						path: [
+							"items",
+							itemId,
+							"mergeIds",
+							mergeIndex,
+						],
+					}),
+					createItemRequirement({
+						itemId: merge.withItemId,
+						path: [
+							"merge",
+							mergeId,
+							"withItemId",
+						],
+					}),
+				],
+				sourceId: `merge:${itemId}:${mergeId}`,
+				targetId: merge.resultItemId,
+			});
+		}
+	}
+
+	for (const [craftRecipeId, recipe] of Object.entries(config.craftRecipes)) {
+		addItemSource({
+			label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
+			path: [
+				"craftRecipes",
+				craftRecipeId,
+			],
+			requirements: [
+				createItemRequirement({
+					itemId: craftRecipeId,
+					path: [
+						"craftRecipes",
+						craftRecipeId,
+					],
+				}),
+				...recipe.inputs.map((input, inputIndex) =>
+					createItemRequirement({
+						itemId: input.itemId,
+						path: [
+							"craftRecipes",
+							craftRecipeId,
+							"inputs",
+							inputIndex,
+							"itemId",
+						],
+					}),
+				),
+				...readLineEffectGameplayRequirements({
+					lineEffects: recipe.effects ?? [],
+					path: [
+						"craftRecipes",
+						craftRecipeId,
+						"effects",
+					],
+				}),
+			],
+			sourceId: `craft:${craftRecipeId}`,
+			targetId: recipe.resultItemId,
+		});
+	}
+
+	for (const [productId, product] of Object.entries(config.products)) {
+		const owner = productOwnerByProductId.get(productId);
+		if (!owner) continue;
+
+		const productRequirements: GameplayRequirement[] = [
+			createItemRequirement({
+				itemId: owner.capabilityId,
+				path: [
+					owner.section,
+					owner.capabilityId,
+					"productIds",
+					owner.productIndex,
+				],
+			}),
+			...(product.inputs ?? []).map((input, inputIndex) =>
+				createItemRequirement({
+					itemId: input.itemId,
+					path: [
+						"products",
+						productId,
+						"inputs",
+						inputIndex,
+						"itemId",
+					],
+				}),
+			),
+			...readLineEffectGameplayRequirements({
+				lineEffects: product.effects ?? [],
+				path: [
+					"products",
+					productId,
+					"effects",
+				],
+			}),
+		];
+
+		for (const outputItemId of readActivationOutputItemIds(product.output ?? [])) {
+			addItemSource({
+				label: `product "${productId}" (${product.name})`,
+				path: [
+					"products",
+					productId,
+				],
+				requirements: productRequirements,
+				sourceId: `product:${productId}:output:${outputItemId}`,
+				targetId: outputItemId,
+			});
+		}
+
+		if (!product.activatesEffectId) continue;
+
+		const effect = config.effects[product.activatesEffectId];
+		if (!effect) continue;
+
+		for (const grant of effect.grants) {
+			addGrantSource({
+				label: `active effect product "${productId}" (${product.name})`,
+				path: [
+					"products",
+					productId,
+					"activatesEffectId",
+				],
+				requirements: productRequirements,
+				sourceId: `product:${productId}:active:${product.activatesEffectId}:${grant.id}`,
+				targetId: grant.id,
+			});
+		}
+	}
+
+	return sources;
+};
+
+const readGameplayReachability = (
+	config: z.infer<typeof BaseGameConfigSchema>,
+	sources: readonly GameplaySource[],
+): GameplayReachability => {
+	const reachableItemIds = new Set<string>();
+	const reachableGrantIds = new Set<string>();
+	const appliedSourceIds = new Set<string>();
+	let changed = true;
+
+	while (changed) {
+		changed = false;
+
+		for (const source of sources) {
+			if (appliedSourceIds.has(source.sourceId)) continue;
+			if (
+				!source.requirements.every((requirement) =>
+					isGameplayRequirementSatisfied({
+						config,
+						reachableGrantIds,
+						reachableItemIds,
+						requirement,
+					}),
+				)
+			) {
+				continue;
+			}
+
+			appliedSourceIds.add(source.sourceId);
+
+			if (source.targetKind === "item") {
+				if (!reachableItemIds.has(source.targetId)) {
+					reachableItemIds.add(source.targetId);
+					changed = true;
+				}
+				continue;
+			}
+
+			if (!reachableGrantIds.has(source.targetId)) {
+				reachableGrantIds.add(source.targetId);
+				changed = true;
+			}
+		}
+	}
+
+	return {
+		reachableGrantIds,
+		reachableItemIds,
+	};
+};
+
+const validateProducerGameplayReachability = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+	sources: readonly GameplaySource[],
+	reachability: GameplayReachability,
+) => {
+	for (const producerId of Object.keys(config.producers).sort()) {
+		if (!isGameplayProgressionProducer(config, producerId)) continue;
+		if (reachability.reachableItemIds.has(producerId)) continue;
+
+		addIssue(
+			ctx,
+			[
+				"producers",
+				producerId,
+			],
+			formatUnreachableGameplayTargetMessage({
+				config,
+				reachability,
+				sources,
+				targetId: producerId,
+				targetKind: "item",
+				targetLabel: `producer ${formatItemLabel(config, producerId)}`,
+			}),
+		);
+	}
+};
+
+const isGameplayProgressionProducer = (
+	config: z.infer<typeof BaseGameConfigSchema>,
+	producerId: string,
+) => {
+	const item = config.items[producerId];
+	return producerId.startsWith("producer:") || item?.tags.includes("producer") === true;
+};
+
+const validateNearbyRequirementsHaveBoardSource = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+) => {
+	for (const usage of readLineEffectUsages(config).filter((usage) => usage.enforceSoftLock)) {
+		for (const [effectIndex, lineEffect] of usage.lineEffects.entries()) {
+			if (lineEffect.kind !== "nearby.require") continue;
+
+			const matchingBoardItemIds = readSelectorMatchingIds({
+				entityIds: Object.keys(config.items),
+				selector: lineEffect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+			}).filter((itemId) => config.items[itemId]?.storage !== "inventory");
+
+			if (matchingBoardItemIds.length > 0) continue;
+
+			addIssue(
+				ctx,
+				[
+					...usage.path,
+					effectIndex,
+					"items",
+				],
+				`Soft-lock risk: nearby requirement on ${usage.label} cannot be satisfied because its selector matches no board-placeable item. Selector: ${formatItemSelector(config, lineEffect.items as z.infer<typeof ResolvedDomainSelectorSchema>)}.`,
+			);
+		}
+	}
+};
+
+const validateGrantRequirementsHavePossibleSource = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+	sources: readonly GameplaySource[],
+) => {
+	const possibleGrantIds = new Set(
+		sources.filter((source) => source.targetKind === "grant").map((source) => source.targetId),
+	);
+
+	for (const usage of readLineEffectUsages(config).filter((usage) => usage.enforceSoftLock)) {
+		for (const [effectIndex, lineEffect] of usage.lineEffects.entries()) {
+			if (lineEffect.kind !== "grant.require") continue;
+			if (doesGameGrantSelectorMatchIdsLocal(possibleGrantIds, lineEffect.selector)) continue;
+
+			addIssue(
+				ctx,
+				[
+					...usage.path,
+					effectIndex,
+					"selector",
+				],
+				`Soft-lock risk: grant requirement on ${usage.label} can never be satisfied because no passive item or active product can provide ${formatGrantSelector(config, lineEffect.selector)}.`,
+			);
+		}
+	}
+};
+
+const validateGrantRequirementBlockerContradictions = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+) => {
+	for (const usage of readLineEffectUsages(config).filter((usage) => usage.enforceSoftLock)) {
+		const lineEffects = usage.lineEffects;
+		const blockers = lineEffects
+			.map((lineEffect, effectIndex) => ({
+				effectIndex,
+				lineEffect,
+			}))
+			.filter(
+				(
+					entry,
+				): entry is {
+					effectIndex: number;
+					lineEffect: Extract<
+						z.infer<typeof GameLineEffectSchema>,
+						{
+							kind: "grant.blockStart";
+						}
+					>;
+				} => entry.lineEffect.kind === "grant.blockStart",
+			);
+
+		if (blockers.length === 0) continue;
+
+		for (const [effectIndex, lineEffect] of lineEffects.entries()) {
+			if (lineEffect.kind !== "grant.require") continue;
+			const requiredGrantIds = readMandatoryGrantIds(lineEffect.selector);
+			if (requiredGrantIds.size === 0) continue;
+
+			for (const blocker of blockers) {
+				if (
+					!doesGameGrantSelectorMatchIdsLocal(
+						requiredGrantIds,
+						blocker.lineEffect.selector,
+					)
+				) {
+					continue;
+				}
+
+				addIssue(
+					ctx,
+					[
+						...usage.path,
+						effectIndex,
+						"selector",
+					],
+					`Soft-lock risk: ${usage.label} requires and blocks the same mandatory grant set. Required ${formatGrantSelector(config, lineEffect.selector)} conflicts with blocker ${formatGrantSelector(config, blocker.lineEffect.selector)} at ${formatIssuePath(
+						[
+							...usage.path,
+							blocker.effectIndex,
+							"selector",
+						],
+					)}.`,
+				);
+			}
+		}
+	}
+};
+
+const readLineEffectUsages = (config: z.infer<typeof BaseGameConfigSchema>) => {
+	const productOwnerByProductId = readProductOwnerByProductId(config);
+
+	return [
+		...Object.entries(config.products).map(([productId, product]) => {
+			const owner = productOwnerByProductId.get(productId);
+
+			return {
+				enforceSoftLock:
+					owner !== undefined &&
+					isGameplayProgressionProducer(config, owner.capabilityId),
+				label: `product "${productId}" (${product.name})`,
+				lineEffects: product.effects ?? [],
+				path: [
+					"products",
+					productId,
+					"effects",
+				] satisfies GameConfigIssuePath,
+			};
+		}),
+		...Object.entries(config.craftRecipes).map(([craftRecipeId, recipe]) => ({
+			enforceSoftLock: isGameplayProgressionProducer(config, recipe.resultItemId),
+			label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
+			lineEffects: recipe.effects ?? [],
+			path: [
+				"craftRecipes",
+				craftRecipeId,
+				"effects",
+			] satisfies GameConfigIssuePath,
+		})),
+	];
+};
+
+const readLineEffectGameplayRequirements = ({
+	lineEffects,
+	path,
+}: {
+	lineEffects: readonly z.infer<typeof GameLineEffectSchema>[];
+	path: GameConfigIssuePath;
+}) => {
+	const requirements: GameplayRequirement[] = [];
+
+	for (const [effectIndex, lineEffect] of lineEffects.entries()) {
+		if (lineEffect.kind === "grant.require") {
+			requirements.push({
+				kind: "grantSelector",
+				path: [
+					...path,
+					effectIndex,
+					"selector",
+				],
+				selector: lineEffect.selector,
+			});
+		}
+
+		if (lineEffect.kind === "nearby.require") {
+			requirements.push({
+				kind: "nearbyItemSelector",
+				path: [
+					...path,
+					effectIndex,
+					"items",
+				],
+				selector: lineEffect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+			});
+		}
+	}
+
+	return requirements;
+};
+
+const createItemRequirement = ({
+	itemId,
+	path,
+}: {
+	itemId: string;
+	path: GameConfigIssuePath;
+}): GameplayRequirement => ({
+	itemId,
+	kind: "item",
+	path,
+});
+
+const isGameplayRequirementSatisfied = ({
+	config,
+	reachableGrantIds,
+	reachableItemIds,
+	requirement,
+}: {
+	config: z.infer<typeof BaseGameConfigSchema>;
+	reachableGrantIds: ReadonlySet<string>;
+	reachableItemIds: ReadonlySet<string>;
+	requirement: GameplayRequirement;
+}) => {
+	if (requirement.kind === "item") {
+		return reachableItemIds.has(requirement.itemId);
+	}
+
+	if (requirement.kind === "grantSelector") {
+		return doesGameGrantSelectorMatchIdsLocal(reachableGrantIds, requirement.selector);
+	}
+
+	return doesItemSelectorMatchReachableBoardItem({
+		config,
+		reachableItemIds,
+		selector: requirement.selector,
+	});
+};
+
+const doesItemSelectorMatchReachableBoardItem = ({
+	config,
+	reachableItemIds,
+	selector,
+}: {
+	config: z.infer<typeof BaseGameConfigSchema>;
+	reachableItemIds: ReadonlySet<string>;
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
+}) =>
+	Object.keys(config.items).some(
+		(itemId) =>
+			reachableItemIds.has(itemId) &&
+			config.items[itemId]?.storage !== "inventory" &&
+			doesResolvedDomainSelectorMatchId({
+				entityId: itemId,
+				selector,
+			}),
+	);
+
+const doesGameGrantSelectorMatchIdsLocal = (
+	grantIds: ReadonlySet<string>,
+	selector: z.infer<typeof GameGrantSelectorSchema>,
+) => {
+	if ("mode" in selector) return true;
+
+	if (selector.anyOf && !selector.anyOf.some((clause) => hasAnyGrantId(grantIds, clause.ids))) {
+		return false;
+	}
+	if (selector.allOf && !selector.allOf.every((clause) => hasAnyGrantId(grantIds, clause.ids))) {
+		return false;
+	}
+	if (selector.noneOf?.some((clause) => hasAnyGrantId(grantIds, clause.ids))) {
+		return false;
+	}
+
+	return true;
+};
+
+const hasAnyGrantId = (grantIds: ReadonlySet<string>, ids: readonly string[]) =>
+	ids.some((id) => grantIds.has(id));
+
+const readMandatoryGrantIds = (selector: z.infer<typeof GameGrantSelectorSchema>) => {
+	const grantIds = new Set<string>();
+	if ("mode" in selector) return grantIds;
+
+	for (const clause of selector.allOf ?? []) {
+		if (clause.ids.length === 1) {
+			grantIds.add(clause.ids[0] ?? "");
+		}
+	}
+
+	return new Set(
+		[
+			...grantIds,
+		].filter(Boolean),
+	);
+};
+
+const readActivationOutputItemIds = (output: z.infer<typeof ActivationOutputSchema>) =>
+	output.flatMap((entry) => {
+		if (entry.type === "weighted") {
+			return entry.entries.map((weightedEntry) => weightedEntry.itemId);
+		}
+
+		return [
+			entry.itemId,
+		];
+	});
+
+const readSelectorMatchingIds = ({
+	entityIds,
+	selector,
+}: {
+	entityIds: readonly string[];
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
+}) =>
+	entityIds.filter((entityId) =>
+		doesResolvedDomainSelectorMatchId({
+			entityId,
+			selector,
+		}),
+	);
+
+const formatUnreachableGameplayTargetMessage = ({
+	config,
+	reachability,
+	sources,
+	targetId,
+	targetKind,
+	targetLabel,
+}: {
+	config: z.infer<typeof BaseGameConfigSchema>;
+	reachability: GameplayReachability;
+	sources: readonly GameplaySource[];
+	targetId: string;
+	targetKind: GameplayReachableEntityKind;
+	targetLabel: string;
+}) => {
+	const targetSources = sources.filter(
+		(source) => source.targetKind === targetKind && source.targetId === targetId,
+	);
+
+	if (targetSources.length === 0) {
+		return `Soft-lock risk: ${targetLabel} is not reachable from startingState. No starting entry, merge, craft recipe, product output, passive effect, or active effect can create it.`;
+	}
+
+	const closestSource = [
+		...targetSources,
+	].sort(
+		(left, right) =>
+			readMissingGameplayRequirements({
+				config,
+				reachability,
+				requirements: left.requirements,
+			}).length -
+			readMissingGameplayRequirements({
+				config,
+				reachability,
+				requirements: right.requirements,
+			}).length,
+	)[0];
+
+	const missingRequirements = closestSource
+		? readMissingGameplayRequirements({
+				config,
+				reachability,
+				requirements: closestSource.requirements,
+			})
+		: [];
+	const missingLabel =
+		missingRequirements.length > 0
+			? ` Missing: ${missingRequirements.slice(0, 6).join("; ")}.`
+			: " The dependency chain is cyclic or blocked by selectors that never become true.";
+	const sourceLabel = closestSource
+		? ` Closest source: ${closestSource.label} at ${formatIssuePath(closestSource.path)}.`
+		: "";
+
+	return `Soft-lock risk: ${targetLabel} is not reachable from startingState.${sourceLabel}${missingLabel}`;
+};
+
+const readMissingGameplayRequirements = ({
+	config,
+	reachability,
+	requirements,
+}: {
+	config: z.infer<typeof BaseGameConfigSchema>;
+	reachability: GameplayReachability;
+	requirements: readonly GameplayRequirement[];
+}) =>
+	requirements.flatMap((requirement) => {
+		if (requirement.kind === "item") {
+			return reachability.reachableItemIds.has(requirement.itemId)
+				? []
+				: [
+						`item ${formatItemLabel(config, requirement.itemId)} at ${formatIssuePath(requirement.path)}`,
+					];
+		}
+
+		if (requirement.kind === "grantSelector") {
+			return doesGameGrantSelectorMatchIdsLocal(
+				reachability.reachableGrantIds,
+				requirement.selector,
+			)
+				? []
+				: [
+						`grant ${formatGrantSelector(config, requirement.selector)} at ${formatIssuePath(requirement.path)}`,
+					];
+		}
+
+		return doesItemSelectorMatchReachableBoardItem({
+			config,
+			reachableItemIds: reachability.reachableItemIds,
+			selector: requirement.selector,
+		})
+			? []
+			: [
+					`nearby item ${formatItemSelector(config, requirement.selector)} at ${formatIssuePath(requirement.path)}`,
+				];
+	});
+
+const formatIssuePath = (path: readonly (string | number)[]) =>
+	path.map((segment) => String(segment)).join(".");
+
+const formatItemLabel = (config: z.infer<typeof BaseGameConfigSchema>, itemId: string) => {
+	const itemName = config.items[itemId]?.name;
+	return itemName ? `"${itemId}" (${itemName})` : `"${itemId}"`;
+};
+
+const formatItemSelector = (
+	config: z.infer<typeof BaseGameConfigSchema>,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
+) => formatResolvedSelector(selector, (itemId) => formatItemLabel(config, itemId));
+
+const formatGrantSelector = (
+	config: z.infer<typeof BaseGameConfigSchema>,
+	selector: z.infer<typeof GameGrantSelectorSchema>,
+) => {
+	const grantNameById = readGrantNameById(config);
+	return formatResolvedSelector(selector, (grantId) => {
+		const grantName = grantNameById.get(grantId);
+		return grantName ? `"${grantId}" (${grantName})` : `"${grantId}"`;
+	});
+};
+
+const formatResolvedSelector = (
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
+	formatId: (id: string) => string,
+) => {
+	if ("mode" in selector) return 'mode "all"';
+
+	const parts: string[] = [];
+	const formatClauses = (label: "allOf" | "anyOf" | "noneOf") => {
+		for (const clause of selector[label] ?? []) {
+			parts.push(`${label} [${clause.ids.map(formatId).join(" OR ")}]`);
+		}
+	};
+
+	formatClauses("anyOf");
+	formatClauses("allOf");
+	formatClauses("noneOf");
+
+	return parts.join(", ") || "empty selector";
+};
+
+const readGrantNameById = (config: z.infer<typeof BaseGameConfigSchema>) => {
+	const grantNameById = new Map<string, string>();
+
+	for (const effect of Object.values(config.effects)) {
+		for (const grant of effect.grants) {
+			grantNameById.set(grant.id, grant.name);
+		}
+	}
+
+	return grantNameById;
+};
 
 const validateActivationOutput = (
 	ctx: z.RefinementCtx,

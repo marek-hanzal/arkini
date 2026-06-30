@@ -10,8 +10,11 @@ describe("line-owned effect expectations", () => {
 			effects: {
 				"effect:test:grant": {
 					polarity: "neutral",
-					grantIds: [
-						"grant:test:available",
+					grants: [
+						{
+							id: "grant:test:available",
+							name: "Available",
+						},
 					],
 					name: "Availability Grant",
 					sourceScope: "both",

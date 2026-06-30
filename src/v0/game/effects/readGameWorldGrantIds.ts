@@ -30,7 +30,7 @@ export const readGameWorldGrantIds = ({
 		if (ignoredSourceIds?.has(source.sourceId)) continue;
 		const effect = config.effects[source.effectId];
 		if (!effect) continue;
-		for (const grantId of effect.grantIds) grants.add(grantId);
+		for (const grant of effect.grants) grants.add(grant.id);
 	}
 
 	return grants;

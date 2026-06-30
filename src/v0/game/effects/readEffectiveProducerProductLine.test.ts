@@ -50,8 +50,11 @@ describe("readEffectiveProducerProductLine", () => {
 			effects: {
 				"effect:test:townhall": {
 					polarity: "neutral",
-					grantIds: [
-						"grant:test:townhall",
+					grants: [
+						{
+							id: "grant:test:townhall",
+							name: "Townhall",
+						},
 					],
 					name: "Town Hall Grant",
 				},
@@ -103,8 +106,11 @@ describe("readEffectiveProducerProductLine", () => {
 			effects: {
 				[effectId]: {
 					polarity: "buff",
-					grantIds: [
-						grantId,
+					grants: [
+						{
+							id: grantId,
+							name: "Test grant",
+						},
 					],
 					name: "Path Grant",
 					sourceScope: "board",
@@ -265,8 +271,11 @@ describe("readEffectiveProducerProductLine", () => {
 			effects: {
 				[effectId]: {
 					polarity: "buff",
-					grantIds: [
-						grantId,
+					grants: [
+						{
+							id: grantId,
+							name: "Test grant",
+						},
 					],
 					name: "Haste Grant",
 					sourceScope: "inventory",

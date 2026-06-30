@@ -10,7 +10,7 @@ const ViewEffectPolaritySchema = z.enum([
 
 const ViewItemGeneratedEffectGrantSchema = z.object({
 	id: z.string(),
-	summary: z.string(),
+	name: z.string(),
 });
 
 const ViewItemGeneratedEffectSchema = z.object({

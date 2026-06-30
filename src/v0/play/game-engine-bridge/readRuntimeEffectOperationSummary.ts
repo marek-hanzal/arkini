@@ -41,7 +41,7 @@ export const readRuntimeEffectBenefitLines = ({
 }: readRuntimeEffectBenefitLines.Props) => {
 	const effect = config.effects[effectId];
 	if (!effect) return [];
-	return effect.grantIds.map((grantId) => `Grants ${grantId}.`);
+	return effect.grants.map((grant) => grant.name);
 };
 
 type EffectInstanceGroup = {

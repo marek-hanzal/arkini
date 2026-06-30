@@ -9,8 +9,11 @@ describe("defaultGameConfig", () => {
 
 	it("keeps passive effects as global grant sources", () => {
 		expect(defaultGameConfig.effects["effect:shrine-minor-haste"]).toMatchObject({
-			grantIds: [
-				"grant:active:shrine-minor-haste",
+			grants: [
+				{
+					id: "grant:active:shrine-minor-haste",
+					name: "Minor Haste active",
+				},
 			],
 		});
 	});

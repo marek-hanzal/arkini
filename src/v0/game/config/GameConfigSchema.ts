@@ -433,11 +433,18 @@ const GameLineEffectAuthoringSchema = createGameLineEffectSchema(
 	GameNearbyItemAuthoringSelectorSchema,
 );
 
+const GameEffectGrantDefinitionSchema = z
+	.object({
+		id: IdSchema,
+		name: z.string().min(1),
+	})
+	.strict();
+
 const GameEffectDefinitionSchema = z
 	.object({
 		name: z.string().min(1),
 		polarity: GameEffectPolaritySchema,
-		grantIds: z.array(IdSchema).min(1),
+		grants: z.array(GameEffectGrantDefinitionSchema).min(1),
 		sourceScope: GameEffectSourceScopeSchema.optional(),
 	})
 	.strict();
@@ -858,9 +865,9 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			[
 				"effects",
 				effectId,
-				"grantIds",
+				"grants",
 			],
-			effect.grantIds,
+			effect.grants.map((grant) => grant.id),
 			(value) => `Duplicate grant id "${value}".`,
 		);
 	}
@@ -1753,7 +1760,9 @@ const validateProductExtraOutputChanceEffects = (
 };
 
 const readGameEffectGrantIds = (config: z.infer<typeof BaseGameConfigSchema>) => [
-	...new Set(Object.values(config.effects).flatMap((effect) => effect.grantIds)),
+	...new Set(
+		Object.values(config.effects).flatMap((effect) => effect.grants.map((grant) => grant.id)),
+	),
 ];
 
 const validateProductLineOwnership = (
@@ -2231,7 +2240,7 @@ const readPassiveGrantSourceItemIdsByGrantId = (config: z.infer<typeof BaseGameC
 		for (const effectId of item.passiveEffectIds ?? []) {
 			const effect = config.effects[effectId];
 			if (!effect) continue;
-			for (const grantId of effect.grantIds) {
+			for (const grantId of effect.grants.map((grant) => grant.id)) {
 				result.set(grantId, [
 					...(result.get(grantId) ?? []),
 					itemId,

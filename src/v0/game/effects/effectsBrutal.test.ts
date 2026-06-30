@@ -9,8 +9,11 @@ describe("line-owned effect runtime guards", () => {
 			effects: {
 				"effect:test:missing": {
 					polarity: "neutral",
-					grantIds: [
-						"grant:test:missing",
+					grants: [
+						{
+							id: "grant:test:missing",
+							name: "Missing",
+						},
 					],
 					name: "Missing Grant",
 				},

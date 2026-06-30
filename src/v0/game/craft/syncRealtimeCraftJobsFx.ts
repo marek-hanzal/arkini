@@ -7,7 +7,7 @@ import {
 } from "~/v0/game/job/GamePausableJobTiming";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
-import type { GameSave, GameSaveCraftJob } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 
@@ -19,29 +19,23 @@ export namespace syncRealtimeCraftJobsFx {
 	}
 }
 
-const readCraftGrantsReady = ({
+const readCraftStartGateReady = ({
 	config,
-	job,
 	nowMs,
 	recipe,
 	save,
-	targetItem,
 }: {
 	config: GameConfig;
-	job: GameSaveCraftJob;
 	nowMs: number;
 	recipe: GameConfig["craftRecipes"][string];
 	save: GameSave;
-	targetItem: GameSave["board"]["items"][string];
 }) =>
 	readCraftLineEffectState({
 		config,
 		nowMs,
 		recipe,
-		recipeId: job.recipeId,
 		save,
-		targetItem,
-	}).grantsReady;
+	}).startGateReady;
 
 export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(function* ({
 	config,
@@ -75,17 +69,15 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 		const targetItem = (nextSave ?? save).board.items[job.targetItemInstanceId];
 		if (!targetItem) continue;
 
-		const grantsReady = readCraftGrantsReady({
+		const startGateReady = readCraftStartGateReady({
 			config,
-			job,
 			nowMs,
 			recipe,
 			save: nextSave ?? save,
-			targetItem,
 		});
 
 		if (isGamePausableJobPaused(job)) {
-			if (!grantsReady) continue;
+			if (!startGateReady) continue;
 
 			const remainingMs = job.remainingMs ?? 0;
 			const effectiveTiming = yield* readCraftJobEffectiveTimingFx({
@@ -115,7 +107,7 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 			continue;
 		}
 
-		if (!grantsReady && job.startAtMs <= nowMs) {
+		if (!startGateReady && job.startAtMs <= nowMs) {
 			const remainingMs = readGamePausableJobRemainingMsAtPause({
 				job,
 				nowMs,

@@ -24,11 +24,13 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 	const inputsReady = craft.inputProgress >= 1;
 	const inputsPartiallyAvailable = readCraftInputsPartiallyAvailable(craft);
 	const grantsReady = craft.grantsReady !== false;
+	const effectBlocked = craft.effectBlocked === true;
 	const canClaim = craft.complete;
 	const canRunAction =
 		craft.phase === "collecting_inputs" &&
 		!craft.complete &&
 		!craft.targetLimitBlocked &&
+		!effectBlocked &&
 		grantsReady &&
 		(inputsReady || inputsPartiallyAvailable);
 
@@ -79,6 +81,16 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 			inputsPartiallyAvailable,
 			inputsReady,
 			label: "Limit reached",
+		};
+	}
+
+	if (effectBlocked) {
+		return {
+			canClaim,
+			canRunAction,
+			inputsPartiallyAvailable,
+			inputsReady,
+			label: "Blocked",
 		};
 	}
 

@@ -1,5 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
 import { readGameWorldGrantIds } from "~/v0/game/effects/readGameWorldGrantIds";
 
@@ -8,9 +8,7 @@ export namespace readCraftLineEffectState {
 		config: GameConfig;
 		nowMs?: number;
 		recipe: GameConfig["craftRecipes"][string];
-		recipeId: string;
 		save: GameSave;
-		targetItem: GameSaveBoardItem;
 	}
 }
 
@@ -18,9 +16,7 @@ export const readCraftLineEffectState = ({
 	config,
 	nowMs,
 	recipe,
-	recipeId,
 	save,
-	targetItem,
 }: readCraftLineEffectState.Props) => {
 	const grantIds = readGameWorldGrantIds({
 		config,
@@ -38,7 +34,9 @@ export const readCraftLineEffectState = ({
 				selector: lineEffect.selector,
 			});
 			if (lineEffect.phase === "start" && !ready) grantsReady = false;
+			continue;
 		}
+
 		if (lineEffect.kind === "grant.blockStart") {
 			const active = doesGameGrantSelectorMatchIds({
 				grantIds,
@@ -58,5 +56,6 @@ export const readCraftLineEffectState = ({
 		blockReasons,
 		grantIds,
 		grantsReady,
+		startGateReady: grantsReady && !blocked,
 	};
 };

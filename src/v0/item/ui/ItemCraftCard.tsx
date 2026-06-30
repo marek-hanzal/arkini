@@ -44,6 +44,7 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 	});
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
+	const effectBlockReasons = craft.effectBlockReasons ?? [];
 
 	return (
 		<UiSection
@@ -95,6 +96,21 @@ export const ItemCraftCard: FC<ItemCraftCard.Props> = ({
 								className="break-words"
 							>
 								{readTargetLimitLabel(limit, items)}
+							</li>
+						))}
+					</ul>
+				</div>
+			) : null}
+			{effectBlockReasons.length ? (
+				<div className="mt-3 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+					<p className="font-semibold text-ak-text">Effect blocked</p>
+					<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+						{effectBlockReasons.map((reason) => (
+							<li
+								key={`${craft.id}:effect-block:${reason}`}
+								className="break-words"
+							>
+								{reason}
 							</li>
 						))}
 					</ul>

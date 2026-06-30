@@ -212,7 +212,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			(requirement) => requirement.phase === "start",
 		);
 		const effectRequirementsReady =
-			effectiveProductLine.grantsReady === false
+			effectiveProductLine.startRequirementsReady === false
 				? false
 				: hasEffectStartRequirements
 					? true

@@ -77,6 +77,33 @@ describe("ItemCraftCard", () => {
 		expect(html).toContain("Auto-fill inputs</button>");
 		expect(html).not.toContain('disabled=""');
 	});
+	it("shows craft effect block reasons", () => {
+		const html = renderToStaticMarkup(
+			<ItemCraftCard
+				craft={createCraft({
+					effectBlocked: true,
+					effectBlockReasons: [
+						"Blocked by Faith Path Chosen",
+					],
+					phase: "collecting_inputs",
+					progress: 0,
+					readyAtMs: undefined,
+					startAtMs: undefined,
+					timeProgress: 0,
+				})}
+				items={{}}
+				pending={false}
+				onClaim={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Blocked");
+		expect(html).toContain("Effect blocked");
+		expect(html).toContain("Blocked by Faith Path Chosen");
+	});
+
 	it("enables ready crafts as claim actions in detail", () => {
 		const html = renderToStaticMarkup(
 			<ItemCraftCard

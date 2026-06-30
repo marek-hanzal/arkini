@@ -35,7 +35,7 @@ export interface EffectiveProducerProductLine {
 	blockReasons: AppliedGameEffectOperation[];
 	durationMs: number;
 	grantIds?: string[];
-	grantsReady?: boolean;
+	startRequirementsReady?: boolean;
 	lootPlan: {
 		baseOutput: NonNullable<GameConfig["products"][string]["output"]>;
 		chanceItems: EffectiveChanceItemEntry[];

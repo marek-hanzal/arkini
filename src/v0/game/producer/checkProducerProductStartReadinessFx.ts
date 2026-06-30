@@ -114,7 +114,7 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"producer_queue_full",
-				`Producer item "${action.producerItemInstanceId}" queue is paused by unmet effect grants or blockers.`,
+				`Producer item "${action.producerItemInstanceId}" queue is paused by unmet effect requirements or blockers.`,
 			),
 		);
 	}
@@ -142,11 +142,11 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		productId,
 		save,
 	});
-	if (!effectiveProductLine.grantsReady) {
+	if (!effectiveProductLine.startRequirementsReady) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"effect:missing-grant",
-				`Product "${productId}" is missing effect grants for the current game state.`,
+				`Product "${productId}" is missing effect requirements for the current game state.`,
 			),
 		);
 	}

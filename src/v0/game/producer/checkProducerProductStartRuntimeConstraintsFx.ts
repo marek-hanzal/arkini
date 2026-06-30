@@ -48,11 +48,11 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 		);
 	}
 
-	if (!effectiveProductLine.grantsReady) {
+	if (!effectiveProductLine.startRequirementsReady) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"effect:missing-grant",
-				`Product "${productId}" is missing effect grants at its scheduled start.`,
+				`Product "${productId}" is missing effect requirements at its scheduled start.`,
 			),
 		);
 	}

@@ -7390,6 +7390,7 @@
 				"building",
 				"education",
 				"knowledge",
+				"unique",
 				"era:VII"
 			],
 			"tier": 7
@@ -7397,6 +7398,7 @@
 		"producer:armory-t1": {
 			"assetId": "asset:producer:armory-t1",
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Armory I",
 			"passiveEffectIds": [
@@ -7416,6 +7418,7 @@
 		"producer:bakery-t1": {
 			"assetId": "asset:producer:bakery-t1",
 			"description": "Consumes flour and water to bake bread.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Bakery I",
 			"passiveEffectIds": [
@@ -7434,6 +7437,7 @@
 			"assetId": "asset:producer:bio-waste-processor-t1",
 			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
 			"label": "I",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Bio-Waste Processor I",
 			"storage": "both",
@@ -7452,6 +7456,7 @@
 			"assetId": "asset:producer:bio-waste-processor-t2",
 			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
 			"label": "II",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Bio-Waste Processor II",
 			"storage": "both",
@@ -7470,6 +7475,7 @@
 		"producer:blacksmith-t1": {
 			"assetId": "asset:producer:blacksmith-t1",
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
 			"passiveEffectIds": [
@@ -7489,6 +7495,7 @@
 		"producer:brewery-t1": {
 			"assetId": "asset:producer:brewery-t1",
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Brewery I",
 			"passiveEffectIds": [
@@ -7506,6 +7513,7 @@
 		"producer:brickyard": {
 			"assetId": "asset:producer:brickyard",
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Brickyard",
 			"passiveEffectIds": [
@@ -7525,6 +7533,7 @@
 		"producer:cathedral": {
 			"assetId": "asset:producer:cathedral",
 			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Cathedral",
 			"passiveEffectIds": [
@@ -7538,6 +7547,7 @@
 				"keystone",
 				"faith",
 				"cathedral",
+				"unique",
 				"era:XI"
 			],
 			"tier": 11
@@ -7545,6 +7555,7 @@
 		"producer:cattle-farm-t1": {
 			"assetId": "asset:producer:cattle-farm-t1",
 			"description": "Consumes grain and water to produce milk.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Cattle Farm I",
 			"passiveEffectIds": [
@@ -7562,6 +7573,7 @@
 		"producer:charcoal-burner-t1": {
 			"assetId": "asset:producer:charcoal-burner-t1",
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
 			"passiveEffectIds": [
@@ -7581,6 +7593,7 @@
 		"producer:chicken-coop-t1": {
 			"assetId": "asset:producer:chicken-coop-t1",
 			"description": "Consumes grain and water to produce eggs.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Chicken Coop I",
 			"passiveEffectIds": [
@@ -7598,6 +7611,7 @@
 		"producer:civic-office-t1": {
 			"assetId": "asset:producer:civic-office-t1",
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Civic Office I",
 			"passiveEffectIds": [
@@ -7609,6 +7623,7 @@
 				"building",
 				"civic",
 				"permit",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4
@@ -7616,6 +7631,7 @@
 		"producer:clay-pit": {
 			"assetId": "asset:producer:clay-pit",
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Clay Pit",
 			"passiveEffectIds": [
@@ -7635,6 +7651,7 @@
 		"producer:coal-mine-t1": {
 			"assetId": "asset:producer:coal-mine-t1",
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
 			"passiveEffectIds": [
@@ -7653,6 +7670,7 @@
 		"producer:construction-yard-t1": {
 			"assetId": "asset:producer:construction-yard-t1",
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Construction Yard I",
 			"passiveEffectIds": [
@@ -7664,6 +7682,7 @@
 				"producer",
 				"construction",
 				"master",
+				"unique",
 				"era:VIII",
 				"industry"
 			],
@@ -7672,6 +7691,7 @@
 		"producer:cookhouse-t1": {
 			"assetId": "asset:producer:cookhouse-t1",
 			"description": "Combines processed food into feasts.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Cookhouse I",
 			"passiveEffectIds": [
@@ -7689,6 +7709,7 @@
 		"producer:dairy-t1": {
 			"assetId": "asset:producer:dairy-t1",
 			"description": "Processes milk into cheese.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Dairy I",
 			"passiveEffectIds": [
@@ -7706,6 +7727,7 @@
 		"producer:dye-workshop-t1": {
 			"assetId": "asset:producer:dye-workshop-t1",
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Dye Workshop I",
 			"passiveEffectIds": [
@@ -7725,6 +7747,7 @@
 		"producer:farm-t1": {
 			"assetId": "asset:producer:farm-t1",
 			"description": "Consumes water and produces grain when placed near a wheat field.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Farm I",
 			"passiveEffectIds": [
@@ -7742,6 +7765,7 @@
 		"producer:glassworks": {
 			"assetId": "asset:producer:glassworks",
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Glassworks",
 			"passiveEffectIds": [
@@ -7761,6 +7785,7 @@
 		"producer:glazier-workshop-t1": {
 			"assetId": "asset:producer:glazier-workshop-t1",
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Glazier Workshop I",
 			"passiveEffectIds": [
@@ -7781,6 +7806,7 @@
 		"producer:gold-mine-t1": {
 			"assetId": "asset:producer:gold-mine-t1",
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
 			"storage": "both",
@@ -7796,6 +7822,7 @@
 		"producer:goldsmith-t1": {
 			"assetId": "asset:producer:goldsmith-t1",
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
 			"passiveEffectIds": [
@@ -7816,6 +7843,7 @@
 		"producer:heroes-guild-t1": {
 			"assetId": "asset:producer:heroes-guild-t1",
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Heroes Guild I",
 			"passiveEffectIds": [
@@ -7828,6 +7856,7 @@
 				"guild",
 				"expedition",
 				"master",
+				"unique",
 				"era:IX"
 			],
 			"tier": 9
@@ -7835,6 +7864,7 @@
 		"producer:house-of-engineers": {
 			"assetId": "asset:producer:house-of-engineers",
 			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "House of Engineers",
 			"passiveEffectIds": [
@@ -7848,6 +7878,7 @@
 				"keystone",
 				"engineers",
 				"engineering",
+				"unique",
 				"era:XI"
 			],
 			"tier": 11
@@ -7856,6 +7887,7 @@
 			"assetId": "asset:producer:house-t1",
 			"description": "Basic housing that turns warmth and water into early morale.",
 			"label": "1",
+			"maxCount": 6,
 			"maxStackSize": 1,
 			"name": "House",
 			"storage": "both",
@@ -7873,6 +7905,7 @@
 			"assetId": "asset:producer:house-t2",
 			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
 			"label": "2",
+			"maxCount": 5,
 			"maxStackSize": 1,
 			"name": "House",
 			"storage": "both",
@@ -7890,6 +7923,7 @@
 			"assetId": "asset:producer:house-t3",
 			"description": "Prosperous housing that consumes clothing, food, and comfort goods to produce mid-tier morale and lower morale.",
 			"label": "3",
+			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "House",
 			"storage": "both",
@@ -7907,6 +7941,7 @@
 			"assetId": "asset:producer:house-t4",
 			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
 			"label": "4",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "House",
 			"storage": "both",
@@ -7923,6 +7958,7 @@
 		"producer:iron-mine-t1": {
 			"assetId": "asset:producer:iron-mine-t1",
 			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
 			"storage": "both",
@@ -7951,6 +7987,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:II"
 			],
 			"tier": 2
@@ -7971,6 +8008,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4
@@ -7991,6 +8029,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:VIII"
 			],
 			"tier": 8
@@ -8011,6 +8050,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:XI"
 			],
 			"tier": 11
@@ -8018,6 +8058,7 @@
 		"producer:lumberjack-t1": {
 			"assetId": "asset:producer:lumberjack-t1",
 			"description": "Produces logs when placed near a tree.",
+			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
 			"passiveEffectIds": [
@@ -8034,6 +8075,7 @@
 		"producer:mage-lodge": {
 			"assetId": "asset:producer:mage-lodge",
 			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
 			"passiveEffectIds": [
@@ -8048,6 +8090,7 @@
 				"mages",
 				"magic",
 				"arcane",
+				"unique",
 				"era:XI"
 			],
 			"tier": 11
@@ -8055,6 +8098,7 @@
 		"producer:market-t1": {
 			"assetId": "asset:producer:market-t1",
 			"description": "First trade producer that converts processed food and drink into coins.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Market",
 			"passiveEffectIds": [
@@ -8065,6 +8109,7 @@
 				"producer",
 				"trade",
 				"market",
+				"unique",
 				"era:III"
 			],
 			"tier": 3
@@ -8072,6 +8117,7 @@
 		"producer:market-t2": {
 			"assetId": "asset:producer:market-t2",
 			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Market II",
 			"storage": "both",
@@ -8080,6 +8126,7 @@
 				"trade",
 				"market",
 				"civic",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4
@@ -8087,6 +8134,7 @@
 		"producer:paper-mill-t1": {
 			"assetId": "asset:producer:paper-mill-t1",
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Paper Mill I",
 			"storage": "both",
@@ -8102,6 +8150,7 @@
 		"producer:pig-farm-t1": {
 			"assetId": "asset:producer:pig-farm-t1",
 			"description": "Consumes grain and water to produce piglets.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
 			"passiveEffectIds": [
@@ -8120,6 +8169,7 @@
 			"assetId": "asset:producer:prospector-guild-t1",
 			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
 			"label": "1",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
 			"storage": "both",
@@ -8129,6 +8179,7 @@
 				"prospecting",
 				"guild",
 				"civic",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4
@@ -8137,6 +8188,7 @@
 			"assetId": "asset:producer:prospector-guild-t2",
 			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
 			"label": "2",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
 			"storage": "both",
@@ -8146,6 +8198,7 @@
 				"prospecting",
 				"guild",
 				"industry",
+				"unique",
 				"era:VII"
 			],
 			"tier": 7
@@ -8153,6 +8206,7 @@
 		"producer:purifier-t1": {
 			"assetId": "asset:producer:purifier-t1",
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Purifier I",
 			"passiveEffectIds": [
@@ -8171,6 +8225,7 @@
 		"producer:quarry-t1": {
 			"assetId": "asset:producer:quarry-t1",
 			"description": "Produces stone when placed near a rock.",
+			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "Quarry I",
 			"passiveEffectIds": [
@@ -8188,6 +8243,7 @@
 			"assetId": "asset:producer:quarry-t2",
 			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
 			"label": "2",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Quarry",
 			"passiveEffectIds": [
@@ -8209,6 +8265,7 @@
 		"producer:roof-tile-factory": {
 			"assetId": "asset:producer:roof-tile-factory",
 			"description": "Workshop that fires clay into sturdy roof tiles.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
 			"passiveEffectIds": [
@@ -8228,6 +8285,7 @@
 		"producer:sand-pit": {
 			"assetId": "asset:producer:sand-pit",
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Sand Pit",
 			"passiveEffectIds": [
@@ -8248,6 +8306,7 @@
 		"producer:sawmill-t1": {
 			"assetId": "asset:producer:sawmill-t1",
 			"description": "Turns logs into planks when placed near a lumberjack.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Sawmill I",
 			"passiveEffectIds": [
@@ -8273,6 +8332,7 @@
 				"building",
 				"education",
 				"knowledge",
+				"unique",
 				"era:IV"
 			],
 			"tier": 2
@@ -8280,6 +8340,7 @@
 		"producer:sheep-pasture-t1": {
 			"assetId": "asset:producer:sheep-pasture-t1",
 			"description": "Consumes grain and water to produce wool.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Sheep Pasture I",
 			"passiveEffectIds": [
@@ -8297,6 +8358,7 @@
 		"producer:shrine-t1": {
 			"assetId": "asset:producer:shrine-t1",
 			"description": "A small roadside shrine that turns simple offerings into temporary production blessings.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Wayside Shrine",
 			"storage": "both",
@@ -8305,6 +8367,7 @@
 				"producer",
 				"shrine",
 				"effect-source",
+				"unique",
 				"era:I"
 			],
 			"tier": 1
@@ -8312,6 +8375,7 @@
 		"producer:slaughterhouse-t1": {
 			"assetId": "asset:producer:slaughterhouse-t1",
 			"description": "Processes piglets into sausage and leather.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
 			"passiveEffectIds": [
@@ -8330,6 +8394,7 @@
 		"producer:smelter-t1": {
 			"assetId": "asset:producer:smelter-t1",
 			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Smelter I",
 			"passiveEffectIds": [
@@ -8347,6 +8412,7 @@
 		"producer:stonemason-t1": {
 			"assetId": "asset:producer:stonemason-t1",
 			"description": "Turns stone into stone blocks when placed near a quarry.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Stonemason I",
 			"passiveEffectIds": [
@@ -8364,6 +8430,7 @@
 			"assetId": "asset:producer:stonemason-t2",
 			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
 			"label": "2",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Stonemason",
 			"passiveEffectIds": [
@@ -8385,6 +8452,7 @@
 		"producer:tailor-workshop-t1": {
 			"assetId": "asset:producer:tailor-workshop-t1",
 			"description": "Clothing producer that sews common and luxury clothing.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Tailor Workshop I",
 			"passiveEffectIds": [
@@ -8403,6 +8471,7 @@
 		"producer:tannery-t1": {
 			"assetId": "asset:producer:tannery-t1",
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Tannery I",
 			"passiveEffectIds": [
@@ -8421,6 +8490,7 @@
 		"producer:tavern-t1": {
 			"assetId": "asset:producer:tavern-t1",
 			"description": "Serves beer barrels as individual beers.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Tavern I",
 			"passiveEffectIds": [
@@ -8438,6 +8508,7 @@
 		"producer:townhall-t1": {
 			"assetId": "asset:producer:townhall-t1",
 			"description": "Starter civic hub that issues basic settlement blueprints.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Town Hall I",
 			"storage": "both",
@@ -8445,6 +8516,7 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:I"
 			],
 			"tier": 1
@@ -8452,6 +8524,7 @@
 		"producer:townhall-t2": {
 			"assetId": "asset:producer:townhall-t2",
 			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Town Hall II",
 			"storage": "both",
@@ -8459,6 +8532,7 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:II"
 			],
 			"tier": 2
@@ -8466,6 +8540,7 @@
 		"producer:townhall-t3": {
 			"assetId": "asset:producer:townhall-t3",
 			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Town Hall III",
 			"storage": "both",
@@ -8473,6 +8548,7 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:III"
 			],
 			"tier": 3
@@ -8480,6 +8556,7 @@
 		"producer:townhall-t4": {
 			"assetId": "asset:producer:townhall-t4",
 			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Town Hall IV",
 			"storage": "both",
@@ -8487,6 +8564,7 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4
@@ -8507,6 +8585,7 @@
 				"education",
 				"knowledge",
 				"university",
+				"unique",
 				"era:IX"
 			],
 			"tier": 9
@@ -8514,6 +8593,7 @@
 		"producer:vegetable-garden-t1": {
 			"assetId": "asset:producer:vegetable-garden-t1",
 			"description": "Consumes water to produce vegetables.",
+			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Vegetable Garden I",
 			"passiveEffectIds": [
@@ -8532,6 +8612,7 @@
 			"assetId": "asset:producer:waste-processor-t1",
 			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
 			"label": "I",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Waste Processor I",
 			"storage": "both",
@@ -8549,6 +8630,7 @@
 			"assetId": "asset:producer:waste-processor-t2",
 			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
 			"label": "II",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Waste Processor II",
 			"storage": "both",
@@ -8566,6 +8648,7 @@
 		"producer:weaver-hut-t1": {
 			"assetId": "asset:producer:weaver-hut-t1",
 			"description": "Textile producer that weaves wool into common cloth.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Weaver Hut I",
 			"passiveEffectIds": [
@@ -8584,6 +8667,7 @@
 		"producer:well-t1": {
 			"assetId": "asset:producer:well-t1",
 			"description": "Produces water.",
+			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "Well I",
 			"passiveEffectIds": [
@@ -8601,6 +8685,7 @@
 		"producer:windmill-t1": {
 			"assetId": "asset:producer:windmill-t1",
 			"description": "Mills grain into flour.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Windmill I",
 			"passiveEffectIds": [
@@ -8619,6 +8704,7 @@
 		"producer:winery-t1": {
 			"assetId": "asset:producer:winery-t1",
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Winery I",
 			"passiveEffectIds": [

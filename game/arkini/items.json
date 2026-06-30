@@ -1831,6 +1831,7 @@
 				"building",
 				"education",
 				"knowledge",
+				"unique",
 				"era:VII"
 			],
 			"tier": 7,
@@ -1852,6 +1853,7 @@
 				"era:IX"
 			],
 			"tier": 9,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-armory-t1"
 			]
@@ -1867,6 +1869,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-bakery-t1"
 			]
@@ -1884,6 +1887,7 @@
 				"era:IX"
 			],
 			"tier": 9,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-blacksmith-t1"
 			]
@@ -1899,6 +1903,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-brewery-t1"
 			]
@@ -1916,6 +1921,7 @@
 				"industry"
 			],
 			"tier": 3,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-brickyard"
 			]
@@ -1924,9 +1930,6 @@
 			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
 			"maxStackSize": 1,
 			"name": "Cathedral",
-			"passiveEffectIds": [
-				"effect:path-faith-locks-counter-keystones"
-			],
 			"tags": [
 				"building",
 				"producer",
@@ -1934,9 +1937,14 @@
 				"keystone",
 				"faith",
 				"cathedral",
+				"unique",
 				"era:XI"
 			],
-			"tier": 11
+			"tier": 11,
+			"maxCount": 1,
+			"passiveEffectIds": [
+				"effect:path-faith-locks-counter-keystones"
+			]
 		},
 		"producer:cattle-farm-t1": {
 			"description": "Consumes grain and water to produce milk.",
@@ -1949,6 +1957,7 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-cattle-farm-t1"
 			]
@@ -1966,6 +1975,7 @@
 				"industry"
 			],
 			"tier": 6,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-charcoal-burner-t1"
 			]
@@ -1981,6 +1991,7 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-chicken-coop-t1"
 			]
@@ -1994,9 +2005,11 @@
 				"building",
 				"civic",
 				"permit",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4,
+			"maxCount": 1,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-civic-office-t1"
 			]
@@ -2014,6 +2027,7 @@
 				"industry"
 			],
 			"tier": 3,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-clay-pit"
 			]
@@ -2030,6 +2044,7 @@
 				"era:VII"
 			],
 			"tier": 7,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-coal-mine-t1"
 			]
@@ -2043,10 +2058,12 @@
 				"producer",
 				"construction",
 				"master",
+				"unique",
 				"era:VIII",
 				"industry"
 			],
 			"tier": 6,
+			"maxCount": 1,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-construction-yard-t1"
 			]
@@ -2062,6 +2079,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-cookhouse-t1"
 			]
@@ -2077,6 +2095,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-dairy-t1"
 			]
@@ -2094,6 +2113,7 @@
 				"era:V"
 			],
 			"tier": 5,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-dye-workshop-t1"
 			]
@@ -2109,6 +2129,7 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-farm-t1"
 			]
@@ -2126,6 +2147,7 @@
 				"industry"
 			],
 			"tier": 4,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-glassworks"
 			]
@@ -2144,6 +2166,7 @@
 				"era:X"
 			],
 			"tier": 10,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-glazier-workshop-t1"
 			]
@@ -2159,7 +2182,8 @@
 				"gold",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"maxCount": 2
 		},
 		"producer:goldsmith-t1": {
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
@@ -2175,6 +2199,7 @@
 				"era:IX"
 			],
 			"tier": 9,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-goldsmith-t1"
 			]
@@ -2189,9 +2214,11 @@
 				"guild",
 				"expedition",
 				"master",
+				"unique",
 				"era:IX"
 			],
 			"tier": 9,
+			"maxCount": 1,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-heroes-guild-t1"
 			]
@@ -2200,9 +2227,6 @@
 			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
 			"maxStackSize": 1,
 			"name": "House of Engineers",
-			"passiveEffectIds": [
-				"effect:path-engineers-locks-counter-keystones"
-			],
 			"tags": [
 				"building",
 				"producer",
@@ -2210,9 +2234,14 @@
 				"keystone",
 				"engineers",
 				"engineering",
+				"unique",
 				"era:XI"
 			],
-			"tier": 11
+			"tier": 11,
+			"maxCount": 1,
+			"passiveEffectIds": [
+				"effect:path-engineers-locks-counter-keystones"
+			]
 		},
 		"producer:house-t1": {
 			"description": "Basic housing that turns warmth and water into early morale.",
@@ -2227,6 +2256,7 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 6,
 			"label": "1"
 		},
 		"producer:house-t2": {
@@ -2242,6 +2272,7 @@
 				"era:III"
 			],
 			"tier": 2,
+			"maxCount": 5,
 			"label": "2"
 		},
 		"producer:house-t3": {
@@ -2257,6 +2288,7 @@
 				"era:V"
 			],
 			"tier": 3,
+			"maxCount": 4,
 			"label": "3"
 		},
 		"producer:house-t4": {
@@ -2272,6 +2304,7 @@
 				"era:X"
 			],
 			"tier": 4,
+			"maxCount": 3,
 			"label": "4"
 		},
 		"producer:iron-mine-t1": {
@@ -2285,7 +2318,8 @@
 				"iron",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"maxCount": 2
 		},
 		"producer:lumberjack-t1": {
 			"description": "Produces logs when placed near a tree.",
@@ -2297,6 +2331,7 @@
 				"era:I"
 			],
 			"tier": 1,
+			"maxCount": 4,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-lumberjack-t1"
 			]
@@ -2305,9 +2340,6 @@
 			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
-			"passiveEffectIds": [
-				"effect:path-mages-locks-counter-keystones"
-			],
 			"tags": [
 				"building",
 				"producer",
@@ -2316,9 +2348,14 @@
 				"mages",
 				"magic",
 				"arcane",
+				"unique",
 				"era:XI"
 			],
-			"tier": 11
+			"tier": 11,
+			"maxCount": 1,
+			"passiveEffectIds": [
+				"effect:path-mages-locks-counter-keystones"
+			]
 		},
 		"producer:market-t1": {
 			"description": "First trade producer that converts processed food and drink into coins.",
@@ -2328,9 +2365,11 @@
 				"producer",
 				"trade",
 				"market",
+				"unique",
 				"era:III"
 			],
 			"tier": 3,
+			"maxCount": 1,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-market-t1"
 			]
@@ -2344,9 +2383,11 @@
 				"trade",
 				"market",
 				"civic",
+				"unique",
 				"era:IV"
 			],
-			"tier": 4
+			"tier": 4,
+			"maxCount": 1
 		},
 		"producer:paper-mill-t1": {
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
@@ -2359,7 +2400,8 @@
 				"civic",
 				"era:IV"
 			],
-			"tier": 4
+			"tier": 4,
+			"maxCount": 2
 		},
 		"producer:pig-farm-t1": {
 			"description": "Consumes grain and water to produce piglets.",
@@ -2372,13 +2414,13 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-pig-farm-t1"
 			]
 		},
 		"producer:prospector-guild-t1": {
 			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
-			"label": "1",
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
 			"tags": [
@@ -2387,13 +2429,15 @@
 				"prospecting",
 				"guild",
 				"civic",
+				"unique",
 				"era:IV"
 			],
-			"tier": 4
+			"tier": 4,
+			"maxCount": 1,
+			"label": "1"
 		},
 		"producer:prospector-guild-t2": {
 			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
-			"label": "2",
 			"maxStackSize": 1,
 			"name": "Prospector Guild",
 			"tags": [
@@ -2402,9 +2446,12 @@
 				"prospecting",
 				"guild",
 				"industry",
+				"unique",
 				"era:VII"
 			],
-			"tier": 7
+			"tier": 7,
+			"maxCount": 1,
+			"label": "2"
 		},
 		"producer:purifier-t1": {
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
@@ -2418,6 +2465,7 @@
 				"era:VIII"
 			],
 			"tier": 7,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-purifier-t1"
 			]
@@ -2432,13 +2480,13 @@
 				"era:I"
 			],
 			"tier": 1,
+			"maxCount": 4,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-quarry-t1"
 			]
 		},
 		"producer:quarry-t2": {
 			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
-			"label": "2",
 			"maxStackSize": 1,
 			"name": "Quarry",
 			"tags": [
@@ -2452,9 +2500,11 @@
 				"era:X"
 			],
 			"tier": 10,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-quarry-t2"
-			]
+			],
+			"label": "2"
 		},
 		"producer:roof-tile-factory": {
 			"description": "Workshop that fires clay into sturdy roof tiles.",
@@ -2469,6 +2519,7 @@
 				"industry"
 			],
 			"tier": 4,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-roof-tile-factory"
 			]
@@ -2487,6 +2538,7 @@
 				"industry"
 			],
 			"tier": 4,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-sand-pit"
 			]
@@ -2501,6 +2553,7 @@
 				"era:I"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-sawmill-t1"
 			]
@@ -2514,6 +2567,7 @@
 				"building",
 				"education",
 				"knowledge",
+				"unique",
 				"era:IV"
 			],
 			"tier": 2,
@@ -2530,6 +2584,7 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-sheep-pasture-t1"
 			]
@@ -2546,6 +2601,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-slaughterhouse-t1"
 			]
@@ -2561,6 +2617,7 @@
 				"era:VIII"
 			],
 			"tier": 7,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-smelter-t1"
 			]
@@ -2575,13 +2632,13 @@
 				"era:I"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-stonemason-t1"
 			]
 		},
 		"producer:stonemason-t2": {
 			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
-			"label": "2",
 			"maxStackSize": 1,
 			"name": "Stonemason",
 			"tags": [
@@ -2595,9 +2652,11 @@
 				"era:X"
 			],
 			"tier": 10,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-stonemason-t2"
-			]
+			],
+			"label": "2"
 		},
 		"producer:tailor-workshop-t1": {
 			"description": "Clothing producer that sews common and luxury clothing.",
@@ -2611,6 +2670,7 @@
 				"era:V"
 			],
 			"tier": 5,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-tailor-workshop-t1"
 			]
@@ -2627,6 +2687,7 @@
 				"era:V"
 			],
 			"tier": 5,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-tannery-t1"
 			]
@@ -2642,6 +2703,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-tavern-t1"
 			]
@@ -2654,9 +2716,11 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:I"
 			],
-			"tier": 1
+			"tier": 1,
+			"maxCount": 1
 		},
 		"producer:townhall-t2": {
 			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
@@ -2666,9 +2730,11 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:II"
 			],
-			"tier": 2
+			"tier": 2,
+			"maxCount": 1
 		},
 		"producer:townhall-t3": {
 			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
@@ -2678,9 +2744,11 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:III"
 			],
-			"tier": 3
+			"tier": 3,
+			"maxCount": 1
 		},
 		"producer:townhall-t4": {
 			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
@@ -2690,9 +2758,11 @@
 				"producer",
 				"townhall",
 				"civic",
+				"unique",
 				"era:IV"
 			],
-			"tier": 4
+			"tier": 4,
+			"maxCount": 1
 		},
 		"producer:university": {
 			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
@@ -2704,6 +2774,7 @@
 				"education",
 				"knowledge",
 				"university",
+				"unique",
 				"era:IX"
 			],
 			"tier": 9,
@@ -2723,6 +2794,7 @@
 				"era:II"
 			],
 			"tier": 1,
+			"maxCount": 3,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-vegetable-garden-t1"
 			]
@@ -2739,6 +2811,7 @@
 				"era:V"
 			],
 			"tier": 5,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-weaver-hut-t1"
 			]
@@ -2754,6 +2827,7 @@
 				"era:I"
 			],
 			"tier": 1,
+			"maxCount": 4,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-well-t1"
 			]
@@ -2770,6 +2844,7 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-windmill-t1"
 			]
@@ -2785,12 +2860,12 @@
 				"era:III"
 			],
 			"tier": 1,
+			"maxCount": 2,
 			"passiveEffectIds": [
 				"effect:grant-owned:producer-winery-t1"
 			]
 		},
 		"producer:shrine-t1": {
-			"assetId": "asset:producer:shrine-t1",
 			"description": "A small roadside shrine that turns simple offerings into temporary production blessings.",
 			"maxStackSize": 1,
 			"name": "Wayside Shrine",
@@ -2799,9 +2874,12 @@
 				"producer",
 				"shrine",
 				"effect-source",
+				"unique",
 				"era:I"
 			],
-			"tier": 1
+			"tier": 1,
+			"maxCount": 1,
+			"assetId": "asset:producer:shrine-t1"
 		},
 		"item:inventory": {
 			"name": "Backpack",
@@ -2866,6 +2944,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:II"
 			],
 			"tier": 2,
@@ -2884,6 +2963,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:IV"
 			],
 			"tier": 4,
@@ -2902,6 +2982,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:VIII"
 			],
 			"tier": 8,
@@ -2920,6 +3001,7 @@
 				"library",
 				"blueprint",
 				"knowledge",
+				"unique",
 				"era:XI"
 			],
 			"tier": 11,
@@ -2996,11 +3078,9 @@
 			]
 		},
 		"producer:waste-processor-t1": {
-			"name": "Waste Processor I",
-			"label": "I",
 			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
-			"tier": 2,
 			"maxStackSize": 1,
+			"name": "Waste Processor I",
 			"tags": [
 				"producer",
 				"building",
@@ -3008,14 +3088,15 @@
 				"waste",
 				"trash",
 				"era:II"
-			]
+			],
+			"tier": 2,
+			"maxCount": 2,
+			"label": "I"
 		},
 		"producer:waste-processor-t2": {
-			"name": "Waste Processor II",
-			"label": "II",
 			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
-			"tier": 8,
 			"maxStackSize": 1,
+			"name": "Waste Processor II",
 			"tags": [
 				"producer",
 				"building",
@@ -3024,14 +3105,15 @@
 				"trash",
 				"industry",
 				"era:VIII"
-			]
+			],
+			"tier": 8,
+			"maxCount": 2,
+			"label": "II"
 		},
 		"producer:bio-waste-processor-t1": {
-			"name": "Bio-Waste Processor I",
-			"label": "I",
 			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
-			"tier": 2,
 			"maxStackSize": 1,
+			"name": "Bio-Waste Processor I",
 			"tags": [
 				"producer",
 				"building",
@@ -3040,14 +3122,15 @@
 				"bio-waste",
 				"farm",
 				"era:II"
-			]
+			],
+			"tier": 2,
+			"maxCount": 2,
+			"label": "I"
 		},
 		"producer:bio-waste-processor-t2": {
-			"name": "Bio-Waste Processor II",
-			"label": "II",
 			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
-			"tier": 8,
 			"maxStackSize": 1,
+			"name": "Bio-Waste Processor II",
 			"tags": [
 				"producer",
 				"building",
@@ -3057,7 +3140,10 @@
 				"farm",
 				"industry",
 				"era:VIII"
-			]
+			],
+			"tier": 8,
+			"maxCount": 2,
+			"label": "II"
 		},
 		"item:blueprint-waste-processor-t1": {
 			"name": "Waste Processor I Blueprint",

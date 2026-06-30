@@ -27,4 +27,34 @@ describe("defaultGameConfig", () => {
 			},
 		);
 	});
+	it("caps every producer building item", () => {
+		const producerItemIds = Object.keys(defaultGameConfig.items)
+			.filter((itemId) => itemId.startsWith("producer:"))
+			.sort();
+		const uncappedProducerItemIds = producerItemIds.filter(
+			(itemId) => defaultGameConfig.items[itemId]?.maxCount === undefined,
+		);
+
+		expect(uncappedProducerItemIds).toEqual([]);
+	});
+
+	it("marks single-copy producer buildings as unique metadata", () => {
+		const singleCopyProducerItemIds = Object.keys(defaultGameConfig.items)
+			.filter((itemId) => itemId.startsWith("producer:"))
+			.filter((itemId) => defaultGameConfig.items[itemId]?.maxCount === 1)
+			.sort();
+
+		expect(singleCopyProducerItemIds).toEqual(
+			expect.arrayContaining([
+				"producer:townhall-t1",
+				"producer:library-t1",
+				"producer:school",
+				"producer:cathedral",
+			]),
+		);
+
+		for (const itemId of singleCopyProducerItemIds) {
+			expect(defaultGameConfig.items[itemId]?.tags).toContain("unique");
+		}
+	});
 });

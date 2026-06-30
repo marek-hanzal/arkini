@@ -165,6 +165,61 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("Water");
 	});
 
+	it("collapses a target-limited product line to the disabled action only", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							inputItemIds: [
+								"item:water",
+							],
+							inputs: [
+								{
+									available: 1,
+									capacity: 1,
+									consume: true,
+									itemId: "item:water",
+									quantity: 0,
+									stored: 0,
+								},
+							],
+							inputsAvailable: true,
+							inputsReady: false,
+							name: "Blueprint: Library I",
+							outputLimitBlocked: true,
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 1,
+									quantity: 1,
+								},
+							],
+							targetLimits: [
+								{
+									itemId: "item:grain",
+									maxCount: 1,
+									ownedQuantity: 1,
+									remainingQuantity: 0,
+									requiredQuantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Blueprint: Library I");
+		expect(html).toContain("Limit reached");
+		expect(html).not.toContain("Outputs");
+		expect(html).not.toContain("Target limits");
+		expect(html).not.toContain("Water");
+		expect(html).not.toContain("Default");
+	});
+
 	it("uses short default labels and missing-item copy", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

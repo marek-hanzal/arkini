@@ -19,6 +19,7 @@ const item = (id: string, name: string, assetSrc: string) => ({
 const items: ItemCatalogView = {
 	"item:grain": item("item:grain", "Grain", "grain.svg"),
 	"item:water": item("item:water", "Water", "water.svg"),
+	"producer:quarry-t1": item("producer:quarry-t1", "Quarry I", "quarry.svg"),
 };
 
 const lineModel = (line: ProducerProductLineView) => ({
@@ -103,6 +104,7 @@ describe("DetailProducerLinesPanel", () => {
 
 		expect(html.match(/data-ui="detail producer line separator"/g)?.length).toBe(1);
 		expect(html).toContain("border-b border-violet-300/25");
+		expect(html).toContain("gap-[0.9rem]");
 	});
 
 	it("does not render a duplicate header count badge", () => {
@@ -115,7 +117,8 @@ describe("DetailProducerLinesPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Product lines");
+		expect(html).toContain("Lines");
+		expect(html).not.toContain("Product lines");
 		expect(html).not.toContain(">1</span>");
 	});
 
@@ -176,7 +179,8 @@ describe("DetailProducerLinesPanel", () => {
 		);
 
 		expect(html).not.toContain("Owns Water");
-		expect(html).not.toContain("Blocked requirements");
+		expect(html).not.toContain("Missing effects");
+		expect(html).not.toContain("Blocked effects");
 		expect(html).toContain("Water");
 	});
 
@@ -312,7 +316,57 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).not.toContain("Default product");
 	});
 
-	it("shows active blockers as blocked requirements", () => {
+	it("renders missing effect requirements before outputs and resource inputs", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							effectRequirements: [
+								{
+									kind: "nearby.require",
+									label: "Nearby producer:quarry-t1",
+									ready: false,
+								},
+							],
+							inputItemIds: [
+								"item:water",
+							],
+							inputs: [
+								{
+									available: 0,
+									capacity: 1,
+									consume: true,
+									itemId: "item:water",
+									quantity: 1,
+									stored: 0,
+								},
+							],
+							inputsAvailable: false,
+							inputsReady: false,
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 0,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Missing effects");
+		expect(html).toContain("Missing Nearby Quarry I");
+		expect(html).not.toContain("producer:quarry-t1");
+		expect(html.indexOf("Missing effects")).toBeLessThan(html.indexOf("Outputs"));
+		expect(html.indexOf("Missing effects")).toBeLessThan(html.indexOf("Water"));
+	});
+
+	it("shows active blockers as blocked effects", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -333,7 +387,7 @@ describe("DetailProducerLinesPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Blocked requirements");
+		expect(html).toContain("Blocked effects");
 		expect(html).toContain("Blocked by Engineers path chosen");
 	});
 });

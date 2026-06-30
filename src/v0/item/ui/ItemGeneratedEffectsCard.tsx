@@ -1,6 +1,11 @@
 import type { FC } from "react";
 import type { ViewItemGeneratedEffect } from "~/v0/item/view/ViewItemSchema";
 import { UiSection } from "~/v0/ui/UiSection";
+import {
+	effectPolaritySections,
+	readEffectPolarityBadgeClassName,
+	readEffectPolarityLabel,
+} from "~/v0/item/ui/effectPolarityUi";
 
 export namespace ItemGeneratedEffectsCard {
 	export interface Props {
@@ -8,55 +13,10 @@ export namespace ItemGeneratedEffectsCard {
 	}
 }
 
-type EffectPolarity = ViewItemGeneratedEffect["polarity"];
-
-const effectPolaritySections: readonly {
-	polarity: EffectPolarity;
-	title: string;
-}[] = [
-	{
-		polarity: "buff",
-		title: "Buffs",
-	},
-	{
-		polarity: "debuff",
-		title: "Debuffs",
-	},
-	{
-		polarity: "neutral",
-		title: "Neutral effects",
-	},
-	{
-		polarity: "mixed",
-		title: "Mixed effects",
-	},
-];
-
 const readSourceScopeLabel = (effect: ViewItemGeneratedEffect) => {
 	if (effect.sourceScope === "both") return "Active from board or inventory";
 	if (effect.sourceScope === "inventory") return "Active while stored in inventory";
 	return "Active while placed on board";
-};
-
-const readEffectPolarityLabel = (polarity: EffectPolarity) => {
-	if (polarity === "buff") return "Buff";
-	if (polarity === "debuff") return "Debuff";
-	if (polarity === "mixed") return "Mixed";
-	return "Neutral";
-};
-
-const readEffectPolarityBadgeClassName = (polarity: EffectPolarity) => {
-	if (polarity === "buff") {
-		return "border-ak-success/40 bg-ak-success-soft text-ak-success";
-	}
-	if (polarity === "debuff") {
-		return "border-ak-danger/40 bg-ak-danger-soft text-ak-danger";
-	}
-	if (polarity === "mixed") {
-		return "border-ak-secondary/40 bg-ak-secondary/15 text-ak-secondary";
-	}
-
-	return "border-ak-border bg-ak-surface-soft text-ak-text-muted";
 };
 
 export const ItemGeneratedEffectsCard: FC<ItemGeneratedEffectsCard.Props> = ({ effects }) => {

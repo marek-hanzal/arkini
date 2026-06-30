@@ -1,6 +1,7 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProducerDefaultEffectProductId";
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
@@ -30,13 +31,26 @@ export namespace readRuntimeProducerProductLineViewsFromGameSave {
 		config: GameConfig;
 		maxQueueSize: number;
 		nowMs: number;
-		producerId: string;
-		producerItemId: string;
 		productIds: readonly string[];
 		save: GameSave;
 		targetItemInstanceId: string;
 	}
 }
+
+const isRuntimeEffectRequirementActive = (
+	requirement: EffectiveProducerProductLine["requirements"][number],
+) => (requirement.kind === "grant.blockStart" ? !requirement.ready : requirement.ready);
+
+const shouldDisplayRuntimeEffectRequirement = (
+	requirement: EffectiveProducerProductLine["requirements"][number],
+) => {
+	if (requirement.display === "never") return false;
+	if (requirement.display === "always") return true;
+	if (requirement.display === "whenActive") {
+		return isRuntimeEffectRequirementActive(requirement);
+	}
+	return !requirement.ready;
+};
 
 const readRuntimeStoredProductInputQuantityFromGameSave = ({
 	itemId,
@@ -54,8 +68,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
 	nowMs,
-	producerId,
-	producerItemId,
 	productIds,
 	save,
 	targetItemInstanceId,
@@ -79,8 +91,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
 		nowMs,
-		producerId,
-		producerItemId,
 		producerItemInstanceId: targetItemInstanceId,
 		productIds,
 		save,
@@ -131,8 +141,6 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			baseDurationMs,
 			config,
 			nowMs,
-			producerId,
-			producerItemId,
 			producerItemInstanceId: targetItemInstanceId,
 			product,
 			productId,
@@ -201,8 +209,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			save,
 		});
 		const hasEffectStartRequirements = effectiveProductLine.requirements.some(
-			(requirement) =>
-				requirement.kind === "grant.require" || requirement.kind === "nearby.require",
+			(requirement) => requirement.phase === "start",
 		);
 		const effectRequirementsReady =
 			effectiveProductLine.grantsReady === false
@@ -211,12 +218,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					? true
 					: undefined;
 		const effectRequirements = effectiveProductLine.requirements
-			.filter((requirement) => {
-				if (requirement.display === "never") return false;
-				if (requirement.display === "always") return true;
-				if (requirement.display === "whenActive") return !requirement.ready;
-				return !requirement.ready;
-			})
+			.filter(shouldDisplayRuntimeEffectRequirement)
 			.map((requirement) => ({
 				kind:
 					requirement.kind === "grant.require" ||

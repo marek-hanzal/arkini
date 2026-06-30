@@ -9,8 +9,6 @@ import { readEffectiveOutputTargetLimits } from "~/v0/game/limit/readEffectiveOu
 export namespace checkProducerProductStartRuntimeConstraintsFx {
 	export interface Props {
 		config: GameConfig;
-		producerId: string;
-		producerItemId: string;
 		producerItemInstanceId: string;
 		product: GameConfig["products"][string];
 		productId: string;
@@ -23,8 +21,6 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 	"checkProducerProductStartRuntimeConstraintsFx",
 )(function* ({
 	config,
-	producerId,
-	producerItemId,
 	producerItemInstanceId,
 	product,
 	productId,
@@ -37,8 +33,6 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 		}),
 		config,
 		nowMs: startAtMs,
-		producerId,
-		producerItemId,
 		producerItemInstanceId,
 		product,
 		productId,

@@ -3,6 +3,12 @@ import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readAc
 import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
+import {
+	effectPolaritySections,
+	readEffectPolarityBadgeClassName,
+	readEffectPolarityLabel,
+	type EffectPolarityUi,
+} from "~/v0/item/ui/effectPolarityUi";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
@@ -99,53 +105,8 @@ const readLineProgressDisplay = (line: ProducerProductLineView) => {
 	return readLineKind(line) === "effect" ? 1 - progress : progress;
 };
 
-type EffectPolarity = NonNullable<ProducerProductLineView["effectPolarity"]>;
-
-const effectPolaritySections: readonly {
-	polarity: EffectPolarity;
-	title: string;
-}[] = [
-	{
-		polarity: "buff",
-		title: "Buffs",
-	},
-	{
-		polarity: "debuff",
-		title: "Debuffs",
-	},
-	{
-		polarity: "neutral",
-		title: "Neutral effects",
-	},
-	{
-		polarity: "mixed",
-		title: "Mixed effects",
-	},
-];
-
-const readEffectPolarity = (line: ProducerProductLineView): EffectPolarity =>
+const readEffectPolarity = (line: ProducerProductLineView): EffectPolarityUi =>
 	line.effectPolarity ?? "neutral";
-
-const readEffectPolarityLabel = (polarity: EffectPolarity) => {
-	if (polarity === "buff") return "Buff";
-	if (polarity === "debuff") return "Debuff";
-	if (polarity === "mixed") return "Mixed";
-	return "Neutral";
-};
-
-const readEffectPolarityBadgeClassName = (polarity: EffectPolarity) => {
-	if (polarity === "buff") {
-		return "border-ak-success/40 bg-ak-success-soft text-ak-success";
-	}
-	if (polarity === "debuff") {
-		return "border-ak-danger/40 bg-ak-danger-soft text-ak-danger";
-	}
-	if (polarity === "mixed") {
-		return "border-ak-secondary/40 bg-ak-secondary/15 text-ak-secondary";
-	}
-
-	return "border-ak-border bg-ak-surface-soft text-ak-text-muted";
-};
 
 const readEffectRequirementStateLabel = (
 	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],

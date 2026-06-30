@@ -37,8 +37,6 @@ const readLine = ({
 	return readEffectiveProducerProductLine({
 		baseDurationMs: product.durationMs,
 		config,
-		producerId: "item:producer",
-		producerItemId: "item:producer",
 		producerItemInstanceId: "item-instance:1",
 		product,
 		productId,
@@ -91,6 +89,7 @@ describe("readEffectiveProducerProductLine", () => {
 				display: "always",
 				kind: "grant.require",
 				label: "Town Hall Grant",
+				phase: "start",
 				ready: false,
 			},
 		]);

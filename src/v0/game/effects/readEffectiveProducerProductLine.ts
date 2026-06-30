@@ -15,8 +15,6 @@ export namespace readEffectiveProducerProductLine {
 		config: GameConfig;
 		ignoredProducerJobIds?: ReadonlySet<string>;
 		nowMs?: number;
-		producerId: string;
-		producerItemId: string;
 		producerItemInstanceId: string;
 		product: GameConfig["products"][string];
 		productId: string;
@@ -188,7 +186,6 @@ export const readEffectiveProducerProductLine = ({
 	config,
 	ignoredProducerJobIds,
 	nowMs,
-	producerId,
 	producerItemInstanceId,
 	product,
 	productId,
@@ -216,6 +213,36 @@ export const readEffectiveProducerProductLine = ({
 		save,
 	});
 
+	const recordRequirementOutcome = ({
+		display,
+		kind,
+		label,
+		operation,
+		phase,
+		ready,
+	}: {
+		display: EffectiveProducerProductLine["requirements"][number]["display"];
+		kind: "grant.require" | "nearby.require";
+		label: string;
+		operation: AppliedGameEffectOperation;
+		phase: "start" | "visibility";
+		ready: boolean;
+	}) => {
+		if (phase === "visibility") {
+			hasVisibilityRequirement = true;
+			if (!ready) visibilityReady = false;
+		}
+		if (phase === "start" && !ready) grantsReady = false;
+		requirements.push({
+			display,
+			kind,
+			label,
+			phase,
+			ready,
+		});
+		if (ready) appliedEffects.push(operation);
+	};
+
 	for (const [lineEffectIndex, lineEffect] of (product.effects ?? []).entries()) {
 		const lineEffectId = `${productId}:effect:${lineEffectIndex}`;
 		const lineEffectName = readLineEffectLabel({
@@ -230,22 +257,17 @@ export const readEffectiveProducerProductLine = ({
 		});
 
 		if (lineEffect.kind === "grant.require") {
-			const ready = doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: lineEffect.selector,
-			});
-			if (lineEffect.phase === "visibility") {
-				hasVisibilityRequirement = true;
-				if (!ready) visibilityReady = false;
-			}
-			if (lineEffect.phase === "start" && !ready) grantsReady = false;
-			requirements.push({
+			recordRequirementOutcome({
 				display: lineEffect.display,
 				kind: lineEffect.kind,
 				label: lineEffectName,
-				ready,
+				operation: appliedOperation,
+				phase: lineEffect.phase,
+				ready: doesGameGrantSelectorMatchIds({
+					grantIds,
+					selector: lineEffect.selector,
+				}),
 			});
-			if (ready) appliedEffects.push(appliedOperation);
 			continue;
 		}
 
@@ -263,32 +285,28 @@ export const readEffectiveProducerProductLine = ({
 				display: lineEffect.display,
 				kind: lineEffect.kind,
 				label: lineEffectName,
+				phase: "start",
 				ready: !active,
 			});
 			continue;
 		}
 
 		if (lineEffect.kind === "nearby.require") {
-			const ready =
-				readNearbyMatches({
-					config,
-					items: lineEffect.items,
-					radius: lineEffect.radius,
-					save,
-					targetCell,
-				}).length > 0;
-			if (lineEffect.phase === "visibility") {
-				hasVisibilityRequirement = true;
-				if (!ready) visibilityReady = false;
-			}
-			if (lineEffect.phase === "start" && !ready) grantsReady = false;
-			requirements.push({
+			recordRequirementOutcome({
 				display: lineEffect.display,
 				kind: lineEffect.kind,
 				label: lineEffectName,
-				ready,
+				operation: appliedOperation,
+				phase: lineEffect.phase,
+				ready:
+					readNearbyMatches({
+						config,
+						items: lineEffect.items,
+						radius: lineEffect.radius,
+						save,
+						targetCell,
+					}).length > 0,
 			});
-			if (ready) appliedEffects.push(appliedOperation);
 			continue;
 		}
 

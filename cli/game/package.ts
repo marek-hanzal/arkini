@@ -7,6 +7,7 @@ import {
 	type GameConfig,
 	type GameConfigFragment,
 } from "../../src/v0/game/config/GameConfigSchema";
+import { doesResolvedDomainSelectorMatchId } from "../../src/v0/game/selector/doesResolvedDomainSelectorMatchId";
 
 const collectionKeys = [
 	"resources",
@@ -506,7 +507,10 @@ const normalizeAuthoringDomainSelector = ({
 	}
 
 	const matchedIds = domain.ids.filter((id) =>
-		doesResolvedDomainSelectorMatchId(id, normalizedSelector),
+		doesResolvedDomainSelectorMatchId({
+			entityId: id,
+			selector: normalizedSelector,
+		}),
 	);
 	if (matchedIds.length === 0) {
 		throw new Error(`${path}: selector matched no ${domain.label}s.`);
@@ -573,20 +577,6 @@ const resolveAuthoringDomainSelectorRef = ({
 	);
 
 	return domain.ids.filter((id) => domain.tagsById.get(id)?.has(ref.tag));
-};
-
-const doesResolvedDomainSelectorMatchId = (entityId: string, selector: ResolvedDomainSelector) => {
-	if ("mode" in selector) return true;
-	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	if (selector.noneOf?.some((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	return true;
 };
 
 const validateUniqueSelectorRefs = (refs: readonly AuthoringDomainSelectorRef[], path: string) => {

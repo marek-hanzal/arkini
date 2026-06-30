@@ -2,6 +2,7 @@ import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readItemTargetLimits } from "~/v0/game/limit/readItemTargetLimits";
+import { mergeItemTargetLimits } from "~/v0/game/limit/mergeItemTargetLimits";
 
 type ActivationOutput = NonNullable<GameConfig["products"][string]["output"]>;
 
@@ -23,25 +24,6 @@ const readOutputQuantityMaximum = (
 		  },
 ) => (typeof quantity === "number" ? quantity : quantity.max);
 
-const mergeLimits = (views: ItemTargetLimit[]) => {
-	const merged = new Map<string, ItemTargetLimit>();
-
-	for (const view of views) {
-		const existing = merged.get(view.itemId);
-		if (!existing) {
-			merged.set(view.itemId, view);
-			continue;
-		}
-
-		merged.set(view.itemId, {
-			...existing,
-			requiredQuantity: existing.requiredQuantity + view.requiredQuantity,
-		});
-	}
-
-	return Array.from(merged.values());
-};
-
 export const readOutputTargetLimits = ({
 	config,
 	ignoredBoardItemInstanceIds,
@@ -50,7 +32,7 @@ export const readOutputTargetLimits = ({
 }: readOutputTargetLimits.Props): ItemTargetLimit[] => {
 	if (!output) return [];
 
-	return mergeLimits(
+	return mergeItemTargetLimits(
 		output.flatMap((outputEntry) => {
 			if (outputEntry.type !== "guaranteed") return [];
 

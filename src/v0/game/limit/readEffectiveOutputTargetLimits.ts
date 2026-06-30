@@ -1,4 +1,5 @@
 import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
+import { mergeItemTargetLimits } from "~/v0/game/limit/mergeItemTargetLimits";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -13,32 +14,13 @@ export namespace readEffectiveOutputTargetLimits {
 	}
 }
 
-const mergeLimits = (views: ItemTargetLimit[]) => {
-	const merged = new Map<string, ItemTargetLimit>();
-
-	for (const view of views) {
-		const existing = merged.get(view.itemId);
-		if (!existing) {
-			merged.set(view.itemId, view);
-			continue;
-		}
-
-		merged.set(view.itemId, {
-			...existing,
-			requiredQuantity: existing.requiredQuantity + view.requiredQuantity,
-		});
-	}
-
-	return Array.from(merged.values());
-};
-
 export const readEffectiveOutputTargetLimits = ({
 	config,
 	ignoredBoardItemInstanceIds,
 	lootPlan,
 	save,
 }: readEffectiveOutputTargetLimits.Props): ItemTargetLimit[] =>
-	mergeLimits(
+	mergeItemTargetLimits(
 		readOutputTargetLimits({
 			config,
 			ignoredBoardItemInstanceIds,

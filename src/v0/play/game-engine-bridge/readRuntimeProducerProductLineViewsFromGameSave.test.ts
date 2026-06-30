@@ -43,8 +43,6 @@ const readTestLine = ({
 		config,
 		maxQueueSize: 1,
 		nowMs,
-		producerId: "item:producer",
-		producerItemId: "item:producer",
 		productIds: [
 			"product:test",
 		],
@@ -95,6 +93,100 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 
 		expect(line.effectRequirements).toBeUndefined();
 		expect(line.effectRequirementsReady).toBe(false);
+	});
+
+	it("honors active and missing display policies separately for requirement rows", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:present": {
+					polarity: "neutral",
+					grantIds: [
+						"grant:test:present",
+					],
+					name: "Present Grant",
+				},
+				"effect:test:missing": {
+					polarity: "neutral",
+					grantIds: [
+						"grant:test:missing",
+					],
+					name: "Missing Grant",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:test:present",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					effects: [
+						{
+							display: "whenActive",
+							kind: "grant.require",
+							label: "Present active row",
+							phase: "start",
+							selector: allOfGrant("grant:test:present"),
+						},
+						{
+							display: "whenActive",
+							kind: "grant.require",
+							label: "Missing active row",
+							phase: "start",
+							selector: allOfGrant("grant:test:missing"),
+						},
+						{
+							display: "whenMissing",
+							kind: "grant.require",
+							label: "Missing row",
+							phase: "start",
+							selector: allOfGrant("grant:test:missing"),
+						},
+					],
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				board: [
+					...baseConfig.startingState.board,
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readTestLine({
+			config,
+			save,
+		});
+
+		expect(line.effectRequirementsReady).toBe(false);
+		expect(line.effectRequirements).toEqual([
+			{
+				kind: "grant.require",
+				label: "Present active row",
+				ready: true,
+			},
+			{
+				kind: "grant.require",
+				label: "Missing row",
+				ready: false,
+			},
+		]);
 	});
 
 	it("reports active line modifiers as bonuses instead of fake missing requirements", () => {

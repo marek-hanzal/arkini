@@ -2,8 +2,9 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
-import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
+import { readItemTargetLimits } from "~/v0/game/limit/readItemTargetLimits";
+import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 
 export namespace checkCraftStartRuntimeConstraintsFx {
 	export interface Props {
@@ -48,20 +49,25 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 				),
 			);
 		}
-		if (
-			readBoardItemMaxCountCapacity({
-				config,
-				ignoredBoardItemInstanceIds: new Set([
-					targetItemInstanceId,
-				]),
-				itemId: recipe.resultItemId,
-				save,
-			}) <= 0
-		) {
+
+		const targetLimits = readItemTargetLimits({
+			config,
+			ignoredBoardItemInstanceIds: new Set([
+				targetItemInstanceId,
+			]),
+			includePendingCraftJobs: true,
+			includePendingProducerJobs: true,
+			itemId: recipe.resultItemId,
+			save,
+		});
+		if (readTargetLimitBlocked(targetLimits)) {
+			const blockedLimit = targetLimits.find(
+				(limit) => limit.remainingQuantity < limit.requiredQuantity,
+			);
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"board:max-count",
-					`Board already has the maximum allowed count for "${recipe.resultItemId}".`,
+					`Board already has the maximum allowed count for "${blockedLimit?.itemId ?? recipe.resultItemId}".`,
 				),
 			);
 		}

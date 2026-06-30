@@ -10,6 +10,9 @@ export namespace readOutputTargetLimits {
 	export interface Props {
 		config: GameConfig;
 		ignoredBoardItemInstanceIds?: ReadonlySet<string>;
+		includePendingCraftJobs?: boolean;
+		includePendingCraftSourceItems?: boolean;
+		includePendingProducerJobs?: boolean;
 		output: ActivationOutput | undefined;
 		save: GameSave;
 	}
@@ -27,6 +30,9 @@ const readOutputQuantityMaximum = (
 export const readOutputTargetLimits = ({
 	config,
 	ignoredBoardItemInstanceIds,
+	includePendingCraftJobs,
+	includePendingCraftSourceItems,
+	includePendingProducerJobs,
 	output,
 	save,
 }: readOutputTargetLimits.Props): ItemTargetLimit[] => {
@@ -39,6 +45,9 @@ export const readOutputTargetLimits = ({
 			return readItemTargetLimits({
 				config,
 				ignoredBoardItemInstanceIds,
+				includePendingCraftJobs,
+				includePendingCraftSourceItems,
+				includePendingProducerJobs,
 				itemId: outputEntry.itemId,
 				requiredQuantity: readOutputQuantityMaximum(outputEntry.quantity),
 				save,

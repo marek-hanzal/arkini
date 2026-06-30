@@ -205,6 +205,181 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("counts owned blueprint items against inherited producer output target limits", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+				"item:blueprint-plank": {
+					assetId: "asset:test",
+					description: "Plank blueprint",
+					maxStackSize: 3,
+					storage: "both",
+					name: "Plank Blueprint",
+					tags: [
+						"blueprint",
+					],
+					tier: 0,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:blueprint-plank": {
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:plank",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:blueprint-plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:blueprint-plank",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const producer = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		}).byId["item-instance:1"];
+
+		expect(producer?.activation?.productLines?.[0]).toMatchObject({
+			outputLimitBlocked: true,
+			targetLimits: [
+				{
+					itemId: "item:plank",
+					maxCount: 1,
+					ownedQuantity: 1,
+					remainingQuantity: 0,
+					requiredQuantity: 1,
+					sourceItemId: "item:blueprint-plank",
+				},
+			],
+		});
+	});
+
+	it("counts inventory blueprint items against inherited producer output target limits", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+				"item:blueprint-plank": {
+					assetId: "asset:test",
+					description: "Plank blueprint",
+					maxStackSize: 3,
+					storage: "both",
+					name: "Plank Blueprint",
+					tags: [
+						"blueprint",
+					],
+					tier: 0,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:blueprint-plank": {
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:plank",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:blueprint-plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:blueprint-plank",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const producer = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		}).byId["item-instance:1"];
+
+		expect(producer?.activation?.productLines?.[0]).toMatchObject({
+			outputLimitBlocked: true,
+			targetLimits: [
+				{
+					itemId: "item:plank",
+					maxCount: 1,
+					ownedQuantity: 1,
+					remainingQuantity: 0,
+					requiredQuantity: 1,
+					sourceItemId: "item:blueprint-plank",
+				},
+			],
+		});
+	});
+
 	it("counts owned product outputs across board and inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

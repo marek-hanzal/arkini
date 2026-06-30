@@ -68,6 +68,9 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 
 	const blockedLimit = readEffectiveOutputTargetLimits({
 		config,
+		includePendingCraftJobs: true,
+		includePendingCraftSourceItems: true,
+		includePendingProducerJobs: true,
 		lootPlan: effectiveProductLine.lootPlan,
 		save,
 	}).find((limit) => limit.remainingQuantity < limit.requiredQuantity);

@@ -9,6 +9,9 @@ export namespace readEffectiveOutputTargetLimits {
 	export interface Props {
 		config: GameConfig;
 		ignoredBoardItemInstanceIds?: ReadonlySet<string>;
+		includePendingCraftJobs?: boolean;
+		includePendingCraftSourceItems?: boolean;
+		includePendingProducerJobs?: boolean;
 		lootPlan: EffectiveProducerProductLine["lootPlan"];
 		save: GameSave;
 	}
@@ -17,6 +20,9 @@ export namespace readEffectiveOutputTargetLimits {
 export const readEffectiveOutputTargetLimits = ({
 	config,
 	ignoredBoardItemInstanceIds,
+	includePendingCraftJobs,
+	includePendingCraftSourceItems,
+	includePendingProducerJobs,
 	lootPlan,
 	save,
 }: readEffectiveOutputTargetLimits.Props): ItemTargetLimit[] =>
@@ -24,6 +30,9 @@ export const readEffectiveOutputTargetLimits = ({
 		readOutputTargetLimits({
 			config,
 			ignoredBoardItemInstanceIds,
+			includePendingCraftJobs,
+			includePendingCraftSourceItems,
+			includePendingProducerJobs,
 			output: lootPlan.baseOutput,
 			save,
 		}),

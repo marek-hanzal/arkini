@@ -3,11 +3,18 @@ import { readBoardItemCount } from "~/v0/game/board/readBoardItemCount";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+
+type ActivationOutput = NonNullable<GameConfig["products"][string]["output"]>;
+type ActivationOutputEntry = ActivationOutput[number];
 
 export namespace readItemTargetLimits {
 	export interface Props {
 		config: GameConfig;
 		ignoredBoardItemInstanceIds?: ReadonlySet<string>;
+		includePendingCraftJobs?: boolean;
+		includePendingCraftSourceItems?: boolean;
+		includePendingProducerJobs?: boolean;
 		itemId: string;
 		requiredQuantity?: number;
 		save: GameSave;
@@ -25,32 +32,194 @@ const appendTargetItemId = ({
 	itemIds.push(itemId);
 };
 
-export const readItemTargetLimits = ({
-	config,
+const readOutputQuantityMaximum = (
+	quantity:
+		| number
+		| {
+				max: number;
+				min: number;
+		  },
+) => (typeof quantity === "number" ? quantity : quantity.max);
+
+const readItemBoardAndInventoryQuantity = ({
 	ignoredBoardItemInstanceIds,
 	itemId,
-	requiredQuantity = 1,
 	save,
-}: readItemTargetLimits.Props): ItemTargetLimit[] => {
-	const targetItemIds: string[] = [];
+}: {
+	ignoredBoardItemInstanceIds: ReadonlySet<string>;
+	itemId: string;
+	save: GameSave;
+}) => {
+	let quantity = readBoardItemCount({
+		ignoredBoardItemInstanceIds,
+		itemId,
+		save,
+	});
+
+	for (const slot of save.inventory.slots) {
+		if (slot?.itemId !== itemId) continue;
+		quantity += readGameSaveInventorySlotQuantity(slot);
+	}
+
+	return quantity;
+};
+
+const readItemTargetItemIds = ({ config, itemId }: { config: GameConfig; itemId: string }) => {
+	const itemIds: string[] = [];
 	appendTargetItemId({
 		itemId,
-		itemIds: targetItemIds,
+		itemIds,
 	});
 	appendTargetItemId({
 		itemId: config.craftRecipes[itemId]?.resultItemId,
-		itemIds: targetItemIds,
+		itemIds,
 	});
+	return itemIds;
+};
 
-	return targetItemIds.flatMap((targetItemId) => {
+const outputEntryCanCreateTargetItem = ({
+	config,
+	outputEntry,
+	targetItemId,
+}: {
+	config: GameConfig;
+	outputEntry: ActivationOutputEntry;
+	targetItemId: string;
+}) => {
+	if (outputEntry.type !== "guaranteed") return false;
+	return readItemTargetItemIds({
+		config,
+		itemId: outputEntry.itemId,
+	}).includes(targetItemId);
+};
+
+const readPendingProducerOutputQuantity = ({
+	config,
+	save,
+	targetItemId,
+}: {
+	config: GameConfig;
+	save: GameSave;
+	targetItemId: string;
+}) => {
+	let quantity = 0;
+
+	for (const job of Object.values(save.producerJobs)) {
+		const product = config.products[job.productId];
+		if (!product?.output) continue;
+
+		for (const outputEntry of product.output) {
+			if (outputEntry.type !== "guaranteed") continue;
+			if (
+				!outputEntryCanCreateTargetItem({
+					config,
+					outputEntry,
+					targetItemId,
+				})
+			) {
+				continue;
+			}
+			quantity += readOutputQuantityMaximum(outputEntry.quantity);
+		}
+	}
+
+	return quantity;
+};
+
+const readPendingCraftJobQuantity = ({
+	config,
+	ignoredBoardItemInstanceIds,
+	save,
+	targetItemId,
+}: {
+	config: GameConfig;
+	ignoredBoardItemInstanceIds: ReadonlySet<string>;
+	save: GameSave;
+	targetItemId: string;
+}) => {
+	let quantity = 0;
+
+	for (const job of Object.values(save.craftJobs)) {
+		if (ignoredBoardItemInstanceIds.has(job.targetItemInstanceId)) continue;
+		const recipe = config.craftRecipes[job.recipeId];
+		if (recipe?.resultItemId === targetItemId) quantity += 1;
+	}
+
+	return quantity;
+};
+
+const readPendingCraftSourceItemQuantity = ({
+	config,
+	ignoredBoardItemInstanceIds,
+	save,
+	targetItemId,
+}: {
+	config: GameConfig;
+	ignoredBoardItemInstanceIds: ReadonlySet<string>;
+	save: GameSave;
+	targetItemId: string;
+}) => {
+	let quantity = 0;
+
+	for (const [sourceItemId, recipe] of Object.entries(config.craftRecipes)) {
+		if (sourceItemId === targetItemId) continue;
+		if (recipe.resultItemId !== targetItemId) continue;
+		quantity += readItemBoardAndInventoryQuantity({
+			ignoredBoardItemInstanceIds,
+			itemId: sourceItemId,
+			save,
+		});
+	}
+
+	return quantity;
+};
+
+export const readItemTargetLimits = ({
+	config,
+	ignoredBoardItemInstanceIds = new Set(),
+	includePendingCraftJobs = false,
+	includePendingCraftSourceItems = false,
+	includePendingProducerJobs = false,
+	itemId,
+	requiredQuantity = 1,
+	save,
+}: readItemTargetLimits.Props): ItemTargetLimit[] =>
+	readItemTargetItemIds({
+		config,
+		itemId,
+	}).flatMap((targetItemId) => {
 		const maxCount = config.items[targetItemId]?.maxCount;
 		if (maxCount === undefined) return [];
 
-		const ownedQuantity = readBoardItemCount({
-			ignoredBoardItemInstanceIds,
-			itemId: targetItemId,
-			save,
-		});
+		const ownedQuantity =
+			readBoardItemCount({
+				ignoredBoardItemInstanceIds,
+				itemId: targetItemId,
+				save,
+			}) +
+			(includePendingCraftSourceItems
+				? readPendingCraftSourceItemQuantity({
+						config,
+						ignoredBoardItemInstanceIds,
+						save,
+						targetItemId,
+					})
+				: 0) +
+			(includePendingCraftJobs
+				? readPendingCraftJobQuantity({
+						config,
+						ignoredBoardItemInstanceIds,
+						save,
+						targetItemId,
+					})
+				: 0) +
+			(includePendingProducerJobs
+				? readPendingProducerOutputQuantity({
+						config,
+						save,
+						targetItemId,
+					})
+				: 0);
 
 		return [
 			{
@@ -67,4 +236,3 @@ export const readItemTargetLimits = ({
 			},
 		] satisfies ItemTargetLimit[];
 	});
-};

@@ -312,6 +312,269 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
+	it("rejects blueprint producer output when the crafted target is reserved by an existing blueprint", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+				"item:blueprint-plank": {
+					assetId: "asset:test",
+					description: "Plank blueprint",
+					maxStackSize: 3,
+					storage: "both",
+					name: "Plank Blueprint",
+					tags: [
+						"blueprint",
+					],
+					tier: 0,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:blueprint-plank": {
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:plank",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:blueprint-plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:blueprint-plank",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			},
+		});
+	});
+
+	it("rejects blueprint producer output when the crafted target is reserved by an inventory blueprint", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+				"item:blueprint-plank": {
+					assetId: "asset:test",
+					description: "Plank blueprint",
+					maxStackSize: 3,
+					storage: "both",
+					name: "Plank Blueprint",
+					tags: [
+						"blueprint",
+					],
+					tier: 0,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:blueprint-plank": {
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:plank",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:blueprint-plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:blueprint-plank",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			},
+		});
+	});
+
+	it("rejects blueprint producer output when an existing producer job already reserves the crafted target", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:plank": {
+					...baseConfig.items["item:plank"],
+					maxCount: 1,
+				},
+				"item:blueprint-plank": {
+					assetId: "asset:test",
+					description: "Plank blueprint",
+					maxStackSize: 3,
+					storage: "both",
+					name: "Plank Blueprint",
+					tags: [
+						"blueprint",
+					],
+					tier: 0,
+				},
+			},
+			craftRecipes: {
+				...baseConfig.craftRecipes,
+				"item:blueprint-plank": {
+					durationMs: 0,
+					inputs: [],
+					resultItemId: "item:plank",
+				},
+			},
+			producers: {
+				...baseConfig.producers,
+				"item:producer": {
+					...baseConfig.producers["item:producer"],
+					maxQueueSize: 2,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					durationMs: 1000,
+					output: [
+						{
+							itemId: "item:blueprint-plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const first = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		const second = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 200,
+			save: first.save,
+		});
+
+		expect(second).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "board:max-count",
+			},
+		});
+	});
+
 	it("rejects producer start while the same target has a running craft job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

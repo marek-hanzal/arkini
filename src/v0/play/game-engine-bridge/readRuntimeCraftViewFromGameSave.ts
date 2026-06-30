@@ -79,6 +79,8 @@ export const readRuntimeCraftViewFromGameSave = ({
 		ignoredBoardItemInstanceIds: new Set([
 			boardItem.id,
 		]),
+		includePendingCraftJobs: true,
+		includePendingProducerJobs: true,
 		itemId: recipe.resultItemId,
 		save,
 	});

@@ -513,6 +513,8 @@ Relevant detail content includes, when applicable:
 
 Satisfied grants and inputs should be omitted from normal item detail sections. They may exist in diagnostic tooling, but player-facing sheets should not become a checklist museum once an expectation is already fulfilled.
 
+Item detail leaf components must be presentational. Start/claim/default/withdraw decisions belong in the item-detail control/view-model bridge, which passes ready button controls (`label`, `disabled`, `tone`, and `onClick`) into the cards. Detail cards must not branch between runtime actions locally, because that turns UI into a tiny second engine with better fonts and worse tests.
+
 Item detail is gameplay UI. If a mechanic exists and the player can reasonably inspect it, the detail is the canonical place to expose it.
 
 ### 8.6 Withdrawal from item-owned storage

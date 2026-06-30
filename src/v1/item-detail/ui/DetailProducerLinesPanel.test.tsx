@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import { readDetailProducerLineControl } from "~/v1/item-detail/control/readDetailProducerLineControl";
 import { DetailProducerLinesPanel } from "~/v1/item-detail/ui/DetailProducerLinesPanel";
 
 const item = (id: string, name: string, assetSrc: string) => ({
@@ -19,6 +20,18 @@ const items: ItemCatalogView = {
 	"item:grain": item("item:grain", "Grain", "grain.svg"),
 	"item:water": item("item:water", "Water", "water.svg"),
 };
+
+const lineModel = (line: ProducerProductLineView) => ({
+	control: readDetailProducerLineControl({
+		canSetDefault: true,
+		line,
+		onSetDefault: () => undefined,
+		onStart: () => undefined,
+		onWithdrawInput: () => undefined,
+		pending: false,
+	}),
+	line,
+});
 
 const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
 	blocked: false,
@@ -45,21 +58,19 @@ describe("DetailProducerLinesPanel", () => {
 			<DetailProducerLinesPanel
 				items={items}
 				lines={[
-					createLine({
-						outputs: [
-							{
-								itemId: "item:grain",
-								kind: "guaranteed",
-								ownedQuantity: 7,
-								quantity: 1,
-							},
-						],
-					}),
+					lineModel(
+						createLine({
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 7,
+									quantity: 1,
+								},
+							],
+						}),
+					),
 				]}
-				pending={false}
-				onSetDefault={() => undefined}
-				onStart={() => undefined}
-				onWithdrawInput={() => undefined}
 			/>,
 		);
 
@@ -72,30 +83,28 @@ describe("DetailProducerLinesPanel", () => {
 			<DetailProducerLinesPanel
 				items={items}
 				lines={[
-					createLine({
-						effectRequirements: [
-							{
-								kind: "grant.require",
-								label: "Owns Water",
-								ready: true,
-							},
-						],
-						inputs: [
-							{
-								available: 1,
-								capacity: 1,
-								consume: true,
-								itemId: "item:water",
-								quantity: 1,
-								stored: 0,
-							},
-						],
-					}),
+					lineModel(
+						createLine({
+							effectRequirements: [
+								{
+									kind: "grant.require",
+									label: "Owns Water",
+									ready: true,
+								},
+							],
+							inputs: [
+								{
+									available: 1,
+									capacity: 1,
+									consume: true,
+									itemId: "item:water",
+									quantity: 1,
+									stored: 0,
+								},
+							],
+						}),
+					),
 				]}
-				pending={false}
-				onSetDefault={() => undefined}
-				onStart={() => undefined}
-				onWithdrawInput={() => undefined}
 			/>,
 		);
 
@@ -109,29 +118,27 @@ describe("DetailProducerLinesPanel", () => {
 			<DetailProducerLinesPanel
 				items={items}
 				lines={[
-					createLine({
-						inputItemIds: [
-							"item:water",
-						],
-						inputs: [
-							{
-								available: 0,
-								capacity: 1,
-								consume: true,
-								itemId: "item:water",
-								quantity: 1,
-								stored: 0,
-							},
-						],
-						inputsAvailable: false,
-						inputsReady: false,
-						isDefault: true,
-					}),
+					lineModel(
+						createLine({
+							inputItemIds: [
+								"item:water",
+							],
+							inputs: [
+								{
+									available: 0,
+									capacity: 1,
+									consume: true,
+									itemId: "item:water",
+									quantity: 1,
+									stored: 0,
+								},
+							],
+							inputsAvailable: false,
+							inputsReady: false,
+							isDefault: true,
+						}),
+					),
 				]}
-				pending={false}
-				onSetDefault={() => undefined}
-				onStart={() => undefined}
-				onWithdrawInput={() => undefined}
 			/>,
 		);
 
@@ -146,21 +153,19 @@ describe("DetailProducerLinesPanel", () => {
 			<DetailProducerLinesPanel
 				items={items}
 				lines={[
-					createLine({
-						blocked: true,
-						effectRequirements: [
-							{
-								kind: "grant.blockStart",
-								label: "Engineers path chosen",
-								ready: false,
-							},
-						],
-					}),
+					lineModel(
+						createLine({
+							blocked: true,
+							effectRequirements: [
+								{
+									kind: "grant.blockStart",
+									label: "Engineers path chosen",
+									ready: false,
+								},
+							],
+						}),
+					),
 				]}
-				pending={false}
-				onSetDefault={() => undefined}
-				onStart={() => undefined}
-				onWithdrawInput={() => undefined}
 			/>,
 		);
 

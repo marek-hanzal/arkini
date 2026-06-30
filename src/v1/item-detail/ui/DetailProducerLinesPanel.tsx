@@ -4,11 +4,11 @@ import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInp
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiProgressButton } from "~/v0/ui/UiProgressButton";
 import { cn } from "~/v0/ui/cn";
+import type { DetailProducerLineModel } from "~/v1/item-detail/control/DetailProducerLineModel";
 import { DetailCard, DetailMutedPill, DetailTabs } from "~/v1/item-detail/ui/DetailCard";
 import {
 	effectDetailPolarityTabs,
@@ -19,17 +19,10 @@ import {
 
 export namespace DetailProducerLinesPanel {
 	export interface Props {
-		canSetDefault?: boolean;
 		items: ItemCatalogView;
-		lines: readonly ProducerProductLineView[];
-		pending: boolean;
-		onSetDefault(productId: string): void;
-		onStart(productId: string): void;
-		onWithdrawInput(productId: string, itemId: string): void;
+		lines: readonly DetailProducerLineModel[];
 	}
 }
-
-type LineRunState = ReturnType<typeof readProducerProductLineRunState>;
 
 const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "");
 
@@ -69,45 +62,12 @@ const readOutputMeta = (output: NonNullable<ProducerProductLineView["outputs"]>[
 		.filter(Boolean)
 		.join(" · ");
 
-const readLineActionLabel = ({
-	line,
-	runState,
-}: {
-	line: ProducerProductLineView;
-	runState: LineRunState;
-}) => {
-	if (!runState.showProgress) return runState.label;
-
-	const statusLabel =
-		line.remainingMs === undefined ? "Queued" : (runState.progressLabel ?? "Running");
-	const timeLabel = line.remainingMs === undefined ? undefined : formatMs(line.remainingMs);
-	const queuedLabel = line.queuedJobs > 1 ? `+${line.queuedJobs - 1} queued` : undefined;
-
-	return [
-		statusLabel,
-		timeLabel,
-		queuedLabel,
-	]
-		.filter(Boolean)
-		.join(" · ");
-};
-
-const readLineProgressDisplay = (line: ProducerProductLineView) => {
-	const progress = line.progress ?? 0;
-	return line.lineKind === "effect" ? 1 - progress : progress;
-};
-
-const readDefaultActionLabel = (line: ProducerProductLineView) =>
-	line.isDefault ? "Un-default" : "Default";
-
 const readEffectRequirementPrefix = (
 	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
 ) => (requirement.kind === "grant.blockStart" ? "Blocked by" : "Missing");
 
 const readVisibleEffectRequirements = (line: ProducerProductLineView) =>
-	(line.effectRequirements ?? []).filter((requirement) =>
-		requirement.kind === "grant.blockStart" ? !requirement.ready : !requirement.ready,
-	);
+	(line.effectRequirements ?? []).filter((requirement) => !requirement.ready);
 
 const readLineEffectPolarity = (
 	line: ProducerProductLineView,
@@ -198,10 +158,9 @@ const DetailLineOutputs: FC<{
 
 const DetailLineInputs: FC<{
 	items: ItemCatalogView;
-	line: ProducerProductLineView;
-	onWithdrawInput(productId: string, itemId: string): void;
-	pending: boolean;
-}> = ({ items, line, onWithdrawInput, pending }) => {
+	model: DetailProducerLineModel;
+}> = ({ items, model }) => {
+	const { control, line } = model;
 	if (line.inputs.length === 0) return null;
 
 	return (
@@ -209,6 +168,7 @@ const DetailLineInputs: FC<{
 			{line.inputs.map((input) => {
 				const inputItem = items[input.itemId];
 				const fillableQuantity = readActivationInputViewFillableQuantity(input);
+				const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
 				const meta = [
 					readActivationInputViewLabel(input),
 					fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined,
@@ -234,14 +194,15 @@ const DetailLineInputs: FC<{
 								{meta}
 							</p>
 						</div>
-						{input.stored > 0 ? (
+						{withdrawAction ? (
 							<UiButton
 								data-ui="withdraw action"
-								disabled={pending}
+								disabled={withdrawAction.disabled}
 								fullWidth={false}
-								onClick={() => onWithdrawInput(line.productId, input.itemId)}
+								tone={withdrawAction.tone}
+								onClick={withdrawAction.onClick}
 							>
-								Withdraw
+								{withdrawAction.label}
 							</UiButton>
 						) : null}
 					</div>
@@ -252,17 +213,10 @@ const DetailLineInputs: FC<{
 };
 
 const DetailProducerLineCard: FC<{
-	canSetDefault: boolean;
 	items: ItemCatalogView;
-	line: ProducerProductLineView;
-	onSetDefault(productId: string): void;
-	onStart(productId: string): void;
-	onWithdrawInput(productId: string, itemId: string): void;
-	pending: boolean;
-}> = ({ canSetDefault, items, line, onSetDefault, onStart, onWithdrawInput, pending }) => {
-	const runState = readProducerProductLineRunState({
-		line,
-	});
+	model: DetailProducerLineModel;
+}> = ({ items, model }) => {
+	const { control, line } = model;
 	const effectPolarity = readLineEffectPolarity(line);
 	const visibleRequirements = readVisibleEffectRequirements(line);
 	const targetLimits = line.targetLimits ?? [];
@@ -276,8 +230,6 @@ const DetailProducerLineCard: FC<{
 		line.effectDurationMultiplier && line.effectDurationMultiplier > 1
 			? `slowed ${formatMultiplier(line.effectDurationMultiplier)}×`
 			: undefined,
-		runState.statusMetaLabel,
-		runState.inputAvailabilityLabel,
 	]
 		.filter(Boolean)
 		.join(" · ");
@@ -337,35 +289,30 @@ const DetailProducerLineCard: FC<{
 				) : null}
 				<DetailLineInputs
 					items={items}
-					line={line}
-					onWithdrawInput={onWithdrawInput}
-					pending={pending}
+					model={model}
 				/>
 			</div>
 
-			<div className={cn("mt-3 grid gap-2", canSetDefault && "grid-cols-3")}>
+			<div className={cn("mt-3 grid gap-2", control.defaultAction && "grid-cols-3")}>
 				<UiProgressButton
-					disabled={runState.showProgress || !runState.canRunAction || pending}
-					progress={runState.showProgress ? readLineProgressDisplay(line) : undefined}
-					progressAutoCompleteMs={runState.progressAutoCompleteMs}
-					progressAutoCompleteTo={line.lineKind === "effect" ? "empty" : "full"}
-					tone="primary"
-					className={canSetDefault ? "col-span-2" : undefined}
-					onClick={() => onStart(line.productId)}
+					disabled={control.primaryAction.disabled}
+					progress={control.primaryAction.progress}
+					progressAutoCompleteMs={control.primaryAction.progressAutoCompleteMs}
+					progressAutoCompleteTo={control.primaryAction.progressAutoCompleteTo}
+					tone={control.primaryAction.tone}
+					className={control.defaultAction ? "col-span-2" : undefined}
+					onClick={control.primaryAction.onClick}
 				>
-					{readLineActionLabel({
-						line,
-						runState,
-					})}
+					{control.primaryAction.label}
 				</UiProgressButton>
-				{canSetDefault ? (
+				{control.defaultAction ? (
 					<UiButton
 						fullWidth
-						disabled={pending}
-						tone="secondary"
-						onClick={() => onSetDefault(line.productId)}
+						disabled={control.defaultAction.disabled}
+						tone={control.defaultAction.tone}
+						onClick={control.defaultAction.onClick}
 					>
-						{readDefaultActionLabel(line)}
+						{control.defaultAction.label}
 					</UiButton>
 				) : null}
 			</div>
@@ -373,27 +320,19 @@ const DetailProducerLineCard: FC<{
 	);
 };
 
-export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({
-	canSetDefault = true,
-	items,
-	lines,
-	onSetDefault,
-	onStart,
-	onWithdrawInput,
-	pending,
-}) => {
+export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ items, lines }) => {
 	const groups = [
 		{
 			id: "product",
 			label: "Products",
-			lines: lines.filter((line) => line.lineKind === "product"),
+			lines: lines.filter(({ line }) => line.lineKind === "product"),
 			title: "Product lines",
 		},
 		...effectDetailPolarityTabs.map((tab) => ({
 			id: `effect:${tab.polarity}`,
 			label: tab.label,
 			lines: lines.filter(
-				(line) =>
+				({ line }) =>
 					line.lineKind === "effect" && readLineEffectPolarity(line) === tab.polarity,
 			),
 			title: tab.title,
@@ -422,16 +361,11 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({
 				/>
 			) : null}
 			<div className="mt-2 grid max-h-[30rem] gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
-				{activeGroup.lines.map((line) => (
+				{activeGroup.lines.map((model) => (
 					<DetailProducerLineCard
-						key={line.productId}
-						canSetDefault={canSetDefault}
+						key={model.line.productId}
 						items={items}
-						line={line}
-						onSetDefault={onSetDefault}
-						onStart={onStart}
-						onWithdrawInput={onWithdrawInput}
-						pending={pending}
+						model={model}
 					/>
 				))}
 			</div>

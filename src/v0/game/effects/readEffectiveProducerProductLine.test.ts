@@ -462,6 +462,117 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(effective.appliedEffects[0]?.sourceItemInstanceId).toBe("item-instance:2");
 	});
 
+	it("lets the nearest local line visibility effect override farther visibility effects", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:far-hide": {
+					name: "Far hide",
+					operations: [
+						{
+							kind: "line.hide",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					radius: 3,
+					scope: "local",
+				},
+				"effect:near-reveal": {
+					name: "Near reveal",
+					operations: [
+						{
+							kind: "line.reveal",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					radius: 3,
+					scope: "local",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 4,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:far-hide",
+					],
+				},
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					passiveEffectIds: [
+						"effect:near-reveal",
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		expect(
+			readEffectiveProducerProductLine({
+				baseDurationMs: product.durationMs,
+				config,
+				nowMs: 0,
+				producerId: "item:producer",
+				producerItemId: "item:producer",
+				producerItemInstanceId: "item-instance:1",
+				product,
+				productId: "product:test",
+				save,
+			}).visible,
+		).toBe(true);
+	});
+
 	it("applies active effects only between activation and expiration", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

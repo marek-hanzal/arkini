@@ -205,6 +205,104 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("shows producer output target limits from effect-replaced outputs", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:replace-test-output": {
+					name: "Replace test output",
+					operations: [
+						{
+							kind: "loot.replaceOutput",
+							output: [
+								{
+									itemId: "item:key",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:replace-test-output",
+					],
+				},
+				"item:key": {
+					...baseConfig.items["item:key"],
+					maxCount: 1,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:key",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const producer = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		}).byId["item-instance:1"];
+
+		expect(producer?.activation?.productLines?.[0]).toMatchObject({
+			outputLimitBlocked: true,
+			targetLimits: [
+				{
+					itemId: "item:key",
+					maxCount: 1,
+					ownedQuantity: 1,
+					remainingQuantity: 0,
+					requiredQuantity: 1,
+				},
+			],
+		});
+	});
+
 	it("counts owned product outputs across board and inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

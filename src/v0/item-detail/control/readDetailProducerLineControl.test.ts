@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import { readDetailProducerLineControl } from "~/v1/item-detail/control/readDetailProducerLineControl";
+import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDetailProducerLineControl";
 
 const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
 	blocked: false,

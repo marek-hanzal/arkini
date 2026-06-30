@@ -1,12 +1,12 @@
 import { type FC, useState } from "react";
 import type { ViewItemGeneratedEffect } from "~/v0/item/view/ViewItemSchema";
 import { cn } from "~/v0/ui/cn";
-import { DetailCard, DetailMutedPill, DetailTabs } from "~/v1/item-detail/ui/DetailCard";
+import { DetailCard, DetailMutedPill, DetailTabs } from "~/v0/item-detail/ui/DetailCard";
 import {
 	effectDetailPolarityTabs,
 	readEffectDetailPolarityClassName,
 	readEffectDetailPolarityLabel,
-} from "~/v1/item-detail/ui/effectDetailPresentation";
+} from "~/v0/item-detail/ui/effectDetailPresentation";
 
 export namespace DetailGeneratedEffectsPanel {
 	export interface Props {

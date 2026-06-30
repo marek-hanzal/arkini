@@ -17,7 +17,7 @@ const readSourceFiles = (directory: string): string[] =>
 
 describe("item detail scroll contract", () => {
 	it("keeps scroll ownership on the sheet instead of nested detail panels", () => {
-		const sources = readSourceFiles("src/v1/item-detail/ui")
+		const sources = readSourceFiles("src/v0/item-detail/ui")
 			.map((path) => ({
 				path,
 				source: readFileSync(path, "utf8"),

@@ -1,13 +1,13 @@
 import type { FC } from "react";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
-import { craftStatusLabel } from "~/v0/item/logic/craftStatusLabel";
+import { craftStatusLabel } from "~/v0/item-detail/logic/craftStatusLabel";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { cn } from "~/v0/ui/cn";
-import type { DetailCraftControl } from "~/v1/item-detail/control/DetailCraftControl";
-import { DetailCard, DetailMutedPill } from "~/v1/item-detail/ui/DetailCard";
+import type { DetailCraftControl } from "~/v0/item-detail/control/DetailCraftControl";
+import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
 
 export namespace DetailCraftPanel {
 	export interface Props {

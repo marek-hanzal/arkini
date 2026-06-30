@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
-import { readDetailCraftControl } from "~/v1/item-detail/control/readDetailCraftControl";
+import { readDetailCraftControl } from "~/v0/item-detail/control/readDetailCraftControl";
 
 const createCraft = (overrides: Partial<CraftProgressView> = {}): CraftProgressView => ({
 	acceptedInputItemIds: [],

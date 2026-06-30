@@ -1,7 +1,7 @@
 import type {
 	DetailActionControl,
 	DetailProgressActionControl,
-} from "~/v1/item-detail/control/DetailActionControl";
+} from "~/v0/item-detail/control/DetailActionControl";
 
 export interface DetailProducerLineControl {
 	defaultAction?: DetailActionControl;

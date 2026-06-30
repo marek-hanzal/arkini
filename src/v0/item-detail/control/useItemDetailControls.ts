@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { DetailCraftControl } from "~/v1/item-detail/control/DetailCraftControl";
-import type { DetailProducerLineModel } from "~/v1/item-detail/control/DetailProducerLineModel";
-import { readDetailCraftControl } from "~/v1/item-detail/control/readDetailCraftControl";
-import { readDetailProducerLineControl } from "~/v1/item-detail/control/readDetailProducerLineControl";
+import type { DetailCraftControl } from "~/v0/item-detail/control/DetailCraftControl";
+import type { DetailProducerLineModel } from "~/v0/item-detail/control/DetailProducerLineModel";
+import { readDetailCraftControl } from "~/v0/item-detail/control/readDetailCraftControl";
+import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDetailProducerLineControl";
 
 export namespace useItemDetailControls {
 	export interface Props {

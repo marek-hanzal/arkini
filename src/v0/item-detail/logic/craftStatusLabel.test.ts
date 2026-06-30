@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CraftProgressView } from "~/v0/board/view/CraftProgressViewSchema";
-import { craftStatusLabel } from "~/v0/item/logic/craftStatusLabel";
+import { craftStatusLabel } from "~/v0/item-detail/logic/craftStatusLabel";
 
 const craft = (overrides: Partial<CraftProgressView> = {}): CraftProgressView => ({
 	acceptedInputItemIds: [],

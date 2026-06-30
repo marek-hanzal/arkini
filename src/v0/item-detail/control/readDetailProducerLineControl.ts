@@ -1,8 +1,8 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
-import type { DetailActionControl } from "~/v1/item-detail/control/DetailActionControl";
-import type { DetailProducerLineControl } from "~/v1/item-detail/control/DetailProducerLineControl";
+import type { DetailActionControl } from "~/v0/item-detail/control/DetailActionControl";
+import type { DetailProducerLineControl } from "~/v0/item-detail/control/DetailProducerLineControl";
 
 export namespace readDetailProducerLineControl {
 	export interface Props {

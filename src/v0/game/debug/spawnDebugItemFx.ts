@@ -1,5 +1,10 @@
 import { Effect } from "effect";
 import { checkDebugItemSpawnReadinessFx } from "~/v0/game/debug/checkDebugItemSpawnReadinessFx";
+import { readGameCheatSpeedMode } from "~/v0/game/cheat/GameCheatSpeedMode";
+import {
+	isCheatSpeedItemId,
+	readCheatSpeedItemIdFromMode,
+} from "~/v0/game/cheat/GameCheatSpeedItem";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { createGameItemInstanceIdFx } from "~/v0/game/save/createGameItemInstanceIdFx";
 import { planEmptyBoardCellsFx } from "~/v0/game/placement/planEmptyBoardCellsFx";
@@ -28,17 +33,29 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 	nowMs,
 	save,
 }: spawnDebugItemFx.Props) {
+	const itemId = isCheatSpeedItemId(action.itemId)
+		? readCheatSpeedItemIdFromMode(
+				readGameCheatSpeedMode({
+					save,
+				}),
+			)
+		: action.itemId;
+	const spawnAction = {
+		...action,
+		itemId,
+	};
+
 	yield* checkDebugItemSpawnReadinessFx({
-		action,
+		action: spawnAction,
 		config,
 		nowMs,
 		save,
 	});
 
-	const item = config.items[action.itemId];
+	const item = config.items[itemId];
 	if (!item) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing item "${action.itemId}".`),
+			GameEngineError.configReferenceMissing(`Missing item "${spawnAction.itemId}".`),
 		);
 	}
 
@@ -65,7 +82,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 
 			const [emptyCell] = yield* planItemBoardPlacementCellsFx({
 				config,
-				itemId: action.itemId,
+				itemId: spawnAction.itemId,
 				nowMs,
 				save: nextSave,
 			});
@@ -86,12 +103,12 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 						}
 					: {}),
 				id: itemInstanceId,
-				itemId: action.itemId,
+				itemId: spawnAction.itemId,
 				x: emptyCell.x,
 				y: emptyCell.y,
 			};
 			events.push({
-				itemId: action.itemId,
+				itemId: spawnAction.itemId,
 				reason: "debug",
 				to: {
 					kind: "board",
@@ -107,7 +124,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 			createdAtMs: item.passiveEffectIds?.length ? nowMs : undefined,
 			events,
 			item: {
-				itemId: action.itemId,
+				itemId: spawnAction.itemId,
 				quantity,
 				reason: "debug",
 			},

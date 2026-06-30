@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import {
+	cheatSpeedDisableItemId,
+	cheatSpeedEnableItemId,
+} from "~/v0/game/cheat/GameCheatSpeedItem";
+import {
 	readOnlyRecordValue,
 	runAction,
 	runInitialSave,
@@ -34,6 +38,121 @@ const createLongTimingConfig = () => {
 };
 
 describe("setCheatSpeedModeFx", () => {
+	it("normalizes every speed watch item to the selected mode item", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				[cheatSpeedDisableItemId]: {
+					assetId: "asset:test",
+					description: "Closed speed watch",
+					maxStackSize: 3,
+					name: "Closed Speed Watch",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+				[cheatSpeedEnableItemId]: {
+					assetId: "asset:test",
+					description: "Open speed watch",
+					maxStackSize: 3,
+					name: "Open Speed Watch",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: cheatSpeedDisableItemId,
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: cheatSpeedEnableItemId,
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: cheatSpeedDisableItemId,
+						quantity: 2,
+					},
+					{
+						itemId: cheatSpeedEnableItemId,
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const enabled = runAction({
+			action: {
+				mode: "instant",
+				type: "cheat.speed_mode.set",
+			},
+			config,
+			nowMs: 0,
+			save,
+		}).save;
+
+		expect(Object.values(enabled.board.items).map((item) => item.itemId)).toEqual([
+			cheatSpeedEnableItemId,
+			cheatSpeedEnableItemId,
+		]);
+		expect(
+			enabled.inventory.slots.flatMap((slot) =>
+				slot
+					? [
+							slot.itemId,
+						]
+					: [],
+			),
+		).toEqual([
+			cheatSpeedEnableItemId,
+			cheatSpeedEnableItemId,
+		]);
+
+		const disabled = runAction({
+			action: {
+				mode: "normal",
+				type: "cheat.speed_mode.set",
+			},
+			config,
+			nowMs: 1000,
+			save: enabled,
+		}).save;
+
+		expect(Object.values(disabled.board.items).map((item) => item.itemId)).toEqual([
+			cheatSpeedDisableItemId,
+			cheatSpeedDisableItemId,
+		]);
+		expect(
+			disabled.inventory.slots.flatMap((slot) =>
+				slot
+					? [
+							slot.itemId,
+						]
+					: [],
+			),
+		).toEqual([
+			cheatSpeedDisableItemId,
+			cheatSpeedDisableItemId,
+		]);
+	});
 	it("makes newly started producer jobs finish after one second", () => {
 		const config = createLongTimingConfig();
 		const save = runInitialSave({

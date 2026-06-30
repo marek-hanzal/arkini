@@ -20,3 +20,12 @@ Validation/test coverage:
 
 - Board tap resolver tests prove the watch items toggle speed mode instead of opening detail.
 - Engine tests cover instant producer starts, queued producer pull-forward, normal mode restore, and craft timing.
+
+## Toggle-state polish
+
+Follow-up changed the watches from two independent action items into one state-reflecting board utility:
+
+- The closed watch (`item:cheat:speed-disable`) is now placed on the starting board and represents normal timing.
+- Clicking the closed watch switches to instant mode and converts all speed-watch instances/stacks on the board and in inventory into the open watch (`item:cheat:speed-enable`).
+- Clicking the open watch switches back to normal mode and converts all speed-watch instances/stacks back into the closed watch.
+- Debug spawning a speed watch now spawns the item matching the current speed mode, so the save should not naturally contain both open and closed watch variants at once.

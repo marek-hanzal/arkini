@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import {
+	cheatSpeedDisableItemId,
+	cheatSpeedEnableItemId,
+} from "~/v0/game/cheat/GameCheatSpeedItem";
+import {
 	findBoardItem,
 	runAction,
 	runActionEither,
@@ -8,6 +12,77 @@ import {
 } from "~/v0/game/engine/applyGameActionFx.testSupport";
 
 describe("spawnDebugItemFx", () => {
+	it("spawns speed watches as the current mode item", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				[cheatSpeedDisableItemId]: {
+					assetId: "asset:test",
+					description: "Closed speed watch",
+					maxStackSize: 3,
+					name: "Closed Speed Watch",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+				[cheatSpeedEnableItemId]: {
+					assetId: "asset:test",
+					description: "Open speed watch",
+					maxStackSize: 3,
+					name: "Open Speed Watch",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const normalSpawn = runAction({
+			action: {
+				itemId: cheatSpeedEnableItemId,
+				location: "inventory",
+				type: "debug.item.spawn",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+
+		expect(normalSpawn.inventory.slots[0]).toMatchObject({
+			itemId: cheatSpeedDisableItemId,
+			quantity: 1,
+		});
+
+		const instantSave = runAction({
+			action: {
+				mode: "instant",
+				type: "cheat.speed_mode.set",
+			},
+			config,
+			nowMs: 200,
+			save: normalSpawn,
+		}).save;
+		const instantSpawn = runAction({
+			action: {
+				itemId: cheatSpeedDisableItemId,
+				location: "inventory",
+				type: "debug.item.spawn",
+			},
+			config,
+			nowMs: 300,
+			save: instantSave,
+		}).save;
+
+		expect(instantSpawn.inventory.slots[0]).toMatchObject({
+			itemId: cheatSpeedEnableItemId,
+			quantity: 2,
+		});
+	});
 	it("spawns a debug item on the first empty board cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

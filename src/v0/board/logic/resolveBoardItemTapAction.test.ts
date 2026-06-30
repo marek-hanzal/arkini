@@ -122,7 +122,7 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("switches cheat speed items without opening detail", () => {
+	it("toggles cheat speed items without opening detail", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
@@ -131,7 +131,7 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			mode: "instant",
+			mode: "normal",
 			type: "set-cheat-speed-mode",
 		});
 
@@ -143,7 +143,7 @@ describe("resolveBoardItemTapAction", () => {
 				nowMs: 0,
 			}),
 		).toEqual({
-			mode: "normal",
+			mode: "instant",
 			type: "set-cheat-speed-mode",
 		});
 	});

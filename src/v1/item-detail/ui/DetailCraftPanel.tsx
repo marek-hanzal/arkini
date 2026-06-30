@@ -86,7 +86,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 				</div>
 
 				{targetLimits.length ? (
-					<div className="rounded-sm border border-ak-border/70 bg-ak-surface px-2.5 py-2 text-xs">
+					<div className="rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs">
 						<p className="font-black text-ak-text">Target limits</p>
 						<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
 							{targetLimits.map((limit) => (
@@ -99,7 +99,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 				) : null}
 
 				{effectBlockReasons.length ? (
-					<div className="rounded-sm border border-rose-400/25 bg-rose-400/10 px-2.5 py-2 text-xs">
+					<div className="rounded-sm bg-rose-400/14 px-2.5 py-2 text-xs text-rose-50">
 						<p className="font-black text-rose-100">Blocked by effects</p>
 						<ul className="mt-1 grid gap-1 leading-5 text-rose-100/80">
 							{effectBlockReasons.map((reason) => (
@@ -118,7 +118,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 						return (
 							<div
 								key={input.itemId}
-								className="flex min-w-0 items-center gap-2 rounded-sm border border-ak-border/70 bg-ak-surface px-2.5 py-2 text-sm"
+								className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface/80 px-2.5 py-2 text-sm"
 							>
 								<ItemInlineAsset
 									item={inputItem}
@@ -159,7 +159,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({
 			</div>
 			<UiButton
 				disabled={(!runState.canRunAction && !runState.canClaim) || pending}
-				tone={runState.canRunAction || runState.canClaim ? "primary" : "secondary"}
+				tone="primary"
 				className="mt-3"
 				onClick={runState.canClaim ? onClaim : onStart}
 			>

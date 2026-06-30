@@ -97,10 +97,8 @@ const readLineProgressDisplay = (line: ProducerProductLineView) => {
 	return line.lineKind === "effect" ? 1 - progress : progress;
 };
 
-const readDefaultActionLabel = (line: ProducerProductLineView) => {
-	const target = line.lineKind === "effect" ? "effect" : "product";
-	return line.isDefault ? `Un-default ${target}` : `Default ${target}`;
-};
+const readDefaultActionLabel = (line: ProducerProductLineView) =>
+	line.isDefault ? "Un-default" : "Default";
 
 const readEffectRequirementPrefix = (
 	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
@@ -139,14 +137,14 @@ const DetailLineNoteList: FC<{
 	return (
 		<div
 			className={cn(
-				"rounded-sm border px-2.5 py-2 text-xs",
-				tone === "good" && "border-emerald-400/20 bg-emerald-400/10",
-				tone === "warn" && "border-rose-400/25 bg-rose-400/10",
-				tone === "neutral" && "border-ak-border/70 bg-ak-surface",
+				"rounded-sm px-2.5 py-2 text-xs",
+				tone === "good" && "bg-emerald-400/12 text-emerald-50",
+				tone === "warn" && "bg-rose-400/14 text-rose-50",
+				tone === "neutral" && "bg-violet-300/10",
 			)}
 		>
 			<p className="font-black text-ak-text">{title}</p>
-			<ul className="mt-1 max-h-32 space-y-1 overflow-y-auto pr-1 leading-5 text-ak-text-muted [scrollbar-width:thin]">
+			<ul className="mt-1 max-h-28 space-y-1 overflow-y-auto pr-1 leading-5 text-ak-text-muted [scrollbar-width:thin]">
 				{items.map((item, index) => (
 					<li
 						key={`${title}:${index}:${item}`}
@@ -168,9 +166,9 @@ const DetailLineOutputs: FC<{
 	if (outputs.length === 0) return null;
 
 	return (
-		<div className="rounded-sm border border-ak-border/70 bg-ak-surface px-2.5 py-2 text-xs">
+		<div className="rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs">
 			<p className="font-black text-ak-text">Outputs</p>
-			<div className="mt-2 grid max-h-48 gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="mt-1.5 grid max-h-40 gap-1.5 overflow-y-auto pr-1 [scrollbar-width:thin]">
 				{outputs.map((output, outputIndex) => {
 					const outputItem = items[output.itemId];
 					return (
@@ -222,7 +220,7 @@ const DetailLineInputs: FC<{
 				return (
 					<div
 						key={input.itemId}
-						className="flex min-w-0 items-center gap-2 rounded-sm border border-ak-border/70 bg-ak-surface px-2.5 py-2 text-xs"
+						className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs"
 					>
 						<ItemInlineAsset
 							item={inputItem}
@@ -285,18 +283,14 @@ const DetailProducerLineCard: FC<{
 		.join(" · ");
 
 	return (
-		<article className="min-w-0 rounded-sm border border-ak-border bg-ak-surface-elevated p-3">
+		<article className="min-w-0 rounded-sm bg-ak-surface-soft p-3 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.035)]">
 			<header className="flex min-w-0 items-start justify-between gap-3">
 				<div className="min-w-0 flex-1">
 					<div className="flex min-w-0 flex-wrap items-center gap-1.5">
 						<p className="mr-auto break-words text-base font-black leading-6 text-ak-text">
 							{line.name}
 						</p>
-						{line.isDefault ? (
-							<DetailMutedPill>
-								{line.lineKind === "effect" ? "Default effect" : "Default product"}
-							</DetailMutedPill>
-						) : null}
+						{line.isDefault ? <DetailMutedPill>Default</DetailMutedPill> : null}
 						{effectPolarity ? (
 							<DetailMutedPill
 								className={readEffectDetailPolarityClassName(effectPolarity)}
@@ -355,7 +349,7 @@ const DetailProducerLineCard: FC<{
 					progress={runState.showProgress ? readLineProgressDisplay(line) : undefined}
 					progressAutoCompleteMs={runState.progressAutoCompleteMs}
 					progressAutoCompleteTo={line.lineKind === "effect" ? "empty" : "full"}
-					tone={runState.showProgress || runState.canRunAction ? "primary" : "secondary"}
+					tone="primary"
 					className={canSetDefault ? "col-span-2" : undefined}
 					onClick={() => onStart(line.productId)}
 				>
@@ -368,6 +362,7 @@ const DetailProducerLineCard: FC<{
 					<UiButton
 						fullWidth
 						disabled={pending}
+						tone="secondary"
 						onClick={() => onSetDefault(line.productId)}
 					>
 						{readDefaultActionLabel(line)}
@@ -426,7 +421,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({
 					onSelect={setSelectedGroupId}
 				/>
 			) : null}
-			<div className="mt-2 grid max-h-[34rem] gap-2.5 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="mt-2 grid max-h-[30rem] gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
 				{activeGroup.lines.map((line) => (
 					<DetailProducerLineCard
 						key={line.productId}

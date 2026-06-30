@@ -32,13 +32,13 @@ export const readEffectDetailPolarityLabel = (polarity: EffectDetailPolarity) =>
 
 export const readEffectDetailPolarityClassName = (polarity: EffectDetailPolarity) => {
 	if (polarity === "buff") {
-		return "border-emerald-400/30 bg-emerald-400/10 text-emerald-200";
+		return "border-emerald-300/55 bg-emerald-400/18 text-emerald-100";
 	}
 	if (polarity === "debuff") {
-		return "border-rose-400/30 bg-rose-400/10 text-rose-200";
+		return "border-rose-300/55 bg-rose-400/18 text-rose-100";
 	}
 	if (polarity === "mixed") {
-		return "border-amber-300/30 bg-amber-300/10 text-amber-100";
+		return "border-amber-200/55 bg-amber-300/18 text-amber-50";
 	}
-	return "border-violet-300/25 bg-violet-300/10 text-violet-100";
+	return "border-violet-200/50 bg-violet-300/18 text-violet-50";
 };

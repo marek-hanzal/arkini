@@ -56,7 +56,7 @@ export const DetailGeneratedEffectsPanel: FC<DetailGeneratedEffectsPanel.Props> 
 					<article
 						key={effect.id}
 						data-ui="generated effect"
-						className="rounded-sm border border-ak-border/80 bg-ak-surface px-3 py-2.5"
+						className="rounded-sm bg-ak-surface/80 px-3 py-2.5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.035)]"
 					>
 						<div className="flex min-w-0 items-start justify-between gap-2">
 							<div className="min-w-0">
@@ -69,7 +69,7 @@ export const DetailGeneratedEffectsPanel: FC<DetailGeneratedEffectsPanel.Props> 
 							</div>
 							<span
 								className={cn(
-									"shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em]",
+									"shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
 									readEffectDetailPolarityClassName(effect.polarity),
 								)}
 							>

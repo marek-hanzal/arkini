@@ -53,7 +53,7 @@ export const DetailInputsPanel: FC<DetailInputsPanel.Props> = ({
 					return (
 						<div
 							key={input.itemId}
-							className="flex min-w-0 items-center gap-2 rounded-sm border border-ak-border/70 bg-ak-surface px-2.5 py-2 text-sm"
+							className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface/80 px-2.5 py-2 text-sm"
 						>
 							<ItemInlineAsset
 								item={item}
@@ -69,10 +69,10 @@ export const DetailInputsPanel: FC<DetailInputsPanel.Props> = ({
 							</div>
 							<span
 								className={cn(
-									"shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em]",
+									"shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
 									ready
-										? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-										: "border-rose-400/30 bg-rose-400/10 text-rose-200",
+										? "border-emerald-300/55 bg-emerald-400/18 text-emerald-100"
+										: "border-rose-300/55 bg-rose-400/18 text-rose-100",
 								)}
 							>
 								{ready ? "Ready" : "Missing"}

@@ -51,50 +51,70 @@ const ProducerProductLineOutputViewSchema = z.object({
 	sort: z.number().optional(),
 });
 
-export const ProducerProductLineViewSchema = z.object({
-	productId: IdSchema,
-	name: z.string().min(1),
-	lineKind: z
-		.enum([
+export const ProducerProductLineViewSchema = z
+	.object({
+		productId: IdSchema,
+		name: z.string().min(1),
+		lineKind: z.enum([
 			"effect",
 			"product",
-		])
-		.optional(),
-	effectPolarity: EffectPolarityViewSchema.optional(),
-	isDefault: z.boolean(),
-	durationMs: z.number().int().nonnegative(),
-	inProgress: z.boolean(),
-	producerQueuedJobs: z.number().int().nonnegative(),
-	queueFull: z.boolean(),
-	blocked: z.boolean(),
-	effectLocked: z.boolean().optional(),
-	deliveryBlocked: z.boolean().optional(),
-	outputLimitBlocked: z.boolean().optional(),
-	queueBlockedReason: z
-		.enum([
-			"delivery_blocked",
-			"paused",
-		])
-		.optional(),
-	queueSize: z.number().int().positive(),
-	queuedJobs: z.number().int().nonnegative(),
-	inputs: z.array(ActivationInputViewSchema),
-	inputsReady: z.boolean(),
-	inputsAvailable: z.boolean(),
-	startAtMs: z.number().int().nonnegative().optional(),
-	readyAtMs: z.number().int().nonnegative().optional(),
-	remainingMs: z.number().int().nonnegative().optional(),
-	pausedAtMs: z.number().int().nonnegative().optional(),
-	progress: z.number().min(0).max(1).optional(),
-	inputItemIds: z.array(IdSchema),
-	effectDurationMultiplier: z.number().min(1).optional(),
-	effectBenefits: z.array(z.string().min(1)).optional(),
-	effectBonusLines: z.array(z.string().min(1)).optional(),
-	effectRequirementsReady: z.boolean().optional(),
-	effectRequirements: z.array(ProducerProductLineEffectRequirementViewSchema).optional(),
-	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
-	outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
-});
+		]),
+		effectPolarity: EffectPolarityViewSchema.optional(),
+		isDefault: z.boolean(),
+		durationMs: z.number().int().nonnegative(),
+		inProgress: z.boolean(),
+		producerQueuedJobs: z.number().int().nonnegative(),
+		queueFull: z.boolean(),
+		blocked: z.boolean(),
+		effectLocked: z.boolean().optional(),
+		deliveryBlocked: z.boolean().optional(),
+		outputLimitBlocked: z.boolean().optional(),
+		queueBlockedReason: z
+			.enum([
+				"delivery_blocked",
+				"paused",
+			])
+			.optional(),
+		queueSize: z.number().int().positive(),
+		queuedJobs: z.number().int().nonnegative(),
+		inputs: z.array(ActivationInputViewSchema),
+		inputsReady: z.boolean(),
+		inputsAvailable: z.boolean(),
+		startAtMs: z.number().int().nonnegative().optional(),
+		readyAtMs: z.number().int().nonnegative().optional(),
+		remainingMs: z.number().int().nonnegative().optional(),
+		pausedAtMs: z.number().int().nonnegative().optional(),
+		progress: z.number().min(0).max(1).optional(),
+		inputItemIds: z.array(IdSchema),
+		effectDurationMultiplier: z.number().min(1).optional(),
+		effectBenefits: z.array(z.string().min(1)).optional(),
+		effectBonusLines: z.array(z.string().min(1)).optional(),
+		startRequirementsReady: z.boolean().optional(),
+		effectRequirements: z.array(ProducerProductLineEffectRequirementViewSchema).optional(),
+		targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
+		outputs: z.array(ProducerProductLineOutputViewSchema).optional(),
+	})
+	.superRefine((line, context) => {
+		if (line.lineKind === "effect" && line.effectPolarity === undefined) {
+			context.addIssue({
+				code: "custom",
+				message: "Effect product-line views must expose effectPolarity.",
+				path: [
+					"effectPolarity",
+				],
+			});
+		}
+
+		if (line.lineKind === "product" && line.effectPolarity !== undefined) {
+			context.addIssue({
+				code: "custom",
+				message: "Product product-line views must not expose effectPolarity.",
+				path: [
+					"effectPolarity",
+				],
+			});
+		}
+	});
 
 type ProducerProductLineViewSchema = typeof ProducerProductLineViewSchema;
 export namespace ProducerProductLineViewSchema {

@@ -211,7 +211,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		const hasEffectStartRequirements = effectiveProductLine.requirements.some(
 			(requirement) => requirement.phase === "start",
 		);
-		const effectRequirementsReady =
+		const startRequirementsReady =
 			effectiveProductLine.startRequirementsReady === false
 				? false
 				: hasEffectStartRequirements
@@ -252,7 +252,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 					: undefined,
 				effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,
 				effectRequirements: effectRequirements.length ? effectRequirements : undefined,
-				effectRequirementsReady,
+				startRequirementsReady,
 				inProgress: jobs.length > 0,
 				inputItemIds: inputs.map((input) => input.itemId),
 				isDefault,

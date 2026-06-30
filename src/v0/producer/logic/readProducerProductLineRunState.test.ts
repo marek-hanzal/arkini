@@ -12,6 +12,7 @@ const line = (overrides: Partial<ProducerProductLineView> = {}): ProducerProduct
 	inputsReady: true,
 	isDefault: false,
 	name: "Test product",
+	lineKind: "product" as const,
 	producerQueuedJobs: 0,
 	productId: "product:test",
 	queueFull: false,
@@ -94,7 +95,7 @@ describe("readProducerProductLineRunState", () => {
 							ready: false,
 						},
 					],
-					effectRequirementsReady: false,
+					startRequirementsReady: false,
 				}),
 			}),
 		).toMatchObject({

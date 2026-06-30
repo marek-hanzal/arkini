@@ -196,7 +196,7 @@ Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allO
 
 ## Product-line effects
 
-Producer and stash product lines may declare line-owned `effects`. These are evaluated for the concrete product line at runtime and produce an effective view: visibility, start readiness, blockers, duration, and extra chance loot.
+Producer and stash product lines may declare line-owned `effects`. These are evaluated for the concrete product line at runtime and produce an effective view: visibility, start readiness, blockers, duration, and extra chance loot. Runtime product-line views must carry explicit `lineKind: "product" | "effect"`; effect views must carry `effectPolarity`, product views must not, and UI must not fall back to product or neutral when the view forgets to say what it is.
 
 Supported product-line effect kinds:
 
@@ -213,7 +213,7 @@ Supported product-line effect kinds:
 
 `nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; at least one authored band must use a multiplier other than `1`, otherwise the whole effect is a pretty no-op. Grant duration and loot effects are global and only activate when the line’s selector is satisfied. `grant.duration.multiply.multiplier` must change timing, so `1` is rejected. `grant.loot.extraOutputChance.add` may only target same-line non-weighted base output items and its `chance` must be greater than `0`; output-less, weighted-only, zero-chance, or selector-no-match bonus loot effects are rejected because otherwise the UI advertises a bonus that runtime cannot ever roll. Modifier effects are reported as active bonuses in UI, not as missing requirements.
 
-`display` controls only UI visibility for requirement-like rows: `always`, `whenActive`, `whenMissing`, or `never`. It must not change runtime validation. Hidden missing requirements still block starts, because otherwise the UI would be decorative nonsense with buttons attached.
+`display` controls only UI visibility for requirement-like rows: `always`, `whenActive`, `whenMissing`, or `never`. It must not change runtime validation. Hidden missing requirements still block starts, because otherwise the UI would be decorative nonsense with buttons attached. For `grant.blockStart`, an inactive blocker is "not blocked by" that rule, not a satisfied requirement; UI wording must keep blocker semantics separate from missing-grant semantics.
 
 ## Craft recipe effects
 

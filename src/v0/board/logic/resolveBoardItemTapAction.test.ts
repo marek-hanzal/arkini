@@ -58,6 +58,7 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 	inputsReady: true,
 	isDefault,
 	name: "Product",
+	lineKind: "product" as const,
 	producerQueuedJobs: 0,
 	productId: "product:test",
 	progress: undefined,
@@ -162,11 +163,11 @@ describe("resolveBoardItemTapAction", () => {
 					activation: activation("producer", {
 						productLines: [
 							productLine(true, {
-								lineKind: "product",
+								lineKind: "product" as const,
 								productId: "product:normal",
 							}),
 							productLine(true, {
-								lineKind: "effect",
+								lineKind: "effect" as const,
 								productId: "product:effect",
 							}),
 						],
@@ -190,11 +191,11 @@ describe("resolveBoardItemTapAction", () => {
 						productLines: [
 							productLine(true, {
 								effectLocked: true,
-								lineKind: "effect",
+								lineKind: "effect" as const,
 								productId: "product:effect",
 							}),
 							productLine(true, {
-								lineKind: "product",
+								lineKind: "product" as const,
 								productId: "product:normal",
 							}),
 						],

@@ -92,7 +92,7 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		});
 
 		expect(line.effectRequirements).toBeUndefined();
-		expect(line.effectRequirementsReady).toBe(false);
+		expect(line.startRequirementsReady).toBe(false);
 	});
 
 	it("honors active and missing display policies separately for requirement rows", () => {
@@ -174,7 +174,7 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			save,
 		});
 
-		expect(line.effectRequirementsReady).toBe(false);
+		expect(line.startRequirementsReady).toBe(false);
 		expect(line.effectRequirements).toEqual([
 			{
 				kind: "grant.require",
@@ -258,7 +258,7 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		});
 
 		expect(line.effectRequirements).toBeUndefined();
-		expect(line.effectRequirementsReady).toBeUndefined();
+		expect(line.startRequirementsReady).toBeUndefined();
 		expect(line.effectBonusLines).toEqual([
 			"Inventory Haste: 50% faster production.",
 			"Extra Twig: 25% chance for +1× Twig.",

@@ -23,6 +23,7 @@ const createLine = (overrides: Partial<ProductLine> = {}): ProductLine => ({
 	inputsReady: true,
 	inputsAvailable: true,
 	name: "Twig",
+	lineKind: "product" as const,
 	productId: "product:twig",
 	producerQueuedJobs: 1,
 	queueFull: true,
@@ -48,6 +49,7 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
+						lineKind: "product" as const,
 						productId: "product:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
@@ -79,6 +81,7 @@ describe("readProducerBoardProgress", () => {
 							inputsReady: true,
 							inputsAvailable: true,
 							name: "Open",
+							lineKind: "product" as const,
 							productId: "product:stash",
 							producerQueuedJobs: 1,
 							queueFull: true,
@@ -103,7 +106,7 @@ describe("readProducerBoardProgress", () => {
 			readProducerBoardProgress({
 				activation: producerActivation([
 					createLine({
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Minor Haste",
 						productId: "product:shrine-t1:minor-haste",
 					}),
@@ -121,7 +124,7 @@ describe("readProducerBoardProgress", () => {
 				activation: producerActivation([
 					createLine(),
 					createLine({
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Minor Haste",
 						productId: "product:shrine-t1:minor-haste",
 						readyAtMs: 3000,
@@ -148,6 +151,7 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
+						lineKind: "product" as const,
 						productId: "product:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
@@ -176,6 +180,7 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
+						lineKind: "product" as const,
 						pausedAtMs: 1250,
 						productId: "product:twig",
 						producerQueuedJobs: 1,
@@ -208,6 +213,7 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
+						lineKind: "product" as const,
 						productId: "product:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
@@ -236,6 +242,7 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
+						lineKind: "product" as const,
 						productId: "product:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,

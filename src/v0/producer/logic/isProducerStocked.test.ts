@@ -13,6 +13,7 @@ const productLine = (
 	inputsReady: true,
 	isDefault: false,
 	name: "Product",
+	lineKind: "product" as const,
 	producerQueuedJobs: 0,
 	productId: "product:test",
 	queueFull: false,
@@ -68,11 +69,11 @@ describe("isProducerStocked", () => {
 					productLine({
 						inputsReady: false,
 						isDefault: true,
-						lineKind: "product",
+						lineKind: "product" as const,
 					}),
 					productLine({
 						isDefault: true,
-						lineKind: "effect",
+						lineKind: "effect" as const,
 					}),
 				]),
 			),
@@ -86,11 +87,11 @@ describe("isProducerStocked", () => {
 					productLine({
 						effectLocked: true,
 						isDefault: true,
-						lineKind: "effect",
+						lineKind: "effect" as const,
 					}),
 					productLine({
 						isDefault: true,
-						lineKind: "product",
+						lineKind: "product" as const,
 					}),
 				]),
 			),

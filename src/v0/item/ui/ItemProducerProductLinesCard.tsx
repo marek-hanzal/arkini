@@ -98,22 +98,29 @@ const readLineActionLabel = ({
 		.join(" · ");
 };
 
-const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
-
 const readLineProgressDisplay = (line: ProducerProductLineView) => {
 	const progress = line.progress ?? 0;
-	return readLineKind(line) === "effect" ? 1 - progress : progress;
+	return line.lineKind === "effect" ? 1 - progress : progress;
 };
 
 const readEffectPolarity = (line: ProducerProductLineView): EffectPolarityUi =>
 	line.effectPolarity ?? "neutral";
 
+const readDefaultBadgeLabel = (line: ProducerProductLineView) =>
+	line.lineKind === "effect" ? "Default effect" : "Default product";
+
+const readDefaultActionLabel = (line: ProducerProductLineView) => {
+	const target = line.lineKind === "effect" ? "effect" : "product";
+	return line.isDefault ? `Un-default ${target}` : `Default ${target}`;
+};
+
 const readEffectRequirementStateLabel = (
 	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
 ) => {
-	if (requirement.ready) return "✓";
-	if (requirement.kind === "grant.blockStart") return "Blocked";
-	return "Missing";
+	if (requirement.kind === "grant.blockStart") {
+		return requirement.ready ? "Not blocked by" : "Blocked";
+	}
+	return requirement.ready ? "✓" : "Missing";
 };
 
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
@@ -131,15 +138,14 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 		eyebrow: "Effects",
 		key: `effect:${section.polarity}`,
 		lines: lines.filter(
-			(line) =>
-				readLineKind(line) === "effect" && readEffectPolarity(line) === section.polarity,
+			(line) => line.lineKind === "effect" && readEffectPolarity(line) === section.polarity,
 		),
 		title: section.title,
 	}));
 	const productLineGroup = {
 		eyebrow: "Production",
 		key: "product",
-		lines: lines.filter((line) => readLineKind(line) === "product"),
+		lines: lines.filter((line) => line.lineKind === "product"),
 		title: "Product lines",
 	};
 	const lineGroups = [
@@ -183,7 +189,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 															/>
 														))}
 													</div>
-												) : readLineKind(line) === "effect" ? (
+												) : line.lineKind === "effect" ? (
 													<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-ak-primary/15 text-[0.62rem] font-black uppercase tracking-[0.12em] text-ak-primary">
 														FX
 													</div>
@@ -193,10 +199,10 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 														{line.name}
 													</p>
 													<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
-														{readLineKind(line) === "effect"
+														{line.lineKind === "effect"
 															? "Window"
 															: "Queue"}{" "}
-														{readLineKind(line) === "effect"
+														{line.lineKind === "effect"
 															? formatMs(line.durationMs)
 															: `${line.producerQueuedJobs}/${line.queueSize} · ${formatMs(line.durationMs)}`}
 														{line.effectDurationMultiplier &&
@@ -213,7 +219,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												</div>
 											</div>
 											<div className="flex shrink-0 flex-wrap justify-end gap-1">
-												{readLineKind(line) === "effect" ? (
+												{line.lineKind === "effect" ? (
 													<span
 														className={`rounded-sm border px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] ${readEffectPolarityBadgeClassName(
 															readEffectPolarity(line),
@@ -226,7 +232,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												) : null}
 												{line.isDefault ? (
 													<span className="rounded-sm bg-ak-primary/15 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ak-primary">
-														Default
+														{readDefaultBadgeLabel(line)}
 													</span>
 												) : null}
 											</div>
@@ -421,7 +427,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 											}
 											progressAutoCompleteMs={runState.progressAutoCompleteMs}
 											progressAutoCompleteTo={
-												readLineKind(line) === "effect" ? "empty" : "full"
+												line.lineKind === "effect" ? "empty" : "full"
 											}
 											tone={
 												runState.showProgress || runState.canRunAction
@@ -442,7 +448,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 												disabled={pending}
 												onClick={() => onSetDefault(line.productId)}
 											>
-												{line.isDefault ? "Un-default" : "Default"}
+												{readDefaultActionLabel(line)}
 											</UiButton>
 										) : null}
 									</div>

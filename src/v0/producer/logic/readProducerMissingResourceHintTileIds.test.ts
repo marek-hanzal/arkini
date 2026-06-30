@@ -45,6 +45,7 @@ const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineV
 	inputsReady: false,
 	isDefault: true,
 	name: "Target",
+	lineKind: "product" as const,
 	producerQueuedJobs: 0,
 	productId: "product:target",
 	queueFull: false,

@@ -34,6 +34,7 @@ const productLine = (
 	inputsReady: true,
 	inputsAvailable: true,
 	name: "Test product",
+	lineKind: "product" as const,
 	producerQueuedJobs: 0,
 	productId: "product:test",
 	progress: undefined,

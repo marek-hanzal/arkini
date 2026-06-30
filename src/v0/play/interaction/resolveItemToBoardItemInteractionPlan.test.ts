@@ -28,6 +28,7 @@ const productLine = (
 		inputsReady: false,
 		isDefault: false,
 		name: productId,
+		lineKind: "product" as const,
 		productId,
 		producerQueuedJobs: 0,
 		queueFull: false,

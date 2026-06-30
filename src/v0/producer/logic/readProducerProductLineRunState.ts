@@ -18,8 +18,6 @@ export namespace readProducerProductLineRunState {
 	}
 }
 
-const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
-
 const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
 	!line.inputsReady &&
 	line.inputs.some((input) => readActivationInputViewFillableQuantity(input) > 0);
@@ -31,9 +29,9 @@ const readInputAvailabilityLabel = ({
 	inputsPartiallyAvailable: boolean;
 	line: ProducerProductLineView;
 }) => {
-	if (line.effectRequirementsReady === false) return "requirements missing";
+	if (line.startRequirementsReady === false) return "requirements missing";
 
-	const actionLabel = readLineKind(line) === "effect" ? "activate" : "run";
+	const actionLabel = line.lineKind === "effect" ? "activate" : "run";
 	if (line.inputItemIds.length === 0) return `tap to ${actionLabel}`;
 	if (line.inputsReady) return "input ready";
 	if (line.inputsAvailable) return "auto-fill ready";
@@ -48,8 +46,8 @@ const readStatusMetaLabel = (line: ProducerProductLineView) => {
 	if (line.queueBlockedReason === "paused") return "queue paused";
 	if (line.pausedAtMs !== undefined) return "paused";
 	if (line.queueFull) return "queue full";
-	if (line.effectRequirementsReady === false) return "requirements missing";
-	if (line.effectLocked) return readLineKind(line) === "effect" ? "effect active" : "locked";
+	if (line.startRequirementsReady === false) return "requirements missing";
+	if (line.effectLocked) return line.lineKind === "effect" ? "effect active" : "locked";
 	if (line.outputLimitBlocked) return "limit reached";
 	if (line.blocked) return "blocked by effect";
 	return undefined;
@@ -83,7 +81,7 @@ const withCommonState = ({
 	progressLabel:
 		line.pausedAtMs !== undefined
 			? "Paused"
-			: readLineKind(line) === "effect"
+			: line.lineKind === "effect"
 				? "Active"
 				: "Running",
 	showProgress: line.inProgress && !line.deliveryBlocked,
@@ -100,7 +98,7 @@ export const readProducerProductLineRunState = ({
 		line.pausedAtMs === undefined &&
 		!line.deliveryBlocked &&
 		!queueBlocked &&
-		line.effectRequirementsReady !== false &&
+		line.startRequirementsReady !== false &&
 		!line.effectLocked &&
 		!line.outputLimitBlocked &&
 		!line.blocked &&
@@ -142,7 +140,7 @@ export const readProducerProductLineRunState = ({
 		});
 	}
 
-	if (line.effectRequirementsReady === false) {
+	if (line.startRequirementsReady === false) {
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
@@ -155,7 +153,7 @@ export const readProducerProductLineRunState = ({
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
-			label: readLineKind(line) === "effect" ? "Active" : "Locked",
+			label: line.lineKind === "effect" ? "Active" : "Locked",
 			line,
 		});
 	}
@@ -191,7 +189,7 @@ export const readProducerProductLineRunState = ({
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
-			label: readLineKind(line) === "effect" ? "Activate" : "Start",
+			label: line.lineKind === "effect" ? "Activate" : "Start",
 			line,
 		});
 	}
@@ -200,7 +198,7 @@ export const readProducerProductLineRunState = ({
 		return withCommonState({
 			canRunAction,
 			inputsPartiallyAvailable,
-			label: readLineKind(line) === "effect" ? "Auto-fill & activate" : "Auto-fill & start",
+			label: line.lineKind === "effect" ? "Auto-fill & activate" : "Auto-fill & start",
 			line,
 		});
 	}

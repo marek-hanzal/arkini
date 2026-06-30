@@ -5,7 +5,6 @@ import { readProducerProductLineRunState } from "~/v0/producer/logic/readProduce
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -101,13 +100,12 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	if (liveBoardItem?.activation?.kind === "producer") {
-		const readLineKind = (line: ProducerProductLineView) => line.lineKind ?? "product";
 		const defaultLines = [
 			liveBoardItem.activation.productLines?.find(
-				(line) => line.isDefault && readLineKind(line) === "effect",
+				(line) => line.isDefault && line.lineKind === "effect",
 			),
 			liveBoardItem.activation.productLines?.find(
-				(line) => line.isDefault && readLineKind(line) === "product",
+				(line) => line.isDefault && line.lineKind === "product",
 			),
 		].filter((line): line is NonNullable<typeof line> => Boolean(line));
 		const runnableDefaultLine = defaultLines.find(

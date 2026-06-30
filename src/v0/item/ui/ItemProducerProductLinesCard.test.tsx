@@ -13,6 +13,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	inputsReady: true,
 	isDefault: true,
 	name: "Log",
+	lineKind: "product" as const,
 	pausedAtMs: 1000,
 	producerQueuedJobs: 1,
 	productId: "product:lumberjack-t1:log",
@@ -175,7 +176,7 @@ describe("ItemProducerProductLinesCard", () => {
 				items={{}}
 				lines={[
 					createLine({
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Minor Haste",
 						pausedAtMs: undefined,
 						remainingMs: 800,
@@ -202,25 +203,25 @@ describe("ItemProducerProductLinesCard", () => {
 				lines={[
 					createLine({
 						effectPolarity: "debuff",
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Smoke Cloud",
 						productId: "product:effect:smoke",
 					}),
 					createLine({
 						effectPolarity: "buff",
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Minor Haste",
 						productId: "product:effect:haste",
 					}),
 					createLine({
 						effectPolarity: "mixed",
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Overdrive",
 						productId: "product:effect:overdrive",
 					}),
 					createLine({
 						effectPolarity: "neutral",
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Path Choice",
 						productId: "product:effect:path",
 					}),
@@ -271,7 +272,7 @@ describe("ItemProducerProductLinesCard", () => {
 								stored: 0,
 							},
 						],
-						lineKind: "effect",
+						lineKind: "effect" as const,
 						name: "Minor Haste",
 					}),
 				]}
@@ -298,7 +299,7 @@ describe("ItemProducerProductLinesCard", () => {
 						effectBonusLines: [
 							"Bountiful Offering: 35% chance for +1× Log.",
 						],
-						lineKind: "product",
+						lineKind: "product" as const,
 						name: "Log",
 					}),
 				]}
@@ -339,6 +340,68 @@ describe("ItemProducerProductLinesCard", () => {
 
 		expect(html).toContain("Blocked Engineers path chosen");
 		expect(html).not.toContain("Missing Engineers path chosen");
+	});
+
+	it("labels inactive block-start effects as not blocked", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						effectRequirements: [
+							{
+								kind: "grant.blockStart",
+								label: "Engineers path chosen",
+								ready: true,
+							},
+						],
+						name: "Cathedral Blueprint",
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Not blocked by Engineers path chosen");
+		expect(html).not.toContain("✓ Engineers path chosen");
+		expect(html).not.toContain("Blocked Engineers path chosen");
+	});
+
+	it("labels product and effect default slots separately", () => {
+		const html = renderToStaticMarkup(
+			<ItemProducerProductLinesCard
+				items={{}}
+				lines={[
+					createLine({
+						isDefault: true,
+						lineKind: "product" as const,
+						name: "Log",
+						productId: "product:log",
+					}),
+					createLine({
+						effectPolarity: "buff",
+						isDefault: true,
+						lineKind: "effect" as const,
+						name: "Minor Haste",
+						productId: "product:effect:minor-haste",
+					}),
+				]}
+				pending={false}
+				onSetDefault={() => undefined}
+				onStart={() => undefined}
+				onWithdrawInput={() => undefined}
+			/>,
+		);
+
+		expect(html).toContain("Default product");
+		expect(html).toContain("Default effect");
+		expect(html).toContain("Un-default product");
+		expect(html).toContain("Un-default effect");
+		expect(html).not.toContain(">Default</span>");
+		expect(html).not.toContain(">Un-default</button>");
 	});
 
 	it("keeps queued producer jobs in the action button", () => {

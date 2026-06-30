@@ -40,7 +40,7 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		recipe: target.recipe,
 		save,
 	});
-	if (!effectState.grantsReady) {
+	if (!effectState.startRequirementsReady) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"effect:missing-grant",

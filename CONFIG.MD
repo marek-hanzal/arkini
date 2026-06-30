@@ -211,7 +211,7 @@ Supported product-line effect kinds:
 
 `phase: "visibility"` hides or reveals a hidden product line based on a requirement. `phase: "start"` leaves the line visible but prevents starting it until the requirement is satisfied. `grant.blockStart` is the opposite shape: if the selector is active, the line is blocked. This is used for path exclusivity and similar “you chose the other door, genius” rules.
 
-`nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`. Grant duration and loot effects are global and only activate when the line’s selector is satisfied. Modifier effects are reported as active bonuses in UI, not as missing requirements.
+`nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`. Grant duration and loot effects are global and only activate when the line’s selector is satisfied. `grant.loot.extraOutputChance.add` may only target same-line non-weighted base output items; output-less, weighted-only, or selector-no-match bonus loot effects are rejected because otherwise the UI advertises a bonus that runtime cannot ever roll. Modifier effects are reported as active bonuses in UI, not as missing requirements.
 
 `display` controls only UI visibility for requirement-like rows: `always`, `whenActive`, `whenMissing`, or `never`. It must not change runtime validation. Hidden missing requirements still block starts, because otherwise the UI would be decorative nonsense with buttons attached.
 

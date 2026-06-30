@@ -23,7 +23,7 @@ const readCraftInputsPartiallyAvailable = (craft: CraftProgressView) =>
 export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraftRunState.Result => {
 	const inputsReady = craft.inputProgress >= 1;
 	const inputsPartiallyAvailable = readCraftInputsPartiallyAvailable(craft);
-	const grantsReady = craft.grantsReady !== false;
+	const startRequirementsReady = craft.startRequirementsReady !== false;
 	const effectBlocked = craft.effectBlocked === true;
 	const canClaim = craft.complete;
 	const canRunAction =
@@ -31,7 +31,7 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 		!craft.complete &&
 		!craft.targetLimitBlocked &&
 		!effectBlocked &&
-		grantsReady &&
+		startRequirementsReady &&
 		(inputsReady || inputsPartiallyAvailable);
 
 	if (craft.phase === "delivery_blocked") {
@@ -94,13 +94,13 @@ export const readCraftRunState = ({ craft }: readCraftRunState.Props): readCraft
 		};
 	}
 
-	if (!grantsReady) {
+	if (!startRequirementsReady) {
 		return {
 			canClaim,
 			canRunAction,
 			inputsPartiallyAvailable,
 			inputsReady,
-			label: "Grants missing",
+			label: "Requirements missing",
 		};
 	}
 

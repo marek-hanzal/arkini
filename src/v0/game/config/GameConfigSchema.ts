@@ -1061,6 +1061,15 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				itemIds,
 			},
 		);
+		validateProductExtraOutputChanceEffects(
+			ctx,
+			[
+				"products",
+				productId,
+				"effects",
+			],
+			product,
+		);
 
 		if (product.output) {
 			validateActivationOutput(
@@ -1669,6 +1678,56 @@ const validateCraftRecipeEffectRuntimeSupport = (
 				"kind",
 			],
 			`Craft recipe effects only support "grant.require" start gates and "grant.blockStart" blockers at runtime. "${effect.kind}" is a producer product-line effect.`,
+		);
+	}
+};
+
+const validateProductExtraOutputChanceEffects = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	product: z.infer<typeof ProductDefinitionSchema>,
+) => {
+	const selectableOutputItemIds = (product.output ?? []).flatMap((outputEntry) =>
+		outputEntry.type === "weighted"
+			? []
+			: [
+					outputEntry.itemId,
+				],
+	);
+
+	for (const [effectIndex, effect] of (product.effects ?? []).entries()) {
+		if (effect.kind !== "grant.loot.extraOutputChance.add") continue;
+
+		if (selectableOutputItemIds.length === 0) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"kind",
+				],
+				"Extra output chance effects require at least one non-weighted base output item on the product line.",
+			);
+			continue;
+		}
+
+		const matchesOutput = selectableOutputItemIds.some((itemId) =>
+			doesResolvedDomainSelectorMatchId({
+				entityId: itemId,
+				selector: effect.outputItems.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+			}),
+		);
+		if (matchesOutput) continue;
+
+		addIssue(
+			ctx,
+			[
+				...path,
+				effectIndex,
+				"outputItems",
+				"items",
+			],
+			"Extra output chance selector must match at least one non-weighted base output item on the same product line.",
 		);
 	}
 };

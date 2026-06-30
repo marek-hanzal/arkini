@@ -46,7 +46,7 @@ export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items
 			title="Possible drops"
 			action={<DetailMutedPill>{drops.length}</DetailMutedPill>}
 		>
-			<div className="grid max-h-72 gap-3 overflow-y-auto pr-1 [scrollbar-width:thin]">
+			<div className="grid gap-3">
 				{groups.map((group) => (
 					<section
 						key={group.label}

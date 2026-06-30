@@ -73,7 +73,7 @@ export const DetailTabs: FC<{
 	selectedId: string;
 	onSelect(id: string): void;
 }> = ({ items, onSelect, selectedId }) => (
-	<div className="flex gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+	<div className="flex flex-wrap gap-1 pb-1">
 		{items.map((item) => (
 			<button
 				key={item.id}

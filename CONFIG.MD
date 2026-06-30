@@ -228,6 +228,8 @@ Craft targets do not have multiple visible product lines, output loot plans, or 
 
 ## Time model
 
+Product and craft `durationMs` should be authored as real gameplay balance, not as universal placeholders. Keep early gathering short, make processing/construction progressively longer, and avoid 1:1 material conversions when a more believable ratio exists. If a source product can reasonably have variable yield, prefer guaranteed output plus small chance outputs over hardcoding every run to the same one-item result.
+
 Config uses `durationMs` for relative authored time. Save/runtime uses normalized absolute fields:
 
 - `startAtMs`: time window begins

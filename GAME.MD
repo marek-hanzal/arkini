@@ -187,7 +187,7 @@ Invalid direction example:
 
 This is invalid because a normal stone chain must not become a diamond chain without an explicit geology/refining/transmutation rule.
 
-Current concrete economy chains are not finalized in this document yet. Existing `GameConfig` chains may be used as inspiration, but they are not the final source of truth for economy balance.
+Current concrete economy balance lives in `game/arkini/products.json` and `game/arkini/craft-recipes.json`. Product lines should avoid lazy 1:1 transformations when a real process has yield or compression: one log can become multiple planks, multiple stones become one stone block, farms can produce small bonus yields, and refined/premium goods should take longer than raw collection. These ratios are authored data, not runtime heuristics.
 
 ### 4.10 Producer
 
@@ -196,6 +196,8 @@ A producer is an infinite or long-lived gameplay entity that generates items whe
 A producer is player-started and then runs a timed product job. Producers do not automatically start new jobs without player activation, but already started jobs may finish later through the tick/runtime job system.
 
 A producer does not use a separate generic cooldown model. Product lines define their own durations, queue behavior, inputs, grant gates, and outputs. Those rules are defined by the concrete producer/product tier in config; they are not patched by save-driven global upgrades.
+
+Default Arkini timings are intentionally no longer placeholder one-second values. Basic gathering stays short, processing takes noticeably longer, civic/knowledge work is slower, construction scales by era, and prestige/guild projects are allowed to take around a minute or more. This keeps early play testable without making late-game keystones feel like vending-machine nonsense.
 
 Examples:
 

@@ -57,4 +57,17 @@ describe("defaultGameConfig", () => {
 			expect(defaultGameConfig.items[itemId]?.tags).toContain("unique");
 		}
 	});
+	it("does not ship placeholder one-second gameplay timings", () => {
+		const oneSecondProductIds = Object.entries(defaultGameConfig.products)
+			.filter(([, product]) => product.durationMs === 1000)
+			.map(([productId]) => productId)
+			.sort();
+		const oneSecondCraftIds = Object.entries(defaultGameConfig.craftRecipes)
+			.filter(([, craftRecipe]) => craftRecipe.durationMs === 1000)
+			.map(([craftRecipeId]) => craftRecipeId)
+			.sort();
+
+		expect(oneSecondProductIds).toEqual([]);
+		expect(oneSecondCraftIds).toEqual([]);
+	});
 });

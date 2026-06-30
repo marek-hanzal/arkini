@@ -36,12 +36,10 @@ export const DetailGeneratedEffectsPanel: FC<DetailGeneratedEffectsPanel.Props> 
 		<DetailCard
 			eyebrow="Effects"
 			title="Provided effects"
-			action={<DetailMutedPill>{effects.length}</DetailMutedPill>}
 		>
 			{groups.length > 1 ? (
 				<DetailTabs
 					items={groups.map((group) => ({
-						count: group.effects.length,
 						id: group.polarity,
 						label: group.label,
 					}))}

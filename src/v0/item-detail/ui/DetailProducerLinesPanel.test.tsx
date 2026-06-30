@@ -105,6 +105,20 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("border-b border-violet-300/25");
 	});
 
+	it("does not render a duplicate header count badge", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(createLine()),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Product lines");
+		expect(html).not.toContain(">1</span>");
+	});
+
 	it("keeps product-line icons only in outputs, not duplicated in the header", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
@@ -144,6 +158,7 @@ describe("DetailProducerLinesPanel", () => {
 									ready: true,
 								},
 							],
+							inputsReady: false,
 							inputs: [
 								{
 									available: 1,
@@ -218,6 +233,48 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).not.toContain("Target limits");
 		expect(html).not.toContain("Water");
 		expect(html).not.toContain("Default");
+	});
+
+	it("hides required resources once a product line is ready to start", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							inputItemIds: [
+								"item:water",
+							],
+							inputs: [
+								{
+									available: 0,
+									capacity: 1,
+									consume: true,
+									itemId: "item:water",
+									quantity: 1,
+									stored: 1,
+								},
+							],
+							inputsAvailable: true,
+							inputsReady: true,
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 0,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Start");
+		expect(html).toContain("Outputs");
+		expect(html).not.toContain("Water");
+		expect(html).not.toContain("Withdraw");
 	});
 
 	it("uses short default labels and missing-item copy", () => {

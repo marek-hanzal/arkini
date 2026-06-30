@@ -249,6 +249,7 @@ const DetailProducerLineCard: FC<{
 	const targetLimits = line.targetLimits ?? [];
 	const effectBenefits = line.effectBenefits ?? [];
 	const effectBonusLines = line.effectBonusLines ?? [];
+	const showInputs = !line.inputsReady && !line.inProgress;
 	const meta = [
 		line.lineKind === "effect"
 			? `Window ${formatMs(line.durationMs)}`
@@ -315,10 +316,12 @@ const DetailProducerLineCard: FC<{
 							tone="neutral"
 						/>
 					) : null}
-					<DetailLineInputs
-						items={items}
-						model={model}
-					/>
+					{showInputs ? (
+						<DetailLineInputs
+							items={items}
+							model={model}
+						/>
+					) : null}
 				</div>
 			)}
 
@@ -383,12 +386,10 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 		<DetailCard
 			eyebrow="Lines"
 			title={activeGroup.title}
-			action={<DetailMutedPill>{lines.length}</DetailMutedPill>}
 		>
 			{groups.length > 1 ? (
 				<DetailTabs
 					items={groups.map((group) => ({
-						count: group.lines.length,
 						id: group.id,
 						label: group.label,
 					}))}

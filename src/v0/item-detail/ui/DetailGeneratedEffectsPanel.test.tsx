@@ -26,4 +26,22 @@ describe("DetailGeneratedEffectsPanel", () => {
 		expect(html).toContain("Owns Quarry I");
 		expect(html).not.toContain("grant:owned:producer:quarry-t1");
 	});
+	it("does not render a duplicate header count badge", () => {
+		const html = renderToStaticMarkup(
+			<DetailGeneratedEffectsPanel
+				effects={[
+					{
+						grants: [],
+						id: "effect:neutral-grant",
+						name: "Neutral grant",
+						polarity: "neutral",
+						sourceScope: "both",
+					},
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Provided effects");
+		expect(html).not.toContain(">1</span>");
+	});
 });

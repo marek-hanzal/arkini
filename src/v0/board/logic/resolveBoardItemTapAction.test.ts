@@ -6,6 +6,10 @@ import {
 	inventoryBoardItemId,
 	nukeSaveBoardItemId,
 } from "~/v0/board/BoardUtilityItem";
+import {
+	cheatSpeedDisableItemId,
+	cheatSpeedEnableItemId,
+} from "~/v0/game/cheat/GameCheatSpeedItem";
 
 const baseBoardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 	id: "board:item",
@@ -115,6 +119,32 @@ describe("resolveBoardItemTapAction", () => {
 				type: "nuke-save",
 			},
 			type: "open-sheet",
+		});
+	});
+
+	it("switches cheat speed items without opening detail", () => {
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					itemId: cheatSpeedEnableItemId,
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			mode: "instant",
+			type: "set-cheat-speed-mode",
+		});
+
+		expect(
+			resolveBoardItemTapAction({
+				boardItem: baseBoardItem({
+					itemId: cheatSpeedDisableItemId,
+				}),
+				nowMs: 0,
+			}),
+		).toEqual({
+			mode: "normal",
+			type: "set-cheat-speed-mode",
 		});
 	});
 

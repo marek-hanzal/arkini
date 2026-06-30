@@ -2907,6 +2907,34 @@
 				"ui"
 			]
 		},
+		"item:cheat:speed-enable": {
+			"name": "Open Onion Watch",
+			"description": "Cheat timepiece that switches the engine into 1s instant timing mode without confirmation.",
+			"maxStackSize": 10,
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			]
+		},
+		"item:cheat:speed-disable": {
+			"name": "Closed Onion Watch",
+			"description": "Cheat timepiece that switches the engine back to normal timing without confirmation.",
+			"maxStackSize": 10,
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			]
+		},
 		"item:nuke-save": {
 			"name": "Save Nuke",
 			"label": "Nuke",

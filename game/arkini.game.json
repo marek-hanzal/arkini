@@ -393,6 +393,14 @@
 			"render": "plain",
 			"resourceId": "item-cheat"
 		},
+		"asset:item:cheat:speed-disable": {
+			"render": "plain",
+			"resourceId": "item-cheat-speed-disable"
+		},
+		"asset:item:cheat:speed-enable": {
+			"render": "plain",
+			"resourceId": "item-cheat-speed-enable"
+		},
 		"asset:item:cheese": {
 			"render": "plain",
 			"resourceId": "item-cheese"
@@ -6046,6 +6054,38 @@
 			"storage": "both",
 			"tags": [
 				"special:cheat",
+				"utility",
+				"ui"
+			],
+			"tier": 0
+		},
+		"item:cheat:speed-disable": {
+			"assetId": "asset:item:cheat:speed-disable",
+			"description": "Cheat timepiece that switches the engine back to normal timing without confirmation.",
+			"maxStackSize": 10,
+			"name": "Closed Onion Watch",
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			],
+			"tier": 0
+		},
+		"item:cheat:speed-enable": {
+			"assetId": "asset:item:cheat:speed-enable",
+			"description": "Cheat timepiece that switches the engine into 1s instant timing mode without confirmation.",
+			"maxStackSize": 10,
+			"name": "Open Onion Watch",
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
 				"utility",
 				"ui"
 			],

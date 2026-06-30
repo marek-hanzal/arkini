@@ -8,6 +8,7 @@ import { doesResolvedDomainSelectorMatchId } from "~/v0/game/selector/doesResolv
 import { readChebyshevDistance } from "~/v0/game/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/v0/game/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/v0/game/effects/readGameWorldGrantIds";
+import { readGameCheatEffectiveDurationMs } from "~/v0/game/cheat/GameCheatSpeedMode";
 
 export namespace readEffectiveProducerProductLine {
 	export interface Props {
@@ -373,11 +374,16 @@ export const readEffectiveProducerProductLine = ({
 
 	if (hasVisibilityRequirement) visible = visibilityReady;
 
+	const durationMs = Math.max(0, Math.ceil(baseDurationMs * durationMultiplier));
+
 	return {
 		appliedEffects,
 		blocked,
 		blockReasons,
-		durationMs: Math.max(0, Math.ceil(baseDurationMs * durationMultiplier)),
+		durationMs: readGameCheatEffectiveDurationMs({
+			durationMs,
+			save,
+		}),
 		grantIds: [
 			...grantIds,
 		].sort(),

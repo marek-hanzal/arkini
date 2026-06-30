@@ -16,6 +16,7 @@ import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { compareProducerQueueJobs } from "~/v0/game/producer/compareProducerQueueJobs";
 import { readProducerJobStartGateReadyFx } from "~/v0/game/producer/readProducerJobStartGateReadyFx";
 import { groupWorldProducerJobs } from "~/v0/game/world/groupWorldProducerJobs";
+import { readGameCheatSpeedMode } from "~/v0/game/cheat/GameCheatSpeedMode";
 
 export namespace syncRealtimeProducerJobsFx {
 	export interface Props {
@@ -106,14 +107,20 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				continue;
 			}
 
-			const startAtMs = Math.max(job.startAtMs, cursorAtMs);
+			const timingSave = nextSave ?? save;
+			const startAtMs =
+				readGameCheatSpeedMode({
+					save: timingSave,
+				}) === "instant"
+					? Math.max(cursorAtMs, Math.min(job.startAtMs, nowMs))
+					: Math.max(job.startAtMs, cursorAtMs);
 			if (isWorldProducerJobPaused(job)) {
 				const startGateReady = yield* readProducerJobStartGateReadyFx({
 					config,
 					evaluateAtMs: nowMs,
 					ignoredProducerJobIds: realtimeProducerJobIds,
 					job,
-					save: nextSave ?? save,
+					save: timingSave,
 				});
 				if (!startGateReady) break;
 
@@ -123,7 +130,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 					evaluateAtMs: nowMs,
 					ignoredProducerJobIds: realtimeProducerJobIds,
 					job,
-					save: nextSave ?? save,
+					save: timingSave,
 					startAtMs: nowMs,
 				});
 				const durationMs = Math.max(
@@ -166,7 +173,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 						evaluateAtMs: nowMs,
 						ignoredProducerJobIds: realtimeProducerJobIds,
 						job,
-						save: nextSave ?? save,
+						save: timingSave,
 					})
 				: true;
 			if (!startGateReady && startAtMs <= nowMs) {
@@ -207,7 +214,7 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 				evaluateAtMs,
 				ignoredProducerJobIds: realtimeProducerJobIds,
 				job,
-				save: nextSave ?? save,
+				save: timingSave,
 				startAtMs,
 			});
 			cursorAtMs = timing.readyAtMs;

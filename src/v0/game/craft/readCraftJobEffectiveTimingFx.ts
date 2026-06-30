@@ -20,6 +20,7 @@ export const readCraftJobEffectiveTimingFx = Effect.fn("readCraftJobEffectiveTim
 }: readCraftJobEffectiveTimingFx.Props) {
 	const durationMs = readCraftRecipeDurationMs({
 		recipe,
+		save,
 	});
 
 	return {

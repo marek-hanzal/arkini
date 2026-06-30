@@ -294,7 +294,8 @@ export const readEffectiveProducerProductLine = ({
 	productId,
 	save,
 }: readEffectiveProducerProductLine.Props): EffectiveProducerProductLine => {
-	let visibility: "visible" | "hidden" = product.visibility === "hidden" ? "hidden" : "visible";
+	let visibility: "visible" | "hidden" =
+		product.visibility === "hidden" && !product.grantSelector ? "hidden" : "visible";
 	let blocked = false;
 	let durationAddMs = 0;
 	let durationMultiplier = 1;
@@ -542,6 +543,8 @@ export const readEffectiveProducerProductLine = ({
 			...grantIds,
 		].sort(),
 		grantsReady,
-		visible: visibility === "visible" && grantsReady,
+		visible:
+			visibility === "visible" &&
+			!(product.visibility === "hidden" && product.grantSelector && !grantsReady),
 	};
 };

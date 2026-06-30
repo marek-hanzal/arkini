@@ -152,6 +152,7 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 								const targetLimits = line.targetLimits ?? [];
 								const effectBenefits = line.effectBenefits ?? [];
 								const effectBonusLines = line.effectBonusLines ?? [];
+								const effectRequirements = line.effectRequirements ?? [];
 								return (
 									<div
 										key={line.productId}
@@ -295,6 +296,29 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 																className="break-words"
 															>
 																{bonusLine}
+															</li>
+														),
+													)}
+												</ul>
+											</div>
+										) : null}
+
+										{effectRequirements.length ? (
+											<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+												<p className="font-semibold text-ak-text">
+													Requirements
+												</p>
+												<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+													{effectRequirements.map(
+														(requirement, requirementIndex) => (
+															<li
+																key={`${line.productId}:effect-requirement:${requirementIndex}`}
+																className="break-words"
+															>
+																{requirement.ready
+																	? "✓"
+																	: "Missing"}{" "}
+																{requirement.label}
 															</li>
 														),
 													)}

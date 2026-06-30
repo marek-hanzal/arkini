@@ -24,6 +24,7 @@ import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readAc
 import { readEffectiveOutputTargetLimits } from "~/v0/game/limit/readEffectiveOutputTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 import { readRuntimeProductLineOutputViews } from "~/v0/play/game-engine-bridge/readRuntimeProductLineOutputViews";
+import { readRuntimeEffectRequirementViews } from "~/v0/play/game-engine-bridge/readRuntimeEffectRequirementViews";
 
 export namespace readRuntimeProducerProductLineViewsFromGameSave {
 	export interface Props {
@@ -200,6 +201,13 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			lootPlan: effectiveProductLine.lootPlan,
 			save,
 		});
+		const effectRequirements = product.grantSelector
+			? readRuntimeEffectRequirementViews({
+					config,
+					grantIds: effectiveProductLine.grantIds ?? [],
+					selector: product.grantSelector,
+				})
+			: [];
 
 		return [
 			{
@@ -222,6 +230,10 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 						})
 					: undefined,
 				effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,
+				effectRequirements: effectRequirements.length ? effectRequirements : undefined,
+				effectRequirementsReady: product.grantSelector
+					? effectiveProductLine.grantsReady
+					: undefined,
 				inProgress: jobs.length > 0,
 				inputItemIds: inputs.map((input) => input.itemId),
 				isDefault,

@@ -85,6 +85,27 @@ describe("readProducerProductLineRunState", () => {
 		});
 	});
 
+	it("blocks visible lines with missing effect requirements", () => {
+		expect(
+			readProducerProductLineRunState({
+				line: line({
+					effectRequirements: [
+						{
+							label: "Nearby Tree",
+							ready: false,
+						},
+					],
+					effectRequirementsReady: false,
+				}),
+			}),
+		).toMatchObject({
+			canRunAction: false,
+			inputAvailabilityLabel: "requirements missing",
+			label: "Requirements missing",
+			statusMetaLabel: "requirements missing",
+		});
+	});
+
 	it("blocks every line while the producer queue is waiting for delivery", () => {
 		expect(
 			readProducerProductLineRunState({

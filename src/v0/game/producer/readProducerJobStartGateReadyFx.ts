@@ -43,6 +43,10 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 			save,
 		});
 
-		return effectiveProductLine.visible && !effectiveProductLine.blocked;
+		return (
+			effectiveProductLine.visible &&
+			effectiveProductLine.grantsReady !== false &&
+			!effectiveProductLine.blocked
+		);
 	},
 );

@@ -48,12 +48,17 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 	if (!effectiveProductLine.visible) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
-				product.grantSelector && !effectiveProductLine.grantsReady
-					? "effect:missing-grant"
-					: "invalid_actor",
-				product.grantSelector && !effectiveProductLine.grantsReady
-					? `Product "${productId}" is missing effect grants at its scheduled start.`
-					: `Product "${productId}" is hidden by an active effect at its scheduled start.`,
+				"invalid_actor",
+				`Product "${productId}" is hidden by an active effect at its scheduled start.`,
+			),
+		);
+	}
+
+	if (!effectiveProductLine.grantsReady) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"effect:missing-grant",
+				`Product "${productId}" is missing effect grants at its scheduled start.`,
 			),
 		);
 	}

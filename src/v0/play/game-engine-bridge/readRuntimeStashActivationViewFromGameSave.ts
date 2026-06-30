@@ -58,23 +58,28 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		producerItemInstanceId: boardItem.id,
 		save,
 	});
+	const productVisible = effectiveProductLine.visible;
 
 	return {
 		deliveryBlocked,
-		drops: readRuntimeLootDropViewsFromEffectiveProductLine({
-			effectiveProductLine,
-		}),
-		inputs: (product.inputs ?? []).map((input) =>
-			readRuntimeActivationInputView({
-				available: readRuntimeActivationInputAvailableQuantityFromGameSave({
-					itemId: input.itemId,
-					save,
-					targetItemInstanceId: boardItem.id,
-				}),
-				input,
-				stored: storedInputs[input.itemId] ?? 0,
-			}),
-		),
+		drops: productVisible
+			? readRuntimeLootDropViewsFromEffectiveProductLine({
+					effectiveProductLine,
+				})
+			: undefined,
+		inputs: productVisible
+			? (product.inputs ?? []).map((input) =>
+					readRuntimeActivationInputView({
+						available: readRuntimeActivationInputAvailableQuantityFromGameSave({
+							itemId: input.itemId,
+							save,
+							targetItemInstanceId: boardItem.id,
+						}),
+						input,
+						stored: storedInputs[input.itemId] ?? 0,
+					}),
+				)
+			: [],
 		kind: "stash",
 		productLines,
 		remainingCharges: readProducerRemainingCharges({

@@ -1253,4 +1253,154 @@ describe("readEffectiveProducerProductLine", () => {
 			"loot.extraOutputChance.add",
 		]);
 	});
+
+	it("keeps visible grant-gated lines visible while marking grants missing", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:test:missing-grant-source": {
+					name: "Missing Grant Source",
+					operations: [
+						{
+							grantId: "grant:test:missing",
+							kind: "grant.add",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:test",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "both",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					grantSelector: {
+						allOf: [
+							{
+								ids: [
+									"grant:test:missing",
+								],
+							},
+						],
+					},
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:test"];
+
+		const effective = readEffectiveProducerProductLine({
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:test",
+			save,
+		});
+
+		expect(effective.visible).toBe(true);
+		expect(effective.grantsReady).toBe(false);
+	});
+
+	it("keeps hidden grant-gated lines hidden until their grants are ready", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				...baseConfig.effects,
+				"effect:test:owned-twig-grant": {
+					name: "Owned Twig Grant",
+					operations: [
+						{
+							grantId: "grant:test:owned-twig",
+							kind: "grant.add",
+							target: {
+								productLines: {
+									anyOf: [
+										{
+											ids: [
+												"product:shred",
+											],
+										},
+									],
+								},
+							},
+						},
+					],
+					scope: "global",
+					sourceScope: "both",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:twig": {
+					...baseConfig.items["item:twig"],
+					passiveEffectIds: [
+						"effect:test:owned-twig-grant",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					grantSelector: {
+						allOf: [
+							{
+								ids: [
+									"grant:test:owned-twig",
+								],
+							},
+						],
+					},
+					visibility: "hidden",
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const product = config.products["product:shred"];
+		const baseProps = {
+			baseDurationMs: product.durationMs,
+			config,
+			nowMs: 0,
+			producerId: "item:producer",
+			producerItemId: "item:producer",
+			producerItemInstanceId: "item-instance:1",
+			product,
+			productId: "product:shred",
+			save,
+		};
+
+		expect(readEffectiveProducerProductLine(baseProps).visible).toBe(false);
+
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const effective = readEffectiveProducerProductLine(baseProps);
+
+		expect(effective.visible).toBe(true);
+		expect(effective.grantsReady).toBe(true);
+	});
 });

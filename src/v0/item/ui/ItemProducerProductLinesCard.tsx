@@ -110,6 +110,14 @@ const readSectionCopy = (lineKind: NonNullable<ProducerProductLineView["lineKind
 				title: "Product lines",
 			};
 
+const readEffectRequirementStateLabel = (
+	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
+) => {
+	if (requirement.ready) return "✓";
+	if (requirement.kind === "grant.blockStart") return "Blocked";
+	return "Missing";
+};
+
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
 	items,
 	lines,
@@ -315,9 +323,9 @@ export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props
 																key={`${line.productId}:effect-requirement:${requirementIndex}`}
 																className="break-words"
 															>
-																{requirement.ready
-																	? "✓"
-																	: "Missing"}{" "}
+																{readEffectRequirementStateLabel(
+																	requirement,
+																)}{" "}
 																{requirement.label}
 															</li>
 														),

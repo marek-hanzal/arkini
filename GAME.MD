@@ -47,7 +47,7 @@ These rules define how the game should be interpreted when implementation detail
 | Blueprint acquisition | specific blueprint is acquired directly through gameplay |
 | Craft/construction location | board or inventory, with active progress only on board |
 | Building tier progression | physical item/producer tiers, not global config patches |
-| Output model | inline output on products, stashes, and effect loot operations |
+| Output model | inline output on product/stash lines plus line-owned extra chance loot modifiers |
 | Time model | real-world wall-clock time for active board/global timers |
 
 ## 4. Vocabulary
@@ -242,13 +242,13 @@ A coal mine may require `1 sausage` and `1 beer` per production cycle and may st
 
 Product inputs are exact by default: a line with `quantity: 4` needs and consumes exactly four items to start. A product input may instead use `mode: "upTo"`; then `quantity` is the per-run maximum, the line can start with at least one stored item, and the run consumes as many as are stored/auto-filled up to that maximum while output stays fixed. This is for cleanup/sink mechanics such as Purifier I, whose single pollution line consumes `1..4` pollution tiles per run and produces no item output.
 
-Stash consumable inputs are currently open-time inputs, not persistent stash input storage. A locked chest can consume a key when opened. Persistent stash gates should use Effect grants instead.
+Stash consumable inputs are currently open-time inputs, not persistent stash input storage. A locked chest can consume a key when opened. Persistent stash gates should use line-owned effect gates instead.
 
 ### 4.13 Inline output model
 
-Product lines, stashes, and effect loot operations own their output inline. There is no top-level loot-table indirection in the current config model. Reintroduce shared output IDs only if the same output table is intentionally reused enough to beat the extra reference hop, not because humans miss paperwork for some reason.
+Product lines own their output inline. Stashes emit through their single product line. There is no top-level loot-table indirection in the current config model. Reintroduce shared output IDs only if the same output table is intentionally reused enough to beat the extra reference hop, not because humans miss paperwork for some reason.
 
-Better output should usually be modeled as another product/building tier with its own inline output. Runtime effects may append or replace output when the change is a concrete gameplay rule.
+Better output should usually be modeled as another product/building tier with its own inline output. Line-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls against already-produced output items, not for rewriting the base output table.
 
 ### 4.14 Blueprint
 
@@ -669,19 +669,17 @@ Because inventory is passive, producer jobs require the producer item to be on t
 
 ### 10.4 Producer product lines
 
-A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, grant gates, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. There are no legacy product input/output reference tables; product-specific data lives on the product itself.
+A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, line-owned effects, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. There are no legacy product input/output reference tables; product-specific data lives on the product itself.
 
-Product lines can start as `visibility: "hidden"` and be revealed by runtime effects. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. A matching hide effect has higher priority than reveal. A matching block effect leaves the line visible but prevents starting new production. Running jobs are not paused or cancelled by block effects, because the game already has enough ways to generate admin work without inventing time-travel bookkeeping.
+Product lines can start as `visibility: "hidden"` and be revealed by their own visibility-phase requirements. Hidden lines are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. Start-phase requirements keep the line visible but disabled until satisfied. `grant.blockStart` keeps the line visible but blocks new production while the blocking grant is active. Running jobs are not paused or cancelled by block effects, because the game already has enough ways to generate admin work without inventing time-travel bookkeeping.
 
 ### 10.6 Runtime effects
 
-Runtime effects are product-line mutators and item-creation rules. They do not patch or rewrite `GameConfig`; instead, a concrete product line asks the runtime which effects apply and receives an effective view. Effect sources have identity and board position, so local effects use Chebyshev distance using the same board-distance math as every local effect, while global effects apply regardless of distance.
+Runtime effect definitions publish global grant facts. They do not patch or rewrite `GameConfig`, do not own operation lists, and do not target product lines directly. Passive effects come from items via `passiveEffectIds`; each effect definition decides where the source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
 
-Passive effects come from items via `passiveEffectIds`. Each effect definition decides where its source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Local effects must be board-sourced because distance needs a board cell; config validation rejects local effects that claim inventory/both source scope. Inventory-sourced effects are for global hard rules such as path locks. Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine.
+Product and craft lines own their own interpretation of those grants. A producer line asks for its effective view and gets visibility, start readiness, blockers, duration multiplier effects, and extra chance loot. Craft recipes intentionally support only start-gate effects: `grant.require` with `phase: "start"` and `grant.blockStart`. Config validation rejects producer-only duration/nearby/loot effects on craft recipes, because silent no-op config is just technical debt wearing perfume.
 
-Effects currently operate on product-line visibility, start blocking, duration, proximity duration penalties, output plan evaluation, and item creation blocking. They can reveal or hide lines, block starts, add or multiply duration, append or replace inline output, add chance item drops, adjust the chance that base output is rolled, add fixed output quantity, add chance-based extra output for matching produced item tags, and block creation of matching items. They intentionally do not mutate config, do not explicitly suppress each other, and do not have a special propagation system. Spread is authored as side loot that drops another effect source item, because sometimes the clean answer is just to let the board get haunted properly.
-
-Effect conflict rules are simple: hide beats reveal, any product-line block blocks start, and any matching `item.blockCreate` blocks creation while the effect applies. Numeric duration, proximity duration penalty, and loot chance operations are aggregated deterministically after effects are sorted by scope and activation/source order. Fixed quantity operations change the base output directly; chance-based extra output operations leave base output intact and add independent extra drops for output items matched by item selectors.
+Current line-owned effect kinds are `grant.require`, `grant.blockStart`, `nearby.require`, `nearby.duration.multiply`, `grant.duration.multiply`, and `grant.loot.extraOutputChance.add`. Nearby effects use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; grant duration and loot effects activate once their grant selector is satisfied. Modifier effects are UI bonuses, not requirement rows. Hidden missing requirements still block starts even when `display: "never"`, because display is not gameplay logic.
 
 ### Board max count
 
@@ -727,19 +725,19 @@ Producer output placement is atomic per completion attempt. Retryable placement 
 
 A blocked producer delivery retries later when the failure is logistical, such as full board/inventory capacity or a board max-count cap that can become valid after removal. The output is not rerolled while blocked. The saved delivery must eventually be placed as rolled, or remain blocked until the board/inventory state changes.
 
-Hard gameplay-rule failures are not retryable delivery. If completion output is blocked by a rule such as `item.blockCreate`, the product job completes and its output is discarded with a failure event. Craft completion follows the same rule: a blocked result fails the craft job instead of crashing the tick or retrying forever. The player changed the world before the job finished, so the result is allowed to go bad; the producer must not be jammed forever by a rule that is not going to become magically less true.
+Hard gameplay-rule failures are not retryable delivery. Current hard output failures are mostly structural placement/capability failures such as storage policy and board max-count violations. Product-line `grant.blockStart` prevents new starts; it does not retroactively void already queued delivery. The producer must not be jammed forever by a rule that is not going to become magically less true.
 
 Board placement uses deterministic nearest-free-cell policy based on the producer origin: Manhattan distance from the seed cell, then scan order by `y`, then `x`. Without a seed cell, placement uses scan order by `y`, then `x`. Yes, the little grid goblin has rules.
 
 ### 10.7 Producer inputs and grant gates
 
-A product line may define consumable activation inputs and grant gates.
+A product line may define consumable activation inputs and line-owned effect gates.
 
 Consumable inputs are items consumed per successful product start. They belong inline to the concrete product line.
 
-Product-line gates are `grantSelector` expressions resolved by the Effect engine. Producer shells do not own gates. If the world should allow a line, an item/building/source emits `grant.add`; if the line should be blocked or mutated, the same Effect subsystem handles it. Consumable resources remain normal `inputs`, because burning planks is not the same thing as being near a tree.
+Product-line gates are `effects` entries resolved against current world grants or nearby board items. Producer shells do not own gates. Consumable resources remain normal `inputs`, because burning planks is not the same thing as being near a tree.
 
-Local access such as trees, deposits, purifier coverage, shrine aura, corruption, pollution, and void nonsense is modeled as local board-sourced Effects. Global era/path access is modeled as global Effects. One subsystem answers both questions, which is the whole point of not building another tiny proprietary swamp.
+Local access such as trees, deposits, purifier coverage, shrine aura, corruption, pollution, and void nonsense is modeled with `nearby.require` or `nearby.duration.multiply` on the line that cares. Global era/path access is modeled with grant-publishing effects plus `grant.require`/`grant.blockStart` on the line that cares. One subsystem answers both questions without turning each producer into its own tiny swamp.
 
 ### 10.8 Producer input storage and auto-fill
 
@@ -769,15 +767,15 @@ A product line can start when:
 
 Starting production consumes configured input quantities only through the activation pipeline. Grants are ambient capabilities and are never consumed. If validation fails, activation is rejected without consuming inputs or changing job state.
 
-Output capacity is checked at completion time, not start time. If completion output cannot fit for a retryable logistical reason, the job becomes blocked and preserves its rolled delivery for retry. If completion violates a hard creation rule such as `item.blockCreate`, the job is resolved as failed/discarded instead of retrying forever.
+Output capacity is checked at completion time, not start time. If completion output cannot fit for a retryable logistical reason, the job becomes blocked and preserves its rolled delivery for retry. Start blockers affect starts; they do not mutate or void already rolled output delivery.
 
 ### 10.10 Effect-authored path choices
 
-Path/faction exclusivity is not a separate item-level mechanic. It is authored through effects and enforced as a hard gameplay rule.
+Path/faction exclusivity is not a separate item-level mechanic. It is authored through grant-publishing effects and line-owned gates/blockers.
 
-A keystone building can emit passive global effects with `sourceScope: "both"`, so the path lock stays active whether the keystone is placed on the board or stored in inventory. Those effects may use `line.blockStart` to prevent counter-path production lines from starting and `item.blockCreate` to prevent counter-path blueprints/buildings from entering gameplay through placement, merge/craft replacement, producer delivery, or spawn jobs.
+A keystone building can emit passive global effects with `sourceScope: "both"`, so the path lock stays active whether the keystone is placed on the board or stored in inventory. Counter-path product lines and craft recipes use `grant.blockStart` to prevent new starts while the opposing path grant exists. Lines that should require the chosen path use `grant.require`.
 
-Effects are not soft UI gates. If an effect blocks creation, immediate actions must fail and delayed producer, craft, or spawn outputs must resolve as failed/discarded instead of retrying forever. The UI must always list generated effects on buildings/items so the player can understand exactly what commitment a keystone emits. Hidden rule magic is how tiny civilizations die screaming, now with worse UX.
+Effects are not soft UI vibes. The engine evaluates blockers/readiness, and UI displays the effective runtime view from that same source of truth. Hidden rule magic is how tiny civilizations die screaming, now with worse UX.
 
 ## 11. Stashes
 
@@ -827,7 +825,7 @@ Random stash output is rolled during producer delivery. UI visuals consume the s
 
 ### 12.1 Inline output ownership
 
-Outputs live inline on the product/effect operation that emits them: product lines and effect loot operations. Stashes emit through their single product line, not through a second stash-only output field. There are no standalone loot-table IDs in the current config.
+Outputs live inline on product lines. Stashes emit through their single product line, not through a second stash-only output field. Line-owned extra chance loot modifiers can add independent bonus rolls for already-produced output items. There are no standalone loot-table IDs in the current config.
 
 Example:
 
@@ -1350,8 +1348,8 @@ A gameplay implementation should provide tests or validation for:
 31. producer product duration timing on board
 32. producer queue size and sequential queued start/completion timing
 33. producer default product-line selection
-34. local duration effects affect production duration through Effect operations
-35. local effects stack through their authored Effect operation categories/caps
+34. nearby duration line effects affect production duration through line-owned effect rules
+35. nearby duration effects stack through authored maxSources and distance bands
 36. producer inline output rolls
 37. producer generating multiple items
 38. producer generating duplicate item outputs when allowed

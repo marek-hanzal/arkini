@@ -97,18 +97,20 @@ const createAppliedOperation = ({
 	kind,
 	lineEffectId,
 	lineEffectName,
-	producerItemInstanceId,
+	sourceId = lineEffectId,
+	sourceItemInstanceId,
 }: {
 	kind: AppliedGameEffectOperation["kind"];
 	lineEffectId: string;
 	lineEffectName: string;
-	producerItemInstanceId: string;
+	sourceId?: string;
+	sourceItemInstanceId: string;
 }): AppliedGameEffectOperation => ({
 	effectId: lineEffectId,
 	effectName: lineEffectName,
 	kind,
-	sourceId: lineEffectId,
-	sourceItemInstanceId: producerItemInstanceId,
+	sourceId,
+	sourceItemInstanceId,
 });
 
 const readNearbyMatches = ({
@@ -224,7 +226,7 @@ export const readEffectiveProducerProductLine = ({
 			kind: lineEffect.kind,
 			lineEffectId,
 			lineEffectName,
-			producerItemInstanceId,
+			sourceItemInstanceId: producerItemInstanceId,
 		});
 
 		if (lineEffect.kind === "grant.require") {
@@ -298,7 +300,6 @@ export const readEffectiveProducerProductLine = ({
 				save,
 				targetCell,
 			}).slice(0, lineEffect.maxSources ?? Number.POSITIVE_INFINITY);
-			let active = false;
 			for (const match of matches) {
 				const multiplier = readDistanceMultiplier({
 					bands: lineEffect.bands,
@@ -306,15 +307,16 @@ export const readEffectiveProducerProductLine = ({
 				});
 				if (multiplier === undefined) continue;
 				durationMultiplier *= multiplier;
-				active = true;
+				appliedEffects.push(
+					createAppliedOperation({
+						kind: lineEffect.kind,
+						lineEffectId,
+						lineEffectName,
+						sourceId: match.item.itemId,
+						sourceItemInstanceId: match.item.id,
+					}),
+				);
 			}
-			if (active) appliedEffects.push(appliedOperation);
-			requirements.push({
-				display: lineEffect.display,
-				kind: lineEffect.kind,
-				label: lineEffectName,
-				ready: !active,
-			});
 			continue;
 		}
 
@@ -327,12 +329,6 @@ export const readEffectiveProducerProductLine = ({
 				durationMultiplier *= lineEffect.multiplier;
 				appliedEffects.push(appliedOperation);
 			}
-			requirements.push({
-				display: lineEffect.display,
-				kind: lineEffect.kind,
-				label: lineEffectName,
-				ready: !active,
-			});
 			continue;
 		}
 
@@ -353,12 +349,6 @@ export const readEffectiveProducerProductLine = ({
 					appliedEffects.push(appliedOperation);
 				}
 			}
-			requirements.push({
-				display: lineEffect.display,
-				kind: lineEffect.kind,
-				label: lineEffectName,
-				ready: !active,
-			});
 			continue;
 		}
 	}

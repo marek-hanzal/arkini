@@ -250,8 +250,10 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(line.durationMs).toBe(3000);
 		expect(line.requirements.map((requirement) => requirement.label)).toEqual([
 			"Nearby Twig",
-			"Nearby Axe Slowdown",
 		]);
+		expect(
+			line.appliedEffects.filter((effect) => effect.kind === "nearby.duration.multiply"),
+		).toHaveLength(1);
 	});
 
 	it("applies global grant-owned duration and loot rules defined by the line", () => {
@@ -331,6 +333,89 @@ describe("readEffectiveProducerProductLine", () => {
 				itemId: "item:twig",
 				quantity: 1,
 			},
+		]);
+		expect(line.requirements).toEqual([]);
+	});
+
+	it("counts every active nearby duration source without pretending bonuses are requirements", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 4,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					effects: [
+						{
+							bands: [
+								{
+									maxDistance: 3,
+									minDistance: 0,
+									multiplier: 0.5,
+								},
+							],
+							display: "whenActive",
+							items: anyOfItem("item:axe"),
+							kind: "nearby.duration.multiply",
+							label: "Nearby Axe Haste",
+							maxSources: 2,
+							radius: 3,
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 1,
+					},
+					{
+						itemId: "item:axe",
+						x: 3,
+						y: 1,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readLine({
+			config,
+			save,
+		});
+		const durationEffects = line.appliedEffects.filter(
+			(effect) => effect.kind === "nearby.duration.multiply",
+		);
+
+		expect(line.durationMs).toBe(250);
+		expect(line.requirements).toEqual([]);
+		expect(durationEffects).toHaveLength(2);
+		expect(new Set(durationEffects.map((effect) => effect.sourceItemInstanceId)).size).toBe(2);
+		expect(durationEffects.map((effect) => effect.sourceId)).toEqual([
+			"item:axe",
+			"item:axe",
 		]);
 	});
 });

@@ -39,8 +39,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 	});
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
-		producerId,
-		producerItemId: producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
 		nowMs,
 		productIds: producerDefinition.productIds,
@@ -139,8 +137,6 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		}),
 		config,
 		nowMs,
-		producerId,
-		producerItemId: producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
 		product,
 		productId,

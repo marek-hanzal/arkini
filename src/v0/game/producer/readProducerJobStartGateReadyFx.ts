@@ -35,8 +35,6 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 			config,
 			ignoredProducerJobIds,
 			nowMs: evaluateAtMs,
-			producerId: subject.producerItem.itemId,
-			producerItemId: subject.producerItem.itemId,
 			producerItemInstanceId: job.producerItemInstanceId,
 			product: subject.product,
 			productId: job.productId,

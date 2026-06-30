@@ -70,8 +70,6 @@ describe("realtime producer line effects", () => {
 			readEffectiveProducerProductLine({
 				baseDurationMs: product.durationMs,
 				config,
-				producerId: "item:producer",
-				producerItemId: "item:producer",
 				producerItemInstanceId: "item-instance:1",
 				product,
 				productId: "product:test",

@@ -27,8 +27,6 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
 		nowMs,
-		producerId,
-		producerItemId: boardItem.itemId,
 		producerItemInstanceId: boardItem.id,
 		productIds: producer.productIds,
 		save,
@@ -46,8 +44,6 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 			config,
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
-			producerId,
-			producerItemId: boardItem.itemId,
 			productIds: producer.productIds,
 			save,
 			targetItemInstanceId: boardItem.id,

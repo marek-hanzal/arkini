@@ -69,8 +69,6 @@ export const readProducerJobEffectiveProductLineFx = Effect.fn(
 		config,
 		ignoredProducerJobIds,
 		nowMs,
-		producerId: producerItem.itemId,
-		producerItemId: producerItem.itemId,
 		producerItemInstanceId,
 		product,
 		productId,

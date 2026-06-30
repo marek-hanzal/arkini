@@ -26,6 +26,7 @@ interface RuntimeLineEffectRequirement {
 	ready: boolean;
 	display: NonNullable<GameConfig["products"][string]["effects"]>[number]["display"];
 	kind: NonNullable<GameConfig["products"][string]["effects"]>[number]["kind"];
+	phase?: "start" | "visibility";
 }
 
 export interface EffectiveProducerProductLine {

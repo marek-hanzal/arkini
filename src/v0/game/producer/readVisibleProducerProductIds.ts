@@ -6,8 +6,6 @@ export namespace readVisibleProducerProductIds {
 	export interface Props {
 		config: GameConfig;
 		nowMs?: number;
-		producerId: string;
-		producerItemId: string;
 		producerItemInstanceId: string;
 		productIds: readonly string[];
 		save: GameSave;
@@ -17,8 +15,6 @@ export namespace readVisibleProducerProductIds {
 export const readVisibleProducerProductIds = ({
 	config,
 	nowMs,
-	producerId,
-	producerItemId,
 	producerItemInstanceId,
 	productIds,
 	save,
@@ -31,8 +27,6 @@ export const readVisibleProducerProductIds = ({
 					baseDurationMs: product.durationMs,
 					config,
 					nowMs,
-					producerId,
-					producerItemId,
 					producerItemInstanceId,
 					product,
 					productId,

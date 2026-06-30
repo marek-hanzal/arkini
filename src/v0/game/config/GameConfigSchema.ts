@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { doesResolvedDomainSelectorMatchId } from "~/v0/game/selector/doesResolvedDomainSelectorMatchId";
 
 /**
  * Canonical Arkini v0 game package contract.
@@ -1391,23 +1392,6 @@ const validateCraftRecipeInputs = (
 	}
 };
 
-const doesResolvedDomainSelectorMatchId = (
-	entityId: string,
-	selector: z.infer<typeof ResolvedDomainSelectorSchema> | undefined,
-) => {
-	if (!selector || "mode" in selector) return true;
-	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	if (selector.noneOf?.some((clause) => clause.ids.includes(entityId))) {
-		return false;
-	}
-	return true;
-};
-
 const readDomainSelectorIds = (selector: z.infer<typeof ResolvedDomainSelectorSchema>) => {
 	if ("mode" in selector) return [];
 	return [
@@ -1512,7 +1496,14 @@ const validateResolvedDomainSelector = ({
 		],
 	});
 
-	if (!entityIds.some((entityId) => doesResolvedDomainSelectorMatchId(entityId, selector))) {
+	if (
+		!entityIds.some((entityId) =>
+			doesResolvedDomainSelectorMatchId({
+				entityId,
+				selector,
+			}),
+		)
+	) {
 		addIssue(ctx, path, `Domain selector matched no ${label}s.`);
 	}
 };

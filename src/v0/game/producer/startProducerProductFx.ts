@@ -128,8 +128,6 @@ export const startProducerProductFx = Effect.fn("startProducerProductFx")(functi
 	);
 	yield* checkProducerProductStartRuntimeConstraintsFx({
 		config,
-		producerId: checked.producerId,
-		producerItemId: checked.producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
 		product: checked.product,
 		productId: checked.productId,

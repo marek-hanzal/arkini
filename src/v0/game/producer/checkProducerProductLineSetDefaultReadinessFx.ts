@@ -33,8 +33,6 @@ export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 	}
 	const visibleProductIds = readVisibleProducerProductIds({
 		config,
-		producerId,
-		producerItemId: producerItem.itemId,
 		producerItemInstanceId: action.producerItemInstanceId,
 		nowMs,
 		productIds: producerDefinition.productIds,

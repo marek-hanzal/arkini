@@ -1,4 +1,4 @@
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { type RefObject, useLayoutEffect } from "react";
 import type { TileEnterMotionSchema } from "~/v0/tile-engine/TileEnterMotionSchema";
 import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
@@ -80,7 +80,7 @@ export const useTileActorEnterMotion = ({
 							"translate3d(0px, 0px, 0px) scale(1)",
 						],
 					}
-				: kind === "fade-in"
+				: kind === "fade-in" || kind === "replace-in"
 					? {
 							opacity: [
 								0,

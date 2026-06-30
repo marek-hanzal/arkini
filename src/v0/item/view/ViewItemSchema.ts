@@ -1,5 +1,29 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
+import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
+
+const ViewEffectPolaritySchema = z.enum([
+	"buff",
+	"debuff",
+	"neutral",
+	"mixed",
+]);
+
+const ViewItemGeneratedEffectGrantSchema = z.object({
+	id: z.string(),
+	summary: z.string(),
+});
+
+const ViewItemGeneratedEffectSchema = z.object({
+	id: z.string().min(1),
+	name: z.string(),
+	polarity: ViewEffectPolaritySchema,
+	grants: z.array(ViewItemGeneratedEffectGrantSchema),
+	sourceScope: z.enum([
+		"board",
+		"inventory",
+		"both",
+	]),
+});
 
 export const ViewItemSchema = z.object({
 	id: GameItemIdSchema,
@@ -15,36 +39,13 @@ export const ViewItemSchema = z.object({
 		])
 		.optional(),
 	maxStackSize: z.number().int().positive(),
+	storage: z.enum([
+		"board",
+		"inventory",
+		"both",
+	]),
 	tags: z.array(z.string()),
-	canProduce: z.boolean(),
-	producerTrigger: z.literal("click").optional(),
-	canMerge: z.boolean(),
-	mergeResults: z
-		.array(
-			z.object({
-				withItemId: GameItemIdSchema,
-				resultItemId: GameItemIdSchema,
-				secret: z.boolean().optional(),
-			}),
-		)
-		.optional(),
-	usedInCrafts: z
-		.array(
-			z.object({
-				targetItemId: GameItemIdSchema,
-				resultItemId: GameItemIdSchema,
-			}),
-		)
-		.optional(),
-	usedInMerges: z
-		.array(
-			z.object({
-				targetItemId: GameItemIdSchema,
-				resultItemId: GameItemIdSchema,
-				secret: z.boolean().optional(),
-			}),
-		)
-		.optional(),
+	generatedEffects: z.array(ViewItemGeneratedEffectSchema),
 });
 
 type ViewItemSchema = typeof ViewItemSchema;
@@ -52,4 +53,5 @@ export namespace ViewItemSchema {
 	export type Type = z.infer<ViewItemSchema>;
 }
 
+export type ViewItemGeneratedEffect = z.infer<typeof ViewItemGeneratedEffectSchema>;
 export type ViewItem = ViewItemSchema.Type;

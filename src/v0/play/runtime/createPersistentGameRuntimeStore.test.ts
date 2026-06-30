@@ -9,6 +9,7 @@ import type {
 	SaveActiveGameSaveProps,
 } from "~/v0/game/storage";
 import { createPersistentGameRuntimeStore } from "~/v0/play/runtime/createPersistentGameRuntimeStore";
+import { readBoardView } from "~/v0/play/runtime/readers";
 
 const createInitialSave = async (): Promise<GameSave> => {
 	const adapter = await RuntimeGameEngineAdapter.create({
@@ -72,7 +73,7 @@ describe("createPersistentGameRuntimeStore", () => {
 			storage,
 		});
 
-		expect(runtime.store.getSnapshot().board.byId["item-instance:1"]?.x).toBe(1);
+		expect(readBoardView(runtime.store.getSnapshot()).byId["item-instance:1"]?.x).toBe(1);
 		expect(storage.saved).toHaveLength(0);
 
 		await runtime.destroy();

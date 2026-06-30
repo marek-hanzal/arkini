@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
 import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
@@ -16,12 +17,51 @@ const source = {
 			id: "stack:source",
 			itemId: "item:twig",
 			quantity: 1,
-			state: {},
-			stateJson: "{}",
-			stateful: false,
 		},
 	},
 } satisfies DragSource;
+
+const inventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+		stack: {
+			id: "stack:source",
+			itemId: "item:twig",
+			quantity: 1,
+		},
+	},
+	{
+		slotIndex: 1,
+	},
+]);
+
+const occupiedInventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+		stack: {
+			id: "stack:source",
+			itemId: "item:twig",
+			quantity: 1,
+		},
+	},
+	{
+		slotIndex: 1,
+		stack: {
+			id: "stack:target",
+			itemId: "item:pebble",
+			quantity: 1,
+		},
+	},
+]);
+
+const staleInventory = rebuildInventoryView([
+	{
+		slotIndex: 0,
+	},
+	{
+		slotIndex: 1,
+	},
+]);
 
 const createContext = ({
 	targetSlotIndex,
@@ -57,6 +97,7 @@ describe("resolveInventoryDropFeedback", () => {
 				context: createContext({
 					targetSlotIndex: 0,
 				}),
+				inventory,
 			}),
 		).toBeNull();
 	});
@@ -67,13 +108,14 @@ describe("resolveInventoryDropFeedback", () => {
 				context: createContext({
 					targetSlotIndex: 1,
 				}),
+				inventory,
 			}),
 		).toEqual({
 			effect: "empty",
 		});
 	});
 
-	it("returns blocked feedback for occupied inventory swap targets", () => {
+	it("marks occupied inventory swap targets as blocked target feedback", () => {
 		expect(
 			resolveInventoryDropFeedback({
 				context: createContext({
@@ -89,6 +131,20 @@ describe("resolveInventoryDropFeedback", () => {
 						},
 					},
 				}),
+				inventory: occupiedInventory,
+			}),
+		).toEqual({
+			effect: "blocked",
+		});
+	});
+
+	it("blocks feedback for stale inventory sources", () => {
+		expect(
+			resolveInventoryDropFeedback({
+				context: createContext({
+					targetSlotIndex: 1,
+				}),
+				inventory: staleInventory,
 			}),
 		).toEqual({
 			effect: "blocked",

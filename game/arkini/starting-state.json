@@ -2,55 +2,56 @@
 	"startingState": {
 		"board": [
 			{
-				"itemId": "item:townhall-1",
+				"itemId": "item:nuke-save",
+				"x": 4,
+				"y": 0
+			},
+			{
+				"itemId": "item:cheat",
+				"x": 5,
+				"y": 0
+			},
+			{
+				"itemId": "item:inventory",
+				"x": 6,
+				"y": 0
+			},
+			{
+				"itemId": "item:tree",
+				"x": 0,
+				"y": 1
+			},
+			{
+				"itemId": "producer:lumberjack-t1",
+				"x": 1,
+				"y": 1
+			},
+			{
+				"itemId": "producer:townhall-t1",
 				"x": 3,
 				"y": 4
 			},
 			{
-				"itemId": "item:lumber-camp-1",
-				"x": 1,
-				"y": 4
-			},
-			{
-				"itemId": "item:quarry-1",
+				"itemId": "producer:well-t1",
 				"x": 5,
 				"y": 4
 			},
 			{
-				"itemId": "item:coal-mine-1",
-				"x": 3,
+				"itemId": "item:rock",
+				"x": 0,
 				"y": 6
+			},
+			{
+				"itemId": "producer:quarry-t1",
+				"x": 1,
+				"y": 6
+			},
+			{
+				"itemId": "producer:shrine-t1",
+				"x": 3,
+				"y": 2
 			}
 		],
-		"inventory": [
-			{
-				"itemId": "item:blueprint-scrap",
-				"quantity": 10
-			},
-			{
-				"itemId": "item:twig",
-				"quantity": 8
-			},
-			{
-				"itemId": "item:pebble",
-				"quantity": 8
-			},
-			{
-				"itemId": "item:water",
-				"quantity": 4
-			},
-			{
-				"itemId": "item:sausage",
-				"quantity": 3
-			},
-			{
-				"itemId": "item:beer",
-				"quantity": 3
-			},
-			{
-				"itemId": "item:coin-stack",
-				"quantity": 1
-			}
-		]
+		"inventory": []
 	}
 }

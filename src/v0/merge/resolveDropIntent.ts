@@ -1,16 +1,13 @@
+import { match } from "ts-pattern";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
-import {
-	hasReverseDirectedItemMergeRule,
-	resolveExecutableItemMergeRule,
-} from "~/v0/game/engine/logic/resolveExecutableItemMergeRule";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
+import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 export type DropIntent =
 	| {
 			type: "merge";
 			resultItemId?: ItemId;
-			directed: boolean;
 	  }
 	| {
 			type: "craft-input";
@@ -19,7 +16,7 @@ export type DropIntent =
 			type: "producer-input";
 	  }
 	| {
-			type: "stored-requirement";
+			type: "stash-input";
 	  }
 	| {
 			type: "swap";
@@ -40,78 +37,61 @@ export const resolveDropIntent = ({
 	config,
 	sourceItemId,
 	targetItem,
-}: resolveDropIntent.Props): DropIntent => {
-	const mergeRule = resolveExecutableItemMergeRule({
-		config,
-		sourceItemId,
-		targetItemId: targetItem.itemId,
-	});
-	const reverseDirectedMerge = hasReverseDirectedItemMergeRule({
-		config,
-		sourceItemId,
-		targetItemId: targetItem.itemId,
-	});
-	const canMerge = Boolean(
-		mergeRule && (!targetItem.craft || targetItem.craft.phase === "collecting_inputs"),
-	);
-	const canCraft = Boolean(
-		targetItem.craft?.canAcceptInputs &&
-			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
-	);
-	const canSupplyProducer = Boolean(
-		targetItem.activation?.productLines?.some(
-			(line) =>
-				line.enabled &&
-				line.inputs.some(
-					(input) => input.itemId === sourceItemId && input.stored < input.capacity,
-				),
-		),
-	);
-	const canSupplyStoredRequirement = Boolean(
-		targetItem.activation?.requirements.some(
-			(requirement) =>
-				requirement.type === "stored" &&
-				requirement.itemId === sourceItemId &&
-				requirement.stored < requirement.capacity,
-		) ||
-			targetItem.activation?.productLines?.some(
-				(line) => line.enabled && line.missingRequirementItemIds.includes(sourceItemId),
-			),
-	);
-
-	if (reverseDirectedMerge) {
-		return {
-			type: "reject",
-		};
-	}
-
-	if (canMerge) {
-		return {
-			type: "merge",
-			resultItemId: mergeRule?.merge.resultItemId as ItemId | undefined,
-			directed: mergeRule?.directed ?? false,
-		};
-	}
-
-	if (canSupplyStoredRequirement) {
-		return {
-			type: "stored-requirement",
-		};
-	}
-
-	if (canCraft) {
-		return {
-			type: "craft-input",
-		};
-	}
-
-	if (canSupplyProducer) {
-		return {
-			type: "producer-input",
-		};
-	}
-
-	return {
-		type: "swap",
-	};
-};
+}: resolveDropIntent.Props): DropIntent =>
+	match(
+		resolveItemToBoardItemInteractionPlan({
+			config,
+			sourceItemId,
+			targetItem,
+		}),
+	)
+		.with(
+			{
+				type: "merge",
+			},
+			(plan) => ({
+				resultItemId: plan.resultItemId as ItemId | undefined,
+				type: "merge" as const,
+			}),
+		)
+		.with(
+			{
+				type: "craft-input",
+			},
+			() => ({
+				type: "craft-input" as const,
+			}),
+		)
+		.with(
+			{
+				type: "producer-input",
+			},
+			() => ({
+				type: "producer-input" as const,
+			}),
+		)
+		.with(
+			{
+				type: "stash-input",
+			},
+			() => ({
+				type: "stash-input" as const,
+			}),
+		)
+		.with(
+			{
+				type: "swap",
+			},
+			() => ({
+				type: "swap" as const,
+			}),
+		)
+		.with(
+			{
+				type: "reject",
+			},
+			() => ({
+				type: "reject" as const,
+			}),
+		)
+		.exhaustive();

@@ -1,9 +1,15 @@
 import type { CSSProperties, ReactNode, RefObject } from "react";
 
+interface TileEngineDropBinding<TDrop = unknown> {
+	id?: string;
+	data: TDrop;
+	disabled?: boolean;
+	onLongActivate?(): void;
+}
+
 export namespace TileEngine {
 	export type Id = string;
 	export type LayerRole = "base" | "overlay";
-	export type TileStyle = Omit<CSSProperties, "zIndex">;
 	export type DropAnimation = "parallel-swap" | "parallel-merge";
 	export type DropOutcome =
 		| "accept"
@@ -38,7 +44,7 @@ export namespace TileEngine {
 		/**
 		 * Adapter-owned equality token for slot renderer data. When provided,
 		 * TileEngine memoization may reuse slot actors across equivalent data object
-		 * instances instead of treating every cache snapshot as a render change.
+		 * instances instead of treating every derived snapshot as a render change.
 		 */
 		renderKey?: string | number;
 		data: TSlot;
@@ -58,7 +64,7 @@ export namespace TileEngine {
 		data: TTile;
 		hidden?: boolean;
 		disabled?: boolean;
-		style?: TileStyle;
+		style?: Omit<CSSProperties, "zIndex">;
 	}
 
 	export interface DragBinding<TDrag = unknown> {
@@ -71,24 +77,16 @@ export namespace TileEngine {
 		onLongActivate?(): void;
 	}
 
-	export type DropFeedbackEffect = "empty" | "merge" | "blocked";
 	export type DropFeedbackVariant = "subtle" | "primary" | "secondary" | "danger";
 
 	export interface DropFeedback {
-		effect: DropFeedbackEffect;
+		effect: "empty" | "merge" | "blocked";
 		variant?: DropFeedbackVariant;
 	}
 
 	export interface ActiveDropFeedback extends DropFeedback {
 		dropId: Id;
 		targetTileId?: Id;
-	}
-
-	export interface DropBinding<TDrop = unknown> {
-		id?: Id;
-		data: TDrop;
-		disabled?: boolean;
-		onLongActivate?(): void;
 	}
 
 	export interface DropContext<
@@ -129,7 +127,7 @@ export namespace TileEngine {
 		slot(
 			slot: Slot<TSlot>,
 			targetTile: Tile<TTile> | undefined,
-		): DropBinding<TDrop> | undefined;
+		): TileEngineDropBinding<TDrop> | undefined;
 		dropFeedback?(context: DragOverContext<TTile, TSlot, TDrag, TDrop>): DropFeedback | null;
 		onDragStart?(context: { source: TDrag; tile: Tile<TTile>; rect: Rect }): void;
 		onDragOver?(context: DragOverContext<TTile, TSlot, TDrag, TDrop>): void;
@@ -161,7 +159,9 @@ export namespace TileEngine {
 		actorLayerClassName?: string;
 		disabled?: boolean;
 		layerRole?: LayerRole;
+		container?: "responsive" | "static";
 		gapPx?: number;
+		rootRef?: RefObject<HTMLDivElement | null>;
 		drag?: DragConfig<TTile, TSlot, TDrag, TDrop>;
 		dragConstraintsRef?: RefObject<HTMLElement | null>;
 		renderSlot(props: RenderSlotProps<TSlot>): ReactNode;

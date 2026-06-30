@@ -1,21 +1,29 @@
 import { Effect } from "effect";
-import { applyGameActionFx } from "~/v0/game/engine/fx/applyGameActionFx";
-import { buildGameConfigServiceFx } from "~/v0/game/engine/fx/buildGameConfigServiceFx";
-import { createInitialGameSaveFx } from "~/v0/game/engine/fx/createInitialGameSaveFx";
-import { readActionReadinessFx } from "~/v0/game/engine/fx/readActionReadinessFx";
-import { runGameTickFx } from "~/v0/game/engine/fx/runGameTickFx";
-import { readNextWakeAtMsFx } from "~/v0/game/engine/fx/readNextWakeAtMsFx";
+import { applyGameActionFx } from "~/v0/game/engine/applyGameActionFx";
+import { createInitialGameSaveFx } from "~/v0/game/save/createInitialGameSaveFx";
+import { readActionReadinessFx } from "~/v0/game/engine/readActionReadinessFx";
+import { runGameTickFx } from "~/v0/game/engine/runGameTickFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
+import { syncRealtimeWorldJobsFx } from "~/v0/game/world/syncRealtimeWorldJobsFx";
+import { validateWorldSnapshotFx } from "~/v0/game/world/validateWorldSnapshotFx";
+import { hasProcessableWorldJobs } from "~/v0/game/world/hasProcessableWorldJobs";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
-import type { GameActionReadiness } from "~/v0/game/engine/model/GameActionReadinessSchema";
+import type { GameAction } from "~/v0/game/action/GameActionSchema";
+import type { GameActionReadiness } from "~/v0/game/action/GameActionReadinessSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
-import type { GameEvent } from "~/v0/game/engine/model/GameEventSchema";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { RandomService } from "~/v0/random/context/RandomService";
+import type { WorldSnapshotCheckId } from "~/v0/game/world/WorldSnapshotCheckId";
 import { runGameEngineEffect } from "~/v0/game/engine/runtime/runGameEngineEffect";
 
-export type GameEngineRuntimeListener = (result: GameEngineResult) => void;
+export interface GameEngineRuntimeUpdate {
+	nowMs: number;
+	result: GameEngineResult;
+}
+
+export type GameEngineRuntimeListener = (update: GameEngineRuntimeUpdate) => void;
 
 export interface GameEngineRuntimeSnapshot {
 	config: GameConfig;
@@ -39,6 +47,7 @@ export namespace RuntimeGameEngineAdapter {
 
 	export interface ReadinessProps {
 		action: GameAction | unknown;
+		nowMs?: number;
 	}
 
 	export interface ReplaceSaveProps {
@@ -48,6 +57,11 @@ export namespace RuntimeGameEngineAdapter {
 	}
 
 	export interface TickProps {
+		nowMs?: number;
+	}
+
+	export interface ValidateSnapshotProps {
+		checks?: readonly WorldSnapshotCheckId[];
 		nowMs?: number;
 	}
 }
@@ -64,8 +78,8 @@ export class RuntimeGameEngineAdapter {
 	readonly config: GameConfig;
 	private readonly listeners = new Set<GameEngineRuntimeListener>();
 	private readonly random?: RandomService;
-	private effectiveConfig: GameConfig;
 	private lastEvents: readonly GameEvent[] = [];
+	private mutationQueue: Promise<void> = Promise.resolve();
 	private nextWakeAtMs: number | null = null;
 	private save: GameSave;
 
@@ -73,10 +87,6 @@ export class RuntimeGameEngineAdapter {
 		this.config = config;
 		this.random = random;
 		this.save = initialSave;
-		this.effectiveConfig = buildEffectiveConfig({
-			config,
-			save: initialSave,
-		});
 		this.nextWakeAtMs = nextWakeAtMs;
 	}
 
@@ -98,9 +108,21 @@ export class RuntimeGameEngineAdapter {
 				},
 			));
 
+		const syncedSave = await runGameEngineEffect(
+			syncRealtimeWorldJobsFx({
+				config,
+				nowMs,
+				save,
+			}),
+			{
+				random,
+			},
+		);
 		const nextWakeAtMs = await runGameEngineEffect(
 			readNextWakeAtMsFx({
-				save,
+				config,
+				nowMs,
+				save: syncedSave,
 			}),
 			{
 				random,
@@ -109,7 +131,7 @@ export class RuntimeGameEngineAdapter {
 
 		return new RuntimeGameEngineAdapter({
 			config,
-			initialSave: save,
+			initialSave: syncedSave,
 			nextWakeAtMs,
 			random,
 		});
@@ -117,7 +139,7 @@ export class RuntimeGameEngineAdapter {
 
 	readSnapshot(): GameEngineRuntimeSnapshot {
 		return {
-			config: this.effectiveConfig,
+			config: this.config,
 			lastEvents: this.lastEvents,
 			nextWakeAtMs: this.nextWakeAtMs,
 			save: this.save,
@@ -138,38 +160,70 @@ export class RuntimeGameEngineAdapter {
 
 	async readiness({
 		action,
+		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
-		return runGameEngineEffect(
-			readActionReadinessFx({
-				action,
-				config: this.config,
-				save: this.save,
-			}),
-			{
-				random: this.random,
-			},
-		);
+		return this.enqueueMutation(async () => {
+			await this.catchUpDueTicks(nowMs);
+
+			return runGameEngineEffect(
+				readActionReadinessFx({
+					action,
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+		});
 	}
 
 	async dispatch({
 		action,
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {
-		const result = await runGameEngineEffect(
-			applyGameActionFx({
-				action,
-				config: this.config,
+		return this.enqueueMutation(async () => {
+			const catchUpResults = await this.catchUpDueTicks(nowMs, {
+				publish: false,
+			});
+
+			let result: GameEngineResult;
+			try {
+				result = await runGameEngineEffect(
+					applyGameActionFx({
+						action,
+						config: this.config,
+						nowMs,
+						save: this.save,
+					}),
+					{
+						random: this.random,
+					},
+				);
+			} catch (error) {
+				const catchUpResult = this.combineResults(catchUpResults);
+				if (catchUpResult) {
+					this.publish({
+						nowMs,
+						result: catchUpResult,
+					});
+				}
+				throw error;
+			}
+
+			const publishedResult =
+				this.combineResults([
+					...catchUpResults,
+					result,
+				]) ?? result;
+			this.publish({
 				nowMs,
-				save: this.save,
-			}),
-			{
-				random: this.random,
-			},
-		);
+				result: publishedResult,
+			});
 
-		this.commit(result);
-
-		return result;
+			return publishedResult;
+		});
 	}
 
 	async replaceSave({
@@ -177,71 +231,183 @@ export class RuntimeGameEngineAdapter {
 		nowMs = Date.now(),
 		save,
 	}: RuntimeGameEngineAdapter.ReplaceSaveProps): Promise<GameEngineResult> {
-		const nextWakeAtMs = await runGameEngineEffect(
-			readNextWakeAtMsFx({
-				save,
-			}),
-			{
-				random: this.random,
-			},
-		);
+		return this.enqueueMutation(async () => {
+			const syncedSave = await runGameEngineEffect(
+				syncRealtimeWorldJobsFx({
+					config: this.config,
+					nowMs,
+					save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+			const nextWakeAtMs = await runGameEngineEffect(
+				readNextWakeAtMsFx({
+					config: this.config,
+					nowMs,
+					save: syncedSave,
+				}),
+				{
+					random: this.random,
+				},
+			);
 
-		const result = {
-			events: [
-				...events,
-			],
-			nextWakeAtMs,
-			save: {
-				...save,
-				updatedAtMs: nowMs,
-			},
-		} satisfies GameEngineResult;
-		this.commit(result);
+			const result = {
+				events: [
+					...events,
+				],
+				nextWakeAtMs,
+				save: {
+					...syncedSave,
+					updatedAtMs: nowMs,
+				},
+			} satisfies GameEngineResult;
+			this.commit({
+				nowMs,
+				result,
+			});
 
-		return result;
+			return result;
+		});
 	}
 
 	async tick({
 		nowMs = Date.now(),
 	}: RuntimeGameEngineAdapter.TickProps = {}): Promise<GameEngineResult> {
-		const result = await runGameEngineEffect(
-			runGameTickFx({
+		return this.enqueueMutation(async () => {
+			const result = await runGameEngineEffect(
+				runGameTickFx({
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+
+			this.commit({
+				nowMs,
+				result,
+			});
+
+			return result;
+		});
+	}
+
+	async validateSnapshot({
+		checks,
+		nowMs = Date.now(),
+	}: RuntimeGameEngineAdapter.ValidateSnapshotProps = {}) {
+		return this.enqueueMutation(async () =>
+			runGameEngineEffect(
+				validateWorldSnapshotFx({
+					checks,
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			),
+		);
+	}
+
+	private async catchUpDueTicks(
+		nowMs: number,
+		{
+			publish = true,
+		}: {
+			publish?: boolean;
+		} = {},
+	) {
+		let tickCount = 0;
+		const results: GameEngineResult[] = [];
+		while (
+			(this.nextWakeAtMs !== null && this.nextWakeAtMs <= nowMs) ||
+			hasProcessableWorldJobs({
 				config: this.config,
 				nowMs,
 				save: this.save,
-			}),
-			{
-				random: this.random,
-			},
+			})
+		) {
+			tickCount += 1;
+			if (tickCount > 100) {
+				throw new Error("Game runtime catch-up exceeded 100 ready ticks.");
+			}
+
+			const result = await runGameEngineEffect(
+				runGameTickFx({
+					config: this.config,
+					nowMs,
+					save: this.save,
+				}),
+				{
+					random: this.random,
+				},
+			);
+
+			results.push(result);
+			if (publish) {
+				this.commit({
+					nowMs,
+					result,
+				});
+			} else {
+				this.storeResult(result);
+			}
+		}
+
+		return results;
+	}
+
+	private enqueueMutation<T>(run: () => Promise<T>): Promise<T> {
+		const queued = this.mutationQueue.then(run, run);
+		this.mutationQueue = queued.then(
+			() => undefined,
+			() => undefined,
 		);
 
-		this.commit(result);
-
-		return result;
+		return queued;
 	}
 
-	private commit(result: GameEngineResult) {
+	private combineResults(results: readonly GameEngineResult[]) {
+		const lastResult = results.at(-1);
+		if (!lastResult) return null;
+
+		return {
+			events: results.flatMap((result) => result.events),
+			nextWakeAtMs: lastResult.nextWakeAtMs,
+			save: lastResult.save,
+		} satisfies GameEngineResult;
+	}
+
+	private storeResult(result: GameEngineResult) {
 		this.save = result.save;
-		this.effectiveConfig = buildEffectiveConfig({
-			config: this.config,
-			save: result.save,
-		});
 		this.lastEvents = result.events;
 		this.nextWakeAtMs = result.nextWakeAtMs;
+	}
+
+	private publish({ nowMs, result }: GameEngineRuntimeUpdate) {
+		this.storeResult(result);
 
 		for (const listener of this.listeners) {
-			listener(result);
+			listener({
+				nowMs,
+				result,
+			});
 		}
 	}
-}
 
-const buildEffectiveConfig = ({ config, save }: { config: GameConfig; save: GameSave }) =>
-	Effect.runSync(
-		buildGameConfigServiceFx({
-			config,
-			save,
-		}),
-	).config;
+	private commit({ nowMs, result }: GameEngineRuntimeUpdate) {
+		this.publish({
+			nowMs,
+			result,
+		});
+	}
+}
 
 interface RequiredAdapterOptions {
 	config: GameConfig;

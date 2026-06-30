@@ -1,82 +1,100 @@
-import type { FC } from "react";
-import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
+import type { FC, ReactNode } from "react";
+import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
+import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
+import type { ActivationInputView } from "~/v0/board/view/ActivationInputViewSchema";
+import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import { UiSection } from "~/v0/ui/UiSection";
+
 export namespace ItemActivationInputsCard {
 	export interface Props {
-		activation: ActivationView;
+		hideSatisfied?: boolean;
+		inputs?: readonly ActivationInputView[];
 		items: ItemCatalogView;
+		title: string;
 	}
 }
 
+interface DetailRow {
+	key: string;
+	label: string;
+	meta?: string;
+	satisfied: boolean;
+	tone: "success" | "danger";
+	asset: ReactNode;
+}
+
+const readInputRow = (input: ActivationInputView, items: ItemCatalogView): DetailRow => {
+	const capacityLabel = input.capacity > input.quantity ? `cap ${input.capacity}` : undefined;
+	const fillableQuantity = readActivationInputViewFillableQuantity(input);
+	const availableLabel = fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined;
+	const consumeLabel = input.consume ? "consumed at start" : "returned or kept";
+	const meta = [
+		readActivationInputViewLabel(input),
+		capacityLabel,
+		availableLabel,
+		consumeLabel,
+	]
+		.filter(Boolean)
+		.join(" · ");
+
+	return {
+		key: `input:${input.itemId}`,
+		label: items[input.itemId]?.name ?? input.itemId,
+		meta,
+		satisfied: readActivationInputViewReady(input),
+		tone: readActivationInputViewReady(input) ? "success" : "danger",
+		asset: (
+			<ItemInlineAsset
+				item={items[input.itemId]}
+				className="h-9 w-9"
+			/>
+		),
+	};
+};
+
 export const ItemActivationInputsCard: FC<ItemActivationInputsCard.Props> = ({
-	activation,
+	hideSatisfied = true,
+	inputs = [],
 	items,
+	title,
 }) => {
-	const title = activation.kind === "stash" ? "Stash inputs" : "Producer inputs";
-	const storedRequirements = activation.requirements.filter(
-		(requirement) => requirement.type === "stored",
-	);
-	const passiveRequirements = activation.requirements.filter(
-		(requirement) => requirement.type === "passive",
-	);
+	const allRows = inputs.map((input) => readInputRow(input, items));
+	const rows = hideSatisfied ? allRows.filter((row) => !row.satisfied) : allRows;
+
+	if (rows.length === 0) return null;
 
 	return (
-		<div className="rounded-md border border-amber-400/20 bg-amber-950/18 p-3">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
-				{title}
-			</p>
-			{storedRequirements.length ? (
-				<div className="mt-3 space-y-2">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-amber-200/80">
-						Persistent requirements
-					</p>
-					{storedRequirements.map((requirement) => (
-						<div
-							key={requirement.itemId}
-							className="flex items-center justify-between gap-3 rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
-						>
-							<span>
-								{items[requirement.itemId]?.name ?? requirement.itemId}:{" "}
-								{requirement.stored}/{requirement.capacity} stored, requires{" "}
-								{requirement.quantity}. Drag matching items onto this tile.
-							</span>
+		<UiSection title={title}>
+			<div className="grid gap-2">
+				{rows.map((row) => (
+					<div
+						key={row.key}
+						className="flex min-w-0 items-start gap-2 rounded-sm bg-ak-surface px-2.5 py-2 text-sm"
+					>
+						{row.asset}
+						<div className="min-w-0 flex-1">
+							<p className="break-words font-semibold text-ak-text">{row.label}</p>
+							{row.meta ? (
+								<p className="mt-0.5 break-words text-xs leading-5 text-ak-text-muted">
+									{row.meta}
+								</p>
+							) : null}
 						</div>
-					))}
-				</div>
-			) : null}
-			{passiveRequirements.length ? (
-				<div className="mt-3 space-y-2">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-amber-200/80">
-						Passive requirements
-					</p>
-					{passiveRequirements.map((requirement) => (
-						<div
-							key={requirement.itemId}
-							className="rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
+						<span
+							aria-hidden="true"
+							className={
+								row.satisfied
+									? "mt-0.5 shrink-0 text-emerald-300"
+									: "mt-0.5 shrink-0 text-rose-300"
+							}
 						>
-							{items[requirement.itemId]?.name ?? requirement.itemId}: requires{" "}
-							{requirement.quantity} owned/available, not dragged here
-						</div>
-					))}
-				</div>
-			) : null}
-			{activation.inputs.length ? (
-				<div className="mt-3 space-y-2">
-					<p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-amber-200/80">
-						Consumable inputs
-					</p>
-					{activation.inputs.map((input) => (
-						<div
-							key={input.itemId}
-							className="rounded-sm bg-slate-950/45 px-2 py-1.5 text-xs"
-						>
-							{items[input.itemId]?.name ?? input.itemId}: feed {input.quantity} by
-							drag
-							{input.consume ? ", consumed at start" : ", returned/kept by action"}
-						</div>
-					))}
-				</div>
-			) : null}
-		</div>
+							{row.satisfied ? "✓" : "✕"}
+						</span>
+					</div>
+				))}
+			</div>
+		</UiSection>
 	);
 };

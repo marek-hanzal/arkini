@@ -1,14 +1,14 @@
 import { memo, useMemo } from "react";
 import { BoardCellCooldownProgress } from "~/v0/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/v0/board/ui/BoardCellProgress";
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import { readBoardTileStatus } from "~/v0/board/logic/readBoardTileStatus";
+import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { GameItemView } from "~/v0/item/ui/GameItemView";
+import { cn } from "~/v0/ui/cn";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
-import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
 import { readProducerCooldown } from "~/v0/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/v0/producer/logic/readProducerBoardProgress";
 import { useGameBoardItem, useGameItemView } from "~/v0/play/runtime";
-import { cn } from "~/v0/ui/cn";
 
 export namespace BoardTile {
 	export interface Props {
@@ -31,37 +31,54 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 	);
 	const nowMs = useProducerClock(clockItems);
 	const item = useGameItemView(boardItem?.itemId);
-	const liveCraft = readLiveCraftView({
-		craft: boardItem?.craft,
+	const liveBoardItem = readLiveBoardItemView({
+		boardItem,
 		nowMs,
 	});
-	const producerReady = isProducerReady(boardItem?.activation, nowMs);
+	const tileStatus = readBoardTileStatus({
+		boardItem: liveBoardItem,
+		nowMs,
+	});
 	const producerCooldown = readProducerCooldown({
-		activation: boardItem?.activation,
+		activation: liveBoardItem?.activation,
 		nowMs,
 	});
 	const producerProgress = readProducerBoardProgress({
-		activation: boardItem?.activation,
+		activation: liveBoardItem?.activation,
 		nowMs,
 	});
+	const hasActiveEffect = liveBoardItem?.activation?.productLines?.some(
+		(line) =>
+			line.lineKind === "effect" &&
+			line.startAtMs !== undefined &&
+			line.readyAtMs !== undefined &&
+			line.startAtMs <= nowMs &&
+			(line.pausedAtMs !== undefined || line.readyAtMs > nowMs),
+	);
 
 	if (!boardItem || !item) return null;
 
 	return (
 		<div
+			data-ui="board item"
 			data-ak-board-item-id={boardItem.id}
+			data-ak-board-tile-ready={tileStatus.ready ? "true" : undefined}
+			data-ak-board-tile-dimmed={tileStatus.dimmed ? "true" : undefined}
 			className={cn(
-				"relative h-full w-full overflow-hidden",
-				producerReady && "ak-board-tile-ready",
+				"relative h-full w-full overflow-hidden transition-opacity duration-200 ease-out",
+				tileStatus.dimmed ? "opacity-[0.68]" : "opacity-100",
 			)}
 		>
 			<GameItemView
 				item={item}
 				variant="board"
-				activation={boardItem.activation}
-				activationNowMs={nowMs}
 			/>
-			<BoardCellProgress progress={liveCraft?.progress} />
+			{hasActiveEffect ? (
+				<div className="pointer-events-none absolute right-1 top-1 rounded-sm bg-ak-primary/90 px-1 py-0.5 text-[0.56rem] font-black uppercase leading-none tracking-[0.12em] text-white shadow-sm">
+					FX
+				</div>
+			) : null}
+			<BoardCellProgress progress={liveBoardItem?.craft?.progress} />
 			<BoardCellCooldownProgress
 				progress={producerProgress?.progress ?? producerCooldown?.progress}
 			/>

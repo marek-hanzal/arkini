@@ -99,4 +99,117 @@ describe("connectGameRuntimeSavePersistence", () => {
 		store.destroy();
 		vi.useRealTimers();
 	});
+	it("keeps a failed save pending and retries it", async () => {
+		vi.useFakeTimers();
+		const store = await createStore();
+		const saved: GameSave[] = [];
+		const errors: unknown[] = [];
+		let saveCallCount = 0;
+		const persistence = connectGameRuntimeSavePersistence({
+			debounceMs: 100,
+			onError(error) {
+				errors.push(error);
+			},
+			storage: {
+				async save(save) {
+					saveCallCount += 1;
+					if (saveCallCount === 1) {
+						throw new Error("write failed");
+					}
+					saved.push(save);
+				},
+			},
+			store,
+		});
+
+		await store.dispatch({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			nowMs: 10,
+		});
+
+		await vi.advanceTimersByTimeAsync(100);
+		expect(errors).toHaveLength(1);
+		expect(saved).toHaveLength(0);
+
+		await vi.advanceTimersByTimeAsync(100);
+		await persistence.flush();
+
+		expect(saved).toHaveLength(1);
+		expect(saved[0]?.board.items["item-instance:1"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
+
+		await persistence.destroy();
+		store.destroy();
+		vi.useRealTimers();
+	});
+
+	it("does not let a failed older write overwrite a newer pending save", async () => {
+		vi.useFakeTimers();
+		const store = await createStore();
+		const saved: GameSave[] = [];
+		const errors: unknown[] = [];
+		let rejectFirstWrite: ((error: unknown) => void) | undefined;
+		let saveCallCount = 0;
+		const persistence = connectGameRuntimeSavePersistence({
+			debounceMs: 100,
+			onError(error) {
+				errors.push(error);
+			},
+			storage: {
+				async save(save) {
+					saveCallCount += 1;
+					if (saveCallCount === 1) {
+						await new Promise((_resolve, reject) => {
+							rejectFirstWrite = reject;
+						});
+						return;
+					}
+					saved.push(save);
+				},
+			},
+			store,
+		});
+
+		await store.dispatch({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			nowMs: 10,
+		});
+		await vi.advanceTimersByTimeAsync(100);
+
+		await store.dispatch({
+			action: {
+				boardItemId: "item-instance:1",
+				type: "board.item.move",
+				x: 0,
+				y: 0,
+			},
+			nowMs: 20,
+		});
+
+		rejectFirstWrite?.(new Error("old write failed"));
+		await persistence.flush();
+
+		expect(errors).toHaveLength(1);
+		expect(saved).toHaveLength(1);
+		expect(saved[0]?.board.items["item-instance:1"]).toMatchObject({
+			x: 0,
+			y: 0,
+		});
+
+		await persistence.destroy();
+		store.destroy();
+		vi.useRealTimers();
+	});
 });

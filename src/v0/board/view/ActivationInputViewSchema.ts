@@ -1,12 +1,19 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
+import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 
 export const ActivationInputViewSchema = z.object({
 	itemId: GameItemIdSchema,
 	quantity: z.number().int().nonnegative(),
 	capacity: z.number().int().nonnegative(),
 	consume: z.boolean(),
+	mode: z
+		.enum([
+			"exact",
+			"upTo",
+		])
+		.optional(),
 	stored: z.number().int().nonnegative(),
+	available: z.number().int().nonnegative().optional(),
 });
 
 type ActivationInputViewSchema = typeof ActivationInputViewSchema;

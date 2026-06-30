@@ -1,18 +1,18 @@
 import { z } from "zod";
+import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { GameSaveUpgradeJobSchema } from "~/v0/game/engine/model/GameSaveUpgradeJobSchema";
-import { GameSaveUpgradeStateSchema } from "~/v0/game/engine/model/GameSaveUpgradeStateSchema";
-import {
-	GameBoardItemChangeReasonSchema,
-	GameItemCreatedReasonSchema,
-} from "~/v0/game/engine/model/GameEventSchema";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
+import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
+import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 
 const IdSchema = z.string().min(1);
 const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
+const NonNegativeNumberSchema = z.number().min(0);
 
-export const GameSaveBoardItemSchema = z
+const GameSaveBoardItemSchema = z
 	.object({
+		createdAtMs: GameInstantMsSchema.optional(),
 		id: IdSchema,
 		itemId: IdSchema,
 		x: NonNegativeIntegerSchema,
@@ -20,181 +20,238 @@ export const GameSaveBoardItemSchema = z
 	})
 	.strict();
 
-export const GameSaveInventoryStackSchema = z
+const GameSaveInventoryStackSchema = z
 	.object({
+		createdAtMs: GameInstantMsSchema.optional(),
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema,
 	})
 	.strict();
 
-export const GameSaveInventorySlotSchema = z.union([
+const GameSaveInventoryInstanceSchema = z
+	.object({
+		createdAtMs: GameInstantMsSchema.optional(),
+		id: IdSchema,
+		itemId: IdSchema,
+		kind: z.literal("instance"),
+	})
+	.strict();
+
+const GameSaveInventorySlotSchema = z.union([
 	GameSaveInventoryStackSchema,
+	GameSaveInventoryInstanceSchema,
 	z.null(),
 ]);
 
-export const GameSaveProducerDeliveryItemSchema = z
+const GameSaveDeliveryRetrySchema = z
 	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-	})
-	.strict();
-
-export const GameSaveProducerDeliverySchema = z
-	.object({
-		items: z.array(GameSaveProducerDeliveryItemSchema).min(1),
-		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
-		retryAtMs: NonNegativeIntegerSchema.optional(),
-	})
-	.strict();
-
-export const GameSaveProducerJobSchema = z
-	.object({
-		id: IdSchema,
-		delivery: GameSaveProducerDeliverySchema.optional(),
-		producerItemInstanceId: IdSchema,
-		outputTableId: z.union([
-			IdSchema,
-			z.null(),
-		]),
-		placement: z.literal("board_then_inventory").optional(),
-		productId: IdSchema,
-		startedAtMs: NonNegativeIntegerSchema,
-		completesAtMs: NonNegativeIntegerSchema,
+		lastBlockedAtMs: GameInstantMsSchema,
+		nextAttemptAtMs: GameInstantMsSchema,
 	})
 	.strict()
-	.refine((value) => value.completesAtMs >= value.startedAtMs, {
-		message: "completesAtMs must be >= startedAtMs",
+	.refine((value) => value.nextAttemptAtMs >= value.lastBlockedAtMs, {
+		message: "nextAttemptAtMs must be >= lastBlockedAtMs",
 		path: [
-			"completesAtMs",
+			"nextAttemptAtMs",
 		],
 	});
 
-export const GameSaveCraftJobReturnItemSchema = z
-	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema,
-	})
-	.strict();
+const validateGameSavePausableJobTiming = (
+	value: {
+		pausedAtMs?: number;
+		readyAtMs: number;
+		remainingMs?: number;
+		startAtMs: number;
+	},
+	ctx: z.RefinementCtx,
+) => {
+	if (value.readyAtMs < value.startAtMs) {
+		ctx.addIssue({
+			code: "custom",
+			message: "readyAtMs must be >= startAtMs",
+			path: [
+				"readyAtMs",
+			],
+		});
+	}
 
-export const GameSaveCraftJobSchema = z
+	if ((value.pausedAtMs === undefined) !== (value.remainingMs === undefined)) {
+		ctx.addIssue({
+			code: "custom",
+			message: "pausedAtMs and remainingMs must be set together",
+			path: [
+				"pausedAtMs",
+			],
+		});
+	}
+
+	if (value.pausedAtMs !== undefined && value.pausedAtMs < value.startAtMs) {
+		ctx.addIssue({
+			code: "custom",
+			message: "pausedAtMs must be >= startAtMs",
+			path: [
+				"pausedAtMs",
+			],
+		});
+	}
+};
+
+const GameSaveProducerJobSchema = z
 	.object({
 		id: IdSchema,
+		delivery: GameSaveDeliveryRetrySchema.optional(),
+		pausedAtMs: GameInstantMsSchema.optional(),
+		remainingMs: NonNegativeIntegerSchema.optional(),
+		producerItemInstanceId: IdSchema,
+		productId: IdSchema,
+		startAtMs: GameInstantMsSchema,
+		readyAtMs: GameInstantMsSchema,
+	})
+	.strict()
+	.superRefine((value, ctx) => {
+		validateGameSavePausableJobTiming(value, ctx);
+
+		if (!value.delivery || value.pausedAtMs === undefined) return;
+
+		ctx.addIssue({
+			code: "custom",
+			message: "delivery producer jobs must not be paused",
+			path: [
+				"delivery",
+			],
+		});
+	});
+
+const GameSaveActiveEffectSchema = z
+	.object({
+		id: IdSchema,
+		effectId: IdSchema,
+		sourceItemInstanceId: IdSchema,
+		startAtMs: GameInstantMsSchema,
+		endAtMs: GameInstantMsSchema,
+		producerJobId: IdSchema.optional(),
+	})
+	.strict()
+	.refine((value) => value.endAtMs >= value.startAtMs, {
+		message: "endAtMs must be >= startAtMs",
+		path: [
+			"endAtMs",
+		],
+	});
+
+const GameSaveCraftJobSchema = z
+	.object({
+		id: IdSchema,
+		delivery: GameSaveDeliveryRetrySchema.optional(),
+		pausedAtMs: GameInstantMsSchema.optional(),
+		remainingMs: NonNegativeIntegerSchema.optional(),
 		recipeId: IdSchema,
-		startedAtMs: NonNegativeIntegerSchema,
-		completesAtMs: NonNegativeIntegerSchema,
-		returnItems: z.array(GameSaveCraftJobReturnItemSchema),
+		startAtMs: GameInstantMsSchema,
+		readyAtMs: GameInstantMsSchema,
 		targetItemInstanceId: IdSchema,
 	})
 	.strict()
-	.refine((value) => value.completesAtMs >= value.startedAtMs, {
-		message: "completesAtMs must be >= startedAtMs",
-		path: [
-			"completesAtMs",
-		],
+	.superRefine((value, ctx) => {
+		validateGameSavePausableJobTiming(value, ctx);
+
+		if (!value.delivery || value.pausedAtMs === undefined) return;
+
+		ctx.addIssue({
+			code: "custom",
+			message: "delivery craft jobs must not be paused",
+			path: [
+				"delivery",
+			],
+		});
 	});
 
-export const GameSaveStashStateSchema = z
+const GameSaveProducerChargeStateSchema = z
 	.object({
-		remainingCharges: NonNegativeIntegerSchema,
+		remainingCharges: NonNegativeNumberSchema,
 	})
 	.strict();
 
-export const GameSaveProducerLineStateSchema = z
+const GameSaveProducerLineStateSchema = z
 	.object({
-		disabledProductIds: z.array(IdSchema),
+		defaultProductId: IdSchema.optional(),
+		defaultEffectProductId: IdSchema.optional(),
 	})
-	.strict()
-	.refine((value) => new Set(value.disabledProductIds).size === value.disabledProductIds.length, {
-		message: "disabledProductIds must be unique",
-		path: [
-			"disabledProductIds",
-		],
-	});
+	.strict();
 
-export const GameSaveProducerProductInputStateSchema = z
+const GameSaveProducerProductInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
 	.strict();
 
-export const GameSaveProducerInputStateSchema = z
+const GameSaveProducerInputStateSchema = z
 	.object({
 		productInputs: z.record(IdSchema, GameSaveProducerProductInputStateSchema),
 	})
 	.strict();
 
-export const GameSaveStoredRequirementStateSchema = z
+const GameSaveCraftInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
 	.strict();
 
-export const GameSaveScheduledEventBaseSchema = z
+const GameSaveItemSpawnJobSeedCellSchema = z
+	.object({
+		x: NonNegativeIntegerSchema,
+		y: NonNegativeIntegerSchema,
+	})
+	.strict();
+
+const GameSaveItemSpawnJobBaseSchema = z
 	.object({
 		id: IdSchema,
-		dueAtMs: NonNegativeIntegerSchema,
-		exclusiveKey: IdSchema.optional(),
-		afterEventIds: z.array(IdSchema).optional(),
-		lastBlockedAtMs: NonNegativeIntegerSchema.optional(),
+		readyAtMs: GameInstantMsSchema,
+		exclusiveGroupKey: IdSchema.optional(),
+		afterJobIds: z.array(IdSchema).optional(),
+		lastBlockedAtMs: GameInstantMsSchema.optional(),
+		seedCell: GameSaveItemSpawnJobSeedCellSchema.optional(),
+		sequenceIndex: NonNegativeIntegerSchema.optional(),
 	})
 	.strict()
 	.refine(
 		(value) =>
-			!value.afterEventIds ||
-			new Set(value.afterEventIds).size === value.afterEventIds.length,
+			!value.afterJobIds || new Set(value.afterJobIds).size === value.afterJobIds.length,
 		{
-			message: "afterEventIds must be unique",
+			message: "afterJobIds must be unique",
 			path: [
-				"afterEventIds",
+				"afterJobIds",
 			],
 		},
 	);
 
-export const GameSaveScheduledEventSchema = z
-	.discriminatedUnion("type", [
-		GameSaveScheduledEventBaseSchema.extend({
-			itemId: IdSchema,
-			originItemInstanceId: IdSchema.optional(),
-			quantity: PositiveIntegerSchema,
-			reason: GameItemCreatedReasonSchema,
-			type: z.literal("item.spawn"),
-		}).strict(),
-		GameSaveScheduledEventBaseSchema.extend({
-			itemId: IdSchema,
-			itemInstanceId: IdSchema,
-			reason: GameBoardItemChangeReasonSchema,
-			type: z.literal("board.item.remove"),
-		}).strict(),
-		GameSaveScheduledEventBaseSchema.extend({
-			fromItemId: IdSchema,
-			itemInstanceId: IdSchema,
-			reason: GameBoardItemChangeReasonSchema,
-			toItemId: IdSchema,
-			type: z.literal("board.item.replace"),
-		}).strict(),
-	])
-	.refine((value) => !value.exclusiveKey || value.exclusiveKey !== value.id, {
-		message: "exclusiveKey must group events and must not equal event id",
+const GameSaveItemSpawnJobSchema = GameSaveItemSpawnJobBaseSchema.extend({
+	itemId: IdSchema,
+	originItemInstanceId: IdSchema.optional(),
+	quantity: PositiveIntegerSchema,
+	reason: GameItemCreatedReasonSchema,
+	type: z.literal("item.spawn"),
+})
+	.strict()
+	.refine((value) => !value.exclusiveGroupKey || value.exclusiveGroupKey !== value.id, {
+		message: "exclusiveGroupKey must group jobs and must not equal job id",
 		path: [
-			"exclusiveKey",
+			"exclusiveGroupKey",
 		],
 	})
-	.refine((value) => !value.afterEventIds?.includes(value.id), {
-		message: "afterEventIds must not contain event id",
+	.refine((value) => !value.afterJobIds?.includes(value.id), {
+		message: "afterJobIds must not contain job id",
 		path: [
-			"afterEventIds",
+			"afterJobIds",
 		],
 	});
 
-export const GameSaveSchema = z
+const GameSaveSchema = z
 	.object({
 		version: z.literal(1),
 		gameId: IdSchema,
-		createdAtMs: NonNegativeIntegerSchema,
-		updatedAtMs: NonNegativeIntegerSchema,
-		nextItemInstanceIndex: PositiveIntegerSchema,
-		nextJobIndex: PositiveIntegerSchema,
-		nextScheduledEventIndex: PositiveIntegerSchema,
+		createdAtMs: GameInstantMsSchema,
+		updatedAtMs: GameInstantMsSchema,
 		board: z
 			.object({
 				items: z.record(IdSchema, GameSaveBoardItemSchema),
@@ -206,14 +263,13 @@ export const GameSaveSchema = z
 			})
 			.strict(),
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
+		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
 		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
+		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
-		upgradeJobs: z.record(IdSchema, GameSaveUpgradeJobSchema),
-		upgrades: z.record(IdSchema, GameSaveUpgradeStateSchema),
-		stashes: z.record(IdSchema, GameSaveStashStateSchema),
-		storedRequirements: z.record(IdSchema, GameSaveStoredRequirementStateSchema),
-		scheduledEvents: z.record(IdSchema, GameSaveScheduledEventSchema),
+		craftInputs: z.record(IdSchema, GameSaveCraftInputStateSchema),
+		itemSpawnJobs: z.record(IdSchema, GameSaveItemSpawnJobSchema),
 	})
 	.strict()
 	.refine((value) => value.updatedAtMs >= value.createdAtMs, {
@@ -222,6 +278,14 @@ export const GameSaveSchema = z
 			"updatedAtMs",
 		],
 	});
+
+// Intentional dense core contract.
+//
+// Keep the save shape and its cross-config validation close together unless a
+// future refactor has a concrete, proven reason to split them. This file is
+// allowed to be large because it is the central save/config contract; do not
+// treat line count alone as a simplification target. Still update this contract
+// when runtime/schema changes require it.
 
 export const GameSaveConfigSchema = z
 	.object({
@@ -246,8 +310,8 @@ const addSaveIssue = (ctx: z.RefinementCtx, path: (string | number)[], message: 
 
 const readBoardItemDefinition = ({
 	config,
-	save,
 	itemInstanceId,
+	save,
 }: {
 	config: GameConfig;
 	save: GameSave;
@@ -263,149 +327,93 @@ const readBoardItemDefinition = ({
 	};
 };
 
-const readStoredRequirementSlots = ({
+const readItemInstanceDefinition = ({
 	config,
+	itemInstanceId,
 	save,
-	targetItemInstanceId,
 }: {
 	config: GameConfig;
 	save: GameSave;
-	targetItemInstanceId: string;
+	itemInstanceId: string;
 }) => {
-	const target = readBoardItemDefinition({
+	const board = readBoardItemDefinition({
 		config,
-		itemInstanceId: targetItemInstanceId,
 		save,
+		itemInstanceId,
 	});
-	if (!target) return [];
+	if (board) {
+		return {
+			item: board.item,
+			itemId: board.boardItem.itemId,
+			location: "board" as const,
+		};
+	}
 
-	const requirements = [];
-
-	if (target.item.producerId) {
-		const producer = config.producers[target.item.producerId];
-		if (producer) {
-			requirements.push(...producer.requirements);
-			for (const productId of producer.productIds) {
-				const product = config.products[productId];
-				if (product) requirements.push(...product.requirements);
-			}
+	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
+		if (!slot || !("kind" in slot) || slot.kind !== "instance" || slot.id !== itemInstanceId) {
+			continue;
 		}
+
+		const item = config.items[slot.itemId];
+		if (!item) return undefined;
+		return {
+			item,
+			itemId: slot.itemId,
+			location: "inventory" as const,
+			slotIndex,
+		};
 	}
 
-	if (target.item.stashId) {
-		const stash = config.stashes[target.item.stashId];
-		if (stash) requirements.push(...stash.requirements);
-	}
-
-	return requirements.filter((requirement) => requirement.type === "stored");
-};
-
-const readStoredRequirementCapacity = ({
-	config,
-	itemId,
-	save,
-	targetItemInstanceId,
-}: {
-	config: GameConfig;
-	itemId: string;
-	save: GameSave;
-	targetItemInstanceId: string;
-}) => {
-	const matchingSlots = readStoredRequirementSlots({
-		config,
-		save,
-		targetItemInstanceId,
-	}).filter((requirement) => requirement.itemId === itemId);
-
-	if (matchingSlots.length === 0) return undefined;
-	return Math.max(...matchingSlots.map((requirement) => requirement.capacity));
-};
-
-const readEffectiveProducerMaxQueueSize = ({
-	config,
-	producerId,
-	save,
-}: {
-	config: GameConfig;
-	producerId: string;
-	save: GameSave;
-}) => {
-	let maxQueueSize = config.producers[producerId]?.maxQueueSize;
-	if (typeof maxQueueSize !== "number") return undefined;
-
-	for (const [upgradeId, upgrade] of Object.entries(config.upgrades).sort(([left], [right]) =>
-		left.localeCompare(right),
-	)) {
-		const completedTiers = Math.min(
-			save.upgrades[upgradeId]?.completedTiers ?? 0,
-			upgrade.tiers.length,
-		);
-
-		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
-			for (const effect of tier.effects) {
-				if (
-					effect.type !== "producer.maxQueueSize.add" ||
-					effect.producerId !== producerId
-				) {
-					continue;
-				}
-
-				maxQueueSize = Math.max(1, maxQueueSize + effect.quantity);
-			}
-		}
-	}
-
-	return maxQueueSize;
-};
-
-const readEffectiveProductInputRefId = ({
-	config,
-	productId,
-	save,
-}: {
-	config: GameConfig;
-	productId: string;
-	save: GameSave;
-}) => {
-	let inputRefId = config.products[productId]?.inputRefId;
-
-	for (const [upgradeId, upgrade] of Object.entries(config.upgrades).sort(([left], [right]) =>
-		left.localeCompare(right),
-	)) {
-		const completedTiers = Math.min(
-			save.upgrades[upgradeId]?.completedTiers ?? 0,
-			upgrade.tiers.length,
-		);
-
-		for (const tier of upgrade.tiers.slice(0, completedTiers)) {
-			for (const effect of tier.effects) {
-				if (effect.type === "product.inputRef.set" && effect.productId === productId) {
-					inputRefId = effect.inputRefId;
-				}
-			}
-		}
-	}
-
-	return inputRefId;
+	return undefined;
 };
 
 const readEffectiveProductInputSlots = ({
 	config,
 	productId,
-	save,
 }: {
 	config: GameConfig;
 	productId: string;
-	save: GameSave;
-}) => {
-	const inputRefId = readEffectiveProductInputRefId({
-		config,
-		productId,
-		save,
-	});
-	if (!inputRefId) return [];
+}) => config.products[productId]?.inputs ?? [];
 
-	return config.inputs[inputRefId]?.inputs ?? [];
+const isSaveProducerJobPaused = (job: GameSaveProducerJob) =>
+	job.pausedAtMs !== undefined && job.remainingMs !== undefined;
+
+const readProducerQueueBarrierAtMs = (job: GameSaveProducerJob) =>
+	isSaveProducerJobPaused(job) ? undefined : (job.delivery?.nextAttemptAtMs ?? job.readyAtMs);
+
+const readItemSpawnDependencyCycleJobIds = (save: GameSave) => {
+	const visiting = new Set<string>();
+	const visited = new Set<string>();
+	const cycleJobIds = new Set<string>();
+
+	const visit = (jobId: string): boolean => {
+		if (visiting.has(jobId)) {
+			cycleJobIds.add(jobId);
+			return true;
+		}
+		if (visited.has(jobId)) return cycleJobIds.has(jobId);
+
+		const job = save.itemSpawnJobs[jobId];
+		if (!job) return false;
+
+		visiting.add(jobId);
+		let hasCycle = false;
+		for (const dependencyId of job.afterJobIds ?? []) {
+			if (visit(dependencyId)) {
+				hasCycle = true;
+				cycleJobIds.add(jobId);
+			}
+		}
+		visiting.delete(jobId);
+		visited.add(jobId);
+		return hasCycle;
+	};
+
+	for (const jobId of Object.keys(save.itemSpawnJobs)) {
+		visit(jobId);
+	}
+
+	return cycleJobIds;
 };
 
 const validateGameSaveAgainstConfig = (
@@ -435,6 +443,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	const usedBoardCells = new Map<string, string>();
+	const boardItemCountByItemId = new Map<string, number>();
 	for (const [itemInstanceId, boardItem] of Object.entries(save.board.items)) {
 		if (boardItem.id !== itemInstanceId) {
 			addSaveIssue(
@@ -449,7 +458,13 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (!config.items[boardItem.itemId]) {
+		boardItemCountByItemId.set(
+			boardItem.itemId,
+			(boardItemCountByItemId.get(boardItem.itemId) ?? 0) + 1,
+		);
+
+		const boardItemDefinition = config.items[boardItem.itemId];
+		if (!boardItemDefinition) {
 			addSaveIssue(
 				ctx,
 				[
@@ -459,6 +474,17 @@ const validateGameSaveAgainstConfig = (
 					"itemId",
 				],
 				`Missing item "${boardItem.itemId}".`,
+			);
+		} else if (boardItemDefinition.storage === "inventory") {
+			addSaveIssue(
+				ctx,
+				[
+					"board",
+					"items",
+					itemInstanceId,
+					"itemId",
+				],
+				`Item "${boardItem.itemId}" storage policy forbids board location.`,
 			);
 		}
 
@@ -505,6 +531,21 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	const inventoryInstanceIds = new Set<string>();
+	for (const [itemId, quantity] of boardItemCountByItemId) {
+		const maxCount = config.items[itemId]?.maxCount;
+		if (maxCount === undefined || quantity <= maxCount) continue;
+
+		addSaveIssue(
+			ctx,
+			[
+				"board",
+				"items",
+			],
+			`Board has ${quantity} item(s) of "${itemId}" but maxCount is ${maxCount}.`,
+		);
+	}
+
 	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
 		if (!slot) continue;
 
@@ -523,7 +564,52 @@ const validateGameSaveAgainstConfig = (
 			continue;
 		}
 
-		if (slot.quantity > item.maxStackSize) {
+		if (item.storage === "board") {
+			addSaveIssue(
+				ctx,
+				[
+					"inventory",
+					"slots",
+					slotIndex,
+					"itemId",
+				],
+				`Item "${slot.itemId}" storage policy forbids inventory location.`,
+			);
+		}
+
+		if ("kind" in slot && slot.kind === "instance") {
+			if (save.board.items[slot.id]) {
+				addSaveIssue(
+					ctx,
+					[
+						"inventory",
+						"slots",
+						slotIndex,
+						"id",
+					],
+					`Inventory instance id "${slot.id}" already exists on board.`,
+				);
+			}
+
+			if (inventoryInstanceIds.has(slot.id)) {
+				addSaveIssue(
+					ctx,
+					[
+						"inventory",
+						"slots",
+						slotIndex,
+						"id",
+					],
+					`Duplicate inventory instance id "${slot.id}".`,
+				);
+			} else {
+				inventoryInstanceIds.add(slot.id);
+			}
+
+			continue;
+		}
+
+		if (!("kind" in slot) && slot.quantity > item.maxStackSize) {
 			addSaveIssue(
 				ctx,
 				[
@@ -538,6 +624,13 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	const producerJobCountByProducerItemInstanceId = new Map<string, number>();
+	const producerJobsByProducerItemInstanceId = new Map<
+		string,
+		{
+			job: GameSaveProducerJob;
+			jobId: string;
+		}[]
+	>();
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -553,11 +646,16 @@ const validateGameSaveAgainstConfig = (
 
 		const target = readBoardItemDefinition({
 			config,
-			itemInstanceId: job.producerItemInstanceId,
 			save,
+			itemInstanceId: job.producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
-		const producer = producerId ? config.producers[producerId] : undefined;
+		const producerId = target?.boardItem.itemId;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
 
 		if (!target) {
 			addSaveIssue(
@@ -577,7 +675,7 @@ const validateGameSaveAgainstConfig = (
 					jobId,
 					"producerItemInstanceId",
 				],
-				`Producer job target "${job.producerItemInstanceId}" must reference a producer item.`,
+				`Producer job target "${job.producerItemInstanceId}" must reference a producer-like item.`,
 			);
 		} else if (!producer.productIds.includes(job.productId)) {
 			addSaveIssue(
@@ -603,68 +701,165 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (job.outputTableId !== null && !config.lootTables[job.outputTableId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"producerJobs",
-					jobId,
-					"outputTableId",
-				],
-				`Missing loot table "${job.outputTableId}".`,
-			);
-		}
-
-		if (job.delivery && job.outputTableId === null) {
-			addSaveIssue(
-				ctx,
-				[
-					"producerJobs",
-					jobId,
-					"delivery",
-				],
-				"Producer delivery requires an output table.",
-			);
-		}
-
-		if (job.delivery) {
-			for (const [index, deliveryItem] of job.delivery.items.entries()) {
-				if (!config.items[deliveryItem.itemId]) {
-					addSaveIssue(
-						ctx,
-						[
-							"producerJobs",
-							jobId,
-							"delivery",
-							"items",
-							index,
-							"itemId",
-						],
-						`Missing item "${deliveryItem.itemId}".`,
-					);
-				}
-			}
-		}
-
 		producerJobCountByProducerItemInstanceId.set(
 			job.producerItemInstanceId,
 			(producerJobCountByProducerItemInstanceId.get(job.producerItemInstanceId) ?? 0) + 1,
 		);
+		const producerJobs =
+			producerJobsByProducerItemInstanceId.get(job.producerItemInstanceId) ?? [];
+		producerJobs.push({
+			job,
+			jobId,
+		});
+		producerJobsByProducerItemInstanceId.set(job.producerItemInstanceId, producerJobs);
+	}
+
+	const activeEffectIdsByProducerJobId = new Map<string, string[]>();
+
+	for (const [activeEffectId, activeEffect] of Object.entries(save.activeEffects ?? {})) {
+		if (activeEffect.id !== activeEffectId) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"id",
+				],
+				`Active effect id must match record key "${activeEffectId}".`,
+			);
+		}
+
+		if (!config.effects[activeEffect.effectId]) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"effectId",
+				],
+				`Missing effect "${activeEffect.effectId}".`,
+			);
+		}
+
+		if (
+			!readItemInstanceDefinition({
+				config,
+				save,
+				itemInstanceId: activeEffect.sourceItemInstanceId,
+			})
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"sourceItemInstanceId",
+				],
+				`Active effect source "${activeEffect.sourceItemInstanceId}" must reference a save item instance.`,
+			);
+		}
+
+		if (activeEffect.producerJobId !== undefined) {
+			activeEffectIdsByProducerJobId.set(activeEffect.producerJobId, [
+				...(activeEffectIdsByProducerJobId.get(activeEffect.producerJobId) ?? []),
+				activeEffectId,
+			]);
+			const producerJob = save.producerJobs[activeEffect.producerJobId];
+			const product = producerJob ? config.products[producerJob.productId] : undefined;
+
+			if (!producerJob) {
+				addSaveIssue(
+					ctx,
+					[
+						"activeEffects",
+						activeEffectId,
+						"producerJobId",
+					],
+					`Active effect producer job "${activeEffect.producerJobId}" must reference a producer job.`,
+				);
+			} else {
+				if (activeEffect.sourceItemInstanceId !== producerJob.producerItemInstanceId) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"sourceItemInstanceId",
+						],
+						`Active effect source must match producer job "${producerJob.id}" source.`,
+					);
+				}
+				if (activeEffect.startAtMs !== producerJob.startAtMs) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"startAtMs",
+						],
+						`Active effect startAtMs must match producer job "${producerJob.id}" startAtMs.`,
+					);
+				}
+				if (activeEffect.endAtMs !== producerJob.readyAtMs) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"endAtMs",
+						],
+						`Active effect endAtMs must match producer job "${producerJob.id}" readyAtMs.`,
+					);
+				}
+				if (product?.activatesEffectId !== activeEffect.effectId) {
+					addSaveIssue(
+						ctx,
+						[
+							"activeEffects",
+							activeEffectId,
+							"effectId",
+						],
+						`Active effect must match producer job "${producerJob.id}" activated effect.`,
+					);
+				}
+			}
+		}
+	}
+
+	for (const [jobId, job] of Object.entries(save.producerJobs)) {
+		const product = config.products[job.productId];
+		if (!product?.activatesEffectId) continue;
+
+		const activeEffectIds = activeEffectIdsByProducerJobId.get(jobId) ?? [];
+		const expectedActiveEffectCount = job.delivery ? 0 : 1;
+		if (activeEffectIds.length !== expectedActiveEffectCount) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerJobs",
+					jobId,
+				],
+				job.delivery
+					? `Blocked producer job "${jobId}" has completed activated effect "${product.activatesEffectId}" and must not keep a linked active effect.`
+					: `Producer job "${jobId}" activates effect "${product.activatesEffectId}" and must have exactly one linked active effect.`,
+			);
+		}
 	}
 
 	for (const [producerItemInstanceId, jobCount] of producerJobCountByProducerItemInstanceId) {
 		const target = readBoardItemDefinition({
 			config,
-			itemInstanceId: producerItemInstanceId,
 			save,
+			itemInstanceId: producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
+		const producerId = target?.boardItem.itemId;
 		if (!producerId) continue;
-		const maxQueueSize = readEffectiveProducerMaxQueueSize({
+		const producer = readProducerCapabilityDefinition({
 			config,
 			producerId,
-			save,
 		});
+		if (!producer) continue;
+		const maxQueueSize = producer.maxQueueSize;
 		if (maxQueueSize !== undefined && jobCount > maxQueueSize) {
 			addSaveIssue(
 				ctx,
@@ -676,14 +871,84 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	for (const [producerItemInstanceId, producerJobs] of producerJobsByProducerItemInstanceId) {
+		const sortedProducerJobs = [
+			...producerJobs,
+		].sort(
+			(left, right) =>
+				left.job.startAtMs - right.job.startAtMs ||
+				left.job.readyAtMs - right.job.readyAtMs ||
+				left.jobId.localeCompare(right.jobId),
+		);
+		for (let index = 1; index < sortedProducerJobs.length; index += 1) {
+			const previous = sortedProducerJobs[index - 1];
+			const current = sortedProducerJobs[index];
+			if (!previous || !current) continue;
+
+			if (current.job.delivery) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerJobs",
+						current.jobId,
+						"delivery",
+					],
+					`Producer job "${current.jobId}" for "${producerItemInstanceId}" has blocked delivery but is not first in the producer queue.`,
+				);
+			}
+
+			const previousQueueBarrierAtMs = readProducerQueueBarrierAtMs(previous.job);
+			if (previousQueueBarrierAtMs === undefined) {
+				continue;
+			}
+
+			if (current.job.startAtMs < previousQueueBarrierAtMs) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerJobs",
+						current.jobId,
+						"startAtMs",
+					],
+					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts before previous job "${previous.jobId}" releases the queue.`,
+				);
+			}
+		}
+
+		for (const current of sortedProducerJobs) {
+			if (
+				!current.job.delivery ||
+				current.job.delivery.lastBlockedAtMs >= current.job.readyAtMs
+			) {
+				continue;
+			}
+
+			addSaveIssue(
+				ctx,
+				[
+					"producerJobs",
+					current.jobId,
+					"delivery",
+					"lastBlockedAtMs",
+				],
+				`Producer job "${current.jobId}" cannot be blocked before it is ready.`,
+			);
+		}
+	}
+
 	for (const [producerItemInstanceId, lineState] of Object.entries(save.producerLines)) {
-		const target = readBoardItemDefinition({
+		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: producerItemInstanceId,
 			save,
+			itemInstanceId: producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
-		const producer = producerId ? config.producers[producerId] : undefined;
+		const producerId = target?.itemId;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
 		if (!target || !producerId || !producer) {
 			addSaveIssue(
 				ctx,
@@ -691,35 +956,91 @@ const validateGameSaveAgainstConfig = (
 					"producerLines",
 					producerItemInstanceId,
 				],
-				`Producer line state target "${producerItemInstanceId}" must reference a producer item.`,
+				`Producer line state target "${producerItemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
 
-		for (const [index, productId] of lineState.disabledProductIds.entries()) {
-			if (!producer.productIds.includes(productId)) {
+		if (
+			lineState.defaultProductId !== undefined &&
+			!producer.productIds.includes(lineState.defaultProductId)
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerLines",
+					producerItemInstanceId,
+					"defaultProductId",
+				],
+				`Default product "${lineState.defaultProductId}" does not belong to producer "${producerId}".`,
+			);
+		} else if (lineState.defaultProductId !== undefined) {
+			const product = config.products[lineState.defaultProductId];
+			if (
+				product &&
+				readProducerLineKind({
+					product,
+				}) !== "product"
+			) {
 				addSaveIssue(
 					ctx,
 					[
 						"producerLines",
 						producerItemInstanceId,
-						"disabledProductIds",
-						index,
+						"defaultProductId",
 					],
-					`Disabled product "${productId}" does not belong to producer "${producerId}".`,
+					`Default product "${lineState.defaultProductId}" must reference a normal product line.`,
+				);
+			}
+		}
+
+		if (
+			lineState.defaultEffectProductId !== undefined &&
+			!producer.productIds.includes(lineState.defaultEffectProductId)
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerLines",
+					producerItemInstanceId,
+					"defaultEffectProductId",
+				],
+				`Default effect product "${lineState.defaultEffectProductId}" does not belong to producer "${producerId}".`,
+			);
+		} else if (lineState.defaultEffectProductId !== undefined) {
+			const effectProduct = config.products[lineState.defaultEffectProductId];
+			if (
+				effectProduct &&
+				readProducerLineKind({
+					product: effectProduct,
+				}) !== "effect"
+			) {
+				addSaveIssue(
+					ctx,
+					[
+						"producerLines",
+						producerItemInstanceId,
+						"defaultEffectProductId",
+					],
+					`Default effect product "${lineState.defaultEffectProductId}" must reference an effect product line.`,
 				);
 			}
 		}
 	}
 
 	for (const [producerItemInstanceId, state] of Object.entries(save.producerInputs)) {
-		const target = readBoardItemDefinition({
+		const target = readItemInstanceDefinition({
 			config,
-			itemInstanceId: producerItemInstanceId,
 			save,
+			itemInstanceId: producerItemInstanceId,
 		});
-		const producerId = target?.item.producerId;
-		const producer = producerId ? config.producers[producerId] : undefined;
+		const producerId = target?.itemId;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
 		if (!target || !producerId || !producer) {
 			addSaveIssue(
 				ctx,
@@ -727,7 +1048,7 @@ const validateGameSaveAgainstConfig = (
 					"producerInputs",
 					producerItemInstanceId,
 				],
-				`Producer input state target "${producerItemInstanceId}" must reference a producer item.`,
+				`Producer input state target "${producerItemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
@@ -750,7 +1071,6 @@ const validateGameSaveAgainstConfig = (
 			const inputSlots = readEffectiveProductInputSlots({
 				config,
 				productId,
-				save,
 			});
 
 			for (const [itemId, quantity] of Object.entries(productInputState.items)) {
@@ -789,6 +1109,7 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	const runningCraftJobsByTargetItemInstanceId = new Map<string, string>();
 	for (const [jobId, job] of Object.entries(save.craftJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -817,10 +1138,10 @@ const validateGameSaveAgainstConfig = (
 
 		const target = readBoardItemDefinition({
 			config,
-			itemInstanceId: job.targetItemInstanceId,
 			save,
+			itemInstanceId: job.targetItemInstanceId,
 		});
-		if (!target || target.item.craftRecipeId !== job.recipeId) {
+		if (!target || target.boardItem.itemId !== job.recipeId) {
 			addSaveIssue(
 				ctx,
 				[
@@ -832,311 +1153,208 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		for (const [index, returnItem] of job.returnItems.entries()) {
-			if (!config.items[returnItem.itemId]) {
+		if (job.delivery && job.delivery.lastBlockedAtMs < job.readyAtMs) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftJobs",
+					jobId,
+					"delivery",
+					"lastBlockedAtMs",
+				],
+				`Craft job "${jobId}" cannot be blocked before it is ready.`,
+			);
+		}
+
+		const runningJobId = runningCraftJobsByTargetItemInstanceId.get(job.targetItemInstanceId);
+		if (runningJobId) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftJobs",
+					jobId,
+					"targetItemInstanceId",
+				],
+				`Craft target "${job.targetItemInstanceId}" already has running job "${runningJobId}".`,
+			);
+		} else {
+			runningCraftJobsByTargetItemInstanceId.set(job.targetItemInstanceId, jobId);
+		}
+	}
+
+	for (const [targetItemInstanceId, state] of Object.entries(save.craftInputs)) {
+		const target = readItemInstanceDefinition({
+			config,
+			save,
+			itemInstanceId: targetItemInstanceId,
+		});
+		const recipeId = target?.itemId;
+		const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
+		if (!target || !recipeId || !recipe) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftInputs",
+					targetItemInstanceId,
+				],
+				`Craft input state target "${targetItemInstanceId}" must reference a craft item.`,
+			);
+			continue;
+		}
+
+		const runningJobId = runningCraftJobsByTargetItemInstanceId.get(targetItemInstanceId);
+		if (runningJobId) {
+			addSaveIssue(
+				ctx,
+				[
+					"craftInputs",
+					targetItemInstanceId,
+				],
+				`Craft target "${targetItemInstanceId}" has running job "${runningJobId}" and must not have editable input state.`,
+			);
+		}
+
+		for (const [itemId, quantity] of Object.entries(state.items)) {
+			const inputSlot = recipe.inputs.find((input) => input.itemId === itemId);
+			if (!inputSlot) {
 				addSaveIssue(
 					ctx,
 					[
-						"craftJobs",
-						jobId,
-						"returnItems",
-						index,
-						"itemId",
+						"craftInputs",
+						targetItemInstanceId,
+						"items",
+						itemId,
 					],
-					`Missing item "${returnItem.itemId}".`,
+					`Craft recipe "${recipeId}" has no input "${itemId}".`,
+				);
+				continue;
+			}
+
+			if (quantity > inputSlot.quantity) {
+				addSaveIssue(
+					ctx,
+					[
+						"craftInputs",
+						targetItemInstanceId,
+						"items",
+						itemId,
+					],
+					`Craft input quantity must be <= recipe input quantity (${inputSlot.quantity}).`,
 				);
 			}
 		}
 	}
 
-	const runningUpgradeJobs = new Set<string>();
-	for (const [jobId, job] of Object.entries(save.upgradeJobs)) {
+	for (const [producerItemInstanceId, state] of Object.entries(save.producerCharges)) {
+		const target = readItemInstanceDefinition({
+			config,
+			save,
+			itemInstanceId: producerItemInstanceId,
+		});
+		const producerId = target?.itemId;
+		const producer = producerId
+			? readProducerCapabilityDefinition({
+					config,
+					producerId,
+				})
+			: undefined;
+		if (!target || !producerId || !producer) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerCharges",
+					producerItemInstanceId,
+				],
+				`Producer charge state target "${producerItemInstanceId}" must reference a producer-like item.`,
+			);
+			continue;
+		}
+
+		if (producer.charges === undefined) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerCharges",
+					producerItemInstanceId,
+				],
+				`Producer charge state target "${producerItemInstanceId}" references a producer-like item without finite charges.`,
+			);
+			continue;
+		}
+
+		if (state.remainingCharges > producer.charges) {
+			addSaveIssue(
+				ctx,
+				[
+					"producerCharges",
+					producerItemInstanceId,
+					"remainingCharges",
+				],
+				`remainingCharges must be <= producer charges (${producer.charges}).`,
+			);
+		}
+	}
+
+	for (const [jobId, job] of Object.entries(save.itemSpawnJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
 				ctx,
 				[
-					"upgradeJobs",
+					"itemSpawnJobs",
 					jobId,
 					"id",
 				],
-				`Upgrade job id must match record key "${jobId}".`,
+				`Item spawn job id must match record key "${jobId}".`,
 			);
 		}
 
-		const upgrade = config.upgrades[job.upgradeId];
-		if (!upgrade) {
+		if (!config.items[job.itemId]) {
 			addSaveIssue(
 				ctx,
 				[
-					"upgradeJobs",
+					"itemSpawnJobs",
 					jobId,
-					"upgradeId",
+					"itemId",
 				],
-				`Missing upgrade "${job.upgradeId}".`,
-			);
-			continue;
-		}
-
-		if (job.tierIndex >= upgrade.tiers.length) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgradeJobs",
-					jobId,
-					"tierIndex",
-				],
-				`tierIndex must be < upgrade tier count (${upgrade.tiers.length}).`,
+				`Missing item "${job.itemId}".`,
 			);
 		}
 
-		if (runningUpgradeJobs.has(job.upgradeId)) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgradeJobs",
-					jobId,
-				],
-				`Upgrade "${job.upgradeId}" already has a running job.`,
-			);
-		} else {
-			runningUpgradeJobs.add(job.upgradeId);
-		}
-	}
-
-	for (const [upgradeId, state] of Object.entries(save.upgrades)) {
-		const upgrade = config.upgrades[upgradeId];
-		if (!upgrade) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgrades",
-					upgradeId,
-				],
-				`Missing upgrade "${upgradeId}".`,
-			);
-			continue;
-		}
-
-		if (state.completedTiers > upgrade.tiers.length) {
-			addSaveIssue(
-				ctx,
-				[
-					"upgrades",
-					upgradeId,
-					"completedTiers",
-				],
-				`completedTiers must be <= upgrade tier count (${upgrade.tiers.length}).`,
-			);
-		}
-	}
-
-	for (const [stashItemInstanceId, state] of Object.entries(save.stashes)) {
-		const target = readBoardItemDefinition({
-			config,
-			itemInstanceId: stashItemInstanceId,
-			save,
-		});
-		const stashId = target?.item.stashId;
-		const stash = stashId ? config.stashes[stashId] : undefined;
-		if (!target || !stashId || !stash) {
-			addSaveIssue(
-				ctx,
-				[
-					"stashes",
-					stashItemInstanceId,
-				],
-				`Stash state target "${stashItemInstanceId}" must reference a stash item.`,
-			);
-			continue;
-		}
-
-		if (state.remainingCharges > stash.charges) {
-			addSaveIssue(
-				ctx,
-				[
-					"stashes",
-					stashItemInstanceId,
-					"remainingCharges",
-				],
-				`remainingCharges must be <= stash charges (${stash.charges}).`,
-			);
-		}
-	}
-
-	for (const [targetItemInstanceId, state] of Object.entries(save.storedRequirements)) {
-		if (!save.board.items[targetItemInstanceId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"storedRequirements",
-					targetItemInstanceId,
-				],
-				`Stored requirement target "${targetItemInstanceId}" must be a board item.`,
-			);
-			continue;
-		}
-
-		for (const [itemId, quantity] of Object.entries(state.items)) {
-			if (!config.items[itemId]) {
+		for (const [dependencyIndex, afterJobId] of (job.afterJobIds ?? []).entries()) {
+			if (!save.itemSpawnJobs[afterJobId]) {
 				addSaveIssue(
 					ctx,
 					[
-						"storedRequirements",
-						targetItemInstanceId,
-						"items",
-						itemId,
+						"itemSpawnJobs",
+						jobId,
+						"afterJobIds",
+						dependencyIndex,
 					],
-					`Missing item "${itemId}".`,
-				);
-				continue;
-			}
-
-			const capacity = readStoredRequirementCapacity({
-				config,
-				itemId,
-				save,
-				targetItemInstanceId,
-			});
-			if (capacity === undefined) {
-				addSaveIssue(
-					ctx,
-					[
-						"storedRequirements",
-						targetItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Item "${itemId}" is not accepted by target stored requirements.`,
-				);
-				continue;
-			}
-
-			if (quantity > capacity) {
-				addSaveIssue(
-					ctx,
-					[
-						"storedRequirements",
-						targetItemInstanceId,
-						"items",
-						itemId,
-					],
-					`Quantity must be <= stored requirement capacity (${capacity}).`,
+					`Item spawn job dependency "${afterJobId}" must reference an existing item spawn job.`,
 				);
 			}
 		}
 	}
 
-	for (const [eventId, event] of Object.entries(save.scheduledEvents)) {
-		if (event.id !== eventId) {
-			addSaveIssue(
-				ctx,
-				[
-					"scheduledEvents",
-					eventId,
-					"id",
-				],
-				`Scheduled event id must match record key "${eventId}".`,
-			);
-		}
-
-		if (event.type === "item.spawn") {
-			if (!config.items[event.itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"scheduledEvents",
-						eventId,
-						"itemId",
-					],
-					`Missing item "${event.itemId}".`,
-				);
-			}
-			continue;
-		}
-
-		if (event.type === "board.item.remove") {
-			if (!config.items[event.itemId]) {
-				addSaveIssue(
-					ctx,
-					[
-						"scheduledEvents",
-						eventId,
-						"itemId",
-					],
-					`Missing item "${event.itemId}".`,
-				);
-			}
-
-			const liveItem = save.board.items[event.itemInstanceId];
-			if (liveItem && liveItem.itemId !== event.itemId) {
-				addSaveIssue(
-					ctx,
-					[
-						"scheduledEvents",
-						eventId,
-						"itemInstanceId",
-					],
-					`Remove event target item must still be "${event.itemId}" when present.`,
-				);
-			}
-			continue;
-		}
-
-		if (!config.items[event.fromItemId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"scheduledEvents",
-					eventId,
-					"fromItemId",
-				],
-				`Missing item "${event.fromItemId}".`,
-			);
-		}
-
-		if (!config.items[event.toItemId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"scheduledEvents",
-					eventId,
-					"toItemId",
-				],
-				`Missing item "${event.toItemId}".`,
-			);
-		}
-
-		const liveItem = save.board.items[event.itemInstanceId];
-		if (liveItem && liveItem.itemId !== event.fromItemId) {
-			addSaveIssue(
-				ctx,
-				[
-					"scheduledEvents",
-					eventId,
-					"itemInstanceId",
-				],
-				`Replace event target item must still be "${event.fromItemId}" when present.`,
-			);
-		}
+	const itemSpawnDependencyCycleJobIds = readItemSpawnDependencyCycleJobIds(save);
+	for (const jobId of itemSpawnDependencyCycleJobIds) {
+		addSaveIssue(
+			ctx,
+			[
+				"itemSpawnJobs",
+				jobId,
+				"afterJobIds",
+			],
+			`Item spawn job "${jobId}" must not be part of a dependency cycle.`,
+		);
 	}
 };
 
 export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
+export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstanceSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
-export type GameSaveProducerDeliveryItem = z.infer<typeof GameSaveProducerDeliveryItemSchema>;
-export type GameSaveProducerDelivery = z.infer<typeof GameSaveProducerDeliverySchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
-export type GameSaveProducerLineState = z.infer<typeof GameSaveProducerLineStateSchema>;
-export type GameSaveProducerProductInputState = z.infer<
-	typeof GameSaveProducerProductInputStateSchema
->;
-export type GameSaveProducerInputState = z.infer<typeof GameSaveProducerInputStateSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
-export type GameSaveStashState = z.infer<typeof GameSaveStashStateSchema>;
-export type GameSaveStoredRequirementState = z.infer<typeof GameSaveStoredRequirementStateSchema>;
-export type GameSaveUpgradeJob = z.infer<typeof GameSaveUpgradeJobSchema>;
-export type GameSaveUpgradeState = z.infer<typeof GameSaveUpgradeStateSchema>;
-export type GameSaveScheduledEvent = z.infer<typeof GameSaveScheduledEventSchema>;
+export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;
 export type GameSave = z.infer<typeof GameSaveSchema>;
-export type GameSaveConfig = z.infer<typeof GameSaveConfigSchema>;

@@ -49,4 +49,73 @@ describe("TileEngineMotionRequestStore", () => {
 		vi.advanceTimersByTime(10);
 		expect(readTileEngineMotionRequests("board").get("tile:one")?.enter).toBeUndefined();
 	});
+
+	it("keeps a single feedback request on a tile for a batched visual update", () => {
+		vi.useFakeTimers();
+
+		registerTileEngineMotionRequests({
+			engineId: "board",
+			requests: [
+				{
+					cleanupDelayMs: 10,
+					feedback: {
+						groupId: "feedback:one",
+						kind: "bounce" as const,
+					},
+					tileId: "producer",
+				},
+				{
+					cleanupDelayMs: 10,
+					feedback: {
+						groupId: "feedback:two",
+						kind: "bounce" as const,
+					},
+					tileId: "producer",
+				},
+			],
+		});
+
+		expect(readTileEngineMotionRequests("board").get("producer")?.feedback).toMatchObject({
+			groupId: "feedback:two",
+			kind: "bounce",
+		});
+		expect(
+			readTileEngineMotionRequests("board").get("producer")?.feedback?.pulseCount,
+		).toBeUndefined();
+	});
+
+	it("settles feedback requests independently from enter requests", () => {
+		vi.useFakeTimers();
+		const enter = {
+			groupId: "spawn:producer",
+			kind: "fade-in" as const,
+		};
+		const feedback = {
+			groupId: "feedback:producer",
+			kind: "bounce" as const,
+		};
+
+		registerTileEngineMotionRequests({
+			engineId: "board",
+			requests: [
+				{
+					cleanupDelayMs: 10,
+					enter,
+					tileId: "producer",
+				},
+				{
+					cleanupDelayMs: 20,
+					feedback,
+					tileId: "producer",
+				},
+			],
+		});
+
+		vi.advanceTimersByTime(10);
+		expect(readTileEngineMotionRequests("board").get("producer")?.enter).toBeUndefined();
+		expect(readTileEngineMotionRequests("board").get("producer")?.feedback).toBe(feedback);
+
+		vi.advanceTimersByTime(10);
+		expect(readTileEngineMotionRequests("board").get("producer")).toBeUndefined();
+	});
 });

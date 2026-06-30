@@ -1,0 +1,18 @@
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
+
+type TargetEvent = Extract<
+	GameEvent,
+	{
+		type: "producer_input.stored" | "craft_input.stored";
+	}
+>;
+
+export namespace shouldAnimateActivationInputStoreVisual {
+	export interface Props {
+		target: TargetEvent;
+	}
+}
+
+export const shouldAnimateActivationInputStoreVisual = ({
+	target,
+}: shouldAnimateActivationInputStoreVisual.Props) => target.quantity > 0;

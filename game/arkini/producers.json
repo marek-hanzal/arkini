@@ -1,140 +1,454 @@
 {
 	"producers": {
-		"producer:coal-mine-1": {
+		"producer:academy": {
+			"maxQueueSize": 2,
 			"productIds": [
-				"product:coal-mine-1"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:academy:basic-knowledge",
+				"product:academy:advanced-knowledge",
+				"product:academy:blueprint-prospector-guild-t2",
+				"product:academy:blueprint-coal-mine-t1",
+				"product:academy:blueprint-iron-mine-t1",
+				"product:academy:blueprint-gold-mine-t1",
+				"product:academy:blueprint-purifier-t1",
+				"product:academy:blueprint-charcoal-burner-t1",
+				"product:academy:blueprint-waste-processor-t2",
+				"product:academy:blueprint-bio-waste-processor-t2",
+				"product:academy:blueprint-clay-pit",
+				"product:academy:blueprint-sand-pit",
+				"product:academy:blueprint-brickyard",
+				"product:academy:blueprint-glassworks",
+				"product:academy:blueprint-roof-tile-factory",
+				"product:academy:blueprint-smelter-t1",
+				"product:academy:blueprint-construction-yard-t1",
+				"product:academy:blueprint-blacksmith-t1",
+				"product:academy:blueprint-armory-t1",
+				"product:academy:blueprint-goldsmith-t1",
+				"product:academy:blueprint-university"
+			]
 		},
-		"producer:lumber-camp-1": {
+		"producer:armory-t1": {
 			"productIds": [
-				"product:lumber-camp-1"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:armory-t1:leather-armor",
+				"product:armory-t1:iron-armor"
+			]
 		},
-		"producer:lumber-camp-2": {
+		"producer:bakery-t1": {
 			"productIds": [
-				"product:lumber-camp-2"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:bakery-t1:bread",
+				"product:bakery-t1:bread-morale-t1"
+			]
 		},
-		"producer:lumber-camp-3": {
+		"producer:blacksmith-t1": {
 			"productIds": [
-				"product:lumber-camp-3"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:blacksmith-t1:nails",
+				"product:blacksmith-t1:axe",
+				"product:blacksmith-t1:sword"
+			]
 		},
-		"producer:lumber-camp-4": {
+		"producer:brewery-t1": {
 			"productIds": [
-				"product:lumber-camp-4"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:brewery-t1:hops",
+				"product:brewery-t1:beer-barrel",
+				"product:brewery-t1:beer-barrel-from-beer"
+			]
 		},
-		"producer:lumber-camp-5": {
+		"producer:brickyard": {
 			"productIds": [
-				"product:lumber-camp-5"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:brickyard:bricks"
+			]
 		},
-		"producer:quarry-1": {
+		"producer:cattle-farm-t1": {
 			"productIds": [
-				"product:quarry-1"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:cattle-farm-t1:milk"
+			]
 		},
-		"producer:quarry-2": {
+		"producer:charcoal-burner-t1": {
 			"productIds": [
-				"product:quarry-2"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:charcoal-burner-t1:charcoal"
+			]
 		},
-		"producer:quarry-3": {
+		"producer:chicken-coop-t1": {
 			"productIds": [
-				"product:quarry-3"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:chicken-coop-t1:egg"
+			]
 		},
-		"producer:quarry-4": {
+		"producer:civic-office-t1": {
 			"productIds": [
-				"product:quarry-4"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:civic-office-t1:building-permit",
+				"product:civic-office-t1:building-permit-morale-t2",
+				"product:civic-office-t1:blueprint-academy",
+				"product:civic-office-t1:guild-charter"
+			]
 		},
-		"producer:quarry-5": {
+		"producer:clay-pit": {
 			"productIds": [
-				"product:quarry-5"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:clay-pit:clay"
+			]
 		},
-		"producer:townhall-1": {
+		"producer:coal-mine-t1": {
 			"productIds": [
-				"product:townhall-1"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:coal-mine-t1:coal"
+			]
 		},
-		"producer:townhall-2": {
+		"producer:construction-yard-t1": {
 			"productIds": [
-				"product:townhall-2"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:construction-yard-t1:construction-bundle",
+				"product:construction-yard-t1:construction-bundle-morale-t3"
+			]
 		},
-		"producer:townhall-3": {
+		"producer:cookhouse-t1": {
 			"productIds": [
-				"product:townhall-3"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:cookhouse-t1:feast"
+			]
 		},
-		"producer:townhall-4": {
+		"producer:dairy-t1": {
 			"productIds": [
-				"product:townhall-4"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:dairy-t1:cheese"
+			]
 		},
-		"producer:townhall-5": {
+		"producer:dye-workshop-t1": {
 			"productIds": [
-				"product:townhall-5"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:dye-workshop-t1:pigment",
+				"product:dye-workshop-t1:luxury-cloth"
+			]
 		},
-		"producer:tree": {
+		"producer:farm-t1": {
 			"productIds": [
-				"product:tree"
-			],
-			"requirements": [],
-			"type": "producer",
-			"maxQueueSize": 1
+				"product:farm-t1:grain",
+				"product:farm-t1:grain-morale-t1"
+			]
+		},
+		"producer:glassworks": {
+			"productIds": [
+				"product:glassworks:glass"
+			]
+		},
+		"producer:glazier-workshop-t1": {
+			"productIds": [
+				"product:glazier-workshop-t1:stained-glass",
+				"product:glazier-workshop-t1:stained-glass-morale-t4"
+			]
+		},
+		"producer:gold-mine-t1": {
+			"productIds": [
+				"product:gold-mine-t1:gold-ore"
+			]
+		},
+		"producer:goldsmith-t1": {
+			"productIds": [
+				"product:goldsmith-t1:coin-stack",
+				"product:goldsmith-t1:key-t1",
+				"product:goldsmith-t1:key-t2",
+				"product:goldsmith-t1:key-t3",
+				"product:goldsmith-t1:key-t4"
+			]
+		},
+		"producer:heroes-guild-t1": {
+			"productIds": [
+				"product:heroes-guild-t1:chest-t1",
+				"product:heroes-guild-t1:chest-t2",
+				"product:heroes-guild-t1:chest-t3",
+				"product:heroes-guild-t1:chest-t4",
+				"product:heroes-guild-t1:treasure-chest",
+				"product:heroes-guild-t1:treasure-chest-morale-t4"
+			]
+		},
+		"producer:house-t1": {
+			"productIds": [
+				"product:house-t1:morale-t1"
+			]
+		},
+		"producer:house-t2": {
+			"productIds": [
+				"product:house-t2:morale-t2"
+			]
+		},
+		"producer:house-t3": {
+			"productIds": [
+				"product:house-t3:morale-t3"
+			]
+		},
+		"producer:house-t4": {
+			"productIds": [
+				"product:house-t4:morale-t4"
+			]
+		},
+		"producer:iron-mine-t1": {
+			"productIds": [
+				"product:iron-mine-t1:iron-ore"
+			]
+		},
+		"producer:lumberjack-t1": {
+			"productIds": [
+				"product:lumberjack-t1:log"
+			]
+		},
+		"producer:market-t1": {
+			"productIds": [
+				"product:market-t1:coin-from-bread",
+				"product:market-t1:coin-from-sausage",
+				"product:market-t1:coin-from-cheese",
+				"product:market-t1:coin-from-beer",
+				"product:market-t1:coin-from-wine-glass",
+				"product:market-t1:coin-from-feast"
+			]
+		},
+		"producer:market-t2": {
+			"productIds": [
+				"product:market-t2:coin-from-paper",
+				"product:market-t2:coin-from-feast",
+				"product:market-t2:coin-from-common-clothing",
+				"product:market-t2:coin-from-luxury-clothing"
+			]
+		},
+		"producer:paper-mill-t1": {
+			"productIds": [
+				"product:paper-mill-t1:paper"
+			]
+		},
+		"producer:pig-farm-t1": {
+			"productIds": [
+				"product:pig-farm-t1:piglet"
+			]
+		},
+		"producer:prospector-guild-t1": {
+			"productIds": [
+				"product:prospector-guild-t1:clay-deposit",
+				"product:prospector-guild-t1:sand-deposit"
+			]
+		},
+		"producer:prospector-guild-t2": {
+			"productIds": [
+				"product:prospector-guild-t2:clay-deposit",
+				"product:prospector-guild-t2:sand-deposit",
+				"product:prospector-guild-t2:coal-deposit",
+				"product:prospector-guild-t2:iron-deposit",
+				"product:prospector-guild-t2:gold-deposit",
+				"product:prospector-guild-t2:marble-deposit"
+			]
+		},
+		"producer:purifier-t1": {
+			"productIds": [
+				"product:purifier-t1:pollution"
+			]
+		},
+		"producer:quarry-t1": {
+			"productIds": [
+				"product:quarry-t1:stone"
+			]
+		},
+		"producer:quarry-t2": {
+			"productIds": [
+				"product:quarry-t2:stone",
+				"product:quarry-t2:marble"
+			]
+		},
+		"producer:roof-tile-factory": {
+			"productIds": [
+				"product:roof-tile-factory:roof-tiles"
+			]
+		},
+		"producer:sand-pit": {
+			"productIds": [
+				"product:sand-pit:sand"
+			]
+		},
+		"producer:sawmill-t1": {
+			"productIds": [
+				"product:sawmill-t1:plank"
+			]
+		},
+		"producer:school": {
+			"productIds": [
+				"product:school:basic-knowledge",
+				"product:school:basic-knowledge-morale-t2"
+			]
+		},
+		"producer:sheep-pasture-t1": {
+			"productIds": [
+				"product:sheep-pasture-t1:wool"
+			]
+		},
+		"producer:slaughterhouse-t1": {
+			"productIds": [
+				"product:slaughterhouse-t1:sausage-raw-hide"
+			]
+		},
+		"producer:smelter-t1": {
+			"productIds": [
+				"product:smelter-t1:iron-ingot",
+				"product:smelter-t1:gold-ingot"
+			]
+		},
+		"producer:stonemason-t1": {
+			"productIds": [
+				"product:stonemason-t1:stone-block"
+			]
+		},
+		"producer:stonemason-t2": {
+			"productIds": [
+				"product:stonemason-t2:stone-block",
+				"product:stonemason-t2:marble-block",
+				"product:stonemason-t2:marble-block-morale-t4"
+			]
+		},
+		"producer:tailor-workshop-t1": {
+			"productIds": [
+				"product:tailor-workshop-t1:common-clothing",
+				"product:tailor-workshop-t1:luxury-clothing",
+				"product:tailor-workshop-t1:luxury-clothing-morale-t3"
+			]
+		},
+		"producer:tannery-t1": {
+			"productIds": [
+				"product:tannery-t1:leather"
+			]
+		},
+		"producer:tavern-t1": {
+			"productIds": [
+				"product:tavern-t1:beer",
+				"product:tavern-t1:wine-glass"
+			]
+		},
+		"producer:townhall-t1": {
+			"productIds": [
+				"product:townhall-t1:blueprint-lumberjack-t1",
+				"product:townhall-t1:blueprint-sawmill-t1",
+				"product:townhall-t1:blueprint-quarry-t1",
+				"product:townhall-t1:blueprint-stonemason-t1",
+				"product:townhall-t1:blueprint-well-t1",
+				"product:townhall-t1:blueprint-library-t1",
+				"product:townhall-t1:blueprint-townhall-t2"
+			]
+		},
+		"producer:townhall-t2": {
+			"productIds": [
+				"product:townhall-t2:wheat-field",
+				"product:townhall-t2:blueprint-farm-t1",
+				"product:townhall-t2:blueprint-pig-farm-t1",
+				"product:townhall-t2:blueprint-cattle-farm-t1",
+				"product:townhall-t2:blueprint-chicken-coop-t1",
+				"product:townhall-t2:blueprint-sheep-pasture-t1",
+				"product:townhall-t2:blueprint-vegetable-garden-t1",
+				"product:townhall-t2:blueprint-waste-processor-t1",
+				"product:townhall-t2:blueprint-bio-waste-processor-t1",
+				"product:townhall-t2:food-supply",
+				"product:townhall-t2:blueprint-house-t1",
+				"product:townhall-t2:blueprint-townhall-t3"
+			]
+		},
+		"producer:townhall-t3": {
+			"productIds": [
+				"product:townhall-t3:blueprint-windmill-t1",
+				"product:townhall-t3:blueprint-bakery-t1",
+				"product:townhall-t3:blueprint-slaughterhouse-t1",
+				"product:townhall-t3:blueprint-dairy-t1",
+				"product:townhall-t3:blueprint-cookhouse-t1",
+				"product:townhall-t3:hop-field",
+				"product:townhall-t3:blueprint-brewery-t1",
+				"product:townhall-t3:blueprint-tavern-t1",
+				"product:townhall-t3:vineyard",
+				"product:townhall-t3:blueprint-winery-t1",
+				"product:townhall-t3:blueprint-market-t1",
+				"product:townhall-t3:blueprint-house-t2",
+				"product:townhall-t3:blueprint-townhall-t4"
+			]
+		},
+		"producer:townhall-t4": {
+			"productIds": [
+				"product:townhall-t4:blueprint-paper-mill-t1",
+				"product:townhall-t4:blueprint-school",
+				"product:townhall-t4:blueprint-library-t2",
+				"product:townhall-t4:blueprint-library-t3",
+				"product:townhall-t4:blueprint-library-t4",
+				"product:townhall-t4:blueprint-civic-office-t1",
+				"product:townhall-t4:blueprint-market-t2",
+				"product:townhall-t4:blueprint-prospector-guild-t1",
+				"product:townhall-t4:blueprint-tannery-t1",
+				"product:townhall-t4:blueprint-weaver-hut-t1",
+				"product:townhall-t4:blueprint-dye-workshop-t1",
+				"product:townhall-t4:blueprint-tailor-workshop-t1",
+				"product:townhall-t4:blueprint-house-t3"
+			]
+		},
+		"producer:university": {
+			"maxQueueSize": 2,
+			"productIds": [
+				"product:university:basic-knowledge",
+				"product:university:advanced-knowledge",
+				"product:university:master-knowledge",
+				"product:university:master-knowledge-morale-t4",
+				"product:university:blueprint-heroes-guild-t1",
+				"product:university:blueprint-glazier-workshop-t1",
+				"product:university:blueprint-quarry-t2",
+				"product:university:blueprint-stonemason-t2",
+				"product:university:blueprint-house-t4",
+				"product:university:blueprint-house-of-engineers",
+				"product:university:blueprint-cathedral",
+				"product:university:blueprint-mage-lodge"
+			]
+		},
+		"producer:vegetable-garden-t1": {
+			"productIds": [
+				"product:vegetable-garden-t1:vegetables"
+			]
+		},
+		"producer:weaver-hut-t1": {
+			"productIds": [
+				"product:weaver-hut-t1:common-cloth"
+			]
+		},
+		"producer:well-t1": {
+			"productIds": [
+				"product:well-t1:water"
+			]
+		},
+		"producer:windmill-t1": {
+			"productIds": [
+				"product:windmill-t1:flour"
+			]
+		},
+		"producer:winery-t1": {
+			"productIds": [
+				"product:winery-t1:grapes",
+				"product:winery-t1:wine-barrel",
+				"product:winery-t1:wine-barrel-from-wine-glasses"
+			]
+		},
+		"producer:shrine-t1": {
+			"maxQueueSize": 2,
+			"productIds": [
+				"product:shrine-t1:minor-haste",
+				"product:shrine-t1:bountiful-offering"
+			]
+		},
+		"producer:waste-processor-t1": {
+			"productIds": [
+				"product:waste-processor-t1:recycle-trash",
+				"product:waste-processor-t1:burn-trash-log"
+			]
+		},
+		"producer:waste-processor-t2": {
+			"productIds": [
+				"product:waste-processor-t2:recycle-trash",
+				"product:waste-processor-t2:burn-trash-log",
+				"product:waste-processor-t2:burn-trash-charcoal",
+				"product:waste-processor-t2:burn-trash-coal"
+			]
+		},
+		"producer:bio-waste-processor-t1": {
+			"productIds": [
+				"product:bio-waste-processor-t1:compost-bio-waste",
+				"product:bio-waste-processor-t1:burn-bio-waste-log"
+			]
+		},
+		"producer:bio-waste-processor-t2": {
+			"productIds": [
+				"product:bio-waste-processor-t2:compost-bio-waste",
+				"product:bio-waste-processor-t2:burn-bio-waste-log",
+				"product:bio-waste-processor-t2:burn-bio-waste-charcoal",
+				"product:bio-waste-processor-t2:burn-bio-waste-coal"
+			]
 		}
 	}
 }

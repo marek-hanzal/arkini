@@ -81,13 +81,38 @@ describe("global layer system", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	it("keeps TileEngine presence CSS keyed by marker presence", () => {
+	it("keeps component styling out of the global stylesheet", () => {
 		const styles = readFileSync(stylePath, "utf8");
 
-		expect(styles).toContain(".ak-tile-engine-visual[data-ak-tile-engine-presence-motion]");
-		expect(styles).not.toContain(
-			'.ak-tile-engine-visual[data-ak-tile-engine-presence-motion="true"]',
+		expect(styles).not.toMatch(/\.ak-/);
+		expect(styles).not.toContain("data-ak-tile-engine");
+		expect(styles).not.toContain("data-ak-board");
+	});
+
+	it("allows overlay TileEngine vertical pan gestures for sheet scrolling", () => {
+		const tileEngineSource = readFileSync(
+			join(sourceRoot, "v0/tile-engine/TileEngine.tsx"),
+			"utf8",
 		);
+		const actorSource = readFileSync(
+			join(sourceRoot, "v0/tile-engine/TileEngineActor.tsx"),
+			"utf8",
+		);
+
+		expect(tileEngineSource).toContain(
+			'isOverlayLayer ? "[touch-action:pan-y]" : "touch-none"',
+		);
+		expect(actorSource).toContain('isOverlayLayer ? "[touch-action:pan-y]" : "touch-none"');
+	});
+
+	it("keeps TileEngine presence motion local to the visual element", () => {
+		const actorSource = readFileSync(
+			join(sourceRoot, "v0/tile-engine/TileEngineActor.tsx"),
+			"utf8",
+		);
+
+		expect(actorSource).toContain("data-[ak-tile-engine-presence-motion]:transition-none");
+		expect(actorSource).not.toContain("data-[ak-tile-engine-presence-motion=true]");
 	});
 
 	it("does not depend on the external Motion package", () => {

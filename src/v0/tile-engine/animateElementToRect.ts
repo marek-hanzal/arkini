@@ -1,4 +1,4 @@
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { rectFromElement } from "~/v0/tile-engine/rect";
 import { targetDelta } from "~/v0/tile-engine/targetDelta";
 import { startTileTransformMotion, tileMotionScope } from "~/v0/tile-engine/TileMotionRuntime";

@@ -1,6 +1,10 @@
-import type { ActivationModeSchema } from "~/v0/activation/type/ActivationModeSchema";
+import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
+import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
+import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
+import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
+import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
+import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -14,12 +18,19 @@ export namespace resolveBoardItemTapAction {
 				boardItemId: string;
 		  }
 		| {
-				type: "activate";
-				activation: ActivationModeSchema.Type;
+				type: "start-craft";
 				boardItemId: string;
+				recipeId: string;
 		  }
 		| {
-				type: "none";
+				type: "activate";
+				activation: "single" | "exhaust";
+				boardItemId: string;
+				productId?: string;
+		  }
+		| {
+				type: "open-sheet";
+				sheet: ActiveSheetState;
 		  };
 }
 
@@ -27,10 +38,19 @@ export const resolveBoardItemTapAction = ({
 	boardItem,
 	nowMs,
 }: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
-	const liveCraft = readLiveCraftView({
-		craft: boardItem.craft,
+	const utilitySheet = readBoardUtilityItemSheet(boardItem.itemId);
+	if (utilitySheet) {
+		return {
+			sheet: utilitySheet,
+			type: "open-sheet",
+		};
+	}
+
+	const liveBoardItem = readLiveBoardItemView({
+		boardItem,
 		nowMs,
 	});
+	const liveCraft = liveBoardItem?.craft;
 
 	if (liveCraft?.complete) {
 		return {
@@ -39,15 +59,84 @@ export const resolveBoardItemTapAction = ({
 		};
 	}
 
-	if (boardItem.activation) {
+	if (liveCraft?.phase === "collecting_inputs") {
+		const craftRunState = readCraftRunState({
+			craft: liveCraft,
+		});
+
+		if (craftRunState.canRunAction) {
+			return {
+				type: "start-craft",
+				boardItemId: boardItem.id,
+				recipeId: liveCraft.id,
+			};
+		}
+
 		return {
-			type: "activate",
-			activation: boardItem.activation.kind === "stash" ? "exhaust" : "single",
-			boardItemId: boardItem.id,
+			sheet: {
+				boardItemId: boardItem.id,
+				type: "item",
+			},
+			type: "open-sheet",
+		};
+	}
+
+	if (liveBoardItem?.activation?.kind === "stash") {
+		if (isProducerReady(liveBoardItem.activation, nowMs)) {
+			return {
+				type: "activate",
+				activation: "exhaust",
+				boardItemId: boardItem.id,
+			};
+		}
+
+		return {
+			sheet: {
+				boardItemId: boardItem.id,
+				type: "item",
+			},
+			type: "open-sheet",
+		};
+	}
+
+	if (liveBoardItem?.activation?.kind === "producer") {
+		const defaultLines = [
+			liveBoardItem.activation.productLines?.find(
+				(line) => line.isDefault && line.lineKind === "effect",
+			),
+			liveBoardItem.activation.productLines?.find(
+				(line) => line.isDefault && line.lineKind === "product",
+			),
+		].filter((line): line is NonNullable<typeof line> => Boolean(line));
+		const runnableDefaultLine = defaultLines.find(
+			(line) =>
+				readProducerProductLineRunState({
+					line,
+				}).canRunAction,
+		);
+
+		if (runnableDefaultLine) {
+			return {
+				type: "activate",
+				activation: "single",
+				boardItemId: boardItem.id,
+				productId: runnableDefaultLine.productId,
+			};
+		}
+		return {
+			sheet: {
+				boardItemId: boardItem.id,
+				type: "item",
+			},
+			type: "open-sheet",
 		};
 	}
 
 	return {
-		type: "none",
+		sheet: {
+			boardItemId: boardItem.id,
+			type: "item",
+		},
+		type: "open-sheet",
 	};
 };

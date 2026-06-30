@@ -3,6 +3,34 @@ import { RuntimeGameEngineAdapter } from "~/v0/game/engine/runtime/RuntimeGameEn
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/v0/game/engine/test/TestRandomService";
 
+const createConcurrencyTestConfig = () => {
+	const base = createEngineTestConfig();
+	return createEngineTestConfig({
+		game: {
+			...base.game,
+			board: {
+				height: 1,
+				width: 4,
+			},
+		},
+		startingState: {
+			board: [
+				{
+					itemId: "item:twig",
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "item:rock",
+					x: 1,
+					y: 0,
+				},
+			],
+			inventory: [],
+		},
+	});
+};
+
 describe("RuntimeGameEngineAdapter", () => {
 	it("bootstraps a save from the config starting state", async () => {
 		const adapter = await RuntimeGameEngineAdapter.create({
@@ -33,7 +61,9 @@ describe("RuntimeGameEngineAdapter", () => {
 			random: TestRandomService,
 		});
 		const emitted: string[] = [];
-		adapter.subscribe((result) => {
+		const emittedAtMs: number[] = [];
+		adapter.subscribe(({ nowMs, result }) => {
+			emittedAtMs.push(nowMs);
 			emitted.push(...result.events.map((event) => event.type));
 		});
 
@@ -52,13 +82,16 @@ describe("RuntimeGameEngineAdapter", () => {
 				type: "product.started",
 			},
 		]);
-		expect(adapter.readSnapshot().save.producerJobs["job:1"]).toMatchObject({
-			completesAtMs: 1200,
+		expect(Object.values(adapter.readSnapshot().save.producerJobs)[0]).toMatchObject({
+			readyAtMs: 1200,
 			productId: "product:test",
 		});
 		expect(adapter.readSnapshot().nextWakeAtMs).toBe(1200);
 		expect(emitted).toEqual([
 			"product.started",
+		]);
+		expect(emittedAtMs).toEqual([
+			200,
 		]);
 	});
 
@@ -69,7 +102,7 @@ describe("RuntimeGameEngineAdapter", () => {
 			random: TestRandomService,
 		});
 		const emitted: string[] = [];
-		adapter.subscribe((result) => {
+		adapter.subscribe(({ result }) => {
 			emitted.push(...result.events.map((event) => event.type));
 		});
 
@@ -100,51 +133,180 @@ describe("RuntimeGameEngineAdapter", () => {
 		]);
 	});
 
-	it("publishes the effective upgraded config in snapshots", async () => {
-		const config = createEngineTestConfig({
-			upgrades: {
-				"upgrade:test-queue": {
-					code: "test-queue",
-					description: "Test queue upgrade",
-					name: "Test Queue",
-					sort: 1,
-					tiers: [
+	it("publishes due tick catch-up and a dispatched action as one runtime update", async () => {
+		const base = createEngineTestConfig();
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createEngineTestConfig({
+				game: {
+					...base.game,
+					board: {
+						height: 1,
+						width: 4,
+					},
+				},
+				products: {
+					...base.products,
+					"product:test": {
+						...base.products["product:test"],
+						output: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+					},
+				},
+				startingState: {
+					board: [
 						{
-							cost: [],
-							durationMs: 0,
-							effects: [
-								{
-									producerId: "producer:test",
-									quantity: 1,
-									type: "producer.maxQueueSize.add",
-								},
-							],
+							itemId: "item:producer",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "item:rock",
+							x: 1,
+							y: 0,
 						},
 					],
+					inventory: [],
 				},
-			},
-		});
-		const adapter = await RuntimeGameEngineAdapter.create({
-			config,
+			}),
 			nowMs: 0,
 			random: TestRandomService,
 		});
+		const updates: string[][] = [];
+		adapter.subscribe(({ result }) => {
+			updates.push(result.events.map((event) => event.type));
+		});
 
-		const startedUpgrade = await adapter.dispatch({
+		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				type: "upgrade.start",
-				upgradeId: "upgrade:test-queue",
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
 			},
 			nowMs: 0,
 		});
-		expect(startedUpgrade.events.map((event) => event.type)).toContain("upgrade.started");
-		await adapter.tick({
-			nowMs: 0,
+		updates.length = 0;
+
+		const result = await adapter.dispatch({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 3,
+				y: 0,
+			},
+			nowMs: 1200,
 		});
 
-		expect(adapter.readSnapshot().config.producers["producer:test"].maxQueueSize).toBe(2);
-		expect(adapter.config.producers["producer:test"].maxQueueSize).toBe(1);
+		expect(result.events.map((event) => event.type)).toEqual([
+			"product.completed",
+			"item.created",
+		]);
+		expect(updates).toEqual([
+			[
+				"product.completed",
+				"item.created",
+			],
+		]);
+		expect(adapter.readSnapshot().save.board.items["item-instance:2"]).toMatchObject({
+			x: 3,
+			y: 0,
+		});
+	});
+
+	it("keeps and publishes due catch-up when the following dispatched action is rejected", async () => {
+		const base = createEngineTestConfig();
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createEngineTestConfig({
+				game: {
+					...base.game,
+					board: {
+						height: 1,
+						width: 3,
+					},
+				},
+				products: {
+					...base.products,
+					"product:test": {
+						...base.products["product:test"],
+						output: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+					},
+				},
+				startingState: {
+					board: [
+						{
+							itemId: "item:producer",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "item:rock",
+							x: 1,
+							y: 0,
+						},
+					],
+					inventory: [],
+				},
+			}),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		const updates: string[][] = [];
+		adapter.subscribe(({ result }) => {
+			updates.push(result.events.map((event) => event.type));
+		});
+
+		await adapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 0,
+		});
+		updates.length = 0;
+
+		await expect(
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:2",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+				nowMs: 1200,
+			}),
+		).rejects.toThrow();
+
+		expect(updates).toEqual([
+			[
+				"product.completed",
+				"item.created",
+			],
+		]);
+		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
+		expect(adapter.readSnapshot().save.board.items["item-instance:2"]).toMatchObject({
+			x: 1,
+			y: 0,
+		});
+		expect(Object.values(adapter.readSnapshot().save.board.items)).toContainEqual(
+			expect.objectContaining({
+				itemId: "item:twig",
+				x: 2,
+				y: 0,
+			}),
+		);
 	});
 
 	it("reads readiness from the current stored save", async () => {
@@ -156,10 +318,10 @@ describe("RuntimeGameEngineAdapter", () => {
 
 		await adapter.dispatch({
 			action: {
-				enabled: false,
+				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
 				productId: "product:test",
-				type: "producer.product_line.set_enabled",
+				type: "producer.product.start",
 			},
 			nowMs: 100,
 		});
@@ -170,11 +332,211 @@ describe("RuntimeGameEngineAdapter", () => {
 				productId: "product:test",
 				type: "producer.product.start",
 			},
+			nowMs: 200,
 		});
 
 		expect(readiness).toMatchObject({
-			reason: "product_line_disabled",
+			reason: "producer_queue_full",
 			type: "rejected",
 		});
+	});
+
+	it("catches up ready ticks before reading readiness", async () => {
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createEngineTestConfig(),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+
+		await adapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 100,
+		});
+
+		const readiness = await adapter.readiness({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 1200,
+		});
+
+		expect(readiness).toMatchObject({
+			type: "ready",
+		});
+		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
+	});
+
+	it("catches up a stale loaded save before same-instant readiness checks", async () => {
+		const config = createEngineTestConfig();
+		const sourceAdapter = await RuntimeGameEngineAdapter.create({
+			config,
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		await sourceAdapter.dispatch({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 0,
+		});
+
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config,
+			initialSave: sourceAdapter.readSave(),
+			nowMs: 1500,
+			random: TestRandomService,
+		});
+
+		const readiness = await adapter.readiness({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			nowMs: 1500,
+		});
+
+		expect(readiness).toMatchObject({
+			type: "ready",
+		});
+		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
+	});
+
+	it("waits for queued mutations before reading readiness", async () => {
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createConcurrencyTestConfig(),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		let releaseMutation: (() => void) | undefined;
+		(
+			adapter as unknown as {
+				mutationQueue: Promise<void>;
+			}
+		).mutationQueue = new Promise((resolve) => {
+			releaseMutation = resolve;
+		});
+		let resolved = false;
+		const readinessPromise = adapter
+			.readiness({
+				action: {
+					boardItemId: "item-instance:1",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+			})
+			.then((readiness) => {
+				resolved = true;
+				return readiness;
+			});
+
+		await Promise.resolve();
+		expect(resolved).toBe(false);
+
+		releaseMutation?.();
+		await expect(readinessPromise).resolves.toMatchObject({
+			type: "ready",
+		});
+	});
+
+	it("serializes concurrent dispatches so independent board updates are not lost", async () => {
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config: createConcurrencyTestConfig(),
+			nowMs: 0,
+			random: TestRandomService,
+		});
+
+		await Promise.all([
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:1",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+				nowMs: 10,
+			}),
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:2",
+					type: "board.item.move",
+					x: 3,
+					y: 0,
+				},
+				nowMs: 20,
+			}),
+		]);
+
+		expect(adapter.readSnapshot().save.board.items).toMatchObject({
+			"item-instance:1": {
+				x: 2,
+				y: 0,
+			},
+			"item-instance:2": {
+				x: 3,
+				y: 0,
+			},
+		});
+	});
+
+	it("serializes replaceSave after an in-flight dispatch", async () => {
+		const config = createConcurrencyTestConfig();
+		const adapter = await RuntimeGameEngineAdapter.create({
+			config,
+			nowMs: 0,
+			random: TestRandomService,
+		});
+		const replacement = {
+			...adapter.readSave(),
+			board: {
+				items: {
+					"item-instance:reset": {
+						id: "item-instance:reset",
+						itemId: "item:plank",
+						x: 0,
+						y: 0,
+					},
+				},
+			},
+		};
+
+		await Promise.all([
+			adapter.dispatch({
+				action: {
+					boardItemId: "item-instance:1",
+					type: "board.item.move",
+					x: 2,
+					y: 0,
+				},
+				nowMs: 10,
+			}),
+			adapter.replaceSave({
+				nowMs: 20,
+				save: replacement,
+			}),
+		]);
+
+		expect(adapter.readSnapshot().save.board.items).toEqual({
+			"item-instance:reset": {
+				id: "item-instance:reset",
+				itemId: "item:plank",
+				x: 0,
+				y: 0,
+			},
+		});
+		expect(adapter.readSnapshot().save.updatedAtMs).toBe(20);
 	});
 });

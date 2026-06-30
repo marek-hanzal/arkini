@@ -1,49 +1,19 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import { cn } from "~/v0/ui/cn";
 import { actorStyle } from "~/v0/tile-engine/actorStyle";
 import type { TileEngineActor as TileEngineActorType } from "~/v0/tile-engine/TileEngineActor.types";
 import { useTileActorDrag } from "~/v0/tile-engine/useTileActorDrag";
 import { useTileActorEnterMotion } from "~/v0/tile-engine/useTileActorEnterMotion";
 import { useTileActorExitMotion } from "~/v0/tile-engine/useTileActorExitMotion";
+import { useTileActorFeedbackMotion } from "~/v0/tile-engine/useTileActorFeedbackMotion";
 import { useTileActorMotion } from "~/v0/tile-engine/useTileActorMotion";
 import { useTileActorTap } from "~/v0/tile-engine/useTileActorTap";
 import { useTileActorTimers } from "~/v0/tile-engine/useTileActorTimers";
 import { cancelTileMotionForElement } from "~/v0/tile-engine/TileMotionRuntime";
 import { useLatestRef } from "~/v0/react/useLatestRef";
-import { sameTileEngineTile } from "~/v0/tile-engine/sameTileEngineTile";
-
-const sameActiveDropFeedback = (
-	left: TileEngineActorType.Props["dropFeedback"],
-	right: TileEngineActorType.Props["dropFeedback"],
-) =>
-	left?.dropId === right?.dropId &&
-	left?.effect === right?.effect &&
-	left?.variant === right?.variant &&
-	left?.targetTileId === right?.targetTileId;
-
-const sameTileEngineActorProps = <TTile, TSlot, TDrag, TDrop>(
-	left: TileEngineActorType.Props<TTile, TSlot, TDrag, TDrop>,
-	right: TileEngineActorType.Props<TTile, TSlot, TDrag, TDrop>,
-) =>
-	sameTileEngineTile(left.tile, right.tile) &&
-	left.index === right.index &&
-	left.columns === right.columns &&
-	left.rowCount === right.rowCount &&
-	left.gapPx === right.gapPx &&
-	left.enter === right.enter &&
-	left.exit === right.exit &&
-	left.dragRef === right.dragRef &&
-	left.dragDisabled === right.dragDisabled &&
-	left.dragConstraintsRef === right.dragConstraintsRef &&
-	left.resolveDrop === right.resolveDrop &&
-	sameActiveDropFeedback(left.dropFeedback, right.dropFeedback) &&
-	left.setActiveDropId === right.setActiveDropId &&
-	left.setActiveDropFeedback === right.setActiveDropFeedback &&
-	left.setHandoff === right.setHandoff &&
-	left.setHandoffs === right.setHandoffs &&
-	left.consumeHandoff === right.consumeHandoff &&
-	left.renderTile === right.renderTile;
+import { sameTileEngineActorProps } from "~/v0/tile-engine/sameTileEngineActorProps";
+import { useTileActorFeedbackDebug } from "~/v0/tile-engine/useTileActorFeedbackDebug";
 
 export namespace TileEngineActor {
 	export type Props<
@@ -55,6 +25,7 @@ export namespace TileEngineActor {
 }
 
 const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
+	layerRole,
 	tile,
 	index,
 	columns,
@@ -62,6 +33,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	gapPx,
 	enter,
 	exit,
+	feedback,
 	dragRef,
 	dragDisabled,
 	dragConstraintsRef,
@@ -123,49 +95,19 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		exit,
 		tileId: tile.id,
 	});
+	useTileActorFeedbackMotion({
+		actorRef,
+		feedback,
+		tileId: tile.id,
+	});
 
-	useEffect(() => {
-		if (!dragging && !dropFeedback) return;
-
-		const visual = actorRef.current?.querySelector<HTMLElement>("[data-ak-tile-engine-visual]");
-		const visualStyle = visual ? window.getComputedStyle(visual) : null;
-
-		DebugTimeline.record({
-			scope: "tile-engine",
-			event: "tile.feedback.render",
-			detail: {
-				tileId: tile.id,
-				slotId: tile.slotId,
-				dragging,
-				feedback: dropFeedback,
-				actorDataset: actorRef.current
-					? {
-							dragging: actorRef.current.dataset.akTileEngineDragging,
-							dropFeedback: actorRef.current.dataset.akTileEngineDropFeedback,
-							dropFeedbackVariant:
-								actorRef.current.dataset.akTileEngineDropFeedbackVariant,
-						}
-					: null,
-				visualDataset: visual
-					? {
-							feedbackVisual: visual.dataset.akTileEngineVisual,
-						}
-					: null,
-				visualComputed: visualStyle
-					? {
-							transform: visualStyle.transform,
-							transitionProperty: visualStyle.transitionProperty,
-							animationName: visualStyle.animationName,
-						}
-					: null,
-			},
-		});
-	}, [
+	useTileActorFeedbackDebug({
+		actorRef,
 		dragging,
 		dropFeedback,
-		tile.id,
-		tile.slotId,
-	]);
+		tileId: tile.id,
+		slotId: tile.slotId,
+	});
 
 	const tap = useTileActorTap({
 		bindingRef,
@@ -203,6 +145,8 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		setHandoffs,
 	});
 
+	const isOverlayLayer = layerRole === "overlay";
+
 	return (
 		<div
 			ref={actorRef}
@@ -212,11 +156,19 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-drop-feedback={dropFeedback?.effect}
 			data-ak-tile-engine-drop-feedback-variant={dropFeedback?.variant}
 			className={cn(
-				"ak-tile-engine-actor pointer-events-auto absolute touch-none select-none will-change-transform",
+				"pointer-events-auto absolute select-none will-change-transform",
+				isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
 				tile.hidden && "pointer-events-none opacity-0",
 				disabled && "pointer-events-none",
 			)}
 			style={{
+				zIndex: dragging
+					? isOverlayLayer
+						? "var(--ak-layer-overlay-drag-tile)"
+						: "var(--ak-layer-base-drag-tile)"
+					: isOverlayLayer
+						? "var(--ak-layer-overlay-tile)"
+						: "var(--ak-layer-base-tile)",
 				...actorStyle({
 					columns,
 					rowCount,
@@ -232,7 +184,14 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 		>
 			<div
 				data-ak-tile-engine-visual="true"
-				className="ak-tile-engine-visual"
+				className={cn(
+					"h-full w-full origin-center transition-[transform,filter,opacity] duration-150 ease-out will-change-[transform,opacity] [backface-visibility:hidden] data-[ak-tile-engine-presence-motion]:transition-none",
+					isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
+					dropFeedback?.effect === "merge" &&
+						"scale-[1.1] saturate-[1.08] brightness-[1.1]",
+					dropFeedback?.effect === "blocked" &&
+						"scale-[0.9] opacity-70 saturate-[0.78] brightness-[0.82]",
+				)}
 			>
 				{renderTile({
 					tile,

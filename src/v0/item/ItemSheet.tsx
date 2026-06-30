@@ -1,15 +1,20 @@
 import { type FC, useMemo } from "react";
-import { ItemActivationCard } from "~/v0/item/ui/ItemActivationCard";
-import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
+import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
+import { ItemStashDropsCard } from "~/v0/item/ui/ItemStashDropsCard";
 import { ItemCraftCard } from "~/v0/item/ui/ItemCraftCard";
+import { ItemActivationInputsCard } from "~/v0/item/ui/ItemActivationInputsCard";
 import { ItemProducerProductLinesCard } from "~/v0/item/ui/ItemProducerProductLinesCard";
-import { ItemRelationList } from "~/v0/item/ui/ItemRelationList";
+import { ItemGeneratedEffectsCard } from "~/v0/item/ui/ItemGeneratedEffectsCard";
 import { ItemSummaryCard } from "~/v0/item/ui/ItemSummaryCard";
-import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import { useProducerClock } from "~/v0/producer/hook/useProducerClock";
-import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { toGameActionError } from "~/v0/play/action/toGameActionError";
-import { useGameAction, useGameBoardView, useGameItemCatalogView } from "~/v0/play/runtime";
+import {
+	useGameAction,
+	useGameBoardItem,
+	useGameItemCatalogView,
+	useGameRuntimeStore,
+} from "~/v0/play/runtime";
+import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 
 export namespace ItemSheet {
 	export interface Props {
@@ -19,153 +24,152 @@ export namespace ItemSheet {
 }
 
 export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
-	const board = useGameBoardView();
+	const boardItem = useGameBoardItem(boardItemId ?? "");
 	const items = useGameItemCatalogView();
 	const itemAction = useGameAction();
-	const nowMs = useProducerClock(board.items);
-	const boardItem = boardItemId ? board.byId[boardItemId] : undefined;
-	const item = boardItem ? items[boardItem.itemId] : undefined;
-	const liveCraft = readLiveCraftView({
-		craft: boardItem?.craft,
-		nowMs,
-	});
-	const actionError = itemAction.error;
-	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
-	const relations = useMemo(
-		() => ({
-			mergeResults: (item?.mergeResults ?? []).map((rule) => ({
-				key: `${rule.withItemId}:${rule.resultItemId}`,
-				leftItemId: rule.withItemId,
-				resultItemId: rule.resultItemId,
-			})),
-			usedInMerges: (item?.usedInMerges ?? []).map((rule) => ({
-				key: `${rule.targetItemId}:${rule.resultItemId}`,
-				leftItemId: rule.targetItemId,
-				resultItemId: rule.resultItemId,
-			})),
-			usedInCrafts: (item?.usedInCrafts ?? []).map((recipe) => ({
-				key: `${recipe.targetItemId}:${recipe.resultItemId}`,
-				leftItemId: recipe.targetItemId,
-				resultItemId: recipe.resultItemId,
-			})),
-		}),
+	const runtimeStore = useGameRuntimeStore();
+	const clockItems = useMemo(
+		() =>
+			boardItem
+				? [
+						boardItem,
+					]
+				: [],
 		[
-			item,
+			boardItem,
 		],
 	);
+	const nowMs = useProducerClock(clockItems);
+	const liveBoardItem = readLiveBoardItemView({
+		boardItem,
+		nowMs,
+	});
+	const item = liveBoardItem ? items[liveBoardItem.itemId] : undefined;
+	const liveCraft = liveBoardItem?.craft;
+	const liveProductLines = liveBoardItem?.activation?.productLines ?? [];
+	const actionError = itemAction.error;
+	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 
-	if (!boardItem || !item) {
+	if (!liveBoardItem || !item) {
 		return (
-			<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
+			<section
+				data-ui="tile detail"
+				className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden bg-ak-surface"
+			>
 				<SheetHeader
-					eyebrow="Item"
-					description="Nothing selected"
+					title="Nothing selected"
 					onClose={onClose}
 				/>
-				<p className="p-4 text-sm text-slate-400">Select a board item first.</p>
+				<div className="mx-auto min-h-0 w-full max-w-[520px] flex-1 overflow-y-auto overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+					<p className="text-sm text-ak-text-muted">Select a board item first.</p>
+				</div>
 			</section>
 		);
 	}
 
-	const setProductLineEnabled = (productId: string, enabled: boolean) => {
+	const setDefaultProductLine = (productId: string) => {
 		void itemAction.run({
-			enabled,
-			producerItemInstanceId: boardItem.id,
+			producerItemInstanceId: liveBoardItem.id,
 			productId,
-			type: "producer.product_line.set_enabled",
+			type: "producer.product_line.set_default",
 		});
 	};
 
 	const startProductLine = (productId: string) => {
 		void itemAction.run({
 			inputRefs: [],
-			producerItemInstanceId: boardItem.id,
+			producerItemInstanceId: liveBoardItem.id,
 			productId,
 			type: "producer.product.start",
+		});
+	};
+
+	const claimCraft = () => {
+		void runtimeStore.tick();
+	};
+
+	const startCraft = () => {
+		if (!liveCraft) return;
+		void itemAction.run({
+			recipeId: liveCraft.id,
+			targetItemInstanceId: liveBoardItem.id,
+			type: "craft.start",
+		});
+	};
+
+	const withdrawCraftInput = (itemId: string) => {
+		void itemAction.run({
+			itemId,
+			quantity: 1,
+			targetItemInstanceId: liveBoardItem.id,
+			type: "craft.input.withdraw",
 		});
 	};
 
 	const withdrawProductLineInput = (productId: string, itemId: string) => {
 		void itemAction.run({
 			itemId,
-			producerItemInstanceId: boardItem.id,
+			producerItemInstanceId: liveBoardItem.id,
 			productId,
 			type: "producer.input.withdraw",
 		});
 	};
 
-	const storeBoardItem = () => {
-		void itemAction
-			.run({
-				boardItemId: boardItem.id,
-				type: "board.item.stash",
-			})
-			.then(onClose)
-			.catch(() => undefined);
-	};
-
 	return (
-		<section className="max-h-[var(--ak-sheet-max-height)] overflow-y-auto overscroll-contain">
+		<section
+			data-ui="tile detail"
+			className="flex max-h-[var(--ak-sheet-max-height)] min-h-0 w-full flex-col overflow-hidden bg-ak-surface"
+		>
 			<SheetHeader
-				eyebrow="Item"
-				description={item.name}
+				title={item.name}
 				onClose={onClose}
 			/>
-			<div className="space-y-4 p-4 pt-1 text-sm text-slate-200">
+			<div className="mx-auto min-h-0 w-full max-w-[520px] flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-3 text-sm text-ak-text [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				{actionErrorMessage ? (
-					<div className="rounded-md border border-red-300/30 bg-red-950/35 px-3 py-2 text-xs font-semibold text-red-100">
+					<div className="rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100">
 						{actionErrorMessage}
 					</div>
 				) : null}
-				<ItemSummaryCard
-					item={item}
-					storeDisabled={itemAction.isPending}
-					onStore={storeBoardItem}
-				/>
+				<ItemSummaryCard item={item} />
+				<ItemGeneratedEffectsCard effects={item.generatedEffects} />
 				{liveCraft ? (
 					<ItemCraftCard
 						craft={liveCraft}
 						items={items}
-					/>
-				) : null}
-				{boardItem.activation ? (
-					<ItemActivationCard
-						activation={boardItem.activation}
-						nowMs={nowMs}
-					/>
-				) : null}
-				{boardItem.activation?.productLines?.length ? (
-					<ItemProducerProductLinesCard
-						lines={boardItem.activation.productLines}
-						nowMs={nowMs}
 						pending={itemAction.isPending}
-						onSetEnabled={setProductLineEnabled}
+						onClaim={claimCraft}
+						onStart={startCraft}
+						onWithdrawInput={withdrawCraftInput}
+					/>
+				) : null}
+				{liveBoardItem.activation?.kind === "stash" ? (
+					<ItemStashDropsCard
+						drops={liveBoardItem.activation.drops}
+						items={items}
+					/>
+				) : null}
+				{liveBoardItem.activation?.inputs.length ? (
+					<ItemActivationInputsCard
+						inputs={liveBoardItem.activation.inputs}
+						items={items}
+						title={
+							liveBoardItem.activation.kind === "stash"
+								? "Stash inputs"
+								: "Producer inputs"
+						}
+					/>
+				) : null}
+				{liveProductLines.length ? (
+					<ItemProducerProductLinesCard
+						items={items}
+						lines={liveProductLines}
+						pending={itemAction.isPending}
+						canSetDefault={liveBoardItem.activation?.kind === "producer"}
+						onSetDefault={setDefaultProductLine}
 						onStart={startProductLine}
 						onWithdrawInput={withdrawProductLineInput}
 					/>
 				) : null}
-				{boardItem.activation?.inputs.length ||
-				boardItem.activation?.requirements.length ? (
-					<ItemActivationInputsCard
-						activation={boardItem.activation}
-						items={items}
-					/>
-				) : null}
-				<ItemRelationList
-					title="Can merge into"
-					items={items}
-					relations={relations.mergeResults}
-				/>
-				<ItemRelationList
-					title="Can be merged with"
-					items={items}
-					relations={relations.usedInMerges}
-				/>
-				<ItemRelationList
-					title="Used in crafts"
-					items={items}
-					relations={relations.usedInCrafts}
-				/>
 			</div>
 		</section>
 	);

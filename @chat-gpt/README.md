@@ -1,144 +1,66 @@
 # Arkini GPT working notes
 
-This repo is now on the runtime tick/action engine path. Treat `RuntimeGameEngineAdapter` + `GameRuntimeStore` as the live gameplay source of truth.
+Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archive/` only for historical rationale. Old notes are reference, not current truth; source code wins.
 
-Hard rules for future work:
+## Layout
 
-- Do not revive the removed browser SQLite/Kysely stack. `src/v0/database`, `dbFx`, `withTransactionFx`, migrations, SQL row projections and database status UI are gone on purpose.
-- Do not add React Query back into gameplay runtime. Board, inventory, item, upgrade and debug runtime UI read through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`.
-- Do not add gameplay `useMutation` hooks. If an action changes `GameSave`, add or reuse a typed engine action and dispatch through the runtime adapter/store.
-- The engine lives under `src/v0/game/engine`. It must not import React, TileEngine, Dexie, browser storage, UI, or app shell code. It receives config/save/action/time and returns save/events.
-- Persistence is outer plumbing. Dexie loads `GameSave`, `createPersistentGameRuntimeStore` creates/wraps `RuntimeGameEngineAdapter`, subscribes to runtime updates and persists the full save snapshot. Storage adapts to the runtime save shape, not the other way around.
-- TileEngine remains generic. `src/v0/tile-engine` must not import Arkini domains such as board, inventory, play, manifest, item, activation, craft, upgrade, database/storage or game.
-- Before each non-trivial task, check whether existing libraries already cover the need. Do not write in-house machinery just because humans enjoy inventing tiny cursed wheels.
+- `tasks/` - active/current work block. If it only contains `README.md`, no active GPT task queue is open.
+- `backlog/` - planned/deferred tasks worth solving later.
+- `archive/` - completed/obsolete notes and rationale.
 
+`README.md` files are allowed as unprefixed folder anchors. Every other note file in `@chat-gpt` must start with `YYYY-MM-DD-`.
 
-Working-notes layout:
+## Current architecture facts
 
-- Root `@chat-gpt/README.md` is the current high-level map. Keep it short and current.
-- v0-specific task notes and historical logs live under `@chat-gpt/v0/`. Do not dump new v0 task files into the root.
-- Epic-style/backlog task groups may live in dedicated subfolders such as `@chat-gpt/000-refactor-backlog/`; the `000-*` shape is optional, not a law handed down by an angry markdown god.
+- Runtime truth: compiled JSON `GameConfig` + `GameSave` inside `RuntimeGameEngineAdapter` / `GameRuntimeStore`. Runtime adapter listener updates carry the exact mutation/tick `nowMs`; subscribers must not replace it with fresh `Date.now()` if deterministic snapshots matter.
+- Live runtime consistency is normalized through `src/v0/game/world/*`: world snapshot facts/checks own producer queue statuses, active effect statuses, processable job facts, wake reasons, and shared post-action/tick processing. Use this hub for new timing/state checks instead of scattering ad-hoc if chains through hot paths.
+- Line-owned modifier effects must not be runtime no-ops. Config validation rejects `grant.duration.multiply` multiplier `1`, `nearby.duration.multiply` definitions whose bands are all multiplier `1`, `grant.loot.extraOutputChance.add` with `chance <= 0`, and bonus loot selectors that cannot match a same-line non-weighted base output. UI effect sections must reflect real runtime behavior, not decorative optimism with JSON syntax. Do not reintroduce unused product-line view fields such as `blockReasonEffectIds`; expose only fields the runtime/UI actually consume.
+- Product lines own their activation `inputs`, `output`, and line-owned `effects` inline. Runtime product-line views should expose output items with current owned quantities counted across board plus inventory so item detail can show output icon + owned count without deriving UI truth locally. Stashes are a one-product facade over producer execution: the stash owns finite charges/depletion mode, while its product line owns inputs/output/grants/effects/chargeCost. Stash activation/progress should reuse producer product-line runtime view plumbing where possible. Producer default-line selection is an explicit player choice only: never infer a default from the first product line, config order, visibility, or availability. With no saved selected default, board-click activation is a noop/detail affordance and backend default actions must reject. Line-owned extra chance loot effects own their bonus roll shape inline. There are no top-level product input/loot tables and no legacy product output refs; do not reintroduce one-off indirection pretending to be reuse.
+- Producer, stash, and craft capabilities are keyed by their owning item id. Items do not carry `producerId`, `stashId`, or `craftRecipeId`; one-to-one capability references are fake indirection, not architecture. Source items omit derived `assetId`; the compiler derives it from item ids and synthesizes conventional assets. Item `code` no longer exists; item id is the single stable identity. `assets.json` is override-only, not a second item catalog with worse ergonomics, and assets do not carry `kind`; that duplicated the asset id/resource shape for no runtime value. Source product names may be omitted when they equal the primary output item name; the compiler derives the compiled product `name`. Source product/craft input `quantity` defaults to 1, output `quantity` defaults to 1, weighted `rolls` defaults to 1, and blueprint craft recipes may omit `resultItemId` when the result is the conventional `producer:<blueprint-suffix>`. Product inputs default to `mode: "exact"`; `mode: "upTo"` means a product can start with at least one input and consumes `1..quantity` for a fixed output, useful for purifier/sink lines. Blueprint craft/acquisition dependencies must be acyclic: a blueprint must never require itself directly, through another blueprint's crafted result, or through the producer product line that creates it.
+- Action contracts live in `game/action`; output event contracts live in `game/event`; dense save contract stays in `game/engine/model`.
+- React reads runtime through `useGameRuntimeSelector` / focused hooks, not React Query.
+- Gameplay mutations go through typed engine actions, not `useMutation` wrappers.
+- Persistence is Dexie snapshot plumbing around `GameSave`; it is not gameplay truth.
+- TileEngine is generic and must not import Arkini domain/debug/play modules. Shared instrumentation belongs in `src/v0/diagnostics/*`, not in dev UI/debug feature folders.
+- `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
+- `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
+- Negative production pressure belongs in line-owned effects. Pollution-style slowdown should be authored with `nearby.duration.multiply` on affected product lines; producer/product-owned `hinderedBy` side tables are obsolete and must not be reintroduced. Keep slowdown rules split by affected product family instead of mixing unrelated concerns into one magical trash bag.
+- Townhall era progression is one-way: the next Town Hall craft consumes the current Town Hall and needs ownership grants for every physical building/place unlocked by the current era. Owned-item grants are emitted by passive global effects with `sourceScope: "both"`. Higher Town Halls do not inherit older blueprint products.
+- Do not add storage buildings; storage is handled by inventory plus passive storage through producer input capacity.
+- Building Permit is an Era IV gameplay item/master produced by Civic Office and used for survey, academy, mining, market, and later construction progression.
+- Market progression is tiered by real building upgrades, starting with Market I in Era III and Market II in Era IV; use new market tiers for new capabilities instead of treating Market as a single eternal building.
+- Era V is textile/clothing production: Raw Hide -> Leather, Wool -> Common Cloth, Dye Workshop turns Vegetables + Water into Pigment, Pigment finishes Luxury Cloth, then Tailor makes Common Clothing and Luxury Clothing. Do not use Work Clothes as a specific item.
+- Era VII is now focused mining expansion: Civic Office issues Academy, Academy produces Advanced Knowledge plus Prospector Guild 2 and mine blueprints, Prospector Guild 2 finds Coal/Iron/Gold deposits, and mines output Coal/Iron Ore/Gold Ore. Gold Ore is the current Era VII master output.
+- Era VIII is dirty processing and advanced construction materials: Academy issues Purifier first plus Charcoal Burner, Clay/Sand Pit, Brickyard, Glassworks, Roof Tile Factory, Smelter, and Construction Yard. Product lines using Coal/Charcoal are gated by nearby Purifier grants and emit random Pollution side outputs. Construction Bundle is the Era VIII master item.
+- Era IX is guild institutions, equipment, keys, and expeditions: Civic Office produces Guild Charter; Academy issues Blacksmith, Armory, Goldsmith, and University blueprints; University issues Heroes Guild blueprint; Blacksmith consumes Iron Ingots for Nails/Axe/Sword; Armory produces Leather/Iron Armor; Goldsmith consumes Gold Ingots for Coin Stack and Keys I-IV; University produces Master Knowledge; Heroes Guild consumes gear, food, luxury, keys, gems, and knowledge for Chests and Treasure Chest. Product lines using Charcoal keep the nearby Purifier + random Pollution rule. Treasure Chest is the Era IX master item. Guild Charter now has its own dedicated PNG asset, not the Building Permit placeholder.
+- Loaded JSON `GameConfig` is the canonical immutable source of truth. There is no save-driven config overlay/layer and no global upgrade patch system.
+- Heroes Guild / Goldsmith / Blacksmith / Armory / University are now connected as Era IX content through Guild Charter and Academy-issued blueprints. Town Hall IV remains civic administration, paper, permits, prospecting, and Market II; do not dump later-era blueprints back into Town Hall.
+- Era X is prestige construction materials: Dye Workshop produces Pigment; Glazier Workshop produces Stained Glass from Glass + Pigment + Charcoal + Water with nearby Glassworks/Purifier; Prospector Guild 2 can now find Marble Deposit; University issues Quarry 2 and Stonemason 2 blueprints; Quarry 2 works near Marble Deposit and outputs Stone/Marble; Stonemason 2 works near Quarry 2 and outputs Stone Block/Marble Block. Stained Glass and Marble Block are current Era X prestige construction outputs.
+- Runtime effect definitions only publish grant ids from passive item sources (`passiveEffectIds`) or timed active product lines (`activatesEffectId`). They do not own operation lists, target selectors, item creation blockers, or config patches. Product/stash lines own their own effect rules: `grant.require`, `grant.blockStart`, `nearby.require`, `nearby.duration.multiply`, `grant.duration.multiply`, and `grant.loot.extraOutputChance.add`. Craft recipes intentionally support only start-gating effects: `grant.require` with `phase: "start"` and `grant.blockStart`; schema validation must reject producer-only duration/nearby/loot craft effects. Craft start gates are `startRequirementsReady && !blocked`; `grant.blockStart` must pause/resume running craft jobs and surface `effectBlocked`/`effectBlockReasons` in runtime craft views. Hidden missing requirements still block starts even when `display: "never"`. Effect requirement rows keep their phase (`start` vs `visibility`) so visibility-only unlocks never masquerade as start blockers. `display: "whenActive"` means the requirement/blocker is currently applying, while `display: "whenMissing"` means the required condition is absent or the blocker is active. Modifier effects are active UI bonuses, not fake missing requirements. `grant.loot.extraOutputChance.add` must match at least one same-line non-weighted base output item; config validation rejects output-less, weighted-only, or no-match bonus loot effects so the UI cannot advertise fake bonuses. Producer product-line start readiness is `startRequirementsReady`, not `grantsReady` or `effectRequirementsReady`, because line-owned start requirements may be grants, nearby anchors, or blockers. Nearby duration effects stack per matched source up to `maxSources` and must report each source instance in applied effect summaries. Passive effect definitions must set `polarity: "buff" | "debuff" | "neutral" | "mixed"` for UI grouping; never infer effect intent from operation math. Passive effect definitions may set `sourceScope: "board" | "inventory" | "both"`; omitted means board. Product `activatesEffectId` creates a timed active grant source while occupying the producer queue for `durationMs`. Producer and craft job timing are live runtime state, not a permanent imprint: every action/tick/load resynchronizes non-blocked producer and craft jobs from currently valid effects/grants. Craft starts and producer starts, including the stash facade, must recheck runtime constraints after auto-filled inputs are consumed, because pre-input readiness can lie when the input was also the blocker/grant source.
+- Path/product gating uses `visibility: "hidden"` plus line-owned visibility-phase `grant.require`/`nearby.require` for unlocks. Path exclusivity uses keystone grant sources plus `grant.blockStart` on counter-path product/craft lines. Do not reintroduce source-owned `line.reveal`, `line.hide`, `line.blockStart`, `item.blockCreate`, or `grantSelector` archaeology.
+- Choose The Path is represented by three Era XI keystone building items: `producer:house-of-engineers`, `producer:cathedral`, and `producer:mage-lodge`. University issues their blueprints after prestige/treasure inputs. Keystone buildings emit passive global effects with `sourceScope: "both"`, so the lock remains active from board or inventory. They block counter-path blueprint/product/craft lines with line-owned `grant.blockStart`. Later branch products should be baseline-hidden and revealed by their own visibility-phase grant requirements.
+- Item detail UI must list generated effects from `passiveEffectIds`, grouped by effect polarity and including where each effect source is active (`board`, `inventory`, or `both`), especially buildings/keystones, so hard gameplay rules are visible instead of occult nonsense. Activated effect product lines must also be grouped into Buffs, Debuffs, Neutral effects, and Mixed effects from `effects.*.polarity`, and expose player-readable benefit copy from the shared runtime effect summary helper; do not make buff cards show only price and timer like a cursed loot box. Runtime product-line views must carry explicit `lineKind`; effect lines must expose `effectPolarity`, and plain product lines must not. Do not reintroduce `lineKind ?? "product"` or missing-polarity neutral fallbacks. Product and active-effect defaults are separate slots, so UI must label them as default product/default effect and not one vague Default blob.
+- UI must read live board-item state through runtime/view helpers, not stale local snapshots. `readLiveBoardItemView` is the shared bridge for board/detail views needing live craft/product-line progress; producer/stash product lines use `readProducerProductLineRunState`, craft uses `readCraftRunState`, and activation input display helpers live in `src/v0/board/logic/*Activation*View*`. Do not duplicate readiness/progress labels in cards. `grant.blockStart` rows are blocker rows: inactive means "not blocked by", not a normal checkmark requirement. Producer product-line detail must keep its action row layout stable while jobs run: progress/remaining time belongs inside the locked action button, not in a separate panel that appears/disappears. Board producer tiles with no explicit default line are neutral, not dimmed; no-default means open detail, not blocked/error. Running progress-button fill should auto-complete to 100% over the reported remaining time so sparse runtime sampling does not leave a visually unfinished bar. DnD hover feedback for occupied targets belongs on the target actor itself, not on slot chrome: accepting targets scale/brighten, refusing or swap targets shrink/dim, and the slot outline/background is hidden whenever a target tile owns the feedback.
+- Housing morale is a side economy, not a core production blocker: `producer:house-t1`..`producer:house-t4` generate `item:morale-t1`..`item:morale-t4` from era-appropriate comfort goods. Higher houses output their own morale plus all lower morale tiers. Morale is spent by selected big crafts (Town Hall III/IV, Academy, Construction Yard, University, Choose The Path keystones) and by duplicate boosted product lines; base production lines remain available without morale.
+- Items support optional `maxCount`, a board-only cap. Undefined means unlimited. Placement, debug spawn, merge/craft board replacements, and save/config validation honor it; inventory and stored inputs are not counted. Use this for limited buildings such as wells or Choose The Path keystones.
+- Branch drawback concept: Engineers generate/handle Pollution pressure, Faith should generate/handle Corruption pressure, and Mages should generate/handle Void pressure. Each branch should get power plus its own mess, because civilization apparently insists on inventing themed garbage. Earlier unconnected Energy/Power Plant placeholder content was removed from live config; reintroduce it only when it is wired into a real production chain.
+- Current `game/arkini` gameplay timing is debug-tuned: every authored product/craft `durationMs` is `1000` ms to make manual flow testing fast. This is content tuning, not engine behavior.
+- Time model uses normalized field names: `startAtMs` for when a time window begins, `readyAtMs` for when a job may complete/process, `endAtMs` for when an active effect stops applying, `nextAttemptAtMs` for retryable blocked delivery, and `atMs` for the event emission instant. Runtime time math belongs in `src/v0/game/time/*`, not scattered inline. Config still uses `durationMs` as authored/compiled relative time.
+- Runtime scheduling must keep waking processable past-due jobs with a tiny follow-up wake (`pastDueGameJobWakeDelayMs`) so loaded producer jobs, blocked producer delivery retries, craft jobs, expired effects, exclusive spawn groups, and dependency-unblocked spawn jobs cannot get stranded after a tick. Waiting dependent item-spawn jobs stay asleep until their dependency can run.
+- Job/event split: anything delayed, scheduled, retrying, blocked, or persisted for future processing is a job. `GameEvent` is only an output for something processed now. Producer queues are FIFO, including blocked deliveries: blocked delivery is the queue head, following jobs may not start before the blocked job `nextAttemptAtMs`, and non-head producer jobs must not have delivery metadata. Runtime dispatch/readiness catches up ready ticks before evaluating player actions. Running producer jobs follow their producer item instance, so board movement and board swaps may relocate a running producer and realtime sync must pause/resume/recompute from the new board reality. Running craft jobs follow their craft target item instance the same way: board movement and board swaps may relocate a crafting target, and realtime craft sync must pause/resume/recompute from the new board reality when effect/grant gates change. Removal and merge replacement must not delete/replace running producer/craft targets; jobs should complete or be canceled through explicit job logic, not by ripping their board item out from under them. Spawn jobs with unresolved dependencies are not wakeable until dependencies resolve, and dependency cycles are invalid save data. Exclusive spawn sequences must be dependency-chained so a blocked earlier spawn cannot be overtaken by later jobs in the same visual sequence. Stash opening is a producer product start under a stash facade, so chest output, blocked delivery, charge spending, source-cell replacement, and depletion removal follow normal producer job semantics instead of a parallel stash dump path. Producer-like UI product-line views must expose backend/runtime status such as paused and blocked delivery; UI components must not invent their own running progress for blocked delivery jobs. Stash activation is producer-like here too: top-level stash activation must surface blocked delivery so board highlights/danger affordances do not silently miss it. If a queued producer reaches its scheduled start while start gates/effects block it before it actually begins, pause it from the current tick time so UI progress stays at zero instead of leaking fake elapsed progress from the stale scheduled start.
 
-Current architectural state:
+## Test coverage guardrails
 
-- Static rules compile into validated `GameConfig` JSON under `game/arkini.game.json`.
-- Runtime save state is the `GameSave` document owned by `RuntimeGameEngineAdapter`.
-- React uses `GameRuntimeStore` with `useSyncExternalStore` selectors.
-- Visual events are derived from engine domain events under `src/v0/play/game-engine-bridge` and registered into TileEngine motion from `GameRuntimeVisualEffects`.
-- Dev scenarios replace the runtime save directly.
-- Browser hard reset wipes Dexie save storage first, then best-effort OPFS/local/session storage and reloads. It is not a SQL database reset.
-- Producer queue size is now a config/runtime invariant. `producers.*.maxQueueSize` caps running+queued jobs per producer item instance; upgrades can adjust it through `producer.maxQueueSize.add`.
-- Runtime snapshots expose the effective config for the current save. `adapter.config` remains the immutable base config; `adapter.readSnapshot().config` is the layered config UI should read.
+- Every delayed/runtime state family needs invariant tests at the save/job boundary, not just happy-path action tests. Cover forbidden derived job fields, blocked retry metadata, stale loaded saves, exact time boundaries, config/effect changes between enqueue and completion, consumed effect sources, and queued jobs whose scheduled start differs from click time. Bugs in these areas are gameplay logic bugs wearing a fake UX moustache.
+- Effects need brutal integration coverage across source scope (`board`/`inventory`/`both`), local proximity drift, stacked source quantities, active-effect windows, live duration resync, live loot reroll, creation blockers, delayed retry, and save/job boundaries. Add expectation/negative tests too: effects must not leak to unrelated products/items, future active windows must not apply early, schema must reject invalid local inventory/both source scopes, and temporary delayed blockers must retry instead of permanently failing jobs. A passing effect unit test is cute; a passing engine scenario is useful.
 
+## Hard rules
 
-Recent runtime parity checkpoint:
+- Do not revive SQLite/Kysely or gameplay React Query.
+- Do not add special UI for filling activation inputs; use core DnD/merge-style interactions.
+- Before non-trivial work, inspect current source and existing library capabilities.
+- Keep active notes short. Archive completed task notes immediately.
+- Do not reintroduce pending/scheduled event queues; future delayed gameplay belongs in explicit job maps/families.
+- Prospector Guild is the long-term tiered source-discovery hub. Use numeric tile labels via item `label` (`1`, `2`, …): T1 finds Clay/Sand deposits, T2 keeps Clay/Sand and adds Coal/Iron/Gold. Do not reintroduce Surveyor Camp as a separate concept.
 
-- Live UI time is shared through `useLiveNowMs`. Use it for countdown/progress UI that should move without engine revisions.
-- `useGameRuntimeSelector` cache now keys on both runtime root snapshot and selector identity, so time/prop-driven selectors can recompute correctly.
-- Scheduled event blocks are retried after `blockedScheduledEventRetryDelayMs` instead of leaving `dueAtMs` in the past and hot-looping the auto ticker.
-- Debounced Dexie persistence flushes on pagehide/hidden as a best-effort safety net.
-
-Recent GameConfig hardening checkpoint:
-
-- `GameConfigSchema` now rejects duplicate authoring codes, duplicate producer product IDs, duplicate activation/craft inputs, duplicate activation requirements, duplicate item tags/merge IDs, item definitions that point at non-item assets, and activation/stored requirement capacities below required quantity.
-- Dedicated schema tests cover starting-state invariants plus these semantic authoring guards.
-- Keep using `parseGameConfig` as the shared CLI/runtime gate. Do not add a second validator that drifts into another tiny religion.
-
-Current task candidates:
-
-1. Badge/visual polish: tighten tile badge offset toward the corner without redesigning the tile.
-
-See `@chat-gpt/v0/README.md` for the v0-specific task index.
-
-Dexie destructive refresh checkpoint:
-
-- Prototype storage compatibility is intentionally coarse. If a Dexie save record has a stale storage schema version, stale save document version, mismatched game id/config hash or invalid `GameSave` payload, `DexieGameSaveStorage.loadActiveSave` wipes the whole save database and returns `null`.
-- `createPersistentGameRuntimeStore` then creates and persists a fresh initial save. Do not add partial IndexedDB migrations while the v0 save shape is still moving quickly.
-- Recoverable Dexie schema open/upgrade errors are treated the same way: drop the Dexie database and retry the operation against a fresh schema.
-
-GameSave schema validation checkpoint:
-
-- Save validation is centralized through `GameSaveConfigSchema`, a Zod schema for `{ save, config }` that sits in the game engine model/schema layer.
-- `GameSaveSchema` owns raw document shape; `GameSaveConfigSchema.superRefine` owns config-aware invariants such as board bounds/unique cells, inventory slot count/max stack sizes, producer queue caps including completed queue upgrades, job target references, stash/stored requirement state, upgrade progress and scheduled event references.
-- Dexie storage receives `config` and calls `GameSaveConfigSchema` on load/save. Invalid semantic save state is wiped through the existing drop-and-fresh policy.
-- Do not scatter save invariant checks into storage, React runtime, UI views or feature modules. Those layers may perform action-readiness/user-intent checks, but persisted save integrity belongs to the schema layer.
-
-Stored requirements runtime checkpoint:
-
-- Stored requirements live in `save.storedRequirements[targetItemInstanceId].items` and are validated centrally by `GameSaveConfigSchema`.
-- Producer/stash readiness gates against stored quantities on the target board item; store/withdraw actions modify the same save bucket.
-- Stored requirements must be filled through the core drag/drop + merge-like tile interaction model, not through special `Store` buttons or bespoke form UI. Drag matching items onto the building/target tile.
-- Product line views expose `requirementsReady` and `missingRequirementItemIds`; blocked product lines should describe the DnD requirement path, not trigger special storage UI.
-- Current runtime drop routing prioritizes missing stored requirements before producer/stash consumable inputs. If an item is both a durable requirement and a consumable input, the requirement fills first; after capacity is full, normal input actions can run.
-- Do not move this into storage/UI validation. UI flags are readiness hints; save integrity stays schema-owned.
-
-DnD interaction contract checkpoint:
-
-- `resolveDropIntent` is the central board-target interaction contract for merge-like DnD decisions. Keep board hover feedback, board drop actions and inventory-to-board drop acceptance aligned with it.
-- Missing stored requirements are accepted as merge-like interactions and should show merge feedback, not blocked feedback.
-- Priority after reverse-directed merge rejection is: regular merge, missing stored requirement, craft input, activation/producer/stash input, swap. Runtime dispatch mirrors the durable-before-consumable part after regular merge.
-- Product-line `missingRequirementItemIds` is only a DnD readiness hint. Disabled product lines must not make their requirements droppable.
-
-
-Local placement planner checkpoint:
-
-- `planEmptyBoardCellsFx` is the shared board placement planner. Without `seedCell`, it preserves top-to-bottom / left-to-right scan order. With `seedCell`, it orders empty cells by Manhattan distance from the seed with scan order as deterministic tie-break.
-- Producer, stash and craft completion preflight placement now pass their source/target board cell as seed. Scheduled spawn processing derives the same seed from `originItemInstanceId`, so delayed output still lands around its source while the source exists.
-- Inventory-to-board long-press placement should reuse this planner instead of creating a second near-cell search.
-
-Producer blocked delivery checkpoint:
-
-- Producer output rolls once. If placement is unavailable, the rolled output is persisted under `producerJobs[jobId].delivery.items`; retries deliver that same payload instead of rerolling.
-- Pending delivery keeps the producer job alive and therefore keeps consuming queue capacity. A package stuck in the doorway is still occupying the slot.
-- Blocked delivery retries via `delivery.retryAtMs` and does not spam `product.blocked` events after the first block.
-- Runtime board view exposes `activation.deliveryBlocked`; board cells map it to a subtle generic danger frame.
-- `placeGameSaveItemsFx` is the current placement reservation layer. It mutates a cloned save as each item is placed, so same-tick producer completions reserve distinct cells against the latest placement state.
-
-DnD feedback frame checkpoint:
-
-- Do not add labels/tooltips/special UI for DnD affordances. Visual feedback should stay in-frame and subtle.
-- TileEngine exposes only generic feedback variants (`subtle`, `primary`, `secondary`, `danger`). Domain layers map Arkini meanings onto those variants.
-- Stored requirement fill uses primary/blue frame feedback; craft/producer/stash consumable input uses secondary/green frame feedback. Regular merge should rely on the existing merge animation rather than extra colored frames.
-- Keep hover feedback and post-success board-cell pulses aligned so the thing previewed during drag matches what flashes after commit.
-- Do not reduce existing hover scale just to make feedback subtle. Subtle means frame/border/glow intensity, while scale should remain clearly visible.
-
-
-Producer board progress checkpoint:
-
-- Running producer jobs now show the existing subtle bottom progress bar directly on the board tile.
-- Board producer progress is active-work-only: future queued jobs and completed blocked deliveries do not show as running progress. Blocked delivery continues to use the subtle danger frame.
-
-Merge executable parity checkpoint:
-
-- Merge/interactions are explicit source-owned `GameConfig` rules. `resolveExecutableItemMergeRule` must only resolve rules from `sourceItem.mergeIds`; it must not synthesize reverse merges from target-owned rules.
-- `water -> twig` is authored on `item:water` as `merge:water-twig-sprout`; `twig -> water` is not a merge unless `item:twig` gets its own explicit rule.
-- `consumeSource: false` imprint rules stay directed. Reverse-directed imprint drops may reject before swap, but they must not become executable merges.
-
-
-Touch / long-press polish checkpoint:
-
-- TileEngine surfaces suppress native `contextmenu` and iOS touch callout/tap highlight so long-press game gestures are not hijacked by the browser.
-- Keep this scoped to game interaction surfaces. Do not prevent context menus globally across ordinary app UI unless there is a very specific reason.
-
-Board DnD confinement checkpoint:
-
-- Board item DnD is board-only. Board items can move, swap, merge and interact with board cells/items, but inventory is no longer a board-item drop target.
-- The bottom inventory nav button must stay a normal button, not a `TileEngineDropTarget`.
-- `DropActions` should not expose board-item stash for DnD plumbing.
-- Moving a board item into inventory is an explicit `Store` action from the item detail sheet, dispatching `board.item.stash`.
-
-Inventory seeded placement checkpoint:
-
-- Long-pressing an empty board cell opens inventory in placement mode with that cell as placement seed.
-- Double-tapping a stack in that mode dispatches `inventory.item.place` with `placementMode: "nearest_by_manhattan"` and `quantity: 1`. It places one item from the stack around the selected seed cell, keeps the inventory sheet open after success, and behaves like normal repeated inventory access rather than one-shot select-and-close. Single tap must not place items.
-- Normal inventory double-tap and explicit inventory-to-board DnD remain exact single-item placement. Do not replace those with nearest-cell behavior unless the UX explicitly changes.
-- TileEngine stays generic: slots only expose optional `onLongActivate`; Arkini board/inventory adapters attach the placement meaning outside the engine.
-
-Product-line input ref checkpoint:
-
-- Producer-level consumable inputs are gone from the live model. Producer shells can have requirements/product lines, but only product lines own consumable production inputs.
-- `GameConfig.inputs` is a top-level named input definition record. Products reference those records via `products.*.inputRefId`; use `readProductInputs({ config, productId })` instead of reading product-local inputs.
-- `producer.input.store` fills the first enabled product line, in `producer.productIds` order, that accepts the dragged item and has capacity. Shared inputs therefore resolve top-to-bottom by enabled line state.
-- Product line UI displays its own input rows/readiness. Filling still happens through core DnD/merge-like interaction onto the producer tile, not a special button.
-- Product line input rows with stored quantity can withdraw the whole stored amount at once. Withdraw uses producer-style board-then-inventory placement seeded at the producer tile and rejects without state changes if no placement is available.
-- `GameSaveConfigSchema` validates `save.producerInputs` against effective product input refs, including completed `product.inputRef.set` upgrades.
+- Item detail is backward-facing, not an encyclopedia of future uses: show what the selected instance needs, stores, can run, can withdraw, and may output. Do not show forward usage lists like “used in crafts”, “can merge into”, or other places where this item could be consumed elsewhere. Normal player-facing grant/input sections omit satisfied rows; diagnostic views may opt into showing fulfilled expectations. Config audit terminal-item warnings must treat line-owned effect selectors as real item usage, because source anchors such as Tree/Rock can be gameplay-relevant without being consumed.

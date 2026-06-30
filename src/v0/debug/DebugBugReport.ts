@@ -1,6 +1,5 @@
 import type { Sheet } from "~/v0/play/sheet/Sheet";
-import { DebugTimeline, createDebugJsonReplacer } from "~/v0/debug/DebugTimeline";
-import { readLastLoadedDevScenario } from "~/v0/debug/scenario/DevScenarioRuntime";
+import { DebugTimeline, createDebugJsonReplacer } from "~/v0/diagnostics/DebugTimeline";
 
 export namespace DebugBugReport {
 	export interface SnapshotContext {
@@ -89,16 +88,10 @@ const readElementMotionSnapshot = (element: HTMLElement) => ({
 
 const readTileEngineDom = () =>
 	Array.from(document.querySelectorAll<HTMLElement>("[data-ak-tile-engine-id]")).map((engine) => {
-		const engineStyle = window.getComputedStyle(engine);
-
 		return {
 			id: engine.dataset.akTileEngineId,
 			layerRole: engine.dataset.akTileEngineLayerRole,
 			className: engine.className,
-			layerVars: {
-				item: engineStyle.getPropertyValue("--ak-tile-engine-item-layer").trim(),
-				dragItem: engineStyle.getPropertyValue("--ak-tile-engine-drag-item-layer").trim(),
-			},
 			actors: Array.from(
 				engine.querySelectorAll<HTMLElement>("[data-ak-tile-engine-tile-id]"),
 			).map((actor) => {
@@ -120,16 +113,13 @@ const readTileEngineDom = () =>
 				};
 			}),
 			slots: Array.from(
-				engine.querySelectorAll<HTMLElement>(
-					".ak-tile-engine-slot[data-ak-tile-engine-slot-id]",
-				),
+				engine.querySelectorAll<HTMLElement>("[data-ak-tile-engine-slot-id]"),
 			).map((slot) => ({
 				slotId: slot.dataset.akTileEngineSlotId,
 				dropId: slot.dataset.akTileEngineDropId,
 				dataset: readDataset(slot),
 				className: slot.className,
 				computed: readComputedMotion(slot),
-				after: readComputedMotion(slot, "::after"),
 			})),
 		};
 	});
@@ -147,7 +137,6 @@ const createReport = () => ({
 	},
 	context: {
 		...getContextRef?.(),
-		lastLoadedScenario: readLastLoadedDevScenario(),
 	},
 	browser: readBrowser(),
 	screen: readScreen(),

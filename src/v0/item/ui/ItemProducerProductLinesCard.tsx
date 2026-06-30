@@ -1,177 +1,463 @@
 import type { FC } from "react";
+import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
+import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
+import {
+	effectPolaritySections,
+	readEffectPolarityBadgeClassName,
+	readEffectPolarityLabel,
+	type EffectPolarityUi,
+} from "~/v0/item/ui/effectPolarityUi";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
-import { cn } from "~/v0/ui/cn";
+import { UiButton } from "~/v0/ui/UiButton";
+import { UiProgressButton } from "~/v0/ui/UiProgressButton";
+import { UiSection } from "~/v0/ui/UiSection";
 
 export namespace ItemProducerProductLinesCard {
 	export interface Props {
+		items: ItemCatalogView;
 		lines: readonly ProducerProductLineView[];
-		nowMs: number;
 		pending: boolean;
-		onSetEnabled(productId: string, enabled: boolean): void;
+		canSetDefault?: boolean;
+		onSetDefault(productId: string): void;
 		onStart(productId: string): void;
 		onWithdrawInput(productId: string, itemId: string): void;
 	}
 }
 
+const formatMultiplier = (value: number) => value.toFixed(2).replace(/\.?0+$/, "");
+
+const readItemName = (itemId: string, items: ItemCatalogView) =>
+	items[itemId]?.name ?? itemId.replace(/^item:/, "").replace(/^producer:/, "");
+
+const formatPercent = (value: number) => {
+	const percent = value * 100;
+	const rounded = Math.round(percent * 10) / 10;
+	return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)}%`;
+};
+
+const readProductLineOutputQuantityLabel = (
+	quantity: NonNullable<ProducerProductLineView["outputs"]>[number]["quantity"],
+) => {
+	const resolvedQuantity = quantity ?? 1;
+	return typeof resolvedQuantity === "number"
+		? `${resolvedQuantity}×`
+		: `${resolvedQuantity.min}-${resolvedQuantity.max}×`;
+};
+
+const readProductLineOutputMeta = (
+	output: NonNullable<ProducerProductLineView["outputs"]>[number],
+) =>
+	[
+		readProductLineOutputQuantityLabel(output.quantity),
+		output.probability === undefined
+			? output.kind === "guaranteed"
+				? "guaranteed"
+				: undefined
+			: `${formatPercent(output.probability)} chance`,
+		output.rollLabel,
+		`Owned ${output.ownedQuantity}`,
+	]
+		.filter(Boolean)
+		.join(" · ");
+
+const readTargetLimitLabel = (
+	limit: NonNullable<ProducerProductLineView["targetLimits"]>[number],
+	items: ItemCatalogView,
+) => {
+	const itemName = readItemName(limit.itemId, items);
+	const baseLabel = `${itemName} ${limit.ownedQuantity}/${limit.maxCount}`;
+	return limit.remainingQuantity < limit.requiredQuantity
+		? `${baseLabel} · limit reached`
+		: baseLabel;
+};
+
+const readLineActionLabel = ({
+	line,
+	runState,
+}: {
+	line: ProducerProductLineView;
+	runState: ReturnType<typeof readProducerProductLineRunState>;
+}) => {
+	if (!runState.showProgress) return runState.label;
+
+	const statusLabel =
+		line.remainingMs === undefined ? "Queued" : (runState.progressLabel ?? "Running");
+	const timeLabel = line.remainingMs === undefined ? undefined : formatMs(line.remainingMs);
+	const queuedLabel = line.queuedJobs > 1 ? `+${line.queuedJobs - 1} queued` : undefined;
+
+	return [
+		statusLabel,
+		timeLabel,
+		queuedLabel,
+	]
+		.filter(Boolean)
+		.join(" · ");
+};
+
+const readLineProgressDisplay = (line: ProducerProductLineView) => {
+	const progress = line.progress ?? 0;
+	return line.lineKind === "effect" ? 1 - progress : progress;
+};
+
+const readEffectPolarity = (line: ProducerProductLineView): EffectPolarityUi =>
+	line.effectPolarity ?? "neutral";
+
+const readDefaultBadgeLabel = (line: ProducerProductLineView) =>
+	line.lineKind === "effect" ? "Default effect" : "Default product";
+
+const readDefaultActionLabel = (line: ProducerProductLineView) => {
+	const target = line.lineKind === "effect" ? "effect" : "product";
+	return line.isDefault ? `Un-default ${target}` : `Default ${target}`;
+};
+
+const readEffectRequirementStateLabel = (
+	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
+) => {
+	if (requirement.kind === "grant.blockStart") {
+		return requirement.ready ? "Not blocked by" : "Blocked";
+	}
+	return requirement.ready ? "✓" : "Missing";
+};
+
 export const ItemProducerProductLinesCard: FC<ItemProducerProductLinesCard.Props> = ({
+	items,
 	lines,
-	nowMs,
 	pending,
-	onSetEnabled,
+	canSetDefault = true,
+	onSetDefault,
 	onStart,
 	onWithdrawInput,
 }) => {
 	if (lines.length === 0) return null;
 
+	const effectLineGroups = effectPolaritySections.map((section) => ({
+		eyebrow: "Effects",
+		key: `effect:${section.polarity}`,
+		lines: lines.filter(
+			(line) => line.lineKind === "effect" && readEffectPolarity(line) === section.polarity,
+		),
+		title: section.title,
+	}));
+	const productLineGroup = {
+		eyebrow: "Production",
+		key: "product",
+		lines: lines.filter((line) => line.lineKind === "product"),
+		title: "Product lines",
+	};
+	const lineGroups = [
+		...effectLineGroups,
+		productLineGroup,
+	].filter((group) => group.lines.length > 0);
+
 	return (
-		<div className="rounded-md border border-violet-400/20 bg-violet-950/18 p-3">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">
-				Product lines
-			</p>
-			<div className="mt-3 space-y-2">
-				{lines.map((baseLine) => {
-					const line = readLiveProducerProductLineView({
-						line: baseLine,
-						nowMs,
-					});
-					const canStart =
-						line.enabled &&
-						line.inputsReady &&
-						line.requirementsReady &&
-						!line.queueFull;
-					const remainingMs = line.readyAtMs
-						? Math.max(0, line.readyAtMs - nowMs)
-						: undefined;
-
-					return (
-						<div
-							key={line.productId}
-							className={cn(
-								"rounded-sm border px-2 py-2 text-xs",
-								line.enabled
-									? "border-violet-300/20 bg-slate-950/45 text-slate-200"
-									: "border-slate-800 bg-slate-950/25 text-slate-500",
-							)}
-						>
-							<div className="flex items-start justify-between gap-3">
-								<div className="min-w-0">
-									<p className="font-bold text-slate-100">{line.name}</p>
-									<p className="mt-1 text-[0.7rem] text-slate-400">
-										Queue {line.producerQueuedJobs}/{line.queueSize} ·{" "}
-										{formatMs(line.durationMs)}
-										{line.inputItemIds.length
-											? ` · ${line.inputsReady ? "input ready" : "needs input"}`
-											: " · tap to run"}
-										{line.requirementItemIds.length
-											? ` · ${line.requirementItemIds.length} requirement${line.requirementItemIds.length === 1 ? "" : "s"}`
-											: ""}
-										{line.missingRequirementItemIds.length
-											? ` · missing ${line.missingRequirementItemIds.length}`
-											: ""}
-									</p>
-								</div>
-								<button
-									type="button"
-									disabled={pending}
-									onClick={() => onSetEnabled(line.productId, !line.enabled)}
-									className={cn(
-										"shrink-0 rounded-sm px-2 py-1 font-black transition disabled:opacity-35",
-										line.enabled
-											? "bg-emerald-300 text-slate-950"
-											: "bg-slate-800 text-slate-300",
-									)}
+		<>
+			{lineGroups.map((group) => (
+				<UiSection
+					key={group.key}
+					eyebrow={group.eyebrow}
+					title={group.title}
+				>
+					<div className="grid gap-2.5">
+						{group.lines.map((line) => {
+							const runState = readProducerProductLineRunState({
+								line,
+							});
+							const outputs = line.outputs ?? [];
+							const targetLimits = line.targetLimits ?? [];
+							const effectBenefits = line.effectBenefits ?? [];
+							const effectBonusLines = line.effectBonusLines ?? [];
+							const effectRequirements = line.effectRequirements ?? [];
+							return (
+								<div
+									key={line.productId}
+									className="min-w-0 rounded-sm border border-ak-border bg-ak-surface p-3"
 								>
-									{line.enabled ? "On" : "Off"}
-								</button>
-							</div>
-
-							{line.inputs.length ? (
-								<div className="mt-2 grid gap-1">
-									{line.inputs.map((input) => (
-										<div
-											key={input.itemId}
-											className="flex items-center justify-between gap-2 rounded-sm border border-slate-700/60 bg-slate-950/35 px-2 py-1 text-[0.68rem]"
-										>
-											<span className="min-w-0 font-semibold text-slate-300">
-												{input.itemId.replace(/^item:/, "")}
-											</span>
-											<span className="ml-auto text-slate-400">
-												{input.stored}/{input.quantity}
-												{input.capacity > input.quantity
-													? ` · cap ${input.capacity}`
-													: ""}
-											</span>
-											{input.stored > 0 ? (
-												<button
-													type="button"
-													disabled={pending}
-													onClick={() =>
-														onWithdrawInput(
-															line.productId,
-															input.itemId,
-														)
-													}
-													className="shrink-0 rounded-sm border border-slate-600/70 px-1.5 py-0.5 font-bold text-slate-300 transition hover:border-slate-400/80 hover:text-slate-100 disabled:opacity-35"
-												>
-													Withdraw
-												</button>
-											) : null}
+									<div className="min-w-0">
+										<div className="flex min-w-0 items-start gap-2">
+											<div className="flex min-w-0 flex-1 items-start gap-2">
+												{outputs.length ? (
+													<div className="flex max-w-24 shrink-0 flex-wrap gap-1">
+														{outputs.map((output, outputIndex) => (
+															<ItemInlineAsset
+																key={`${output.itemId}:${outputIndex}`}
+																item={items[output.itemId]}
+																className="h-8 w-8"
+															/>
+														))}
+													</div>
+												) : line.lineKind === "effect" ? (
+													<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-ak-primary/15 text-[0.62rem] font-black uppercase tracking-[0.12em] text-ak-primary">
+														FX
+													</div>
+												) : null}
+												<div className="min-w-0 flex-1">
+													<p className="break-words text-base font-bold leading-6 text-ak-text">
+														{line.name}
+													</p>
+													<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">
+														{line.lineKind === "effect"
+															? "Window"
+															: "Queue"}{" "}
+														{line.lineKind === "effect"
+															? formatMs(line.durationMs)
+															: `${line.producerQueuedJobs}/${line.queueSize} · ${formatMs(line.durationMs)}`}
+														{line.effectDurationMultiplier &&
+														line.effectDurationMultiplier > 1
+															? ` · slowed ${formatMultiplier(line.effectDurationMultiplier)}×`
+															: ""}
+														{runState.statusMetaLabel
+															? ` · ${runState.statusMetaLabel}`
+															: ""}
+														{runState.inputAvailabilityLabel
+															? ` · ${runState.inputAvailabilityLabel}`
+															: ""}
+													</p>
+												</div>
+											</div>
+											<div className="flex shrink-0 flex-wrap justify-end gap-1">
+												{line.lineKind === "effect" ? (
+													<span
+														className={`rounded-sm border px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] ${readEffectPolarityBadgeClassName(
+															readEffectPolarity(line),
+														)}`}
+													>
+														{readEffectPolarityLabel(
+															readEffectPolarity(line),
+														)}
+													</span>
+												) : null}
+												{line.isDefault ? (
+													<span className="rounded-sm bg-ak-primary/15 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ak-primary">
+														{readDefaultBadgeLabel(line)}
+													</span>
+												) : null}
+											</div>
 										</div>
-									))}
-								</div>
-							) : null}
-
-							{line.inProgress ? (
-								<div className="mt-2 rounded-sm bg-slate-950/60 p-2">
-									<div className="flex justify-between gap-3 font-bold text-violet-100">
-										<span>
-											Running
-											{line.queuedJobs > 1
-												? ` +${line.queuedJobs - 1} queued`
-												: ""}
-										</span>
-										<span>
-											{remainingMs !== undefined
-												? formatMs(remainingMs)
-												: "Queued"}
-										</span>
 									</div>
-									<div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-900">
-										<div
-											className="h-full rounded-full bg-violet-300/80"
-											style={{
-												width: `${Math.round((line.progress ?? 0) * 100)}%`,
-											}}
-										/>
+
+									{outputs.length ? (
+										<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+											<p className="font-semibold text-ak-text">Outputs</p>
+											<ul className="mt-1 grid gap-1.5">
+												{outputs.map((output, outputIndex) => {
+													const outputItem = items[output.itemId];
+
+													return (
+														<li
+															key={`${line.productId}:output:${output.itemId}:${outputIndex}`}
+															className="flex min-w-0 items-center gap-2"
+														>
+															<ItemInlineAsset
+																item={outputItem}
+																className="h-7 w-7"
+															/>
+															<div className="min-w-0 flex-1">
+																<p className="break-words font-semibold text-ak-text">
+																	{outputItem?.name ??
+																		readItemName(
+																			output.itemId,
+																			items,
+																		)}
+																</p>
+																<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+																	{readProductLineOutputMeta(
+																		output,
+																	)}
+																</p>
+															</div>
+														</li>
+													);
+												})}
+											</ul>
+										</div>
+									) : null}
+
+									{targetLimits.length ? (
+										<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+											<p className="font-semibold text-ak-text">
+												Target limit
+											</p>
+											<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+												{targetLimits.map((limit) => (
+													<li
+														key={`${line.productId}:target-limit:${limit.itemId}`}
+														className="break-words"
+													>
+														{readTargetLimitLabel(limit, items)}
+													</li>
+												))}
+											</ul>
+										</div>
+									) : null}
+
+									{effectBenefits.length ? (
+										<div className="mt-2.5 rounded-sm bg-ak-primary/10 px-2.5 py-2 text-xs">
+											<p className="font-semibold text-ak-text">Benefit</p>
+											<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+												{effectBenefits.map((benefit, benefitIndex) => (
+													<li
+														key={`${line.productId}:benefit:${benefitIndex}`}
+														className="break-words"
+													>
+														{benefit}
+													</li>
+												))}
+											</ul>
+										</div>
+									) : null}
+
+									{effectBonusLines.length ? (
+										<div className="mt-2.5 rounded-sm bg-ak-primary/10 px-2.5 py-2 text-xs">
+											<p className="font-semibold text-ak-text">
+												Active bonus
+											</p>
+											<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+												{effectBonusLines.map((bonusLine, bonusIndex) => (
+													<li
+														key={`${line.productId}:effect-bonus:${bonusIndex}`}
+														className="break-words"
+													>
+														{bonusLine}
+													</li>
+												))}
+											</ul>
+										</div>
+									) : null}
+
+									{effectRequirements.length ? (
+										<div className="mt-2.5 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs">
+											<p className="font-semibold text-ak-text">
+												Requirements
+											</p>
+											<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
+												{effectRequirements.map(
+													(requirement, requirementIndex) => (
+														<li
+															key={`${line.productId}:effect-requirement:${requirementIndex}`}
+															className="break-words"
+														>
+															{readEffectRequirementStateLabel(
+																requirement,
+															)}{" "}
+															{requirement.label}
+														</li>
+													),
+												)}
+											</ul>
+										</div>
+									) : null}
+
+									{line.inputs.length ? (
+										<div className="mt-2.5 grid gap-1.5">
+											{line.inputs.map((input) => {
+												const inputItem = items[input.itemId];
+												return (
+													<div
+														key={input.itemId}
+														className="flex min-w-0 items-center gap-2 rounded-sm bg-ak-surface-soft px-2.5 py-2 text-xs"
+													>
+														<ItemInlineAsset
+															item={inputItem}
+															className="h-9 w-9"
+														/>
+														<div className="min-w-0 flex-1">
+															<p className="break-words font-semibold text-ak-text">
+																{inputItem?.name ??
+																	readItemName(
+																		input.itemId,
+																		items,
+																	)}
+															</p>
+															<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+																{readActivationInputViewLabel(
+																	input,
+																)}
+																{readActivationInputViewFillableQuantity(
+																	input,
+																) > 0
+																	? ` · +${readActivationInputViewFillableQuantity(input)} available`
+																	: ""}
+																{input.capacity > input.quantity
+																	? ` · cap ${input.capacity}`
+																	: ""}
+															</p>
+														</div>
+														{input.stored > 0 ? (
+															<UiButton
+																data-ui="withdraw action"
+																fullWidth={false}
+																disabled={pending}
+																onClick={() =>
+																	onWithdrawInput(
+																		line.productId,
+																		input.itemId,
+																	)
+																}
+															>
+																Withdraw
+															</UiButton>
+														) : null}
+													</div>
+												);
+											})}
+										</div>
+									) : null}
+
+									<div
+										className={
+											canSetDefault
+												? "mt-2.5 grid grid-cols-3 gap-2"
+												: "mt-2.5 grid gap-2"
+										}
+									>
+										<UiProgressButton
+											disabled={
+												runState.showProgress ||
+												!runState.canRunAction ||
+												pending
+											}
+											progress={
+												runState.showProgress
+													? readLineProgressDisplay(line)
+													: undefined
+											}
+											progressAutoCompleteMs={runState.progressAutoCompleteMs}
+											progressAutoCompleteTo={
+												line.lineKind === "effect" ? "empty" : "full"
+											}
+											tone={
+												runState.showProgress || runState.canRunAction
+													? "primary"
+													: "secondary"
+											}
+											className={canSetDefault ? "col-span-2" : undefined}
+											onClick={() => onStart(line.productId)}
+										>
+											{readLineActionLabel({
+												line,
+												runState,
+											})}
+										</UiProgressButton>
+										{canSetDefault ? (
+											<UiButton
+												fullWidth
+												disabled={pending}
+												onClick={() => onSetDefault(line.productId)}
+											>
+												{readDefaultActionLabel(line)}
+											</UiButton>
+										) : null}
 									</div>
 								</div>
-							) : null}
-
-							<button
-								type="button"
-								disabled={!canStart || pending}
-								onClick={() => onStart(line.productId)}
-								className={cn(
-									"mt-2 w-full rounded-sm px-2 py-1.5 font-black transition disabled:opacity-35",
-									canStart
-										? "bg-violet-300 text-slate-950 active:scale-[0.99]"
-										: "bg-slate-800 text-slate-500",
-								)}
-							>
-								{line.queueFull
-									? "Queue full"
-									: !line.requirementsReady
-										? "Drag requirements in"
-										: !line.inputsReady
-											? "Feed items by drag"
-											: "Start"}
-							</button>
-						</div>
-					);
-				})}
-			</div>
-		</div>
+							);
+						})}
+					</div>
+				</UiSection>
+			))}
+		</>
 	);
 };

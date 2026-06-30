@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/v0/manifest/GameItemIdSchema";
+import { GameItemIdSchema } from "~/v0/game/config/GameIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
+import { ItemTargetLimitViewSchema } from "./ItemTargetLimitViewSchema";
 
 export const CraftProgressViewSchema = z.object({
 	id: z.string().min(1),
@@ -10,6 +11,7 @@ export const CraftProgressViewSchema = z.object({
 		z.object({
 			itemId: GameItemIdSchema,
 			quantity: z.number().int().nonnegative(),
+			available: z.number().int().nonnegative().optional(),
 		}),
 	),
 	delivered: z.record(z.string(), z.number().int().nonnegative()),
@@ -19,9 +21,16 @@ export const CraftProgressViewSchema = z.object({
 	phase: CraftProgressPhaseSchema,
 	complete: z.boolean(),
 	canAcceptInputs: z.boolean(),
-	startedAtMs: z.number().optional(),
+	startRequirementsReady: z.boolean().optional(),
+	effectBlocked: z.boolean().optional(),
+	effectBlockReasons: z.array(z.string().min(1)).optional(),
+	startAtMs: z.number().optional(),
 	readyAtMs: z.number().optional(),
+	pausedAtMs: z.number().optional(),
 	remainingMs: z.number().optional(),
+	deliveryBlocked: z.boolean().optional(),
+	targetLimitBlocked: z.boolean().optional(),
+	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
 	acceptedInputItemIds: z.array(GameItemIdSchema),
 });
 

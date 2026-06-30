@@ -2,17 +2,21 @@ import { useCallback, useMemo } from "react";
 import { resolveInventoryDropFeedback } from "~/v0/inventory/drop/resolveInventoryDropFeedback";
 import { resolveInventorySlotTapAction } from "~/v0/inventory/logic/resolveInventorySlotTapAction";
 import type { InventorySurface } from "~/v0/inventory/InventorySurface.types";
-import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
 import {
-	useGameBoardView,
 	useGameInventoryView,
 	useGameRuntimeDropActions,
+	useGameRuntimeSelector,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
+import {
+	readBoardFirstEmptyCell,
+	readBoardView,
+	readInventoryView,
+} from "~/v0/play/runtime/readers";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useInventoryTileEngineModel {
@@ -25,9 +29,9 @@ export namespace useInventoryTileEngineModel {
 	}
 
 	export interface Result {
-		filled: number;
 		slots: TileEngine.Slot<InventorySurface.SlotData>[];
 		tiles: TileEngine.Tile<InventorySurface.TileData>[];
+		columns: number;
 		drag: TileEngine.DragConfig<
 			InventorySurface.TileData,
 			InventorySurface.SlotData,
@@ -41,11 +45,10 @@ export const useInventoryTileEngineModel = ({
 	feedback,
 	placementTarget,
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
-	const board = useGameBoardView();
 	const inventory = useGameInventoryView();
+	const columns = useGameRuntimeSelector((state) => state.runtime.config.game.board.width);
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
-	const config = runtimeStore.getSnapshot().runtime.config;
 
 	const slotLayoutKey = inventory.slots.map((slot) => slot.slotIndex).join("|");
 	const slots = useMemo(
@@ -90,19 +93,35 @@ export const useInventoryTileEngineModel = ({
 	);
 
 	const placeInventoryOnBoard = useCallback(
-		(slot: InventorySlot) => {
-			const placementStack = slot.stack;
-			if (placementTarget) {
-				if (!placementStack) {
-					feedback.flashInventorySlot(slot.slotIndex);
-					return;
-				}
+		({
+			expectedItemId,
+			expectedStackId,
+			slotIndex,
+		}: {
+			expectedItemId: string;
+			expectedStackId: string;
+			slotIndex: number;
+		}) => {
+			const snapshot = runtimeStore.getSnapshot();
+			const liveInventory = readInventoryView(snapshot);
+			const liveSlot = liveInventory.bySlotIndex[String(slotIndex)];
+			if (
+				!liveSlot?.stack ||
+				liveSlot.stack.id !== expectedStackId ||
+				liveSlot.stack.itemId !== expectedItemId
+			) {
+				feedback.flashInventorySlot(slotIndex);
+				return;
+			}
 
+			if (placementTarget) {
 				void actions
 					.placeInventoryItem({
+						expectedItemId: liveSlot.stack.itemId,
+						expectedStackId: liveSlot.stack.id,
 						placementMode: "nearest_by_manhattan",
 						quantity: 1,
-						slotIndex: slot.slotIndex,
+						slotIndex,
 						x: placementTarget.x,
 						y: placementTarget.y,
 					})
@@ -111,8 +130,8 @@ export const useInventoryTileEngineModel = ({
 			}
 
 			const action = resolveInventorySlotTapAction({
-				firstEmptyCell: board.firstEmptyCell,
-				slot,
+				firstEmptyCell: readBoardFirstEmptyCell(snapshot),
+				slot: liveSlot,
 			});
 
 			if (action.type === "flash-inventory-slot") {
@@ -122,6 +141,8 @@ export const useInventoryTileEngineModel = ({
 
 			void actions
 				.placeInventoryItem({
+					expectedItemId: liveSlot.stack.itemId,
+					expectedStackId: liveSlot.stack.id,
 					slotIndex: action.slotIndex,
 					x: action.x,
 					y: action.y,
@@ -130,9 +151,9 @@ export const useInventoryTileEngineModel = ({
 		},
 		[
 			actions,
-			board.firstEmptyCell,
 			feedback,
 			placementTarget,
+			runtimeStore,
 		],
 	);
 
@@ -158,7 +179,12 @@ export const useInventoryTileEngineModel = ({
 						itemId: stack.itemId,
 						slot,
 					},
-					onDoubleActivate: () => placeInventoryOnBoard(slot),
+					onDoubleActivate: () =>
+						placeInventoryOnBoard({
+							expectedItemId: stack.itemId,
+							expectedStackId: stack.id,
+							slotIndex: slot.slotIndex,
+						}),
 				};
 			},
 			slot(slot) {
@@ -170,16 +196,21 @@ export const useInventoryTileEngineModel = ({
 				};
 			},
 			dropFeedback(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveInventoryDropFeedback({
 					context,
+					inventory: readInventoryView(snapshot),
 				});
 			},
 			onDrop(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveDrop({
 					context,
-					board,
-					config,
-					inventory,
+					board: readBoardView(snapshot),
+					config: snapshot.runtime.config,
+					inventory: readInventoryView(snapshot),
 					feedback,
 					actions,
 				});
@@ -187,18 +218,16 @@ export const useInventoryTileEngineModel = ({
 		}),
 		[
 			actions,
-			board,
-			config,
 			feedback,
 			inventory,
 			placeInventoryOnBoard,
-			placementTarget,
+			runtimeStore,
 		],
 	);
 
 	return {
+		columns,
 		drag,
-		filled: inventory.slots.filter((slot) => slot.stack).length,
 		slots,
 		tiles,
 	};

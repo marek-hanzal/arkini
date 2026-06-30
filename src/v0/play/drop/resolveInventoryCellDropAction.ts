@@ -1,8 +1,9 @@
 import { cellKey } from "~/v0/board/cellKey";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
-import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
+import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
@@ -27,6 +28,9 @@ export type InventoryCellDropAction =
 				variant: TileEngine.DropFeedbackVariant;
 			};
 			input: {
+				expectedSourceItemId: string;
+				expectedSourceStackId: string;
+				expectedTargetItemId: string;
 				sourceSlotIndex: number;
 				targetBoardItemId: string;
 			};
@@ -34,6 +38,8 @@ export type InventoryCellDropAction =
 	| {
 			type: "place-inventory-item";
 			input: {
+				expectedItemId: string;
+				expectedStackId: string;
 				slotIndex: number;
 				x: number;
 				y: number;
@@ -67,8 +73,13 @@ export const resolveInventoryCellDropAction = ({
 	source,
 	target,
 }: resolveInventoryCellDropAction.Props): InventoryCellDropAction => {
+	const targetCellKey = cellKey(target.x, target.y);
 	const sourceSlot = inventory.bySlotIndex[String(source.slotIndex)];
-	if (!sourceSlot?.stack) {
+	if (
+		!sourceSlot?.stack ||
+		sourceSlot.stack.id !== source.slot.stack?.id ||
+		sourceSlot.stack.itemId !== source.itemId
+	) {
 		return {
 			feedback: {
 				kind: "inventory-slot",
@@ -78,56 +89,68 @@ export const resolveInventoryCellDropAction = ({
 		};
 	}
 
-	if (target.boardItemId) {
-		const targetItem = board.byId[target.boardItemId];
-		if (!targetItem) {
+	const targetItem = board.byCellKey[targetCellKey];
+	if (targetItem) {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config,
+			sourceItemId: sourceSlot.stack.itemId,
+			targetItem,
+		});
+		if (plan.type === "reject" || plan.type === "swap") {
 			return {
 				feedback: {
 					kind: "board-cell",
-					cellKey: cellKey(target.x, target.y),
+					cellKey: targetCellKey,
 				},
 				type: "reject",
 			};
 		}
 
-		const intent = resolveDropIntent({
-			config,
-			sourceItemId: source.itemId,
-			targetItem,
-		});
-		if (intent.type === "reject" || intent.type === "swap") {
+		const input = {
+			expectedSourceItemId: sourceSlot.stack.itemId,
+			expectedSourceStackId: sourceSlot.stack.id,
+			expectedTargetItemId: targetItem.itemId,
+			sourceSlotIndex: source.slotIndex,
+			targetBoardItemId: targetItem.id,
+		};
+
+		if (plan.type === "merge" || plan.type === "producer-input") {
 			return {
-				feedback: {
-					kind: "board-cell",
-					cellKey: cellKey(target.x, target.y),
-				},
-				type: "reject",
+				input,
+				type: "apply-inventory-item-to-board-item",
 			};
 		}
 
 		return {
-			feedback:
-				intent.type === "stored-requirement"
-					? {
-							cellKey: cellKey(target.x, target.y),
-							variant: "primary",
-						}
-					: intent.type === "craft-input" || intent.type === "producer-input"
-						? {
-								cellKey: cellKey(target.x, target.y),
-								variant: "secondary",
-							}
-						: undefined,
-			input: {
-				sourceSlotIndex: source.slotIndex,
-				targetBoardItemId: target.boardItemId,
+			feedback: {
+				cellKey: targetCellKey,
+				variant: plan.feedbackVariant,
 			},
+			input,
 			type: "apply-inventory-item-to-board-item",
+		};
+	}
+
+	if (
+		!isItemStorageAllowed({
+			config,
+			itemId: sourceSlot.stack.itemId,
+			location: "board",
+		})
+	) {
+		return {
+			feedback: {
+				kind: "board-cell",
+				cellKey: targetCellKey,
+			},
+			type: "reject",
 		};
 	}
 
 	return {
 		input: {
+			expectedItemId: sourceSlot.stack.itemId,
+			expectedStackId: sourceSlot.stack.id,
 			slotIndex: source.slotIndex,
 			x: target.x,
 			y: target.y,

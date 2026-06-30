@@ -1,6 +1,13 @@
+import type { GamePlacementFailureReason } from "~/v0/game/placement/GamePlacementFailureReasonSchema";
+
 export type GameEngineError =
 	| {
 			readonly _tag: "GameActionInvalid";
+			readonly message: string;
+	  }
+	| {
+			readonly _tag: "GamePlacementFailed";
+			readonly reason: GamePlacementFailureReason;
 			readonly message: string;
 	  }
 	| {
@@ -10,15 +17,15 @@ export type GameEngineError =
 				| "input_unavailable"
 				| "invalid_actor"
 				| "invalid_merge"
-				| "missing_requirement"
-				| "placement_unavailable"
-				| "product_line_disabled"
+				| "item_busy"
+				| "craft_in_progress"
+				| "effect:missing-grant"
+				| GamePlacementFailureReason
 				| "producer_queue_full"
-				| "stash_depleted"
-				| "unsupported_target"
-				| "unsupported_requirement"
-				| "upgrade_complete"
-				| "upgrade_in_progress";
+				| "producer_charges_depleted"
+				| "blocked"
+				| "storage_restricted"
+				| "unsupported_target";
 			readonly message: string;
 	  }
 	| {
@@ -35,6 +42,13 @@ export const GameEngineError = {
 		return {
 			_tag: "GameActionInvalid",
 			message,
+		};
+	},
+	placementFailed(reason: GamePlacementFailureReason, message: string): GameEngineError {
+		return {
+			_tag: "GamePlacementFailed",
+			message,
+			reason,
 		};
 	},
 	actionRejected(

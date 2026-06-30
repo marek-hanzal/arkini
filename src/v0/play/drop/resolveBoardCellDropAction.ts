@@ -1,10 +1,13 @@
 import { cellKey } from "~/v0/board/cellKey";
+import { isInventoryBoardItemId } from "~/v0/board/BoardUtilityItem";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
+import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
+import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
+import { readBoardItemInventoryStorageReadiness } from "~/v0/play/drop/readBoardItemInventoryStorageReadiness";
 
 export type BoardCellDropAction =
 	| {
@@ -21,6 +24,7 @@ export type BoardCellDropAction =
 			type: "move-board-item";
 			input: {
 				boardItemId: string;
+				expectedItemId: string;
 				x: number;
 				y: number;
 			};
@@ -29,26 +33,50 @@ export type BoardCellDropAction =
 			type: "swap-board-items";
 			animation: "parallel-swap";
 			input: {
+				expectedSourceItemId: string;
+				expectedTargetItemId: string;
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
 			};
 	  }
 	| {
 			type: "merge-board-items";
-			animation?: "parallel-merge";
-			feedback?:
-				| {
-						kind: "merge-cell" | "imprint-cell";
-						cellKey: string;
-				  }
-				| {
-						kind: "cell-feedback";
-						cellKey: string;
-						variant: TileEngine.DropFeedbackVariant;
-				  };
+			animation: "parallel-merge";
+			feedback?: {
+				kind: "merge-cell";
+				cellKey: string;
+			};
 			input: {
+				expectedSourceItemId: string;
+				expectedTargetItemId: string;
 				sourceBoardItemId: string;
 				targetBoardItemId: string;
+			};
+	  }
+	| {
+			type: "apply-board-item-to-board-item";
+			feedback?: {
+				kind: "cell-feedback";
+				cellKey: string;
+				variant: TileEngine.DropFeedbackVariant;
+			};
+			input: {
+				expectedSourceItemId: string;
+				expectedTargetItemId: string;
+				sourceBoardItemId: string;
+				targetBoardItemId: string;
+			};
+	  }
+	| {
+			type: "store-board-item-in-inventory";
+			feedback: {
+				kind: "cell-feedback";
+				cellKey: string;
+				variant: TileEngine.DropFeedbackVariant;
+			};
+			input: {
+				boardItemId: string;
+				expectedItemId: string;
 			};
 	  };
 
@@ -68,52 +96,98 @@ export namespace resolveBoardCellDropAction {
 		>;
 		board: BoardView;
 		config: GameConfig;
+		inventory: InventoryView;
 	}
 }
 
 export const resolveBoardCellDropAction = ({
 	board,
 	config,
+	inventory,
 	source,
 	target,
 }: resolveBoardCellDropAction.Props): BoardCellDropAction => {
 	const targetCellKey = cellKey(target.x, target.y);
+	const sourceItem = board.byId[source.boardItemId];
 
-	if (target.boardItemId === source.boardItemId) {
+	if (sourceItem && sourceItem.itemId !== source.itemId) {
+		return {
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: targetCellKey,
+			},
+		};
+	}
+
+	if (!sourceItem) {
+		return {
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: targetCellKey,
+			},
+		};
+	}
+
+	const targetItem = board.byCellKey[targetCellKey];
+
+	if (targetItem?.id === source.boardItemId) {
 		return {
 			type: "ignore",
 		};
 	}
 
-	if (!target.boardItemId) {
+	if (!targetItem) {
 		return {
 			type: "move-board-item",
 			input: {
 				boardItemId: source.boardItemId,
+				expectedItemId: sourceItem.itemId,
 				x: target.x,
 				y: target.y,
 			},
 		};
 	}
 
-	const targetItem = board.byId[target.boardItemId];
-	if (!targetItem) {
+	if (isInventoryBoardItemId(targetItem.itemId)) {
+		const readiness = readBoardItemInventoryStorageReadiness({
+			config,
+			inventory,
+			sourceItem,
+		});
+
+		if (!readiness.canStore) {
+			return {
+				feedback: {
+					cellKey: targetCellKey,
+					kind: "board-cell",
+				},
+				type: "reject",
+			};
+		}
+
 		return {
-			type: "reject",
 			feedback: {
-				kind: "board-cell",
 				cellKey: targetCellKey,
+				kind: "cell-feedback",
+				variant: "primary",
 			},
+			input: {
+				boardItemId: source.boardItemId,
+				expectedItemId: sourceItem.itemId,
+			},
+			type: "store-board-item-in-inventory",
 		};
 	}
 
-	const intent = resolveDropIntent({
+	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
-		sourceItemId: source.itemId,
+		sourceItemId: sourceItem.itemId,
 		targetItem,
 	});
 
-	if (intent.type === "reject") {
+	if (plan.type === "reject") {
 		return {
 			type: "reject",
 			feedback: {
@@ -123,49 +197,57 @@ export const resolveBoardCellDropAction = ({
 		};
 	}
 
-	if (intent.type === "swap") {
+	if (plan.type === "swap") {
 		return {
 			type: "swap-board-items",
 			animation: "parallel-swap",
 			input: {
+				expectedSourceItemId: sourceItem.itemId,
+				expectedTargetItemId: targetItem.itemId,
 				sourceBoardItemId: source.boardItemId,
 				targetBoardItemId: targetItem.id,
 			},
 		};
 	}
 
-	if (intent.type === "merge") {
+	if (plan.type === "merge") {
 		return {
 			type: "merge-board-items",
 			animation: "parallel-merge",
 			feedback: {
-				kind: intent.directed ? "imprint-cell" : "merge-cell",
+				kind: "merge-cell",
 				cellKey: targetCellKey,
 			},
 			input: {
+				expectedSourceItemId: sourceItem.itemId,
+				expectedTargetItemId: targetItem.itemId,
 				sourceBoardItemId: source.boardItemId,
 				targetBoardItemId: targetItem.id,
 			},
 		};
 	}
 
+	const input = {
+		expectedSourceItemId: sourceItem.itemId,
+		expectedTargetItemId: targetItem.itemId,
+		sourceBoardItemId: source.boardItemId,
+		targetBoardItemId: targetItem.id,
+	};
+
+	if (plan.type === "producer-input") {
+		return {
+			input,
+			type: "apply-board-item-to-board-item",
+		};
+	}
+
 	return {
-		type: "merge-board-items",
-		feedback:
-			intent.type === "stored-requirement"
-				? {
-						cellKey: targetCellKey,
-						kind: "cell-feedback",
-						variant: "primary",
-					}
-				: {
-						cellKey: targetCellKey,
-						kind: "cell-feedback",
-						variant: "secondary",
-					},
-		input: {
-			sourceBoardItemId: source.boardItemId,
-			targetBoardItemId: targetItem.id,
+		type: "apply-board-item-to-board-item",
+		feedback: {
+			cellKey: targetCellKey,
+			kind: "cell-feedback",
+			variant: plan.feedbackVariant,
 		},
+		input,
 	};
 };

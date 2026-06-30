@@ -10,7 +10,7 @@ import {
 	type SaveActiveGameSaveProps,
 } from "~/v0/game/storage/GameSaveStorage";
 
-export const defaultDexieGameSaveDatabaseName = "arkini-v0-game-storage";
+const defaultDexieGameSaveDatabaseName = "arkini-v0-game-storage";
 
 const gameSaveDocumentVersion = 1;
 

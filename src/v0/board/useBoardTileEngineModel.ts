@@ -1,33 +1,39 @@
 import { useCallback, useMemo } from "react";
-import type { BoardCellView } from "~/v0/board/boardCells";
+import { readBoardCells, type BoardCellView } from "~/v0/board/boardCells";
 import { cellKey } from "~/v0/board/cellKey";
 import { resolveBoardDropFeedback } from "~/v0/board/drop/resolveBoardDropFeedback";
 import { resolveBoardItemTapAction } from "~/v0/board/logic/resolveBoardItemTapAction";
+import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardSurface } from "~/v0/board/BoardSurface.types";
-import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
 import { useBoardTransientTiles } from "~/v0/board/animation/BoardTransientTileStore";
 import type { DragSource } from "~/v0/play/drag/DragSource";
 import type { DropTarget } from "~/v0/play/drag/DropTarget";
 import { resolveDrop } from "~/v0/play/drop/resolveDrop";
 import type { Feedback } from "~/v0/play/feedback/Feedback";
+import { registerBoardTileBounceFeedback } from "~/v0/play/game-engine-visual/registerBoardTileBounceFeedback";
 import {
 	useGameBoardView,
-	useGameInventoryView,
 	useGameRuntimeDropActions,
+	useGameRuntimeSelector,
 	useGameRuntimeStore,
 } from "~/v0/play/runtime";
+import { readBoardView, readInventoryView } from "~/v0/play/runtime/readers";
+import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
 
 export namespace useBoardTileEngineModel {
 	export interface Props {
 		feedback: Feedback.Type;
-		onOpenInventoryPlacementTarget(cell: { x: number; y: number }): void;
-		onOpenItem(boardItemId: string): void;
+		onOpenSheet(sheet: ActiveSheetState): void;
 	}
 
 	export interface Result {
 		tiles: TileEngine.Tile<BoardSurface.TileData>[];
 		drag: TileEngine.DragConfig<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>;
+		blockedCellKeys: readonly string[];
+		columns: number;
+		slots: TileEngine.Slot<BoardCellView>[];
 	}
 }
 
@@ -35,17 +41,40 @@ const transientTileStyle = {
 	pointerEvents: "none" as const,
 };
 
+const readBoardItemSheet = ({
+	boardItemId,
+	itemId,
+}: {
+	boardItemId: string;
+	itemId: string;
+}): ActiveSheetState =>
+	readBoardUtilityItemSheet(itemId) ?? {
+		boardItemId,
+		type: "item",
+	};
+
 export const useBoardTileEngineModel = ({
 	feedback,
-	onOpenInventoryPlacementTarget,
-	onOpenItem,
+	onOpenSheet,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
 	const board = useGameBoardView();
-	const inventory = useGameInventoryView();
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
-	const config = runtimeStore.getSnapshot().runtime.config;
+	const boardLayout = useGameRuntimeSelector((state) => state.runtime.config.game.board);
 	const transientTiles = useBoardTransientTiles();
+
+	const slots = useMemo(
+		() =>
+			readBoardCells(boardLayout).map((cell) => ({
+				id: cell.key,
+				dropId: `board-cell:${cell.key}`,
+				renderKey: cell.key,
+				data: cell,
+			})) satisfies TileEngine.Slot<BoardCellView>[],
+		[
+			boardLayout,
+		],
+	);
 
 	const tiles = useMemo(
 		() =>
@@ -82,25 +111,63 @@ export const useBoardTileEngineModel = ({
 		],
 	);
 
+	const blockedCellKeys = useMemo(
+		() =>
+			Object.entries(board.byCellKey)
+				.filter(
+					([, boardItem]) =>
+						boardItem.activation?.deliveryBlocked || boardItem.craft?.deliveryBlocked,
+				)
+				.map(([key]) => key),
+		[
+			board.byCellKey,
+		],
+	);
+
 	const activateBoardItem = useCallback(
-		(boardItem: BoardViewItem) => {
+		(boardItemId: string, expectedItemId: string) => {
+			const snapshot = runtimeStore.getSnapshot();
+			const nowMs = Date.now();
+			const liveBoard = readBoardView(snapshot);
+			const liveBoardItem = liveBoard.byId[boardItemId];
+			if (!liveBoardItem || liveBoardItem.itemId !== expectedItemId) return;
+
 			const action = resolveBoardItemTapAction({
-				boardItem,
-				nowMs: Date.now(),
+				boardItem: liveBoardItem,
+				nowMs,
 			});
 
 			if (action.type === "claim-craft") {
 				void runtimeStore
 					.tick({
-						nowMs: Date.now(),
+						nowMs,
 					})
 					.catch(feedback.showError);
 				return;
 			}
 
+			if (action.type === "start-craft") {
+				void runtimeStore
+					.dispatch({
+						action: {
+							recipeId: action.recipeId,
+							targetItemInstanceId: action.boardItemId,
+							type: "craft.start",
+						},
+						nowMs,
+					})
+					.catch(feedback.showError);
+				return;
+			}
+
+			if (action.type === "open-sheet") {
+				onOpenSheet(action.sheet);
+				return;
+			}
+
 			if (action.type !== "activate") return;
 
-			const activation = boardItem.activation;
+			const activation = liveBoardItem.activation;
 			if (!activation) return;
 
 			if (activation.kind === "stash") {
@@ -108,34 +175,42 @@ export const useBoardTileEngineModel = ({
 					.dispatch({
 						action: {
 							inputRefs: [],
-							stashItemInstanceId: boardItem.id,
+							stashItemInstanceId: liveBoardItem.id,
 							type: "stash.open",
 						},
+						nowMs,
 					})
 					.catch(feedback.showError);
 				return;
 			}
 
-			const productId = activation.productLines?.find((line) => line.enabled)?.productId;
-
-			if (!productId) {
-				feedback.showError("No enabled product line.");
-				return;
+			const hintTileIds = readProducerMissingResourceHintTileIds({
+				board: liveBoard,
+				config: snapshot.runtime.config,
+				producerItem: liveBoardItem,
+			});
+			if (hintTileIds.length > 0) {
+				registerBoardTileBounceFeedback({
+					groupId: `producer-missing-resource-hint:${liveBoardItem.id}:${nowMs}`,
+					tileIds: hintTileIds,
+				});
 			}
 
 			void runtimeStore
 				.dispatch({
 					action: {
 						inputRefs: [],
-						producerItemInstanceId: boardItem.id,
-						productId,
+						producerItemInstanceId: liveBoardItem.id,
+						productId: action.productId,
 						type: "producer.product.start",
 					},
+					nowMs,
 				})
 				.catch(feedback.showError);
 		},
 		[
 			feedback.showError,
+			onOpenSheet,
 			runtimeStore,
 		],
 	);
@@ -158,8 +233,14 @@ export const useBoardTileEngineModel = ({
 						itemId: boardItem.itemId,
 						boardItem,
 					},
-					onSingleActivate: () => activateBoardItem(boardItem),
-					onLongActivate: () => onOpenItem(boardItem.id),
+					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
+					onLongActivate: () =>
+						onOpenSheet(
+							readBoardItemSheet({
+								boardItemId: boardItem.id,
+								itemId: boardItem.itemId,
+							}),
+						),
 				};
 			},
 			slot(slot, targetTile) {
@@ -178,25 +259,33 @@ export const useBoardTileEngineModel = ({
 					onLongActivate: targetBoardItemId
 						? undefined
 						: () =>
-								onOpenInventoryPlacementTarget({
-									x: cell.x,
-									y: cell.y,
+								onOpenSheet({
+									placementTarget: {
+										x: cell.x,
+										y: cell.y,
+									},
+									type: "inventory",
 								}),
 				};
 			},
 			dropFeedback(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveBoardDropFeedback({
-					board,
-					config,
+					board: readBoardView(snapshot),
+					config: snapshot.runtime.config,
 					context,
+					inventory: readInventoryView(snapshot),
 				});
 			},
 			onDrop(context) {
+				const snapshot = runtimeStore.getSnapshot();
+
 				return resolveDrop({
 					context,
-					board,
-					config,
-					inventory,
+					board: readBoardView(snapshot),
+					config: snapshot.runtime.config,
+					inventory: readInventoryView(snapshot),
 					feedback,
 					actions,
 				});
@@ -208,17 +297,18 @@ export const useBoardTileEngineModel = ({
 		[
 			actions,
 			activateBoardItem,
-			config,
 			board,
 			feedback,
-			inventory,
-			onOpenInventoryPlacementTarget,
-			onOpenItem,
+			runtimeStore,
+			onOpenSheet,
 		],
 	);
 
 	return {
+		blockedCellKeys,
+		columns: boardLayout.width,
 		drag,
+		slots,
 		tiles,
 	};
 };

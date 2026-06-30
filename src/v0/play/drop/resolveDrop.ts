@@ -76,6 +76,7 @@ export const resolveDrop = ({
 						target,
 						board,
 						config,
+						inventory,
 						feedback,
 						actions,
 					}),
@@ -94,6 +95,7 @@ export const resolveDrop = ({
 						source,
 						target,
 						actions,
+						inventory,
 					}),
 			)
 			.with(

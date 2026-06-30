@@ -1,124 +1,9006 @@
 {
 	"products": {
-		"product:coal-mine-1": {
-			"durationMs": 5200,
-			"name": "Coal Mine I Production",
-			"outputTableId": "loot:coal-mine-1",
-			"placement": "board_then_inventory",
-			"requirements": [],
-			"inputRefId": "input:coal-mine-1-rations"
+		"product:academy:advanced-knowledge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:lumber-camp-1": {
-			"durationMs": 5000,
-			"name": "Lumber Camp I Production",
-			"outputTableId": "loot:lumber-camp-1",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:basic-knowledge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:lumber-camp-2": {
-			"durationMs": 4500,
-			"name": "Lumber Camp II Production",
-			"outputTableId": "loot:lumber-camp-2",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-armory-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Armory I",
+			"output": [
+				{
+					"itemId": "item:blueprint-armory-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:lumber-camp-3": {
-			"durationMs": 4000,
-			"name": "Lumber Camp III Production",
-			"outputTableId": "loot:lumber-camp-3",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-blacksmith-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Blacksmith I",
+			"output": [
+				{
+					"itemId": "item:blueprint-blacksmith-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:lumber-camp-4": {
-			"durationMs": 3600,
-			"name": "Lumber Camp IV Production",
-			"outputTableId": "loot:lumber-camp-4",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-brickyard": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Brickyard",
+			"output": [
+				{
+					"itemId": "item:blueprint-brickyard",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:lumber-camp-5": {
-			"durationMs": 3200,
-			"name": "Lumber Camp V Production",
-			"outputTableId": "loot:lumber-camp-5",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-charcoal-burner-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Charcoal Burner I",
+			"output": [
+				{
+					"itemId": "item:blueprint-charcoal-burner-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:quarry-1": {
-			"durationMs": 5500,
-			"name": "Quarry I Production",
-			"outputTableId": "loot:quarry-1",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-clay-pit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:clay-deposit"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Clay Pit",
+			"output": [
+				{
+					"itemId": "item:blueprint-clay-pit",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:quarry-2": {
-			"durationMs": 5000,
-			"name": "Quarry II Production",
-			"outputTableId": "loot:quarry-2",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-coal-mine-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Coal Mine I",
+			"output": [
+				{
+					"itemId": "item:blueprint-coal-mine-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:quarry-3": {
-			"durationMs": 4500,
-			"name": "Quarry III Production",
-			"outputTableId": "loot:quarry-3",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-construction-yard-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 5
+				}
+			],
+			"name": "Blueprint: Construction Yard I",
+			"output": [
+				{
+					"itemId": "item:blueprint-construction-yard-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:quarry-4": {
-			"durationMs": 4100,
-			"name": "Quarry IV Production",
-			"outputTableId": "loot:quarry-4",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-glassworks": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Glassworks",
+			"output": [
+				{
+					"itemId": "item:blueprint-glassworks",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:quarry-5": {
-			"durationMs": 3700,
-			"name": "Quarry V Production",
-			"outputTableId": "loot:quarry-5",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-gold-mine-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Gold Mine I",
+			"output": [
+				{
+					"itemId": "item:blueprint-gold-mine-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:townhall-1": {
-			"durationMs": 3500,
-			"name": "Town Hall I Production",
-			"outputTableId": "loot:townhall-1",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-goldsmith-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Goldsmith I",
+			"output": [
+				{
+					"itemId": "item:blueprint-goldsmith-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:townhall-2": {
-			"durationMs": 3000,
-			"name": "Town Hall II Production",
-			"outputTableId": "loot:townhall-2",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-iron-mine-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Iron Mine I",
+			"output": [
+				{
+					"itemId": "item:blueprint-iron-mine-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:townhall-3": {
-			"durationMs": 2500,
-			"name": "Town Hall III Production",
-			"outputTableId": "loot:townhall-3",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-prospector-guild-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Prospector Guild 2",
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t2",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:townhall-4": {
-			"durationMs": 2200,
-			"name": "Town Hall IV Production",
-			"outputTableId": "loot:townhall-4",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-purifier-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Purifier I",
+			"output": [
+				{
+					"itemId": "item:blueprint-purifier-t1",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:townhall-5": {
-			"durationMs": 1900,
-			"name": "Town Hall V Production",
-			"outputTableId": "loot:townhall-5",
-			"placement": "board_then_inventory",
-			"requirements": []
+		"product:academy:blueprint-roof-tile-factory": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: Roof Tile Factory",
+			"output": [
+				{
+					"itemId": "item:blueprint-roof-tile-factory",
+					"type": "guaranteed"
+				}
+			]
 		},
-		"product:tree": {
-			"durationMs": 6200,
-			"name": "Tree Production",
-			"outputTableId": "loot:tree",
+		"product:academy:blueprint-sand-pit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sand-deposit"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Sand Pit",
+			"output": [
+				{
+					"itemId": "item:blueprint-sand-pit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:academy:blueprint-smelter-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ore"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Smelter I",
+			"output": [
+				{
+					"itemId": "item:blueprint-smelter-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:academy:blueprint-university": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: University",
+			"output": [
+				{
+					"itemId": "item:blueprint-university",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:armory-t1:iron-armor": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather-armor"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-armor",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:armory-t1:leather-armor": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:leather-armor",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:bakery-t1:bread": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:bread",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:bakery-t1:bread-morale-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t1"
+				}
+			],
+			"name": "Bread (Inspired)",
+			"output": [
+				{
+					"itemId": "item:bread",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:blacksmith-t1:axe": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:plank"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:axe",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:blacksmith-t1:nails": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:nails",
+					"quantity": 4,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:blacksmith-t1:sword": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:leather"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:sword",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.45,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:brewery-t1:beer-barrel": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:hops"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:hop-field",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:hop-field"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:brewery-t1:beer-barrel-from-beer": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:beer-barrel",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:hop-field",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:hop-field"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:brewery-t1:hops": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:hops",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:hop-field",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:hop-field"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:brickyard:bricks": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:bricks",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:clay-pit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:clay-pit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:cattle-farm-t1:milk": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:milk",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"effects": [
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:charcoal-burner-t1:charcoal": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:charcoal",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:charcoal",
+										"item:construction-bundle"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.12,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:chicken-coop-t1:egg": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:egg",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"effects": [
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:civic-office-t1:blueprint-academy": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Blueprint: Academy",
+			"output": [
+				{
+					"itemId": "item:blueprint-academy",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:civic-office-t1:building-permit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:civic-office-t1:building-permit-morale-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t2"
+				}
+			],
+			"name": "Building Permit (Inspired)",
+			"output": [
+				{
+					"itemId": "item:building-permit",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:civic-office-t1:guild-charter": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 20,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:guild-charter",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:clay-pit:clay": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:clay",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:clay-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:clay-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:coal-mine-t1:coal": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coal",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:coal-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:coal-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:coal",
+										"item:gold-ingot",
+										"item:gold-ore",
+										"item:iron-ingot",
+										"item:iron-ore"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.1,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:construction-yard-t1:construction-bundle": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:charcoal",
+										"item:construction-bundle"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.12,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:construction-yard-t1:construction-bundle-morale-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"name": "Construction Bundle (Inspired)",
+			"output": [
+				{
+					"itemId": "item:construction-bundle",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:charcoal",
+										"item:construction-bundle"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.12,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:cookhouse-t1:feast": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:cheese"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:egg"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:feast",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:dairy-t1:cheese": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:milk"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:cheese",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:dye-workshop-t1:luxury-cloth": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:luxury-cloth",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:dye-workshop-t1:pigment": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:pigment",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:farm-t1:grain": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:grain",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2",
+				"shrine:haste-target"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:wheat-field",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:wheat-field"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:farm-t1:grain-morale-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t1"
+				}
+			],
+			"name": "Grain (Inspired)",
+			"output": [
+				{
+					"itemId": "item:grain",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:wheat-field",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:wheat-field"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:glassworks:glass": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:glass",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.15,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:sand-pit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:sand-pit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:glazier-workshop-t1:stained-glass": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:glassworks",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:glassworks"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:marble",
+										"item:marble-block",
+										"item:stained-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.05,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:glazier-workshop-t1:stained-glass-morale-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4"
+				}
+			],
+			"name": "Stained Glass (Inspired)",
+			"output": [
+				{
+					"itemId": "item:stained-glass",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.5,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.1,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:glassworks",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:glassworks"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:marble",
+										"item:marble-block",
+										"item:stained-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.05,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:gold-mine-t1:gold-ore": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:gold-ore",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:gold-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:gold-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:coal",
+										"item:gold-ingot",
+										"item:gold-ore",
+										"item:iron-ingot",
+										"item:iron-ore"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.1,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:goldsmith-t1:coin-stack": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:coin-stack",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:goldsmith-t1:key-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t1",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:goldsmith-t1:key-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t1"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:ruby"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t2",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:goldsmith-t1:key-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t2"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:emerald"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t3",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:goldsmith-t1:key-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t3"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sapphire"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:key-t4",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.06,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"product:heroes-guild-t1:chest-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:axe"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather-armor"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Chest I Expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:heroes-guild-t1:chest-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Chest II Expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:heroes-guild-t1:chest-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t1"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Chest III Expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t3",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:heroes-guild-t1:chest-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t2"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Chest IV Expedition",
+			"output": [
+				{
+					"itemId": "item:chest-t4",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:heroes-guild-t1:treasure-chest": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t4"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:topaz"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:aquamarine"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Grand Expedition",
+			"output": [
+				{
+					"itemId": "item:treasure-chest",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:heroes-guild-t1:treasure-chest-morale-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sword"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-armor"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:key-t4"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:topaz"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:aquamarine"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4"
+				}
+			],
+			"name": "Grand Expedition (Inspired)",
+			"output": [
+				{
+					"itemId": "item:treasure-chest",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:aquamarine",
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:topaz",
+					"type": "chance"
+				}
+			]
+		},
+		"product:house-t1:morale-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:house-t2:morale-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t2",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:house-t3:morale-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t3",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t2",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:house-t4:morale-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:morale-t4",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t3",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t2",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:morale-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:iron-mine-t1:iron-ore": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-ore",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:iron-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:iron-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:coal",
+										"item:gold-ingot",
+										"item:gold-ore",
+										"item:iron-ingot",
+										"item:iron-ore"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.1,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:lumberjack-t1:log": {
+			"durationMs": 1000,
+			"output": [
+				{
+					"itemId": "item:log",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:tree",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:tree"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Nearby item:tree enables production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:tree"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 2,
+							"multiplier": 0.9
+						}
+					],
+					"display": "whenActive",
+					"maxSources": 5
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:market-t1:coin-from-beer": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer"
+				}
+			],
+			"name": "Coins from Beer",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t1:coin-from-bread": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				}
+			],
+			"name": "Coins from Bread",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t1:coin-from-cheese": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:cheese"
+				}
+			],
+			"name": "Coins from Cheese",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t1:coin-from-feast": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				}
+			],
+			"name": "Coins from Feast",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t1:coin-from-sausage": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage"
+				}
+			],
+			"name": "Coins from Sausage",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t1:coin-from-wine-glass": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass"
+				}
+			],
+			"name": "Coins from Wine Glass",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t2:coin-from-common-clothing": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				}
+			],
+			"name": "Coins from Common Clothing",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t2:coin-from-feast": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				}
+			],
+			"name": "Better Coins from Feast",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 5,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t2:coin-from-luxury-clothing": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				}
+			],
+			"name": "Coins from Luxury Clothing",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": 6,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:market-t2:coin-from-paper": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				}
+			],
+			"name": "Coins from Paper",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:paper-mill-t1:paper": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:paper",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:pig-farm-t1:piglet": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:piglet",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"effects": [
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:prospector-guild-t1:clay-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Prospect: Clay Deposit",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t1:sand-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Prospect: Sand Deposit",
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t2:clay-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Prospect: Clay Deposit",
+			"output": [
+				{
+					"itemId": "item:clay-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t2:coal-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Prospect: Coal Deposit",
+			"output": [
+				{
+					"itemId": "item:coal-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t2:gold-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"name": "Prospect: Gold Deposit",
+			"output": [
+				{
+					"itemId": "item:gold-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t2:iron-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Prospect: Iron Deposit",
+			"output": [
+				{
+					"itemId": "item:iron-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t2:marble-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Prospect: Marble Deposit",
+			"output": [
+				{
+					"itemId": "item:marble-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:prospector-guild-t2:sand-deposit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Prospect: Sand Deposit",
+			"output": [
+				{
+					"itemId": "item:sand-deposit",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:purifier-t1:pollution": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pollution",
+					"mode": "upTo",
+					"quantity": 4
+				}
+			],
+			"name": "Purify Pollution"
+		},
+		"product:quarry-t1:stone": {
+			"durationMs": 1000,
+			"output": [
+				{
+					"itemId": "item:stone",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:rock",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:rock"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:quarry-t2:marble": {
+			"durationMs": 1000,
+			"output": [
+				{
+					"itemId": "item:marble",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:marble-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:marble-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:marble",
+										"item:marble-block",
+										"item:stained-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.05,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:quarry-t2:stone": {
+			"durationMs": 1000,
+			"output": [
+				{
+					"itemId": "item:stone",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:marble-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:marble-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:roof-tile-factory:roof-tiles": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:roof-tiles",
+					"quantity": 2,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:clay-pit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:clay-pit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:sand-pit:sand": {
+			"durationMs": 1000,
+			"output": [
+				{
+					"itemId": "item:sand",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:sand-deposit",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:sand-deposit"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:sawmill-t1:plank": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:plank",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:lumberjack-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:lumberjack-t1"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:school:basic-knowledge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:school:basic-knowledge-morale-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t2"
+				}
+			],
+			"name": "Basic Knowledge (Inspired)",
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:sheep-pasture-t1:wool": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wool",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2"
+			],
+			"effects": [
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:slaughterhouse-t1:sausage-raw-hide": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet"
+				}
+			],
+			"name": "Sausage + Raw Hide",
+			"output": [
+				{
+					"itemId": "item:sausage",
+					"type": "guaranteed"
+				},
+				{
+					"itemId": "item:raw-hide",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:smelter-t1:gold-ingot": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:gold-ore"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:gold-ingot",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.75,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:coal",
+										"item:gold-ingot",
+										"item:gold-ore",
+										"item:iron-ingot",
+										"item:iron-ore"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.1,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:smelter-t1:iron-ingot": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:iron-ore"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coal"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:iron-ingot",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.75,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.3,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:coal",
+										"item:gold-ingot",
+										"item:gold-ore",
+										"item:iron-ingot",
+										"item:iron-ore"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.1,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:stonemason-t1:stone-block": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:quarry-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:quarry-t1"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:stonemason-t2:marble-block": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:marble-block",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:quarry-t2",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:quarry-t2"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:marble",
+										"item:marble-block",
+										"item:stained-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.05,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:stonemason-t2:marble-block-morale-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4"
+				}
+			],
+			"name": "Marble Block (Inspired)",
+			"output": [
+				{
+					"itemId": "item:marble-block",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:quarry-t2",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:quarry-t2"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:marble",
+										"item:marble-block",
+										"item:stained-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.05,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:stonemason-t2:stone-block": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:stone-block",
+					"type": "guaranteed"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:quarry-t2",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:quarry-t2"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:egg",
+										"item:milk",
+										"item:piglet",
+										"item:plank",
+										"item:stone-block",
+										"item:wool"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.3,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:tailor-workshop-t1:common-clothing": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:common-clothing",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:tailor-workshop-t1:luxury-clothing": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-cloth"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-cloth"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"name": "Luxury Clothing (Inspired)",
+			"output": [
+				{
+					"itemId": "item:luxury-clothing",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:tannery-t1:leather": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:raw-hide"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:leather",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:tavern-t1:beer": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:beer",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:tavern-t1:wine-glass": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-barrel"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wine-glass",
+					"quantity": 4,
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:feast",
+										"item:glass",
+										"item:nails",
+										"item:paper",
+										"item:roof-tiles",
+										"item:sand",
+										"item:wine-glass"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.2,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:townhall-t1:blueprint-lumberjack-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				}
+			],
+			"name": "Blueprint: Lumberjack I",
+			"output": [
+				{
+					"itemId": "item:blueprint-lumberjack-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t1:blueprint-quarry-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			],
+			"name": "Blueprint: Quarry I",
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t1:blueprint-sawmill-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				}
+			],
+			"name": "Blueprint: Sawmill I",
+			"output": [
+				{
+					"itemId": "item:blueprint-sawmill-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t1:blueprint-stonemason-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			],
+			"name": "Blueprint: Stonemason I",
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t1:blueprint-townhall-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Blueprint: Town Hall II",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t1:blueprint-well-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Blueprint: Well I",
+			"output": [
+				{
+					"itemId": "item:blueprint-well-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-cattle-farm-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Cattle Farm I",
+			"output": [
+				{
+					"itemId": "item:blueprint-cattle-farm-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-chicken-coop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Chicken Coop I",
+			"output": [
+				{
+					"itemId": "item:blueprint-chicken-coop-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-farm-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Farm I",
+			"output": [
+				{
+					"itemId": "item:blueprint-farm-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-house-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:food-supply"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Blueprint: House I",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-pig-farm-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Blueprint: Pig Farm I",
+			"output": [
+				{
+					"itemId": "item:blueprint-pig-farm-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-sheep-pasture-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Sheep Pasture I",
+			"output": [
+				{
+					"itemId": "item:blueprint-sheep-pasture-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-townhall-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:food-supply"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block"
+				}
+			],
+			"name": "Blueprint: Town Hall III",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t3",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-vegetable-garden-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Vegetable Garden I",
+			"output": [
+				{
+					"itemId": "item:blueprint-vegetable-garden-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t2:food-supply": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:milk"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:egg"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:food-supply",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:townhall-t2:wheat-field": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Survey: Wheat Field",
+			"output": [
+				{
+					"itemId": "item:wheat-field",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-bakery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:flour"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block"
+				}
+			],
+			"name": "Blueprint: Bakery I",
+			"output": [
+				{
+					"itemId": "item:blueprint-bakery-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-brewery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Brewery I",
+			"output": [
+				{
+					"itemId": "item:blueprint-brewery-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-cookhouse-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block"
+				}
+			],
+			"name": "Blueprint: Cookhouse I",
+			"output": [
+				{
+					"itemId": "item:blueprint-cookhouse-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-dairy-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:milk"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Dairy I",
+			"output": [
+				{
+					"itemId": "item:blueprint-dairy-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-house-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Blueprint: House II",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-market-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sausage"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Market",
+			"output": [
+				{
+					"itemId": "item:blueprint-market-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-slaughterhouse-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:piglet"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Slaughterhouse I",
+			"output": [
+				{
+					"itemId": "item:blueprint-slaughterhouse-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-tavern-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:beer-barrel"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Tavern I",
+			"output": [
+				{
+					"itemId": "item:blueprint-tavern-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-townhall-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Town Hall IV",
+			"output": [
+				{
+					"itemId": "item:blueprint-townhall-t4",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-windmill-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Windmill I",
+			"output": [
+				{
+					"itemId": "item:blueprint-windmill-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:blueprint-winery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Winery I",
+			"output": [
+				{
+					"itemId": "item:blueprint-winery-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:hop-field": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Survey: Hop Field",
+			"output": [
+				{
+					"itemId": "item:hop-field",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t3:vineyard": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Survey: Vineyard",
+			"output": [
+				{
+					"itemId": "item:vineyard",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-civic-office-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Blueprint: Civic Office I",
+			"output": [
+				{
+					"itemId": "item:blueprint-civic-office-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-dye-workshop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:vegetables"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				}
+			],
+			"name": "Blueprint: Dye Workshop I",
+			"output": [
+				{
+					"itemId": "item:blueprint-dye-workshop-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-house-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-clothing"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 12,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"name": "Blueprint: House III",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t3",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-market-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Market II",
+			"output": [
+				{
+					"itemId": "item:blueprint-market-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-paper-mill-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:plank"
+				}
+			],
+			"name": "Blueprint: Paper Mill I",
+			"output": [
+				{
+					"itemId": "item:blueprint-paper-mill-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-prospector-guild-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Prospector Guild 1",
+			"output": [
+				{
+					"itemId": "item:blueprint-prospector-guild-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-school": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"name": "Blueprint: School",
+			"output": [
+				{
+					"itemId": "item:blueprint-school",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-tailor-workshop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:common-cloth"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:leather"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				}
+			],
+			"name": "Blueprint: Tailor Workshop I",
+			"output": [
+				{
+					"itemId": "item:blueprint-tailor-workshop-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-tannery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:raw-hide"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				}
+			],
+			"name": "Blueprint: Tannery I",
+			"output": [
+				{
+					"itemId": "item:blueprint-tannery-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-weaver-hut-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper"
+				}
+			],
+			"name": "Blueprint: Weaver Hut I",
+			"output": [
+				{
+					"itemId": "item:blueprint-weaver-hut-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:advanced-knowledge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:basic-knowledge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:bread"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:basic-knowledge",
+					"quantity": 3,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:blueprint-cathedral": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 4
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Cathedral",
+			"output": [
+				{
+					"itemId": "item:blueprint-cathedral",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:engineers"
+								]
+							}
+						]
+					},
+					"label": "Engineers path locks Faith and Mages keystone plans",
+					"reason": "Engineers path is already chosen.",
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:mages"
+								]
+							}
+						]
+					},
+					"label": "Mages path locks Engineers and Faith keystone plans",
+					"reason": "Mages path is already chosen.",
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:university:blueprint-glazier-workshop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:pigment"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Blueprint: Glazier Workshop I",
+			"output": [
+				{
+					"itemId": "item:blueprint-glazier-workshop-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:blueprint-heroes-guild-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Heroes Guild I",
+			"output": [
+				{
+					"itemId": "item:blueprint-heroes-guild-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:blueprint-house-of-engineers": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: House of Engineers",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-of-engineers",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:faith"
+								]
+							}
+						]
+					},
+					"label": "Faith path locks Engineers and Mages keystone plans",
+					"reason": "Faith path is already chosen.",
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:mages"
+								]
+							}
+						]
+					},
+					"label": "Mages path locks Engineers and Faith keystone plans",
+					"reason": "Mages path is already chosen.",
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:university:blueprint-house-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: House IV",
+			"output": [
+				{
+					"itemId": "item:blueprint-house-t4",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:blueprint-mage-lodge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 2,
+					"consume": true,
+					"itemId": "item:treasure-chest"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:sapphire"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Mage Lodge",
+			"output": [
+				{
+					"itemId": "item:blueprint-mage-lodge",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:engineers"
+								]
+							}
+						]
+					},
+					"label": "Engineers path locks Faith and Mages keystone plans",
+					"reason": "Engineers path is already chosen.",
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:faith"
+								]
+							}
+						]
+					},
+					"label": "Faith path locks Engineers and Mages keystone plans",
+					"reason": "Faith path is already chosen.",
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:university:blueprint-quarry-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Blueprint: Quarry 2",
+			"output": [
+				{
+					"itemId": "item:blueprint-quarry-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:blueprint-stonemason-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"name": "Blueprint: Stonemason 2",
+			"output": [
+				{
+					"itemId": "item:blueprint-stonemason-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:master-knowledge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:university:master-knowledge-morale-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:coin-stack"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:morale-t4"
+				}
+			],
+			"name": "Master Knowledge (Inspired)",
+			"output": [
+				{
+					"itemId": "item:master-knowledge",
+					"quantity": 2,
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:vegetable-garden-t1:vegetables": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:vegetables",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-2",
+				"shrine:haste-target"
+			],
+			"effects": [
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows nearby sensitive production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:weaver-hut-t1:common-cloth": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wool"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:common-cloth",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:common-cloth",
+										"item:common-clothing",
+										"item:leather",
+										"item:luxury-cloth",
+										"item:luxury-clothing",
+										"item:pigment",
+										"item:raw-hide"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.15,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:well-t1:water": {
+			"durationMs": 1000,
+			"output": [
+				{
+					"itemId": "item:water",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:grain",
+										"item:log",
+										"item:stone",
+										"item:vegetables",
+										"item:water"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.35,
+					"quantity": 1,
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:windmill-t1:flour": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grain"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:flour",
+					"type": "guaranteed"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:winery-t1:grapes": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:grapes",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:vineyard",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:vineyard"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows wider winery production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 3.0
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 3,
+							"maxDistance": 3,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:winery-t1:wine-barrel": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:grapes"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:vineyard",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:vineyard"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows wider winery production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 3.0
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 3,
+							"maxDistance": 3,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:winery-t1:wine-barrel-from-wine-glasses": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:wine-glass",
+					"quantity": 4
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:wine-barrel",
+					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"pollution-sensitive",
+				"pollution-sensitive:radius-3"
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby item:vineyard",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:vineyard"
+								]
+							}
+						]
+					},
+					"radius": 2,
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "nearby.duration.multiply",
+					"label": "Pollution slows wider winery production",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"item:pollution"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"bands": [
+						{
+							"minDistance": 0,
+							"maxDistance": 0,
+							"multiplier": 3.0
+						},
+						{
+							"minDistance": 1,
+							"maxDistance": 1,
+							"multiplier": 2.5
+						},
+						{
+							"minDistance": 2,
+							"maxDistance": 2,
+							"multiplier": 2.0
+						},
+						{
+							"minDistance": 3,
+							"maxDistance": 3,
+							"multiplier": 1.5
+						}
+					],
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.loot.extraOutputChance.add",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-bountiful-offering"
+								]
+							}
+						]
+					},
+					"label": "Bountiful Offering",
+					"outputItems": {
+						"items": {
+							"anyOf": [
+								{
+									"ids": [
+										"item:beer",
+										"item:beer-barrel",
+										"item:bread",
+										"item:bricks",
+										"item:cheese",
+										"item:clay",
+										"item:flour",
+										"item:food-supply",
+										"item:grapes",
+										"item:hops",
+										"item:sausage",
+										"item:wine-barrel"
+									]
+								}
+							]
+						}
+					},
+					"chance": 0.25,
+					"quantity": 1,
+					"display": "whenActive"
+				}
+			]
+		},
+		"product:chest-t1:open": {
+			"chargeCost": 1,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:key-t1",
+					"capacity": 1,
+					"consume": true
+				}
+			],
+			"name": "Open Chest T1",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 4,
+						"min": 2
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:ruby",
+					"type": "chance"
+				},
+				{
+					"chance": 0.12,
+					"itemId": "item:emerald",
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory"
+		},
+		"product:chest-t2:open": {
+			"chargeCost": 1,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:key-t2",
+					"capacity": 1,
+					"consume": true
+				}
+			],
+			"name": "Open Chest T2",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 7,
+						"min": 4
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:ruby",
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:emerald",
+					"type": "chance"
+				},
+				{
+					"chance": 0.18,
+					"itemId": "item:sapphire",
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory"
+		},
+		"product:chest-t3:open": {
+			"chargeCost": 1,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:key-t3",
+					"capacity": 1,
+					"consume": true
+				}
+			],
+			"name": "Open Chest T3",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 10,
+						"min": 7
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:emerald",
+					"type": "chance"
+				},
+				{
+					"chance": 0.65,
+					"itemId": "item:sapphire",
+					"type": "chance"
+				},
+				{
+					"chance": 0.25,
+					"itemId": "item:topaz",
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory"
+		},
+		"product:chest-t4:open": {
+			"chargeCost": 1,
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:key-t4",
+					"capacity": 1,
+					"consume": true
+				}
+			],
+			"name": "Open Chest T4",
+			"output": [
+				{
+					"itemId": "item:coin",
+					"quantity": {
+						"max": 15,
+						"min": 10
+					},
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:sapphire",
+					"type": "chance"
+				},
+				{
+					"chance": 0.55,
+					"itemId": "item:topaz",
+					"type": "chance"
+				},
+				{
+					"chance": 0.35,
+					"itemId": "item:aquamarine",
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory"
+		},
+		"product:shrine-t1:minor-haste": {
+			"durationMs": 300000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			],
+			"name": "Minor Haste",
+			"activatesEffectId": "effect:shrine-minor-haste",
+			"tags": [
+				"shrine:effect"
+			]
+		},
+		"product:shrine-t1:bountiful-offering": {
+			"durationMs": 180000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Bountiful Offering",
+			"activatesEffectId": "effect:shrine-bountiful-offering",
+			"tags": [
+				"shrine:effect"
+			]
+		},
+		"product:townhall-t1:blueprint-library-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone"
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"name": "Blueprint: Library I",
+			"output": [
+				{
+					"itemId": "item:blueprint-library-t1",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:waste-processor-t1:recycle-trash": {
+			"name": "Recycle Trash",
+			"durationMs": 180000,
 			"placement": "board_then_inventory",
-			"requirements": []
+			"inputs": [
+				{
+					"itemId": "item:trash",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				}
+			]
+		},
+		"product:waste-processor-t1:burn-trash-log": {
+			"name": "Burn Trash: Wood",
+			"durationMs": 45000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:trash",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.25
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.05
+				}
+			]
+		},
+		"product:waste-processor-t2:recycle-trash": {
+			"name": "Recycle Trash",
+			"durationMs": 150000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:trash",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				}
+			]
+		},
+		"product:waste-processor-t2:burn-trash-log": {
+			"name": "Burn Trash: Wood",
+			"durationMs": 40000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:trash",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.25
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.05
+				}
+			]
+		},
+		"product:waste-processor-t2:burn-trash-charcoal": {
+			"name": "Burn Trash: Charcoal",
+			"durationMs": 30000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:trash",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.3
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.08
+				}
+			]
+		},
+		"product:waste-processor-t2:burn-trash-coal": {
+			"name": "Burn Trash: Coal",
+			"durationMs": 25000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:trash",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.45
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.15
+				}
+			]
+		},
+		"product:bio-waste-processor-t1:compost-bio-waste": {
+			"name": "Compost Bio Waste",
+			"durationMs": 180000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:bio-waste",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				}
+			]
+		},
+		"product:bio-waste-processor-t1:burn-bio-waste-log": {
+			"name": "Burn Bio Waste: Wood",
+			"durationMs": 45000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:bio-waste",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.2
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.04
+				}
+			]
+		},
+		"product:bio-waste-processor-t2:compost-bio-waste": {
+			"name": "Compost Bio Waste",
+			"durationMs": 150000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:bio-waste",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				}
+			]
+		},
+		"product:bio-waste-processor-t2:burn-bio-waste-log": {
+			"name": "Burn Bio Waste: Wood",
+			"durationMs": 40000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:bio-waste",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:log",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.2
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.04
+				}
+			]
+		},
+		"product:bio-waste-processor-t2:burn-bio-waste-charcoal": {
+			"name": "Burn Bio Waste: Charcoal",
+			"durationMs": 30000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:bio-waste",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:charcoal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.25
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.06
+				}
+			]
+		},
+		"product:bio-waste-processor-t2:burn-bio-waste-coal": {
+			"name": "Burn Bio Waste: Coal",
+			"durationMs": 25000,
+			"placement": "board_then_inventory",
+			"inputs": [
+				{
+					"itemId": "item:bio-waste",
+					"quantity": 4,
+					"capacity": 4,
+					"consume": true,
+					"mode": "upTo"
+				},
+				{
+					"itemId": "item:coal",
+					"quantity": 1,
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.4
+				},
+				{
+					"type": "chance",
+					"itemId": "item:pollution",
+					"chance": 0.12
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-waste-processor-t1": {
+			"name": "Blueprint: Waste Processor I",
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"capacity": 4,
+					"consume": true,
+					"quantity": 2
+				},
+				{
+					"itemId": "item:stone",
+					"capacity": 4,
+					"consume": true,
+					"quantity": 2
+				},
+				{
+					"itemId": "item:water",
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-waste-processor-t1"
+				}
+			]
+		},
+		"product:townhall-t2:blueprint-bio-waste-processor-t1": {
+			"name": "Blueprint: Bio-Waste Processor I",
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:plank",
+					"capacity": 4,
+					"consume": true,
+					"quantity": 2
+				},
+				{
+					"itemId": "item:grain",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:water",
+					"capacity": 4,
+					"consume": true
+				}
+			],
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-bio-waste-processor-t1"
+				}
+			]
+		},
+		"product:academy:blueprint-waste-processor-t2": {
+			"name": "Blueprint: Waste Processor II",
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"capacity": 12,
+					"consume": true,
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-waste-processor-t2"
+				}
+			]
+		},
+		"product:academy:blueprint-bio-waste-processor-t2": {
+			"name": "Blueprint: Bio-Waste Processor II",
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"itemId": "item:advanced-knowledge",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:building-permit",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coal",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:charcoal",
+					"capacity": 4,
+					"consume": true
+				},
+				{
+					"itemId": "item:coin",
+					"capacity": 12,
+					"consume": true,
+					"quantity": 3
+				}
+			],
+			"output": [
+				{
+					"type": "guaranteed",
+					"itemId": "item:blueprint-bio-waste-processor-t2"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-library-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:stone-block"
+				}
+			],
+			"name": "Blueprint: Library II",
+			"output": [
+				{
+					"itemId": "item:blueprint-library-t2",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-library-t3": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 8,
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"name": "Blueprint: Library III",
+			"output": [
+				{
+					"itemId": "item:blueprint-library-t3",
+					"type": "guaranteed"
+				}
+			]
+		},
+		"product:townhall-t4:blueprint-library-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"capacity": 4,
+					"consume": true,
+					"itemId": "item:marble-block"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"name": "Blueprint: Library IV",
+			"output": [
+				{
+					"itemId": "item:blueprint-library-t4",
+					"type": "guaranteed"
+				}
+			]
 		}
 	}
 }

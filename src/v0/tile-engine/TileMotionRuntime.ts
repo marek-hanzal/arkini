@@ -1,4 +1,4 @@
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
 import {
 	freezeElementVisualState,
 	readTileVisualSnapshot,
@@ -6,7 +6,7 @@ import {
 } from "~/v0/tile-engine/TileVisualSnapshot";
 import type { TileEngine } from "~/v0/tile-engine/TileEngine.types";
 
-export namespace TileMotionRuntime {
+namespace TileMotionRuntime {
 	export type Status = "completed" | "cancelled";
 	export type StyleKeyframes = Record<string, unknown>;
 
@@ -57,6 +57,7 @@ let motionSequence = 0;
 
 export const tileMotionScope = (tileId: TileEngine.Id) => `tile:${tileId}`;
 export const tilePresenceMotionScope = (tileId: TileEngine.Id) => `tile-presence:${tileId}`;
+export const tileFeedbackMotionScope = (tileId: TileEngine.Id) => `tile-feedback:${tileId}`;
 
 const createMotionId = (scope: string) => `motion:${scope}:${++motionSequence}`;
 

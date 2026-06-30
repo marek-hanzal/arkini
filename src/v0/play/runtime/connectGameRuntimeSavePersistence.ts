@@ -1,7 +1,7 @@
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameRuntimeStore } from "~/v0/play/runtime/GameRuntimeStore";
 
-export interface GameRuntimeSaveStorage {
+interface GameRuntimeSaveStorage {
 	save(save: GameSave): Promise<void>;
 }
 
@@ -47,6 +47,16 @@ export const connectGameRuntimeSavePersistence = ({
 		timeout = undefined;
 	};
 
+	const scheduleRetryAfterFailure = () => {
+		if (disposed || pendingSave === undefined || timeout !== undefined || debounceMs <= 0) {
+			return;
+		}
+
+		timeout = globalThis.setTimeout(() => {
+			void flush();
+		}, debounceMs);
+	};
+
 	const persistPending = async () => {
 		clearPendingTimeout();
 		const save = pendingSave;
@@ -56,7 +66,11 @@ export const connectGameRuntimeSavePersistence = ({
 		try {
 			await storage.save(save);
 		} catch (error) {
+			if (pendingSave === undefined) {
+				pendingSave = save;
+			}
 			onError(error);
+			scheduleRetryAfterFailure();
 		}
 	};
 

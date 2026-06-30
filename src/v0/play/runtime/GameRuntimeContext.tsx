@@ -24,7 +24,7 @@ export namespace GameRuntimeProvider {
 }
 
 const DefaultFallback: FC = () => (
-	<div className="flex h-full min-h-[18rem] items-center justify-center rounded-md border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+	<div className="flex h-full min-h-[18rem] items-center justify-center rounded-sm border border-ak-border bg-ak-surface p-4 text-sm font-semibold text-ak-text-muted">
 		Starting runtime…
 	</div>
 );

@@ -1,5 +1,9 @@
 import { type RefObject, useLayoutEffect } from "react";
-import { DebugTimeline } from "~/v0/debug/DebugTimeline";
+import { DebugTimeline } from "~/v0/diagnostics/DebugTimeline";
+import { findTileEngineActorById } from "~/v0/tile-engine/findTileEngineActorById";
+import { rectFromElement } from "~/v0/tile-engine/rect";
+import { targetDelta } from "~/v0/tile-engine/targetDelta";
+import { translate3d } from "~/v0/tile-engine/TileVisualSnapshot";
 import type { TileExitMotionSchema } from "~/v0/tile-engine/TileExitMotionSchema";
 import {
 	cancelTileMotion,
@@ -32,13 +36,15 @@ export const useTileActorExitMotion = ({
 	const delayMs = exit?.delayMs ?? 0;
 	const durationMs = exit?.durationMs;
 	const groupId = exit?.groupId;
+	const toTileId = exit?.toTileId;
 	const hasExit = Boolean(exit);
 
 	useLayoutEffect(() => {
 		if (!hasExit) return;
 
-		const element = readActorVisual(actorRef.current);
-		if (!element) return;
+		const actorElement = actorRef.current;
+		const element = readActorVisual(actorElement);
+		if (!actorElement || !element) return;
 
 		DebugTimeline.record({
 			scope: "tile-engine",
@@ -49,6 +55,7 @@ export const useTileActorExitMotion = ({
 				tileId,
 				delayMs,
 				durationMs,
+				toTileId,
 			},
 		});
 
@@ -59,19 +66,50 @@ export const useTileActorExitMotion = ({
 			tileId,
 		});
 		const clearPresenceMotion = markTilePresenceMotion(element, token);
+		const targetElement =
+			toTileId && toTileId !== tileId ? findTileEngineActorById(toTileId) : null;
+		const flyDelta = targetElement
+			? targetDelta({
+					origin: rectFromElement(actorElement),
+					target: rectFromElement(targetElement),
+				})
+			: null;
+		const keyframes =
+			kind === "fly-to-tile" && flyDelta
+				? {
+						opacity: [
+							1,
+							0.95,
+							0,
+						],
+						transform: [
+							"translate3d(0px, 0px, 0px) scale(1)",
+							`${translate3d(flyDelta.x * 0.72, flyDelta.y * 0.72)} scale(0.82)`,
+							`${translate3d(flyDelta.x, flyDelta.y)} scale(0.5)`,
+						],
+					}
+				: kind === "replace-out"
+					? {
+							opacity: [
+								1,
+								0,
+							],
+						}
+					: {
+							opacity: [
+								1,
+								0,
+							],
+							transform: [
+								"translate3d(0px, 0px, 0px) scale(1)",
+								"translate3d(0px, 0px, 0px) scale(0.92)",
+							],
+						};
+
 		void startTileStyleMotion({
 			scope,
 			element,
-			keyframes: {
-				opacity: [
-					1,
-					0,
-				],
-				transform: [
-					"translate3d(0px, 0px, 0px) scale(1)",
-					"translate3d(0px, 0px, 0px) scale(0.92)",
-				],
-			},
+			keyframes,
 			delay: delayMs / 1000,
 			duration: (durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
@@ -80,6 +118,7 @@ export const useTileActorExitMotion = ({
 				exitKind: kind,
 				groupId,
 				tileId,
+				toTileId,
 			},
 		}).then((result) => {
 			clearPresenceMotion();
@@ -106,5 +145,6 @@ export const useTileActorExitMotion = ({
 		hasExit,
 		kind,
 		tileId,
+		toTileId,
 	]);
 };

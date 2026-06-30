@@ -8,11 +8,11 @@ import { HomeScreen } from "~/app/HomeScreen";
 import { RootErrorBoundary } from "~/app/RootErrorBoundary";
 import { RootShell } from "~/app/RootShell";
 
-export interface RouterContext {}
+type RouterContext = Record<string, never>;
 
 const history = createHashHistory();
 
-export const rootRoute = createRootRouteWithContext<RouterContext>()({
+const rootRoute = createRootRouteWithContext<RouterContext>()({
 	component: RootShell,
 	errorComponent: ({ error }) => <RootErrorBoundary error={error} />,
 });

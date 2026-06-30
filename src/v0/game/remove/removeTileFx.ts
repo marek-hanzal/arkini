@@ -1,0 +1,88 @@
+import { Effect } from "effect";
+import { match } from "ts-pattern";
+import { checkTileRemoveReadinessFx } from "~/v0/game/remove/checkTileRemoveReadinessFx";
+import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
+import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
+import { consumeActivationInputsFx } from "~/v0/game/activation/consumeActivationInputsFx";
+import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
+import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameActionTileRemove } from "~/v0/game/action/GameActionTileRemove";
+import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
+import type { GameEvent } from "~/v0/game/event/GameEventSchema";
+import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
+
+export namespace removeTileFx {
+	export interface Props {
+		config: GameConfig;
+		save: GameSave;
+		action: GameActionTileRemove;
+		nowMs: number;
+	}
+}
+
+export const removeTileFx = Effect.fn("removeTileFx")(function* ({
+	config,
+	save,
+	action,
+	nowMs,
+}: removeTileFx.Props) {
+	const checked = yield* checkTileRemoveReadinessFx({
+		action,
+		config,
+		save,
+	});
+	const consumed = yield* match(checked.removal.mode)
+		.with("consume", () =>
+			consumeActivationInputsFx({
+				inputRefs: [
+					action.toolRef,
+				],
+				inputs: [
+					{
+						consume: true,
+						itemId: checked.tool.itemId,
+						quantity: 1,
+					},
+				],
+				nowMs,
+				reason: "remove-tool",
+				save,
+			}),
+		)
+		.with("keep", () =>
+			Effect.succeed({
+				events: [] satisfies GameEvent[],
+				save,
+			}),
+		)
+		.exhaustive();
+
+	const nextSave = yield* cloneGameSaveFx({
+		save: consumed.save,
+	});
+	delete nextSave.board.items[checked.target.id];
+	removeBoardItemRuntimeState({
+		itemInstanceId: checked.target.id,
+		save: nextSave,
+	});
+	nextSave.updatedAtMs = nowMs;
+
+	return {
+		events: [
+			...consumed.events,
+			{
+				itemId: checked.target.itemId,
+				itemInstanceId: checked.target.id,
+				reason: "tile-remove" as const,
+				atMs: nowMs,
+				type: "item.removed" as const,
+			},
+		],
+		nextWakeAtMs: yield* readNextWakeAtMsFx({
+			config,
+			nowMs,
+			save: nextSave,
+		}),
+		save: nextSave,
+	} satisfies GameEngineResult;
+});

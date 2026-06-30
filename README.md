@@ -13,33 +13,31 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 ## Direction
 
-Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, upgrades, and runtime/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
+Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, and runtime/debug controls. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: `GameConfig` in `src/v0/manifest/GameConfig.ts`. The public config object is composed from focused files in `src/v0/manifest/config/` so the actual data does not rot inside one 3000-line shrine to human suffering. Constants used by UI identity helpers are derived from that config, not copied by hand into parallel little truth goblins. Config IDs are locked by explicit Zod enum schemas such as `GameItemIdSchema`, `GameLootTableIdSchema`, and `GameUpgradeIdSchema`; gameplay string IDs should flow through those types instead of prefix-only string guesses.
+The game has one gameplay source of truth: compiled JSON parsed by `src/v0/game/config/GameConfigSchema.ts`. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
 
 Item definitions drive behavior. An item may define:
 
 - normal merge rules, for example `seed + seed -> sprout`
 - mixed/secret merge rules, for example `twig + water -> sprout`
-- non-consuming source merge rules, used when a known building imprints a blank blueprint without deleting the original
 - click producers with batch output: guaranteed drops, chance drops, and weighted rolls
 - optional producer input inventories; producers can require stored consumables before they work
 - finite crates that exhaust all charges through their single-tap stash action
 - optional item display labels, for reused building art with tiny level numbers
 - collectible board items that can be tapped into a limited player inventory
-- tiered global upgrades with item costs, timed upgrade jobs, and effects such as producer speed or loot-table swaps
 - craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
-There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables and upgrades are top-level config sections because they are reusable game-wide progression data; everything else is derived into indexes over the config.
+There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables are top-level config sections because they are reusable game-wide generation data; everything else is derived into indexes over the config.
 
 
 ## Logic and Effect boundary
 
 Effect now belongs to the standalone tick/action engine, not to UI-facing persistence plumbing. React components dispatch typed runtime actions through `GameRuntimeStore`/`RuntimeGameEngineAdapter`; they do not call storage-style mutation hooks, React Query mutations, or old database-flavored `src/v0/**/fx` roots.
 
-The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine/fx`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
+The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
 
-Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and upgrade gameplay UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
+Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and debug gameplay UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
 
 Time-sensitive runtime updates are handled by the runtime auto-ticker and engine `nextWakeAtMs`. Randomness is provided through `RandomServiceFx`; gameplay rolling must not call `Math.random()` directly.
 
@@ -51,7 +49,7 @@ The old browser SQLite/Kysely layer, database migrations, `dbFx`, `withTransacti
 
 ## Tile engine boundary
 
-Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules.
+Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules. Occupied drop-target feedback is actor-local: valid accepting targets scale/brighten, rejecting or swap targets shrink/dim, and the generic slot outline/background is suppressed when a target tile owns the hover feedback.
 
 `TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, and drop resolution callbacks. It must not import Arkini board/inventory/producers directly. Game-specific stuff lives in `src/v0/play/drop` and the board/inventory surfaces. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
 
@@ -64,9 +62,9 @@ Rules for this layer:
 
 ## Gameplay model
 
-The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint scraps are generic now: scraps merge into fragments, fragments into drafts, drafts into a blank blueprint. A known building can then be dragged onto that blank blueprint to create a specific build blueprint without consuming the original building. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
+The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint imprinting is gone: build blueprints are concrete target-specific items acquired directly through gameplay. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
 
-- Board size comes from `GameConfig.game.board`, currently 7×9.
+- Board size comes from `GameConfig.game.board`, currently 7×11.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.
 - Board and inventory use zero-gap square cells to avoid DnD blind spots.
 - Merging happens on the board only. Dropping onto a non-mergeable occupied board cell swaps the two board items instead of rejecting the action.
@@ -76,12 +74,11 @@ The current content direction is Settlers-like: small producers create raw goods
 - Inventory items go to the first empty board cell by double-click/tap inside inventory.
 - Build menu is gone. Buildings and other advanced outputs are created through board craft: merge input items into a craft target, fill its progress, then transform it into the result.
 - Craft progress lives on the board item instance and is rendered as a bottom-up fill on the tile. Blueprint construction, seed growth, and future production chains all use the same generic `craft` data model. Deposited craft materials live in the runtime `GameSave`, scoped to the concrete target board item instance. No SQL row cosplay, no hidden global bucket.
-- Runtime item storage is the `GameSave` document: board items, inventory stacks, producer jobs, stash charges, stored requirements, craft jobs and upgrade jobs live in one explicit save object owned by the runtime engine.
+- Runtime item storage is the `GameSave` document: board items, inventory stacks, producer jobs, stash charges, activation inputs, and craft jobs live in one explicit save object owned by the runtime engine.
 - Collectible valuables are real board items first. Coins merge through `Coin -> Coin Pair -> Coin Stack -> Coin Chest`, then single tap into the limited player inventory instead of the material inventory. Long press still opens their detail.
 - Player inventory is slot-based and stack-limited like the material inventory. It is the sink for special progression items such as coins and future hard-gems, not a scalar wallet pretending to be design.
-- Upgrades are tiered definitions in `GameConfig`. Buying an upgrade spends player inventory items immediately, starts a timed runtime job, and applies the tier only after the timer finishes. A save stores owned level plus pending target/ready timestamps.
-- Producer speed upgrades add cooldown deltas. Better-loot upgrades swap the effective producer loot table rather than mutating random weights in place, because percentage soup is how balance turns into swamp gas. Building level upgrades no longer happen by merging two buildings directly; higher-level buildings are crafted through upgrade blueprints that consume materials plus at least two previous-level buildings.
-- Producers and stashes can hold activation storage. Consumable inputs are spent only after the complete rolled output placement plan succeeds. Persistent requirements use the same nested storage but are not consumed, so a future quarry worker can stay assigned while beer and sausage vanish into the traditional productivity furnace. Item detail shows both stored/needed inputs and requirements, and withdrawal is board-first with inventory fallback.
+- Global/world-wide upgrades are gone. Better buildings are concrete item/producer tiers produced by craft recipes that consume the previous tier plus materials. The loaded JSON config is the source of truth; saves do not patch config through overlays.
+- Producers, stashes, and craft targets can hold activation input storage. Consumable inputs are spent only after the complete output placement plan succeeds. Ambient gates, unlocks, proximity access, and path locks are Effect grants, not item-owned checklist storage. Item detail shows blocked grants/effects plus stored/needed inputs, omits satisfied expectation spam and forward usage lists, and withdrawal is board-first with inventory fallback.
 - Producers can produce multiple outputs in one cycle. Guaranteed outputs, probability outputs, and weighted rolls are resolved into one batch.
 - Producers place generated items into the board first. If the board is full, they spill into inventory. If neither board nor inventory has capacity for the whole production batch, the action is rejected before cooldown/charge/capacity is spent.
 - Click producers use cooldowns and optional finite charges. Producer ready feedback is emitted only on a real `not-ready -> ready` transition, never on first mount, move, query refresh, or React deciding to reincarnate a node for no noble reason.
@@ -99,9 +96,9 @@ XState is no longer part of the runtime. The app has two main state buckets: the
 
 ## React data subscriptions
 
-Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`. Board, inventory, item, upgrade and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
+Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`. Board, inventory, item and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
 
-Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft/upgrade state. If the action changes `GameSave`, it belongs to the runtime adapter.
+Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft state. If the action changes `GameSave`, it belongs to the runtime adapter.
 
 Components should stay boring: render props, wire callbacks, and shut up. If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
@@ -110,9 +107,9 @@ Components should stay boring: render props, wire callbacks, and shut up. If a c
 
 The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
-Types and schemas live with the domain they describe: board schemas in `board/schema`, inventory schemas in `inventory/schema`, upgrade schemas in `upgrade/schema`, save schemas in `play/save`, manifest definition schemas in `manifest/*DefinitionSchema.ts`, and view schemas in the relevant domain `view` folder. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, canonical game config schemas in `game/config`, action contracts in `game/action`, output event contracts in `game/event`, and the dense save contract in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
 
-Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions, upgrade definitions, and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
+Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
 
 Centralized hooks are banned unless the domain is explicitly the runtime, such as `tile-engine`. A hook named after a broad concept like game/session/runtime is guilty until proven tiny. Prefer concrete action hooks, domain query options, and small components over one hook that returns a sack of callbacks like a cursed Santa.
 
@@ -120,11 +117,9 @@ Centralized hooks are banned unless the domain is explicitly the runtime, such a
 
 ```txt
 src/app/                         App entry, router and global styles.
-src/assets/                      PNG gameplay assets imported by v0 manifest helper utilities.
-src/v0/                         Active client play runtime. v0 should be self-contained except asset imports.
-src/v0/manifest/                Active GameConfig composition, typed IDs, standalone definition schemas, validation, derived indexes.
-src/v0/manifest/config/*/       Manifest config split into topical asset/item/loot-table definition chunks.
-src/v0/manifest/dsl/            Manifest-local definition DSL helpers; not a generic utils bucket.
+src/v0/                         Active client play runtime. v0 should consume compiled game package resources, not mirrored PNG folders.
+src/v0/game/config/             Canonical compiled JSON config schema, ID value schemas, config readers.
+game/arkini/                    Source JSON game package compiled into canonical runtime config/assets.
 src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.
 src/v0/date/                    Active Luxon date Effect service.
 src/v0/debug/                   Dev-only structured timeline buffer for drag/drop/action reports.
@@ -166,6 +161,16 @@ npm run check
 
 This runs `format:check`, dependency-cruiser boundaries, TypeScript, and Vitest. Run `npm run build` separately for the production bundle. `npm run dc` can be run alone when changing imports or architecture boundaries. `npm run test` runs the focused Vitest suite.
 
+Optional code hygiene passes live outside the hard check gate:
+
+```bash
+npm run audit:dead
+npm run audit:dupes
+npm run audit:optional
+```
+
+`audit:dead` runs Knip with a zero exit code for findings. `audit:dupes` runs jscpd with a zero duplicate exit code. They are meant to be annoying local searchlights, not CI guillotines. Do not wire them into `npm run check` unless we deliberately decide to start failing builds on dead exports or copy-paste.
+
 ## Formatting
 
 Code formatting is owned by Biome. The config is intentionally formatter-only: `biome format` is allowed to rewrite code shape, but Biome linting and assist actions are disabled. Do not sneak lint rules into `biome.json`; lint creep is how a formatter becomes a tiny annoying government.
@@ -191,7 +196,7 @@ The router uses hash history, so static hosts do not need SPA rewrite rules.
 
 ## Debug timeline
 
-Dev builds expose a small structured timeline buffer for drag/drop/action-cache bug reports:
+Dev builds expose a small structured timeline buffer for drag/drop/action/runtime bug reports:
 
 ```js
 window.__ARKINI_DEBUG_TIMELINE__.dump();
@@ -215,7 +220,7 @@ Future Dexie/IndexedDB persistence should wrap the runtime from outside: load a 
 
 ## Validation policy
 
-The runtime save is not trusted just because it came from memory or future storage. Gameplay inputs and saves are validated through active Zod models under `src/v0/game/engine/model` and the UI-facing `schema|type|view` models. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
+The runtime save is not trusted just because it came from memory or future storage. Gameplay inputs and saves are validated through active Zod models under `src/v0/game/action`, `src/v0/game/config`, `src/v0/game/event`, `src/v0/game/engine/model`, and the UI-facing `schema|type|view` models. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
 
 ## Minimal-code philosophy
 

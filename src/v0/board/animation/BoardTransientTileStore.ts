@@ -10,7 +10,7 @@ const notify = () => {
 
 export const readBoardTransientTiles = () => transientTiles;
 
-export const subscribeBoardTransientTiles = (listener: () => void) => {
+const subscribeBoardTransientTiles = (listener: () => void) => {
 	listeners.add(listener);
 	return () => {
 		listeners.delete(listener);

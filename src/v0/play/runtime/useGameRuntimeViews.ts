@@ -1,13 +1,21 @@
+import { useCallback } from "react";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
-import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
+import type { BoardCellSchema } from "~/v0/board/schema/BoardCellSchema";
+import type { InventorySlot } from "~/v0/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
-import type { ItemId } from "~/v0/manifest/manifestId";
-import { readRuntimeUpgradeListViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeUpgradeListViewFromGameSave";
-import type { UpgradeListView } from "~/v0/upgrade/view/UpgradeListViewSchema";
+import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import { useGameRuntimeSelector } from "~/v0/play/runtime/GameRuntimeContext";
+import {
+	readBoardItem,
+	readBoardView,
+	readInventoryView,
+	readItemCatalogView,
+	readItemView,
+} from "~/v0/play/runtime/readers";
+import type { GameRuntimeState } from "~/v0/play/runtime/GameRuntimeStore";
 
 const stableStringify = (value: unknown) => JSON.stringify(value ?? null);
 
@@ -26,6 +34,11 @@ const sameBoardItem = (left: BoardViewItem | null, right: BoardViewItem | null) 
 	);
 };
 
+const sameBoardCell = (
+	left: BoardCellSchema.Type | undefined,
+	right: BoardCellSchema.Type | undefined,
+) => left?.x === right?.x && left?.y === right?.y;
+
 const sameInventorySlot = (left: InventorySlot, right: InventorySlot) => {
 	if (left === right) return true;
 
@@ -35,39 +48,55 @@ const sameInventorySlot = (left: InventorySlot, right: InventorySlot) => {
 		left.slotIndex === right.slotIndex &&
 		leftStack?.id === rightStack?.id &&
 		leftStack?.itemId === rightStack?.itemId &&
-		leftStack?.quantity === rightStack?.quantity &&
-		leftStack?.stateJson === rightStack?.stateJson
+		leftStack?.quantity === rightStack?.quantity
 	);
 };
 
-export const useGameBoardView = (): BoardView => useGameRuntimeSelector((state) => state.board);
+const sameBoardView = (left: BoardView, right: BoardView) =>
+	left.items.length === right.items.length &&
+	sameBoardCell(left.firstEmptyCell, right.firstEmptyCell) &&
+	left.items.every((leftItem, index) => sameBoardItem(leftItem, right.items[index] ?? null));
+
+const sameInventoryView = (left: InventoryView, right: InventoryView) =>
+	left.slots.length === right.slots.length &&
+	left.firstEmptySlotIndex === right.firstEmptySlotIndex &&
+	left.slots.every((leftSlot, index) => sameInventorySlot(leftSlot, right.slots[index]));
+
+export const useGameBoardView = (): BoardView =>
+	useGameRuntimeSelector(readBoardView, sameBoardView);
 
 export const useGameInventoryView = (): InventoryView =>
-	useGameRuntimeSelector((state) => state.inventory);
+	useGameRuntimeSelector(readInventoryView, sameInventoryView);
 
-export const useGameBoardItem = (boardItemId: string): BoardViewItem | null =>
-	useGameRuntimeSelector((state) => state.board.byId[boardItemId] ?? null, sameBoardItem);
-
-export const useGameInventorySlot = (slotIndex: number): InventorySlot =>
-	useGameRuntimeSelector(
-		(state) =>
-			state.inventory.bySlotIndex[String(slotIndex)] ?? {
-				slotIndex,
-			},
-		sameInventorySlot,
+export const useGameBoardItem = (boardItemId: string): BoardViewItem | null => {
+	const selector = useCallback(
+		(state: GameRuntimeState) =>
+			readBoardItem({
+				boardItemId,
+				state,
+			}) ?? null,
+		[
+			boardItemId,
+		],
 	);
 
-export const useGameUpgradeListView = (nowMs = Date.now()): UpgradeListView =>
-	useGameRuntimeSelector((state) =>
-		readRuntimeUpgradeListViewFromGameSave({
-			config: state.runtime.config,
-			nowMs,
-			save: state.runtime.save,
-		}),
-	);
+	return useGameRuntimeSelector(selector, sameBoardItem);
+};
 
 export const useGameItemCatalogView = (): ItemCatalogView =>
-	useGameRuntimeSelector((state) => state.items);
+	useGameRuntimeSelector(readItemCatalogView);
 
-export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null =>
-	useGameRuntimeSelector((state) => (itemId ? (state.items[itemId as ItemId] ?? null) : null));
+export const useGameItemView = (itemId: ItemId | string | undefined): ViewItem | null => {
+	const selector = useCallback(
+		(state: GameRuntimeState) =>
+			readItemView({
+				itemId,
+				state,
+			}) ?? null,
+		[
+			itemId,
+		],
+	);
+
+	return useGameRuntimeSelector(selector);
+};

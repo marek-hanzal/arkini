@@ -10,10 +10,3 @@ export const BoardItemStateSchema = z.object({
 		.optional(),
 	craft: CraftRuntimeStateSchema.optional(),
 });
-
-type BoardItemStateSchema = typeof BoardItemStateSchema;
-export namespace BoardItemStateSchema {
-	export type Type = z.infer<BoardItemStateSchema>;
-}
-
-export type BoardItemState = BoardItemStateSchema.Type;

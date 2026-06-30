@@ -1,258 +1,2834 @@
 {
 	"craftRecipes": {
-		"craft:lumber-camp": {
-			"durationMs": 0,
+		"item:blueprint-academy": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:school"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:basic-knowledge",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:civic-office-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:library-t2"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-armory-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:leather",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:common-clothing"
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:blacksmith-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:tailor-workshop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:tannery-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-bakery-t1": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 1
+					"quantity": 2
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 1
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:flour"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
 				}
-			],
-			"requirements": [],
-			"resultItemId": "item:lumber-camp-1"
+			]
 		},
-		"craft:lumber-camp-2": {
-			"durationMs": 0,
+		"item:blueprint-blacksmith-t1": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:lumber-camp-1",
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:smelter-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-brewery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-brickyard": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:clay-pit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-cathedral": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 6
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t4"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:civic-office-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:glazier-workshop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:library-t4"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:stonemason-t2"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:engineers"
+								]
+							}
+						]
+					},
+					"label": "Engineers path locks Faith and Mages keystone plans",
+					"reason": "Engineers path is already chosen.",
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:mages"
+								]
+							}
+						]
+					},
+					"label": "Mages path locks Engineers and Faith keystone plans",
+					"reason": "Mages path is already chosen.",
+					"display": "whenActive"
+				}
+			]
+		},
+		"item:blueprint-cattle-farm-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone"
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-charcoal-burner-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-chicken-coop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain"
+				}
+			]
+		},
+		"item:blueprint-civic-office-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:basic-knowledge"
+				}
+			]
+		},
+		"item:blueprint-clay-pit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:clay-deposit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-coal-mine-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 6
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:coal-deposit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-construction-yard-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:brickyard"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:glassworks"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:roof-tile-factory"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:smelter-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-cookhouse-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:vegetables"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-dairy-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:milk"
+				}
+			]
+		},
+		"item:blueprint-dye-workshop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:vegetables",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:weaver-hut-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-farm-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-glassworks": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:sand",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:sand-pit"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-glazier-workshop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks"
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles"
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:dye-workshop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:glassworks"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-gold-mine-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 6
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 5
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:gold-deposit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-goldsmith-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 8
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:smelter-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-heroes-guild-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:roof-tiles",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:armory-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:goldsmith-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:library-t4"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-house-of-engineers": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:gold-ingot"
+				},
+				{
+					"consume": true,
+					"itemId": "item:nails",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t4"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:blacksmith-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:glazier-workshop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:library-t4"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:stonemason-t2"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:faith"
+								]
+							}
+						]
+					},
+					"label": "Faith path locks Engineers and Mages keystone plans",
+					"reason": "Faith path is already chosen.",
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:mages"
+								]
+							}
+						]
+					},
+					"label": "Mages path locks Engineers and Faith keystone plans",
+					"reason": "Mages path is already chosen.",
+					"display": "whenActive"
+				}
+			]
+		},
+		"item:blueprint-house-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:well-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-house-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:house-t1"
 				},
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 1
+					"quantity": 3
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 1
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t1"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:lumber-camp-2"
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:bakery-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:market-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
 		},
-		"craft:lumber-camp-3": {
-			"durationMs": 0,
+		"item:blueprint-house-t3": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:lumber-camp-2",
-					"quantity": 2
+					"itemId": "producer:house-t2"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 1
+					"quantity": 2
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 1
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:common-clothing"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:lumber-camp-3"
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:civic-office-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:tailor-workshop-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
 		},
-		"craft:lumber-camp-4": {
-			"durationMs": 0,
+		"item:blueprint-house-t4": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:lumber-camp-3",
+					"itemId": "producer:house-t3"
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:luxury-clothing"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:glazier-workshop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:stonemason-t2"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-iron-mine-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 6
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
 					"quantity": 2
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:iron-deposit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-lumberjack-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-mage-lodge": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:pigment",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:sapphire"
+				},
+				{
+					"consume": true,
+					"itemId": "item:aquamarine"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t4"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:glazier-workshop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:heroes-guild-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:library-t4"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:stonemason-t2"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:engineers"
+								]
+							}
+						]
+					},
+					"label": "Engineers path locks Faith and Mages keystone plans",
+					"reason": "Engineers path is already chosen.",
+					"display": "whenActive"
+				},
+				{
+					"kind": "grant.blockStart",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:path:faith"
+								]
+							}
+						]
+					},
+					"label": "Faith path locks Engineers and Mages keystone plans",
+					"reason": "Faith path is already chosen.",
+					"display": "whenActive"
+				}
+			]
+		},
+		"item:blueprint-market-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:bread"
+				},
+				{
+					"consume": true,
+					"itemId": "item:sausage"
+				}
+			]
+		},
+		"item:blueprint-market-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:market-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:civic-office-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-paper-mill-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			]
+		},
+		"item:blueprint-pig-farm-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-prospector-guild-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			]
+		},
+		"item:blueprint-prospector-guild-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:prospector-guild-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-purifier-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 5
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:coal-mine-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-quarry-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			]
+		},
+		"item:blueprint-quarry-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:quarry-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:iron-ingot"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:marble-deposit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-roof-tile-factory": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:clay",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:brickyard"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:clay-pit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-sand-pit": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:sand-deposit"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-sawmill-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone"
+				}
+			]
+		},
+		"item:blueprint-school": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:library-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-sheep-pasture-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone"
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-slaughterhouse-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:piglet"
+				}
+			]
+		},
+		"item:blueprint-smelter-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 5
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:coal-mine-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-stonemason-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				}
+			]
+		},
+		"item:blueprint-stonemason-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:stonemason-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack"
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:quarry-t2"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:university"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-tailor-workshop-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:common-cloth"
+				},
+				{
+					"consume": true,
+					"itemId": "item:leather"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 2
+				}
+			],
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:tannery-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:weaver-hut-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-tannery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			]
+		},
+		"item:blueprint-tavern-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:beer-barrel"
+				}
+			]
+		},
+		"item:blueprint-townhall-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:townhall-t1"
 				},
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 1
+					"quantity": 2
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 1
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:lumber-camp-4"
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:lumberjack-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:quarry-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:sawmill-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:stonemason-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:well-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
 		},
-		"craft:lumber-camp-5": {
-			"durationMs": 0,
+		"item:blueprint-townhall-t3": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:lumber-camp-4",
-					"quantity": 2
+					"itemId": "producer:townhall-t2"
 				},
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 1
+					"quantity": 3
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 1
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:food-supply"
+				},
+				{
+					"consume": true,
+					"itemId": "item:wool"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t1"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:lumber-camp-5"
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:wheat-field"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:cattle-farm-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:chicken-coop-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:farm-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:pig-farm-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:sheep-pasture-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:vegetable-garden-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
 		},
-		"craft:quarry": {
-			"durationMs": 0,
+		"item:blueprint-townhall-t4": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 1
+					"itemId": "producer:townhall-t3"
+				},
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 4
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:feast"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t1"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:quarry-1"
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:item:hop-field"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:item:vineyard"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:bakery-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:brewery-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:cookhouse-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:dairy-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:market-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:slaughterhouse-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:tavern-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:windmill-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:winery-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
 		},
-		"craft:quarry-2": {
-			"durationMs": 0,
+		"item:blueprint-university": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:quarry-1",
+					"itemId": "producer:academy"
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:guild-charter"
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass",
 					"quantity": 2
 				},
 				{
 					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 1
+					"itemId": "item:bricks",
+					"quantity": 2
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
+					"itemId": "item:roof-tiles",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t3"
+				},
+				{
+					"consume": true,
+					"itemId": "item:morale-t2"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:quarry-2"
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:construction-yard-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:glassworks"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:library-t3"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:roof-tile-factory"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
 		},
-		"craft:quarry-3": {
-			"durationMs": 0,
+		"item:blueprint-vegetable-garden-t1": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:quarry-2",
-					"quantity": 2
+					"itemId": "item:plank"
 				},
-				{
-					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				}
-			],
-			"requirements": [],
-			"resultItemId": "item:quarry-3"
-		},
-		"craft:quarry-4": {
-			"durationMs": 0,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:quarry-3",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				}
-			],
-			"requirements": [],
-			"resultItemId": "item:quarry-4"
-		},
-		"craft:quarry-5": {
-			"durationMs": 0,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:quarry-4",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				}
-			],
-			"requirements": [],
-			"resultItemId": "item:quarry-5"
-		},
-		"craft:sapling-water-tree": {
-			"durationMs": 30000,
-			"inputs": [
 				{
 					"consume": true,
 					"itemId": "item:water",
 					"quantity": 2
 				}
-			],
-			"requirements": [],
-			"resultItemId": "item:tree"
+			]
 		},
-		"craft:seed-water-sprout": {
-			"durationMs": 10000,
+		"item:blueprint-weaver-hut-t1": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "item:plank",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:wool",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin"
+				}
+			]
+		},
+		"item:blueprint-well-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log"
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				}
+			]
+		},
+		"item:blueprint-windmill-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain"
+				}
+			]
+		},
+		"item:blueprint-winery-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			]
+		},
+		"item:blueprint-library-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:log",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:sprout"
+			"resultItemId": "producer:library-t1"
 		},
-		"craft:sprout-water-sapling": {
-			"durationMs": 15000,
+		"item:blueprint-library-t2": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
+					"itemId": "producer:library-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:paper",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 4
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone-block",
+					"quantity": 2
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:sapling"
+			"resultItemId": "producer:library-t2"
 		},
-		"craft:townhall": {
-			"durationMs": 0,
+		"item:blueprint-library-t3": {
+			"durationMs": 1000,
 			"inputs": [
 				{
 					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 1
+					"itemId": "producer:library-t2"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
+				},
+				{
+					"consume": true,
+					"itemId": "item:construction-bundle"
+				},
+				{
+					"consume": true,
+					"itemId": "item:bricks",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:advanced-knowledge"
+				}
+			],
+			"resultItemId": "producer:library-t3"
+		},
+		"item:blueprint-library-t4": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:library-t3"
+				},
+				{
+					"consume": true,
+					"itemId": "item:master-knowledge",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:marble-block",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stained-glass"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin-stack",
+					"quantity": 2
+				}
+			],
+			"resultItemId": "producer:library-t4"
+		},
+		"item:blueprint-waste-processor-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 3
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"resultItemId": "producer:waste-processor-t1"
+		},
+		"item:blueprint-bio-waste-processor-t1": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:stone",
+					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:grain"
+				},
+				{
+					"consume": true,
+					"itemId": "item:water"
+				}
+			],
+			"resultItemId": "producer:bio-waste-processor-t1"
+		},
+		"item:blueprint-waste-processor-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:waste-processor-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
@@ -261,100 +2837,103 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:gem",
-					"quantity": 1
-				}
-			],
-			"requirements": [],
-			"resultItemId": "item:townhall-1"
-		},
-		"craft:townhall-2": {
-			"durationMs": 0,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:townhall-1",
-					"quantity": 2
+					"itemId": "item:coal"
 				},
 				{
 					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 2
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
+				}
+			],
+			"resultItemId": "producer:waste-processor-t2",
+			"effects": [
+				{
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:charcoal-burner-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:coal-mine-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
+		"item:blueprint-bio-waste-processor-t2": {
+			"durationMs": 1000,
+			"inputs": [
+				{
+					"consume": true,
+					"itemId": "producer:bio-waste-processor-t1"
+				},
+				{
+					"consume": true,
+					"itemId": "item:building-permit"
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
 					"quantity": 2
+				},
+				{
+					"consume": true,
+					"itemId": "item:coal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:charcoal"
+				},
+				{
+					"consume": true,
+					"itemId": "item:coin",
+					"quantity": 3
 				}
 			],
-			"requirements": [],
-			"resultItemId": "item:townhall-2"
-		},
-		"craft:townhall-3": {
-			"durationMs": 0,
-			"inputs": [
+			"resultItemId": "producer:bio-waste-processor-t2",
+			"effects": [
 				{
-					"consume": true,
-					"itemId": "item:townhall-2",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
+					"kind": "grant.require",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:owned:producer:academy"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:charcoal-burner-t1"
+								]
+							},
+							{
+								"ids": [
+									"grant:owned:producer:coal-mine-t1"
+								]
+							}
+						]
+					},
+					"phase": "start",
+					"display": "always"
 				}
-			],
-			"requirements": [],
-			"resultItemId": "item:townhall-3"
-		},
-		"craft:townhall-4": {
-			"durationMs": 0,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:townhall-3",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				}
-			],
-			"requirements": [],
-			"resultItemId": "item:townhall-4"
-		},
-		"craft:townhall-5": {
-			"durationMs": 0,
-			"inputs": [
-				{
-					"consume": true,
-					"itemId": "item:townhall-4",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:beam",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				}
-			],
-			"requirements": [],
-			"resultItemId": "item:townhall-5"
+			]
 		}
 	}
 }

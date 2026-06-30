@@ -1,21 +1,14 @@
-import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import type { GameAction } from "~/v0/game/engine/model/GameActionSchema";
+import type { GameAction } from "~/v0/game/action/GameActionSchema";
 import {
 	RuntimeGameEngineAdapter,
 	type GameEngineRuntimeSnapshot,
 } from "~/v0/game/engine/runtime/RuntimeGameEngineAdapter";
-import type { InventoryView } from "~/v0/inventory/view/InventoryViewSchema";
-import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { readRuntimeBoardViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeBoardViewFromGameSave";
-import { readRuntimeInventoryViewFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeInventoryViewFromGameSave";
-import { readRuntimeItemCatalogViewFromGameConfig } from "~/v0/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
+import { clearGameRuntimeVisualStores } from "~/v0/play/runtime/clearGameRuntimeVisualStores";
 
 export interface GameRuntimeState {
-	board: BoardView;
-	inventory: InventoryView;
-	items: ItemCatalogView;
+	nowMs: number;
 	revision: number;
 	runtime: GameEngineRuntimeSnapshot;
 }
@@ -55,16 +48,7 @@ const createRuntimeState = ({
 	revision: number;
 	runtime: GameEngineRuntimeSnapshot;
 }): GameRuntimeState => ({
-	board: readRuntimeBoardViewFromGameSave({
-		config: runtime.config,
-		nowMs,
-		save: runtime.save,
-	}),
-	inventory: readRuntimeInventoryViewFromGameSave({
-		config: runtime.config,
-		save: runtime.save,
-	}),
-	items: readRuntimeItemCatalogViewFromGameConfig(runtime.config),
+	nowMs,
 	revision,
 	runtime,
 });
@@ -83,9 +67,9 @@ export class GameRuntimeStore {
 			revision: 0,
 			runtime: adapter.readSnapshot(),
 		});
-		this.unsubscribeAdapter = adapter.subscribe((result) => {
+		this.unsubscribeAdapter = adapter.subscribe(({ nowMs, result }) => {
 			this.publish({
-				nowMs: Date.now(),
+				nowMs,
 				result,
 			});
 		});
@@ -133,13 +117,15 @@ export class GameRuntimeStore {
 		});
 	}
 
-	async readiness({ action }: RuntimeGameEngineAdapter.ReadinessProps) {
+	async readiness({ action, nowMs = Date.now() }: RuntimeGameEngineAdapter.ReadinessProps) {
 		return this.adapter.readiness({
 			action,
+			nowMs,
 		});
 	}
 
 	async replaceSave({ save, nowMs = Date.now() }: GameRuntimeStore.ReplaceSaveProps) {
+		clearGameRuntimeVisualStores();
 		return this.adapter.replaceSave({
 			nowMs,
 			save,
@@ -147,6 +133,7 @@ export class GameRuntimeStore {
 	}
 
 	destroy() {
+		clearGameRuntimeVisualStores();
 		this.unsubscribeAdapter();
 		this.listeners.clear();
 		this.updateListeners.clear();
@@ -175,5 +162,3 @@ export class GameRuntimeStore {
 		}
 	}
 }
-
-export type GameRuntimeDispatchResult = GameEngineResult;

@@ -1,7 +1,7 @@
 {
 	"game": {
 		"board": {
-			"height": 9,
+			"height": 11,
 			"width": 7
 		},
 		"id": "arkini",

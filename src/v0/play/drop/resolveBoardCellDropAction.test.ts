@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { inventoryBoardItemId } from "~/v0/board/BoardUtilityItem";
 import { rebuildBoardView } from "~/v0/board/view/rebuildBoardView";
-import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
+import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { DragSource } from "~/v0/play/drag/DragSource";
+import { rebuildInventoryView } from "~/v0/inventory/view/rebuildInventoryView";
 import { resolveBoardCellDropAction } from "~/v0/play/drop/resolveBoardCellDropAction";
 
 const boardItem = (props: Pick<BoardViewItem, "id" | "itemId" | "x" | "y">) =>
@@ -20,7 +22,34 @@ const boardSource = (item: BoardViewItem) =>
 		boardItem: item,
 	}) satisfies DragSource;
 
+const boardMoveInput = (
+	item: BoardViewItem,
+	cell: {
+		x: number;
+		y: number;
+	},
+) => ({
+	boardItemId: item.id,
+	expectedItemId: item.itemId,
+	x: cell.x,
+	y: cell.y,
+});
+
+const boardPairInput = (source: BoardViewItem, target: BoardViewItem) => ({
+	expectedSourceItemId: source.itemId,
+	expectedTargetItemId: target.itemId,
+	sourceBoardItemId: source.id,
+	targetBoardItemId: target.id,
+});
+
 const config = createEngineTestConfig();
+const emptyInventory = rebuildInventoryView([]);
+const inventoryWithEmptySlot = rebuildInventoryView([
+	{
+		slotIndex: 0,
+	},
+]);
+const directionalMergeConfig = createEngineMergeTestConfig();
 
 describe("resolveBoardCellDropAction", () => {
 	it("ignores drops onto the source item cell", () => {
@@ -34,6 +63,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -61,6 +91,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -73,15 +104,97 @@ describe("resolveBoardCellDropAction", () => {
 			}),
 		).toEqual({
 			type: "move-board-item",
-			input: {
-				boardItemId: "source",
+			input: boardMoveInput(source, {
 				x: 2,
 				y: 1,
-			},
+			}),
 		});
 	});
 
-	it("rejects cells that point to missing board items", () => {
+	it("stores board items dropped onto the inventory board item", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const inventoryTarget = boardItem({
+			id: "inventory",
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: inventoryWithEmptySlot,
+				board: rebuildBoardView([
+					source,
+					inventoryTarget,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: inventoryTarget.x,
+					y: inventoryTarget.y,
+					boardItemId: inventoryTarget.id,
+				},
+			}),
+		).toEqual({
+			feedback: {
+				cellKey: "1:0",
+				kind: "cell-feedback",
+				variant: "primary",
+			},
+			input: {
+				boardItemId: source.id,
+				expectedItemId: source.itemId,
+			},
+			type: "store-board-item-in-inventory",
+		});
+	});
+
+	it("rejects board-only items dropped onto the inventory board item", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: inventoryBoardItemId,
+			x: 0,
+			y: 0,
+		});
+		const inventoryTarget = boardItem({
+			id: "inventory",
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: inventoryWithEmptySlot,
+				board: rebuildBoardView([
+					source,
+					inventoryTarget,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: inventoryTarget.x,
+					y: inventoryTarget.y,
+					boardItemId: inventoryTarget.id,
+				},
+			}),
+		).toEqual({
+			feedback: {
+				cellKey: "1:0",
+				kind: "board-cell",
+			},
+			type: "reject",
+		});
+	});
+
+	it("uses the live empty cell instead of a stale target item id", () => {
 		const source = boardItem({
 			id: "source",
 			itemId: "item:twig",
@@ -92,6 +205,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 				]),
@@ -104,11 +218,11 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			type: "reject",
-			feedback: {
-				kind: "board-cell",
-				cellKey: "1:3",
-			},
+			type: "move-board-item",
+			input: boardMoveInput(source, {
+				x: 1,
+				y: 3,
+			}),
 		});
 	});
 
@@ -129,6 +243,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -148,10 +263,7 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "merge-cell",
 				cellKey: "1:0",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -171,7 +283,8 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
-				config: defaultGameConfig,
+				config: directionalMergeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					twig,
 					water,
@@ -191,7 +304,8 @@ describe("resolveBoardCellDropAction", () => {
 
 		expect(
 			resolveBoardCellDropAction({
-				config: defaultGameConfig,
+				config: directionalMergeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					twig,
 					water,
@@ -207,6 +321,126 @@ describe("resolveBoardCellDropAction", () => {
 		).toMatchObject({
 			animation: "parallel-swap",
 			type: "swap-board-items",
+		});
+	});
+
+	it("uses the live target cell item instead of a stale empty target snapshot", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: emptyInventory,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+				},
+			}),
+		).toEqual({
+			type: "merge-board-items",
+			animation: "parallel-merge",
+			feedback: {
+				kind: "merge-cell",
+				cellKey: "1:0",
+			},
+			input: boardPairInput(source, target),
+		});
+	});
+
+	it("rejects stale board drag sources whose live item id changed", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:water",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config: directionalMergeConfig,
+				inventory: emptyInventory,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: {
+					...boardSource(source),
+					itemId: "item:twig",
+				},
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toEqual({
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: "1:0",
+			},
+		});
+	});
+
+	it("rejects stale board drag sources that no longer exist in the live board view", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const target = boardItem({
+			id: "target",
+			itemId: "item:twig",
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: emptyInventory,
+				board: rebuildBoardView([
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toEqual({
+			type: "reject",
+			feedback: {
+				kind: "board-cell",
+				cellKey: "1:0",
+			},
 		});
 	});
 
@@ -236,6 +470,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config: runtimeConfig,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -251,10 +486,7 @@ describe("resolveBoardCellDropAction", () => {
 		).toEqual({
 			type: "swap-board-items",
 			animation: "parallel-swap",
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
@@ -275,6 +507,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -290,14 +523,11 @@ describe("resolveBoardCellDropAction", () => {
 		).toEqual({
 			type: "swap-board-items",
 			animation: "parallel-swap",
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
-	it("does not treat passive requirements as droppable stored slots", () => {
+	it("does not treat passive grants as droppable stored slots", () => {
 		const source = boardItem({
 			id: "source",
 			itemId: "item:twig",
@@ -313,15 +543,6 @@ describe("resolveBoardCellDropAction", () => {
 			activation: {
 				inputs: [],
 				kind: "producer",
-				requirements: [
-					{
-						type: "passive",
-						itemId: "item:twig",
-						quantity: 1,
-						capacity: 1,
-						stored: 0,
-					},
-				],
 				trigger: "click",
 			},
 		} satisfies BoardViewItem;
@@ -329,6 +550,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -344,14 +566,11 @@ describe("resolveBoardCellDropAction", () => {
 		).toEqual({
 			type: "swap-board-items",
 			animation: "parallel-swap",
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 
-	it("applies board items to stored requirement slots", () => {
+	it("applies board items to stash inputs", () => {
 		const source = boardItem({
 			id: "source",
 			itemId: "item:twig",
@@ -360,22 +579,21 @@ describe("resolveBoardCellDropAction", () => {
 		});
 		const target = {
 			id: "target",
-			itemId: "item:lumber-camp-1",
+			itemId: "item:branch",
 			state: {},
 			x: 1,
 			y: 0,
 			activation: {
-				inputs: [],
-				kind: "producer",
-				requirements: [
+				inputs: [
 					{
 						capacity: 1,
+						consume: true,
 						itemId: "item:twig",
 						quantity: 1,
 						stored: 0,
-						type: "stored",
 					},
 				],
+				kind: "stash",
 				trigger: "click",
 			},
 		} satisfies BoardViewItem;
@@ -383,6 +601,7 @@ describe("resolveBoardCellDropAction", () => {
 		expect(
 			resolveBoardCellDropAction({
 				config,
+				inventory: emptyInventory,
 				board: rebuildBoardView([
 					source,
 					target,
@@ -396,90 +615,13 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			type: "merge-board-items",
+			type: "apply-board-item-to-board-item",
 			feedback: {
 				cellKey: "1:0",
 				kind: "cell-feedback",
-				variant: "primary",
+				variant: "secondary",
 			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
-		});
-	});
-
-	it("applies board items to missing product-line stored requirements", () => {
-		const source = boardItem({
-			id: "source",
-			itemId: "item:twig",
-			x: 0,
-			y: 0,
-		});
-		const target = {
-			id: "target",
-			itemId: "item:lumber-camp-1",
-			state: {},
-			x: 1,
-			y: 0,
-			activation: {
-				inputs: [],
-				kind: "producer",
-				productLines: [
-					{
-						durationMs: 1000,
-						enabled: true,
-						inProgress: false,
-						inputItemIds: [],
-						inputs: [],
-						inputsReady: true,
-						missingRequirementItemIds: [
-							"item:twig",
-						],
-						name: "Test product",
-						producerQueuedJobs: 0,
-						productId: "product:test",
-						progress: undefined,
-						queueFull: false,
-						queuedJobs: 0,
-						queueSize: 1,
-						requirementItemIds: [
-							"item:twig",
-						],
-						requirementsReady: false,
-					},
-				],
-				requirements: [],
-				trigger: "click",
-			},
-		} satisfies BoardViewItem;
-
-		expect(
-			resolveBoardCellDropAction({
-				config,
-				board: rebuildBoardView([
-					source,
-					target,
-				]),
-				source: boardSource(source),
-				target: {
-					kind: "cell",
-					x: 1,
-					y: 0,
-					boardItemId: target.id,
-				},
-			}),
-		).toEqual({
-			type: "merge-board-items",
-			feedback: {
-				cellKey: "1:0",
-				kind: "cell-feedback",
-				variant: "primary",
-			},
-			input: {
-				sourceBoardItemId: "source",
-				targetBoardItemId: "target",
-			},
+			input: boardPairInput(source, target),
 		});
 	});
 });

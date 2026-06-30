@@ -1,9 +1,7 @@
 import { memo } from "react";
-import { boardColumns } from "~/v0/board/boardColumns";
-import { boardRows } from "~/v0/board/boardRows";
 import type { BoardCellView } from "~/v0/board/boardCells";
-import { cn } from "~/v0/ui/cn";
 import type { TileEngineNamespace as TileEngine } from "~/v0/tile-engine";
+import { cn } from "~/v0/ui/cn";
 
 export namespace BoardCell {
 	export interface Props {
@@ -14,20 +12,44 @@ export namespace BoardCell {
 	}
 }
 
+const cellFeedbackClassName = (variant: TileEngine.DropFeedbackVariant | undefined): string => {
+	if (variant === "secondary") return "bg-ak-success/20 opacity-100 outline-ak-success/30";
+	if (variant === "subtle") return "bg-ak-secondary/20 opacity-100 outline-ak-secondary/30";
+	if (variant === "danger") return "bg-ak-danger/20 opacity-100 outline-ak-danger/35";
+	if (variant === "primary") return "bg-pink-400/20 opacity-100 outline-ak-primary/40";
+
+	return "opacity-0";
+};
+
 export const BoardCell = memo(
 	({ cell, feedbackVariant, invalid, statusVariant }: BoardCell.Props) => (
 		<div
+			data-ui="board cell"
 			data-ak-board-cell={`${cell.x}:${cell.y}`}
 			data-ak-board-cell-feedback={feedbackVariant}
 			data-ak-board-cell-status={statusVariant}
+			data-ak-cell-invalid={invalid ? "true" : undefined}
 			className={cn(
-				"relative aspect-square touch-none border-b border-r border-slate-800/65 bg-slate-900/45",
-				cell.x === boardColumns - 1 && "border-r-0",
-				cell.y === boardRows - 1 && "border-b-0",
-				feedbackVariant && "ak-cell-feedback",
-				statusVariant && "ak-cell-status",
-				invalid && "ak-cell-error",
+				"relative aspect-square touch-none bg-white/[0.045]",
+				invalid &&
+					"bg-ak-danger/15 outline outline-1 -outline-offset-1 outline-ak-danger/35",
 			)}
-		/>
+		>
+			<span
+				aria-hidden="true"
+				className={cn(
+					"pointer-events-none absolute inset-[0.12rem] rounded-[0.12rem] outline outline-1 -outline-offset-1 outline-transparent transition-[opacity,background-color,outline-color] duration-150 ease-out",
+					statusVariant && "bg-ak-danger/15 opacity-100 outline-ak-danger/30",
+					!statusVariant && "opacity-0",
+				)}
+			/>
+			<span
+				aria-hidden="true"
+				className={cn(
+					"pointer-events-none absolute inset-[0.12rem] rounded-[0.12rem] outline outline-1 -outline-offset-1 outline-transparent transition-[opacity,background-color,outline-color] duration-150 ease-out",
+					cellFeedbackClassName(feedbackVariant),
+				)}
+			/>
+		</div>
 	),
 );

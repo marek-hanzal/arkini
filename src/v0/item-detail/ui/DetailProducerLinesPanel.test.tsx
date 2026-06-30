@@ -80,6 +80,31 @@ describe("DetailProducerLinesPanel", () => {
 		);
 	});
 
+	it("renders separators between product lines only", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							name: "Grain",
+							productId: "product:farm:grain",
+						}),
+					),
+					lineModel(
+						createLine({
+							name: "Water",
+							productId: "product:farm:water",
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html.match(/data-ui="detail producer line separator"/g)?.length).toBe(1);
+		expect(html).toContain("border-b border-ak-border/70");
+	});
+
 	it("keeps product-line icons only in outputs, not duplicated in the header", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

@@ -1,7 +1,7 @@
 {
 	"craftRecipes": {
 		"item:blueprint-academy": {
-			"durationMs": 1000,
+			"durationMs": 55000,
 			"inputs": [
 				{
 					"consume": true,
@@ -19,7 +19,7 @@
 				{
 					"consume": true,
 					"itemId": "item:paper",
-					"quantity": 3
+					"quantity": 4
 				},
 				{
 					"consume": true,
@@ -58,7 +58,7 @@
 			]
 		},
 		"item:blueprint-armory-t1": {
-			"durationMs": 1000,
+			"durationMs": 70000,
 			"inputs": [
 				{
 					"consume": true,
@@ -115,7 +115,7 @@
 			]
 		},
 		"item:blueprint-bakery-t1": {
-			"durationMs": 1000,
+			"durationMs": 24000,
 			"inputs": [
 				{
 					"consume": true,
@@ -124,8 +124,7 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
+					"itemId": "item:stone-block"
 				},
 				{
 					"consume": true,
@@ -138,7 +137,7 @@
 			]
 		},
 		"item:blueprint-blacksmith-t1": {
-			"durationMs": 1000,
+			"durationMs": 65000,
 			"inputs": [
 				{
 					"consume": true,
@@ -197,7 +196,7 @@
 			]
 		},
 		"item:blueprint-brewery-t1": {
-			"durationMs": 1000,
+			"durationMs": 26000,
 			"inputs": [
 				{
 					"consume": true,
@@ -215,7 +214,7 @@
 			]
 		},
 		"item:blueprint-brickyard": {
-			"durationMs": 1000,
+			"durationMs": 48000,
 			"inputs": [
 				{
 					"consume": true,
@@ -269,7 +268,7 @@
 			]
 		},
 		"item:blueprint-cathedral": {
-			"durationMs": 1000,
+			"durationMs": 150000,
 			"inputs": [
 				{
 					"consume": true,
@@ -385,7 +384,7 @@
 			]
 		},
 		"item:blueprint-cattle-farm-t1": {
-			"durationMs": 1000,
+			"durationMs": 22000,
 			"inputs": [
 				{
 					"consume": true,
@@ -407,7 +406,7 @@
 			]
 		},
 		"item:blueprint-charcoal-burner-t1": {
-			"durationMs": 1000,
+			"durationMs": 44000,
 			"inputs": [
 				{
 					"consume": true,
@@ -460,7 +459,7 @@
 			]
 		},
 		"item:blueprint-chicken-coop-t1": {
-			"durationMs": 1000,
+			"durationMs": 18000,
 			"inputs": [
 				{
 					"consume": true,
@@ -474,7 +473,7 @@
 			]
 		},
 		"item:blueprint-civic-office-t1": {
-			"durationMs": 1000,
+			"durationMs": 36000,
 			"inputs": [
 				{
 					"consume": true,
@@ -498,7 +497,7 @@
 			]
 		},
 		"item:blueprint-clay-pit": {
-			"durationMs": 1000,
+			"durationMs": 42000,
 			"inputs": [
 				{
 					"consume": true,
@@ -542,7 +541,7 @@
 			]
 		},
 		"item:blueprint-coal-mine-t1": {
-			"durationMs": 1000,
+			"durationMs": 58000,
 			"inputs": [
 				{
 					"consume": true,
@@ -591,7 +590,7 @@
 			]
 		},
 		"item:blueprint-construction-yard-t1": {
-			"durationMs": 1000,
+			"durationMs": 70000,
 			"inputs": [
 				{
 					"consume": true,
@@ -667,7 +666,7 @@
 			]
 		},
 		"item:blueprint-cookhouse-t1": {
-			"durationMs": 1000,
+			"durationMs": 30000,
 			"inputs": [
 				{
 					"consume": true,
@@ -690,7 +689,7 @@
 			]
 		},
 		"item:blueprint-dairy-t1": {
-			"durationMs": 1000,
+			"durationMs": 22000,
 			"inputs": [
 				{
 					"consume": true,
@@ -708,7 +707,7 @@
 			]
 		},
 		"item:blueprint-dye-workshop-t1": {
-			"durationMs": 1000,
+			"durationMs": 40000,
 			"inputs": [
 				{
 					"consume": true,
@@ -752,7 +751,7 @@
 			]
 		},
 		"item:blueprint-farm-t1": {
-			"durationMs": 1000,
+			"durationMs": 14000,
 			"inputs": [
 				{
 					"consume": true,
@@ -765,7 +764,7 @@
 			]
 		},
 		"item:blueprint-glassworks": {
-			"durationMs": 1000,
+			"durationMs": 55000,
 			"inputs": [
 				{
 					"consume": true,
@@ -825,7 +824,7 @@
 			]
 		},
 		"item:blueprint-glazier-workshop-t1": {
-			"durationMs": 1000,
+			"durationMs": 80000,
 			"inputs": [
 				{
 					"consume": true,
@@ -890,7 +889,7 @@
 			]
 		},
 		"item:blueprint-gold-mine-t1": {
-			"durationMs": 1000,
+			"durationMs": 70000,
 			"inputs": [
 				{
 					"consume": true,
@@ -939,7 +938,7 @@
 			]
 		},
 		"item:blueprint-goldsmith-t1": {
-			"durationMs": 1000,
+			"durationMs": 72000,
 			"inputs": [
 				{
 					"consume": true,
@@ -997,7 +996,7 @@
 			]
 		},
 		"item:blueprint-heroes-guild-t1": {
-			"durationMs": 1000,
+			"durationMs": 95000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1064,7 +1063,7 @@
 			]
 		},
 		"item:blueprint-house-of-engineers": {
-			"durationMs": 1000,
+			"durationMs": 140000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1182,7 +1181,7 @@
 			]
 		},
 		"item:blueprint-house-t1": {
-			"durationMs": 1000,
+			"durationMs": 18000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1221,7 +1220,7 @@
 			]
 		},
 		"item:blueprint-house-t2": {
-			"durationMs": 1000,
+			"durationMs": 24000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1274,7 +1273,7 @@
 			]
 		},
 		"item:blueprint-house-t3": {
-			"durationMs": 1000,
+			"durationMs": 36000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1326,7 +1325,7 @@
 			]
 		},
 		"item:blueprint-house-t4": {
-			"durationMs": 1000,
+			"durationMs": 65000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1385,7 +1384,7 @@
 			]
 		},
 		"item:blueprint-iron-mine-t1": {
-			"durationMs": 1000,
+			"durationMs": 62000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1434,7 +1433,7 @@
 			]
 		},
 		"item:blueprint-lumberjack-t1": {
-			"durationMs": 1000,
+			"durationMs": 8000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1447,7 +1446,7 @@
 			]
 		},
 		"item:blueprint-mage-lodge": {
-			"durationMs": 1000,
+			"durationMs": 145000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1566,12 +1565,12 @@
 			]
 		},
 		"item:blueprint-market-t1": {
-			"durationMs": 1000,
+			"durationMs": 28000,
 			"inputs": [
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 3
+					"quantity": 4
 				},
 				{
 					"consume": true,
@@ -1589,7 +1588,7 @@
 			]
 		},
 		"item:blueprint-market-t2": {
-			"durationMs": 1000,
+			"durationMs": 36000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1628,7 +1627,7 @@
 			]
 		},
 		"item:blueprint-paper-mill-t1": {
-			"durationMs": 1000,
+			"durationMs": 34000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1650,7 +1649,7 @@
 			]
 		},
 		"item:blueprint-pig-farm-t1": {
-			"durationMs": 1000,
+			"durationMs": 20000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1669,7 +1668,7 @@
 			]
 		},
 		"item:blueprint-prospector-guild-t1": {
-			"durationMs": 1000,
+			"durationMs": 38000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1698,7 +1697,7 @@
 			]
 		},
 		"item:blueprint-prospector-guild-t2": {
-			"durationMs": 1000,
+			"durationMs": 45000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1741,7 +1740,7 @@
 			]
 		},
 		"item:blueprint-purifier-t1": {
-			"durationMs": 1000,
+			"durationMs": 48000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1800,7 +1799,7 @@
 			]
 		},
 		"item:blueprint-quarry-t1": {
-			"durationMs": 1000,
+			"durationMs": 9000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1814,7 +1813,7 @@
 			]
 		},
 		"item:blueprint-quarry-t2": {
-			"durationMs": 1000,
+			"durationMs": 72000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1860,7 +1859,7 @@
 			]
 		},
 		"item:blueprint-roof-tile-factory": {
-			"durationMs": 1000,
+			"durationMs": 48000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1919,7 +1918,7 @@
 			]
 		},
 		"item:blueprint-sand-pit": {
-			"durationMs": 1000,
+			"durationMs": 42000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1963,7 +1962,7 @@
 			]
 		},
 		"item:blueprint-sawmill-t1": {
-			"durationMs": 1000,
+			"durationMs": 12000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1977,7 +1976,7 @@
 			]
 		},
 		"item:blueprint-school": {
-			"durationMs": 1000,
+			"durationMs": 32000,
 			"inputs": [
 				{
 					"consume": true,
@@ -1991,7 +1990,8 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:paper"
+					"itemId": "item:paper",
+					"quantity": 2
 				},
 				{
 					"consume": true,
@@ -2016,7 +2016,7 @@
 			]
 		},
 		"item:blueprint-sheep-pasture-t1": {
-			"durationMs": 1000,
+			"durationMs": 22000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2038,7 +2038,7 @@
 			]
 		},
 		"item:blueprint-slaughterhouse-t1": {
-			"durationMs": 1000,
+			"durationMs": 24000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2057,7 +2057,7 @@
 			]
 		},
 		"item:blueprint-smelter-t1": {
-			"durationMs": 1000,
+			"durationMs": 65000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2111,7 +2111,7 @@
 			]
 		},
 		"item:blueprint-stonemason-t1": {
-			"durationMs": 1000,
+			"durationMs": 12000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2125,7 +2125,7 @@
 			]
 		},
 		"item:blueprint-stonemason-t2": {
-			"durationMs": 1000,
+			"durationMs": 75000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2171,7 +2171,7 @@
 			]
 		},
 		"item:blueprint-tailor-workshop-t1": {
-			"durationMs": 1000,
+			"durationMs": 42000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2219,7 +2219,7 @@
 			]
 		},
 		"item:blueprint-tannery-t1": {
-			"durationMs": 1000,
+			"durationMs": 38000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2246,7 +2246,7 @@
 			]
 		},
 		"item:blueprint-tavern-t1": {
-			"durationMs": 1000,
+			"durationMs": 28000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2265,7 +2265,7 @@
 			]
 		},
 		"item:blueprint-townhall-t2": {
-			"durationMs": 1000,
+			"durationMs": 30000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2324,7 +2324,7 @@
 			]
 		},
 		"item:blueprint-townhall-t3": {
-			"durationMs": 1000,
+			"durationMs": 45000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2338,7 +2338,7 @@
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 3
+					"quantity": 4
 				},
 				{
 					"consume": true,
@@ -2401,7 +2401,7 @@
 			]
 		},
 		"item:blueprint-townhall-t4": {
-			"durationMs": 1000,
+			"durationMs": 60000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2410,12 +2410,12 @@
 				{
 					"consume": true,
 					"itemId": "item:plank",
-					"quantity": 4
+					"quantity": 5
 				},
 				{
 					"consume": true,
 					"itemId": "item:stone-block",
-					"quantity": 4
+					"quantity": 5
 				},
 				{
 					"consume": true,
@@ -2503,7 +2503,7 @@
 			]
 		},
 		"item:blueprint-university": {
-			"durationMs": 1000,
+			"durationMs": 90000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2535,7 +2535,7 @@
 				{
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
-					"quantity": 2
+					"quantity": 3
 				},
 				{
 					"consume": true,
@@ -2584,7 +2584,7 @@
 			]
 		},
 		"item:blueprint-vegetable-garden-t1": {
-			"durationMs": 1000,
+			"durationMs": 16000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2598,7 +2598,7 @@
 			]
 		},
 		"item:blueprint-weaver-hut-t1": {
-			"durationMs": 1000,
+			"durationMs": 36000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2621,7 +2621,7 @@
 			]
 		},
 		"item:blueprint-well-t1": {
-			"durationMs": 1000,
+			"durationMs": 9000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2635,7 +2635,7 @@
 			]
 		},
 		"item:blueprint-windmill-t1": {
-			"durationMs": 1000,
+			"durationMs": 20000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2653,7 +2653,7 @@
 			]
 		},
 		"item:blueprint-winery-t1": {
-			"durationMs": 1000,
+			"durationMs": 28000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2671,7 +2671,7 @@
 			]
 		},
 		"item:blueprint-library-t1": {
-			"durationMs": 1000,
+			"durationMs": 14000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2691,7 +2691,7 @@
 			"resultItemId": "producer:library-t1"
 		},
 		"item:blueprint-library-t2": {
-			"durationMs": 1000,
+			"durationMs": 38000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2716,7 +2716,7 @@
 			"resultItemId": "producer:library-t2"
 		},
 		"item:blueprint-library-t3": {
-			"durationMs": 1000,
+			"durationMs": 48000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2747,7 +2747,7 @@
 			"resultItemId": "producer:library-t3"
 		},
 		"item:blueprint-library-t4": {
-			"durationMs": 1000,
+			"durationMs": 65000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2776,7 +2776,7 @@
 			"resultItemId": "producer:library-t4"
 		},
 		"item:blueprint-waste-processor-t1": {
-			"durationMs": 1000,
+			"durationMs": 34000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2796,7 +2796,7 @@
 			"resultItemId": "producer:waste-processor-t1"
 		},
 		"item:blueprint-bio-waste-processor-t1": {
-			"durationMs": 1000,
+			"durationMs": 34000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2820,7 +2820,7 @@
 			"resultItemId": "producer:bio-waste-processor-t1"
 		},
 		"item:blueprint-waste-processor-t2": {
-			"durationMs": 1000,
+			"durationMs": 46000,
 			"inputs": [
 				{
 					"consume": true,
@@ -2878,7 +2878,7 @@
 			]
 		},
 		"item:blueprint-bio-waste-processor-t2": {
-			"durationMs": 1000,
+			"durationMs": 46000,
 			"inputs": [
 				{
 					"consume": true,

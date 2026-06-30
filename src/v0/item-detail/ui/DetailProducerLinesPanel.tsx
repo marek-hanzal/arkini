@@ -261,7 +261,7 @@ const DetailProducerLineCard: FC<{
 		.join(" · ");
 
 	return (
-		<article className="min-w-0 rounded-sm bg-ak-surface-soft p-3 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.035)]">
+		<article className="min-w-0">
 			<header className="flex min-w-0 items-start justify-between gap-3">
 				<div className="min-w-0 flex-1">
 					<div className="flex min-w-0 flex-wrap items-center gap-1.5">
@@ -386,7 +386,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 					onSelect={setSelectedGroupId}
 				/>
 			) : null}
-			<div className="mt-2 grid gap-2">
+			<div className="mt-2 grid gap-4">
 				{activeGroup.lines.map((model) => (
 					<DetailProducerLineCard
 						key={model.line.productId}

@@ -53,6 +53,33 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 });
 
 describe("DetailProducerLinesPanel", () => {
+	it("renders product lines without an extra nested card shell", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 0,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain('<article class="min-w-0">');
+		expect(html).not.toContain(
+			"rounded-sm bg-ak-surface-soft p-3 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.035)]",
+		);
+	});
+
 	it("keeps product-line icons only in outputs, not duplicated in the header", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

@@ -70,4 +70,40 @@ describe("defaultGameConfig", () => {
 		expect(oneSecondProductIds).toEqual([]);
 		expect(oneSecondCraftIds).toEqual([]);
 	});
+	it("keeps blueprint planning costs separate from construction costs", () => {
+		const repeatedBlueprintCosts = Object.entries(defaultGameConfig.products)
+			.flatMap(([productId, product]) =>
+				(product.output ?? []).flatMap((output) => {
+					if (!("itemId" in output)) return [];
+					const blueprintItemId = output.itemId;
+					if (!blueprintItemId.includes(":blueprint-")) return [];
+					const craftRecipe = defaultGameConfig.craftRecipes[blueprintItemId];
+					if (craftRecipe === undefined) return [];
+
+					const productInputItemIds = new Set(
+						(product.inputs ?? []).map((input) => input.itemId),
+					);
+					return craftRecipe.inputs
+						.map((input) => input.itemId)
+						.filter((itemId) => productInputItemIds.has(itemId))
+						.map((itemId) => `${productId} repeats ${itemId}`);
+				}),
+			)
+			.sort();
+
+		expect(repeatedBlueprintCosts).toEqual([]);
+	});
+
+	it("keeps feasts as construction labor cost instead of town hall plan cost", () => {
+		expect(
+			defaultGameConfig.products["product:townhall-t3:blueprint-townhall-t4"]?.inputs?.map(
+				(input) => input.itemId,
+			),
+		).not.toContain("item:feast");
+		expect(
+			defaultGameConfig.craftRecipes["item:blueprint-townhall-t4"]?.inputs.map(
+				(input) => input.itemId,
+			),
+		).toContain("item:feast");
+	});
 });

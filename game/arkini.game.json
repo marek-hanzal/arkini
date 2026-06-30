@@ -1039,16 +1039,6 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 4
-				},
-				{
-					"consume": true,
 					"itemId": "item:luxury-clothing",
 					"quantity": 1
 				},
@@ -1462,6 +1452,11 @@
 				},
 				{
 					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"consume": true,
 					"itemId": "item:marble-block",
 					"quantity": 3
 				},
@@ -1472,18 +1467,8 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
-				},
-				{
-					"consume": true,
 					"itemId": "item:luxury-clothing",
 					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 6
 				},
 				{
 					"consume": true,
@@ -1577,11 +1562,6 @@
 					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
 				}
 			],
 			"resultItemId": "producer:charcoal-burner-t1"
@@ -1666,11 +1646,6 @@
 					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
 				}
 			],
 			"resultItemId": "producer:clay-pit"
@@ -1712,11 +1687,6 @@
 				{
 					"consume": true,
 					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				},
 				{
@@ -2042,11 +2012,6 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
-				},
-				{
-					"consume": true,
 					"itemId": "item:coin-stack",
 					"quantity": 1
 				}
@@ -2090,11 +2055,6 @@
 				{
 					"consume": true,
 					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				},
 				{
@@ -2228,11 +2188,6 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
-				},
-				{
-					"consume": true,
 					"itemId": "item:coin-stack",
 					"quantity": 2
 				}
@@ -2320,17 +2275,17 @@
 				},
 				{
 					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"consume": true,
 					"itemId": "item:marble-block",
 					"quantity": 1
 				},
 				{
 					"consume": true,
 					"itemId": "item:stained-glass",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:master-knowledge",
 					"quantity": 1
 				},
 				{
@@ -2630,11 +2585,6 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
-				},
-				{
-					"consume": true,
 					"itemId": "item:coin",
 					"quantity": 2
 				}
@@ -2852,6 +2802,11 @@
 				},
 				{
 					"consume": true,
+					"itemId": "item:treasure-chest",
+					"quantity": 1
+				},
+				{
+					"consume": true,
 					"itemId": "item:marble-block",
 					"quantity": 2
 				},
@@ -2859,11 +2814,6 @@
 					"consume": true,
 					"itemId": "item:stained-glass",
 					"quantity": 3
-				},
-				{
-					"consume": true,
-					"itemId": "item:master-knowledge",
-					"quantity": 1
 				},
 				{
 					"consume": true,
@@ -3070,18 +3020,8 @@
 				},
 				{
 					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
-				},
-				{
-					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 2
 				},
 				{
 					"consume": true,
@@ -3138,11 +3078,6 @@
 				{
 					"consume": true,
 					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				},
 				{
@@ -3321,11 +3256,6 @@
 					"consume": true,
 					"itemId": "item:building-permit",
 					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 1
 				}
 			],
 			"resultItemId": "producer:sand-pit"
@@ -3482,11 +3412,6 @@
 				{
 					"consume": true,
 					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
 					"quantity": 1
 				}
 			],
@@ -3978,11 +3903,6 @@
 					"consume": true,
 					"itemId": "item:roof-tiles",
 					"quantity": 2
-				},
-				{
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 3
 				},
 				{
 					"consume": true,
@@ -9370,38 +9290,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
+					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:nails",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 20,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
 				}
 			],
 			"name": "Blueprint: Armory I",
@@ -9425,30 +9315,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Bio-Waste Processor II",
@@ -9470,38 +9336,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 20,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
 				}
 			],
 			"name": "Blueprint: Blacksmith I",
@@ -9525,30 +9361,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:clay",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Brickyard",
@@ -9576,32 +9388,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:log",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:paper",
 					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Charcoal Burner I",
@@ -9629,20 +9417,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:clay-deposit",
 					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Clay Pit",
@@ -9670,20 +9446,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:paper",
 					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Coal Mine I",
@@ -9707,36 +9471,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:bricks",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:roof-tiles",
-					"quantity": 2
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 5
 				}
 			],
 			"name": "Blueprint: Construction Yard I",
@@ -9760,30 +9494,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:sand",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Glassworks",
@@ -9811,20 +9521,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:paper",
 					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
 				}
 			],
 			"name": "Blueprint: Gold Mine I",
@@ -9846,38 +9544,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:gold-ingot",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 20,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
 				}
 			],
 			"name": "Blueprint: Goldsmith I",
@@ -9905,20 +9573,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:paper",
 					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Iron Mine I",
@@ -9946,20 +9602,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
 					"itemId": "item:paper",
 					"quantity": 2
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Prospector Guild 2",
@@ -9983,30 +9627,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 2
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
 				}
 			],
 			"name": "Blueprint: Purifier I",
@@ -10030,30 +9650,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:clay",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Roof Tile Factory",
@@ -10081,20 +9677,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:sand-deposit",
 					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Sand Pit",
@@ -10118,30 +9702,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:iron-ore",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
 				}
 			],
 			"name": "Blueprint: Smelter I",
@@ -10163,43 +9723,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:bricks",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:roof-tiles",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
 					"itemId": "item:advanced-knowledge",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
 					"quantity": 2
 				}
 			],
@@ -10224,30 +9748,6 @@
 					"consume": true,
 					"itemId": "item:advanced-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coal",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:charcoal",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
 				}
 			],
 			"name": "Blueprint: Waste Processor II",
@@ -11855,32 +11355,14 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
 					"itemId": "item:basic-knowledge",
 					"quantity": 2
 				},
 				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 3
-				},
-				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
+					"itemId": "item:paper",
+					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Academy",
@@ -16846,26 +16328,6 @@
 		"product:townhall-t1:blueprint-library-t1": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:log",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Library I",
 			"output": [
 				{
@@ -16881,14 +16343,6 @@
 		"product:townhall-t1:blueprint-lumberjack-t1": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:log",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Lumberjack I",
 			"output": [
 				{
@@ -16904,14 +16358,6 @@
 		"product:townhall-t1:blueprint-quarry-t1": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Quarry I",
 			"output": [
 				{
@@ -16927,14 +16373,6 @@
 		"product:townhall-t1:blueprint-sawmill-t1": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:log",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Sawmill I",
 			"output": [
 				{
@@ -16950,14 +16388,6 @@
 		"product:townhall-t1:blueprint-stonemason-t1": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Stonemason I",
 			"output": [
 				{
@@ -16973,26 +16403,6 @@
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Town Hall II",
 			"output": [
 				{
@@ -17008,14 +16418,6 @@
 		"product:townhall-t1:blueprint-well-t1": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Well I",
 			"output": [
 				{
@@ -17031,26 +16433,6 @@
 		"product:townhall-t2:blueprint-bio-waste-processor-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Bio-Waste Processor I",
 			"output": [
 				{
@@ -17066,26 +16448,6 @@
 		"product:townhall-t2:blueprint-cattle-farm-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Cattle Farm I",
 			"output": [
 				{
@@ -17101,20 +16463,6 @@
 		"product:townhall-t2:blueprint-chicken-coop-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Chicken Coop I",
 			"output": [
 				{
@@ -17130,20 +16478,6 @@
 		"product:townhall-t2:blueprint-farm-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Farm I",
 			"output": [
 				{
@@ -17165,12 +16499,6 @@
 					"consume": true,
 					"itemId": "item:food-supply",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
 				}
 			],
 			"name": "Blueprint: House I",
@@ -17188,20 +16516,6 @@
 		"product:townhall-t2:blueprint-pig-farm-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Pig Farm I",
 			"output": [
 				{
@@ -17217,26 +16531,6 @@
 		"product:townhall-t2:blueprint-sheep-pasture-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Sheep Pasture I",
 			"output": [
 				{
@@ -17252,32 +16546,6 @@
 		"product:townhall-t2:blueprint-townhall-t3": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:food-supply",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:wool",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Town Hall III",
 			"output": [
 				{
@@ -17293,20 +16561,6 @@
 		"product:townhall-t2:blueprint-vegetable-garden-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Vegetable Garden I",
 			"output": [
 				{
@@ -17322,26 +16576,6 @@
 		"product:townhall-t2:blueprint-waste-processor-t1": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Waste Processor I",
 			"output": [
 				{
@@ -17467,20 +16701,6 @@
 		"product:townhall-t3:blueprint-bakery-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:flour",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Bakery I",
 			"output": [
 				{
@@ -17496,26 +16716,6 @@
 		"product:townhall-t3:blueprint-brewery-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Brewery I",
 			"output": [
 				{
@@ -17531,26 +16731,6 @@
 		"product:townhall-t3:blueprint-cookhouse-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Cookhouse I",
 			"output": [
 				{
@@ -17566,20 +16746,6 @@
 		"product:townhall-t3:blueprint-dairy-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:milk",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Dairy I",
 			"output": [
 				{
@@ -17599,19 +16765,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:beer",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
 					"quantity": 1
 				}
 			],
@@ -17630,26 +16784,6 @@
 		"product:townhall-t3:blueprint-market-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:bread",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:sausage",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Market",
 			"output": [
 				{
@@ -17665,20 +16799,6 @@
 		"product:townhall-t3:blueprint-slaughterhouse-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:piglet",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Slaughterhouse I",
 			"output": [
 				{
@@ -17694,20 +16814,6 @@
 		"product:townhall-t3:blueprint-tavern-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:beer-barrel",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Tavern I",
 			"output": [
 				{
@@ -17727,26 +16833,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 3
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 3
+					"itemId": "item:food-supply",
+					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Town Hall IV",
@@ -17764,20 +16852,6 @@
 		"product:townhall-t3:blueprint-windmill-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Windmill I",
 			"output": [
 				{
@@ -17793,26 +16867,6 @@
 		"product:townhall-t3:blueprint-winery-t1": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:grain",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Winery I",
 			"output": [
 				{
@@ -17886,26 +16940,6 @@
 		"product:townhall-t4:blueprint-civic-office-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Civic Office I",
 			"output": [
 				{
@@ -17921,32 +16955,6 @@
 		"product:townhall-t4:blueprint-dye-workshop-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:vegetables",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Dye Workshop I",
 			"output": [
 				{
@@ -17962,32 +16970,6 @@
 		"product:townhall-t4:blueprint-house-t3": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:common-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
-				},
-				{
-					"capacity": 12,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 3
-				}
-			],
 			"name": "Blueprint: House III",
 			"output": [
 				{
@@ -18003,26 +16985,6 @@
 		"product:townhall-t4:blueprint-library-t2": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 4
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stone-block",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Library II",
 			"output": [
 				{
@@ -18038,26 +17000,6 @@
 		"product:townhall-t4:blueprint-library-t3": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 8
-				}
-			],
 			"name": "Blueprint: Library III",
 			"output": [
 				{
@@ -18073,26 +17015,6 @@
 		"product:townhall-t4:blueprint-library-t4": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:advanced-knowledge",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Library IV",
 			"output": [
 				{
@@ -18108,26 +17030,6 @@
 		"product:townhall-t4:blueprint-market-t2": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Market II",
 			"output": [
 				{
@@ -18143,26 +17045,6 @@
 		"product:townhall-t4:blueprint-paper-mill-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:water",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:plank",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Paper Mill I",
 			"output": [
 				{
@@ -18178,26 +17060,6 @@
 		"product:townhall-t4:blueprint-prospector-guild-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:basic-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 2
-				}
-			],
 			"name": "Blueprint: Prospector Guild 1",
 			"output": [
 				{
@@ -18213,20 +17075,6 @@
 		"product:townhall-t4:blueprint-school": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:coin",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: School",
 			"output": [
 				{
@@ -18242,32 +17090,6 @@
 		"product:townhall-t4:blueprint-tailor-workshop-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:common-cloth",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:leather",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Tailor Workshop I",
 			"output": [
 				{
@@ -18283,26 +17105,6 @@
 		"product:townhall-t4:blueprint-tannery-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:raw-hide",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Tannery I",
 			"output": [
 				{
@@ -18318,26 +17120,6 @@
 		"product:townhall-t4:blueprint-weaver-hut-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"inputs": [
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:building-permit",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:wool",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:paper",
-					"quantity": 1
-				}
-			],
 			"name": "Blueprint: Weaver Hut I",
 			"output": [
 				{
@@ -18447,43 +17229,7 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 2,
-					"consume": true,
-					"itemId": "item:treasure-chest",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 8,
-					"consume": true,
 					"itemId": "item:paper",
-					"quantity": 4
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
 					"quantity": 2
 				}
 			],
@@ -18508,30 +17254,6 @@
 					"consume": true,
 					"itemId": "item:master-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:glass",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:pigment",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Glazier Workshop I",
@@ -18553,38 +17275,8 @@
 				{
 					"capacity": 4,
 					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
 					"itemId": "item:master-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:luxury-clothing",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:feast",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Heroes Guild I",
@@ -18640,48 +17332,6 @@
 					"consume": true,
 					"itemId": "item:master-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 2,
-					"consume": true,
-					"itemId": "item:treasure-chest",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:iron-ingot",
-					"quantity": 2
-				},
-				{
-					"capacity": 8,
-					"consume": true,
-					"itemId": "item:nails",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: House of Engineers",
@@ -18705,24 +17355,6 @@
 					"consume": true,
 					"itemId": "item:master-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: House IV",
@@ -18778,48 +17410,6 @@
 					"consume": true,
 					"itemId": "item:master-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 2,
-					"consume": true,
-					"itemId": "item:treasure-chest",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:marble-block",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 2
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:pigment",
-					"quantity": 2
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:sapphire",
-					"quantity": 1
-				},
-				{
-					"capacity": 6,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 2
 				}
 			],
 			"name": "Blueprint: Mage Lodge",
@@ -18843,24 +17433,6 @@
 					"consume": true,
 					"itemId": "item:master-knowledge",
 					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:construction-bundle",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coin-stack",
-					"quantity": 1
 				}
 			],
 			"name": "Blueprint: Quarry 2",
@@ -18883,24 +17455,6 @@
 					"capacity": 4,
 					"consume": true,
 					"itemId": "item:master-knowledge",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:guild-charter",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:stained-glass",
-					"quantity": 1
-				},
-				{
-					"capacity": 4,
-					"consume": true,
-					"itemId": "item:coin-stack",
 					"quantity": 1
 				}
 			],

@@ -32,13 +32,8 @@ export const DetailCard: FC<DetailCard.Props> = ({
 							{eyebrow}
 						</p>
 					) : null}
-					{title ? (
-						<h3
-							className={cn(
-								"break-words text-base font-black leading-5 text-ak-text",
-								eyebrow && "mt-1",
-							)}
-						>
+					{title && !eyebrow ? (
+						<h3 className="break-words text-base font-black leading-5 text-ak-text">
 							{title}
 						</h3>
 					) : null}

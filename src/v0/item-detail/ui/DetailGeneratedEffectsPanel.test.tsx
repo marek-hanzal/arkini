@@ -41,7 +41,8 @@ describe("DetailGeneratedEffectsPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Provided effects");
+		expect(html).toContain("Effects");
+		expect(html).not.toContain("Provided effects");
 		expect(html).not.toContain(">1</span>");
 	});
 });

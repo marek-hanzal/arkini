@@ -5,6 +5,8 @@ import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInp
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
+import { readDetailEffectRequirementLabel } from "~/v0/item-detail/ui/readDetailEffectRequirementLabel";
+import { readDetailItemName } from "~/v0/item-detail/ui/readDetailItemName";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
 import { UiProgressButton } from "~/v0/ui/UiProgressButton";
@@ -32,13 +34,6 @@ const formatPercent = (value: number) => {
 	const rounded = Math.round(percent * 10) / 10;
 	return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)}%`;
 };
-
-const readItemName = (itemId: string, items: ItemCatalogView) =>
-	items[itemId]?.name ??
-	itemId
-		.replace(/^item:/, "")
-		.replace(/^producer:/, "")
-		.replaceAll("-", " ");
 
 const readQuantityLabel = (
 	quantity: NonNullable<ProducerProductLineView["outputs"]>[number]["quantity"],
@@ -81,7 +76,10 @@ const readTargetLimitLabel = (
 	limit: NonNullable<ProducerProductLineView["targetLimits"]>[number],
 	items: ItemCatalogView,
 ) => {
-	const itemName = readItemName(limit.itemId, items);
+	const itemName = readDetailItemName({
+		itemId: limit.itemId,
+		items,
+	});
 	const baseLabel = `${itemName} ${limit.ownedQuantity}/${limit.maxCount}`;
 	return limit.remainingQuantity < limit.requiredQuantity
 		? `${baseLabel} · limit reached`
@@ -159,7 +157,11 @@ const DetailLineOutputs: FC<{
 							/>
 							<div className="min-w-0 flex-1">
 								<p className="break-words font-black text-ak-text">
-									{outputItem?.name ?? readItemName(output.itemId, items)}
+									{outputItem?.name ??
+										readDetailItemName({
+											itemId: output.itemId,
+											items,
+										})}
 								</p>
 								<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
 									{readOutputMeta(output)}
@@ -209,7 +211,11 @@ const DetailLineInputs: FC<{
 						/>
 						<div className="min-w-0 flex-1">
 							<p className="break-words font-black text-ak-text">
-								{inputItem?.name ?? readItemName(input.itemId, items)}
+								{inputItem?.name ??
+									readDetailItemName({
+										itemId: input.itemId,
+										items,
+									})}
 							</p>
 							<p
 								className={cn(
@@ -249,6 +255,18 @@ const DetailProducerLineCard: FC<{
 	const targetLimits = line.targetLimits ?? [];
 	const effectBenefits = line.effectBenefits ?? [];
 	const effectBonusLines = line.effectBonusLines ?? [];
+	const effectRequirementTitle = visibleRequirements.some(
+		(requirement) => requirement.kind === "grant.blockStart",
+	)
+		? "Blocked effects"
+		: "Missing effects";
+	const effectRequirementLabels = visibleRequirements.map(
+		(requirement) =>
+			`${readEffectRequirementPrefix(requirement)} ${readDetailEffectRequirementLabel({
+				items,
+				label: requirement.label,
+			})}`,
+	);
 	const showInputs = !line.inputsReady && !line.inProgress;
 	const meta = [
 		line.lineKind === "effect"
@@ -285,10 +303,6 @@ const DetailProducerLineCard: FC<{
 
 			{targetLimitReached ? null : (
 				<div className="mt-3 grid gap-2">
-					<DetailLineOutputs
-						items={items}
-						line={line}
-					/>
 					<DetailLineNoteList
 						items={effectBenefits}
 						title="Effect grants"
@@ -299,13 +313,10 @@ const DetailProducerLineCard: FC<{
 						title="Active bonuses"
 						tone="good"
 					/>
-					{visibleRequirements.length ? (
+					{effectRequirementLabels.length ? (
 						<DetailLineNoteList
-							items={visibleRequirements.map(
-								(requirement) =>
-									`${readEffectRequirementPrefix(requirement)} ${requirement.label}`,
-							)}
-							title="Blocked requirements"
+							items={effectRequirementLabels}
+							title={effectRequirementTitle}
 							tone="warn"
 						/>
 					) : null}
@@ -316,6 +327,10 @@ const DetailProducerLineCard: FC<{
 							tone="neutral"
 						/>
 					) : null}
+					<DetailLineOutputs
+						items={items}
+						line={line}
+					/>
 					{showInputs ? (
 						<DetailLineInputs
 							items={items}
@@ -397,7 +412,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 					onSelect={setSelectedGroupId}
 				/>
 			) : null}
-			<div className="mt-2 flex flex-col gap-3">
+			<div className="mt-2 flex flex-col gap-[0.9rem]">
 				{activeGroup.lines.map((model, index) => (
 					<Fragment key={model.line.productId}>
 						{index > 0 ? (

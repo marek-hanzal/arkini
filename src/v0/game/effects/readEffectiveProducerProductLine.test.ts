@@ -609,4 +609,186 @@ describe("readEffectiveProducerProductLine", () => {
 			"item:axe",
 		]);
 	});
+
+	it("does not keep bonus chance from a disabled duplicate output drop", () => {
+		const baseConfig = createEngineTestConfig();
+		const bonusGrantId = "grant:test:bonus";
+		const bonusEffectId = "effect:test:bonus";
+		const missingGrantId = "grant:test:missing";
+		const config = createEngineTestConfig({
+			effects: {
+				[bonusEffectId]: {
+					polarity: "buff",
+					grants: [
+						{
+							id: bonusGrantId,
+							name: "Bonus grant",
+						},
+					],
+					name: "Bonus Grant",
+					sourceScope: "inventory",
+				},
+				"effect:test:missing": {
+					polarity: "neutral",
+					grants: [
+						{
+							id: missingGrantId,
+							name: "Missing grant",
+						},
+					],
+					name: "Missing Grant",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						bonusEffectId,
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+							effects: [
+								{
+									chance: 0.5,
+									display: "whenActive",
+									kind: "grant.loot.extraOutputChance.add",
+									label: "Disabled source bonus",
+									quantity: 1,
+									selector: allOfGrant(bonusGrantId),
+								},
+								{
+									display: "always",
+									kind: "grant.require",
+									label: "Missing unlock",
+									phase: "start",
+									selector: allOfGrant(missingGrantId),
+								},
+							],
+						},
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				inventory: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readLine({
+			config,
+			save,
+		});
+
+		expect(line.lootPlan.visibleOutput).toHaveLength(2);
+		expect(line.lootPlan.baseOutput).toHaveLength(1);
+		expect(line.lootPlan.chanceItems).toEqual([]);
+	});
+
+	it("does not let ready drop requirements re-enable an earlier disabled drop", () => {
+		const baseConfig = createEngineTestConfig();
+		const grantId = "grant:test:disable";
+		const effectId = "effect:test:disable";
+		const config = createEngineTestConfig({
+			effects: {
+				[effectId]: {
+					polarity: "debuff",
+					grants: [
+						{
+							id: grantId,
+							name: "Disable grant",
+						},
+					],
+					name: "Disable Grant",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						effectId,
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+							effects: [
+								{
+									display: "always",
+									kind: "grant.drop.disable",
+									label: "Disable Twig",
+									selector: allOfGrant(grantId),
+								},
+								{
+									display: "always",
+									kind: "grant.require",
+									label: "Ready Requirement",
+									phase: "start",
+									selector: allOfGrant(grantId),
+								},
+							],
+						},
+					],
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				inventory: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readLine({
+			config,
+			save,
+		});
+
+		expect(line.lootPlan.baseOutput).toEqual([]);
+		expect(line.lootPlan.visibleOutput).toMatchObject([
+			{
+				enabled: false,
+				itemId: "item:twig",
+			},
+		]);
+	});
 });

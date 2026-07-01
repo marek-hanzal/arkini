@@ -18,6 +18,7 @@ export interface EffectiveChanceItemEntry {
 	dropEffects?: EffectiveDropEffectOutcome[];
 	effectId?: string;
 	effectName?: string;
+	sourceDropId: string;
 	itemId: string;
 	chance: number;
 	quantity?:

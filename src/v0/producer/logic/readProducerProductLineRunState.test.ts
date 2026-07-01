@@ -129,4 +129,27 @@ describe("readProducerProductLineRunState", () => {
 			label: "Queue paused",
 		});
 	});
+
+	it("blocks lines whose visible drops are all disabled", () => {
+		expect(
+			readProducerProductLineRunState({
+				line: line({
+					outputs: [
+						{
+							enabled: false,
+							itemId: "item:twig",
+							kind: "guaranteed",
+							ownedQuantity: 0,
+							quantity: 1,
+						},
+					],
+				}),
+			}),
+		).toMatchObject({
+			canRunAction: false,
+			inputAvailabilityLabel: "drops disabled",
+			label: "Drops disabled",
+			statusMetaLabel: "drops disabled",
+		});
+	});
 });

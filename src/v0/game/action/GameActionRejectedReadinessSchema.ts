@@ -21,6 +21,7 @@ export const GameActionRejectedReadinessSchema = z
 					"item_busy",
 					"craft_in_progress",
 					"effect:missing-grant",
+					"effect:disabled-output",
 					"producer_queue_full",
 					"producer_charges_depleted",
 					"blocked",

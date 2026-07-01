@@ -52,6 +52,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 						chanceItems: [
 							{
 								chance: 0.35,
+								sourceDropId: "product:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
 								itemId: "item:log",
@@ -100,6 +101,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 						chanceItems: [
 							{
 								chance: 0.35,
+								sourceDropId: "product:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
 								itemId: "item:log",
@@ -107,6 +109,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 							},
 							{
 								chance: 0.35,
+								sourceDropId: "product:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
 								itemId: "item:log",

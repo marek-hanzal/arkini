@@ -77,6 +77,7 @@ describe("readRuntimeProductLineOutputViews", () => {
 					{
 						chance: 0.5,
 						itemId: "item:plank",
+						sourceDropId: "product:test:output:bonus",
 					},
 				],
 			},

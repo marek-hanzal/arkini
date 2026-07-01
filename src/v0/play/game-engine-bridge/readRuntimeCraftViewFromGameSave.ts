@@ -82,6 +82,7 @@ export const readRuntimeCraftViewFromGameSave = ({
 		]),
 		includePendingCraftJobs: true,
 		includePendingProducerJobs: true,
+		nowMs,
 		itemId: recipe.resultItemId,
 		save,
 	});

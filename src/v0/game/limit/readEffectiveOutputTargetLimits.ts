@@ -12,6 +12,7 @@ export namespace readEffectiveOutputTargetLimits {
 		includePendingCraftJobs?: boolean;
 		includePendingCraftSourceItems?: boolean;
 		includePendingProducerJobs?: boolean;
+		nowMs?: number;
 		lootPlan: EffectiveProducerProductLine["lootPlan"];
 		save: GameSave;
 	}
@@ -23,6 +24,7 @@ export const readEffectiveOutputTargetLimits = ({
 	includePendingCraftJobs,
 	includePendingCraftSourceItems,
 	includePendingProducerJobs,
+	nowMs,
 	lootPlan,
 	save,
 }: readEffectiveOutputTargetLimits.Props): ItemTargetLimit[] =>
@@ -33,6 +35,7 @@ export const readEffectiveOutputTargetLimits = ({
 			includePendingCraftJobs,
 			includePendingCraftSourceItems,
 			includePendingProducerJobs,
+			nowMs,
 			output: lootPlan.baseOutput,
 			save,
 		}),

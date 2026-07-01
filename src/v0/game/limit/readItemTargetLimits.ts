@@ -1,6 +1,8 @@
 import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
 import { readBoardItemCount } from "~/v0/game/board/readBoardItemCount";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
+import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
@@ -16,6 +18,7 @@ export namespace readItemTargetLimits {
 		includePendingCraftSourceItems?: boolean;
 		includePendingProducerJobs?: boolean;
 		itemId: string;
+		nowMs?: number;
 		requiredQuantity?: number;
 		save: GameSave;
 	}
@@ -95,10 +98,12 @@ const outputEntryCanCreateTargetItem = ({
 
 const readPendingProducerOutputQuantity = ({
 	config,
+	nowMs,
 	save,
 	targetItemId,
 }: {
 	config: GameConfig;
+	nowMs?: number;
 	save: GameSave;
 	targetItemId: string;
 }) => {
@@ -108,7 +113,19 @@ const readPendingProducerOutputQuantity = ({
 		const product = config.products[job.productId];
 		if (!product?.output) continue;
 
-		for (const outputEntry of product.output) {
+		const effectiveProductLine = readEffectiveProducerProductLine({
+			baseDurationMs: readProducerProductDurationMs({
+				product,
+			}),
+			config,
+			nowMs,
+			producerItemInstanceId: job.producerItemInstanceId,
+			product,
+			productId: job.productId,
+			save,
+		});
+
+		for (const outputEntry of effectiveProductLine.lootPlan.baseOutput) {
 			if (outputEntry.type !== "guaranteed") continue;
 			if (
 				!outputEntryCanCreateTargetItem({
@@ -181,6 +198,7 @@ export const readItemTargetLimits = ({
 	includePendingCraftSourceItems = false,
 	includePendingProducerJobs = false,
 	itemId,
+	nowMs,
 	requiredQuantity = 1,
 	save,
 }: readItemTargetLimits.Props): ItemTargetLimit[] =>
@@ -216,6 +234,7 @@ export const readItemTargetLimits = ({
 			(includePendingProducerJobs
 				? readPendingProducerOutputQuantity({
 						config,
+						nowMs,
 						save,
 						targetItemId,
 					})

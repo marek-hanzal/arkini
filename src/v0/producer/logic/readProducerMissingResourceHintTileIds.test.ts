@@ -3,39 +3,6 @@ import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/read
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-
-const config = {
-	items: {
-		"item:source-producer": {},
-		"item:target-producer": {},
-	},
-	producers: {
-		"item:source-producer": {
-			productIds: [
-				"product:source-water",
-			],
-		},
-		"item:target-producer": {
-			productIds: [
-				"product:target",
-			],
-		},
-	},
-	products: {
-		"product:source-water": {
-			output: [
-				{
-					itemId: "item:water",
-					quantity: 1,
-					type: "guaranteed",
-				},
-			],
-		},
-		"product:target": {},
-	},
-} as unknown as GameConfig;
-
 const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineView => ({
 	durationMs: 1000,
 	inProgress: false,
@@ -121,7 +88,6 @@ describe("readProducerMissingResourceHintTileIds", () => {
 					target,
 					tree,
 				]),
-				config,
 				producerItem: target,
 			}),
 		).toEqual([]);
@@ -148,7 +114,6 @@ describe("readProducerMissingResourceHintTileIds", () => {
 					target,
 					tree,
 				]),
-				config,
 				producerItem: target,
 			}),
 		).toEqual([]);
@@ -195,7 +160,6 @@ describe("readProducerMissingResourceHintTileIds", () => {
 					source,
 					water,
 				]),
-				config,
 				producerItem: target,
 			}),
 		).toEqual([]);
@@ -225,6 +189,18 @@ describe("readProducerMissingResourceHintTileIds", () => {
 		const source = item({
 			id: "source",
 			itemId: "item:source-producer",
+			line: line({
+				outputs: [
+					{
+						enabled: true,
+						itemId: "item:water",
+						kind: "guaranteed",
+						ownedQuantity: 0,
+						quantity: 1,
+					},
+				],
+				productId: "product:source-water",
+			}),
 			x: 1,
 			y: 0,
 		});
@@ -235,11 +211,61 @@ describe("readProducerMissingResourceHintTileIds", () => {
 					target,
 					source,
 				]),
-				config,
 				producerItem: target,
 			}),
 		).toEqual([
 			"source",
 		]);
+	});
+
+	it("does not bounce producers whose effective output view is disabled", () => {
+		const target = item({
+			id: "target",
+			itemId: "item:target-producer",
+			line: line({
+				inputs: [
+					{
+						capacity: 1,
+						consume: true,
+						itemId: "item:water",
+						quantity: 1,
+						stored: 0,
+					},
+				],
+				inputItemIds: [
+					"item:water",
+				],
+			}),
+			x: 0,
+			y: 0,
+		});
+		const source = item({
+			id: "source",
+			itemId: "item:source-producer",
+			line: line({
+				outputs: [
+					{
+						enabled: false,
+						itemId: "item:water",
+						kind: "guaranteed",
+						ownedQuantity: 0,
+						quantity: 1,
+					},
+				],
+				productId: "product:source-water",
+			}),
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			readProducerMissingResourceHintTileIds({
+				board: board([
+					target,
+					source,
+				]),
+				producerItem: target,
+			}),
+		).toEqual([]);
 	});
 });

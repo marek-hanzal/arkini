@@ -33,6 +33,25 @@ describe("runtime readers", () => {
 		expect(item).toEqual(readBoardView(state).byId["item-instance:1"]);
 	});
 
+	it("can rebuild the board view against an explicit clock instead of snapshot time", async () => {
+		const state = await createRuntimeState();
+		state.runtime.save.producerJobs["producer-job:1"] = {
+			id: "producer-job:1",
+			producerItemInstanceId: "item-instance:1",
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		expect(
+			readBoardView(state).byId["item-instance:1"]?.activation?.productLines?.[0]?.progress,
+		).toBe(0);
+		expect(
+			readBoardView(state, 500).byId["item-instance:1"]?.activation?.productLines?.[0]
+				?.progress,
+		).toBe(0.5);
+	});
+
 	it("reads the first empty board cell from raw save coordinates and config dimensions", async () => {
 		const state = await createRuntimeState();
 

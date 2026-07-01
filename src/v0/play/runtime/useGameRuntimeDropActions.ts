@@ -40,8 +40,9 @@ const dispatchItemToBoardItemAction = ({
 	targetBoardItemId: string;
 }) => {
 	const snapshot = store.getSnapshot();
+	const nowMs = Date.now();
 	const { config } = snapshot.runtime;
-	const board = readBoardView(snapshot);
+	const board = readBoardView(snapshot, nowMs);
 	const sourceItemId = resolveSourceItemId({
 		board,
 		snapshot,
@@ -74,6 +75,7 @@ const dispatchItemToBoardItemAction = ({
 				sourceRef,
 				targetItemInstanceId: target.id,
 			}),
+		nowMs,
 	});
 };
 
@@ -122,7 +124,9 @@ export const useGameRuntimeDropActions = (): DropActions => {
 				});
 			},
 			moveBoardItem(input) {
-				const boardItem = readBoardView(store.getSnapshot()).byId[input.boardItemId];
+				const snapshot = store.getSnapshot();
+				const nowMs = Date.now();
+				const boardItem = readBoardView(snapshot, nowMs).byId[input.boardItemId];
 				if (!boardItem || boardItem.itemId !== input.expectedItemId)
 					return Promise.resolve();
 
@@ -133,10 +137,13 @@ export const useGameRuntimeDropActions = (): DropActions => {
 						x: input.x,
 						y: input.y,
 					},
+					nowMs,
 				});
 			},
 			storeBoardItem(input) {
-				const boardItem = readBoardView(store.getSnapshot()).byId[input.boardItemId];
+				const snapshot = store.getSnapshot();
+				const nowMs = Date.now();
+				const boardItem = readBoardView(snapshot, nowMs).byId[input.boardItemId];
 				if (!boardItem || boardItem.itemId !== input.expectedItemId)
 					return Promise.resolve();
 
@@ -145,12 +152,14 @@ export const useGameRuntimeDropActions = (): DropActions => {
 						boardItemId: input.boardItemId,
 						type: "board.item.stash",
 					},
+					nowMs,
 				});
 			},
 			placeInventoryItem(input) {
-				const stack = readInventoryView(store.getSnapshot()).bySlotIndex[
-					String(input.slotIndex)
-				]?.stack;
+				const snapshot = store.getSnapshot();
+				const nowMs = Date.now();
+				const stack =
+					readInventoryView(snapshot).bySlotIndex[String(input.slotIndex)]?.stack;
 				if (
 					!stack ||
 					stack.id !== input.expectedStackId ||
@@ -168,10 +177,13 @@ export const useGameRuntimeDropActions = (): DropActions => {
 						x: input.x,
 						y: input.y,
 					},
+					nowMs,
 				});
 			},
 			swapBoardItems(input) {
-				const board = readBoardView(store.getSnapshot());
+				const snapshot = store.getSnapshot();
+				const nowMs = Date.now();
+				const board = readBoardView(snapshot, nowMs);
 				const source = board.byId[input.sourceBoardItemId];
 				const target = board.byId[input.targetBoardItemId];
 				if (
@@ -189,10 +201,13 @@ export const useGameRuntimeDropActions = (): DropActions => {
 						targetBoardItemId: input.targetBoardItemId,
 						type: "board.items.swap",
 					},
+					nowMs,
 				});
 			},
 			swapInventorySlots(input) {
-				const inventory = readInventoryView(store.getSnapshot());
+				const snapshot = store.getSnapshot();
+				const nowMs = Date.now();
+				const inventory = readInventoryView(snapshot);
 				const source = inventory.bySlotIndex[String(input.sourceSlotIndex)]?.stack;
 				const target = inventory.bySlotIndex[String(input.targetSlotIndex)]?.stack;
 				if (
@@ -211,6 +226,7 @@ export const useGameRuntimeDropActions = (): DropActions => {
 						targetSlotIndex: input.targetSlotIndex,
 						type: "inventory.slots.swap",
 					},
+					nowMs,
 				});
 			},
 		}),

@@ -128,7 +128,7 @@ export const useBoardTileEngineModel = ({
 		(boardItemId: string, expectedItemId: string) => {
 			const snapshot = runtimeStore.getSnapshot();
 			const nowMs = Date.now();
-			const liveBoard = readBoardView(snapshot);
+			const liveBoard = readBoardView(snapshot, nowMs);
 			const liveBoardItem = liveBoard.byId[boardItemId];
 			if (!liveBoardItem || liveBoardItem.itemId !== expectedItemId) return;
 
@@ -199,7 +199,6 @@ export const useBoardTileEngineModel = ({
 
 			const hintTileIds = readProducerMissingResourceHintTileIds({
 				board: liveBoard,
-				config: snapshot.runtime.config,
 				producerItem: liveBoardItem,
 			});
 			if (hintTileIds.length > 0) {
@@ -283,9 +282,10 @@ export const useBoardTileEngineModel = ({
 			},
 			dropFeedback(context) {
 				const snapshot = runtimeStore.getSnapshot();
+				const nowMs = Date.now();
 
 				return resolveBoardDropFeedback({
-					board: readBoardView(snapshot),
+					board: readBoardView(snapshot, nowMs),
 					config: snapshot.runtime.config,
 					context,
 					inventory: readInventoryView(snapshot),
@@ -293,10 +293,11 @@ export const useBoardTileEngineModel = ({
 			},
 			onDrop(context) {
 				const snapshot = runtimeStore.getSnapshot();
+				const nowMs = Date.now();
 
 				return resolveDrop({
 					context,
-					board: readBoardView(snapshot),
+					board: readBoardView(snapshot, nowMs),
 					config: snapshot.runtime.config,
 					inventory: readInventoryView(snapshot),
 					feedback,

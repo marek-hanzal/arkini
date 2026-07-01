@@ -424,7 +424,9 @@ describe("applyGameActionFx BoardInventory", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-stack": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Stackable craft target",
 					maxStackSize: 3,
 					name: "Craft Stack",

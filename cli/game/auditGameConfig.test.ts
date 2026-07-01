@@ -29,7 +29,9 @@ const createConfigValue = () => ({
 	},
 	items: {
 		"item:producer": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
@@ -37,7 +39,9 @@ const createConfigValue = () => ({
 			tier: 0,
 		},
 		"item:fuel": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Fuel",
 			maxStackSize: 10,
 			name: "Fuel",
@@ -45,7 +49,9 @@ const createConfigValue = () => ({
 			tier: 0,
 		},
 		"item:pollution": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Pollution",
 			maxStackSize: 1,
 			name: "Pollution",

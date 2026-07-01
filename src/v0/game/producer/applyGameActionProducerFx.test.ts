@@ -393,7 +393,9 @@ describe("applyGameActionFx Producer", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 1,
 					storage: "both",
@@ -484,7 +486,9 @@ describe("applyGameActionFx Producer", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 3,
 					storage: "both",
@@ -568,7 +572,9 @@ describe("applyGameActionFx Producer", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 3,
 					storage: "both",
@@ -652,7 +658,9 @@ describe("applyGameActionFx Producer", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 3,
 					storage: "both",

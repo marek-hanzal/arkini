@@ -2879,7 +2879,9 @@
 			],
 			"tier": 1,
 			"maxCount": 1,
-			"assetId": "asset:producer:shrine-t1"
+			"assetIds": [
+				"asset:producer:shrine-t1"
+			]
 		},
 		"item:inventory": {
 			"name": "Backpack",

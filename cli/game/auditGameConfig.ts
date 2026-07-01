@@ -110,7 +110,9 @@ const collectUsedAssetDependencyUsage = (config: GameConfig, usage: UsageIndex) 
 
 const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const [itemId, item] of Object.entries(config.items)) {
-		usage.assets.add(item.assetId);
+		for (const assetId of item.assetIds) {
+			usage.assets.add(assetId);
+		}
 
 		if (item.mergeIds && item.mergeIds.length > 0) {
 			itemFlow.consumedItemIds.add(itemId);

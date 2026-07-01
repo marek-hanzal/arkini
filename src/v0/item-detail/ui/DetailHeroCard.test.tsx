@@ -4,7 +4,11 @@ import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import { DetailHeroCard } from "~/v0/item-detail/ui/DetailHeroCard";
 
 const createItem = (overrides: Partial<ViewItem> = {}): ViewItem => ({
-	assetSrc: "townhall.svg",
+	assets: [
+		{
+			src: "townhall.svg",
+		},
+	],
 	description: "Starter civic hub.",
 	generatedEffects: [],
 	id: "producer:town-hall-t1",

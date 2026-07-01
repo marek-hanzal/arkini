@@ -131,7 +131,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 1,
 					storage: "both",
@@ -222,7 +224,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 3,
 					storage: "both",
@@ -306,7 +310,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					maxCount: 1,
 				},
 				"item:blueprint-plank": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Plank blueprint",
 					maxStackSize: 3,
 					storage: "both",
@@ -582,7 +588,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-table": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -645,7 +653,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-table": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -701,7 +711,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-table": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -771,7 +783,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-table": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -825,7 +839,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-table": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",
@@ -1034,7 +1050,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			items: {
 				...baseConfig.items,
 				"item:craft-table": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Craft table",
 					maxStackSize: 1,
 					name: "Craft Table",

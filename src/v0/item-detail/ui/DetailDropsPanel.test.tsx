@@ -4,7 +4,11 @@ import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { DetailDropsPanel } from "~/v0/item-detail/ui/DetailDropsPanel";
 
 const item = (id: string, name: string, assetSrc: string) => ({
-	assetSrc,
+	assets: [
+		{
+			src: assetSrc,
+		},
+	],
 	description: name,
 	generatedEffects: [],
 	id,

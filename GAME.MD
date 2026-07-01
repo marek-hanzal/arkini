@@ -1082,7 +1082,7 @@ Expected fields:
 - `id`
 - `name`
 - `description`
-- `assetId`
+- `assetIds`
 - `maxStackSize`
 - `storage`: `board`, `inventory`, or `both`; default `both`
 - `tags`

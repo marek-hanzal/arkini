@@ -51,7 +51,9 @@ describe("setCheatSpeedModeFx", () => {
 			items: {
 				...baseConfig.items,
 				[cheatSpeedDisableItemId]: {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Closed speed watch",
 					maxStackSize: 3,
 					name: "Closed Speed Watch",
@@ -60,7 +62,9 @@ describe("setCheatSpeedModeFx", () => {
 					tier: 0,
 				},
 				[cheatSpeedEnableItemId]: {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Open speed watch",
 					maxStackSize: 3,
 					name: "Open Speed Watch",

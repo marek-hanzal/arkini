@@ -6,7 +6,11 @@ import { readDetailCraftControl } from "~/v0/item-detail/control/readDetailCraft
 import { DetailCraftPanel } from "~/v0/item-detail/ui/DetailCraftPanel";
 
 const item = (id: string, name: string, assetSrc: string) => ({
-	assetSrc,
+	assets: [
+		{
+			src: assetSrc,
+		},
+	],
 	description: name,
 	generatedEffects: [],
 	id,

@@ -629,7 +629,7 @@ const RemoveByDefinitionSchema = z
  */
 const ItemDefinitionSchema = z
 	.object({
-		assetId: IdSchema,
+		assetIds: z.array(IdSchema).min(1),
 		name: z.string().min(1),
 		tier: NonNegativeIntegerSchema.default(0),
 		maxStackSize: PositiveIntegerSchema.default(10),
@@ -645,7 +645,7 @@ const ItemDefinitionSchema = z
 	.strict();
 
 const ItemDefinitionFragmentSchema = ItemDefinitionSchema.extend({
-	assetId: IdSchema.optional(),
+	assetIds: z.array(IdSchema).min(1).optional(),
 });
 
 const ProducerDepletedModeSchema = z.enum([
@@ -848,16 +848,19 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	}
 
 	for (const [itemId, item] of Object.entries(value.items)) {
-		if (!value.assets[item.assetId]) {
-			addIssue(
-				ctx,
-				[
-					"items",
-					itemId,
-					"assetId",
-				],
-				`Missing asset "${item.assetId}".`,
-			);
+		for (const [assetIndex, assetId] of item.assetIds.entries()) {
+			if (!value.assets[assetId]) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"assetIds",
+						assetIndex,
+					],
+					`Missing asset "${assetId}".`,
+				);
+			}
 		}
 
 		validateUniqueStringList(
@@ -1975,12 +1978,12 @@ const readBlueprintItemIds = (config: z.infer<typeof BaseGameConfigSchema>) =>
 	new Set(
 		Object.entries(config.items)
 			.filter(([itemId, item]) => {
-				const asset = config.assets[item.assetId];
+				const primaryAsset = config.assets[item.assetIds[0]];
 
 				return (
 					itemId.startsWith("item:blueprint-") ||
 					item.tags.includes("blueprint") ||
-					asset?.render === "blueprint"
+					primaryAsset?.render === "blueprint"
 				);
 			})
 			.map(([itemId]) => itemId),

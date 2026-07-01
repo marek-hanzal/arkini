@@ -6,7 +6,11 @@ import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDeta
 import { DetailProducerLinesPanel } from "~/v0/item-detail/ui/DetailProducerLinesPanel";
 
 const item = (id: string, name: string, assetSrc: string) => ({
-	assetSrc,
+	assets: [
+		{
+			src: assetSrc,
+		},
+	],
 	description: name,
 	generatedEffects: [],
 	id,

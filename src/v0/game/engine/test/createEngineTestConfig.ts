@@ -28,7 +28,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 		},
 		items: {
 			"item:producer": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Producer",
 				maxStackSize: 1,
 				name: "Producer",
@@ -36,7 +38,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:twig": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Twig",
 				maxStackSize: 3,
 				mergeIds: [
@@ -47,7 +51,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:plank": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Plank",
 				maxStackSize: 2,
 				name: "Plank",
@@ -55,7 +61,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 1,
 			},
 			"item:craft-table": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Craft table",
 				maxStackSize: 1,
 				name: "Craft Table",
@@ -63,7 +71,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:key": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Key",
 				maxStackSize: 3,
 				name: "Key",
@@ -71,7 +81,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:stash": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Stash",
 				maxStackSize: 1,
 				name: "Stash",
@@ -79,7 +91,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:axe": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Axe",
 				maxStackSize: 1,
 				name: "Axe",
@@ -87,7 +101,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:rock": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Rock",
 				maxStackSize: 1,
 				name: "Rock",
@@ -101,7 +117,9 @@ export const createEngineTestConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 			"item:empty-stash": {
-				assetId: "asset:test",
+				assetIds: [
+					"asset:test",
+				],
 				description: "Empty stash",
 				maxStackSize: 1,
 				name: "Empty Stash",

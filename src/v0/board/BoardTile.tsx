@@ -70,6 +70,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			)}
 		>
 			<GameItemView
+				assetProgress={liveBoardItem?.craft?.inputProgress}
 				item={item}
 				variant="board"
 			/>

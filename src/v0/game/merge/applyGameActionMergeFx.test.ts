@@ -14,7 +14,9 @@ describe("applyGameActionFx merge", () => {
 			items: {
 				...baseConfig.items,
 				"item:water": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Water",
 					maxStackSize: 3,
 					mergeIds: [

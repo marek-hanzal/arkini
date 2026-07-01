@@ -74,7 +74,9 @@ const createValidConfigValue = () => ({
 	},
 	items: {
 		"item:producer": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
@@ -82,7 +84,9 @@ const createValidConfigValue = () => ({
 			tier: 0,
 		},
 		"item:twig": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Twig",
 			maxStackSize: 3,
 			name: "Twig",
@@ -92,7 +96,9 @@ const createValidConfigValue = () => ({
 			tier: 0,
 		},
 		"item:plank": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Plank",
 			maxStackSize: 2,
 			name: "Plank",
@@ -100,7 +106,9 @@ const createValidConfigValue = () => ({
 			tier: 1,
 		},
 		"item:craft-target": {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Craft target",
 			maxStackSize: 1,
 			name: "Craft Target",
@@ -268,6 +276,15 @@ describe("GameConfigSchema", () => {
 		(config.assets["asset:item"] as Record<string, unknown>).kind = "item";
 
 		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key.*kind/);
+	});
+
+	it("rejects obsolete single item asset ids", () => {
+		const config = createValidConfigValue();
+		const item = config.items["item:twig"] as Record<string, unknown>;
+		delete item.assetIds;
+		item.assetId = "asset:item";
+
+		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key.*assetId/);
 	});
 
 	it("rejects duplicate producer product lines", () => {
@@ -613,7 +630,9 @@ describe("GameConfigSchema", () => {
 	it("rejects blueprint craft recipes that require their own target", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:blueprint-house-t1"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "House I Blueprint",
 			maxStackSize: 1,
 			name: "House I Blueprint",
@@ -621,7 +640,9 @@ describe("GameConfigSchema", () => {
 			tier: 0,
 		};
 		config.items["producer:house-t1"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "House I",
 			maxStackSize: 1,
 			name: "House I",
@@ -646,7 +667,9 @@ describe("GameConfigSchema", () => {
 	it("rejects indirect blueprint dependency cycles through crafted buildings", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:blueprint-a"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Blueprint A",
 			maxStackSize: 1,
 			name: "Blueprint A",
@@ -654,7 +677,9 @@ describe("GameConfigSchema", () => {
 			tier: 0,
 		};
 		config.items["item:blueprint-b"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Blueprint B",
 			maxStackSize: 1,
 			name: "Blueprint B",
@@ -662,7 +687,9 @@ describe("GameConfigSchema", () => {
 			tier: 0,
 		};
 		config.items["producer:a"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "A",
 			maxStackSize: 1,
 			name: "A",
@@ -670,7 +697,9 @@ describe("GameConfigSchema", () => {
 			tier: 1,
 		};
 		config.items["producer:b"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "B",
 			maxStackSize: 1,
 			name: "B",
@@ -706,7 +735,9 @@ describe("GameConfigSchema", () => {
 	it("rejects blueprint product lines that require the building they unlock", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:blueprint-a"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Blueprint A",
 			maxStackSize: 1,
 			name: "Blueprint A",
@@ -714,7 +745,9 @@ describe("GameConfigSchema", () => {
 			tier: 0,
 		};
 		config.items["producer:a"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "A",
 			maxStackSize: 1,
 			name: "A",
@@ -756,7 +789,9 @@ describe("GameConfigSchema", () => {
 	it("rejects producer progression that is cross-locked behind another future producer", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:blueprint-a"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Blueprint A",
 			maxStackSize: 1,
 			name: "Blueprint A",
@@ -766,7 +801,9 @@ describe("GameConfigSchema", () => {
 			tier: 0,
 		};
 		config.items["item:blueprint-b"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Blueprint B",
 			maxStackSize: 1,
 			name: "Blueprint B",
@@ -776,7 +813,9 @@ describe("GameConfigSchema", () => {
 			tier: 0,
 		};
 		config.items["item:a-part"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Part A",
 			maxStackSize: 1,
 			name: "Part A",
@@ -784,7 +823,9 @@ describe("GameConfigSchema", () => {
 			tier: 1,
 		};
 		config.items["item:b-part"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Part B",
 			maxStackSize: 1,
 			name: "Part B",
@@ -792,7 +833,9 @@ describe("GameConfigSchema", () => {
 			tier: 1,
 		};
 		config.items["producer:a"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Producer A",
 			maxStackSize: 1,
 			name: "Producer A",
@@ -802,7 +845,9 @@ describe("GameConfigSchema", () => {
 			tier: 1,
 		};
 		config.items["producer:b"] = {
-			assetId: "asset:item",
+			assetIds: [
+				"asset:item",
+			],
 			description: "Producer B",
 			maxStackSize: 1,
 			name: "Producer B",

@@ -211,12 +211,19 @@ const normalizePackage = (value: unknown): unknown => {
 		const item = {
 			...(itemEntry as Record<string, unknown>),
 		};
-		const assetId = typeof item.assetId === "string" ? item.assetId : `asset:${itemId}`;
+		const assetIds = Array.isArray(item.assetIds)
+			? item.assetIds
+			: [
+					`asset:${itemId}`,
+				];
 
-		item.assetId = assetId;
+		item.assetIds = assetIds;
 		normalizedItems[itemId] = item;
 
-		assets[assetId] = normalizeAssetDefinition(assetId, assets[assetId]);
+		for (const assetId of assetIds) {
+			if (typeof assetId !== "string") continue;
+			assets[assetId] = normalizeAssetDefinition(assetId, assets[assetId]);
+		}
 	}
 
 	for (const [craftRecipeId, craftRecipeEntry] of Object.entries(craftRecipes)) {

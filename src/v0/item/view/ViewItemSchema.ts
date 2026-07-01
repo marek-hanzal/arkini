@@ -25,19 +25,23 @@ const ViewItemGeneratedEffectSchema = z.object({
 	]),
 });
 
-export const ViewItemSchema = z.object({
-	id: GameItemIdSchema,
-	name: z.string(),
-	description: z.string(),
-	label: z.string().optional(),
-	assetSrc: z.string(),
-	assetOverlaySrc: z.string().optional(),
-	assetRender: z
+const ViewItemAssetSchema = z.object({
+	src: z.string(),
+	overlaySrc: z.string().optional(),
+	render: z
 		.enum([
 			"plain",
 			"blueprint",
 		])
 		.optional(),
+});
+
+export const ViewItemSchema = z.object({
+	id: GameItemIdSchema,
+	name: z.string(),
+	description: z.string(),
+	label: z.string().optional(),
+	assets: z.array(ViewItemAssetSchema).min(1),
 	maxStackSize: z.number().int().positive(),
 	storage: z.enum([
 		"board",
@@ -53,5 +57,6 @@ export namespace ViewItemSchema {
 	export type Type = z.infer<ViewItemSchema>;
 }
 
+export type ViewItemAsset = z.infer<typeof ViewItemAssetSchema>;
 export type ViewItemGeneratedEffect = z.infer<typeof ViewItemGeneratedEffectSchema>;
 export type ViewItem = ViewItemSchema.Type;

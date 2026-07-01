@@ -11,7 +11,9 @@ describe("readRuntimeProductLineOutputViews", () => {
 			items: {
 				...baseConfig.items,
 				"item:pollution": {
-					assetId: "asset:test",
+					assetIds: [
+						"asset:test",
+					],
 					description: "Pollution",
 					maxStackSize: 99,
 					name: "Pollution",

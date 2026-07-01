@@ -5,15 +5,17 @@ import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
 
 export namespace DetailHeroCard {
 	export interface Props {
+		assetProgress?: number;
 		item: ViewItem;
 	}
 }
 
-export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ item }) => (
+export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ assetProgress, item }) => (
 	<DetailCard>
 		<div className="flex min-w-0 gap-4">
 			<div className="flex h-28 w-28 max-w-[34vw] shrink-0 items-center justify-center rounded-sm bg-ak-surface-soft p-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
 				<GameItemView
+					assetProgress={assetProgress}
 					item={item}
 					variant="inventory"
 				/>

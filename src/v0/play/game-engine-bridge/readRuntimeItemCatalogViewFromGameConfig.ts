@@ -1,7 +1,7 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import type { ViewItem } from "~/v0/item/view/ViewItemSchema";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
+import type { ViewItem, ViewItemAsset } from "~/v0/item/view/ViewItemSchema";
+import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 
 const catalogCache = new WeakMap<GameConfig, ItemCatalogView>();
 
@@ -40,10 +40,15 @@ const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: 
 		];
 	});
 
-const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: string }): ViewItem => {
-	const item = config.items[itemId];
-	const asset = config.assets[item.assetId];
-	const overlayAssetSrc = asset?.overlayAssetId
+const readCatalogItemAsset = ({
+	assetId,
+	config,
+}: {
+	assetId: string;
+	config: GameConfig;
+}): ViewItemAsset => {
+	const asset = config.assets[assetId];
+	const overlaySrc = asset?.overlayAssetId
 		? resolveAssetSrc({
 				assetId: asset.overlayAssetId,
 				config,
@@ -51,16 +56,29 @@ const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: strin
 		: undefined;
 
 	return {
+		src: resolveAssetSrc({
+			assetId,
+			config,
+		}),
+		overlaySrc,
+		render: asset?.render ?? "plain",
+	};
+};
+
+const readCatalogItem = ({ config, itemId }: { config: GameConfig; itemId: string }): ViewItem => {
+	const item = config.items[itemId];
+
+	return {
 		id: itemId as ItemId,
 		name: item.name,
 		description: item.description,
 		label: item.label,
-		assetSrc: resolveAssetSrc({
-			assetId: item.assetId,
-			config,
-		}),
-		assetOverlaySrc: overlayAssetSrc,
-		assetRender: asset?.render ?? "plain",
+		assets: item.assetIds.map((assetId) =>
+			readCatalogItemAsset({
+				assetId,
+				config,
+			}),
+		),
 		maxStackSize: item.maxStackSize,
 		storage: item.storage,
 		tags: [

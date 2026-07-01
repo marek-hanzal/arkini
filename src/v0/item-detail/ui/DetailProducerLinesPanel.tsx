@@ -12,7 +12,12 @@ import { UiButton } from "~/v0/ui/UiButton";
 import { UiProgressButton } from "~/v0/ui/UiProgressButton";
 import { cn } from "~/v0/ui/cn";
 import type { DetailProducerLineModel } from "~/v0/item-detail/control/DetailProducerLineModel";
-import { DetailCard, DetailMutedPill, DetailTabs } from "~/v0/item-detail/ui/DetailCard";
+import {
+	DetailCard,
+	DetailMutedPill,
+	DetailSeparator,
+	DetailTabs,
+} from "~/v0/item-detail/ui/DetailCard";
 import {
 	effectDetailPolarityTabs,
 	readEffectDetailPolarityClassName,
@@ -302,7 +307,7 @@ const DetailProducerLineCard: FC<{
 				label: requirement.label,
 			})}`,
 	);
-	const showInputs = !line.inputsReady && !line.inProgress;
+	const showInputs = !line.inProgress;
 	const meta = [
 		line.lineKind === "effect"
 			? `Window ${formatMs(line.durationMs)}`
@@ -438,16 +443,10 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 					onSelect={setSelectedGroupId}
 				/>
 			) : null}
-			<div className="mt-2 flex flex-col gap-[0.9rem]">
+			<div className="mt-3 flex flex-col gap-4">
 				{activeGroup.lines.map((model, index) => (
 					<Fragment key={model.line.productId}>
-						{index > 0 ? (
-							<div
-								aria-hidden="true"
-								className="border-b border-violet-300/25"
-								data-ui="detail producer line separator"
-							/>
-						) : null}
+						{index > 0 ? <DetailSeparator className="my-1.5" /> : null}
 						<DetailProducerLineCard
 							items={items}
 							model={model}

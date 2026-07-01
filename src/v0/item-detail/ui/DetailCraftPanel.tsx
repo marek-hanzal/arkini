@@ -48,7 +48,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
 	const effectBlockReasons = craft.effectBlockReasons ?? [];
-	const showInputs = craft.phase === "collecting_inputs" && craft.inputProgress < 1;
+	const showInputs = craft.phase === "collecting_inputs";
 
 	return (
 		<DetailCard

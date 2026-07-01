@@ -52,6 +52,19 @@ describe("readRuntimeEffectBenefitLines", () => {
 						chanceItems: [
 							{
 								chance: 0.35,
+								dropEffects: [
+									{
+										active: true,
+										display: "whenActive",
+										effectId: "effect:shrine-bountiful-offering",
+										effectName: "Bountiful Offering",
+										impact: "chance",
+										kind: "grant.loot.extraOutputChance.add",
+										label: "Bountiful Offering",
+										ready: true,
+										result: "+35% extra roll",
+									},
+								],
 								sourceDropId: "product:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
@@ -101,6 +114,19 @@ describe("readRuntimeEffectBenefitLines", () => {
 						chanceItems: [
 							{
 								chance: 0.35,
+								dropEffects: [
+									{
+										active: true,
+										display: "whenActive",
+										effectId: "effect:shrine-bountiful-offering",
+										effectName: "Bountiful Offering",
+										impact: "chance",
+										kind: "grant.loot.extraOutputChance.add",
+										label: "Bountiful Offering",
+										ready: true,
+										result: "+35% extra roll",
+									},
+								],
 								sourceDropId: "product:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
@@ -109,6 +135,19 @@ describe("readRuntimeEffectBenefitLines", () => {
 							},
 							{
 								chance: 0.35,
+								dropEffects: [
+									{
+										active: true,
+										display: "whenActive",
+										effectId: "effect:shrine-bountiful-offering",
+										effectName: "Bountiful Offering",
+										impact: "chance",
+										kind: "grant.loot.extraOutputChance.add",
+										label: "Bountiful Offering",
+										ready: true,
+										result: "+35% extra roll",
+									},
+								],
 								sourceDropId: "product:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
@@ -125,5 +164,36 @@ describe("readRuntimeEffectBenefitLines", () => {
 			"Minor Haste ×2: 44% faster production.",
 			"Bountiful Offering ×2: 58% chance for at least +1× Log (2 rolls, max +2×).",
 		]);
+	});
+
+	it("respects hidden display rules when summarizing chance bonuses", () => {
+		expect(
+			readRuntimeProductLineActiveEffectBonusLines({
+				baseDurationMs: 1000,
+				config: defaultGameConfig,
+				effectiveProductLine: {
+					appliedEffects: [],
+					blocked: false,
+					blockReasons: [],
+					durationMs: 1000,
+					lootPlan: {
+						baseOutput: [],
+						visibleOutput: [],
+						chanceItems: [
+							{
+								chance: 0.35,
+								effectId: "effect:shrine-bountiful-offering",
+								effectName: "Bountiful Offering",
+								itemId: "item:log",
+								quantity: 1,
+								sourceDropId: "product:test:output:0",
+							},
+						],
+					},
+					requirements: [],
+					visible: true,
+				},
+			}),
+		).toEqual([]);
 	});
 });

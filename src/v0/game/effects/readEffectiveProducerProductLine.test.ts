@@ -528,6 +528,85 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(line.requirements).toEqual([]);
 	});
 
+	it("keeps bonus chance display rules on generated chance drops", () => {
+		const baseConfig = createEngineTestConfig();
+		const grantId = "grant:test:bonus";
+		const effectId = "effect:test:bonus";
+		const config = createEngineTestConfig({
+			effects: {
+				[effectId]: {
+					grants: [
+						{
+							id: grantId,
+							name: "Bonus grant",
+						},
+					],
+					name: "Bonus Grant",
+					polarity: "buff",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						effectId,
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							effects: [
+								{
+									chance: 0.25,
+									display: "never",
+									kind: "grant.loot.extraOutputChance.add",
+									label: "Hidden Bonus Label",
+									quantity: 1,
+									selector: allOfGrant(grantId),
+								},
+							],
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				inventory: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readLine({
+			config,
+			save,
+		});
+
+		expect(line.lootPlan.chanceItems).toMatchObject([
+			{
+				chance: 0.25,
+				itemId: "item:twig",
+			},
+		]);
+		expect(line.lootPlan.chanceItems[0]?.dropEffects).toBeUndefined();
+	});
+
 	it("counts every active nearby duration source without pretending bonuses are requirements", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

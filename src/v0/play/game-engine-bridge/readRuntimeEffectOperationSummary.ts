@@ -141,7 +141,9 @@ const readAggregatedChanceItemLines = ({
 	>();
 
 	for (const chanceItem of effectiveProductLine.lootPlan.chanceItems) {
-		if (!chanceItem.effectId || !chanceItem.effectName) continue;
+		if (!chanceItem.effectId || !chanceItem.effectName || !chanceItem.dropEffects?.length) {
+			continue;
+		}
 
 		const quantityRange = readQuantityRange(chanceItem.quantity);
 		const groupKey = [

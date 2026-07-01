@@ -41,9 +41,14 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 			save,
 		});
 
+		const hasEnabledOutput =
+			subject.product.output === undefined ||
+			effectiveProductLine.lootPlan.baseOutput.length > 0;
+
 		return (
 			effectiveProductLine.visible &&
 			effectiveProductLine.startRequirementsReady !== false &&
+			hasEnabledOutput &&
 			!effectiveProductLine.blocked
 		);
 	},

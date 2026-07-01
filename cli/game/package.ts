@@ -259,16 +259,22 @@ const normalizePackage = (value: unknown): unknown => {
 		};
 
 		product.name ??= readProductNameFromPrimaryOutput(product, normalizedItems);
+		const productDomainIndexes = {
+			items: createTaggedDomainIndex({
+				entries: normalizedItems,
+				ids: Object.keys(normalizedItems),
+				label: "item",
+			}),
+		};
 		product.effects = normalizeLineEffects({
-			domainIndexes: {
-				items: createTaggedDomainIndex({
-					entries: normalizedItems,
-					ids: Object.keys(normalizedItems),
-					label: "item",
-				}),
-			},
+			domainIndexes: productDomainIndexes,
 			effects: product.effects,
 			path: `products.${productId}.effects`,
+		});
+		product.output = normalizeActivationOutputEffects({
+			domainIndexes: productDomainIndexes,
+			output: product.output,
+			path: `products.${productId}.output`,
 		});
 		normalizedProducts[productId] = product;
 	}
@@ -411,17 +417,87 @@ const normalizeLineEffects = ({
 				selector: asAuthoringDomainSelector(effect.items),
 			});
 		}
-		if (effect.kind === "grant.loot.extraOutputChance.add") {
-			const outputItems = asRecord(effect.outputItems);
-			effect.outputItems = {
-				items: normalizeAuthoringDomainSelector({
-					domain: domainIndexes.items,
-					path: `${path}.${effectIndex}.outputItems.items`,
-					selector: asAuthoringDomainSelector(outputItems.items),
-				}),
-			};
+		return effect;
+	});
+};
+
+const normalizeDropEffects = ({
+	domainIndexes,
+	effects,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	effects: unknown;
+	path: string;
+}) => {
+	if (!Array.isArray(effects)) return effects;
+	return effects.map((effectEntry, effectIndex) => {
+		if (!effectEntry || typeof effectEntry !== "object" || Array.isArray(effectEntry)) {
+			return effectEntry;
+		}
+		const effect = {
+			...(effectEntry as Record<string, unknown>),
+		};
+		if (effect.kind === "nearby.require" && effect.items !== undefined) {
+			effect.items = normalizeAuthoringDomainSelector({
+				domain: domainIndexes.items,
+				path: `${path}.${effectIndex}.items`,
+				selector: asAuthoringDomainSelector(effect.items),
+			});
 		}
 		return effect;
+	});
+};
+
+const normalizeActivationOutputEffects = ({
+	domainIndexes,
+	output,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	output: unknown;
+	path: string;
+}) => {
+	if (!Array.isArray(output)) return output;
+
+	return output.map((outputEntry, outputIndex) => {
+		if (!outputEntry || typeof outputEntry !== "object" || Array.isArray(outputEntry)) {
+			return outputEntry;
+		}
+		const entry = {
+			...(outputEntry as Record<string, unknown>),
+		};
+		if (entry.type === "weighted" && Array.isArray(entry.entries)) {
+			entry.entries = entry.entries.map((weightedEntry, weightedEntryIndex) => {
+				if (
+					!weightedEntry ||
+					typeof weightedEntry !== "object" ||
+					Array.isArray(weightedEntry)
+				) {
+					return weightedEntry;
+				}
+				const normalizedWeightedEntry = {
+					...(weightedEntry as Record<string, unknown>),
+				};
+				normalizedWeightedEntry.effects = normalizeDropEffects({
+					domainIndexes,
+					effects: normalizedWeightedEntry.effects,
+					path: `${path}.${outputIndex}.entries.${weightedEntryIndex}.effects`,
+				});
+				return normalizedWeightedEntry;
+			});
+			return entry;
+		}
+		entry.effects = normalizeDropEffects({
+			domainIndexes,
+			effects: entry.effects,
+			path: `${path}.${outputIndex}.effects`,
+		});
+		return entry;
 	});
 };
 

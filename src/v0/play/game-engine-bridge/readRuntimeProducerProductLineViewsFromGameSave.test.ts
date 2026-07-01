@@ -235,16 +235,22 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 							multiplier: 0.5,
 							selector: allOfGrant("grant:test:haste"),
 						},
+					],
+					output: [
 						{
-							chance: 0.25,
-							display: "whenActive",
-							kind: "grant.loot.extraOutputChance.add",
-							label: "Extra Twig",
-							outputItems: {
-								items: anyOfItem("item:twig"),
-							},
-							quantity: 1,
-							selector: allOfGrant("grant:test:haste"),
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
+								{
+									chance: 0.25,
+									display: "whenActive",
+									kind: "grant.loot.extraOutputChance.add",
+									label: "Extra Twig",
+									quantity: 1,
+									selector: allOfGrant("grant:test:haste"),
+								},
+							],
 						},
 					],
 				},

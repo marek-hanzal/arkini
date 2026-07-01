@@ -34,16 +34,43 @@ describe("readRuntimeProductLineOutputViews", () => {
 				baseOutput: [
 					{
 						chance: 0.25,
+						dropEffects: [],
+						enabled: true,
 						itemId: "item:pollution",
 						quantity: 1,
 						sort: 20,
 						type: "chance",
+						visible: true,
 					},
 					{
+						dropEffects: [],
+						enabled: true,
 						itemId: "item:twig",
 						quantity: 2,
 						sort: 10,
 						type: "guaranteed",
+						visible: true,
+					},
+				],
+				visibleOutput: [
+					{
+						chance: 0.25,
+						dropEffects: [],
+						enabled: true,
+						itemId: "item:pollution",
+						quantity: 1,
+						sort: 20,
+						type: "chance",
+						visible: true,
+					},
+					{
+						dropEffects: [],
+						enabled: true,
+						itemId: "item:twig",
+						quantity: 2,
+						sort: 10,
+						type: "guaranteed",
+						visible: true,
 					},
 				],
 				chanceItems: [
@@ -79,6 +106,68 @@ describe("readRuntimeProductLineOutputViews", () => {
 				itemId: "item:plank",
 				kind: "chance",
 				probability: 0.5,
+			},
+		]);
+	});
+	it("exposes drop-owned effect state for visible disabled outputs", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const effectiveProductLine: EffectiveProducerProductLine = {
+			appliedEffects: [],
+			blocked: false,
+			blockReasons: [],
+			durationMs: 1000,
+			lootPlan: {
+				baseOutput: [],
+				visibleOutput: [
+					{
+						dropEffects: [
+							{
+								active: false,
+								display: "always",
+								effectId: "product:test:output:0:effect:0",
+								effectName: "Unlock Twig Drop",
+								impact: "availability",
+								kind: "grant.require",
+								label: "Unlock Twig Drop",
+								phase: "start",
+								ready: false,
+								result: "disabled",
+							},
+						],
+						enabled: false,
+						itemId: "item:twig",
+						quantity: 2,
+						type: "guaranteed",
+						visible: true,
+					},
+				],
+				chanceItems: [],
+			},
+			requirements: [],
+			visible: true,
+		};
+
+		expect(
+			readRuntimeProductLineOutputViews({
+				effectiveProductLine,
+				save,
+			}),
+		).toMatchObject([
+			{
+				enabled: false,
+				effects: [
+					{
+						impact: "availability",
+						label: "Unlock Twig Drop",
+						ready: false,
+						result: "disabled",
+					},
+				],
+				itemId: "item:twig",
 			},
 		]);
 	});

@@ -234,16 +234,6 @@ const collectLineEffectUsage = (
 				usage.items.add(itemId);
 			}
 		}
-
-		if (effect.kind === "grant.loot.extraOutputChance.add") {
-			for (const itemId of readResolvedSelectorIds(
-				effect.outputItems.items as Parameters<typeof readResolvedSelectorIds>[0],
-				config.items,
-			)) {
-				usage.items.add(itemId);
-				itemFlow.producedItemIds.add(itemId);
-			}
-		}
 	}
 };
 
@@ -279,6 +269,50 @@ const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: It
 		}
 		if (product.output) {
 			collectLootOutputUsage(product.output, itemFlow);
+			collectLootOutputEffectUsage(product.output, config, usage);
+		}
+	}
+};
+
+type GameDropEffect = NonNullable<
+	Extract<
+		NonNullable<GameConfig["products"][string]["output"]>[number],
+		{
+			type: "guaranteed" | "chance";
+		}
+	>["effects"]
+>[number];
+
+const collectLootOutputEffectUsage = (
+	output: NonNullable<GameConfig["products"][string]["output"]>,
+	config: GameConfig,
+	usage: UsageIndex,
+) => {
+	for (const entry of output) {
+		if (entry.type === "weighted") {
+			for (const weightedEntry of entry.entries) {
+				collectDropEffectUsage(weightedEntry.effects ?? [], config, usage);
+			}
+			continue;
+		}
+
+		collectDropEffectUsage(entry.effects ?? [], config, usage);
+	}
+};
+
+const collectDropEffectUsage = (
+	effects: readonly GameDropEffect[],
+	config: GameConfig,
+	usage: UsageIndex,
+) => {
+	for (const effect of effects) {
+		if (effect.kind !== "nearby.require") continue;
+
+		for (const itemId of readResolvedSelectorIds(
+			effect.items as Parameters<typeof readResolvedSelectorIds>[0],
+			config.items,
+		)) {
+			usage.items.add(itemId);
 		}
 	}
 };

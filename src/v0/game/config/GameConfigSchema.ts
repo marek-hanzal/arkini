@@ -251,53 +251,6 @@ const AuthoringDomainSelectorSchema = z.union([
 /** Grant selectors describe domain capabilities, not concrete source items. */
 const GameGrantSelectorSchema = ResolvedDomainSelectorSchema;
 
-/**
- * Loot output model.
- *
- * `guaranteed` always emits, `chance` is an independent probability roll, and
- * `weighted` chooses from weighted entries for the configured number of rolls.
- */
-const ActivationOutputSchema = z.array(
-	z.discriminatedUnion("type", [
-		z
-			.object({
-				type: z.literal("guaranteed"),
-				itemId: IdSchema,
-				quantity: QuantitySchema.default(1),
-				sort: SortSchema.optional(),
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("chance"),
-				itemId: IdSchema,
-				chance: z.number().min(0).max(1),
-				quantity: QuantitySchema.default(1),
-				sort: SortSchema.optional(),
-			})
-			.strict(),
-		z
-			.object({
-				type: z.literal("weighted"),
-				rolls: QuantitySchema.default(1),
-				sort: SortSchema.optional(),
-				entries: z
-					.array(
-						z
-							.object({
-								itemId: IdSchema,
-								weight: PositiveIntegerSchema,
-								quantity: QuantitySchema.default(1),
-								sort: SortSchema.optional(),
-							})
-							.strict(),
-					)
-					.min(1),
-			})
-			.strict(),
-	]),
-);
-
 const GameEffectSourceScopeSchema = z.enum([
 	"board",
 	"inventory",
@@ -415,11 +368,91 @@ const createGameLineEffectSchema = <
 				label: z.string().min(1).optional(),
 			})
 			.strict(),
+	]);
+
+const GameLineEffectSchema = createGameLineEffectSchema(GameNearbyItemSelectorSchema);
+const GameLineEffectAuthoringSchema = createGameLineEffectSchema(
+	GameNearbyItemAuthoringSelectorSchema,
+);
+
+const createGameDropEffectSchema = <
+	TItemSelectorSchema extends
+		| typeof GameNearbyItemSelectorSchema
+		| typeof GameNearbyItemAuthoringSelectorSchema,
+>(
+	itemSelectorSchema: TItemSelectorSchema,
+) =>
+	z.discriminatedUnion("kind", [
+		z
+			.object({
+				kind: z.literal("grant.require"),
+				selector: GameGrantSelectorSchema,
+				phase: GameLineEffectPhaseSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.blockStart"),
+				selector: GameGrantSelectorSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("nearby.require"),
+				...itemSelectorSchema.shape,
+				radius: NonNegativeIntegerSchema,
+				phase: GameLineEffectPhaseSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.drop.hide"),
+				selector: GameGrantSelectorSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.drop.show"),
+				selector: GameGrantSelectorSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.drop.disable"),
+				selector: GameGrantSelectorSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.drop.enable"),
+				selector: GameGrantSelectorSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
 		z
 			.object({
 				kind: z.literal("grant.loot.extraOutputChance.add"),
 				selector: GameGrantSelectorSchema,
-				outputItems: itemSelectorSchema,
 				chance: PositiveProbabilitySchema,
 				quantity: QuantitySchema.default(1),
 				display: GameLineEffectDisplaySchema,
@@ -428,10 +461,81 @@ const createGameLineEffectSchema = <
 			.strict(),
 	]);
 
-const GameLineEffectSchema = createGameLineEffectSchema(GameNearbyItemSelectorSchema);
-const GameLineEffectAuthoringSchema = createGameLineEffectSchema(
+const GameDropEffectSchema = createGameDropEffectSchema(GameNearbyItemSelectorSchema);
+const GameDropEffectAuthoringSchema = createGameDropEffectSchema(
 	GameNearbyItemAuthoringSelectorSchema,
 );
+
+const createActivationOutputSchema = <
+	TDropEffectSchema extends typeof GameDropEffectSchema | typeof GameDropEffectAuthoringSchema,
+>(
+	dropEffectSchema: TDropEffectSchema,
+) => {
+	const dropEffectFields = {
+		enabled: z.boolean().optional(),
+		effects: z.array(dropEffectSchema).optional(),
+		visibility: z
+			.enum([
+				"visible",
+				"hidden",
+			])
+			.optional(),
+	};
+
+	return z.array(
+		z.discriminatedUnion("type", [
+			z
+				.object({
+					type: z.literal("guaranteed"),
+					itemId: IdSchema,
+					quantity: QuantitySchema.default(1),
+					sort: SortSchema.optional(),
+					...dropEffectFields,
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("chance"),
+					itemId: IdSchema,
+					chance: z.number().min(0).max(1),
+					quantity: QuantitySchema.default(1),
+					sort: SortSchema.optional(),
+					...dropEffectFields,
+				})
+				.strict(),
+			z
+				.object({
+					type: z.literal("weighted"),
+					rolls: QuantitySchema.default(1),
+					sort: SortSchema.optional(),
+					entries: z
+						.array(
+							z
+								.object({
+									itemId: IdSchema,
+									weight: PositiveIntegerSchema,
+									quantity: QuantitySchema.default(1),
+									sort: SortSchema.optional(),
+									...dropEffectFields,
+								})
+								.strict(),
+						)
+						.min(1),
+				})
+				.strict(),
+		]),
+	);
+};
+
+/**
+ * Loot output model.
+ *
+ * `guaranteed` always emits, `chance` is an independent probability roll, and
+ * `weighted` chooses from weighted entries for the configured number of rolls.
+ * Drop-local effects are evaluated from top to bottom on the concrete output entry.
+ */
+const ActivationOutputSchema = createActivationOutputSchema(GameDropEffectSchema);
+const ActivationOutputAuthoringSchema = createActivationOutputSchema(GameDropEffectAuthoringSchema);
 
 const GameEffectGrantDefinitionSchema = z
 	.object({
@@ -630,6 +734,7 @@ const ProductDefinitionSchema = z
 const ProductDefinitionFragmentSchema = ProductDefinitionSchema.extend({
 	name: z.string().min(1).optional(),
 	effects: z.array(GameLineEffectAuthoringSchema).optional(),
+	output: ActivationOutputAuthoringSchema.min(1).optional(),
 });
 
 /** New-game seed. Board entries are individual tiles; inventory entries may stack. */
@@ -1073,16 +1178,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				itemIds,
 			},
 		);
-		validateProductExtraOutputChanceEffects(
-			ctx,
-			[
-				"products",
-				productId,
-				"effects",
-			],
-			product,
-		);
-
 		if (product.output) {
 			validateActivationOutput(
 				ctx,
@@ -1092,7 +1187,11 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					"output",
 				],
 				product.output,
-				hasItem,
+				{
+					grantIds,
+					hasItem,
+					itemIds,
+				},
 			);
 		}
 
@@ -1610,8 +1709,7 @@ const validateGameLineEffects = (
 		if (
 			effect.kind === "grant.require" ||
 			effect.kind === "grant.blockStart" ||
-			effect.kind === "grant.duration.multiply" ||
-			effect.kind === "grant.loot.extraOutputChance.add"
+			effect.kind === "grant.duration.multiply"
 		) {
 			validateGameGrantSelector(
 				ctx,
@@ -1655,17 +1753,50 @@ const validateGameLineEffects = (
 				"Nearby duration effect must contain at least one non-1 multiplier band.",
 			);
 		}
+	}
+};
 
-		if (effect.kind === "grant.loot.extraOutputChance.add") {
+const validateGameDropEffects = (
+	ctx: z.RefinementCtx,
+	path: GameConfigIssuePath,
+	effects: readonly z.infer<typeof GameDropEffectSchema>[],
+	entities: {
+		grantIds: readonly string[];
+		hasItem: (itemId: string) => boolean;
+		itemIds: readonly string[];
+	},
+) => {
+	for (const [effectIndex, effect] of effects.entries()) {
+		if (
+			effect.kind === "grant.require" ||
+			effect.kind === "grant.blockStart" ||
+			effect.kind === "grant.drop.hide" ||
+			effect.kind === "grant.drop.show" ||
+			effect.kind === "grant.drop.disable" ||
+			effect.kind === "grant.drop.enable" ||
+			effect.kind === "grant.loot.extraOutputChance.add"
+		) {
+			validateGameGrantSelector(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"selector",
+				],
+				effect.selector,
+				entities.grantIds,
+			);
+		}
+
+		if (effect.kind === "nearby.require") {
 			validateGameLineItemSelector(
 				ctx,
 				[
 					...path,
 					effectIndex,
-					"outputItems",
 					"items",
 				],
-				effect.outputItems.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+				effect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
 				{
 					entityIds: entities.itemIds,
 					hasEntity: entities.hasItem,
@@ -1706,56 +1837,6 @@ const validateCraftRecipeEffectRuntimeSupport = (
 				"kind",
 			],
 			`Craft recipe effects only support "grant.require" start gates and "grant.blockStart" blockers at runtime. "${effect.kind}" is a producer product-line effect.`,
-		);
-	}
-};
-
-const validateProductExtraOutputChanceEffects = (
-	ctx: z.RefinementCtx,
-	path: GameConfigIssuePath,
-	product: z.infer<typeof ProductDefinitionSchema>,
-) => {
-	const selectableOutputItemIds = (product.output ?? []).flatMap((outputEntry) =>
-		outputEntry.type === "weighted"
-			? []
-			: [
-					outputEntry.itemId,
-				],
-	);
-
-	for (const [effectIndex, effect] of (product.effects ?? []).entries()) {
-		if (effect.kind !== "grant.loot.extraOutputChance.add") continue;
-
-		if (selectableOutputItemIds.length === 0) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"kind",
-				],
-				"Extra output chance effects require at least one non-weighted base output item on the product line.",
-			);
-			continue;
-		}
-
-		const matchesOutput = selectableOutputItemIds.some((itemId) =>
-			doesResolvedDomainSelectorMatchId({
-				entityId: itemId,
-				selector: effect.outputItems.items as z.infer<typeof ResolvedDomainSelectorSchema>,
-			}),
-		);
-		if (matchesOutput) continue;
-
-		addIssue(
-			ctx,
-			[
-				...path,
-				effectIndex,
-				"outputItems",
-				"items",
-			],
-			"Extra output chance selector must match at least one non-weighted base output item on the same product line.",
 		);
 	}
 };
@@ -3196,12 +3277,16 @@ const validateActivationOutput = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
 	output: z.infer<typeof ActivationOutputSchema>,
-	hasItem: (itemId: string) => boolean,
+	entities: {
+		grantIds: readonly string[];
+		hasItem: (itemId: string) => boolean;
+		itemIds: readonly string[];
+	},
 ) => {
 	for (const [index, entry] of output.entries()) {
 		if (entry.type === "weighted") {
 			for (const [entryIndex, weightedEntry] of entry.entries.entries()) {
-				if (!hasItem(weightedEntry.itemId)) {
+				if (!entities.hasItem(weightedEntry.itemId)) {
 					addIssue(
 						ctx,
 						[
@@ -3214,12 +3299,24 @@ const validateActivationOutput = (
 						`Missing item "${weightedEntry.itemId}".`,
 					);
 				}
+				validateGameDropEffects(
+					ctx,
+					[
+						...path,
+						index,
+						"entries",
+						entryIndex,
+						"effects",
+					],
+					weightedEntry.effects ?? [],
+					entities,
+				);
 			}
 
 			continue;
 		}
 
-		if (!hasItem(entry.itemId)) {
+		if (!entities.hasItem(entry.itemId)) {
 			addIssue(
 				ctx,
 				[
@@ -3230,5 +3327,16 @@ const validateActivationOutput = (
 				`Missing item "${entry.itemId}".`,
 			);
 		}
+
+		validateGameDropEffects(
+			ctx,
+			[
+				...path,
+				index,
+				"effects",
+			],
+			entry.effects ?? [],
+			entities,
+		);
 	}
 };

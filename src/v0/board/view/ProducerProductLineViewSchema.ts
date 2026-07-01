@@ -35,9 +35,26 @@ const EffectPolarityViewSchema = z.enum([
 	"mixed",
 ]);
 
+const ProducerProductLineDropEffectViewSchema = z
+	.object({
+		active: z.boolean(),
+		impact: z.enum([
+			"availability",
+			"chance",
+			"visibility",
+		]),
+		kind: z.string().min(1),
+		label: z.string().min(1),
+		ready: z.boolean(),
+		result: z.string().min(1),
+	})
+	.strict();
+
 const ProducerProductLineOutputViewSchema = z.object({
 	itemId: IdSchema,
 	ownedQuantity: z.number().int().nonnegative(),
+	enabled: z.boolean().optional(),
+	effects: z.array(ProducerProductLineDropEffectViewSchema).optional(),
 	kind: z
 		.enum([
 			"chance",

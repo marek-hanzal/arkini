@@ -1,6 +1,9 @@
 import type { ActivationDropView } from "~/v0/board/view/ActivationDropViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
+import type {
+	EffectiveDropEffectOutcome,
+	EffectiveProducerProductLine,
+} from "~/v0/game/effects/EffectiveProducerProductLine";
 
 type LootOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
 type LootQuantity = NonNullable<
@@ -43,6 +46,18 @@ const readRollLabel = (rolls: LootQuantity | undefined) => {
 	return `${rolls.min}-${rolls.max} rolls`;
 };
 
+const readDropEffects = (effects: readonly EffectiveDropEffectOutcome[] | undefined) =>
+	effects?.length
+		? effects.map((effect) => ({
+				active: effect.active,
+				impact: effect.impact,
+				kind: effect.kind,
+				label: effect.label,
+				ready: effect.ready,
+				result: effect.result,
+			}))
+		: undefined;
+
 const readWeightedChanceLabel = ({
 	entry,
 	totalWeight,
@@ -57,13 +72,15 @@ const readWeightedChanceLabel = ({
 const collectDropViews = ({
 	output,
 }: {
-	output: NonNullable<GameConfig["products"][string]["output"]>;
+	output: EffectiveProducerProductLine["lootPlan"]["visibleOutput"];
 }): ActivationDropView[] =>
 	output.flatMap((entry) => {
 		if (entry.type === "guaranteed") {
 			return [
 				{
 					chanceLabel: formatPercent(1),
+					enabled: entry.enabled,
+					effects: readDropEffects(entry.dropEffects),
 					itemId: entry.itemId,
 					quantityLabel: readQuantityLabel(entry.quantity),
 				},
@@ -74,16 +91,17 @@ const collectDropViews = ({
 			return [
 				{
 					chanceLabel: formatPercent(entry.chance),
+					enabled: entry.enabled,
+					effects: readDropEffects(entry.dropEffects),
 					itemId: entry.itemId,
 					quantityLabel: readQuantityLabel(entry.quantity),
 				},
 			];
 		}
 
-		const totalWeight = entry.entries.reduce(
-			(total, weightedEntry) => total + weightedEntry.weight,
-			0,
-		);
+		const totalWeight = entry.entries
+			.filter((weightedEntry) => weightedEntry.enabled)
+			.reduce((total, weightedEntry) => total + weightedEntry.weight, 0);
 		const rollLabel = readRollLabel(entry.rolls);
 
 		return entry.entries.map((weightedEntry) => ({
@@ -91,6 +109,8 @@ const collectDropViews = ({
 				entry: weightedEntry,
 				totalWeight,
 			}),
+			enabled: weightedEntry.enabled,
+			effects: readDropEffects(weightedEntry.dropEffects),
 			itemId: weightedEntry.itemId,
 			quantityLabel: readQuantityLabel(weightedEntry.quantity),
 			rollLabel,
@@ -103,13 +123,15 @@ export const readRuntimeLootDropViewsFromEffectiveProductLine = ({
 	const drops: ActivationDropView[] = [];
 	drops.push(
 		...collectDropViews({
-			output: effectiveProductLine.lootPlan.baseOutput,
+			output: effectiveProductLine.lootPlan.visibleOutput,
 		}),
 	);
 
 	for (const chanceItem of effectiveProductLine.lootPlan.chanceItems) {
 		drops.push({
 			chanceLabel: formatPercent(chanceItem.chance),
+			enabled: true,
+			effects: readDropEffects(chanceItem.dropEffects),
 			itemId: chanceItem.itemId,
 			quantityLabel: readQuantityLabel(chanceItem.quantity),
 		});

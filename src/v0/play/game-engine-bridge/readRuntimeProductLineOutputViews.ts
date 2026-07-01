@@ -1,8 +1,11 @@
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import { readGameSaveItemQuantityByScope } from "~/v0/game/activation/readGameSaveItemQuantityByScope";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
-import { readGameSaveItemQuantityByScope } from "~/v0/game/activation/readGameSaveItemQuantityByScope";
+import type {
+	EffectiveDropEffectOutcome,
+	EffectiveProducerProductLine,
+} from "~/v0/game/effects/EffectiveProducerProductLine";
 
 type ProductOutput = NonNullable<GameConfig["products"][string]["output"]>;
 type ProductOutputEntry = ProductOutput[number];
@@ -36,7 +39,21 @@ const readOwnedQuantity = ({ itemId, save }: { itemId: string; save: GameSave })
 		scope: "board_or_inventory",
 	});
 
+const readDropEffects = (effects: readonly EffectiveDropEffectOutcome[] | undefined) =>
+	effects?.length
+		? effects.map((effect) => ({
+				active: effect.active,
+				impact: effect.impact,
+				kind: effect.kind,
+				label: effect.label,
+				ready: effect.ready,
+				result: effect.result,
+			}))
+		: undefined;
+
 const createOutputView = ({
+	enabled,
+	effects,
 	itemId,
 	kind,
 	ownedQuantity,
@@ -46,6 +63,8 @@ const createOutputView = ({
 	sort,
 	sourceIndex,
 }: IndexedProductLineOutputView): IndexedProductLineOutputView => ({
+	enabled,
+	effects,
 	itemId,
 	kind,
 	ownedQuantity,
@@ -66,7 +85,7 @@ const collectOutputViews = ({
 	save,
 	sourceIndexOffset,
 }: {
-	output: ProductOutput;
+	output: EffectiveProducerProductLine["lootPlan"]["visibleOutput"];
 	save: GameSave;
 	sourceIndexOffset: number;
 }): IndexedProductLineOutputView[] =>
@@ -76,6 +95,8 @@ const collectOutputViews = ({
 		if (entry.type === "weighted") {
 			return entry.entries.map((weightedEntry, weightedEntryIndex) =>
 				createOutputView({
+					enabled: weightedEntry.enabled,
+					effects: readDropEffects(weightedEntry.dropEffects),
 					itemId: weightedEntry.itemId,
 					kind: "weighted",
 					ownedQuantity: readOwnedQuantity({
@@ -93,6 +114,8 @@ const collectOutputViews = ({
 
 		return [
 			createOutputView({
+				enabled: entry.enabled,
+				effects: readDropEffects(entry.dropEffects),
 				itemId: entry.itemId,
 				kind: entry.type,
 				ownedQuantity: readOwnedQuantity({
@@ -125,16 +148,18 @@ export const readRuntimeProductLineOutputViews = ({
 
 	outputs.push(
 		...collectOutputViews({
-			output: effectiveProductLine.lootPlan.baseOutput,
+			output: effectiveProductLine.lootPlan.visibleOutput,
 			save,
 			sourceIndexOffset,
 		}),
 	);
-	sourceIndexOffset += effectiveProductLine.lootPlan.baseOutput.length * 1000 + 1000;
+	sourceIndexOffset += effectiveProductLine.lootPlan.visibleOutput.length * 1000 + 1000;
 
 	for (const [chanceIndex, chanceItem] of effectiveProductLine.lootPlan.chanceItems.entries()) {
 		outputs.push(
 			createOutputView({
+				enabled: true,
+				effects: readDropEffects(chanceItem.dropEffects),
 				itemId: chanceItem.itemId,
 				kind: "chance",
 				ownedQuantity: readOwnedQuantity({

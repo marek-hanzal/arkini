@@ -174,6 +174,24 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).not.toContain("disabled · 1× · guaranteed");
 	});
 
+	it("renders faster duration multipliers instead of hiding speedups", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							durationMs: 45000,
+							effectDurationMultiplier: 0.75,
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("faster 0.75×");
+	});
+
 	it("hides fulfilled effect requirements and the parent requirement box", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

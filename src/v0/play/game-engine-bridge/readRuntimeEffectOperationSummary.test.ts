@@ -83,6 +83,39 @@ describe("readRuntimeEffectBenefitLines", () => {
 		]);
 	});
 
+	it("uses effect multiplier, not cheat-clamped runtime duration, for duration bonus copy", () => {
+		expect(
+			readRuntimeProductLineActiveEffectBonusLines({
+				baseDurationMs: 60000,
+				config: defaultGameConfig,
+				effectiveProductLine: {
+					appliedEffects: [
+						{
+							effectId: "effect:shrine-minor-haste",
+							effectName: "Minor Haste",
+							kind: "grant.duration.multiply",
+							sourceId: "effect-source:1",
+							sourceItemInstanceId: "item-instance:shrine",
+						},
+					],
+					blocked: false,
+					blockReasons: [],
+					durationMs: 1000,
+					effectDurationMultiplier: 0.75,
+					lootPlan: {
+						baseOutput: [],
+						visibleOutput: [],
+						chanceItems: [],
+					},
+					requirements: [],
+					visible: true,
+				},
+			}),
+		).toEqual([
+			"Minor Haste: 25% faster production.",
+		]);
+	});
+
 	it("aggregates stacked active product-line bonuses into resulting numbers", () => {
 		expect(
 			readRuntimeProductLineActiveEffectBonusLines({

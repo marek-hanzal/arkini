@@ -103,7 +103,7 @@ export const ProducerProductLineViewSchema = z
 		pausedAtMs: z.number().int().nonnegative().optional(),
 		progress: z.number().min(0).max(1).optional(),
 		inputItemIds: z.array(IdSchema),
-		effectDurationMultiplier: z.number().min(1).optional(),
+		effectDurationMultiplier: z.number().positive().optional(),
 		effectBenefits: z.array(z.string().min(1)).optional(),
 		effectBonusLines: z.array(z.string().min(1)).optional(),
 		startRequirementsReady: z.boolean().optional(),

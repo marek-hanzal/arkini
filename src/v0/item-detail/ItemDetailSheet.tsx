@@ -1,7 +1,6 @@
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 import { useItemDetailControls } from "~/v0/item-detail/control/useItemDetailControls";
 import { DetailCraftPanel } from "~/v0/item-detail/ui/DetailCraftPanel";
 import { DetailDropsPanel } from "~/v0/item-detail/ui/DetailDropsPanel";
@@ -9,6 +8,8 @@ import { DetailGeneratedEffectsPanel } from "~/v0/item-detail/ui/DetailGenerated
 import { DetailHeroCard } from "~/v0/item-detail/ui/DetailHeroCard";
 import { DetailInputsPanel } from "~/v0/item-detail/ui/DetailInputsPanel";
 import { DetailProducerLinesPanel } from "~/v0/item-detail/ui/DetailProducerLinesPanel";
+import { DetailSeparator } from "~/v0/item-detail/ui/DetailCard";
+import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 
 export namespace ItemDetailSheet {
 	export interface Props {
@@ -26,6 +27,21 @@ export namespace ItemDetailSheet {
 		onWithdrawProductLineInput(productId: string, itemId: string): void;
 	}
 }
+
+const interleaveSections = (sections: readonly ReactNode[]) =>
+	sections.flatMap((section, index) =>
+		index === 0
+			? [
+					section,
+				]
+			: [
+					<DetailSeparator
+						key={`detail-section-separator:${index}`}
+						className="my-4"
+					/>,
+					section,
+				],
+	);
 
 export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 	actionErrorMessage,
@@ -65,12 +81,53 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 					title="Nothing selected"
 					onClose={onClose}
 				/>
-				<div className="mx-auto min-h-0 w-full max-w-[540px] flex-1 overflow-y-auto overscroll-contain px-3 py-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+				<div className="mx-auto min-h-0 w-full max-w-[540px] flex-1 overflow-y-auto overscroll-contain px-4 py-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 					<p className="text-sm text-ak-text-muted">Select a board item first.</p>
 				</div>
 			</section>
 		);
 	}
+
+	const sections = [
+		<DetailHeroCard
+			key="hero"
+			item={item}
+		/>,
+		<DetailGeneratedEffectsPanel
+			key="generated-effects"
+			effects={item.generatedEffects}
+		/>,
+		boardItem.craft && craftControl ? (
+			<DetailCraftPanel
+				key="craft"
+				control={craftControl}
+				craft={boardItem.craft}
+				items={items}
+			/>
+		) : null,
+		activation?.kind === "stash" ? (
+			<DetailDropsPanel
+				key="drops"
+				drops={activation.drops}
+				items={items}
+			/>
+		) : null,
+		activation?.inputs.length ? (
+			<DetailInputsPanel
+				key="shared-inputs"
+				inputs={activation.inputs}
+				items={items}
+				title={activation.kind === "stash" ? "Needed to open" : "Shared inputs"}
+			/>
+		) : null,
+		producerLineModels.length ? (
+			<DetailProducerLinesPanel
+				key="producer-lines"
+				items={items}
+				lines={producerLineModels}
+			/>
+		) : null,
+	].filter(Boolean) as ReactNode[];
 
 	return (
 		<section
@@ -81,40 +138,16 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 				title={item.name}
 				onClose={onClose}
 			/>
-			<div className="mx-auto min-h-0 w-full max-w-[540px] flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-3 text-sm text-ak-text [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+			<div className="mx-auto min-h-0 w-full max-w-[540px] flex-1 overflow-y-auto overscroll-contain px-4 py-4 text-sm text-ak-text [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				{actionErrorMessage ? (
 					<div className="rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-bold text-rose-100">
 						{actionErrorMessage}
 					</div>
 				) : null}
-				<DetailHeroCard item={item} />
-				<DetailGeneratedEffectsPanel effects={item.generatedEffects} />
-				{boardItem.craft && craftControl ? (
-					<DetailCraftPanel
-						control={craftControl}
-						craft={boardItem.craft}
-						items={items}
-					/>
+				{actionErrorMessage && sections.length > 0 ? (
+					<DetailSeparator className="my-4" />
 				) : null}
-				{activation?.kind === "stash" ? (
-					<DetailDropsPanel
-						drops={activation.drops}
-						items={items}
-					/>
-				) : null}
-				{activation?.inputs.length ? (
-					<DetailInputsPanel
-						inputs={activation.inputs}
-						items={items}
-						title={activation.kind === "stash" ? "Needed to open" : "Shared inputs"}
-					/>
-				) : null}
-				{producerLineModels.length ? (
-					<DetailProducerLinesPanel
-						items={items}
-						lines={producerLineModels}
-					/>
-				) : null}
+				{interleaveSections(sections)}
 			</div>
 		</section>
 	);

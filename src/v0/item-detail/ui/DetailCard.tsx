@@ -19,13 +19,11 @@ export const DetailCard: FC<DetailCard.Props> = ({
 	title,
 }) => (
 	<section
-		className={cn(
-			"overflow-hidden rounded-sm border border-violet-300/12 bg-ak-surface-elevated shadow-[0_14px_32px_rgba(0,0,0,0.14)]",
-			className,
-		)}
+		data-ui="detail section"
+		className={cn("min-w-0", className)}
 	>
 		{eyebrow || title || action ? (
-			<header className="flex min-w-0 items-start justify-between gap-3 px-3 py-2.5">
+			<header className="flex min-w-0 items-start justify-between gap-3">
 				<div className="min-w-0">
 					{eyebrow ? (
 						<p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-ak-primary">
@@ -41,8 +39,18 @@ export const DetailCard: FC<DetailCard.Props> = ({
 				{action ? <div className="shrink-0">{action}</div> : null}
 			</header>
 		) : null}
-		<div className="min-w-0 px-3 pb-3">{children}</div>
+		<div className={cn("min-w-0", (eyebrow || title || action) && "mt-3")}>{children}</div>
 	</section>
+);
+
+export const DetailSeparator: FC<{
+	className?: string;
+}> = ({ className }) => (
+	<div
+		aria-hidden="true"
+		className={cn("border-t border-violet-300/18", className)}
+		data-ui="detail separator"
+	/>
 );
 
 export const DetailMutedPill: FC<{

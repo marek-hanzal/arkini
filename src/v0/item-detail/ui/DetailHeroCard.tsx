@@ -11,7 +11,7 @@ export namespace DetailHeroCard {
 
 export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ item }) => (
 	<DetailCard>
-		<div className="flex min-w-0 gap-3">
+		<div className="flex min-w-0 gap-4">
 			<div className="flex h-28 w-28 max-w-[34vw] shrink-0 items-center justify-center rounded-sm bg-ak-surface-soft p-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
 				<GameItemView
 					item={item}
@@ -20,7 +20,7 @@ export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ item }) => (
 			</div>
 			<div className="min-w-0 flex-1">
 				<div className="flex min-w-0 flex-wrap items-start gap-1.5">
-					<h2 className="mr-auto break-words text-xl font-black leading-7 text-ak-text">
+					<h2 className="mr-auto break-words text-[1.75rem] font-black leading-8 text-ak-text">
 						{item.name}
 					</h2>
 					{item.maxStackSize > 1 ? (

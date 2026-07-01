@@ -70,7 +70,7 @@ describe("DetailCraftPanel", () => {
 		expect(html).toContain("Auto-fill inputs");
 	});
 
-	it("hides required resources once the craft is ready to start", () => {
+	it("keeps fulfilled resources visible until the craft starts running", () => {
 		const html = renderCraft(
 			createCraft({
 				delivered: {
@@ -82,8 +82,9 @@ describe("DetailCraftPanel", () => {
 		);
 
 		expect(html).toContain("Start craft");
-		expect(html).not.toContain("Water");
-		expect(html).not.toContain("Withdraw");
+		expect(html).toContain("Water");
+		expect(html).toContain("Withdraw");
+		expect(html).toContain("1/1");
 	});
 
 	it("hides required resources while the craft is running", () => {

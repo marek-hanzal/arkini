@@ -102,9 +102,9 @@ describe("DetailProducerLinesPanel", () => {
 			/>,
 		);
 
-		expect(html.match(/data-ui="detail producer line separator"/g)?.length).toBe(1);
-		expect(html).toContain("border-b border-violet-300/25");
-		expect(html).toContain("gap-[0.9rem]");
+		expect(html.match(/data-ui="detail separator"/g)?.length).toBe(1);
+		expect(html).toContain("border-t border-violet-300/18");
+		expect(html).toContain("gap-4");
 	});
 
 	it("does not render a duplicate header count badge", () => {
@@ -312,7 +312,7 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("Default");
 	});
 
-	it("hides required resources once a product line is ready to start", () => {
+	it("keeps fulfilled resources visible until a product line starts running", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -350,8 +350,9 @@ describe("DetailProducerLinesPanel", () => {
 
 		expect(html).toContain("Start");
 		expect(html).toContain("Outputs");
-		expect(html).not.toContain("Water");
-		expect(html).not.toContain("Withdraw");
+		expect(html).toContain("Water");
+		expect(html).toContain("Withdraw");
+		expect(html).toContain("1/1");
 	});
 
 	it("uses short default labels and missing-item copy", () => {

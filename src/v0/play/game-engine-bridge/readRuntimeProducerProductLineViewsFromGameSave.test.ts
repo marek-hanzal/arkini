@@ -98,6 +98,81 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		expect(line.startRequirementsReady).toBe(false);
 	});
 
+	it("keeps hidden product lines visible while a runtime job still exists", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:path": {
+					polarity: "neutral",
+					grants: [
+						{
+							id: "grant:test:path",
+							name: "Chosen Path",
+						},
+					],
+					name: "Chosen Path",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					effects: [
+						{
+							display: "whenMissing",
+							kind: "grant.require",
+							label: "Chosen path",
+							phase: "visibility",
+							selector: allOfGrant("grant:test:path"),
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const producerItem = findBoardItem(save, {
+			itemId: "item:producer",
+			x: 0,
+			y: 0,
+		});
+		if (!producerItem) throw new Error("Missing test producer.");
+		save.producerJobs["job:hidden-line"] = {
+			id: "job:hidden-line",
+			producerItemInstanceId: producerItem.id,
+			productId: "product:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		const lines = readRuntimeProducerProductLineViewsFromGameSave({
+			config,
+			maxQueueSize: 1,
+			nowMs: 500,
+			productIds: [
+				"product:test",
+			],
+			save,
+			targetItemInstanceId: producerItem.id,
+		});
+
+		expect(lines).toMatchObject([
+			{
+				effectRequirements: [
+					{
+						label: "Chosen path",
+						ready: false,
+					},
+				],
+				inProgress: true,
+				productId: "product:test",
+				visible: false,
+			},
+		]);
+	});
+
 	it("honors active and missing display policies separately for requirement rows", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

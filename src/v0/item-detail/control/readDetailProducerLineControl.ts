@@ -89,7 +89,7 @@ export const readDetailProducerLineControl = ({
 		line,
 	});
 	const primaryActionDisabled = runState.showProgress || !runState.canRunAction || pending;
-	const defaultActionDisabled = pending;
+	const defaultActionDisabled = pending || line.visible === false;
 	const defaultAction = canSetDefault
 		? ({
 				disabled: defaultActionDisabled,

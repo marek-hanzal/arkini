@@ -33,6 +33,7 @@ const readInputAvailabilityLabel = ({
 	inputsPartiallyAvailable: boolean;
 	line: ProducerProductLineView;
 }) => {
+	if (line.visible === false) return "line hidden";
 	if (line.startRequirementsReady === false) return "requirements missing";
 	if (readOutputsDisabled(line)) return "drops disabled";
 
@@ -51,6 +52,7 @@ const readStatusMetaLabel = (line: ProducerProductLineView) => {
 	if (line.queueBlockedReason === "paused") return "queue paused";
 	if (line.pausedAtMs !== undefined) return "paused";
 	if (line.queueFull) return "queue full";
+	if (line.visible === false) return "line hidden";
 	if (line.startRequirementsReady === false) return "requirements missing";
 	if (line.effectLocked) return line.lineKind === "effect" ? "effect active" : "locked";
 	if (line.outputLimitBlocked) return "limit reached";
@@ -97,6 +99,7 @@ export const readProducerProductLineRunState = ({
 		line.pausedAtMs === undefined &&
 		!line.deliveryBlocked &&
 		!queueBlocked &&
+		line.visible !== false &&
 		line.startRequirementsReady !== false &&
 		!line.effectLocked &&
 		!line.outputLimitBlocked &&
@@ -136,6 +139,15 @@ export const readProducerProductLineRunState = ({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Queue full",
+			line,
+		});
+	}
+
+	if (line.visible === false) {
+		return withCommonState({
+			canRunAction,
+			inputsPartiallyAvailable,
+			label: "Line hidden",
 			line,
 		});
 	}

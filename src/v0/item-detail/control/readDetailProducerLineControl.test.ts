@@ -105,4 +105,25 @@ describe("readDetailProducerLineControl", () => {
 		expect(onSetDefault).toHaveBeenCalledWith("product:lumberjack:log");
 		expect(onWithdrawInput).toHaveBeenCalledWith("product:lumberjack:log", "item:log");
 	});
+
+	it("disables default controls for hidden runtime-only lines", () => {
+		const onSetDefault = vi.fn();
+		const control = readDetailProducerLineControl({
+			canSetDefault: true,
+			line: createLine({
+				visible: false,
+			}),
+			onSetDefault,
+			onStart: () => undefined,
+			onWithdrawInput: () => undefined,
+			pending: false,
+		});
+
+		control.defaultAction?.onClick();
+
+		expect(control.defaultAction?.disabled).toBe(true);
+		expect(control.primaryAction.disabled).toBe(true);
+		expect(control.primaryAction.label).toBe("Line hidden");
+		expect(onSetDefault).not.toHaveBeenCalled();
+	});
 });

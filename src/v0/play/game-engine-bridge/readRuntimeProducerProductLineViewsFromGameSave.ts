@@ -64,6 +64,21 @@ const readRuntimeStoredProductInputQuantityFromGameSave = ({
 	targetItemInstanceId: string;
 }) => save.producerInputs[targetItemInstanceId]?.productInputs[productId]?.items[itemId] ?? 0;
 
+const readViewProductIds = ({
+	producerJobs,
+	productIds,
+	visibleProductIds,
+}: {
+	producerJobs: readonly GameSave["producerJobs"][string][];
+	productIds: readonly string[];
+	visibleProductIds: readonly string[];
+}) => {
+	const visible = new Set(visibleProductIds);
+	const jobProductIds = new Set(producerJobs.map((job) => job.productId));
+
+	return productIds.filter((productId) => visible.has(productId) || jobProductIds.has(productId));
+};
+
 export const readRuntimeProducerProductLineViewsFromGameSave = ({
 	config,
 	maxQueueSize,
@@ -105,8 +120,13 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		producerItemInstanceId: targetItemInstanceId,
 		save,
 	});
+	const viewProductIds = readViewProductIds({
+		producerJobs,
+		productIds,
+		visibleProductIds,
+	});
 
-	return visibleProductIds.flatMap((productId) => {
+	return viewProductIds.flatMap((productId) => {
 		const product = config.products[productId];
 		if (!product) return [];
 		const lineKind = readProducerLineKind({
@@ -237,6 +257,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		return [
 			{
 				blocked: effectiveProductLine.blocked,
+				visible: effectiveProductLine.visible,
 				effectLocked,
 				effectPolarity: product.activatesEffectId
 					? config.effects[product.activatesEffectId]?.polarity

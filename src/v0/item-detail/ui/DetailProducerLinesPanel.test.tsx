@@ -174,6 +174,34 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).not.toContain("disabled · 1× · guaranteed");
 	});
 
+	it("renders weighted output odds per roll instead of hiding runtime odds", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							outputs: [
+								{
+									enabled: false,
+									itemId: "item:grain",
+									kind: "weighted",
+									ownedQuantity: 0,
+									probability: 0,
+									quantity: 1,
+									rollLabel: "weighted roll",
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("disabled · 1× · 0%/roll · weighted roll");
+		expect(html).not.toContain("disabled · 1× · weighted roll");
+	});
+
 	it("renders faster duration multipliers instead of hiding speedups", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

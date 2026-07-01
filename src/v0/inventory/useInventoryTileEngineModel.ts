@@ -205,10 +205,11 @@ export const useInventoryTileEngineModel = ({
 			},
 			onDrop(context) {
 				const snapshot = runtimeStore.getSnapshot();
+				const nowMs = Date.now();
 
 				return resolveDrop({
 					context,
-					board: readBoardView(snapshot),
+					board: readBoardView(snapshot, nowMs),
 					config: snapshot.runtime.config,
 					inventory: readInventoryView(snapshot),
 					feedback,

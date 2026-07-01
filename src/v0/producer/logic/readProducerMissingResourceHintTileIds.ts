@@ -2,13 +2,10 @@ import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readAc
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readProductOutputItemIds } from "~/v0/game/config/readProductOutputItemIds";
 
 export namespace readProducerMissingResourceHintTileIds {
 	export interface Props {
 		board: BoardView;
-		config: GameConfig;
 		producerItem: BoardViewItem;
 		productId?: string;
 	}
@@ -64,23 +61,21 @@ const readInputItemIdsMissingOnBoard = ({
 	return itemIds;
 };
 
-const readProducedItemIds = ({
-	boardItem,
-	config,
-}: {
-	boardItem: BoardViewItem;
-	config: GameConfig;
-}): Set<string> => {
-	const producer = config.producers[boardItem.itemId];
-	const itemIds = new Set<string>();
-	if (!producer) return itemIds;
+const canLineExposeUsefulOutput = (line: ProducerProductLineView) =>
+	!line.blocked &&
+	line.startRequirementsReady !== false &&
+	!line.outputLimitBlocked &&
+	(line.outputs ?? []).some((output) => output.enabled !== false);
 
-	for (const productId of producer.productIds) {
-		for (const itemId of readProductOutputItemIds({
-			config,
-			productId,
-		})) {
-			itemIds.add(itemId);
+const readProducedItemIds = ({ boardItem }: { boardItem: BoardViewItem }): Set<string> => {
+	const itemIds = new Set<string>();
+
+	for (const line of boardItem.activation?.productLines ?? []) {
+		if (!canLineExposeUsefulOutput(line)) continue;
+
+		for (const output of line.outputs ?? []) {
+			if (output.enabled === false) continue;
+			itemIds.add(output.itemId);
 		}
 	}
 
@@ -89,7 +84,6 @@ const readProducedItemIds = ({
 
 export const readProducerMissingResourceHintTileIds = ({
 	board,
-	config,
 	producerItem,
 	productId,
 }: readProducerMissingResourceHintTileIds.Props): readonly string[] => {
@@ -110,7 +104,6 @@ export const readProducerMissingResourceHintTileIds = ({
 	for (const boardItem of board.items) {
 		const producedItemIds = readProducedItemIds({
 			boardItem,
-			config,
 		});
 		for (const itemId of inputItemIds) {
 			if (!producedItemIds.has(itemId)) continue;

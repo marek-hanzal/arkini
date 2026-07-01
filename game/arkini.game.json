@@ -457,6 +457,10 @@
 			"render": "plain",
 			"resourceId": "item-construction-bundle"
 		},
+		"asset:item:double-tree": {
+			"render": "plain",
+			"resourceId": "item-double-tree"
+		},
 		"asset:item:egg": {
 			"render": "plain",
 			"resourceId": "item-egg"
@@ -584,6 +588,10 @@
 		"asset:item:master-knowledge": {
 			"render": "plain",
 			"resourceId": "item-master-knowledge"
+		},
+		"asset:item:micro-forest": {
+			"render": "plain",
+			"resourceId": "item-micro-forest"
 		},
 		"asset:item:milk": {
 			"render": "plain",
@@ -6501,6 +6509,24 @@
 			],
 			"tier": 6
 		},
+		"item:double-tree": {
+			"assetIds": [
+				"asset:item:double-tree"
+			],
+			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls.",
+			"maxStackSize": 1,
+			"name": "Double Tree",
+			"storage": "both",
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t2",
+				"era:I"
+			],
+			"tier": 2
+		},
 		"item:egg": {
 			"assetIds": [
 				"asset:item:egg"
@@ -7069,6 +7095,25 @@
 			],
 			"tier": 4
 		},
+		"item:micro-forest": {
+			"assetIds": [
+				"asset:item:micro-forest"
+			],
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it.",
+			"maxStackSize": 1,
+			"name": "Micro-Forest",
+			"storage": "both",
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t3",
+				"forest",
+				"era:I"
+			],
+			"tier": 3
+		},
 		"item:milk": {
 			"assetIds": [
 				"asset:item:milk"
@@ -7531,16 +7576,19 @@
 			"assetIds": [
 				"asset:item:tree"
 			],
-			"description": "Movable wood source used by nearby lumberjacks.",
+			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls.",
 			"maxStackSize": 10,
 			"name": "Tree",
 			"storage": "both",
 			"tags": [
 				"source",
 				"wood",
-				"era:I"
+				"era:I",
+				"wood-source",
+				"tree",
+				"tree:t1"
 			],
-			"tier": 0
+			"tier": 1
 		},
 		"item:vegetables": {
 			"assetIds": [
@@ -7584,6 +7632,10 @@
 			],
 			"description": "Basic water resource produced by wells and consumed by farms.",
 			"maxStackSize": 50,
+			"mergeIds": [
+				"merge:water-tree-to-double-tree",
+				"merge:water-double-tree-to-micro-forest"
+			],
 			"name": "Water",
 			"storage": "both",
 			"tags": [
@@ -9150,7 +9202,16 @@
 			"tier": 1
 		}
 	},
-	"merge": {},
+	"merge": {
+		"merge:water-double-tree-to-micro-forest": {
+			"resultItemId": "item:micro-forest",
+			"withItemId": "item:double-tree"
+		},
+		"merge:water-tree-to-double-tree": {
+			"resultItemId": "item:double-tree",
+			"withItemId": "item:tree"
+		}
+	},
 	"producers": {
 		"producer:academy": {
 			"maxQueueSize": 2,
@@ -13975,13 +14036,15 @@
 						"anyOf": [
 							{
 								"ids": [
-									"item:tree"
+									"item:tree",
+									"item:double-tree",
+									"item:micro-forest"
 								]
 							}
 						]
 					},
 					"kind": "nearby.require",
-					"label": "Nearby item:tree",
+					"label": "Nearby wood source",
 					"phase": "start",
 					"radius": 2
 				},
@@ -13998,13 +14061,15 @@
 						"anyOf": [
 							{
 								"ids": [
-									"item:tree"
+									"item:tree",
+									"item:double-tree",
+									"item:micro-forest"
 								]
 							}
 						]
 					},
 					"kind": "nearby.duration.multiply",
-					"label": "Nearby item:tree enables production",
+					"label": "Nearby wood source enables production",
 					"maxSources": 5,
 					"radius": 2
 				},
@@ -14027,55 +14092,56 @@
 			"name": "Log",
 			"output": [
 				{
+					"chance": 0,
 					"effects": [
 						{
-							"chance": 0.35,
-							"display": "whenActive",
-							"kind": "grant.loot.extraOutputChance.add",
-							"label": "Bountiful Offering",
+							"display": "always",
+							"kind": "nearby.loot.outputChance.add",
+							"label": "Nearby wood source drop chance",
 							"quantity": 1,
-							"selector": {
-								"allOf": [
-									{
-										"ids": [
-											"grant:active:shrine-bountiful-offering"
+							"radius": 2,
+							"sources": [
+								{
+									"chance": 0.5,
+									"items": {
+										"anyOf": [
+											{
+												"ids": [
+													"item:tree"
+												]
+											}
 										]
-									}
-								]
-							}
-						}
-					],
-					"itemId": "item:log",
-					"quantity": 1,
-					"type": "guaranteed"
-				},
-				{
-					"chance": 0.45,
-					"effects": [
-						{
-							"chance": 0.35,
-							"display": "whenActive",
-							"kind": "grant.loot.extraOutputChance.add",
-							"label": "Bountiful Offering",
-							"quantity": 1,
-							"selector": {
-								"allOf": [
-									{
-										"ids": [
-											"grant:active:shrine-bountiful-offering"
+									},
+									"label": "Single Tree"
+								},
+								{
+									"chance": 0.65,
+									"items": {
+										"anyOf": [
+											{
+												"ids": [
+													"item:double-tree"
+												]
+											}
 										]
-									}
-								]
-							}
-						}
-					],
-					"itemId": "item:log",
-					"quantity": 1,
-					"type": "chance"
-				},
-				{
-					"chance": 0.15,
-					"effects": [
+									},
+									"label": "Double Tree"
+								},
+								{
+									"chance": 0.85,
+									"items": {
+										"anyOf": [
+											{
+												"ids": [
+													"item:micro-forest"
+												]
+											}
+										]
+									},
+									"label": "Micro-Forest"
+								}
+							]
+						},
 						{
 							"chance": 0.35,
 							"display": "whenActive",

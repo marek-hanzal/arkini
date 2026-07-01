@@ -199,6 +199,52 @@ describe("readRuntimeEffectBenefitLines", () => {
 		]);
 	});
 
+	it("describes uncapped chance bonuses as guaranteed plus remainder rolls", () => {
+		expect(
+			readRuntimeProductLineActiveEffectBonusLines({
+				baseDurationMs: 1000,
+				config: defaultGameConfig,
+				effectiveProductLine: {
+					appliedEffects: [],
+					blocked: false,
+					blockReasons: [],
+					durationMs: 1000,
+					lootPlan: {
+						baseOutput: [],
+						visibleOutput: [],
+						chanceItems: [
+							{
+								chance: 1.15,
+								dropEffects: [
+									{
+										active: true,
+										display: "always",
+										effectId: "product:test:output:0:effect:0",
+										effectName: "Nearby wood sources",
+										impact: "chance",
+										kind: "nearby.loot.outputChance.add",
+										label: "Single tree",
+										ready: true,
+										result: "+50%",
+									},
+								],
+								effectId: "product:test:output:0:effect:0",
+								effectName: "Nearby wood sources",
+								itemId: "item:log",
+								quantity: 1,
+								sourceDropId: "product:test:output:0",
+							},
+						],
+					},
+					requirements: [],
+					visible: true,
+				},
+			}),
+		).toEqual([
+			"Nearby wood sources: +1× Log guaranteed, 15% chance for +1× Log.",
+		]);
+	});
+
 	it("respects hidden display rules when summarizing chance bonuses", () => {
 		expect(
 			readRuntimeProductLineActiveEffectBonusLines({

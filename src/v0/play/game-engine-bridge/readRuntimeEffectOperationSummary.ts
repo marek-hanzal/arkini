@@ -118,6 +118,11 @@ const groupDurationEffectInstances = (
 const readChanceAtLeastOne = (chances: readonly number[]) =>
 	1 - chances.reduce((missChance, chance) => missChance * (1 - chance), 1);
 
+const readGuaranteedRollCount = (chance: number) => Math.floor(Math.max(0, chance));
+
+const readChanceRemainder = (chance: number) =>
+	Math.max(0, chance - readGuaranteedRollCount(chance));
+
 const readAggregatedChanceItemLines = ({
 	config,
 	effectiveProductLine,
@@ -186,10 +191,56 @@ const readAggregatedChanceItemLines = ({
 			effectName: group.effectName,
 		});
 
+		const hasUncappedChance = group.chances.some((chance) => chance > 1);
 		if (rollCount === 1) {
-			return `${effectLabel}: ${formatPercent(group.chances[0] ?? 0)} chance for +${formatQuantityNumber(
+			const chance = group.chances[0] ?? 0;
+			const quantityRange = group.quantityRanges[0] ?? {
+				max: 1,
+				min: 1,
+			};
+			const guaranteedQuantity = readGuaranteedRollCount(chance) * quantityRange.min;
+			const remainder = readChanceRemainder(chance);
+
+			if (guaranteedQuantity > 0 && remainder > 0) {
+				return `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed, ${formatPercent(
+					remainder,
+				)} chance for +${formatQuantityNumber(quantityRange.min)} ${itemName}.`;
+			}
+
+			if (guaranteedQuantity > 0) {
+				return `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed.`;
+			}
+
+			return `${effectLabel}: ${formatPercent(chance)} chance for +${formatQuantityNumber(
 				firstSuccessMin,
 			)} ${itemName}.`;
+		}
+
+		if (hasUncappedChance) {
+			const guaranteedQuantity = group.chances.reduce((total, chance, index) => {
+				const quantityRange = group.quantityRanges[index] ?? {
+					max: 1,
+					min: 1,
+				};
+				return total + readGuaranteedRollCount(chance) * quantityRange.min;
+			}, 0);
+			const remainderChances = group.chances
+				.map(readChanceRemainder)
+				.filter((chance) => chance > 0);
+			const guaranteedPrefix =
+				guaranteedQuantity > 0
+					? `+${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed`
+					: undefined;
+
+			if (guaranteedPrefix && remainderChances.length > 0) {
+				return `${effectLabel}: ${guaranteedPrefix}, ${formatPercent(
+					readChanceAtLeastOne(remainderChances),
+				)} chance for extra ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`;
+			}
+
+			if (guaranteedPrefix) {
+				return `${effectLabel}: ${guaranteedPrefix} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`;
+			}
 		}
 
 		return `${effectLabel}: ${formatPercent(

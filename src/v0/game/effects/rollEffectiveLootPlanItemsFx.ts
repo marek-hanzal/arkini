@@ -26,10 +26,23 @@ const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
 	});
 });
 
+const readChanceRollCountFx = Effect.fn("readChanceRollCountFx")(function* ({
+	chance,
+}: {
+	chance: number;
+}) {
+	if (chance <= 0) return 0;
+
+	const random = yield* RandomServiceFx;
+	const guaranteedRolls = Math.floor(chance);
+	const remainder = chance - guaranteedRolls;
+
+	return guaranteedRolls + (random.chance(remainder) ? 1 : 0);
+});
+
 export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItemsFx")(function* ({
 	lootPlan,
 }: rollEffectiveLootPlanItemsFx.Props) {
-	const random = yield* RandomServiceFx;
 	const items: LootTableRollResult["items"] = [];
 
 	if (lootPlan.baseOutput.length > 0) {
@@ -40,15 +53,19 @@ export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItem
 	}
 
 	for (const chanceItem of lootPlan.chanceItems) {
-		if (!random.chance(chanceItem.chance)) continue;
+		const rollCount = yield* readChanceRollCountFx({
+			chance: chanceItem.chance,
+		});
 
-		const quantity = yield* rollGameQuantityFx({
-			quantity: chanceItem.quantity,
-		});
-		items.push({
-			itemId: chanceItem.itemId,
-			quantity: quantity.quantity,
-		});
+		for (let rollIndex = 0; rollIndex < rollCount; rollIndex += 1) {
+			const quantity = yield* rollGameQuantityFx({
+				quantity: chanceItem.quantity,
+			});
+			items.push({
+				itemId: chanceItem.itemId,
+				quantity: quantity.quantity,
+			});
+		}
 	}
 
 	return {

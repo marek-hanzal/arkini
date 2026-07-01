@@ -62,7 +62,7 @@ const ProducerProductLineOutputViewSchema = z.object({
 			"weighted",
 		])
 		.optional(),
-	probability: z.number().min(0).max(1).optional(),
+	probability: z.number().min(0).optional(),
 	quantity: ProducerProductLineOutputQuantityViewSchema.optional(),
 	rollLabel: z.string().min(1).optional(),
 	sort: z.number().optional(),

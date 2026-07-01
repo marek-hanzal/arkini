@@ -887,4 +887,109 @@ describe("readEffectiveProducerProductLine", () => {
 			},
 		]);
 	});
+
+	it("adds nearby loot source chances into one uncapped chance item", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 4,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							chance: 0,
+							quantity: 1,
+							effects: [
+								{
+									display: "always",
+									kind: "nearby.loot.outputChance.add",
+									label: "Nearby wood sources",
+									quantity: 1,
+									radius: 2,
+									sources: [
+										{
+											chance: 0.5,
+											items: anyOfItem("item:twig"),
+											label: "Single tree",
+										},
+										{
+											chance: 0.65,
+											items: anyOfItem("item:plank"),
+											label: "Double tree",
+										},
+									],
+								},
+							],
+							itemId: "item:twig",
+							type: "chance",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+					{
+						itemId: "item:plank",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readLine({
+			config,
+			save,
+		});
+
+		expect(line.lootPlan.chanceItems).toMatchObject([
+			{
+				chance: 1.15,
+				itemId: "item:twig",
+				dropEffects: [
+					{
+						label: "Single tree",
+						result: "+50% (1× 50%)",
+					},
+					{
+						label: "Double tree",
+						result: "+65% (1× 65%)",
+					},
+				],
+			},
+		]);
+		expect(line.lootPlan.visibleOutput).toMatchObject([
+			{
+				dropEffects: [
+					{
+						label: "Nearby wood sources",
+						result: "+115% total",
+					},
+				],
+				itemId: "item:twig",
+			},
+		]);
+	});
 });

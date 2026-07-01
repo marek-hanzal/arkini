@@ -1730,13 +1730,17 @@
 			"tier": 4
 		},
 		"item:tree": {
-			"description": "Movable wood source used by nearby lumberjacks.",
+			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls.",
 			"name": "Tree",
 			"tags": [
 				"source",
 				"wood",
-				"era:I"
-			]
+				"era:I",
+				"wood-source",
+				"tree",
+				"tree:t1"
+			],
+			"tier": 1
 		},
 		"item:vegetables": {
 			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
@@ -1773,6 +1777,10 @@
 				"water",
 				"era:I",
 				"tier-1-resource"
+			],
+			"mergeIds": [
+				"merge:water-tree-to-double-tree",
+				"merge:water-double-tree-to-micro-forest"
 			]
 		},
 		"item:wheat-field": {
@@ -3226,6 +3234,35 @@
 				"industry",
 				"era:VIII"
 			]
+		},
+		"item:double-tree": {
+			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls.",
+			"maxStackSize": 1,
+			"name": "Double Tree",
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t2",
+				"era:I"
+			],
+			"tier": 2
+		},
+		"item:micro-forest": {
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it.",
+			"maxStackSize": 1,
+			"name": "Micro-Forest",
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t3",
+				"forest",
+				"era:I"
+			],
+			"tier": 3
 		}
 	}
 }

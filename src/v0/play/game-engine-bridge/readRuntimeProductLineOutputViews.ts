@@ -188,6 +188,12 @@ const compareOutputViews = (
 	(left.kind ?? "").localeCompare(right.kind ?? "") ||
 	left.sourceIndex - right.sourceIndex;
 
+const isZeroChanceEffectCarrier = (output: ProductLineOutputView) =>
+	output.kind === "chance" &&
+	output.enabled !== false &&
+	output.probability === 0 &&
+	(output.effects ?? []).some((effect) => effect.impact === "chance");
+
 export const readRuntimeProductLineOutputViews = ({
 	effectiveProductLine,
 	save,
@@ -224,5 +230,6 @@ export const readRuntimeProductLineOutputViews = ({
 
 	return outputs
 		.sort(compareOutputViews)
-		.map(({ sourceIndex: _sourceIndex, ...output }) => output);
+		.map(({ sourceIndex: _sourceIndex, ...output }) => output)
+		.filter((output) => !isZeroChanceEffectCarrier(output));
 };

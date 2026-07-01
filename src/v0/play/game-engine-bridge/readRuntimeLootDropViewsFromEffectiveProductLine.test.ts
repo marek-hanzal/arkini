@@ -158,4 +158,63 @@ describe("readRuntimeLootDropViewsFromEffectiveProductLine", () => {
 			},
 		]);
 	});
+	it("hides zero-probability effect carrier drops when runtime chance items replace them", () => {
+		const chanceEffect = {
+			active: true,
+			display: "always" as const,
+			effectId: "product:test:output:0:effect:0",
+			effectName: "Nearby wood sources",
+			impact: "chance" as const,
+			kind: "nearby.loot.outputChance.add",
+			label: "Nearby wood sources",
+			ready: true,
+			result: "+115% total",
+		} as const;
+		const effectiveProductLine: EffectiveProducerProductLine = {
+			appliedEffects: [],
+			blocked: false,
+			blockReasons: [],
+			durationMs: 1000,
+			lootPlan: {
+				baseOutput: [],
+				chanceItems: [
+					{
+						chance: 1.15,
+						dropEffects: [
+							chanceEffect,
+						],
+						itemId: "item:log",
+						quantity: 1,
+						sourceDropId: "product:test:output:0",
+					},
+				],
+				visibleOutput: [
+					{
+						chance: 0,
+						dropEffects: [
+							chanceEffect,
+						],
+						enabled: true,
+						itemId: "item:log",
+						quantity: 1,
+						type: "chance",
+						visible: true,
+					},
+				],
+			},
+			requirements: [],
+			visible: true,
+		};
+
+		expect(
+			readRuntimeLootDropViewsFromEffectiveProductLine({
+				effectiveProductLine,
+			}),
+		).toMatchObject([
+			{
+				chanceLabel: "115%",
+				itemId: "item:log",
+			},
+		]);
+	});
 });

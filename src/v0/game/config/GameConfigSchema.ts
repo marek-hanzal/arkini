@@ -310,6 +310,21 @@ const GameNearbyItemAuthoringSelectorSchema = z
 	})
 	.strict();
 
+const createGameNearbyLootChanceSourceSchema = <
+	TItemSelectorSchema extends
+		| typeof GameNearbyItemSelectorSchema
+		| typeof GameNearbyItemAuthoringSelectorSchema,
+>(
+	itemSelectorSchema: TItemSelectorSchema,
+) =>
+	z
+		.object({
+			...itemSelectorSchema.shape,
+			chance: PositiveNumberSchema,
+			label: z.string().min(1).optional(),
+		})
+		.strict();
+
 const createGameLineEffectSchema = <
 	TItemSelectorSchema extends
 		| typeof GameNearbyItemSelectorSchema
@@ -454,6 +469,16 @@ const createGameDropEffectSchema = <
 				kind: z.literal("grant.loot.extraOutputChance.add"),
 				selector: GameGrantSelectorSchema,
 				chance: PositiveProbabilitySchema,
+				quantity: QuantitySchema.default(1),
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("nearby.loot.outputChance.add"),
+				radius: NonNegativeIntegerSchema,
+				sources: z.array(createGameNearbyLootChanceSourceSchema(itemSelectorSchema)).min(1),
 				quantity: QuantitySchema.default(1),
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
@@ -1805,6 +1830,26 @@ const validateGameDropEffects = (
 					hasEntity: entities.hasItem,
 				},
 			);
+		}
+
+		if (effect.kind === "nearby.loot.outputChance.add") {
+			for (const [sourceIndex, source] of effect.sources.entries()) {
+				validateGameLineItemSelector(
+					ctx,
+					[
+						...path,
+						effectIndex,
+						"sources",
+						sourceIndex,
+						"items",
+					],
+					source.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+					{
+						entityIds: entities.itemIds,
+						hasEntity: entities.hasItem,
+					},
+				);
+			}
 		}
 	}
 };

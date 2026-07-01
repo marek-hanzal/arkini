@@ -74,6 +74,21 @@ const readWeightedChanceLabel = ({
 	return `${formatPercent(entry.weight / totalWeight)}/roll`;
 };
 
+const isZeroChanceEffectCarrier = (
+	entry: Extract<
+		LootOutput,
+		{
+			type: "chance";
+		}
+	> & {
+		dropEffects?: readonly EffectiveDropEffectOutcome[];
+		enabled?: boolean;
+	},
+) =>
+	entry.enabled !== false &&
+	entry.chance === 0 &&
+	(entry.dropEffects ?? []).some((effect) => effect.impact === "chance");
+
 const collectDropViews = ({
 	output,
 }: {
@@ -96,6 +111,8 @@ const collectDropViews = ({
 		}
 
 		if (entry.type === "chance") {
+			if (isZeroChanceEffectCarrier(entry)) return [];
+
 			return [
 				{
 					chanceLabel: readDropChanceLabel({

@@ -3329,55 +3329,52 @@
 			"durationMs": 7000,
 			"output": [
 				{
-					"itemId": "item:log",
-					"type": "guaranteed",
-					"effects": [
-						{
-							"kind": "grant.loot.extraOutputChance.add",
-							"selector": {
-								"allOf": [
-									{
-										"ids": [
-											"grant:active:shrine-bountiful-offering"
-										]
-									}
-								]
-							},
-							"label": "Bountiful Offering",
-							"chance": 0.35,
-							"quantity": 1,
-							"display": "whenActive"
-						}
-					]
-				},
-				{
-					"chance": 0.45,
+					"chance": 0,
 					"itemId": "item:log",
 					"type": "chance",
 					"effects": [
 						{
-							"kind": "grant.loot.extraOutputChance.add",
-							"selector": {
-								"allOf": [
-									{
-										"ids": [
-											"grant:active:shrine-bountiful-offering"
-										]
-									}
-								]
-							},
-							"label": "Bountiful Offering",
-							"chance": 0.35,
+							"kind": "nearby.loot.outputChance.add",
+							"label": "Nearby wood source drop chance",
+							"radius": 2,
+							"display": "always",
 							"quantity": 1,
-							"display": "whenActive"
-						}
-					]
-				},
-				{
-					"chance": 0.15,
-					"itemId": "item:log",
-					"type": "chance",
-					"effects": [
+							"sources": [
+								{
+									"items": {
+										"anyOf": [
+											{
+												"id": "item:tree"
+											}
+										]
+									},
+									"label": "Single Tree",
+									"chance": 0.5
+								},
+								{
+									"items": {
+										"anyOf": [
+											{
+												"id": "item:double-tree"
+											}
+										]
+									},
+									"label": "Double Tree",
+									"chance": 0.65
+								},
+								{
+									"items": {
+										"anyOf": [
+											{
+												"id": "item:micro-forest"
+											}
+										]
+									},
+									"label": "Micro-Forest",
+									"chance": 0.85
+								}
+							]
+						},
 						{
 							"kind": "grant.loot.extraOutputChance.add",
 							"selector": {
@@ -3404,13 +3401,11 @@
 			"effects": [
 				{
 					"kind": "nearby.require",
-					"label": "Nearby item:tree",
+					"label": "Nearby wood source",
 					"items": {
 						"anyOf": [
 							{
-								"ids": [
-									"item:tree"
-								]
+								"tag": "wood-source"
 							}
 						]
 					},
@@ -3420,13 +3415,11 @@
 				},
 				{
 					"kind": "nearby.duration.multiply",
-					"label": "Nearby item:tree enables production",
+					"label": "Nearby wood source enables production",
 					"items": {
 						"anyOf": [
 							{
-								"ids": [
-									"item:tree"
-								]
+								"tag": "wood-source"
 							}
 						]
 					},

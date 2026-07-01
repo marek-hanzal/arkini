@@ -55,11 +55,20 @@ type DropEvaluation = {
 };
 
 type RuntimeItemSelector = Extract<
-	ProducerProductDropEffect,
+	NonNullable<GameConfig["products"][string]["effects"]>[number],
 	{
 		kind: "nearby.require";
 	}
 >["items"];
+
+type NearbyLootChanceEffect = Extract<
+	ProducerProductDropEffect,
+	{
+		kind: "nearby.loot.outputChance.add";
+	}
+>;
+
+type NearbyLootChanceSource = NearbyLootChanceEffect["sources"][number];
 
 type NearbyLineEffect = Extract<
 	NonNullable<GameConfig["products"][string]["effects"]>[number],
@@ -113,6 +122,12 @@ const formatList = (values: readonly string[]) => {
 	return `${values.slice(0, -1).join(", ")} or ${values[values.length - 1]}`;
 };
 
+const formatChancePercent = (chance: number) => {
+	const percent = chance * 100;
+	const rounded = Math.round(percent * 10) / 10;
+	return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)}%`;
+};
+
 const readNearbyItemSelectorLabel = ({
 	config,
 	selector,
@@ -144,6 +159,19 @@ const readNearbyLineEffectLabel = ({
 		? `Nearby ${itemLabel} enables production`
 		: `Nearby ${itemLabel}`;
 };
+
+const readNearbyLootChanceSourceLabel = ({
+	config,
+	source,
+}: {
+	config: GameConfig;
+	source: NearbyLootChanceSource;
+}) =>
+	source.label ??
+	`Nearby ${readNearbyItemSelectorLabel({
+		config,
+		selector: source.items as RuntimeItemSelector,
+	})}`;
 
 const readLineEffectLabel = ({
 	config,
@@ -197,12 +225,7 @@ const readNearbyMatches = ({
 	save,
 	targetCell,
 }: {
-	items: Extract<
-		NonNullable<GameConfig["products"][string]["effects"]>[number],
-		{
-			kind: "nearby.require" | "nearby.duration.multiply";
-		}
-	>["items"];
+	items: RuntimeItemSelector;
 	radius: number;
 	save: GameSave;
 	targetCell?: BoardCell;
@@ -272,6 +295,7 @@ const createDropEffectOutcome = ({
 	effectId,
 	effectName,
 	impact,
+	label,
 	ready,
 	result,
 }: {
@@ -280,6 +304,7 @@ const createDropEffectOutcome = ({
 	effectId: string;
 	effectName: string;
 	impact: EffectiveDropEffectOutcome["impact"];
+	label?: string;
 	ready: boolean;
 	result: string;
 }): EffectiveDropEffectOutcome => ({
@@ -289,7 +314,7 @@ const createDropEffectOutcome = ({
 	effectName,
 	impact,
 	kind: effect.kind,
-	label: effect.label ?? effectName,
+	label: label ?? effect.label ?? effectName,
 	phase: "phase" in effect ? effect.phase : undefined,
 	ready,
 	result,
@@ -314,6 +339,7 @@ const readDropEffectGrantActive = ({
 
 const applyDropEffect = ({
 	chanceItems,
+	config,
 	dropEffectId,
 	dropEffectName,
 	sourceDropId,
@@ -326,6 +352,7 @@ const applyDropEffect = ({
 	visible,
 }: {
 	chanceItems: EffectiveChanceItemEntry[];
+	config: GameConfig;
 	dropEffectId: string;
 	dropEffectName: string;
 	sourceDropId: string;
@@ -483,6 +510,74 @@ const applyDropEffect = ({
 		};
 	}
 
+	if (effect.kind === "nearby.loot.outputChance.add") {
+		const activeSourceEffects: EffectiveDropEffectOutcome[] = [];
+		let totalChance = 0;
+
+		for (const [sourceIndex, source] of effect.sources.entries()) {
+			const matches = readNearbyMatches({
+				items: source.items as RuntimeItemSelector,
+				radius: effect.radius,
+				save,
+				targetCell,
+			});
+			const sourceTotalChance = matches.length * source.chance;
+			totalChance += sourceTotalChance;
+			const active = matches.length > 0;
+			const sourceEffect = createDropEffectOutcome({
+				active,
+				effect,
+				effectId: `${dropEffectId}:source:${sourceIndex}`,
+				effectName: readNearbyLootChanceSourceLabel({
+					config,
+					source,
+				}),
+				impact: "chance",
+				label: readNearbyLootChanceSourceLabel({
+					config,
+					source,
+				}),
+				ready: active,
+				result: active
+					? `+${formatChancePercent(sourceTotalChance)} (${matches.length}× ${formatChancePercent(source.chance)})`
+					: "inactive",
+			});
+			if (shouldDropEffectDisplay(sourceEffect)) {
+				activeSourceEffects.push(sourceEffect);
+			}
+		}
+
+		if (totalChance > 0) {
+			nextChanceItems.push({
+				chance: totalChance,
+				dropEffects: activeSourceEffects.length ? activeSourceEffects : undefined,
+				effectId: dropEffectId,
+				effectName: dropEffectName,
+				sourceDropId,
+				itemId,
+				quantity: effect.quantity,
+			});
+		}
+
+		const summaryEffect = createDropEffectOutcome({
+			active: totalChance > 0,
+			effect,
+			effectId: dropEffectId,
+			effectName: dropEffectName,
+			impact: "chance",
+			ready: totalChance > 0,
+			result: totalChance > 0 ? `+${formatChancePercent(totalChance)} total` : "inactive",
+		});
+		dropEffects.push(summaryEffect);
+
+		return {
+			chanceItems: nextChanceItems,
+			dropEffects,
+			enabled: nextEnabled,
+			visible: nextVisible,
+		};
+	}
+
 	if (effect.kind === "grant.loot.extraOutputChance.add") {
 		const active = readDropEffectGrantActive({
 			effect,
@@ -578,6 +673,7 @@ const readEffectiveDrop = ({
 		});
 		const next = applyDropEffect({
 			chanceItems: evaluation.chanceItems,
+			config,
 			dropEffectId,
 			dropEffectName,
 			sourceDropId: dropEffectIdPrefix,

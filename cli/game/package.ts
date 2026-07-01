@@ -454,6 +454,25 @@ const normalizeDropEffects = ({
 				selector: asAuthoringDomainSelector(effect.items),
 			});
 		}
+		if (effect.kind === "nearby.loot.outputChance.add" && Array.isArray(effect.sources)) {
+			effect.sources = effect.sources.map((sourceEntry, sourceIndex) => {
+				if (!sourceEntry || typeof sourceEntry !== "object" || Array.isArray(sourceEntry)) {
+					return sourceEntry;
+				}
+
+				const source = {
+					...(sourceEntry as Record<string, unknown>),
+				};
+				if (source.items !== undefined) {
+					source.items = normalizeAuthoringDomainSelector({
+						domain: domainIndexes.items,
+						path: `${path}.${effectIndex}.sources.${sourceIndex}.items`,
+						selector: asAuthoringDomainSelector(source.items),
+					});
+				}
+				return source;
+			});
+		}
 		return effect;
 	});
 };

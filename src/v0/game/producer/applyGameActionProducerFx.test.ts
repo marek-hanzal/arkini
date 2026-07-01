@@ -158,6 +158,78 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("rejects products whose visible output drops are all disabled by drop-owned effects", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:unlock": {
+					polarity: "neutral",
+					grants: [
+						{
+							id: "grant:test:unlock",
+							name: "Unlock grant",
+						},
+					],
+					name: "Unlock Grant",
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+							effects: [
+								{
+									display: "always",
+									kind: "grant.require",
+									label: "Unlock Twig Drop",
+									phase: "start",
+									selector: {
+										allOf: [
+											{
+												ids: [
+													"grant:test:unlock",
+												],
+											},
+										],
+									},
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "effect:disabled-output",
+			},
+		});
+	});
+
 	it("completes zero-duration producer products in the same action", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

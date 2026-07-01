@@ -66,6 +66,15 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 		);
 	}
 
+	if (product.output && effectiveProductLine.lootPlan.baseOutput.length === 0) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"effect:disabled-output",
+				`Product "${productId}" has no enabled drops at its scheduled start.`,
+			),
+		);
+	}
+
 	const blockedLimit = readEffectiveOutputTargetLimits({
 		config,
 		includePendingCraftJobs: true,

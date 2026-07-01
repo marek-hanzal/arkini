@@ -21,6 +21,11 @@ const readInputsPartiallyAvailable = (line: ProducerProductLineView) =>
 	!line.inputsReady &&
 	line.inputs.some((input) => readActivationInputViewFillableQuantity(input) > 0);
 
+const readOutputsDisabled = (line: ProducerProductLineView) => {
+	const outputs = line.outputs ?? [];
+	return outputs.length > 0 && outputs.every((output) => output.enabled === false);
+};
+
 const readInputAvailabilityLabel = ({
 	inputsPartiallyAvailable,
 	line,
@@ -29,6 +34,7 @@ const readInputAvailabilityLabel = ({
 	line: ProducerProductLineView;
 }) => {
 	if (line.startRequirementsReady === false) return "requirements missing";
+	if (readOutputsDisabled(line)) return "drops disabled";
 
 	const actionLabel = line.lineKind === "effect" ? "activate" : "run";
 	if (line.inputItemIds.length === 0) return `tap to ${actionLabel}`;
@@ -48,6 +54,7 @@ const readStatusMetaLabel = (line: ProducerProductLineView) => {
 	if (line.startRequirementsReady === false) return "requirements missing";
 	if (line.effectLocked) return line.lineKind === "effect" ? "effect active" : "locked";
 	if (line.outputLimitBlocked) return "limit reached";
+	if (readOutputsDisabled(line)) return "drops disabled";
 	if (line.blocked) return "blocked by effect";
 	return undefined;
 };
@@ -93,6 +100,7 @@ export const readProducerProductLineRunState = ({
 		line.startRequirementsReady !== false &&
 		!line.effectLocked &&
 		!line.outputLimitBlocked &&
+		!readOutputsDisabled(line) &&
 		!line.blocked &&
 		!line.queueFull;
 
@@ -155,6 +163,15 @@ export const readProducerProductLineRunState = ({
 			canRunAction,
 			inputsPartiallyAvailable,
 			label: "Limit reached",
+			line,
+		});
+	}
+
+	if (readOutputsDisabled(line)) {
+		return withCommonState({
+			canRunAction,
+			inputsPartiallyAvailable,
+			label: "Drops disabled",
 			line,
 		});
 	}

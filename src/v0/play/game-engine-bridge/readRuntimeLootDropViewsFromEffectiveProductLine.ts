@@ -59,13 +59,15 @@ const readDropEffects = (effects: readonly EffectiveDropEffectOutcome[] | undefi
 		: undefined;
 
 const readWeightedChanceLabel = ({
+	enabled,
 	entry,
 	totalWeight,
 }: {
+	enabled?: boolean;
 	entry: WeightedLootEntry;
 	totalWeight: number;
 }) => {
-	if (totalWeight <= 0) return "0%/roll";
+	if (enabled === false || totalWeight <= 0) return "0%/roll";
 	return `${formatPercent(entry.weight / totalWeight)}/roll`;
 };
 
@@ -106,6 +108,7 @@ const collectDropViews = ({
 
 		return entry.entries.map((weightedEntry) => ({
 			chanceLabel: readWeightedChanceLabel({
+				enabled: weightedEntry.enabled,
 				entry: weightedEntry,
 				totalWeight,
 			}),

@@ -209,6 +209,7 @@ const applyDropEffect = ({
 	chanceItems,
 	dropEffectId,
 	dropEffectName,
+	sourceDropId,
 	effect,
 	enabled,
 	grantIds,
@@ -220,6 +221,7 @@ const applyDropEffect = ({
 	chanceItems: EffectiveChanceItemEntry[];
 	dropEffectId: string;
 	dropEffectName: string;
+	sourceDropId: string;
 	effect: ProducerProductDropEffect;
 	enabled: boolean;
 	grantIds: ReadonlySet<string>;
@@ -241,7 +243,7 @@ const applyDropEffect = ({
 			grantIds,
 		});
 		if (effect.phase === "visibility") nextVisible = ready;
-		if (effect.phase === "start") nextEnabled = ready;
+		if (effect.phase === "start" && !ready) nextEnabled = false;
 		dropEffects.push(
 			createDropEffectOutcome({
 				active: ready,
@@ -276,7 +278,7 @@ const applyDropEffect = ({
 				targetCell,
 			}).length > 0;
 		if (effect.phase === "visibility") nextVisible = ready;
-		if (effect.phase === "start") nextEnabled = ready;
+		if (effect.phase === "start" && !ready) nextEnabled = false;
 		dropEffects.push(
 			createDropEffectOutcome({
 				active: ready,
@@ -395,6 +397,7 @@ const applyDropEffect = ({
 				],
 				effectId: dropEffectId,
 				effectName: dropEffectName,
+				sourceDropId,
 				itemId,
 				quantity: effect.quantity,
 			});
@@ -464,6 +467,7 @@ const readEffectiveDrop = ({
 			chanceItems: evaluation.chanceItems,
 			dropEffectId,
 			dropEffectName,
+			sourceDropId: dropEffectIdPrefix,
 			effect,
 			enabled: evaluation.enabled,
 			grantIds,
@@ -502,6 +506,7 @@ const readEffectiveOutputEntries = ({
 	const rollableOutput: EffectiveProductOutputEntry[] = [];
 	const visibleOutput: EffectiveProductOutputEntry[] = [];
 	const chanceItems: EffectiveChanceItemEntry[] = [];
+	const rollableDropIds = new Set<string>();
 
 	for (const [outputIndex, entry] of output.entries()) {
 		if (entry.type === "weighted") {
@@ -509,8 +514,9 @@ const readEffectiveOutputEntries = ({
 			const rollableEntries: EffectiveWeightedProductOutputSubEntry[] = [];
 
 			for (const [weightedEntryIndex, weightedEntry] of entry.entries.entries()) {
+				const sourceDropId = `${productId}:output:${outputIndex}:entry:${weightedEntryIndex}`;
 				const evaluation = readEffectiveDrop({
-					dropEffectIdPrefix: `${productId}:output:${outputIndex}:entry:${weightedEntryIndex}`,
+					dropEffectIdPrefix: sourceDropId,
 					dropEffects: weightedEntry.effects,
 					enabled: weightedEntry.enabled,
 					grantIds,
@@ -527,7 +533,10 @@ const readEffectiveOutputEntries = ({
 					visible: evaluation.visible,
 				};
 				if (evaluation.visible) visibleEntries.push(effectiveEntry);
-				if (evaluation.visible && evaluation.enabled) rollableEntries.push(effectiveEntry);
+				if (evaluation.visible && evaluation.enabled) {
+					rollableEntries.push(effectiveEntry);
+					rollableDropIds.add(sourceDropId);
+				}
 			}
 
 			if (visibleEntries.length > 0) {
@@ -551,8 +560,9 @@ const readEffectiveOutputEntries = ({
 			continue;
 		}
 
+		const sourceDropId = `${productId}:output:${outputIndex}`;
 		const evaluation = readEffectiveDrop({
-			dropEffectIdPrefix: `${productId}:output:${outputIndex}`,
+			dropEffectIdPrefix: sourceDropId,
 			dropEffects: entry.effects,
 			enabled: entry.enabled,
 			grantIds,
@@ -570,11 +580,16 @@ const readEffectiveOutputEntries = ({
 		};
 
 		if (evaluation.visible) visibleOutput.push(effectiveEntry);
-		if (evaluation.visible && evaluation.enabled) rollableOutput.push(effectiveEntry);
+		if (evaluation.visible && evaluation.enabled) {
+			rollableOutput.push(effectiveEntry);
+			rollableDropIds.add(sourceDropId);
+		}
 	}
 
 	return {
-		chanceItems,
+		chanceItems: chanceItems.filter((chanceItem) =>
+			rollableDropIds.has(chanceItem.sourceDropId),
+		),
 		rollableOutput,
 		visibleOutput,
 	};
@@ -773,14 +788,7 @@ export const readEffectiveProducerProductLine = ({
 		startRequirementsReady,
 		lootPlan: {
 			baseOutput: effectiveOutput.rollableOutput,
-			chanceItems: effectiveOutput.chanceItems.filter((chanceItem) =>
-				effectiveOutput.rollableOutput.some((output) => {
-					if (output.type === "weighted") {
-						return output.entries.some((entry) => entry.itemId === chanceItem.itemId);
-					}
-					return output.itemId === chanceItem.itemId;
-				}),
-			),
+			chanceItems: effectiveOutput.chanceItems,
 			visibleOutput: effectiveOutput.visibleOutput,
 		},
 		requirements,

@@ -80,6 +80,7 @@ export const checkProducerProductStartRuntimeConstraintsFx = Effect.fn(
 		includePendingCraftJobs: true,
 		includePendingCraftSourceItems: true,
 		includePendingProducerJobs: true,
+		nowMs: startAtMs,
 		lootPlan: effectiveProductLine.lootPlan,
 		save,
 	}).find((limit) => limit.remainingQuantity < limit.requiredQuantity);

@@ -208,6 +208,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 			includePendingCraftJobs: true,
 			includePendingCraftSourceItems: true,
 			includePendingProducerJobs: true,
+			nowMs,
 			lootPlan: effectiveProductLine.lootPlan,
 			save,
 		});

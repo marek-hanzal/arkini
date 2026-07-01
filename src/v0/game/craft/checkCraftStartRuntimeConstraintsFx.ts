@@ -57,6 +57,7 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 			]),
 			includePendingCraftJobs: true,
 			includePendingProducerJobs: true,
+			nowMs,
 			itemId: recipe.resultItemId,
 			save,
 		});

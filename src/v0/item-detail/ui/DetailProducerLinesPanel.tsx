@@ -279,7 +279,6 @@ const DetailProducerLineCard: FC<{
 	const { control, line } = model;
 	const effectPolarity = readLineEffectPolarity(line);
 	const visibleRequirements = readVisibleEffectRequirements(line);
-	const targetLimitReached = line.outputLimitBlocked === true;
 	const targetLimits = line.targetLimits ?? [];
 	const effectBenefits = line.effectBenefits ?? [];
 	const effectBonusLines = line.effectBonusLines ?? [];
@@ -329,63 +328,54 @@ const DetailProducerLineCard: FC<{
 				</div>
 			</header>
 
-			{targetLimitReached ? null : (
-				<div className="mt-3 grid gap-2">
+			<div className="mt-3 grid gap-2">
+				<DetailLineNoteList
+					items={effectBenefits}
+					title="Effect grants"
+					tone="good"
+				/>
+				<DetailLineNoteList
+					items={effectBonusLines}
+					title="Active bonuses"
+					tone="good"
+				/>
+				{effectRequirementLabels.length ? (
 					<DetailLineNoteList
-						items={effectBenefits}
-						title="Effect grants"
-						tone="good"
+						items={effectRequirementLabels}
+						title={effectRequirementTitle}
+						tone="warn"
 					/>
+				) : null}
+				{targetLimits.length ? (
 					<DetailLineNoteList
-						items={effectBonusLines}
-						title="Active bonuses"
-						tone="good"
+						items={targetLimits.map((limit) => readTargetLimitLabel(limit, items))}
+						title="Target limits"
+						tone="neutral"
 					/>
-					{effectRequirementLabels.length ? (
-						<DetailLineNoteList
-							items={effectRequirementLabels}
-							title={effectRequirementTitle}
-							tone="warn"
-						/>
-					) : null}
-					{targetLimits.length ? (
-						<DetailLineNoteList
-							items={targetLimits.map((limit) => readTargetLimitLabel(limit, items))}
-							title="Target limits"
-							tone="neutral"
-						/>
-					) : null}
-					<DetailLineOutputs
+				) : null}
+				<DetailLineOutputs
+					items={items}
+					line={line}
+				/>
+				{showInputs ? (
+					<DetailLineInputs
 						items={items}
-						line={line}
+						model={model}
 					/>
-					{showInputs ? (
-						<DetailLineInputs
-							items={items}
-							model={model}
-						/>
-					) : null}
-				</div>
-			)}
+				) : null}
+			</div>
 
-			<div
-				className={cn(
-					"mt-3 grid gap-2",
-					!targetLimitReached && control.defaultAction && "grid-cols-3",
-				)}
-			>
+			<div className={cn("mt-3 grid gap-2", control.defaultAction && "grid-cols-3")}>
 				<UiProgressButton
 					disabled={control.primaryAction.disabled}
 					progress={control.primaryAction.progress}
 					tone={control.primaryAction.tone}
-					className={
-						!targetLimitReached && control.defaultAction ? "col-span-2" : undefined
-					}
+					className={control.defaultAction ? "col-span-2" : undefined}
 					onClick={control.primaryAction.onClick}
 				>
 					{control.primaryAction.label}
 				</UiProgressButton>
-				{!targetLimitReached && control.defaultAction ? (
+				{control.defaultAction ? (
 					<UiButton
 						fullWidth
 						disabled={control.defaultAction.disabled}

@@ -184,7 +184,7 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("Water");
 	});
 
-	it("collapses a target-limited product line to the disabled action only", () => {
+	it("keeps target-limited product line details visible beside the disabled action", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -200,7 +200,7 @@ describe("DetailProducerLinesPanel", () => {
 									capacity: 1,
 									consume: true,
 									itemId: "item:water",
-									quantity: 0,
+									quantity: 1,
 									stored: 0,
 								},
 							],
@@ -233,10 +233,10 @@ describe("DetailProducerLinesPanel", () => {
 
 		expect(html).toContain("Blueprint: Library I");
 		expect(html).toContain("Limit reached");
-		expect(html).not.toContain("Outputs");
-		expect(html).not.toContain("Target limits");
-		expect(html).not.toContain("Water");
-		expect(html).not.toContain("Default");
+		expect(html).toContain("Outputs");
+		expect(html).toContain("Target limits");
+		expect(html).toContain("Water");
+		expect(html).toContain("Default");
 	});
 
 	it("hides required resources once a product line is ready to start", () => {

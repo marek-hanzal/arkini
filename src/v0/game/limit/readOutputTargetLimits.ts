@@ -13,6 +13,7 @@ export namespace readOutputTargetLimits {
 		includePendingCraftJobs?: boolean;
 		includePendingCraftSourceItems?: boolean;
 		includePendingProducerJobs?: boolean;
+		nowMs?: number;
 		output: ActivationOutput | undefined;
 		save: GameSave;
 	}
@@ -33,6 +34,7 @@ export const readOutputTargetLimits = ({
 	includePendingCraftJobs,
 	includePendingCraftSourceItems,
 	includePendingProducerJobs,
+	nowMs,
 	output,
 	save,
 }: readOutputTargetLimits.Props): ItemTargetLimit[] => {
@@ -48,6 +50,7 @@ export const readOutputTargetLimits = ({
 				includePendingCraftJobs,
 				includePendingCraftSourceItems,
 				includePendingProducerJobs,
+				nowMs,
 				itemId: outputEntry.itemId,
 				requiredQuantity: readOutputQuantityMaximum(outputEntry.quantity),
 				save,

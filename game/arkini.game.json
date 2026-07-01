@@ -16029,7 +16029,24 @@
 		},
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"chargeCost": 0,
-			"durationMs": 7000,
+			"durationMs": 60000,
+			"effects": [
+				{
+					"display": "whenActive",
+					"kind": "grant.duration.multiply",
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					}
+				}
+			],
 			"name": "Blueprint: Town Hall II",
 			"output": [
 				{
@@ -16039,7 +16056,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"tags": [],
+			"tags": [
+				"shrine:haste-target"
+			],
 			"visibility": "visible"
 		},
 		"product:townhall-t1:blueprint-well-t1": {
@@ -16172,7 +16191,24 @@
 		},
 		"product:townhall-t2:blueprint-townhall-t3": {
 			"chargeCost": 0,
-			"durationMs": 10000,
+			"durationMs": 90000,
+			"effects": [
+				{
+					"display": "whenActive",
+					"kind": "grant.duration.multiply",
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					}
+				}
+			],
 			"name": "Blueprint: Town Hall III",
 			"output": [
 				{
@@ -16182,7 +16218,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"tags": [],
+			"tags": [
+				"shrine:haste-target"
+			],
 			"visibility": "visible"
 		},
 		"product:townhall-t2:blueprint-vegetable-garden-t1": {
@@ -16433,7 +16471,24 @@
 		},
 		"product:townhall-t3:blueprint-townhall-t4": {
 			"chargeCost": 0,
-			"durationMs": 12000,
+			"durationMs": 120000,
+			"effects": [
+				{
+					"display": "whenActive",
+					"kind": "grant.duration.multiply",
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					}
+				}
+			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16451,7 +16506,9 @@
 				}
 			],
 			"placement": "board_then_inventory",
-			"tags": [],
+			"tags": [
+				"shrine:haste-target"
+			],
 			"visibility": "visible"
 		},
 		"product:townhall-t3:blueprint-windmill-t1": {

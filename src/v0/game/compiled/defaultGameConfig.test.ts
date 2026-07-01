@@ -57,6 +57,29 @@ describe("defaultGameConfig", () => {
 			expect(defaultGameConfig.items[itemId]?.tags).toContain("unique");
 		}
 	});
+	it("makes town hall upgrade planning a real timed milestone", () => {
+		const townHallUpgradePlanDurations = {
+			"product:townhall-t1:blueprint-townhall-t2": 60000,
+			"product:townhall-t2:blueprint-townhall-t3": 90000,
+			"product:townhall-t3:blueprint-townhall-t4": 120000,
+		} as const;
+
+		for (const [productId, durationMs] of Object.entries(townHallUpgradePlanDurations)) {
+			const product = defaultGameConfig.products[productId];
+
+			expect(product?.durationMs).toBe(durationMs);
+			expect(product?.tags).toContain("shrine:haste-target");
+			expect(product?.effects).toContainEqual(
+				expect.objectContaining({
+					display: "whenActive",
+					kind: "grant.duration.multiply",
+					label: "Minor Haste",
+					multiplier: 0.75,
+				}),
+			);
+		}
+	});
+
 	it("does not ship placeholder one-second gameplay timings", () => {
 		const oneSecondProductIds = Object.entries(defaultGameConfig.products)
 			.filter(([, product]) => product.durationMs === 1000)

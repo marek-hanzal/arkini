@@ -244,10 +244,7 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 				deliveryBlocked,
 				outputLimitBlocked: readTargetLimitBlocked(targetLimits),
 				durationMs,
-				effectDurationMultiplier:
-					effectiveProductLine.durationMs > baseDurationMs && baseDurationMs > 0
-						? effectiveProductLine.durationMs / baseDurationMs
-						: undefined,
+				effectDurationMultiplier: effectiveProductLine.effectDurationMultiplier,
 				effectBenefits: product.activatesEffectId
 					? readRuntimeEffectBenefitLines({
 							config,

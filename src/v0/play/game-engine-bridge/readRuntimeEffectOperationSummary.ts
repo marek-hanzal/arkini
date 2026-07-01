@@ -216,7 +216,9 @@ export const readRuntimeProductLineActiveEffectBonusLines = ({
 	const durationEffectInstances = groupDurationEffectInstances(
 		effectiveProductLine.appliedEffects,
 	);
-	const durationRatio = baseDurationMs > 0 ? effectiveProductLine.durationMs / baseDurationMs : 1;
+	const durationRatio =
+		effectiveProductLine.effectDurationMultiplier ??
+		(baseDurationMs > 0 ? effectiveProductLine.durationMs / baseDurationMs : 1);
 	const durationLine =
 		durationEffectInstances.length === 0 || durationRatio === 1
 			? undefined

@@ -86,6 +86,7 @@ export interface EffectiveProducerProductLine {
 	blocked: boolean;
 	blockReasons: AppliedGameEffectOperation[];
 	durationMs: number;
+	effectDurationMultiplier?: number;
 	grantIds?: string[];
 	startRequirementsReady?: boolean;
 	lootPlan: {

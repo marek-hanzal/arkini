@@ -255,7 +255,7 @@ const applyDropEffect = ({
 				result: ready
 					? effect.phase === "visibility"
 						? "shown"
-						: "enabled"
+						: "requirement met"
 					: effect.phase === "visibility"
 						? "hidden"
 						: "disabled",
@@ -290,7 +290,7 @@ const applyDropEffect = ({
 				result: ready
 					? effect.phase === "visibility"
 						? "shown"
-						: "enabled"
+						: "requirement met"
 					: effect.phase === "visibility"
 						? "hidden"
 						: "disabled",
@@ -785,6 +785,7 @@ export const readEffectiveProducerProductLine = ({
 			durationMs,
 			save,
 		}),
+		effectDurationMultiplier: durationMultiplier === 1 ? undefined : durationMultiplier,
 		grantIds: [
 			...grantIds,
 		].sort(),

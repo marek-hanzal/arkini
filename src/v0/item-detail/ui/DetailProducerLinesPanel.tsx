@@ -300,9 +300,11 @@ const DetailProducerLineCard: FC<{
 			? `Window ${formatMs(line.durationMs)}`
 			: `Queue ${line.producerQueuedJobs}/${line.queueSize}`,
 		line.lineKind === "product" ? formatMs(line.durationMs) : undefined,
-		line.effectDurationMultiplier && line.effectDurationMultiplier > 1
-			? `slowed ${formatMultiplier(line.effectDurationMultiplier)}×`
-			: undefined,
+		line.effectDurationMultiplier && line.effectDurationMultiplier < 1
+			? `faster ${formatMultiplier(line.effectDurationMultiplier)}×`
+			: line.effectDurationMultiplier && line.effectDurationMultiplier > 1
+				? `slowed ${formatMultiplier(line.effectDurationMultiplier)}×`
+				: undefined,
 	]
 		.filter(Boolean)
 		.join(" · ");

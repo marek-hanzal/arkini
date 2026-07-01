@@ -865,6 +865,16 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(line.lootPlan.baseOutput).toEqual([]);
 		expect(line.lootPlan.visibleOutput).toMatchObject([
 			{
+				dropEffects: [
+					{
+						label: "Disable Twig",
+						result: "disabled",
+					},
+					{
+						label: "Ready Requirement",
+						result: "requirement met",
+					},
+				],
 				enabled: false,
 				itemId: "item:twig",
 			},

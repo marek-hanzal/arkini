@@ -121,9 +121,10 @@ const readProducerInputRowClassName = ({
 
 const DetailLineNoteList: FC<{
 	items: readonly string[];
+	itemCatalog: ItemCatalogView;
 	title: string;
 	tone?: "good" | "warn" | "neutral";
-}> = ({ items, title, tone = "neutral" }) => {
+}> = ({ itemCatalog, items, title, tone = "neutral" }) => {
 	if (items.length === 0) return null;
 
 	return (
@@ -142,7 +143,10 @@ const DetailLineNoteList: FC<{
 						key={`${title}:${index}:${item}`}
 						className="break-words"
 					>
-						{item}
+						{readDetailEffectRequirementLabel({
+							items: itemCatalog,
+							label: item,
+						})}
 					</li>
 				))}
 			</ul>
@@ -345,17 +349,20 @@ const DetailProducerLineCard: FC<{
 
 			<div className="mt-3 grid gap-2">
 				<DetailLineNoteList
+					itemCatalog={items}
 					items={effectBenefits}
 					title="Effect grants"
 					tone="good"
 				/>
 				<DetailLineNoteList
+					itemCatalog={items}
 					items={effectBonusLines}
 					title="Active bonuses"
 					tone="good"
 				/>
 				{effectRequirementLabels.length ? (
 					<DetailLineNoteList
+						itemCatalog={items}
 						items={effectRequirementLabels}
 						title={effectRequirementTitle}
 						tone="warn"
@@ -363,6 +370,7 @@ const DetailProducerLineCard: FC<{
 				) : null}
 				{targetLimits.length ? (
 					<DetailLineNoteList
+						itemCatalog={items}
 						items={targetLimits.map((limit) => readTargetLimitLabel(limit, items))}
 						title="Target limits"
 						tone="neutral"

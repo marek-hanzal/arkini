@@ -18,6 +18,7 @@ const item = (id: string, name: string, assetSrc: string) => ({
 
 const items: ItemCatalogView = {
 	"item:plank": item("item:plank", "Plank", "plank.svg"),
+	"item:tree": item("item:tree", "Tree", "tree.svg"),
 	"item:water": item("item:water", "Water", "water.svg"),
 };
 
@@ -68,6 +69,20 @@ describe("DetailCraftPanel", () => {
 		expect(html).toContain("Water");
 		expect(html).toContain("0/1");
 		expect(html).toContain("Auto-fill inputs");
+	});
+
+	it("renders item titles inside effect block reasons instead of raw ids", () => {
+		const html = renderCraft(
+			createCraft({
+				effectBlockReasons: [
+					"Nearby item:tree blocks crafting",
+				],
+				effectBlocked: true,
+			}),
+		);
+
+		expect(html).toContain("Nearby Tree blocks crafting");
+		expect(html).not.toContain("item:tree");
 	});
 
 	it("keeps fulfilled resources visible until the craft starts running", () => {

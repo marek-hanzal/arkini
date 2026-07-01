@@ -18,6 +18,7 @@ const item = (id: string, name: string, assetSrc: string) => ({
 
 const items: ItemCatalogView = {
 	"item:grain": item("item:grain", "Grain", "grain.svg"),
+	"item:tree": item("item:tree", "Tree", "tree.svg"),
 	"item:water": item("item:water", "Water", "water.svg"),
 	"producer:quarry-t1": item("producer:quarry-t1", "Quarry I", "quarry.svg"),
 };
@@ -218,6 +219,26 @@ describe("DetailProducerLinesPanel", () => {
 		);
 
 		expect(html).toContain("faster 0.75×");
+	});
+
+	it("renders item titles inside active bonus summaries instead of raw ids", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							effectBonusLines: [
+								"Nearby item:tree enables production: 10% faster production.",
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Nearby Tree enables production");
+		expect(html).not.toContain("item:tree");
 	});
 
 	it("hides fulfilled effect requirements and the parent requirement box", () => {

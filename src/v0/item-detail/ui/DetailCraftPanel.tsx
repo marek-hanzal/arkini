@@ -160,7 +160,6 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 			<UiProgressButton
 				disabled={control.primaryAction.disabled}
 				progress={control.primaryAction.progress}
-				progressAutoCompleteMs={control.primaryAction.progressAutoCompleteMs}
 				tone={control.primaryAction.tone}
 				className="mt-3 min-h-12 py-2.5"
 				onClick={control.primaryAction.onClick}

@@ -88,10 +88,10 @@ describe("readDetailCraftControl", () => {
 
 		expect(control.statusLabel).toBe("Collecting inputs");
 		expect(control.primaryAction.progress).toBe(0.5);
-		expect(control.primaryAction.progressAutoCompleteMs).toBeUndefined();
+		expect(control.primaryAction).not.toHaveProperty("progressAutoCompleteMs");
 	});
 
-	it("auto-completes waiting craft button progress over remaining time", () => {
+	it("keeps waiting craft button progress tied to the live runtime view", () => {
 		const control = readDetailCraftControl({
 			craft: createCraft({
 				phase: "waiting",
@@ -105,6 +105,6 @@ describe("readDetailCraftControl", () => {
 		});
 
 		expect(control.primaryAction.progress).toBe(0.25);
-		expect(control.primaryAction.progressAutoCompleteMs).toBe(750);
+		expect(control.primaryAction).not.toHaveProperty("progressAutoCompleteMs");
 	});
 });

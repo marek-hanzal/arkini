@@ -11,7 +11,6 @@ export namespace readProducerProductLineRunState {
 		inputsPartiallyAvailable: boolean;
 		inputAvailabilityLabel?: string;
 		label: string;
-		progressAutoCompleteMs?: number;
 		progressLabel?: string;
 		showProgress: boolean;
 		statusMetaLabel?: string;
@@ -71,13 +70,6 @@ const withCommonState = ({
 		line,
 	}),
 	label,
-	progressAutoCompleteMs:
-		line.inProgress &&
-		!line.deliveryBlocked &&
-		line.pausedAtMs === undefined &&
-		line.remainingMs !== undefined
-			? line.remainingMs
-			: undefined,
 	progressLabel:
 		line.pausedAtMs !== undefined
 			? "Paused"

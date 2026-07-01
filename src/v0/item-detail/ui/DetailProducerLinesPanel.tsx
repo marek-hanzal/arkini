@@ -377,8 +377,6 @@ const DetailProducerLineCard: FC<{
 				<UiProgressButton
 					disabled={control.primaryAction.disabled}
 					progress={control.primaryAction.progress}
-					progressAutoCompleteMs={control.primaryAction.progressAutoCompleteMs}
-					progressAutoCompleteTo={control.primaryAction.progressAutoCompleteTo}
 					tone={control.primaryAction.tone}
 					className={
 						!targetLimitReached && control.defaultAction ? "col-span-2" : undefined

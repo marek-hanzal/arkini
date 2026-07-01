@@ -47,9 +47,6 @@ const readWithdrawInputActionsByItemId = ({
 		}),
 	) satisfies Readonly<Record<string, DetailActionControl | undefined>>;
 
-const readCraftProgressAutoCompleteMs = (craft: CraftProgressView) =>
-	craft.phase === "waiting" ? craft.remainingMs : undefined;
-
 export const readDetailCraftControl = ({
 	craft,
 	onClaim,
@@ -75,7 +72,6 @@ export const readDetailCraftControl = ({
 				onStart();
 			},
 			progress: craft.progress,
-			progressAutoCompleteMs: readCraftProgressAutoCompleteMs(craft),
 			tone: "primary",
 		},
 		statusLabel: craftStatusLabel({

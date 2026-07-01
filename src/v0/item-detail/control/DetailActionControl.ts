@@ -9,6 +9,4 @@ export interface DetailActionControl {
 
 export interface DetailProgressActionControl extends DetailActionControl {
 	progress?: number;
-	progressAutoCompleteMs?: number;
-	progressAutoCompleteTo?: "empty" | "full";
 }

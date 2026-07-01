@@ -158,6 +158,89 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
+	it("rejects blocked products before planning or consuming inputs", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:block": {
+					grants: [
+						{
+							id: "grant:test:block",
+							name: "Block grant",
+						},
+					],
+					name: "Block Grant",
+					polarity: "debuff",
+					sourceScope: "inventory",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						"effect:test:block",
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:shred": {
+					...baseConfig.products["product:shred"],
+					effects: [
+						{
+							display: "always",
+							kind: "grant.blockStart",
+							label: "Blocked by Axe",
+							selector: {
+								allOf: [
+									{
+										ids: [
+											"grant:test:block",
+										],
+									},
+								],
+							},
+						},
+					],
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				inventory: [
+					{
+						itemId: "item:axe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:shred",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 500,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "blocked",
+			},
+		});
+	});
+
 	it("rejects products whose visible output drops are all disabled by drop-owned effects", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -1329,6 +1412,128 @@ describe("applyGameActionFx Producer", () => {
 				reason: "producer_queue_full",
 			},
 		});
+	});
+
+	it("pauses a running producer when all visible drop-owned outputs become disabled", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 5,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							effects: [
+								{
+									display: "always",
+									items: {
+										anyOf: [
+											{
+												ids: [
+													"item:axe",
+												],
+											},
+										],
+									},
+									kind: "nearby.require",
+									label: "Nearby Axe Unlocks Drop",
+									phase: "start",
+									radius: 1,
+								},
+							],
+							itemId: "item:twig",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const started = runAction({
+			action: {
+				inputRefs: [],
+				producerItemInstanceId: "item-instance:1",
+				productId: "product:test",
+				type: "producer.product.start",
+			},
+			config,
+			nowMs: 0,
+			save,
+		});
+		const job = readOnlyRecordValue(started.save.producerJobs);
+
+		const movedAway = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 4,
+				y: 0,
+			},
+			config,
+			nowMs: 250,
+			save: started.save,
+		});
+		expect(movedAway.save.producerJobs[job.id]).toMatchObject({
+			pausedAtMs: 250,
+			remainingMs: 750,
+		});
+		expect(movedAway.nextWakeAtMs).toBeNull();
+
+		const staleTime = runTick({
+			config,
+			nowMs: 1000,
+			save: movedAway.save,
+		});
+		expect(staleTime.events).toEqual([]);
+		expect(staleTime.save.producerJobs[job.id]).toMatchObject({
+			pausedAtMs: 250,
+			remainingMs: 750,
+		});
+
+		const movedBack = runAction({
+			action: {
+				boardItemId: "item-instance:2",
+				type: "board.item.move",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 1250,
+			save: staleTime.save,
+		});
+		expect(movedBack.save.producerJobs[job.id]).toMatchObject({
+			pausedAtMs: undefined,
+			readyAtMs: 2000,
+			startAtMs: 1000,
+		});
+		expect(movedBack.nextWakeAtMs).toBe(2000);
 	});
 
 	it("pauses a running producer when the producer moves outside its local grant", () => {

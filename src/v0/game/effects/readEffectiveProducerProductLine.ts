@@ -381,20 +381,23 @@ const applyDropEffect = ({
 			effect,
 			grantIds,
 		});
+		const activeChanceEffect = createDropEffectOutcome({
+			active: true,
+			effect,
+			effectId: dropEffectId,
+			effectName: dropEffectName,
+			impact: "chance",
+			ready: true,
+			result: `+${Math.round(effect.chance * 1000) / 10}% extra roll`,
+		});
 		if (active) {
 			nextChanceItems.push({
 				chance: effect.chance,
-				dropEffects: [
-					createDropEffectOutcome({
-						active: true,
-						effect,
-						effectId: dropEffectId,
-						effectName: dropEffectName,
-						impact: "chance",
-						ready: true,
-						result: `+${Math.round(effect.chance * 1000) / 10}% extra roll`,
-					}),
-				],
+				dropEffects: shouldDropEffectDisplay(activeChanceEffect)
+					? [
+							activeChanceEffect,
+						]
+					: undefined,
 				effectId: dropEffectId,
 				effectName: dropEffectName,
 				sourceDropId,

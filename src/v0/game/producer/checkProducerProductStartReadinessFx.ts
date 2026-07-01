@@ -150,6 +150,22 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 			),
 		);
 	}
+	if (effectiveProductLine.blocked) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"blocked",
+				`Product "${productId}" is blocked by an active effect for the current game state.`,
+			),
+		);
+	}
+	if (product.output && effectiveProductLine.lootPlan.baseOutput.length === 0) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"effect:disabled-output",
+				`Product "${productId}" has no enabled drops for the current game state.`,
+			),
+		);
+	}
 	if (
 		product.activatesEffectId &&
 		readProducerEffectLineLocked({

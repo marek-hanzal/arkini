@@ -115,8 +115,6 @@ export const readDetailProducerLineControl = ({
 				onStart(line.productId);
 			},
 			progress: runState.showProgress ? readLineProgressDisplay(line) : undefined,
-			progressAutoCompleteMs: runState.progressAutoCompleteMs,
-			progressAutoCompleteTo: line.lineKind === "effect" ? "empty" : "full",
 			tone: "primary",
 		},
 		withdrawInputActionsByItemId: readWithdrawInputActionsByItemId({

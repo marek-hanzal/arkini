@@ -58,31 +58,29 @@ describe("readProducerProductLineRunState", () => {
 		});
 	});
 
-	it("auto-completes active progress only for unpaused running lines", () => {
-		expect(
-			readProducerProductLineRunState({
-				line: line({
-					inProgress: true,
-					remainingMs: 800,
-				}),
+	it("reports active progress state without autonomous button timing", () => {
+		const running = readProducerProductLineRunState({
+			line: line({
+				inProgress: true,
+				remainingMs: 800,
 			}),
-		).toMatchObject({
-			progressAutoCompleteMs: 800,
-			showProgress: true,
+		});
+		const paused = readProducerProductLineRunState({
+			line: line({
+				inProgress: true,
+				pausedAtMs: 200,
+				remainingMs: 800,
+			}),
 		});
 
-		expect(
-			readProducerProductLineRunState({
-				line: line({
-					inProgress: true,
-					pausedAtMs: 200,
-					remainingMs: 800,
-				}),
-			}),
-		).toMatchObject({
-			progressAutoCompleteMs: undefined,
+		expect(running).toMatchObject({
 			showProgress: true,
 		});
+		expect(running).not.toHaveProperty("progressAutoCompleteMs");
+		expect(paused).toMatchObject({
+			showProgress: true,
+		});
+		expect(paused).not.toHaveProperty("progressAutoCompleteMs");
 	});
 
 	it("blocks visible lines with missing effect requirements", () => {

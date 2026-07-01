@@ -5496,12 +5496,32 @@
 			]
 		},
 		"product:townhall-t1:blueprint-townhall-t2": {
-			"durationMs": 7000,
+			"durationMs": 60000,
 			"name": "Blueprint: Town Hall II",
 			"output": [
 				{
 					"itemId": "item:blueprint-townhall-t2",
 					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"effects": [
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
 				}
 			]
 		},
@@ -5583,12 +5603,32 @@
 			]
 		},
 		"product:townhall-t2:blueprint-townhall-t3": {
-			"durationMs": 10000,
+			"durationMs": 90000,
 			"name": "Blueprint: Town Hall III",
 			"output": [
 				{
 					"itemId": "item:blueprint-townhall-t3",
 					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"effects": [
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
 				}
 			]
 		},
@@ -5762,7 +5802,7 @@
 			]
 		},
 		"product:townhall-t3:blueprint-townhall-t4": {
-			"durationMs": 12000,
+			"durationMs": 120000,
 			"inputs": [
 				{
 					"capacity": 4,
@@ -5775,6 +5815,26 @@
 				{
 					"itemId": "item:blueprint-townhall-t4",
 					"type": "guaranteed"
+				}
+			],
+			"tags": [
+				"shrine:haste-target"
+			],
+			"effects": [
+				{
+					"kind": "grant.duration.multiply",
+					"selector": {
+						"allOf": [
+							{
+								"ids": [
+									"grant:active:shrine-minor-haste"
+								]
+							}
+						]
+					},
+					"label": "Minor Haste",
+					"multiplier": 0.75,
+					"display": "whenActive"
 				}
 			]
 		},

@@ -221,7 +221,7 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("faster 0.75×");
 	});
 
-	it("renders item titles inside active bonus summaries instead of raw ids", () => {
+	it("renders already enriched active bonus summaries", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -229,7 +229,7 @@ describe("DetailProducerLinesPanel", () => {
 					lineModel(
 						createLine({
 							effectBonusLines: [
-								"Nearby item:tree enables production: 10% faster production.",
+								"Nearby Tree enables production: 10% faster production.",
 							],
 						}),
 					),
@@ -238,7 +238,6 @@ describe("DetailProducerLinesPanel", () => {
 		);
 
 		expect(html).toContain("Nearby Tree enables production");
-		expect(html).not.toContain("item:tree");
 	});
 
 	it("hides fulfilled effect requirements and the parent requirement box", () => {
@@ -421,7 +420,7 @@ describe("DetailProducerLinesPanel", () => {
 							effectRequirements: [
 								{
 									kind: "nearby.require",
-									label: "Nearby producer:quarry-t1",
+									label: "Nearby Quarry I",
 									ready: false,
 								},
 							],
@@ -456,7 +455,6 @@ describe("DetailProducerLinesPanel", () => {
 
 		expect(html).toContain("Missing effects");
 		expect(html).toContain("Missing Nearby Quarry I");
-		expect(html).not.toContain("producer:quarry-t1");
 		expect(html.indexOf("Missing effects")).toBeLessThan(html.indexOf("Outputs"));
 		expect(html.indexOf("Missing effects")).toBeLessThan(html.indexOf("Water"));
 	});

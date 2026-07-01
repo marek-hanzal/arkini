@@ -3,7 +3,6 @@ import type { ActivationDropView } from "~/v0/board/view/ActivationDropViewSchem
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
-import { readDetailEffectRequirementLabel } from "~/v0/item-detail/ui/readDetailEffectRequirementLabel";
 
 export namespace DetailDropsPanel {
 	export interface Props {
@@ -90,10 +89,7 @@ export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items
 																key={`${group.label}:${index}:${drop.itemId}:effect:${effectLineIndex}`}
 																className="break-words"
 															>
-																{readDetailEffectRequirementLabel({
-																	items,
-																	label: effectLine,
-																})}
+																{effectLine}
 															</li>
 														),
 													)}

@@ -20,7 +20,7 @@ const items: ItemCatalogView = {
 };
 
 describe("DetailDropsPanel", () => {
-	it("renders item titles inside drop effect labels instead of raw ids", () => {
+	it("renders already enriched drop effect labels", () => {
 		const html = renderToStaticMarkup(
 			<DetailDropsPanel
 				items={items}
@@ -32,7 +32,7 @@ describe("DetailDropsPanel", () => {
 								active: true,
 								impact: "availability",
 								kind: "nearby.require",
-								label: "Nearby item:tree",
+								label: "Nearby Tree",
 								ready: true,
 								result: "requirement met",
 							},
@@ -45,6 +45,5 @@ describe("DetailDropsPanel", () => {
 		);
 
 		expect(html).toContain("Nearby Tree");
-		expect(html).not.toContain("item:tree");
 	});
 });

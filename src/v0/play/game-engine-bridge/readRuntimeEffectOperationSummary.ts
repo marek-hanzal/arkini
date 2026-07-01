@@ -29,11 +29,7 @@ const formatEffectInstanceLabelList = (
 ) => instances.map((instance) => formatEffectInstanceLabel(instance)).join(", ");
 
 const readItemName = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	config.items[itemId]?.name ??
-	itemId
-		.replace(/^item:/, "")
-		.replace(/^producer:/, "")
-		.replaceAll("-", " ");
+	config.items[itemId]?.name ?? itemId;
 
 export const readRuntimeEffectBenefitLines = ({
 	config,

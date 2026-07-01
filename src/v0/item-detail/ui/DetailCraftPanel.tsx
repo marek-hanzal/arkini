@@ -8,7 +8,6 @@ import { UiProgressButton } from "~/v0/ui/UiProgressButton";
 import { cn } from "~/v0/ui/cn";
 import type { DetailCraftControl } from "~/v0/item-detail/control/DetailCraftControl";
 import { DetailCard } from "~/v0/item-detail/ui/DetailCard";
-import { readDetailEffectRequirementLabel } from "~/v0/item-detail/ui/readDetailEffectRequirementLabel";
 
 export namespace DetailCraftPanel {
 	export interface Props {
@@ -93,12 +92,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 						<p className="font-black text-rose-100">Blocked by effects</p>
 						<ul className="mt-1 grid gap-1 leading-5 text-rose-100/80">
 							{effectBlockReasons.map((reason) => (
-								<li key={`${craft.id}:effect-block:${reason}`}>
-									{readDetailEffectRequirementLabel({
-										items,
-										label: reason,
-									})}
-								</li>
+								<li key={`${craft.id}:effect-block:${reason}`}>{reason}</li>
 							))}
 						</ul>
 					</div>

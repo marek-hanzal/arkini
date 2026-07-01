@@ -54,15 +54,122 @@ type DropEvaluation = {
 	visible: boolean;
 };
 
+type RuntimeItemSelector = Extract<
+	ProducerProductDropEffect,
+	{
+		kind: "nearby.require";
+	}
+>["items"];
+
+type NearbyLineEffect = Extract<
+	NonNullable<GameConfig["products"][string]["effects"]>[number],
+	{
+		kind: "nearby.duration.multiply" | "nearby.require";
+	}
+>;
+
+const readItemName = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
+	config.items[itemId]?.name ?? itemId;
+
+const readSelectorClauseIds = (
+	clause:
+		| {
+				id: string;
+		  }
+		| {
+				ids: string[];
+		  }
+		| {
+				tag: string;
+		  },
+) => {
+	if ("ids" in clause) return clause.ids;
+	if ("id" in clause)
+		return [
+			clause.id,
+		];
+	return [];
+};
+
+const readSelectorPositiveIds = (selector: RuntimeItemSelector) => {
+	if ("mode" in selector) return [];
+
+	const ids = new Set<string>();
+	for (const clause of selector.anyOf ?? []) {
+		for (const id of readSelectorClauseIds(clause)) ids.add(id);
+	}
+	for (const clause of selector.allOf ?? []) {
+		for (const id of readSelectorClauseIds(clause)) ids.add(id);
+	}
+
+	return [
+		...ids,
+	];
+};
+
+const formatList = (values: readonly string[]) => {
+	if (values.length === 0) return "matching item";
+	if (values.length === 1) return values[0] ?? "matching item";
+	return `${values.slice(0, -1).join(", ")} or ${values[values.length - 1]}`;
+};
+
+const readNearbyItemSelectorLabel = ({
+	config,
+	selector,
+}: {
+	config: GameConfig;
+	selector: RuntimeItemSelector;
+}) =>
+	formatList(
+		readSelectorPositiveIds(selector).map((itemId) =>
+			readItemName({
+				config,
+				itemId,
+			}),
+		),
+	);
+
+const readNearbyLineEffectLabel = ({
+	config,
+	lineEffect,
+}: {
+	config: GameConfig;
+	lineEffect: NearbyLineEffect;
+}) => {
+	const itemLabel = readNearbyItemSelectorLabel({
+		config,
+		selector: lineEffect.items as RuntimeItemSelector,
+	});
+	return lineEffect.kind === "nearby.duration.multiply"
+		? `Nearby ${itemLabel} enables production`
+		: `Nearby ${itemLabel}`;
+};
+
 const readLineEffectLabel = ({
+	config,
 	fallback,
 	lineEffect,
 }: {
+	config: GameConfig;
 	fallback: string;
-	lineEffect: {
-		label?: string;
-	};
-}) => lineEffect.label ?? fallback;
+	lineEffect:
+		| NonNullable<GameConfig["products"][string]["effects"]>[number]
+		| ProducerProductDropEffect;
+}) => {
+	if (lineEffect.kind === "nearby.require") {
+		return readNearbyLineEffectLabel({
+			config,
+			lineEffect: lineEffect as NearbyLineEffect,
+		});
+	}
+	if (lineEffect.kind === "nearby.duration.multiply") {
+		return readNearbyLineEffectLabel({
+			config,
+			lineEffect,
+		});
+	}
+	return lineEffect.label ?? fallback;
+};
 
 const createAppliedOperation = ({
 	kind,
@@ -435,6 +542,7 @@ const applyDropEffect = ({
 };
 
 const readEffectiveDrop = ({
+	config,
 	dropEffectIdPrefix,
 	dropEffects,
 	enabled,
@@ -444,6 +552,7 @@ const readEffectiveDrop = ({
 	targetCell,
 	visibility,
 }: {
+	config: GameConfig;
 	dropEffectIdPrefix: string;
 	dropEffects: readonly ProducerProductDropEffect[] | undefined;
 	enabled?: boolean;
@@ -463,6 +572,7 @@ const readEffectiveDrop = ({
 	for (const [dropEffectIndex, effect] of (dropEffects ?? []).entries()) {
 		const dropEffectId = `${dropEffectIdPrefix}:effect:${dropEffectIndex}`;
 		const dropEffectName = readLineEffectLabel({
+			config,
 			fallback: effect.kind,
 			lineEffect: effect,
 		});
@@ -494,12 +604,14 @@ const readEffectiveDrop = ({
 };
 
 const readEffectiveOutputEntries = ({
+	config,
 	grantIds,
 	output,
 	productId,
 	save,
 	targetCell,
 }: {
+	config: GameConfig;
 	grantIds: ReadonlySet<string>;
 	output: NonNullable<GameConfig["products"][string]["output"]>;
 	productId: string;
@@ -519,6 +631,7 @@ const readEffectiveOutputEntries = ({
 			for (const [weightedEntryIndex, weightedEntry] of entry.entries.entries()) {
 				const sourceDropId = `${productId}:output:${outputIndex}:entry:${weightedEntryIndex}`;
 				const evaluation = readEffectiveDrop({
+					config,
 					dropEffectIdPrefix: sourceDropId,
 					dropEffects: weightedEntry.effects,
 					enabled: weightedEntry.enabled,
@@ -565,6 +678,7 @@ const readEffectiveOutputEntries = ({
 
 		const sourceDropId = `${productId}:output:${outputIndex}`;
 		const evaluation = readEffectiveDrop({
+			config,
 			dropEffectIdPrefix: sourceDropId,
 			dropEffects: entry.effects,
 			enabled: entry.enabled,
@@ -661,6 +775,7 @@ export const readEffectiveProducerProductLine = ({
 	for (const [lineEffectIndex, lineEffect] of (product.effects ?? []).entries()) {
 		const lineEffectId = `${productId}:effect:${lineEffectIndex}`;
 		const lineEffectName = readLineEffectLabel({
+			config,
 			fallback: lineEffect.kind,
 			lineEffect,
 		});
@@ -765,6 +880,7 @@ export const readEffectiveProducerProductLine = ({
 	}
 
 	const effectiveOutput = readEffectiveOutputEntries({
+		config,
 		grantIds,
 		output: product.output ?? [],
 		productId,

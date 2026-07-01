@@ -358,6 +358,69 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		]);
 	});
 
+	it("uses catalog item names for nearby active bonus labels", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					effects: [
+						{
+							bands: [
+								{
+									maxDistance: 1,
+									minDistance: 0,
+									multiplier: 0.9,
+								},
+							],
+							display: "whenActive",
+							items: anyOfItem("item:axe"),
+							kind: "nearby.duration.multiply",
+							label: "Nearby item:axe enables production",
+							radius: 1,
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:axe",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readTestLine({
+			config,
+			save,
+		});
+
+		expect(line.effectBonusLines).toEqual([
+			"Nearby Axe enables production: 10% faster production.",
+		]);
+	});
+
 	it("surfaces activated effect polarity on effect product lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

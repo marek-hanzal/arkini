@@ -5,7 +5,6 @@ import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInp
 import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
-import { readDetailEffectRequirementLabel } from "~/v0/item-detail/ui/readDetailEffectRequirementLabel";
 import { readDetailItemName } from "~/v0/item-detail/ui/readDetailItemName";
 import { formatMs } from "~/v0/time/formatMs";
 import { UiButton } from "~/v0/ui/UiButton";
@@ -121,10 +120,9 @@ const readProducerInputRowClassName = ({
 
 const DetailLineNoteList: FC<{
 	items: readonly string[];
-	itemCatalog: ItemCatalogView;
 	title: string;
 	tone?: "good" | "warn" | "neutral";
-}> = ({ itemCatalog, items, title, tone = "neutral" }) => {
+}> = ({ items, title, tone = "neutral" }) => {
 	if (items.length === 0) return null;
 
 	return (
@@ -143,10 +141,7 @@ const DetailLineNoteList: FC<{
 						key={`${title}:${index}:${item}`}
 						className="break-words"
 					>
-						{readDetailEffectRequirementLabel({
-							items: itemCatalog,
-							label: item,
-						})}
+						{item}
 					</li>
 				))}
 			</ul>
@@ -202,10 +197,7 @@ const DetailLineOutputs: FC<{
 													key={`${line.productId}:output:${outputIndex}:effect:${effectLineIndex}`}
 													className="break-words"
 												>
-													{readDetailEffectRequirementLabel({
-														items,
-														label: effectLine,
-													})}
+													{effectLine}
 												</li>
 											),
 										)}
@@ -305,11 +297,7 @@ const DetailProducerLineCard: FC<{
 		? "Blocked effects"
 		: "Missing effects";
 	const effectRequirementLabels = visibleRequirements.map(
-		(requirement) =>
-			`${readEffectRequirementPrefix(requirement)} ${readDetailEffectRequirementLabel({
-				items,
-				label: requirement.label,
-			})}`,
+		(requirement) => `${readEffectRequirementPrefix(requirement)} ${requirement.label}`,
 	);
 	const showInputs = !line.inProgress;
 	const meta = [
@@ -349,20 +337,17 @@ const DetailProducerLineCard: FC<{
 
 			<div className="mt-3 grid gap-2">
 				<DetailLineNoteList
-					itemCatalog={items}
 					items={effectBenefits}
 					title="Effect grants"
 					tone="good"
 				/>
 				<DetailLineNoteList
-					itemCatalog={items}
 					items={effectBonusLines}
 					title="Active bonuses"
 					tone="good"
 				/>
 				{effectRequirementLabels.length ? (
 					<DetailLineNoteList
-						itemCatalog={items}
 						items={effectRequirementLabels}
 						title={effectRequirementTitle}
 						tone="warn"
@@ -370,7 +355,6 @@ const DetailProducerLineCard: FC<{
 				) : null}
 				{targetLimits.length ? (
 					<DetailLineNoteList
-						itemCatalog={items}
 						items={targetLimits.map((limit) => readTargetLimitLabel(limit, items))}
 						title="Target limits"
 						tone="neutral"

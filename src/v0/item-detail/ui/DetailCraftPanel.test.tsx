@@ -71,18 +71,17 @@ describe("DetailCraftPanel", () => {
 		expect(html).toContain("Auto-fill inputs");
 	});
 
-	it("renders item titles inside effect block reasons instead of raw ids", () => {
+	it("renders already enriched effect block reasons", () => {
 		const html = renderCraft(
 			createCraft({
 				effectBlockReasons: [
-					"Nearby item:tree blocks crafting",
+					"Nearby Tree blocks crafting",
 				],
 				effectBlocked: true,
 			}),
 		);
 
 		expect(html).toContain("Nearby Tree blocks crafting");
-		expect(html).not.toContain("item:tree");
 	});
 
 	it("keeps fulfilled resources visible until the craft starts running", () => {

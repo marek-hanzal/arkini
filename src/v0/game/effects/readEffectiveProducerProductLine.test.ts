@@ -432,9 +432,12 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(line.requirements.map((requirement) => requirement.label)).toEqual([
 			"Nearby Twig",
 		]);
-		expect(
-			line.appliedEffects.filter((effect) => effect.kind === "nearby.duration.multiply"),
-		).toHaveLength(1);
+		const durationEffects = line.appliedEffects.filter(
+			(effect) => effect.kind === "nearby.duration.multiply",
+		);
+
+		expect(durationEffects).toHaveLength(1);
+		expect(durationEffects[0]?.effectName).toBe("Nearby Axe enables production");
 	});
 
 	it("applies global grant-owned duration and loot rules defined by the line", () => {
@@ -686,6 +689,10 @@ describe("readEffectiveProducerProductLine", () => {
 		expect(durationEffects.map((effect) => effect.sourceId)).toEqual([
 			"item:axe",
 			"item:axe",
+		]);
+		expect(durationEffects.map((effect) => effect.effectName)).toEqual([
+			"Nearby Axe enables production",
+			"Nearby Axe enables production",
 		]);
 	});
 

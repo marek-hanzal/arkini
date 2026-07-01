@@ -3,6 +3,7 @@ import type { ActivationDropView } from "~/v0/board/view/ActivationDropViewSchem
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { DetailCard, DetailMutedPill } from "~/v0/item-detail/ui/DetailCard";
+import { readDetailEffectRequirementLabel } from "~/v0/item-detail/ui/readDetailEffectRequirementLabel";
 
 export namespace DetailDropsPanel {
 	export interface Props {
@@ -30,11 +31,15 @@ const readDropGroups = (drops: readonly ActivationDropView[]): DropGroup[] =>
 
 const readDropMeta = (drop: ActivationDropView) =>
 	[
+		drop.enabled === false ? "disabled" : undefined,
 		drop.rollLabel,
 		`Quantity ${drop.quantityLabel}`,
 	]
 		.filter(Boolean)
 		.join(" · ");
+
+const readDropEffectLines = (drop: ActivationDropView) =>
+	(drop.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
 
 export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items }) => {
 	const groups = readDropGroups(drops);
@@ -77,6 +82,23 @@ export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items
 											<p className="mt-0.5 break-words text-xs leading-5 text-ak-text-muted">
 												{readDropMeta(drop)}
 											</p>
+											{readDropEffectLines(drop).length ? (
+												<ul className="mt-1 space-y-0.5 text-xs leading-5 text-ak-text-muted">
+													{readDropEffectLines(drop).map(
+														(effectLine, effectLineIndex) => (
+															<li
+																key={`${group.label}:${index}:${drop.itemId}:effect:${effectLineIndex}`}
+																className="break-words"
+															>
+																{readDetailEffectRequirementLabel({
+																	items,
+																	label: effectLine,
+																})}
+															</li>
+														),
+													)}
+												</ul>
+											) : null}
 										</div>
 										<DetailMutedPill>{drop.chanceLabel}</DetailMutedPill>
 									</article>

@@ -178,6 +178,180 @@ describe("readEffectiveProducerProductLine", () => {
 		).toBe(true);
 	});
 
+	it("evaluates drop-owned visibility effects without hiding sibling drops", () => {
+		const baseConfig = createEngineTestConfig();
+		const grantId = "grant:test:path";
+		const effectId = "effect:test:path";
+		const config = createEngineTestConfig({
+			effects: {
+				[effectId]: {
+					polarity: "buff",
+					grants: [
+						{
+							id: grantId,
+							name: "Path grant",
+						},
+					],
+					name: "Path Grant",
+					sourceScope: "board",
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:axe": {
+					...baseConfig.items["item:axe"],
+					passiveEffectIds: [
+						effectId,
+					],
+				},
+			},
+			products: {
+				...baseConfig.products,
+				"product:test": {
+					...baseConfig.products["product:test"],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
+								{
+									display: "always",
+									kind: "grant.require",
+									label: "Choose Twig Path",
+									phase: "visibility",
+									selector: allOfGrant(grantId),
+								},
+							],
+						},
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const lineWithoutGrant = readLine({
+			config,
+			save,
+		});
+		expect(lineWithoutGrant.visible).toBe(true);
+		expect(
+			lineWithoutGrant.lootPlan.visibleOutput.map((entry) =>
+				entry.type === "weighted" ? "weighted" : entry.itemId,
+			),
+		).toEqual([
+			"item:plank",
+		]);
+		expect(
+			lineWithoutGrant.lootPlan.baseOutput.map((entry) =>
+				entry.type === "weighted" ? "weighted" : entry.itemId,
+			),
+		).toEqual([
+			"item:plank",
+		]);
+
+		const lineWithGrant = readLine({
+			config,
+			save: {
+				...save,
+				board: {
+					...save.board,
+					items: {
+						...save.board.items,
+						"item-instance:path": {
+							createdAtMs: 0,
+							id: "item-instance:path",
+							itemId: "item:axe",
+							x: 1,
+							y: 0,
+						},
+					},
+				},
+			},
+		});
+		expect(
+			lineWithGrant.lootPlan.visibleOutput.map((entry) =>
+				entry.type === "weighted" ? "weighted" : entry.itemId,
+			),
+		).toEqual([
+			"item:twig",
+			"item:plank",
+		]);
+	});
+
+	it("keeps disabled drop-owned start requirements visible but out of rollable output", () => {
+		const config = createEngineTestConfig({
+			effects: {
+				"effect:test:unlock": {
+					polarity: "buff",
+					grants: [
+						{
+							id: "grant:test:unlock",
+							name: "Unlock grant",
+						},
+					],
+					name: "Unlock Grant",
+				},
+			},
+			products: {
+				...createEngineTestConfig().products,
+				"product:test": {
+					...createEngineTestConfig().products["product:test"],
+					output: [
+						{
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
+								{
+									display: "always",
+									kind: "grant.require",
+									label: "Unlock Twig Drop",
+									phase: "start",
+									selector: allOfGrant("grant:test:unlock"),
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const line = readLine({
+			config,
+			save,
+		});
+
+		expect(line.visible).toBe(true);
+		expect(line.lootPlan.baseOutput).toEqual([]);
+		expect(line.lootPlan.visibleOutput).toMatchObject([
+			{
+				enabled: false,
+				itemId: "item:twig",
+				dropEffects: [
+					{
+						impact: "availability",
+						label: "Unlock Twig Drop",
+						ready: false,
+						result: "disabled",
+					},
+				],
+			},
+		]);
+	});
+
 	it("evaluates nearby requirements and exact distance bands from the product line", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -302,16 +476,22 @@ describe("readEffectiveProducerProductLine", () => {
 							multiplier: 0.5,
 							selector: allOfGrant(grantId),
 						},
+					],
+					output: [
 						{
-							chance: 0.25,
-							display: "whenActive",
-							kind: "grant.loot.extraOutputChance.add",
-							label: "Extra Twig",
-							outputItems: {
-								items: anyOfItem("item:twig"),
-							},
-							quantity: 1,
-							selector: allOfGrant(grantId),
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
+								{
+									chance: 0.25,
+									display: "whenActive",
+									kind: "grant.loot.extraOutputChance.add",
+									label: "Extra Twig",
+									quantity: 1,
+									selector: allOfGrant(grantId),
+								},
+							],
 						},
 					],
 				},

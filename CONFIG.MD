@@ -88,7 +88,7 @@ A product line owns its inputs and output inline:
 }
 ```
 
-`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product-line gates and modifiers live in the line-owned `effects` array. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence. For blueprint-output product lines, inputs should represent lightweight plan acquisition, research, survey evidence, or paperwork. Do not duplicate the same construction materials/labor inputs that the blueprint craft recipe will consume later; validation tests treat repeated blueprint planning/build costs as a balance bug.
+`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Product-line gates and duration modifiers live in the line-owned `effects` array. Drop-specific visibility, availability, and chance modifiers live directly on the affected `output` entry. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence. For blueprint-output product lines, inputs should represent lightweight plan acquisition, research, survey evidence, or paperwork. Do not duplicate the same construction materials/labor inputs that the blueprint craft recipe will consume later; validation tests treat repeated blueprint planning/build costs as a balance bug.
 
 Product input `quantity` defaults to `1`. Missing input `mode` means `exact`: the product needs and consumes exactly `quantity` items for each run. `mode: "upTo"` changes `quantity` into the per-run maximum: the product can start with at least one stored/selected input and consumes `1..quantity` for the same fixed output. Use this for sink/cleanup lines such as a purifier that can absorb up to four pollution tiles per activation without scaling the output. `capacity` still means how many items may be parked on that product input slot.
 
@@ -117,7 +117,7 @@ Output entries support:
 }
 ```
 
-Quantity may be a number or `{ "min": number, "max": number }`. Output entries may also define optional `sort` for display ordering when a line has several possible outputs such as trash, pollution, or weighted alternatives. Lower values appear first; omitted values fall back to deterministic item-id ordering.
+Quantity may be a number or `{ "min": number, "max": number }`. Output entries may also define optional `sort` for display ordering when a line has several possible outputs such as trash, pollution, or weighted alternatives. Lower values appear first; omitted values fall back to deterministic item-id ordering. Each concrete drop, including a weighted entry, may also define `visibility`, `enabled`, and ordered drop-owned `effects`. Runtime evaluates those effects from top to bottom on that one drop, so the affected output owns its own reactivity instead of being poked from a product-line bonus table like a JSON voodoo doll.
 
 ## Stashes
 
@@ -196,7 +196,7 @@ Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allO
 
 ## Product-line effects
 
-Producer and stash product lines may declare line-owned `effects`. These are evaluated for the concrete product line at runtime and produce an effective view: visibility, start readiness, blockers, duration, and extra chance loot. Runtime product-line views must carry explicit `lineKind: "product" | "effect"`; effect views must carry `effectPolarity`, product views must not, and UI must not fall back to product or neutral when the view forgets to say what it is.
+Producer and stash product lines may declare line-owned `effects`. These are evaluated for the concrete product line at runtime and produce an effective view: line visibility, start readiness, blockers, and duration. Drop-specific rules do **not** live here anymore; they belong on the concrete `output` entry they affect. Runtime product-line views must carry explicit `lineKind: "product" | "effect"`; effect views must carry `effectPolarity`, product views must not, and UI must not fall back to product or neutral when the view forgets to say what it is.
 
 Supported product-line effect kinds:
 
@@ -206,14 +206,33 @@ Supported product-line effect kinds:
 { "kind": "nearby.require", "phase": "start", "display": "always", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 1 }
 { "kind": "nearby.duration.multiply", "display": "whenActive", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 3, "maxSources": 5, "bands": [{ "minDistance": 0, "maxDistance": 3, "multiplier": 0.9 }] }
 { "kind": "grant.duration.multiply", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:minor-haste" }] }, "multiplier": 0.75 }
-{ "kind": "grant.loot.extraOutputChance.add", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:bountiful-offering" }] }, "outputItems": { "items": { "anyOf": [{ "tag": "tier-1-resource" }] } }, "chance": 0.35, "quantity": 1 }
 ```
 
 `phase: "visibility"` hides or reveals a hidden product line based on a requirement. `phase: "start"` leaves the line visible but prevents starting it until the requirement is satisfied. `grant.blockStart` is the opposite shape: if the selector is active, the line is blocked. This is used for path exclusivity and similar “you chose the other door, genius” rules.
 
-`nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; at least one authored band must use a multiplier other than `1`, otherwise the whole effect is a pretty no-op. Grant duration and loot effects are global and only activate when the line’s selector is satisfied. `grant.duration.multiply.multiplier` must change timing, so `1` is rejected. `grant.loot.extraOutputChance.add` may only target same-line non-weighted base output items and its `chance` must be greater than `0`; output-less, weighted-only, zero-chance, or selector-no-match bonus loot effects are rejected because otherwise the UI advertises a bonus that runtime cannot ever roll. Modifier effects are reported as active bonuses in UI, not as missing requirements.
+`nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; at least one authored band must use a multiplier other than `1`, otherwise the whole effect is a pretty no-op. Grant duration effects are global and only activate when the line’s selector is satisfied. `grant.duration.multiply.multiplier` must change timing, so `1` is rejected. Duration modifier effects are reported as active bonuses in UI, not as missing requirements.
 
 `display` controls only UI visibility for requirement-like rows: `always`, `whenActive`, `whenMissing`, or `never`. It must not change runtime validation. Hidden missing requirements still block starts, because otherwise the UI would be decorative nonsense with buttons attached. For `grant.blockStart`, an inactive blocker is "not blocked by" that rule, not a satisfied requirement; UI wording must keep blocker semantics separate from missing-grant semantics.
+
+## Drop-owned effects
+
+Every output entry may declare ordered `effects`. The evaluator applies them from top to bottom to that one concrete drop and returns both the rollable output state and UI explanation rows. This covers the cases we actually care about without making product lines perform séance-level target resolution.
+
+Supported drop-owned effect kinds:
+
+```json
+{ "kind": "grant.require", "phase": "visibility", "display": "always", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
+{ "kind": "grant.require", "phase": "start", "display": "always", "selector": { "allOf": [{ "id": "grant:tooling:advanced" }] } }
+{ "kind": "nearby.require", "phase": "start", "display": "whenMissing", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 2 }
+{ "kind": "grant.blockStart", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
+{ "kind": "grant.drop.hide", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
+{ "kind": "grant.drop.show", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
+{ "kind": "grant.drop.disable", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:polluted" }] } }
+{ "kind": "grant.drop.enable", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:purified" }] } }
+{ "kind": "grant.loot.extraOutputChance.add", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:bountiful-offering" }] }, "chance": 0.35, "quantity": 1 }
+```
+
+`phase: "visibility"` means the drop is completely absent when the condition fails. Use that for choose-the-path content where the player should not even see the other branch. `phase: "start"`, `grant.blockStart`, and `grant.drop.disable` leave the drop visible but unavailable, so UI can say exactly what is missing or blocking it. `grant.loot.extraOutputChance.add` adds an independent bonus roll for the same drop item; it no longer accepts `outputItems` because the drop is already the target.
 
 ## Craft recipe effects
 

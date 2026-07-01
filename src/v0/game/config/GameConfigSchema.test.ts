@@ -369,7 +369,7 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/polarity/);
 	});
 
-	it("rejects extra output chance effects that match no concrete base output", () => {
+	it("rejects product-line-owned extra output chance effects", () => {
 		const config: any = createValidConfigValue();
 		config.effects = {
 			"effect:test": {
@@ -393,7 +393,7 @@ describe("GameConfigSchema", () => {
 						anyOf: [
 							{
 								ids: [
-									"item:plank",
+									"item:twig",
 								],
 							},
 						],
@@ -411,7 +411,7 @@ describe("GameConfigSchema", () => {
 			},
 		];
 
-		expect(() => parseGameConfig(config)).toThrow(/selector must match/);
+		expect(() => parseGameConfig(config)).toThrow(/Invalid discriminator value/);
 	});
 
 	it("rejects line-owned modifier effects that would be runtime no-ops", () => {
@@ -473,7 +473,7 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/non-1 multiplier/);
 	});
 
-	it("rejects zero-chance extra output effects", () => {
+	it("rejects zero-chance drop-owned extra output effects", () => {
 		const config: any = createValidConfigValue();
 		config.effects = {
 			"effect:test": {
@@ -487,22 +487,11 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				chance: 0,
 				display: "whenActive",
 				kind: "grant.loot.extraOutputChance.add",
-				outputItems: {
-					items: {
-						anyOf: [
-							{
-								ids: [
-									"item:twig",
-								],
-							},
-						],
-					},
-				},
 				selector: {
 					allOf: [
 						{
@@ -518,61 +507,27 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Too small/);
 	});
 
-	it("rejects extra output chance effects on output-less or weighted-only lines", () => {
+	it("rejects drop-owned nearby requirements that target missing items", () => {
 		const config: any = createValidConfigValue();
-		config.effects = {
-			"effect:test": {
-				polarity: "buff",
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test",
-					},
-				],
-				name: "Test Grant",
-			},
-		};
-		config.products["product:test"].output = [
+		config.products["product:test"].output[0].effects = [
 			{
-				entries: [
-					{
-						itemId: "item:twig",
-						weight: 1,
-					},
-				],
-				rolls: 1,
-				type: "weighted",
-			},
-		];
-		config.products["product:test"].effects = [
-			{
-				chance: 0.5,
-				display: "whenActive",
-				kind: "grant.loot.extraOutputChance.add",
-				outputItems: {
-					items: {
-						anyOf: [
-							{
-								ids: [
-									"item:twig",
-								],
-							},
-						],
-					},
-				},
-				selector: {
-					allOf: [
+				display: "always",
+				items: {
+					anyOf: [
 						{
 							ids: [
-								"grant:test",
+								"item:ghost",
 							],
 						},
 					],
 				},
+				kind: "nearby.require",
+				phase: "start",
+				radius: 1,
 			},
 		];
 
-		expect(() => parseGameConfig(config)).toThrow(/non-weighted base output/);
+		expect(() => parseGameConfig(config)).toThrow(/Missing item/);
 	});
 
 	it("rejects craft effects that the craft runtime does not support", () => {

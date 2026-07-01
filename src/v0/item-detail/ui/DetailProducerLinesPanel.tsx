@@ -46,6 +46,7 @@ const readQuantityLabel = (
 
 const readOutputMeta = (output: NonNullable<ProducerProductLineView["outputs"]>[number]) =>
 	[
+		output.enabled === false ? "disabled" : undefined,
 		readQuantityLabel(output.quantity),
 		output.probability === undefined
 			? output.kind === "guaranteed"
@@ -57,6 +58,9 @@ const readOutputMeta = (output: NonNullable<ProducerProductLineView["outputs"]>[
 	]
 		.filter(Boolean)
 		.join(" · ");
+
+const readOutputEffectLines = (output: NonNullable<ProducerProductLineView["outputs"]>[number]) =>
+	(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
 
 const readEffectRequirementPrefix = (
 	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
@@ -163,9 +167,33 @@ const DetailLineOutputs: FC<{
 											items,
 										})}
 								</p>
-								<p className="mt-0.5 break-words leading-5 text-ak-text-muted">
+								<p
+									className={cn(
+										"mt-0.5 break-words leading-5",
+										output.enabled === false
+											? "text-rose-200"
+											: "text-ak-text-muted",
+									)}
+								>
 									{readOutputMeta(output)}
 								</p>
+								{readOutputEffectLines(output).length ? (
+									<ul className="mt-1 space-y-0.5 leading-5 text-ak-text-muted">
+										{readOutputEffectLines(output).map(
+											(effectLine, effectLineIndex) => (
+												<li
+													key={`${line.productId}:output:${outputIndex}:effect:${effectLineIndex}`}
+													className="break-words"
+												>
+													{readDetailEffectRequirementLabel({
+														items,
+														label: effectLine,
+													})}
+												</li>
+											),
+										)}
+									</ul>
+								) : null}
 							</div>
 						</div>
 					);

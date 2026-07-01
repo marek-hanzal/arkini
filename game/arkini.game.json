@@ -9911,46 +9911,6 @@
 		"product:bakery-t1:bread": {
 			"chargeCost": 0,
 			"durationMs": 15000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -9968,6 +9928,24 @@
 			"name": "Bread",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:bread",
 					"quantity": 3,
 					"type": "guaranteed"
@@ -9980,46 +9958,6 @@
 		"product:bakery-t1:bread-morale-t1": {
 			"chargeCost": 0,
 			"durationMs": 13000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10043,6 +9981,24 @@
 			"name": "Bread (Inspired)",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:bread",
 					"quantity": 5,
 					"type": "guaranteed"
@@ -10318,39 +10274,6 @@
 					"label": "Nearby producer:purifier-t1",
 					"phase": "start",
 					"radius": 3
-				},
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -10370,6 +10293,24 @@
 			"name": "Nails",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:nails",
 					"quantity": 6,
 					"type": "guaranteed"
@@ -10507,44 +10448,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -10564,6 +10467,24 @@
 			"name": "Beer Barrel",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:beer-barrel",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -10627,44 +10548,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -10678,6 +10561,24 @@
 			"name": "Beer Barrel",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:beer-barrel",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -10741,44 +10642,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -10792,12 +10655,48 @@
 			"name": "Hops",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:hops",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:hops",
 					"quantity": 1,
 					"type": "chance"
@@ -10845,44 +10744,6 @@
 					"label": "Nearby producer:purifier-t1",
 					"phase": "start",
 					"radius": 3
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -10908,6 +10769,24 @@
 			"name": "Bricks",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:bricks",
 					"quantity": 4,
 					"type": "guaranteed"
@@ -10964,38 +10843,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -11015,6 +10862,24 @@
 			"name": "Milk",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:milk",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -11046,34 +10911,6 @@
 					"label": "Nearby producer:purifier-t1",
 					"phase": "start",
 					"radius": 3
-				},
-				{
-					"chance": 0.12,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:charcoal",
-										"item:construction-bundle"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -11087,12 +10924,48 @@
 			"name": "Charcoal",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.12,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:charcoal",
 					"quantity": 3,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.3,
+					"effects": [
+						{
+							"chance": 0.12,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:charcoal",
 					"quantity": 1,
 					"type": "chance"
@@ -11319,38 +11192,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -11370,12 +11211,48 @@
 			"name": "Egg",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:egg",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.3,
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:egg",
 					"quantity": 1,
 					"type": "chance"
@@ -11559,44 +11436,6 @@
 					"label": "Nearby item:clay-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -11610,12 +11449,48 @@
 			"name": "Clay",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:clay",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.3,
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:clay",
 					"quantity": 1,
 					"type": "chance"
@@ -11644,37 +11519,6 @@
 					"label": "Nearby item:coal-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.1,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:coal",
-										"item:gold-ingot",
-										"item:gold-ore",
-										"item:iron-ingot",
-										"item:iron-ore"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -11700,6 +11544,24 @@
 			"name": "Coal Cart",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.1,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:coal",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -11712,36 +11574,6 @@
 		"product:construction-yard-t1:construction-bundle": {
 			"chargeCost": 0,
 			"durationMs": 45000,
-			"effects": [
-				{
-					"chance": 0.12,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:charcoal",
-										"item:construction-bundle"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11783,6 +11615,24 @@
 			"name": "Construction Bundle",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.12,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:construction-bundle",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -11795,36 +11645,6 @@
 		"product:construction-yard-t1:construction-bundle-morale-t3": {
 			"chargeCost": 0,
 			"durationMs": 38000,
-			"effects": [
-				{
-					"chance": 0.12,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:charcoal",
-										"item:construction-bundle"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11872,6 +11692,24 @@
 			"name": "Construction Bundle (Inspired)",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.12,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:construction-bundle",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -11884,41 +11722,6 @@
 		"product:cookhouse-t1:feast": {
 			"chargeCost": 0,
 			"durationMs": 34000,
-			"effects": [
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11954,6 +11757,24 @@
 			"name": "Feast",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:feast",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -11966,46 +11787,6 @@
 		"product:dairy-t1:cheese": {
 			"chargeCost": 0,
 			"durationMs": 18000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12017,6 +11798,24 @@
 			"name": "Cheese",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:cheese",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -12029,41 +11828,6 @@
 		"product:dye-workshop-t1:luxury-cloth": {
 			"chargeCost": 0,
 			"durationMs": 28000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12087,6 +11851,24 @@
 			"name": "Luxury Cloth",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:luxury-cloth",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -12099,41 +11881,6 @@
 		"product:dye-workshop-t1:pigment": {
 			"chargeCost": 0,
 			"durationMs": 18000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -12151,6 +11898,24 @@
 			"name": "Pigment",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:pigment",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -12213,37 +11978,6 @@
 					"radius": 2
 				},
 				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
-				{
 					"display": "whenActive",
 					"kind": "grant.duration.multiply",
 					"label": "Minor Haste",
@@ -12270,12 +12004,48 @@
 			"name": "Grain",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:grain",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.4,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:grain",
 					"quantity": 1,
 					"type": "chance"
@@ -12340,37 +12110,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -12390,12 +12129,48 @@
 			"name": "Grain (Inspired)",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:grain",
 					"quantity": 4,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:grain",
 					"quantity": 1,
 					"type": "chance"
@@ -12443,39 +12218,6 @@
 					"label": "Nearby producer:sand-pit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -12495,6 +12237,24 @@
 			"name": "Glass",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:glass",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -12551,35 +12311,6 @@
 					"label": "Nearby producer:glassworks",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.05,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:marble",
-										"item:marble-block",
-										"item:stained-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -12611,6 +12342,24 @@
 			"name": "Stained Glass",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stained-glass",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -12667,35 +12416,6 @@
 					"label": "Nearby producer:glassworks",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.05,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:marble",
-										"item:marble-block",
-										"item:stained-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -12733,6 +12453,24 @@
 			"name": "Stained Glass (Inspired)",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stained-glass",
 					"quantity": 3,
 					"type": "guaranteed"
@@ -12773,37 +12511,6 @@
 					"label": "Nearby item:gold-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.1,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:coal",
-										"item:gold-ingot",
-										"item:gold-ore",
-										"item:iron-ingot",
-										"item:iron-ore"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -12829,6 +12536,24 @@
 			"name": "Gold Ore Cart",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.1,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:gold-ore",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -13718,37 +13443,6 @@
 					"label": "Nearby item:iron-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.1,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:coal",
-										"item:gold-ingot",
-										"item:gold-ore",
-										"item:iron-ingot",
-										"item:iron-ore"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -13774,6 +13468,24 @@
 			"name": "Iron Ore Cart",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.1,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:iron-ore",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -13827,37 +13539,6 @@
 					"radius": 2
 				},
 				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
-				{
 					"display": "whenActive",
 					"kind": "grant.duration.multiply",
 					"label": "Minor Haste",
@@ -13876,18 +13557,72 @@
 			"name": "Log",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:log",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.45,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:log",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.15,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:log",
 					"quantity": 1,
 					"type": "chance"
@@ -14132,41 +13867,6 @@
 		"product:paper-mill-t1:paper": {
 			"chargeCost": 0,
 			"durationMs": 18000,
-			"effects": [
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -14184,6 +13884,24 @@
 			"name": "Paper",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:paper",
 					"quantity": 3,
 					"type": "guaranteed"
@@ -14228,38 +13946,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -14279,12 +13965,48 @@
 			"name": "Piglet",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:piglet",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:piglet",
 					"quantity": 1,
 					"type": "chance"
@@ -14639,37 +14361,6 @@
 					"radius": 2
 				},
 				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
-				{
 					"display": "whenActive",
 					"kind": "grant.duration.multiply",
 					"label": "Minor Haste",
@@ -14688,18 +14379,72 @@
 			"name": "Stone",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.4,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.15,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone",
 					"quantity": 1,
 					"type": "chance"
@@ -14730,46 +14475,53 @@
 					"label": "Nearby item:marble-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.05,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:marble",
-										"item:marble-block",
-										"item:stained-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"name": "Marble",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:marble",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:marble",
 					"quantity": 1,
 					"type": "chance"
@@ -14798,48 +14550,53 @@
 					"label": "Nearby item:marble-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"name": "Stone",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone",
 					"quantity": 1,
 					"type": "chance"
@@ -14884,39 +14641,6 @@
 					"label": "Nearby producer:purifier-t1",
 					"phase": "start",
 					"radius": 3
-				},
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -14942,6 +14666,24 @@
 			"name": "Roof Tiles",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:roof-tiles",
 					"quantity": 4,
 					"type": "guaranteed"
@@ -14982,50 +14724,53 @@
 					"label": "Nearby item:sand-deposit",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"name": "Sand",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:sand",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:sand",
 					"quantity": 1,
 					"type": "chance"
@@ -15056,38 +14801,6 @@
 					"radius": 2
 				},
 				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
-				{
 					"display": "whenActive",
 					"kind": "grant.duration.multiply",
 					"label": "Minor Haste",
@@ -15114,12 +14827,48 @@
 			"name": "Plank",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:plank",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:plank",
 					"quantity": 1,
 					"type": "chance"
@@ -15230,38 +14979,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows nearby sensitive production",
 					"radius": 2
-				},
-				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15281,6 +14998,24 @@
 			"name": "Wool",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:wool",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -15352,79 +15087,6 @@
 		"product:slaughterhouse-t1:sausage-raw-hide": {
 			"chargeCost": 0,
 			"durationMs": 24000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -15436,17 +15098,71 @@
 			"name": "Sausage + Raw Hide",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:sausage",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:raw-hide",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:raw-hide",
 					"quantity": 1,
 					"type": "chance"
@@ -15475,37 +15191,6 @@
 					"label": "Nearby producer:purifier-t1",
 					"phase": "start",
 					"radius": 3
-				},
-				{
-					"chance": 0.1,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:coal",
-										"item:gold-ingot",
-										"item:gold-ore",
-										"item:iron-ingot",
-										"item:iron-ore"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15531,6 +15216,24 @@
 			"name": "Gold Ingot",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.1,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:gold-ingot",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -15571,37 +15274,6 @@
 					"label": "Nearby producer:purifier-t1",
 					"phase": "start",
 					"radius": 3
-				},
-				{
-					"chance": 0.1,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:coal",
-										"item:gold-ingot",
-										"item:gold-ore",
-										"item:iron-ingot",
-										"item:iron-ore"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15627,6 +15299,24 @@
 			"name": "Iron Ingot",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.1,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:iron-ingot",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -15667,38 +15357,6 @@
 					"label": "Nearby producer:quarry-t1",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15712,6 +15370,24 @@
 			"name": "Stone Block",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone-block",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -15740,35 +15416,6 @@
 					"label": "Nearby producer:quarry-t2",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.05,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:marble",
-										"item:marble-block",
-										"item:stained-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15788,12 +15435,48 @@
 			"name": "Marble Block",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:marble-block",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.2,
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:marble-block",
 					"quantity": 1,
 					"type": "chance"
@@ -15822,35 +15505,6 @@
 					"label": "Nearby producer:quarry-t2",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.05,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:marble",
-										"item:marble-block",
-										"item:stained-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15876,12 +15530,48 @@
 			"name": "Marble Block (Inspired)",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:marble-block",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.05,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:marble-block",
 					"quantity": 1,
 					"type": "chance"
@@ -15910,38 +15600,6 @@
 					"label": "Nearby producer:quarry-t2",
 					"phase": "start",
 					"radius": 2
-				},
-				{
-					"chance": 0.3,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:egg",
-										"item:milk",
-										"item:piglet",
-										"item:plank",
-										"item:stone-block",
-										"item:wool"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -15955,12 +15613,48 @@
 			"name": "Stone Block",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone-block",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"chance": 0.3,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:stone-block",
 					"quantity": 1,
 					"type": "chance"
@@ -15973,41 +15667,6 @@
 		"product:tailor-workshop-t1:common-clothing": {
 			"chargeCost": 0,
 			"durationMs": 26000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16025,6 +15684,24 @@
 			"name": "Common Clothing",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:common-clothing",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -16037,41 +15714,6 @@
 		"product:tailor-workshop-t1:luxury-clothing": {
 			"chargeCost": 0,
 			"durationMs": 35000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16095,6 +15737,24 @@
 			"name": "Luxury Clothing",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:luxury-clothing",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -16107,41 +15767,6 @@
 		"product:tailor-workshop-t1:luxury-clothing-morale-t3": {
 			"chargeCost": 0,
 			"durationMs": 30000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16171,6 +15796,24 @@
 			"name": "Luxury Clothing (Inspired)",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:luxury-clothing",
 					"quantity": 3,
 					"type": "guaranteed"
@@ -16183,41 +15826,6 @@
 		"product:tannery-t1:leather": {
 			"chargeCost": 0,
 			"durationMs": 22000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16235,6 +15843,24 @@
 			"name": "Leather",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:leather",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -16247,46 +15873,6 @@
 		"product:tavern-t1:beer": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16298,6 +15884,24 @@
 			"name": "Beer",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:beer",
 					"quantity": 4,
 					"type": "guaranteed"
@@ -16310,41 +15914,6 @@
 		"product:tavern-t1:wine-glass": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"effects": [
-				{
-					"chance": 0.2,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:feast",
-										"item:glass",
-										"item:nails",
-										"item:paper",
-										"item:roof-tiles",
-										"item:sand",
-										"item:wine-glass"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16356,6 +15925,24 @@
 			"name": "Wine Glass",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.2,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:wine-glass",
 					"quantity": 4,
 					"type": "guaranteed"
@@ -16631,46 +16218,6 @@
 		"product:townhall-t2:food-supply": {
 			"chargeCost": 0,
 			"durationMs": 24000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16706,6 +16253,24 @@
 			"name": "Food Supply",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:food-supply",
 					"quantity": 2,
 					"type": "guaranteed"
@@ -17227,38 +16792,6 @@
 		"product:university:blueprint-cathedral": {
 			"chargeCost": 0,
 			"durationMs": 34000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.blockStart",
-					"label": "Engineers path locks Faith and Mages keystone plans",
-					"reason": "Engineers path is already chosen.",
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:path:engineers"
-								]
-							}
-						]
-					}
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.blockStart",
-					"label": "Mages path locks Engineers and Faith keystone plans",
-					"reason": "Mages path is already chosen.",
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:path:mages"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -17276,6 +16809,38 @@
 			"name": "Blueprint: Cathedral",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "whenActive",
+							"kind": "grant.drop.hide",
+							"label": "Engineers path locks Faith and Mages keystone plans",
+							"reason": "Engineers path is already chosen.",
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:path:engineers"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.drop.hide",
+							"label": "Mages path locks Engineers and Faith keystone plans",
+							"reason": "Mages path is already chosen.",
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:path:mages"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:blueprint-cathedral",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -17334,38 +16899,6 @@
 		"product:university:blueprint-house-of-engineers": {
 			"chargeCost": 0,
 			"durationMs": 34000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.blockStart",
-					"label": "Faith path locks Engineers and Mages keystone plans",
-					"reason": "Faith path is already chosen.",
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:path:faith"
-								]
-							}
-						]
-					}
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.blockStart",
-					"label": "Mages path locks Engineers and Faith keystone plans",
-					"reason": "Mages path is already chosen.",
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:path:mages"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -17377,6 +16910,38 @@
 			"name": "Blueprint: House of Engineers",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "whenActive",
+							"kind": "grant.drop.hide",
+							"label": "Faith path locks Engineers and Mages keystone plans",
+							"reason": "Faith path is already chosen.",
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:path:faith"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.drop.hide",
+							"label": "Mages path locks Engineers and Faith keystone plans",
+							"reason": "Mages path is already chosen.",
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:path:mages"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:blueprint-house-of-engineers",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -17412,38 +16977,6 @@
 		"product:university:blueprint-mage-lodge": {
 			"chargeCost": 0,
 			"durationMs": 34000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.blockStart",
-					"label": "Engineers path locks Faith and Mages keystone plans",
-					"reason": "Engineers path is already chosen.",
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:path:engineers"
-								]
-							}
-						]
-					}
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.blockStart",
-					"label": "Faith path locks Engineers and Mages keystone plans",
-					"reason": "Faith path is already chosen.",
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:path:faith"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -17455,6 +16988,38 @@
 			"name": "Blueprint: Mage Lodge",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "whenActive",
+							"kind": "grant.drop.hide",
+							"label": "Engineers path locks Faith and Mages keystone plans",
+							"reason": "Engineers path is already chosen.",
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:path:engineers"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.drop.hide",
+							"label": "Faith path locks Engineers and Mages keystone plans",
+							"reason": "Faith path is already chosen.",
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:path:faith"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:blueprint-mage-lodge",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -17635,37 +17200,6 @@
 					"radius": 2
 				},
 				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
-				{
 					"display": "whenActive",
 					"kind": "grant.duration.multiply",
 					"label": "Minor Haste",
@@ -17692,12 +17226,48 @@
 			"name": "Vegetables",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:vegetables",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:vegetables",
 					"quantity": 1,
 					"type": "chance"
@@ -17896,41 +17466,6 @@
 		"product:weaver-hut-t1:common-cloth": {
 			"chargeCost": 0,
 			"durationMs": 18000,
-			"effects": [
-				{
-					"chance": 0.15,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:common-cloth",
-										"item:common-clothing",
-										"item:leather",
-										"item:luxury-cloth",
-										"item:luxury-clothing",
-										"item:pigment",
-										"item:raw-hide"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -17942,6 +17477,24 @@
 			"name": "Common Cloth",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.15,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:common-cloth",
 					"quantity": 3,
 					"type": "guaranteed"
@@ -17955,37 +17508,6 @@
 			"chargeCost": 0,
 			"durationMs": 5000,
 			"effects": [
-				{
-					"chance": 0.35,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:grain",
-										"item:log",
-										"item:stone",
-										"item:vegetables",
-										"item:water"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				},
 				{
 					"display": "whenActive",
 					"kind": "grant.duration.multiply",
@@ -18005,12 +17527,48 @@
 			"name": "Water",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:water",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.5,
+					"effects": [
+						{
+							"chance": 0.35,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:water",
 					"quantity": 1,
 					"type": "chance"
@@ -18025,46 +17583,6 @@
 		"product:windmill-t1:flour": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"effects": [
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -18076,6 +17594,24 @@
 			"name": "Flour",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:flour",
 					"quantity": 3,
 					"type": "guaranteed"
@@ -18141,44 +17677,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows wider winery production",
 					"radius": 3
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -18192,12 +17690,48 @@
 			"name": "Grapes",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:grapes",
 					"quantity": 2,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.25,
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:grapes",
 					"quantity": 1,
 					"type": "chance"
@@ -18266,44 +17800,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows wider winery production",
 					"radius": 3
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -18323,6 +17819,24 @@
 			"name": "Wine Barrel",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:wine-barrel",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -18391,44 +17905,6 @@
 					"kind": "nearby.duration.multiply",
 					"label": "Pollution slows wider winery production",
 					"radius": 3
-				},
-				{
-					"chance": 0.25,
-					"display": "whenActive",
-					"kind": "grant.loot.extraOutputChance.add",
-					"label": "Bountiful Offering",
-					"outputItems": {
-						"items": {
-							"anyOf": [
-								{
-									"ids": [
-										"item:beer",
-										"item:beer-barrel",
-										"item:bread",
-										"item:bricks",
-										"item:cheese",
-										"item:clay",
-										"item:flour",
-										"item:food-supply",
-										"item:grapes",
-										"item:hops",
-										"item:sausage",
-										"item:wine-barrel"
-									]
-								}
-							]
-						}
-					},
-					"quantity": 1,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-bountiful-offering"
-								]
-							}
-						]
-					}
 				}
 			],
 			"inputs": [
@@ -18442,6 +17918,24 @@
 			"name": "Wine Barrel",
 			"output": [
 				{
+					"effects": [
+						{
+							"chance": 0.25,
+							"display": "whenActive",
+							"kind": "grant.loot.extraOutputChance.add",
+							"label": "Bountiful Offering",
+							"quantity": 1,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:wine-barrel",
 					"quantity": 1,
 					"type": "guaranteed"

@@ -48,6 +48,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 					durationMs: 750,
 					lootPlan: {
 						baseOutput: [],
+						visibleOutput: [],
 						chanceItems: [
 							{
 								chance: 0.35,
@@ -95,6 +96,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 					durationMs: 563,
 					lootPlan: {
 						baseOutput: [],
+						visibleOutput: [],
 						chanceItems: [
 							{
 								chance: 0.35,

@@ -58,6 +58,9 @@ const readDropEffects = (effects: readonly EffectiveDropEffectOutcome[] | undefi
 			}))
 		: undefined;
 
+const readDropChanceLabel = ({ chance, enabled }: { chance: number; enabled?: boolean }) =>
+	formatPercent(enabled === false ? 0 : chance);
+
 const readWeightedChanceLabel = ({
 	enabled,
 	entry,
@@ -80,7 +83,10 @@ const collectDropViews = ({
 		if (entry.type === "guaranteed") {
 			return [
 				{
-					chanceLabel: formatPercent(1),
+					chanceLabel: readDropChanceLabel({
+						chance: 1,
+						enabled: entry.enabled,
+					}),
 					enabled: entry.enabled,
 					effects: readDropEffects(entry.dropEffects),
 					itemId: entry.itemId,
@@ -92,7 +98,10 @@ const collectDropViews = ({
 		if (entry.type === "chance") {
 			return [
 				{
-					chanceLabel: formatPercent(entry.chance),
+					chanceLabel: readDropChanceLabel({
+						chance: entry.chance,
+						enabled: entry.enabled,
+					}),
 					enabled: entry.enabled,
 					effects: readDropEffects(entry.dropEffects),
 					itemId: entry.itemId,

@@ -32,6 +32,23 @@ const readOutputQuantity = (
 const readOutputEntrySort = (output: ProductOutputEntry, entrySort?: number) =>
 	entrySort ?? output.sort;
 
+const readOutputProbability = ({
+	enabled,
+	entry,
+}: {
+	enabled?: boolean;
+	entry: Extract<
+		ProductOutputEntry,
+		{
+			type: "chance" | "guaranteed";
+		}
+	>;
+}) => {
+	if (enabled === false) return 0;
+	if (entry.type === "chance") return entry.chance;
+	return undefined;
+};
+
 const readOwnedQuantity = ({ itemId, save }: { itemId: string; save: GameSave }) =>
 	readGameSaveItemQuantityByScope({
 		itemId,
@@ -122,7 +139,10 @@ const collectOutputViews = ({
 					itemId: entry.itemId,
 					save,
 				}),
-				probability: entry.type === "chance" ? entry.chance : undefined,
+				probability: readOutputProbability({
+					enabled: entry.enabled,
+					entry,
+				}),
 				quantity: readOutputQuantity(entry.quantity),
 				sort: entry.sort,
 				sourceIndex,

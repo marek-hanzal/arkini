@@ -147,6 +147,33 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html.match(/<img[^>]+src="grain\.svg"/g)?.length).toBe(1);
 	});
 
+	it("renders disabled guaranteed outputs as zero chance, not guaranteed", () => {
+		const html = renderToStaticMarkup(
+			<DetailProducerLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							outputs: [
+								{
+									enabled: false,
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 0,
+									probability: 0,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("disabled · 1× · 0% chance");
+		expect(html).not.toContain("disabled · 1× · guaranteed");
+	});
+
 	it("hides fulfilled effect requirements and the parent requirement box", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel

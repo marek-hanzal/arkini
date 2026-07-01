@@ -172,4 +172,78 @@ describe("readRuntimeProductLineOutputViews", () => {
 			},
 		]);
 	});
+	it("exposes disabled guaranteed and chance outputs with zero runtime probability", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const disabledEffect = {
+			active: false,
+			display: "always" as const,
+			effectId: "product:test:output:effect:0",
+			effectName: "Missing Permit",
+			impact: "availability" as const,
+			kind: "grant.require",
+			label: "Missing Permit",
+			phase: "start" as const,
+			ready: false,
+			result: "disabled",
+		} as const;
+		const effectiveProductLine: EffectiveProducerProductLine = {
+			appliedEffects: [],
+			blocked: false,
+			blockReasons: [],
+			durationMs: 1000,
+			lootPlan: {
+				baseOutput: [],
+				visibleOutput: [
+					{
+						dropEffects: [
+							disabledEffect,
+						],
+						enabled: false,
+						itemId: "item:twig",
+						quantity: 1,
+						type: "guaranteed",
+						visible: true,
+					},
+					{
+						chance: 0.35,
+						dropEffects: [
+							disabledEffect,
+						],
+						enabled: false,
+						itemId: "item:plank",
+						quantity: 1,
+						type: "chance",
+						visible: true,
+					},
+				],
+				chanceItems: [],
+			},
+			requirements: [],
+			visible: true,
+		};
+
+		expect(
+			readRuntimeProductLineOutputViews({
+				effectiveProductLine,
+				save,
+			}),
+		).toMatchObject([
+			{
+				enabled: false,
+				itemId: "item:plank",
+				kind: "chance",
+				probability: 0,
+			},
+			{
+				enabled: false,
+				itemId: "item:twig",
+				kind: "guaranteed",
+				probability: 0,
+			},
+		]);
+	});
 });

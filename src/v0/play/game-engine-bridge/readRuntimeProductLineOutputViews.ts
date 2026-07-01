@@ -97,6 +97,31 @@ const readRollLabel = (rolls: ProductLineOutputQuantity) => {
 	return rolls > 1 ? `weighted · ${rolls} rolls` : "weighted roll";
 };
 
+const readWeightedOutputTotalWeight = (
+	entries: Extract<
+		EffectiveProducerProductLine["lootPlan"]["visibleOutput"][number],
+		{
+			type: "weighted";
+		}
+	>["entries"],
+) => entries.filter((entry) => entry.enabled).reduce((total, entry) => total + entry.weight, 0);
+
+const readWeightedOutputProbability = ({
+	entry,
+	totalWeight,
+}: {
+	entry: Extract<
+		EffectiveProducerProductLine["lootPlan"]["visibleOutput"][number],
+		{
+			type: "weighted";
+		}
+	>["entries"][number];
+	totalWeight: number;
+}) => {
+	if (entry.enabled === false || totalWeight <= 0) return 0;
+	return entry.weight / totalWeight;
+};
+
 const collectOutputViews = ({
 	output,
 	save,
@@ -110,6 +135,7 @@ const collectOutputViews = ({
 		const sourceIndex = sourceIndexOffset + outputIndex;
 
 		if (entry.type === "weighted") {
+			const totalWeight = readWeightedOutputTotalWeight(entry.entries);
 			return entry.entries.map((weightedEntry, weightedEntryIndex) =>
 				createOutputView({
 					enabled: weightedEntry.enabled,
@@ -120,7 +146,10 @@ const collectOutputViews = ({
 						itemId: weightedEntry.itemId,
 						save,
 					}),
-					probability: undefined,
+					probability: readWeightedOutputProbability({
+						entry: weightedEntry,
+						totalWeight,
+					}),
 					quantity: readOutputQuantity(weightedEntry.quantity),
 					rollLabel: readRollLabel(entry.rolls ?? 1),
 					sort: readOutputEntrySort(entry, weightedEntry.sort),

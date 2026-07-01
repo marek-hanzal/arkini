@@ -83,6 +83,21 @@ describe("readProducerProductLineRunState", () => {
 		expect(paused).not.toHaveProperty("progressAutoCompleteMs");
 	});
 
+	it("blocks hidden runtime-only lines from pretending they can run", () => {
+		expect(
+			readProducerProductLineRunState({
+				line: line({
+					visible: false,
+				}),
+			}),
+		).toMatchObject({
+			canRunAction: false,
+			inputAvailabilityLabel: "line hidden",
+			label: "Line hidden",
+			statusMetaLabel: "line hidden",
+		});
+	});
+
 	it("blocks visible lines with missing effect requirements", () => {
 		expect(
 			readProducerProductLineRunState({

@@ -76,6 +76,7 @@ export const ProducerProductLineViewSchema = z
 			"effect",
 			"product",
 		]),
+		visible: z.boolean().optional(),
 		effectPolarity: EffectPolarityViewSchema.optional(),
 		isDefault: z.boolean(),
 		durationMs: z.number().int().nonnegative(),

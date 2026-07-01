@@ -246,4 +246,101 @@ describe("readRuntimeProductLineOutputViews", () => {
 			},
 		]);
 	});
+	it("exposes weighted entry runtime odds in product-line output views", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const effectiveProductLine: EffectiveProducerProductLine = {
+			appliedEffects: [],
+			blocked: false,
+			blockReasons: [],
+			durationMs: 1000,
+			lootPlan: {
+				baseOutput: [
+					{
+						dropEffects: [],
+						enabled: true,
+						entries: [
+							{
+								dropEffects: [],
+								enabled: true,
+								itemId: "item:twig",
+								quantity: 1,
+								visible: true,
+								weight: 1,
+							},
+						],
+						rolls: 1,
+						type: "weighted",
+						visible: true,
+					},
+				],
+				visibleOutput: [
+					{
+						dropEffects: [],
+						enabled: true,
+						entries: [
+							{
+								dropEffects: [],
+								enabled: true,
+								itemId: "item:twig",
+								quantity: 1,
+								visible: true,
+								weight: 1,
+							},
+							{
+								dropEffects: [
+									{
+										active: false,
+										display: "always",
+										effectId: "product:test:output:0:entry:1:effect:0",
+										effectName: "Locked Plank",
+										impact: "availability",
+										kind: "grant.require",
+										label: "Locked Plank",
+										phase: "start",
+										ready: false,
+										result: "disabled",
+									},
+								],
+								enabled: false,
+								itemId: "item:plank",
+								quantity: 1,
+								visible: true,
+								weight: 9,
+							},
+						],
+						rolls: 1,
+						type: "weighted",
+						visible: true,
+					},
+				],
+				chanceItems: [],
+			},
+			requirements: [],
+			visible: true,
+		};
+
+		expect(
+			readRuntimeProductLineOutputViews({
+				effectiveProductLine,
+				save,
+			}),
+		).toMatchObject([
+			{
+				enabled: false,
+				itemId: "item:plank",
+				kind: "weighted",
+				probability: 0,
+			},
+			{
+				enabled: true,
+				itemId: "item:twig",
+				kind: "weighted",
+				probability: 1,
+			},
+		]);
+	});
 });

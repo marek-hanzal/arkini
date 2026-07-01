@@ -44,15 +44,23 @@ const readQuantityLabel = (
 		: `${resolvedQuantity.min}-${resolvedQuantity.max}×`;
 };
 
+const readOutputProbabilityLabel = (
+	output: NonNullable<ProducerProductLineView["outputs"]>[number],
+) => {
+	if (output.probability === undefined) {
+		return output.kind === "guaranteed" ? "guaranteed" : undefined;
+	}
+
+	return output.kind === "weighted"
+		? `${formatPercent(output.probability)}/roll`
+		: `${formatPercent(output.probability)} chance`;
+};
+
 const readOutputMeta = (output: NonNullable<ProducerProductLineView["outputs"]>[number]) =>
 	[
 		output.enabled === false ? "disabled" : undefined,
 		readQuantityLabel(output.quantity),
-		output.probability === undefined
-			? output.kind === "guaranteed"
-				? "guaranteed"
-				: undefined
-			: `${formatPercent(output.probability)} chance`,
+		readOutputProbabilityLabel(output),
 		output.rollLabel,
 		`Owned ${output.ownedQuantity}`,
 	]

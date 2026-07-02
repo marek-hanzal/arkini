@@ -55,9 +55,9 @@ type DropEvaluation = {
 };
 
 type RuntimeItemSelector = Extract<
-	NonNullable<GameConfig["products"][string]["effects"]>[number],
+	ProducerProductDropEffect,
 	{
-		kind: "nearby.require";
+		kind: "nearby.duration.multiply" | "nearby.require";
 	}
 >["items"];
 
@@ -71,7 +71,7 @@ type NearbyLootChanceEffect = Extract<
 type NearbyLootChanceSource = NearbyLootChanceEffect["sources"][number];
 
 type NearbyLineEffect = Extract<
-	NonNullable<GameConfig["products"][string]["effects"]>[number],
+	ProducerProductDropEffect,
 	{
 		kind: "nearby.duration.multiply" | "nearby.require";
 	}
@@ -180,9 +180,7 @@ const readLineEffectLabel = ({
 }: {
 	config: GameConfig;
 	fallback: string;
-	lineEffect:
-		| NonNullable<GameConfig["products"][string]["effects"]>[number]
-		| ProducerProductDropEffect;
+	lineEffect: ProducerProductDropEffect;
 }) => {
 	if (lineEffect.kind === "nearby.require") {
 		return readNearbyLineEffectLabel({
@@ -269,7 +267,7 @@ const readDistanceMultiplier = ({
 	distance,
 }: {
 	bands: Extract<
-		NonNullable<GameConfig["products"][string]["effects"]>[number],
+		ProducerProductDropEffect,
 		{
 			kind: "nearby.duration.multiply";
 		}
@@ -638,6 +636,7 @@ const applyDropEffect = ({
 
 const readEffectiveDrop = ({
 	config,
+	defaultVisible,
 	dropEffectIdPrefix,
 	dropEffects,
 	enabled,
@@ -648,6 +647,7 @@ const readEffectiveDrop = ({
 	visibility,
 }: {
 	config: GameConfig;
+	defaultVisible: boolean;
 	dropEffectIdPrefix: string;
 	dropEffects: readonly ProducerProductDropEffect[] | undefined;
 	enabled?: boolean;
@@ -661,7 +661,7 @@ const readEffectiveDrop = ({
 		chanceItems: [],
 		dropEffects: [],
 		enabled: enabled !== false,
-		visible: visibility !== "hidden",
+		visible: defaultVisible && visibility !== "hidden",
 	};
 
 	for (const [dropEffectIndex, effect] of (dropEffects ?? []).entries()) {
@@ -699,25 +699,130 @@ const readEffectiveDrop = ({
 	return evaluation;
 };
 
+const readOutputDurationEffects = ({
+	config,
+	dropEffectIdPrefix,
+	dropEffects,
+	grantIds,
+	producerItemInstanceId,
+	save,
+	targetCell,
+}: {
+	config: GameConfig;
+	dropEffectIdPrefix: string;
+	dropEffects: readonly ProducerProductDropEffect[] | undefined;
+	grantIds: ReadonlySet<string>;
+	producerItemInstanceId: string;
+	save: GameSave;
+	targetCell?: BoardCell;
+}) => {
+	let durationMultiplier = 1;
+	const appliedEffects: AppliedGameEffectOperation[] = [];
+
+	for (const [dropEffectIndex, effect] of (dropEffects ?? []).entries()) {
+		const effectId = `${dropEffectIdPrefix}:effect:${dropEffectIndex}`;
+		const effectName = readLineEffectLabel({
+			config,
+			fallback: effect.kind,
+			lineEffect: effect,
+		});
+
+		if (effect.kind === "nearby.duration.multiply") {
+			const matches = readNearbyMatches({
+				items: effect.items as RuntimeItemSelector,
+				radius: effect.radius,
+				save,
+				targetCell,
+			}).slice(0, effect.maxSources ?? Number.POSITIVE_INFINITY);
+			for (const match of matches) {
+				const multiplier = readDistanceMultiplier({
+					bands: effect.bands,
+					distance: match.distance,
+				});
+				if (multiplier === undefined) continue;
+				durationMultiplier *= multiplier;
+				appliedEffects.push(
+					createAppliedOperation({
+						kind: effect.kind,
+						lineEffectId: effectId,
+						lineEffectName: effectName,
+						sourceId: match.item.itemId,
+						sourceItemInstanceId: match.item.id,
+					}),
+				);
+			}
+			continue;
+		}
+
+		if (effect.kind === "grant.duration.multiply") {
+			const active = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: effect.selector,
+			});
+			if (!active) continue;
+
+			durationMultiplier *= effect.multiplier;
+			appliedEffects.push(
+				createAppliedOperation({
+					kind: effect.kind,
+					lineEffectId: effectId,
+					lineEffectName: effectName,
+					sourceItemInstanceId: producerItemInstanceId,
+				}),
+			);
+		}
+	}
+
+	return {
+		appliedEffects,
+		durationMultiplier,
+	};
+};
+
 const readEffectiveOutputEntries = ({
 	config,
 	grantIds,
 	output,
+	producerItemInstanceId,
 	productId,
+	productVisible,
 	save,
 	targetCell,
 }: {
 	config: GameConfig;
 	grantIds: ReadonlySet<string>;
 	output: NonNullable<GameConfig["products"][string]["output"]>;
+	producerItemInstanceId: string;
 	productId: string;
+	productVisible: boolean;
 	save: GameSave;
 	targetCell?: BoardCell;
 }) => {
+	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const rollableOutput: EffectiveProductOutputEntry[] = [];
 	const visibleOutput: EffectiveProductOutputEntry[] = [];
 	const chanceItems: EffectiveChanceItemEntry[] = [];
+	let durationMultiplier = 1;
 	const rollableDropIds = new Set<string>();
+	const applyDurationEffects = ({
+		dropEffectIdPrefix,
+		dropEffects,
+	}: {
+		dropEffectIdPrefix: string;
+		dropEffects: readonly ProducerProductDropEffect[] | undefined;
+	}) => {
+		const duration = readOutputDurationEffects({
+			config,
+			dropEffectIdPrefix,
+			dropEffects,
+			grantIds,
+			producerItemInstanceId,
+			save,
+			targetCell,
+		});
+		durationMultiplier *= duration.durationMultiplier;
+		appliedEffects.push(...duration.appliedEffects);
+	};
 
 	for (const [outputIndex, entry] of output.entries()) {
 		if (entry.type === "weighted") {
@@ -728,6 +833,7 @@ const readEffectiveOutputEntries = ({
 				const sourceDropId = `${productId}:output:${outputIndex}:entry:${weightedEntryIndex}`;
 				const evaluation = readEffectiveDrop({
 					config,
+					defaultVisible: productVisible,
 					dropEffectIdPrefix: sourceDropId,
 					dropEffects: weightedEntry.effects,
 					enabled: weightedEntry.enabled,
@@ -748,6 +854,10 @@ const readEffectiveOutputEntries = ({
 				if (evaluation.visible && evaluation.enabled) {
 					rollableEntries.push(effectiveEntry);
 					rollableDropIds.add(sourceDropId);
+					applyDurationEffects({
+						dropEffectIdPrefix: sourceDropId,
+						dropEffects: weightedEntry.effects,
+					});
 				}
 			}
 
@@ -775,6 +885,7 @@ const readEffectiveOutputEntries = ({
 		const sourceDropId = `${productId}:output:${outputIndex}`;
 		const evaluation = readEffectiveDrop({
 			config,
+			defaultVisible: productVisible,
 			dropEffectIdPrefix: sourceDropId,
 			dropEffects: entry.effects,
 			enabled: entry.enabled,
@@ -796,13 +907,19 @@ const readEffectiveOutputEntries = ({
 		if (evaluation.visible && evaluation.enabled) {
 			rollableOutput.push(effectiveEntry);
 			rollableDropIds.add(sourceDropId);
+			applyDurationEffects({
+				dropEffectIdPrefix: sourceDropId,
+				dropEffects: entry.effects,
+			});
 		}
 	}
 
 	return {
+		appliedEffects,
 		chanceItems: chanceItems.filter((chanceItem) =>
 			rollableDropIds.has(chanceItem.sourceDropId),
 		),
+		durationMultiplier,
 		rollableOutput,
 		visibleOutput,
 	};
@@ -818,15 +935,6 @@ export const readEffectiveProducerProductLine = ({
 	productId,
 	save,
 }: readEffectiveProducerProductLine.Props): EffectiveProducerProductLine => {
-	let visible = product.visibility !== "hidden";
-	let startRequirementsReady = true;
-	let hasVisibilityRequirement = false;
-	let visibilityReady = true;
-	let blocked = false;
-	let durationMultiplier = 1;
-	const appliedEffects: AppliedGameEffectOperation[] = [];
-	const blockReasons: AppliedGameEffectOperation[] = [];
-	const requirements: EffectiveProducerProductLine["requirements"] = [];
 	const targetCell = readGameEffectSourceCell({
 		save,
 		sourceItemInstanceId: producerItemInstanceId,
@@ -837,162 +945,26 @@ export const readEffectiveProducerProductLine = ({
 		nowMs,
 		save,
 	});
-
-	const recordRequirementOutcome = ({
-		display,
-		kind,
-		label,
-		operation,
-		phase,
-		ready,
-	}: {
-		display: EffectiveProducerProductLine["requirements"][number]["display"];
-		kind: "grant.require" | "nearby.require";
-		label: string;
-		operation: AppliedGameEffectOperation;
-		phase: "start" | "visibility";
-		ready: boolean;
-	}) => {
-		if (phase === "visibility") {
-			hasVisibilityRequirement = true;
-			if (!ready) visibilityReady = false;
-		}
-		if (phase === "start" && !ready) startRequirementsReady = false;
-		requirements.push({
-			display,
-			kind,
-			label,
-			phase,
-			ready,
-		});
-		if (ready) appliedEffects.push(operation);
-	};
-
-	for (const [lineEffectIndex, lineEffect] of (product.effects ?? []).entries()) {
-		const lineEffectId = `${productId}:effect:${lineEffectIndex}`;
-		const lineEffectName = readLineEffectLabel({
-			config,
-			fallback: lineEffect.kind,
-			lineEffect,
-		});
-		const appliedOperation = createAppliedOperation({
-			kind: lineEffect.kind,
-			lineEffectId,
-			lineEffectName,
-			sourceItemInstanceId: producerItemInstanceId,
-		});
-
-		if (lineEffect.kind === "grant.require") {
-			recordRequirementOutcome({
-				display: lineEffect.display,
-				kind: lineEffect.kind,
-				label: lineEffectName,
-				operation: appliedOperation,
-				phase: lineEffect.phase,
-				ready: doesGameGrantSelectorMatchIds({
-					grantIds,
-					selector: lineEffect.selector,
-				}),
-			});
-			continue;
-		}
-
-		if (lineEffect.kind === "grant.blockStart") {
-			const active = doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: lineEffect.selector,
-			});
-			if (active) {
-				blocked = true;
-				blockReasons.push(appliedOperation);
-				appliedEffects.push(appliedOperation);
-			}
-			requirements.push({
-				display: lineEffect.display,
-				kind: lineEffect.kind,
-				label: lineEffectName,
-				phase: "start",
-				ready: !active,
-			});
-			continue;
-		}
-
-		if (lineEffect.kind === "nearby.require") {
-			recordRequirementOutcome({
-				display: lineEffect.display,
-				kind: lineEffect.kind,
-				label: lineEffectName,
-				operation: appliedOperation,
-				phase: lineEffect.phase,
-				ready:
-					readNearbyMatches({
-						items: lineEffect.items,
-						radius: lineEffect.radius,
-						save,
-						targetCell,
-					}).length > 0,
-			});
-			continue;
-		}
-
-		if (lineEffect.kind === "nearby.duration.multiply") {
-			const matches = readNearbyMatches({
-				items: lineEffect.items,
-				radius: lineEffect.radius,
-				save,
-				targetCell,
-			}).slice(0, lineEffect.maxSources ?? Number.POSITIVE_INFINITY);
-			for (const match of matches) {
-				const multiplier = readDistanceMultiplier({
-					bands: lineEffect.bands,
-					distance: match.distance,
-				});
-				if (multiplier === undefined) continue;
-				durationMultiplier *= multiplier;
-				appliedEffects.push(
-					createAppliedOperation({
-						kind: lineEffect.kind,
-						lineEffectId,
-						lineEffectName,
-						sourceId: match.item.itemId,
-						sourceItemInstanceId: match.item.id,
-					}),
-				);
-			}
-			continue;
-		}
-
-		if (lineEffect.kind === "grant.duration.multiply") {
-			const active = doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: lineEffect.selector,
-			});
-			if (active) {
-				durationMultiplier *= lineEffect.multiplier;
-				appliedEffects.push(appliedOperation);
-			}
-			continue;
-		}
-	}
-
 	const effectiveOutput = readEffectiveOutputEntries({
 		config,
 		grantIds,
 		output: product.output ?? [],
+		producerItemInstanceId,
 		productId,
+		productVisible: product.visibility !== "hidden",
 		save,
 		targetCell,
 	});
-
-	if (hasVisibilityRequirement) visible = visibilityReady;
-	if (product.output && effectiveOutput.visibleOutput.length === 0) visible = false;
-
+	const visible = product.output
+		? effectiveOutput.visibleOutput.length > 0
+		: product.visibility !== "hidden";
+	const durationMultiplier = effectiveOutput.durationMultiplier;
 	const durationMs = Math.max(0, Math.ceil(baseDurationMs * durationMultiplier));
 
 	return {
-		appliedEffects,
-		blocked,
-		blockReasons,
+		appliedEffects: effectiveOutput.appliedEffects,
+		blocked: false,
+		blockReasons: [],
 		durationMs: readGameCheatEffectiveDurationMs({
 			durationMs,
 			save,
@@ -1001,13 +973,13 @@ export const readEffectiveProducerProductLine = ({
 		grantIds: [
 			...grantIds,
 		].sort(),
-		startRequirementsReady,
+		startRequirementsReady: true,
 		lootPlan: {
 			baseOutput: effectiveOutput.rollableOutput,
 			chanceItems: effectiveOutput.chanceItems,
 			visibleOutput: effectiveOutput.visibleOutput,
 		},
-		requirements,
+		requirements: [],
 		visible,
 	};
 };

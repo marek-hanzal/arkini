@@ -63,13 +63,20 @@ describe("readEffectiveProducerProductLine", () => {
 				...createEngineTestConfig().products,
 				"product:test": {
 					...createEngineTestConfig().products["product:test"],
-					effects: [
+					output: [
 						{
-							display: "always",
-							kind: "grant.require",
-							label: "Town Hall Grant",
-							phase: "start",
-							selector: allOfGrant("grant:test:townhall"),
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
+								{
+									display: "always",
+									kind: "grant.require",
+									label: "Town Hall Grant",
+									phase: "start",
+									selector: allOfGrant("grant:test:townhall"),
+								},
+							],
 						},
 					],
 				},
@@ -86,14 +93,20 @@ describe("readEffectiveProducerProductLine", () => {
 		});
 
 		expect(line.visible).toBe(true);
-		expect(line.startRequirementsReady).toBe(false);
-		expect(line.requirements).toEqual([
+		expect(line.startRequirementsReady).toBe(true);
+		expect(line.requirements).toEqual([]);
+		expect(line.lootPlan.baseOutput).toEqual([]);
+		expect(line.lootPlan.visibleOutput).toMatchObject([
 			{
-				display: "always",
-				kind: "grant.require",
-				label: "Town Hall Grant",
-				phase: "start",
-				ready: false,
+				dropEffects: [
+					{
+						label: "Town Hall Grant",
+						ready: false,
+						result: "disabled",
+					},
+				],
+				enabled: false,
+				itemId: "item:twig",
 			},
 		]);
 	});
@@ -129,12 +142,19 @@ describe("readEffectiveProducerProductLine", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					effects: [
+					output: [
 						{
-							display: "never",
-							kind: "grant.require",
-							phase: "visibility",
-							selector: allOfGrant(grantId),
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
+								{
+									display: "never",
+									kind: "grant.require",
+									phase: "visibility",
+									selector: allOfGrant(grantId),
+								},
+							],
 						},
 					],
 					visibility: "hidden",
@@ -366,32 +386,39 @@ describe("readEffectiveProducerProductLine", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					effects: [
+					output: [
 						{
-							display: "always",
-							items: anyOfItem("item:twig"),
-							kind: "nearby.require",
-							label: "Nearby Twig",
-							phase: "start",
-							radius: 1,
-						},
-						{
-							bands: [
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
 								{
-									maxDistance: 1,
-									minDistance: 0,
-									multiplier: 2,
+									display: "always",
+									items: anyOfItem("item:twig"),
+									kind: "nearby.require",
+									label: "Nearby Twig",
+									phase: "start",
+									radius: 1,
 								},
 								{
-									minDistance: 2,
-									multiplier: 3,
+									bands: [
+										{
+											maxDistance: 1,
+											minDistance: 0,
+											multiplier: 2,
+										},
+										{
+											minDistance: 2,
+											multiplier: 3,
+										},
+									],
+									display: "whenActive",
+									items: anyOfItem("item:axe"),
+									kind: "nearby.duration.multiply",
+									label: "Nearby Axe Slowdown",
+									radius: 2,
 								},
 							],
-							display: "whenActive",
-							items: anyOfItem("item:axe"),
-							kind: "nearby.duration.multiply",
-							label: "Nearby Axe Slowdown",
-							radius: 2,
 						},
 					],
 				},
@@ -429,7 +456,8 @@ describe("readEffectiveProducerProductLine", () => {
 
 		expect(line.startRequirementsReady).toBe(true);
 		expect(line.durationMs).toBe(3000);
-		expect(line.requirements.map((requirement) => requirement.label)).toEqual([
+		expect(line.requirements).toEqual([]);
+		expect(line.lootPlan.visibleOutput[0]?.dropEffects?.map((effect) => effect.label)).toEqual([
 			"Nearby Twig",
 		]);
 		const durationEffects = line.appliedEffects.filter(
@@ -471,21 +499,19 @@ describe("readEffectiveProducerProductLine", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					effects: [
-						{
-							display: "whenActive",
-							kind: "grant.duration.multiply",
-							label: "Inventory Haste",
-							multiplier: 0.5,
-							selector: allOfGrant(grantId),
-						},
-					],
 					output: [
 						{
 							itemId: "item:twig",
 							quantity: 2,
 							type: "guaranteed",
 							effects: [
+								{
+									display: "whenActive",
+									kind: "grant.duration.multiply",
+									label: "Inventory Haste",
+									multiplier: 0.5,
+									selector: allOfGrant(grantId),
+								},
 								{
 									chance: 0.25,
 									display: "whenActive",
@@ -624,21 +650,28 @@ describe("readEffectiveProducerProductLine", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					effects: [
+					output: [
 						{
-							bands: [
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
 								{
-									maxDistance: 3,
-									minDistance: 0,
-									multiplier: 0.5,
+									bands: [
+										{
+											maxDistance: 3,
+											minDistance: 0,
+											multiplier: 0.5,
+										},
+									],
+									display: "whenActive",
+									items: anyOfItem("item:axe"),
+									kind: "nearby.duration.multiply",
+									label: "Nearby Axe Haste",
+									maxSources: 2,
+									radius: 3,
 								},
 							],
-							display: "whenActive",
-							items: anyOfItem("item:axe"),
-							kind: "nearby.duration.multiply",
-							label: "Nearby Axe Haste",
-							maxSources: 2,
-							radius: 3,
 						},
 					],
 				},

@@ -17,6 +17,49 @@ import {
 const runTick = (props: runGameTickFx.Props) =>
 	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
+type TestConfig = ReturnType<typeof createEngineTestConfig>;
+type TestProduct = TestConfig["products"][string];
+type TestOutputEntry = NonNullable<TestProduct["output"]>[number];
+type TestOutputEffect = NonNullable<
+	Exclude<
+		TestOutputEntry,
+		{
+			type: "weighted";
+		}
+	>["effects"]
+>[number];
+
+const appendFirstOutputEffects = (
+	product: TestProduct | undefined,
+	effects: readonly TestOutputEffect[],
+): TestProduct => {
+	if (!product) throw new Error("Missing test product.");
+	const [firstOutput, ...remainingOutput] = product.output ?? [
+		{
+			itemId: "item:plank",
+			quantity: 1,
+			type: "guaranteed" as const,
+		},
+	];
+	if (firstOutput.type === "weighted") {
+		throw new Error("Test helper only supports non-weighted first outputs.");
+	}
+
+	return {
+		...product,
+		output: [
+			{
+				...firstOutput,
+				effects: [
+					...(firstOutput.effects ?? []),
+					...effects,
+				],
+			},
+			...remainingOutput,
+		],
+	};
+};
+
 const readOwnedTwigGrantConfig = (
 	baseConfig: ReturnType<typeof createEngineTestConfig>,
 	productIds: readonly string[],
@@ -53,26 +96,22 @@ const readOwnedTwigGrantConfig = (
 			...Object.fromEntries(
 				productIds.map((productId) => [
 					productId,
-					{
-						...baseConfig.products[productId],
-						effects: [
-							...(baseConfig.products[productId]?.effects ?? []),
-							{
-								display: "always" as const,
-								kind: "grant.require" as const,
-								phase: "start" as const,
-								selector: {
-									allOf: [
-										{
-											ids: [
-												grantId,
-											],
-										},
-									],
-								},
+					appendFirstOutputEffects(baseConfig.products[productId], [
+						{
+							display: "always" as const,
+							kind: "grant.require" as const,
+							phase: "start" as const,
+							selector: {
+								allOf: [
+									{
+										ids: [
+											grantId,
+										],
+									},
+								],
 							},
-						],
-					},
+						},
+					]),
 				]),
 			),
 		},
@@ -91,27 +130,23 @@ const readLocalTwigGrantConfig = (
 		...Object.fromEntries(
 			props.productIds.map((productId) => [
 				productId,
-				{
-					...baseConfig.products[productId],
-					effects: [
-						...(baseConfig.products[productId]?.effects ?? []),
-						{
-							display: "always" as const,
-							items: {
-								anyOf: [
-									{
-										ids: [
-											"item:twig",
-										],
-									},
-								],
-							},
-							kind: "nearby.require" as const,
-							phase: "start" as const,
-							radius: props.radius,
+				appendFirstOutputEffects(baseConfig.products[productId], [
+					{
+						display: "always" as const,
+						items: {
+							anyOf: [
+								{
+									ids: [
+										"item:twig",
+									],
+								},
+							],
 						},
-					],
-				},
+						kind: "nearby.require" as const,
+						phase: "start" as const,
+						radius: props.radius,
+					},
+				]),
 			]),
 		),
 	},
@@ -158,7 +193,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.nextWakeAtMs).toBe(1500);
 	});
 
-	it("rejects blocked products before planning or consuming inputs", () => {
+	it("rejects products whose only output is blocked before planning or consuming inputs", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			effects: {
@@ -185,25 +220,22 @@ describe("applyGameActionFx Producer", () => {
 			},
 			products: {
 				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
-					effects: [
-						{
-							display: "always",
-							kind: "grant.blockStart",
-							label: "Blocked by Axe",
-							selector: {
-								allOf: [
-									{
-										ids: [
-											"grant:test:block",
-										],
-									},
-								],
-							},
+				"product:shred": appendFirstOutputEffects(baseConfig.products["product:shred"], [
+					{
+						display: "always",
+						kind: "grant.blockStart",
+						label: "Blocked by Axe",
+						selector: {
+							allOf: [
+								{
+									ids: [
+										"grant:test:block",
+									],
+								},
+							],
 						},
-					],
-				},
+					},
+				]),
 			},
 			startingState: {
 				...baseConfig.startingState,
@@ -236,7 +268,7 @@ describe("applyGameActionFx Producer", () => {
 			_tag: "Left",
 			left: {
 				_tag: "GameActionRejected",
-				reason: "blocked",
+				reason: "effect:disabled-output",
 			},
 		});
 	});
@@ -837,7 +869,7 @@ describe("applyGameActionFx Producer", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "effect:missing-grant",
+				reason: "effect:disabled-output",
 			});
 		}
 		expect(save.board.items["item-instance:2"]).toMatchObject({
@@ -1764,7 +1796,7 @@ describe("applyGameActionFx Producer", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "effect:missing-grant",
+				reason: "effect:disabled-output",
 			});
 		}
 	});
@@ -2840,7 +2872,7 @@ describe("applyGameActionFx Producer", () => {
 		if (result._tag === "Left") {
 			expect(result.left).toMatchObject({
 				_tag: "GameActionRejected",
-				reason: "effect:missing-grant",
+				reason: "effect:disabled-output",
 			});
 		}
 	});

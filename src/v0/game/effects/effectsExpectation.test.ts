@@ -3,7 +3,7 @@ import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestCo
 import { runInitialSave } from "~/v0/game/engine/applyGameActionFx.testSupport";
 import { readGameWorldGrantIds } from "~/v0/game/effects/readGameWorldGrantIds";
 
-describe("line-owned effect expectations", () => {
+describe("effect expectations", () => {
 	it("effect sources only publish global grant facts", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

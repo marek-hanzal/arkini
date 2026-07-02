@@ -217,7 +217,7 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 		if (product.activatesEffectId) {
 			usage.effects.add(product.activatesEffectId);
 		}
-		collectLineEffectUsage(product.effects ?? [], config, usage, itemFlow);
+		collectActivationOutputEffectUsage(product.output ?? [], config, usage, itemFlow);
 	}
 
 	for (const recipe of Object.values(config.craftRecipes)) {
@@ -225,8 +225,29 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: Ite
 	}
 };
 
+const collectActivationOutputEffectUsage = (
+	output: NonNullable<GameConfig["products"][string]["output"]>,
+	config: GameConfig,
+	usage: UsageIndex,
+	itemFlow: ItemFlowIndex,
+) => {
+	for (const entry of output) {
+		if (entry.type === "weighted") {
+			for (const weightedEntry of entry.entries) {
+				collectLineEffectUsage(weightedEntry.effects ?? [], config, usage, itemFlow);
+			}
+			continue;
+		}
+
+		collectLineEffectUsage(entry.effects ?? [], config, usage, itemFlow);
+	}
+};
+
 const collectLineEffectUsage = (
-	effects: readonly NonNullable<GameConfig["products"][string]["effects"]>[number][],
+	effects: readonly {
+		kind: string;
+		items?: unknown;
+	}[],
 	config: GameConfig,
 	usage: UsageIndex,
 	itemFlow: ItemFlowIndex,

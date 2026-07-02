@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 
 describe("defaultGameConfig", () => {
-	it("is compiled to the line-owned effect model without legacy mutator fields", () => {
+	it("is compiled to the output-owned producer effect model without legacy mutator fields", () => {
 		expect(JSON.stringify(defaultGameConfig)).not.toContain("grantSelector");
 		expect(JSON.stringify(defaultGameConfig.effects)).not.toContain("operations");
 	});
@@ -18,14 +18,14 @@ describe("defaultGameConfig", () => {
 		});
 	});
 
-	it("authors work requirements directly on product lines", () => {
-		expect(defaultGameConfig.products["product:lumberjack-t1:log"]?.effects?.[0]).toMatchObject(
-			{
-				display: "always",
-				kind: "nearby.require",
-				phase: "start",
-			},
-		);
+	it("authors work requirements directly on product outputs", () => {
+		const output = defaultGameConfig.products["product:lumberjack-t1:log"]?.output?.[0];
+
+		expect(output && "effects" in output ? output.effects?.[2] : undefined).toMatchObject({
+			display: "always",
+			kind: "nearby.require",
+			phase: "start",
+		});
 	});
 	it("caps every producer building item", () => {
 		const producerItemIds = Object.keys(defaultGameConfig.items)
@@ -69,7 +69,8 @@ describe("defaultGameConfig", () => {
 
 			expect(product?.durationMs).toBe(durationMs);
 			expect(product?.tags).toContain("shrine:haste-target");
-			expect(product?.effects).toContainEqual(
+			const output = product?.output?.[0];
+			expect(output && "effects" in output ? output.effects : undefined).toContainEqual(
 				expect.objectContaining({
 					display: "whenActive",
 					kind: "grant.duration.multiply",

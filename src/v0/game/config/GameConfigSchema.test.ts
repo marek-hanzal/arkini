@@ -386,7 +386,7 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/polarity/);
 	});
 
-	it("rejects product-line-owned extra output chance effects", () => {
+	it("rejects malformed output-owned extra output chance effects", () => {
 		const config: any = createValidConfigValue();
 		config.effects = {
 			"effect:test": {
@@ -400,7 +400,7 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				chance: 0.5,
 				display: "whenActive",
@@ -428,10 +428,10 @@ describe("GameConfigSchema", () => {
 			},
 		];
 
-		expect(() => parseGameConfig(config)).toThrow(/Invalid discriminator value/);
+		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key/);
 	});
 
-	it("rejects line-owned modifier effects that would be runtime no-ops", () => {
+	it("rejects output-owned modifier effects that would be runtime no-ops", () => {
 		const config: any = createValidConfigValue();
 		config.effects = {
 			"effect:test": {
@@ -445,7 +445,7 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				display: "whenActive",
 				kind: "grant.duration.multiply",
@@ -464,7 +464,7 @@ describe("GameConfigSchema", () => {
 
 		expect(() => parseGameConfig(config)).toThrow(/no-op/);
 
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				display: "whenActive",
 				kind: "nearby.duration.multiply",
@@ -573,7 +573,7 @@ describe("GameConfigSchema", () => {
 			},
 		];
 
-		expect(() => parseGameConfig(config)).toThrow(/producer product-line effect/);
+		expect(() => parseGameConfig(config)).toThrow(/producer output effect/);
 	});
 
 	it("rejects craft visibility requirements because craft targets have no line visibility", () => {
@@ -959,7 +959,7 @@ describe("GameConfigSchema", () => {
 				polarity: "neutral",
 			},
 		};
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				display: "whenMissing",
 				kind: "grant.require",
@@ -979,7 +979,7 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/can never be satisfied/);
 	});
 
-	it("rejects line effects that require and block the same grant", () => {
+	it("rejects output effects that require and block the same grant", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:producer"].tags = [
 			"producer",
@@ -999,7 +999,7 @@ describe("GameConfigSchema", () => {
 		config.items["item:twig"].passiveEffectIds = [
 			"effect:test",
 		];
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				display: "whenMissing",
 				kind: "grant.require",
@@ -1038,7 +1038,7 @@ describe("GameConfigSchema", () => {
 			"producer",
 		];
 		config.items["item:twig"].storage = "inventory";
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				display: "always",
 				items: {

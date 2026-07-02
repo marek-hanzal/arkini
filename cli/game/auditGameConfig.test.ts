@@ -152,9 +152,9 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
-	it("does not call produced items terminal when line-owned effects reference them", () => {
+	it("does not call produced items terminal when output-owned effects reference them", () => {
 		const config: any = createConfigValue();
-		config.products["product:test"].effects = [
+		config.products["product:test"].output[0].effects = [
 			{
 				bands: [
 					{

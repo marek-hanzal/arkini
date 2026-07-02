@@ -273,11 +273,6 @@ const normalizePackage = (value: unknown): unknown => {
 				label: "item",
 			}),
 		};
-		product.effects = normalizeLineEffects({
-			domainIndexes: productDomainIndexes,
-			effects: product.effects,
-			path: `products.${productId}.effects`,
-		});
 		product.output = normalizeActivationOutputEffects({
 			domainIndexes: productDomainIndexes,
 			output: product.output,
@@ -447,7 +442,10 @@ const normalizeDropEffects = ({
 		const effect = {
 			...(effectEntry as Record<string, unknown>),
 		};
-		if (effect.kind === "nearby.require" && effect.items !== undefined) {
+		if (
+			(effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") &&
+			effect.items !== undefined
+		) {
 			effect.items = normalizeAuthoringDomainSelector({
 				domain: domainIndexes.items,
 				path: `${path}.${effectIndex}.items`,

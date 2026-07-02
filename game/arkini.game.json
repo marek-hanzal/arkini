@@ -10424,24 +10424,6 @@
 		"product:armory-t1:iron-armor": {
 			"chargeCost": 0,
 			"durationMs": 42000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -10471,18 +10453,72 @@
 			"name": "Iron Armor",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:iron-armor",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.45,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -10812,24 +10848,6 @@
 		"product:blacksmith-t1:axe": {
 			"chargeCost": 0,
 			"durationMs": 20000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -10853,18 +10871,72 @@
 			"name": "Axe",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:axe",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.4,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.08,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -10877,24 +10949,6 @@
 		"product:blacksmith-t1:nails": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -10928,6 +10982,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:nails",
@@ -10936,12 +11006,48 @@
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -10954,24 +11060,6 @@
 		"product:blacksmith-t1:pickaxe": {
 			"chargeCost": 0,
 			"durationMs": 20000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -10995,18 +11083,72 @@
 			"name": "Pickaxe",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pickaxe",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.4,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.08,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -11019,24 +11161,6 @@
 		"product:blacksmith-t1:sword": {
 			"chargeCost": 0,
 			"durationMs": 26000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -11060,18 +11184,72 @@
 			"name": "Sword",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:sword",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.45,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -11084,56 +11262,6 @@
 		"product:brewery-t1:beer-barrel": {
 			"chargeCost": 0,
 			"durationMs": 24000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:hop-field"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:hop-field",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11167,6 +11295,54 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:hop-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:hop-field",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:beer-barrel",
@@ -11184,56 +11360,6 @@
 		"product:brewery-t1:beer-barrel-from-beer": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:hop-field"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:hop-field",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11261,6 +11387,54 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:hop-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:hop-field",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:beer-barrel",
@@ -11278,56 +11452,6 @@
 		"product:brewery-t1:hops": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:hop-field"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:hop-field",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11355,6 +11479,54 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:hop-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:hop-field",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:hops",
@@ -11379,6 +11551,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:hop-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:hop-field",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:hops",
@@ -11396,40 +11584,6 @@
 		"product:brickyard:bricks": {
 			"chargeCost": 0,
 			"durationMs": 22000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:clay-pit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:clay-pit",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11469,6 +11623,38 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:clay-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:clay-pit",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:bricks",
@@ -11477,12 +11663,80 @@
 				},
 				{
 					"chance": 0.55,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:clay-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:clay-pit",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.12,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:clay-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:clay-pit",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -11495,40 +11749,6 @@
 		"product:cattle-farm-t1:milk": {
 			"chargeCost": 0,
 			"durationMs": 26000,
-			"effects": [
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11562,6 +11782,38 @@
 									}
 								]
 							}
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:milk",
@@ -11579,24 +11831,6 @@
 		"product:charcoal-burner-t1:charcoal": {
 			"chargeCost": 0,
 			"durationMs": 20000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -11624,6 +11858,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:charcoal",
@@ -11648,6 +11898,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:charcoal",
@@ -11656,12 +11922,48 @@
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.08,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -11844,40 +12146,6 @@
 		"product:chicken-coop-t1:egg": {
 			"chargeCost": 0,
 			"durationMs": 22000,
-			"effects": [
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -11911,6 +12179,38 @@
 									}
 								]
 							}
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:egg",
@@ -12104,24 +12404,6 @@
 		"product:clay-pit:clay": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:clay-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:clay-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12149,6 +12431,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:clay-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:clay-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:clay",
@@ -12173,6 +12471,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:clay-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:clay-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:clay",
@@ -12187,24 +12501,6 @@
 		"product:coal-mine-t1:coal": {
 			"chargeCost": 0,
 			"durationMs": 50000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:coal-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:coal-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12244,6 +12540,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:coal-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:coal-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:coal",
@@ -12612,71 +12924,6 @@
 		"product:farm-t1:grain": {
 			"chargeCost": 0,
 			"durationMs": 18000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:wheat-field"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:wheat-field",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12700,6 +12947,69 @@
 									{
 										"ids": [
 											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:wheat-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:wheat-field",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
 										]
 									}
 								]
@@ -12728,6 +13038,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:wheat-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:wheat-field",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:grain",
@@ -12746,56 +13072,6 @@
 		"product:farm-t1:grain-morale-t1": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:wheat-field"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:wheat-field",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -12829,6 +13105,54 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:wheat-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:wheat-field",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:grain",
@@ -12853,6 +13177,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:wheat-field"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:wheat-field",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:grain",
@@ -12870,40 +13210,6 @@
 		"product:glassworks:glass": {
 			"chargeCost": 0,
 			"durationMs": 30000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				},
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:sand-pit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:sand-pit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -12937,6 +13243,38 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:sand-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:sand-pit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:glass",
@@ -12945,12 +13283,80 @@
 				},
 				{
 					"chance": 0.65,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:sand-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:sand-pit",
+							"phase": "start",
+							"radius": 2
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.15,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:sand-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:sand-pit",
+							"phase": "start",
+							"radius": 2
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -12963,40 +13369,6 @@
 		"product:glazier-workshop-t1:stained-glass": {
 			"chargeCost": 0,
 			"durationMs": 40000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				},
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:glassworks"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:glassworks",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -13042,6 +13414,38 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:glassworks"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:glassworks",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stained-glass",
@@ -13050,12 +13454,80 @@
 				},
 				{
 					"chance": 0.5,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:glassworks"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:glassworks",
+							"phase": "start",
+							"radius": 2
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:glassworks"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:glassworks",
+							"phase": "start",
+							"radius": 2
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -13068,40 +13540,6 @@
 		"product:glazier-workshop-t1:stained-glass-morale-t4": {
 			"chargeCost": 0,
 			"durationMs": 34000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				},
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:glassworks"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:glassworks",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -13153,6 +13591,38 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:glassworks"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:glassworks",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stained-glass",
@@ -13161,12 +13631,80 @@
 				},
 				{
 					"chance": 0.5,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:glassworks"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:glassworks",
+							"phase": "start",
+							"radius": 2
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.1,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:glassworks"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:glassworks",
+							"phase": "start",
+							"radius": 2
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -13179,24 +13717,6 @@
 		"product:gold-mine-t1:gold-ore": {
 			"chargeCost": 0,
 			"durationMs": 72000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:gold-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:gold-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13236,6 +13756,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:gold-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:gold-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:gold-ore",
@@ -13250,24 +13786,6 @@
 		"product:goldsmith-t1:coin-stack": {
 			"chargeCost": 0,
 			"durationMs": 25000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -13285,18 +13803,72 @@
 			"name": "Coin Stack",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:coin-stack",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -13309,24 +13881,6 @@
 		"product:goldsmith-t1:key-t1": {
 			"chargeCost": 0,
 			"durationMs": 30000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 6,
@@ -13356,18 +13910,72 @@
 			"name": "Key I",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:key-t1",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -13380,24 +13988,6 @@
 		"product:goldsmith-t1:key-t2": {
 			"chargeCost": 0,
 			"durationMs": 34000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13427,18 +14017,72 @@
 			"name": "Key II",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:key-t2",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -13451,24 +14095,6 @@
 		"product:goldsmith-t1:key-t3": {
 			"chargeCost": 0,
 			"durationMs": 38000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13498,18 +14124,72 @@
 			"name": "Key III",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:key-t3",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -13522,24 +14202,6 @@
 		"product:goldsmith-t1:key-t4": {
 			"chargeCost": 0,
 			"durationMs": 45000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -13569,18 +14231,72 @@
 			"name": "Key IV",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:key-t4",
 					"quantity": 1,
 					"type": "guaranteed"
 				},
 				{
 					"chance": 0.35,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.06,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -14111,24 +14827,6 @@
 		"product:iron-mine-t1:iron-ore": {
 			"chargeCost": 0,
 			"durationMs": 62000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:iron-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:iron-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -14168,6 +14866,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:iron-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:iron-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:iron-ore",
@@ -14182,66 +14896,6 @@
 		"product:lumberjack-t1:log": {
 			"chargeCost": 0,
 			"durationMs": 7000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:tree",
-									"item:double-tree",
-									"item:micro-forest"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby wood source",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 2,
-							"minDistance": 0,
-							"multiplier": 0.9
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:tree",
-									"item:double-tree",
-									"item:micro-forest"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Nearby wood source enables production",
-					"maxSources": 5,
-					"radius": 2
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"name": "Log",
 			"output": [
 				{
@@ -14306,6 +14960,64 @@
 									{
 										"ids": [
 											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:tree",
+											"item:double-tree",
+											"item:micro-forest"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby wood source",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 2,
+									"minDistance": 0,
+									"multiplier": 0.9
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:tree",
+											"item:double-tree",
+											"item:micro-forest"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Nearby wood source enables production",
+							"maxSources": 5,
+							"radius": 2
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
 										]
 									}
 								]
@@ -14603,40 +15315,6 @@
 		"product:pig-farm-t1:piglet": {
 			"chargeCost": 0,
 			"durationMs": 32000,
-			"effects": [
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -14670,6 +15348,38 @@
 									}
 								]
 							}
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:piglet",
@@ -15032,39 +15742,6 @@
 		"product:quarry-t1:stone": {
 			"chargeCost": 0,
 			"durationMs": 8000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:rock"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:rock",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"name": "Stone",
 			"output": [
 				{
@@ -15080,6 +15757,37 @@
 									{
 										"ids": [
 											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:rock"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:rock",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
 										]
 									}
 								]
@@ -15108,6 +15816,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:rock"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:rock",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone",
@@ -15132,6 +15856,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:rock"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:rock",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone",
@@ -15148,24 +15888,6 @@
 		"product:quarry-t2:marble": {
 			"chargeCost": 0,
 			"durationMs": 22000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:marble-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:marble-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"name": "Marble",
 			"output": [
 				{
@@ -15185,6 +15907,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:marble-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:marble-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:marble",
@@ -15209,6 +15947,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:marble-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:marble-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:marble",
@@ -15223,24 +15977,6 @@
 		"product:quarry-t2:stone": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:marble-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:marble-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"name": "Stone",
 			"output": [
 				{
@@ -15260,6 +15996,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:marble-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:marble-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone",
@@ -15284,6 +16036,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:marble-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:marble-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone",
@@ -15298,40 +16066,6 @@
 		"product:roof-tile-factory:roof-tiles": {
 			"chargeCost": 0,
 			"durationMs": 22000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:clay-pit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:clay-pit",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 8,
@@ -15371,6 +16105,38 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:clay-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:clay-pit",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:roof-tiles",
@@ -15379,12 +16145,80 @@
 				},
 				{
 					"chance": 0.55,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:clay-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:clay-pit",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.12,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:clay-pit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:clay-pit",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -15397,24 +16231,6 @@
 		"product:sand-pit:sand": {
 			"chargeCost": 0,
 			"durationMs": 9000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:sand-deposit"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:sand-deposit",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"name": "Sand",
 			"output": [
 				{
@@ -15434,6 +16250,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:sand-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:sand-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:sand",
@@ -15458,6 +16290,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:sand-deposit"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:sand-deposit",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:sand",
@@ -15472,39 +16320,6 @@
 		"product:sawmill-t1:plank": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:lumberjack-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:lumberjack-t1",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -15528,6 +16343,37 @@
 									{
 										"ids": [
 											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:lumberjack-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:lumberjack-t1",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
 										]
 									}
 								]
@@ -15556,6 +16402,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:lumberjack-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:lumberjack-t1",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:plank",
@@ -15636,40 +16498,6 @@
 		"product:sheep-pasture-t1:wool": {
 			"chargeCost": 0,
 			"durationMs": 28000,
-			"effects": [
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -15703,6 +16531,38 @@
 									}
 								]
 							}
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
 						}
 					],
 					"itemId": "item:wool",
@@ -15864,24 +16724,6 @@
 		"product:smelter-t1:gold-ingot": {
 			"chargeCost": 0,
 			"durationMs": 48000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -15921,6 +16763,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:gold-ingot",
@@ -15929,12 +16787,48 @@
 				},
 				{
 					"chance": 0.75,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.3,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -15947,24 +16841,6 @@
 		"product:smelter-t1:iron-ingot": {
 			"chargeCost": 0,
 			"durationMs": 36000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:purifier-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:purifier-t1",
-					"phase": "start",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16004,6 +16880,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
 						}
 					],
 					"itemId": "item:iron-ingot",
@@ -16012,12 +16904,48 @@
 				},
 				{
 					"chance": 0.75,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
 				},
 				{
 					"chance": 0.3,
+					"effects": [
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:purifier-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:purifier-t1",
+							"phase": "start",
+							"radius": 3
+						}
+					],
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"
@@ -16030,24 +16958,6 @@
 		"product:stonemason-t1:stone-block": {
 			"chargeCost": 0,
 			"durationMs": 12000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:quarry-t1"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:quarry-t1",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16075,6 +16985,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t1"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t1",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone-block",
@@ -16089,24 +17015,6 @@
 		"product:stonemason-t2:marble-block": {
 			"chargeCost": 0,
 			"durationMs": 28000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:quarry-t2"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:quarry-t2",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16140,6 +17048,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t2"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t2",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:marble-block",
@@ -16164,6 +17088,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t2"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t2",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:marble-block",
@@ -16178,24 +17118,6 @@
 		"product:stonemason-t2:marble-block-morale-t4": {
 			"chargeCost": 0,
 			"durationMs": 24000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:quarry-t2"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:quarry-t2",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16235,6 +17157,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t2"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t2",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:marble-block",
@@ -16259,6 +17197,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t2"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t2",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:marble-block",
@@ -16273,24 +17227,6 @@
 		"product:stonemason-t2:stone-block": {
 			"chargeCost": 0,
 			"durationMs": 10000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"producer:quarry-t2"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby producer:quarry-t2",
-					"phase": "start",
-					"radius": 2
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -16318,6 +17254,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t2"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t2",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone-block",
@@ -16342,6 +17294,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"producer:quarry-t2"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby producer:quarry-t2",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:stone-block",
@@ -16719,26 +17687,26 @@
 		"product:townhall-t1:blueprint-townhall-t2": {
 			"chargeCost": 0,
 			"durationMs": 60000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"name": "Blueprint: Town Hall II",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:blueprint-townhall-t2",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -16881,26 +17849,26 @@
 		"product:townhall-t2:blueprint-townhall-t3": {
 			"chargeCost": 0,
 			"durationMs": 90000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"name": "Blueprint: Town Hall III",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:blueprint-townhall-t3",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -17161,23 +18129,6 @@
 		"product:townhall-t3:blueprint-townhall-t4": {
 			"chargeCost": 0,
 			"durationMs": 120000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -17189,6 +18140,23 @@
 			"name": "Blueprint: Town Hall IV",
 			"output": [
 				{
+					"effects": [
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
+										]
+									}
+								]
+							}
+						}
+					],
 					"itemId": "item:blueprint-townhall-t4",
 					"quantity": 1,
 					"type": "guaranteed"
@@ -17912,55 +18880,6 @@
 		"product:vegetable-garden-t1:vegetables": {
 			"chargeCost": 0,
 			"durationMs": 20000,
-			"effects": [
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows nearby sensitive production",
-					"radius": 2
-				},
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -17984,6 +18903,53 @@
 									{
 										"ids": [
 											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows nearby sensitive production",
+							"radius": 2
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
 										]
 									}
 								]
@@ -18253,23 +19219,6 @@
 		"product:well-t1:water": {
 			"chargeCost": 0,
 			"durationMs": 5000,
-			"effects": [
-				{
-					"display": "whenActive",
-					"kind": "grant.duration.multiply",
-					"label": "Minor Haste",
-					"multiplier": 0.75,
-					"selector": {
-						"allOf": [
-							{
-								"ids": [
-									"grant:active:shrine-minor-haste"
-								]
-							}
-						]
-					}
-				}
-			],
 			"name": "Water",
 			"output": [
 				{
@@ -18285,6 +19234,21 @@
 									{
 										"ids": [
 											"grant:active:shrine-bountiful-offering"
+										]
+									}
+								]
+							}
+						},
+						{
+							"display": "whenActive",
+							"kind": "grant.duration.multiply",
+							"label": "Minor Haste",
+							"multiplier": 0.75,
+							"selector": {
+								"allOf": [
+									{
+										"ids": [
+											"grant:active:shrine-minor-haste"
 										]
 									}
 								]
@@ -18370,61 +19334,6 @@
 		"product:winery-t1:grapes": {
 			"chargeCost": 0,
 			"durationMs": 22000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:vineyard"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:vineyard",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 3
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 3,
-							"minDistance": 3,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows wider winery production",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -18452,6 +19361,59 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:vineyard"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:vineyard",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 3
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 3,
+									"minDistance": 3,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows wider winery production",
+							"radius": 3
 						}
 					],
 					"itemId": "item:grapes",
@@ -18476,6 +19438,22 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:vineyard"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:vineyard",
+							"phase": "start",
+							"radius": 2
 						}
 					],
 					"itemId": "item:grapes",
@@ -18493,61 +19471,6 @@
 		"product:winery-t1:wine-barrel": {
 			"chargeCost": 0,
 			"durationMs": 30000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:vineyard"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:vineyard",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 3
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 3,
-							"minDistance": 3,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows wider winery production",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -18581,6 +19504,59 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:vineyard"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:vineyard",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 3
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 3,
+									"minDistance": 3,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows wider winery production",
+							"radius": 3
 						}
 					],
 					"itemId": "item:wine-barrel",
@@ -18598,61 +19574,6 @@
 		"product:winery-t1:wine-barrel-from-wine-glasses": {
 			"chargeCost": 0,
 			"durationMs": 16000,
-			"effects": [
-				{
-					"display": "always",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:vineyard"
-								]
-							}
-						]
-					},
-					"kind": "nearby.require",
-					"label": "Nearby item:vineyard",
-					"phase": "start",
-					"radius": 2
-				},
-				{
-					"bands": [
-						{
-							"maxDistance": 0,
-							"minDistance": 0,
-							"multiplier": 3
-						},
-						{
-							"maxDistance": 1,
-							"minDistance": 1,
-							"multiplier": 2.5
-						},
-						{
-							"maxDistance": 2,
-							"minDistance": 2,
-							"multiplier": 2
-						},
-						{
-							"maxDistance": 3,
-							"minDistance": 3,
-							"multiplier": 1.5
-						}
-					],
-					"display": "whenActive",
-					"items": {
-						"anyOf": [
-							{
-								"ids": [
-									"item:pollution"
-								]
-							}
-						]
-					},
-					"kind": "nearby.duration.multiply",
-					"label": "Pollution slows wider winery production",
-					"radius": 3
-				}
-			],
 			"inputs": [
 				{
 					"capacity": 4,
@@ -18680,6 +19601,59 @@
 									}
 								]
 							}
+						},
+						{
+							"display": "always",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:vineyard"
+										]
+									}
+								]
+							},
+							"kind": "nearby.require",
+							"label": "Nearby item:vineyard",
+							"phase": "start",
+							"radius": 2
+						},
+						{
+							"bands": [
+								{
+									"maxDistance": 0,
+									"minDistance": 0,
+									"multiplier": 3
+								},
+								{
+									"maxDistance": 1,
+									"minDistance": 1,
+									"multiplier": 2.5
+								},
+								{
+									"maxDistance": 2,
+									"minDistance": 2,
+									"multiplier": 2
+								},
+								{
+									"maxDistance": 3,
+									"minDistance": 3,
+									"multiplier": 1.5
+								}
+							],
+							"display": "whenActive",
+							"items": {
+								"anyOf": [
+									{
+										"ids": [
+											"item:pollution"
+										]
+									}
+								]
+							},
+							"kind": "nearby.duration.multiply",
+							"label": "Pollution slows wider winery production",
+							"radius": 3
 						}
 					],
 					"itemId": "item:wine-barrel",

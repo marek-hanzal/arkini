@@ -23,6 +23,49 @@ const anyOfItem = (itemId: string) => ({
 	],
 });
 
+type TestConfig = ReturnType<typeof createEngineTestConfig>;
+type TestProduct = TestConfig["products"][string];
+type TestOutputEntry = NonNullable<TestProduct["output"]>[number];
+type TestOutputEffect = NonNullable<
+	Exclude<
+		TestOutputEntry,
+		{
+			type: "weighted";
+		}
+	>["effects"]
+>[number];
+
+const appendFirstOutputEffects = (
+	product: TestProduct | undefined,
+	effects: readonly TestOutputEffect[],
+): TestProduct => {
+	if (!product) throw new Error("Missing test product.");
+	const [firstOutput, ...remainingOutput] = product.output ?? [
+		{
+			itemId: "item:twig",
+			quantity: 1,
+			type: "guaranteed" as const,
+		},
+	];
+	if (firstOutput.type === "weighted") {
+		throw new Error("Test helper only supports non-weighted first outputs.");
+	}
+
+	return {
+		...product,
+		output: [
+			{
+				...firstOutput,
+				effects: [
+					...(firstOutput.effects ?? []),
+					...effects,
+				],
+			},
+			...remainingOutput,
+		],
+	};
+};
+
 const readTestLine = ({
 	config,
 	nowMs = 0,
@@ -54,7 +97,7 @@ const readTestLine = ({
 };
 
 describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
-	it("keeps hidden missing start requirements blocking even when they are not rendered", () => {
+	it("keeps hidden missing output requirements disabling the affected output", () => {
 		const config = createEngineTestConfig({
 			effects: {
 				"effect:test:missing": {
@@ -70,9 +113,9 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			},
 			products: {
 				...createEngineTestConfig().products,
-				"product:test": {
-					...createEngineTestConfig().products["product:test"],
-					effects: [
+				"product:test": appendFirstOutputEffects(
+					createEngineTestConfig().products["product:test"],
+					[
 						{
 							display: "never",
 							kind: "grant.require",
@@ -81,7 +124,7 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 							selector: allOfGrant("grant:test:missing"),
 						},
 					],
-				},
+				),
 			},
 		});
 		const save = runInitialSave({
@@ -95,7 +138,13 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 		});
 
 		expect(line.effectRequirements).toBeUndefined();
-		expect(line.startRequirementsReady).toBe(false);
+		expect(line.startRequirementsReady).toBeUndefined();
+		expect(line.outputs).toMatchObject([
+			{
+				enabled: false,
+				itemId: "item:twig",
+			},
+		]);
 	});
 
 	it("keeps hidden product lines visible while a runtime job still exists", () => {
@@ -115,18 +164,15 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			},
 			products: {
 				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					effects: [
-						{
-							display: "whenMissing",
-							kind: "grant.require",
-							label: "Chosen path",
-							phase: "visibility",
-							selector: allOfGrant("grant:test:path"),
-						},
-					],
-				},
+				"product:test": appendFirstOutputEffects(baseConfig.products["product:test"], [
+					{
+						display: "whenMissing",
+						kind: "grant.require",
+						label: "Chosen path",
+						phase: "visibility",
+						selector: allOfGrant("grant:test:path"),
+					},
+				]),
 			},
 		});
 		const save = runInitialSave({
@@ -160,13 +206,9 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 
 		expect(lines).toMatchObject([
 			{
-				effectRequirements: [
-					{
-						label: "Chosen path",
-						ready: false,
-					},
-				],
+				effectRequirements: undefined,
 				inProgress: true,
+				outputs: [],
 				productId: "product:test",
 				visible: false,
 			},
@@ -209,32 +251,29 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			},
 			products: {
 				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					effects: [
-						{
-							display: "whenActive",
-							kind: "grant.require",
-							label: "Present active row",
-							phase: "start",
-							selector: allOfGrant("grant:test:present"),
-						},
-						{
-							display: "whenActive",
-							kind: "grant.require",
-							label: "Missing active row",
-							phase: "start",
-							selector: allOfGrant("grant:test:missing"),
-						},
-						{
-							display: "whenMissing",
-							kind: "grant.require",
-							label: "Missing row",
-							phase: "start",
-							selector: allOfGrant("grant:test:missing"),
-						},
-					],
-				},
+				"product:test": appendFirstOutputEffects(baseConfig.products["product:test"], [
+					{
+						display: "whenActive",
+						kind: "grant.require",
+						label: "Present active row",
+						phase: "start",
+						selector: allOfGrant("grant:test:present"),
+					},
+					{
+						display: "whenActive",
+						kind: "grant.require",
+						label: "Missing active row",
+						phase: "start",
+						selector: allOfGrant("grant:test:missing"),
+					},
+					{
+						display: "whenMissing",
+						kind: "grant.require",
+						label: "Missing row",
+						phase: "start",
+						selector: allOfGrant("grant:test:missing"),
+					},
+				]),
 			},
 			startingState: {
 				...baseConfig.startingState,
@@ -258,17 +297,23 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			save,
 		});
 
-		expect(line.startRequirementsReady).toBe(false);
-		expect(line.effectRequirements).toEqual([
+		expect(line.startRequirementsReady).toBeUndefined();
+		expect(line.effectRequirements).toBeUndefined();
+		expect(line.outputs).toMatchObject([
 			{
-				kind: "grant.require",
-				label: "Present active row",
-				ready: true,
-			},
-			{
-				kind: "grant.require",
-				label: "Missing row",
-				ready: false,
+				effects: [
+					{
+						kind: "grant.require",
+						label: "Present active row",
+						ready: true,
+					},
+					{
+						kind: "grant.require",
+						label: "Missing row",
+						ready: false,
+					},
+				],
+				enabled: false,
 			},
 		]);
 	});
@@ -302,21 +347,19 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					effects: [
-						{
-							display: "whenActive",
-							kind: "grant.duration.multiply",
-							label: "Inventory Haste",
-							multiplier: 0.5,
-							selector: allOfGrant("grant:test:haste"),
-						},
-					],
 					output: [
 						{
 							itemId: "item:twig",
 							quantity: 2,
 							type: "guaranteed",
 							effects: [
+								{
+									display: "whenActive",
+									kind: "grant.duration.multiply",
+									label: "Inventory Haste",
+									multiplier: 0.5,
+									selector: allOfGrant("grant:test:haste"),
+								},
 								{
 									chance: 0.25,
 									display: "whenActive",
@@ -370,25 +413,22 @@ describe("readRuntimeProducerProductLineViewsFromGameSave", () => {
 			},
 			products: {
 				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
-					effects: [
-						{
-							bands: [
-								{
-									maxDistance: 1,
-									minDistance: 0,
-									multiplier: 0.9,
-								},
-							],
-							display: "whenActive",
-							items: anyOfItem("item:axe"),
-							kind: "nearby.duration.multiply",
-							label: "Nearby item:axe enables production",
-							radius: 1,
-						},
-					],
-				},
+				"product:test": appendFirstOutputEffects(baseConfig.products["product:test"], [
+					{
+						bands: [
+							{
+								maxDistance: 1,
+								minDistance: 0,
+								multiplier: 0.9,
+							},
+						],
+						display: "whenActive",
+						items: anyOfItem("item:axe"),
+						kind: "nearby.duration.multiply",
+						label: "Nearby item:axe enables production",
+						radius: 1,
+					},
+				]),
 			},
 			startingState: {
 				board: [

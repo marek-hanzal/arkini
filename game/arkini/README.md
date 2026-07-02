@@ -274,7 +274,7 @@ Era X prestige construction materials
 
 Most first-pass production durations stay in the `5000` to `9000` ms range. Windmill flour takes `6000` ms, bakery bread and slaughterhouse sausage/raw-hide and tannery leather take `8000` ms, dairy cheese takes `7000` ms, cookhouse feast takes `9000` ms, and market trades are intentionally short conversions. Town Hall upgrade planning is intentionally heavier: Town Hall II/III/IV blueprints take `60000`/`90000`/`120000` ms and are Minor Haste targets, so era jumps feel like real milestones instead of another disposable click-snack. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.
 
-Pollution is authored as ordinary board content and individual product lines decide how they react to it through line-owned `nearby.duration.multiply` rules. Pollution no longer carries a local mutator that reaches into other definitions; farm/animal/vegetable/brewery/winery lines explicitly define their own exact distance bands, display policy, and stacking limits. Same ecological disaster, fewer invisible demons.
+Pollution is authored as ordinary board content and affected product outputs decide how they react to it through output-owned `nearby.duration.multiply` rules. Pollution no longer carries a local mutator that reaches into other definitions; farm/animal/vegetable/brewery/winery outputs explicitly define their own exact distance bands, display policy, and stacking limits. Same ecological disaster, fewer invisible demons.
 
 Current processor input buffers use capacity `4`:
 
@@ -675,7 +675,7 @@ University
   -> House of Engineers Blueprint / Cathedral Blueprint / Mage Lodge Blueprint
 ```
 
-The actual keystone buildings emit passive global grant effects. The University and keystone craft recipes own their own path-lock reactions through line-owned `grant.blockStart` effects, so choosing one path disables counter-path work without item-level creation blockers. Later branch-specific product lines should be baseline-hidden and made visible through visibility-phase `grant.require` effects on those lines.
+The actual keystone buildings emit passive global grant effects. The University outputs and keystone craft recipes own their own path-lock reactions through output/craft-owned `grant.blockStart` effects, so choosing one path disables counter-path work without item-level creation blockers. Later branch-specific product lines should keep hidden baseline outputs and reveal affected output entries through visibility-phase `grant.require` effects.
 
 ```txt
 producer:house-of-engineers blocks Cathedral/Mage Lodge blueprint products and creation of Cathedral/Mage Lodge blueprints/buildings

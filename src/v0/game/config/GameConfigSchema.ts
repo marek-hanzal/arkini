@@ -40,11 +40,12 @@ import { doesResolvedDomainSelectorMatchId } from "~/v0/game/selector/doesResolv
  *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
  *   Product inputs may use `mode: "upTo"` when a run should consume 1..quantity items for the same fixed output.
  * - Passive and active `effects` only publish global grant facts. They do not target,
- *   mutate, or reach into product lines. Product and craft lines own their own
- *   visibility requirements, start requirements, proximity checks, and modifiers.
- * - Nearby line effects use Chebyshev grid distance, so radius 1 includes diagonals
- *   around the producer/craft tile. Duration changes are authored as explicit
- *   line-owned distance bands or grant-driven multipliers.
+ *   mutate, or reach into product lines. Producer output entries and craft recipes
+ *   own their own visibility requirements, start requirements, proximity checks,
+ *   and modifiers.
+ * - Nearby output/craft effects use Chebyshev grid distance, so radius 1 includes
+ *   diagonals around the producer/craft tile. Duration changes are authored as
+ *   explicit output-owned distance bands or grant-driven multipliers.
  * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
  *   only uses an explicitly selected default product line. Without a user-selected
  *   default, clicking a producer tile is intentionally a noop. Product
@@ -431,6 +432,26 @@ const createGameDropEffectSchema = <
 			.strict(),
 		z
 			.object({
+				kind: z.literal("nearby.duration.multiply"),
+				...itemSelectorSchema.shape,
+				radius: NonNegativeIntegerSchema,
+				bands: z.array(GameLineEffectDistanceBandSchema).min(1),
+				maxSources: PositiveIntegerSchema.optional(),
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("grant.duration.multiply"),
+				selector: GameGrantSelectorSchema,
+				multiplier: DurationMultiplierSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
 				kind: z.literal("grant.drop.hide"),
 				selector: GameGrantSelectorSchema,
 				display: GameLineEffectDisplaySchema,
@@ -680,7 +701,7 @@ const ProducerDepletedModeSchema = z.enum([
 	"remove",
 ]);
 
-/** Producer-like capability with ordered product lines. Product-line gates live on product lines/effects. */
+/** Producer-like capability with ordered product lines. Output gates live on product output entries. */
 const ProducerDefinitionSchema = z
 	.object({
 		maxQueueSize: PositiveIntegerSchema.default(1),
@@ -734,9 +755,9 @@ const CraftRecipeFragmentSchema = CraftRecipeSchema.extend({
  * Producer product line.
  *
  * Missing `output` means a valid delayed sink/destructor product.
- * `visibility: "hidden"` keeps the line hidden until its own visibility-phase line
- * effects are satisfied. Start-phase effects keep visible lines disabled instead of
- * pretending the line does not exist.
+ * `visibility: "hidden"` is baseline line visibility. Producer-specific gates,
+ * blockers, duration modifiers, and loot modifiers live on concrete output entries
+ * so sibling drops do not inherit rules by accident.
  */
 const ProductDefinitionSchema = z
 	.object({
@@ -748,7 +769,6 @@ const ProductDefinitionSchema = z
 				"hidden",
 			])
 			.default("visible"),
-		effects: z.array(GameLineEffectSchema).optional(),
 		durationMs: NonNegativeIntegerSchema,
 		placement: PlacementSchema,
 		chargeCost: NonNegativeNumberSchema.default(0),
@@ -760,7 +780,6 @@ const ProductDefinitionSchema = z
 
 const ProductDefinitionFragmentSchema = ProductDefinitionSchema.extend({
 	name: z.string().min(1).optional(),
-	effects: z.array(GameLineEffectAuthoringSchema).optional(),
 	output: ActivationOutputAuthoringSchema.min(1).optional(),
 });
 
@@ -1212,20 +1231,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			],
 			product.tags,
 			(value) => `Duplicate tag "${value}".`,
-		);
-		validateGameLineEffects(
-			ctx,
-			[
-				"products",
-				productId,
-				"effects",
-			],
-			product.effects ?? [],
-			{
-				grantIds,
-				hasItem,
-				itemIds,
-			},
 		);
 		if (product.output) {
 			validateActivationOutput(
@@ -1819,6 +1824,7 @@ const validateGameDropEffects = (
 		if (
 			effect.kind === "grant.require" ||
 			effect.kind === "grant.blockStart" ||
+			effect.kind === "grant.duration.multiply" ||
 			effect.kind === "grant.drop.hide" ||
 			effect.kind === "grant.drop.show" ||
 			effect.kind === "grant.drop.disable" ||
@@ -1837,7 +1843,7 @@ const validateGameDropEffects = (
 			);
 		}
 
-		if (effect.kind === "nearby.require") {
+		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
 			validateGameLineItemSelector(
 				ctx,
 				[
@@ -1850,6 +1856,21 @@ const validateGameDropEffects = (
 					entityIds: entities.itemIds,
 					hasEntity: entities.hasItem,
 				},
+			);
+		}
+
+		if (
+			effect.kind === "nearby.duration.multiply" &&
+			effect.bands.every((band) => band.multiplier === 1)
+		) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"bands",
+				],
+				"Nearby duration effect must contain at least one non-1 multiplier band.",
 			);
 		}
 
@@ -1905,7 +1926,7 @@ const validateCraftRecipeEffectRuntimeSupport = (
 				effectIndex,
 				"kind",
 			],
-			`Craft recipe effects only support "grant.require" start gates and "grant.blockStart" blockers at runtime. "${effect.kind}" is a producer product-line effect.`,
+			`Craft recipe effects only support "grant.require" start gates and "grant.blockStart" blockers at runtime. "${effect.kind}" is a producer output effect.`,
 		);
 	}
 };
@@ -2155,12 +2176,18 @@ const collectProductBlueprintDependencies = ({
 	const productOwnerByProductId = readProductOwnerByProductId(config);
 
 	for (const [productId, product] of Object.entries(config.products)) {
-		const outputBlueprintItemIds = readOutputBlueprintItemIds(
-			product.output ?? [],
-			blueprintItemIds,
-		);
+		const outputEntries = readActivationOutputEffectEntries({
+			output: product.output ?? [],
+			path: [
+				"products",
+				productId,
+				"output",
+			],
+		});
 
-		for (const fromBlueprintItemId of outputBlueprintItemIds) {
+		for (const outputEntry of outputEntries) {
+			if (!blueprintItemIds.has(outputEntry.itemId)) continue;
+			const fromBlueprintItemId = outputEntry.itemId;
 			const owner = productOwnerByProductId.get(productId);
 			if (owner) {
 				addDependencyItem({
@@ -2193,10 +2220,9 @@ const collectProductBlueprintDependencies = ({
 				addDependencyItem,
 				config,
 				fromBlueprintItemId,
-				lineEffects: product.effects ?? [],
+				lineEffects: outputEntry.effects,
 				path: [
-					"products",
-					productId,
+					...outputEntry.path,
 					"effects",
 				],
 			});
@@ -2304,6 +2330,10 @@ const readOutputBlueprintItemIds = (
 	return outputBlueprintItemIds;
 };
 
+type GameConfigRuntimeEffect =
+	| z.infer<typeof GameLineEffectSchema>
+	| z.infer<typeof GameDropEffectSchema>;
+
 const collectLineEffectDependencyItems = ({
 	addDependencyItem,
 	config,
@@ -2318,7 +2348,7 @@ const collectLineEffectDependencyItems = ({
 	}) => void;
 	config: z.infer<typeof BaseGameConfigSchema>;
 	fromBlueprintItemId: string;
-	lineEffects: readonly z.infer<typeof GameLineEffectSchema>[];
+	lineEffects: readonly GameConfigRuntimeEffect[];
 	path: GameConfigIssuePath;
 }) => {
 	for (const [lineEffectIndex, lineEffect] of lineEffects.entries()) {
@@ -2783,26 +2813,36 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 					],
 				}),
 			),
-			...readLineEffectGameplayRequirements({
-				lineEffects: product.effects ?? [],
-				path: [
-					"products",
-					productId,
-					"effects",
-				],
-			}),
 		];
 
-		for (const outputItemId of readActivationOutputItemIds(product.output ?? [])) {
+		for (const outputEntry of readActivationOutputEffectEntries({
+			output: product.output ?? [],
+			path: [
+				"products",
+				productId,
+				"output",
+			],
+		})) {
+			const outputRequirements = [
+				...productRequirements,
+				...readLineEffectGameplayRequirements({
+					lineEffects: outputEntry.effects,
+					path: [
+						...outputEntry.path,
+						"effects",
+					],
+				}),
+			];
+
 			addItemSource({
 				label: `product "${productId}" (${product.name})`,
 				path: [
 					"products",
 					productId,
 				],
-				requirements: productRequirements,
-				sourceId: `product:${productId}:output:${outputItemId}`,
-				targetId: outputItemId,
+				requirements: outputRequirements,
+				sourceId: `product:${productId}:output:${outputEntry.sourceKey}`,
+				targetId: outputEntry.itemId,
 			});
 		}
 
@@ -2987,7 +3027,7 @@ const validateGrantRequirementBlockerContradictions = (
 				): entry is {
 					effectIndex: number;
 					lineEffect: Extract<
-						z.infer<typeof GameLineEffectSchema>,
+						GameConfigRuntimeEffect,
 						{
 							kind: "grant.blockStart";
 						}
@@ -3036,21 +3076,27 @@ const readLineEffectUsages = (config: z.infer<typeof BaseGameConfigSchema>) => {
 	const productOwnerByProductId = readProductOwnerByProductId(config);
 
 	return [
-		...Object.entries(config.products).map(([productId, product]) => {
+		...Object.entries(config.products).flatMap(([productId, product]) => {
 			const owner = productOwnerByProductId.get(productId);
 
-			return {
-				enforceSoftLock:
-					owner !== undefined &&
-					isGameplayProgressionProducer(config, owner.capabilityId),
-				label: `product "${productId}" (${product.name})`,
-				lineEffects: product.effects ?? [],
+			return readActivationOutputEffectEntries({
+				output: product.output ?? [],
 				path: [
 					"products",
 					productId,
+					"output",
+				],
+			}).map((outputEntry) => ({
+				enforceSoftLock:
+					owner !== undefined &&
+					isGameplayProgressionProducer(config, owner.capabilityId),
+				label: `product "${productId}" (${product.name}) output ${formatItemLabel(config, outputEntry.itemId)}`,
+				lineEffects: outputEntry.effects,
+				path: [
+					...outputEntry.path,
 					"effects",
 				] satisfies GameConfigIssuePath,
-			};
+			}));
 		}),
 		...Object.entries(config.craftRecipes).map(([craftRecipeId, recipe]) => ({
 			enforceSoftLock: isGameplayProgressionProducer(config, recipe.resultItemId),
@@ -3069,7 +3115,7 @@ const readLineEffectGameplayRequirements = ({
 	lineEffects,
 	path,
 }: {
-	lineEffects: readonly z.infer<typeof GameLineEffectSchema>[];
+	lineEffects: readonly GameConfigRuntimeEffect[];
 	path: GameConfigIssuePath;
 }) => {
 	const requirements: GameplayRequirement[] = [];
@@ -3200,13 +3246,43 @@ const readMandatoryGrantIds = (selector: z.infer<typeof GameGrantSelectorSchema>
 };
 
 const readActivationOutputItemIds = (output: z.infer<typeof ActivationOutputSchema>) =>
-	output.flatMap((entry) => {
+	readActivationOutputEffectEntries({
+		output,
+		path: [],
+	}).map((entry) => entry.itemId);
+
+const readActivationOutputEffectEntries = ({
+	output,
+	path,
+}: {
+	output: z.infer<typeof ActivationOutputSchema>;
+	path: GameConfigIssuePath;
+}) =>
+	output.flatMap((entry, outputIndex) => {
+		const outputPath = [
+			...path,
+			outputIndex,
+		];
 		if (entry.type === "weighted") {
-			return entry.entries.map((weightedEntry) => weightedEntry.itemId);
+			return entry.entries.map((weightedEntry, weightedEntryIndex) => ({
+				effects: weightedEntry.effects ?? [],
+				itemId: weightedEntry.itemId,
+				path: [
+					...outputPath,
+					"entries",
+					weightedEntryIndex,
+				] satisfies GameConfigIssuePath,
+				sourceKey: `${outputIndex}:entry:${weightedEntryIndex}:${weightedEntry.itemId}`,
+			}));
 		}
 
 		return [
-			entry.itemId,
+			{
+				effects: entry.effects ?? [],
+				itemId: entry.itemId,
+				path: outputPath satisfies GameConfigIssuePath,
+				sourceKey: `${outputIndex}:${entry.itemId}`,
+			},
 		];
 	});
 

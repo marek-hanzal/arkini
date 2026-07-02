@@ -32,7 +32,7 @@ export interface EffectiveChanceItemEntry {
 export interface AppliedGameEffectOperation {
 	effectId: string;
 	effectName: string;
-	kind: NonNullable<ProductDefinition["effects"]>[number]["kind"];
+	kind: ProductDropEffect["kind"];
 	sourceId: string;
 	sourceItemInstanceId: string;
 }
@@ -40,8 +40,8 @@ export interface AppliedGameEffectOperation {
 interface RuntimeLineEffectRequirement {
 	label: string;
 	ready: boolean;
-	display: NonNullable<ProductDefinition["effects"]>[number]["display"];
-	kind: NonNullable<ProductDefinition["effects"]>[number]["kind"];
+	display: ProductDropEffect["display"];
+	kind: ProductDropEffect["kind"];
 	phase?: "start" | "visibility";
 }
 

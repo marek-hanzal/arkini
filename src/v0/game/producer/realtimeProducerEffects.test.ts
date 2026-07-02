@@ -4,7 +4,7 @@ import { runInitialSave } from "~/v0/game/engine/applyGameActionFx.testSupport";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 
 describe("realtime producer line effects", () => {
-	it("computes duration from current nearby board state through line-owned rules", () => {
+	it("computes duration from current nearby board state through output-owned rules", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -18,28 +18,35 @@ describe("realtime producer line effects", () => {
 				...baseConfig.products,
 				"product:test": {
 					...baseConfig.products["product:test"],
-					effects: [
+					output: [
 						{
-							bands: [
+							itemId: "item:twig",
+							quantity: 2,
+							type: "guaranteed",
+							effects: [
 								{
-									maxDistance: 1,
-									minDistance: 0,
-									multiplier: 0.5,
-								},
-							],
-							display: "whenActive",
-							items: {
-								anyOf: [
-									{
-										ids: [
-											"item:axe",
+									bands: [
+										{
+											maxDistance: 1,
+											minDistance: 0,
+											multiplier: 0.5,
+										},
+									],
+									display: "whenActive",
+									items: {
+										anyOf: [
+											{
+												ids: [
+													"item:axe",
+												],
+											},
 										],
 									},
-								],
-							},
-							kind: "nearby.duration.multiply",
-							label: "Nearby Axe Haste",
-							radius: 1,
+									kind: "nearby.duration.multiply",
+									label: "Nearby Axe Haste",
+									radius: 1,
+								},
+							],
 						},
 					],
 				},

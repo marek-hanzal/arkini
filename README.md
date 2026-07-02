@@ -28,16 +28,16 @@ Item definitions drive behavior. An item may define:
 - collectible board items that can be tapped into a limited player inventory
 - craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
-There are no separate static `merges`, `producers`, `stashes`, `products`, or `craftRecipes` registries. Item-owned capabilities are embedded directly on the item definition, because the item is the gameplay unit and not a paperwork index with boots.
+Item-owned capabilities are embedded directly on the item definition, because the item is the gameplay unit and not a paperwork index with boots. Root config owns metadata, resources, assets, items and starting state.
 
 
 ## Logic and Effect boundary
 
-Effect now belongs to the standalone tick/action engine, not to UI-facing persistence plumbing. React components dispatch typed runtime actions through `GameRuntimeStore`/`RuntimeGameEngineAdapter`; they do not call storage-style mutation hooks, React Query mutations, or old database-flavored `src/**/fx` roots.
+Effect belongs to the standalone tick/action engine, not to UI-facing persistence plumbing. React components dispatch typed runtime actions through `GameRuntimeStore`/`RuntimeGameEngineAdapter`; gameplay state changes go through typed engine actions.
 
 The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/engine`, someone has poured concrete into the gearbox again.
 
-Runtime reads subscribe through `useGameRuntimeSelector` from `src/play/runtime`. Board, inventory, item and testing utility UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
+Runtime reads subscribe through `useGameRuntimeSelector` from `src/play/runtime`. Board, inventory, item and testing utility UI read from runtime projections derived from `(GameConfig, GameSave)`. Live gameplay state is local engine state, not a remote-data cache wearing theatrical glasses.
 
 Time-sensitive runtime updates are handled by the runtime auto-ticker and engine `nextWakeAtMs`. Randomness is provided through `RandomServiceFx`; gameplay rolling must not call `Math.random()` directly.
 
@@ -45,7 +45,7 @@ Time-sensitive runtime updates are handled by the runtime auto-ticker and engine
 
 The game has one live gameplay source of truth: `RuntimeGameEngineAdapter`. It owns the current `(config, save)` pair for the browser session, applies typed actions, ticks due jobs and publishes domain events. `GameRuntimeStore` wraps it for React with `useSyncExternalStore` selectors and focused action hooks.
 
-The old browser SQLite/Kysely layer, database migrations, `dbFx`, `withTransactionFx`, React Query gameplay cache patches and old mutation hooks have been removed. Future Dexie/IndexedDB persistence should be a thin outside wrapper: load `GameSave`, create the runtime adapter, subscribe to save changes, debounce writes. The engine itself should continue to receive data and return data like a civilized machine.
+Browser persistence is an outside wrapper: load `GameSave`, create the runtime adapter, subscribe to save changes, debounce writes. The engine itself receives data and returns data like a civilized machine.
 
 ## Tile engine boundary
 
@@ -86,7 +86,7 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-The active play runtime lives directly under `src/*`. The old `src/v0` namespace and `src/ancient` archaeology snapshot are gone; keep new gameplay work in the owning root domain instead of growing parallel runtime junk beside it.
+The active play runtime lives directly under `src/*`. Keep gameplay work in the owning root domain instead of growing parallel runtime junk beside it.
 
 Tap/press recognition is owned by `src/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions dispatch into the runtime engine, runtime selectors publish the new board/inventory view, and visual-event adapters register TileEngine motion requests without a cache detour.
 
@@ -96,7 +96,7 @@ XState is no longer part of the runtime. The app has two main state buckets: the
 
 ## React data subscriptions
 
-Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/play/runtime`. Board, inventory, item and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
+Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/play/runtime`. Board, inventory, item and debug runtime UI must read from `GameRuntimeStore`, not from parallel caches wearing a fake mustache.
 
 Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft state. If the action changes `GameSave`, it belongs to the runtime adapter.
 
@@ -165,12 +165,13 @@ This runs `format:check`, dependency-cruiser boundaries, TypeScript with unused 
 Optional code hygiene passes live outside the hard check gate:
 
 ```bash
+npm run audit:current
 npm run audit:dead
 npm run audit:dupes
 npm run audit:optional
 ```
 
-`audit:dead` runs Knip with a zero exit code for findings. `audit:dupes` runs jscpd with a zero duplicate exit code. They are meant to be annoying local searchlights, not CI guillotines. Do not wire them into `npm run check` unless we deliberately decide to start failing builds on dead exports or copy-paste.
+`audit:current` rejects removed runtime namespaces, removed embedded-config fields, catch-all barrels and historical persistence/cache markers in active code/docs. `audit:dead` runs Knip with a zero exit code for findings. `audit:dupes` runs jscpd with a zero duplicate exit code. They are meant to be annoying local searchlights, not CI guillotines. Do not wire `audit:dead` or `audit:dupes` into `npm run check` unless we deliberately decide to start failing builds on dead exports or copy-paste.
 
 ## Formatting
 

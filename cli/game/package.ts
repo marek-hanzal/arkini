@@ -195,7 +195,7 @@ const normalizePackage = (value: unknown): unknown => {
 		ids: Object.keys(items),
 		label: "item",
 	});
-	const productDomainIndexes = {
+	const effectSelectorDomainIndexes = {
 		items: itemDomainIndex,
 	};
 
@@ -222,7 +222,7 @@ const normalizePackage = (value: unknown): unknown => {
 			};
 			craft.resultItemId ??= readCraftResultItemIdFromCraftTargetId(itemId);
 			craft.effects = normalizeLineEffects({
-				domainIndexes: productDomainIndexes,
+				domainIndexes: effectSelectorDomainIndexes,
 				effects: craft.effects,
 				path: `items.${itemId}.craft.effects`,
 			});
@@ -234,7 +234,7 @@ const normalizePackage = (value: unknown): unknown => {
 				...(item.producer as Record<string, unknown>),
 			};
 			producer.lines = normalizeLines({
-				domainIndexes: productDomainIndexes,
+				domainIndexes: effectSelectorDomainIndexes,
 				items,
 				lines: producer.lines,
 				path: `items.${itemId}.producer.lines`,
@@ -247,7 +247,7 @@ const normalizePackage = (value: unknown): unknown => {
 				...(item.stash as Record<string, unknown>),
 			};
 			stash.line = normalizeLine({
-				domainIndexes: productDomainIndexes,
+				domainIndexes: effectSelectorDomainIndexes,
 				items,
 				line: stash.line,
 				path: `items.${itemId}.stash.line`,
@@ -562,7 +562,7 @@ const normalizeLine = ({
 	const normalizedLine = {
 		...(line as Record<string, unknown>),
 	};
-	normalizedLine.name ??= readProductNameFromPrimaryOutput(normalizedLine, items);
+	normalizedLine.name ??= readLineNameFromPrimaryOutput(normalizedLine, items);
 	normalizedLine.output = normalizeActivationOutputEffects({
 		domainIndexes,
 		output: normalizedLine.output,
@@ -765,7 +765,7 @@ const validateUniqueValues = (
 	}
 };
 
-const readProductNameFromPrimaryOutput = (
+const readLineNameFromPrimaryOutput = (
 	line: Readonly<Record<string, unknown>>,
 	items: Readonly<Record<string, unknown>>,
 ) => {

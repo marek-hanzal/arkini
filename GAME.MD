@@ -252,7 +252,7 @@ Stash consumable inputs are currently open-time inputs, not persistent stash inp
 
 Lines own their output inline. Stashes emit through their single line. There is no top-level loot-table indirection in the current config model. Reintroduce shared output IDs only if the same output table is intentionally reused enough to beat the extra reference hop, not because humans miss paperwork for some reason.
 
-Better output should usually be modeled as another product/building tier with its own inline output. Drop-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls on the concrete output entry that owns it, not for rewriting the whole output table. The old line-level selector version is gone because making a line guess which drop it meant was exactly as dumb as it sounds.
+Better output should usually be modeled as another product/building tier with its own inline output. Drop-owned `grant.loot.extraOutputChance.add` is for independent bonus rolls on the concrete output entry that owns it, not for rewriting the whole output table. Line-level loot selectors are not supported because a line guessing which drop it meant is exactly as dumb as it sounds.
 
 ### 4.14 Blueprint
 

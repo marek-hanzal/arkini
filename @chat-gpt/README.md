@@ -1,6 +1,6 @@
 # Arkini GPT working notes
 
-Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archive/` only for historical rationale. Old notes are reference, not current truth; source code wins.
+Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archive/` only for completed historical rationale; source code wins over archived notes.
 
 ## Layout
 
@@ -18,10 +18,10 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Lines live embedded on `items.*.producer.lines`; stash behavior lives on `items.*.stash.line`; craft lives on `items.*.craft`; merge rules live on `items.*.merges`. Runtime line views should expose output items with current owned quantities counted across board plus inventory so item detail can show output icon + owned count without deriving UI truth locally. Stashes are a one-line facade over producer execution: the stash owns finite charges/depletion mode, while its line owns inputs/output/chargeCost and its output entries own grants/effects. Stash activation/progress should reuse line runtime view plumbing where possible. Producer default-line selection is an explicit player choice only: never infer a default from the first line, config order, visibility, or availability. With no saved selected default, board-click activation is a noop/detail affordance and backend default actions must reject. Drop-owned extra chance loot effects own their bonus roll shape inline on the concrete output entry they modify. Do not reintroduce detached top-level registries for one-off line/input/loot data.
 - Producer, stash, and craft capabilities are keyed by their owning item id. Items do not carry `producerId`, `stashId`, or `craftRecipeId`; one-to-one capability references are fake indirection, not architecture. Source items omit derived `assetIds`; the compiler derives `["asset:<itemId>"]` from item ids and synthesizes conventional assets. Item `code` no longer exists; item id is the single stable identity. `game.json` owns asset overrides; there is no authored `assets.json`, and assets do not carry `kind`; that duplicated the asset id/resource shape for no runtime value. Source line names may be omitted when they equal the primary output item name; the compiler derives the compiled product `name`. Source line/craft input `quantity` defaults to 1, output `quantity` defaults to 1, weighted `rolls` defaults to 1, and blueprint craft recipes may omit `resultItemId` when the result is the conventional `producer:<blueprint-suffix>`. Line inputs default to `mode: "exact"`; `mode: "upTo"` means a product can start with at least one input and consumes `1..quantity` for a fixed output, useful for purifier/sink lines. Blueprint craft/acquisition dependencies must be acyclic: a blueprint must never require itself directly, through another blueprint's crafted result, or through the line that creates it.
 - Action contracts live in `src/action`; output event contracts live in `src/event`; dense save contract stays in `src/engine/model`.
-- React reads runtime through `useGameRuntimeSelector` / focused hooks, not React Query.
+- React reads runtime through `useGameRuntimeSelector` / focused hooks from `GameRuntimeStore`.
 - Gameplay mutations go through typed engine actions, not `useMutation` wrappers.
 - Persistence is Dexie snapshot plumbing around `GameSave`; it is not gameplay truth.
-- TileEngine is generic and must not import Arkini domain/debug/play modules. The old shared DebugTimeline/diagnostics layer is intentionally removed; do not bring it back unless a new bug class truly needs structured instrumentation.
+- TileEngine is generic and must not import Arkini domain/debug/play modules. Diagnostics belong in a deliberate new boundary only when a concrete bug class truly needs structured instrumentation.
 - `GameConfigSchema` / `GameSaveConfigSchema` are central validation gates.
 - `GameConfig` is the primary gameplay contract: if config validation accepts an item/capability combination, the engine/runtime must support and honor it deterministically.
 - Negative production pressure belongs in output-owned effects. Pollution-style slowdown should be authored with `nearby.duration.multiply` on affected product outputs; producer/product-owned `hinderedBy` side tables are obsolete and must not be reintroduced. Keep slowdown rules split by affected product family instead of mixing unrelated concerns into one magical trash bag.
@@ -56,7 +56,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 
 ## Hard rules
 
-- Do not revive SQLite/Kysely or gameplay React Query.
+- Do not add gameplay database/query-cache state. Gameplay truth belongs to `GameSave` in `RuntimeGameEngineAdapter` / `GameRuntimeStore`.
 - Do not add special UI for filling activation inputs; use core DnD/merge-style interactions.
 - Before non-trivial work, inspect current source and existing library capabilities.
 - Keep active notes short. Archive completed task notes immediately.

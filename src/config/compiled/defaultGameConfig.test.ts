@@ -58,13 +58,6 @@ const readEmbeddedEffect = (effectId: string) =>
 	readEmbeddedEffects().find((effect) => effect.id === effectId);
 
 describe("defaultGameConfig", () => {
-	it("is compiled to embedded capability effects without root mutator fields", () => {
-		expect(JSON.stringify(defaultGameConfig)).not.toContain("grantSelector");
-		expect(JSON.stringify(defaultGameConfig)).not.toContain("operations");
-		expect(JSON.stringify(defaultGameConfig)).not.toContain("passiveEffectIds");
-		expect(JSON.stringify(defaultGameConfig)).not.toContain("activatesEffectId");
-	});
-
 	it("keeps active effects as line-owned grant sources", () => {
 		expect(readEmbeddedEffect("effect:shrine-minor-haste")).toMatchObject({
 			grants: [

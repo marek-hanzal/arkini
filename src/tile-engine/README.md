@@ -28,7 +28,7 @@ Somehow civilization will stagger onward.
 ## What TileEngine must not know
 
 - Arkini item IDs, board cells, inventory slots, producers, stashes, crafting or economy rules;
-- React Query cache shapes;
+- app-specific persistence or cache shapes;
 - domain action names such as `item.spawned`, `item.merged` or `activation.depleted`;
 - semantic visual event schemas from `src/play`.
 

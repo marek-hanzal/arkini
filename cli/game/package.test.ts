@@ -28,7 +28,7 @@ afterEach(async () => {
 });
 
 describe("game package normalization", () => {
-	it("derives missing product names from the primary output item", async () => {
+	it("derives missing line names from the primary output item", async () => {
 		const path = await createTempPackageFile({
 			version: 1,
 			game: {

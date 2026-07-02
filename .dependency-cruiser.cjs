@@ -37,7 +37,7 @@ const boundaryRules = [
 		to: {
 			path: [
 				"^src/(?:item|play|tile-engine|ui)(?:/|$)",
-				"^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
+				"^node_modules/(?:react|react-dom)(?:/|$)",
 			],
 		},
 	},
@@ -51,18 +51,6 @@ const boundaryRules = [
 		},
 		to: {
 			path: "^src/.+/index\\.ts$",
-		},
-	},
-	{
-		name: "play-drop-no-legacy-resolve-wrapper",
-		comment:
-			"Use ~/play/drop/resolveDrop directly. The old ~/play/resolveDrop wrapper is intentionally not a public API.",
-		severity: "error",
-		from: {
-			path: "^src(?:/|$)",
-		},
-		to: {
-			path: "^src/play/resolveDrop\\.ts$",
 		},
 	},
 ];

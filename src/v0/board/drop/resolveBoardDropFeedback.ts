@@ -114,7 +114,8 @@ export const resolveBoardDropFeedback = ({
 	if (
 		intent.type === "craft-input" ||
 		intent.type === "producer-input" ||
-		intent.type === "stash-input"
+		intent.type === "stash-input" ||
+		intent.type === "tile-remove"
 	) {
 		return {
 			effect: "merge",

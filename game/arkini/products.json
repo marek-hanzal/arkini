@@ -610,6 +610,61 @@
 				}
 			]
 		},
+		"product:blacksmith-t1:pickaxe": {
+			"durationMs": 20000,
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:plank"
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal"
+				}
+			],
+			"output": [
+				{
+					"itemId": "item:pickaxe",
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
+					"itemId": "item:pollution",
+					"type": "chance"
+				}
+			],
+			"visibility": "visible",
+			"effects": [
+				{
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"radius": 3,
+					"phase": "start",
+					"display": "always"
+				}
+			]
+		},
 		"product:blacksmith-t1:nails": {
 			"durationMs": 16000,
 			"inputs": [

@@ -12,6 +12,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"craft-input-withdraw",
 	"inventory-placement",
 	"board-stash",
+	"tile-remove-output",
 	"debug",
 ]);
 

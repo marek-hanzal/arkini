@@ -23,4 +23,8 @@ export type ItemToBoardItemInteractionPlan =
 	| {
 			feedbackVariant: ItemInteractionFeedbackVariant;
 			type: "stash-input";
+	  }
+	| {
+			feedbackVariant: ItemInteractionFeedbackVariant;
+			type: "tile-remove";
 	  };

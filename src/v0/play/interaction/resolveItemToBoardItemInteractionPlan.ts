@@ -54,10 +54,14 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
 			),
 	);
+	const canRemoveTile = Boolean(
+		config.items[targetItem.itemId]?.removeBy?.some((entry) => entry.itemId === sourceItemId),
+	);
 
 	return match({
 		canCraft,
 		canMerge,
+		canRemoveTile,
 		canSupplyStashInput,
 		mergeRule,
 		producerInputProductId,
@@ -87,6 +91,15 @@ export const resolveItemToBoardItemInteractionPlan = ({
 			() => ({
 				feedbackVariant: "secondary" as const,
 				type: "stash-input" as const,
+			}),
+		)
+		.with(
+			{
+				canRemoveTile: true,
+			},
+			() => ({
+				feedbackVariant: "primary" as const,
+				type: "tile-remove" as const,
 			}),
 		)
 		.with(

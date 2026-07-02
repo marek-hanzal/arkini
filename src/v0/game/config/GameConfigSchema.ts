@@ -60,6 +60,7 @@ import { doesResolvedDomainSelectorMatchId } from "~/v0/game/selector/doesResolv
  * - Product lines own their normal `output` inline and may spend producer charges with `chargeCost`. A product without `output` is valid.
  *   That is a delayed sink/destructor such as a shredder.
  * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
+ *   Removal rules may emit inline loot output after the target tile is removed.
  *
  * Minimal source fragment example:
  *
@@ -642,6 +643,7 @@ const RemoveByDefinitionSchema = z
 			"keep",
 			"consume",
 		]),
+		output: ActivationOutputSchema.min(1).optional(),
 	})
 	.strict();
 
@@ -961,6 +963,25 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 						"itemId",
 					],
 					`Missing item "${removal.itemId}".`,
+				);
+			}
+
+			if (removal.output) {
+				validateActivationOutput(
+					ctx,
+					[
+						"items",
+						itemId,
+						"removeBy",
+						index,
+						"output",
+					],
+					removal.output,
+					{
+						grantIds,
+						hasItem,
+						itemIds,
+					},
 				);
 			}
 		}
@@ -2657,6 +2678,41 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 				sourceId: `merge:${itemId}:${mergeId}`,
 				targetId: merge.resultItemId,
 			});
+		}
+
+		for (const [removeIndex, removal] of (item.removeBy ?? []).entries()) {
+			for (const outputItemId of readActivationOutputItemIds(removal.output ?? [])) {
+				addItemSource({
+					label: `tile removal of ${formatItemLabel(config, itemId)}`,
+					path: [
+						"items",
+						itemId,
+						"removeBy",
+						removeIndex,
+					],
+					requirements: [
+						createItemRequirement({
+							itemId,
+							path: [
+								"items",
+								itemId,
+							],
+						}),
+						createItemRequirement({
+							itemId: removal.itemId,
+							path: [
+								"items",
+								itemId,
+								"removeBy",
+								removeIndex,
+								"itemId",
+							],
+						}),
+					],
+					sourceId: `remove:${itemId}:${removeIndex}:output:${outputItemId}`,
+					targetId: outputItemId,
+				});
+			}
 		}
 	}
 

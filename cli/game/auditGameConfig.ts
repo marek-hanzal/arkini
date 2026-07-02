@@ -139,6 +139,10 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 		for (const removal of item.removeBy ?? []) {
 			usage.items.add(removal.itemId);
 			itemFlow.consumedItemIds.add(removal.itemId);
+			if (removal.output) {
+				collectLootOutputUsage(removal.output, itemFlow);
+				collectLootOutputEffectUsage(removal.output, config, usage);
+			}
 		}
 	}
 };

@@ -25,7 +25,7 @@
 			"tier": 4
 		},
 		"item:axe": {
-			"description": "Reliable utility weapon forged from iron with a sturdy wooden haft.",
+			"description": "Single-use chopping tool. Drag onto tree sources to harvest logs; also still serves later expedition gear chains.",
 			"maxStackSize": 20,
 			"name": "Axe",
 			"tags": [
@@ -34,7 +34,9 @@
 				"tool",
 				"blacksmith",
 				"hero",
-				"era:IX"
+				"era:IX",
+				"woodcutting",
+				"single-use"
 			],
 			"tier": 1
 		},
@@ -1537,6 +1539,21 @@
 				"tier-2-resource"
 			]
 		},
+		"item:pickaxe": {
+			"description": "Single-use mining tool. Drag onto a stone deposit to harvest a random pile of stones.",
+			"maxStackSize": 20,
+			"name": "Pickaxe",
+			"tags": [
+				"equipment",
+				"tool",
+				"mining",
+				"stone",
+				"blacksmith",
+				"single-use",
+				"era:IX"
+			],
+			"tier": 1
+		},
 		"item:pollution": {
 			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
 			"maxStackSize": 1,
@@ -1565,12 +1582,29 @@
 			"tier": 5
 		},
 		"item:rock": {
-			"description": "Movable stone source used by nearby quarries.",
-			"name": "Rock",
+			"description": "Movable stone deposit used by nearby quarries or mined manually with a single-use pickaxe.",
+			"name": "Stone Deposit",
 			"tags": [
 				"source",
 				"stone",
-				"era:I"
+				"era:I",
+				"stone-deposit"
+			],
+			"removeBy": [
+				{
+					"itemId": "item:pickaxe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:stone",
+							"quantity": {
+								"min": 1,
+								"max": 4
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
 			]
 		},
 		"item:roof-tiles": {
@@ -1730,7 +1764,7 @@
 			"tier": 4
 		},
 		"item:tree": {
-			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls.",
+			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls. Harvesting it with a single-use axe removes the source and drops logs.",
 			"name": "Tree",
 			"tags": [
 				"source",
@@ -1740,7 +1774,20 @@
 				"tree",
 				"tree:t1"
 			],
-			"tier": 1
+			"tier": 1,
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": 1,
+							"type": "guaranteed"
+						}
+					]
+				}
+			]
 		},
 		"item:vegetables": {
 			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
@@ -3236,7 +3283,7 @@
 			]
 		},
 		"item:double-tree": {
-			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls.",
+			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls. Harvesting it with a single-use axe removes the source and drops logs.",
 			"maxStackSize": 1,
 			"name": "Double Tree",
 			"tags": [
@@ -3247,10 +3294,26 @@
 				"tree:t2",
 				"era:I"
 			],
-			"tier": 2
+			"tier": 2,
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"min": 1,
+								"max": 2
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			]
 		},
 		"item:micro-forest": {
-			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it.",
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it. Harvesting it with a single-use axe removes the source and drops logs.",
 			"maxStackSize": 1,
 			"name": "Micro-Forest",
 			"tags": [
@@ -3262,7 +3325,23 @@
 				"forest",
 				"era:I"
 			],
-			"tier": 3
+			"tier": 3,
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"min": 1,
+								"max": 3
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			]
 		}
 	}
 }

@@ -19,6 +19,9 @@ export type DropIntent =
 			type: "stash-input";
 	  }
 	| {
+			type: "tile-remove";
+	  }
+	| {
 			type: "swap";
 	  }
 	| {
@@ -76,6 +79,14 @@ export const resolveDropIntent = ({
 			},
 			() => ({
 				type: "stash-input" as const,
+			}),
+		)
+		.with(
+			{
+				type: "tile-remove",
+			},
+			() => ({
+				type: "tile-remove" as const,
 			}),
 		)
 		.with(

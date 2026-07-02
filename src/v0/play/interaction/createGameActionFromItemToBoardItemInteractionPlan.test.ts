@@ -70,6 +70,21 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 			stashItemInstanceId: "target",
 			type: "stash.open",
 		});
+
+		expect(
+			createGameActionFromItemToBoardItemInteractionPlan({
+				plan: {
+					feedbackVariant: "primary",
+					type: "tile-remove",
+				},
+				sourceRef,
+				targetItemInstanceId: "target",
+			}),
+		).toEqual({
+			targetItemInstanceId: "target",
+			toolRef: sourceRef,
+			type: "tile.remove",
+		});
 	});
 
 	it("does not create engine actions for non-executable plans", () => {

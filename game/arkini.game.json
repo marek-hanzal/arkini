@@ -625,6 +625,10 @@
 			"render": "plain",
 			"resourceId": "item-paper"
 		},
+		"asset:item:pickaxe": {
+			"render": "plain",
+			"resourceId": "item-pickaxe"
+		},
 		"asset:item:piglet": {
 			"render": "plain",
 			"resourceId": "item-piglet"
@@ -4854,7 +4858,7 @@
 			"assetIds": [
 				"asset:item:axe"
 			],
-			"description": "Reliable utility weapon forged from iron with a sturdy wooden haft.",
+			"description": "Single-use chopping tool. Drag onto tree sources to harvest logs; also still serves later expedition gear chains.",
 			"maxStackSize": 20,
 			"name": "Axe",
 			"storage": "both",
@@ -4864,7 +4868,9 @@
 				"tool",
 				"blacksmith",
 				"hero",
-				"era:IX"
+				"era:IX",
+				"woodcutting",
+				"single-use"
 			],
 			"tier": 1
 		},
@@ -6513,9 +6519,25 @@
 			"assetIds": [
 				"asset:item:double-tree"
 			],
-			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls.",
+			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls. Harvesting it with a single-use axe removes the source and drops logs.",
 			"maxStackSize": 1,
 			"name": "Double Tree",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"max": 2,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7099,9 +7121,25 @@
 			"assetIds": [
 				"asset:item:micro-forest"
 			],
-			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it.",
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it. Harvesting it with a single-use axe removes the source and drops logs.",
 			"maxStackSize": 1,
 			"name": "Micro-Forest",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"max": 3,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7246,6 +7284,25 @@
 			],
 			"tier": 4
 		},
+		"item:pickaxe": {
+			"assetIds": [
+				"asset:item:pickaxe"
+			],
+			"description": "Single-use mining tool. Drag onto a stone deposit to harvest a random pile of stones.",
+			"maxStackSize": 20,
+			"name": "Pickaxe",
+			"storage": "both",
+			"tags": [
+				"equipment",
+				"tool",
+				"mining",
+				"stone",
+				"blacksmith",
+				"single-use",
+				"era:IX"
+			],
+			"tier": 1
+		},
 		"item:piglet": {
 			"assetIds": [
 				"asset:item:piglet"
@@ -7335,14 +7392,31 @@
 			"assetIds": [
 				"asset:item:rock"
 			],
-			"description": "Movable stone source used by nearby quarries.",
+			"description": "Movable stone deposit used by nearby quarries or mined manually with a single-use pickaxe.",
 			"maxStackSize": 10,
-			"name": "Rock",
+			"name": "Stone Deposit",
+			"removeBy": [
+				{
+					"itemId": "item:pickaxe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:stone",
+							"quantity": {
+								"max": 4,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
 			"storage": "both",
 			"tags": [
 				"source",
 				"stone",
-				"era:I"
+				"era:I",
+				"stone-deposit"
 			],
 			"tier": 0
 		},
@@ -7576,9 +7650,22 @@
 			"assetIds": [
 				"asset:item:tree"
 			],
-			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls.",
+			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls. Harvesting it with a single-use axe removes the source and drops logs.",
 			"maxStackSize": 10,
 			"name": "Tree",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": 1,
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -9280,6 +9367,7 @@
 			"productIds": [
 				"product:blacksmith-t1:nails",
 				"product:blacksmith-t1:axe",
+				"product:blacksmith-t1:pickaxe",
 				"product:blacksmith-t1:sword"
 			]
 		},
@@ -10854,6 +10942,71 @@
 				},
 				{
 					"chance": 0.06,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				}
+			],
+			"placement": "board_then_inventory",
+			"tags": [],
+			"visibility": "visible"
+		},
+		"product:blacksmith-t1:pickaxe": {
+			"chargeCost": 0,
+			"durationMs": 20000,
+			"effects": [
+				{
+					"display": "always",
+					"items": {
+						"anyOf": [
+							{
+								"ids": [
+									"producer:purifier-t1"
+								]
+							}
+						]
+					},
+					"kind": "nearby.require",
+					"label": "Nearby producer:purifier-t1",
+					"phase": "start",
+					"radius": 3
+				}
+			],
+			"inputs": [
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:iron-ingot",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:plank",
+					"quantity": 1
+				},
+				{
+					"capacity": 6,
+					"consume": true,
+					"itemId": "item:charcoal",
+					"quantity": 1
+				}
+			],
+			"name": "Pickaxe",
+			"output": [
+				{
+					"itemId": "item:pickaxe",
+					"quantity": 1,
+					"type": "guaranteed"
+				},
+				{
+					"chance": 0.4,
+					"itemId": "item:pollution",
+					"quantity": 1,
+					"type": "chance"
+				},
+				{
+					"chance": 0.08,
 					"itemId": "item:pollution",
 					"quantity": 1,
 					"type": "chance"

@@ -146,6 +146,24 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 		});
 	});
 
+	it("routes configured removal tools to tile removal", () => {
+		const plan = resolveItemToBoardItemInteractionPlan({
+			config: createEngineTestConfig(),
+			sourceItemId: "item:axe",
+			targetItem: {
+				id: "rock",
+				itemId: "item:rock",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+		});
+
+		expect(plan).toMatchObject({
+			type: "tile-remove",
+		});
+	});
+
 	it("does not show producer product passive grants as droppable stored slots", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),

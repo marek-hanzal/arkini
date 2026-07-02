@@ -186,4 +186,115 @@ describe("applyGameActionFx remove", () => {
 		expect(result.save.board.items).toEqual({});
 		expect(result.save.producerInputs).toEqual({});
 	});
+
+	it("consumes a single-use removal tool and places configured removal loot", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:pickaxe": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Pickaxe",
+					maxStackSize: 3,
+					name: "Pickaxe",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+				"item:rock": {
+					...baseConfig.items["item:rock"],
+					removeBy: [
+						{
+							itemId: "item:pickaxe",
+							mode: "consume",
+							output: [
+								{
+									itemId: "item:stone",
+									quantity: {
+										max: 4,
+										min: 1,
+									},
+									type: "guaranteed",
+								},
+							],
+						},
+					],
+				},
+				"item:stone": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Stone",
+					maxStackSize: 10,
+					name: "Stone",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:rock",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:pickaxe",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				targetItemInstanceId: "item-instance:1",
+				toolRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				type: "tile.remove",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(Object.values(result.save.board.items)).toEqual([
+			expect.objectContaining({
+				itemId: "item:stone",
+				x: 0,
+				y: 0,
+			}),
+		]);
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:pickaxe",
+				reason: "remove-tool",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:rock",
+				reason: "tile-remove",
+				type: "item.removed",
+			},
+			{
+				itemId: "item:stone",
+				originItemInstanceId: "item-instance:1",
+				reason: "tile-remove-output",
+				type: "item.created",
+			},
+		]);
+	});
 });

@@ -62,6 +62,16 @@ export const createGameActionFromItemToBoardItemInteractionPlan = ({
 		)
 		.with(
 			{
+				type: "tile-remove",
+			},
+			() => ({
+				targetItemInstanceId,
+				toolRef: sourceRef,
+				type: "tile.remove" as const,
+			}),
+		)
+		.with(
+			{
 				type: "reject",
 			},
 			() => undefined,

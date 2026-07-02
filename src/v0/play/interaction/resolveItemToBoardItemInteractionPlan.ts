@@ -33,7 +33,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		targetItem.craft?.canAcceptInputs &&
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
 	);
-	const producerInputProductId = (targetItem.activation?.productLines ?? [])
+	const producerInputLineId = (targetItem.activation?.producerLines ?? [])
 		.map((line, index) => ({
 			index,
 			line,
@@ -47,7 +47,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 			line.inputs.some(
 				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
 			),
-		)?.line.productId;
+		)?.line.lineId;
 	const canSupplyStashInput = Boolean(
 		targetItem.activation?.kind === "stash" &&
 			targetItem.activation.inputs.some(
@@ -64,7 +64,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		canRemoveTile,
 		canSupplyStashInput,
 		mergeRule,
-		producerInputProductId,
+		producerInputLineId,
 	})
 		.with(
 			{
@@ -104,11 +104,11 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		)
 		.with(
 			{
-				producerInputProductId: P.string,
+				producerInputLineId: P.string,
 			},
-			({ producerInputProductId }) => ({
+			({ producerInputLineId }) => ({
 				feedbackVariant: "secondary" as const,
-				productId: producerInputProductId,
+				lineId: producerInputLineId,
 				type: "producer-input" as const,
 			}),
 		)

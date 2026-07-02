@@ -1,5 +1,5 @@
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+import { readProducerLineRunState } from "~/v0/producer/logic/readProducerLineRunState";
 import { formatMs } from "~/v0/time/formatMs";
 import type { DetailActionControl } from "~/v0/item-detail/control/DetailActionControl";
 import type { DetailProducerLineControl } from "~/v0/item-detail/control/DetailProducerLineControl";
@@ -7,17 +7,17 @@ import type { DetailProducerLineControl } from "~/v0/item-detail/control/DetailP
 export namespace readDetailProducerLineControl {
 	export interface Props {
 		canSetDefault: boolean;
-		line: ProducerProductLineView;
-		onSetDefault(productId: string): void;
-		onStart(productId: string): void;
-		onWithdrawInput(productId: string, itemId: string): void;
+		line: ProducerLineView;
+		onSetDefault(lineId: string): void;
+		onStart(lineId: string): void;
+		onWithdrawInput(lineId: string, itemId: string): void;
 		pending: boolean;
 	}
 }
 
-type LineRunState = ReturnType<typeof readProducerProductLineRunState>;
+type LineRunState = ReturnType<typeof readProducerLineRunState>;
 
-const readLineProgressDisplay = (line: ProducerProductLineView) => {
+const readLineProgressDisplay = (line: ProducerLineView) => {
 	const progress = line.progress ?? 0;
 	return line.lineKind === "effect" ? 1 - progress : progress;
 };
@@ -26,7 +26,7 @@ const readLineActionLabel = ({
 	line,
 	runState,
 }: {
-	line: ProducerProductLineView;
+	line: ProducerLineView;
 	runState: LineRunState;
 }) => {
 	if (!runState.showProgress) return runState.label;
@@ -50,8 +50,8 @@ const readWithdrawInputActionsByItemId = ({
 	onWithdrawInput,
 	pending,
 }: {
-	line: ProducerProductLineView;
-	onWithdrawInput(productId: string, itemId: string): void;
+	line: ProducerLineView;
+	onWithdrawInput(lineId: string, itemId: string): void;
 	pending: boolean;
 }) =>
 	Object.fromEntries(
@@ -63,7 +63,7 @@ const readWithdrawInputActionsByItemId = ({
 				label: "Withdraw",
 				onClick: () => {
 					if (pending) return;
-					onWithdrawInput(line.productId, input.itemId);
+					onWithdrawInput(line.lineId, input.itemId);
 				},
 				tone: "secondary",
 			};
@@ -85,7 +85,7 @@ export const readDetailProducerLineControl = ({
 	onWithdrawInput,
 	pending,
 }: readDetailProducerLineControl.Props): DetailProducerLineControl => {
-	const runState = readProducerProductLineRunState({
+	const runState = readProducerLineRunState({
 		line,
 	});
 	const primaryActionDisabled = runState.showProgress || !runState.canRunAction || pending;
@@ -96,7 +96,7 @@ export const readDetailProducerLineControl = ({
 				label: line.isDefault ? "Un-default" : "Default",
 				onClick: () => {
 					if (defaultActionDisabled) return;
-					onSetDefault(line.productId);
+					onSetDefault(line.lineId);
 				},
 				tone: "secondary",
 			} satisfies DetailActionControl)
@@ -112,7 +112,7 @@ export const readDetailProducerLineControl = ({
 			}),
 			onClick: () => {
 				if (primaryActionDisabled) return;
-				onStart(line.productId);
+				onStart(line.lineId);
 			},
 			progress: runState.showProgress ? readLineProgressDisplay(line) : undefined,
 			tone: "primary",

@@ -7,9 +7,9 @@ import { blockedProducerDeliveryRetryDelayMs } from "~/v0/game/producer/producer
 import { readBoardItemCell } from "~/v0/game/board/readBoardItemCell";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/v0/game/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
-import { readProducerJobEffectiveProductLineFx } from "~/v0/game/producer/readProducerJobEffectiveProductLineFx";
+import { readProducerJobEffectiveLineFx } from "~/v0/game/producer/readProducerJobEffectiveLineFx";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
-import { readProducerProductLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import { readProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
@@ -28,7 +28,7 @@ export namespace completeProducerJobFx {
 	}
 }
 
-const createProductCompletedEvent = ({
+const createProducerLineCompletedEvent = ({
 	job,
 	nowMs,
 }: {
@@ -38,8 +38,8 @@ const createProductCompletedEvent = ({
 	atMs: nowMs,
 	jobId: job.id,
 	producerItemInstanceId: job.producerItemInstanceId,
-	productId: job.productId,
-	type: "product.completed" as const,
+	lineId: job.lineId,
+	type: "producer_line.completed" as const,
 });
 
 type ProducerDeliveryItem = {
@@ -59,7 +59,7 @@ const toPlacementRequests = ({
 			({
 				...item,
 				originItemInstanceId: producerItemInstanceId,
-				reason: "product-output",
+				reason: "producer-line-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
 
@@ -75,16 +75,16 @@ const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProduce
 		nowMs: number;
 		save: GameSave;
 	}) {
-		const effectiveProductLine = yield* readProducerJobEffectiveProductLineFx({
+		const effectiveProducerLine = yield* readProducerJobEffectiveLineFx({
 			config,
 			nowMs,
 			producerItemInstanceId: job.producerItemInstanceId,
-			productId: job.productId,
+			lineId: job.lineId,
 			save,
 		});
 		return (yield* rollEffectiveLootPlanItemsFx({
 			config,
-			lootPlan: effectiveProductLine.lootPlan,
+			lootPlan: effectiveProducerLine.lootPlan,
 		})).items;
 	},
 );
@@ -112,13 +112,13 @@ const readProducerChargeCompletionOutcome = ({
 		config,
 		producerId,
 	});
-	const product = producer
-		? readProducerProductLineDefinition({
+	const line = producer
+		? readProducerLineDefinition({
 				producerDefinition: producer,
-				productId: job.productId,
+				lineId: job.lineId,
 			})
 		: undefined;
-	if (!producer || !product || producer.charges === undefined || product.chargeCost <= 0) {
+	if (!producer || !line || producer.charges === undefined || line.chargeCost <= 0) {
 		return undefined;
 	}
 
@@ -130,7 +130,7 @@ const readProducerChargeCompletionOutcome = ({
 	});
 	if (remainingCharges === undefined) return undefined;
 
-	const nextRemainingCharges = Math.max(0, remainingCharges - product.chargeCost);
+	const nextRemainingCharges = Math.max(0, remainingCharges - line.chargeCost);
 
 	return {
 		nextRemainingCharges,
@@ -243,19 +243,19 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				producerId: producerItem.itemId,
 			})
 		: undefined;
-	const product = producer
-		? readProducerProductLineDefinition({
+	const line = producer
+		? readProducerLineDefinition({
 				producerDefinition: producer,
-				productId: liveJob.productId,
+				lineId: liveJob.lineId,
 			})
 		: undefined;
-	if (!product) {
+	if (!line) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing producer line "${liveJob.productId}".`),
+			GameEngineError.configReferenceMissing(`Missing producer line "${liveJob.lineId}".`),
 		);
 	}
 
-	const placement = product.placement;
+	const placement = line.placement;
 	yield* match(placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
@@ -288,7 +288,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 		return {
 			events: [
-				createProductCompletedEvent({
+				createProducerLineCompletedEvent({
 					job: liveJob,
 					nowMs,
 				}),
@@ -350,7 +350,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 			return {
 				events: [
-					createProductCompletedEvent({
+					createProducerLineCompletedEvent({
 						job: liveJob,
 						nowMs,
 					}),
@@ -358,9 +358,9 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 						atMs: nowMs,
 						jobId: liveJob.id,
 						producerItemInstanceId: liveJob.producerItemInstanceId,
-						productId: liveJob.productId,
+						lineId: liveJob.lineId,
 						reason: error.reason,
-						type: "product.failed" as const,
+						type: "producer_line.failed" as const,
 					},
 				],
 				save: nextSave,
@@ -393,9 +393,9 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 								atMs: nowMs,
 								jobId: liveJob.id,
 								producerItemInstanceId: liveJob.producerItemInstanceId,
-								productId: liveJob.productId,
+								lineId: liveJob.lineId,
 								reason: error.reason,
-								type: "product.blocked" as const,
+								type: "producer_line.blocked" as const,
 							},
 						]
 					: [],
@@ -462,7 +462,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	return {
 		events: [
-			createProductCompletedEvent({
+			createProducerLineCompletedEvent({
 				job: liveJob,
 				nowMs,
 			}),

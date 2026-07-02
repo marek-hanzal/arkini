@@ -42,10 +42,9 @@ describe("readItemTargetLimits", () => {
 					maxCount: 2,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							effects: [
@@ -80,7 +79,7 @@ describe("readItemTargetLimits", () => {
 		save.producerJobs["job:pending"] = {
 			id: "job:pending",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};

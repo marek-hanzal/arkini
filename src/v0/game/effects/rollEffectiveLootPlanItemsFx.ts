@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
-import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
+import type { EffectiveProducerLine } from "~/v0/game/effects/EffectiveProducerLine";
 import { rollGameQuantityFx } from "~/v0/game/loot/rollGameQuantityFx";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import type { LootTableRollResult } from "~/v0/game/loot/LootTableRollResult";
@@ -10,7 +10,7 @@ import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 export namespace rollEffectiveLootPlanItemsFx {
 	export interface Props {
 		config: GameConfig;
-		lootPlan: EffectiveProducerProductLine["lootPlan"];
+		lootPlan: EffectiveProducerLine["lootPlan"];
 	}
 }
 

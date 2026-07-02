@@ -20,9 +20,9 @@ These rules define how the game should be interpreted when implementation detail
 2. All gameplay entities should be data-driven from a central game configuration.
 3. Game definitions must describe items, merge chains, producers, stashes, inline outputs, blueprints, craft/construction inputs and grants, building tiers, grid sizes, inventory sizes, starting state, and other game rules.
 4. The game is client-only and must be able to run offline in the browser.
-5. Saved state is not considered backwards-compatible unless a migration explicitly supports it.
-6. If the game crashes during startup or runtime because local storage is corrupt or incompatible, the first recovery action is a full browser-storage hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
-7. If a saved game is incompatible with the active game definition version after migrations, the save may be dropped.
+5. Saved state may be dropped when the active game definition changes unless an explicit migration supports it.
+6. If the game crashes during startup or runtime because local storage is corrupt or version-mismatched, the first recovery action is a full browser-storage hard reset followed by reload. Do not build soft recovery mazes for prototype saves.
+7. If a saved game does not match the active game definition version after migrations, the save may be dropped.
 8. Game mechanics should be simple, explicit, and consistent. If a rule needs a special exception, the design should be questioned first.
 9. Prefer one clean mechanic over several similar mechanics that behave slightly differently.
 10. Empty values should be stable and predictable. Avoid optional/null gameplay data unless absence is a meaningful game state.
@@ -187,7 +187,7 @@ Invalid direction example:
 
 This is invalid because a normal stone chain must not become a diamond chain without an explicit geology/refining/transmutation rule.
 
-Current concrete economy balance lives in `game/arkini/products.json` and `game/arkini/craft-recipes.json`. Product lines should avoid lazy 1:1 transformations when a real process has yield or compression: one log can become multiple planks, multiple stones become one stone block, farms can produce small bonus yields, and refined/premium goods should take longer than raw collection. These ratios are authored data, not runtime heuristics. Blueprint-producing product lines should stay as planning/research/discovery costs and must not repeat the same expensive construction inputs that the resulting blueprint craft recipe asks for. Building materials, labor food, permits, guild charters, construction bundles, and prestige sinks belong primarily to the actual craft/construction step, so creating a plan does not double-tax the player before the build even starts.
+Current concrete economy balance lives in embedded item capabilities under `game/arkini/items.json`. Producer lines should avoid lazy 1:1 transformations when a real process has yield or compression: one log can become multiple planks, multiple stones become one stone block, farms can produce small bonus yields, and refined/premium goods should take longer than raw collection. These ratios are authored data, not runtime heuristics. Blueprint-producing producer lines should stay as planning/research/discovery costs and must not repeat the same expensive construction inputs that the resulting blueprint craft recipe asks for. Building materials, labor food, permits, guild charters, construction bundles, and prestige sinks belong primarily to the actual craft/construction step, so creating a plan does not double-tax the player before the build even starts.
 
 Cheat/testing items may deliberately bypass this pacing. `item:cheat:speed-enable` switches save-level timing into instant mode where positive producer and craft durations resolve as one second; `item:cheat:speed-disable` switches back to authored timing. These are explicit cheat items, not economy balance data, so do not hide normal progression behind them like a goblin accountant.
 
@@ -195,9 +195,9 @@ Cheat/testing items may deliberately bypass this pacing. `item:cheat:speed-enabl
 
 A producer is an infinite or long-lived gameplay entity that generates items when activated by the player and when its rules allow production.
 
-A producer is player-started and then runs a timed product job. Producers do not automatically start new jobs without player activation, but already started jobs may finish later through the tick/runtime job system.
+A producer is player-started and then runs a timed producer-line job. Producers do not automatically start new jobs without player activation, but already started jobs may finish later through the tick/runtime job system.
 
-A producer does not use a separate generic cooldown model. Product lines define their own durations, queue behavior, inputs, grant gates, and outputs. Those rules are defined by the concrete producer/product tier in config; they are not patched by save-driven global upgrades.
+A producer does not use a separate generic cooldown model. Producer lines define their own durations, queue behavior, inputs, grant gates, and outputs. Those rules are defined by the concrete producer tier in config; they are not patched by save-driven global upgrades.
 
 Default Arkini timings are intentionally no longer placeholder one-second values. Basic gathering stays short, processing takes noticeably longer, civic/knowledge work is slower, construction scales by era, and prestige/guild projects are allowed to take around a minute or more. This keeps early play testable without making late-game keystones feel like vending-machine nonsense.
 
@@ -212,7 +212,7 @@ Examples:
 
 A stash is a finite producer-like entity.
 
-A stash keeps its own gameplay type for UX and authoring, but internally it uses the same product-line execution model as producers. The stash definition points to exactly one product line. That product line owns inputs, output, duration, and charge cost; producer-facing gates/modifiers live on the concrete output entries they affect. The stash owns finite charges and what happens when those charges are depleted.
+A stash keeps its own gameplay type for UX and authoring, but internally it uses the same producer-line execution model as producers. The stash item owns exactly one embedded line. That line owns inputs, output, duration, and charge cost; producer-facing gates/modifiers live on the concrete output entries they affect. The stash owns finite charges and what happens when those charges are depleted.
 
 A stash may require input items before it can be opened or collected.
 
@@ -499,7 +499,7 @@ Long press on a board item opens the item detail for that item instance.
 
 Long press on an empty board cell opens inventory in placement-target mode using that empty cell as the placement seed.
 
-The item detail must show the concrete selected item instance and its backward-facing state: what this item needs, what is currently stored on it, what it can actively run or withdraw, and what output it is currently working toward. It must not spam forward usage lists such as every craft, recipe, or merge where the selected item could be used elsewhere.
+The item detail must show the concrete selected item instance and its current-instance state: what this item needs, what is currently stored on it, what it can actively run or withdraw, and what output it is currently working toward. It must not spam forward usage lists such as every craft, recipe, or merge where the selected item could be used elsewhere.
 
 Relevant detail content includes, when applicable:
 
@@ -661,27 +661,27 @@ Runtime time uses real-world wall-clock milliseconds, but save/event field names
 
 All progress, remaining-time, active-window, due/ready, and next-wake calculations should go through `src/v0/game/time/*`. Do not reintroduce inline timestamp arithmetic unless the time helper genuinely cannot express the rule. That way the runtime has one clock vocabulary instead of a tiny horological landfill.
 
-### 10.3 Producer product jobs and queue
+### 10.3 Producer line jobs and queue
 
-Current producers do not use a separate refresh/cooldown clock. A successful activation starts a timed product job. Product duration is the production time between start and completion.
+Current producers do not use a separate refresh/cooldown clock. A successful activation starts a timed producer-line job. Line duration is the production time between start and completion.
 
-Each producer definition has `maxQueueSize`. This is a per-producer-instance limit over running plus queued jobs. If a producer already has `maxQueueSize` jobs, starting another product is rejected with a queue-full failure.
+Each producer definition has `maxQueueSize`. This is a per-producer-instance limit over running plus queued jobs. If a producer already has `maxQueueSize` jobs, starting another line is rejected with a queue-full failure.
 
 Jobs for one producer instance run sequentially. Starting a second job while the first is running queues it after the previous job's completion time instead of running it in parallel. Completion is FIFO, including blocked delivery: a later queued job cannot complete ahead of an earlier unresolved delivery just because its timestamp is due. Queues are not tiny wormholes for skipping failed logistics.
 
-Product duration may be changed by concrete product tier data and output-owned duration effects. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
+Line duration may be changed by concrete line data and output-owned duration effects. The computed duration is captured when the job starts. Moving a resource after job start does not retroactively change that running job.
 
 Because inventory is passive, producer jobs require the producer item to be on the board. A producer item with a running job cannot be moved into inventory by normal storage.
 
-### 10.4 Producer product lines
+### 10.4 Producer lines
 
-A producer owns ordered product lines through `productIds`. Each product line defines its own duration, inline inputs, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. Producer-facing gates, blockers, duration modifiers, and loot modifiers live on the concrete output entries they affect, not on the root product line. There are no legacy product input/output reference tables; product-specific data lives on the product itself.
+A producer item owns ordered embedded producer lines in `items.*.producer.lines`. Each line defines its own stable local `id`, duration, inline inputs, placement, tags, baseline runtime visibility, optional active-effect activation, and inline output. Producer-facing gates, blockers, duration modifiers, and loot modifiers live on the concrete output entries they affect, not on a root line-level rule bag. There are no detached producer-line registries; line-specific data lives on the owning item capability.
 
-Product lines can start as `visibility: "hidden"`; output-owned visibility-phase effects decide whether affected outputs become visible. Hidden lines with no visible output are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. Start-phase output requirements keep the affected output visible but disabled until satisfied. `grant.blockStart` keeps the affected output visible but blocks new production while the blocking grant is active. Running producer and craft jobs resynchronize from the current start gate and pause/resume when effect requirements or blockers change, because stale background progress is how tiny lies become save-corrupting goblins.
+Producer lines can start as `visibility: "hidden"`; output-owned visibility-phase effects decide whether affected outputs become visible. Hidden lines with no visible output are not shown in runtime producer detail, cannot be selected as default, cannot receive producer inputs through normal priority routing, and cannot be started. Start-phase output requirements keep the affected output visible but disabled until satisfied. `grant.blockStart` keeps the affected output visible but blocks new production while the blocking grant is active. Running producer and craft jobs resynchronize from the current start gate and pause/resume when effect requirements or blockers change, because stale background progress is how tiny lies become save-corrupting goblins.
 
 ### 10.6 Runtime effects
 
-Runtime effect definitions publish global grant facts. They do not patch or rewrite `GameConfig`, do not own operation lists, and do not target product lines directly. Passive effects come from items via `passiveEffectIds`; each effect definition declares explicit UI/design polarity: `buff`, `debuff`, `neutral`, or `mixed`. UI groups generated effects and active effect product lines by that polarity instead of pretending it can divine designer intent from a multiplier. Each published grant has a stable runtime `id` and a player-readable `name`; detail UI renders the name and keeps raw grant ids out of normal player-facing cards. Each effect definition also decides where the source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Active effects come from product lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine. Runtime product-line views carry explicit `lineKind`; effect views also carry `effectPolarity`, and malformed view data fails schema validation instead of being painted as neutral product UI. Product/effect defaults are separate slots and UI labels them as default product versus default effect instead of collapsing both into one vague badge.
+Runtime effect definitions publish global grant facts. They do not patch or rewrite `GameConfig`, do not own operation lists, and do not target producer lines directly. Passive effects come from items via `passiveEffectIds`; each effect definition declares explicit UI/design polarity: `buff`, `debuff`, `neutral`, or `mixed`. UI groups generated effects and active effect product lines by that polarity instead of pretending it can divine designer intent from a multiplier. Each published grant has a stable runtime `id` and a player-readable `name`; detail UI renders the name and keeps raw grant ids out of normal player-facing cards. Each effect definition also decides where the source item counts through `sourceScope`: `board`, `inventory`, or `both` (default `board`). Active effects come from producer lines with `activatesEffectId`: the line consumes inputs, creates a timed effect instance tied to the source producer, occupies that producer queue for its duration, and expires through the tick engine. Runtime producer-line views carry explicit `lineKind`; effect views also carry `effectPolarity`, and malformed view data fails schema validation instead of being painted as neutral producer UI. Production/effect defaults are separate slots and UI labels them as default production versus default effect instead of collapsing both into one vague badge.
 
 Producer outputs and craft recipes own their own interpretation of those grants. A producer line asks for its effective view and gets visibility, start readiness, blockers, duration multiplier effects, and a drop-by-drop loot plan from the output entries themselves. Each drop reports whether it is visible, enabled, and which output-owned effects influenced it. Craft recipes intentionally support only start-gate effects: `grant.require` with `phase: "start"` and `grant.blockStart`. Config validation rejects producer-only duration/nearby/loot effects on craft recipes, because silent no-op config is just technical debt wearing perfume.
 
@@ -700,24 +700,24 @@ Runtime save state may store a default product line per concrete producer item i
 
 Producer feeding priority is:
 
-1. current default product line, if it accepts the item with available capacity
-2. the next product line in configured order with available capacity
+1. current default producer line, if it accepts the item with available capacity
+2. the next producer line in configured order with available capacity
 
 If the default line is full, feeding continues to the next matching line.
 
-### 10.5 Producer loot output and sink products
+### 10.5 Producer loot output and sink lines
 
-A product line owns its generated `output` inline. Stashes and runtime effects also own their output inline, so normal gameplay data is readable at the point of use.
+A producer line owns its generated `output` inline. Stashes and runtime effects also own their output inline, so normal gameplay data is readable at the point of use.
 
-A loot-producing product may generate:
+A loot-producing line may generate:
 
 - one item
 - multiple different items
 - multiple copies of the same item
 
-The output count and probability rules must be encoded in product `output` data, not hidden in UI code or random item definitions.
+The output count and probability rules must be encoded in line `output` data, not hidden in UI code or random item definitions.
 
-A product line may omit `output`. Missing output means a valid delayed sink/destructor product: the product job consumes its inputs, waits for its duration, completes, and creates no output. This is an explicit no-output product.
+A producer line may omit `output`. Missing output means a valid delayed sink/destructor line: the job consumes its inputs, waits for its duration, completes, and creates no output. This is an explicit no-output line.
 
 ### 10.6 Producer output placement and blocked delivery
 
@@ -733,42 +733,42 @@ Producer output placement is atomic per completion attempt. Retryable placement 
 
 A blocked producer delivery retries later when the failure is logistical, such as full board/inventory capacity or a board max-count cap that can become valid after removal. The output is not rerolled while blocked. The saved delivery must eventually be placed as rolled, or remain blocked until the board/inventory state changes.
 
-Hard gameplay-rule failures are not retryable delivery. Current hard output failures are mostly structural placement/capability failures such as storage policy and board max-count violations. Product-line `grant.blockStart` prevents new starts; it does not retroactively void already queued delivery. The producer must not be jammed forever by a rule that is not going to become magically less true.
+Hard gameplay-rule failures are not retryable delivery. Current hard output failures are mostly structural placement/capability failures such as storage policy and board max-count violations. Producer-line `grant.blockStart` prevents new starts; it does not retroactively void already queued delivery. The producer must not be jammed forever by a rule that is not going to become magically less true.
 
 Board placement uses deterministic nearest-free-cell policy based on the producer origin: Manhattan distance from the seed cell, then scan order by `y`, then `x`. Without a seed cell, placement uses scan order by `y`, then `x`. Yes, the little grid goblin has rules.
 
 ### 10.7 Producer inputs and grant gates
 
-A product line may define consumable activation inputs. Producer-facing effect gates belong to the concrete output entry they affect.
+A producer line may define consumable activation inputs. Producer-facing effect gates belong to the concrete output entry they affect.
 
-Consumable inputs are items consumed per successful product start. They belong inline to the concrete product line.
+Consumable inputs are items consumed per successful product start. They belong inline to the concrete producer line.
 
-Output gates are `effects` entries resolved against current world grants or nearby board items on a concrete output entry. Producer shells and product roots do not own gates. Consumable resources remain normal `inputs`, because burning planks is not the same thing as being near a tree.
+Output gates are `effects` entries resolved against current world grants or nearby board items on a concrete output entry. Producer shells and line roots do not own gates. Consumable resources remain normal `inputs`, because burning planks is not the same thing as being near a tree.
 
 Local access such as trees, deposits, purifier coverage, shrine aura, corruption, pollution, and void nonsense is modeled with `nearby.require` or `nearby.duration.multiply` on the output that cares. Global era/path access is modeled with grant-publishing effects plus `grant.require`/`grant.blockStart` on the output or craft recipe that cares. One subsystem answers both questions without turning each producer into its own tiny swamp.
 
 ### 10.8 Producer input storage and auto-fill
 
-Producer product-line input storage exists to store required production input items per concrete producer instance and product line.
+Producer line input storage exists to store required production input items per concrete producer instance and line.
 
 Producer input storage is item-instance state. It makes that producer instance stateful and therefore non-stackable.
 
-A product line may contain more input items than one production cycle requires, up to configured capacity.
+A producer line may contain more input items than one production cycle requires, up to configured capacity.
 
-The player may feed producer inputs by dragging matching items onto the producer. The engine selects the target product line using default-line priority, configured order, and remaining input capacity.
+The player may feed producer inputs by dragging matching items onto the producer. The engine selects the target producer line using default-line priority, configured order, and remaining input capacity.
 
-The player may also start a product line with empty or partially filled inputs. In that case, the engine auto-fills only the missing quantities before starting the product. Auto-fill searches board items first in deterministic scan order, excluding the producer itself, then inventory slots in slot order. Board-sourced auto-fill emits visual producer-input movement; inventory-sourced auto-fill has no board flight animation because the item is already hidden in inventory, the coward.
+The player may also start a producer line with empty or partially filled inputs. In that case, the engine auto-fills only the missing quantities before starting the product. Auto-fill searches board items first in deterministic scan order, excluding the producer itself, then inventory slots in slot order. Board-sourced auto-fill emits visual producer-input movement; inventory-sourced auto-fill has no board flight animation because the item is already hidden in inventory, the coward.
 
-If auto-fill cannot find enough matching inputs, the product start is rejected with no state change.
+If auto-fill cannot find enough matching inputs, the line start is rejected with no state change.
 
 The player may withdraw stored producer input items only through item detail. Withdrawal places items onto the board first, then falls back to normal inventory.
 
 ### 10.9 Producer readiness
 
-A product line can start when:
+A producer line can start when:
 
 1. the producer item is on the board
-2. the product line belongs to the producer
+2. the line belongs to the producer
 3. the producer queue has room
 4. every output-owned start requirement/blocker needed by the rollable output passes
 5. every consumable input is already stored or can be auto-filled from board/inventory
@@ -805,9 +805,9 @@ Board item storage still belongs to the explicit item-detail store action. Doubl
 
 A stash must define its finite behavior explicitly through the shared producer charge model.
 
-Current chest gameplay uses `charges: 1`, a single stash product line with `chargeCost: 1`, and `onChargesDepleted: "remove"`. The product line starts like any other producer product, completes through the normal job/tick path, rolls output through the normal producer loot path, and then removes the stash item after the last charge is successfully spent.
+Current chest gameplay uses `charges: 1`, a single stash line with `chargeCost: 1`, and `onChargesDepleted: "remove"`. The stash line starts like any other producer line, completes through the normal job/tick path, rolls output through the normal producer loot path, and then removes the stash item after the last charge is successfully spent.
 
-General producer charges are numeric and may be fractional. Product lines spend their own `chargeCost`. Depletion mode is `stop` for long-lived finite producers and `remove` for finite containers like chests. For now, only chests use the remove behavior.
+General producer charges are numeric and may be fractional. Producer lines spend their own `chargeCost`. Depletion mode is `stop` for long-lived finite producers and `remove` for finite containers like chests. For now, only chests use the remove behavior.
 
 ### 11.4 Stash inputs and grant gates
 
@@ -817,7 +817,7 @@ Example:
 
 An epic chest may require a key.
 
-Consumable stash inputs are normal product-line inputs. Single-click may auto-fill these inputs from board/inventory into the shared producer input state. Dragging a matching key/item onto a stash may start the stash product line directly with that input. If the product cannot start, input consumption follows the same rules as producer product start. If output placement later blocks, the job remains blocked and charges are not spent until delivery succeeds.
+Consumable stash inputs are normal producer-line inputs. Single-click may auto-fill these inputs from board/inventory into the shared producer input state. Dragging a matching key/item onto a stash may start the stash product line directly with that input. If the line cannot start, input consumption follows the same rules as producer product start. If output placement later blocks, the job remains blocked and charges are not spent until delivery succeeds.
 
 If a stash needs a persistent non-consumed gate, it should use Effect grants. Grants must resolve for the target, but they are not consumed when the stash opens.
 
@@ -827,22 +827,22 @@ Default stash output placement is `board_then_inventory`, using the same determi
 
 Stash output now follows producer blocked-delivery semantics. Product start may consume inputs and create a job; the charge is spent only after successful delivery. If delivery blocks because the board/inventory cannot accept the rolled output, the job keeps its delivery state and retries through the normal producer retry path without rerolling.
 
-Random stash output is rolled during producer delivery. UI visuals consume the same `product.started`, `product.completed`, `item.created`, and `item.removed` events as producers. There are no stash-specific output/input events anymore, because duplicate event dialects are how codebases develop mold.
+Random stash output is rolled during producer delivery. UI visuals consume the same `producer_line.started`, `producer_line.completed`, `item.created`, and `item.removed` events as producers. There are no stash-specific output/input events anymore, because duplicate event dialects are how codebases develop mold.
 
 ## 12. Output rules
 
 ### 12.1 Inline output ownership
 
-Outputs live inline on product lines. Stashes emit through their single product line, not through a second stash-only output field. Line-owned extra chance loot modifiers can add independent bonus rolls for already-produced output items. There are no standalone loot-table IDs in the current config.
+Outputs live inline on producer lines. Stashes emit through their single embedded stash line, not through a second stash-only output field. Line-owned extra chance loot modifiers can add independent bonus rolls for already-produced output items. There are no standalone loot-table IDs in the current config.
 
 Example:
 
-- `product:lumber-camp-1:log` owns the output that emits `item:log`
-- a higher-tier product owns a different inline output definition
+- `line:lumber-camp-1:log` owns the output that emits `item:log`
+- a higher-tier line owns a different inline output definition
 
 ### 12.2 Output definition
 
-A normal successful product or stash activation should produce at least one output item unless it is explicitly authored as a delayed sink/destructor by omitting `output`. Inline output entries support guaranteed, chance, and weighted entries with optional quantities.
+A normal successful producer-line or stash activation should produce at least one output item unless it is explicitly authored as a delayed sink/destructor by omitting `output`. Inline output entries support guaranteed, chance, and weighted entries with optional quantities.
 
 Output entries define:
 
@@ -855,7 +855,7 @@ Output entries define:
 
 ### 12.3 Higher-tier output
 
-Higher-tier producers/products should own their concrete output inline. Do not patch drop rates directly inside runtime logic. Probability changes belong either in the product's inline output or in output-owned runtime effects.
+Higher-tier producers and lines should own their concrete output inline. Do not patch drop rates directly inside runtime logic. Probability changes belong either in the line's inline output or in output-owned runtime effects.
 
 ## 13. Blueprint mechanics
 
@@ -1151,7 +1151,7 @@ Expected fields:
 - `id`
 - `name`
 - ordered product line IDs
-- producer shell gates are not supported; target product lines use grants
+- producer shell gates are not supported; target producer lines use grants
 - maximum queue size
 - product-level duration/input/output rules
 - optional sink product behavior when no output is defined
@@ -1288,7 +1288,7 @@ These notes track where the current implementation already matches this document
 3. Board -> inventory storage preserves runtime state through the explicit item-detail store action.
 4. Inventory -> board placement restores runtime state and supports empty-cell long-press placement targets.
 5. Producers and stashes are separate entity types, but stash runtime execution is producer-like.
-6. Producer outputs are authored on product lines; stashes emit through exactly one product line.
+6. Producer outputs are authored on embedded producer lines; stashes emit through exactly one embedded stash line.
 7. Producer/stash output capacity is handled at completion time with blocked delivery retry and preserved rolled delivery.
 8. Stash charges are spent only after successful product delivery.
 9. Producer and craft input withdrawal is exposed through item detail and must not silently destroy nested items.
@@ -1310,7 +1310,7 @@ These concepts are not part of canonical gameplay and should be removed during c
 7. `collect` as a special item behavior for currency.
 8. Double-click exhaust/open/collect behavior. Double-click is inventory placement only.
 9. `doubleClickBehavior: "exhaust"`. It is replaced by single-click stash exhaust/open.
-10. Mixed `producer.mode` finite/infinite model. Finite behavior is expressed through `charges` and `onChargesDepleted`; stashes are a one-product facade for finite containers.
+10. Mixed `producer.mode` finite/infinite model. Finite behavior is expressed through `charges` and `onChargesDepleted`; stashes are a one-line facade for finite containers.
 11. Player-inventory capacity mechanics as a separate storage layer.
 12. Inventory capacity changes as current gameplay. Inventory size is fixed at `7 x 5`.
 13. Any global upgrade UI, schema, or copy that implies save-driven config patching.
@@ -1389,10 +1389,10 @@ A gameplay implementation should provide tests or validation for:
 64. obsolete `playerInventory` concepts are absent from gameplay logic
 65. obsolete `collect` behavior is absent from gameplay logic
 66. obsolete double-click exhaust behavior is absent from gameplay logic
-67. save compatibility behavior when game definition version changes
+67. save reset behavior when game definition version changes
 68. board timers advance while the app is closed
 69. inventory timers do not advance while the app is closed
-70. zero-output activations are rejected unless explicitly authored as sink/destructor products
+70. zero-output activations are rejected unless explicitly authored as sink/destructor lines
 71. ambiguous source-target interaction definitions are rejected as invalid data
 72. blueprint imprinting/binding behavior is absent from board drag/drop
 73. craft completion replaces the progress item in the same board cell

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDetailProducerLineControl";
 
-const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
+const createLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineView => ({
 	blocked: false,
 	durationMs: 1000,
 	inProgress: false,
@@ -14,7 +14,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	lineKind: "product",
 	name: "Log",
 	producerQueuedJobs: 0,
-	productId: "product:lumberjack:log",
+	lineId: "line:lumberjack:log",
 	queueFull: false,
 	queuedJobs: 0,
 	queueSize: 1,
@@ -35,7 +35,7 @@ describe("readDetailProducerLineControl", () => {
 
 		control.primaryAction.onClick();
 
-		expect(onStart).toHaveBeenCalledWith("product:lumberjack:log");
+		expect(onStart).toHaveBeenCalledWith("line:lumberjack:log");
 		expect(control.primaryAction.label).toBe("Start");
 		expect(control.primaryAction.tone).toBe("primary");
 	});
@@ -102,8 +102,8 @@ describe("readDetailProducerLineControl", () => {
 		control.withdrawInputActionsByItemId["item:log"]?.onClick();
 
 		expect(control.defaultAction?.label).toBe("Un-default");
-		expect(onSetDefault).toHaveBeenCalledWith("product:lumberjack:log");
-		expect(onWithdrawInput).toHaveBeenCalledWith("product:lumberjack:log", "item:log");
+		expect(onSetDefault).toHaveBeenCalledWith("line:lumberjack:log");
+		expect(onWithdrawInput).toHaveBeenCalledWith("line:lumberjack:log", "item:log");
 	});
 
 	it("disables default controls for hidden runtime-only lines", () => {

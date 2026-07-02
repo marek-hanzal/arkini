@@ -19,7 +19,7 @@ describe("readNextWakeAtMsFx", () => {
 		save.producerJobs["job:ready"] = {
 			id: "job:ready",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 100,
 			startAtMs: 0,
 		};

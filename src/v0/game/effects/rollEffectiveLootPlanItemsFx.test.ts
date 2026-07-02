@@ -19,7 +19,7 @@ describe("rollEffectiveLootPlanItemsFx", () => {
 					{
 						chance: 2.5,
 						itemId: "item:twig",
-						sourceDropId: "product:test:output:0",
+						sourceDropId: "line:test:output:0",
 					},
 				],
 			},

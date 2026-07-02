@@ -39,7 +39,7 @@ export const replaceDepletedProducerSourceCellOutput = Effect.fn(
 	const sourceOutputIndex = events.findIndex(
 		(event) =>
 			event.type === "item.created" &&
-			event.reason === "product-output" &&
+			event.reason === "producer-line-output" &&
 			event.originItemInstanceId === job.producerItemInstanceId &&
 			event.to.kind === "board" &&
 			isSameBoardCell(event.to, producerItem),

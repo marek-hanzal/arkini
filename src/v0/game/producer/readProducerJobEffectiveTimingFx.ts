@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
-import { readProducerJobEffectiveProductLineFx } from "~/v0/game/producer/readProducerJobEffectiveProductLineFx";
+import { readProducerJobEffectiveLineFx } from "~/v0/game/producer/readProducerJobEffectiveLineFx";
 
 export namespace readProducerJobEffectiveTimingFx {
 	export interface Props {
@@ -28,17 +28,17 @@ export const readProducerJobEffectiveTimingFx = Effect.fn("readProducerJobEffect
 		save,
 		startAtMs,
 	}: readProducerJobEffectiveTimingFx.Props) {
-		const effectiveProductLine = yield* readProducerJobEffectiveProductLineFx({
+		const effectiveProducerLine = yield* readProducerJobEffectiveLineFx({
 			config,
 			ignoredProducerJobIds,
 			nowMs: evaluateAtMs,
 			producerItemInstanceId: job.producerItemInstanceId,
-			productId: job.productId,
+			lineId: job.lineId,
 			save,
 		});
 
 		return {
-			readyAtMs: startAtMs + effectiveProductLine.durationMs,
+			readyAtMs: startAtMs + effectiveProducerLine.durationMs,
 			startAtMs,
 		} satisfies readProducerJobEffectiveTimingFx.Result;
 	},

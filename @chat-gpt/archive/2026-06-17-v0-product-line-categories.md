@@ -28,7 +28,7 @@ Possible product-line metadata, if UI proves it needs them:
 ```json
 {
 	"products": {
-		"product:lumber-camp.saw": {
+		"line:lumber-camp.saw": {
 			"name": "Saw logs",
 			"categoryId": "product-category:wood.advanced",
 			"sort": 20

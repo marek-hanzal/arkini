@@ -6,7 +6,7 @@ import { appendItemMergeVisuals } from "~/v0/play/game-engine-visual/appendItemM
 import { appendItemReplaceVisuals } from "~/v0/play/game-engine-visual/appendItemReplaceVisuals";
 import { appendActivationInputStoreVisuals } from "~/v0/play/game-engine-visual/appendActivationInputStoreVisuals";
 import { appendActivationInputTargetFeedback } from "~/v0/play/game-engine-visual/appendActivationInputTargetFeedback";
-import { appendProducerProductCompletedFeedback } from "~/v0/play/game-engine-visual/appendProducerProductCompletedFeedback";
+import { appendProducerLineCompletedFeedback } from "~/v0/play/game-engine-visual/appendProducerLineCompletedFeedback";
 import { appendProducerDepletedRetainedTile } from "~/v0/play/game-engine-visual/appendProducerDepletedRetainedTile";
 import type { GameEngineVisualPlan } from "~/v0/play/game-engine-visual/GameEngineVisualPlan";
 import { createGameEngineVisualPlanDraft } from "~/v0/play/game-engine-visual/GameEngineVisualPlanDraft";
@@ -136,8 +136,8 @@ export const createGameEngineVisualPlan = ({
 				});
 				break;
 
-			case "product.completed":
-				appendProducerProductCompletedFeedback({
+			case "producer_line.completed":
+				appendProducerLineCompletedFeedback({
 					event,
 					plan,
 				});
@@ -165,11 +165,11 @@ export const createGameEngineVisualPlan = ({
 			case "craft_input.withdrawn":
 			case "item.spawn.blocked":
 			case "item.spawn.failed":
-			case "producer.product_line.default_changed":
+			case "producer.line.default_changed":
 			case "producer_input.withdrawn":
-			case "product.blocked":
-			case "product.failed":
-			case "product.started":
+			case "producer_line.blocked":
+			case "producer_line.failed":
+			case "producer_line.started":
 				plan.ignoredEventTypes.push(event.type);
 				break;
 

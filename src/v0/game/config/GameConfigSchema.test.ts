@@ -1,138 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { parseGameConfig as parseGameConfigRaw } from "~/v0/game/config/GameConfigSchema";
-
-type TestProductInput = {
-	capacity: number;
-	consume: boolean;
-	itemId: string;
-	quantity: number;
-	mode?: "exact" | "upTo";
-};
-
-type TestProduct = {
-	activatesEffectId?: string;
-	durationMs: number;
-	tags?: string[];
-	visibility?: "visible" | "hidden";
-	inputs?: TestProductInput[];
-	name: string;
-	output?: {
-		chance?: number;
-		entries?: {
-			itemId: string;
-			quantity?: number;
-			weight: number;
-		}[];
-		itemId?: string;
-		quantity?: number;
-		rolls?: number;
-		type: "chance" | "guaranteed" | "weighted";
-	}[];
-	placement: "board_then_inventory";
-};
+import { parseGameConfig } from "~/v0/game/config/GameConfigSchema";
 
 type TestItemStorage = "board" | "inventory" | "both";
 
 type TestItemWithMaxCount = {
 	maxCount?: number;
 };
-
-type TestCraftRecipe = {
-	durationMs: number;
-	inputs: {
-		consume: boolean;
-		itemId: string;
-		quantity: number;
-	}[];
-	resultItemId: string;
-};
-
-const embedLegacyConfigForSchemaTest = (value: unknown): unknown => {
-	if (!value || typeof value !== "object") {
-		return value;
-	}
-
-	const legacy = value as Record<string, any>;
-	const items = {
-		...(legacy.items ?? {}),
-	};
-	const products = legacy.products ?? {};
-
-	for (const [producerId, producer] of Object.entries<any>(legacy.producers ?? {})) {
-		const item = {
-			...(items[producerId] ?? {}),
-		};
-		item.producer = {
-			charges: producer.charges,
-			lines: (producer.productIds ?? []).map((productId: string) => ({
-				...(products[productId] ?? {}),
-				id: products[productId]?.id ?? productId,
-			})),
-			maxQueueSize: producer.maxQueueSize,
-			onChargesDepleted: producer.onChargesDepleted,
-		};
-		items[producerId] = item;
-	}
-
-	for (const [stashId, stash] of Object.entries<any>(legacy.stashes ?? {})) {
-		const productId = stash.productIds?.[0];
-		const item = {
-			...(items[stashId] ?? {}),
-		};
-		item.stash = {
-			charges: stash.charges,
-			line: {
-				...(products[productId] ?? {}),
-				id: products[productId]?.id ?? productId,
-			},
-			maxQueueSize: stash.maxQueueSize,
-			onChargesDepleted: stash.onChargesDepleted,
-		};
-		items[stashId] = item;
-	}
-
-	for (const [itemId, craft] of Object.entries<any>(legacy.craftRecipes ?? {})) {
-		items[itemId] = {
-			...(items[itemId] ?? {}),
-			craft,
-		};
-	}
-
-	for (const [itemId, item] of Object.entries<any>(items)) {
-		if (!Array.isArray(item.mergeIds)) {
-			continue;
-		}
-		items[itemId] = {
-			...item,
-			mergeIds: undefined,
-			merges: item.mergeIds.map((mergeId: string) => legacy.merge?.[mergeId]).filter(Boolean),
-		};
-		delete items[itemId].mergeIds;
-	}
-
-	const {
-		craftRecipes: _craftRecipes,
-		merge: _merge,
-		producers: _producers,
-		products: _products,
-		stashes: _stashes,
-		...next
-	} = legacy;
-
-	void _craftRecipes;
-	void _merge;
-	void _producers;
-	void _products;
-	void _stashes;
-
-	return {
-		...next,
-		items,
-	};
-};
-
-const parseGameConfig = (value: unknown) =>
-	parseGameConfigRaw(embedLegacyConfigForSchemaTest(value));
 
 const createValidConfigValue = () => ({
 	version: 1,
@@ -167,6 +40,32 @@ const createValidConfigValue = () => ({
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
+			producer: {
+				maxQueueSize: 1,
+				lines: [
+					{
+						durationMs: 1000,
+						id: "line:test",
+						inputs: [
+							{
+								capacity: 2,
+								consume: true,
+								itemId: "item:twig",
+								quantity: 1,
+							},
+						],
+						name: "Test line",
+						output: [
+							{
+								itemId: "item:twig",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+						placement: "board_then_inventory",
+					},
+				],
+			},
 			tags: [],
 			tier: 0,
 		},
@@ -196,6 +95,17 @@ const createValidConfigValue = () => ({
 			assetIds: [
 				"asset:item",
 			],
+			craft: {
+				durationMs: 1000,
+				inputs: [
+					{
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+				resultItemId: "item:plank",
+			},
 			description: "Craft target",
 			maxStackSize: 1,
 			name: "Craft Target",
@@ -203,52 +113,7 @@ const createValidConfigValue = () => ({
 			tier: 0,
 		},
 	},
-	merge: {},
 	effects: {} as Record<string, unknown>,
-	producers: {
-		"item:producer": {
-			maxQueueSize: 1,
-			productIds: [
-				"product:test",
-			],
-		},
-	},
-	stashes: {},
-	craftRecipes: {
-		"item:craft-target": {
-			durationMs: 1000,
-			inputs: [
-				{
-					consume: true,
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			resultItemId: "item:plank",
-		},
-	} as Record<string, TestCraftRecipe>,
-	products: {
-		"product:test": {
-			durationMs: 1000,
-			inputs: [
-				{
-					capacity: 2,
-					consume: true,
-					itemId: "item:twig",
-					quantity: 1,
-				},
-			],
-			name: "Test product",
-			output: [
-				{
-					itemId: "item:twig",
-					quantity: 1,
-					type: "guaranteed",
-				},
-			],
-			placement: "board_then_inventory",
-		},
-	} as Record<string, TestProduct>,
 	startingState: {
 		board: [
 			{
@@ -265,6 +130,67 @@ const createValidConfigValue = () => ({
 		],
 	},
 });
+
+const readTestProducer = (config: any, itemId: string) => {
+	const producer = config.items[itemId]?.producer;
+	if (!producer) throw new Error(`Missing producer capability on "${itemId}".`);
+	return producer;
+};
+
+const readTestLine = (config: any, lineId: string) => {
+	for (const item of Object.values<any>(config.items ?? {})) {
+		const line = item.producer?.lines?.find((line: any) => line.id === lineId);
+		if (line) return line;
+		if (item.stash?.line?.id === lineId) return item.stash.line;
+	}
+	throw new Error(`Missing producer line "${lineId}".`);
+};
+
+const readTestCraft = (config: any, itemId: string) => {
+	const craft = config.items[itemId]?.craft;
+	if (!craft) throw new Error(`Missing craft recipe on "${itemId}".`);
+	return craft;
+};
+
+const setTestCraft = (config: any, itemId: string, craft: unknown) => {
+	config.items[itemId] = {
+		...(config.items[itemId] ?? {
+			assetIds: [
+				"asset:item",
+			],
+			description: itemId,
+			maxStackSize: 1,
+			name: itemId,
+			tags: [],
+			tier: 0,
+		}),
+		craft,
+	};
+};
+
+const setTestProducer = (config: any, itemId: string, producer: unknown) => {
+	config.items[itemId] = {
+		...(config.items[itemId] ?? {
+			assetIds: [
+				"asset:item",
+			],
+			description: itemId,
+			maxStackSize: 1,
+			name: itemId,
+			tags: [],
+			tier: 0,
+		}),
+		producer,
+	};
+};
+
+const appendTestProducerLine = (config: any, itemId: string, line: unknown) => {
+	const item = config.items[itemId];
+	if (!item?.producer) {
+		throw new Error(`Missing producer capability on "${itemId}".`);
+	}
+	item.producer.lines.push(line);
+};
 
 const setItemStorage = (
 	config: ReturnType<typeof createValidConfigValue>,
@@ -374,9 +300,11 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key.*assetId/);
 	});
 
-	it("rejects duplicate producer product lines", () => {
+	it("rejects duplicate producer producer lines", () => {
 		const config = createValidConfigValue();
-		config.producers["item:producer"].productIds.push("product:test");
+		readTestProducer(config, "item:producer").lines.push({
+			...readTestLine(config, "line:test"),
+		});
 
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate producer line/);
 	});
@@ -393,12 +321,14 @@ describe("GameConfigSchema", () => {
 			tags: [],
 			tier: 0,
 		};
-		config.producers["producer:second"] = {
+		setTestProducer(config, "producer:second", {
 			maxQueueSize: 1,
-			productIds: [
-				"product:test",
+			lines: [
+				{
+					...readTestLine(config, "line:test"),
+				},
 			],
-		};
+		});
 		config.startingState.board.push({
 			itemId: "producer:second",
 			x: 1,
@@ -410,15 +340,15 @@ describe("GameConfigSchema", () => {
 
 	it("rejects activation input slots with capacity below required quantity", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].inputs![0]!.quantity = 3;
-		config.products["product:test"].inputs![0]!.capacity = 2;
+		readTestLine(config, "line:test").inputs![0]!.quantity = 3;
+		readTestLine(config, "line:test").inputs![0]!.capacity = 2;
 
 		expect(() => parseGameConfig(config)).toThrow(/Capacity must be >= quantity/);
 	});
 
 	it("accepts up-to activation inputs", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].inputs![0] = {
+		readTestLine(config, "line:test").inputs![0] = {
 			capacity: 4,
 			consume: true,
 			itemId: "item:twig",
@@ -437,7 +367,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects duplicate activation inputs for one product", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].inputs!.push({
+		readTestLine(config, "line:test").inputs!.push({
 			capacity: 1,
 			consume: true,
 			itemId: "item:twig",
@@ -449,7 +379,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects duplicate craft inputs", () => {
 		const config = createValidConfigValue();
-		config.craftRecipes["item:craft-target"].inputs.push({
+		readTestCraft(config, "item:craft-target").inputs.push({
 			consume: true,
 			itemId: "item:twig",
 			quantity: 1,
@@ -460,7 +390,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects product active effect refs that point at missing effects", () => {
 		const config = createValidConfigValue();
-		config.products["product:test"].activatesEffectId = "effect:ghost";
+		readTestLine(config, "line:test").activatesEffectId = "effect:ghost";
 
 		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
 	});
@@ -496,7 +426,7 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				chance: 0.5,
 				display: "whenActive",
@@ -541,7 +471,7 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "whenActive",
 				kind: "grant.duration.multiply",
@@ -560,7 +490,7 @@ describe("GameConfigSchema", () => {
 
 		expect(() => parseGameConfig(config)).toThrow(/no-op/);
 
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "whenActive",
 				kind: "nearby.duration.multiply",
@@ -600,7 +530,7 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				chance: 0,
 				display: "whenActive",
@@ -622,7 +552,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects drop-owned nearby requirements that target missing items", () => {
 		const config: any = createValidConfigValue();
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "always",
 				items: {
@@ -645,7 +575,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects craft effects that the craft runtime does not support", () => {
 		const config: any = createValidConfigValue();
-		config.craftRecipes["item:craft-target"].effects = [
+		readTestCraft(config, "item:craft-target").effects = [
 			{
 				bands: [
 					{
@@ -686,7 +616,7 @@ describe("GameConfigSchema", () => {
 				name: "Test Grant",
 			},
 		};
-		config.craftRecipes["item:craft-target"].effects = [
+		readTestCraft(config, "item:craft-target").effects = [
 			{
 				display: "never",
 				kind: "grant.require",
@@ -715,8 +645,8 @@ describe("GameConfigSchema", () => {
 
 	it("rejects non-consumed craft inputs until craft can return preserved inputs", () => {
 		const config = createValidConfigValue();
-		config.craftRecipes["item:craft-target"].inputs[0] = {
-			...config.craftRecipes["item:craft-target"].inputs[0],
+		readTestCraft(config, "item:craft-target").inputs[0] = {
+			...readTestCraft(config, "item:craft-target").inputs[0],
 			consume: false,
 		};
 
@@ -745,7 +675,7 @@ describe("GameConfigSchema", () => {
 			tags: [],
 			tier: 1,
 		};
-		config.craftRecipes["item:blueprint-house-t1"] = {
+		setTestCraft(config, "item:blueprint-house-t1", {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -755,7 +685,7 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			resultItemId: "producer:house-t1",
-		};
+		});
 
 		expect(() => parseGameConfig(config)).toThrow(/House I Blueprint -> House I Blueprint/);
 	});
@@ -802,7 +732,7 @@ describe("GameConfigSchema", () => {
 			tags: [],
 			tier: 1,
 		};
-		config.craftRecipes["item:blueprint-a"] = {
+		setTestCraft(config, "item:blueprint-a", {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -812,8 +742,8 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			resultItemId: "producer:a",
-		};
-		config.craftRecipes["item:blueprint-b"] = {
+		});
+		setTestCraft(config, "item:blueprint-b", {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -823,12 +753,12 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			resultItemId: "producer:b",
-		};
+		});
 
 		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint B -> Blueprint A/);
 	});
 
-	it("rejects blueprint product lines that require the building they unlock", () => {
+	it("rejects blueprint producer lines that require the building they unlock", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:blueprint-a"] = {
 			assetIds: [
@@ -850,7 +780,7 @@ describe("GameConfigSchema", () => {
 			tags: [],
 			tier: 1,
 		};
-		config.craftRecipes["item:blueprint-a"] = {
+		setTestCraft(config, "item:blueprint-a", {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -860,24 +790,24 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			resultItemId: "producer:a",
-		};
-		config.producers["producer:a"] = {
+		});
+		setTestProducer(config, "producer:a", {
 			maxQueueSize: 1,
-			productIds: [
-				"product:producer-a:blueprint-a",
-			],
-		};
-		config.products["product:producer-a:blueprint-a"] = {
-			durationMs: 1000,
-			name: "Blueprint A",
-			output: [
+			lines: [
 				{
-					itemId: "item:blueprint-a",
-					type: "guaranteed",
+					durationMs: 1000,
+					id: "line:producer-a:blueprint-a",
+					name: "Blueprint A",
+					output: [
+						{
+							itemId: "item:blueprint-a",
+							type: "guaranteed",
+						},
+					],
+					placement: "board_then_inventory",
 				},
 			],
-			placement: "board_then_inventory",
-		};
+		});
 
 		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint A/);
 	});
@@ -952,33 +882,33 @@ describe("GameConfigSchema", () => {
 			],
 			tier: 1,
 		};
-		config.products["product:blueprint-a"] = {
-			durationMs: 1000,
-			name: "Blueprint A",
-			output: [
-				{
-					itemId: "item:blueprint-a",
-					type: "guaranteed",
-				},
-			],
-			placement: "board_then_inventory",
-		};
-		config.products["product:blueprint-b"] = {
-			durationMs: 1000,
-			name: "Blueprint B",
-			output: [
-				{
-					itemId: "item:blueprint-b",
-					type: "guaranteed",
-				},
-			],
-			placement: "board_then_inventory",
-		};
-		config.producers["item:producer"].productIds.push(
-			"product:blueprint-a",
-			"product:blueprint-b",
+		readTestProducer(config, "item:producer").lines.push(
+			{
+				durationMs: 1000,
+				id: "line:blueprint-a",
+				name: "Blueprint A",
+				output: [
+					{
+						itemId: "item:blueprint-a",
+						type: "guaranteed",
+					},
+				],
+				placement: "board_then_inventory",
+			},
+			{
+				durationMs: 1000,
+				id: "line:blueprint-b",
+				name: "Blueprint B",
+				output: [
+					{
+						itemId: "item:blueprint-b",
+						type: "guaranteed",
+					},
+				],
+				placement: "board_then_inventory",
+			},
 		);
-		config.craftRecipes["item:blueprint-a"] = {
+		setTestCraft(config, "item:blueprint-a", {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -988,8 +918,8 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			resultItemId: "producer:a",
-		};
-		config.craftRecipes["item:blueprint-b"] = {
+		});
+		setTestCraft(config, "item:blueprint-b", {
 			durationMs: 1000,
 			inputs: [
 				{
@@ -999,41 +929,41 @@ describe("GameConfigSchema", () => {
 				},
 			],
 			resultItemId: "producer:b",
-		};
-		config.products["product:a-part"] = {
-			durationMs: 1000,
-			name: "Part A",
-			output: [
+		});
+		setTestProducer(config, "producer:a", {
+			maxQueueSize: 1,
+			lines: [
 				{
-					itemId: "item:a-part",
-					type: "guaranteed",
+					durationMs: 1000,
+					id: "line:a-part",
+					name: "Part A",
+					output: [
+						{
+							itemId: "item:a-part",
+							type: "guaranteed",
+						},
+					],
+					placement: "board_then_inventory",
 				},
 			],
-			placement: "board_then_inventory",
-		};
-		config.products["product:b-part"] = {
-			durationMs: 1000,
-			name: "Part B",
-			output: [
+		});
+		setTestProducer(config, "producer:b", {
+			maxQueueSize: 1,
+			lines: [
 				{
-					itemId: "item:b-part",
-					type: "guaranteed",
+					durationMs: 1000,
+					id: "line:b-part",
+					name: "Part B",
+					output: [
+						{
+							itemId: "item:b-part",
+							type: "guaranteed",
+						},
+					],
+					placement: "board_then_inventory",
 				},
 			],
-			placement: "board_then_inventory",
-		};
-		config.producers["producer:a"] = {
-			maxQueueSize: 1,
-			productIds: [
-				"product:a-part",
-			],
-		};
-		config.producers["producer:b"] = {
-			maxQueueSize: 1,
-			productIds: [
-				"product:b-part",
-			],
-		};
+		});
 
 		expect(() => parseGameConfig(config)).toThrow(/Soft-lock risk.*producer:a.*item:b-part/s);
 	});
@@ -1055,7 +985,7 @@ describe("GameConfigSchema", () => {
 				polarity: "neutral",
 			},
 		};
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "whenMissing",
 				kind: "grant.require",
@@ -1095,7 +1025,7 @@ describe("GameConfigSchema", () => {
 		config.items["item:twig"].passiveEffectIds = [
 			"effect:test",
 		];
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "whenMissing",
 				kind: "grant.require",
@@ -1134,7 +1064,7 @@ describe("GameConfigSchema", () => {
 			"producer",
 		];
 		config.items["item:twig"].storage = "inventory";
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "always",
 				items: {
@@ -1157,8 +1087,8 @@ describe("GameConfigSchema", () => {
 
 	it("keeps structural checks for queue size and non-empty inline output", () => {
 		const config = createValidConfigValue();
-		config.producers["item:producer"].maxQueueSize = 0;
-		config.products["product:test"].output = [];
+		readTestProducer(config, "item:producer").maxQueueSize = 0;
+		readTestLine(config, "line:test").output = [];
 
 		expect(() => parseGameConfig(config)).toThrow(/Too small/);
 	});

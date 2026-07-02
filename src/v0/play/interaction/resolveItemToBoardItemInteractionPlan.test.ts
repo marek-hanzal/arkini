@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 const productLine = (
-	overrides: Partial<ProducerProductLineView> & Pick<ProducerProductLineView, "productId">,
-): ProducerProductLineView => {
-	const { productId, ...rest } = overrides;
+	overrides: Partial<ProducerLineView> & Pick<ProducerLineView, "lineId">,
+): ProducerLineView => {
+	const { lineId, ...rest } = overrides;
 
 	return {
 		durationMs: 1000,
@@ -27,9 +27,9 @@ const productLine = (
 		inputsAvailable: true,
 		inputsReady: false,
 		isDefault: false,
-		name: productId,
+		name: lineId,
 		lineKind: "product" as const,
-		productId,
+		lineId,
 		producerQueuedJobs: 0,
 		queueFull: false,
 		blocked: false,
@@ -39,11 +39,11 @@ const productLine = (
 	};
 };
 
-const producerTarget = (productLines: ProducerProductLineView[]): BoardViewItem => ({
+const producerTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
 	activation: {
 		inputs: [],
 		kind: "producer",
-		productLines,
+		producerLines,
 		trigger: "click",
 	},
 	id: "producer",
@@ -53,7 +53,7 @@ const producerTarget = (productLines: ProducerProductLineView[]): BoardViewItem 
 	y: 0,
 });
 
-const stashTarget = (productLines: ProducerProductLineView[]): BoardViewItem => ({
+const stashTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
 	activation: {
 		inputs: [
 			{
@@ -65,7 +65,7 @@ const stashTarget = (productLines: ProducerProductLineView[]): BoardViewItem => 
 			},
 		],
 		kind: "stash",
-		productLines,
+		producerLines,
 		trigger: "click",
 	},
 	id: "stash",
@@ -76,23 +76,23 @@ const stashTarget = (productLines: ProducerProductLineView[]): BoardViewItem => 
 });
 
 describe("resolveItemToBoardItemInteractionPlan", () => {
-	it("routes producer inputs into the default product line before earlier matching lines", () => {
+	it("routes producer inputs into the default producer line before earlier matching lines", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),
 			sourceItemId: "item:twig",
 			targetItem: producerTarget([
 				productLine({
-					productId: "product:first",
+					lineId: "line:first",
 				}),
 				productLine({
 					isDefault: true,
-					productId: "product:default",
+					lineId: "line:default",
 				}),
 			]),
 		});
 
 		expect(plan).toMatchObject({
-			productId: "product:default",
+			lineId: "line:default",
 			type: "producer-input",
 		});
 	});
@@ -113,19 +113,19 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 							stored: 1,
 						},
 					],
-					productId: "product:default",
+					lineId: "line:default",
 				}),
 				productLine({
-					productId: "product:next",
+					lineId: "line:next",
 				}),
 				productLine({
-					productId: "product:last",
+					lineId: "line:last",
 				}),
 			]),
 		});
 
 		expect(plan).toMatchObject({
-			productId: "product:next",
+			lineId: "line:next",
 			type: "producer-input",
 		});
 	});
@@ -136,7 +136,7 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			sourceItemId: "item:twig",
 			targetItem: stashTarget([
 				productLine({
-					productId: "product:stash",
+					lineId: "line:stash",
 				}),
 			]),
 		});
@@ -170,7 +170,7 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			sourceItemId: "item:water",
 			targetItem: producerTarget([
 				productLine({
-					productId: "product:watered",
+					lineId: "line:watered",
 				}),
 			]),
 		});
@@ -187,7 +187,7 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			targetItem: producerTarget([
 				productLine({
 					inProgress: true,
-					productId: "product:running",
+					lineId: "line:running",
 					producerQueuedJobs: 1,
 				}),
 			]),

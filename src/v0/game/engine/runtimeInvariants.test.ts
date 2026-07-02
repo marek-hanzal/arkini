@@ -41,7 +41,7 @@ describe("runtime invariants", () => {
 			outputItems: createOutputItems(),
 			placement: "board_then_inventory",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -76,7 +76,7 @@ describe("runtime invariants", () => {
 			},
 			id: "job:duplicated-output",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -104,7 +104,7 @@ describe("runtime invariants", () => {
 		save.producerJobs["job:empty-output"] = {
 			id: "job:empty-output",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:shred",
+			lineId: "line:shred",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -121,8 +121,8 @@ describe("runtime invariants", () => {
 				atMs: 1000,
 				jobId: "job:empty-output",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "product.completed",
+				lineId: "line:shred",
+				type: "producer_line.completed",
 			},
 		]);
 	});
@@ -130,10 +130,9 @@ describe("runtime invariants", () => {
 	it("rolls producer output from live config at completion", () => {
 		const baseConfig = createEngineTestConfig();
 		const changedConfig = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:plank",
@@ -151,7 +150,7 @@ describe("runtime invariants", () => {
 		save.producerJobs["job:live-output"] = {
 			id: "job:live-output",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -193,7 +192,7 @@ describe("runtime invariants", () => {
 			},
 			id: "job:blocked",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -210,10 +209,8 @@ describe("runtime invariants", () => {
 	it("allows already queued producer jobs behind a paused previous job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -226,7 +223,7 @@ describe("runtime invariants", () => {
 			id: "job:paused",
 			pausedAtMs: 250,
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			remainingMs: 750,
 			startAtMs: 0,
@@ -234,7 +231,7 @@ describe("runtime invariants", () => {
 		save.producerJobs["job:queued-behind-pause"] = {
 			id: "job:queued-behind-pause",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 2500,
 			startAtMs: 1500,
 		};
@@ -250,10 +247,8 @@ describe("runtime invariants", () => {
 	it("rejects stale queued producer timing behind blocked delivery", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -269,14 +264,14 @@ describe("runtime invariants", () => {
 			},
 			id: "job:blocked",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
 		invalidSave.producerJobs["job:stale"] = {
 			id: "job:stale",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 2000,
 			startAtMs: 1000,
 		};
@@ -303,10 +298,8 @@ describe("runtime invariants", () => {
 	it("rejects blocked delivery on a non-head producer queue job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -318,7 +311,7 @@ describe("runtime invariants", () => {
 		invalidSave.producerJobs["job:first"] = {
 			id: "job:first",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -329,7 +322,7 @@ describe("runtime invariants", () => {
 			},
 			id: "job:blocked-second",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 2000,
 			startAtMs: 1000,
 		};

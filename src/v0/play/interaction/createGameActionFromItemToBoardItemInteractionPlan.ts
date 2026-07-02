@@ -41,10 +41,10 @@ export const createGameActionFromItemToBoardItemInteractionPlan = ({
 			{
 				type: "producer-input",
 			},
-			({ productId }) => ({
+			({ lineId }) => ({
 				inputRef: sourceRef,
 				producerItemInstanceId: targetItemInstanceId,
-				productId,
+				lineId,
 				type: "producer.input.store" as const,
 			}),
 		)

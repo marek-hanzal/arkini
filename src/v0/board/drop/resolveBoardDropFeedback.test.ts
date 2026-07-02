@@ -355,7 +355,7 @@ describe("resolveBoardDropFeedback", () => {
 			activation: {
 				inputs: [],
 				kind: "producer",
-				productLines: [
+				producerLines: [
 					{
 						durationMs: 1000,
 						inProgress: false,
@@ -377,7 +377,7 @@ describe("resolveBoardDropFeedback", () => {
 						name: "Test product",
 						lineKind: "product" as const,
 						producerQueuedJobs: 0,
-						productId: "product:test",
+						lineId: "line:test",
 						queueFull: false,
 						blocked: false,
 						queuedJobs: 0,
@@ -449,7 +449,7 @@ describe("resolveBoardDropFeedback", () => {
 					},
 				],
 				kind: "stash",
-				productLines: [
+				producerLines: [
 					{
 						durationMs: 1000,
 						inProgress: false,
@@ -471,7 +471,7 @@ describe("resolveBoardDropFeedback", () => {
 						name: "Open stash",
 						lineKind: "product" as const,
 						producerQueuedJobs: 0,
-						productId: "product:stash",
+						lineId: "line:stash",
 						queueFull: false,
 						blocked: false,
 						queuedJobs: 0,

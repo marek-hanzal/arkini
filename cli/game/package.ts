@@ -745,10 +745,10 @@ const validateUniqueValues = (
 };
 
 const readProductNameFromPrimaryOutput = (
-	product: Readonly<Record<string, unknown>>,
+	line: Readonly<Record<string, unknown>>,
 	items: Readonly<Record<string, unknown>>,
 ) => {
-	const output = Array.isArray(product.output) ? product.output : [];
+	const output = Array.isArray(line.output) ? line.output : [];
 	const primaryOutput = output.find(
 		(
 			entry,

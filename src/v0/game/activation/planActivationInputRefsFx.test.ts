@@ -20,7 +20,7 @@ describe("planActivationInputRefsFx", () => {
 			y: 0,
 		};
 		save.producerInputs["item-instance:2"] = {
-			productInputs: {},
+			lineInputs: {},
 		};
 		save.inventory.slots[0] = {
 			itemId: "item:twig",

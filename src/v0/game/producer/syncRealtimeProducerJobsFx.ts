@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readProducerJobProductLine } from "~/v0/game/producer/readProducerJobProductLine";
+import { readProducerJobLine } from "~/v0/game/producer/readProducerJobLine";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import {
 	readGamePausableJobRemainingMsAtPause,
@@ -40,17 +40,17 @@ const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffect
 	readyAtMs: number;
 	startAtMs: number;
 }) {
-	const product = readProducerJobProductLine({
+	const line = readProducerJobLine({
 		config,
 		job,
 		save: draft,
 	});
-	if (!product) {
+	if (!line) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing producer line "${job.productId}".`),
+			GameEngineError.configReferenceMissing(`Missing producer line "${job.lineId}".`),
 		);
 	}
-	if (!product.activatesEffectId) return;
+	if (!line.activatesEffectId) return;
 
 	const activeEffect = findActiveEffectByProducerJobId({
 		producerJobId: job.id,
@@ -59,13 +59,13 @@ const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffect
 	if (!activeEffect) {
 		return yield* Effect.fail(
 			GameEngineError.saveInvalid(
-				`Producer job "${job.id}" activates effect "${product.activatesEffectId}" but has no active effect instance.`,
+				`Producer job "${job.id}" activates effect "${line.activatesEffectId}" but has no active effect instance.`,
 			),
 		);
 	}
 	draft.activeEffects[activeEffect.id] = {
 		...activeEffect,
-		effectId: product.activatesEffectId,
+		effectId: line.activatesEffectId,
 		endAtMs: readyAtMs,
 		producerJobId: job.id,
 		sourceItemInstanceId: job.producerItemInstanceId,

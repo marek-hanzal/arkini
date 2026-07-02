@@ -57,13 +57,13 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 	);
 
 	const producerInputState = placement.save.producerInputs[action.producerItemInstanceId];
-	const productInputState = producerInputState?.productInputs[action.productId];
-	if (productInputState) {
-		delete productInputState.items[action.itemId];
-		if (Object.keys(productInputState.items).length === 0) {
-			delete producerInputState.productInputs[action.productId];
+	const lineInputState = producerInputState?.lineInputs[action.lineId];
+	if (lineInputState) {
+		delete lineInputState.items[action.itemId];
+		if (Object.keys(lineInputState.items).length === 0) {
+			delete producerInputState.lineInputs[action.lineId];
 		}
-		if (Object.keys(producerInputState.productInputs).length === 0) {
+		if (Object.keys(producerInputState.lineInputs).length === 0) {
 			delete placement.save.producerInputs[action.producerItemInstanceId];
 		}
 	}
@@ -75,7 +75,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 			nextQuantity: 0,
 			previousQuantity: checked.previousQuantity,
 			producerItemInstanceId: action.producerItemInstanceId,
-			productId: action.productId,
+			lineId: action.lineId,
 			quantity: checked.previousQuantity,
 			type: "producer_input.withdrawn",
 			atMs: nowMs,

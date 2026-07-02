@@ -193,8 +193,8 @@ Recommendation: for no-default producers, detail sheet should make product-line 
 
 Current pollution blockers slow:
 
-- `product:farm-t1:grain`, proximity 2.
-- `product:pig-farm-t1:piglet`, proximity 2.
+- `line:farm-t1:grain`, proximity 2.
+- `line:pig-farm-t1:piglet`, proximity 2.
 - `producer:brewery-t1`, proximity 2.
 - `producer:winery-t1`, proximity 3.
 

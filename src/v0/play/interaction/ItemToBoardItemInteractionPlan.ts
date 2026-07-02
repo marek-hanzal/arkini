@@ -17,7 +17,7 @@ export type ItemToBoardItemInteractionPlan =
 	  }
 	| {
 			feedbackVariant: ItemInteractionFeedbackVariant;
-			productId: string;
+			lineId: string;
 			type: "producer-input";
 	  }
 	| {

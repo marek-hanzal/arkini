@@ -23,10 +23,8 @@ export namespace matchGameAction {
 		itemMerge: (action: GameActionOfType<"item.merge">) => Result;
 		producerInputStore: (action: GameActionOfType<"producer.input.store">) => Result;
 		producerInputWithdraw: (action: GameActionOfType<"producer.input.withdraw">) => Result;
-		producerProductLineSetDefault: (
-			action: GameActionOfType<"producer.product_line.set_default">,
-		) => Result;
-		producerProductStart: (action: GameActionOfType<"producer.product.start">) => Result;
+		producerLineSetDefault: (action: GameActionOfType<"producer.line.set_default">) => Result;
+		producerLineStart: (action: GameActionOfType<"producer.line.start">) => Result;
 		stashOpen: (action: GameActionOfType<"stash.open">) => Result;
 		tileRemove: (action: GameActionOfType<"tile.remove">) => Result;
 	}
@@ -117,15 +115,15 @@ export const matchGameAction = <Result>(
 		)
 		.with(
 			{
-				type: "producer.product_line.set_default",
+				type: "producer.line.set_default",
 			},
-			cases.producerProductLineSetDefault,
+			cases.producerLineSetDefault,
 		)
 		.with(
 			{
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
-			cases.producerProductStart,
+			cases.producerLineStart,
 		)
 		.with(
 			{

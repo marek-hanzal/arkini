@@ -163,8 +163,8 @@ describe("validateWorldSnapshotFx", () => {
 	it("reports live replacement-safety conflicts against a selected check set", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
@@ -179,7 +179,7 @@ describe("validateWorldSnapshotFx", () => {
 		save.producerJobs["job:producer"] = {
 			id: "job:producer",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -227,7 +227,7 @@ describe("validateWorldSnapshotFx", () => {
 			id: "job:broken",
 			pausedAtMs: 1000,
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			remainingMs: 500,
 			startAtMs: 0,
@@ -264,7 +264,7 @@ describe("validateWorldSnapshotFx", () => {
 			},
 			id: "job:producer",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -329,8 +329,8 @@ describe("validateWorldSnapshotFx", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 0,
 		});

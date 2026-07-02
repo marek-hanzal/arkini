@@ -7,7 +7,7 @@ export function useProducerClock(items: readonly BoardViewItem[]) {
 		() =>
 			items.flatMap((item) => [
 				item.activation?.cooldownUntilMs,
-				...(item.activation?.productLines?.map((line) => line.readyAtMs) ?? []),
+				...(item.activation?.producerLines?.map((line) => line.readyAtMs) ?? []),
 				item.craft?.readyAtMs,
 			]),
 		[

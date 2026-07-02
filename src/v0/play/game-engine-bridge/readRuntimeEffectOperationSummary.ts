@@ -1,5 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
+import type { EffectiveProducerLine } from "~/v0/game/effects/EffectiveProducerLine";
 
 export namespace readRuntimeEffectBenefitLines {
 	export interface Props {
@@ -8,11 +8,11 @@ export namespace readRuntimeEffectBenefitLines {
 	}
 }
 
-export namespace readRuntimeProductLineActiveEffectBonusLines {
+export namespace readRuntimeProducerLineActiveEffectBonusLines {
 	export interface Props {
 		baseDurationMs: number;
 		config: GameConfig;
-		effectiveProductLine: EffectiveProducerProductLine;
+		effectiveProducerLine: EffectiveProducerLine;
 	}
 }
 
@@ -79,7 +79,7 @@ const readQuantityRange = (
 const formatQuantityNumber = (value: number) => `${value}×`;
 
 const groupDurationEffectInstances = (
-	appliedEffects: EffectiveProducerProductLine["appliedEffects"],
+	appliedEffects: EffectiveProducerLine["appliedEffects"],
 ): EffectInstanceGroup[] => {
 	const groups = new Map<
 		string,
@@ -125,10 +125,10 @@ const readChanceRemainder = (chance: number) =>
 
 const readAggregatedChanceItemLines = ({
 	config,
-	effectiveProductLine,
+	effectiveProducerLine,
 }: {
 	config: GameConfig;
-	effectiveProductLine: EffectiveProducerProductLine;
+	effectiveProducerLine: EffectiveProducerLine;
 }) => {
 	const groups = new Map<
 		string,
@@ -141,7 +141,7 @@ const readAggregatedChanceItemLines = ({
 		}
 	>();
 
-	for (const chanceItem of effectiveProductLine.lootPlan.chanceItems) {
+	for (const chanceItem of effectiveProducerLine.lootPlan.chanceItems) {
 		if (!chanceItem.effectId || !chanceItem.effectName || !chanceItem.dropEffects?.length) {
 			continue;
 		}
@@ -251,21 +251,21 @@ const readAggregatedChanceItemLines = ({
 	});
 };
 
-export const readRuntimeProductLineActiveEffectBonusLines = ({
+export const readRuntimeProducerLineActiveEffectBonusLines = ({
 	baseDurationMs,
 	config,
-	effectiveProductLine,
-}: readRuntimeProductLineActiveEffectBonusLines.Props) => {
+	effectiveProducerLine,
+}: readRuntimeProducerLineActiveEffectBonusLines.Props) => {
 	const chanceItemLines = readAggregatedChanceItemLines({
 		config,
-		effectiveProductLine,
+		effectiveProducerLine,
 	});
 	const durationEffectInstances = groupDurationEffectInstances(
-		effectiveProductLine.appliedEffects,
+		effectiveProducerLine.appliedEffects,
 	);
 	const durationRatio =
-		effectiveProductLine.effectDurationMultiplier ??
-		(baseDurationMs > 0 ? effectiveProductLine.durationMs / baseDurationMs : 1);
+		effectiveProducerLine.effectDurationMultiplier ??
+		(baseDurationMs > 0 ? effectiveProducerLine.durationMs / baseDurationMs : 1);
 	const durationLine =
 		durationEffectInstances.length === 0 || durationRatio === 1
 			? undefined

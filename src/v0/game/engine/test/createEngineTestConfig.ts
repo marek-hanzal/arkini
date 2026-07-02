@@ -1,33 +1,40 @@
 import { parseGameConfig, type GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import type {
+	GameCraftRecipeDefinition,
+	GameMergeRuleDefinition,
+	GameProducerCapabilityDefinition,
+	GameProducerDefinition,
+	GameProducerLineDefinition,
+	GameStashDefinition,
+} from "~/v0/game/config/GameItemCapabilities";
 
-type LegacyProducerDefinition = {
-	maxQueueSize?: number;
-	productIds: string[];
-	charges?: number;
-	onChargesDepleted?: "remove" | "stop";
-};
-
-type LegacyStashDefinition = LegacyProducerDefinition;
-type LegacyProductDefinition = GameProducerLineDefinition;
-type LegacyProductOverride = Omit<GameProducerLineDefinition, "id"> & {
+type ProducerLineOverride = Partial<GameProducerLineDefinition> & {
 	id?: string;
 };
-type LegacyCraftRecipeDefinition = NonNullable<GameConfig["items"][string]["craft"]>;
-type LegacyMergeDefinition = NonNullable<GameConfig["items"][string]["merges"]>[number];
 
-type LegacyGameConfigViews = {
-	craftRecipes: Record<string, LegacyCraftRecipeDefinition>;
-	merge: Record<string, LegacyMergeDefinition>;
-	producers: Record<string, LegacyProducerDefinition>;
-	products: Record<string, LegacyProductDefinition>;
-	stashes: Record<string, LegacyStashDefinition>;
+type ProducerCapabilityOverride = Partial<Omit<GameProducerDefinition, "lines">> & {
+	lines?: GameProducerLineDefinition[];
 };
 
-type LegacyGameConfigOverrides = Omit<Partial<GameConfig>, "items"> & {
+type StashCapabilityOverride = Partial<Omit<GameStashDefinition, "line">> & {
+	line?: GameProducerLineDefinition;
+};
+
+type TestConfigCatalogs = {
+	craftCatalog: Record<string, GameCraftRecipeDefinition>;
+	lineCatalog: Record<string, GameProducerLineDefinition>;
+	mergeCatalog: Record<string, GameMergeRuleDefinition>;
+	producerCatalog: Record<string, GameProducerCapabilityDefinition>;
+};
+
+type EngineTestGameConfigOverrides = Omit<Partial<GameConfig>, "items"> & {
+	craftOverrides?: Record<string, GameCraftRecipeDefinition>;
 	items?: Record<string, unknown>;
-	products?: Record<string, LegacyProductOverride>;
-} & Omit<Partial<LegacyGameConfigViews>, "products">;
+	lineOverrides?: Record<string, ProducerLineOverride>;
+	producerOverrides?: Record<string, ProducerCapabilityOverride>;
+	stashOverrides?: Record<string, StashCapabilityOverride>;
+};
+
 type DraftGameConfig = {
 	assets: Record<string, unknown>;
 	effects: Record<string, unknown>;
@@ -38,23 +45,40 @@ type DraftGameConfig = {
 	version: 1;
 };
 
-export type EngineTestGameConfig = GameConfig & LegacyGameConfigViews;
+export type EngineTestGameConfig = GameConfig & TestConfigCatalogs;
 
 export const createEngineTestConfig = (
-	overrides: LegacyGameConfigOverrides = {},
+	overrides: EngineTestGameConfigOverrides = {},
 ): EngineTestGameConfig => {
 	const raw = createEmbeddedTestConfig(overrides);
 	const config = parseGameConfig(raw) as EngineTestGameConfig;
-	return attachLegacyGameConfigViews(config);
+	return attachTestConfigCatalogs(config);
 };
 
-const createEmbeddedTestConfig = (overrides: LegacyGameConfigOverrides): unknown => {
+export const readEngineTestLine = (
+	config: GameConfig,
+	lineId: string,
+): GameProducerLineDefinition => {
+	const line = readLineCatalog(config)[lineId];
+	if (!line) throw new Error(`Missing test producer line "${lineId}".`);
+	return line;
+};
+
+export const readEngineTestCraft = (
+	config: GameConfig,
+	itemId: string,
+): GameCraftRecipeDefinition => {
+	const craft = config.items[itemId]?.craft;
+	if (!craft) throw new Error(`Missing test craft recipe on "${itemId}".`);
+	return craft;
+};
+
+const createEmbeddedTestConfig = (overrides: EngineTestGameConfigOverrides): unknown => {
 	const {
-		craftRecipes: legacyCraftRecipes,
-		merge: legacyMerge,
-		producers: legacyProducers,
-		products: legacyProducts,
-		stashes: legacyStashes,
+		craftOverrides,
+		lineOverrides,
+		producerOverrides,
+		stashOverrides,
 		...embeddedOverrides
 	} = overrides;
 
@@ -81,17 +105,21 @@ const createEmbeddedTestConfig = (overrides: LegacyGameConfigOverrides): unknown
 		startingState: embeddedOverrides.startingState ?? base.startingState,
 	};
 
-	applyLegacyConfigOverrides({
-		craftRecipes: legacyCraftRecipes,
+	applyProducerCapabilityOverrides({
 		draft,
-		merge: legacyMerge,
-		producers: legacyProducers,
-		products: legacyProducts,
-		stashes: legacyStashes,
+		overrides: producerOverrides,
 	});
-	applyEmbeddedMergeRulesFromLegacyIds({
+	applyStashCapabilityOverrides({
 		draft,
-		merge: legacyMerge,
+		overrides: stashOverrides,
+	});
+	applyProducerLineOverrides({
+		draft,
+		overrides: lineOverrides,
+	});
+	applyCraftOverrides({
+		draft,
+		overrides: craftOverrides,
 	});
 
 	return draft;
@@ -135,8 +163,8 @@ const createBaseEmbeddedConfig = () => ({
 				lines: [
 					{
 						durationMs: 1000,
-						id: "product:test",
-						name: "Test product",
+						id: "line:test",
+						name: "Test line",
 						output: [
 							{
 								itemId: "item:twig",
@@ -148,7 +176,7 @@ const createBaseEmbeddedConfig = () => ({
 					},
 					{
 						durationMs: 1000,
-						id: "product:shred",
+						id: "line:shred",
 						inputs: [
 							{
 								capacity: 1,
@@ -234,7 +262,7 @@ const createBaseEmbeddedConfig = () => ({
 				line: {
 					chargeCost: 1,
 					durationMs: 0,
-					id: "product:stash",
+					id: "line:stash",
 					inputs: [
 						{
 							capacity: 1,
@@ -337,128 +365,74 @@ const mergeDraftItems = ({
 	return items;
 };
 
-const applyLegacyConfigOverrides = ({
-	craftRecipes,
+const applyProducerCapabilityOverrides = ({
 	draft,
-	merge,
-	producers,
-	products,
-	stashes,
+	overrides,
 }: {
-	craftRecipes?: LegacyGameConfigViews["craftRecipes"];
 	draft: DraftGameConfig;
-	merge?: LegacyGameConfigViews["merge"];
-	producers?: LegacyGameConfigViews["producers"];
-	products?: Record<string, LegacyProductOverride>;
-	stashes?: LegacyGameConfigViews["stashes"];
+	overrides?: Record<string, ProducerCapabilityOverride>;
 }) => {
-	const productCatalog = {
-		...readDraftProductLineCatalog(draft),
-		...(products ?? {}),
-	};
-
-	for (const [itemId, producer] of Object.entries(producers ?? {})) {
+	for (const [itemId, override] of Object.entries(overrides ?? {})) {
 		const item = readDraftItem(draft, itemId);
+		const baseProducer = readDraftProducer(item);
 		item.producer = {
-			charges: producer.charges,
-			maxQueueSize: producer.maxQueueSize ?? 1,
-			onChargesDepleted: producer.onChargesDepleted ?? "stop",
-			lines: producer.productIds.flatMap((productId) => {
-				const product = productCatalog[productId];
-				return product
-					? [
-							{
-								...product,
-								id: productId,
-							},
-						]
-					: [];
-			}),
+			...baseProducer,
+			...override,
+			lines: override.lines ?? baseProducer.lines,
 		};
 	}
+};
 
-	for (const [itemId, stash] of Object.entries(stashes ?? {})) {
-		const productId = stash.productIds[0];
-		const product = productId ? productCatalog[productId] : undefined;
-		if (!product) continue;
+const applyStashCapabilityOverrides = ({
+	draft,
+	overrides,
+}: {
+	draft: DraftGameConfig;
+	overrides?: Record<string, StashCapabilityOverride>;
+}) => {
+	for (const [itemId, override] of Object.entries(overrides ?? {})) {
 		const item = readDraftItem(draft, itemId);
+		const baseStash = readDraftStash(item);
 		item.stash = {
-			charges: stash.charges ?? 1,
-			line: {
-				...product,
-				id: productId,
-			},
-			maxQueueSize: stash.maxQueueSize ?? 1,
-			onChargesDepleted: stash.onChargesDepleted ?? "remove",
+			...baseStash,
+			...override,
+			line: override.line ?? baseStash.line,
 		};
 	}
+};
 
-	applyLegacyProductOverridesToEmbeddedLines({
-		draft,
-		products,
-	});
+const applyProducerLineOverrides = ({
+	draft,
+	overrides,
+}: {
+	draft: DraftGameConfig;
+	overrides?: Record<string, ProducerLineOverride>;
+}) => {
+	for (const [lineId, override] of Object.entries(overrides ?? {})) {
+		const line = readDraftLine(draft, lineId);
+		Object.assign(line, {
+			...override,
+			id: lineId,
+		});
+	}
+};
 
-	for (const [itemId, craft] of Object.entries(craftRecipes ?? {})) {
+const applyCraftOverrides = ({
+	draft,
+	overrides,
+}: {
+	draft: DraftGameConfig;
+	overrides?: Record<string, GameCraftRecipeDefinition>;
+}) => {
+	for (const [itemId, craft] of Object.entries(overrides ?? {})) {
 		readDraftItem(draft, itemId).craft = craft;
 	}
 };
 
-const readDraftProductLineCatalog = (draft: DraftGameConfig) => {
-	const catalog: Record<string, LegacyProductOverride> = {};
-	for (const item of Object.values(draft.items)) {
-		if (!item || typeof item !== "object" || Array.isArray(item)) continue;
-		const draftItem = item as Record<string, any>;
-		for (const line of draftItem.producer?.lines ?? []) {
-			if (line?.id) catalog[line.id] = line;
-		}
-		const stashLine = draftItem.stash?.line;
-		if (stashLine?.id) catalog[stashLine.id] = stashLine;
-	}
-	return catalog;
-};
-
-const applyLegacyProductOverridesToEmbeddedLines = ({
-	draft,
-	products,
-}: {
-	draft: DraftGameConfig;
-	products?: Record<string, LegacyProductOverride>;
-}) => {
-	if (!products) return;
-	for (const item of Object.values(draft.items)) {
-		if (!item || typeof item !== "object" || Array.isArray(item)) continue;
-		const draftItem = item as Record<string, any>;
-		if (Array.isArray(draftItem.producer?.lines)) {
-			draftItem.producer.lines = draftItem.producer.lines.map((line: any) => {
-				const override = line?.id ? products[line.id] : undefined;
-				return override
-					? {
-							...override,
-							id: line.id,
-						}
-					: line;
-			});
-		}
-		const stashLine = draftItem.stash?.line;
-		const stashOverride = stashLine?.id ? products[stashLine.id] : undefined;
-		if (stashOverride) {
-			draftItem.stash.line = {
-				...stashOverride,
-				id: stashLine.id,
-			};
-		}
-	}
-};
-
-const readDraftItem = (
-	draft: {
-		items: Record<string, unknown>;
-	},
-	itemId: string,
-) => {
+const readDraftItem = (draft: DraftGameConfig, itemId: string) => {
 	const item = draft.items[itemId];
 	if (item && typeof item === "object" && !Array.isArray(item))
-		return item as Record<string, unknown>;
+		return item as Record<string, any>;
 	const created = {
 		assetIds: [
 			"asset:test",
@@ -470,98 +444,101 @@ const readDraftItem = (
 		tier: 0,
 	};
 	draft.items[itemId] = created;
-	return created as Record<string, unknown>;
+	return created as Record<string, any>;
 };
 
-const applyEmbeddedMergeRulesFromLegacyIds = ({
-	draft,
-	merge,
-}: {
-	draft: {
-		items: Record<string, unknown>;
+const readDraftProducer = (item: Record<string, any>): GameProducerDefinition => {
+	if (item.producer) return item.producer;
+	return {
+		lines: [],
+		maxQueueSize: 1,
+		onChargesDepleted: "stop",
 	};
-	merge?: LegacyGameConfigViews["merge"];
-}) => {
-	if (!merge) return;
+};
+
+const readDraftStash = (item: Record<string, any>): GameStashDefinition => {
+	if (item.stash) return item.stash;
+	return {
+		charges: 1,
+		line: {
+			chargeCost: 1,
+			durationMs: 0,
+			id: "line:stash",
+			name: "Open stash",
+			placement: "board_then_inventory",
+			tags: [],
+			visibility: "visible",
+		},
+		maxQueueSize: 1,
+		onChargesDepleted: "remove",
+	};
+};
+
+const readDraftLine = (draft: DraftGameConfig, lineId: string) => {
 	for (const item of Object.values(draft.items)) {
 		if (!item || typeof item !== "object" || Array.isArray(item)) continue;
-		const draftItem = item as Record<string, unknown>;
-		const mergeIds = draftItem.mergeIds;
-		if (!Array.isArray(mergeIds)) continue;
-		draftItem.merges = mergeIds.flatMap((mergeId) => {
-			const rule = typeof mergeId === "string" ? merge[mergeId] : undefined;
-			return rule
-				? [
-						rule,
-					]
-				: [];
-		});
-		delete draftItem.mergeIds;
+		const draftItem = item as Record<string, any>;
+		for (const line of draftItem.producer?.lines ?? []) {
+			if (line?.id === lineId) return line as Record<string, unknown>;
+		}
+		if (draftItem.stash?.line?.id === lineId)
+			return draftItem.stash.line as Record<string, unknown>;
 	}
+	throw new Error(`Cannot override missing test producer line "${lineId}".`);
 };
 
-const attachLegacyGameConfigViews = (config: EngineTestGameConfig) => {
-	const views = readLegacyViews(config);
+const attachTestConfigCatalogs = (config: EngineTestGameConfig) => {
 	Object.defineProperties(config, {
-		craftRecipes: {
-			value: views.craftRecipes,
+		craftCatalog: {
+			value: readCraftCatalog(config),
 		},
-		merge: {
-			value: views.merge,
+		lineCatalog: {
+			value: readLineCatalog(config),
 		},
-		producers: {
-			value: views.producers,
+		mergeCatalog: {
+			value: readMergeCatalog(config),
 		},
-		products: {
-			value: views.products,
-		},
-		stashes: {
-			value: views.stashes,
+		producerCatalog: {
+			value: readProducerCatalog(config),
 		},
 	});
 	return config;
 };
 
-const readLegacyViews = (config: GameConfig): LegacyGameConfigViews => {
-	const craftRecipes: LegacyGameConfigViews["craftRecipes"] = {};
-	const merge: LegacyGameConfigViews["merge"] = {};
-	const producers: LegacyGameConfigViews["producers"] = {};
-	const products: LegacyGameConfigViews["products"] = {};
-	const stashes: LegacyGameConfigViews["stashes"] = {};
-
+const readCraftCatalog = (config: GameConfig): Record<string, GameCraftRecipeDefinition> => {
+	const catalog: Record<string, GameCraftRecipeDefinition> = {};
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.craft) craftRecipes[itemId] = item.craft;
-		for (const [mergeIndex, rule] of (item.merges ?? []).entries()) {
-			merge[`merge:${itemId}:${mergeIndex}`] = rule;
-		}
-		if (item.producer) {
-			const productIds = item.producer.lines.map((line) => line.id);
-			producers[itemId] = {
-				charges: item.producer.charges,
-				maxQueueSize: item.producer.maxQueueSize,
-				onChargesDepleted: item.producer.onChargesDepleted,
-				productIds,
-			};
-			for (const line of item.producer.lines) products[line.id] = line;
-		}
-		if (item.stash) {
-			stashes[itemId] = {
-				charges: item.stash.charges,
-				maxQueueSize: item.stash.maxQueueSize,
-				onChargesDepleted: item.stash.onChargesDepleted,
-				productIds: [
-					item.stash.line.id,
-				],
-			};
-			products[item.stash.line.id] = item.stash.line;
+		if (item.craft) catalog[itemId] = item.craft;
+	}
+	return catalog;
+};
+
+const readLineCatalog = (config: GameConfig): Record<string, GameProducerLineDefinition> => {
+	const catalog: Record<string, GameProducerLineDefinition> = {};
+	for (const item of Object.values(config.items)) {
+		for (const line of item.producer?.lines ?? []) catalog[line.id] = line;
+		if (item.stash?.line) catalog[item.stash.line.id] = item.stash.line;
+	}
+	return catalog;
+};
+
+const readMergeCatalog = (config: GameConfig): Record<string, GameMergeRuleDefinition> => {
+	const catalog: Record<string, GameMergeRuleDefinition> = {};
+	for (const [itemId, item] of Object.entries(config.items)) {
+		for (const [index, rule] of (item.merges ?? []).entries()) {
+			catalog[`${itemId}:${index}`] = rule;
 		}
 	}
+	return catalog;
+};
 
-	return {
-		craftRecipes,
-		merge,
-		producers,
-		products,
-		stashes,
-	};
+const readProducerCatalog = (
+	config: GameConfig,
+): Record<string, GameProducerCapabilityDefinition> => {
+	const catalog: Record<string, GameProducerCapabilityDefinition> = {};
+	for (const [itemId, item] of Object.entries(config.items)) {
+		const producer = item.producer ?? item.stash;
+		if (producer) catalog[itemId] = producer;
+	}
+	return catalog;
 };

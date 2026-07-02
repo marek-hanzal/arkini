@@ -2,7 +2,7 @@ import { Fragment, type FC, useState } from "react";
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewLabel } from "~/v0/board/logic/readActivationInputViewLabel";
 import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 import { ItemInlineAsset } from "~/v0/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readDetailItemName } from "~/v0/item-detail/ui/readDetailItemName";
@@ -40,7 +40,7 @@ const formatPercent = (value: number) => {
 };
 
 const readQuantityLabel = (
-	quantity: NonNullable<ProducerProductLineView["outputs"]>[number]["quantity"],
+	quantity: NonNullable<ProducerLineView["outputs"]>[number]["quantity"],
 ) => {
 	const resolvedQuantity = quantity ?? 1;
 	return typeof resolvedQuantity === "number"
@@ -48,9 +48,7 @@ const readQuantityLabel = (
 		: `${resolvedQuantity.min}-${resolvedQuantity.max}×`;
 };
 
-const readOutputProbabilityLabel = (
-	output: NonNullable<ProducerProductLineView["outputs"]>[number],
-) => {
+const readOutputProbabilityLabel = (output: NonNullable<ProducerLineView["outputs"]>[number]) => {
 	if (output.probability === undefined) {
 		return output.kind === "guaranteed" ? "guaranteed" : undefined;
 	}
@@ -60,7 +58,7 @@ const readOutputProbabilityLabel = (
 		: `${formatPercent(output.probability)} chance`;
 };
 
-const readOutputMeta = (output: NonNullable<ProducerProductLineView["outputs"]>[number]) =>
+const readOutputMeta = (output: NonNullable<ProducerLineView["outputs"]>[number]) =>
 	[
 		output.enabled === false ? "disabled" : undefined,
 		readQuantityLabel(output.quantity),
@@ -71,25 +69,23 @@ const readOutputMeta = (output: NonNullable<ProducerProductLineView["outputs"]>[
 		.filter(Boolean)
 		.join(" · ");
 
-const readOutputEffectLines = (output: NonNullable<ProducerProductLineView["outputs"]>[number]) =>
+const readOutputEffectLines = (output: NonNullable<ProducerLineView["outputs"]>[number]) =>
 	(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
 
 const readEffectRequirementPrefix = (
-	requirement: NonNullable<ProducerProductLineView["effectRequirements"]>[number],
+	requirement: NonNullable<ProducerLineView["effectRequirements"]>[number],
 ) => (requirement.kind === "grant.blockStart" ? "Blocked by" : "Missing");
 
-const readVisibleEffectRequirements = (line: ProducerProductLineView) =>
+const readVisibleEffectRequirements = (line: ProducerLineView) =>
 	(line.effectRequirements ?? []).filter((requirement) => !requirement.ready);
 
-const readLineEffectPolarity = (
-	line: ProducerProductLineView,
-): EffectDetailPolarity | undefined => {
+const readLineEffectPolarity = (line: ProducerLineView): EffectDetailPolarity | undefined => {
 	if (line.lineKind !== "effect") return undefined;
 	return line.effectPolarity;
 };
 
 const readTargetLimitLabel = (
-	limit: NonNullable<ProducerProductLineView["targetLimits"]>[number],
+	limit: NonNullable<ProducerLineView["targetLimits"]>[number],
 	items: ItemCatalogView,
 ) => {
 	const itemName = readDetailItemName({
@@ -151,7 +147,7 @@ const DetailLineNoteList: FC<{
 
 const DetailLineOutputs: FC<{
 	items: ItemCatalogView;
-	line: ProducerProductLineView;
+	line: ProducerLineView;
 }> = ({ items, line }) => {
 	const outputs = line.outputs ?? [];
 	if (outputs.length === 0) return null;
@@ -164,7 +160,7 @@ const DetailLineOutputs: FC<{
 					const outputItem = items[output.itemId];
 					return (
 						<div
-							key={`${line.productId}:output:${output.itemId}:${outputIndex}`}
+							key={`${line.lineId}:output:${output.itemId}:${outputIndex}`}
 							className="flex min-w-0 items-center gap-2"
 						>
 							<ItemInlineAsset
@@ -194,7 +190,7 @@ const DetailLineOutputs: FC<{
 										{readOutputEffectLines(output).map(
 											(effectLine, effectLineIndex) => (
 												<li
-													key={`${line.productId}:output:${outputIndex}:effect:${effectLineIndex}`}
+													key={`${line.lineId}:output:${outputIndex}:effect:${effectLineIndex}`}
 													className="break-words"
 												>
 													{effectLine}
@@ -403,7 +399,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 			id: "product",
 			label: "Products",
 			lines: lines.filter(({ line }) => line.lineKind === "product"),
-			title: "Product lines",
+			title: "Producer lines",
 		},
 		...effectDetailPolarityTabs.map((tab) => ({
 			id: `effect:${tab.polarity}`,
@@ -437,7 +433,7 @@ export const DetailProducerLinesPanel: FC<DetailProducerLinesPanel.Props> = ({ i
 			) : null}
 			<div className="mt-3 flex flex-col gap-4">
 				{activeGroup.lines.map((model, index) => (
-					<Fragment key={model.line.productId}>
+					<Fragment key={model.line.lineId}>
 						{index > 0 ? <DetailSeparator className="my-1.5" /> : null}
 						<DetailProducerLineCard
 							items={items}

@@ -2,91 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseGameConfig as parseGameConfigRaw } from "../../src/v0/game/config/GameConfigSchema";
 import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
 
-const embedLegacyConfigForAuditTest = (value: unknown): unknown => {
-	if (!value || typeof value !== "object") return value;
-	const legacy = value as Record<string, any>;
-	const items = {
-		...(legacy.items ?? {}),
-	};
-	const products = legacy.products ?? {};
-
-	for (const [producerId, producer] of Object.entries<any>(legacy.producers ?? {})) {
-		items[producerId] = {
-			...(items[producerId] ?? {}),
-			producer: {
-				charges: producer.charges,
-				lines: (producer.productIds ?? []).flatMap((productId: string) => {
-					const product = products[productId];
-					return product
-						? [
-								{
-									...product,
-									id: product.id ?? productId,
-								},
-							]
-						: [];
-				}),
-				maxQueueSize: producer.maxQueueSize,
-				onChargesDepleted: producer.onChargesDepleted,
-			},
-		};
-	}
-
-	for (const [stashId, stash] of Object.entries<any>(legacy.stashes ?? {})) {
-		const productId = stash.productIds?.[0];
-		const product = productId ? products[productId] : undefined;
-		if (!product) continue;
-		items[stashId] = {
-			...(items[stashId] ?? {}),
-			stash: {
-				charges: stash.charges,
-				line: {
-					...product,
-					id: product.id ?? productId,
-				},
-				maxQueueSize: stash.maxQueueSize,
-				onChargesDepleted: stash.onChargesDepleted,
-			},
-		};
-	}
-
-	for (const [itemId, craft] of Object.entries<any>(legacy.craftRecipes ?? {})) {
-		items[itemId] = {
-			...(items[itemId] ?? {}),
-			craft,
-		};
-	}
-
-	for (const [itemId, item] of Object.entries<any>(items)) {
-		if (!Array.isArray(item.mergeIds)) continue;
-		items[itemId] = {
-			...item,
-			merges: item.mergeIds.map((mergeId: string) => legacy.merge?.[mergeId]).filter(Boolean),
-		};
-		delete items[itemId].mergeIds;
-	}
-
-	const {
-		craftRecipes: _craftRecipes,
-		merge: _merge,
-		producers: _producers,
-		products: _products,
-		stashes: _stashes,
-		...next
-	} = legacy;
-	void _craftRecipes;
-	void _merge;
-	void _producers;
-	void _products;
-	void _stashes;
-	return {
-		...next,
-		items,
-	};
-};
-
-const parseGameConfig = (value: unknown) =>
-	parseGameConfigRaw(embedLegacyConfigForAuditTest(value));
+const parseGameConfig = parseGameConfigRaw;
 
 const createConfigValue = () => ({
 	version: 1,
@@ -121,6 +37,32 @@ const createConfigValue = () => ({
 			description: "Producer",
 			maxStackSize: 1,
 			name: "Producer",
+			producer: {
+				maxQueueSize: 1,
+				lines: [
+					{
+						durationMs: 1000,
+						id: "line:test",
+						inputs: [
+							{
+								capacity: 1,
+								consume: true,
+								itemId: "item:fuel",
+								quantity: 1,
+							},
+						],
+						name: "Test line",
+						output: [
+							{
+								itemId: "item:pollution",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
+						placement: "board_then_inventory",
+					},
+				],
+			},
 			tags: [],
 			tier: 0,
 		},
@@ -148,39 +90,6 @@ const createConfigValue = () => ({
 			tier: 0,
 		},
 	},
-	merge: {},
-	producers: {
-		"item:producer": {
-			maxQueueSize: 1,
-			productIds: [
-				"product:test",
-			],
-		},
-	},
-	stashes: {},
-	craftRecipes: {},
-	products: {
-		"product:test": {
-			durationMs: 1000,
-			inputs: [
-				{
-					capacity: 1,
-					consume: true,
-					itemId: "item:fuel",
-					quantity: 1,
-				},
-			],
-			name: "Test product",
-			output: [
-				{
-					itemId: "item:pollution",
-					quantity: 1,
-					type: "guaranteed",
-				},
-			],
-			placement: "board_then_inventory",
-		},
-	},
 	startingState: {
 		board: [
 			{
@@ -198,6 +107,12 @@ const createConfigValue = () => ({
 	},
 });
 
+const readTestLine = (config: ReturnType<typeof createConfigValue>, lineId: string) => {
+	const line = config.items["item:producer"].producer.lines.find((line) => line.id === lineId);
+	if (!line) throw new Error(`Missing test line "${lineId}".`);
+	return line as any;
+};
+
 describe("auditGameConfig", () => {
 	it("warns about produced items with no downstream use", () => {
 		const warnings = auditGameConfig(parseGameConfig(createConfigValue()));
@@ -210,9 +125,9 @@ describe("auditGameConfig", () => {
 		]);
 	});
 
-	it("tracks product-owned inline inputs and outputs", () => {
+	it("tracks line-owned inline inputs and outputs", () => {
 		const config: any = createConfigValue();
-		config.products["product:test"].inputs = [
+		readTestLine(config, "line:test").inputs = [
 			{
 				capacity: 1,
 				consume: true,
@@ -220,7 +135,7 @@ describe("auditGameConfig", () => {
 				quantity: 1,
 			},
 		];
-		config.products["product:test"].output = [
+		readTestLine(config, "line:test").output = [
 			{
 				itemId: "item:pollution",
 				quantity: 1,
@@ -240,7 +155,7 @@ describe("auditGameConfig", () => {
 
 	it("does not call produced items terminal when output-owned effects reference them", () => {
 		const config: any = createConfigValue();
-		config.products["product:test"].output[0].effects = [
+		readTestLine(config, "line:test").output[0].effects = [
 			{
 				bands: [
 					{

@@ -3,12 +3,12 @@ import { readBoardItemCount } from "~/v0/game/board/readBoardItemCount";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
-import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
+import { readProducerLineDurationMs } from "~/v0/game/producer/readProducerLineDurationMs";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
-import { readProducerJobProductLine } from "~/v0/game/producer/readProducerJobProductLine";
+import { readProducerJobLine } from "~/v0/game/producer/readProducerJobLine";
 
 type ActivationOutput = NonNullable<GameProducerLineDefinition["output"]>;
 type ActivationOutputEntry = ActivationOutput[number];
@@ -116,26 +116,26 @@ const readPendingProducerOutputQuantity = ({
 	let quantity = 0;
 
 	for (const job of Object.values(save.producerJobs)) {
-		const product = readProducerJobProductLine({
+		const line = readProducerJobLine({
 			config,
 			job,
 			save,
 		});
-		if (!product?.output) continue;
+		if (!line?.output) continue;
 
-		const effectiveProductLine = readEffectiveProducerProductLine({
-			baseDurationMs: readProducerProductDurationMs({
-				product,
+		const effectiveProducerLine = readEffectiveProducerLine({
+			baseDurationMs: readProducerLineDurationMs({
+				line,
 			}),
 			config,
 			nowMs,
 			producerItemInstanceId: job.producerItemInstanceId,
-			product,
-			productId: job.productId,
+			line,
+			lineId: job.lineId,
 			save,
 		});
 
-		for (const outputEntry of effectiveProductLine.lootPlan.baseOutput) {
+		for (const outputEntry of effectiveProducerLine.lootPlan.baseOutput) {
 			if (outputEntry.type !== "guaranteed") continue;
 			if (
 				!outputEntryCanCreateTargetItem({

@@ -15,5 +15,5 @@ Rules:
 Config content change:
 
 - Purifier I now has one product line only.
-- `product:purifier-t1:pollution` consumes `1..4` `item:pollution` through `mode: "upTo"`.
+- `line:purifier-t1:pollution` consumes `1..4` `item:pollution` through `mode: "upTo"`.
 - Removed the previous separate bulk purifier line and removed water/charcoal costs from purifier cleanup.

@@ -9,7 +9,7 @@ import { mergeItemFx } from "~/v0/game/merge/mergeItemFx";
 import { openStashFx } from "~/v0/game/stash/openStashFx";
 import { parseGameActionFx } from "~/v0/game/engine/parseGameActionFx";
 import { removeTileFx } from "~/v0/game/remove/removeTileFx";
-import { setProducerProductLineDefaultFx } from "~/v0/game/producer/setProducerProductLineDefaultFx";
+import { setProducerLineDefaultFx } from "~/v0/game/producer/setProducerLineDefaultFx";
 import { setCheatSpeedModeFx } from "~/v0/game/cheat/setCheatSpeedModeFx";
 import { startCraftFx } from "~/v0/game/craft/startCraftFx";
 import { spawnDebugItemFx } from "~/v0/game/debug/spawnDebugItemFx";
@@ -17,7 +17,7 @@ import { storeCraftInputFx } from "~/v0/game/craft/storeCraftInputFx";
 import { withdrawCraftInputFx } from "~/v0/game/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/v0/game/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/v0/game/producer/withdrawProducerInputFx";
-import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
+import { startProducerLineFx } from "~/v0/game/producer/startProducerLineFx";
 import { matchGameAction } from "~/v0/game/engine/logic/matchGameAction";
 import { processWorldSnapshotFx } from "~/v0/game/world/processWorldSnapshotFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
@@ -142,15 +142,15 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 				nowMs,
 				save,
 			}),
-		producerProductLineSetDefault: (setDefaultAction) =>
-			setProducerProductLineDefaultFx({
+		producerLineSetDefault: (setDefaultAction) =>
+			setProducerLineDefaultFx({
 				action: setDefaultAction,
 				config,
 				nowMs,
 				save,
 			}),
-		producerProductStart: (startAction) =>
-			startProducerProductFx({
+		producerLineStart: (startAction) =>
+			startProducerLineFx({
 				action: startAction,
 				config,
 				nowMs,

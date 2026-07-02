@@ -41,22 +41,22 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 	const actionError = itemAction.error;
 	const actionErrorMessage = actionError ? toGameActionError(actionError).message : undefined;
 
-	const setDefaultProductLine = (productId: string) => {
+	const setDefaultProducerLine = (lineId: string) => {
 		if (!liveBoardItem) return;
 		void itemAction.run({
 			producerItemInstanceId: liveBoardItem.id,
-			productId,
-			type: "producer.product_line.set_default",
+			lineId,
+			type: "producer.line.set_default",
 		});
 	};
 
-	const startProductLine = (productId: string) => {
+	const startProducerLine = (lineId: string) => {
 		if (!liveBoardItem) return;
 		void itemAction.run({
 			inputRefs: [],
 			producerItemInstanceId: liveBoardItem.id,
-			productId,
-			type: "producer.product.start",
+			lineId,
+			type: "producer.line.start",
 		});
 	};
 
@@ -83,12 +83,12 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 		});
 	};
 
-	const withdrawProductLineInput = (productId: string, itemId: string) => {
+	const withdrawProducerLineInput = (lineId: string, itemId: string) => {
 		if (!liveBoardItem) return;
 		void itemAction.run({
 			itemId,
 			producerItemInstanceId: liveBoardItem.id,
-			productId,
+			lineId,
 			type: "producer.input.withdraw",
 		});
 	};
@@ -102,11 +102,11 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			items={items}
 			onClaimCraft={claimCraft}
 			onClose={onClose}
-			onSetDefaultProductLine={setDefaultProductLine}
+			onSetDefaultProducerLine={setDefaultProducerLine}
 			onStartCraft={startCraft}
-			onStartProductLine={startProductLine}
+			onStartProducerLine={startProducerLine}
 			onWithdrawCraftInput={withdrawCraftInput}
-			onWithdrawProductLineInput={withdrawProductLineInput}
+			onWithdrawProducerLineInput={withdrawProducerLineInput}
 		/>
 	);
 };

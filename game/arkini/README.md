@@ -28,7 +28,7 @@ Everything is movable and storable by default unless a concrete mechanic says ot
 
 ### Capability ownership
 
-Every placeable board tile lives in `items.json`. If that tile can produce, store, or craft, the capability definition is keyed by the same item id in `producers.json`, `stashes.json`, or `craft-recipes.json`. Items do not carry `producerId`, `stashId`, or `craftRecipeId`. Source items usually omit derived `assetIds`: the compiler derives `["asset:<itemId>"]` from the item id and synthesizes conventional assets. Item `code` no longer exists; the item id is the single stable identity. `assets.json` is only for overrides, such as one producer deliberately reusing another producer image. Asset overrides do not carry `kind`; asset ownership and rendering are already implied by the item `assetIds`, asset id, render mode, and resource id. Craft/blueprint items may list multiple ordered asset ids; runtime maps delivered requirement progress evenly across that array. One owner id is enough; making the config repeat itself was paperwork wearing fake architecture glasses. Omit boring product names when they equal the primary output item name, omit quantity `1` in source inputs/outputs, and omit blueprint craft `resultItemId` when it is derived from the blueprint id.
+Every placeable board tile lives in `items.json`. If that tile can produce, store, craft, merge, or be removed by a tool, that capability is embedded directly on the same item definition. Source items usually omit derived `assetIds`: the compiler derives `["asset:<itemId>"]` from the item id and synthesizes conventional assets. Item `code` no longer exists; the item id is the single stable identity. `assets.json` is only for overrides, such as one producer deliberately reusing another producer image. Asset overrides do not carry `kind`; asset ownership and rendering are already implied by the item `assetIds`, asset id, render mode, and resource id. Craft/blueprint items may list multiple ordered asset ids; runtime maps delivered requirement progress evenly across that array. One owner id is enough; making the config repeat itself was paperwork wearing fake architecture glasses. Omit boring line names when they equal the primary output item name, omit quantity `1` in source inputs/outputs, and omit blueprint craft `resultItemId` when it is derived from the blueprint id.
 
 Producer building item ids intentionally use the `producer:<name>-t<tier>` shape because those ids are the stable item/capability identity used by saves, effects, and UI. Do not create alias items like `item:lumberjack-t1` unless the gameplay model truly needs a separate item.
 
@@ -55,7 +55,7 @@ Townhall tier progression is a one-way era gate. Crafting the next Town Hall con
 
 Higher Town Hall tiers do not re-issue lower-era blueprints. If the player wants duplicate lower-era infrastructure, they should build it before moving to the next era. Missing duplicates should slow later economy, not soft-lock progression.
 
-Townhall products use era-proof inputs, while blueprint craft recipes use construction inputs. Current era spine:
+Townhall producer lines use era-proof inputs, while blueprint craft recipes use construction inputs. Current era spine:
 
 ```txt
 Town Hall I
@@ -148,9 +148,9 @@ producer:lumberjack-t1
 producer:sawmill-t1
 proximity:lumberjack-t1:tree
 proximity:sawmill-t1:lumberjack-t1
-product:lumberjack-t1:log
-product:sawmill-t1:plank
-product inputs live inline on `product:sawmill-t1:plank`
+line:lumberjack-t1:log
+line:sawmill-t1:plank
+product inputs live inline on `line:sawmill-t1:plank`
 outputs live inline on the product lines
 ```
 
@@ -164,9 +164,9 @@ producer:quarry-t1
 producer:stonemason-t1
 proximity:quarry-t1:rock
 proximity:stonemason-t1:quarry-t1
-product:quarry-t1:stone
-product:stonemason-t1:stone-block
-product inputs live inline on `product:stonemason-t1:stone-block`
+line:quarry-t1:stone
+line:stonemason-t1:stone-block
+product inputs live inline on `line:stonemason-t1:stone-block`
 outputs live inline on the product lines
 ```
 
@@ -638,7 +638,7 @@ Guild branch asset IDs:
 
 ### Housing morale side economy
 
-Housing is a parallel morale subsystem layered on top of the core producer economy. Houses consume comfort goods from the era where they appear and produce morale tokens. Morale is intentionally not required for ordinary production lines; base lines stay available. Where morale appears in producer products, it is authored as a duplicate boosted line with better output/speed. Where morale appears in crafts, it is reserved for bigger civic upgrades and prestige buildings, because even a tiny city should occasionally ask whether its people are miserable before building another giant marble ego box.
+Housing is a parallel morale subsystem layered on top of the core producer economy. Houses consume comfort goods from the era where they appear and produce morale tokens. Morale is intentionally not required for ordinary production lines; base lines stay available. Where morale appears in producer lines, it is authored as a duplicate boosted line with better output/speed. Where morale appears in crafts, it is reserved for bigger civic upgrades and prestige buildings, because even a tiny city should occasionally ask whether its people are miserable before building another giant marble ego box.
 
 ```txt
 House I  + Water + Log -> Morale I
@@ -678,9 +678,9 @@ University
 The actual keystone buildings emit passive global grant effects. The University outputs and keystone craft recipes own their own path-lock reactions through output/craft-owned `grant.blockStart` effects, so choosing one path disables counter-path work without item-level creation blockers. Later branch-specific product lines should keep hidden baseline outputs and reveal affected output entries through visibility-phase `grant.require` effects.
 
 ```txt
-producer:house-of-engineers blocks Cathedral/Mage Lodge blueprint products and creation of Cathedral/Mage Lodge blueprints/buildings
-producer:cathedral blocks House of Engineers/Mage Lodge blueprint products and creation of House of Engineers/Mage Lodge blueprints/buildings
-producer:mage-lodge blocks House of Engineers/Cathedral blueprint products and creation of House of Engineers/Cathedral blueprints/buildings
+producer:house-of-engineers blocks Cathedral/Mage Lodge blueprint producer lines and creation of Cathedral/Mage Lodge blueprints/buildings
+producer:cathedral blocks House of Engineers/Mage Lodge blueprint producer lines and creation of House of Engineers/Mage Lodge blueprints/buildings
+producer:mage-lodge blocks House of Engineers/Cathedral blueprint producer lines and creation of House of Engineers/Cathedral blueprints/buildings
 ```
 
 The branches are intentionally only keystone buildings for now. Unconnected Energy/Power Plant placeholder content is not present in live config; add it back only when Engineers actually use it. Follow-up eras should give branches passive path effects that reveal branch-tagged product lines:

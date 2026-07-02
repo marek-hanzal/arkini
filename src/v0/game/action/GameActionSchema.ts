@@ -12,8 +12,8 @@ import { GameActionCraftStartSchema } from "~/v0/game/action/GameActionCraftStar
 import { GameActionItemMergeSchema } from "~/v0/game/action/GameActionItemMergeSchema";
 import { GameActionProducerInputStoreSchema } from "~/v0/game/action/GameActionProducerInputStoreSchema";
 import { GameActionProducerInputWithdrawSchema } from "~/v0/game/action/GameActionProducerInputWithdrawSchema";
-import { GameActionProducerProductLineSetDefaultSchema } from "~/v0/game/action/GameActionProducerProductLineSetDefaultSchema";
-import { GameActionProducerProductStartSchema } from "~/v0/game/action/GameActionProducerProductStartSchema";
+import { GameActionProducerLineSetDefaultSchema } from "~/v0/game/action/GameActionProducerLineSetDefaultSchema";
+import { GameActionProducerLineStartSchema } from "~/v0/game/action/GameActionProducerLineStartSchema";
 import { GameActionStashOpenSchema } from "~/v0/game/action/GameActionStashOpenSchema";
 import { GameActionTileRemoveSchema } from "~/v0/game/action/GameActionTileRemoveSchema";
 
@@ -31,8 +31,8 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionInventorySlotsSwapSchema,
 	GameActionProducerInputStoreSchema,
 	GameActionProducerInputWithdrawSchema,
-	GameActionProducerProductLineSetDefaultSchema,
-	GameActionProducerProductStartSchema,
+	GameActionProducerLineSetDefaultSchema,
+	GameActionProducerLineStartSchema,
 	GameActionStashOpenSchema,
 	GameActionTileRemoveSchema,
 ]);

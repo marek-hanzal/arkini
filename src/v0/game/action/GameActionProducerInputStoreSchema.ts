@@ -7,7 +7,7 @@ export const GameActionProducerInputStoreSchema = z
 	.object({
 		inputRef: GameActionItemRefSchema,
 		producerItemInstanceId: IdSchema,
-		productId: IdSchema.optional(),
+		lineId: IdSchema.optional(),
 		type: z.literal("producer.input.store"),
 	})
 	.strict();

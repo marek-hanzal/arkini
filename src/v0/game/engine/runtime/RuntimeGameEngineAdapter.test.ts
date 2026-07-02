@@ -71,24 +71,24 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 200,
 		});
 
 		expect(result.events).toMatchObject([
 			{
-				type: "product.started",
+				type: "producer_line.started",
 			},
 		]);
 		expect(Object.values(adapter.readSnapshot().save.producerJobs)[0]).toMatchObject({
 			readyAtMs: 1200,
-			productId: "product:test",
+			lineId: "line:test",
 		});
 		expect(adapter.readSnapshot().nextWakeAtMs).toBe(1200);
 		expect(emitted).toEqual([
-			"product.started",
+			"producer_line.started",
 		]);
 		expect(emittedAtMs).toEqual([
 			200,
@@ -110,8 +110,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 0,
 		});
@@ -120,14 +120,14 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 
 		expect(result.events.map((event) => event.type)).toEqual([
-			"product.completed",
+			"producer_line.completed",
 			"item.created",
 			"item.created",
 		]);
 		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
 		expect(emitted).toEqual([
-			"product.started",
-			"product.completed",
+			"producer_line.started",
+			"producer_line.completed",
 			"item.created",
 			"item.created",
 		]);
@@ -144,10 +144,10 @@ describe("RuntimeGameEngineAdapter", () => {
 						width: 4,
 					},
 				},
-				products: {
-					...base.products,
-					"product:test": {
-						...base.products["product:test"],
+				lineOverrides: {
+					...base.lineCatalog,
+					"line:test": {
+						...base.lineCatalog["line:test"],
 						output: [
 							{
 								itemId: "item:twig",
@@ -185,8 +185,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 0,
 		});
@@ -203,12 +203,12 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 
 		expect(result.events.map((event) => event.type)).toEqual([
-			"product.completed",
+			"producer_line.completed",
 			"item.created",
 		]);
 		expect(updates).toEqual([
 			[
-				"product.completed",
+				"producer_line.completed",
 				"item.created",
 			],
 		]);
@@ -229,10 +229,10 @@ describe("RuntimeGameEngineAdapter", () => {
 						width: 3,
 					},
 				},
-				products: {
-					...base.products,
-					"product:test": {
-						...base.products["product:test"],
+				lineOverrides: {
+					...base.lineCatalog,
+					"line:test": {
+						...base.lineCatalog["line:test"],
 						output: [
 							{
 								itemId: "item:twig",
@@ -270,8 +270,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 0,
 		});
@@ -291,7 +291,7 @@ describe("RuntimeGameEngineAdapter", () => {
 
 		expect(updates).toEqual([
 			[
-				"product.completed",
+				"producer_line.completed",
 				"item.created",
 			],
 		]);
@@ -320,8 +320,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 100,
 		});
@@ -329,8 +329,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 200,
 		});
@@ -352,8 +352,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 100,
 		});
@@ -362,8 +362,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 1200,
 		});
@@ -385,8 +385,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 0,
 		});
@@ -402,8 +402,8 @@ describe("RuntimeGameEngineAdapter", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			nowMs: 1500,
 		});

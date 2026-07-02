@@ -18,8 +18,8 @@ const runTick = (props: runGameTickFx.Props) =>
 	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
 type TestConfig = ReturnType<typeof createEngineTestConfig>;
-type TestProduct = TestConfig["products"][string];
-type TestOutputEntry = NonNullable<TestProduct["output"]>[number];
+type TestLine = TestConfig["lineCatalog"][string];
+type TestOutputEntry = NonNullable<TestLine["output"]>[number];
 type TestOutputEffect = NonNullable<
 	Exclude<
 		TestOutputEntry,
@@ -30,11 +30,11 @@ type TestOutputEffect = NonNullable<
 >[number];
 
 const appendFirstOutputEffects = (
-	product: TestProduct | undefined,
+	line: TestLine | undefined,
 	effects: readonly TestOutputEffect[],
-): TestProduct => {
-	if (!product) throw new Error("Missing test product.");
-	const [firstOutput, ...remainingOutput] = product.output ?? [
+): TestLine => {
+	if (!line) throw new Error("Missing test line.");
+	const [firstOutput, ...remainingOutput] = line.output ?? [
 		{
 			itemId: "item:plank",
 			quantity: 1,
@@ -46,7 +46,7 @@ const appendFirstOutputEffects = (
 	}
 
 	return {
-		...product,
+		...line,
 		output: [
 			{
 				...firstOutput,
@@ -62,7 +62,7 @@ const appendFirstOutputEffects = (
 
 const readOwnedTwigGrantConfig = (
 	baseConfig: ReturnType<typeof createEngineTestConfig>,
-	productIds: readonly string[],
+	lineIds: readonly string[],
 ) => {
 	const grantId = "grant:test:owned-twig";
 	const effectId = "effect:test:owned-twig-grant";
@@ -91,12 +91,11 @@ const readOwnedTwigGrantConfig = (
 				],
 			},
 		},
-		products: {
-			...baseConfig.products,
+		lineOverrides: {
 			...Object.fromEntries(
-				productIds.map((productId) => [
-					productId,
-					appendFirstOutputEffects(baseConfig.products[productId], [
+				lineIds.map((lineId) => [
+					lineId,
+					appendFirstOutputEffects(baseConfig.lineCatalog[lineId], [
 						{
 							display: "always" as const,
 							kind: "grant.require" as const,
@@ -121,16 +120,15 @@ const readOwnedTwigGrantConfig = (
 const readLocalTwigGrantConfig = (
 	baseConfig: ReturnType<typeof createEngineTestConfig>,
 	props: {
-		productIds: readonly string[];
+		lineIds: readonly string[];
 		radius: number;
 	},
 ) => ({
-	products: {
-		...baseConfig.products,
+	lineOverrides: {
 		...Object.fromEntries(
-			props.productIds.map((productId) => [
-				productId,
-				appendFirstOutputEffects(baseConfig.products[productId], [
+			props.lineIds.map((lineId) => [
+				lineId,
+				appendFirstOutputEffects(baseConfig.lineCatalog[lineId], [
 					{
 						display: "always" as const,
 						items: {
@@ -163,9 +161,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -176,7 +174,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(job).toMatchObject({
 			readyAtMs: 1500,
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 500,
 		});
 		expect(result.events).toEqual([
@@ -185,9 +183,9 @@ describe("applyGameActionFx Producer", () => {
 				readyAtMs: 1500,
 				jobId: job.id,
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				startAtMs: 500,
-				type: "product.started",
+				type: "producer_line.started",
 			},
 		]);
 		expect(result.nextWakeAtMs).toBe(1500);
@@ -218,9 +216,8 @@ describe("applyGameActionFx Producer", () => {
 					],
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:shred": appendFirstOutputEffects(baseConfig.products["product:shred"], [
+			lineOverrides: {
+				"line:shred": appendFirstOutputEffects(baseConfig.lineCatalog["line:shred"], [
 					{
 						display: "always",
 						kind: "grant.blockStart",
@@ -256,8 +253,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -288,10 +285,9 @@ describe("applyGameActionFx Producer", () => {
 					name: "Unlock Grant",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:twig",
@@ -328,8 +324,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -348,10 +344,9 @@ describe("applyGameActionFx Producer", () => {
 	it("completes zero-duration producer products in the same action", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					durationMs: 0,
 					output: [
 						{
@@ -372,8 +367,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -393,13 +388,13 @@ describe("applyGameActionFx Producer", () => {
 			expect.objectContaining({
 				atMs: 500,
 				readyAtMs: 500,
-				productId: "product:test",
-				type: "product.started",
+				lineId: "line:test",
+				type: "producer_line.started",
 			}),
 			expect.objectContaining({
 				atMs: 500,
-				productId: "product:test",
-				type: "product.completed",
+				lineId: "line:test",
+				type: "producer_line.completed",
 			}),
 			expect.objectContaining({
 				itemId: "item:twig",
@@ -438,18 +433,17 @@ describe("applyGameActionFx Producer", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:blueprint-plank",
@@ -484,8 +478,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -531,18 +525,17 @@ describe("applyGameActionFx Producer", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:blueprint-plank",
@@ -577,8 +570,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -617,18 +610,17 @@ describe("applyGameActionFx Producer", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:blueprint-plank",
@@ -663,8 +655,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -703,25 +695,22 @@ describe("applyGameActionFx Producer", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					durationMs: 1000,
 					output: [
 						{
@@ -741,8 +730,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -753,8 +742,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 200,
@@ -773,8 +762,8 @@ describe("applyGameActionFx Producer", () => {
 	it("rejects producer start while the same target has a running craft job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
@@ -801,8 +790,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 200,
@@ -822,14 +811,13 @@ describe("applyGameActionFx Producer", () => {
 	it("rechecks product-line grants after auto-filled inputs are consumed", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
-			"product:shred",
+			"line:shred",
 		]);
 		const config = createEngineTestConfig({
 			...grantConfig,
-			products: {
-				...grantConfig.products,
-				"product:shred": {
-					...grantConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...grantConfig.lineOverrides["line:shred"],
 				},
 			},
 			startingState: {
@@ -856,9 +844,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -888,7 +876,7 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				producerItemInstanceId: "item-instance:1",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -904,13 +892,12 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("rejects hidden producer product lines", () => {
+	it("rejects hidden producer producer lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					visibility: "hidden",
 				},
 			},
@@ -923,9 +910,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -941,14 +928,14 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("starts the saved default producer product line when productId is omitted", () => {
+	it("starts the saved default producer producer line when lineId is omitted", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
 		save.producerLines["item-instance:1"] = {
-			defaultProductId: "product:shred",
+			defaultLineId: "line:shred",
 		};
 
 		const result = runAction({
@@ -960,7 +947,7 @@ describe("applyGameActionFx Producer", () => {
 						kind: "board",
 					},
 				],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -983,12 +970,12 @@ describe("applyGameActionFx Producer", () => {
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:shred",
+			lineId: "line:shred",
 		});
 		expect(result.events).toContainEqual(
 			expect.objectContaining({
-				productId: "product:shred",
-				type: "product.started",
+				lineId: "line:shred",
+				type: "producer_line.started",
 			}),
 		);
 	});
@@ -996,8 +983,8 @@ describe("applyGameActionFx Producer", () => {
 	it("accepts local product grants from diagonal neighbors", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 1,
 		});
@@ -1010,10 +997,9 @@ describe("applyGameActionFx Producer", () => {
 					width: 2,
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 			startingState: {
@@ -1040,9 +1026,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -1051,7 +1037,7 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.events).toMatchObject([
 			{
-				type: "product.started",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -1059,8 +1045,8 @@ describe("applyGameActionFx Producer", () => {
 	it("pauses a running producer while its local grant source is out of range", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 2,
 		});
@@ -1073,10 +1059,9 @@ describe("applyGameActionFx Producer", () => {
 					width: 4,
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 			startingState: {
@@ -1103,9 +1088,9 @@ describe("applyGameActionFx Producer", () => {
 		const started = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1132,7 +1117,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(moved.events).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					type: "product.completed",
+					type: "producer_line.completed",
 				}),
 			]),
 		);
@@ -1152,7 +1137,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(stillPaused.events).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					type: "product.completed",
+					type: "producer_line.completed",
 				}),
 			]),
 		);
@@ -1185,8 +1170,8 @@ describe("applyGameActionFx Producer", () => {
 	it("keeps already queued producer jobs behind a newly paused head job until the head resumes", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 1,
 		});
@@ -1199,23 +1184,35 @@ describe("applyGameActionFx Producer", () => {
 					width: 4,
 				},
 			},
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
-					productIds: [
-						"product:test",
-						"product:backup",
+					lines: [
+						baseConfig.lineCatalog["line:test"],
+						{
+							chargeCost: 0,
+							durationMs: 1000,
+							id: "line:backup",
+							name: "Backup",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							placement: "board_then_inventory",
+							tags: [],
+							visibility: "visible",
+						},
 					],
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
-				"product:backup": {
+				"line:backup": {
 					chargeCost: 0,
 					durationMs: 1000,
 					name: "Backup",
@@ -1255,9 +1252,9 @@ describe("applyGameActionFx Producer", () => {
 		const firstStarted = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1266,9 +1263,9 @@ describe("applyGameActionFx Producer", () => {
 		const queued = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:backup",
+				lineId: "line:backup",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1292,11 +1289,11 @@ describe("applyGameActionFx Producer", () => {
 		expect(pausedJobs).toHaveLength(2);
 		expect(pausedJobs[0]).toMatchObject({
 			pausedAtMs: 250,
-			productId: "product:test",
+			lineId: "line:test",
 			remainingMs: 750,
 		});
 		expect(pausedJobs[1]).toMatchObject({
-			productId: "product:backup",
+			lineId: "line:backup",
 			readyAtMs: 2000,
 			startAtMs: 1000,
 		});
@@ -1325,12 +1322,12 @@ describe("applyGameActionFx Producer", () => {
 		expect(resumedJobs).toHaveLength(2);
 		expect(resumedJobs[0]).toMatchObject({
 			pausedAtMs: undefined,
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 2000,
 			startAtMs: 1000,
 		});
 		expect(resumedJobs[1]).toMatchObject({
-			productId: "product:backup",
+			lineId: "line:backup",
 			readyAtMs: 3000,
 			startAtMs: 2000,
 		});
@@ -1340,8 +1337,8 @@ describe("applyGameActionFx Producer", () => {
 	it("rejects starting another producer job behind a grant-paused first job", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 1,
 		});
@@ -1354,23 +1351,35 @@ describe("applyGameActionFx Producer", () => {
 					width: 4,
 				},
 			},
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
-					productIds: [
-						"product:test",
-						"product:backup",
+					lines: [
+						baseConfig.lineCatalog["line:test"],
+						{
+							chargeCost: 0,
+							durationMs: 1000,
+							id: "line:backup",
+							name: "Backup",
+							output: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							placement: "board_then_inventory",
+							tags: [],
+							visibility: "visible",
+						},
 					],
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
-				"product:backup": {
+				"line:backup": {
 					chargeCost: 0,
 					durationMs: 1000,
 					name: "Backup",
@@ -1410,9 +1419,9 @@ describe("applyGameActionFx Producer", () => {
 		const started = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1436,9 +1445,9 @@ describe("applyGameActionFx Producer", () => {
 		const queued = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:backup",
+				lineId: "line:backup",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -1464,10 +1473,9 @@ describe("applyGameActionFx Producer", () => {
 					width: 5,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							effects: [
@@ -1520,8 +1528,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1579,8 +1587,8 @@ describe("applyGameActionFx Producer", () => {
 	it("pauses a running producer when the producer moves outside its local grant", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 1,
 		});
@@ -1593,10 +1601,9 @@ describe("applyGameActionFx Producer", () => {
 					width: 5,
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 			startingState: {
@@ -1623,9 +1630,9 @@ describe("applyGameActionFx Producer", () => {
 		const started = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1686,8 +1693,8 @@ describe("applyGameActionFx Producer", () => {
 	it("keeps product-line local grants as gates instead of duration mutators", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 2,
 		});
@@ -1700,10 +1707,9 @@ describe("applyGameActionFx Producer", () => {
 					width: 3,
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 			startingState: {
@@ -1735,9 +1741,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1754,8 +1760,8 @@ describe("applyGameActionFx Producer", () => {
 	it("rejects missing product local grants", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
-			productIds: [
-				"product:test",
+			lineIds: [
+				"line:test",
 			],
 			radius: 1,
 		});
@@ -1768,10 +1774,9 @@ describe("applyGameActionFx Producer", () => {
 					width: 2,
 				},
 			},
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 		});
@@ -1783,9 +1788,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1822,8 +1827,8 @@ describe("applyGameActionFx Producer", () => {
 					},
 				],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1844,12 +1849,12 @@ describe("applyGameActionFx Producer", () => {
 					slotIndex: 0,
 				},
 				itemId: "item:twig",
-				reason: "product-input",
+				reason: "producer-line-input",
 				type: "item.consumed",
 			},
 			{
-				productId: "product:shred",
-				type: "product.started",
+				lineId: "line:shred",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -1871,8 +1876,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1896,12 +1901,12 @@ describe("applyGameActionFx Producer", () => {
 				nextQuantity: 1,
 				previousQuantity: 0,
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 			{
-				productId: "product:shred",
-				type: "product.started",
+				lineId: "line:shred",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -1909,10 +1914,9 @@ describe("applyGameActionFx Producer", () => {
 	it("starts an up-to producer product with one explicit input ref", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 4,
@@ -1945,8 +1949,8 @@ describe("applyGameActionFx Producer", () => {
 					},
 				],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1956,7 +1960,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:shred",
+			lineId: "line:shred",
 			startAtMs: 100,
 		});
 	});
@@ -1964,10 +1968,9 @@ describe("applyGameActionFx Producer", () => {
 	it("starts an up-to producer product with one stored input", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 4,
@@ -1985,8 +1988,8 @@ describe("applyGameActionFx Producer", () => {
 			nowMs: 0,
 		});
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},
@@ -1998,8 +2001,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2009,7 +2012,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.save.producerInputs).toEqual({});
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:shred",
+			lineId: "line:shred",
 			startAtMs: 100,
 		});
 	});
@@ -2017,10 +2020,9 @@ describe("applyGameActionFx Producer", () => {
 	it("auto-fills an up-to producer product to its run maximum before starting", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 4,
@@ -2055,8 +2057,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2072,7 +2074,7 @@ describe("applyGameActionFx Producer", () => {
 		).toHaveLength(4);
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:shred",
+			lineId: "line:shred",
 			startAtMs: 100,
 		});
 	});
@@ -2088,8 +2090,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2104,10 +2106,9 @@ describe("applyGameActionFx Producer", () => {
 	it("auto-fills available producer inputs without starting an incomplete product", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 2,
@@ -2134,8 +2135,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2145,8 +2146,8 @@ describe("applyGameActionFx Producer", () => {
 		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
 		expect(result.save.producerInputs).toEqual({
 			"item-instance:1": {
-				productInputs: {
-					"product:shred": {
+				lineInputs: {
+					"line:shred": {
 						items: {
 							"item:twig": 1,
 						},
@@ -2170,19 +2171,18 @@ describe("applyGameActionFx Producer", () => {
 				nextQuantity: 1,
 				previousQuantity: 0,
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 		]);
 	});
 
-	it("auto-fills only missing producer input when the product line is partially filled", () => {
+	it("auto-fills only missing producer input when the producer line is partially filled", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 2,
@@ -2205,8 +2205,8 @@ describe("applyGameActionFx Producer", () => {
 			y: 0,
 		};
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},
@@ -2218,8 +2218,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2243,12 +2243,12 @@ describe("applyGameActionFx Producer", () => {
 				nextQuantity: 2,
 				previousQuantity: 1,
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 			{
-				productId: "product:shred",
-				type: "product.started",
+				lineId: "line:shred",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -2268,8 +2268,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product.start",
+				lineId: "line:shred",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2297,12 +2297,12 @@ describe("applyGameActionFx Producer", () => {
 			{
 				itemId: "item:twig",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 			{
-				productId: "product:shred",
-				type: "product.started",
+				lineId: "line:shred",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -2336,8 +2336,8 @@ describe("applyGameActionFx Producer", () => {
 		expect(stored.save.inventory.slots[0]).toBeNull();
 		expect(stored.save.producerInputs).toEqual({
 			"item-instance:1": {
-				productInputs: {
-					"product:shred": {
+				lineInputs: {
+					"line:shred": {
 						items: {
 							"item:twig": 1,
 						},
@@ -2353,7 +2353,7 @@ describe("applyGameActionFx Producer", () => {
 			},
 			{
 				itemId: "item:twig",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 		]);
@@ -2361,9 +2361,9 @@ describe("applyGameActionFx Producer", () => {
 		const started = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 200,
@@ -2373,8 +2373,8 @@ describe("applyGameActionFx Producer", () => {
 		expect(started.save.producerInputs).toEqual({});
 		expect(started.events).toMatchObject([
 			{
-				productId: "product:shred",
-				type: "product.started",
+				lineId: "line:shred",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -2382,10 +2382,9 @@ describe("applyGameActionFx Producer", () => {
 	it("withdraws an entire producer product-line input through board then inventory placement", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 3,
@@ -2402,8 +2401,8 @@ describe("applyGameActionFx Producer", () => {
 			nowMs: 0,
 		});
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 2,
 					},
@@ -2415,7 +2414,7 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				itemId: "item:twig",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer.input.withdraw",
 			},
 			config,
@@ -2439,7 +2438,7 @@ describe("applyGameActionFx Producer", () => {
 			{
 				itemId: "item:twig",
 				previousQuantity: 2,
-				productId: "product:shred",
+				lineId: "line:shred",
 				quantity: 2,
 				type: "producer_input.withdrawn",
 			},
@@ -2487,8 +2486,8 @@ describe("applyGameActionFx Producer", () => {
 			quantity: 2,
 		};
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},
@@ -2500,7 +2499,7 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				itemId: "item:twig",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				type: "producer.input.withdraw",
 			},
 			config,
@@ -2509,9 +2508,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 
 		expect(result._tag).toBe("Left");
-		expect(
-			save.producerInputs["item-instance:1"]?.productInputs["product:shred"]?.items,
-		).toEqual({
+		expect(save.producerInputs["item-instance:1"]?.lineInputs["line:shred"]?.items).toEqual({
 			"item:twig": 1,
 		});
 	});
@@ -2519,20 +2516,22 @@ describe("applyGameActionFx Producer", () => {
 	it("stores duplicate producer input into the saved default line before earlier lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					productIds: [
-						"product:shred",
-						"product:alt-shred",
+					maxQueueSize: baseConfig.producerCatalog["item:producer"].maxQueueSize,
+					lines: [
+						baseConfig.lineCatalog["line:shred"],
+						{
+							...baseConfig.lineCatalog["line:shred"],
+							id: "line:alt-shred",
+							name: "Alt shred",
+						},
 					],
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:alt-shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:alt-shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 1,
@@ -2554,7 +2553,7 @@ describe("applyGameActionFx Producer", () => {
 			quantity: 1,
 		};
 		save.producerLines["item-instance:1"] = {
-			defaultProductId: "product:alt-shred",
+			defaultLineId: "line:alt-shred",
 		};
 
 		const result = runAction({
@@ -2572,8 +2571,8 @@ describe("applyGameActionFx Producer", () => {
 			save,
 		});
 
-		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
-			"product:alt-shred": {
+		expect(result.save.producerInputs["item-instance:1"]?.lineInputs).toEqual({
+			"line:alt-shred": {
 				items: {
 					"item:twig": 1,
 				},
@@ -2584,20 +2583,22 @@ describe("applyGameActionFx Producer", () => {
 	it("stores duplicate producer input into the default line before later matching lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					productIds: [
-						"product:shred",
-						"product:alt-shred",
+					maxQueueSize: baseConfig.producerCatalog["item:producer"].maxQueueSize,
+					lines: [
+						baseConfig.lineCatalog["line:shred"],
+						{
+							...baseConfig.lineCatalog["line:shred"],
+							id: "line:alt-shred",
+							name: "Alt shred",
+						},
 					],
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:alt-shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:alt-shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 1,
@@ -2634,8 +2635,8 @@ describe("applyGameActionFx Producer", () => {
 			save,
 		});
 
-		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
-			"product:shred": {
+		expect(result.save.producerInputs["item-instance:1"]?.lineInputs).toEqual({
+			"line:shred": {
 				items: {
 					"item:twig": 1,
 				},
@@ -2643,23 +2644,25 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stores duplicate producer input into the first product line with remaining capacity", () => {
+	it("stores duplicate producer input into the first producer line with remaining capacity", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					productIds: [
-						"product:shred",
-						"product:alt-shred",
+					maxQueueSize: baseConfig.producerCatalog["item:producer"].maxQueueSize,
+					lines: [
+						baseConfig.lineCatalog["line:shred"],
+						{
+							...baseConfig.lineCatalog["line:shred"],
+							id: "line:alt-shred",
+							name: "Alt shred",
+						},
 					],
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:alt-shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:alt-shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 1,
@@ -2681,8 +2684,8 @@ describe("applyGameActionFx Producer", () => {
 			quantity: 1,
 		};
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},
@@ -2705,13 +2708,13 @@ describe("applyGameActionFx Producer", () => {
 			save,
 		});
 
-		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
-			"product:alt-shred": {
+		expect(result.save.producerInputs["item-instance:1"]?.lineInputs).toEqual({
+			"line:alt-shred": {
 				items: {
 					"item:twig": 1,
 				},
 			},
-			"product:shred": {
+			"line:shred": {
 				items: {
 					"item:twig": 1,
 				},
@@ -2719,23 +2722,25 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stores duplicate producer input into the next product line after the default line is full", () => {
+	it("stores duplicate producer input into the next producer line after the default line is full", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
-					productIds: [
-						"product:shred",
-						"product:alt-shred",
+					maxQueueSize: baseConfig.producerCatalog["item:producer"].maxQueueSize,
+					lines: [
+						baseConfig.lineCatalog["line:shred"],
+						{
+							...baseConfig.lineCatalog["line:shred"],
+							id: "line:alt-shred",
+							name: "Alt shred",
+						},
 					],
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:alt-shred": {
-					...baseConfig.products["product:shred"],
+			lineOverrides: {
+				"line:alt-shred": {
+					...baseConfig.lineCatalog["line:shred"],
 					inputs: [
 						{
 							capacity: 1,
@@ -2757,8 +2762,8 @@ describe("applyGameActionFx Producer", () => {
 			quantity: 1,
 		};
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},
@@ -2781,13 +2786,13 @@ describe("applyGameActionFx Producer", () => {
 			save,
 		});
 
-		expect(result.save.producerInputs["item-instance:1"]?.productInputs).toEqual({
-			"product:alt-shred": {
+		expect(result.save.producerInputs["item-instance:1"]?.lineInputs).toEqual({
+			"line:alt-shred": {
 				items: {
 					"item:twig": 1,
 				},
 			},
-			"product:shred": {
+			"line:shred": {
 				items: {
 					"item:twig": 1,
 				},
@@ -2798,14 +2803,13 @@ describe("applyGameActionFx Producer", () => {
 	it("accepts owned grants from inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
-			"product:test",
+			"line:test",
 		]);
 		const config = createEngineTestConfig({
 			...grantConfig,
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 		});
@@ -2821,9 +2825,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -2832,7 +2836,7 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.events).toMatchObject([
 			{
-				type: "product.started",
+				type: "producer_line.started",
 			},
 		]);
 	});
@@ -2840,14 +2844,13 @@ describe("applyGameActionFx Producer", () => {
 	it("fails through the typed error channel when a passive grant is missing", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
-			"product:test",
+			"line:test",
 		]);
 		const config = createEngineTestConfig({
 			...grantConfig,
-			products: {
-				...grantConfig.products,
-				"product:test": {
-					...grantConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...grantConfig.lineOverrides["line:test"],
 				},
 			},
 		});
@@ -2859,9 +2862,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -2880,10 +2883,8 @@ describe("applyGameActionFx Producer", () => {
 	it("queues product jobs for the same producer instead of running them in parallel", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -2895,9 +2896,9 @@ describe("applyGameActionFx Producer", () => {
 		const first = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -2907,9 +2908,9 @@ describe("applyGameActionFx Producer", () => {
 		const second = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 600,
@@ -2933,9 +2934,9 @@ describe("applyGameActionFx Producer", () => {
 		const first = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 500,
@@ -2945,9 +2946,9 @@ describe("applyGameActionFx Producer", () => {
 		const second = runActionEither({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 600,
@@ -2963,7 +2964,7 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("stores a non-first producer product line as the runtime default", () => {
+	it("stores a non-first producer producer line as the runtime default", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -2973,8 +2974,8 @@ describe("applyGameActionFx Producer", () => {
 		const defaulted = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "producer.product_line.set_default",
+				lineId: "line:shred",
+				type: "producer.line.set_default",
 			},
 			config,
 			nowMs: 100,
@@ -2983,24 +2984,24 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(defaulted.save.producerLines).toEqual({
 			"item-instance:1": {
-				defaultProductId: "product:shred",
+				defaultLineId: "line:shred",
 			},
 		});
 		expect(defaulted.events).toEqual([
 			{
 				atMs: 100,
-				nextProductId: "product:shred",
-				previousProductId: undefined,
+				nextLineId: "line:shred",
+				previousLineId: undefined,
 				producerItemInstanceId: "item-instance:1",
-				type: "producer.product_line.default_changed",
+				type: "producer.line.default_changed",
 			},
 		]);
 
 		const reset = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_default",
+				lineId: "line:test",
+				type: "producer.line.set_default",
 			},
 			config,
 			nowMs: 200,
@@ -3009,21 +3010,21 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(reset.save.producerLines).toEqual({
 			"item-instance:1": {
-				defaultProductId: "product:test",
+				defaultLineId: "line:test",
 			},
 		});
 		expect(reset.events).toEqual([
 			{
 				atMs: 200,
-				nextProductId: "product:test",
-				previousProductId: "product:shred",
+				nextLineId: "line:test",
+				previousLineId: "line:shred",
 				producerItemInstanceId: "item-instance:1",
-				type: "producer.product_line.default_changed",
+				type: "producer.line.default_changed",
 			},
 		]);
 	});
 
-	it("unsets the runtime default when the selected producer product line is clicked again", () => {
+	it("unsets the runtime default when the selected producer producer line is clicked again", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -3032,8 +3033,8 @@ describe("applyGameActionFx Producer", () => {
 		const defaulted = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_default",
+				lineId: "line:test",
+				type: "producer.line.set_default",
 			},
 			config,
 			nowMs: 100,
@@ -3042,8 +3043,8 @@ describe("applyGameActionFx Producer", () => {
 		const unset = runAction({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product_line.set_default",
+				lineId: "line:test",
+				type: "producer.line.set_default",
 			},
 			config,
 			nowMs: 200,
@@ -3054,10 +3055,10 @@ describe("applyGameActionFx Producer", () => {
 		expect(unset.events).toEqual([
 			{
 				atMs: 200,
-				nextProductId: undefined,
-				previousProductId: "product:test",
+				nextLineId: undefined,
+				previousLineId: "line:test",
 				producerItemInstanceId: "item-instance:1",
-				type: "producer.product_line.default_changed",
+				type: "producer.line.default_changed",
 			},
 		]);
 	});
@@ -3076,18 +3077,15 @@ describe("applyGameActionFx Producer", () => {
 				},
 				title: "Test",
 			},
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					charges: 1,
 					onChargesDepleted: "remove",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					chargeCost: 1,
 				},
 			},
@@ -3110,8 +3108,8 @@ describe("applyGameActionFx Producer", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,

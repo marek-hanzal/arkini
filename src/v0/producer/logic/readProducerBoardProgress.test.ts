@@ -3,18 +3,18 @@ import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { readProducerBoardProgress } from "~/v0/producer/logic/readProducerBoardProgress";
 
 const producerActivation = (
-	productLines: ActivationView["productLines"],
+	producerLines: ActivationView["producerLines"],
 	kind: ActivationView["kind"] = "producer",
 ): ActivationView => ({
 	inputs: [],
 	kind,
-	productLines,
+	producerLines,
 	trigger: "click",
 });
 
-type ProductLine = NonNullable<ActivationView["productLines"]>[number];
+type ProducerLine = NonNullable<ActivationView["producerLines"]>[number];
 
-const createLine = (overrides: Partial<ProductLine> = {}): ProductLine => ({
+const createLine = (overrides: Partial<ProducerLine> = {}): ProducerLine => ({
 	durationMs: 1000,
 	inProgress: true,
 	isDefault: true,
@@ -24,7 +24,7 @@ const createLine = (overrides: Partial<ProductLine> = {}): ProductLine => ({
 	inputsAvailable: true,
 	name: "Twig",
 	lineKind: "product" as const,
-	productId: "product:twig",
+	lineId: "line:twig",
 	producerQueuedJobs: 1,
 	queueFull: true,
 	blocked: false,
@@ -50,7 +50,7 @@ describe("readProducerBoardProgress", () => {
 						inputsAvailable: true,
 						name: "Twig",
 						lineKind: "product" as const,
-						productId: "product:twig",
+						lineId: "line:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
 						blocked: false,
@@ -67,7 +67,7 @@ describe("readProducerBoardProgress", () => {
 		});
 	});
 
-	it("returns live progress for stash activations that expose producer product lines", () => {
+	it("returns live progress for stash activations that expose producer producer lines", () => {
 		expect(
 			readProducerBoardProgress({
 				activation: producerActivation(
@@ -82,7 +82,7 @@ describe("readProducerBoardProgress", () => {
 							inputsAvailable: true,
 							name: "Open",
 							lineKind: "product" as const,
-							productId: "product:stash",
+							lineId: "line:stash",
 							producerQueuedJobs: 1,
 							queueFull: true,
 							blocked: false,
@@ -108,7 +108,7 @@ describe("readProducerBoardProgress", () => {
 					createLine({
 						lineKind: "effect" as const,
 						name: "Minor Haste",
-						productId: "product:shrine-t1:minor-haste",
+						lineId: "line:shrine-t1:minor-haste",
 					}),
 				]),
 				nowMs: 1250,
@@ -126,7 +126,7 @@ describe("readProducerBoardProgress", () => {
 					createLine({
 						lineKind: "effect" as const,
 						name: "Minor Haste",
-						productId: "product:shrine-t1:minor-haste",
+						lineId: "line:shrine-t1:minor-haste",
 						readyAtMs: 3000,
 						startAtMs: 2000,
 					}),
@@ -152,7 +152,7 @@ describe("readProducerBoardProgress", () => {
 						inputsAvailable: true,
 						name: "Twig",
 						lineKind: "product" as const,
-						productId: "product:twig",
+						lineId: "line:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
 						blocked: false,
@@ -182,7 +182,7 @@ describe("readProducerBoardProgress", () => {
 						name: "Twig",
 						lineKind: "product" as const,
 						pausedAtMs: 1250,
-						productId: "product:twig",
+						lineId: "line:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
 						blocked: false,
@@ -199,7 +199,7 @@ describe("readProducerBoardProgress", () => {
 		});
 	});
 
-	it("ignores blocked delivery product lines even before their retry wake", () => {
+	it("ignores blocked delivery producer lines even before their retry wake", () => {
 		expect(
 			readProducerBoardProgress({
 				activation: producerActivation([
@@ -214,7 +214,7 @@ describe("readProducerBoardProgress", () => {
 						inputsAvailable: true,
 						name: "Twig",
 						lineKind: "product" as const,
-						productId: "product:twig",
+						lineId: "line:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
 						blocked: false,
@@ -243,7 +243,7 @@ describe("readProducerBoardProgress", () => {
 						inputsAvailable: true,
 						name: "Twig",
 						lineKind: "product" as const,
-						productId: "product:twig",
+						lineId: "line:twig",
 						producerQueuedJobs: 1,
 						queueFull: true,
 						blocked: false,

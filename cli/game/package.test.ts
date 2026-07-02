@@ -62,7 +62,7 @@ describe("game package normalization", () => {
 						lines: [
 							{
 								durationMs: 1000,
-								id: "product:test",
+								id: "line:test",
 								output: [
 									{
 										itemId: "item:plank",

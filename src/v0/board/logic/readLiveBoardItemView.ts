@@ -1,6 +1,6 @@
 import { readLiveCraftView } from "~/v0/board/logic/readLiveCraftView";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
+import { readLiveProducerLineView } from "~/v0/producer/logic/readLiveProducerLineView";
 
 export namespace readLiveBoardItemView {
 	export interface Props {
@@ -15,8 +15,8 @@ export const readLiveBoardItemView = ({
 }: readLiveBoardItemView.Props): BoardViewItem | undefined => {
 	if (!boardItem) return undefined;
 
-	const productLines = boardItem.activation?.productLines?.map((line) =>
-		readLiveProducerProductLineView({
+	const producerLines = boardItem.activation?.producerLines?.map((line) =>
+		readLiveProducerLineView({
 			line,
 			nowMs,
 		}),
@@ -27,7 +27,7 @@ export const readLiveBoardItemView = ({
 		activation: boardItem.activation
 			? {
 					...boardItem.activation,
-					productLines,
+					producerLines,
 				}
 			: undefined,
 		craft: readLiveCraftView({

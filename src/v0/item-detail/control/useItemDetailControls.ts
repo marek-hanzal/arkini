@@ -11,11 +11,11 @@ export namespace useItemDetailControls {
 		canSetDefaultLines: boolean;
 		isPending: boolean;
 		onClaimCraft(): void;
-		onSetDefaultProductLine(productId: string): void;
+		onSetDefaultProducerLine(lineId: string): void;
 		onStartCraft(): void;
-		onStartProductLine(productId: string): void;
+		onStartProducerLine(lineId: string): void;
 		onWithdrawCraftInput(itemId: string): void;
-		onWithdrawProductLineInput(productId: string, itemId: string): void;
+		onWithdrawProducerLineInput(lineId: string, itemId: string): void;
 	}
 
 	export interface Result {
@@ -29,14 +29,14 @@ export const useItemDetailControls = ({
 	canSetDefaultLines,
 	isPending,
 	onClaimCraft,
-	onSetDefaultProductLine,
+	onSetDefaultProducerLine,
 	onStartCraft,
-	onStartProductLine,
+	onStartProducerLine,
 	onWithdrawCraftInput,
-	onWithdrawProductLineInput,
+	onWithdrawProducerLineInput,
 }: useItemDetailControls.Props): useItemDetailControls.Result => {
 	const craft = boardItem?.craft;
-	const productLines = boardItem?.activation?.productLines ?? [];
+	const producerLines = boardItem?.activation?.producerLines ?? [];
 	const craftControl = useMemo(
 		() =>
 			craft
@@ -58,13 +58,13 @@ export const useItemDetailControls = ({
 	);
 	const producerLineModels = useMemo(
 		() =>
-			productLines.map((line) => ({
+			producerLines.map((line) => ({
 				control: readDetailProducerLineControl({
 					canSetDefault: canSetDefaultLines,
 					line,
-					onSetDefault: onSetDefaultProductLine,
-					onStart: onStartProductLine,
-					onWithdrawInput: onWithdrawProductLineInput,
+					onSetDefault: onSetDefaultProducerLine,
+					onStart: onStartProducerLine,
+					onWithdrawInput: onWithdrawProducerLineInput,
 					pending: isPending,
 				}),
 				line,
@@ -72,10 +72,10 @@ export const useItemDetailControls = ({
 		[
 			canSetDefaultLines,
 			isPending,
-			onSetDefaultProductLine,
-			onStartProductLine,
-			onWithdrawProductLineInput,
-			productLines,
+			onSetDefaultProducerLine,
+			onStartProducerLine,
+			onWithdrawProducerLineInput,
+			producerLines,
 		],
 	);
 

@@ -22,14 +22,14 @@ Move authoring config away from single-owner top-level ID registries and toward 
 - Reworked validator traversal to validate embedded capabilities directly.
 - Updated compiler/package normalization to derive defaults inside embedded item capabilities.
 - Updated runtime/craft/producer/stash/merge/UI bridge code to read capabilities from items.
-- Kept legacy-view compatibility only inside test helper code so old tests can be migrated gradually without leaking the old model into real config.
+- Test helper fixtures now use explicit embedded-capability overrides; no compatibility layer is part of production config or runtime.
 
 ## Important constraints after this pass
 
 - Stable `itemId` remains the cross-item identity. Outputs/inputs/selectors still reference item IDs.
-- Producer line `id` still exists because saves/jobs/defaults still store line IDs. The next cleanup target is renaming product-oriented runtime fields to line-oriented names and reducing old `productId` terminology.
+- Producer line `id` remains because saves/jobs/defaults need a stable local identity inside the owning producer/stash capability.
 - Do not reintroduce top-level single-owner registries for producer lines, craft recipes, merge rules, producers, or stashes.
-- Runtime should prefer item-owned capability reads. Test-only legacy compatibility belongs in `src/v0/game/engine/test/createEngineTestConfig.ts`, not production.
+- Runtime should prefer item-owned capability reads and avoid global capability indexes unless there is an explicit, documented reason.
 
 ## Validation
 

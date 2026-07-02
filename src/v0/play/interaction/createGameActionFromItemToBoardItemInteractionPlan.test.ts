@@ -41,7 +41,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
 					feedbackVariant: "secondary",
-					productId: "product:test",
+					lineId: "line:test",
 					type: "producer-input",
 				},
 				sourceRef,
@@ -50,7 +50,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		).toEqual({
 			inputRef: sourceRef,
 			producerItemInstanceId: "target",
-			productId: "product:test",
+			lineId: "line:test",
 			type: "producer.input.store",
 		});
 

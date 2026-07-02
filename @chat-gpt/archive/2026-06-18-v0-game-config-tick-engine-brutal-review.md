@@ -122,9 +122,9 @@ Config model říká: produkty referencují named input definition přes `inputR
 
 Implementace layeru pak při aplikaci udělá globální modifikaci `config.inputs[inputRefId].inputs[*].quantity`. `applyConfigLayerFx` hledá první product layer, který má daný `inputRefId`, a přepíše quantity v shared input definition.
 
-Dnes config používá jediný input ref pro jediný product:
+Dnes config používá jediný input ref pro jediný line:
 
-- `input:coal-mine-1-rations` používá jen `product:coal-mine-1`
+- `input:coal-mine-1-rations` používá jen `line:coal-mine-1`
 
 Takže se to aktuálně neprojeví. Ale schema reuse inputRefů povoluje a README to dokonce popisuje jako named reusable definitions. Jakmile dva produkty sdílí inputRef a jeden dostane upgrade quantity, přepíše to oba. Krásný malý sabotér, co čeká na obsahový pass.
 

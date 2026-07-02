@@ -38,16 +38,16 @@ describe("runtime readers", () => {
 		state.runtime.save.producerJobs["producer-job:1"] = {
 			id: "producer-job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
 
 		expect(
-			readBoardView(state).byId["item-instance:1"]?.activation?.productLines?.[0]?.progress,
+			readBoardView(state).byId["item-instance:1"]?.activation?.producerLines?.[0]?.progress,
 		).toBe(0);
 		expect(
-			readBoardView(state, 500).byId["item-instance:1"]?.activation?.productLines?.[0]
+			readBoardView(state, 500).byId["item-instance:1"]?.activation?.producerLines?.[0]
 				?.progress,
 		).toBe(0.5);
 	});

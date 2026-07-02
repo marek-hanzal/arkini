@@ -13,24 +13,21 @@ import {
 const createLongTimingConfig = () => {
 	const baseConfig = createEngineTestConfig();
 	return createEngineTestConfig({
-		producers: {
-			...baseConfig.producers,
+		producerOverrides: {
 			"item:producer": {
-				...baseConfig.producers["item:producer"],
 				maxQueueSize: 2,
 			},
 		},
-		products: {
-			...baseConfig.products,
-			"product:test": {
-				...baseConfig.products["product:test"],
+		lineOverrides: {
+			"line:test": {
+				...baseConfig.lineCatalog["line:test"],
 				durationMs: 30000,
 			},
 		},
-		craftRecipes: {
-			...baseConfig.craftRecipes,
+		craftOverrides: {
+			...baseConfig.craftCatalog,
 			"item:craft-table": {
-				...baseConfig.craftRecipes["item:craft-table"],
+				...baseConfig.craftCatalog["item:craft-table"],
 				durationMs: 30000,
 			},
 		},
@@ -179,8 +176,8 @@ describe("setCheatSpeedModeFx", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: producer.id,
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -203,8 +200,8 @@ describe("setCheatSpeedModeFx", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: producer.id,
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -214,8 +211,8 @@ describe("setCheatSpeedModeFx", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: producer.id,
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -276,8 +273,8 @@ describe("setCheatSpeedModeFx", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: producer.id,
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,

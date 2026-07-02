@@ -42,7 +42,7 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 					lines: [
 						{
 							durationMs: 1000,
-							id: "product:test",
+							id: "line:test",
 							name: "Test product",
 							placement: "board_then_inventory",
 						},

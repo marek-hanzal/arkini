@@ -3,7 +3,7 @@ import type { GameActionStashOpen } from "~/v0/game/action/GameActionStashOpen";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { startProducerProductFx } from "~/v0/game/producer/startProducerProductFx";
+import { startProducerLineFx } from "~/v0/game/producer/startProducerLineFx";
 import { readStashBoardItemFx } from "~/v0/game/stash/readStashBoardItemFx";
 
 export namespace openStashFx {
@@ -27,8 +27,8 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		stashItemInstanceId: action.stashItemInstanceId,
 	});
 	const stash = config.items[stashItem.itemId]?.stash;
-	const productId = stash?.line.id;
-	if (!stash || !productId) {
+	const lineId = stash?.line.id;
+	if (!stash || !lineId) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(
 				`Item "${stashItem.itemId}" is not a valid stash producer capability.`,
@@ -36,12 +36,12 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		);
 	}
 
-	return yield* startProducerProductFx({
+	return yield* startProducerLineFx({
 		action: {
 			inputRefs: action.inputRefs,
 			producerItemInstanceId: action.stashItemInstanceId,
-			productId,
-			type: "producer.product.start",
+			lineId,
+			type: "producer.line.start",
 		},
 		config,
 		nowMs,

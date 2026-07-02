@@ -68,7 +68,7 @@ describe("applyGameActionFx Craft", () => {
 					maxCount: 1,
 				},
 			},
-			craftRecipes: baseConfig.craftRecipes,
+			craftOverrides: baseConfig.craftCatalog,
 			startingState: {
 				board: [
 					{
@@ -123,7 +123,7 @@ describe("applyGameActionFx Craft", () => {
 					maxCount: 1,
 				},
 			},
-			craftRecipes: baseConfig.craftRecipes,
+			craftOverrides: baseConfig.craftCatalog,
 			startingState: baseConfig.startingState,
 		});
 		const save = runInitialSave({
@@ -186,10 +186,10 @@ describe("applyGameActionFx Craft", () => {
 					],
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:craft-table": {
-					...baseConfig.craftRecipes["item:craft-table"],
+					...baseConfig.craftCatalog["item:craft-table"],
 					effects: [
 						{
 							display: "whenActive",
@@ -277,10 +277,10 @@ describe("applyGameActionFx Craft", () => {
 					],
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:craft-table": {
-					...baseConfig.craftRecipes["item:craft-table"],
+					...baseConfig.craftCatalog["item:craft-table"],
 					effects: [
 						{
 							display: "whenActive",
@@ -474,10 +474,10 @@ describe("applyGameActionFx Craft", () => {
 	it("completes zero-duration craft jobs in the same action", () => {
 		const baseConfig = createEngineCraftTableTestConfig();
 		const config = createEngineTestConfig({
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:craft-table": {
-					...baseConfig.craftRecipes["item:craft-table"],
+					...baseConfig.craftCatalog["item:craft-table"],
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
@@ -548,8 +548,8 @@ describe("applyGameActionFx Craft", () => {
 	it("rejects craft start while the same target has a running producer job", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
@@ -575,8 +575,8 @@ describe("applyGameActionFx Craft", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 100,

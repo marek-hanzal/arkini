@@ -15,7 +15,7 @@ const runTick = (props: runGameTickFx.Props) =>
 	Effect.runSync(runGameTickFx(props).pipe(withRandomService(TestRandomService)));
 
 describe("applyGameActionFx Stash", () => {
-	it("opens a stash through its producer product line and removes it when charges are depleted", () => {
+	it("opens a stash through its producer producer line and removes it when charges are depleted", () => {
 		const config = createEngineTestConfig({
 			game: {
 				id: "game:test",
@@ -98,13 +98,13 @@ describe("applyGameActionFx Stash", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					itemId: "item:key",
-					reason: "product-input",
+					reason: "producer-line-input",
 					type: "item.consumed",
 				}),
 				expect.objectContaining({
 					producerItemInstanceId: "item-instance:2",
-					productId: "product:stash",
-					type: "product.started",
+					lineId: "line:stash",
+					type: "producer_line.started",
 				}),
 			]),
 		);
@@ -120,8 +120,8 @@ describe("applyGameActionFx Stash", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					producerItemInstanceId: "item-instance:2",
-					productId: "product:stash",
-					type: "product.completed",
+					lineId: "line:stash",
+					type: "producer_line.completed",
 				}),
 				expect.objectContaining({
 					fromItemId: "item:stash",
@@ -132,7 +132,7 @@ describe("applyGameActionFx Stash", () => {
 				}),
 				expect.objectContaining({
 					itemId: "item:twig",
-					reason: "product-output",
+					reason: "producer-line-output",
 					type: "item.created",
 				}),
 			]),
@@ -199,13 +199,13 @@ describe("applyGameActionFx Stash", () => {
 				expect.objectContaining({
 					itemId: "item:key",
 					producerItemInstanceId: "item-instance:1",
-					productId: "product:stash",
+					lineId: "line:stash",
 					type: "producer_input.stored",
 				}),
 				expect.objectContaining({
 					producerItemInstanceId: "item-instance:1",
-					productId: "product:stash",
-					type: "product.started",
+					lineId: "line:stash",
+					type: "producer_line.started",
 				}),
 			]),
 		);
@@ -214,10 +214,9 @@ describe("applyGameActionFx Stash", () => {
 	it("keeps partially auto-filled stash inputs in producer input state", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:stash": {
-					...baseConfig.products["product:stash"],
+			lineOverrides: {
+				"line:stash": {
+					...baseConfig.lineCatalog["line:stash"],
 					inputs: [
 						{
 							capacity: 2,
@@ -266,8 +265,8 @@ describe("applyGameActionFx Stash", () => {
 		expect(result.save.producerJobs).toEqual({});
 		expect(result.save.producerCharges).toEqual({});
 		expect(result.save.producerInputs["item-instance:1"]).toEqual({
-			productInputs: {
-				"product:stash": {
+			lineInputs: {
+				"line:stash": {
 					items: {
 						"item:key": 1,
 					},
@@ -283,7 +282,7 @@ describe("applyGameActionFx Stash", () => {
 			expect.objectContaining({
 				itemId: "item:key",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:stash",
+				lineId: "line:stash",
 				type: "producer_input.stored",
 			}),
 		]);
@@ -292,18 +291,15 @@ describe("applyGameActionFx Stash", () => {
 	it("reserves producer charges while queued jobs are pending", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					charges: 1,
 					maxQueueSize: 2,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					chargeCost: 1,
 				},
 			},
@@ -317,8 +313,8 @@ describe("applyGameActionFx Stash", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,
@@ -328,8 +324,8 @@ describe("applyGameActionFx Stash", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 1,

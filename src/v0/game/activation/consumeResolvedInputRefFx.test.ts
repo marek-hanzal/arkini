@@ -24,8 +24,8 @@ describe("consumeResolvedInputRefFx", () => {
 			y: 0,
 		};
 		save.producerInputs["item-instance:2"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},
@@ -38,7 +38,7 @@ describe("consumeResolvedInputRefFx", () => {
 			consumeResolvedInputRefFx({
 				events,
 				nextSave: save,
-				reason: "product-input",
+				reason: "producer-line-input",
 				ref: {
 					itemId: "item:twig",
 					itemInstanceId: "item-instance:2",
@@ -57,7 +57,7 @@ describe("consumeResolvedInputRefFx", () => {
 					kind: "board",
 				},
 				itemId: "item:twig",
-				reason: "product-input",
+				reason: "producer-line-input",
 				type: "item.consumed",
 			},
 		]);
@@ -80,7 +80,7 @@ describe("consumeResolvedInputRefFx", () => {
 			consumeResolvedInputRefFx({
 				events,
 				nextSave: save,
-				reason: "product-input",
+				reason: "producer-line-input",
 				ref: {
 					itemId: "item:twig",
 					kind: "inventory",
@@ -112,7 +112,7 @@ describe("resolveInputRefsFx", () => {
 			y: 0,
 		};
 		save.producerInputs["item-instance:2"] = {
-			productInputs: {},
+			lineInputs: {},
 		};
 
 		const result = runFxEither(

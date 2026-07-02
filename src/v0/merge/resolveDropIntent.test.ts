@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
@@ -23,9 +23,7 @@ const activationTarget = (activation: NonNullable<BoardViewItem["activation"]>):
 		itemId: "item:lumber-camp-1",
 	});
 
-const productLine = (
-	overrides: Partial<ProducerProductLineView> = {},
-): ProducerProductLineView => ({
+const productLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineView => ({
 	durationMs: 1000,
 	inProgress: false,
 	isDefault: true,
@@ -36,7 +34,7 @@ const productLine = (
 	name: "Test product",
 	lineKind: "product" as const,
 	producerQueuedJobs: 0,
-	productId: "product:test",
+	lineId: "line:test",
 	progress: undefined,
 	queueFull: false,
 	blocked: false,
@@ -90,7 +88,7 @@ describe("resolveDropIntent", () => {
 		});
 	});
 
-	it("prefers the default producer product line when multiple lines accept the same input", () => {
+	it("prefers the default producer producer line when multiple lines accept the same input", () => {
 		expect(
 			resolveItemToBoardItemInteractionPlan({
 				config,
@@ -98,7 +96,7 @@ describe("resolveDropIntent", () => {
 				targetItem: activationTarget({
 					inputs: [],
 					kind: "producer",
-					productLines: [
+					producerLines: [
 						productLine({
 							inputs: [
 								{
@@ -110,7 +108,7 @@ describe("resolveDropIntent", () => {
 								},
 							],
 							isDefault: false,
-							productId: "product:test",
+							lineId: "line:test",
 						}),
 						productLine({
 							inputs: [
@@ -123,7 +121,7 @@ describe("resolveDropIntent", () => {
 								},
 							],
 							isDefault: true,
-							productId: "product:shred",
+							lineId: "line:shred",
 						}),
 					],
 					trigger: "click",
@@ -131,7 +129,7 @@ describe("resolveDropIntent", () => {
 			}),
 		).toEqual({
 			feedbackVariant: "secondary",
-			productId: "product:shred",
+			lineId: "line:shred",
 			type: "producer-input",
 		});
 	});

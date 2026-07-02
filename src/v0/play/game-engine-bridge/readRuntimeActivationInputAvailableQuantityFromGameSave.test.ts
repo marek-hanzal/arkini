@@ -45,7 +45,7 @@ describe("readRuntimeActivationInputAvailableQuantityFromGameSave", () => {
 			nowMs: 0,
 		});
 		save.producerInputs["item-instance:2"] = {
-			productInputs: {},
+			lineInputs: {},
 		};
 
 		expect(

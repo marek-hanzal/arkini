@@ -1,11 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 import { readBoardTileStatus } from "~/v0/board/logic/readBoardTileStatus";
 
-const productLine = (
-	overrides: Partial<ProducerProductLineView> = {},
-): ProducerProductLineView => ({
+const productLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineView => ({
 	blocked: false,
 	durationMs: 1000,
 	inProgress: false,
@@ -17,7 +15,7 @@ const productLine = (
 	name: "Product",
 	lineKind: "product" as const,
 	producerQueuedJobs: 0,
-	productId: "product:test",
+	lineId: "line:test",
 	queueFull: false,
 	queuedJobs: 0,
 	queueSize: 1,
@@ -34,14 +32,14 @@ const boardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 });
 
 describe("readBoardTileStatus", () => {
-	it("keeps producers without explicit default product line visually neutral", () => {
+	it("keeps producers without explicit default producer line visually neutral", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
 					activation: {
 						inputs: [],
 						kind: "producer",
-						productLines: [
+						producerLines: [
 							productLine({
 								isDefault: false,
 							}),
@@ -57,14 +55,14 @@ describe("readBoardTileStatus", () => {
 		});
 	});
 
-	it("dims producers with blocked explicit default product line", () => {
+	it("dims producers with blocked explicit default producer line", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
 					activation: {
 						inputs: [],
 						kind: "producer",
-						productLines: [
+						producerLines: [
 							productLine({
 								inputsAvailable: false,
 								inputsReady: false,
@@ -82,14 +80,14 @@ describe("readBoardTileStatus", () => {
 		});
 	});
 
-	it("marks producers with runnable explicit default product line ready", () => {
+	it("marks producers with runnable explicit default producer line ready", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
 					activation: {
 						inputs: [],
 						kind: "producer",
-						productLines: [
+						producerLines: [
 							productLine({
 								isDefault: true,
 							}),

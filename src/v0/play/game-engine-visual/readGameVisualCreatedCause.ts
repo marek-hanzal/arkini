@@ -11,7 +11,8 @@ type CreatedEvent = Extract<
 export const readGameVisualCreatedCause = (
 	reason: CreatedEvent["reason"],
 ): GameVisualMotion["cause"] => {
-	if (reason === "product-output" || reason === "producer-input-withdraw") return "producer";
+	if (reason === "producer-line-output" || reason === "producer-input-withdraw")
+		return "producer";
 	if (reason === "craft-input-withdraw") return "craft";
 	return "inventory";
 };

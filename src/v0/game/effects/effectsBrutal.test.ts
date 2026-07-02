@@ -18,10 +18,9 @@ describe("output-owned producer effect runtime guards", () => {
 					name: "Missing Grant",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:twig",
@@ -57,8 +56,8 @@ describe("output-owned producer effect runtime guards", () => {
 			action: {
 				inputRefs: [],
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
-				type: "producer.product.start",
+				lineId: "line:test",
+				type: "producer.line.start",
 			},
 			config,
 			nowMs: 0,

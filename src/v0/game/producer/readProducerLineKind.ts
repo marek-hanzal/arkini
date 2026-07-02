@@ -4,9 +4,9 @@ export type ProducerLineKind = "effect" | "product";
 
 export namespace readProducerLineKind {
 	export interface Props {
-		product: GameProducerLineDefinition;
+		line: GameProducerLineDefinition;
 	}
 }
 
-export const readProducerLineKind = ({ product }: readProducerLineKind.Props): ProducerLineKind =>
-	product.activatesEffectId ? "effect" : "product";
+export const readProducerLineKind = ({ line }: readProducerLineKind.Props): ProducerLineKind =>
+	line.activatesEffectId ? "effect" : "product";

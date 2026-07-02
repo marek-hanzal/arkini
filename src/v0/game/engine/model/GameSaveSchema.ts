@@ -4,9 +4,9 @@ import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSc
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import {
-	readProducerProductLineDefinition,
-	readProducerProductLineIds,
-} from "~/v0/game/config/readProducerProductLineDefinition";
+	readProducerLineDefinition,
+	readProducerLineIds,
+} from "~/v0/game/config/readProducerLineDefinition";
 import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 
@@ -108,7 +108,7 @@ const GameSaveProducerJobSchema = z
 		pausedAtMs: GameInstantMsSchema.optional(),
 		remainingMs: NonNegativeIntegerSchema.optional(),
 		producerItemInstanceId: IdSchema,
-		productId: IdSchema,
+		lineId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		readyAtMs: GameInstantMsSchema,
 	})
@@ -189,12 +189,12 @@ const GameSaveCheatStateSchema = z
 
 const GameSaveProducerLineStateSchema = z
 	.object({
-		defaultProductId: IdSchema.optional(),
-		defaultEffectProductId: IdSchema.optional(),
+		defaultLineId: IdSchema.optional(),
+		defaultEffectLineId: IdSchema.optional(),
 	})
 	.strict();
 
-const GameSaveProducerProductInputStateSchema = z
+const GameSaveProducerLineInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
@@ -202,7 +202,7 @@ const GameSaveProducerProductInputStateSchema = z
 
 const GameSaveProducerInputStateSchema = z
 	.object({
-		productInputs: z.record(IdSchema, GameSaveProducerProductInputStateSchema),
+		lineInputs: z.record(IdSchema, GameSaveProducerLineInputStateSchema),
 	})
 	.strict();
 
@@ -384,19 +384,19 @@ const readItemInstanceDefinition = ({
 	return undefined;
 };
 
-const readEffectiveProductInputSlots = ({
+const readEffectiveLineInputSlots = ({
 	producer,
-	productId,
+	lineId,
 }: {
 	producer: NonNullable<ReturnType<typeof readProducerCapabilityDefinition>>;
-	productId: string;
+	lineId: string;
 }) =>
-	readProducerProductLineDefinition({
+	readProducerLineDefinition({
 		producerDefinition: producer,
-		productId,
+		lineId,
 	})?.inputs ?? [];
 
-const readProducerProductLineFromJob = ({
+const readProducerLineFromJob = ({
 	config,
 	job,
 	save,
@@ -414,9 +414,9 @@ const readProducerProductLineFromJob = ({
 		: undefined;
 
 	return producer
-		? readProducerProductLineDefinition({
+		? readProducerLineDefinition({
 				producerDefinition: producer,
-				productId: job.productId,
+				lineId: job.lineId,
 			})
 		: undefined;
 };
@@ -724,18 +724,18 @@ const validateGameSaveAgainstConfig = (
 				`Producer job target "${job.producerItemInstanceId}" must reference a producer-like item.`,
 			);
 		} else if (
-			!readProducerProductLineIds({
+			!readProducerLineIds({
 				producerDefinition: producer,
-			}).includes(job.productId)
+			}).includes(job.lineId)
 		) {
 			addSaveIssue(
 				ctx,
 				[
 					"producerJobs",
 					jobId,
-					"productId",
+					"lineId",
 				],
-				`Product "${job.productId}" does not belong to producer "${producerId}".`,
+				`Line "${job.lineId}" does not belong to producer "${producerId}".`,
 			);
 		}
 
@@ -803,8 +803,8 @@ const validateGameSaveAgainstConfig = (
 				activeEffectId,
 			]);
 			const producerJob = save.producerJobs[activeEffect.producerJobId];
-			const product = producerJob
-				? readProducerProductLineFromJob({
+			const line = producerJob
+				? readProducerLineFromJob({
 						config,
 						save,
 						job: producerJob,
@@ -855,7 +855,7 @@ const validateGameSaveAgainstConfig = (
 						`Active effect endAtMs must match producer job "${producerJob.id}" readyAtMs.`,
 					);
 				}
-				if (product?.activatesEffectId !== activeEffect.effectId) {
+				if (line?.activatesEffectId !== activeEffect.effectId) {
 					addSaveIssue(
 						ctx,
 						[
@@ -871,12 +871,12 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
-		const product = readProducerProductLineFromJob({
+		const line = readProducerLineFromJob({
 			config,
 			save,
 			job,
 		});
-		if (!product?.activatesEffectId) continue;
+		if (!line?.activatesEffectId) continue;
 
 		const activeEffectIds = activeEffectIdsByProducerJobId.get(jobId) ?? [];
 		const expectedActiveEffectCount = job.delivery ? 0 : 1;
@@ -888,8 +888,8 @@ const validateGameSaveAgainstConfig = (
 					jobId,
 				],
 				job.delivery
-					? `Blocked producer job "${jobId}" has completed activated effect "${product.activatesEffectId}" and must not keep a linked active effect.`
-					: `Producer job "${jobId}" activates effect "${product.activatesEffectId}" and must have exactly one linked active effect.`,
+					? `Blocked producer job "${jobId}" has completed activated effect "${line.activatesEffectId}" and must not keep a linked active effect.`
+					: `Producer job "${jobId}" activates effect "${line.activatesEffectId}" and must have exactly one linked active effect.`,
 			);
 		}
 	}
@@ -1010,29 +1010,29 @@ const validateGameSaveAgainstConfig = (
 		}
 
 		if (
-			lineState.defaultProductId !== undefined &&
-			!readProducerProductLineIds({
+			lineState.defaultLineId !== undefined &&
+			!readProducerLineIds({
 				producerDefinition: producer,
-			}).includes(lineState.defaultProductId)
+			}).includes(lineState.defaultLineId)
 		) {
 			addSaveIssue(
 				ctx,
 				[
 					"producerLines",
 					producerItemInstanceId,
-					"defaultProductId",
+					"defaultLineId",
 				],
-				`Default product "${lineState.defaultProductId}" does not belong to producer "${producerId}".`,
+				`Default line "${lineState.defaultLineId}" does not belong to producer "${producerId}".`,
 			);
-		} else if (lineState.defaultProductId !== undefined) {
-			const product = readProducerProductLineDefinition({
+		} else if (lineState.defaultLineId !== undefined) {
+			const line = readProducerLineDefinition({
 				producerDefinition: producer,
-				productId: lineState.defaultProductId,
+				lineId: lineState.defaultLineId,
 			});
 			if (
-				product &&
+				line &&
 				readProducerLineKind({
-					product,
+					line,
 				}) !== "product"
 			) {
 				addSaveIssue(
@@ -1040,37 +1040,37 @@ const validateGameSaveAgainstConfig = (
 					[
 						"producerLines",
 						producerItemInstanceId,
-						"defaultProductId",
+						"defaultLineId",
 					],
-					`Default product "${lineState.defaultProductId}" must reference a normal product line.`,
+					`Default line "${lineState.defaultLineId}" must reference a normal producer line.`,
 				);
 			}
 		}
 
 		if (
-			lineState.defaultEffectProductId !== undefined &&
-			!readProducerProductLineIds({
+			lineState.defaultEffectLineId !== undefined &&
+			!readProducerLineIds({
 				producerDefinition: producer,
-			}).includes(lineState.defaultEffectProductId)
+			}).includes(lineState.defaultEffectLineId)
 		) {
 			addSaveIssue(
 				ctx,
 				[
 					"producerLines",
 					producerItemInstanceId,
-					"defaultEffectProductId",
+					"defaultEffectLineId",
 				],
-				`Default effect product "${lineState.defaultEffectProductId}" does not belong to producer "${producerId}".`,
+				`Default effect line "${lineState.defaultEffectLineId}" does not belong to producer "${producerId}".`,
 			);
-		} else if (lineState.defaultEffectProductId !== undefined) {
-			const effectProduct = readProducerProductLineDefinition({
+		} else if (lineState.defaultEffectLineId !== undefined) {
+			const effectLine = readProducerLineDefinition({
 				producerDefinition: producer,
-				productId: lineState.defaultEffectProductId,
+				lineId: lineState.defaultEffectLineId,
 			});
 			if (
-				effectProduct &&
+				effectLine &&
 				readProducerLineKind({
-					product: effectProduct,
+					line: effectLine,
 				}) !== "effect"
 			) {
 				addSaveIssue(
@@ -1078,9 +1078,9 @@ const validateGameSaveAgainstConfig = (
 					[
 						"producerLines",
 						producerItemInstanceId,
-						"defaultEffectProductId",
+						"defaultEffectLineId",
 					],
-					`Default effect product "${lineState.defaultEffectProductId}" must reference an effect product line.`,
+					`Default effect line "${lineState.defaultEffectLineId}" must reference an effect producer line.`,
 				);
 			}
 		}
@@ -1111,31 +1111,31 @@ const validateGameSaveAgainstConfig = (
 			continue;
 		}
 
-		for (const [productId, productInputState] of Object.entries(state.productInputs)) {
+		for (const [lineId, lineInputState] of Object.entries(state.lineInputs)) {
 			if (
-				!readProducerProductLineIds({
+				!readProducerLineIds({
 					producerDefinition: producer,
-				}).includes(productId)
+				}).includes(lineId)
 			) {
 				addSaveIssue(
 					ctx,
 					[
 						"producerInputs",
 						producerItemInstanceId,
-						"productInputs",
-						productId,
+						"lineInputs",
+						lineId,
 					],
-					`Product "${productId}" does not belong to producer "${producerId}".`,
+					`Line "${lineId}" does not belong to producer "${producerId}".`,
 				);
 				continue;
 			}
 
-			const inputSlots = readEffectiveProductInputSlots({
+			const inputSlots = readEffectiveLineInputSlots({
 				producer,
-				productId,
+				lineId,
 			});
 
-			for (const [itemId, quantity] of Object.entries(productInputState.items)) {
+			for (const [itemId, quantity] of Object.entries(lineInputState.items)) {
 				const inputSlot = inputSlots.find((input) => input.itemId === itemId);
 				if (!inputSlot) {
 					addSaveIssue(
@@ -1143,12 +1143,12 @@ const validateGameSaveAgainstConfig = (
 						[
 							"producerInputs",
 							producerItemInstanceId,
-							"productInputs",
-							productId,
+							"lineInputs",
+							lineId,
 							"items",
 							itemId,
 						],
-						`Product "${productId}" has no input "${itemId}".`,
+						`Line "${lineId}" has no input "${itemId}".`,
 					);
 					continue;
 				}
@@ -1159,8 +1159,8 @@ const validateGameSaveAgainstConfig = (
 						[
 							"producerInputs",
 							producerItemInstanceId,
-							"productInputs",
-							productId,
+							"lineInputs",
+							lineId,
 							"items",
 							itemId,
 						],

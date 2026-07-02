@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineView => ({
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+const line = (overrides: Partial<ProducerLineView>): ProducerLineView => ({
 	durationMs: 1000,
 	inProgress: false,
 	inputItemIds: [],
@@ -14,7 +14,7 @@ const line = (overrides: Partial<ProducerProductLineView>): ProducerProductLineV
 	name: "Target",
 	lineKind: "product" as const,
 	producerQueuedJobs: 0,
-	productId: "product:target",
+	lineId: "line:target",
 	queueFull: false,
 	blocked: false,
 	queuedJobs: 0,
@@ -27,7 +27,7 @@ const item = (props: {
 	itemId: string;
 	x: number;
 	y: number;
-	line?: ProducerProductLineView;
+	line?: ProducerLineView;
 }): BoardViewItem => ({
 	id: props.id,
 	itemId: props.itemId,
@@ -39,7 +39,7 @@ const item = (props: {
 				activation: {
 					inputs: [],
 					kind: "producer" as const,
-					productLines: [
+					producerLines: [
 						props.line,
 					],
 					trigger: "click" as const,
@@ -199,7 +199,7 @@ describe("readProducerMissingResourceHintTileIds", () => {
 						quantity: 1,
 					},
 				],
-				productId: "product:source-water",
+				lineId: "line:source-water",
 			}),
 			x: 1,
 			y: 0,
@@ -252,7 +252,7 @@ describe("readProducerMissingResourceHintTileIds", () => {
 						quantity: 1,
 					},
 				],
-				productId: "product:source-water",
+				lineId: "line:source-water",
 			}),
 			x: 1,
 			y: 0,

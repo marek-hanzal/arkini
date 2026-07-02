@@ -7,7 +7,7 @@ const NonNegativeIntegerSchema = z.number().int().min(0);
 const PositiveIntegerSchema = z.number().int().positive();
 
 export const GameItemCreatedReasonSchema = z.enum([
-	"product-output",
+	"producer-line-output",
 	"producer-input-withdraw",
 	"craft-input-withdraw",
 	"inventory-placement",
@@ -17,7 +17,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 ]);
 
 const GameItemConsumedReasonSchema = z.enum([
-	"product-input",
+	"producer-line-input",
 	"producer-input-store",
 	"producer-input-auto-fill",
 	"craft-input",
@@ -115,7 +115,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.object({
 			type: z.literal("producer_input.stored"),
 			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
+			lineId: IdSchema,
 			itemId: IdSchema,
 			quantity: PositiveIntegerSchema,
 			previousQuantity: NonNegativeIntegerSchema,
@@ -127,7 +127,7 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.object({
 			type: z.literal("producer_input.withdrawn"),
 			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
+			lineId: IdSchema,
 			itemId: IdSchema,
 			quantity: PositiveIntegerSchema,
 			previousQuantity: PositiveIntegerSchema,
@@ -162,11 +162,11 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
-			type: z.literal("product.started"),
+			type: z.literal("producer_line.started"),
 			atMs: GameInstantMsSchema,
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
+			lineId: IdSchema,
 			startAtMs: GameInstantMsSchema,
 			readyAtMs: GameInstantMsSchema,
 		})
@@ -207,29 +207,29 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
-			type: z.literal("product.completed"),
+			type: z.literal("producer_line.completed"),
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
+			lineId: IdSchema,
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
 		.object({
-			type: z.literal("product.blocked"),
+			type: z.literal("producer_line.blocked"),
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
+			lineId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 	z
 		.object({
-			type: z.literal("product.failed"),
+			type: z.literal("producer_line.failed"),
 			jobId: IdSchema,
 			producerItemInstanceId: IdSchema,
-			productId: IdSchema,
+			lineId: IdSchema,
 			reason: GamePlacementFailureReasonSchema,
 			atMs: GameInstantMsSchema,
 		})
@@ -283,10 +283,10 @@ const GameEventSchema = z.discriminatedUnion("type", [
 		.strict(),
 	z
 		.object({
-			type: z.literal("producer.product_line.default_changed"),
+			type: z.literal("producer.line.default_changed"),
 			producerItemInstanceId: IdSchema,
-			previousProductId: IdSchema.optional(),
-			nextProductId: IdSchema.optional(),
+			previousLineId: IdSchema.optional(),
+			nextLineId: IdSchema.optional(),
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),

@@ -1,13 +1,13 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
-import { readLiveProducerProductLineView } from "~/v0/producer/logic/readLiveProducerProductLineView";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+import { readLiveProducerLineView } from "~/v0/producer/logic/readLiveProducerLineView";
 
-const readBoardProgressDisplay = (line: ProducerProductLineView) => {
+const readBoardProgressDisplay = (line: ProducerLineView) => {
 	const progress = line.progress ?? 0;
 	return line.lineKind === "effect" ? 1 - progress : progress;
 };
 
-const compareRunningLines = (left: ProducerProductLineView, right: ProducerProductLineView) => {
+const compareRunningLines = (left: ProducerLineView, right: ProducerLineView) => {
 	const leftKindPriority = left.lineKind === "effect" ? 0 : 1;
 	const rightKindPriority = right.lineKind === "effect" ? 0 : 1;
 
@@ -15,7 +15,7 @@ const compareRunningLines = (left: ProducerProductLineView, right: ProducerProdu
 		leftKindPriority - rightKindPriority ||
 		(left.startAtMs ?? 0) - (right.startAtMs ?? 0) ||
 		(left.readyAtMs ?? 0) - (right.readyAtMs ?? 0) ||
-		left.productId.localeCompare(right.productId)
+		left.lineId.localeCompare(right.lineId)
 	);
 };
 
@@ -27,9 +27,9 @@ export namespace readProducerBoardProgress {
 }
 
 export function readProducerBoardProgress({ activation, nowMs }: readProducerBoardProgress.Props) {
-	if (!activation?.productLines?.length) return undefined;
+	if (!activation?.producerLines?.length) return undefined;
 
-	const runningLine = activation.productLines
+	const runningLine = activation.producerLines
 		?.filter(
 			(line) =>
 				line.startAtMs !== undefined &&
@@ -42,7 +42,7 @@ export function readProducerBoardProgress({ activation, nowMs }: readProducerBoa
 
 	if (!runningLine) return undefined;
 
-	const liveLine = readLiveProducerProductLineView({
+	const liveLine = readLiveProducerLineView({
 		line: runningLine,
 		nowMs,
 	});

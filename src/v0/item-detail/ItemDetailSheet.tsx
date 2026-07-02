@@ -20,11 +20,11 @@ export namespace ItemDetailSheet {
 		items: ItemCatalogView;
 		onClaimCraft(): void;
 		onClose(): void;
-		onSetDefaultProductLine(productId: string): void;
+		onSetDefaultProducerLine(lineId: string): void;
 		onStartCraft(): void;
-		onStartProductLine(productId: string): void;
+		onStartProducerLine(lineId: string): void;
 		onWithdrawCraftInput(itemId: string): void;
-		onWithdrawProductLineInput(productId: string, itemId: string): void;
+		onWithdrawProducerLineInput(lineId: string, itemId: string): void;
 	}
 }
 
@@ -51,11 +51,11 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 	items,
 	onClaimCraft,
 	onClose,
-	onSetDefaultProductLine,
+	onSetDefaultProducerLine,
 	onStartCraft,
-	onStartProductLine,
+	onStartProducerLine,
 	onWithdrawCraftInput,
-	onWithdrawProductLineInput,
+	onWithdrawProducerLineInput,
 }) => {
 	const item = boardItem ? items[boardItem.itemId] : undefined;
 	const activation = boardItem?.activation;
@@ -64,11 +64,11 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 		canSetDefaultLines,
 		isPending,
 		onClaimCraft,
-		onSetDefaultProductLine,
+		onSetDefaultProducerLine,
 		onStartCraft,
-		onStartProductLine,
+		onStartProducerLine,
 		onWithdrawCraftInput,
-		onWithdrawProductLineInput,
+		onWithdrawProducerLineInput,
 	});
 
 	if (!boardItem || !item) {

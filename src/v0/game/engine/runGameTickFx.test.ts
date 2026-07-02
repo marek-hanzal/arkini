@@ -23,7 +23,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -47,7 +47,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -68,8 +68,8 @@ describe("runGameTickFx", () => {
 		expect(result.events).toMatchObject([
 			{
 				jobId: "job:1",
-				productId: "product:test",
-				type: "product.completed",
+				lineId: "line:test",
+				type: "producer_line.completed",
 			},
 			{
 				itemId: "item:twig",
@@ -124,7 +124,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -169,11 +169,11 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerLines["item-instance:1"] = {
-			defaultProductId: "product:test",
+			defaultLineId: "line:test",
 		};
 
 		const result = runTick({
@@ -187,8 +187,8 @@ describe("runGameTickFx", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					jobId: "job:1",
-					productId: "product:test",
-					type: "product.completed",
+					lineId: "line:test",
+					type: "producer_line.completed",
 				}),
 			]),
 		);
@@ -220,7 +220,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -242,9 +242,9 @@ describe("runGameTickFx", () => {
 				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				reason: "board:full",
-				type: "product.blocked",
+				type: "producer_line.blocked",
 			},
 		]);
 	});
@@ -279,7 +279,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -294,9 +294,9 @@ describe("runGameTickFx", () => {
 				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				reason: "board:full",
-				type: "product.blocked",
+				type: "producer_line.blocked",
 			},
 		]);
 		expect(result.save.producerJobs["job:1"]).toMatchObject({
@@ -342,7 +342,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -353,10 +353,10 @@ describe("runGameTickFx", () => {
 		});
 		const changedConfig = createEngineTestConfig({
 			...config,
-			products: {
-				...config.products,
-				"product:test": {
-					...config.products["product:test"],
+			lineOverrides: {
+				...config.lineCatalog,
+				"line:test": {
+					...config.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:plank",
@@ -379,7 +379,7 @@ describe("runGameTickFx", () => {
 		expect(delivered.events).toEqual([
 			expect.objectContaining({
 				jobId: "job:1",
-				type: "product.completed",
+				type: "producer_line.completed",
 			}),
 			expect.objectContaining({
 				itemId: "item:plank",
@@ -414,7 +414,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -457,10 +457,8 @@ describe("runGameTickFx", () => {
 				},
 				title: "Test",
 			},
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -477,14 +475,14 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:blocked",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerJobs["job:queued"] = {
 			readyAtMs: 2000,
 			id: "job:queued",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 1000,
 		};
 
@@ -550,14 +548,14 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerJobs["job:2"] = {
 			readyAtMs: 1000,
 			id: "job:2",
 			producerItemInstanceId: "item-instance:2",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -638,7 +636,7 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:shred",
+			lineId: "line:shred",
 			startAtMs: 0,
 		};
 
@@ -654,8 +652,8 @@ describe("runGameTickFx", () => {
 				atMs: 1000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
-				type: "product.completed",
+				lineId: "line:shred",
+				type: "producer_line.completed",
 			},
 		]);
 	});
@@ -675,10 +673,8 @@ describe("runGameTickFx", () => {
 				},
 				title: "Test",
 			},
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -695,14 +691,14 @@ describe("runGameTickFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerJobs["job:2"] = {
 			readyAtMs: 2000,
 			id: "job:2",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 1000,
 		};
 
@@ -717,9 +713,9 @@ describe("runGameTickFx", () => {
 				atMs: 2000,
 				jobId: "job:1",
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				reason: "board:full",
-				type: "product.blocked",
+				type: "producer_line.blocked",
 			},
 		]);
 		expect(result.nextWakeAtMs).toBe(3000);

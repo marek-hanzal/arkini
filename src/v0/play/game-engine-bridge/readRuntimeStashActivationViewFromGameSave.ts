@@ -1,13 +1,13 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
-import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
+import { readProducerLineDurationMs } from "~/v0/game/producer/readProducerLineDurationMs";
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
-import { readRuntimeLootDropViewsFromEffectiveProductLine } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromEffectiveProductLine";
-import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
+import { readRuntimeLootDropViewsFromEffectiveProducerLine } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromEffectiveProducerLine";
+import { readRuntimeProducerLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerLineViewsFromGameSave";
 import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
 
 export namespace readRuntimeStashActivationViewFromGameSave {
@@ -26,27 +26,28 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	save,
 }: readRuntimeStashActivationViewFromGameSave.Props): ActivationView | undefined => {
 	const stash = config.items[boardItem.itemId]?.stash;
-	const productId = stash?.line.id;
-	const product = stash?.line;
-	if (!stash || !productId || !product) return undefined;
+	const lineId = stash?.line.id;
+	const line = stash?.line;
+	if (!stash || !lineId || !line) return undefined;
 
-	const storedInputs = save.producerInputs[boardItem.id]?.productInputs[productId]?.items ?? {};
-	const effectiveProductLine = readEffectiveProducerProductLine({
-		baseDurationMs: readProducerProductDurationMs({
-			product,
+	const storedInputs = save.producerInputs[boardItem.id]?.lineInputs[lineId]?.items ?? {};
+	const effectiveProducerLine = readEffectiveProducerLine({
+		baseDurationMs: readProducerLineDurationMs({
+			line,
 		}),
 		config,
 		nowMs,
 		producerItemInstanceId: boardItem.id,
-		product,
-		productId,
+		line,
+		lineId,
 		save,
 	});
-	const productLines = readRuntimeProducerProductLineViewsFromGameSave({
+	const producerLines = readRuntimeProducerLineViewsFromGameSave({
 		config,
 		maxQueueSize: stash.maxQueueSize,
 		nowMs,
-		productIds: [
+		producerDefinition: stash,
+		lineIds: [
 			stash.line.id,
 		],
 		save,
@@ -56,17 +57,17 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		producerItemInstanceId: boardItem.id,
 		save,
 	});
-	const productVisible = effectiveProductLine.visible;
+	const lineVisible = effectiveProducerLine.visible;
 
 	return {
 		deliveryBlocked,
-		drops: productVisible
-			? readRuntimeLootDropViewsFromEffectiveProductLine({
-					effectiveProductLine,
+		drops: lineVisible
+			? readRuntimeLootDropViewsFromEffectiveProducerLine({
+					effectiveProducerLine,
 				})
 			: undefined,
-		inputs: productVisible
-			? (product.inputs ?? []).map((input) =>
+		inputs: lineVisible
+			? (line.inputs ?? []).map((input) =>
 					readRuntimeActivationInputView({
 						available: readRuntimeActivationInputAvailableQuantityFromGameSave({
 							itemId: input.itemId,
@@ -79,7 +80,7 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 				)
 			: [],
 		kind: "stash",
-		productLines,
+		producerLines,
 		remainingCharges: readProducerRemainingCharges({
 			config,
 			producerId: boardItem.itemId,

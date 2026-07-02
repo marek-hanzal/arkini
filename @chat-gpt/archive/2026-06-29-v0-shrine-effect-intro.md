@@ -6,8 +6,8 @@ Status: DONE
 
 - Added `producer:shrine-t1` to the starting board as an early effect-source building.
 - Added two active effect product lines:
-  - `product:shrine-t1:minor-haste` activates `effect:shrine-minor-haste` for 5 minutes and multiplies selected basic line durations by `0.75`.
-  - `product:shrine-t1:bountiful-offering` activates `effect:shrine-bountiful-offering` for 3 minutes and adds `+1` quantity to selected basic outputs.
+  - `line:shrine-t1:minor-haste` activates `effect:shrine-minor-haste` for 5 minutes and multiplies selected basic line durations by `0.75`.
+  - `line:shrine-t1:bountiful-offering` activates `effect:shrine-bountiful-offering` for 3 minutes and adds `+1` quantity to selected basic outputs.
 - Added `loot.quantity.add` as a first-class effect operation for product-line loot quantity boosts.
 - Added separate runtime defaults for effect lines and product lines. A producer can have both; click priority is runnable default effect first, then runnable default product.
 - Active/scheduled effect lines are locked until their active effect expires. They cannot be bought/refreshed again while locked.

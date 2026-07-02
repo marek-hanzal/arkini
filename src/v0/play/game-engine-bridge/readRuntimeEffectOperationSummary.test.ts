@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import {
 	readRuntimeEffectBenefitLines,
-	readRuntimeProductLineActiveEffectBonusLines,
+	readRuntimeProducerLineActiveEffectBonusLines,
 } from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
 describe("readRuntimeEffectBenefitLines", () => {
@@ -30,10 +30,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("describes active product-line bonuses from effective runtime state", () => {
 		expect(
-			readRuntimeProductLineActiveEffectBonusLines({
+			readRuntimeProducerLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProductLine: {
+				effectiveProducerLine: {
 					appliedEffects: [
 						{
 							effectId: "effect:shrine-minor-haste",
@@ -65,7 +65,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 										result: "+35% extra roll",
 									},
 								],
-								sourceDropId: "product:test:output:0",
+								sourceDropId: "line:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
 								itemId: "item:log",
@@ -85,10 +85,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("uses effect multiplier, not cheat-clamped runtime duration, for duration bonus copy", () => {
 		expect(
-			readRuntimeProductLineActiveEffectBonusLines({
+			readRuntimeProducerLineActiveEffectBonusLines({
 				baseDurationMs: 60000,
 				config: defaultGameConfig,
-				effectiveProductLine: {
+				effectiveProducerLine: {
 					appliedEffects: [
 						{
 							effectId: "effect:shrine-minor-haste",
@@ -118,10 +118,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("aggregates stacked active product-line bonuses into resulting numbers", () => {
 		expect(
-			readRuntimeProductLineActiveEffectBonusLines({
+			readRuntimeProducerLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProductLine: {
+				effectiveProducerLine: {
 					appliedEffects: [
 						{
 							effectId: "effect:shrine-minor-haste",
@@ -160,7 +160,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 										result: "+35% extra roll",
 									},
 								],
-								sourceDropId: "product:test:output:0",
+								sourceDropId: "line:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
 								itemId: "item:log",
@@ -181,7 +181,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 										result: "+35% extra roll",
 									},
 								],
-								sourceDropId: "product:test:output:0",
+								sourceDropId: "line:test:output:0",
 								effectId: "effect:shrine-bountiful-offering",
 								effectName: "Bountiful Offering",
 								itemId: "item:log",
@@ -201,10 +201,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("describes uncapped chance bonuses as guaranteed plus remainder rolls", () => {
 		expect(
-			readRuntimeProductLineActiveEffectBonusLines({
+			readRuntimeProducerLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProductLine: {
+				effectiveProducerLine: {
 					appliedEffects: [],
 					blocked: false,
 					blockReasons: [],
@@ -219,7 +219,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 									{
 										active: true,
 										display: "always",
-										effectId: "product:test:output:0:effect:0",
+										effectId: "line:test:output:0:effect:0",
 										effectName: "Nearby wood sources",
 										impact: "chance",
 										kind: "nearby.loot.outputChance.add",
@@ -228,11 +228,11 @@ describe("readRuntimeEffectBenefitLines", () => {
 										result: "+50%",
 									},
 								],
-								effectId: "product:test:output:0:effect:0",
+								effectId: "line:test:output:0:effect:0",
 								effectName: "Nearby wood sources",
 								itemId: "item:log",
 								quantity: 1,
-								sourceDropId: "product:test:output:0",
+								sourceDropId: "line:test:output:0",
 							},
 						],
 					},
@@ -247,10 +247,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("respects hidden display rules when summarizing chance bonuses", () => {
 		expect(
-			readRuntimeProductLineActiveEffectBonusLines({
+			readRuntimeProducerLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProductLine: {
+				effectiveProducerLine: {
 					appliedEffects: [],
 					blocked: false,
 					blockReasons: [],
@@ -265,7 +265,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 								effectName: "Bountiful Offering",
 								itemId: "item:log",
 								quantity: 1,
-								sourceDropId: "product:test:output:0",
+								sourceDropId: "line:test:output:0",
 							},
 						],
 					},

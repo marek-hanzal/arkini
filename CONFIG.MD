@@ -1,6 +1,6 @@
 # Arkini GameConfig reference
 
-`GameConfig` is the canonical immutable gameplay contract. Runtime reads it, save data references it, and validation must reject anything the engine cannot execute deterministically. There is no backward compatibility layer for old config shapes. If source data is obsolete, delete it instead of teaching runtime to babysit ghosts.
+`GameConfig` is the canonical immutable gameplay contract. Runtime reads it, save data references it, and validation must reject anything the engine cannot execute deterministically. Old config shapes are not supported. If source data is obsolete, delete it instead of teaching runtime to babysit ghosts.
 
 ## Package shape
 
@@ -15,17 +15,12 @@ Canonical game config keys:
   "resources": {},
   "assets": {},
   "items": {},
-  "merge": {},
   "effects": {},
-  "producers": {},
-  "products": {},
-  "stashes": {},
-  "craftRecipes": {},
   "startingState": { "board": [], "inventory": [] }
 }
 ```
 
-There are no top-level reusable product input tables and no top-level reusable loot tables. Normal product/stash data lives directly on the thing that uses it. Referencing one-off data through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
+There are no top-level producer-line, stash, merge, or craft registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, and `removeBy`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
 
 ## Items
 
@@ -44,53 +39,43 @@ Items define physical tiles/stacks. Source items omit identity fields that can b
 }
 ```
 
-The compiler derives `assetIds` as `["asset:<itemId>"]` and synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. Asset definitions do not carry a `kind` field; the asset id/resource id already describe the render resource, and item ownership is validated through `items.*.assetIds`. Multi-asset craft/blueprint items select an asset by delivered input progress, split evenly across the ordered asset list. Item `code` no longer exists; the item id is the single stable identity. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap for the final item, and craft source items such as blueprints inherit that target cap during producer output and job reservation checks. Use an informational `unique` tag on intentionally single-copy content when that helps humans read the config; the cap itself still comes from `maxCount`. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, and craft capabilities are not referenced from the item; they are keyed by the owning item id in `producers`, `stashes`, and `craftRecipes`.
+The compiler derives `assetIds` as `["asset:<itemId>"]` and synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. Asset definitions do not carry a `kind` field; the asset id/resource id already describe the render resource, and item ownership is validated through `items.*.assetIds`. Multi-asset craft/blueprint items select an asset by delivered input progress, split evenly across the ordered asset list. Item `code` no longer exists; the item id is the single stable identity. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap for the final item, and craft source items such as blueprints inherit that target cap during producer output and job reservation checks. Use an informational `unique` tag on intentionally single-copy content when that helps humans read the config; the cap itself still comes from `maxCount`. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, craft, merge, and removal capabilities are embedded directly on the owning item. The item is the authoring unit: take the item and you have the behavior it owns, without asking a second registry for permission like a tiny JSON bureaucrat.
 
-## Producers and products
+## Producer lines
 
-A producer capability is keyed by the owning item id and owns ordered product ids. A concrete producer item instance may have queued jobs up to `maxQueueSize`.
+A producer capability lives directly on the producer item. The concrete board instance queues jobs up to `maxQueueSize`; the item definition owns the ordered `lines` array. Each line keeps a stable local `id`, because save data and jobs need to point at a line without depending on array order.
 
 ```json
 {
-  "producers": {
+  "items": {
     "producer:lumber-camp-1": {
-      "productIds": ["product:lumber-camp-1-twigs"]
+      "name": "Lumber Camp I",
+      "producer": {
+        "maxQueueSize": 1,
+        "lines": [
+          {
+            "id": "line:lumber-camp-1:twigs",
+            "durationMs": 3000,
+            "inputs": [
+              { "itemId": "item:water", "quantity": 1, "capacity": 1, "consume": true }
+            ],
+            "output": [
+              { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
+            ],
+            "placement": "board_then_inventory"
+          }
+        ]
+      }
     }
   }
 }
 ```
 
-`maxQueueSize` defaults to `1`. Producer shells do not own gates; product-line availability is resolved through Effect grants. A producer may also define finite `charges` and `onChargesDepleted` (`stop` or `remove`). Product lines may define `chargeCost`; if omitted, the product costs no charges. There is no `type: "producer"` field because the section already says the thing is a producer. Humans, tragically, can infer this too.
+`maxQueueSize` defaults to `1`. Producer shells do not own gates; line availability is resolved through Effect grants and output-owned rules. Lines may define `chargeCost`; if omitted, the line costs no charges. There is no top-level product registry and no `type: "producer"` field, because the item capability already says what the thing is. Humans, tragically, can infer this too.
 
-A product line owns its inputs and output inline:
+`name` may be omitted when the line name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free lines. `output` may be omitted for delayed sink/destructor lines. Producer output gates, visibility, availability, duration modifiers, and loot chance modifiers live directly on the affected `output` entry. The root line does not own producer-facing `effects`; the concrete output that is changed owns the rule, because apparently JSON also deserves accountability. Lines that define `activatesEffectId` must not define item output, because their output is runtime influence. For blueprint-output lines, inputs should represent lightweight plan acquisition, research, survey evidence, or paperwork. Do not duplicate the same construction materials/labor inputs that the blueprint craft recipe will consume later; validation tests treat repeated blueprint planning/build costs as a balance bug.
 
-```json
-{
-  "products": {
-    "product:lumber-camp-1-twigs": {
-      "durationMs": 3000,
-      "inputs": [
-        {
-          "itemId": "item:water",
-          "capacity": 1,
-          "consume": true
-        }
-      ],
-      "output": [
-        {
-          "type": "guaranteed",
-          "itemId": "item:twig",
-          "quantity": 2
-        }
-      ]
-    }
-  }
-}
-```
-
-`name` may be omitted when the product name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free products. `output` may be omitted for delayed sink/destructor products. Producer output gates, visibility, availability, duration modifiers, and loot chance modifiers live directly on the affected `output` entry. Product definitions themselves do not own an `effects` array anymore; the concrete output that is changed owns the rule, because apparently JSON also deserves accountability. Product lines that define `activatesEffectId` must not define item output, because their output is runtime influence. For blueprint-output product lines, inputs should represent lightweight plan acquisition, research, survey evidence, or paperwork. Do not duplicate the same construction materials/labor inputs that the blueprint craft recipe will consume later; validation tests treat repeated blueprint planning/build costs as a balance bug.
-
-Product input `quantity` defaults to `1`. Missing input `mode` means `exact`: the product needs and consumes exactly `quantity` items for each run. `mode: "upTo"` changes `quantity` into the per-run maximum: the product can start with at least one stored/selected input and consumes `1..quantity` for the same fixed output. Use this for sink/cleanup lines such as a purifier that can absorb up to four pollution tiles per activation without scaling the output. `capacity` still means how many items may be parked on that product input slot.
+Line input `quantity` defaults to `1`. Missing input `mode` means `exact`: the line needs and consumes exactly `quantity` items for each run. `mode: "upTo"` changes `quantity` into the per-run maximum: the line can start with at least one stored/selected input and consumes `1..quantity` for the same fixed output. Use this for sink/cleanup lines such as a purifier that can absorb up to four pollution tiles per activation without scaling the output. `capacity` still means how many items may be parked on that line input slot.
 
 ```json
 {
@@ -117,51 +102,69 @@ Output entries support:
 }
 ```
 
-Quantity may be a number or `{ "min": number, "max": number }`. Output entries may also define optional `sort` for display ordering when a line has several possible outputs such as trash, pollution, or weighted alternatives. Lower values appear first; omitted values fall back to deterministic item-id ordering. Each concrete drop, including a weighted entry, may also define `visibility`, `enabled`, and ordered drop-owned `effects`. Runtime evaluates those effects from top to bottom on that one drop, so the affected output owns its own reactivity instead of being poked from a product-line bonus table like a JSON voodoo doll.
+Quantity may be a number or `{ "min": number, "max": number }`. Output entries may also define optional `sort` for display ordering when a line has several possible outputs such as trash, pollution, or weighted alternatives. Lower values appear first; omitted values fall back to deterministic item-id ordering. Each concrete drop, including a weighted entry, may also define `visibility`, `enabled`, and ordered drop-owned `effects`. Runtime evaluates those effects from top to bottom on that one drop, so the affected output owns its own reactivity instead of being poked from a bonus table like a JSON voodoo doll.
 
 ## Stashes
 
-A stash is an authoring-level producer facade for finite loot/container behavior. It is keyed by the owning item id, has exactly one `productId`, and uses the same product-line execution path as producers. The product line owns inputs, output, placement, duration, and `chargeCost`; any producer-facing effect rules live on the concrete output entries. The stash owns the finite charges and depletion mode.
+A stash is an item-owned producer facade for finite loot/container behavior. It owns finite charges and depletion mode, and it has exactly one embedded `line`. The line owns inputs, output, placement, duration, and `chargeCost`; any producer-facing effect rules live on the concrete output entries.
 
 ```json
 {
-  "stashes": {
+  "items": {
     "item:crate-1": {
-      "charges": 1,
-      "onChargesDepleted": "remove",
-      "productIds": ["product:crate-1-open"]
-    }
-  },
-  "products": {
-    "product:crate-1-open": {
-      "chargeCost": 1,
-      "durationMs": 0,
-      "inputs": [],
-      "output": [
-        { "type": "guaranteed", "itemId": "item:twig", "quantity": { "min": 1, "max": 3 } },
-        { "type": "chance", "itemId": "item:plank", "chance": 0.25, "quantity": 1 }
-      ],
-      "placement": "board_then_inventory"
+      "stash": {
+        "charges": 1,
+        "onChargesDepleted": "remove",
+        "line": {
+          "id": "line:crate-1:open",
+          "chargeCost": 1,
+          "durationMs": 0,
+          "inputs": [],
+          "output": [
+            { "type": "guaranteed", "itemId": "item:twig", "quantity": { "min": 1, "max": 3 } },
+            { "type": "chance", "itemId": "item:plank", "chance": 0.25, "quantity": 1 }
+          ],
+          "placement": "board_then_inventory"
+        }
+      }
     }
   }
 }
 ```
 
-`charges` defaults to `1`, `onChargesDepleted` defaults to `remove`, and stash `productIds` must contain exactly one product. Stash products must spend charges with `chargeCost > 0`; otherwise the finite container would be an infinite loot faucet, because apparently we do need to say that out loud.
+`charges` defaults to `1`, `onChargesDepleted` defaults to `remove`, and stash lines must spend charges with `chargeCost > 0`; otherwise the finite container would be an infinite loot faucet, because apparently we do need to say that out loud.
 
-For the current chest implementation, depletion mode is `remove`: when the product line completes successfully and spends the last charge, the stash item is removed. Its own board cell is considered available for the output placement attempt, while failed placement keeps the original stash/job state intact through the normal producer blocked-delivery path.
+For the current chest implementation, depletion mode is `remove`: when the line completes successfully and spends the last charge, the stash item is removed. Its own board cell is considered available for the output placement attempt, while failed placement keeps the original stash/job state intact through the normal producer blocked-delivery path.
 
-## Craft recipes
+## Craft
 
-Craft recipes are keyed by the craft target item id, usually a blueprint item. Blueprint recipes may omit `resultItemId`; the compiler derives `producer:<suffix>` from `item:blueprint-<suffix>`. Inputs are stored through the normal DnD interaction model. Input `quantity` defaults to `1`; keep it only when the recipe needs more than one item. Craft `effects` intentionally support only runtime start gates: `grant.require` with `phase: "start"` and `grant.blockStart`. Producer-only nearby/duration/loot effects are rejected on craft recipes so config cannot describe behavior the craft runtime silently ignores. A blueprint recipe must not require its own blueprint item, directly or through another blueprint/building chain; `game:validate` and `game:compile` reject blueprint dependency cycles.
+Craft capability lives directly on the craft target item, usually a blueprint item. Blueprint recipes may omit `resultItemId`; the compiler derives `producer:<suffix>` from `item:blueprint-<suffix>`. Inputs are stored through the normal DnD interaction model. Input `quantity` defaults to `1`; keep it only when the recipe needs more than one item. Craft `effects` intentionally support only runtime start gates: `grant.require` with `phase: "start"` and `grant.blockStart`. Producer-only nearby/duration/loot effects are rejected on craft so config cannot describe behavior the craft runtime silently ignores. A blueprint recipe must not require its own blueprint item, directly or through another blueprint/building chain; `game:validate` and `game:compile` reject blueprint dependency cycles.
 
 ```json
 {
-  "craftRecipes": {
+  "items": {
     "item:blueprint-townhall-t2": {
-      "durationMs": 10000,
-      "inputs": [
-        { "itemId": "item:plank", "quantity": 4, "consume": true }
+      "craft": {
+        "durationMs": 10000,
+        "inputs": [
+          { "itemId": "item:plank", "quantity": 4, "consume": true }
+        ]
+      }
+    }
+  }
+}
+```
+
+## Merges
+
+Merge rules live on the source item in `items.*.merges`. They are explicit and directional: if water can be merged into a tree, that does not mean the tree can be merged into water unless the tree owns its own rule. Runtime does not invent symmetric behavior, because "helpful" merge inference is just a bug wearing perfume.
+
+```json
+{
+  "items": {
+    "item:water": {
+      "merges": [
+        { "withItemId": "item:tree", "resultItemId": "item:double-tree" }
       ]
     }
   }

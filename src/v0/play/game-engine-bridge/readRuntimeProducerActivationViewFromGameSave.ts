@@ -1,9 +1,9 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import { readRuntimeProducerProductLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerProductLineViewsFromGameSave";
+import { readRuntimeProducerLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerLineViewsFromGameSave";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
-import { readProducerProductLineIds } from "~/v0/game/config/readProducerProductLineDefinition";
+import { readProducerLineIds } from "~/v0/game/config/readProducerLineDefinition";
 
 export namespace readRuntimeProducerActivationViewFromGameSave {
 	export interface Props {
@@ -33,11 +33,12 @@ export const readRuntimeProducerActivationViewFromGameSave = ({
 		deliveryBlocked,
 		inputs: [],
 		kind: "producer",
-		productLines: readRuntimeProducerProductLineViewsFromGameSave({
+		producerLines: readRuntimeProducerLineViewsFromGameSave({
 			config,
 			maxQueueSize: producer.maxQueueSize,
 			nowMs,
-			productIds: readProducerProductLineIds({
+			producerDefinition: producer,
+			lineIds: readProducerLineIds({
 				producerDefinition: producer,
 			}),
 			save,

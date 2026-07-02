@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 import type { ItemCatalogView } from "~/v0/item/view/ItemCatalogViewSchema";
 import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDetailProducerLineControl";
 import { DetailProducerLinesPanel } from "~/v0/item-detail/ui/DetailProducerLinesPanel";
@@ -27,7 +27,7 @@ const items: ItemCatalogView = {
 	"producer:quarry-t1": item("producer:quarry-t1", "Quarry I", "quarry.svg"),
 };
 
-const lineModel = (line: ProducerProductLineView) => ({
+const lineModel = (line: ProducerLineView) => ({
 	control: readDetailProducerLineControl({
 		canSetDefault: true,
 		line,
@@ -39,7 +39,7 @@ const lineModel = (line: ProducerProductLineView) => ({
 	line,
 });
 
-const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerProductLineView => ({
+const createLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineView => ({
 	blocked: false,
 	durationMs: 5000,
 	inProgress: false,
@@ -51,7 +51,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 	lineKind: "product",
 	name: "Grain",
 	producerQueuedJobs: 0,
-	productId: "product:farm:grain",
+	lineId: "line:farm:grain",
 	queueFull: false,
 	queuedJobs: 0,
 	queueSize: 1,
@@ -59,7 +59,7 @@ const createLine = (overrides: Partial<ProducerProductLineView> = {}): ProducerP
 });
 
 describe("DetailProducerLinesPanel", () => {
-	it("renders product lines without an extra nested card shell", () => {
+	it("renders producer lines without an extra nested card shell", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -86,7 +86,7 @@ describe("DetailProducerLinesPanel", () => {
 		);
 	});
 
-	it("renders separators between product lines only", () => {
+	it("renders separators between producer lines only", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -94,13 +94,13 @@ describe("DetailProducerLinesPanel", () => {
 					lineModel(
 						createLine({
 							name: "Grain",
-							productId: "product:farm:grain",
+							lineId: "line:farm:grain",
 						}),
 					),
 					lineModel(
 						createLine({
 							name: "Water",
-							productId: "product:farm:water",
+							lineId: "line:farm:water",
 						}),
 					),
 				]}
@@ -123,7 +123,7 @@ describe("DetailProducerLinesPanel", () => {
 		);
 
 		expect(html).toContain("Lines");
-		expect(html).not.toContain("Product lines");
+		expect(html).not.toContain("Producer lines");
 		expect(html).not.toContain(">1</span>");
 	});
 
@@ -281,7 +281,7 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("Water");
 	});
 
-	it("keeps target-limited product line details visible beside the disabled action", () => {
+	it("keeps target-limited producer line details visible beside the disabled action", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}
@@ -336,7 +336,7 @@ describe("DetailProducerLinesPanel", () => {
 		expect(html).toContain("Default");
 	});
 
-	it("keeps fulfilled resources visible until a product line starts running", () => {
+	it("keeps fulfilled resources visible until a producer line starts running", () => {
 		const html = renderToStaticMarkup(
 			<DetailProducerLinesPanel
 				items={items}

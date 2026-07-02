@@ -3,7 +3,7 @@ import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
-import { readProducerProductLineDefinition } from "~/v0/game/config/readProducerProductLineDefinition";
+import { readProducerLineDefinition } from "~/v0/game/config/readProducerLineDefinition";
 
 export namespace readWorldProducerJobSubjectFx {
 	export interface Props {
@@ -39,19 +39,19 @@ export const readWorldProducerJobSubjectFx = Effect.fn("readWorldProducerJobSubj
 		);
 	}
 
-	const product = readProducerProductLineDefinition({
+	const line = readProducerLineDefinition({
 		producerDefinition,
-		productId: job.productId,
+		lineId: job.lineId,
 	});
-	if (!product) {
+	if (!line) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing product "${job.productId}".`),
+			GameEngineError.configReferenceMissing(`Missing producer line "${job.lineId}".`),
 		);
 	}
 
 	return {
 		producerDefinition,
 		producerItem,
-		product,
+		line,
 	};
 });

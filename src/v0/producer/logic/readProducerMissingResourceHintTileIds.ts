@@ -1,27 +1,27 @@
 import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readActivationInputRequiredQuantity";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerProductLineView } from "~/v0/board/view/ProducerProductLineViewSchema";
+import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
 
 export namespace readProducerMissingResourceHintTileIds {
 	export interface Props {
 		board: BoardView;
 		producerItem: BoardViewItem;
-		productId?: string;
+		lineId?: string;
 	}
 }
 
-const readSelectedProductLine = ({
+const readSelectedProducerLine = ({
 	producerItem,
-	productId,
+	lineId,
 }: {
 	producerItem: BoardViewItem;
-	productId?: string;
-}): ProducerProductLineView | undefined => {
-	const productLines = producerItem.activation?.productLines ?? [];
-	if (productId) return productLines.find((line) => line.productId === productId);
+	lineId?: string;
+}): ProducerLineView | undefined => {
+	const producerLines = producerItem.activation?.producerLines ?? [];
+	if (lineId) return producerLines.find((line) => line.lineId === lineId);
 
-	return productLines.find((line) => line.isDefault);
+	return producerLines.find((line) => line.isDefault);
 };
 
 const readBoardItemQuantity = ({
@@ -43,7 +43,7 @@ const readInputItemIdsMissingOnBoard = ({
 	producerItemId,
 }: {
 	board: BoardView;
-	line: ProducerProductLineView;
+	line: ProducerLineView;
 	producerItemId: string;
 }) => {
 	const itemIds = new Set<string>();
@@ -61,7 +61,7 @@ const readInputItemIdsMissingOnBoard = ({
 	return itemIds;
 };
 
-const canLineExposeUsefulOutput = (line: ProducerProductLineView) =>
+const canLineExposeUsefulOutput = (line: ProducerLineView) =>
 	!line.blocked &&
 	line.startRequirementsReady !== false &&
 	!line.outputLimitBlocked &&
@@ -70,7 +70,7 @@ const canLineExposeUsefulOutput = (line: ProducerProductLineView) =>
 const readProducedItemIds = ({ boardItem }: { boardItem: BoardViewItem }): Set<string> => {
 	const itemIds = new Set<string>();
 
-	for (const line of boardItem.activation?.productLines ?? []) {
+	for (const line of boardItem.activation?.producerLines ?? []) {
 		if (!canLineExposeUsefulOutput(line)) continue;
 
 		for (const output of line.outputs ?? []) {
@@ -85,11 +85,11 @@ const readProducedItemIds = ({ boardItem }: { boardItem: BoardViewItem }): Set<s
 export const readProducerMissingResourceHintTileIds = ({
 	board,
 	producerItem,
-	productId,
+	lineId,
 }: readProducerMissingResourceHintTileIds.Props): readonly string[] => {
-	const line = readSelectedProductLine({
+	const line = readSelectedProducerLine({
 		producerItem,
-		productId,
+		lineId,
 	});
 	if (!line || line.queueFull || line.blocked) return [];
 

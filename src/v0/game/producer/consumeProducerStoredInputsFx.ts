@@ -7,7 +7,7 @@ export namespace consumeProducerStoredInputsFx {
 	export interface Props {
 		nextSave: GameSave;
 		producerItemInstanceId: string;
-		productId: string;
+		lineId: string;
 		inputs: readonly GameActivationInput[];
 	}
 }
@@ -15,33 +15,33 @@ export namespace consumeProducerStoredInputsFx {
 export const consumeProducerStoredInputsFx = Effect.fn("consumeProducerStoredInputsFx")(function* ({
 	nextSave,
 	producerItemInstanceId,
-	productId,
+	lineId,
 	inputs,
 }: consumeProducerStoredInputsFx.Props) {
 	const producerInputState = nextSave.producerInputs[producerItemInstanceId];
-	const productInputState = producerInputState?.productInputs[productId];
-	if (!producerInputState || !productInputState) return;
+	const lineInputState = producerInputState?.lineInputs[lineId];
+	if (!producerInputState || !lineInputState) return;
 
 	for (const input of inputs) {
 		if (!input.consume) continue;
 
-		const previousQuantity = productInputState.items[input.itemId] ?? 0;
+		const previousQuantity = lineInputState.items[input.itemId] ?? 0;
 		const consumedQuantity =
 			readActivationInputMode(input) === "upTo"
 				? Math.min(previousQuantity, input.quantity)
 				: input.quantity;
 		const nextQuantity = previousQuantity - consumedQuantity;
 		if (nextQuantity > 0) {
-			productInputState.items[input.itemId] = nextQuantity;
+			lineInputState.items[input.itemId] = nextQuantity;
 		} else {
-			delete productInputState.items[input.itemId];
+			delete lineInputState.items[input.itemId];
 		}
 	}
 
-	if (Object.keys(productInputState.items).length === 0) {
-		delete producerInputState.productInputs[productId];
+	if (Object.keys(lineInputState.items).length === 0) {
+		delete producerInputState.lineInputs[lineId];
 	}
-	if (Object.keys(producerInputState.productInputs).length === 0) {
+	if (Object.keys(producerInputState.lineInputs).length === 0) {
 		delete nextSave.producerInputs[producerItemInstanceId];
 	}
 });

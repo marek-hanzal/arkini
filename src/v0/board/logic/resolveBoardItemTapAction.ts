@@ -1,7 +1,7 @@
 import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
-import { readProducerProductLineRunState } from "~/v0/producer/logic/readProducerProductLineRunState";
+import { readProducerLineRunState } from "~/v0/producer/logic/readProducerLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
@@ -28,7 +28,7 @@ export namespace resolveBoardItemTapAction {
 				type: "activate";
 				activation: "single" | "exhaust";
 				boardItemId: string;
-				productId?: string;
+				lineId?: string;
 		  }
 		| {
 				type: "open-sheet";
@@ -115,16 +115,16 @@ export const resolveBoardItemTapAction = ({
 
 	if (liveBoardItem?.activation?.kind === "producer") {
 		const defaultLines = [
-			liveBoardItem.activation.productLines?.find(
+			liveBoardItem.activation.producerLines?.find(
 				(line) => line.isDefault && line.lineKind === "effect",
 			),
-			liveBoardItem.activation.productLines?.find(
+			liveBoardItem.activation.producerLines?.find(
 				(line) => line.isDefault && line.lineKind === "product",
 			),
 		].filter((line): line is NonNullable<typeof line> => Boolean(line));
 		const runnableDefaultLine = defaultLines.find(
 			(line) =>
-				readProducerProductLineRunState({
+				readProducerLineRunState({
 					line,
 				}).canRunAction,
 		);
@@ -134,7 +134,7 @@ export const resolveBoardItemTapAction = ({
 				type: "activate",
 				activation: "single",
 				boardItemId: boardItem.id,
-				productId: runnableDefaultLine.productId,
+				lineId: runnableDefaultLine.lineId,
 			};
 		}
 		return {

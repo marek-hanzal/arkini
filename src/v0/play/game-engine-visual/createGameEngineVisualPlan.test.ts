@@ -34,7 +34,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:twig",
 					originItemInstanceId: "producer:1",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						itemInstanceId: "spawned:1",
 						kind: "board",
@@ -46,7 +46,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:stone",
 					originItemInstanceId: "producer:1",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						itemInstanceId: "spawned:2",
 						kind: "board",
@@ -63,7 +63,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardEnterRequests[0]).toMatchObject({
 			enter: {
 				fromTileId: "producer:1",
-				groupId: "engine:product-output:producer:1",
+				groupId: "engine:producer-line-output:producer:1",
 				kind: "spawn-from-tile",
 				sequenceIndex: 0,
 			},
@@ -72,7 +72,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardEnterRequests[1]).toMatchObject({
 			enter: {
 				fromTileId: "producer:1",
-				groupId: "engine:product-output:producer:1",
+				groupId: "engine:producer-line-output:producer:1",
 				kind: "spawn-from-tile",
 				sequenceIndex: 1,
 			},
@@ -250,7 +250,7 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					producerItemInstanceId: "producer",
-					productId: "product:test",
+					lineId: "line:test",
 					quantity: 1,
 					atMs: 1,
 					type: "producer_input.stored",
@@ -313,7 +313,7 @@ describe("createGameEngineVisualPlan", () => {
 					nextQuantity: 1,
 					previousQuantity: 0,
 					producerItemInstanceId: "producer",
-					productId: "product:test",
+					lineId: "line:test",
 					quantity: 1,
 					atMs: 1,
 					type: "producer_input.stored",
@@ -323,9 +323,9 @@ describe("createGameEngineVisualPlan", () => {
 					readyAtMs: 1000,
 					jobId: "job:1",
 					producerItemInstanceId: "producer",
-					productId: "product:test",
+					lineId: "line:test",
 					startAtMs: 1,
-					type: "product.started",
+					type: "producer_line.started",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -400,7 +400,7 @@ describe("createGameEngineVisualPlan", () => {
 					producerItemInstanceId: "stash",
 					atMs: 1,
 					type: "producer_input.stored",
-					productId: "product:stash",
+					lineId: "line:stash",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -464,7 +464,7 @@ describe("createGameEngineVisualPlan", () => {
 						kind: "board",
 					},
 					itemId: "item:key",
-					reason: "product-input",
+					reason: "producer-line-input",
 					type: "item.consumed",
 				},
 				{
@@ -475,7 +475,7 @@ describe("createGameEngineVisualPlan", () => {
 					producerItemInstanceId: "stash",
 					atMs: 1,
 					type: "producer_input.stored",
-					productId: "product:stash",
+					lineId: "line:stash",
 				},
 			] satisfies GameEvent[],
 			previousBoard,
@@ -531,7 +531,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:twig",
 					originItemInstanceId: "stash",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						itemInstanceId: "output:1",
 						kind: "board",
@@ -543,7 +543,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:stone",
 					originItemInstanceId: "stash",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						itemInstanceId: "output:2",
 						kind: "board",
@@ -555,7 +555,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:log",
 					originItemInstanceId: "stash",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						itemInstanceId: "output:3",
 						kind: "board",
@@ -640,7 +640,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:twig",
 					originItemInstanceId: "stash",
-					reason: "product-output",
+					reason: "producer-line-output",
 					spawnSequenceIndex: 0,
 					to: {
 						itemInstanceId: "output:1",
@@ -653,7 +653,7 @@ describe("createGameEngineVisualPlan", () => {
 				{
 					itemId: "item:stone",
 					originItemInstanceId: "stash",
-					reason: "product-output",
+					reason: "producer-line-output",
 					spawnSequenceIndex: 1,
 					to: {
 						itemInstanceId: "output:2",
@@ -707,12 +707,12 @@ describe("createGameEngineVisualPlan", () => {
 					producerItemInstanceId: "stash",
 					atMs: 1,
 					type: "producer_input.stored",
-					productId: "product:stash",
+					lineId: "line:stash",
 				},
 				{
 					itemId: "item:twig",
 					originItemInstanceId: "stash",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						itemInstanceId: "output:1",
 						kind: "board",
@@ -761,8 +761,8 @@ describe("createGameEngineVisualPlan", () => {
 					atMs: 1000,
 					jobId: "job:1",
 					producerItemInstanceId: "producer",
-					productId: "product:test",
-					type: "product.completed",
+					lineId: "line:test",
+					type: "producer_line.completed",
 				},
 			] satisfies GameEvent[],
 			previousBoard: boardView([
@@ -801,7 +801,7 @@ describe("createGameEngineVisualPlan", () => {
 			events: [
 				{
 					itemId: "item:twig",
-					reason: "product-output",
+					reason: "producer-line-output",
 					to: {
 						kind: "inventory",
 						nextQuantity: 2,

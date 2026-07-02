@@ -872,7 +872,7 @@ const validateCraftRecipeEffectRuntimeSupport = (
 						effectIndex,
 						"phase",
 					],
-					'Craft recipe grant requirements only support phase "start" because craft targets do not own visible product lines.',
+					'Craft recipe grant requirements only support phase "start" because craft targets do not own visible producer lines.',
 				);
 			}
 			continue;
@@ -1078,7 +1078,7 @@ const validateProducerCapability = ({
 					...linePath,
 					"activatesEffectId",
 				],
-				"Active effect product lines must not also define output.",
+				"Active effect producer lines must not also define output.",
 			);
 		}
 	}
@@ -1204,7 +1204,7 @@ const validateBlueprintDependencyCycles = (
 		blueprintItemIds,
 		config,
 	});
-	collectProductBlueprintDependencies({
+	collectProducerLineBlueprintDependencies({
 		addDependencyItem,
 		blueprintItemIds,
 		config,
@@ -1332,7 +1332,7 @@ const collectCraftRecipeBlueprintDependencies = ({
 	}
 };
 
-const collectProductBlueprintDependencies = ({
+const collectProducerLineBlueprintDependencies = ({
 	addDependencyItem,
 	blueprintItemIds,
 	config,
@@ -2135,7 +2135,7 @@ const validateGrantRequirementsHavePossibleSource = (
 					effectIndex,
 					"selector",
 				],
-				`Soft-lock risk: grant requirement on ${usage.label} can never be satisfied because no passive item or active product can provide ${formatGrantSelector(config, lineEffect.selector)}.`,
+				`Soft-lock risk: grant requirement on ${usage.label} can never be satisfied because no passive item or active producer line can provide ${formatGrantSelector(config, lineEffect.selector)}.`,
 			);
 		}
 	}
@@ -2443,7 +2443,7 @@ const formatUnreachableGameplayTargetMessage = ({
 	);
 
 	if (targetSources.length === 0) {
-		return `Soft-lock risk: ${targetLabel} is not reachable from startingState. No starting entry, merge, craft recipe, product output, passive effect, or active effect can create it.`;
+		return `Soft-lock risk: ${targetLabel} is not reachable from startingState. No starting entry, merge, craft recipe, producer line output, passive effect, or active effect can create it.`;
 	}
 
 	const closestSource = [

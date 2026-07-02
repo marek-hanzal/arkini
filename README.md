@@ -28,7 +28,7 @@ Item definitions drive behavior. An item may define:
 - collectible board items that can be tapped into a limited player inventory
 - craft recipes with visible board progress, used by blueprints, growth, and any future item that wants continual construction
 
-There are no separate static `merges`, `producers`, and `craftRecipes` arrays. Loot tables are top-level config sections because they are reusable game-wide generation data; everything else is derived into indexes over the config.
+There are no separate static `merges`, `producers`, `stashes`, `products`, or `craftRecipes` registries. Item-owned capabilities are embedded directly on the item definition, because the item is the gameplay unit and not a paperwork index with boots.
 
 
 ## Logic and Effect boundary
@@ -86,7 +86,7 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-The active play runtime lives in `src/v0`. The pre-v0 root runtime and `src/ancient` archaeology snapshot have been removed; do not recreate legacy buckets beside `src/v0` unless the goal is to reintroduce the plague in a fresh little hat.
+The active play runtime lives in `src/v0`. The pre-v0 root runtime and `src/ancient` archaeology snapshot have been removed; keep new gameplay work in the active tree instead of growing parallel runtime junk beside it.
 
 Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions dispatch into the runtime engine, runtime selectors publish the new board/inventory view, and visual-event adapters register TileEngine motion requests without a cache detour.
 

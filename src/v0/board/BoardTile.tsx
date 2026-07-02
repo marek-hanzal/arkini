@@ -47,7 +47,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		activation: liveBoardItem?.activation,
 		nowMs,
 	});
-	const hasActiveEffect = liveBoardItem?.activation?.productLines?.some(
+	const hasActiveEffect = liveBoardItem?.activation?.producerLines?.some(
 		(line) =>
 			line.lineKind === "effect" &&
 			line.startAtMs !== undefined &&

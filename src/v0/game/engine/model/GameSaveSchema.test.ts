@@ -13,7 +13,7 @@ const cloneSave = (save: GameSave): GameSave => structuredClone(save);
 const createProducerJob = (id: string) => ({
 	readyAtMs: 1000,
 	id,
-	productId: "product:test",
+	lineId: "line:test",
 	producerItemInstanceId: "item-instance:1",
 	startAtMs: 0,
 });
@@ -145,10 +145,8 @@ describe("GameSaveConfigSchema", () => {
 	it("rejects overlapping producer queue jobs for the same producer", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			producers: {
-				...baseConfig.producers,
+			producerOverrides: {
 				"item:producer": {
-					...baseConfig.producers["item:producer"],
 					maxQueueSize: 2,
 				},
 			},
@@ -178,7 +176,7 @@ describe("GameSaveConfigSchema", () => {
 		expect(result.error?.issues[0]?.message).toContain("starts before previous job");
 	});
 
-	it("rejects producer line default products that do not belong to the producer", () => {
+	it("rejects producer default lines that do not belong to the producer", () => {
 		const config = createEngineTestConfig();
 		const save = createInitialSave({
 			config,
@@ -186,7 +184,7 @@ describe("GameSaveConfigSchema", () => {
 		});
 		const invalidSave = cloneSave(save);
 		invalidSave.producerLines["item-instance:1"] = {
-			defaultProductId: "product:missing",
+			defaultLineId: "line:missing",
 		};
 
 		const result = GameSaveConfigSchema.safeParse({
@@ -195,7 +193,7 @@ describe("GameSaveConfigSchema", () => {
 		});
 
 		expect(result.success).toBe(false);
-		expect(result.error?.issues[0]?.message).toContain("Default product");
+		expect(result.error?.issues[0]?.message).toContain("Default line");
 	});
 
 	it("reports save validation issues on the exact save path", () => {

@@ -159,8 +159,8 @@ describe("applyGameActionFx remove", () => {
 			nowMs: 0,
 		});
 		save.producerInputs["item-instance:1"] = {
-			productInputs: {
-				"product:shred": {
+			lineInputs: {
+				"line:shred": {
 					items: {
 						"item:twig": 1,
 					},

@@ -21,7 +21,7 @@ export const readProducerCapabilityDefinition = ({
 	return item?.producer ?? item?.stash;
 };
 
-export const readProducerProductLineDefinitions = ({
+export const readProducerLineDefinitions = ({
 	producerDefinition,
 }: {
 	producerDefinition: GameProducerCapabilityDefinition;
@@ -32,64 +32,45 @@ export const readProducerProductLineDefinitions = ({
 			]
 		: producerDefinition.lines;
 
-export const readProducerProductLineIds = ({
+export const readProducerLineIds = ({
 	producerDefinition,
 }: {
 	producerDefinition: GameProducerCapabilityDefinition;
 }) =>
-	readProducerProductLineDefinitions({
+	readProducerLineDefinitions({
 		producerDefinition,
 	}).map((line) => line.id);
 
-export const readProducerProductLineDefinition = ({
+export const readProducerLineDefinition = ({
 	producerDefinition,
-	productId,
+	lineId,
 }: {
 	producerDefinition: GameProducerCapabilityDefinition;
-	productId: string;
+	lineId: string;
 }) =>
-	readProducerProductLineDefinitions({
+	readProducerLineDefinitions({
 		producerDefinition,
-	}).find((line) => line.id === productId);
+	}).find((line) => line.id === lineId);
 
-export const readProducerProductLineDefinitionFromConfig = ({
+export const readProducerLineDefinitionFromConfig = ({
 	config,
 	producerId,
-	productId,
+	lineId,
 }: {
 	config: GameConfig;
 	producerId: string;
-	productId: string;
+	lineId: string;
 }) => {
 	const producerDefinition = readProducerCapabilityDefinition({
 		config,
 		producerId,
 	});
 	return producerDefinition
-		? readProducerProductLineDefinition({
+		? readProducerLineDefinition({
 				producerDefinition,
-				productId,
+				lineId,
 			})
 		: undefined;
-};
-
-export const readProductLineDefinitionFromConfig = ({
-	config,
-	productId,
-}: {
-	config: GameConfig;
-	productId: string;
-}) => {
-	for (const item of Object.values(config.items)) {
-		const producerDefinition = item.producer ?? item.stash;
-		if (!producerDefinition) continue;
-		const line = readProducerProductLineDefinition({
-			producerDefinition,
-			productId,
-		});
-		if (line) return line;
-	}
-	return undefined;
 };
 
 export const readCraftRecipeDefinition = ({

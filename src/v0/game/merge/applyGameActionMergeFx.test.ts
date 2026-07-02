@@ -19,8 +19,11 @@ describe("applyGameActionFx merge", () => {
 					],
 					description: "Water",
 					maxStackSize: 3,
-					mergeIds: [
-						"merge:water-twig",
+					merges: [
+						{
+							resultItemId: "item:plank",
+							withItemId: "item:twig",
+						},
 					],
 					name: "Water",
 					storage: "both",
@@ -28,13 +31,7 @@ describe("applyGameActionFx merge", () => {
 					tier: 0,
 				},
 			},
-			merge: {
-				...baseConfig.merge,
-				"merge:water-twig": {
-					resultItemId: "item:plank",
-					withItemId: "item:twig",
-				},
-			},
+
 			startingState: {
 				board: [
 					{
@@ -164,18 +161,15 @@ describe("applyGameActionFx merge", () => {
 				...baseConfig.items,
 				"item:craft-table": {
 					...baseConfig.items["item:craft-table"],
-					mergeIds: [
-						"merge:craft-table-craft-table",
+					merges: [
+						{
+							resultItemId: "item:plank",
+							withItemId: "item:craft-table",
+						},
 					],
 				},
 			},
-			merge: {
-				...baseConfig.merge,
-				"merge:craft-table-craft-table": {
-					resultItemId: "item:plank",
-					withItemId: "item:craft-table",
-				},
-			},
+
 			startingState: {
 				board: [
 					{
@@ -259,18 +253,15 @@ describe("applyGameActionFx merge", () => {
 				...baseConfig.items,
 				"item:twig": {
 					...baseConfig.items["item:twig"],
-					mergeIds: [
-						"merge:twig-craft-table",
+					merges: [
+						{
+							resultItemId: "item:plank",
+							withItemId: "item:craft-table",
+						},
 					],
 				},
 			},
-			merge: {
-				...baseConfig.merge,
-				"merge:twig-craft-table": {
-					resultItemId: "item:plank",
-					withItemId: "item:craft-table",
-				},
-			},
+
 			startingState: {
 				board: [
 					{

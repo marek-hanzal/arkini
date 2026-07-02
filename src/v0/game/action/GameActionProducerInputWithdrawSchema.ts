@@ -6,7 +6,7 @@ export const GameActionProducerInputWithdrawSchema = z
 	.object({
 		itemId: IdSchema,
 		producerItemInstanceId: IdSchema,
-		productId: IdSchema,
+		lineId: IdSchema,
 		type: z.literal("producer.input.withdraw"),
 	})
 	.strict();

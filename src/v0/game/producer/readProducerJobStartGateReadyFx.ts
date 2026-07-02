@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
-import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
-import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
+import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
+import { readProducerLineDurationMs } from "~/v0/game/producer/readProducerLineDurationMs";
 import { readWorldProducerJobSubjectFx } from "~/v0/game/world/readWorldProducerJobSubjectFx";
 
 export namespace readProducerJobStartGateReadyFx {
@@ -28,28 +28,28 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 			job,
 			save,
 		});
-		const effectiveProductLine = readEffectiveProducerProductLine({
-			baseDurationMs: readProducerProductDurationMs({
-				product: subject.product,
+		const effectiveProducerLine = readEffectiveProducerLine({
+			baseDurationMs: readProducerLineDurationMs({
+				line: subject.line,
 			}),
 			config,
 			ignoredProducerJobIds,
 			nowMs: evaluateAtMs,
 			producerItemInstanceId: job.producerItemInstanceId,
-			product: subject.product,
-			productId: job.productId,
+			line: subject.line,
+			lineId: job.lineId,
 			save,
 		});
 
 		const hasEnabledOutput =
-			subject.product.output === undefined ||
-			effectiveProductLine.lootPlan.baseOutput.length > 0;
+			subject.line.output === undefined ||
+			effectiveProducerLine.lootPlan.baseOutput.length > 0;
 
 		return (
-			effectiveProductLine.visible &&
-			effectiveProductLine.startRequirementsReady !== false &&
+			effectiveProducerLine.visible &&
+			effectiveProducerLine.startRequirementsReady !== false &&
 			hasEnabledOutput &&
-			!effectiveProductLine.blocked
+			!effectiveProducerLine.blocked
 		);
 	},
 );

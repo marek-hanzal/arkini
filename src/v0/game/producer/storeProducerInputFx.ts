@@ -43,12 +43,12 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 	});
 
 	const producerInputState = (nextSave.producerInputs[action.producerItemInstanceId] ??= {
-		productInputs: {},
+		lineInputs: {},
 	});
-	const productInputState = (producerInputState.productInputs[checked.productId] ??= {
+	const lineInputState = (producerInputState.lineInputs[checked.lineId] ??= {
 		items: {},
 	});
-	productInputState.items[checked.resolvedRef.itemId] = checked.nextQuantity;
+	lineInputState.items[checked.resolvedRef.itemId] = checked.nextQuantity;
 	nextSave.updatedAtMs = nowMs;
 
 	events.push({
@@ -56,7 +56,7 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 		nextQuantity: checked.nextQuantity,
 		previousQuantity: checked.previousQuantity,
 		producerItemInstanceId: action.producerItemInstanceId,
-		productId: checked.productId,
+		lineId: checked.lineId,
 		quantity: checked.resolvedRef.quantity,
 		atMs: nowMs,
 		type: "producer_input.stored",

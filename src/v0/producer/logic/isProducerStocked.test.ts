@@ -3,7 +3,7 @@ import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { isProducerStocked } from "~/v0/producer/logic/isProducerStocked";
 
 const productLine = (
-	overrides: Partial<NonNullable<ActivationView["productLines"]>[number]> = {},
+	overrides: Partial<NonNullable<ActivationView["producerLines"]>[number]> = {},
 ) => ({
 	durationMs: 1000,
 	inProgress: false,
@@ -15,7 +15,7 @@ const productLine = (
 	name: "Product",
 	lineKind: "product" as const,
 	producerQueuedJobs: 0,
-	productId: "product:test",
+	lineId: "line:test",
 	queueFull: false,
 	blocked: false,
 	queueSize: 1,
@@ -24,16 +24,16 @@ const productLine = (
 });
 
 const producerActivation = (
-	productLines: NonNullable<ActivationView["productLines"]>,
+	producerLines: NonNullable<ActivationView["producerLines"]>,
 ): ActivationView => ({
 	inputs: [],
 	kind: "producer",
-	productLines,
+	producerLines,
 	trigger: "click",
 });
 
 describe("isProducerStocked", () => {
-	it("does not treat the first producer product line as an implicit default", () => {
+	it("does not treat the first producer producer line as an implicit default", () => {
 		expect(
 			isProducerStocked(
 				producerActivation([
@@ -45,7 +45,7 @@ describe("isProducerStocked", () => {
 		).toBe(false);
 	});
 
-	it("uses only the explicit default producer product line for stocked state", () => {
+	it("uses only the explicit default producer producer line for stocked state", () => {
 		expect(
 			isProducerStocked(
 				producerActivation([
@@ -55,14 +55,14 @@ describe("isProducerStocked", () => {
 					}),
 					productLine({
 						isDefault: true,
-						productId: "product:default",
+						lineId: "line:default",
 					}),
 				]),
 			),
 		).toBe(true);
 	});
 
-	it("uses runnable default effects before default product lines for stocked state", () => {
+	it("uses runnable default effects before default producer lines for stocked state", () => {
 		expect(
 			isProducerStocked(
 				producerActivation([
@@ -98,7 +98,7 @@ describe("isProducerStocked", () => {
 		).toBe(true);
 	});
 
-	it("treats default producer product line with auto-fill availability as stocked", () => {
+	it("treats default producer producer line with auto-fill availability as stocked", () => {
 		expect(
 			isProducerStocked(
 				producerActivation([
@@ -112,7 +112,7 @@ describe("isProducerStocked", () => {
 		).toBe(true);
 	});
 
-	it("does not treat default producer product line blocked by queue delivery as stocked", () => {
+	it("does not treat default producer producer line blocked by queue delivery as stocked", () => {
 		expect(
 			isProducerStocked(
 				producerActivation([
@@ -125,7 +125,7 @@ describe("isProducerStocked", () => {
 		).toBe(false);
 	});
 
-	it("treats default producer product line with partial fill availability as stocked", () => {
+	it("treats default producer producer line with partial fill availability as stocked", () => {
 		expect(
 			isProducerStocked(
 				producerActivation([
@@ -186,12 +186,12 @@ describe("isProducerStocked", () => {
 			}),
 		).toBe(false);
 	});
-	it("uses stash product line run state when producer-like line views are available", () => {
+	it("uses stash producer line run state when producer-like line views are available", () => {
 		expect(
 			isProducerStocked({
 				inputs: [],
 				kind: "stash",
-				productLines: [
+				producerLines: [
 					productLine({
 						queueBlockedReason: "paused",
 					}),

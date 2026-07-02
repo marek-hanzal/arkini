@@ -65,10 +65,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					maxCount: 1,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:craft-table": {
-					...baseConfig.craftRecipes["item:craft-table"],
+					...baseConfig.craftCatalog["item:craft-table"],
 					inputs: [],
 					resultItemId: "item:plank",
 				},
@@ -144,18 +144,17 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:blueprint-plank",
@@ -192,7 +191,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			save,
 		}).byId["item-instance:1"];
 
-		expect(producer?.activation?.productLines?.[0]).toMatchObject({
+		expect(producer?.activation?.producerLines?.[0]).toMatchObject({
 			outputLimitBlocked: true,
 			targetLimits: [
 				{
@@ -237,18 +236,17 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:blueprint-plank",
@@ -285,7 +283,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			save,
 		}).byId["item-instance:1"];
 
-		expect(producer?.activation?.productLines?.[0]).toMatchObject({
+		expect(producer?.activation?.producerLines?.[0]).toMatchObject({
 			outputLimitBlocked: true,
 			targetLimits: [
 				{
@@ -323,18 +321,17 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					tier: 0,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
 					resultItemId: "item:plank",
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
 							itemId: "item:blueprint-plank",
@@ -371,7 +368,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			save,
 		}).byId["item-instance:1"];
 
-		expect(producer?.activation?.productLines?.[0]).toMatchObject({
+		expect(producer?.activation?.producerLines?.[0]).toMatchObject({
 			outputLimitBlocked: true,
 			targetLimits: [
 				{
@@ -429,8 +426,8 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 
 		expect(
-			board.byId["item-instance:1"]?.activation?.productLines?.find(
-				(line) => line.productId === "product:test",
+			board.byId["item-instance:1"]?.activation?.producerLines?.find(
+				(line) => line.lineId === "line:test",
 			),
 		).toMatchObject({
 			outputs: [
@@ -452,10 +449,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					width: 3,
 				},
 			},
-			products: {
-				...baseConfig.products,
-				"product:test": {
-					...baseConfig.products["product:test"],
+			lineOverrides: {
+				"line:test": {
+					...baseConfig.lineCatalog["line:test"],
 				},
 			},
 			startingState: {
@@ -484,8 +480,8 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			nowMs: 0,
 			save,
 		});
-		const line = board.byId["item-instance:1"]?.activation?.productLines?.find(
-			(line) => line.productId === "product:test",
+		const line = board.byId["item-instance:1"]?.activation?.producerLines?.find(
+			(line) => line.lineId === "line:test",
 		);
 
 		expect(line).toMatchObject({
@@ -493,14 +489,14 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
-	it("marks the saved producer product line as the default line", () => {
+	it("marks the saved producer producer line as the default line", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
 		save.producerLines["item-instance:1"] = {
-			defaultProductId: "product:shred",
+			defaultLineId: "line:shred",
 		};
 
 		const board = readRuntimeBoardViewFromGameSave({
@@ -509,19 +505,19 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			save,
 		});
 
-		expect(board.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
+		expect(board.byId["item-instance:1"]?.activation?.producerLines).toMatchObject([
 			{
 				isDefault: false,
-				productId: "product:test",
+				lineId: "line:test",
 			},
 			{
 				isDefault: true,
-				productId: "product:shred",
+				lineId: "line:shred",
 			},
 		]);
 	});
 
-	it("does not mark a producer product line as default until save selects one", () => {
+	it("does not mark a producer producer line as default until save selects one", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -534,14 +530,14 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			save,
 		});
 
-		expect(board.byId["item-instance:1"]?.activation?.productLines).toMatchObject([
+		expect(board.byId["item-instance:1"]?.activation?.producerLines).toMatchObject([
 			{
 				isDefault: false,
-				productId: "product:test",
+				lineId: "line:test",
 			},
 			{
 				isDefault: false,
-				productId: "product:shred",
+				lineId: "line:shred",
 			},
 		]);
 	});
@@ -560,7 +556,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			},
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
@@ -575,7 +571,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			deliveryBlocked: true,
 		});
 		expect(
-			activation?.productLines?.find((line) => line.productId === "product:test"),
+			activation?.producerLines?.find((line) => line.lineId === "line:test"),
 		).toMatchObject({
 			deliveryBlocked: true,
 			progress: undefined,
@@ -774,10 +770,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					width: 3,
 				},
 			},
-			craftRecipes: {
-				...baseConfig.craftRecipes,
+			craftOverrides: {
+				...baseConfig.craftCatalog,
 				"item:craft-table": {
-					...baseConfig.craftRecipes["item:craft-table"],
+					...baseConfig.craftCatalog["item:craft-table"],
 				},
 			},
 			items: {
@@ -945,10 +941,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 	it("exposes stash producer-line progress through the shared product-line view", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:stash": {
-					...baseConfig.products["product:stash"],
+			lineOverrides: {
+				"line:stash": {
+					...baseConfig.lineCatalog["line:stash"],
 					durationMs: 1000,
 				},
 			},
@@ -970,7 +965,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		save.producerJobs["job:stash"] = {
 			id: "job:stash",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:stash",
+			lineId: "line:stash",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -983,11 +978,11 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 
 		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
 			kind: "stash",
-			productLines: [
+			producerLines: [
 				{
 					inProgress: true,
 					isDefault: false,
-					productId: "product:stash",
+					lineId: "line:stash",
 					progress: 0.5,
 					readyAtMs: 1000,
 					startAtMs: 0,
@@ -1020,7 +1015,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			},
 			id: "job:stash-blocked",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:stash",
+			lineId: "line:stash",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
@@ -1034,10 +1029,10 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
 			deliveryBlocked: true,
 			kind: "stash",
-			productLines: [
+			producerLines: [
 				{
 					deliveryBlocked: true,
-					productId: "product:stash",
+					lineId: "line:stash",
 					progress: undefined,
 				},
 			],
@@ -1101,10 +1096,9 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 	it("does not leak hidden stash product drops or inputs", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:stash": {
-					...baseConfig.products["product:stash"],
+			lineOverrides: {
+				"line:stash": {
+					...baseConfig.lineCatalog["line:stash"],
 					visibility: "hidden",
 				},
 			},
@@ -1133,17 +1127,16 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		expect(board.byId["item-instance:1"]?.activation).toMatchObject({
 			drops: undefined,
 			inputs: [],
-			productLines: [],
+			producerLines: [],
 		});
 	});
 
 	it("shows stash drop previews with probabilities", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:stash": {
-					...baseConfig.products["product:stash"],
+			lineOverrides: {
+				"line:stash": {
+					...baseConfig.lineCatalog["line:stash"],
 					output: [
 						{
 							itemId: "item:twig",

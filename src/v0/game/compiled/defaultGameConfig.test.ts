@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 
-const readProductLine = (productId: string) =>
+const readProducerLine = (lineId: string) =>
 	Object.values(defaultGameConfig.items)
 		.flatMap((item) => [
 			...(item.producer?.lines ?? []),
@@ -11,9 +11,9 @@ const readProductLine = (productId: string) =>
 					]
 				: []),
 		])
-		.find((line) => line.id === productId);
+		.find((line) => line.id === lineId);
 
-const readProductLines = () =>
+const readProducerLines = () =>
 	Object.values(defaultGameConfig.items).flatMap((item) => [
 		...(item.producer?.lines ?? []),
 		...(item.stash
@@ -38,7 +38,7 @@ const readCraftRecipes = () =>
 	);
 
 describe("defaultGameConfig", () => {
-	it("is compiled to the output-owned producer effect model without legacy mutator fields", () => {
+	it("is compiled to the output-owned producer effect model without root mutator fields", () => {
 		expect(JSON.stringify(defaultGameConfig)).not.toContain("grantSelector");
 		expect(JSON.stringify(defaultGameConfig.effects)).not.toContain("operations");
 	});
@@ -55,7 +55,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("authors work requirements directly on product outputs", () => {
-		const output = readProductLine("product:lumberjack-t1:log")?.output?.[0];
+		const output = readProducerLine("line:lumberjack-t1:log")?.output?.[0];
 
 		expect(output && "effects" in output ? output.effects?.[2] : undefined).toMatchObject({
 			display: "always",
@@ -95,13 +95,13 @@ describe("defaultGameConfig", () => {
 	});
 	it("makes town hall upgrade planning a real timed milestone", () => {
 		const townHallUpgradePlanDurations = {
-			"product:townhall-t1:blueprint-townhall-t2": 60000,
-			"product:townhall-t2:blueprint-townhall-t3": 90000,
-			"product:townhall-t3:blueprint-townhall-t4": 120000,
+			"line:townhall-t1:blueprint-townhall-t2": 60000,
+			"line:townhall-t2:blueprint-townhall-t3": 90000,
+			"line:townhall-t3:blueprint-townhall-t4": 120000,
 		} as const;
 
-		for (const [productId, durationMs] of Object.entries(townHallUpgradePlanDurations)) {
-			const product = readProductLine(productId);
+		for (const [lineId, durationMs] of Object.entries(townHallUpgradePlanDurations)) {
+			const product = readProducerLine(lineId);
 
 			expect(product?.durationMs).toBe(durationMs);
 			expect(product?.tags).toContain("shrine:haste-target");
@@ -118,7 +118,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("does not ship placeholder one-second gameplay timings", () => {
-		const oneSecondProductIds = readProductLines()
+		const oneSecondLineIds = readProducerLines()
 			.map(
 				(product) =>
 					[
@@ -127,18 +127,18 @@ describe("defaultGameConfig", () => {
 					] as const,
 			)
 			.filter(([, product]) => product.durationMs === 1000)
-			.map(([productId]) => productId)
+			.map(([lineId]) => lineId)
 			.sort();
 		const oneSecondCraftIds = readCraftRecipes()
 			.filter(([, craftRecipe]) => craftRecipe.durationMs === 1000)
 			.map(([craftRecipeId]) => craftRecipeId)
 			.sort();
 
-		expect(oneSecondProductIds).toEqual([]);
+		expect(oneSecondLineIds).toEqual([]);
 		expect(oneSecondCraftIds).toEqual([]);
 	});
 	it("keeps blueprint planning costs separate from construction costs", () => {
-		const repeatedBlueprintCosts = readProductLines()
+		const repeatedBlueprintCosts = readProducerLines()
 			.map(
 				(product) =>
 					[
@@ -146,7 +146,7 @@ describe("defaultGameConfig", () => {
 						product,
 					] as const,
 			)
-			.flatMap(([productId, product]) =>
+			.flatMap(([lineId, product]) =>
 				(product.output ?? []).flatMap((output) => {
 					if (!("itemId" in output)) return [];
 					const blueprintItemId = output.itemId;
@@ -160,7 +160,7 @@ describe("defaultGameConfig", () => {
 					return craftRecipe.inputs
 						.map((input) => input.itemId)
 						.filter((itemId) => productInputItemIds.has(itemId))
-						.map((itemId) => `${productId} repeats ${itemId}`);
+						.map((itemId) => `${lineId} repeats ${itemId}`);
 				}),
 			)
 			.sort();
@@ -170,7 +170,7 @@ describe("defaultGameConfig", () => {
 
 	it("keeps feasts as construction labor cost instead of town hall plan cost", () => {
 		expect(
-			readProductLine("product:townhall-t3:blueprint-townhall-t4")?.inputs?.map(
+			readProducerLine("line:townhall-t3:blueprint-townhall-t4")?.inputs?.map(
 				(input) => input.itemId,
 			),
 		).not.toContain("item:feast");

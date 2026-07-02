@@ -23,9 +23,9 @@ describe("readActionReadinessFx", () => {
 		const readiness = runReadiness({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			save,
@@ -47,7 +47,7 @@ describe("readActionReadinessFx", () => {
 			action: {
 				producerItemInstanceId: "item-instance:1",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			save,
@@ -73,9 +73,9 @@ describe("readActionReadinessFx", () => {
 		const readiness = runReadiness({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			save,
@@ -96,9 +96,9 @@ describe("readActionReadinessFx", () => {
 		const readiness = runReadiness({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:shred",
+				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			save,
@@ -119,16 +119,16 @@ describe("readActionReadinessFx", () => {
 			readyAtMs: 1000,
 			id: "job:1",
 			producerItemInstanceId: "item-instance:1",
-			productId: "product:test",
+			lineId: "line:test",
 			startAtMs: 0,
 		};
 
 		const readiness = runReadiness({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			save,
@@ -240,10 +240,9 @@ describe("readActionReadinessFx", () => {
 	it("returns ready for stash partial auto-fill readiness", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			products: {
-				...baseConfig.products,
-				"product:stash": {
-					...baseConfig.products["product:stash"],
+			lineOverrides: {
+				"line:stash": {
+					...baseConfig.lineCatalog["line:stash"],
 					inputs: [
 						{
 							capacity: 2,
@@ -301,9 +300,9 @@ describe("readActionReadinessFx", () => {
 		runReadiness({
 			action: {
 				producerItemInstanceId: "item-instance:1",
-				productId: "product:test",
+				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.product.start",
+				type: "producer.line.start",
 			},
 			config,
 			save,

@@ -1,5 +1,5 @@
-import type { GameConfig } from "../../src/v0/game/config/GameConfigSchema";
-import type { GameLineDefinition } from "../../src/v0/game/config/GameItemCapabilities";
+import type { GameConfig } from "../../src/config/GameConfigSchema";
+import type { GameLineDefinition } from "../../src/config/GameItemCapabilities";
 
 export type GameConfigAuditWarning = {
 	code: "duplicate-definition-shape" | "terminal-item" | "unused-definition";

@@ -21,8 +21,7 @@
 		"resolveJsonModule": true
 	},
 	"include": [
-		"src/app",
-		"src/v0",
+		"src",
 		"src/vite-env.d.ts",
 		"vite.config.ts",
 		"cli/**/*.ts",

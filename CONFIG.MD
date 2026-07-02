@@ -272,7 +272,7 @@ Config uses `durationMs` for relative authored time. Save/runtime uses normalize
 - `nextAttemptAtMs`: retryable blocked delivery can try again
 - `atMs`: event emission instant
 
-Runtime time math belongs in `src/v0/game/time/*`.
+Runtime time math belongs in `src/time/*`.
 
 ## Starting state
 

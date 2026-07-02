@@ -6,8 +6,8 @@ import {
 	parseGameConfigFragment,
 	type GameConfig,
 	type GameConfigFragment,
-} from "../../src/v0/game/config/GameConfigSchema";
-import { doesResolvedDomainSelectorMatchId } from "../../src/v0/game/selector/doesResolvedDomainSelectorMatchId";
+} from "../../src/config/GameConfigSchema";
+import { doesResolvedDomainSelectorMatchId } from "../../src/selector/doesResolvedDomainSelectorMatchId";
 
 const collectionKeys = [
 	"resources",

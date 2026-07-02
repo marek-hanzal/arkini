@@ -15,11 +15,11 @@ Audit domain logic and tighten the boundary:
 
 ## What to inspect
 
-- `src/v0/**/logic/**`
-- `src/v0/**/planning/**`
-- `src/v0/**/read*/**`
-- `src/v0/**/resolve*/**`
-- `src/v0/**/match*/**`
+- `src/**/logic/**`
+- `src/**/planning/**`
+- `src/**/read*/**`
+- `src/**/resolve*/**`
+- `src/**/match*/**`
 - pure helpers imported by `fx/` modules
 - duplicated readiness/apply/UI planning paths
 

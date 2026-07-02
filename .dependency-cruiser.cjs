@@ -3,43 +3,29 @@ const boundaryRules = [
 	{
 		name: "tile-engine-no-arkini-domain-imports",
 		comment:
-			"TileEngine is generic interaction infrastructure. Inject Arkini behavior through props/adapters instead of importing game domains.",
+			"TileEngine is generic interaction infrastructure. Inject Arkini behavior through props/adapters instead of importing gameplay domains.",
 		severity: "error",
 		from: {
-			path: "^src/v0/tile-engine(?:/|$)",
+			path: "^src/tile-engine(?:/|$)",
 		},
 		to: {
 			path: [
-				"^src/v0/(?:activation|board|craft|database|debug|game|inventory|item|item-instance|manifest|play|upgrade)(?:/|$)",
+				"^src/(?:action|activation|board|cheat|config|craft|debug|effects|engine|event|inventory|item|job|limit|loot|merge|placement|play|producer|quantity|remove|save|selector|stash|storage|world)(?:/|$)",
 			],
 		},
 	},
 	{
 		name: "tile-engine-public-api-only",
 		comment:
-			"Code outside TileEngine must import the public ~/v0/tile-engine barrel instead of reaching into package internals.",
+			"Code outside TileEngine must import the public ~/tile-engine barrel instead of reaching into package internals.",
 		severity: "error",
 		from: {
-			path: "^src/v0/(?!tile-engine(?:/|$)).+",
+			path: "^src/(?!tile-engine(?:/|$)).+",
 		},
 		to: {
-			path: "^src/v0/tile-engine/.+",
+			path: "^src/tile-engine/.+",
 			pathNot: [
-				"^src/v0/tile-engine/index\\.ts$",
-			],
-		},
-	},
-	{
-		name: "manifest-no-runtime-imports",
-		comment:
-			"Manifest owns static game definitions only. Runtime state, UI and persistence must not leak back into game data.",
-		severity: "error",
-		from: {
-			path: "^src/v0/manifest(?:/|$)",
-		},
-		to: {
-			path: [
-				"^src/v0/(?:activation|board|craft|database|inventory|item|item-instance|play|tile-engine|upgrade)(?:/|$)",
+				"^src/tile-engine/index\\.ts$",
 			],
 		},
 	},
@@ -49,51 +35,37 @@ const boundaryRules = [
 			"Domain Fx roots are durable use-cases. React belongs in action/query hooks and components, not in Effect/persistence roots.",
 		severity: "error",
 		from: {
-			path: "^src/v0/(?:activation|board|craft|inventory|item|upgrade)/fx(?:/|$)",
+			path: "^src/(?:activation|board|craft|inventory|item|producer)/fx(?:/|$)",
 		},
 		to: {
 			path: "^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
 		},
 	},
 	{
-		name: "game-domain-no-runtime-ui-imports",
+		name: "gameplay-domain-no-runtime-ui-imports",
 		comment:
-			"The game domain is pure gameplay state/Effect logic. UI, Play runtime, Debug and TileEngine depend on it, never the other way around.",
+			"Gameplay domains are pure state/Effect logic. UI, Play runtime and TileEngine depend on them, never the other way around.",
 		severity: "error",
 		from: {
-			path: "^src/v0/game(?:/|$)",
+			path: "^src/(?:action|activation|cheat|config|craft|effects|engine|event|job|limit|loot|placement|quantity|remove|save|selector|stash|storage|world)(?:/|$)",
 		},
 		to: {
 			path: [
-				"^src/v0/(?:board|debug|inventory|item|play|producer|tile-engine|ui)(?:/|$)",
+				"^src/(?:item|play|tile-engine|ui)(?:/|$)",
 				"^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
-			],
-		},
-	},
-	{
-		name: "diagnostics-no-feature-imports",
-		comment:
-			"Diagnostics is low-level instrumentation. Feature layers may record to it, but it must not import feature/UI/game modules back.",
-		severity: "error",
-		from: {
-			path: "^src/v0/diagnostics(?:/|$)",
-		},
-		to: {
-			path: [
-				"^src/v0/(?:activation|board|craft|database|debug|game|inventory|item|item-instance|manifest|play|producer|tile-engine|upgrade)(?:/|$)",
 			],
 		},
 	},
 	{
 		name: "play-drop-no-legacy-resolve-wrapper",
 		comment:
-			"Use ~/v0/play/drop/resolveDrop directly. The old ~/v0/play/resolveDrop wrapper is intentionally not a public API.",
+			"Use ~/play/drop/resolveDrop directly. The old ~/play/resolveDrop wrapper is intentionally not a public API.",
 		severity: "error",
 		from: {
-			path: "^src/v0(?:/|$)",
+			path: "^src(?:/|$)",
 		},
 		to: {
-			path: "^src/v0/play/resolveDrop\\.ts$",
+			path: "^src/play/resolveDrop\\.ts$",
 		},
 	},
 ];

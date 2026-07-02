@@ -5,7 +5,7 @@ Deferred or broader tasks. Promote one into `tasks/` when it becomes current wor
 ## Architecture / runtime
 
 - Pure vs Effect boundary audit: classify pure helpers vs Effect programs and remove duplicated business decisions. See `2026-06-19-pure-vs-effect-boundary-audit.md`.
-- Game engine model topology audit: inspect whether small model contracts under `game/engine/model` should stay engine-level or move beside top-level domains. Do not split dense core schemas for line count.
+- Game engine model topology audit: inspect whether small model contracts under `src/engine/model` should stay engine-level or move beside top-level domains. Do not split dense core schemas for line count.
 - Do not create capability matrix enforcement outside `GameConfigSchema`; legality belongs to config validation, not a separate runtime whitelist. Reopen only for a concrete bug or an intentional schema rule.
 - Runtime adapter audit: check whether `RuntimeGameEngineAdapter` is a justified orchestration boundary or carrying too many concerns. Keep dormant until a concrete adapter pain appears.
 - Keep `GameConfigSchema` / `GameSaveSchema` as intentional dense core contracts; do not split them as line-count cleanup.

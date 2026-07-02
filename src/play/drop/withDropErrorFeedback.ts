@@ -1,0 +1,21 @@
+import { toGameActionError } from "~/play/action/toGameActionError";
+import type { Feedback } from "~/play/feedback/Feedback";
+
+export namespace withDropErrorFeedback {
+	export interface Props {
+		feedback: Feedback.Type;
+		commit(): Promise<unknown>;
+	}
+}
+
+export const withDropErrorFeedback =
+	({ feedback, commit }: withDropErrorFeedback.Props) =>
+	async () => {
+		try {
+			await commit();
+		} catch (error) {
+			const actionError = toGameActionError(error);
+			feedback.showError(actionError);
+			throw actionError;
+		}
+	};

@@ -1,0 +1,14 @@
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+
+export const isBoardViewItemRuntimeBusy = (boardItem: BoardViewItem) =>
+	Boolean(
+		(boardItem.craft && boardItem.craft.phase !== "collecting_inputs") ||
+			boardItem.activation?.deliveryBlocked ||
+			boardItem.activation?.lines?.some(
+				(line) =>
+					line.inProgress ||
+					line.deliveryBlocked ||
+					line.queueBlockedReason !== undefined ||
+					line.queueUsed > 0,
+			),
+	);

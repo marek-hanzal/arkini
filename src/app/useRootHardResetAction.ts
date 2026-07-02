@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { hardResetBrowserStorage } from "~/v0/browser/hardResetBrowserStorage";
+import { hardResetBrowserStorage } from "~/browser/hardResetBrowserStorage";
 
 export namespace useRootHardResetAction {
 	export type Status = "idle" | "pending" | "failed" | "succeeded";

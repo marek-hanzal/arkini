@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { PlayShell } from "~/v0/play";
+import { PlayShell } from "~/play";
 
 export namespace HomeScreen {
 	export interface Props {}

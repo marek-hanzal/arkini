@@ -659,7 +659,7 @@ Item detail may show all lines and can start any line directly. Each line header
 
 Runtime time uses real-world wall-clock milliseconds, but save/event field names are normalized so the engine does not need five dialects of the same clock. Config authors still use `durationMs` for relative lengths. Runtime save state uses `startAtMs` for when a job/effect window begins, `readyAtMs` for when a producer/craft/spawn job may process, `endAtMs` for when an active effect stops applying, and `nextAttemptAtMs` for retryable blocked delivery. Events use `atMs` for the instant the event was emitted; events that describe a scheduled window may additionally include `startAtMs`, `readyAtMs`, or `endAtMs`.
 
-All progress, remaining-time, active-window, due/ready, and next-wake calculations should go through `src/v0/game/time/*`. Do not reintroduce inline timestamp arithmetic unless the time helper genuinely cannot express the rule. That way the runtime has one clock vocabulary instead of a tiny horological landfill.
+All progress, remaining-time, active-window, due/ready, and next-wake calculations should go through `src/time/*`. Do not reintroduce inline timestamp arithmetic unless the time helper genuinely cannot express the rule. That way the runtime has one clock vocabulary instead of a tiny horological landfill.
 
 ### 10.3 Line jobs and queue
 

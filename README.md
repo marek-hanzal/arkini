@@ -15,7 +15,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, and testing utilities. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: compiled JSON parsed by `src/v0/game/config/GameConfigSchema.ts`. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
+The game has one gameplay source of truth: compiled JSON parsed by `src/config/GameConfigSchema.ts`. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
 
 Item definitions drive behavior. An item may define:
 
@@ -33,11 +33,11 @@ There are no separate static `merges`, `producers`, `stashes`, `products`, or `c
 
 ## Logic and Effect boundary
 
-Effect now belongs to the standalone tick/action engine, not to UI-facing persistence plumbing. React components dispatch typed runtime actions through `GameRuntimeStore`/`RuntimeGameEngineAdapter`; they do not call storage-style mutation hooks, React Query mutations, or old database-flavored `src/v0/**/fx` roots.
+Effect now belongs to the standalone tick/action engine, not to UI-facing persistence plumbing. React components dispatch typed runtime actions through `GameRuntimeStore`/`RuntimeGameEngineAdapter`; they do not call storage-style mutation hooks, React Query mutations, or old database-flavored `src/**/fx` roots.
 
-The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/v0/game/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/v0/game/engine`, someone has poured concrete into the gearbox again.
+The engine entrypoints are `applyGameActionFx`, `runGameTickFx`, and readiness checks under `src/engine`. `runGameEngineEffect` provides only the services the engine actually needs, currently `RandomServiceFx`. Storage, visual effects, React and TileEngine stay outside the engine. If persistence starts importing into `src/engine`, someone has poured concrete into the gearbox again.
 
-Runtime reads subscribe through `useGameRuntimeSelector` from `src/v0/play/runtime`. Board, inventory, item and testing utility UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
+Runtime reads subscribe through `useGameRuntimeSelector` from `src/play/runtime`. Board, inventory, item and testing utility UI read from runtime projections derived from `(GameConfig, GameSave)`. React Query is no longer part of live gameplay state, because making a local tick engine pretend to be a remote server cache was cute only in the same way a raccoon in a data center is cute.
 
 Time-sensitive runtime updates are handled by the runtime auto-ticker and engine `nextWakeAtMs`. Randomness is provided through `RandomServiceFx`; gameplay rolling must not call `Math.random()` directly.
 
@@ -49,9 +49,9 @@ The old browser SQLite/Kysely layer, database migrations, `dbFx`, `withTransacti
 
 ## Tile engine boundary
 
-Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/v0/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules. Occupied drop-target feedback is actor-local: valid accepting targets scale/brighten, rejecting or swap targets shrink/dim, and the generic slot outline/background is suppressed when a target tile owns the hover feedback.
+Board and inventory tile visuals in the active runtime are rendered through the generic `TileEngine` in `src/tile-engine/`. Slots/cells are geometry and drop targets; item tiles are stable actors in one absolute item layer. Durable board/inventory gameplay data belongs to `RuntimeGameEngineAdapter`/`GameRuntimeStore`; persistence wraps that later. TileEngine owns transient pointer lifecycle, hit testing, snap handoff, rollback, and FLIP-style tile motion, not game rules. Occupied drop-target feedback is actor-local: valid accepting targets scale/brighten, rejecting or swap targets shrink/dim, and the generic slot outline/background is suppressed when a target tile owns the hover feedback.
 
-`TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, and drop resolution callbacks. It must not import Arkini board/inventory/producers directly. Game-specific stuff lives in `src/v0/play/drop` and the board/inventory surfaces. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
+`TileEngine` is standalone by design: it accepts slots, tiles, render callbacks, generic drag bindings, and drop resolution callbacks. It must not import Arkini board/inventory/producers directly. Game-specific stuff lives in `src/play/drop` and the board/inventory surfaces. If a future game surface needs tile behavior, it should feed generic slots/tiles into `TileEngine` instead of inventing another tiny haunted renderer.
 
 Rules for this layer:
 
@@ -86,28 +86,28 @@ The current content direction is Settlers-like: small producers create raw goods
 
 ## Interaction model
 
-The active play runtime lives in `src/v0`. The pre-v0 root runtime and `src/ancient` archaeology snapshot have been removed; keep new gameplay work in the active tree instead of growing parallel runtime junk beside it.
+The active play runtime lives directly under `src/*`. The old `src/v0` namespace and `src/ancient` archaeology snapshot are gone; keep new gameplay work in the owning root domain instead of growing parallel runtime junk beside it.
 
-Tap/press recognition is owned by `src/v0/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions dispatch into the runtime engine, runtime selectors publish the new board/inventory view, and visual-event adapters register TileEngine motion requests without a cache detour.
+Tap/press recognition is owned by `src/tile-engine/TileEngine.tsx` together with tile dragging and FLIP tile motion. Single tap, double tap, long press, drag threshold, pointer cancel, hit testing, snap, reject rollback, and stable tile actors all live in the same engine path. Animations are first-class runtime behavior, not decorative confetti after data changes. Tiles keep stable ids; accepted actions dispatch into the runtime engine, runtime selectors publish the new board/inventory view, and visual-event adapters register TileEngine motion requests without a cache detour.
 
-Game-specific drop policy lives in `src/v0/play/drop`. The top-level `resolveDrop` is only a tiny delegator over focused case resolvers such as `resolveBoardCellDrop`, `resolveInventoryCellDrop`, and `resolveInventorySlotDrop`. Board/inventory mutation calls are provided as concrete `DropActions`, not as a generic `Command` router. The engine stays game-agnostic: it receives slots, tiles, renderers, drag bindings, and a drop resolver; it does not know what a producer, stash, merge recipe, or inventory stack means.
+Game-specific drop policy lives in `src/play/drop`. The top-level `resolveDrop` is only a tiny delegator over focused case resolvers such as `resolveBoardCellDrop`, `resolveInventoryCellDrop`, and `resolveInventorySlotDrop`. Board/inventory mutation calls are provided as concrete `DropActions`, not as a generic `Command` router. The engine stays game-agnostic: it receives slots, tiles, renderers, drag bindings, and a drop resolver; it does not know what a producer, stash, merge recipe, or inventory stack means.
 
 XState is no longer part of the runtime. The app has two main state buckets: the runtime engine/store for gameplay state, and tiny colocated React state for transient UI such as active sheet and feedback pulses. Future real async support data can get its own boundary; it does not get to masquerade as gameplay state. If a workflow does not branch across meaningful domain states, it stays as a hook, reducer, or concrete runtime action instead of becoming a statechart shrine.
 
 ## React data subscriptions
 
-Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/v0/play/runtime`. Board, inventory, item and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
+Gameplay reads subscribe through `useGameRuntimeSelector` / focused hooks from `src/play/runtime`. Board, inventory, item and debug runtime UI must read from `GameRuntimeStore`, not from React Query, SQL rows, or parallel caches wearing a fake mustache.
 
 Concrete gameplay actions use runtime commands such as `useGameAction` and `useGameRuntimeDropActions`. Do not add new gameplay `useMutation` hooks for board/inventory/producer/stash/craft state. If the action changes `GameSave`, it belongs to the runtime adapter.
 
 Components should stay boring: render props, wire callbacks, and shut up. If a component needs board data, it subscribes to board data. If it needs inventory, it subscribes to inventory. Passing one mega snapshot through `PlayShell` is banned, because prop-drilled god objects are how codebases quietly become haunted houses.
 
 
-## v0 hygiene gate
+## Source hygiene gate
 
-The active `src/v0` runtime should remain the template for new code. Do not add generic buckets such as `src/v0/shared`, `src/v0/query`, `src/v0/mutation`, or `src/v0/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
+The active `src/*` runtime is intentionally domain-first. Do not add generic buckets such as `src/shared`, `src/query`, `src/mutation`, or `src/play/schema`. If something feels shared, name the owning domain first. If no domain owns it, the design is probably still mushy.
 
-Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, canonical game config schemas in `game/config`, action contracts in `game/action`, output event contracts in `game/event`, and the dense save contract in `game/engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
+Types and schemas live with the domain they describe: board schemas in `board/view`, inventory schemas in `inventory/view`, canonical config schemas in `config`, action contracts in `action`, output event contracts in `event`, and the dense save contract in `engine/model`. Cross-domain play contracts such as drag targets or visual action events stay under `play/*` only when they are truly runtime contracts.
 
 Standalone model files are preferred over mixed `types.ts` piles. Inventory planning rows, placement plans, activation definitions and service contracts should live as one exported concept per file unless a file is intentionally a tiny namespace wrapper around the same concept.
 
@@ -116,30 +116,31 @@ Centralized hooks are banned unless the domain is explicitly the runtime, such a
 ## Source layout
 
 ```txt
-src/app/                         App entry, router and global styles.
-src/v0/                         Active client play runtime. v0 should consume compiled game package resources, not mirrored PNG folders.
-src/v0/game/config/             Canonical compiled JSON config schema, ID value schemas, config readers.
-game/arkini/                    Source JSON game package compiled into canonical runtime config/assets.
-src/v0/game/                    Active GameConfig Effect service and derived lookup helpers.
-src/v0/date/                    Active Luxon date Effect service.
-src/v0/debug/                   Cheat/testing utility sheets kept out of player-facing progression.
-src/v0/hash/                    Active WebCrypto hash Effect service.
-src/v0/id/                      Active CUID2 id Effect service.
-src/v0/random/                  Active random Effect service and weighted helpers.
-src/v0/placement/               Cross-surface placement persistence Fx for activation/craft outputs.
-src/v0/serialization/           JSON serialization helpers used by DB state boundaries.
-src/v0/time/                    Formatting helpers for time labels.
-src/v0/ui/                      Generic UI-only helpers such as class merging.
-src/v0/**/fx/                   Active v0 domain Fx roots for gameplay actions, save lifecycle, reads, persistence, and bootstrap.
-src/v0/**/query/                Suspense query options and keys owned by their data domain.
-src/v0/**/action/               Concrete mutation hooks owned by the action domain.
-src/v0/play/runtime/            Runtime store, selectors and action dispatch hooks for gameplay state.
-src/v0/tile-engine/             Game-agnostic drag/drop/tap/animation runtime for stable tile actors.
-src/v0/play/drag/               Arkini-specific drag source/target contracts for TileEngine.
-src/v0/play/drop/               Arkini-specific drop policy over the generic TileEngine.
-src/v0/play/sheet/              Active play sheet state and bottom-sheet shell.
-src/v0/play/feedback/           Local play feedback pulse state and feedback contract.
-src/v0/play/bootstrap/          Tiny bootstrap status holder, not gameplay state.
+src/app/                    App entry, router and global styles.
+game/arkini/                Source JSON game package compiled into canonical runtime config/assets.
+src/config/                 Canonical GameConfig schemas, default compiled config, Effect service and config readers.
+src/action/                 Runtime action contracts.
+src/activation/             Input demand planning and consumption.
+src/board/                  Board UI, view models and board-domain runtime helpers.
+src/craft/                  Craft runtime logic plus craft view/run-state helpers.
+src/effects/                Grant/effect source resolution and effective line/drop logic.
+src/engine/                 Gameplay action parsing, ticking, runtime adapter and model schemas.
+src/event/                  Output event contracts emitted by engine actions.
+src/inventory/              Inventory UI, view models and inventory-domain runtime helpers.
+src/item/                   Item catalog UI/view models.
+src/job/                    Scheduled jobs and wake-up planning.
+src/limit/                  Output target limit planning.
+src/loot/                   Loot tables, quantities and roll helpers.
+src/merge/                  Merge action rules and drop intent helpers.
+src/placement/              Cross-surface placement planning/persistence Fx.
+src/play/                   Runtime store, Arkini drop policy, drag contracts, sheets and visual adapters.
+src/producer/               Producer line runtime, state readers, UI-facing line helpers and clocks.
+src/random/                 Random Effect service and weighted helpers.
+src/save/                   Save cloning/initialization helpers.
+src/storage/                Save persistence boundary and config hashing.
+src/tile-engine/            Game-agnostic drag/drop/tap/animation runtime for stable tile actors.
+src/ui/                     Generic UI-only helpers such as class merging.
+src/world/                  Read-only world facts assembled from save/config/effects.
 ```
 
 ## Local run
@@ -204,11 +205,11 @@ Current runtime boot is intentionally simple: `RuntimeGameEngineAdapter` loads t
 
 The developer sheet and root error boundary can still wipe browser storage and reload, because future persistence will use browser storage again and prototype saves are not sacred museum artifacts.
 
-Future Dexie/IndexedDB persistence should wrap the runtime from outside: load a `GameSave`, create the adapter, subscribe to save changes, debounce writes and keep migrations/storage adapters out of `src/v0/game/engine`.
+Future Dexie/IndexedDB persistence should wrap the runtime from outside: load a `GameSave`, create the adapter, subscribe to save changes, debounce writes and keep migrations/storage adapters out of `src/engine`.
 
 ## Validation policy
 
-The runtime save is not trusted just because it came from memory or future storage. Gameplay inputs and saves are validated through active Zod models under `src/v0/game/action`, `src/v0/game/config`, `src/v0/game/event`, `src/v0/game/engine/model`, and the UI-facing `schema|type|view` models. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
+The runtime save is not trusted just because it came from memory or future storage. Gameplay inputs and saves are validated through active Zod models under `src/action`, `src/config`, `src/event`, `src/engine/model`, and the UI-facing `schema|type|view` models. If corrupt state slips in, it should explode close to the game logic instead of being politely escorted into undefined behavior.
 
 ## Minimal-code philosophy
 

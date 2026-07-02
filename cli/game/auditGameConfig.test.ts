@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseGameConfig as parseGameConfigRaw } from "../../src/v0/game/config/GameConfigSchema";
+import { parseGameConfig as parseGameConfigRaw } from "../../src/config/GameConfigSchema";
 import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
 
 const parseGameConfig = parseGameConfigRaw;

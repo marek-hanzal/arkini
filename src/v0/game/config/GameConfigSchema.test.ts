@@ -233,6 +233,38 @@ const setItemStorage = (
 	).storage = storage;
 };
 
+const addReachabilityTargetProducer = (config: any, itemId = "producer:future") => {
+	config.items[itemId] = {
+		assetIds: [
+			"asset:item",
+		],
+		description: itemId,
+		maxStackSize: 1,
+		name: itemId,
+		producer: {
+			maxQueueSize: 1,
+			lines: [
+				{
+					durationMs: 1000,
+					id: "line:future",
+					name: "Future",
+					output: [
+						{
+							itemId: "item:twig",
+							type: "guaranteed",
+						},
+					],
+					placement: "board_then_inventory",
+				},
+			],
+		},
+		tags: [
+			"producer",
+		],
+		tier: 1,
+	};
+};
+
 describe("GameConfigSchema", () => {
 	it("accepts the minimal valid test config", () => {
 		expect(parseGameConfig(createValidConfigValue()).game.id).toBe("game:test");
@@ -1061,6 +1093,122 @@ describe("GameConfigSchema", () => {
 		];
 
 		expect(() => parseGameConfig(config)).toThrow(/matches no board-placeable item/);
+	});
+
+	it("does not treat permanently hidden outputs as reachable progression", () => {
+		const config: any = createValidConfigValue();
+		addReachabilityTargetProducer(config);
+		appendTestLine(config, "item:producer", {
+			durationMs: 1000,
+			id: "line:hidden-future",
+			name: "Hidden Future",
+			output: [
+				{
+					itemId: "producer:future",
+					type: "guaranteed",
+					visibility: "hidden",
+				},
+			],
+			placement: "board_then_inventory",
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(
+			/Soft-lock risk.*producer:future.*No starting entry/s,
+		);
+	});
+
+	it("allows hidden progression outputs when a reachable show grant can reveal them", () => {
+		const config: any = createValidConfigValue();
+		addTestGrantSource(config);
+		addReachabilityTargetProducer(config);
+		appendTestLine(config, "item:producer", {
+			durationMs: 1000,
+			id: "line:hidden-future",
+			name: "Hidden Future",
+			output: [
+				{
+					effects: [
+						{
+							display: "whenActive",
+							kind: "grant.drop.show",
+							selector: {
+								allOf: [
+									{
+										ids: [
+											"grant:test",
+										],
+									},
+								],
+							},
+						},
+					],
+					itemId: "producer:future",
+					type: "guaranteed",
+					visibility: "hidden",
+				},
+			],
+			placement: "board_then_inventory",
+		});
+
+		expect(() => parseGameConfig(config)).not.toThrow();
+	});
+
+	it("does not treat permanently disabled outputs as reachable progression", () => {
+		const config: any = createValidConfigValue();
+		addReachabilityTargetProducer(config);
+		appendTestLine(config, "item:producer", {
+			durationMs: 1000,
+			id: "line:disabled-future",
+			name: "Disabled Future",
+			output: [
+				{
+					enabled: false,
+					itemId: "producer:future",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(
+			/Soft-lock risk.*producer:future.*No starting entry/s,
+		);
+	});
+
+	it("allows disabled progression outputs when a reachable grant can enable them", () => {
+		const config: any = createValidConfigValue();
+		addTestGrantSource(config);
+		addReachabilityTargetProducer(config);
+		appendTestLine(config, "item:producer", {
+			durationMs: 1000,
+			id: "line:disabled-future",
+			name: "Disabled Future",
+			output: [
+				{
+					effects: [
+						{
+							display: "whenActive",
+							kind: "grant.drop.enable",
+							selector: {
+								allOf: [
+									{
+										ids: [
+											"grant:test",
+										],
+									},
+								],
+							},
+						},
+					],
+					enabled: false,
+					itemId: "producer:future",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		});
+
+		expect(() => parseGameConfig(config)).not.toThrow();
 	});
 
 	it("keeps structural checks for queue size and non-empty inline output", () => {

@@ -1,0 +1,558 @@
+{
+	"items": {
+		"item:blueprint-cathedral": {
+			"craft": {
+				"durationMs": 150000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:civic-office-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:glazier-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:library-t4"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Engineers path locks Faith and Mages keystone plans",
+						"reason": "Engineers path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:engineers"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Mages path locks Engineers and Faith keystone plans",
+						"reason": "Mages path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:mages"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:treasure-chest"
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:luxury-clothing",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t4"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
+			"name": "Cathedral Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"faith",
+				"cathedral",
+				"era:XI"
+			]
+		},
+		"item:blueprint-house-of-engineers": {
+			"craft": {
+				"durationMs": 140000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:blacksmith-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:glazier-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:library-t4"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Faith path locks Engineers and Mages keystone plans",
+						"reason": "Faith path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:faith"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Mages path locks Engineers and Faith keystone plans",
+						"reason": "Mages path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:mages"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:treasure-chest"
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:iron-ingot",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:gold-ingot"
+					},
+					{
+						"consume": true,
+						"itemId": "item:nails",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t4"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
+			"name": "House of Engineers Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"era:XI"
+			]
+		},
+		"item:blueprint-library-t4": {
+			"craft": {
+				"durationMs": 65000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:library-t3"
+					},
+					{
+						"consume": true,
+						"itemId": "item:master-knowledge",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack",
+						"quantity": 2
+					}
+				],
+				"resultItemId": "producer:library-t4"
+			},
+			"description": "Build plan that upgrades Library III into Library IV.",
+			"name": "Library IV Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:XI"
+			],
+			"tier": 11
+		},
+		"item:blueprint-mage-lodge": {
+			"craft": {
+				"durationMs": 145000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:glazier-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:heroes-guild-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:library-t4"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Engineers path locks Faith and Mages keystone plans",
+						"reason": "Engineers path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:engineers"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Faith path locks Engineers and Mages keystone plans",
+						"reason": "Faith path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:faith"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:treasure-chest"
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:pigment",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:sapphire"
+					},
+					{
+						"consume": true,
+						"itemId": "item:aquamarine"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t4"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan for Mage Lodge, one of the mutually exclusive Choose The Path keystone buildings.",
+			"name": "Mage Lodge Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"mages",
+				"magic",
+				"arcane",
+				"era:XI"
+			]
+		},
+		"producer:cathedral": {
+			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:faith",
+							"name": "Faith path chosen"
+						}
+					],
+					"id": "effect:path-faith-locks-counter-keystones",
+					"name": "Faith path locks Engineers and Mages keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Cathedral",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"faith",
+				"cathedral",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		},
+		"producer:house-of-engineers": {
+			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:engineers",
+							"name": "Engineers path chosen"
+						}
+					],
+					"id": "effect:path-engineers-locks-counter-keystones",
+					"name": "Engineers path locks Faith and Mages keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "House of Engineers",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		},
+		"producer:library-t4": {
+			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t4",
+							"name": "Owns Library IV"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t4",
+					"name": "Owned Library IV grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Library IV",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		},
+		"producer:mage-lodge": {
+			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:mages",
+							"name": "Mages path chosen"
+						}
+					],
+					"id": "effect:path-mages-locks-counter-keystones",
+					"name": "Mages path locks Engineers and Faith keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Mage Lodge",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"mages",
+				"magic",
+				"arcane",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		}
+	}
+}

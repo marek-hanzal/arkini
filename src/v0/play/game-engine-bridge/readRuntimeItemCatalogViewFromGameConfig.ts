@@ -22,23 +22,16 @@ const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameCon
 };
 
 const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	(config.items[itemId]?.passiveEffectIds ?? []).flatMap((effectId) => {
-		const effect = config.effects[effectId];
-		if (!effect) return [];
-
-		return [
-			{
-				id: effectId,
-				name: effect.name,
-				polarity: effect.polarity,
-				grants: effect.grants.map((grant) => ({
-					id: grant.id,
-					name: grant.name,
-				})),
-				sourceScope: effect.sourceScope ?? "board",
-			},
-		];
-	});
+	(config.items[itemId]?.effects ?? []).map((effect) => ({
+		id: effect.id,
+		name: effect.name,
+		polarity: effect.polarity,
+		grants: effect.grants.map((grant) => ({
+			id: grant.id,
+			name: grant.name,
+		})),
+		sourceScope: effect.sourceScope ?? "board",
+	}));
 
 const readCatalogItemAsset = ({
 	assetId,

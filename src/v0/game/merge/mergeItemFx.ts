@@ -56,7 +56,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		);
 	}
 
-	if (config.items[checked.merge.resultItemId]?.passiveEffectIds?.length) {
+	if (config.items[checked.merge.resultItemId]?.effects?.length) {
 		liveTarget.createdAtMs = nowMs;
 	} else {
 		delete liveTarget.createdAtMs;

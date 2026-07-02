@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readGameConfigEffect } from "~/v0/game/config/readGameConfigEffects";
 import type { EffectiveLine } from "~/v0/game/effects/EffectiveLine";
 
 export namespace readRuntimeEffectBenefitLines {
@@ -35,7 +36,10 @@ export const readRuntimeEffectBenefitLines = ({
 	config,
 	effectId,
 }: readRuntimeEffectBenefitLines.Props) => {
-	const effect = config.effects[effectId];
+	const effect = readGameConfigEffect({
+		config,
+		effectId,
+	});
 	if (!effect) return [];
 	return effect.grants.map((grant) => grant.name);
 };

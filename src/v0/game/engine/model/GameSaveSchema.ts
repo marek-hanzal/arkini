@@ -3,6 +3,7 @@ import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
+import { readGameConfigEffect } from "~/v0/game/config/readGameConfigEffects";
 import { readLineDefinition, readLineIds } from "~/v0/game/config/readLineDefinition";
 import { readLineKind } from "~/v0/game/producer/readLineKind";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
@@ -763,7 +764,12 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (!config.effects[activeEffect.effectId]) {
+		if (
+			!readGameConfigEffect({
+				config,
+				effectId: activeEffect.effectId,
+			})
+		) {
 			addSaveIssue(
 				ctx,
 				[
@@ -851,7 +857,7 @@ const validateGameSaveAgainstConfig = (
 						`Active effect endAtMs must match producer job "${producerJob.id}" readyAtMs.`,
 					);
 				}
-				if (line?.activatesEffectId !== activeEffect.effectId) {
+				if (line?.effect?.id !== activeEffect.effectId) {
 					addSaveIssue(
 						ctx,
 						[
@@ -872,7 +878,7 @@ const validateGameSaveAgainstConfig = (
 			save,
 			job,
 		});
-		if (!line?.activatesEffectId) continue;
+		if (!line?.effect) continue;
 
 		const activeEffectIds = activeEffectIdsByProducerJobId.get(jobId) ?? [];
 		const expectedActiveEffectCount = job.delivery ? 0 : 1;
@@ -884,8 +890,8 @@ const validateGameSaveAgainstConfig = (
 					jobId,
 				],
 				job.delivery
-					? `Blocked producer job "${jobId}" has completed activated effect "${line.activatesEffectId}" and must not keep a linked active effect.`
-					: `Producer job "${jobId}" activates effect "${line.activatesEffectId}" and must have exactly one linked active effect.`,
+					? `Blocked producer job "${jobId}" has completed activated effect "${line.effect.id}" and must not keep a linked active effect.`
+					: `Producer job "${jobId}" activates effect "${line.effect.id}" and must have exactly one linked active effect.`,
 			);
 		}
 	}

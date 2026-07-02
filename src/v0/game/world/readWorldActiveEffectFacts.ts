@@ -1,4 +1,7 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readGameConfigEffect } from "~/v0/game/config/readGameConfigEffects";
+import { readLineDefinition } from "~/v0/game/config/readLineDefinition";
+import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { isGameTimeWindowActive } from "~/v0/game/time/GameTime";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
@@ -17,7 +20,7 @@ const sourceScopeIncludes = ({
 	sourceScope,
 }: {
 	location: NonNullable<WorldActiveEffectFacts["sourceLocation"]>;
-	sourceScope: GameConfig["effects"][string]["sourceScope"];
+	sourceScope: NonNullable<WorldActiveEffectFacts["definition"]>["sourceScope"];
 }) => (sourceScope ?? "board") === "both" || (sourceScope ?? "board") === location;
 
 const readActiveEffectSourceLocation = ({
@@ -60,6 +63,38 @@ const readTimeStatus = ({
 	return "active";
 };
 
+const readActiveEffectDefinition = ({
+	config,
+	effect,
+	save,
+}: {
+	config: GameConfig;
+	effect: GameSave["activeEffects"][string];
+	save: GameSave;
+}) => {
+	const job = effect.producerJobId ? save.producerJobs[effect.producerJobId] : undefined;
+	const sourceItem = job ? save.board.items[job.itemInstanceId] : undefined;
+	const producer = sourceItem
+		? readProducerCapabilityDefinition({
+				config,
+				producerId: sourceItem.itemId,
+			})
+		: undefined;
+	const line = producer
+		? readLineDefinition({
+				lineId: job?.lineId ?? "",
+				producerDefinition: producer,
+			})
+		: undefined;
+
+	if (line?.effect?.id === effect.effectId) return line.effect;
+
+	return readGameConfigEffect({
+		config,
+		effectId: effect.effectId,
+	});
+};
+
 export const readWorldActiveEffectFacts = ({
 	config,
 	nowMs,
@@ -89,12 +124,16 @@ export const readWorldActiveEffectFacts = ({
 				};
 			}
 
-			const effectDefinition = config.effects[effect.effectId];
+			const definition = readActiveEffectDefinition({
+				config,
+				effect,
+				save,
+			});
 			if (
-				!effectDefinition ||
+				!definition ||
 				!sourceScopeIncludes({
 					location: sourceLocation,
-					sourceScope: effectDefinition.sourceScope,
+					sourceScope: definition.sourceScope,
 				})
 			) {
 				return {
@@ -110,6 +149,7 @@ export const readWorldActiveEffectFacts = ({
 				: undefined;
 			if (producerFacts?.status === "paused") {
 				return {
+					definition,
 					effect,
 					producerJobId: effect.producerJobId,
 					sourceLocation,
@@ -118,6 +158,7 @@ export const readWorldActiveEffectFacts = ({
 			}
 			if (producerFacts?.status === "blocked_by_paused_queue_head") {
 				return {
+					definition,
 					effect,
 					producerJobId: effect.producerJobId,
 					sourceLocation,
@@ -126,6 +167,7 @@ export const readWorldActiveEffectFacts = ({
 			}
 
 			return {
+				definition,
 				effect,
 				producerJobId: effect.producerJobId,
 				sourceLocation,

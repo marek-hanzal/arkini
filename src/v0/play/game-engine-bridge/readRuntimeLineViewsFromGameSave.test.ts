@@ -100,17 +100,20 @@ const readTestLine = ({
 describe("readRuntimeLineViewsFromGameSave", () => {
 	it("keeps hidden missing output requirements disabling the affected output", () => {
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:missing": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:missing",
-							name: "Missing",
-						},
-					],
-					name: "Missing Grant",
-				},
+			itemEffects: {
+				"item:empty-stash": [
+					{
+						id: "effect:test:missing",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:missing",
+								name: "Missing",
+							},
+						],
+						name: "Missing Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": appendFirstOutputEffects(
@@ -150,17 +153,20 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 	it("keeps hidden lines visible while a runtime job still exists", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:path": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:path",
-							name: "Chosen Path",
-						},
-					],
-					name: "Chosen Path",
-				},
+			itemEffects: {
+				"item:empty-stash": [
+					{
+						id: "effect:test:path",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:path",
+								name: "Chosen Path",
+							},
+						],
+						name: "Chosen Path",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": appendFirstOutputEffects(baseConfig.lineCatalog["line:test"], [
@@ -218,36 +224,33 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 	it("honors active and missing display policies separately for requirement rows", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:present": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:present",
-							name: "Present",
-						},
-					],
-					name: "Present Grant",
-				},
-				"effect:test:missing": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:missing",
-							name: "Missing",
-						},
-					],
-					name: "Missing Grant",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						"effect:test:present",
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:present",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:present",
+								name: "Present",
+							},
+						],
+						name: "Present Grant",
+					},
+				],
+				"item:empty-stash": [
+					{
+						id: "effect:test:missing",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:missing",
+								name: "Missing",
+							},
+						],
+						name: "Missing Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": appendFirstOutputEffects(baseConfig.lineCatalog["line:test"], [
@@ -320,27 +323,21 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 	it("reports active line modifiers as bonuses instead of fake missing requirements", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:haste": {
-					polarity: "buff",
-					grants: [
-						{
-							id: "grant:test:haste",
-							name: "Haste",
-						},
-					],
-					name: "Haste Grant",
-					sourceScope: "inventory",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						"effect:test:haste",
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:haste",
+						polarity: "buff",
+						grants: [
+							{
+								id: "grant:test:haste",
+								name: "Haste",
+							},
+						],
+						name: "Haste Grant",
+						sourceScope: "inventory",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -461,23 +458,21 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 	it("surfaces activated effect polarity on effect lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:overdrive": {
-					polarity: "mixed",
-					grants: [
-						{
-							id: "grant:test:overdrive",
-							name: "Overdrive",
-						},
-					],
-					name: "Overdrive",
-					sourceScope: "board",
-				},
-			},
 			lineOverrides: {
 				"line:test": {
 					...baseConfig.lineCatalog["line:test"],
-					activatesEffectId: "effect:test:overdrive",
+					effect: {
+						id: "effect:test:overdrive",
+						polarity: "mixed",
+						grants: [
+							{
+								id: "grant:test:overdrive",
+								name: "Overdrive",
+							},
+						],
+						name: "Overdrive",
+						sourceScope: "board",
+					},
 					output: undefined,
 				},
 			},

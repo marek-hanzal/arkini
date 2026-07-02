@@ -47,17 +47,20 @@ const readLine = ({
 describe("readEffectiveLine", () => {
 	it("keeps visible start requirements visible while reporting missing grants", () => {
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:townhall": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:townhall",
-							name: "Townhall",
-						},
-					],
-					name: "Town Hall Grant",
-				},
+			itemEffects: {
+				"item:empty-stash": [
+					{
+						id: "effect:test:townhall",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:townhall",
+								name: "Townhall",
+							},
+						],
+						name: "Town Hall Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -115,27 +118,21 @@ describe("readEffectiveLine", () => {
 		const grantId = "grant:test:path";
 		const effectId = "effect:test:path";
 		const config = createEngineTestConfig({
-			effects: {
-				[effectId]: {
-					polarity: "buff",
-					grants: [
-						{
-							id: grantId,
-							name: "Test grant",
-						},
-					],
-					name: "Path Grant",
-					sourceScope: "board",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						effectId,
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: effectId,
+						polarity: "buff",
+						grants: [
+							{
+								id: grantId,
+								name: "Test grant",
+							},
+						],
+						name: "Path Grant",
+						sourceScope: "board",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -201,27 +198,21 @@ describe("readEffectiveLine", () => {
 		const grantId = "grant:test:path";
 		const effectId = "effect:test:path";
 		const config = createEngineTestConfig({
-			effects: {
-				[effectId]: {
-					polarity: "buff",
-					grants: [
-						{
-							id: grantId,
-							name: "Path grant",
-						},
-					],
-					name: "Path Grant",
-					sourceScope: "board",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						effectId,
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: effectId,
+						polarity: "buff",
+						grants: [
+							{
+								id: grantId,
+								name: "Path grant",
+							},
+						],
+						name: "Path Grant",
+						sourceScope: "board",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -306,17 +297,20 @@ describe("readEffectiveLine", () => {
 
 	it("keeps disabled drop-owned start requirements visible but out of rollable output", () => {
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:unlock": {
-					polarity: "buff",
-					grants: [
-						{
-							id: "grant:test:unlock",
-							name: "Unlock grant",
-						},
-					],
-					name: "Unlock Grant",
-				},
+			itemEffects: {
+				"item:empty-stash": [
+					{
+						id: "effect:test:unlock",
+						polarity: "buff",
+						grants: [
+							{
+								id: "grant:test:unlock",
+								name: "Unlock grant",
+							},
+						],
+						name: "Unlock Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -468,27 +462,21 @@ describe("readEffectiveLine", () => {
 		const grantId = "grant:test:haste";
 		const effectId = "effect:test:haste";
 		const config = createEngineTestConfig({
-			effects: {
-				[effectId]: {
-					polarity: "buff",
-					grants: [
-						{
-							id: grantId,
-							name: "Test grant",
-						},
-					],
-					name: "Haste Grant",
-					sourceScope: "inventory",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						effectId,
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: effectId,
+						polarity: "buff",
+						grants: [
+							{
+								id: grantId,
+								name: "Test grant",
+							},
+						],
+						name: "Haste Grant",
+						sourceScope: "inventory",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -556,27 +544,21 @@ describe("readEffectiveLine", () => {
 		const grantId = "grant:test:bonus";
 		const effectId = "effect:test:bonus";
 		const config = createEngineTestConfig({
-			effects: {
-				[effectId]: {
-					grants: [
-						{
-							id: grantId,
-							name: "Bonus grant",
-						},
-					],
-					name: "Bonus Grant",
-					polarity: "buff",
-					sourceScope: "inventory",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						effectId,
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: effectId,
+						grants: [
+							{
+								id: grantId,
+								name: "Bonus grant",
+							},
+						],
+						name: "Bonus Grant",
+						polarity: "buff",
+						sourceScope: "inventory",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -727,37 +709,34 @@ describe("readEffectiveLine", () => {
 		const bonusEffectId = "effect:test:bonus";
 		const missingGrantId = "grant:test:missing";
 		const config = createEngineTestConfig({
-			effects: {
-				[bonusEffectId]: {
-					polarity: "buff",
-					grants: [
-						{
-							id: bonusGrantId,
-							name: "Bonus grant",
-						},
-					],
-					name: "Bonus Grant",
-					sourceScope: "inventory",
-				},
-				"effect:test:missing": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: missingGrantId,
-							name: "Missing grant",
-						},
-					],
-					name: "Missing Grant",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						bonusEffectId,
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: bonusEffectId,
+						polarity: "buff",
+						grants: [
+							{
+								id: bonusGrantId,
+								name: "Bonus grant",
+							},
+						],
+						name: "Bonus Grant",
+						sourceScope: "inventory",
+					},
+				],
+				"item:empty-stash": [
+					{
+						id: "effect:test:missing",
+						polarity: "neutral",
+						grants: [
+							{
+								id: missingGrantId,
+								name: "Missing grant",
+							},
+						],
+						name: "Missing Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {
@@ -823,27 +802,21 @@ describe("readEffectiveLine", () => {
 		const grantId = "grant:test:disable";
 		const effectId = "effect:test:disable";
 		const config = createEngineTestConfig({
-			effects: {
-				[effectId]: {
-					polarity: "debuff",
-					grants: [
-						{
-							id: grantId,
-							name: "Disable grant",
-						},
-					],
-					name: "Disable Grant",
-					sourceScope: "inventory",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						effectId,
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: effectId,
+						polarity: "debuff",
+						grants: [
+							{
+								id: grantId,
+								name: "Disable grant",
+							},
+						],
+						name: "Disable Grant",
+						sourceScope: "inventory",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {

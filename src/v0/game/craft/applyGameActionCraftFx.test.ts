@@ -164,27 +164,21 @@ describe("applyGameActionFx Craft", () => {
 	it("rejects and surfaces craft start blockers from active effects", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:blocker": {
-					grants: [
-						{
-							id: "grant:test:blocker",
-							name: "Blocker",
-						},
-					],
-					name: "Craft Blocker",
-					polarity: "debuff",
-					sourceScope: "board",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						"effect:test:blocker",
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:blocker",
+						grants: [
+							{
+								id: "grant:test:blocker",
+								name: "Blocker",
+							},
+						],
+						name: "Craft Blocker",
+						polarity: "debuff",
+						sourceScope: "board",
+					},
+				],
 			},
 			craftOverrides: {
 				...baseConfig.craftCatalog,
@@ -255,27 +249,21 @@ describe("applyGameActionFx Craft", () => {
 	it("pauses running craft jobs when a start blocker becomes active", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:blocker": {
-					grants: [
-						{
-							id: "grant:test:blocker",
-							name: "Blocker",
-						},
-					],
-					name: "Craft Blocker",
-					polarity: "debuff",
-					sourceScope: "board",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						"effect:test:blocker",
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:blocker",
+						grants: [
+							{
+								id: "grant:test:blocker",
+								name: "Blocker",
+							},
+						],
+						name: "Craft Blocker",
+						polarity: "debuff",
+						sourceScope: "board",
+					},
+				],
 			},
 			craftOverrides: {
 				...baseConfig.craftCatalog,

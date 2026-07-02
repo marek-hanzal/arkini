@@ -53,8 +53,7 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 
 	const itemId = liveSlot.itemId;
 	const placedCreatedAtMs =
-		liveSlot.createdAtMs ??
-		(config.items[itemId]?.passiveEffectIds?.length ? nowMs : undefined);
+		liveSlot.createdAtMs ?? (config.items[itemId]?.effects?.length ? nowMs : undefined);
 	const previousQuantity = readGameSaveInventorySlotQuantity(liveSlot);
 	const nextQuantity = previousQuantity - quantity;
 	const consumedEvent = {

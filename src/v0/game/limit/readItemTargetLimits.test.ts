@@ -16,27 +16,23 @@ describe("readItemTargetLimits", () => {
 		const grantId = "grant:test:disable-output";
 		const effectId = "effect:test:disable-output";
 		const config = createEngineTestConfig({
-			effects: {
-				...baseConfig.effects,
-				[effectId]: {
-					grants: [
-						{
-							id: grantId,
-							name: "Disable output",
-						},
-					],
-					name: "Disable output",
-					polarity: "debuff",
-				},
+			itemEffects: {
+				"item:key": [
+					{
+						id: effectId,
+						grants: [
+							{
+								id: grantId,
+								name: "Disable output",
+							},
+						],
+						name: "Disable output",
+						polarity: "debuff",
+					},
+				],
 			},
 			items: {
 				...baseConfig.items,
-				"item:key": {
-					...baseConfig.items["item:key"],
-					passiveEffectIds: [
-						effectId,
-					],
-				},
 				"item:twig": {
 					...baseConfig.items["item:twig"],
 					maxCount: 2,

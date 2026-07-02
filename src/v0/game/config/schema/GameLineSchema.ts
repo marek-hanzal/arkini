@@ -4,6 +4,7 @@ import {
 	ActivationOutputAuthoringSchema,
 	ActivationOutputSchema,
 } from "~/v0/game/config/schema/GameActivationOutputSchema";
+import { GameEffectSchema } from "~/v0/game/config/schema/GameEffectSchema";
 import {
 	IdSchema,
 	NonNegativeIntegerSchema,
@@ -27,7 +28,7 @@ export const LineSchema = z
 		chargeCost: NonNegativeNumberSchema.default(0),
 		inputs: ProducerInputsSchema.optional(),
 		output: ActivationOutputSchema.min(1).optional(),
-		activatesEffectId: IdSchema.optional(),
+		effect: GameEffectSchema.optional(),
 	})
 	.strict();
 

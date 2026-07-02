@@ -63,7 +63,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 				GameEngineError.configReferenceMissing(`Missing line "${job.lineId}".`),
 			);
 		}
-		if (line.activatesEffectId) {
+		if (line.effect) {
 			const activeEffect = findActiveEffectByProducerJobId({
 				producerJobId: job.id,
 				save: nextSave,
@@ -71,13 +71,13 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 			if (!activeEffect) {
 				return yield* Effect.fail(
 					GameEngineError.saveInvalid(
-						`Producer job "${job.id}" activates effect "${line.activatesEffectId}" but has no active effect instance.`,
+						`Producer job "${job.id}" activates effect "${line.effect.id}" but has no active effect instance.`,
 					),
 				);
 			}
 			nextSave.activeEffects[activeEffect.id] = {
 				...activeEffect,
-				effectId: line.activatesEffectId,
+				effectId: line.effect.id,
 				endAtMs: timing.readyAtMs,
 				producerJobId: job.id,
 				sourceItemInstanceId: job.itemInstanceId,

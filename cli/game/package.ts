@@ -13,7 +13,6 @@ const collectionKeys = [
 	"resources",
 	"assets",
 	"items",
-	"effects",
 ] as const;
 
 type CollectionKey = (typeof collectionKeys)[number];
@@ -191,7 +190,6 @@ const normalizePackage = (value: unknown): unknown => {
 		...sourceAssets,
 	};
 	const normalizedItems: Record<string, unknown> = {};
-	const effects = asRecord(packageValue.effects);
 
 	const itemDomainIndex = createTaggedDomainIndex({
 		entries: items,
@@ -238,7 +236,7 @@ const normalizePackage = (value: unknown): unknown => {
 			};
 			producer.lines = normalizeLines({
 				domainIndexes: productDomainIndexes,
-				items: normalizedItems,
+				items,
 				lines: producer.lines,
 				path: `items.${itemId}.producer.lines`,
 			});
@@ -251,7 +249,7 @@ const normalizePackage = (value: unknown): unknown => {
 			};
 			stash.line = normalizeLine({
 				domainIndexes: productDomainIndexes,
-				items: normalizedItems,
+				items,
 				line: stash.line,
 				path: `items.${itemId}.stash.line`,
 			});
@@ -266,14 +264,9 @@ const normalizePackage = (value: unknown): unknown => {
 		}
 	}
 
-	const normalizedEffects = normalizeEffectDefinitions({
-		effects,
-	});
-
 	return {
 		...packageValue,
 		assets,
-		effects: normalizedEffects,
 		items: normalizedItems,
 	};
 };
@@ -341,28 +334,6 @@ type DomainIndex = {
 	ids: readonly string[];
 	label: string;
 	tagsById: ReadonlyMap<string, ReadonlySet<string>>;
-};
-
-const normalizeEffectDefinitions = ({
-	effects,
-}: {
-	effects: Readonly<Record<string, unknown>>;
-}) => {
-	const normalizedEffects: Record<string, unknown> = {};
-
-	for (const [effectId, effectEntry] of Object.entries(effects)) {
-		if (!effectEntry || typeof effectEntry !== "object" || Array.isArray(effectEntry)) {
-			normalizedEffects[effectId] = effectEntry;
-			continue;
-		}
-
-		const effect = {
-			...(effectEntry as Record<string, unknown>),
-		};
-		normalizedEffects[effectId] = effect;
-	}
-
-	return normalizedEffects;
 };
 
 const normalizeLineEffects = ({
@@ -885,7 +856,6 @@ const createEmptyPackage = (): MergedGameConfig => ({
 	resources: {},
 	assets: {},
 	items: {},
-	effects: {},
 });
 
 const assignSingleton = <T>(

@@ -1,0 +1,1325 @@
+{
+	"items": {
+		"item:blueprint-glazier-workshop-t1": {
+			"craft": {
+				"durationMs": 80000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:dye-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:glassworks"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:purifier-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:glass",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:bricks"
+					},
+					{
+						"consume": true,
+						"itemId": "item:roof-tiles"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
+			"name": "Glazier Workshop I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"glass",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		},
+		"item:blueprint-house-t4": {
+			"craft": {
+				"durationMs": 65000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:glazier-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:house-t3"
+					},
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:luxury-clothing"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan for House IV, a housing producer that generates morale.",
+			"name": "House IV Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:X"
+			]
+		},
+		"item:blueprint-quarry-t2": {
+			"craft": {
+				"durationMs": 72000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:item:marble-deposit"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:quarry-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:iron-ingot"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack"
+					}
+				]
+			},
+			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
+			"label": "2",
+			"name": "Quarry Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		},
+		"item:blueprint-stonemason-t2": {
+			"craft": {
+				"durationMs": 75000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:quarry-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:stonemason-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack"
+					}
+				]
+			},
+			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
+			"label": "2",
+			"name": "Stonemason Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		},
+		"item:marble": {
+			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
+			"maxStackSize": 40,
+			"name": "Marble",
+			"tags": [
+				"material",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X",
+				"tier-10-resource"
+			],
+			"tier": 10
+		},
+		"item:marble-block": {
+			"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
+			"maxStackSize": 30,
+			"name": "Marble Block",
+			"tags": [
+				"material",
+				"construction",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"master",
+				"era:X",
+				"tier-10-resource"
+			],
+			"tier": 10
+		},
+		"item:marble-deposit": {
+			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:marble-deposit",
+							"name": "Owns Marble Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-marble-deposit",
+					"name": "Owned Marble Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Marble Deposit",
+			"tags": [
+				"source",
+				"construction",
+				"stone",
+				"marble",
+				"deposit",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
+		},
+		"item:morale-t4": {
+			"description": "Tier IV social morale generated by housing and spent as an optional boost currency or prestige cost.",
+			"maxStackSize": 50,
+			"name": "Morale IV",
+			"tags": [
+				"morale",
+				"housing",
+				"currency",
+				"era:X"
+			],
+			"tier": 4
+		},
+		"item:stained-glass": {
+			"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
+			"maxStackSize": 20,
+			"name": "Stained Glass",
+			"tags": [
+				"material",
+				"construction",
+				"luxury",
+				"glass",
+				"prestige",
+				"master",
+				"era:X",
+				"tier-10-resource"
+			],
+			"tier": 10
+		},
+		"producer:glazier-workshop-t1": {
+			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:glazier-workshop-t1",
+							"name": "Owns Glazier Workshop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-glazier-workshop-t1",
+					"name": "Owned Glazier Workshop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 2,
+			"maxStackSize": 1,
+			"name": "Glazier Workshop I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 40000,
+						"id": "line:glazier-workshop-t1:stained-glass",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:glass",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:pigment"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:charcoal"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:glassworks"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:glassworks",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stained-glass",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.5,
+								"effects": [
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:glassworks"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:glassworks",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:pollution",
+								"type": "chance"
+							},
+							{
+								"chance": 0.1,
+								"effects": [
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:glassworks"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:glassworks",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:pollution",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:glazier-workshop-t1:stained-glass-morale-t4",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:glass",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:pigment"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:charcoal"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t4"
+							}
+						],
+						"name": "Stained Glass (Inspired)",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:glassworks"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:glassworks",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stained-glass",
+								"quantity": 3,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.5,
+								"effects": [
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:glassworks"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:glassworks",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:pollution",
+								"type": "chance"
+							},
+							{
+								"chance": 0.1,
+								"effects": [
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:glassworks"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:glassworks",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:pollution",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"glass",
+				"luxury",
+				"prestige",
+				"construction",
+				"era:X"
+			],
+			"tier": 10
+		},
+		"producer:house-t4": {
+			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
+			"label": "4",
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "House",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 40000,
+						"id": "line:house-t4:morale-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:wine-glass"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:coin-stack"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:morale-t4",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:morale-t3",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:morale-t2",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:morale-t1",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:X"
+			],
+			"tier": 4
+		},
+		"producer:quarry-t2": {
+			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:quarry-t2",
+							"name": "Owns Quarry"
+						}
+					],
+					"id": "effect:grant-owned:producer-quarry-t2",
+					"name": "Owned Quarry grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"label": "2",
+			"maxCount": 2,
+			"maxStackSize": 1,
+			"name": "Quarry",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:quarry-t2:stone",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:marble-deposit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:marble-deposit",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.35,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:marble-deposit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:marble-deposit",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 22000,
+						"id": "line:quarry-t2:marble",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:marble-deposit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:marble-deposit",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:marble",
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.25,
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:marble-deposit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:marble-deposit",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:marble",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"quarry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
+		},
+		"producer:stonemason-t2": {
+			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:stonemason-t2",
+							"name": "Owns Stonemason"
+						}
+					],
+					"id": "effect:grant-owned:producer-stonemason-t2",
+					"name": "Owned Stonemason grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"label": "2",
+			"maxCount": 2,
+			"maxStackSize": 1,
+			"name": "Stonemason",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:stonemason-t2:stone-block",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:stone",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t2"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t2",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone-block",
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.35,
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t2"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t2",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone-block",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 28000,
+						"id": "line:stonemason-t2:marble-block",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:marble",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t2"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t2",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:marble-block",
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.2,
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t2"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t2",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:marble-block",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:stonemason-t2:marble-block-morale-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:marble",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t4"
+							}
+						],
+						"name": "Marble Block (Inspired)",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t2"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t2",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:marble-block",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.25,
+								"effects": [
+									{
+										"chance": 0.05,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t2"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t2",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:marble-block",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
+		}
+	}
+}

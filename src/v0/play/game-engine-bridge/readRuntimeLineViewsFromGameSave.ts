@@ -268,17 +268,15 @@ export const readRuntimeLineViewsFromGameSave = ({
 				blocked: effectiveLine.blocked,
 				visible: effectiveLine.visible,
 				effectLocked,
-				effectPolarity: line.activatesEffectId
-					? config.effects[line.activatesEffectId]?.polarity
-					: undefined,
+				effectPolarity: line.effect?.polarity,
 				deliveryBlocked,
 				outputLimitBlocked: readTargetLimitBlocked(targetLimits),
 				durationMs,
 				effectDurationMultiplier: effectiveLine.effectDurationMultiplier,
-				effectBenefits: line.activatesEffectId
+				effectBenefits: line.effect
 					? readRuntimeEffectBenefitLines({
 							config,
-							effectId: line.activatesEffectId,
+							effectId: line.effect.id,
 						})
 					: undefined,
 				effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,

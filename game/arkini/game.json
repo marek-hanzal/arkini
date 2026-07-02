@@ -1,4 +1,18 @@
 {
+	"assets": {
+		"asset:item:cheat:speed-disable": {
+			"resourceId": "item-cheat-speed-disable"
+		},
+		"asset:item:cheat:speed-enable": {
+			"resourceId": "item-cheat-speed-enable"
+		},
+		"asset:producer:prospector-guild-t2": {
+			"resourceId": "producer-prospector-guild-t1"
+		},
+		"asset:producer:shrine-t1": {
+			"resourceId": "producer-shrine-t1"
+		}
+	},
 	"game": {
 		"board": {
 			"height": 11,
@@ -9,5 +23,135 @@
 			"slots": 35
 		},
 		"title": "Arkini"
-	}
+	},
+	"items": {
+		"item:cheat": {
+			"description": "A shameless little toolkit that opens the cheat inventory for testing.",
+			"label": "Cheats",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Cheat Kit",
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"utility",
+				"ui"
+			]
+		},
+		"item:cheat:speed-disable": {
+			"description": "Cheat timepiece that switches the engine back to normal timing without confirmation.",
+			"maxStackSize": 10,
+			"name": "Closed Onion Watch",
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			]
+		},
+		"item:cheat:speed-enable": {
+			"description": "Cheat timepiece that switches the engine into 1s instant timing mode without confirmation.",
+			"maxStackSize": 10,
+			"name": "Open Onion Watch",
+			"storage": "both",
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			]
+		},
+		"item:inventory": {
+			"description": "A trusty backpack that opens the shared inventory from the board.",
+			"label": "Inventory",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Backpack",
+			"storage": "board",
+			"tags": [
+				"special:inventory",
+				"utility",
+				"ui"
+			]
+		},
+		"item:nuke-save": {
+			"description": "A dangerous reset charge that opens the save nuke confirmation.",
+			"label": "Nuke",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Save Nuke",
+			"storage": "both",
+			"tags": [
+				"special:nuke-save",
+				"utility",
+				"ui"
+			]
+		}
+	},
+	"startingState": {
+		"board": [
+			{
+				"itemId": "item:nuke-save",
+				"x": 4,
+				"y": 0
+			},
+			{
+				"itemId": "item:cheat",
+				"x": 5,
+				"y": 0
+			},
+			{
+				"itemId": "item:inventory",
+				"x": 6,
+				"y": 0
+			},
+			{
+				"itemId": "item:cheat:speed-disable",
+				"x": 2,
+				"y": 0
+			},
+			{
+				"itemId": "item:tree",
+				"x": 0,
+				"y": 1
+			},
+			{
+				"itemId": "producer:lumberjack-t1",
+				"x": 1,
+				"y": 1
+			},
+			{
+				"itemId": "producer:townhall-t1",
+				"x": 3,
+				"y": 4
+			},
+			{
+				"itemId": "producer:well-t1",
+				"x": 5,
+				"y": 4
+			},
+			{
+				"itemId": "item:rock",
+				"x": 0,
+				"y": 6
+			},
+			{
+				"itemId": "producer:quarry-t1",
+				"x": 1,
+				"y": 6
+			},
+			{
+				"itemId": "producer:shrine-t1",
+				"x": 3,
+				"y": 2
+			}
+		],
+		"inventory": []
+	},
+	"version": 1
 }

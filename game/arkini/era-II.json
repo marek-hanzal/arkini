@@ -1,0 +1,1906 @@
+{
+	"items": {
+		"item:bio-waste": {
+			"description": "Farm byproduct from animals and messy food chains. It belongs on the board until processed, because pretending manure fits neatly in a pocket is how UI crimes begin.",
+			"maxStackSize": 1,
+			"name": "Bio Waste",
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"bio-waste",
+				"farm",
+				"cleanup",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"item:blueprint-bio-waste-processor-t1": {
+			"craft": {
+				"durationMs": 34000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:grain"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				],
+				"resultItemId": "producer:bio-waste-processor-t1"
+			},
+			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
+			"name": "Bio-Waste Processor I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"era:II"
+			]
+		},
+		"item:blueprint-cattle-farm-t1": {
+			"craft": {
+				"durationMs": 22000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					},
+					{
+						"consume": true,
+						"itemId": "item:grain"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Cattle Farm I.",
+			"name": "Cattle Farm I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-chicken-coop-t1": {
+			"craft": {
+				"durationMs": 18000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:grain"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
+			"name": "Chicken Coop I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-farm-t1": {
+			"craft": {
+				"durationMs": 14000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Farm I.",
+			"name": "Farm I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-house-t1": {
+			"craft": {
+				"durationMs": 18000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:well-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan for House I, a housing producer that generates morale.",
+			"name": "House I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:II"
+			]
+		},
+		"item:blueprint-library-t1": {
+			"craft": {
+				"durationMs": 14000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				],
+				"resultItemId": "producer:library-t1"
+			},
+			"description": "Build plan that can be filled with early resources to construct Library I.",
+			"name": "Library I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"item:blueprint-pig-farm-t1": {
+			"craft": {
+				"durationMs": 20000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:grain",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
+			"name": "Pig Farm I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-sheep-pasture-t1": {
+			"craft": {
+				"durationMs": 22000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					},
+					{
+						"consume": true,
+						"itemId": "item:grain"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
+			"name": "Sheep Pasture I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-townhall-t3": {
+			"craft": {
+				"durationMs": 45000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:item:wheat-field"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:cattle-farm-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:chicken-coop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:farm-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:pig-farm-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:sheep-pasture-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:vegetable-garden-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:townhall-t2"
+					},
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:food-supply"
+					},
+					{
+						"consume": true,
+						"itemId": "item:wool"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t1"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Town Hall III.",
+			"name": "Town Hall III Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-vegetable-garden-t1": {
+			"craft": {
+				"durationMs": 16000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water",
+						"quantity": 2
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
+			"name": "Vegetable Garden I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		},
+		"item:blueprint-waste-processor-t1": {
+			"craft": {
+				"durationMs": 34000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				],
+				"resultItemId": "producer:waste-processor-t1"
+			},
+			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
+			"name": "Waste Processor I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"era:II"
+			]
+		},
+		"item:egg": {
+			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Egg",
+			"tags": [
+				"food",
+				"egg",
+				"era:II",
+				"tier-2-resource"
+			]
+		},
+		"item:food-supply": {
+			"description": "Packed base food supply prepared from grain, animal produce, and vegetables. Era II master item.",
+			"maxStackSize": 20,
+			"name": "Food Supply",
+			"tags": [
+				"food",
+				"master",
+				"era:II",
+				"tier-3-resource"
+			]
+		},
+		"item:grain": {
+			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
+			"maxStackSize": 50,
+			"name": "Grain",
+			"tags": [
+				"material",
+				"food",
+				"grain",
+				"era:II",
+				"tier-1-resource"
+			]
+		},
+		"item:milk": {
+			"description": "Fresh milk produced by cattle farms for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Milk",
+			"tags": [
+				"food",
+				"dairy",
+				"era:II",
+				"tier-2-resource"
+			]
+		},
+		"item:morale-t1": {
+			"description": "Tier I social morale generated by housing and spent as an optional boost currency or prestige cost.",
+			"maxStackSize": 50,
+			"name": "Morale I",
+			"tags": [
+				"morale",
+				"housing",
+				"currency",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"item:piglet": {
+			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
+			"maxStackSize": 20,
+			"name": "Piglet",
+			"tags": [
+				"animal",
+				"food",
+				"pig",
+				"era:II",
+				"tier-2-resource"
+			]
+		},
+		"item:vegetables": {
+			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Vegetables",
+			"tags": [
+				"food",
+				"vegetable",
+				"era:II",
+				"tier-1-resource"
+			]
+		},
+		"item:wheat-field": {
+			"description": "Movable grain source used by nearby farms.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:wheat-field",
+							"name": "Owns Wheat Field"
+						}
+					],
+					"id": "effect:grant-owned:item-wheat-field",
+					"name": "Owned Wheat Field grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Wheat Field",
+			"tags": [
+				"source",
+				"food",
+				"grain",
+				"era:II"
+			]
+		},
+		"item:wool": {
+			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
+			"maxStackSize": 50,
+			"name": "Wool",
+			"tags": [
+				"material",
+				"animal",
+				"era:II",
+				"tier-2-resource"
+			]
+		},
+		"producer:bio-waste-processor-t1": {
+			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
+			"label": "I",
+			"maxCount": 2,
+			"maxStackSize": 1,
+			"name": "Bio-Waste Processor I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 85000,
+						"id": "line:bio-waste-processor-t1:compost-bio-waste",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:bio-waste",
+								"mode": "upTo",
+								"quantity": 4
+							}
+						],
+						"name": "Compost Bio Waste",
+						"placement": "board_then_inventory"
+					},
+					{
+						"durationMs": 45000,
+						"id": "line:bio-waste-processor-t1:burn-bio-waste-log",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:bio-waste",
+								"mode": "upTo",
+								"quantity": 4
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log",
+								"quantity": 1
+							}
+						],
+						"name": "Burn Bio Waste: Wood",
+						"output": [
+							{
+								"chance": 0.2,
+								"itemId": "item:pollution",
+								"type": "chance"
+							},
+							{
+								"chance": 0.04,
+								"itemId": "item:pollution",
+								"type": "chance"
+							}
+						],
+						"placement": "board_then_inventory"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"bio-waste",
+				"farm",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"producer:cattle-farm-t1": {
+			"description": "Consumes grain and water to produce milk.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:cattle-farm-t1",
+							"name": "Owns Cattle Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-cattle-farm-t1",
+					"name": "Owned Cattle Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Cattle Farm I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 26000,
+						"id": "line:cattle-farm-t1:milk",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:milk",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:chicken-coop-t1": {
+			"description": "Consumes grain and water to produce eggs.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:chicken-coop-t1",
+							"name": "Owns Chicken Coop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-chicken-coop-t1",
+					"name": "Owned Chicken Coop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Chicken Coop I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 22000,
+						"id": "line:chicken-coop-t1:egg",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:egg",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.3,
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:egg",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"egg",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:farm-t1": {
+			"description": "Consumes water and produces grain when placed near a wheat field.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:farm-t1",
+							"name": "Owns Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-farm-t1",
+					"name": "Owned Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Farm I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 18000,
+						"id": "line:farm-t1:grain",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:wheat-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:wheat-field",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:grain",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.4,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:wheat-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:wheat-field",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:grain",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2",
+							"shrine:haste-target"
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:farm-t1:grain-morale-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t1"
+							}
+						],
+						"name": "Grain (Inspired)",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:wheat-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:wheat-field",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:grain",
+								"quantity": 4,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.25,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:wheat-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:wheat-field",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:grain",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"grain",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:house-t1": {
+			"description": "Basic housing that turns warmth and water into early morale.",
+			"label": "1",
+			"maxCount": 6,
+			"maxStackSize": 1,
+			"name": "House",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 20000,
+						"id": "line:house-t1:morale-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:morale-t1",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:library-t1": {
+			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t1",
+							"name": "Owns Library I"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t1",
+					"name": "Owned Library I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Library I",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"producer:pig-farm-t1": {
+			"description": "Consumes grain and water to produce piglets.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:pig-farm-t1",
+							"name": "Owns Pig Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-pig-farm-t1",
+					"name": "Owned Pig Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Pig Farm I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 32000,
+						"id": "line:pig-farm-t1:piglet",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:piglet",
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.35,
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:piglet",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"pig",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:sheep-pasture-t1": {
+			"description": "Consumes grain and water to produce wool.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sheep-pasture-t1",
+							"name": "Owns Sheep Pasture I"
+						}
+					],
+					"id": "effect:grant-owned:producer-sheep-pasture-t1",
+					"name": "Owned Sheep Pasture I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Sheep Pasture I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 28000,
+						"id": "line:sheep-pasture-t1:wool",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:wool",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"animal",
+				"wool",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:townhall-t2": {
+			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall II",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:wheat-field",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"name": "Survey: Wheat Field",
+						"output": [
+							{
+								"itemId": "item:wheat-field",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-farm-t1",
+						"name": "Blueprint: Farm I",
+						"output": [
+							{
+								"itemId": "item:blueprint-farm-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-pig-farm-t1",
+						"name": "Blueprint: Pig Farm I",
+						"output": [
+							{
+								"itemId": "item:blueprint-pig-farm-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-cattle-farm-t1",
+						"name": "Blueprint: Cattle Farm I",
+						"output": [
+							{
+								"itemId": "item:blueprint-cattle-farm-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-chicken-coop-t1",
+						"name": "Blueprint: Chicken Coop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-chicken-coop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-sheep-pasture-t1",
+						"name": "Blueprint: Sheep Pasture I",
+						"output": [
+							{
+								"itemId": "item:blueprint-sheep-pasture-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-vegetable-garden-t1",
+						"name": "Blueprint: Vegetable Garden I",
+						"output": [
+							{
+								"itemId": "item:blueprint-vegetable-garden-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-waste-processor-t1",
+						"name": "Blueprint: Waste Processor I",
+						"output": [
+							{
+								"itemId": "item:blueprint-waste-processor-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-bio-waste-processor-t1",
+						"name": "Blueprint: Bio-Waste Processor I",
+						"output": [
+							{
+								"itemId": "item:blueprint-bio-waste-processor-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:townhall-t2:food-supply",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:piglet"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:milk"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:egg"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:vegetables"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:food-supply",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-house-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:food-supply"
+							}
+						],
+						"name": "Blueprint: House I",
+						"output": [
+							{
+								"itemId": "item:blueprint-house-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 90000,
+						"id": "line:townhall-t2:blueprint-townhall-t3",
+						"name": "Blueprint: Town Hall III",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-townhall-t3",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:II"
+			],
+			"tier": 2
+		},
+		"producer:vegetable-garden-t1": {
+			"description": "Consumes water to produce vegetables.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:vegetable-garden-t1",
+							"name": "Owns Vegetable Garden I"
+						}
+					],
+					"id": "effect:grant-owned:producer-vegetable-garden-t1",
+					"name": "Owned Vegetable Garden I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Vegetable Garden I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 20000,
+						"id": "line:vegetable-garden-t1:vegetables",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:vegetables",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.35,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:vegetables",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2",
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"vegetable",
+				"era:II"
+			],
+			"tier": 1
+		},
+		"producer:waste-processor-t1": {
+			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
+			"label": "I",
+			"maxCount": 2,
+			"maxStackSize": 1,
+			"name": "Waste Processor I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 90000,
+						"id": "line:waste-processor-t1:recycle-trash",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:trash",
+								"mode": "upTo",
+								"quantity": 4
+							}
+						],
+						"name": "Recycle Trash",
+						"placement": "board_then_inventory"
+					},
+					{
+						"durationMs": 45000,
+						"id": "line:waste-processor-t1:burn-trash-log",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:trash",
+								"mode": "upTo",
+								"quantity": 4
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log",
+								"quantity": 1
+							}
+						],
+						"name": "Burn Trash: Wood",
+						"output": [
+							{
+								"chance": 0.25,
+								"itemId": "item:pollution",
+								"type": "chance"
+							},
+							{
+								"chance": 0.05,
+								"itemId": "item:pollution",
+								"type": "chance"
+							}
+						],
+						"placement": "board_then_inventory"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"era:II"
+			],
+			"tier": 2
+		}
+	}
+}

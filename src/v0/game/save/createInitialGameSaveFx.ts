@@ -57,7 +57,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		const id = `item-instance:${initialItemInstanceIndex}`;
 		initialItemInstanceIndex += 1;
 		boardItems[id] = {
-			...(config.items[entry.itemId]?.passiveEffectIds?.length
+			...(config.items[entry.itemId]?.effects?.length
 				? {
 						createdAtMs: nowMs,
 					}

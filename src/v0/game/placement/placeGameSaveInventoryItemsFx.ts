@@ -52,8 +52,7 @@ export const placeGameSaveInventoryItemsFx = Effect.fn("placeGameSaveInventoryIt
 		}
 
 		const placed = yield* placeGameSaveInventoryRemainderFx({
-			createdAtMs:
-				item.createdAtMs ?? (itemDefinition.passiveEffectIds?.length ? nowMs : undefined),
+			createdAtMs: item.createdAtMs ?? (itemDefinition.effects?.length ? nowMs : undefined),
 			events,
 			item,
 			maxStackSize: itemDefinition.maxStackSize,

@@ -14,10 +14,7 @@ import {
 	ResolvedDomainSelectorSchema,
 } from "~/v0/game/config/schema/GameDomainSelectorSchema";
 import { GameDropEffectSchema } from "~/v0/game/config/schema/GameDropEffectSchema";
-import {
-	GameEffectAuthoringDefinitionSchema,
-	GameEffectDefinitionSchema,
-} from "~/v0/game/config/schema/GameEffectDefinitionSchema";
+import { GameEffectSchema } from "~/v0/game/config/schema/GameEffectSchema";
 import { GameLineEffectSchema } from "~/v0/game/config/schema/GameLineEffectSchema";
 import { GameMetaSchema } from "~/v0/game/config/schema/GameMetaSchema";
 import { ItemFragmentSchema, ItemSchema } from "~/v0/game/config/schema/GameItemSchema";
@@ -31,7 +28,6 @@ const GameConfigFragmentSchema = z
 		resources: z.record(IdSchema, ResourceSchema).optional(),
 		assets: z.record(IdSchema, AssetFragmentSchema).optional(),
 		items: z.record(IdSchema, ItemFragmentSchema).optional(),
-		effects: z.record(IdSchema, GameEffectAuthoringDefinitionSchema).optional(),
 		startingState: StartingStateSchema.optional(),
 	})
 	.strict();
@@ -43,7 +39,6 @@ const BaseGameConfigSchema = z
 		resources: z.record(IdSchema, ResourceSchema),
 		assets: z.record(IdSchema, AssetSchema),
 		items: z.record(IdSchema, ItemSchema),
-		effects: z.record(IdSchema, GameEffectDefinitionSchema).default({}),
 		startingState: StartingStateSchema,
 	})
 	.strict();
@@ -52,7 +47,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	const hasResource = createRecordGuard(value.resources);
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
-	const hasEffect = createRecordGuard(value.effects);
 	const itemIds = Object.keys(value.items);
 	const grantIds = readGameEffectGrantIds(value);
 
@@ -107,32 +101,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			item.tags,
 			(value) => `Duplicate tag "${value}".`,
 		);
-		validateUniqueStringList(
-			ctx,
-			[
-				"items",
-				itemId,
-				"passiveEffectIds",
-			],
-			item.passiveEffectIds ?? [],
-			(value) => `Duplicate passive effect "${value}".`,
-		);
-
-		for (const [index, effectId] of (item.passiveEffectIds ?? []).entries()) {
-			if (!hasEffect(effectId)) {
-				addIssue(
-					ctx,
-					[
-						"items",
-						itemId,
-						"passiveEffectIds",
-						index,
-					],
-					`Missing effect "${effectId}".`,
-				);
-			}
-		}
-
 		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
 			if (!hasItem(merge.withItemId)) {
 				addIssue(
@@ -213,7 +181,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				capabilityId: itemId,
 				ctx,
 				grantIds,
-				hasEffect,
 				hasItem,
 				itemIds,
 				section: "producer",
@@ -225,7 +192,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				capabilityId: itemId,
 				ctx,
 				grantIds,
-				hasEffect,
 				hasItem,
 				itemIds,
 				section: "stash",
@@ -244,18 +210,7 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		}
 	}
 
-	for (const [effectId, effect] of Object.entries(value.effects)) {
-		validateUniqueStringList(
-			ctx,
-			[
-				"effects",
-				effectId,
-				"grants",
-			],
-			effect.grants.map((grant) => grant.id),
-			(value) => `Duplicate grant id "${value}".`,
-		);
-	}
+	validateConfigEffects(ctx, value);
 
 	validateBlueprintDependencyCycles(ctx, value);
 	validateGameplaySoftLockRisks(ctx, value);
@@ -938,9 +893,97 @@ const readConfigLines = (config: z.infer<typeof BaseGameConfigSchema>) =>
 		];
 	});
 
+type ConfigEffectEntry = {
+	effect: z.infer<typeof GameEffectSchema>;
+	path: GameConfigIssuePath;
+};
+
+const readConfigEffects = (config: z.infer<typeof BaseGameConfigSchema>): ConfigEffectEntry[] =>
+	Object.entries(config.items).flatMap(([itemId, item]) => {
+		const passiveEffects = (item.effects ?? []).map((effect, effectIndex) => ({
+			effect,
+			path: [
+				"items",
+				itemId,
+				"effects",
+				effectIndex,
+			] satisfies GameConfigIssuePath,
+		}));
+		const producerEffects = (item.producer?.lines ?? []).flatMap((line, lineIndex) =>
+			line.effect
+				? [
+						{
+							effect: line.effect,
+							path: [
+								"items",
+								itemId,
+								"producer",
+								"lines",
+								lineIndex,
+								"effect",
+							] satisfies GameConfigIssuePath,
+						},
+					]
+				: [],
+		);
+		const stashEffect = item.stash?.line.effect
+			? [
+					{
+						effect: item.stash.line.effect,
+						path: [
+							"items",
+							itemId,
+							"stash",
+							"line",
+							"effect",
+						] satisfies GameConfigIssuePath,
+					},
+				]
+			: [];
+
+		return [
+			...passiveEffects,
+			...producerEffects,
+			...stashEffect,
+		];
+	});
+
+const validateConfigEffects = (
+	ctx: z.RefinementCtx,
+	config: z.infer<typeof BaseGameConfigSchema>,
+) => {
+	const effectIds = new Map<string, GameConfigIssuePath>();
+
+	for (const { effect, path } of readConfigEffects(config)) {
+		const previousPath = effectIds.get(effect.id);
+		if (previousPath) {
+			addIssue(
+				ctx,
+				[
+					...path,
+					"id",
+				],
+				`Duplicate effect id "${effect.id}" already defined at ${formatIssuePath(previousPath)}.`,
+			);
+		} else {
+			effectIds.set(effect.id, path);
+		}
+
+		validateUniqueStringList(
+			ctx,
+			[
+				...path,
+				"grants",
+			],
+			effect.grants.map((grant) => grant.id),
+			(value) => `Duplicate grant id "${value}".`,
+		);
+	}
+};
+
 const readGameEffectGrantIds = (config: z.infer<typeof BaseGameConfigSchema>) => [
 	...new Set(
-		Object.values(config.effects).flatMap((effect) => effect.grants.map((grant) => grant.id)),
+		readConfigEffects(config).flatMap(({ effect }) => effect.grants.map((grant) => grant.id)),
 	),
 ];
 
@@ -966,7 +1009,6 @@ const validateProducerCapability = ({
 	capabilityId,
 	ctx,
 	grantIds,
-	hasEffect,
 	hasItem,
 	itemIds,
 	section,
@@ -975,7 +1017,6 @@ const validateProducerCapability = ({
 	capabilityId: string;
 	ctx: z.RefinementCtx;
 	grantIds: readonly string[];
-	hasEffect: (itemId: string) => boolean;
 	hasItem: (itemId: string) => boolean;
 	itemIds: readonly string[];
 	section: "producer" | "stash";
@@ -1060,23 +1101,12 @@ const validateProducerCapability = ({
 			);
 		}
 
-		if (line.activatesEffectId && !hasEffect(line.activatesEffectId)) {
+		if (line.effect && line.output) {
 			addIssue(
 				ctx,
 				[
 					...linePath,
-					"activatesEffectId",
-				],
-				`Missing effect "${line.activatesEffectId}".`,
-			);
-		}
-
-		if (line.activatesEffectId && line.output) {
-			addIssue(
-				ctx,
-				[
-					...linePath,
-					"activatesEffectId",
+					"effect",
 				],
 				"Active effect lines must not also define output.",
 			);
@@ -1556,9 +1586,7 @@ const collectGrantDependencyItems = ({
 const readPassiveGrantSourceItemIdsByGrantId = (config: z.infer<typeof BaseGameConfigSchema>) => {
 	const result = new Map<string, string[]>();
 	for (const [itemId, item] of Object.entries(config.items)) {
-		for (const effectId of item.passiveEffectIds ?? []) {
-			const effect = config.effects[effectId];
-			if (!effect) continue;
+		for (const effect of item.effects ?? []) {
 			for (const grantId of effect.grants.map((grant) => grant.id)) {
 				result.set(grantId, [
 					...(result.get(grantId) ?? []),
@@ -1783,17 +1811,14 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 	}
 
 	for (const [itemId, item] of Object.entries(config.items)) {
-		for (const [effectIndex, effectId] of (item.passiveEffectIds ?? []).entries()) {
-			const effect = config.effects[effectId];
-			if (!effect) continue;
-
+		for (const [effectIndex, effect] of (item.effects ?? []).entries()) {
 			for (const grant of effect.grants) {
 				addGrantSource({
-					label: `passive effect "${effectId}" on ${formatItemLabel(config, itemId)}`,
+					label: `passive effect "${effect.id}" on ${formatItemLabel(config, itemId)}`,
 					path: [
 						"items",
 						itemId,
-						"passiveEffectIds",
+						"effects",
 						effectIndex,
 					],
 					requirements: [
@@ -1805,7 +1830,7 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 							],
 						}),
 					],
-					sourceId: `passive:${itemId}:${effectId}:${grant.id}`,
+					sourceId: `passive:${itemId}:${effect.id}:${grant.id}`,
 					targetId: grant.id,
 				});
 			}
@@ -1976,19 +2001,17 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 			});
 		}
 
-		if (!line.activatesEffectId) continue;
-		const effect = config.effects[line.activatesEffectId];
-		if (!effect) continue;
+		if (!line.effect) continue;
 
-		for (const grant of effect.grants) {
+		for (const grant of line.effect.grants) {
 			addGrantSource({
 				label: `active effect line "${line.id}" (${line.name})`,
 				path: [
 					...linePath,
-					"activatesEffectId",
+					"effect",
 				],
 				requirements: lineRequirements,
-				sourceId: `line:${ownerItemId}:${line.id}:active:${line.activatesEffectId}:${grant.id}`,
+				sourceId: `line:${ownerItemId}:${line.id}:active:${line.effect.id}:${grant.id}`,
 				targetId: grant.id,
 			});
 		}
@@ -2567,7 +2590,7 @@ const formatResolvedSelector = (
 const readGrantNameById = (config: z.infer<typeof BaseGameConfigSchema>) => {
 	const grantNameById = new Map<string, string>();
 
-	for (const effect of Object.values(config.effects)) {
+	for (const { effect } of readConfigEffects(config)) {
 		for (const grant of effect.grants) {
 			grantNameById.set(grant.id, grant.name);
 		}

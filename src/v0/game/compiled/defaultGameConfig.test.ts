@@ -37,14 +37,36 @@ const readCraftRecipes = () =>
 			: [],
 	);
 
+const readEmbeddedEffects = () =>
+	Object.values(defaultGameConfig.items).flatMap((item) => [
+		...(item.effects ?? []),
+		...(item.producer?.lines.flatMap((line) =>
+			line.effect
+				? [
+						line.effect,
+					]
+				: [],
+		) ?? []),
+		...(item.stash?.line.effect
+			? [
+					item.stash.line.effect,
+				]
+			: []),
+	]);
+
+const readEmbeddedEffect = (effectId: string) =>
+	readEmbeddedEffects().find((effect) => effect.id === effectId);
+
 describe("defaultGameConfig", () => {
-	it("is compiled to the output-owned producer effect model without root mutator fields", () => {
+	it("is compiled to embedded capability effects without root mutator fields", () => {
 		expect(JSON.stringify(defaultGameConfig)).not.toContain("grantSelector");
-		expect(JSON.stringify(defaultGameConfig.effects)).not.toContain("operations");
+		expect(JSON.stringify(defaultGameConfig)).not.toContain("operations");
+		expect(JSON.stringify(defaultGameConfig)).not.toContain("passiveEffectIds");
+		expect(JSON.stringify(defaultGameConfig)).not.toContain("activatesEffectId");
 	});
 
-	it("keeps passive effects as global grant sources", () => {
-		expect(defaultGameConfig.effects["effect:shrine-minor-haste"]).toMatchObject({
+	it("keeps active effects as line-owned grant sources", () => {
+		expect(readEmbeddedEffect("effect:shrine-minor-haste")).toMatchObject({
 			grants: [
 				{
 					id: "grant:active:shrine-minor-haste",

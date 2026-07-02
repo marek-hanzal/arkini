@@ -1022,690 +1022,6 @@
 			"resourceId": "producer-winery-t1"
 		}
 	},
-	"effects": {
-		"effect:grant-owned:item-clay-deposit": {
-			"grants": [
-				{
-					"id": "grant:owned:item:clay-deposit",
-					"name": "Owns Clay Deposit"
-				}
-			],
-			"name": "Owned Clay Deposit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-coal-deposit": {
-			"grants": [
-				{
-					"id": "grant:owned:item:coal-deposit",
-					"name": "Owns Coal Deposit"
-				}
-			],
-			"name": "Owned Coal Deposit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-gold-deposit": {
-			"grants": [
-				{
-					"id": "grant:owned:item:gold-deposit",
-					"name": "Owns Gold Deposit"
-				}
-			],
-			"name": "Owned Gold Deposit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-hop-field": {
-			"grants": [
-				{
-					"id": "grant:owned:item:hop-field",
-					"name": "Owns Hop Field"
-				}
-			],
-			"name": "Owned Hop Field grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-iron-deposit": {
-			"grants": [
-				{
-					"id": "grant:owned:item:iron-deposit",
-					"name": "Owns Iron Deposit"
-				}
-			],
-			"name": "Owned Iron Deposit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-marble-deposit": {
-			"grants": [
-				{
-					"id": "grant:owned:item:marble-deposit",
-					"name": "Owns Marble Deposit"
-				}
-			],
-			"name": "Owned Marble Deposit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-sand-deposit": {
-			"grants": [
-				{
-					"id": "grant:owned:item:sand-deposit",
-					"name": "Owns Sand Deposit"
-				}
-			],
-			"name": "Owned Sand Deposit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-vineyard": {
-			"grants": [
-				{
-					"id": "grant:owned:item:vineyard",
-					"name": "Owns Vineyard"
-				}
-			],
-			"name": "Owned Vineyard grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:item-wheat-field": {
-			"grants": [
-				{
-					"id": "grant:owned:item:wheat-field",
-					"name": "Owns Wheat Field"
-				}
-			],
-			"name": "Owned Wheat Field grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-academy": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:academy",
-					"name": "Owns Academy"
-				}
-			],
-			"name": "Owned Academy grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-armory-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:armory-t1",
-					"name": "Owns Armory I"
-				}
-			],
-			"name": "Owned Armory I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-bakery-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:bakery-t1",
-					"name": "Owns Bakery I"
-				}
-			],
-			"name": "Owned Bakery I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-blacksmith-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:blacksmith-t1",
-					"name": "Owns Blacksmith I"
-				}
-			],
-			"name": "Owned Blacksmith I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-brewery-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:brewery-t1",
-					"name": "Owns Brewery I"
-				}
-			],
-			"name": "Owned Brewery I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-brickyard": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:brickyard",
-					"name": "Owns Brickyard"
-				}
-			],
-			"name": "Owned Brickyard grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-cattle-farm-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:cattle-farm-t1",
-					"name": "Owns Cattle Farm I"
-				}
-			],
-			"name": "Owned Cattle Farm I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-charcoal-burner-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:charcoal-burner-t1",
-					"name": "Owns Charcoal Burner I"
-				}
-			],
-			"name": "Owned Charcoal Burner I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-chicken-coop-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:chicken-coop-t1",
-					"name": "Owns Chicken Coop I"
-				}
-			],
-			"name": "Owned Chicken Coop I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-civic-office-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:civic-office-t1",
-					"name": "Owns Civic Office I"
-				}
-			],
-			"name": "Owned Civic Office I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-clay-pit": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:clay-pit",
-					"name": "Owns Clay Pit"
-				}
-			],
-			"name": "Owned Clay Pit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-coal-mine-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:coal-mine-t1",
-					"name": "Owns Coal Mine I"
-				}
-			],
-			"name": "Owned Coal Mine I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-construction-yard-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:construction-yard-t1",
-					"name": "Owns Construction Yard I"
-				}
-			],
-			"name": "Owned Construction Yard I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-cookhouse-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:cookhouse-t1",
-					"name": "Owns Cookhouse I"
-				}
-			],
-			"name": "Owned Cookhouse I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-dairy-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:dairy-t1",
-					"name": "Owns Dairy I"
-				}
-			],
-			"name": "Owned Dairy I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-dye-workshop-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:dye-workshop-t1",
-					"name": "Owns Dye Workshop I"
-				}
-			],
-			"name": "Owned Dye Workshop I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-farm-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:farm-t1",
-					"name": "Owns Farm I"
-				}
-			],
-			"name": "Owned Farm I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-glassworks": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:glassworks",
-					"name": "Owns Glassworks"
-				}
-			],
-			"name": "Owned Glassworks grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-glazier-workshop-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:glazier-workshop-t1",
-					"name": "Owns Glazier Workshop I"
-				}
-			],
-			"name": "Owned Glazier Workshop I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-goldsmith-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:goldsmith-t1",
-					"name": "Owns Goldsmith I"
-				}
-			],
-			"name": "Owned Goldsmith I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-heroes-guild-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:heroes-guild-t1",
-					"name": "Owns Heroes Guild I"
-				}
-			],
-			"name": "Owned Heroes Guild I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-library-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:library-t1",
-					"name": "Owns Library I"
-				}
-			],
-			"name": "Owned Library I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-library-t2": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:library-t2",
-					"name": "Owns Library II"
-				}
-			],
-			"name": "Owned Library II grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-library-t3": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:library-t3",
-					"name": "Owns Library III"
-				}
-			],
-			"name": "Owned Library III grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-library-t4": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:library-t4",
-					"name": "Owns Library IV"
-				}
-			],
-			"name": "Owned Library IV grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-lumberjack-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:lumberjack-t1",
-					"name": "Owns Lumberjack I"
-				}
-			],
-			"name": "Owned Lumberjack I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-market-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:market-t1",
-					"name": "Owns Market"
-				}
-			],
-			"name": "Owned Market grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-pig-farm-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:pig-farm-t1",
-					"name": "Owns Pig Farm I"
-				}
-			],
-			"name": "Owned Pig Farm I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-purifier-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:purifier-t1",
-					"name": "Owns Purifier I"
-				}
-			],
-			"name": "Owned Purifier I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-quarry-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:quarry-t1",
-					"name": "Owns Quarry I"
-				}
-			],
-			"name": "Owned Quarry I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-quarry-t2": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:quarry-t2",
-					"name": "Owns Quarry"
-				}
-			],
-			"name": "Owned Quarry grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-roof-tile-factory": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:roof-tile-factory",
-					"name": "Owns Roof Tile Factory"
-				}
-			],
-			"name": "Owned Roof Tile Factory grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-sand-pit": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:sand-pit",
-					"name": "Owns Sand Pit"
-				}
-			],
-			"name": "Owned Sand Pit grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-sawmill-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:sawmill-t1",
-					"name": "Owns Sawmill I"
-				}
-			],
-			"name": "Owned Sawmill I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-sheep-pasture-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:sheep-pasture-t1",
-					"name": "Owns Sheep Pasture I"
-				}
-			],
-			"name": "Owned Sheep Pasture I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-slaughterhouse-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:slaughterhouse-t1",
-					"name": "Owns Slaughterhouse I"
-				}
-			],
-			"name": "Owned Slaughterhouse I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-smelter-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:smelter-t1",
-					"name": "Owns Smelter I"
-				}
-			],
-			"name": "Owned Smelter I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-stonemason-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:stonemason-t1",
-					"name": "Owns Stonemason I"
-				}
-			],
-			"name": "Owned Stonemason I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-stonemason-t2": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:stonemason-t2",
-					"name": "Owns Stonemason"
-				}
-			],
-			"name": "Owned Stonemason grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-tailor-workshop-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:tailor-workshop-t1",
-					"name": "Owns Tailor Workshop I"
-				}
-			],
-			"name": "Owned Tailor Workshop I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-tannery-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:tannery-t1",
-					"name": "Owns Tannery I"
-				}
-			],
-			"name": "Owned Tannery I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-tavern-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:tavern-t1",
-					"name": "Owns Tavern I"
-				}
-			],
-			"name": "Owned Tavern I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-university": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:university",
-					"name": "Owns University"
-				}
-			],
-			"name": "Owned University grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-vegetable-garden-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:vegetable-garden-t1",
-					"name": "Owns Vegetable Garden I"
-				}
-			],
-			"name": "Owned Vegetable Garden I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-weaver-hut-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:weaver-hut-t1",
-					"name": "Owns Weaver Hut I"
-				}
-			],
-			"name": "Owned Weaver Hut I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-well-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:well-t1",
-					"name": "Owns Well I"
-				}
-			],
-			"name": "Owned Well I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-windmill-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:windmill-t1",
-					"name": "Owns Windmill I"
-				}
-			],
-			"name": "Owned Windmill I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:grant-owned:producer-winery-t1": {
-			"grants": [
-				{
-					"id": "grant:owned:producer:winery-t1",
-					"name": "Owns Winery I"
-				}
-			],
-			"name": "Owned Winery I grant",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:path-engineers-locks-counter-keystones": {
-			"grants": [
-				{
-					"id": "grant:path:engineers",
-					"name": "Engineers path chosen"
-				}
-			],
-			"name": "Engineers path locks Faith and Mages keystone plans",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:path-faith-locks-counter-keystones": {
-			"grants": [
-				{
-					"id": "grant:path:faith",
-					"name": "Faith path chosen"
-				}
-			],
-			"name": "Faith path locks Engineers and Mages keystone plans",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:path-mages-locks-counter-keystones": {
-			"grants": [
-				{
-					"id": "grant:path:mages",
-					"name": "Mages path chosen"
-				}
-			],
-			"name": "Mages path locks Engineers and Faith keystone plans",
-			"polarity": "neutral",
-			"sourceScope": "both"
-		},
-		"effect:shrine-bountiful-offering": {
-			"grants": [
-				{
-					"id": "grant:active:shrine-bountiful-offering",
-					"name": "Bountiful Offering active"
-				}
-			],
-			"name": "Bountiful Offering",
-			"polarity": "buff",
-			"sourceScope": "board"
-		},
-		"effect:shrine-minor-haste": {
-			"grants": [
-				{
-					"id": "grant:active:shrine-minor-haste",
-					"name": "Minor Haste active"
-				}
-			],
-			"name": "Minor Haste",
-			"polarity": "buff",
-			"sourceScope": "board"
-		}
-	},
 	"game": {
 		"board": {
 			"height": 11,
@@ -6571,11 +5887,22 @@
 				"asset:item:clay-deposit"
 			],
 			"description": "Movable clay source used by nearby clay pits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:clay-deposit",
+							"name": "Owns Clay Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-clay-deposit",
+					"name": "Owned Clay Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Clay Deposit",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-clay-deposit"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6609,11 +5936,22 @@
 				"asset:item:coal-deposit"
 			],
 			"description": "Movable coal source used by nearby coal mines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:coal-deposit",
+							"name": "Owns Coal Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-coal-deposit",
+					"name": "Owned Coal Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Coal Deposit",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-coal-deposit"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6847,11 +6185,22 @@
 				"asset:item:gold-deposit"
 			],
 			"description": "Movable gold source used by nearby gold mines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:gold-deposit",
+							"name": "Owns Gold Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-gold-deposit",
+					"name": "Owned Gold Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Gold Deposit",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-gold-deposit"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -6956,11 +6305,22 @@
 				"asset:item:hop-field"
 			],
 			"description": "Movable hop source used by nearby breweries.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:hop-field",
+							"name": "Owns Hop Field"
+						}
+					],
+					"id": "effect:grant-owned:item-hop-field",
+					"name": "Owned Hop Field grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Hop Field",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-hop-field"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7028,11 +6388,22 @@
 				"asset:item:iron-deposit"
 			],
 			"description": "Movable iron source used by nearby iron mines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:iron-deposit",
+							"name": "Owns Iron Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-iron-deposit",
+					"name": "Owned Iron Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Iron Deposit",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-iron-deposit"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7274,11 +6645,22 @@
 				"asset:item:marble-deposit"
 			],
 			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:marble-deposit",
+							"name": "Owns Marble Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-marble-deposit",
+					"name": "Owned Marble Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Marble Deposit",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-marble-deposit"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7670,11 +7052,22 @@
 				"asset:item:sand-deposit"
 			],
 			"description": "Movable sand source used by nearby sand pits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:sand-deposit",
+							"name": "Owns Sand Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-sand-deposit",
+					"name": "Owned Sand Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Sand Deposit",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-sand-deposit"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7890,11 +7283,22 @@
 				"asset:item:vineyard"
 			],
 			"description": "Movable vineyard source used by nearby wineries.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:vineyard",
+							"name": "Owns Vineyard"
+						}
+					],
+					"id": "effect:grant-owned:item-vineyard",
+					"name": "Owned Vineyard grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Vineyard",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-vineyard"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -7937,11 +7341,22 @@
 				"asset:item:wheat-field"
 			],
 			"description": "Movable grain source used by nearby farms.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:wheat-field",
+							"name": "Owns Wheat Field"
+						}
+					],
+					"id": "effect:grant-owned:item-wheat-field",
+					"name": "Owned Wheat Field grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxStackSize": 10,
 			"name": "Wheat Field",
-			"passiveEffectIds": [
-				"effect:grant-owned:item-wheat-field"
-			],
 			"storage": "both",
 			"tags": [
 				"source",
@@ -8005,12 +7420,23 @@
 				"asset:producer:academy"
 			],
 			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:academy",
+							"name": "Owns Academy"
+						}
+					],
+					"id": "effect:grant-owned:producer-academy",
+					"name": "Owned Academy grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Academy",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-academy"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -8597,12 +8023,23 @@
 				"asset:producer:armory-t1"
 			],
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:armory-t1",
+							"name": "Owns Armory I"
+						}
+					],
+					"id": "effect:grant-owned:producer-armory-t1",
+					"name": "Owned Armory I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Armory I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-armory-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -8769,12 +8206,23 @@
 				"asset:producer:bakery-t1"
 			],
 			"description": "Consumes flour and water to bake bread.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:bakery-t1",
+							"name": "Owns Bakery I"
+						}
+					],
+					"id": "effect:grant-owned:producer-bakery-t1",
+					"name": "Owned Bakery I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Bakery I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-bakery-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -9140,12 +8588,23 @@
 				"asset:producer:blacksmith-t1"
 			],
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:blacksmith-t1",
+							"name": "Owns Blacksmith I"
+						}
+					],
+					"id": "effect:grant-owned:producer-blacksmith-t1",
+					"name": "Owned Blacksmith I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-blacksmith-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -9586,12 +9045,23 @@
 				"asset:producer:brewery-t1"
 			],
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:brewery-t1",
+							"name": "Owns Brewery I"
+						}
+					],
+					"id": "effect:grant-owned:producer-brewery-t1",
+					"name": "Owned Brewery I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Brewery I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-brewery-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -9937,12 +9407,23 @@
 				"asset:producer:brickyard"
 			],
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:brickyard",
+							"name": "Owns Brickyard"
+						}
+					],
+					"id": "effect:grant-owned:producer-brickyard",
+					"name": "Owned Brickyard grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Brickyard",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-brickyard"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10131,12 +9612,23 @@
 				"asset:producer:cathedral"
 			],
 			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:faith",
+							"name": "Faith path chosen"
+						}
+					],
+					"id": "effect:path-faith-locks-counter-keystones",
+					"name": "Faith path locks Engineers and Mages keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Cathedral",
-			"passiveEffectIds": [
-				"effect:path-faith-locks-counter-keystones"
-			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -10155,12 +9647,23 @@
 				"asset:producer:cattle-farm-t1"
 			],
 			"description": "Consumes grain and water to produce milk.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:cattle-farm-t1",
+							"name": "Owns Cattle Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-cattle-farm-t1",
+					"name": "Owned Cattle Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Cattle Farm I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-cattle-farm-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10264,12 +9767,23 @@
 				"asset:producer:charcoal-burner-t1"
 			],
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:charcoal-burner-t1",
+							"name": "Owns Charcoal Burner I"
+						}
+					],
+					"id": "effect:grant-owned:producer-charcoal-burner-t1",
+					"name": "Owned Charcoal Burner I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-charcoal-burner-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10438,12 +9952,23 @@
 				"asset:producer:chicken-coop-t1"
 			],
 			"description": "Consumes grain and water to produce eggs.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:chicken-coop-t1",
+							"name": "Owns Chicken Coop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-chicken-coop-t1",
+					"name": "Owned Chicken Coop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Chicken Coop I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-chicken-coop-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10571,12 +10096,23 @@
 				"asset:producer:civic-office-t1"
 			],
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:civic-office-t1",
+							"name": "Owns Civic Office I"
+						}
+					],
+					"id": "effect:grant-owned:producer-civic-office-t1",
+					"name": "Owned Civic Office I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Civic Office I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-civic-office-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10755,12 +10291,23 @@
 				"asset:producer:clay-pit"
 			],
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:clay-pit",
+							"name": "Owns Clay Pit"
+						}
+					],
+					"id": "effect:grant-owned:producer-clay-pit",
+					"name": "Owned Clay Pit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Clay Pit",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-clay-pit"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10881,12 +10428,23 @@
 				"asset:producer:coal-mine-t1"
 			],
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:coal-mine-t1",
+							"name": "Owns Coal Mine I"
+						}
+					],
+					"id": "effect:grant-owned:producer-coal-mine-t1",
+					"name": "Owned Coal Mine I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-coal-mine-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -10978,12 +10536,23 @@
 				"asset:producer:construction-yard-t1"
 			],
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:construction-yard-t1",
+							"name": "Owns Construction Yard I"
+						}
+					],
+					"id": "effect:grant-owned:producer-construction-yard-t1",
+					"name": "Owned Construction Yard I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Construction Yard I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-construction-yard-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -11157,12 +10726,23 @@
 				"asset:producer:cookhouse-t1"
 			],
 			"description": "Combines processed food into feasts.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:cookhouse-t1",
+							"name": "Owns Cookhouse I"
+						}
+					],
+					"id": "effect:grant-owned:producer-cookhouse-t1",
+					"name": "Owned Cookhouse I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Cookhouse I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-cookhouse-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -11249,12 +10829,23 @@
 				"asset:producer:dairy-t1"
 			],
 			"description": "Processes milk into cheese.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:dairy-t1",
+							"name": "Owns Dairy I"
+						}
+					],
+					"id": "effect:grant-owned:producer-dairy-t1",
+					"name": "Owned Dairy I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Dairy I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-dairy-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -11317,12 +10908,23 @@
 				"asset:producer:dye-workshop-t1"
 			],
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:dye-workshop-t1",
+							"name": "Owns Dye Workshop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-dye-workshop-t1",
+					"name": "Owned Dye Workshop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Dye Workshop I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-dye-workshop-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -11447,12 +11049,23 @@
 				"asset:producer:farm-t1"
 			],
 			"description": "Consumes water and produces grain when placed near a wheat field.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:farm-t1",
+							"name": "Owns Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-farm-t1",
+					"name": "Owned Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Farm I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-farm-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -11761,12 +11374,23 @@
 				"asset:producer:glassworks"
 			],
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:glassworks",
+							"name": "Owns Glassworks"
+						}
+					],
+					"id": "effect:grant-owned:producer-glassworks",
+					"name": "Owned Glassworks grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Glassworks",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-glassworks"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -11949,12 +11573,23 @@
 				"asset:producer:glazier-workshop-t1"
 			],
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:glazier-workshop-t1",
+							"name": "Owns Glazier Workshop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-glazier-workshop-t1",
+					"name": "Owned Glazier Workshop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Glazier Workshop I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-glazier-workshop-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -12422,12 +12057,23 @@
 				"asset:producer:goldsmith-t1"
 			],
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:goldsmith-t1",
+							"name": "Owns Goldsmith I"
+						}
+					],
+					"id": "effect:grant-owned:producer-goldsmith-t1",
+					"name": "Owned Goldsmith I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-goldsmith-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -12979,12 +12625,23 @@
 				"asset:producer:heroes-guild-t1"
 			],
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:heroes-guild-t1",
+							"name": "Owns Heroes Guild I"
+						}
+					],
+					"id": "effect:grant-owned:producer-heroes-guild-t1",
+					"name": "Owned Heroes Guild I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Heroes Guild I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-heroes-guild-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -13356,12 +13013,23 @@
 				"asset:producer:house-of-engineers"
 			],
 			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:engineers",
+							"name": "Engineers path chosen"
+						}
+					],
+					"id": "effect:path-engineers-locks-counter-keystones",
+					"name": "Engineers path locks Faith and Mages keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "House of Engineers",
-			"passiveEffectIds": [
-				"effect:path-engineers-locks-counter-keystones"
-			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -13758,12 +13426,23 @@
 				"asset:producer:library-t1"
 			],
 			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t1",
+							"name": "Owns Library I"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t1",
+					"name": "Owned Library I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-library-t1"
-			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -13781,12 +13460,23 @@
 				"asset:producer:library-t2"
 			],
 			"description": "Established library that researches and reissues blueprints up through Era IV.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t2",
+							"name": "Owns Library II"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t2",
+					"name": "Owned Library II grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library II",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-library-t2"
-			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -13804,12 +13494,23 @@
 				"asset:producer:library-t3"
 			],
 			"description": "Advanced library that researches and reissues blueprints up through Era VIII.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t3",
+							"name": "Owns Library III"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t3",
+					"name": "Owned Library III grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library III",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-library-t3"
-			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -13827,12 +13528,23 @@
 				"asset:producer:library-t4"
 			],
 			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t4",
+							"name": "Owns Library IV"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t4",
+					"name": "Owned Library IV grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Library IV",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-library-t4"
-			],
 			"storage": "both",
 			"tags": [
 				"producer",
@@ -13850,12 +13562,23 @@
 				"asset:producer:lumberjack-t1"
 			],
 			"description": "Produces logs when placed near a tree.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:lumberjack-t1",
+							"name": "Owns Lumberjack I"
+						}
+					],
+					"id": "effect:grant-owned:producer-lumberjack-t1",
+					"name": "Owned Lumberjack I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-lumberjack-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -14018,12 +13741,23 @@
 				"asset:producer:mage-lodge"
 			],
 			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:mages",
+							"name": "Mages path chosen"
+						}
+					],
+					"id": "effect:path-mages-locks-counter-keystones",
+					"name": "Mages path locks Engineers and Faith keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Mage Lodge",
-			"passiveEffectIds": [
-				"effect:path-mages-locks-counter-keystones"
-			],
 			"storage": "both",
 			"tags": [
 				"building",
@@ -14043,12 +13777,23 @@
 				"asset:producer:market-t1"
 			],
 			"description": "First trade producer that converts processed food and drink into coins.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:market-t1",
+							"name": "Owns Market"
+						}
+					],
+					"id": "effect:grant-owned:producer-market-t1",
+					"name": "Owned Market grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Market",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-market-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -14407,12 +14152,23 @@
 				"asset:producer:pig-farm-t1"
 			],
 			"description": "Consumes grain and water to produce piglets.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:pig-farm-t1",
+							"name": "Owns Pig Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-pig-farm-t1",
+					"name": "Owned Pig Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-pig-farm-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -14906,12 +14662,23 @@
 				"asset:producer:purifier-t1"
 			],
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:purifier-t1",
+							"name": "Owns Purifier I"
+						}
+					],
+					"id": "effect:grant-owned:producer-purifier-t1",
+					"name": "Owned Purifier I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Purifier I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-purifier-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -14951,12 +14718,23 @@
 				"asset:producer:quarry-t1"
 			],
 			"description": "Produces stone when placed near a rock.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:quarry-t1",
+							"name": "Owns Quarry I"
+						}
+					],
+					"id": "effect:grant-owned:producer-quarry-t1",
+					"name": "Owned Quarry I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "Quarry I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-quarry-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -15123,13 +14901,24 @@
 				"asset:producer:quarry-t2"
 			],
 			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:quarry-t2",
+							"name": "Owns Quarry"
+						}
+					],
+					"id": "effect:grant-owned:producer-quarry-t2",
+					"name": "Owned Quarry grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"label": "2",
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Quarry",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-quarry-t2"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -15334,12 +15123,23 @@
 				"asset:producer:roof-tile-factory"
 			],
 			"description": "Workshop that fires clay into sturdy roof tiles.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:roof-tile-factory",
+							"name": "Owns Roof Tile Factory"
+						}
+					],
+					"id": "effect:grant-owned:producer-roof-tile-factory",
+					"name": "Owned Roof Tile Factory grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-roof-tile-factory"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -15528,12 +15328,23 @@
 				"asset:producer:sand-pit"
 			],
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sand-pit",
+							"name": "Owns Sand Pit"
+						}
+					],
+					"id": "effect:grant-owned:producer-sand-pit",
+					"name": "Owned Sand Pit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Sand Pit",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-sand-pit"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -15647,12 +15458,23 @@
 				"asset:producer:sawmill-t1"
 			],
 			"description": "Turns logs into planks when placed near a lumberjack.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sawmill-t1",
+							"name": "Owns Sawmill I"
+						}
+					],
+					"id": "effect:grant-owned:producer-sawmill-t1",
+					"name": "Owned Sawmill I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Sawmill I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-sawmill-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -15878,12 +15700,23 @@
 				"asset:producer:sheep-pasture-t1"
 			],
 			"description": "Consumes grain and water to produce wool.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sheep-pasture-t1",
+							"name": "Owns Sheep Pasture I"
+						}
+					],
+					"id": "effect:grant-owned:producer-sheep-pasture-t1",
+					"name": "Owned Sheep Pasture I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Sheep Pasture I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-sheep-pasture-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -15993,9 +15826,20 @@
 			"producer": {
 				"lines": [
 					{
-						"activatesEffectId": "effect:shrine-minor-haste",
 						"chargeCost": 0,
 						"durationMs": 300000,
+						"effect": {
+							"grants": [
+								{
+									"id": "grant:active:shrine-minor-haste",
+									"name": "Minor Haste active"
+								}
+							],
+							"id": "effect:shrine-minor-haste",
+							"name": "Minor Haste",
+							"polarity": "buff",
+							"sourceScope": "board"
+						},
 						"id": "line:shrine-t1:minor-haste",
 						"inputs": [
 							{
@@ -16019,9 +15863,20 @@
 						"visibility": "visible"
 					},
 					{
-						"activatesEffectId": "effect:shrine-bountiful-offering",
 						"chargeCost": 0,
 						"durationMs": 180000,
+						"effect": {
+							"grants": [
+								{
+									"id": "grant:active:shrine-bountiful-offering",
+									"name": "Bountiful Offering active"
+								}
+							],
+							"id": "effect:shrine-bountiful-offering",
+							"name": "Bountiful Offering",
+							"polarity": "buff",
+							"sourceScope": "board"
+						},
 						"id": "line:shrine-t1:bountiful-offering",
 						"inputs": [
 							{
@@ -16070,12 +15925,23 @@
 				"asset:producer:slaughterhouse-t1"
 			],
 			"description": "Processes piglets into sausage and leather.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:slaughterhouse-t1",
+							"name": "Owns Slaughterhouse I"
+						}
+					],
+					"id": "effect:grant-owned:producer-slaughterhouse-t1",
+					"name": "Owned Slaughterhouse I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-slaughterhouse-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -16186,12 +16052,23 @@
 				"asset:producer:smelter-t1"
 			],
 			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:smelter-t1",
+							"name": "Owns Smelter I"
+						}
+					],
+					"id": "effect:grant-owned:producer-smelter-t1",
+					"name": "Owned Smelter I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Smelter I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-smelter-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -16448,12 +16325,23 @@
 				"asset:producer:stonemason-t1"
 			],
 			"description": "Turns stone into stone blocks when placed near a quarry.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:stonemason-t1",
+							"name": "Owns Stonemason I"
+						}
+					],
+					"id": "effect:grant-owned:producer-stonemason-t1",
+					"name": "Owned Stonemason I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Stonemason I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-stonemason-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -16531,13 +16419,24 @@
 				"asset:producer:stonemason-t2"
 			],
 			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:stonemason-t2",
+							"name": "Owns Stonemason"
+						}
+					],
+					"id": "effect:grant-owned:producer-stonemason-t2",
+					"name": "Owned Stonemason grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"label": "2",
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Stonemason",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-stonemason-t2"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -16874,12 +16773,23 @@
 				"asset:producer:tailor-workshop-t1"
 			],
 			"description": "Clothing producer that sews common and luxury clothing.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:tailor-workshop-t1",
+							"name": "Owns Tailor Workshop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-tailor-workshop-t1",
+					"name": "Owned Tailor Workshop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Tailor Workshop I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-tailor-workshop-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -17063,12 +16973,23 @@
 				"asset:producer:tannery-t1"
 			],
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:tannery-t1",
+							"name": "Owns Tannery I"
+						}
+					],
+					"id": "effect:grant-owned:producer-tannery-t1",
+					"name": "Owned Tannery I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Tannery I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-tannery-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -17138,12 +17059,23 @@
 				"asset:producer:tavern-t1"
 			],
 			"description": "Serves beer barrels as individual beers.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:tavern-t1",
+							"name": "Owns Tavern I"
+						}
+					],
+					"id": "effect:grant-owned:producer-tavern-t1",
+					"name": "Owned Tavern I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Tavern I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-tavern-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -18231,12 +18163,23 @@
 				"asset:producer:university"
 			],
 			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:university",
+							"name": "Owns University"
+						}
+					],
+					"id": "effect:grant-owned:producer-university",
+					"name": "Owned University grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "University",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-university"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -18698,12 +18641,23 @@
 				"asset:producer:vegetable-garden-t1"
 			],
 			"description": "Consumes water to produce vegetables.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:vegetable-garden-t1",
+							"name": "Owns Vegetable Garden I"
+						}
+					],
+					"id": "effect:grant-owned:producer-vegetable-garden-t1",
+					"name": "Owned Vegetable Garden I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 3,
 			"maxStackSize": 1,
 			"name": "Vegetable Garden I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-vegetable-garden-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -19082,12 +19036,23 @@
 				"asset:producer:weaver-hut-t1"
 			],
 			"description": "Textile producer that weaves wool into common cloth.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:weaver-hut-t1",
+							"name": "Owns Weaver Hut I"
+						}
+					],
+					"id": "effect:grant-owned:producer-weaver-hut-t1",
+					"name": "Owned Weaver Hut I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Weaver Hut I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-weaver-hut-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -19151,12 +19116,23 @@
 				"asset:producer:well-t1"
 			],
 			"description": "Produces water.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:well-t1",
+							"name": "Owns Well I"
+						}
+					],
+					"id": "effect:grant-owned:producer-well-t1",
+					"name": "Owned Well I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 4,
 			"maxStackSize": 1,
 			"name": "Well I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-well-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -19252,12 +19228,23 @@
 				"asset:producer:windmill-t1"
 			],
 			"description": "Mills grain into flour.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:windmill-t1",
+							"name": "Owns Windmill I"
+						}
+					],
+					"id": "effect:grant-owned:producer-windmill-t1",
+					"name": "Owned Windmill I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Windmill I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-windmill-t1"
-			],
 			"producer": {
 				"lines": [
 					{
@@ -19321,12 +19308,23 @@
 				"asset:producer:winery-t1"
 			],
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:winery-t1",
+							"name": "Owns Winery I"
+						}
+					],
+					"id": "effect:grant-owned:producer-winery-t1",
+					"name": "Owned Winery I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
 			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Winery I",
-			"passiveEffectIds": [
-				"effect:grant-owned:producer-winery-t1"
-			],
 			"producer": {
 				"lines": [
 					{

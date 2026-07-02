@@ -7,27 +7,21 @@ describe("effect expectations", () => {
 	it("effect sources only publish global grant facts", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:grant": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:available",
-							name: "Available",
-						},
-					],
-					name: "Availability Grant",
-					sourceScope: "both",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						"effect:test:grant",
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:grant",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:available",
+								name: "Available",
+							},
+						],
+						name: "Availability Grant",
+						sourceScope: "both",
+					},
+				],
 			},
 			startingState: {
 				...baseConfig.startingState,

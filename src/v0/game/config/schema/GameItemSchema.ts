@@ -9,6 +9,7 @@ import {
 	NonNegativeIntegerSchema,
 	PositiveIntegerSchema,
 } from "~/v0/game/config/schema/GameConfigScalarSchemas";
+import { GameEffectSchema } from "~/v0/game/config/schema/GameEffectSchema";
 import { MergeRuleSchema } from "~/v0/game/config/schema/GameMergeRuleSchema";
 import { ProducerFragmentSchema, ProducerSchema } from "~/v0/game/config/schema/GameProducerSchema";
 import { RemoveBySchema } from "~/v0/game/config/schema/GameRemoveBySchema";
@@ -25,7 +26,7 @@ export const ItemSchema = z
 		description: z.string(),
 		label: z.string().optional(),
 		tags: z.array(z.string().min(1)).default([]),
-		passiveEffectIds: z.array(IdSchema).optional(),
+		effects: z.array(GameEffectSchema).optional(),
 		merges: z.array(MergeRuleSchema).optional(),
 		removeBy: z.array(RemoveBySchema).optional(),
 		craft: CraftRecipeSchema.optional(),

@@ -1,9 +1,12 @@
+import type { GameEffect } from "~/v0/game/config/readGameConfigEffects";
+
 export interface GameEffectSourceInstance {
-	startAtMs: number;
+	effect: GameEffect;
 	effectId: string;
 	kind: "active" | "passive";
-	sourceId: string;
 	sourceCreatedAtMs?: number;
+	sourceId: string;
 	sourceItemInstanceId: string;
 	sourceLocation: "board" | "inventory";
+	startAtMs: number;
 }

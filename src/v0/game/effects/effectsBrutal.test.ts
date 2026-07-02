@@ -6,17 +6,20 @@ describe("output-owned producer effect runtime guards", () => {
 	it("rejects producer starts through output-owned grant requirements", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:missing": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:missing",
-							name: "Missing",
-						},
-					],
-					name: "Missing Grant",
-				},
+			itemEffects: {
+				"item:empty-stash": [
+					{
+						id: "effect:test:missing",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:missing",
+								name: "Missing",
+							},
+						],
+						name: "Missing Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {

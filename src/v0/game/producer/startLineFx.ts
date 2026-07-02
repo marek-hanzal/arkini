@@ -144,9 +144,9 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 	});
 	const readyAtMs = jobTiming.readyAtMs;
 
-	const activatedEffect = checked.line.activatesEffectId
+	const activatedEffect = checked.line.effect
 		? {
-				effectId: checked.line.activatesEffectId,
+				effectId: checked.line.effect.id,
 				endAtMs: readyAtMs,
 				id: yield* createGameActiveEffectIdFx(),
 				producerJobId: jobId,

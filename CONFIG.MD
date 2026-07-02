@@ -15,12 +15,11 @@ Canonical game config keys:
   "resources": {},
   "assets": {},
   "items": {},
-  "effects": {},
   "startingState": { "board": [], "inventory": [] }
 }
 ```
 
-There are no top-level line, stash, merge, or craft registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, and `removeBy`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
+The authored Arkini package is intentionally small at the root: `game.json` owns version, game metadata, starting state, asset overrides, and global utility items; `era-I.json`, `era-II.json`, and the later era files own era gameplay items. There are no top-level line, stash, merge, craft, or effect registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, `removeBy`, and grant-publishing `effects`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
 
 ## Items
 
@@ -33,13 +32,21 @@ Items define physical tiles/stacks. Source items omit identity fields that can b
   "tier": 1,
   "tags": ["building", "wood"],
   "maxStackSize": 1,
-  "passiveEffectIds": ["effect:path-engineers-lock"],
+  "effects": [
+    {
+      "id": "effect:path-engineers-lock",
+      "name": "Engineers path lock",
+      "polarity": "neutral",
+      "sourceScope": "both",
+      "grants": [{ "id": "grant:path:engineers-lock", "name": "Engineers path locked" }]
+    }
+  ],
   "maxCount": 1,
   "label": "1"
 }
 ```
 
-The compiler derives `assetIds` as `["asset:<itemId>"]` and synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. Asset definitions do not carry a `kind` field; the asset id/resource id already describe the render resource, and item ownership is validated through `items.*.assetIds`. Multi-asset craft/blueprint items select an asset by delivered input progress, split evenly across the ordered asset list. Item `code` no longer exists; the item id is the single stable identity. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap for the final item, and craft source items such as blueprints inherit that target cap during producer output and job reservation checks. Use an informational `unique` tag on intentionally single-copy content when that helps humans read the config; the cap itself still comes from `maxCount`. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, craft, merge, and removal capabilities are embedded directly on the owning item. The item is the authoring unit: take the item and you have the behavior it owns, without asking a second registry for permission like a tiny JSON bureaucrat.
+The compiler derives `assetIds` as `["asset:<itemId>"]` and synthesizes conventional item assets; `game.json` only carries asset overrides such as intentional resource reuse. Asset definitions do not carry a `kind` field; the asset id/resource id already describe the render resource, and item ownership is validated through `items.*.assetIds`. Multi-asset craft/blueprint items select an asset by delivered input progress, split evenly across the ordered asset list. Item `code` no longer exists; the item id is the single stable identity. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap for the final item, and craft source items such as blueprints inherit that target cap during producer output and job reservation checks. Use an informational `unique` tag on intentionally single-copy content when that helps humans read the config; the cap itself still comes from `maxCount`. `effects` on an item make that item a grant source according to each effect's `sourceScope`. Producer, stash, craft, merge, effects, and removal capabilities are embedded directly on the owning item. The item is the authoring unit: take the item and you have the behavior it owns, without asking a second registry for permission like a tiny JSON bureaucrat.
 
 ## Lines
 
@@ -73,7 +80,7 @@ A producer capability lives directly on the producer item. The concrete board in
 
 `maxQueueSize` defaults to `1`. Producer shells do not own gates; line availability is resolved through Effect grants and output-owned rules. Lines may define `chargeCost`; if omitted, the line costs no charges. There is no top-level product registry and no `type: "producer"` field, because the item capability already says what the thing is. Humans, tragically, can infer this too.
 
-`name` may be omitted when the line name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free lines. `output` may be omitted for delayed sink/destructor lines. Producer output gates, visibility, availability, duration modifiers, and loot chance modifiers live directly on the affected `output` entry. The root line does not own producer-facing `effects`; the concrete output that is changed owns the rule, because apparently JSON also deserves accountability. Lines that define `activatesEffectId` must not define item output, because their output is runtime influence. For blueprint-output lines, inputs should represent lightweight plan acquisition, research, survey evidence, or paperwork. Do not duplicate the same construction materials/labor inputs that the blueprint craft recipe will consume later; validation tests treat repeated blueprint planning/build costs as a balance bug.
+`name` may be omitted when the line name is the same as the primary output item name; the compiler derives it for the compiled package. Keep `name` only for action-style labels such as trade, prospecting, expeditions, inspired variants, or blueprint wording that differs from the item name. `placement` defaults to `board_then_inventory`. `inputs` may be omitted for free lines. `output` may be omitted for delayed sink/destructor lines. Producer output gates, visibility, availability, duration modifiers, and loot chance modifiers live directly on the affected `output` entry. The root line does not own producer-facing `effects`; the concrete output that is changed owns the rule, because apparently JSON also deserves accountability. Lines that define an embedded `effect` must not define item output, because their output is runtime influence. For blueprint-output lines, inputs should represent lightweight plan acquisition, research, survey evidence, or paperwork. Do not duplicate the same construction materials/labor inputs that the blueprint craft recipe will consume later; validation tests treat repeated blueprint planning/build costs as a balance bug.
 
 Line input `quantity` defaults to `1`. Missing input `mode` means `exact`: the line needs and consumes exactly `quantity` items for each run. `mode: "upTo"` changes `quantity` into the per-run maximum: the line can start with at least one stored/selected input and consumes `1..quantity` for the same fixed output. Use this for sink/cleanup lines such as a purifier that can absorb up to four pollution tiles per activation without scaling the output. `capacity` still means how many items may be parked on that line input slot.
 
@@ -173,27 +180,45 @@ Merge rules live on the source item in `items.*.merges`. They are explicit and d
 
 ## Effects
 
-Effect definitions are deliberately boring now: an effect only publishes one or more global grants while its source exists. The source is an item/building with `passiveEffectIds`, or a timed active line with `activatesEffectId`. Each effect must declare `polarity`: `buff`, `debuff`, `neutral`, or `mixed`. Runtime logic does not infer meaning from math or labels; UI groups effects by this explicit authoring truth, because guessing intent from JSON is how software gets haunted. The effect definition also decides where passive item sources count through `sourceScope`: `board`, `inventory`, or `both`; omitted means board-only. Each grant has a stable `id` used by runtime selectors and a player-readable `name` used by detail UI, so UI must not print raw grant ids in player-facing surfaces.
+Effect definitions are embedded where their source lives. Passive grant sources use `items.*.effects`; timed active grant sources use `items.*.producer.lines.*.effect` or `items.*.stash.line.effect`. There is no top-level `effects` registry and no id-ref hop between the source and the grant definition. Each effect must declare `id`, `name`, `polarity`, and at least one `{ "id", "name" }` grant. `sourceScope` is `board`, `inventory`, or `both`; omitted means board-only. Runtime logic does not infer meaning from math or labels; UI groups effects by this explicit authoring truth, because guessing intent from JSON is how software gets haunted.
 
 ```json
 {
-  "effects": {
-    "effect:path:engineers": {
-      "name": "Engineers path",
-      "polarity": "neutral",
-      "sourceScope": "both",
-      "grants": [{ "id": "grant:path:engineers", "name": "Engineers path chosen" }]
-    }
-  },
   "items": {
     "producer:house-of-engineers": {
-      "passiveEffectIds": ["effect:path:engineers"]
+      "effects": [
+        {
+          "id": "effect:path:engineers",
+          "name": "Engineers path",
+          "polarity": "neutral",
+          "sourceScope": "both",
+          "grants": [{ "id": "grant:path:engineers", "name": "Engineers path chosen" }]
+        }
+      ]
+    },
+    "producer:shrine-t1": {
+      "producer": {
+        "lines": [
+          {
+            "id": "line:shrine-t1:minor-haste",
+            "name": "Minor Haste",
+            "durationMs": 30000,
+            "effect": {
+              "id": "effect:shrine-minor-haste",
+              "name": "Minor Haste",
+              "polarity": "buff",
+              "sourceScope": "both",
+              "grants": [{ "id": "grant:active:shrine-minor-haste", "name": "Minor Haste active" }]
+            }
+          }
+        ]
+      }
     }
   }
 }
 ```
 
-Effects do not contain operations, targets, line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Centralized grants are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
+Effects do not contain operations, targets, line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Grant-publishing effects are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
 
 Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each source ref is `{ "id": "..." }`, `{ "ids": ["..."] }`, or `{ "tag": "..." }`. Compile expands tags into deterministic runtime `{ "ids": [...] }` clauses.
 

@@ -8,7 +8,7 @@ export type GameConfigAuditWarning = {
 	section: string;
 };
 
-type RecordName = "resources" | "assets" | "items" | "effects";
+type RecordName = "resources" | "assets" | "items";
 type UsageIndex = Record<RecordName, Set<string>>;
 
 type ItemFlowIndex = {
@@ -57,7 +57,6 @@ const createUsageIndex = (): UsageIndex => ({
 	resources: new Set(),
 	assets: new Set(),
 	items: new Set(),
-	effects: new Set(),
 });
 
 const createItemFlowIndex = (): ItemFlowIndex => ({
@@ -96,8 +95,7 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const assetId of item.assetIds) usage.assets.add(assetId);
 
-		for (const effectId of item.passiveEffectIds ?? []) {
-			usage.effects.add(effectId);
+		if ((item.effects ?? []).length > 0) {
 			itemFlow.consumedItemIds.add(itemId);
 		}
 
@@ -148,7 +146,6 @@ const collectLineUsage = (
 		usage.items.add(input.itemId);
 		itemFlow.consumedItemIds.add(input.itemId);
 	}
-	if (line.activatesEffectId) usage.effects.add(line.activatesEffectId);
 	if (line.output) {
 		collectLootOutputUsage(line.output, itemFlow);
 		collectLootOutputEffectUsage(line.output, config, usage);
@@ -201,14 +198,10 @@ const doesResolvedSelectorMatchId = (
 
 const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const item of Object.values(config.items)) {
-		for (const effectId of item.passiveEffectIds ?? []) usage.effects.add(effectId);
 		for (const line of item.producer?.lines ?? []) {
-			if (line.activatesEffectId) usage.effects.add(line.activatesEffectId);
 			collectActivationOutputEffectUsage(line.output ?? [], config, usage, itemFlow);
 		}
 		if (item.stash?.line) {
-			if (item.stash.line.activatesEffectId)
-				usage.effects.add(item.stash.line.activatesEffectId);
 			collectActivationOutputEffectUsage(
 				item.stash.line.output ?? [],
 				config,
@@ -327,7 +320,6 @@ const readUnusedDefinitionWarnings = (
 ): GameConfigAuditWarning[] => [
 	...readUnusedRecordWarnings("resources", config.resources, usage.resources),
 	...readUnusedRecordWarnings("assets", config.assets, usage.assets),
-	...readUnusedRecordWarnings("effects", config.effects, usage.effects),
 ];
 
 const readTerminalItemWarnings = (

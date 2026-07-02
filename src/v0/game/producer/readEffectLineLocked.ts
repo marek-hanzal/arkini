@@ -26,7 +26,7 @@ export const readEffectLineLocked = ({
 				config,
 				producerId: producerItem.itemId,
 				lineId,
-			})?.activatesEffectId
+			})?.effect?.id
 		: undefined;
 	if (!effectId) return false;
 

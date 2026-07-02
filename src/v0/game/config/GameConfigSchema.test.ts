@@ -113,7 +113,6 @@ const createValidConfigValue = () => ({
 			tier: 0,
 		},
 	},
-	effects: {} as Record<string, unknown>,
 	startingState: {
 		board: [
 			{
@@ -150,6 +149,34 @@ const readTestCraft = (config: any, itemId: string) => {
 	const craft = config.items[itemId]?.craft;
 	if (!craft) throw new Error(`Missing craft recipe on "${itemId}".`);
 	return craft;
+};
+
+const createTestEffect = ({
+	effectId = "effect:test",
+	grantId = "grant:test",
+	polarity = "neutral",
+}: {
+	effectId?: string;
+	grantId?: string;
+	polarity?: "buff" | "debuff" | "mixed" | "neutral";
+} = {}) => ({
+	grants: [
+		{
+			id: grantId,
+			name: "Test Grant",
+		},
+	],
+	id: effectId,
+	name: "Test Effect",
+	polarity,
+	sourceScope: "both" as const,
+});
+
+const addTestGrantSource = (config: any, props?: Parameters<typeof createTestEffect>[0]) => {
+	config.items["item:twig"].effects = [
+		...((config.items["item:twig"].effects ?? []) as unknown[]),
+		createTestEffect(props),
+	];
 };
 
 const setTestCraft = (config: any, itemId: string, craft: unknown) => {
@@ -189,7 +216,7 @@ const appendTestLine = (config: any, itemId: string, line: unknown) => {
 	if (!item?.producer) {
 		throw new Error(`Missing producer capability on "${itemId}".`);
 	}
-	item.lines.push(line);
+	item.producer.lines.push(line);
 };
 
 const setItemStorage = (
@@ -388,44 +415,45 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Duplicate craft input item/);
 	});
 
-	it("rejects product active effect refs that point at missing effects", () => {
+	it("rejects active line effects without explicit polarity", () => {
 		const config = createValidConfigValue();
-		readTestLine(config, "line:test").activatesEffectId = "effect:ghost";
+		readTestLine(config, "line:test").effect = {
+			grants: [
+				{
+					id: "grant:test",
+					name: "Test",
+				},
+			],
+			id: "effect:test",
+			name: "Test Grant",
+		};
 
-		expect(() => parseGameConfig(config)).toThrow(/Missing effect/);
+		expect(() => parseGameConfig(config)).toThrow(/polarity/);
 	});
 
-	it("rejects effects without explicit polarity", () => {
-		const config = createValidConfigValue();
-		config.effects = {
-			"effect:test": {
+	it("rejects item effects without explicit polarity", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:twig"].effects = [
+			{
 				grants: [
 					{
 						id: "grant:test",
 						name: "Test",
 					},
 				],
+				id: "effect:test",
 				name: "Test Grant",
 			},
-		};
+		];
 
 		expect(() => parseGameConfig(config)).toThrow(/polarity/);
 	});
 
 	it("rejects malformed output-owned extra output chance effects", () => {
 		const config: any = createValidConfigValue();
-		config.effects = {
-			"effect:test": {
-				polarity: "buff",
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test",
-					},
-				],
-				name: "Test Grant",
-			},
-		};
+		addTestGrantSource(config, {
+			polarity: "buff",
+		});
 		readTestLine(config, "line:test").output[0].effects = [
 			{
 				chance: 0.5,
@@ -459,18 +487,9 @@ describe("GameConfigSchema", () => {
 
 	it("rejects output-owned modifier effects that would be runtime no-ops", () => {
 		const config: any = createValidConfigValue();
-		config.effects = {
-			"effect:test": {
-				polarity: "buff",
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test",
-					},
-				],
-				name: "Test Grant",
-			},
-		};
+		addTestGrantSource(config, {
+			polarity: "buff",
+		});
 		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "whenActive",
@@ -518,18 +537,9 @@ describe("GameConfigSchema", () => {
 
 	it("rejects zero-chance drop-owned extra output effects", () => {
 		const config: any = createValidConfigValue();
-		config.effects = {
-			"effect:test": {
-				polarity: "buff",
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test",
-					},
-				],
-				name: "Test Grant",
-			},
-		};
+		addTestGrantSource(config, {
+			polarity: "buff",
+		});
 		readTestLine(config, "line:test").output[0].effects = [
 			{
 				chance: 0,
@@ -604,18 +614,9 @@ describe("GameConfigSchema", () => {
 
 	it("rejects craft visibility requirements because craft targets have no line visibility", () => {
 		const config: any = createValidConfigValue();
-		config.effects = {
-			"effect:test": {
-				polarity: "neutral",
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test",
-					},
-				],
-				name: "Test Grant",
-			},
-		};
+		addTestGrantSource(config, {
+			polarity: "neutral",
+		});
 		readTestCraft(config, "item:craft-target").effects = [
 			{
 				display: "never",
@@ -968,23 +969,11 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Soft-lock risk.*producer:a.*item:b-part/s);
 	});
 
-	it("rejects progression grant requirements that no item or product can provide", () => {
+	it("rejects progression grant requirements that no item or line can provide", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:producer"].tags = [
 			"producer",
 		];
-		config.effects = {
-			"effect:test": {
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test Grant",
-					},
-				],
-				name: "Test Effect",
-				polarity: "neutral",
-			},
-		};
 		readTestLine(config, "line:test").output[0].effects = [
 			{
 				display: "whenMissing",
@@ -1010,20 +999,9 @@ describe("GameConfigSchema", () => {
 		config.items["item:producer"].tags = [
 			"producer",
 		];
-		config.effects = {
-			"effect:test": {
-				grants: [
-					{
-						id: "grant:test",
-						name: "Test Grant",
-					},
-				],
-				name: "Test Effect",
-				polarity: "neutral",
-			},
-		};
-		config.items["item:twig"].passiveEffectIds = [
-			"effect:test",
+		addTestGrantSource(config);
+		config.items["item:twig"].effects = [
+			createTestEffect(),
 		];
 		readTestLine(config, "line:test").output[0].effects = [
 			{

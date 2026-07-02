@@ -1,3 +1,4 @@
+import type { GameEffect } from "~/v0/game/config/readGameConfigEffects";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 type WorldActiveEffectStatus =
@@ -10,6 +11,7 @@ type WorldActiveEffectStatus =
 	| "scheduled";
 
 export interface WorldActiveEffectFacts {
+	definition?: GameEffect;
 	effect: GameSave["activeEffects"][string];
 	producerJobId?: string;
 	sourceLocation?: "board" | "inventory";

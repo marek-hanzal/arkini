@@ -5,20 +5,19 @@ import {
 	GameEffectSourceScopeSchema,
 } from "~/v0/game/config/schema/GameLineEffectSchema";
 
-export const GameEffectGrantDefinitionSchema = z
+export const GameEffectGrantSchema = z
 	.object({
 		id: IdSchema,
 		name: z.string().min(1),
 	})
 	.strict();
 
-export const GameEffectDefinitionSchema = z
+export const GameEffectSchema = z
 	.object({
+		id: IdSchema,
 		name: z.string().min(1),
 		polarity: GameEffectPolaritySchema,
-		grants: z.array(GameEffectGrantDefinitionSchema).min(1),
+		grants: z.array(GameEffectGrantSchema).min(1),
 		sourceScope: GameEffectSourceScopeSchema.optional(),
 	})
 	.strict();
-
-export const GameEffectAuthoringDefinitionSchema = GameEffectDefinitionSchema;

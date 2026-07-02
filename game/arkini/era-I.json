@@ -1,0 +1,1242 @@
+{
+	"items": {
+		"item:blueprint-lumberjack-t1": {
+			"craft": {
+				"durationMs": 8000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
+			"name": "Lumberjack I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
+		"item:blueprint-quarry-t1": {
+			"craft": {
+				"durationMs": 9000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Quarry I.",
+			"name": "Quarry I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
+		"item:blueprint-sawmill-t1": {
+			"craft": {
+				"durationMs": 12000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Sawmill I.",
+			"name": "Sawmill I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
+		"item:blueprint-stonemason-t1": {
+			"craft": {
+				"durationMs": 12000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Stonemason I.",
+			"name": "Stonemason I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
+		"item:blueprint-townhall-t2": {
+			"craft": {
+				"durationMs": 30000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:lumberjack-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:quarry-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:sawmill-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:well-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:townhall-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Town Hall II.",
+			"name": "Town Hall II Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
+		"item:blueprint-well-t1": {
+			"craft": {
+				"durationMs": 9000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Well I.",
+			"name": "Well I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
+		"item:double-tree": {
+			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls. Harvesting it with a single-use axe removes the source and drops logs.",
+			"maxStackSize": 1,
+			"name": "Double Tree",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"max": 2,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t2",
+				"era:I"
+			],
+			"tier": 2
+		},
+		"item:log": {
+			"description": "Basic wood material produced by lumberjacks.",
+			"maxStackSize": 50,
+			"name": "Log",
+			"tags": [
+				"material",
+				"wood",
+				"era:I",
+				"tier-1-resource"
+			]
+		},
+		"item:micro-forest": {
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it. Harvesting it with a single-use axe removes the source and drops logs.",
+			"maxStackSize": 1,
+			"name": "Micro-Forest",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"max": 3,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t3",
+				"forest",
+				"era:I"
+			],
+			"tier": 3
+		},
+		"item:plank": {
+			"description": "Processed wood material produced by sawmills.",
+			"maxStackSize": 50,
+			"name": "Plank",
+			"tags": [
+				"material",
+				"wood",
+				"era:I",
+				"tier-2-resource"
+			]
+		},
+		"item:rock": {
+			"description": "Movable stone deposit used by nearby quarries or mined manually with a single-use pickaxe.",
+			"name": "Stone Deposit",
+			"removeBy": [
+				{
+					"itemId": "item:pickaxe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:stone",
+							"quantity": {
+								"max": 4,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
+			"tags": [
+				"source",
+				"stone",
+				"era:I",
+				"stone-deposit"
+			]
+		},
+		"item:stone": {
+			"description": "Basic stone material produced by quarries.",
+			"maxStackSize": 50,
+			"name": "Stone",
+			"tags": [
+				"material",
+				"stone",
+				"era:I",
+				"tier-1-resource"
+			]
+		},
+		"item:stone-block": {
+			"description": "Processed stone material produced by stonemasons.",
+			"maxStackSize": 50,
+			"name": "Stone Block",
+			"tags": [
+				"material",
+				"stone",
+				"era:I",
+				"tier-2-resource"
+			]
+		},
+		"item:trash": {
+			"description": "Generic board waste byproduct from messy production lines. It is harmless, ugly, and should eventually be cleaned instead of hidden away.",
+			"maxStackSize": 1,
+			"name": "Trash",
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"trash",
+				"cleanup",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"item:tree": {
+			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls. Harvesting it with a single-use axe removes the source and drops logs.",
+			"name": "Tree",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": 1,
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
+			"tags": [
+				"source",
+				"wood",
+				"era:I",
+				"wood-source",
+				"tree",
+				"tree:t1"
+			],
+			"tier": 1
+		},
+		"item:water": {
+			"description": "Basic water resource produced by wells and consumed by farms.",
+			"maxStackSize": 50,
+			"merges": [
+				{
+					"resultItemId": "item:double-tree",
+					"withItemId": "item:tree"
+				},
+				{
+					"resultItemId": "item:micro-forest",
+					"withItemId": "item:double-tree"
+				}
+			],
+			"name": "Water",
+			"tags": [
+				"material",
+				"food",
+				"water",
+				"era:I",
+				"tier-1-resource"
+			]
+		},
+		"producer:lumberjack-t1": {
+			"description": "Produces logs when placed near a tree.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:lumberjack-t1",
+							"name": "Owns Lumberjack I"
+						}
+					],
+					"id": "effect:grant-owned:producer-lumberjack-t1",
+					"name": "Owned Lumberjack I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 4,
+			"maxStackSize": 1,
+			"name": "Lumberjack I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 7000,
+						"id": "line:lumberjack-t1:log",
+						"output": [
+							{
+								"chance": 0,
+								"effects": [
+									{
+										"display": "always",
+										"kind": "nearby.loot.outputChance.add",
+										"label": "Nearby wood source drop chance",
+										"quantity": 1,
+										"radius": 2,
+										"sources": [
+											{
+												"chance": 0.5,
+												"items": {
+													"anyOf": [
+														{
+															"id": "item:tree"
+														}
+													]
+												},
+												"label": "Single Tree"
+											},
+											{
+												"chance": 0.65,
+												"items": {
+													"anyOf": [
+														{
+															"id": "item:double-tree"
+														}
+													]
+												},
+												"label": "Double Tree"
+											},
+											{
+												"chance": 0.85,
+												"items": {
+													"anyOf": [
+														{
+															"id": "item:micro-forest"
+														}
+													]
+												},
+												"label": "Micro-Forest"
+											}
+										]
+									},
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"tag": "wood-source"
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby wood source",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 2,
+												"minDistance": 0,
+												"multiplier": 0.9
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"tag": "wood-source"
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Nearby wood source enables production",
+										"maxSources": 5,
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:log",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"wood",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:quarry-t1": {
+			"description": "Produces stone when placed near a rock.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:quarry-t1",
+							"name": "Owns Quarry I"
+						}
+					],
+					"id": "effect:grant-owned:producer-quarry-t1",
+					"name": "Owned Quarry I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 4,
+			"maxStackSize": 1,
+			"name": "Quarry I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 8000,
+						"id": "line:quarry-t1:stone",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:rock"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:rock",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:stone",
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.4,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:rock"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:rock",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone",
+								"type": "chance"
+							},
+							{
+								"chance": 0.15,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:rock"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:rock",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"stone",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:sawmill-t1": {
+			"description": "Turns logs into planks when placed near a lumberjack.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sawmill-t1",
+							"name": "Owns Sawmill I"
+						}
+					],
+					"id": "effect:grant-owned:producer-sawmill-t1",
+					"name": "Owned Sawmill I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Sawmill I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:sawmill-t1:plank",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:lumberjack-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:lumberjack-t1",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:plank",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.25,
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:lumberjack-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:lumberjack-t1",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:plank",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"wood",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:shrine-t1": {
+			"assetIds": [
+				"asset:producer:shrine-t1"
+			],
+			"description": "A small roadside shrine that turns simple offerings into temporary production blessings.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Wayside Shrine",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 300000,
+						"effect": {
+							"grants": [
+								{
+									"id": "grant:active:shrine-minor-haste",
+									"name": "Minor Haste active"
+								}
+							],
+							"id": "effect:shrine-minor-haste",
+							"name": "Minor Haste",
+							"polarity": "buff",
+							"sourceScope": "board"
+						},
+						"id": "line:shrine-t1:minor-haste",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Minor Haste",
+						"tags": [
+							"shrine:effect"
+						]
+					},
+					{
+						"durationMs": 180000,
+						"effect": {
+							"grants": [
+								{
+									"id": "grant:active:shrine-bountiful-offering",
+									"name": "Bountiful Offering active"
+								}
+							],
+							"id": "effect:shrine-bountiful-offering",
+							"name": "Bountiful Offering",
+							"polarity": "buff",
+							"sourceScope": "board"
+						},
+						"id": "line:shrine-t1:bountiful-offering",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:stone"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"name": "Bountiful Offering",
+						"tags": [
+							"shrine:effect"
+						]
+					}
+				],
+				"maxQueueSize": 2
+			},
+			"tags": [
+				"building",
+				"producer",
+				"shrine",
+				"effect-source",
+				"unique",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:stonemason-t1": {
+			"description": "Turns stone into stone blocks when placed near a quarry.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:stonemason-t1",
+							"name": "Owns Stonemason I"
+						}
+					],
+					"id": "effect:grant-owned:producer-stonemason-t1",
+					"name": "Owned Stonemason I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 3,
+			"maxStackSize": 1,
+			"name": "Stonemason I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 12000,
+						"id": "line:stonemason-t1:stone-block",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:stone",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:quarry-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:quarry-t1",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:stone-block",
+								"type": "guaranteed"
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"stone",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:townhall-t1": {
+			"description": "Starter civic hub that issues basic settlement blueprints.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-lumberjack-t1",
+						"name": "Blueprint: Lumberjack I",
+						"output": [
+							{
+								"itemId": "item:blueprint-lumberjack-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-sawmill-t1",
+						"name": "Blueprint: Sawmill I",
+						"output": [
+							{
+								"itemId": "item:blueprint-sawmill-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-quarry-t1",
+						"name": "Blueprint: Quarry I",
+						"output": [
+							{
+								"itemId": "item:blueprint-quarry-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-stonemason-t1",
+						"name": "Blueprint: Stonemason I",
+						"output": [
+							{
+								"itemId": "item:blueprint-stonemason-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-well-t1",
+						"name": "Blueprint: Well I",
+						"output": [
+							{
+								"itemId": "item:blueprint-well-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-library-t1",
+						"name": "Blueprint: Library I",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 60000,
+						"id": "line:townhall-t1:blueprint-townhall-t2",
+						"name": "Blueprint: Town Hall II",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-townhall-t2",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:I"
+			],
+			"tier": 1
+		},
+		"producer:well-t1": {
+			"description": "Produces water.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:well-t1",
+							"name": "Owns Well I"
+						}
+					],
+					"id": "effect:grant-owned:producer-well-t1",
+					"name": "Owned Well I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 4,
+			"maxStackSize": 1,
+			"name": "Well I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 5000,
+						"id": "line:well-t1:water",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:water",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.5,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:water",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"water",
+				"era:I"
+			],
+			"tier": 1
+		}
+	}
+}

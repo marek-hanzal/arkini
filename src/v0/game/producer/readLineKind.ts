@@ -9,4 +9,4 @@ export namespace readLineKind {
 }
 
 export const readLineKind = ({ line }: readLineKind.Props): LineKind =>
-	line.activatesEffectId ? "effect" : "product";
+	line.effect ? "effect" : "product";

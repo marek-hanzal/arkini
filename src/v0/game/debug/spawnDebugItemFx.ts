@@ -97,7 +97,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 
 			const itemInstanceId = yield* createGameItemInstanceIdFx();
 			nextSave.board.items[itemInstanceId] = {
-				...(item.passiveEffectIds?.length
+				...(item.effects?.length
 					? {
 							createdAtMs: nowMs,
 						}
@@ -121,7 +121,7 @@ export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
 		}
 	} else {
 		const placed = yield* placeGameSaveInventoryRemainderFx({
-			createdAtMs: item.passiveEffectIds?.length ? nowMs : undefined,
+			createdAtMs: item.effects?.length ? nowMs : undefined,
 			events,
 			item: {
 				itemId: spawnAction.itemId,

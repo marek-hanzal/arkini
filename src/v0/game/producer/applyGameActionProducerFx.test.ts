@@ -67,29 +67,21 @@ const readOwnedTwigGrantConfig = (
 	const grantId = "grant:test:owned-twig";
 	const effectId = "effect:test:owned-twig-grant";
 	return {
-		effects: {
-			...baseConfig.effects,
-			[effectId]: {
-				polarity: "neutral" as const,
-				grants: [
-					{
-						id: grantId,
-						name: "Test grant",
-					},
-				],
-				name: "Owned Twig Grant",
-				sourceScope: "both" as const,
-			},
-		},
-		items: {
-			...baseConfig.items,
-			"item:twig": {
-				...baseConfig.items["item:twig"],
-				passiveEffectIds: [
-					...(baseConfig.items["item:twig"].passiveEffectIds ?? []),
-					effectId,
-				],
-			},
+		itemEffects: {
+			"item:twig": [
+				{
+					id: effectId,
+					polarity: "neutral" as const,
+					grants: [
+						{
+							id: grantId,
+							name: "Test grant",
+						},
+					],
+					name: "Owned Twig Grant",
+					sourceScope: "both" as const,
+				},
+			],
 		},
 		lineOverrides: {
 			...Object.fromEntries(
@@ -194,27 +186,21 @@ describe("applyGameActionFx Producer", () => {
 	it("rejects products whose only output is blocked before planning or consuming inputs", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:block": {
-					grants: [
-						{
-							id: "grant:test:block",
-							name: "Block grant",
-						},
-					],
-					name: "Block Grant",
-					polarity: "debuff",
-					sourceScope: "inventory",
-				},
-			},
-			items: {
-				...baseConfig.items,
-				"item:axe": {
-					...baseConfig.items["item:axe"],
-					passiveEffectIds: [
-						"effect:test:block",
-					],
-				},
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:block",
+						grants: [
+							{
+								id: "grant:test:block",
+								name: "Block grant",
+							},
+						],
+						name: "Block Grant",
+						polarity: "debuff",
+						sourceScope: "inventory",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:shred": appendFirstOutputEffects(baseConfig.lineCatalog["line:shred"], [
@@ -273,17 +259,20 @@ describe("applyGameActionFx Producer", () => {
 	it("rejects products whose visible output drops are all disabled by drop-owned effects", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
-			effects: {
-				"effect:test:unlock": {
-					polarity: "neutral",
-					grants: [
-						{
-							id: "grant:test:unlock",
-							name: "Unlock grant",
-						},
-					],
-					name: "Unlock Grant",
-				},
+			itemEffects: {
+				"item:empty-stash": [
+					{
+						id: "effect:test:unlock",
+						polarity: "neutral",
+						grants: [
+							{
+								id: "grant:test:unlock",
+								name: "Unlock grant",
+							},
+						],
+						name: "Unlock Grant",
+					},
+				],
 			},
 			lineOverrides: {
 				"line:test": {

@@ -69,7 +69,7 @@ export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemF
 
 		const placedQuantity = Math.min(item.maxStackSize, remainingQuantity);
 		inventorySlots[slotIndex] = {
-			...(item.passiveEffectIds?.length
+			...(item.effects?.length
 				? {
 						createdAtMs: nowMs,
 					}

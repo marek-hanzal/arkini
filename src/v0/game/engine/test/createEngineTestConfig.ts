@@ -1,4 +1,5 @@
 import { parseGameConfig, type GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameEffect } from "~/v0/game/config/readGameConfigEffects";
 import type {
 	GameCraftRecipeDefinition,
 	GameMergeRuleDefinition,
@@ -8,7 +9,8 @@ import type {
 	GameStashDefinition,
 } from "~/v0/game/config/GameItemCapabilities";
 
-type LineOverride = Partial<GameLineDefinition> & {
+type LineOverride = Omit<Partial<GameLineDefinition>, "effect"> & {
+	effect?: GameLineDefinition["effect"];
 	id?: string;
 };
 
@@ -30,6 +32,7 @@ type TestConfigCatalogs = {
 type EngineTestGameConfigOverrides = Omit<Partial<GameConfig>, "items"> & {
 	craftOverrides?: Record<string, GameCraftRecipeDefinition>;
 	items?: Record<string, unknown>;
+	itemEffects?: Record<string, readonly GameEffect[]>;
 	lineOverrides?: Record<string, LineOverride>;
 	producerOverrides?: Record<string, ProducerCapabilityOverride>;
 	stashOverrides?: Record<string, StashCapabilityOverride>;
@@ -37,7 +40,6 @@ type EngineTestGameConfigOverrides = Omit<Partial<GameConfig>, "items"> & {
 
 type DraftGameConfig = {
 	assets: Record<string, unknown>;
-	effects: Record<string, unknown>;
 	game: unknown;
 	items: Record<string, unknown>;
 	resources: Record<string, unknown>;
@@ -73,6 +75,7 @@ export const readEngineTestCraft = (
 const createEmbeddedTestConfig = (overrides: EngineTestGameConfigOverrides): unknown => {
 	const {
 		craftOverrides,
+		itemEffects,
 		lineOverrides,
 		producerOverrides,
 		stashOverrides,
@@ -95,10 +98,6 @@ const createEmbeddedTestConfig = (overrides: EngineTestGameConfigOverrides): unk
 			...base.resources,
 			...(embeddedOverrides.resources ?? {}),
 		},
-		effects: {
-			...base.effects,
-			...(embeddedOverrides.effects ?? {}),
-		},
 		startingState: embeddedOverrides.startingState ?? base.startingState,
 	};
 
@@ -113,6 +112,10 @@ const createEmbeddedTestConfig = (overrides: EngineTestGameConfigOverrides): unk
 	applyLineOverrides({
 		draft,
 		overrides: lineOverrides,
+	});
+	applyItemEffects({
+		draft,
+		effectsByItemId: itemEffects,
 	});
 	applyCraftOverrides({
 		draft,
@@ -321,7 +324,6 @@ const createBaseEmbeddedConfig = () => ({
 			tier: 0,
 		},
 	},
-	effects: {},
 	startingState: {
 		board: [
 			{
@@ -360,6 +362,32 @@ const mergeDraftItems = ({
 				: overrideItem;
 	}
 	return items;
+};
+
+const applyItemEffects = ({
+	draft,
+	effectsByItemId,
+}: {
+	draft: DraftGameConfig;
+	effectsByItemId?: Record<string, readonly GameEffect[]>;
+}) => {
+	for (const [itemId, effects] of Object.entries(effectsByItemId ?? {})) {
+		const item = readDraftItem(draft, itemId);
+		const existingEffects = Array.isArray(item.effects)
+			? (item.effects as readonly GameEffect[])
+			: [];
+		const seenEffectIds = new Set(existingEffects.map((effect) => effect.id));
+		for (const effect of effects) {
+			if (seenEffectIds.has(effect.id)) {
+				throw new Error(`Duplicate test item effect "${effect.id}" on "${itemId}".`);
+			}
+			seenEffectIds.add(effect.id);
+		}
+		item.effects = [
+			...existingEffects,
+			...effects,
+		];
+	}
 };
 
 const applyProducerCapabilityOverrides = ({

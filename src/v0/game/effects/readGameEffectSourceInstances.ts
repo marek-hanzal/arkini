@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameEffect } from "~/v0/game/config/readGameConfigEffects";
 import type { GameSave, GameSaveInventorySlot } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameEffectSourceInstance } from "~/v0/game/effects/GameEffectSourceInstance";
 import { readWorldActiveEffectFacts } from "~/v0/game/world/readWorldActiveEffectFacts";
@@ -17,7 +18,7 @@ const sourceScopeIncludes = ({
 	sourceScope,
 }: {
 	location: GameEffectSourceInstance["sourceLocation"];
-	sourceScope: GameConfig["effects"][string]["sourceScope"];
+	sourceScope: GameEffect["sourceScope"];
 }) => (sourceScope ?? "board") === "both" || (sourceScope ?? "board") === location;
 
 const readPassiveBoardSources = ({
@@ -29,10 +30,8 @@ const readPassiveBoardSources = ({
 }): GameEffectSourceInstance[] =>
 	Object.values(save.board.items).flatMap((item) => {
 		const itemDefinition = config.items[item.itemId];
-		return (itemDefinition?.passiveEffectIds ?? []).flatMap((effectId) => {
-			const effect = config.effects[effectId];
+		return (itemDefinition?.effects ?? []).flatMap((effect) => {
 			if (
-				!effect ||
 				!sourceScopeIncludes({
 					location: "board",
 					sourceScope: effect.sourceScope,
@@ -43,13 +42,14 @@ const readPassiveBoardSources = ({
 
 			return [
 				{
-					startAtMs: item.createdAtMs ?? 0,
-					effectId,
+					effect,
+					effectId: effect.id,
 					kind: "passive" as const,
-					sourceId: item.id,
 					sourceCreatedAtMs: item.createdAtMs ?? 0,
+					sourceId: item.id,
 					sourceItemInstanceId: item.id,
 					sourceLocation: "board" as const,
+					startAtMs: item.createdAtMs ?? 0,
 				},
 			];
 		});
@@ -84,10 +84,8 @@ const readPassiveInventorySources = ({
 		if (!slot) return [];
 
 		const itemDefinition = config.items[slot.itemId];
-		return (itemDefinition?.passiveEffectIds ?? []).flatMap((effectId) => {
-			const effect = config.effects[effectId];
+		return (itemDefinition?.effects ?? []).flatMap((effect) => {
 			if (
-				!effect ||
 				!sourceScopeIncludes({
 					location: "inventory",
 					sourceScope: effect.sourceScope,
@@ -108,13 +106,14 @@ const readPassiveInventorySources = ({
 					});
 
 					return {
-						startAtMs: slot.createdAtMs ?? 0,
-						effectId,
+						effect,
+						effectId: effect.id,
 						kind: "passive" as const,
-						sourceId: sourceItemInstanceId,
 						sourceCreatedAtMs: slot.createdAtMs ?? 0,
+						sourceId: sourceItemInstanceId,
 						sourceItemInstanceId,
 						sourceLocation: "inventory" as const,
+						startAtMs: slot.createdAtMs ?? 0,
 					};
 				},
 			);
@@ -131,22 +130,28 @@ export const readGameEffectSourceInstances = ({
 		config,
 		nowMs,
 		save,
-	})
-		.filter(
-			(effectFacts) =>
-				effectFacts.status === "active" &&
-				(!effectFacts.effect.producerJobId ||
-					!ignoredProducerJobIds?.has(effectFacts.effect.producerJobId)),
-		)
-		.map(({ effect, sourceLocation }) => ({
-			startAtMs: effect.startAtMs,
-			effectId: effect.effectId,
-			kind: "active" as const,
-			sourceId: effect.id,
-			sourceCreatedAtMs: effect.startAtMs,
-			sourceItemInstanceId: effect.sourceItemInstanceId,
-			sourceLocation: sourceLocation ?? "board",
-		}));
+	}).flatMap(({ definition, effect, sourceLocation, status }) => {
+		if (
+			status !== "active" ||
+			!definition ||
+			(effect.producerJobId && ignoredProducerJobIds?.has(effect.producerJobId))
+		) {
+			return [];
+		}
+
+		return [
+			{
+				effect: definition,
+				effectId: definition.id,
+				kind: "active" as const,
+				sourceCreatedAtMs: effect.startAtMs,
+				sourceId: effect.id,
+				sourceItemInstanceId: effect.sourceItemInstanceId,
+				sourceLocation: sourceLocation ?? "board",
+				startAtMs: effect.startAtMs,
+			},
+		];
+	});
 
 	return [
 		...readPassiveBoardSources({
@@ -158,5 +163,5 @@ export const readGameEffectSourceInstances = ({
 			save,
 		}),
 		...activeSources,
-	].filter((source) => Boolean(config.effects[source.effectId]));
+	];
 };

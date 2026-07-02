@@ -1,0 +1,949 @@
+{
+	"items": {
+		"item:basic-knowledge": {
+			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
+			"maxStackSize": 50,
+			"name": "Basic Knowledge",
+			"tags": [
+				"knowledge",
+				"education",
+				"research",
+				"era:IV"
+			],
+			"tier": 2
+		},
+		"item:blueprint-civic-office-t1": {
+			"craft": {
+				"durationMs": 36000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:basic-knowledge"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Civic Office I.",
+			"name": "Civic Office I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"civic",
+				"permit",
+				"era:IV"
+			]
+		},
+		"item:blueprint-library-t2": {
+			"craft": {
+				"durationMs": 38000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:library-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					}
+				],
+				"resultItemId": "producer:library-t2"
+			},
+			"description": "Build plan that upgrades Library I into Library II.",
+			"name": "Library II Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"item:blueprint-market-t2": {
+			"craft": {
+				"durationMs": 36000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:civic-office-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:market-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 3
+					}
+				]
+			},
+			"description": "Build plan that can upgrade Market into Market II.",
+			"name": "Market II Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"market",
+				"trade",
+				"era:IV"
+			]
+		},
+		"item:blueprint-paper-mill-t1": {
+			"craft": {
+				"durationMs": 34000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
+			"name": "Paper Mill I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"paper",
+				"civic",
+				"era:IV"
+			]
+		},
+		"item:blueprint-prospector-guild-t1": {
+			"craft": {
+				"durationMs": 38000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 2
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
+			"label": "1",
+			"name": "Prospector Guild Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"prospecting",
+				"guild",
+				"civic",
+				"era:IV"
+			]
+		},
+		"item:blueprint-school": {
+			"craft": {
+				"durationMs": 32000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:library-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with supplies to construct a School.",
+			"name": "School Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge",
+				"era:IV"
+			]
+		},
+		"item:building-permit": {
+			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
+			"maxStackSize": 20,
+			"name": "Building Permit",
+			"tags": [
+				"resource",
+				"master",
+				"permit",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"item:paper": {
+			"description": "Processed writing material used by schools, civic offices, prospectors, and improved trade.",
+			"maxStackSize": 50,
+			"name": "Paper",
+			"tags": [
+				"resource",
+				"paper",
+				"civic",
+				"era:IV",
+				"tier-4-resource"
+			],
+			"tier": 4
+		},
+		"producer:civic-office-t1": {
+			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:civic-office-t1",
+							"name": "Owns Civic Office I"
+						}
+					],
+					"id": "effect:grant-owned:producer-civic-office-t1",
+					"name": "Owned Civic Office I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Civic Office I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 18000,
+						"id": "line:civic-office-t1:building-permit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:building-permit",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 15000,
+						"id": "line:civic-office-t1:building-permit-morale-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t2"
+							}
+						],
+						"name": "Building Permit (Inspired)",
+						"output": [
+							{
+								"itemId": "item:building-permit",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 18000,
+						"id": "line:civic-office-t1:blueprint-academy",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							}
+						],
+						"name": "Blueprint: Academy",
+						"output": [
+							{
+								"itemId": "item:blueprint-academy",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 42000,
+						"id": "line:civic-office-t1:guild-charter",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:construction-bundle"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 20,
+								"consume": true,
+								"itemId": "item:coin",
+								"quantity": 8
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:guild-charter",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"civic",
+				"permit",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:library-t2": {
+			"description": "Established library that researches and reissues blueprints up through Era IV.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t2",
+							"name": "Owns Library II"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t2",
+					"name": "Owned Library II grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Library II",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:market-t2": {
+			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Market II",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:market-t2:coin-from-paper",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 3
+							}
+						],
+						"name": "Coins from Paper",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 14000,
+						"id": "line:market-t2:coin-from-feast",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							}
+						],
+						"name": "Better Coins from Feast",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 7,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 15000,
+						"id": "line:market-t2:coin-from-common-clothing",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:common-clothing"
+							}
+						],
+						"name": "Coins from Common Clothing",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 5,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 18000,
+						"id": "line:market-t2:coin-from-luxury-clothing",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							}
+						],
+						"name": "Coins from Luxury Clothing",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 8,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"trade",
+				"market",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:paper-mill-t1": {
+			"description": "Civic workshop that turns planks and water into paper for education and permits.",
+			"maxCount": 2,
+			"maxStackSize": 1,
+			"name": "Paper Mill I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 18000,
+						"id": "line:paper-mill-t1:paper",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:plank"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.2,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:paper",
+								"quantity": 3,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"paper",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:prospector-guild-t1": {
+			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"label": "1",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Prospector Guild",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 14000,
+						"id": "line:prospector-guild-t1:clay-deposit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"name": "Prospect: Clay Deposit",
+						"output": [
+							{
+								"itemId": "item:clay-deposit",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 14000,
+						"id": "line:prospector-guild-t1:sand-deposit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"name": "Prospect: Sand Deposit",
+						"output": [
+							{
+								"itemId": "item:sand-deposit",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"prospecting",
+				"guild",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		},
+		"producer:school": {
+			"description": "Education building that turns civic support into Basic Knowledge.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "School",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 22000,
+						"id": "line:school:basic-knowledge",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:basic-knowledge",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 18000,
+						"id": "line:school:basic-knowledge-morale-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t2"
+							}
+						],
+						"name": "Basic Knowledge (Inspired)",
+						"output": [
+							{
+								"itemId": "item:basic-knowledge",
+								"quantity": 4,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"education",
+				"knowledge",
+				"unique",
+				"era:IV"
+			],
+			"tier": 2
+		},
+		"producer:townhall-t4": {
+			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall IV",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-paper-mill-t1",
+						"name": "Blueprint: Paper Mill I",
+						"output": [
+							{
+								"itemId": "item:blueprint-paper-mill-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-school",
+						"name": "Blueprint: School",
+						"output": [
+							{
+								"itemId": "item:blueprint-school",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-library-t2",
+						"name": "Blueprint: Library II",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-library-t3",
+						"name": "Blueprint: Library III",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t3",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-library-t4",
+						"name": "Blueprint: Library IV",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t4",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-civic-office-t1",
+						"name": "Blueprint: Civic Office I",
+						"output": [
+							{
+								"itemId": "item:blueprint-civic-office-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-market-t2",
+						"name": "Blueprint: Market II",
+						"output": [
+							{
+								"itemId": "item:blueprint-market-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-prospector-guild-t1",
+						"name": "Blueprint: Prospector Guild 1",
+						"output": [
+							{
+								"itemId": "item:blueprint-prospector-guild-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-tannery-t1",
+						"name": "Blueprint: Tannery I",
+						"output": [
+							{
+								"itemId": "item:blueprint-tannery-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-weaver-hut-t1",
+						"name": "Blueprint: Weaver Hut I",
+						"output": [
+							{
+								"itemId": "item:blueprint-weaver-hut-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-dye-workshop-t1",
+						"name": "Blueprint: Dye Workshop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-dye-workshop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-tailor-workshop-t1",
+						"name": "Blueprint: Tailor Workshop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-tailor-workshop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-house-t3",
+						"name": "Blueprint: House III",
+						"output": [
+							{
+								"itemId": "item:blueprint-house-t3",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		}
+	}
+}

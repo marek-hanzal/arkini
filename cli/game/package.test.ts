@@ -74,7 +74,6 @@ describe("game package normalization", () => {
 					},
 				},
 			},
-			effects: {},
 			startingState: {
 				board: [
 					{

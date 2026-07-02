@@ -47,7 +47,7 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 		}
 
 		const createdAtMs =
-			item.createdAtMs ?? (itemDefinition.passiveEffectIds?.length ? nowMs : undefined);
+			item.createdAtMs ?? (itemDefinition.effects?.length ? nowMs : undefined);
 		let remainingQuantity = item.quantity;
 		let boardPlacedQuantity = 0;
 		let boardHitMaxCount = false;

@@ -1,0 +1,54 @@
+{
+	"items": {
+		"item:clay-deposit": {
+			"description": "Movable clay source used by nearby clay pits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:clay-deposit",
+							"name": "Owns Clay Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-clay-deposit",
+					"name": "Owned Clay Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Clay Deposit",
+			"tags": [
+				"source",
+				"construction",
+				"clay",
+				"deposit",
+				"era:VI"
+			]
+		},
+		"item:sand-deposit": {
+			"description": "Movable sand source used by nearby sand pits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:sand-deposit",
+							"name": "Owns Sand Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-sand-deposit",
+					"name": "Owned Sand Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Sand Deposit",
+			"tags": [
+				"source",
+				"construction",
+				"sand",
+				"glass",
+				"era:VI"
+			]
+		}
+	}
+}

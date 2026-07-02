@@ -186,7 +186,7 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 		);
 	}
 	if (
-		line.activatesEffectId &&
+		line.effect &&
 		readEffectLineLocked({
 			config,
 			nowMs,

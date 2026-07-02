@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 
-const readProducerLine = (lineId: string) =>
+const readLine = (lineId: string) =>
 	Object.values(defaultGameConfig.items)
 		.flatMap((item) => [
 			...(item.producer?.lines ?? []),
@@ -13,7 +13,7 @@ const readProducerLine = (lineId: string) =>
 		])
 		.find((line) => line.id === lineId);
 
-const readProducerLines = () =>
+const readLines = () =>
 	Object.values(defaultGameConfig.items).flatMap((item) => [
 		...(item.producer?.lines ?? []),
 		...(item.stash
@@ -55,7 +55,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("authors work requirements directly on product outputs", () => {
-		const output = readProducerLine("line:lumberjack-t1:log")?.output?.[0];
+		const output = readLine("line:lumberjack-t1:log")?.output?.[0];
 
 		expect(output && "effects" in output ? output.effects?.[2] : undefined).toMatchObject({
 			display: "always",
@@ -101,7 +101,7 @@ describe("defaultGameConfig", () => {
 		} as const;
 
 		for (const [lineId, durationMs] of Object.entries(townHallUpgradePlanDurations)) {
-			const product = readProducerLine(lineId);
+			const product = readLine(lineId);
 
 			expect(product?.durationMs).toBe(durationMs);
 			expect(product?.tags).toContain("shrine:haste-target");
@@ -118,7 +118,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("does not ship placeholder one-second gameplay timings", () => {
-		const oneSecondLineIds = readProducerLines()
+		const oneSecondLineIds = readLines()
 			.map(
 				(product) =>
 					[
@@ -138,7 +138,7 @@ describe("defaultGameConfig", () => {
 		expect(oneSecondCraftIds).toEqual([]);
 	});
 	it("keeps blueprint planning costs separate from construction costs", () => {
-		const repeatedBlueprintCosts = readProducerLines()
+		const repeatedBlueprintCosts = readLines()
 			.map(
 				(product) =>
 					[
@@ -170,7 +170,7 @@ describe("defaultGameConfig", () => {
 
 	it("keeps feasts as construction labor cost instead of town hall plan cost", () => {
 		expect(
-			readProducerLine("line:townhall-t3:blueprint-townhall-t4")?.inputs?.map(
+			readLine("line:townhall-t3:blueprint-townhall-t4")?.inputs?.map(
 				(input) => input.itemId,
 			),
 		).not.toContain("item:feast");

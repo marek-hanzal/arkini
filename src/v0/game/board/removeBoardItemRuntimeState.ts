@@ -8,12 +8,12 @@ export const removeBoardItemRuntimeState = ({
 	save: GameSave;
 }) => {
 	delete save.producerCharges[itemInstanceId];
-	delete save.producerLines[itemInstanceId];
+	delete save.lines[itemInstanceId];
 	delete save.producerInputs[itemInstanceId];
 	delete save.craftInputs[itemInstanceId];
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
-		if (job.producerItemInstanceId === itemInstanceId) delete save.producerJobs[jobId];
+		if (job.itemInstanceId === itemInstanceId) delete save.producerJobs[jobId];
 	}
 
 	for (const [jobId, job] of Object.entries(save.craftJobs)) {

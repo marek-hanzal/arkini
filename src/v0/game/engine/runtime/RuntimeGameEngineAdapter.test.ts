@@ -70,16 +70,16 @@ describe("RuntimeGameEngineAdapter", () => {
 		const result = await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 200,
 		});
 
 		expect(result.events).toMatchObject([
 			{
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 		expect(Object.values(adapter.readSnapshot().save.producerJobs)[0]).toMatchObject({
@@ -88,7 +88,7 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 		expect(adapter.readSnapshot().nextWakeAtMs).toBe(1200);
 		expect(emitted).toEqual([
-			"producer_line.started",
+			"line.started",
 		]);
 		expect(emittedAtMs).toEqual([
 			200,
@@ -109,9 +109,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 0,
 		});
@@ -120,14 +120,14 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 
 		expect(result.events.map((event) => event.type)).toEqual([
-			"producer_line.completed",
+			"line.completed",
 			"item.created",
 			"item.created",
 		]);
 		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
 		expect(emitted).toEqual([
-			"producer_line.started",
-			"producer_line.completed",
+			"line.started",
+			"line.completed",
 			"item.created",
 			"item.created",
 		]);
@@ -184,9 +184,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 0,
 		});
@@ -203,12 +203,12 @@ describe("RuntimeGameEngineAdapter", () => {
 		});
 
 		expect(result.events.map((event) => event.type)).toEqual([
-			"producer_line.completed",
+			"line.completed",
 			"item.created",
 		]);
 		expect(updates).toEqual([
 			[
-				"producer_line.completed",
+				"line.completed",
 				"item.created",
 			],
 		]);
@@ -269,9 +269,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 0,
 		});
@@ -291,7 +291,7 @@ describe("RuntimeGameEngineAdapter", () => {
 
 		expect(updates).toEqual([
 			[
-				"producer_line.completed",
+				"line.completed",
 				"item.created",
 			],
 		]);
@@ -319,18 +319,18 @@ describe("RuntimeGameEngineAdapter", () => {
 		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 100,
 		});
 		const readiness = await adapter.readiness({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 200,
 		});
@@ -351,9 +351,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 100,
 		});
@@ -361,9 +361,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		const readiness = await adapter.readiness({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 1200,
 		});
@@ -384,9 +384,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		await sourceAdapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 0,
 		});
@@ -401,9 +401,9 @@ describe("RuntimeGameEngineAdapter", () => {
 		const readiness = await adapter.readiness({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 1500,
 		});

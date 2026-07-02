@@ -1,13 +1,13 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
-import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
-import { readProducerLineDurationMs } from "~/v0/game/producer/readProducerLineDurationMs";
+import { readEffectiveLine } from "~/v0/game/effects/readEffectiveLine";
+import { readLineDurationMs } from "~/v0/game/producer/readLineDurationMs";
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
 import { readRuntimeActivationInputView } from "~/v0/play/game-engine-bridge/readRuntimeActivationInputView";
-import { readRuntimeLootDropViewsFromEffectiveProducerLine } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromEffectiveProducerLine";
-import { readRuntimeProducerLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeProducerLineViewsFromGameSave";
+import { readRuntimeLootDropViewsFromEffectiveLine } from "~/v0/play/game-engine-bridge/readRuntimeLootDropViewsFromEffectiveLine";
+import { readRuntimeLineViewsFromGameSave } from "~/v0/play/game-engine-bridge/readRuntimeLineViewsFromGameSave";
 import { readProducerDeliveryBlocked } from "~/v0/game/producer/readProducerDeliveryBlocked";
 
 export namespace readRuntimeStashActivationViewFromGameSave {
@@ -31,18 +31,18 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	if (!stash || !lineId || !line) return undefined;
 
 	const storedInputs = save.producerInputs[boardItem.id]?.lineInputs[lineId]?.items ?? {};
-	const effectiveProducerLine = readEffectiveProducerLine({
-		baseDurationMs: readProducerLineDurationMs({
+	const effectiveLine = readEffectiveLine({
+		baseDurationMs: readLineDurationMs({
 			line,
 		}),
 		config,
 		nowMs,
-		producerItemInstanceId: boardItem.id,
+		itemInstanceId: boardItem.id,
 		line,
 		lineId,
 		save,
 	});
-	const producerLines = readRuntimeProducerLineViewsFromGameSave({
+	const lines = readRuntimeLineViewsFromGameSave({
 		config,
 		maxQueueSize: stash.maxQueueSize,
 		nowMs,
@@ -54,16 +54,16 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		targetItemInstanceId: boardItem.id,
 	});
 	const deliveryBlocked = readProducerDeliveryBlocked({
-		producerItemInstanceId: boardItem.id,
+		itemInstanceId: boardItem.id,
 		save,
 	});
-	const lineVisible = effectiveProducerLine.visible;
+	const lineVisible = effectiveLine.visible;
 
 	return {
 		deliveryBlocked,
 		drops: lineVisible
-			? readRuntimeLootDropViewsFromEffectiveProducerLine({
-					effectiveProducerLine,
+			? readRuntimeLootDropViewsFromEffectiveLine({
+					effectiveLine,
 				})
 			: undefined,
 		inputs: lineVisible
@@ -80,11 +80,11 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 				)
 			: [],
 		kind: "stash",
-		producerLines,
+		lines,
 		remainingCharges: readProducerRemainingCharges({
 			config,
 			producerId: boardItem.itemId,
-			producerItemInstanceId: boardItem.id,
+			itemInstanceId: boardItem.id,
 			save,
 		}),
 		trigger: "click",

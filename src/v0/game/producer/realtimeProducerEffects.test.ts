@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { runInitialSave } from "~/v0/game/engine/applyGameActionFx.testSupport";
-import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
+import { readEffectiveLine } from "~/v0/game/effects/readEffectiveLine";
 
-describe("realtime producer line effects", () => {
+describe("realtime line effects", () => {
 	it("computes duration from current nearby board state through output-owned rules", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
@@ -73,10 +73,10 @@ describe("realtime producer line effects", () => {
 		const line = config.lineCatalog["line:test"];
 
 		expect(
-			readEffectiveProducerLine({
+			readEffectiveLine({
 				baseDurationMs: line.durationMs,
 				config,
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				line,
 				lineId: "line:test",
 				save,

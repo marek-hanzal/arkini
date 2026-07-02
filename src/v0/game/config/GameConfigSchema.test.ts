@@ -143,7 +143,7 @@ const readTestLine = (config: any, lineId: string) => {
 		if (line) return line;
 		if (item.stash?.line?.id === lineId) return item.stash.line;
 	}
-	throw new Error(`Missing producer line "${lineId}".`);
+	throw new Error(`Missing line "${lineId}".`);
 };
 
 const readTestCraft = (config: any, itemId: string) => {
@@ -184,12 +184,12 @@ const setTestProducer = (config: any, itemId: string, producer: unknown) => {
 	};
 };
 
-const appendTestProducerLine = (config: any, itemId: string, line: unknown) => {
+const appendTestLine = (config: any, itemId: string, line: unknown) => {
 	const item = config.items[itemId];
 	if (!item?.producer) {
 		throw new Error(`Missing producer capability on "${itemId}".`);
 	}
-	item.producer.lines.push(line);
+	item.lines.push(line);
 };
 
 const setItemStorage = (
@@ -300,13 +300,13 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Unrecognized key.*assetId/);
 	});
 
-	it("rejects duplicate producer producer lines", () => {
+	it("rejects duplicate lines", () => {
 		const config = createValidConfigValue();
 		readTestProducer(config, "item:producer").lines.push({
 			...readTestLine(config, "line:test"),
 		});
 
-		expect(() => parseGameConfig(config)).toThrow(/Duplicate producer line/);
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate line/);
 	});
 
 	it("accepts same local line id under different producers", () => {
@@ -758,7 +758,7 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint B -> Blueprint A/);
 	});
 
-	it("rejects blueprint producer lines that require the building they unlock", () => {
+	it("rejects blueprint lines that require the building they unlock", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:blueprint-a"] = {
 			assetIds: [

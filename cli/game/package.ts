@@ -236,7 +236,7 @@ const normalizePackage = (value: unknown): unknown => {
 			const producer = {
 				...(item.producer as Record<string, unknown>),
 			};
-			producer.lines = normalizeProducerLines({
+			producer.lines = normalizeLines({
 				domainIndexes: productDomainIndexes,
 				items: normalizedItems,
 				lines: producer.lines,
@@ -249,7 +249,7 @@ const normalizePackage = (value: unknown): unknown => {
 			const stash = {
 				...(item.stash as Record<string, unknown>),
 			};
-			stash.line = normalizeProducerLine({
+			stash.line = normalizeLine({
 				domainIndexes: productDomainIndexes,
 				items: normalizedItems,
 				line: stash.line,
@@ -500,7 +500,7 @@ const normalizeActivationOutputEffects = ({
 	});
 };
 
-const normalizeProducerLines = ({
+const normalizeLines = ({
 	domainIndexes,
 	items,
 	lines,
@@ -515,7 +515,7 @@ const normalizeProducerLines = ({
 }) => {
 	if (!Array.isArray(lines)) return lines;
 	return lines.map((line, lineIndex) =>
-		normalizeProducerLine({
+		normalizeLine({
 			domainIndexes,
 			items,
 			line,
@@ -524,7 +524,7 @@ const normalizeProducerLines = ({
 	);
 };
 
-const normalizeProducerLine = ({
+const normalizeLine = ({
 	domainIndexes,
 	items,
 	line,

@@ -34,7 +34,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 		items: [
 			{
 				itemId: action.itemId,
-				originItemInstanceId: action.producerItemInstanceId,
+				originItemInstanceId: action.itemInstanceId,
 				quantity: checked.previousQuantity,
 				reason: "producer-input-withdraw",
 			},
@@ -56,7 +56,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 		),
 	);
 
-	const producerInputState = placement.save.producerInputs[action.producerItemInstanceId];
+	const producerInputState = placement.save.producerInputs[action.itemInstanceId];
 	const lineInputState = producerInputState?.lineInputs[action.lineId];
 	if (lineInputState) {
 		delete lineInputState.items[action.itemId];
@@ -64,7 +64,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 			delete producerInputState.lineInputs[action.lineId];
 		}
 		if (Object.keys(producerInputState.lineInputs).length === 0) {
-			delete placement.save.producerInputs[action.producerItemInstanceId];
+			delete placement.save.producerInputs[action.itemInstanceId];
 		}
 	}
 	placement.save.updatedAtMs = nowMs;
@@ -74,7 +74,7 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 			itemId: action.itemId,
 			nextQuantity: 0,
 			previousQuantity: checked.previousQuantity,
-			producerItemInstanceId: action.producerItemInstanceId,
+			itemInstanceId: action.itemInstanceId,
 			lineId: action.lineId,
 			quantity: checked.previousQuantity,
 			type: "producer_input.withdrawn",

@@ -178,7 +178,7 @@ describe("validateWorldSnapshotFx", () => {
 		});
 		save.producerJobs["job:producer"] = {
 			id: "job:producer",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -226,7 +226,7 @@ describe("validateWorldSnapshotFx", () => {
 			},
 			id: "job:broken",
 			pausedAtMs: 1000,
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			remainingMs: 500,
@@ -263,7 +263,7 @@ describe("validateWorldSnapshotFx", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:producer",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -328,9 +328,9 @@ describe("validateWorldSnapshotFx", () => {
 		await adapter.dispatch({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			nowMs: 0,
 		});

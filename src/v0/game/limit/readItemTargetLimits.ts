@@ -1,16 +1,16 @@
 import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
 import { readBoardItemCount } from "~/v0/game/board/readBoardItemCount";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import type { GameLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
-import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
-import { readProducerLineDurationMs } from "~/v0/game/producer/readProducerLineDurationMs";
+import { readEffectiveLine } from "~/v0/game/effects/readEffectiveLine";
+import { readLineDurationMs } from "~/v0/game/producer/readLineDurationMs";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
 import { readProducerJobLine } from "~/v0/game/producer/readProducerJobLine";
 
-type ActivationOutput = NonNullable<GameProducerLineDefinition["output"]>;
+type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
 type ActivationOutputEntry = ActivationOutput[number];
 
 export namespace readItemTargetLimits {
@@ -123,19 +123,19 @@ const readPendingProducerOutputQuantity = ({
 		});
 		if (!line?.output) continue;
 
-		const effectiveProducerLine = readEffectiveProducerLine({
-			baseDurationMs: readProducerLineDurationMs({
+		const effectiveLine = readEffectiveLine({
+			baseDurationMs: readLineDurationMs({
 				line,
 			}),
 			config,
 			nowMs,
-			producerItemInstanceId: job.producerItemInstanceId,
+			itemInstanceId: job.itemInstanceId,
 			line,
 			lineId: job.lineId,
 			save,
 		});
 
-		for (const outputEntry of effectiveProducerLine.lootPlan.baseOutput) {
+		for (const outputEntry of effectiveLine.lootPlan.baseOutput) {
 			if (outputEntry.type !== "guaranteed") continue;
 			if (
 				!outputEntryCanCreateTargetItem({

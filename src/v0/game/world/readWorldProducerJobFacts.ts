@@ -37,7 +37,7 @@ export const readWorldProducerJobFacts = ({
 }: readWorldProducerJobFacts.Props): WorldProducerJobFacts[] => {
 	const facts: WorldProducerJobFacts[] = [];
 
-	for (const [producerItemInstanceId, queue] of groupWorldProducerJobs(save)) {
+	for (const [itemInstanceId, queue] of groupWorldProducerJobs(save)) {
 		let hasPausedBarrier = false;
 		const sortedQueue = [
 			...queue,
@@ -53,7 +53,7 @@ export const readWorldProducerJobFacts = ({
 			facts.push({
 				job,
 				previousJobId: previousJob?.id,
-				producerItemInstanceId,
+				itemInstanceId,
 				queueIndex,
 				releaseAtMs,
 				status: readJobStatus({
@@ -71,7 +71,7 @@ export const readWorldProducerJobFacts = ({
 
 	return facts.sort(
 		(left, right) =>
-			left.producerItemInstanceId.localeCompare(right.producerItemInstanceId) ||
+			left.itemInstanceId.localeCompare(right.itemInstanceId) ||
 			left.queueIndex - right.queueIndex ||
 			left.job.id.localeCompare(right.job.id),
 	);

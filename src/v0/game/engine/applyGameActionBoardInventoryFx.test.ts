@@ -136,9 +136,9 @@ describe("applyGameActionFx BoardInventory", () => {
 		const started = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -167,7 +167,7 @@ describe("applyGameActionFx BoardInventory", () => {
 			y: 0,
 		});
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 		});
 	});

@@ -1,5 +1,5 @@
 import type { GameConfig } from "../../src/v0/game/config/GameConfigSchema";
-import type { GameProducerLineDefinition } from "../../src/v0/game/config/GameItemCapabilities";
+import type { GameLineDefinition } from "../../src/v0/game/config/GameItemCapabilities";
 
 export type GameConfigAuditWarning = {
 	code: "duplicate-definition-shape" | "terminal-item" | "unused-definition";
@@ -16,7 +16,7 @@ type ItemFlowIndex = {
 	producedItemIds: Set<string>;
 };
 
-type ActivationOutput = NonNullable<GameProducerLineDefinition["output"]>;
+type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
 type GameDropEffect = NonNullable<
 	Extract<
 		ActivationOutput[number],
@@ -130,16 +130,16 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 		}
 
 		for (const line of item.producer?.lines ?? []) {
-			collectProducerLineUsage(line, config, usage, itemFlow);
+			collectLineUsage(line, config, usage, itemFlow);
 		}
 		if (item.stash?.line) {
-			collectProducerLineUsage(item.stash.line, config, usage, itemFlow);
+			collectLineUsage(item.stash.line, config, usage, itemFlow);
 		}
 	}
 };
 
-const collectProducerLineUsage = (
-	line: GameProducerLineDefinition,
+const collectLineUsage = (
+	line: GameLineDefinition,
 	config: GameConfig,
 	usage: UsageIndex,
 	itemFlow: ItemFlowIndex,

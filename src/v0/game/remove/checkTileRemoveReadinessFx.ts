@@ -52,7 +52,7 @@ export const checkTileRemoveReadinessFx = Effect.fn("checkTileRemoveReadinessFx"
 			),
 		);
 	}
-	if (Object.values(save.producerJobs).some((job) => job.producerItemInstanceId === target.id)) {
+	if (Object.values(save.producerJobs).some((job) => job.itemInstanceId === target.id)) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",

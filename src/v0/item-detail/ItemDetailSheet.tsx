@@ -7,7 +7,7 @@ import { DetailDropsPanel } from "~/v0/item-detail/ui/DetailDropsPanel";
 import { DetailGeneratedEffectsPanel } from "~/v0/item-detail/ui/DetailGeneratedEffectsPanel";
 import { DetailHeroCard } from "~/v0/item-detail/ui/DetailHeroCard";
 import { DetailInputsPanel } from "~/v0/item-detail/ui/DetailInputsPanel";
-import { DetailProducerLinesPanel } from "~/v0/item-detail/ui/DetailProducerLinesPanel";
+import { DetailLinesPanel } from "~/v0/item-detail/ui/DetailLinesPanel";
 import { DetailSeparator } from "~/v0/item-detail/ui/DetailCard";
 import { SheetHeader } from "~/v0/play/sheet/SheetHeader";
 
@@ -20,11 +20,11 @@ export namespace ItemDetailSheet {
 		items: ItemCatalogView;
 		onClaimCraft(): void;
 		onClose(): void;
-		onSetDefaultProducerLine(lineId: string): void;
+		onSetDefaultLine(lineId: string): void;
 		onStartCraft(): void;
-		onStartProducerLine(lineId: string): void;
+		onStartLine(lineId: string): void;
 		onWithdrawCraftInput(itemId: string): void;
-		onWithdrawProducerLineInput(lineId: string, itemId: string): void;
+		onWithdrawLineInput(lineId: string, itemId: string): void;
 	}
 }
 
@@ -51,24 +51,24 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 	items,
 	onClaimCraft,
 	onClose,
-	onSetDefaultProducerLine,
+	onSetDefaultLine,
 	onStartCraft,
-	onStartProducerLine,
+	onStartLine,
 	onWithdrawCraftInput,
-	onWithdrawProducerLineInput,
+	onWithdrawLineInput,
 }) => {
 	const item = boardItem ? items[boardItem.itemId] : undefined;
 	const activation = boardItem?.activation;
-	const { craftControl, producerLineModels } = useItemDetailControls({
+	const { craftControl, lineModels } = useItemDetailControls({
 		boardItem,
 		canSetDefaultLines,
 		isPending,
 		onClaimCraft,
-		onSetDefaultProducerLine,
+		onSetDefaultLine,
 		onStartCraft,
-		onStartProducerLine,
+		onStartLine,
 		onWithdrawCraftInput,
-		onWithdrawProducerLineInput,
+		onWithdrawLineInput,
 	});
 
 	if (!boardItem || !item) {
@@ -121,11 +121,11 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 				title={activation.kind === "stash" ? "Needed to open" : "Shared inputs"}
 			/>
 		) : null,
-		producerLineModels.length ? (
-			<DetailProducerLinesPanel
-				key="producer-lines"
+		lineModels.length ? (
+			<DetailLinesPanel
+				key="lines"
 				items={items}
-				lines={producerLineModels}
+				lines={lineModels}
 			/>
 		) : null,
 	].filter(Boolean) as ReactNode[];

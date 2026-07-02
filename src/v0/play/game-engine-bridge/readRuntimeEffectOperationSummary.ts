@@ -1,5 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { EffectiveProducerLine } from "~/v0/game/effects/EffectiveProducerLine";
+import type { EffectiveLine } from "~/v0/game/effects/EffectiveLine";
 
 export namespace readRuntimeEffectBenefitLines {
 	export interface Props {
@@ -8,11 +8,11 @@ export namespace readRuntimeEffectBenefitLines {
 	}
 }
 
-export namespace readRuntimeProducerLineActiveEffectBonusLines {
+export namespace readRuntimeLineActiveEffectBonusLines {
 	export interface Props {
 		baseDurationMs: number;
 		config: GameConfig;
-		effectiveProducerLine: EffectiveProducerLine;
+		effectiveLine: EffectiveLine;
 	}
 }
 
@@ -79,7 +79,7 @@ const readQuantityRange = (
 const formatQuantityNumber = (value: number) => `${value}×`;
 
 const groupDurationEffectInstances = (
-	appliedEffects: EffectiveProducerLine["appliedEffects"],
+	appliedEffects: EffectiveLine["appliedEffects"],
 ): EffectInstanceGroup[] => {
 	const groups = new Map<
 		string,
@@ -125,10 +125,10 @@ const readChanceRemainder = (chance: number) =>
 
 const readAggregatedChanceItemLines = ({
 	config,
-	effectiveProducerLine,
+	effectiveLine,
 }: {
 	config: GameConfig;
-	effectiveProducerLine: EffectiveProducerLine;
+	effectiveLine: EffectiveLine;
 }) => {
 	const groups = new Map<
 		string,
@@ -141,7 +141,7 @@ const readAggregatedChanceItemLines = ({
 		}
 	>();
 
-	for (const chanceItem of effectiveProducerLine.lootPlan.chanceItems) {
+	for (const chanceItem of effectiveLine.lootPlan.chanceItems) {
 		if (!chanceItem.effectId || !chanceItem.effectName || !chanceItem.dropEffects?.length) {
 			continue;
 		}
@@ -251,21 +251,19 @@ const readAggregatedChanceItemLines = ({
 	});
 };
 
-export const readRuntimeProducerLineActiveEffectBonusLines = ({
+export const readRuntimeLineActiveEffectBonusLines = ({
 	baseDurationMs,
 	config,
-	effectiveProducerLine,
-}: readRuntimeProducerLineActiveEffectBonusLines.Props) => {
+	effectiveLine,
+}: readRuntimeLineActiveEffectBonusLines.Props) => {
 	const chanceItemLines = readAggregatedChanceItemLines({
 		config,
-		effectiveProducerLine,
+		effectiveLine,
 	});
-	const durationEffectInstances = groupDurationEffectInstances(
-		effectiveProducerLine.appliedEffects,
-	);
+	const durationEffectInstances = groupDurationEffectInstances(effectiveLine.appliedEffects);
 	const durationRatio =
-		effectiveProducerLine.effectDurationMultiplier ??
-		(baseDurationMs > 0 ? effectiveProducerLine.durationMs / baseDurationMs : 1);
+		effectiveLine.effectDurationMultiplier ??
+		(baseDurationMs > 0 ? effectiveLine.durationMs / baseDurationMs : 1);
 	const durationLine =
 		durationEffectInstances.length === 0 || durationRatio === 1
 			? undefined

@@ -37,18 +37,17 @@ describe("runtime readers", () => {
 		const state = await createRuntimeState();
 		state.runtime.save.producerJobs["producer-job:1"] = {
 			id: "producer-job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
 
+		expect(readBoardView(state).byId["item-instance:1"]?.activation?.lines?.[0]?.progress).toBe(
+			0,
+		);
 		expect(
-			readBoardView(state).byId["item-instance:1"]?.activation?.producerLines?.[0]?.progress,
-		).toBe(0);
-		expect(
-			readBoardView(state, 500).byId["item-instance:1"]?.activation?.producerLines?.[0]
-				?.progress,
+			readBoardView(state, 500).byId["item-instance:1"]?.activation?.lines?.[0]?.progress,
 		).toBe(0.5);
 	});
 

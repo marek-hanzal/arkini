@@ -11,7 +11,7 @@ type WorldProducerJobStatus =
 export interface WorldProducerJobFacts {
 	job: GameSaveProducerJob;
 	previousJobId?: string;
-	producerItemInstanceId: string;
+	itemInstanceId: string;
 	queueIndex: number;
 	releaseAtMs?: number;
 	status: WorldProducerJobStatus;

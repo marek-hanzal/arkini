@@ -30,7 +30,7 @@ export namespace appendActivationInputStoreVisuals {
 }
 
 const readTargetItemInstanceId = (target: TargetEvent) => {
-	if (target.type === "producer_input.stored") return target.producerItemInstanceId;
+	if (target.type === "producer_input.stored") return target.itemInstanceId;
 	return target.targetItemInstanceId;
 };
 

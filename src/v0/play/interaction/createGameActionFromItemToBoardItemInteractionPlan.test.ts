@@ -49,7 +49,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 			}),
 		).toEqual({
 			inputRef: sourceRef,
-			producerItemInstanceId: "target",
+			itemInstanceId: "target",
 			lineId: "line:test",
 			type: "producer.input.store",
 		});

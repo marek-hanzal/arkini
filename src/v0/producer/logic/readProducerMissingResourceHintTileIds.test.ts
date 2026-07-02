@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { readProducerMissingResourceHintTileIds } from "~/v0/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
-const line = (overrides: Partial<ProducerLineView>): ProducerLineView => ({
+import type { LineView } from "~/v0/board/view/LineViewSchema";
+const line = (overrides: Partial<LineView>): LineView => ({
 	durationMs: 1000,
 	inProgress: false,
 	inputItemIds: [],
@@ -12,13 +12,13 @@ const line = (overrides: Partial<ProducerLineView>): ProducerLineView => ({
 	inputsReady: false,
 	isDefault: true,
 	name: "Target",
-	lineKind: "product" as const,
-	producerQueuedJobs: 0,
+	kind: "product" as const,
+	queueUsed: 0,
 	lineId: "line:target",
 	queueFull: false,
 	blocked: false,
-	queuedJobs: 0,
-	queueSize: 1,
+	jobs: 0,
+	queueMax: 1,
 	...overrides,
 });
 
@@ -27,7 +27,7 @@ const item = (props: {
 	itemId: string;
 	x: number;
 	y: number;
-	line?: ProducerLineView;
+	line?: LineView;
 }): BoardViewItem => ({
 	id: props.id,
 	itemId: props.itemId,
@@ -39,7 +39,7 @@ const item = (props: {
 				activation: {
 					inputs: [],
 					kind: "producer" as const,
-					producerLines: [
+					lines: [
 						props.line,
 					],
 					trigger: "click" as const,

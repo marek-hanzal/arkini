@@ -22,7 +22,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -46,7 +46,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -69,7 +69,7 @@ describe("runGameTickFx", () => {
 			{
 				jobId: "job:1",
 				lineId: "line:test",
-				type: "producer_line.completed",
+				type: "line.completed",
 			},
 			{
 				itemId: "item:twig",
@@ -123,7 +123,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -159,7 +159,7 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("completes already running producer jobs while producer line state exists", () => {
+	it("completes already running producer jobs while line state exists", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -168,11 +168,11 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
-		save.producerLines["item-instance:1"] = {
+		save.lines["item-instance:1"] = {
 			defaultLineId: "line:test",
 		};
 
@@ -188,7 +188,7 @@ describe("runGameTickFx", () => {
 				expect.objectContaining({
 					jobId: "job:1",
 					lineId: "line:test",
-					type: "producer_line.completed",
+					type: "line.completed",
 				}),
 			]),
 		);
@@ -219,7 +219,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -241,10 +241,10 @@ describe("runGameTickFx", () => {
 			{
 				atMs: 1000,
 				jobId: "job:1",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				reason: "board:full",
-				type: "producer_line.blocked",
+				type: "line.blocked",
 			},
 		]);
 	});
@@ -278,7 +278,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -293,10 +293,10 @@ describe("runGameTickFx", () => {
 			{
 				atMs: 1000,
 				jobId: "job:1",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				reason: "board:full",
-				type: "producer_line.blocked",
+				type: "line.blocked",
 			},
 		]);
 		expect(result.save.producerJobs["job:1"]).toMatchObject({
@@ -341,7 +341,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -379,7 +379,7 @@ describe("runGameTickFx", () => {
 		expect(delivered.events).toEqual([
 			expect.objectContaining({
 				jobId: "job:1",
-				type: "producer_line.completed",
+				type: "line.completed",
 			}),
 			expect.objectContaining({
 				itemId: "item:plank",
@@ -413,7 +413,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -474,14 +474,14 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:blocked"] = {
 			readyAtMs: 1000,
 			id: "job:blocked",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerJobs["job:queued"] = {
 			readyAtMs: 2000,
 			id: "job:queued",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 1000,
 		};
@@ -547,14 +547,14 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerJobs["job:2"] = {
 			readyAtMs: 1000,
 			id: "job:2",
-			producerItemInstanceId: "item-instance:2",
+			itemInstanceId: "item-instance:2",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
@@ -635,7 +635,7 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:shred",
 			startAtMs: 0,
 		};
@@ -651,9 +651,9 @@ describe("runGameTickFx", () => {
 			{
 				atMs: 1000,
 				jobId: "job:1",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer_line.completed",
+				type: "line.completed",
 			},
 		]);
 	});
@@ -690,14 +690,14 @@ describe("runGameTickFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
 		save.producerJobs["job:2"] = {
 			readyAtMs: 2000,
 			id: "job:2",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 1000,
 		};
@@ -712,10 +712,10 @@ describe("runGameTickFx", () => {
 			{
 				atMs: 2000,
 				jobId: "job:1",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				reason: "board:full",
-				type: "producer_line.blocked",
+				type: "line.blocked",
 			},
 		]);
 		expect(result.nextWakeAtMs).toBe(3000);

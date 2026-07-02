@@ -212,9 +212,9 @@ export const useBoardTileEngineModel = ({
 				.dispatch({
 					action: {
 						inputRefs: [],
-						producerItemInstanceId: liveBoardItem.id,
+						itemInstanceId: liveBoardItem.id,
 						lineId: action.lineId,
-						type: "producer.line.start",
+						type: "line.start",
 					},
 					nowMs,
 				})

@@ -3,11 +3,8 @@ import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
-import {
-	readProducerLineDefinition,
-	readProducerLineIds,
-} from "~/v0/game/config/readProducerLineDefinition";
-import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
+import { readLineDefinition, readLineIds } from "~/v0/game/config/readLineDefinition";
+import { readLineKind } from "~/v0/game/producer/readLineKind";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 
 const IdSchema = z.string().min(1);
@@ -107,7 +104,7 @@ const GameSaveProducerJobSchema = z
 		delivery: GameSaveDeliveryRetrySchema.optional(),
 		pausedAtMs: GameInstantMsSchema.optional(),
 		remainingMs: NonNegativeIntegerSchema.optional(),
-		producerItemInstanceId: IdSchema,
+		itemInstanceId: IdSchema,
 		lineId: IdSchema,
 		startAtMs: GameInstantMsSchema,
 		readyAtMs: GameInstantMsSchema,
@@ -187,14 +184,14 @@ const GameSaveCheatStateSchema = z
 	})
 	.strict();
 
-const GameSaveProducerLineStateSchema = z
+const GameSaveLineStateSchema = z
 	.object({
 		defaultLineId: IdSchema.optional(),
 		defaultEffectLineId: IdSchema.optional(),
 	})
 	.strict();
 
-const GameSaveProducerLineInputStateSchema = z
+const GameSaveLineInputStateSchema = z
 	.object({
 		items: z.record(IdSchema, PositiveIntegerSchema),
 	})
@@ -202,7 +199,7 @@ const GameSaveProducerLineInputStateSchema = z
 
 const GameSaveProducerInputStateSchema = z
 	.object({
-		lineInputs: z.record(IdSchema, GameSaveProducerLineInputStateSchema),
+		lineInputs: z.record(IdSchema, GameSaveLineInputStateSchema),
 	})
 	.strict();
 
@@ -281,7 +278,7 @@ const GameSaveSchema = z
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
 		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
 		cheats: GameSaveCheatStateSchema.optional(),
-		producerLines: z.record(IdSchema, GameSaveProducerLineStateSchema),
+		lines: z.record(IdSchema, GameSaveLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),
 		craftJobs: z.record(IdSchema, GameSaveCraftJobSchema),
@@ -391,12 +388,12 @@ const readEffectiveLineInputSlots = ({
 	producer: NonNullable<ReturnType<typeof readProducerCapabilityDefinition>>;
 	lineId: string;
 }) =>
-	readProducerLineDefinition({
+	readLineDefinition({
 		producerDefinition: producer,
 		lineId,
 	})?.inputs ?? [];
 
-const readProducerLineFromJob = ({
+const readLineFromJob = ({
 	config,
 	job,
 	save,
@@ -405,7 +402,7 @@ const readProducerLineFromJob = ({
 	job: GameSaveProducerJob;
 	save: GameSave;
 }) => {
-	const producerItem = save.board.items[job.producerItemInstanceId];
+	const producerItem = save.board.items[job.itemInstanceId];
 	const producer = producerItem
 		? readProducerCapabilityDefinition({
 				config,
@@ -414,7 +411,7 @@ const readProducerLineFromJob = ({
 		: undefined;
 
 	return producer
-		? readProducerLineDefinition({
+		? readLineDefinition({
 				producerDefinition: producer,
 				lineId: job.lineId,
 			})
@@ -669,8 +666,8 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	const producerJobCountByProducerItemInstanceId = new Map<string, number>();
-	const producerJobsByProducerItemInstanceId = new Map<
+	const jobCountByItemInstanceId = new Map<string, number>();
+	const jobsByItemInstanceId = new Map<
 		string,
 		{
 			job: GameSaveProducerJob;
@@ -693,7 +690,7 @@ const validateGameSaveAgainstConfig = (
 		const target = readBoardItemDefinition({
 			config,
 			save,
-			itemInstanceId: job.producerItemInstanceId,
+			itemInstanceId: job.itemInstanceId,
 		});
 		const producerId = target?.boardItem.itemId;
 		const producer = producerId
@@ -709,9 +706,9 @@ const validateGameSaveAgainstConfig = (
 				[
 					"producerJobs",
 					jobId,
-					"producerItemInstanceId",
+					"itemInstanceId",
 				],
-				`Producer job target "${job.producerItemInstanceId}" must be a board item.`,
+				`Producer job target "${job.itemInstanceId}" must be a board item.`,
 			);
 		} else if (!producerId || !producer) {
 			addSaveIssue(
@@ -719,12 +716,12 @@ const validateGameSaveAgainstConfig = (
 				[
 					"producerJobs",
 					jobId,
-					"producerItemInstanceId",
+					"itemInstanceId",
 				],
-				`Producer job target "${job.producerItemInstanceId}" must reference a producer-like item.`,
+				`Producer job target "${job.itemInstanceId}" must reference a producer-like item.`,
 			);
 		} else if (
-			!readProducerLineIds({
+			!readLineIds({
 				producerDefinition: producer,
 			}).includes(job.lineId)
 		) {
@@ -739,17 +736,16 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		producerJobCountByProducerItemInstanceId.set(
-			job.producerItemInstanceId,
-			(producerJobCountByProducerItemInstanceId.get(job.producerItemInstanceId) ?? 0) + 1,
+		jobCountByItemInstanceId.set(
+			job.itemInstanceId,
+			(jobCountByItemInstanceId.get(job.itemInstanceId) ?? 0) + 1,
 		);
-		const producerJobs =
-			producerJobsByProducerItemInstanceId.get(job.producerItemInstanceId) ?? [];
+		const producerJobs = jobsByItemInstanceId.get(job.itemInstanceId) ?? [];
 		producerJobs.push({
 			job,
 			jobId,
 		});
-		producerJobsByProducerItemInstanceId.set(job.producerItemInstanceId, producerJobs);
+		jobsByItemInstanceId.set(job.itemInstanceId, producerJobs);
 	}
 
 	const activeEffectIdsByProducerJobId = new Map<string, string[]>();
@@ -804,7 +800,7 @@ const validateGameSaveAgainstConfig = (
 			]);
 			const producerJob = save.producerJobs[activeEffect.producerJobId];
 			const line = producerJob
-				? readProducerLineFromJob({
+				? readLineFromJob({
 						config,
 						save,
 						job: producerJob,
@@ -822,7 +818,7 @@ const validateGameSaveAgainstConfig = (
 					`Active effect producer job "${activeEffect.producerJobId}" must reference a producer job.`,
 				);
 			} else {
-				if (activeEffect.sourceItemInstanceId !== producerJob.producerItemInstanceId) {
+				if (activeEffect.sourceItemInstanceId !== producerJob.itemInstanceId) {
 					addSaveIssue(
 						ctx,
 						[
@@ -871,7 +867,7 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
-		const line = readProducerLineFromJob({
+		const line = readLineFromJob({
 			config,
 			save,
 			job,
@@ -894,11 +890,11 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	for (const [producerItemInstanceId, jobCount] of producerJobCountByProducerItemInstanceId) {
+	for (const [itemInstanceId, jobCount] of jobCountByItemInstanceId) {
 		const target = readBoardItemDefinition({
 			config,
 			save,
-			itemInstanceId: producerItemInstanceId,
+			itemInstanceId: itemInstanceId,
 		});
 		const producerId = target?.boardItem.itemId;
 		if (!producerId) continue;
@@ -914,12 +910,12 @@ const validateGameSaveAgainstConfig = (
 				[
 					"producerJobs",
 				],
-				`Producer "${producerItemInstanceId}" queue has ${jobCount} jobs but maxQueueSize is ${maxQueueSize}.`,
+				`Producer "${itemInstanceId}" queue has ${jobCount} jobs but maxQueueSize is ${maxQueueSize}.`,
 			);
 		}
 	}
 
-	for (const [producerItemInstanceId, producerJobs] of producerJobsByProducerItemInstanceId) {
+	for (const [itemInstanceId, producerJobs] of jobsByItemInstanceId) {
 		const sortedProducerJobs = [
 			...producerJobs,
 		].sort(
@@ -941,7 +937,7 @@ const validateGameSaveAgainstConfig = (
 						current.jobId,
 						"delivery",
 					],
-					`Producer job "${current.jobId}" for "${producerItemInstanceId}" has blocked delivery but is not first in the producer queue.`,
+					`Producer job "${current.jobId}" for "${itemInstanceId}" has blocked delivery but is not first in the producer queue.`,
 				);
 			}
 
@@ -958,7 +954,7 @@ const validateGameSaveAgainstConfig = (
 						current.jobId,
 						"startAtMs",
 					],
-					`Producer job "${current.jobId}" for "${producerItemInstanceId}" starts before previous job "${previous.jobId}" releases the queue.`,
+					`Producer job "${current.jobId}" for "${itemInstanceId}" starts before previous job "${previous.jobId}" releases the queue.`,
 				);
 			}
 		}
@@ -984,11 +980,11 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	for (const [producerItemInstanceId, lineState] of Object.entries(save.producerLines)) {
+	for (const [itemInstanceId, lineState] of Object.entries(save.lines)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: producerItemInstanceId,
+			itemInstanceId: itemInstanceId,
 		});
 		const producerId = target?.itemId;
 		const producer = producerId
@@ -1001,96 +997,96 @@ const validateGameSaveAgainstConfig = (
 			addSaveIssue(
 				ctx,
 				[
-					"producerLines",
-					producerItemInstanceId,
+					"lines",
+					itemInstanceId,
 				],
-				`Producer line state target "${producerItemInstanceId}" must reference a producer-like item.`,
+				`Line state target "${itemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
 
 		if (
 			lineState.defaultLineId !== undefined &&
-			!readProducerLineIds({
+			!readLineIds({
 				producerDefinition: producer,
 			}).includes(lineState.defaultLineId)
 		) {
 			addSaveIssue(
 				ctx,
 				[
-					"producerLines",
-					producerItemInstanceId,
+					"lines",
+					itemInstanceId,
 					"defaultLineId",
 				],
 				`Default line "${lineState.defaultLineId}" does not belong to producer "${producerId}".`,
 			);
 		} else if (lineState.defaultLineId !== undefined) {
-			const line = readProducerLineDefinition({
+			const line = readLineDefinition({
 				producerDefinition: producer,
 				lineId: lineState.defaultLineId,
 			});
 			if (
 				line &&
-				readProducerLineKind({
+				readLineKind({
 					line,
 				}) !== "product"
 			) {
 				addSaveIssue(
 					ctx,
 					[
-						"producerLines",
-						producerItemInstanceId,
+						"lines",
+						itemInstanceId,
 						"defaultLineId",
 					],
-					`Default line "${lineState.defaultLineId}" must reference a normal producer line.`,
+					`Default line "${lineState.defaultLineId}" must reference a normal line.`,
 				);
 			}
 		}
 
 		if (
 			lineState.defaultEffectLineId !== undefined &&
-			!readProducerLineIds({
+			!readLineIds({
 				producerDefinition: producer,
 			}).includes(lineState.defaultEffectLineId)
 		) {
 			addSaveIssue(
 				ctx,
 				[
-					"producerLines",
-					producerItemInstanceId,
+					"lines",
+					itemInstanceId,
 					"defaultEffectLineId",
 				],
 				`Default effect line "${lineState.defaultEffectLineId}" does not belong to producer "${producerId}".`,
 			);
 		} else if (lineState.defaultEffectLineId !== undefined) {
-			const effectLine = readProducerLineDefinition({
+			const effectLine = readLineDefinition({
 				producerDefinition: producer,
 				lineId: lineState.defaultEffectLineId,
 			});
 			if (
 				effectLine &&
-				readProducerLineKind({
+				readLineKind({
 					line: effectLine,
 				}) !== "effect"
 			) {
 				addSaveIssue(
 					ctx,
 					[
-						"producerLines",
-						producerItemInstanceId,
+						"lines",
+						itemInstanceId,
 						"defaultEffectLineId",
 					],
-					`Default effect line "${lineState.defaultEffectLineId}" must reference an effect producer line.`,
+					`Default effect line "${lineState.defaultEffectLineId}" must reference an effect line.`,
 				);
 			}
 		}
 	}
 
-	for (const [producerItemInstanceId, state] of Object.entries(save.producerInputs)) {
+	for (const [itemInstanceId, state] of Object.entries(save.producerInputs)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: producerItemInstanceId,
+			itemInstanceId: itemInstanceId,
 		});
 		const producerId = target?.itemId;
 		const producer = producerId
@@ -1104,16 +1100,16 @@ const validateGameSaveAgainstConfig = (
 				ctx,
 				[
 					"producerInputs",
-					producerItemInstanceId,
+					itemInstanceId,
 				],
-				`Producer input state target "${producerItemInstanceId}" must reference a producer-like item.`,
+				`Producer input state target "${itemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
 
 		for (const [lineId, lineInputState] of Object.entries(state.lineInputs)) {
 			if (
-				!readProducerLineIds({
+				!readLineIds({
 					producerDefinition: producer,
 				}).includes(lineId)
 			) {
@@ -1121,7 +1117,7 @@ const validateGameSaveAgainstConfig = (
 					ctx,
 					[
 						"producerInputs",
-						producerItemInstanceId,
+						itemInstanceId,
 						"lineInputs",
 						lineId,
 					],
@@ -1142,7 +1138,7 @@ const validateGameSaveAgainstConfig = (
 						ctx,
 						[
 							"producerInputs",
-							producerItemInstanceId,
+							itemInstanceId,
 							"lineInputs",
 							lineId,
 							"items",
@@ -1158,7 +1154,7 @@ const validateGameSaveAgainstConfig = (
 						ctx,
 						[
 							"producerInputs",
-							producerItemInstanceId,
+							itemInstanceId,
 							"lineInputs",
 							lineId,
 							"items",
@@ -1315,11 +1311,11 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	for (const [producerItemInstanceId, state] of Object.entries(save.producerCharges)) {
+	for (const [itemInstanceId, state] of Object.entries(save.producerCharges)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: producerItemInstanceId,
+			itemInstanceId: itemInstanceId,
 		});
 		const producerId = target?.itemId;
 		const producer = producerId
@@ -1333,9 +1329,9 @@ const validateGameSaveAgainstConfig = (
 				ctx,
 				[
 					"producerCharges",
-					producerItemInstanceId,
+					itemInstanceId,
 				],
-				`Producer charge state target "${producerItemInstanceId}" must reference a producer-like item.`,
+				`Producer charge state target "${itemInstanceId}" must reference a producer-like item.`,
 			);
 			continue;
 		}
@@ -1345,9 +1341,9 @@ const validateGameSaveAgainstConfig = (
 				ctx,
 				[
 					"producerCharges",
-					producerItemInstanceId,
+					itemInstanceId,
 				],
-				`Producer charge state target "${producerItemInstanceId}" references a producer-like item without finite charges.`,
+				`Producer charge state target "${itemInstanceId}" references a producer-like item without finite charges.`,
 			);
 			continue;
 		}
@@ -1357,7 +1353,7 @@ const validateGameSaveAgainstConfig = (
 				ctx,
 				[
 					"producerCharges",
-					producerItemInstanceId,
+					itemInstanceId,
 					"remainingCharges",
 				],
 				`remainingCharges must be <= producer charges (${producer.charges}).`,

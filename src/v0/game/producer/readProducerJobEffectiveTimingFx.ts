@@ -28,17 +28,17 @@ export const readProducerJobEffectiveTimingFx = Effect.fn("readProducerJobEffect
 		save,
 		startAtMs,
 	}: readProducerJobEffectiveTimingFx.Props) {
-		const effectiveProducerLine = yield* readProducerJobEffectiveLineFx({
+		const effectiveLine = yield* readProducerJobEffectiveLineFx({
 			config,
 			ignoredProducerJobIds,
 			nowMs: evaluateAtMs,
-			producerItemInstanceId: job.producerItemInstanceId,
+			itemInstanceId: job.itemInstanceId,
 			lineId: job.lineId,
 			save,
 		});
 
 		return {
-			readyAtMs: startAtMs + effectiveProducerLine.durationMs,
+			readyAtMs: startAtMs + effectiveLine.durationMs,
 			startAtMs,
 		} satisfies readProducerJobEffectiveTimingFx.Result;
 	},

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 import {
 	readRuntimeEffectBenefitLines,
-	readRuntimeProducerLineActiveEffectBonusLines,
+	readRuntimeLineActiveEffectBonusLines,
 } from "~/v0/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
 describe("readRuntimeEffectBenefitLines", () => {
@@ -28,12 +28,12 @@ describe("readRuntimeEffectBenefitLines", () => {
 		]);
 	});
 
-	it("describes active product-line bonuses from effective runtime state", () => {
+	it("describes active line bonuses from effective runtime state", () => {
 		expect(
-			readRuntimeProducerLineActiveEffectBonusLines({
+			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProducerLine: {
+				effectiveLine: {
 					appliedEffects: [
 						{
 							effectId: "effect:shrine-minor-haste",
@@ -85,10 +85,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("uses effect multiplier, not cheat-clamped runtime duration, for duration bonus copy", () => {
 		expect(
-			readRuntimeProducerLineActiveEffectBonusLines({
+			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 60000,
 				config: defaultGameConfig,
-				effectiveProducerLine: {
+				effectiveLine: {
 					appliedEffects: [
 						{
 							effectId: "effect:shrine-minor-haste",
@@ -116,12 +116,12 @@ describe("readRuntimeEffectBenefitLines", () => {
 		]);
 	});
 
-	it("aggregates stacked active product-line bonuses into resulting numbers", () => {
+	it("aggregates stacked active line bonuses into resulting numbers", () => {
 		expect(
-			readRuntimeProducerLineActiveEffectBonusLines({
+			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProducerLine: {
+				effectiveLine: {
 					appliedEffects: [
 						{
 							effectId: "effect:shrine-minor-haste",
@@ -201,10 +201,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("describes uncapped chance bonuses as guaranteed plus remainder rolls", () => {
 		expect(
-			readRuntimeProducerLineActiveEffectBonusLines({
+			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProducerLine: {
+				effectiveLine: {
 					appliedEffects: [],
 					blocked: false,
 					blockReasons: [],
@@ -247,10 +247,10 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("respects hidden display rules when summarizing chance bonuses", () => {
 		expect(
-			readRuntimeProducerLineActiveEffectBonusLines({
+			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
 				config: defaultGameConfig,
-				effectiveProducerLine: {
+				effectiveLine: {
 					appliedEffects: [],
 					blocked: false,
 					blockReasons: [],

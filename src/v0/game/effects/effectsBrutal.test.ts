@@ -55,9 +55,9 @@ describe("output-owned producer effect runtime guards", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,

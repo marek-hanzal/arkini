@@ -1,14 +1,11 @@
 import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
-import { readProducerLineIdsByPriority } from "~/v0/game/producer/readProducerLineIdsByPriority";
-import { readVisibleProducerLineIds } from "~/v0/game/producer/readVisibleProducerLineIds";
-import { readProducerLineStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerLineStoredInputQuantitiesFx";
+import { readLineIdsByPriority } from "~/v0/game/producer/readLineIdsByPriority";
+import { readVisibleLineIds } from "~/v0/game/producer/readVisibleLineIds";
+import { readLineStoredInputQuantitiesFx } from "~/v0/game/producer/readLineStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import {
-	readProducerLineDefinition,
-	readProducerLineIds,
-} from "~/v0/game/config/GameItemCapabilities";
+import { readLineDefinition, readLineIds } from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionProducerInputStore } from "~/v0/game/action/GameActionProducerInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -28,7 +25,7 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 		const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx(
 			{
 				config,
-				producerItemInstanceId: action.producerItemInstanceId,
+				itemInstanceId: action.itemInstanceId,
 				save,
 			},
 		);
@@ -45,10 +42,7 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				GameEngineError.actionRejected("input_unavailable", "Missing producer input."),
 			);
 		}
-		if (
-			resolvedRef.kind === "board" &&
-			resolvedRef.itemInstanceId === action.producerItemInstanceId
-		) {
+		if (resolvedRef.kind === "board" && resolvedRef.itemInstanceId === action.itemInstanceId) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"invalid_actor",
@@ -57,12 +51,12 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			);
 		}
 
-		const visibleLineIds = readVisibleProducerLineIds({
+		const visibleLineIds = readVisibleLineIds({
 			config,
 			producerDefinition,
-			producerItemInstanceId: action.producerItemInstanceId,
+			itemInstanceId: action.itemInstanceId,
 			nowMs,
-			lineIds: readProducerLineIds({
+			lineIds: readLineIds({
 				producerDefinition,
 			}),
 			save,
@@ -71,15 +65,15 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			? [
 					action.lineId,
 				]
-			: readProducerLineIdsByPriority({
+			: readLineIdsByPriority({
 					lineIds: visibleLineIds,
-					producerItemInstanceId: action.producerItemInstanceId,
+					itemInstanceId: action.itemInstanceId,
 					save,
 				});
 
 		for (const lineId of lineIds) {
 			if (
-				!readProducerLineIds({
+				!readLineIds({
 					producerDefinition,
 				}).includes(lineId)
 			) {
@@ -99,7 +93,7 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				);
 			}
 
-			const inputSlot = readProducerLineDefinition({
+			const inputSlot = readLineDefinition({
 				producerDefinition,
 				lineId,
 			})?.inputs?.find((input) => input.itemId === resolvedRef.itemId);
@@ -107,8 +101,8 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				continue;
 			}
 
-			const storedInputs = yield* readProducerLineStoredInputQuantitiesFx({
-				producerItemInstanceId: action.producerItemInstanceId,
+			const storedInputs = yield* readLineStoredInputQuantitiesFx({
+				itemInstanceId: action.itemInstanceId,
 				lineId,
 				save,
 			});
@@ -135,7 +129,7 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"input_mismatch",
-				`Producer input "${resolvedRef.itemId}" is not accepted by any producer line with capacity.`,
+				`Producer input "${resolvedRef.itemId}" is not accepted by any line with capacity.`,
 			),
 		);
 	},

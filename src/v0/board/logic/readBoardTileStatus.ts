@@ -23,8 +23,7 @@ export const readBoardTileStatus = ({
 	const hasReadyState = Boolean(activation || boardItem?.craft);
 	const ready = !hasReadyState || activationReady || craftReady;
 	const noExplicitDefaultProducer =
-		activation?.kind === "producer" &&
-		!activation.producerLines?.some((line) => line.isDefault);
+		activation?.kind === "producer" && !activation.lines?.some((line) => line.isDefault);
 
 	return {
 		ready,

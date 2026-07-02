@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+import type { LineView } from "~/v0/board/view/LineViewSchema";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { createEngineMergeTestConfig } from "~/v0/game/engine/test/createEngineMergeTestConfig";
 import { resolveDropIntent } from "~/v0/merge/resolveDropIntent";
@@ -23,7 +23,7 @@ const activationTarget = (activation: NonNullable<BoardViewItem["activation"]>):
 		itemId: "item:lumber-camp-1",
 	});
 
-const productLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineView => ({
+const line = (overrides: Partial<LineView> = {}): LineView => ({
 	durationMs: 1000,
 	inProgress: false,
 	isDefault: true,
@@ -32,14 +32,14 @@ const productLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineVie
 	inputsReady: true,
 	inputsAvailable: true,
 	name: "Test product",
-	lineKind: "product" as const,
-	producerQueuedJobs: 0,
+	kind: "product" as const,
+	queueUsed: 0,
 	lineId: "line:test",
 	progress: undefined,
 	queueFull: false,
 	blocked: false,
-	queuedJobs: 0,
-	queueSize: 1,
+	jobs: 0,
+	queueMax: 1,
 	...overrides,
 });
 
@@ -88,7 +88,7 @@ describe("resolveDropIntent", () => {
 		});
 	});
 
-	it("prefers the default producer producer line when multiple lines accept the same input", () => {
+	it("prefers the default line when multiple lines accept the same input", () => {
 		expect(
 			resolveItemToBoardItemInteractionPlan({
 				config,
@@ -96,8 +96,8 @@ describe("resolveDropIntent", () => {
 				targetItem: activationTarget({
 					inputs: [],
 					kind: "producer",
-					producerLines: [
-						productLine({
+					lines: [
+						line({
 							inputs: [
 								{
 									capacity: 1,
@@ -110,7 +110,7 @@ describe("resolveDropIntent", () => {
 							isDefault: false,
 							lineId: "line:test",
 						}),
-						productLine({
+						line({
 							inputs: [
 								{
 									capacity: 1,

@@ -26,7 +26,7 @@ export const checkCraftTargetIdleFx = Effect.fn("checkCraftTargetIdleFx")(functi
 	}
 
 	const runningProducerJob = Object.values(save.producerJobs).find(
-		(job) => job.producerItemInstanceId === targetItemInstanceId,
+		(job) => job.itemInstanceId === targetItemInstanceId,
 	);
 	if (!runningProducerJob) return;
 

@@ -53,7 +53,7 @@ const activation = (
 	...overrides,
 });
 
-const productLine = (isDefault: boolean, overrides = {}) => ({
+const line = (isDefault: boolean, overrides = {}) => ({
 	durationMs: 1000,
 	inProgress: false,
 	inputItemIds: [],
@@ -62,14 +62,14 @@ const productLine = (isDefault: boolean, overrides = {}) => ({
 	inputsReady: true,
 	isDefault,
 	name: "Product",
-	lineKind: "product" as const,
-	producerQueuedJobs: 0,
+	kind: "product" as const,
+	queueUsed: 0,
 	lineId: "line:test",
 	progress: undefined,
 	queueFull: false,
 	blocked: false,
-	queueSize: 1,
-	queuedJobs: 0,
+	queueMax: 1,
+	jobs: 0,
 	...overrides,
 });
 
@@ -166,13 +166,13 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("activates producers with explicit default producer line", () => {
+	it("activates producers with explicit default line", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("producer", {
-						producerLines: [
-							productLine(true),
+						lines: [
+							line(true),
 						],
 					}),
 				}),
@@ -186,18 +186,18 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("activates default effect lines before default producer lines", () => {
+	it("activates default effect lines before default lines", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("producer", {
-						producerLines: [
-							productLine(true, {
-								lineKind: "product" as const,
+						lines: [
+							line(true, {
+								kind: "product" as const,
 								lineId: "line:normal",
 							}),
-							productLine(true, {
-								lineKind: "effect" as const,
+							line(true, {
+								kind: "effect" as const,
 								lineId: "line:effect",
 							}),
 						],
@@ -213,19 +213,19 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("falls back to the default producer line while the default effect is active", () => {
+	it("falls back to the default line while the default effect is active", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("producer", {
-						producerLines: [
-							productLine(true, {
+						lines: [
+							line(true, {
 								effectLocked: true,
-								lineKind: "effect" as const,
+								kind: "effect" as const,
 								lineId: "line:effect",
 							}),
-							productLine(true, {
-								lineKind: "product" as const,
+							line(true, {
+								kind: "product" as const,
 								lineId: "line:normal",
 							}),
 						],
@@ -241,13 +241,13 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("opens detail for producers without explicit default producer line", () => {
+	it("opens detail for producers without explicit default line", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("producer", {
-						producerLines: [
-							productLine(false),
+						lines: [
+							line(false),
 						],
 					}),
 				}),
@@ -262,13 +262,13 @@ describe("resolveBoardItemTapAction", () => {
 		});
 	});
 
-	it("opens detail for producers with default producer line that cannot start", () => {
+	it("opens detail for producers with default line that cannot start", () => {
 		expect(
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("producer", {
-						producerLines: [
-							productLine(true, {
+						lines: [
+							line(true, {
 								inputsAvailable: false,
 								inputsReady: false,
 							}),
@@ -291,8 +291,8 @@ describe("resolveBoardItemTapAction", () => {
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("producer", {
-						producerLines: [
-							productLine(true),
+						lines: [
+							line(true),
 						],
 					}),
 					craft: craft({
@@ -441,8 +441,8 @@ describe("resolveBoardItemTapAction", () => {
 			resolveBoardItemTapAction({
 				boardItem: baseBoardItem({
 					activation: activation("stash", {
-						producerLines: [
-							productLine(false, {
+						lines: [
+							line(false, {
 								queueBlockedReason: "delivery_blocked",
 							}),
 						],

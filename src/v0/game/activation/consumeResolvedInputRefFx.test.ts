@@ -38,7 +38,7 @@ describe("consumeResolvedInputRefFx", () => {
 			consumeResolvedInputRefFx({
 				events,
 				nextSave: save,
-				reason: "producer-line-input",
+				reason: "line-input",
 				ref: {
 					itemId: "item:twig",
 					itemInstanceId: "item-instance:2",
@@ -57,7 +57,7 @@ describe("consumeResolvedInputRefFx", () => {
 					kind: "board",
 				},
 				itemId: "item:twig",
-				reason: "producer-line-input",
+				reason: "line-input",
 				type: "item.consumed",
 			},
 		]);
@@ -80,7 +80,7 @@ describe("consumeResolvedInputRefFx", () => {
 			consumeResolvedInputRefFx({
 				events,
 				nextSave: save,
-				reason: "producer-line-input",
+				reason: "line-input",
 				ref: {
 					itemId: "item:twig",
 					kind: "inventory",

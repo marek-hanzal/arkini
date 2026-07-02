@@ -1,7 +1,7 @@
 import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readActivationInputRequiredQuantity";
 import type { BoardView } from "~/v0/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+import type { LineView } from "~/v0/board/view/LineViewSchema";
 
 export namespace readProducerMissingResourceHintTileIds {
 	export interface Props {
@@ -11,17 +11,17 @@ export namespace readProducerMissingResourceHintTileIds {
 	}
 }
 
-const readSelectedProducerLine = ({
+const readSelectedLine = ({
 	producerItem,
 	lineId,
 }: {
 	producerItem: BoardViewItem;
 	lineId?: string;
-}): ProducerLineView | undefined => {
-	const producerLines = producerItem.activation?.producerLines ?? [];
-	if (lineId) return producerLines.find((line) => line.lineId === lineId);
+}): LineView | undefined => {
+	const lines = producerItem.activation?.lines ?? [];
+	if (lineId) return lines.find((line) => line.lineId === lineId);
 
-	return producerLines.find((line) => line.isDefault);
+	return lines.find((line) => line.isDefault);
 };
 
 const readBoardItemQuantity = ({
@@ -43,7 +43,7 @@ const readInputItemIdsMissingOnBoard = ({
 	producerItemId,
 }: {
 	board: BoardView;
-	line: ProducerLineView;
+	line: LineView;
 	producerItemId: string;
 }) => {
 	const itemIds = new Set<string>();
@@ -61,7 +61,7 @@ const readInputItemIdsMissingOnBoard = ({
 	return itemIds;
 };
 
-const canLineExposeUsefulOutput = (line: ProducerLineView) =>
+const canLineExposeUsefulOutput = (line: LineView) =>
 	!line.blocked &&
 	line.startRequirementsReady !== false &&
 	!line.outputLimitBlocked &&
@@ -70,7 +70,7 @@ const canLineExposeUsefulOutput = (line: ProducerLineView) =>
 const readProducedItemIds = ({ boardItem }: { boardItem: BoardViewItem }): Set<string> => {
 	const itemIds = new Set<string>();
 
-	for (const line of boardItem.activation?.producerLines ?? []) {
+	for (const line of boardItem.activation?.lines ?? []) {
 		if (!canLineExposeUsefulOutput(line)) continue;
 
 		for (const output of line.outputs ?? []) {
@@ -87,7 +87,7 @@ export const readProducerMissingResourceHintTileIds = ({
 	producerItem,
 	lineId,
 }: readProducerMissingResourceHintTileIds.Props): readonly string[] => {
-	const line = readSelectedProducerLine({
+	const line = readSelectedLine({
 		producerItem,
 		lineId,
 	});

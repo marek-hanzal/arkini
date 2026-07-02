@@ -20,7 +20,7 @@ Canonical game config keys:
 }
 ```
 
-There are no top-level producer-line, stash, merge, or craft registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, and `removeBy`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
+There are no top-level line, stash, merge, or craft registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, and `removeBy`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
 
 ## Items
 
@@ -41,7 +41,7 @@ Items define physical tiles/stacks. Source items omit identity fields that can b
 
 The compiler derives `assetIds` as `["asset:<itemId>"]` and synthesizes conventional item assets; `assets.json` only contains overrides such as intentional resource reuse. Asset definitions do not carry a `kind` field; the asset id/resource id already describe the render resource, and item ownership is validated through `items.*.assetIds`. Multi-asset craft/blueprint items select an asset by delivered input progress, split evenly across the ordered asset list. Item `code` no longer exists; the item id is the single stable identity. `storage` is `board`, `inventory`, or `both`; omitted means `both`. `tier` defaults to `0`, `maxStackSize` defaults to `10`, and `tags` default to `[]`. Board-only dangers cannot be hidden in inventory. `maxCount` is a board-only cap for the final item, and craft source items such as blueprints inherit that target cap during producer output and job reservation checks. Use an informational `unique` tag on intentionally single-copy content when that helps humans read the config; the cap itself still comes from `maxCount`. `passiveEffectIds` make the item an effect source according to each effect's `sourceScope`. Producer, stash, craft, merge, and removal capabilities are embedded directly on the owning item. The item is the authoring unit: take the item and you have the behavior it owns, without asking a second registry for permission like a tiny JSON bureaucrat.
 
-## Producer lines
+## Lines
 
 A producer capability lives directly on the producer item. The concrete board instance queues jobs up to `maxQueueSize`; the item definition owns the ordered `lines` array. Each line keeps a stable local `id`, because save data and jobs need to point at a line without depending on array order.
 
@@ -173,7 +173,7 @@ Merge rules live on the source item in `items.*.merges`. They are explicit and d
 
 ## Effects
 
-Effect definitions are deliberately boring now: an effect only publishes one or more global grants while its source exists. The source is an item/building with `passiveEffectIds`, or a timed active producer line with `activatesEffectId`. Each effect must declare `polarity`: `buff`, `debuff`, `neutral`, or `mixed`. Runtime logic does not infer meaning from math or labels; UI groups effects by this explicit authoring truth, because guessing intent from JSON is how software gets haunted. The effect definition also decides where passive item sources count through `sourceScope`: `board`, `inventory`, or `both`; omitted means board-only. Each grant has a stable `id` used by runtime selectors and a player-readable `name` used by detail UI, so UI must not print raw grant ids in player-facing surfaces.
+Effect definitions are deliberately boring now: an effect only publishes one or more global grants while its source exists. The source is an item/building with `passiveEffectIds`, or a timed active line with `activatesEffectId`. Each effect must declare `polarity`: `buff`, `debuff`, `neutral`, or `mixed`. Runtime logic does not infer meaning from math or labels; UI groups effects by this explicit authoring truth, because guessing intent from JSON is how software gets haunted. The effect definition also decides where passive item sources count through `sourceScope`: `board`, `inventory`, or `both`; omitted means board-only. Each grant has a stable `id` used by runtime selectors and a player-readable `name` used by detail UI, so UI must not print raw grant ids in player-facing surfaces.
 
 ```json
 {
@@ -193,13 +193,13 @@ Effect definitions are deliberately boring now: an effect only publishes one or 
 }
 ```
 
-Effects do not contain operations, targets, product-line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Centralized grants are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
+Effects do not contain operations, targets, line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Centralized grants are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
 
 Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each source ref is `{ "id": "..." }`, `{ "ids": ["..."] }`, or `{ "tag": "..." }`. Compile expands tags into deterministic runtime `{ "ids": [...] }` clauses.
 
 ## Output-owned producer effects
 
-Producer and stash product definitions no longer declare root `effects`. Every producer-facing rule belongs on the concrete `output` entry it affects, including weighted entries. Runtime evaluates the ordered `effects` from top to bottom for that one drop and returns both the rollable output state and UI explanation rows. One output can be hidden, disabled, sped up, slowed down, or given bonus chance without making its sibling outputs inherit the same rule because they had the misfortune of sharing a product line.
+Producer and stash product definitions no longer declare root `effects`. Every producer-facing rule belongs on the concrete `output` entry it affects, including weighted entries. Runtime evaluates the ordered `effects` from top to bottom for that one drop and returns both the rollable output state and UI explanation rows. One output can be hidden, disabled, sped up, slowed down, or given bonus chance without making its sibling outputs inherit the same rule because they had the misfortune of sharing a line.
 
 Supported output-owned effect kinds:
 
@@ -233,7 +233,7 @@ Craft recipe `effects` are intentionally narrower than producer output effects. 
 { "kind": "grant.blockStart", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
 ```
 
-Craft targets do not have multiple visible product lines, output loot plans, or duration bonus summaries. Validation rejects producer-only output effects on craft recipes instead of silently pretending everything is fine like a tiny bureaucrat with a clipboard.
+Craft targets do not have multiple visible lines, output loot plans, or duration bonus summaries. Validation rejects producer-only output effects on craft recipes instead of silently pretending everything is fine like a tiny bureaucrat with a clipboard.
 
 ## Time model
 

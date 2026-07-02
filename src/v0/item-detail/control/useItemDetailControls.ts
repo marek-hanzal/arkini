@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { DetailCraftControl } from "~/v0/item-detail/control/DetailCraftControl";
-import type { DetailProducerLineModel } from "~/v0/item-detail/control/DetailProducerLineModel";
+import type { DetailLineModel } from "~/v0/item-detail/control/DetailLineModel";
 import { readDetailCraftControl } from "~/v0/item-detail/control/readDetailCraftControl";
-import { readDetailProducerLineControl } from "~/v0/item-detail/control/readDetailProducerLineControl";
+import { readDetailLineControl } from "~/v0/item-detail/control/readDetailLineControl";
 
 export namespace useItemDetailControls {
 	export interface Props {
@@ -11,16 +11,16 @@ export namespace useItemDetailControls {
 		canSetDefaultLines: boolean;
 		isPending: boolean;
 		onClaimCraft(): void;
-		onSetDefaultProducerLine(lineId: string): void;
+		onSetDefaultLine(lineId: string): void;
 		onStartCraft(): void;
-		onStartProducerLine(lineId: string): void;
+		onStartLine(lineId: string): void;
 		onWithdrawCraftInput(itemId: string): void;
-		onWithdrawProducerLineInput(lineId: string, itemId: string): void;
+		onWithdrawLineInput(lineId: string, itemId: string): void;
 	}
 
 	export interface Result {
 		craftControl?: DetailCraftControl;
-		producerLineModels: readonly DetailProducerLineModel[];
+		lineModels: readonly DetailLineModel[];
 	}
 }
 
@@ -29,14 +29,14 @@ export const useItemDetailControls = ({
 	canSetDefaultLines,
 	isPending,
 	onClaimCraft,
-	onSetDefaultProducerLine,
+	onSetDefaultLine,
 	onStartCraft,
-	onStartProducerLine,
+	onStartLine,
 	onWithdrawCraftInput,
-	onWithdrawProducerLineInput,
+	onWithdrawLineInput,
 }: useItemDetailControls.Props): useItemDetailControls.Result => {
 	const craft = boardItem?.craft;
-	const producerLines = boardItem?.activation?.producerLines ?? [];
+	const lines = boardItem?.activation?.lines ?? [];
 	const craftControl = useMemo(
 		() =>
 			craft
@@ -56,15 +56,15 @@ export const useItemDetailControls = ({
 			onWithdrawCraftInput,
 		],
 	);
-	const producerLineModels = useMemo(
+	const lineModels = useMemo(
 		() =>
-			producerLines.map((line) => ({
-				control: readDetailProducerLineControl({
+			lines.map((line) => ({
+				control: readDetailLineControl({
 					canSetDefault: canSetDefaultLines,
 					line,
-					onSetDefault: onSetDefaultProducerLine,
-					onStart: onStartProducerLine,
-					onWithdrawInput: onWithdrawProducerLineInput,
+					onSetDefault: onSetDefaultLine,
+					onStart: onStartLine,
+					onWithdrawInput: onWithdrawLineInput,
 					pending: isPending,
 				}),
 				line,
@@ -72,15 +72,15 @@ export const useItemDetailControls = ({
 		[
 			canSetDefaultLines,
 			isPending,
-			onSetDefaultProducerLine,
-			onStartProducerLine,
-			onWithdrawProducerLineInput,
-			producerLines,
+			onSetDefaultLine,
+			onStartLine,
+			onWithdrawLineInput,
+			lines,
 		],
 	);
 
 	return {
 		craftControl,
-		producerLineModels,
+		lineModels,
 	};
 };

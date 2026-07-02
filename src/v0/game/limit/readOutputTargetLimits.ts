@@ -1,11 +1,11 @@
 import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import type { GameLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readItemTargetLimits } from "~/v0/game/limit/readItemTargetLimits";
 import { mergeItemTargetLimits } from "~/v0/game/limit/mergeItemTargetLimits";
 
-type ActivationOutput = NonNullable<GameProducerLineDefinition["output"]>;
+type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
 
 export namespace readOutputTargetLimits {
 	export interface Props {

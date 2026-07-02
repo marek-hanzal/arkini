@@ -14,7 +14,7 @@ The current gameplay direction is producer-driven rather than merge-chain-driven
 - Merge should be used mostly where merging is logical or abstract, such as coins, energy/lightning, or recipe discovery.
 - Avoid fake material merge chains such as `twig + twig -> bigger twig` unless there is a strong gameplay reason.
 - Low-level materials are plain semantic items. A log is `item:log`, not `item:log-t1`.
-- Upgrade tiers belong primarily to producers/buildings and their product lines, not to ordinary resources.
+- Upgrade tiers belong primarily to producers/buildings and their lines, not to ordinary resources.
 
 ### Movement and storage default
 
@@ -55,7 +55,7 @@ Townhall tier progression is a one-way era gate. Crafting the next Town Hall con
 
 Higher Town Hall tiers do not re-issue lower-era blueprints. If the player wants duplicate lower-era infrastructure, they should build it before moving to the next era. Missing duplicates should slow later economy, not soft-lock progression.
 
-Townhall producer lines use era-proof inputs, while blueprint craft recipes use construction inputs. Current era spine:
+Townhall lines use era-proof inputs, while blueprint craft recipes use construction inputs. Current era spine:
 
 ```txt
 Town Hall I
@@ -151,7 +151,7 @@ proximity:sawmill-t1:lumberjack-t1
 line:lumberjack-t1:log
 line:sawmill-t1:plank
 product inputs live inline on `line:sawmill-t1:plank`
-outputs live inline on the product lines
+outputs live inline on the lines
 ```
 
 Stone pair:
@@ -167,7 +167,7 @@ proximity:stonemason-t1:quarry-t1
 line:quarry-t1:stone
 line:stonemason-t1:stone-block
 product inputs live inline on `line:stonemason-t1:stone-block`
-outputs live inline on the product lines
+outputs live inline on the lines
 ```
 
 Food and trade lines:
@@ -231,7 +231,7 @@ Era VII mining expansion
 
 Era VIII dirty processing and advanced construction materials
   Academy + Coal + Water + Advanced Knowledge -> Purifier I Blueprint
-  Purifier I must be owned and nearby before dirty product lines run.
+  Purifier I must be owned and nearby before dirty lines run.
   Charcoal Burner I + Log + nearby Purifier -> Charcoal + random Pollution
   Clay Pit + Water + nearby Clay Deposit -> Clay
   Sand Pit + nearby Sand Deposit -> Sand
@@ -526,7 +526,7 @@ Prepared item asset IDs:
 
 ### Mining and dirty industry gameplay
 
-Mining is now the focused Era VII progression through Academy and Prospector Guild 2. Dirty processing is the following Era VIII layer: Purifier comes first, and any coal/charcoal product line must run near it and may emit board-only pollution. Tiny OSHA, but with worse paperwork.
+Mining is now the focused Era VII progression through Academy and Prospector Guild 2. Dirty processing is the following Era VIII layer: Purifier comes first, and any coal/charcoal line must run near it and may emit board-only pollution. Tiny OSHA, but with worse paperwork.
 
 `item:sausage` is now produced by the slaughterhouse branch of the food chain instead of being a placeholder. Good, the economy no longer pretends sausages grow in config comments.
 
@@ -554,7 +554,7 @@ producer:smelter-t1
   Gold Ore Cart + 2 Coal Cart + Water + nearby Purifier -> Gold Ingot + random Pollution
 ```
 
-The purifier is an early required sink for board-only pollution. Its product lines intentionally define no `output`; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
+The purifier is an early required sink for board-only pollution. Its lines intentionally define no `output`; the product consumes pollution and finishes without spawning anything. It has a single-cleanup line plus a bulk quality-of-life line:
 
 ```txt
 producer:purifier-t1
@@ -602,7 +602,7 @@ This currently introduces `item:coin` as the first playable currency item and gi
 
 ### Heroes guild expedition loop
 
-Heroes Guild I is prepared late-era content but is not connected to the current townhall progression. When it comes back, it should remain a producer with long product lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
+Heroes Guild I is prepared late-era content but is not connected to the current townhall progression. When it comes back, it should remain a producer with long lines: the player pays coins plus food/drink supplies, waits for the hero expedition, and receives exactly one locked chest. Lower expedition tiers have a small weighted chance to upgrade the returned chest by one tier.
 
 ```txt
 future late-era blueprint source
@@ -638,7 +638,7 @@ Guild branch asset IDs:
 
 ### Housing morale side economy
 
-Housing is a parallel morale subsystem layered on top of the core producer economy. Houses consume comfort goods from the era where they appear and produce morale tokens. Morale is intentionally not required for ordinary production lines; base lines stay available. Where morale appears in producer lines, it is authored as a duplicate boosted line with better output/speed. Where morale appears in crafts, it is reserved for bigger civic upgrades and prestige buildings, because even a tiny city should occasionally ask whether its people are miserable before building another giant marble ego box.
+Housing is a parallel morale subsystem layered on top of the core producer economy. Houses consume comfort goods from the era where they appear and produce morale tokens. Morale is intentionally not required for ordinary production lines; base lines stay available. Where morale appears in lines, it is authored as a duplicate boosted line with better output/speed. Where morale appears in crafts, it is reserved for bigger civic upgrades and prestige buildings, because even a tiny city should occasionally ask whether its people are miserable before building another giant marble ego box.
 
 ```txt
 House I  + Water + Log -> Morale I
@@ -675,15 +675,15 @@ University
   -> House of Engineers Blueprint / Cathedral Blueprint / Mage Lodge Blueprint
 ```
 
-The actual keystone buildings emit passive global grant effects. The University outputs and keystone craft recipes own their own path-lock reactions through output/craft-owned `grant.blockStart` effects, so choosing one path disables counter-path work without item-level creation blockers. Later branch-specific product lines should keep hidden baseline outputs and reveal affected output entries through visibility-phase `grant.require` effects.
+The actual keystone buildings emit passive global grant effects. The University outputs and keystone craft recipes own their own path-lock reactions through output/craft-owned `grant.blockStart` effects, so choosing one path disables counter-path work without item-level creation blockers. Later branch-specific lines should keep hidden baseline outputs and reveal affected output entries through visibility-phase `grant.require` effects.
 
 ```txt
-producer:house-of-engineers blocks Cathedral/Mage Lodge blueprint producer lines and creation of Cathedral/Mage Lodge blueprints/buildings
-producer:cathedral blocks House of Engineers/Mage Lodge blueprint producer lines and creation of House of Engineers/Mage Lodge blueprints/buildings
-producer:mage-lodge blocks House of Engineers/Cathedral blueprint producer lines and creation of House of Engineers/Cathedral blueprints/buildings
+producer:house-of-engineers blocks Cathedral/Mage Lodge blueprint lines and creation of Cathedral/Mage Lodge blueprints/buildings
+producer:cathedral blocks House of Engineers/Mage Lodge blueprint lines and creation of House of Engineers/Mage Lodge blueprints/buildings
+producer:mage-lodge blocks House of Engineers/Cathedral blueprint lines and creation of House of Engineers/Cathedral blueprints/buildings
 ```
 
-The branches are intentionally only keystone buildings for now. Unconnected Energy/Power Plant placeholder content is not present in live config; add it back only when Engineers actually use it. Follow-up eras should give branches passive path effects that reveal branch-tagged product lines:
+The branches are intentionally only keystone buildings for now. Unconnected Energy/Power Plant placeholder content is not present in live config; add it back only when Engineers actually use it. Follow-up eras should give branches passive path effects that reveal branch-tagged lines:
 
 ```txt
 Engineers -> machines, energy, power upgrades, Pollution pressure

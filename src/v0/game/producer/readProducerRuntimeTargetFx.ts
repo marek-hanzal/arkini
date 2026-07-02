@@ -8,19 +8,19 @@ import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerC
 export namespace readProducerRuntimeTargetFx {
 	export interface Props {
 		config: GameConfig;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		save: GameSave;
 	}
 }
 
 export const readProducerRuntimeTargetFx = Effect.fn("readProducerRuntimeTargetFx")(function* ({
 	config,
-	producerItemInstanceId,
+	itemInstanceId,
 	save,
 }: readProducerRuntimeTargetFx.Props) {
 	const producerItem = yield* readProducerBoardItemFx({
 		config,
-		producerItemInstanceId,
+		itemInstanceId,
 		save,
 	});
 	const producerId = producerItem.itemId;

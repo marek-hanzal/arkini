@@ -12,7 +12,7 @@ export namespace rescheduleProducerQueueAfterBlockedDeliveryFx {
 		blockedJobId: string;
 		config: GameConfig;
 		nextSave: GameSave;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		resumeAtMs: number;
 	}
 }
@@ -23,19 +23,16 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 	blockedJobId,
 	config,
 	nextSave,
-	producerItemInstanceId,
+	itemInstanceId,
 	resumeAtMs,
 }: rescheduleProducerQueueAfterBlockedDeliveryFx.Props) {
 	let cursorAtMs = resumeAtMs;
-	const queuedJobs = Object.values(nextSave.producerJobs)
-		.filter(
-			(job) =>
-				job.producerItemInstanceId === producerItemInstanceId && job.id !== blockedJobId,
-		)
+	const jobs = Object.values(nextSave.producerJobs)
+		.filter((job) => job.itemInstanceId === itemInstanceId && job.id !== blockedJobId)
 		.sort(compareProducerQueueJobs);
-	const rescheduledProducerJobIds = new Set(queuedJobs.map((job) => job.id));
+	const rescheduledProducerJobIds = new Set(jobs.map((job) => job.id));
 
-	for (const job of queuedJobs) {
+	for (const job of jobs) {
 		const nextStartAtMs = Math.max(job.startAtMs, cursorAtMs);
 		if (nextStartAtMs === job.startAtMs) {
 			cursorAtMs = job.readyAtMs;
@@ -45,7 +42,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 		const timing = yield* readProducerJobTimingFx({
 			config,
 			ignoredProducerJobIds: rescheduledProducerJobIds,
-			producerItemInstanceId: job.producerItemInstanceId,
+			itemInstanceId: job.itemInstanceId,
 			lineId: job.lineId,
 			save: nextSave,
 			startAtMs: nextStartAtMs,
@@ -63,7 +60,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 		});
 		if (!line) {
 			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing producer line "${job.lineId}".`),
+				GameEngineError.configReferenceMissing(`Missing line "${job.lineId}".`),
 			);
 		}
 		if (line.activatesEffectId) {
@@ -83,7 +80,7 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 				effectId: line.activatesEffectId,
 				endAtMs: timing.readyAtMs,
 				producerJobId: job.id,
-				sourceItemInstanceId: job.producerItemInstanceId,
+				sourceItemInstanceId: job.itemInstanceId,
 				startAtMs: timing.startAtMs,
 			};
 		}

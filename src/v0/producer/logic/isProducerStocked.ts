@@ -1,28 +1,28 @@
 import { readActivationInputViewFillableQuantity } from "~/v0/board/logic/readActivationInputViewFillableQuantity";
 import { readActivationInputViewReady } from "~/v0/board/logic/readActivationInputViewReady";
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
-import { readProducerLineRunState } from "~/v0/producer/logic/readProducerLineRunState";
+import { readLineRunState } from "~/v0/producer/logic/readLineRunState";
 
 export function isProducerStocked(activation: ActivationView | undefined) {
 	if (!activation) return false;
 
 	if (activation.kind === "producer") {
 		const defaultLines = [
-			activation.producerLines?.find((line) => line.isDefault && line.lineKind === "effect"),
-			activation.producerLines?.find((line) => line.isDefault && line.lineKind === "product"),
+			activation.lines?.find((line) => line.isDefault && line.kind === "effect"),
+			activation.lines?.find((line) => line.isDefault && line.kind === "product"),
 		].filter((line): line is NonNullable<typeof line> => Boolean(line));
 
 		return defaultLines.some(
 			(line) =>
-				readProducerLineRunState({
+				readLineRunState({
 					line,
 				}).canRunAction,
 		);
 	}
 
-	const stashLine = activation.producerLines?.[0];
+	const stashLine = activation.lines?.[0];
 	if (stashLine) {
-		return readProducerLineRunState({
+		return readLineRunState({
 			line: stashLine,
 		}).canRunAction;
 	}

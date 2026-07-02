@@ -14,7 +14,7 @@ const createProducerJob = (id: string) => ({
 	readyAtMs: 1000,
 	id,
 	lineId: "line:test",
-	producerItemInstanceId: "item-instance:1",
+	itemInstanceId: "item-instance:1",
 	startAtMs: 0,
 });
 
@@ -183,7 +183,7 @@ describe("GameSaveConfigSchema", () => {
 			nowMs: 0,
 		});
 		const invalidSave = cloneSave(save);
-		invalidSave.producerLines["item-instance:1"] = {
+		invalidSave.lines["item-instance:1"] = {
 			defaultLineId: "line:missing",
 		};
 

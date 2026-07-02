@@ -7,14 +7,14 @@ describe("DetailCard", () => {
 		const html = renderToStaticMarkup(
 			<DetailCard
 				eyebrow="Lines"
-				title="Producer lines"
+				title="Hidden title"
 			>
 				<div>Body</div>
 			</DetailCard>,
 		);
 
 		expect(html).toContain("Lines");
-		expect(html).not.toContain("Producer lines");
+		expect(html).not.toContain("Hidden title");
 	});
 
 	it("keeps plain titles for cards without an eyebrow", () => {

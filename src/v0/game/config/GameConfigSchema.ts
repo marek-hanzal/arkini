@@ -872,7 +872,7 @@ const validateCraftRecipeEffectRuntimeSupport = (
 						effectIndex,
 						"phase",
 					],
-					'Craft recipe grant requirements only support phase "start" because craft targets do not own visible producer lines.',
+					'Craft recipe grant requirements only support phase "start" because craft targets do not own visible lines.',
 				);
 			}
 			continue;
@@ -902,9 +902,9 @@ const readConfigCraftRecipes = (config: z.infer<typeof BaseGameConfigSchema>) =>
 			: [],
 	);
 
-const readConfigProducerLines = (config: z.infer<typeof BaseGameConfigSchema>) =>
+const readConfigLines = (config: z.infer<typeof BaseGameConfigSchema>) =>
 	Object.entries(config.items).flatMap(([ownerItemId, item]) => {
-		const producerLines = (item.producer?.lines ?? []).map((line, lineIndex) => ({
+		const lines = (item.producer?.lines ?? []).map((line, lineIndex) => ({
 			line,
 			lineIndex,
 			linePath: [
@@ -933,7 +933,7 @@ const readConfigProducerLines = (config: z.infer<typeof BaseGameConfigSchema>) =
 			: [];
 
 		return [
-			...producerLines,
+			...lines,
 			...stashLine,
 		];
 	});
@@ -950,11 +950,11 @@ type ProducerLikeCapability = NonNullable<
 type StashLikeCapability = NonNullable<
 	z.infer<typeof BaseGameConfigSchema>["items"][string]["stash"]
 >;
-type ProducerLine = ProducerLikeCapability["lines"][number] | StashLikeCapability["line"];
+type Line = ProducerLikeCapability["lines"][number] | StashLikeCapability["line"];
 
 const readProducerCapabilityLines = (
 	capability: ProducerLikeCapability | StashLikeCapability,
-): readonly ProducerLine[] =>
+): readonly Line[] =>
 	"line" in capability
 		? [
 				capability.line,
@@ -995,7 +995,7 @@ const validateProducerCapability = ({
 			linePathKey,
 		],
 		lines.map((line) => line.id),
-		(value) => `Duplicate producer line "${value}".`,
+		(value) => `Duplicate line "${value}".`,
 	);
 
 	for (const [lineIndex, line] of lines.entries()) {
@@ -1078,7 +1078,7 @@ const validateProducerCapability = ({
 					...linePath,
 					"activatesEffectId",
 				],
-				"Active effect producer lines must not also define output.",
+				"Active effect lines must not also define output.",
 			);
 		}
 	}
@@ -1204,7 +1204,7 @@ const validateBlueprintDependencyCycles = (
 		blueprintItemIds,
 		config,
 	});
-	collectProducerLineBlueprintDependencies({
+	collectLineBlueprintDependencies({
 		addDependencyItem,
 		blueprintItemIds,
 		config,
@@ -1332,7 +1332,7 @@ const collectCraftRecipeBlueprintDependencies = ({
 	}
 };
 
-const collectProducerLineBlueprintDependencies = ({
+const collectLineBlueprintDependencies = ({
 	addDependencyItem,
 	blueprintItemIds,
 	config,
@@ -1345,7 +1345,7 @@ const collectProducerLineBlueprintDependencies = ({
 	blueprintItemIds: ReadonlySet<string>;
 	config: z.infer<typeof BaseGameConfigSchema>;
 }) => {
-	for (const { line, lineIndex, linePath, ownerItemId } of readConfigProducerLines(config)) {
+	for (const { line, lineIndex, linePath, ownerItemId } of readConfigLines(config)) {
 		const outputEntries = readActivationOutputEffectEntries({
 			output: line.output ?? [],
 			path: [
@@ -1927,7 +1927,7 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 		});
 	}
 
-	for (const { line, linePath, ownerItemId } of readConfigProducerLines(config)) {
+	for (const { line, linePath, ownerItemId } of readConfigLines(config)) {
 		const lineRequirements: GameplayRequirement[] = [
 			createItemRequirement({
 				itemId: ownerItemId,
@@ -1968,7 +1968,7 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 			];
 
 			addItemSource({
-				label: `producer line "${line.id}" (${line.name})`,
+				label: `line "${line.id}" (${line.name})`,
 				path: linePath,
 				requirements: outputRequirements,
 				sourceId: `line:${ownerItemId}:${line.id}:output:${outputEntry.sourceKey}`,
@@ -2135,7 +2135,7 @@ const validateGrantRequirementsHavePossibleSource = (
 					effectIndex,
 					"selector",
 				],
-				`Soft-lock risk: grant requirement on ${usage.label} can never be satisfied because no passive item or active producer line can provide ${formatGrantSelector(config, lineEffect.selector)}.`,
+				`Soft-lock risk: grant requirement on ${usage.label} can never be satisfied because no passive item or active line can provide ${formatGrantSelector(config, lineEffect.selector)}.`,
 			);
 		}
 	}
@@ -2204,7 +2204,7 @@ const validateGrantRequirementBlockerContradictions = (
 };
 
 const readLineEffectUsages = (config: z.infer<typeof BaseGameConfigSchema>) => [
-	...readConfigProducerLines(config).flatMap(({ line, linePath, ownerItemId }) =>
+	...readConfigLines(config).flatMap(({ line, linePath, ownerItemId }) =>
 		readActivationOutputEffectEntries({
 			output: line.output ?? [],
 			path: [
@@ -2213,7 +2213,7 @@ const readLineEffectUsages = (config: z.infer<typeof BaseGameConfigSchema>) => [
 			],
 		}).map((outputEntry) => ({
 			enforceSoftLock: isGameplayProgressionProducer(config, ownerItemId),
-			label: `producer line "${line.id}" (${line.name}) output ${formatItemLabel(config, outputEntry.itemId)}`,
+			label: `line "${line.id}" (${line.name}) output ${formatItemLabel(config, outputEntry.itemId)}`,
 			lineEffects: outputEntry.effects,
 			path: [
 				...outputEntry.path,
@@ -2443,7 +2443,7 @@ const formatUnreachableGameplayTargetMessage = ({
 	);
 
 	if (targetSources.length === 0) {
-		return `Soft-lock risk: ${targetLabel} is not reachable from startingState. No starting entry, merge, craft recipe, producer line output, passive effect, or active effect can create it.`;
+		return `Soft-lock risk: ${targetLabel} is not reachable from startingState. No starting entry, merge, craft recipe, line output, passive effect, or active effect can create it.`;
 	}
 
 	const closestSource = [

@@ -355,7 +355,7 @@ describe("resolveBoardDropFeedback", () => {
 			activation: {
 				inputs: [],
 				kind: "producer",
-				producerLines: [
+				lines: [
 					{
 						durationMs: 1000,
 						inProgress: false,
@@ -375,13 +375,13 @@ describe("resolveBoardDropFeedback", () => {
 						inputsReady: false,
 						inputsAvailable: false,
 						name: "Test product",
-						lineKind: "product" as const,
-						producerQueuedJobs: 0,
+						kind: "product" as const,
+						queueUsed: 0,
 						lineId: "line:test",
 						queueFull: false,
 						blocked: false,
-						queuedJobs: 0,
-						queueSize: 1,
+						jobs: 0,
+						queueMax: 1,
 					},
 				],
 				trigger: "click",
@@ -425,7 +425,7 @@ describe("resolveBoardDropFeedback", () => {
 		});
 	});
 
-	it("marks stash inputs as secondary merge feedback when shared product-line views are present", () => {
+	it("marks stash inputs as secondary merge feedback when shared line views are present", () => {
 		const source = boardItem({
 			id: "a",
 			itemId: "item:twig",
@@ -449,7 +449,7 @@ describe("resolveBoardDropFeedback", () => {
 					},
 				],
 				kind: "stash",
-				producerLines: [
+				lines: [
 					{
 						durationMs: 1000,
 						inProgress: false,
@@ -469,13 +469,13 @@ describe("resolveBoardDropFeedback", () => {
 						inputsReady: false,
 						isDefault: false,
 						name: "Open stash",
-						lineKind: "product" as const,
-						producerQueuedJobs: 0,
+						kind: "product" as const,
+						queueUsed: 0,
 						lineId: "line:stash",
 						queueFull: false,
 						blocked: false,
-						queuedJobs: 0,
-						queueSize: 1,
+						jobs: 0,
+						queueMax: 1,
 					},
 				],
 				trigger: "click",

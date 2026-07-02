@@ -28,17 +28,17 @@ const producerExitDurationMs = 1;
 
 const readRetainedTileExitDelayMs = ({
 	plan,
-	producerItemInstanceId,
+	itemInstanceId,
 }: {
 	plan: GameEngineVisualPlanDraft;
-	producerItemInstanceId: string;
+	itemInstanceId: string;
 }) => {
 	const linkedMotionMilestonesMs = [
 		...plan.boardEnterRequests
-			.filter((request) => request.enter?.fromTileId === producerItemInstanceId)
+			.filter((request) => request.enter?.fromTileId === itemInstanceId)
 			.map((request) => readMotionStartMs(request.enter?.delayMs)),
 		...plan.boardTransientTilePlans
-			.filter((entry) => entry.request.exit?.toTileId === producerItemInstanceId)
+			.filter((entry) => entry.request.exit?.toTileId === itemInstanceId)
 			.map((entry) => readMotionEndMs(entry.cleanupDelayMs)),
 	];
 
@@ -59,7 +59,7 @@ export const appendProducerDepletedRetainedTile = ({
 
 	const delayMs = readRetainedTileExitDelayMs({
 		plan,
-		producerItemInstanceId: event.itemInstanceId,
+		itemInstanceId: event.itemInstanceId,
 	});
 	const durationMs = producerExitDurationMs;
 	const groupId = `engine:producer-depleted-retain:${event.itemInstanceId}:${event.atMs}`;

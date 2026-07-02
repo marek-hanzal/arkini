@@ -47,7 +47,7 @@ const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffect
 	});
 	if (!line) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing producer line "${job.lineId}".`),
+			GameEngineError.configReferenceMissing(`Missing line "${job.lineId}".`),
 		);
 	}
 	if (!line.activatesEffectId) return;
@@ -68,7 +68,7 @@ const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffect
 		effectId: line.activatesEffectId,
 		endAtMs: readyAtMs,
 		producerJobId: job.id,
-		sourceItemInstanceId: job.producerItemInstanceId,
+		sourceItemInstanceId: job.itemInstanceId,
 		startAtMs,
 	};
 });

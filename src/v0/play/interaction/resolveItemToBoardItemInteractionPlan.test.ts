@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+import type { LineView } from "~/v0/board/view/LineViewSchema";
 import { createEngineTestConfig } from "~/v0/game/engine/test/createEngineTestConfig";
 import { resolveItemToBoardItemInteractionPlan } from "~/v0/play/interaction/resolveItemToBoardItemInteractionPlan";
 
-const productLine = (
-	overrides: Partial<ProducerLineView> & Pick<ProducerLineView, "lineId">,
-): ProducerLineView => {
+const line = (overrides: Partial<LineView> & Pick<LineView, "lineId">): LineView => {
 	const { lineId, ...rest } = overrides;
 
 	return {
@@ -28,22 +26,22 @@ const productLine = (
 		inputsReady: false,
 		isDefault: false,
 		name: lineId,
-		lineKind: "product" as const,
+		kind: "product" as const,
 		lineId,
-		producerQueuedJobs: 0,
+		queueUsed: 0,
 		queueFull: false,
 		blocked: false,
-		queueSize: 1,
-		queuedJobs: 0,
+		queueMax: 1,
+		jobs: 0,
 		...rest,
 	};
 };
 
-const producerTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
+const producerTarget = (lines: LineView[]): BoardViewItem => ({
 	activation: {
 		inputs: [],
 		kind: "producer",
-		producerLines,
+		lines,
 		trigger: "click",
 	},
 	id: "producer",
@@ -53,7 +51,7 @@ const producerTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
 	y: 0,
 });
 
-const stashTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
+const stashTarget = (lines: LineView[]): BoardViewItem => ({
 	activation: {
 		inputs: [
 			{
@@ -65,7 +63,7 @@ const stashTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
 			},
 		],
 		kind: "stash",
-		producerLines,
+		lines,
 		trigger: "click",
 	},
 	id: "stash",
@@ -76,15 +74,15 @@ const stashTarget = (producerLines: ProducerLineView[]): BoardViewItem => ({
 });
 
 describe("resolveItemToBoardItemInteractionPlan", () => {
-	it("routes producer inputs into the default producer line before earlier matching lines", () => {
+	it("routes producer inputs into the default line before earlier matching lines", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),
 			sourceItemId: "item:twig",
 			targetItem: producerTarget([
-				productLine({
+				line({
 					lineId: "line:first",
 				}),
-				productLine({
+				line({
 					isDefault: true,
 					lineId: "line:default",
 				}),
@@ -102,7 +100,7 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			config: createEngineTestConfig(),
 			sourceItemId: "item:twig",
 			targetItem: producerTarget([
-				productLine({
+				line({
 					isDefault: true,
 					inputs: [
 						{
@@ -115,10 +113,10 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 					],
 					lineId: "line:default",
 				}),
-				productLine({
+				line({
 					lineId: "line:next",
 				}),
-				productLine({
+				line({
 					lineId: "line:last",
 				}),
 			]),
@@ -130,12 +128,12 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 		});
 	});
 
-	it("routes stash inputs to stash open even when shared producer-line views are present", () => {
+	it("routes stash inputs to stash open even when shared line views are present", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),
 			sourceItemId: "item:twig",
 			targetItem: stashTarget([
-				productLine({
+				line({
 					lineId: "line:stash",
 				}),
 			]),
@@ -164,12 +162,12 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 		});
 	});
 
-	it("does not show producer product passive grants as droppable stored slots", () => {
+	it("does not show line passive grants as droppable stored slots", () => {
 		const plan = resolveItemToBoardItemInteractionPlan({
 			config: createEngineTestConfig(),
 			sourceItemId: "item:water",
 			targetItem: producerTarget([
-				productLine({
+				line({
 					lineId: "line:watered",
 				}),
 			]),
@@ -185,10 +183,10 @@ describe("resolveItemToBoardItemInteractionPlan", () => {
 			config: createEngineTestConfig(),
 			sourceItemId: "item:twig",
 			targetItem: producerTarget([
-				productLine({
+				line({
 					inProgress: true,
 					lineId: "line:running",
-					producerQueuedJobs: 1,
+					queueUsed: 1,
 				}),
 			]),
 		});

@@ -8,21 +8,21 @@ export namespace readProducerBoardItemFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 	}
 }
 
 export const readProducerBoardItemFx = Effect.fn("readProducerBoardItemFx")(function* ({
 	config,
 	save,
-	producerItemInstanceId,
+	itemInstanceId,
 }: readProducerBoardItemFx.Props) {
-	const boardItem = save.board.items[producerItemInstanceId];
+	const boardItem = save.board.items[itemInstanceId];
 	if (!boardItem) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
-				`Missing board item instance "${producerItemInstanceId}".`,
+				`Missing board item instance "${itemInstanceId}".`,
 			),
 		);
 	}
@@ -35,7 +35,7 @@ export const readProducerBoardItemFx = Effect.fn("readProducerBoardItemFx")(func
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
-				`Board item "${producerItemInstanceId}" is not a producer-like capability.`,
+				`Board item "${itemInstanceId}" is not a producer-like capability.`,
 			),
 		);
 	}

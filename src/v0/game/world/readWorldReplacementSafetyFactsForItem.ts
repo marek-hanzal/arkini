@@ -28,16 +28,12 @@ export const readWorldReplacementSafetyFactsForItem = ({
 	if (Object.values(save.craftJobs).some((job) => job.targetItemInstanceId === itemInstanceId)) {
 		pushReason(blockReasons, "craft_job");
 	}
-	if (
-		Object.values(save.producerJobs).some(
-			(job) => job.producerItemInstanceId === itemInstanceId,
-		)
-	) {
+	if (Object.values(save.producerJobs).some((job) => job.itemInstanceId === itemInstanceId)) {
 		pushReason(blockReasons, "producer_job");
 	}
 	if (
 		save.producerInputs[itemInstanceId] ||
-		save.producerLines[itemInstanceId] ||
+		save.lines[itemInstanceId] ||
 		save.producerCharges[itemInstanceId]
 	) {
 		pushReason(blockReasons, "producer_runtime_state");

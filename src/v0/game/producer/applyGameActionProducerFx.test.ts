@@ -151,7 +151,7 @@ const readLocalTwigGrantConfig = (
 });
 
 describe("applyGameActionFx Producer", () => {
-	it("starts a no-input producer product as an Effect action", () => {
+	it("starts a no-input line as an Effect action", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -160,10 +160,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -173,7 +173,7 @@ describe("applyGameActionFx Producer", () => {
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
 			readyAtMs: 1500,
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 500,
 		});
@@ -182,10 +182,10 @@ describe("applyGameActionFx Producer", () => {
 				atMs: 500,
 				readyAtMs: 1500,
 				jobId: job.id,
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				startAtMs: 500,
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 		expect(result.nextWakeAtMs).toBe(1500);
@@ -252,9 +252,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -323,9 +323,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -341,7 +341,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("completes zero-duration producer products in the same action", () => {
+	it("completes zero-duration lines in the same action", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -366,9 +366,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -389,12 +389,12 @@ describe("applyGameActionFx Producer", () => {
 				atMs: 500,
 				readyAtMs: 500,
 				lineId: "line:test",
-				type: "producer_line.started",
+				type: "line.started",
 			}),
 			expect.objectContaining({
 				atMs: 500,
 				lineId: "line:test",
-				type: "producer_line.completed",
+				type: "line.completed",
 			}),
 			expect.objectContaining({
 				itemId: "item:twig",
@@ -477,9 +477,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -569,9 +569,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -654,9 +654,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -729,9 +729,9 @@ describe("applyGameActionFx Producer", () => {
 		const first = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -741,9 +741,9 @@ describe("applyGameActionFx Producer", () => {
 		const second = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 200,
@@ -789,9 +789,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 200,
@@ -808,7 +808,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(Object.values(crafting.save.craftJobs)).toHaveLength(1);
 	});
 
-	it("rechecks product-line grants after auto-filled inputs are consumed", () => {
+	it("rechecks line grants after auto-filled inputs are consumed", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readOwnedTwigGrantConfig(baseConfig, [
 			"line:shred",
@@ -843,10 +843,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -865,7 +865,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("rejects default producer product action when no default line is selected", () => {
+	it("rejects default line action when no default line is selected", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -874,9 +874,9 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -892,7 +892,7 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("rejects hidden producer producer lines", () => {
+	it("rejects hidden lines", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -909,10 +909,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -928,26 +928,26 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("starts the saved default producer producer line when lineId is omitted", () => {
+	it("starts the saved default line when lineId is omitted", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
 			nowMs: 0,
 		});
-		save.producerLines["item-instance:1"] = {
+		save.lines["item-instance:1"] = {
 			defaultLineId: "line:shred",
 		};
 
 		const result = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				inputRefs: [
 					{
 						itemInstanceId: "item-instance:2",
 						kind: "board",
 					},
 				],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -969,13 +969,13 @@ describe("applyGameActionFx Producer", () => {
 
 		const job = readOnlyRecordValue(result.save.producerJobs);
 		expect(job).toMatchObject({
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:shred",
 		});
 		expect(result.events).toContainEqual(
 			expect.objectContaining({
 				lineId: "line:shred",
-				type: "producer_line.started",
+				type: "line.started",
 			}),
 		);
 	});
@@ -1025,10 +1025,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -1037,7 +1037,7 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.events).toMatchObject([
 			{
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
@@ -1087,10 +1087,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const started = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1117,7 +1117,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(moved.events).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					type: "producer_line.completed",
+					type: "line.completed",
 				}),
 			]),
 		);
@@ -1137,7 +1137,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(stillPaused.events).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					type: "producer_line.completed",
+					type: "line.completed",
 				}),
 			]),
 		);
@@ -1251,10 +1251,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const firstStarted = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1262,10 +1262,10 @@ describe("applyGameActionFx Producer", () => {
 		});
 		const queued = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:backup",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1418,10 +1418,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const started = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1444,10 +1444,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const queued = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:backup",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -1527,9 +1527,9 @@ describe("applyGameActionFx Producer", () => {
 		const started = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1629,10 +1629,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const started = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1690,7 +1690,7 @@ describe("applyGameActionFx Producer", () => {
 		expect(movedBack.nextWakeAtMs).toBe(2000);
 	});
 
-	it("keeps product-line local grants as gates instead of duration mutators", () => {
+	it("keeps line local grants as gates instead of duration mutators", () => {
 		const baseConfig = createEngineTestConfig();
 		const grantConfig = readLocalTwigGrantConfig(baseConfig, {
 			lineIds: [
@@ -1740,10 +1740,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1787,10 +1787,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -1806,7 +1806,7 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("consumes explicit inventory inputs at product start", () => {
+	it("consumes explicit inventory inputs at line start", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -1826,9 +1826,9 @@ describe("applyGameActionFx Producer", () => {
 						slotIndex: 0,
 					},
 				],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1849,12 +1849,12 @@ describe("applyGameActionFx Producer", () => {
 					slotIndex: 0,
 				},
 				itemId: "item:twig",
-				reason: "producer-line-input",
+				reason: "line-input",
 				type: "item.consumed",
 			},
 			{
 				lineId: "line:shred",
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
@@ -1875,9 +1875,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1900,18 +1900,18 @@ describe("applyGameActionFx Producer", () => {
 				itemId: "item:twig",
 				nextQuantity: 1,
 				previousQuantity: 0,
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 			{
 				lineId: "line:shred",
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
 
-	it("starts an up-to producer product with one explicit input ref", () => {
+	it("starts an up-to line with one explicit input ref", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -1948,9 +1948,9 @@ describe("applyGameActionFx Producer", () => {
 						kind: "board",
 					},
 				],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -1959,13 +1959,13 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.save.board.items["item-instance:2"]).toBeUndefined();
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:shred",
 			startAtMs: 100,
 		});
 	});
 
-	it("starts an up-to producer product with one stored input", () => {
+	it("starts an up-to line with one stored input", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -2000,9 +2000,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2011,13 +2011,13 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.save.producerInputs).toEqual({});
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:shred",
 			startAtMs: 100,
 		});
 	});
 
-	it("auto-fills an up-to producer product to its run maximum before starting", () => {
+	it("auto-fills an up-to line to its run maximum before starting", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -2056,9 +2056,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2073,13 +2073,13 @@ describe("applyGameActionFx Producer", () => {
 			result.events.filter((event) => event.type === "producer_input.stored"),
 		).toHaveLength(4);
 		expect(readOnlyRecordValue(result.save.producerJobs)).toMatchObject({
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:shred",
 			startAtMs: 100,
 		});
 	});
 
-	it("leaves an incomplete producer product idle when auto-fill finds no inputs", () => {
+	it("leaves an incomplete line idle when auto-fill finds no inputs", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -2089,9 +2089,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2134,9 +2134,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2170,14 +2170,14 @@ describe("applyGameActionFx Producer", () => {
 				itemId: "item:twig",
 				nextQuantity: 1,
 				previousQuantity: 0,
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 		]);
 	});
 
-	it("auto-fills only missing producer input when the producer line is partially filled", () => {
+	it("auto-fills only missing producer input when the line is partially filled", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -2217,9 +2217,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2242,13 +2242,13 @@ describe("applyGameActionFx Producer", () => {
 				itemId: "item:twig",
 				nextQuantity: 2,
 				previousQuantity: 1,
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 			{
 				lineId: "line:shred",
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
@@ -2267,9 +2267,9 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,
@@ -2296,18 +2296,18 @@ describe("applyGameActionFx Producer", () => {
 			},
 			{
 				itemId: "item:twig",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				type: "producer_input.stored",
 			},
 			{
 				lineId: "line:shred",
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
 
-	it("stores producer line input from inventory and later consumes it on product start", () => {
+	it("stores line input from inventory and later consumes it on line start", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -2325,7 +2325,7 @@ describe("applyGameActionFx Producer", () => {
 					quantity: 1,
 					slotIndex: 0,
 				},
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				type: "producer.input.store",
 			},
 			config,
@@ -2360,10 +2360,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const started = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 200,
@@ -2374,12 +2374,12 @@ describe("applyGameActionFx Producer", () => {
 		expect(started.events).toMatchObject([
 			{
 				lineId: "line:shred",
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
 
-	it("withdraws an entire producer product-line input through board then inventory placement", () => {
+	it("withdraws an entire line input through board then inventory placement", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			lineOverrides: {
@@ -2413,7 +2413,7 @@ describe("applyGameActionFx Producer", () => {
 		const result = runAction({
 			action: {
 				itemId: "item:twig",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				type: "producer.input.withdraw",
 			},
@@ -2465,7 +2465,7 @@ describe("applyGameActionFx Producer", () => {
 		]);
 	});
 
-	it("keeps producer line input stored when withdraw placement is unavailable", () => {
+	it("keeps line input stored when withdraw placement is unavailable", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -2498,7 +2498,7 @@ describe("applyGameActionFx Producer", () => {
 		const result = runActionEither({
 			action: {
 				itemId: "item:twig",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				type: "producer.input.withdraw",
 			},
@@ -2552,7 +2552,7 @@ describe("applyGameActionFx Producer", () => {
 			itemId: "item:twig",
 			quantity: 1,
 		};
-		save.producerLines["item-instance:1"] = {
+		save.lines["item-instance:1"] = {
 			defaultLineId: "line:alt-shred",
 		};
 
@@ -2563,7 +2563,7 @@ describe("applyGameActionFx Producer", () => {
 					quantity: 1,
 					slotIndex: 0,
 				},
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				type: "producer.input.store",
 			},
 			config,
@@ -2627,7 +2627,7 @@ describe("applyGameActionFx Producer", () => {
 					quantity: 1,
 					slotIndex: 0,
 				},
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				type: "producer.input.store",
 			},
 			config,
@@ -2644,7 +2644,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stores duplicate producer input into the first producer line with remaining capacity", () => {
+	it("stores duplicate producer input into the first line with remaining capacity", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
@@ -2700,7 +2700,7 @@ describe("applyGameActionFx Producer", () => {
 					quantity: 1,
 					slotIndex: 0,
 				},
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				type: "producer.input.store",
 			},
 			config,
@@ -2722,7 +2722,7 @@ describe("applyGameActionFx Producer", () => {
 		});
 	});
 
-	it("stores duplicate producer input into the next producer line after the default line is full", () => {
+	it("stores duplicate producer input into the next line after the default line is full", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
@@ -2778,7 +2778,7 @@ describe("applyGameActionFx Producer", () => {
 					quantity: 1,
 					slotIndex: 0,
 				},
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				type: "producer.input.store",
 			},
 			config,
@@ -2824,10 +2824,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -2836,7 +2836,7 @@ describe("applyGameActionFx Producer", () => {
 
 		expect(result.events).toMatchObject([
 			{
-				type: "producer_line.started",
+				type: "line.started",
 			},
 		]);
 	});
@@ -2861,10 +2861,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const result = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -2895,10 +2895,10 @@ describe("applyGameActionFx Producer", () => {
 		});
 		const first = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -2907,25 +2907,25 @@ describe("applyGameActionFx Producer", () => {
 
 		const second = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 600,
 			save: first.save,
 		});
 
-		const queuedJobs = Object.values(second.save.producerJobs);
-		expect(queuedJobs).toHaveLength(2);
-		expect(queuedJobs.find((job) => job.startAtMs === 1500)).toMatchObject({
+		const jobs = Object.values(second.save.producerJobs);
+		expect(jobs).toHaveLength(2);
+		expect(jobs.find((job) => job.startAtMs === 1500)).toMatchObject({
 			readyAtMs: 2500,
 		});
 		expect(second.nextWakeAtMs).toBe(1500);
 	});
 
-	it("rejects producer product start when the producer queue is full", () => {
+	it("rejects line start when the producer queue is full", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -2933,10 +2933,10 @@ describe("applyGameActionFx Producer", () => {
 		});
 		const first = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 500,
@@ -2945,10 +2945,10 @@ describe("applyGameActionFx Producer", () => {
 
 		const second = runActionEither({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 600,
@@ -2964,7 +2964,7 @@ describe("applyGameActionFx Producer", () => {
 		}
 	});
 
-	it("stores a non-first producer producer line as the runtime default", () => {
+	it("stores a non-first line as the runtime default", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -2973,16 +2973,16 @@ describe("applyGameActionFx Producer", () => {
 
 		const defaulted = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer.line.set_default",
+				type: "line.set_default",
 			},
 			config,
 			nowMs: 100,
 			save,
 		});
 
-		expect(defaulted.save.producerLines).toEqual({
+		expect(defaulted.save.lines).toEqual({
 			"item-instance:1": {
 				defaultLineId: "line:shred",
 			},
@@ -2992,23 +2992,23 @@ describe("applyGameActionFx Producer", () => {
 				atMs: 100,
 				nextLineId: "line:shred",
 				previousLineId: undefined,
-				producerItemInstanceId: "item-instance:1",
-				type: "producer.line.default_changed",
+				itemInstanceId: "item-instance:1",
+				type: "line.default_changed",
 			},
 		]);
 
 		const reset = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.set_default",
+				type: "line.set_default",
 			},
 			config,
 			nowMs: 200,
 			save: defaulted.save,
 		});
 
-		expect(reset.save.producerLines).toEqual({
+		expect(reset.save.lines).toEqual({
 			"item-instance:1": {
 				defaultLineId: "line:test",
 			},
@@ -3018,13 +3018,13 @@ describe("applyGameActionFx Producer", () => {
 				atMs: 200,
 				nextLineId: "line:test",
 				previousLineId: "line:shred",
-				producerItemInstanceId: "item-instance:1",
-				type: "producer.line.default_changed",
+				itemInstanceId: "item-instance:1",
+				type: "line.default_changed",
 			},
 		]);
 	});
 
-	it("unsets the runtime default when the selected producer producer line is clicked again", () => {
+	it("unsets the runtime default when the selected line is clicked again", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -3032,9 +3032,9 @@ describe("applyGameActionFx Producer", () => {
 		});
 		const defaulted = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.set_default",
+				type: "line.set_default",
 			},
 			config,
 			nowMs: 100,
@@ -3042,23 +3042,23 @@ describe("applyGameActionFx Producer", () => {
 		});
 		const unset = runAction({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.set_default",
+				type: "line.set_default",
 			},
 			config,
 			nowMs: 200,
 			save: defaulted.save,
 		});
 
-		expect(unset.save.producerLines).toEqual({});
+		expect(unset.save.lines).toEqual({});
 		expect(unset.events).toEqual([
 			{
 				atMs: 200,
 				nextLineId: undefined,
 				previousLineId: "line:test",
-				producerItemInstanceId: "item-instance:1",
-				type: "producer.line.default_changed",
+				itemInstanceId: "item-instance:1",
+				type: "line.default_changed",
 			},
 		]);
 	});
@@ -3107,9 +3107,9 @@ describe("applyGameActionFx Producer", () => {
 		const started = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,

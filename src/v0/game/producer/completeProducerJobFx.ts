@@ -9,7 +9,7 @@ import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/v0/game/produce
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/v0/game/producer/readProducerJobEffectiveLineFx";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
-import { readProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import { readLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
@@ -28,18 +28,12 @@ export namespace completeProducerJobFx {
 	}
 }
 
-const createProducerLineCompletedEvent = ({
-	job,
-	nowMs,
-}: {
-	job: GameSaveProducerJob;
-	nowMs: number;
-}) => ({
+const createLineCompletedEvent = ({ job, nowMs }: { job: GameSaveProducerJob; nowMs: number }) => ({
 	atMs: nowMs,
 	jobId: job.id,
-	producerItemInstanceId: job.producerItemInstanceId,
+	itemInstanceId: job.itemInstanceId,
 	lineId: job.lineId,
-	type: "producer_line.completed" as const,
+	type: "line.completed" as const,
 });
 
 type ProducerDeliveryItem = {
@@ -49,17 +43,17 @@ type ProducerDeliveryItem = {
 
 const toPlacementRequests = ({
 	items,
-	producerItemInstanceId,
+	itemInstanceId,
 }: {
 	items: readonly ProducerDeliveryItem[];
-	producerItemInstanceId: string;
+	itemInstanceId: string;
 }) =>
 	items.map(
 		(item) =>
 			({
 				...item,
-				originItemInstanceId: producerItemInstanceId,
-				reason: "producer-line-output",
+				originItemInstanceId: itemInstanceId,
+				reason: "line-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
 
@@ -75,16 +69,16 @@ const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProduce
 		nowMs: number;
 		save: GameSave;
 	}) {
-		const effectiveProducerLine = yield* readProducerJobEffectiveLineFx({
+		const effectiveLine = yield* readProducerJobEffectiveLineFx({
 			config,
 			nowMs,
-			producerItemInstanceId: job.producerItemInstanceId,
+			itemInstanceId: job.itemInstanceId,
 			lineId: job.lineId,
 			save,
 		});
 		return (yield* rollEffectiveLootPlanItemsFx({
 			config,
-			lootPlan: effectiveProducerLine.lootPlan,
+			lootPlan: effectiveLine.lootPlan,
 		})).items;
 	},
 );
@@ -104,7 +98,7 @@ const readProducerChargeCompletionOutcome = ({
 	job: GameSaveProducerJob;
 	save: GameSave;
 }): ProducerChargeCompletionOutcome | undefined => {
-	const producerItem = save.board.items[job.producerItemInstanceId];
+	const producerItem = save.board.items[job.itemInstanceId];
 	if (!producerItem) return undefined;
 
 	const producerId = producerItem.itemId;
@@ -113,7 +107,7 @@ const readProducerChargeCompletionOutcome = ({
 		producerId,
 	});
 	const line = producer
-		? readProducerLineDefinition({
+		? readLineDefinition({
 				producerDefinition: producer,
 				lineId: job.lineId,
 			})
@@ -125,7 +119,7 @@ const readProducerChargeCompletionOutcome = ({
 	const remainingCharges = readProducerRemainingCharges({
 		config,
 		producerId,
-		producerItemInstanceId: job.producerItemInstanceId,
+		itemInstanceId: job.itemInstanceId,
 		save,
 	});
 	if (remainingCharges === undefined) return undefined;
@@ -150,7 +144,7 @@ const createProducerChargesDepletedRemovalEvent = ({
 }) => ({
 	atMs: nowMs,
 	itemId: producerId,
-	itemInstanceId: job.producerItemInstanceId,
+	itemInstanceId: job.itemInstanceId,
 	reason: "producer-depleted" as const,
 	type: "item.removed" as const,
 });
@@ -173,7 +167,7 @@ const spendProducerChargeCostAfterCompletedDelivery = ({
 	});
 	if (!outcome) return [] satisfies GameEngineCompletionResult["events"];
 
-	nextSave.producerCharges[job.producerItemInstanceId] = {
+	nextSave.producerCharges[job.itemInstanceId] = {
 		remainingCharges: outcome.nextRemainingCharges,
 	};
 
@@ -181,9 +175,9 @@ const spendProducerChargeCostAfterCompletedDelivery = ({
 		return [] satisfies GameEngineCompletionResult["events"];
 	}
 
-	delete nextSave.board.items[job.producerItemInstanceId];
+	delete nextSave.board.items[job.itemInstanceId];
 	removeBoardItemRuntimeState({
-		itemInstanceId: job.producerItemInstanceId,
+		itemInstanceId: job.itemInstanceId,
 		save: nextSave,
 	});
 
@@ -215,7 +209,7 @@ const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
 		blockedJobId: liveJob.id,
 		config,
 		nextSave,
-		producerItemInstanceId: liveJob.producerItemInstanceId,
+		itemInstanceId: liveJob.itemInstanceId,
 		resumeAtMs: nowMs,
 	});
 });
@@ -236,7 +230,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const producerItem = save.board.items[liveJob.producerItemInstanceId];
+	const producerItem = save.board.items[liveJob.itemInstanceId];
 	const producer = producerItem
 		? readProducerCapabilityDefinition({
 				config,
@@ -244,14 +238,14 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			})
 		: undefined;
 	const line = producer
-		? readProducerLineDefinition({
+		? readLineDefinition({
 				producerDefinition: producer,
 				lineId: liveJob.lineId,
 			})
 		: undefined;
 	if (!line) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing producer line "${liveJob.lineId}".`),
+			GameEngineError.configReferenceMissing(`Missing line "${liveJob.lineId}".`),
 		);
 	}
 
@@ -288,7 +282,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 		return {
 			events: [
-				createProducerLineCompletedEvent({
+				createLineCompletedEvent({
 					job: liveJob,
 					nowMs,
 				}),
@@ -301,10 +295,10 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	const placementRequests = toPlacementRequests({
 		items: deliveryItems,
-		producerItemInstanceId: liveJob.producerItemInstanceId,
+		itemInstanceId: liveJob.itemInstanceId,
 	});
 	const seedCell = readBoardItemCell({
-		itemInstanceId: liveJob.producerItemInstanceId,
+		itemInstanceId: liveJob.itemInstanceId,
 		save,
 	});
 	const chargeOutcome = readProducerChargeCompletionOutcome({
@@ -314,7 +308,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 	});
 	const freedBoardItemInstanceIds = chargeOutcome?.removeOnDepleted
 		? new Set([
-				liveJob.producerItemInstanceId,
+				liveJob.itemInstanceId,
 			])
 		: undefined;
 	const placementEither = yield* Effect.either(
@@ -350,17 +344,17 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 			return {
 				events: [
-					createProducerLineCompletedEvent({
+					createLineCompletedEvent({
 						job: liveJob,
 						nowMs,
 					}),
 					{
 						atMs: nowMs,
 						jobId: liveJob.id,
-						producerItemInstanceId: liveJob.producerItemInstanceId,
+						itemInstanceId: liveJob.itemInstanceId,
 						lineId: liveJob.lineId,
 						reason: error.reason,
-						type: "producer_line.failed" as const,
+						type: "line.failed" as const,
 					},
 				],
 				save: nextSave,
@@ -380,7 +374,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			blockedJobId: liveJob.id,
 			config,
 			nextSave,
-			producerItemInstanceId: liveJob.producerItemInstanceId,
+			itemInstanceId: liveJob.itemInstanceId,
 			resumeAtMs: nextAttemptAtMs,
 		});
 		nextSave.updatedAtMs = nowMs;
@@ -392,10 +386,10 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 							{
 								atMs: nowMs,
 								jobId: liveJob.id,
-								producerItemInstanceId: liveJob.producerItemInstanceId,
+								itemInstanceId: liveJob.itemInstanceId,
 								lineId: liveJob.lineId,
 								reason: error.reason,
-								type: "producer_line.blocked" as const,
+								type: "line.blocked" as const,
 							},
 						]
 					: [],
@@ -409,7 +403,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 	let placementEvents = placementResult.events;
 	let chargeEvents: GameEngineCompletionResult["events"];
 	if (chargeOutcome?.removeOnDepleted) {
-		const producerItem = save.board.items[liveJob.producerItemInstanceId];
+		const producerItem = save.board.items[liveJob.itemInstanceId];
 		if (!producerItem) {
 			chargeEvents = [
 				createProducerChargesDepletedRemovalEvent({
@@ -428,9 +422,9 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			});
 			placementEvents = replacedSource.events;
 			if (!replacedSource.replaced) {
-				delete placementResult.save.board.items[liveJob.producerItemInstanceId];
+				delete placementResult.save.board.items[liveJob.itemInstanceId];
 				removeBoardItemRuntimeState({
-					itemInstanceId: liveJob.producerItemInstanceId,
+					itemInstanceId: liveJob.itemInstanceId,
 					save: placementResult.save,
 				});
 			}
@@ -462,7 +456,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 
 	return {
 		events: [
-			createProducerLineCompletedEvent({
+			createLineCompletedEvent({
 				job: liveJob,
 				nowMs,
 			}),

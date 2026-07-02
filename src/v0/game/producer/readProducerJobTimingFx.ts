@@ -7,7 +7,7 @@ export namespace readProducerJobTimingFx {
 	export interface Props {
 		config: GameConfig;
 		ignoredProducerJobIds?: ReadonlySet<string>;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		lineId: string;
 		save: GameSave;
 		startAtMs: number;
@@ -22,21 +22,21 @@ export namespace readProducerJobTimingFx {
 export const readProducerJobTimingFx = Effect.fn("readProducerJobTimingFx")(function* ({
 	config,
 	ignoredProducerJobIds,
-	producerItemInstanceId,
+	itemInstanceId,
 	lineId,
 	save,
 	startAtMs,
 }: readProducerJobTimingFx.Props) {
-	const effectiveProducerLine = yield* readProducerJobEffectiveLineFx({
+	const effectiveLine = yield* readProducerJobEffectiveLineFx({
 		config,
 		ignoredProducerJobIds,
 		nowMs: startAtMs,
-		producerItemInstanceId,
+		itemInstanceId,
 		lineId,
 		save,
 	});
 	return {
-		readyAtMs: startAtMs + effectiveProducerLine.durationMs,
+		readyAtMs: startAtMs + effectiveLine.durationMs,
 		startAtMs,
 	} satisfies readProducerJobTimingFx.Result;
 });

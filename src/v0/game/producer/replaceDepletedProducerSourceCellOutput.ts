@@ -39,8 +39,8 @@ export const replaceDepletedProducerSourceCellOutput = Effect.fn(
 	const sourceOutputIndex = events.findIndex(
 		(event) =>
 			event.type === "item.created" &&
-			event.reason === "producer-line-output" &&
-			event.originItemInstanceId === job.producerItemInstanceId &&
+			event.reason === "line-output" &&
+			event.originItemInstanceId === job.itemInstanceId &&
 			event.to.kind === "board" &&
 			isSameBoardCell(event.to, producerItem),
 	);
@@ -67,9 +67,9 @@ export const replaceDepletedProducerSourceCellOutput = Effect.fn(
 	}
 
 	delete nextSave.board.items[sourceOutputEvent.to.itemInstanceId];
-	nextSave.board.items[job.producerItemInstanceId] = {
+	nextSave.board.items[job.itemInstanceId] = {
 		...outputItem,
-		id: job.producerItemInstanceId,
+		id: job.itemInstanceId,
 		x: producerItem.x,
 		y: producerItem.y,
 	};
@@ -80,7 +80,7 @@ export const replaceDepletedProducerSourceCellOutput = Effect.fn(
 				? {
 						atMs: nowMs,
 						fromItemId: producerItem.itemId,
-						itemInstanceId: job.producerItemInstanceId,
+						itemInstanceId: job.itemInstanceId,
 						reason: "producer-depleted" as const,
 						toItemId: sourceOutputEvent.itemId,
 						type: "item.replaced" as const,

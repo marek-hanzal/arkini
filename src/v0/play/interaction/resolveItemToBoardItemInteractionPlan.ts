@@ -33,7 +33,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		targetItem.craft?.canAcceptInputs &&
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
 	);
-	const producerInputLineId = (targetItem.activation?.producerLines ?? [])
+	const producerInputLineId = (targetItem.activation?.lines ?? [])
 		.map((line, index) => ({
 			index,
 			line,

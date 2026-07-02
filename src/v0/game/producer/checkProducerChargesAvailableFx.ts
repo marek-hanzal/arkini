@@ -9,7 +9,7 @@ export namespace checkProducerChargesAvailableFx {
 	export interface Props {
 		config: GameConfig;
 		producerId: string;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		lineChargeCost: number;
 		save: GameSave;
 	}
@@ -19,7 +19,7 @@ export const checkProducerChargesAvailableFx = Effect.fn("checkProducerChargesAv
 	function* ({
 		config,
 		producerId,
-		producerItemInstanceId,
+		itemInstanceId,
 		lineChargeCost,
 		save,
 	}: checkProducerChargesAvailableFx.Props) {
@@ -28,14 +28,14 @@ export const checkProducerChargesAvailableFx = Effect.fn("checkProducerChargesAv
 		const remainingCharges = readProducerRemainingCharges({
 			config,
 			producerId,
-			producerItemInstanceId,
+			itemInstanceId,
 			save,
 		});
 		if (remainingCharges === undefined) return;
 
 		const reservedChargeCost = readProducerReservedChargeCost({
 			config,
-			producerItemInstanceId,
+			itemInstanceId,
 			save,
 		});
 		const availableCharges = remainingCharges - reservedChargeCost;
@@ -45,7 +45,7 @@ export const checkProducerChargesAvailableFx = Effect.fn("checkProducerChargesAv
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"producer_charges_depleted",
-				`Producer item "${producerItemInstanceId}" has ${availableCharges} available charges but line requires ${lineChargeCost}.`,
+				`Producer item "${itemInstanceId}" has ${availableCharges} available charges but line requires ${lineChargeCost}.`,
 			),
 		);
 	},

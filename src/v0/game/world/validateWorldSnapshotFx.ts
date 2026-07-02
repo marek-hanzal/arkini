@@ -96,7 +96,7 @@ export const validateWorldSnapshotFx = Effect.fn("validateWorldSnapshotFx")(func
 						kind: "producerJob",
 					},
 					evidence: {
-						producerItemInstanceId: producerJobFacts.producerItemInstanceId,
+						itemInstanceId: producerJobFacts.itemInstanceId,
 						queueIndex: producerJobFacts.queueIndex,
 					},
 					message: `Producer job "${job.id}" has blocked delivery but is not the queue head.`,
@@ -213,7 +213,7 @@ export const validateWorldSnapshotFx = Effect.fn("validateWorldSnapshotFx")(func
 				.filter((job) => job.targetItemInstanceId === replacementFacts.itemInstanceId)
 				.map((job) => job.id);
 			const producerJobIds = Object.values(save.producerJobs)
-				.filter((job) => job.producerItemInstanceId === replacementFacts.itemInstanceId)
+				.filter((job) => job.itemInstanceId === replacementFacts.itemInstanceId)
 				.map((job) => job.id);
 			issues.push({
 				code: "craft_and_producer_share_target",

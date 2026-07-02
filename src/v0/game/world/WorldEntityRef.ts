@@ -25,5 +25,5 @@ export type WorldEntityRef =
 	  }
 	| {
 			kind: "producerQueue";
-			producerItemInstanceId: string;
+			itemInstanceId: string;
 	  };

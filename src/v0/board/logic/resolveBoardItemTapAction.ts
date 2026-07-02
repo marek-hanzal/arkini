@@ -1,7 +1,7 @@
 import { readLiveBoardItemView } from "~/v0/board/logic/readLiveBoardItemView";
 import { readCraftRunState } from "~/v0/craft/logic/readCraftRunState";
 import { isProducerReady } from "~/v0/producer/logic/isProducerReady";
-import { readProducerLineRunState } from "~/v0/producer/logic/readProducerLineRunState";
+import { readLineRunState } from "~/v0/producer/logic/readLineRunState";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/v0/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/v0/board/BoardUtilityItem";
@@ -115,16 +115,16 @@ export const resolveBoardItemTapAction = ({
 
 	if (liveBoardItem?.activation?.kind === "producer") {
 		const defaultLines = [
-			liveBoardItem.activation.producerLines?.find(
-				(line) => line.isDefault && line.lineKind === "effect",
+			liveBoardItem.activation.lines?.find(
+				(line) => line.isDefault && line.kind === "effect",
 			),
-			liveBoardItem.activation.producerLines?.find(
-				(line) => line.isDefault && line.lineKind === "product",
+			liveBoardItem.activation.lines?.find(
+				(line) => line.isDefault && line.kind === "product",
 			),
 		].filter((line): line is NonNullable<typeof line> => Boolean(line));
 		const runnableDefaultLine = defaultLines.find(
 			(line) =>
-				readProducerLineRunState({
+				readLineRunState({
 					line,
 				}).canRunAction,
 		);

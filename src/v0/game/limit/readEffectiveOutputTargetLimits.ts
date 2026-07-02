@@ -1,6 +1,6 @@
 import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
 import { mergeItemTargetLimits } from "~/v0/game/limit/mergeItemTargetLimits";
-import type { EffectiveProducerLine } from "~/v0/game/effects/EffectiveProducerLine";
+import type { EffectiveLine } from "~/v0/game/effects/EffectiveLine";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readOutputTargetLimits } from "~/v0/game/limit/readOutputTargetLimits";
@@ -13,7 +13,7 @@ export namespace readEffectiveOutputTargetLimits {
 		includePendingCraftSourceItems?: boolean;
 		includePendingProducerJobs?: boolean;
 		nowMs?: number;
-		lootPlan: EffectiveProducerLine["lootPlan"];
+		lootPlan: EffectiveLine["lootPlan"];
 		save: GameSave;
 	}
 }

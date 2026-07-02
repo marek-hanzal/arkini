@@ -6,7 +6,7 @@ const hasCraftInputState = (craft: BoardViewItem["craft"]) =>
 const hasProducerRuntimeState = (activation: BoardViewItem["activation"]) =>
 	Boolean(
 		activation?.remainingCharges !== undefined ||
-			activation?.producerLines?.some(
+			activation?.lines?.some(
 				(line) => line.isDefault || line.inputs.some((input) => input.stored > 0),
 			) ||
 			activation?.inputs.some((input) => input.stored > 0),

@@ -78,7 +78,7 @@ describe("readItemTargetLimits", () => {
 		);
 		save.producerJobs["job:pending"] = {
 			id: "job:pending",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,

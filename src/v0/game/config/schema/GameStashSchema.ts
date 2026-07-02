@@ -4,16 +4,13 @@ import {
 	ProducerDepletedModeSchema,
 	ProducerSchema,
 } from "~/v0/game/config/schema/GameProducerSchema";
-import {
-	ProducerLineFragmentSchema,
-	ProducerLineSchema,
-} from "~/v0/game/config/schema/GameProducerLineSchema";
+import { LineFragmentSchema, LineSchema } from "~/v0/game/config/schema/GameLineSchema";
 
 export const StashBaseSchema = ProducerSchema.omit({
 	lines: true,
 })
 	.extend({
-		line: ProducerLineSchema,
+		line: LineSchema,
 		charges: PositiveNumberSchema.default(1),
 		onChargesDepleted: ProducerDepletedModeSchema.default("remove"),
 	})
@@ -32,5 +29,5 @@ export const StashSchema = StashBaseSchema.superRefine((stash, ctx) => {
 });
 
 export const StashFragmentSchema = StashBaseSchema.extend({
-	line: ProducerLineFragmentSchema,
+	line: LineFragmentSchema,
 });

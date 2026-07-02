@@ -1,15 +1,15 @@
 import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
-import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
-import { readLiveProducerLineView } from "~/v0/producer/logic/readLiveProducerLineView";
+import type { LineView } from "~/v0/board/view/LineViewSchema";
+import { readLiveLineView } from "~/v0/producer/logic/readLiveLineView";
 
-const readBoardProgressDisplay = (line: ProducerLineView) => {
+const readBoardProgressDisplay = (line: LineView) => {
 	const progress = line.progress ?? 0;
-	return line.lineKind === "effect" ? 1 - progress : progress;
+	return line.kind === "effect" ? 1 - progress : progress;
 };
 
-const compareRunningLines = (left: ProducerLineView, right: ProducerLineView) => {
-	const leftKindPriority = left.lineKind === "effect" ? 0 : 1;
-	const rightKindPriority = right.lineKind === "effect" ? 0 : 1;
+const compareRunningLines = (left: LineView, right: LineView) => {
+	const leftKindPriority = left.kind === "effect" ? 0 : 1;
+	const rightKindPriority = right.kind === "effect" ? 0 : 1;
 
 	return (
 		leftKindPriority - rightKindPriority ||
@@ -27,9 +27,9 @@ export namespace readProducerBoardProgress {
 }
 
 export function readProducerBoardProgress({ activation, nowMs }: readProducerBoardProgress.Props) {
-	if (!activation?.producerLines?.length) return undefined;
+	if (!activation?.lines?.length) return undefined;
 
-	const runningLine = activation.producerLines
+	const runningLine = activation.lines
 		?.filter(
 			(line) =>
 				line.startAtMs !== undefined &&
@@ -42,7 +42,7 @@ export function readProducerBoardProgress({ activation, nowMs }: readProducerBoa
 
 	if (!runningLine) return undefined;
 
-	const liveLine = readLiveProducerLineView({
+	const liveLine = readLiveLineView({
 		line: runningLine,
 		nowMs,
 	});

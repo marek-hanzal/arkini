@@ -4,25 +4,25 @@ import type {
 	GameMergeRuleDefinition,
 	GameProducerCapabilityDefinition,
 	GameProducerDefinition,
-	GameProducerLineDefinition,
+	GameLineDefinition,
 	GameStashDefinition,
 } from "~/v0/game/config/GameItemCapabilities";
 
-type ProducerLineOverride = Partial<GameProducerLineDefinition> & {
+type LineOverride = Partial<GameLineDefinition> & {
 	id?: string;
 };
 
 type ProducerCapabilityOverride = Partial<Omit<GameProducerDefinition, "lines">> & {
-	lines?: GameProducerLineDefinition[];
+	lines?: GameLineDefinition[];
 };
 
 type StashCapabilityOverride = Partial<Omit<GameStashDefinition, "line">> & {
-	line?: GameProducerLineDefinition;
+	line?: GameLineDefinition;
 };
 
 type TestConfigCatalogs = {
 	craftCatalog: Record<string, GameCraftRecipeDefinition>;
-	lineCatalog: Record<string, GameProducerLineDefinition>;
+	lineCatalog: Record<string, GameLineDefinition>;
 	mergeCatalog: Record<string, GameMergeRuleDefinition>;
 	producerCatalog: Record<string, GameProducerCapabilityDefinition>;
 };
@@ -30,7 +30,7 @@ type TestConfigCatalogs = {
 type EngineTestGameConfigOverrides = Omit<Partial<GameConfig>, "items"> & {
 	craftOverrides?: Record<string, GameCraftRecipeDefinition>;
 	items?: Record<string, unknown>;
-	lineOverrides?: Record<string, ProducerLineOverride>;
+	lineOverrides?: Record<string, LineOverride>;
 	producerOverrides?: Record<string, ProducerCapabilityOverride>;
 	stashOverrides?: Record<string, StashCapabilityOverride>;
 };
@@ -55,12 +55,9 @@ export const createEngineTestConfig = (
 	return attachTestConfigCatalogs(config);
 };
 
-export const readEngineTestLine = (
-	config: GameConfig,
-	lineId: string,
-): GameProducerLineDefinition => {
+export const readEngineTestLine = (config: GameConfig, lineId: string): GameLineDefinition => {
 	const line = readLineCatalog(config)[lineId];
-	if (!line) throw new Error(`Missing test producer line "${lineId}".`);
+	if (!line) throw new Error(`Missing test line "${lineId}".`);
 	return line;
 };
 
@@ -113,7 +110,7 @@ const createEmbeddedTestConfig = (overrides: EngineTestGameConfigOverrides): unk
 		draft,
 		overrides: stashOverrides,
 	});
-	applyProducerLineOverrides({
+	applyLineOverrides({
 		draft,
 		overrides: lineOverrides,
 	});
@@ -401,12 +398,12 @@ const applyStashCapabilityOverrides = ({
 	}
 };
 
-const applyProducerLineOverrides = ({
+const applyLineOverrides = ({
 	draft,
 	overrides,
 }: {
 	draft: DraftGameConfig;
-	overrides?: Record<string, ProducerLineOverride>;
+	overrides?: Record<string, LineOverride>;
 }) => {
 	for (const [lineId, override] of Object.entries(overrides ?? {})) {
 		const line = readDraftLine(draft, lineId);
@@ -484,7 +481,7 @@ const readDraftLine = (draft: DraftGameConfig, lineId: string) => {
 		if (draftItem.stash?.line?.id === lineId)
 			return draftItem.stash.line as Record<string, unknown>;
 	}
-	throw new Error(`Cannot override missing test producer line "${lineId}".`);
+	throw new Error(`Cannot override missing test line "${lineId}".`);
 };
 
 const attachTestConfigCatalogs = (config: EngineTestGameConfig) => {
@@ -513,8 +510,8 @@ const readCraftCatalog = (config: GameConfig): Record<string, GameCraftRecipeDef
 	return catalog;
 };
 
-const readLineCatalog = (config: GameConfig): Record<string, GameProducerLineDefinition> => {
-	const catalog: Record<string, GameProducerLineDefinition> = {};
+const readLineCatalog = (config: GameConfig): Record<string, GameLineDefinition> => {
+	const catalog: Record<string, GameLineDefinition> = {};
 	for (const item of Object.values(config.items)) {
 		for (const line of item.producer?.lines ?? []) catalog[line.id] = line;
 		if (item.stash?.line) catalog[item.stash.line.id] = item.stash.line;

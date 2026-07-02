@@ -40,7 +40,7 @@ describe("runtime invariants", () => {
 			id: "job:stale-derived",
 			outputItems: createOutputItems(),
 			placement: "board_then_inventory",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -75,7 +75,7 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:duplicated-output",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -103,7 +103,7 @@ describe("runtime invariants", () => {
 		});
 		save.producerJobs["job:empty-output"] = {
 			id: "job:empty-output",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:shred",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -120,9 +120,9 @@ describe("runtime invariants", () => {
 			{
 				atMs: 1000,
 				jobId: "job:empty-output",
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
-				type: "producer_line.completed",
+				type: "line.completed",
 			},
 		]);
 	});
@@ -149,7 +149,7 @@ describe("runtime invariants", () => {
 		});
 		save.producerJobs["job:live-output"] = {
 			id: "job:live-output",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -191,7 +191,7 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 2000,
 			},
 			id: "job:blocked",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -222,7 +222,7 @@ describe("runtime invariants", () => {
 		save.producerJobs["job:paused"] = {
 			id: "job:paused",
 			pausedAtMs: 250,
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			remainingMs: 750,
@@ -230,7 +230,7 @@ describe("runtime invariants", () => {
 		};
 		save.producerJobs["job:queued-behind-pause"] = {
 			id: "job:queued-behind-pause",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 2500,
 			startAtMs: 1500,
@@ -263,14 +263,14 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 3000,
 			},
 			id: "job:blocked",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
 		};
 		invalidSave.producerJobs["job:stale"] = {
 			id: "job:stale",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 2000,
 			startAtMs: 1000,
@@ -310,7 +310,7 @@ describe("runtime invariants", () => {
 		});
 		invalidSave.producerJobs["job:first"] = {
 			id: "job:first",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 1000,
 			startAtMs: 0,
@@ -321,7 +321,7 @@ describe("runtime invariants", () => {
 				nextAttemptAtMs: 3000,
 			},
 			id: "job:blocked-second",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			readyAtMs: 2000,
 			startAtMs: 1000,

@@ -13,7 +13,7 @@ const runReadiness = (props: readActionReadinessFx.Props) =>
 	Effect.runSync(readActionReadinessFx(props).pipe(withRandomService(TestRandomService)));
 
 describe("readActionReadinessFx", () => {
-	it("returns ready for a valid producer product action", () => {
+	it("returns ready for a valid line action", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -22,10 +22,10 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			save,
@@ -36,7 +36,7 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
-	it("returns rejected readiness for default producer product action when no default is selected", () => {
+	it("returns rejected readiness for default line action when no default is selected", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -45,9 +45,9 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			save,
@@ -59,7 +59,7 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
-	it("returns ready for a producer product action that can auto-fill from inventory", () => {
+	it("returns ready for a line action that can auto-fill from inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -72,10 +72,10 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			save,
@@ -86,7 +86,7 @@ describe("readActionReadinessFx", () => {
 		});
 	});
 
-	it("returns ready for a producer product action that can partially auto-fill later", () => {
+	it("returns ready for a line action that can partially auto-fill later", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -95,10 +95,10 @@ describe("readActionReadinessFx", () => {
 
 		const readiness = runReadiness({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:shred",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			save,
@@ -118,17 +118,17 @@ describe("readActionReadinessFx", () => {
 		save.producerJobs["job:1"] = {
 			readyAtMs: 1000,
 			id: "job:1",
-			producerItemInstanceId: "item-instance:1",
+			itemInstanceId: "item-instance:1",
 			lineId: "line:test",
 			startAtMs: 0,
 		};
 
 		const readiness = runReadiness({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			save,
@@ -299,10 +299,10 @@ describe("readActionReadinessFx", () => {
 
 		runReadiness({
 			action: {
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
 				inputRefs: [],
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			save,

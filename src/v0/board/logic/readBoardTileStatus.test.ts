@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/v0/board/view/BoardViewItemSchema";
-import type { ProducerLineView } from "~/v0/board/view/ProducerLineViewSchema";
+import type { LineView } from "~/v0/board/view/LineViewSchema";
 import { readBoardTileStatus } from "~/v0/board/logic/readBoardTileStatus";
 
-const productLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineView => ({
+const line = (overrides: Partial<LineView> = {}): LineView => ({
 	blocked: false,
 	durationMs: 1000,
 	inProgress: false,
@@ -13,12 +13,12 @@ const productLine = (overrides: Partial<ProducerLineView> = {}): ProducerLineVie
 	inputsReady: true,
 	isDefault: false,
 	name: "Product",
-	lineKind: "product" as const,
-	producerQueuedJobs: 0,
+	kind: "product" as const,
+	queueUsed: 0,
 	lineId: "line:test",
 	queueFull: false,
-	queuedJobs: 0,
-	queueSize: 1,
+	jobs: 0,
+	queueMax: 1,
 	...overrides,
 });
 
@@ -32,15 +32,15 @@ const boardItem = (overrides: Partial<BoardViewItem> = {}): BoardViewItem => ({
 });
 
 describe("readBoardTileStatus", () => {
-	it("keeps producers without explicit default producer line visually neutral", () => {
+	it("keeps producers without explicit default line visually neutral", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
 					activation: {
 						inputs: [],
 						kind: "producer",
-						producerLines: [
-							productLine({
+						lines: [
+							line({
 								isDefault: false,
 							}),
 						],
@@ -55,15 +55,15 @@ describe("readBoardTileStatus", () => {
 		});
 	});
 
-	it("dims producers with blocked explicit default producer line", () => {
+	it("dims producers with blocked explicit default line", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
 					activation: {
 						inputs: [],
 						kind: "producer",
-						producerLines: [
-							productLine({
+						lines: [
+							line({
 								inputsAvailable: false,
 								inputsReady: false,
 								isDefault: true,
@@ -80,15 +80,15 @@ describe("readBoardTileStatus", () => {
 		});
 	});
 
-	it("marks producers with runnable explicit default producer line ready", () => {
+	it("marks producers with runnable explicit default line ready", () => {
 		expect(
 			readBoardTileStatus({
 				boardItem: boardItem({
 					activation: {
 						inputs: [],
 						kind: "producer",
-						producerLines: [
-							productLine({
+						lines: [
+							line({
 								isDefault: true,
 							}),
 						],

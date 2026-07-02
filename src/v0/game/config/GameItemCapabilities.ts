@@ -4,7 +4,7 @@ export type GameItemDefinition = GameConfig["items"][string];
 export type GameProducerDefinition = NonNullable<GameItemDefinition["producer"]>;
 export type GameStashDefinition = NonNullable<GameItemDefinition["stash"]>;
 export type GameProducerCapabilityDefinition = GameProducerDefinition | GameStashDefinition;
-export type GameProducerLineDefinition =
+export type GameLineDefinition =
 	| GameProducerDefinition["lines"][number]
 	| GameStashDefinition["line"];
 export type GameCraftRecipeDefinition = NonNullable<GameItemDefinition["craft"]>;
@@ -21,38 +21,38 @@ export const readProducerCapabilityDefinition = ({
 	return item?.producer ?? item?.stash;
 };
 
-export const readProducerLineDefinitions = ({
+export const readLineDefinitions = ({
 	producerDefinition,
 }: {
 	producerDefinition: GameProducerCapabilityDefinition;
-}): readonly GameProducerLineDefinition[] =>
+}): readonly GameLineDefinition[] =>
 	"line" in producerDefinition
 		? [
 				producerDefinition.line,
 			]
 		: producerDefinition.lines;
 
-export const readProducerLineIds = ({
+export const readLineIds = ({
 	producerDefinition,
 }: {
 	producerDefinition: GameProducerCapabilityDefinition;
 }) =>
-	readProducerLineDefinitions({
+	readLineDefinitions({
 		producerDefinition,
 	}).map((line) => line.id);
 
-export const readProducerLineDefinition = ({
+export const readLineDefinition = ({
 	producerDefinition,
 	lineId,
 }: {
 	producerDefinition: GameProducerCapabilityDefinition;
 	lineId: string;
 }) =>
-	readProducerLineDefinitions({
+	readLineDefinitions({
 		producerDefinition,
 	}).find((line) => line.id === lineId);
 
-export const readProducerLineDefinitionFromConfig = ({
+export const readLineDefinitionFromConfig = ({
 	config,
 	producerId,
 	lineId,
@@ -66,7 +66,7 @@ export const readProducerLineDefinitionFromConfig = ({
 		producerId,
 	});
 	return producerDefinition
-		? readProducerLineDefinition({
+		? readLineDefinition({
 				producerDefinition,
 				lineId,
 			})
@@ -89,9 +89,9 @@ export const readConfigProducerItemIds = ({ config }: { config: GameConfig }) =>
 		.filter(([, item]) => item.producer || item.stash)
 		.map(([itemId]) => itemId);
 
-export const readConfigProducerLines = ({ config }: { config: GameConfig }) =>
+export const readConfigLines = ({ config }: { config: GameConfig }) =>
 	Object.entries(config.items).flatMap(([producerId, item]) => {
-		const producerLines = (item.producer?.lines ?? []).map((line) => ({
+		const lines = (item.producer?.lines ?? []).map((line) => ({
 			line,
 			producerId,
 			producerDefinition: item.producer as GameProducerCapabilityDefinition,
@@ -106,7 +106,7 @@ export const readConfigProducerLines = ({ config }: { config: GameConfig }) =>
 				]
 			: [];
 		return [
-			...producerLines,
+			...lines,
 			...stashLine,
 		];
 	});

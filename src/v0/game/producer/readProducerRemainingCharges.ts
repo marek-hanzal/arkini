@@ -5,12 +5,12 @@ import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerC
 export const readProducerRemainingCharges = ({
 	config,
 	producerId,
-	producerItemInstanceId,
+	itemInstanceId,
 	save,
 }: {
 	config: GameConfig;
 	producerId: string;
-	producerItemInstanceId: string;
+	itemInstanceId: string;
 	save: GameSave;
 }) => {
 	const producer = readProducerCapabilityDefinition({
@@ -19,5 +19,5 @@ export const readProducerRemainingCharges = ({
 	});
 	if (producer?.charges === undefined) return undefined;
 
-	return save.producerCharges[producerItemInstanceId]?.remainingCharges ?? producer.charges;
+	return save.producerCharges[itemInstanceId]?.remainingCharges ?? producer.charges;
 };

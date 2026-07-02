@@ -3,18 +3,18 @@ import type { ActivationView } from "~/v0/board/view/ActivationViewSchema";
 import { readProducerBoardProgress } from "~/v0/producer/logic/readProducerBoardProgress";
 
 const producerActivation = (
-	producerLines: ActivationView["producerLines"],
+	lines: ActivationView["lines"],
 	kind: ActivationView["kind"] = "producer",
 ): ActivationView => ({
 	inputs: [],
 	kind,
-	producerLines,
+	lines,
 	trigger: "click",
 });
 
-type ProducerLine = NonNullable<ActivationView["producerLines"]>[number];
+type Line = NonNullable<ActivationView["lines"]>[number];
 
-const createLine = (overrides: Partial<ProducerLine> = {}): ProducerLine => ({
+const createLine = (overrides: Partial<Line> = {}): Line => ({
 	durationMs: 1000,
 	inProgress: true,
 	isDefault: true,
@@ -23,20 +23,20 @@ const createLine = (overrides: Partial<ProducerLine> = {}): ProducerLine => ({
 	inputsReady: true,
 	inputsAvailable: true,
 	name: "Twig",
-	lineKind: "product" as const,
+	kind: "product" as const,
 	lineId: "line:twig",
-	producerQueuedJobs: 1,
+	queueUsed: 1,
 	queueFull: true,
 	blocked: false,
-	queueSize: 1,
-	queuedJobs: 1,
+	queueMax: 1,
+	jobs: 1,
 	readyAtMs: 2000,
 	startAtMs: 1000,
 	...overrides,
 });
 
 describe("readProducerBoardProgress", () => {
-	it("returns live progress for the currently running producer line", () => {
+	it("returns live progress for the currently running line", () => {
 		expect(
 			readProducerBoardProgress({
 				activation: producerActivation([
@@ -49,13 +49,13 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
-						lineKind: "product" as const,
+						kind: "product" as const,
 						lineId: "line:twig",
-						producerQueuedJobs: 1,
+						queueUsed: 1,
 						queueFull: true,
 						blocked: false,
-						queueSize: 1,
-						queuedJobs: 1,
+						queueMax: 1,
+						jobs: 1,
 						readyAtMs: 2000,
 						startAtMs: 1000,
 					},
@@ -67,7 +67,7 @@ describe("readProducerBoardProgress", () => {
 		});
 	});
 
-	it("returns live progress for stash activations that expose producer producer lines", () => {
+	it("returns live progress for stash activations that expose lines", () => {
 		expect(
 			readProducerBoardProgress({
 				activation: producerActivation(
@@ -81,13 +81,13 @@ describe("readProducerBoardProgress", () => {
 							inputsReady: true,
 							inputsAvailable: true,
 							name: "Open",
-							lineKind: "product" as const,
+							kind: "product" as const,
 							lineId: "line:stash",
-							producerQueuedJobs: 1,
+							queueUsed: 1,
 							queueFull: true,
 							blocked: false,
-							queueSize: 1,
-							queuedJobs: 1,
+							queueMax: 1,
+							jobs: 1,
 							readyAtMs: 2000,
 							startAtMs: 1000,
 						},
@@ -106,7 +106,7 @@ describe("readProducerBoardProgress", () => {
 			readProducerBoardProgress({
 				activation: producerActivation([
 					createLine({
-						lineKind: "effect" as const,
+						kind: "effect" as const,
 						name: "Minor Haste",
 						lineId: "line:shrine-t1:minor-haste",
 					}),
@@ -124,7 +124,7 @@ describe("readProducerBoardProgress", () => {
 				activation: producerActivation([
 					createLine(),
 					createLine({
-						lineKind: "effect" as const,
+						kind: "effect" as const,
 						name: "Minor Haste",
 						lineId: "line:shrine-t1:minor-haste",
 						readyAtMs: 3000,
@@ -151,13 +151,13 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
-						lineKind: "product" as const,
+						kind: "product" as const,
 						lineId: "line:twig",
-						producerQueuedJobs: 1,
+						queueUsed: 1,
 						queueFull: true,
 						blocked: false,
-						queueSize: 1,
-						queuedJobs: 1,
+						queueMax: 1,
+						jobs: 1,
 						readyAtMs: 3000,
 						startAtMs: 2000,
 					},
@@ -180,14 +180,14 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
-						lineKind: "product" as const,
+						kind: "product" as const,
 						pausedAtMs: 1250,
 						lineId: "line:twig",
-						producerQueuedJobs: 1,
+						queueUsed: 1,
 						queueFull: true,
 						blocked: false,
-						queueSize: 1,
-						queuedJobs: 1,
+						queueMax: 1,
+						jobs: 1,
 						readyAtMs: 2000,
 						startAtMs: 1000,
 					},
@@ -199,7 +199,7 @@ describe("readProducerBoardProgress", () => {
 		});
 	});
 
-	it("ignores blocked delivery producer lines even before their retry wake", () => {
+	it("ignores blocked delivery lines even before their retry wake", () => {
 		expect(
 			readProducerBoardProgress({
 				activation: producerActivation([
@@ -213,13 +213,13 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
-						lineKind: "product" as const,
+						kind: "product" as const,
 						lineId: "line:twig",
-						producerQueuedJobs: 1,
+						queueUsed: 1,
 						queueFull: true,
 						blocked: false,
-						queueSize: 1,
-						queuedJobs: 1,
+						queueMax: 1,
+						jobs: 1,
 						readyAtMs: 2000,
 						startAtMs: 1000,
 					},
@@ -242,13 +242,13 @@ describe("readProducerBoardProgress", () => {
 						inputsReady: true,
 						inputsAvailable: true,
 						name: "Twig",
-						lineKind: "product" as const,
+						kind: "product" as const,
 						lineId: "line:twig",
-						producerQueuedJobs: 1,
+						queueUsed: 1,
 						queueFull: true,
 						blocked: false,
-						queueSize: 1,
-						queuedJobs: 1,
+						queueMax: 1,
+						jobs: 1,
 						readyAtMs: 2000,
 						startAtMs: 1000,
 					},

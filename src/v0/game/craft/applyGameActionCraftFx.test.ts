@@ -574,9 +574,9 @@ describe("applyGameActionFx Craft", () => {
 		const producing = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: "item-instance:1",
+				itemInstanceId: "item-instance:1",
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 100,

@@ -4,11 +4,11 @@ export const isBoardViewItemRuntimeBusy = (boardItem: BoardViewItem) =>
 	Boolean(
 		(boardItem.craft && boardItem.craft.phase !== "collecting_inputs") ||
 			boardItem.activation?.deliveryBlocked ||
-			boardItem.activation?.producerLines?.some(
+			boardItem.activation?.lines?.some(
 				(line) =>
 					line.inProgress ||
 					line.deliveryBlocked ||
 					line.queueBlockedReason !== undefined ||
-					line.producerQueuedJobs > 0,
+					line.queueUsed > 0,
 			),
 	);

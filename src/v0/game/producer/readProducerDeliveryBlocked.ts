@@ -2,17 +2,16 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace readProducerDeliveryBlocked {
 	export interface Props {
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		save: GameSave;
 	}
 }
 
 export const readProducerDeliveryBlocked = ({
-	producerItemInstanceId,
+	itemInstanceId,
 	save,
 }: readProducerDeliveryBlocked.Props) =>
 	Object.values(save.producerJobs).some(
 		(job) =>
-			job.producerItemInstanceId === producerItemInstanceId &&
-			job.delivery?.lastBlockedAtMs !== undefined,
+			job.itemInstanceId === itemInstanceId && job.delivery?.lastBlockedAtMs !== undefined,
 	);

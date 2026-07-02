@@ -5,7 +5,7 @@ const IdSchema = z.string().min(1);
 export const GameActionProducerInputWithdrawSchema = z
 	.object({
 		itemId: IdSchema,
-		producerItemInstanceId: IdSchema,
+		itemInstanceId: IdSchema,
 		lineId: IdSchema,
 		type: z.literal("producer.input.withdraw"),
 	})

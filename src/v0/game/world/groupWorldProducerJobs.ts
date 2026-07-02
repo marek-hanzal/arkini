@@ -3,8 +3,8 @@ import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameS
 export const groupWorldProducerJobs = (save: GameSave) => {
 	const groups = new Map<string, GameSaveProducerJob[]>();
 	for (const job of Object.values(save.producerJobs)) {
-		groups.set(job.producerItemInstanceId, [
-			...(groups.get(job.producerItemInstanceId) ?? []),
+		groups.set(job.itemInstanceId, [
+			...(groups.get(job.itemInstanceId) ?? []),
 			job,
 		]);
 	}

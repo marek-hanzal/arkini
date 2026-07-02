@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
-import type { EffectiveProducerLine } from "~/v0/game/effects/EffectiveProducerLine";
+import type { GameLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import type { EffectiveLine } from "~/v0/game/effects/EffectiveLine";
 import { rollGameQuantityFx } from "~/v0/game/loot/rollGameQuantityFx";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
 import type { LootTableRollResult } from "~/v0/game/loot/LootTableRollResult";
@@ -10,14 +10,14 @@ import { RandomServiceFx } from "~/v0/random/context/RandomServiceFx";
 export namespace rollEffectiveLootPlanItemsFx {
 	export interface Props {
 		config: GameConfig;
-		lootPlan: EffectiveProducerLine["lootPlan"];
+		lootPlan: EffectiveLine["lootPlan"];
 	}
 }
 
 const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
 	output,
 }: {
-	output: NonNullable<GameProducerLineDefinition["output"]>;
+	output: NonNullable<GameLineDefinition["output"]>;
 }) {
 	return yield* rollLootTableItemsFx({
 		lootTable: {

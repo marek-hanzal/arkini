@@ -175,9 +175,9 @@ describe("setCheatSpeedModeFx", () => {
 		const started = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: producer.id,
+				itemInstanceId: producer.id,
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -199,9 +199,9 @@ describe("setCheatSpeedModeFx", () => {
 		const firstQueued = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: producer.id,
+				itemInstanceId: producer.id,
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -210,9 +210,9 @@ describe("setCheatSpeedModeFx", () => {
 		const secondQueued = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: producer.id,
+				itemInstanceId: producer.id,
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,
@@ -272,9 +272,9 @@ describe("setCheatSpeedModeFx", () => {
 		const started = runAction({
 			action: {
 				inputRefs: [],
-				producerItemInstanceId: producer.id,
+				itemInstanceId: producer.id,
 				lineId: "line:test",
-				type: "producer.line.start",
+				type: "line.start",
 			},
 			config,
 			nowMs: 0,

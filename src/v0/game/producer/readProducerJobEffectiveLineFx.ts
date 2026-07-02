@@ -1,13 +1,10 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
-import {
-	readProducerLineDefinition,
-	readProducerLineIds,
-} from "~/v0/game/config/GameItemCapabilities";
+import { readLineDefinition, readLineIds } from "~/v0/game/config/GameItemCapabilities";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
-import { readEffectiveProducerLine } from "~/v0/game/effects/readEffectiveProducerLine";
-import { readProducerLineDurationMs } from "~/v0/game/producer/readProducerLineDurationMs";
+import { readEffectiveLine } from "~/v0/game/effects/readEffectiveLine";
+import { readLineDurationMs } from "~/v0/game/producer/readLineDurationMs";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
 
 export namespace readProducerJobEffectiveLineFx {
@@ -15,7 +12,7 @@ export namespace readProducerJobEffectiveLineFx {
 		config: GameConfig;
 		ignoredProducerJobIds?: ReadonlySet<string>;
 		nowMs: number;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		lineId: string;
 		save: GameSave;
 	}
@@ -26,15 +23,15 @@ export const readProducerJobEffectiveLineFx = Effect.fn("readProducerJobEffectiv
 		config,
 		ignoredProducerJobIds,
 		nowMs,
-		producerItemInstanceId,
+		itemInstanceId,
 		lineId,
 		save,
 	}: readProducerJobEffectiveLineFx.Props) {
-		const producerItem = save.board.items[producerItemInstanceId];
+		const producerItem = save.board.items[itemInstanceId];
 		if (!producerItem) {
 			return yield* Effect.fail(
 				GameEngineError.saveInvalid(
-					`Producer job target "${producerItemInstanceId}" must be a board item.`,
+					`Producer job target "${itemInstanceId}" must be a board item.`,
 				),
 			);
 		}
@@ -51,7 +48,7 @@ export const readProducerJobEffectiveLineFx = Effect.fn("readProducerJobEffectiv
 			);
 		}
 		if (
-			!readProducerLineIds({
+			!readLineIds({
 				producerDefinition,
 			}).includes(lineId)
 		) {
@@ -62,24 +59,24 @@ export const readProducerJobEffectiveLineFx = Effect.fn("readProducerJobEffectiv
 			);
 		}
 
-		const line = readProducerLineDefinition({
+		const line = readLineDefinition({
 			producerDefinition,
 			lineId,
 		});
 		if (!line) {
 			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing producer line "${lineId}".`),
+				GameEngineError.configReferenceMissing(`Missing line "${lineId}".`),
 			);
 		}
 
-		return readEffectiveProducerLine({
-			baseDurationMs: readProducerLineDurationMs({
+		return readEffectiveLine({
+			baseDurationMs: readLineDurationMs({
 				line,
 			}),
 			config,
 			ignoredProducerJobIds,
 			nowMs,
-			producerItemInstanceId,
+			itemInstanceId,
 			line,
 			lineId,
 			save,

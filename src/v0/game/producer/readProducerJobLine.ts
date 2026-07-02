@@ -1,7 +1,7 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
 import {
 	readProducerCapabilityDefinition,
-	readProducerLineDefinition,
+	readLineDefinition,
 } from "~/v0/game/config/GameItemCapabilities";
 import type { GameSave, GameSaveProducerJob } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -14,7 +14,7 @@ export const readProducerJobLine = ({
 	job: GameSaveProducerJob;
 	save: GameSave;
 }) => {
-	const producerItem = save.board.items[job.producerItemInstanceId];
+	const producerItem = save.board.items[job.itemInstanceId];
 	const producerDefinition = producerItem
 		? readProducerCapabilityDefinition({
 				config,
@@ -23,7 +23,7 @@ export const readProducerJobLine = ({
 		: undefined;
 
 	return producerDefinition
-		? readProducerLineDefinition({
+		? readLineDefinition({
 				producerDefinition,
 				lineId: job.lineId,
 			})

@@ -6,7 +6,7 @@ const IdSchema = z.string().min(1);
 export const GameActionProducerInputStoreSchema = z
 	.object({
 		inputRef: GameActionItemRefSchema,
-		producerItemInstanceId: IdSchema,
+		itemInstanceId: IdSchema,
 		lineId: IdSchema.optional(),
 		type: z.literal("producer.input.store"),
 	})

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ActivationDropViewSchema } from "./ActivationDropViewSchema";
 import { ActivationInputViewSchema } from "./ActivationInputViewSchema";
-import { ProducerLineViewSchema } from "./ProducerLineViewSchema";
+import { LineViewSchema } from "./LineViewSchema";
 
 export const ActivationViewSchema = z.object({
 	kind: z.enum([
@@ -15,7 +15,7 @@ export const ActivationViewSchema = z.object({
 	remainingCharges: z.number().optional(),
 	drops: z.array(ActivationDropViewSchema).optional(),
 	deliveryBlocked: z.boolean().optional(),
-	producerLines: z.array(ProducerLineViewSchema).optional(),
+	lines: z.array(LineViewSchema).optional(),
 	inputs: z.array(ActivationInputViewSchema),
 });
 

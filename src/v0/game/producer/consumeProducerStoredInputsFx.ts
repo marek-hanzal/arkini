@@ -6,7 +6,7 @@ import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 export namespace consumeProducerStoredInputsFx {
 	export interface Props {
 		nextSave: GameSave;
-		producerItemInstanceId: string;
+		itemInstanceId: string;
 		lineId: string;
 		inputs: readonly GameActivationInput[];
 	}
@@ -14,11 +14,11 @@ export namespace consumeProducerStoredInputsFx {
 
 export const consumeProducerStoredInputsFx = Effect.fn("consumeProducerStoredInputsFx")(function* ({
 	nextSave,
-	producerItemInstanceId,
+	itemInstanceId,
 	lineId,
 	inputs,
 }: consumeProducerStoredInputsFx.Props) {
-	const producerInputState = nextSave.producerInputs[producerItemInstanceId];
+	const producerInputState = nextSave.producerInputs[itemInstanceId];
 	const lineInputState = producerInputState?.lineInputs[lineId];
 	if (!producerInputState || !lineInputState) return;
 
@@ -42,6 +42,6 @@ export const consumeProducerStoredInputsFx = Effect.fn("consumeProducerStoredInp
 		delete producerInputState.lineInputs[lineId];
 	}
 	if (Object.keys(producerInputState.lineInputs).length === 0) {
-		delete nextSave.producerInputs[producerItemInstanceId];
+		delete nextSave.producerInputs[itemInstanceId];
 	}
 });

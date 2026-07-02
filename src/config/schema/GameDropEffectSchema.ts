@@ -5,12 +5,10 @@ import {
 	PositiveProbabilitySchema,
 	QuantitySchema,
 } from "~/config/schema/GameConfigScalarSchemas";
-import { GameGrantSelectorSchema } from "~/config/schema/GameDomainSelectorSchema";
+import { ResolvedDomainSelectorSchema } from "~/config/schema/GameDomainSelectorSchema";
 import {
-	DurationMultiplierSchema,
+	createGameLineEffectMemberSchemas,
 	GameLineEffectDisplaySchema,
-	GameLineEffectDistanceBandSchema,
-	GameLineEffectPhaseSchema,
 	GameNearbyItemAuthoringSelectorSchema,
 	GameNearbyItemSelectorSchema,
 } from "~/config/schema/GameLineEffectSchema";
@@ -30,68 +28,18 @@ const createGameNearbyLootChanceSourceSchema = <
 		})
 		.strict();
 
-const createGameDropEffectSchema = <
+const createGameDropOnlyEffectMemberSchemas = <
 	TItemSelectorSchema extends
 		| typeof GameNearbyItemSelectorSchema
 		| typeof GameNearbyItemAuthoringSelectorSchema,
 >(
 	itemSelectorSchema: TItemSelectorSchema,
 ) =>
-	z.discriminatedUnion("kind", [
-		z
-			.object({
-				kind: z.literal("grant.require"),
-				selector: GameGrantSelectorSchema,
-				phase: GameLineEffectPhaseSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.blockStart"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.require"),
-				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				phase: GameLineEffectPhaseSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.duration.multiply"),
-				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				bands: z.array(GameLineEffectDistanceBandSchema).min(1),
-				maxSources: z.number().int().positive().optional(),
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.duration.multiply"),
-				selector: GameGrantSelectorSchema,
-				multiplier: DurationMultiplierSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
+	[
 		z
 			.object({
 				kind: z.literal("grant.drop.hide"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 				reason: z.string().min(1).optional(),
@@ -100,7 +48,7 @@ const createGameDropEffectSchema = <
 		z
 			.object({
 				kind: z.literal("grant.drop.show"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 				reason: z.string().min(1).optional(),
@@ -109,7 +57,7 @@ const createGameDropEffectSchema = <
 		z
 			.object({
 				kind: z.literal("grant.drop.disable"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 				reason: z.string().min(1).optional(),
@@ -118,7 +66,7 @@ const createGameDropEffectSchema = <
 		z
 			.object({
 				kind: z.literal("grant.drop.enable"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 				reason: z.string().min(1).optional(),
@@ -127,7 +75,7 @@ const createGameDropEffectSchema = <
 		z
 			.object({
 				kind: z.literal("grant.loot.extraOutputChance.add"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				chance: PositiveProbabilitySchema,
 				quantity: QuantitySchema.default(1),
 				display: GameLineEffectDisplaySchema,
@@ -144,6 +92,18 @@ const createGameDropEffectSchema = <
 				label: z.string().min(1).optional(),
 			})
 			.strict(),
+	] as const;
+
+const createGameDropEffectSchema = <
+	TItemSelectorSchema extends
+		| typeof GameNearbyItemSelectorSchema
+		| typeof GameNearbyItemAuthoringSelectorSchema,
+>(
+	itemSelectorSchema: TItemSelectorSchema,
+) =>
+	z.discriminatedUnion("kind", [
+		...createGameLineEffectMemberSchemas(itemSelectorSchema),
+		...createGameDropOnlyEffectMemberSchemas(itemSelectorSchema),
 	]);
 
 export const GameDropEffectSchema = createGameDropEffectSchema(GameNearbyItemSelectorSchema);

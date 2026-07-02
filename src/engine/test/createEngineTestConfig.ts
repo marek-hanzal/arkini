@@ -57,21 +57,6 @@ export const createEngineTestConfig = (
 	return attachTestConfigCatalogs(config);
 };
 
-export const readEngineTestLine = (config: GameConfig, lineId: string): GameLineDefinition => {
-	const line = readLineCatalog(config)[lineId];
-	if (!line) throw new Error(`Missing test line "${lineId}".`);
-	return line;
-};
-
-export const readEngineTestCraft = (
-	config: GameConfig,
-	itemId: string,
-): GameCraftRecipeDefinition => {
-	const craft = config.items[itemId]?.craft;
-	if (!craft) throw new Error(`Missing test craft recipe on "${itemId}".`);
-	return craft;
-};
-
 const createEmbeddedTestConfig = (overrides: EngineTestGameConfigOverrides): unknown => {
 	const {
 		craftOverrides,

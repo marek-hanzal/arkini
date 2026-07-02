@@ -5,7 +5,7 @@ import {
 	GameEffectSourceScopeSchema,
 } from "~/config/schema/GameLineEffectSchema";
 
-export const GameEffectGrantSchema = z
+const GameEffectGrantSchema = z
 	.object({
 		id: IdSchema,
 		name: z.string().min(1),

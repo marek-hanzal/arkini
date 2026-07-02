@@ -58,7 +58,7 @@ export interface EffectiveDropEffectOutcome {
 	result: string;
 }
 
-export type EffectiveNonWeightedLineOutputEntry = NonWeightedLineOutput & {
+type EffectiveNonWeightedLineOutputEntry = NonWeightedLineOutput & {
 	dropEffects: EffectiveDropEffectOutcome[];
 	enabled: boolean;
 	visible: boolean;
@@ -70,7 +70,7 @@ export type EffectiveWeightedLineOutputSubEntry = WeightedLineOutputEntry & {
 	visible: boolean;
 };
 
-export type EffectiveWeightedLineOutputEntry = Omit<WeightedLineOutput, "entries"> & {
+type EffectiveWeightedLineOutputEntry = Omit<WeightedLineOutput, "entries"> & {
 	dropEffects: EffectiveDropEffectOutcome[];
 	enabled: boolean;
 	entries: EffectiveWeightedLineOutputSubEntry[];

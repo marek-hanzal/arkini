@@ -481,6 +481,22 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/polarity/);
 	});
 
+	it("rejects duplicate grant ids across embedded effect sources", () => {
+		const config: any = createValidConfigValue();
+		addTestGrantSource(config, {
+			effectId: "effect:first",
+			grantId: "grant:shared",
+		});
+		config.items["item:plank"].effects = [
+			createTestEffect({
+				effectId: "effect:second",
+				grantId: "grant:shared",
+			}),
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate grant id.*grant:shared/);
+	});
+
 	it("rejects malformed output-owned extra output chance effects", () => {
 		const config: any = createValidConfigValue();
 		addTestGrantSource(config, {

@@ -9,7 +9,7 @@ export type GameConfigEffectEntry = {
 	lineId?: string;
 };
 
-export const readGameConfigEffects = (config: GameConfig): GameConfigEffectEntry[] =>
+const readGameConfigEffects = (config: GameConfig): GameConfigEffectEntry[] =>
 	Object.entries(config.items).flatMap(([ownerItemId, item]) => {
 		const itemEffects = (item.effects ?? []).map((effect) => ({
 			effect,
@@ -53,15 +53,3 @@ export const readGameConfigEffect = ({
 	config: GameConfig;
 	effectId: string;
 }) => readGameConfigEffects(config).find((entry) => entry.effect.id === effectId)?.effect;
-
-export const readGameConfigGrantNameById = (config: GameConfig) => {
-	const grantNameById = new Map<string, string>();
-
-	for (const { effect } of readGameConfigEffects(config)) {
-		for (const grant of effect.grants) {
-			grantNameById.set(grant.id, grant.name);
-		}
-	}
-
-	return grantNameById;
-};

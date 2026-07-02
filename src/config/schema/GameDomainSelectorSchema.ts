@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { IdSchema } from "~/config/schema/GameConfigScalarSchemas";
 
-export const TagSchema = z.string().min(1);
+const TagSchema = z.string().min(1);
 
 export const ResolvedDomainSelectorClauseSchema = z
 	.object({
@@ -24,7 +24,7 @@ export const ResolvedDomainSelectorSchema = z.union([
 		.strict(),
 ]);
 
-export const AuthoringDomainSelectorRefSchema = z.union([
+const AuthoringDomainSelectorRefSchema = z.union([
 	z
 		.object({
 			id: IdSchema,
@@ -56,5 +56,3 @@ export const AuthoringDomainSelectorSchema = z.union([
 		})
 		.strict(),
 ]);
-
-export const GameGrantSelectorSchema = ResolvedDomainSelectorSchema;

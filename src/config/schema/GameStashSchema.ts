@@ -3,7 +3,7 @@ import { PositiveNumberSchema } from "~/config/schema/GameConfigScalarSchemas";
 import { ProducerDepletedModeSchema, ProducerSchema } from "~/config/schema/GameProducerSchema";
 import { LineFragmentSchema, LineSchema } from "~/config/schema/GameLineSchema";
 
-export const StashBaseSchema = ProducerSchema.omit({
+const StashBaseSchema = ProducerSchema.omit({
 	lines: true,
 })
 	.extend({

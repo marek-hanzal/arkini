@@ -20,9 +20,7 @@ export const readCheatSpeedItemIdFromMode = (mode: GameCheatSpeedMode): ItemId =
 	}
 };
 
-export const readCheatSpeedModeFromItemId = (
-	itemId: ItemId | string,
-): GameCheatSpeedMode | undefined => {
+const readCheatSpeedModeFromItemId = (itemId: ItemId | string): GameCheatSpeedMode | undefined => {
 	if (itemId === cheatSpeedEnableItemId) return "instant";
 	if (itemId === cheatSpeedDisableItemId) return "normal";
 	return undefined;

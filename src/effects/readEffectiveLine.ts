@@ -334,6 +334,53 @@ const readDropEffectGrantActive = ({
 		selector: effect.selector,
 	});
 
+const applyRequirementDropEffect = ({
+	chanceItems,
+	dropEffectId,
+	dropEffectName,
+	effect,
+	enabled,
+	ready,
+	visible,
+}: {
+	chanceItems: EffectiveChanceItemEntry[];
+	dropEffectId: string;
+	dropEffectName: string;
+	effect: Extract<
+		DropEffect,
+		{
+			kind: "grant.require" | "nearby.require";
+		}
+	>;
+	enabled: boolean;
+	ready: boolean;
+	visible: boolean;
+}): DropEvaluation => {
+	const visibilityPhase = effect.phase === "visibility";
+	return {
+		chanceItems,
+		dropEffects: [
+			createDropEffectOutcome({
+				active: ready,
+				effect,
+				effectId: dropEffectId,
+				effectName: dropEffectName,
+				impact: visibilityPhase ? "visibility" : "availability",
+				ready,
+				result: ready
+					? visibilityPhase
+						? "shown"
+						: "requirement met"
+					: visibilityPhase
+						? "hidden"
+						: "disabled",
+			}),
+		],
+		enabled: effect.phase === "start" && !ready ? false : enabled,
+		visible: visibilityPhase ? ready : visible,
+	};
+};
+
 const applyDropEffect = ({
 	chanceItems,
 	config,
@@ -369,70 +416,36 @@ const applyDropEffect = ({
 	];
 
 	if (effect.kind === "grant.require") {
-		const ready = readDropEffectGrantActive({
-			effect,
-			grantIds,
-		});
-		if (effect.phase === "visibility") nextVisible = ready;
-		if (effect.phase === "start" && !ready) nextEnabled = false;
-		dropEffects.push(
-			createDropEffectOutcome({
-				active: ready,
-				effect,
-				effectId: dropEffectId,
-				effectName: dropEffectName,
-				impact: effect.phase === "visibility" ? "visibility" : "availability",
-				ready,
-				result: ready
-					? effect.phase === "visibility"
-						? "shown"
-						: "requirement met"
-					: effect.phase === "visibility"
-						? "hidden"
-						: "disabled",
-			}),
-		);
-		return {
+		return applyRequirementDropEffect({
 			chanceItems: nextChanceItems,
-			dropEffects,
+			dropEffectId,
+			dropEffectName,
+			effect,
 			enabled: nextEnabled,
+			ready: readDropEffectGrantActive({
+				effect,
+				grantIds,
+			}),
 			visible: nextVisible,
-		};
+		});
 	}
 
 	if (effect.kind === "nearby.require") {
-		const ready =
-			readNearbyMatches({
-				items: effect.items as Parameters<typeof readNearbyMatches>[0]["items"],
-				radius: effect.radius,
-				save,
-				targetCell,
-			}).length > 0;
-		if (effect.phase === "visibility") nextVisible = ready;
-		if (effect.phase === "start" && !ready) nextEnabled = false;
-		dropEffects.push(
-			createDropEffectOutcome({
-				active: ready,
-				effect,
-				effectId: dropEffectId,
-				effectName: dropEffectName,
-				impact: effect.phase === "visibility" ? "visibility" : "availability",
-				ready,
-				result: ready
-					? effect.phase === "visibility"
-						? "shown"
-						: "requirement met"
-					: effect.phase === "visibility"
-						? "hidden"
-						: "disabled",
-			}),
-		);
-		return {
+		return applyRequirementDropEffect({
 			chanceItems: nextChanceItems,
-			dropEffects,
+			dropEffectId,
+			dropEffectName,
+			effect,
 			enabled: nextEnabled,
+			ready:
+				readNearbyMatches({
+					items: effect.items as Parameters<typeof readNearbyMatches>[0]["items"],
+					radius: effect.radius,
+					save,
+					targetCell,
+				}).length > 0,
 			visible: nextVisible,
-		};
+		});
 	}
 
 	if (effect.kind === "grant.blockStart") {

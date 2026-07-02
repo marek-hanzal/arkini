@@ -4,7 +4,6 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { CraftRecipeSchema } from "~/config/schema/GameCraftRecipeSchema";
 import { ActivationOutputSchema } from "~/config/schema/GameActivationOutputSchema";
 import {
-	GameGrantSelectorSchema,
 	ResolvedDomainSelectorClauseSchema,
 	ResolvedDomainSelectorSchema,
 } from "~/config/schema/GameDomainSelectorSchema";
@@ -12,7 +11,7 @@ import { GameDropEffectSchema } from "~/config/schema/GameDropEffectSchema";
 import { GameEffectSchema } from "~/config/schema/GameEffectSchema";
 import { GameLineEffectSchema } from "~/config/schema/GameLineEffectSchema";
 
-export type GameConfigIssuePath = (string | number)[];
+type GameConfigIssuePath = (string | number)[];
 
 type GameConfigValidationContext = {
 	config: GameConfig;
@@ -596,7 +595,7 @@ const validateResolvedDomainSelector = ({
 const validateGameGrantSelector = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	selector: z.infer<typeof GameGrantSelectorSchema>,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
 	grantIds: readonly string[],
 ) => {
 	if ("mode" in selector) return;
@@ -659,82 +658,113 @@ const validateGameLineItemSelector = (
 	});
 };
 
+type GameEffectValidationEntities = {
+	grantIds: readonly string[];
+	hasItem: (itemId: string) => boolean;
+	itemIds: readonly string[];
+};
+
+type CommonGameLineEffect = z.infer<typeof GameLineEffectSchema>;
+type GameDropEffect = z.infer<typeof GameDropEffectSchema>;
+
+const validateCommonGameLineEffect = ({
+	ctx,
+	effect,
+	effectIndex,
+	entities,
+	path,
+}: {
+	ctx: z.RefinementCtx;
+	effect: CommonGameLineEffect;
+	effectIndex: number;
+	entities: GameEffectValidationEntities;
+	path: GameConfigIssuePath;
+}) => {
+	if (
+		effect.kind === "grant.require" ||
+		effect.kind === "grant.blockStart" ||
+		effect.kind === "grant.duration.multiply"
+	) {
+		validateGameGrantSelector(
+			ctx,
+			[
+				...path,
+				effectIndex,
+				"selector",
+			],
+			effect.selector,
+			entities.grantIds,
+		);
+	}
+
+	if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
+		validateGameLineItemSelector(
+			ctx,
+			[
+				...path,
+				effectIndex,
+				"items",
+			],
+			effect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+			{
+				entityIds: entities.itemIds,
+				hasEntity: entities.hasItem,
+			},
+		);
+	}
+
+	if (
+		effect.kind === "nearby.duration.multiply" &&
+		effect.bands.every((band) => band.multiplier === 1)
+	) {
+		addIssue(
+			ctx,
+			[
+				...path,
+				effectIndex,
+				"bands",
+			],
+			"Nearby duration effect must contain at least one non-1 multiplier band.",
+		);
+	}
+};
+
 const validateGameLineEffects = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	effects: readonly z.infer<typeof GameLineEffectSchema>[],
-	entities: {
-		grantIds: readonly string[];
-		hasItem: (itemId: string) => boolean;
-		itemIds: readonly string[];
-	},
+	effects: readonly CommonGameLineEffect[],
+	entities: GameEffectValidationEntities,
 ) => {
 	for (const [effectIndex, effect] of effects.entries()) {
-		if (
-			effect.kind === "grant.require" ||
-			effect.kind === "grant.blockStart" ||
-			effect.kind === "grant.duration.multiply"
-		) {
-			validateGameGrantSelector(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"selector",
-				],
-				effect.selector,
-				entities.grantIds,
-			);
-		}
-
-		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
-			validateGameLineItemSelector(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"items",
-				],
-				effect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
-				{
-					entityIds: entities.itemIds,
-					hasEntity: entities.hasItem,
-				},
-			);
-		}
-
-		if (
-			effect.kind === "nearby.duration.multiply" &&
-			effect.bands.every((band) => band.multiplier === 1)
-		) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"bands",
-				],
-				"Nearby duration effect must contain at least one non-1 multiplier band.",
-			);
-		}
+		validateCommonGameLineEffect({
+			ctx,
+			effect,
+			effectIndex,
+			entities,
+			path,
+		});
 	}
 };
 
 const validateGameDropEffects = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
-	effects: readonly z.infer<typeof GameDropEffectSchema>[],
-	entities: {
-		grantIds: readonly string[];
-		hasItem: (itemId: string) => boolean;
-		itemIds: readonly string[];
-	},
+	effects: readonly GameDropEffect[],
+	entities: GameEffectValidationEntities,
 ) => {
 	for (const [effectIndex, effect] of effects.entries()) {
+		if (isCommonGameLineEffect(effect)) {
+			validateCommonGameLineEffect({
+				ctx,
+				effect,
+				effectIndex,
+				entities,
+				path,
+			});
+			continue;
+		}
+
 		if (
-			effect.kind === "grant.require" ||
-			effect.kind === "grant.blockStart" ||
-			effect.kind === "grant.duration.multiply" ||
 			effect.kind === "grant.drop.hide" ||
 			effect.kind === "grant.drop.show" ||
 			effect.kind === "grant.drop.disable" ||
@@ -750,37 +780,6 @@ const validateGameDropEffects = (
 				],
 				effect.selector,
 				entities.grantIds,
-			);
-		}
-
-		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
-			validateGameLineItemSelector(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"items",
-				],
-				effect.items as z.infer<typeof ResolvedDomainSelectorSchema>,
-				{
-					entityIds: entities.itemIds,
-					hasEntity: entities.hasItem,
-				},
-			);
-		}
-
-		if (
-			effect.kind === "nearby.duration.multiply" &&
-			effect.bands.every((band) => band.multiplier === 1)
-		) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"bands",
-				],
-				"Nearby duration effect must contain at least one non-1 multiplier band.",
 			);
 		}
 
@@ -805,6 +804,13 @@ const validateGameDropEffects = (
 		}
 	}
 };
+
+const isCommonGameLineEffect = (effect: GameDropEffect): effect is CommonGameLineEffect =>
+	effect.kind === "grant.require" ||
+	effect.kind === "grant.blockStart" ||
+	effect.kind === "nearby.require" ||
+	effect.kind === "nearby.duration.multiply" ||
+	effect.kind === "grant.duration.multiply";
 
 const validateCraftRecipeEffectRuntimeSupport = (
 	ctx: z.RefinementCtx,
@@ -946,31 +952,41 @@ const readConfigEffects = (config: GameConfig): ConfigEffectEntry[] =>
 
 const validateConfigEffects = (ctx: z.RefinementCtx, config: GameConfig) => {
 	const effectIds = new Map<string, GameConfigIssuePath>();
+	const grantIds = new Map<string, GameConfigIssuePath>();
 
 	for (const { effect, path } of readConfigEffects(config)) {
-		const previousPath = effectIds.get(effect.id);
-		if (previousPath) {
+		const previousEffectPath = effectIds.get(effect.id);
+		if (previousEffectPath) {
 			addIssue(
 				ctx,
 				[
 					...path,
 					"id",
 				],
-				`Duplicate effect id "${effect.id}" already defined at ${formatIssuePath(previousPath)}.`,
+				`Duplicate effect id "${effect.id}" already defined at ${formatIssuePath(previousEffectPath)}.`,
 			);
 		} else {
 			effectIds.set(effect.id, path);
 		}
 
-		validateUniqueStringList(
-			ctx,
-			[
+		for (const [grantIndex, grant] of effect.grants.entries()) {
+			const grantPath: GameConfigIssuePath = [
 				...path,
 				"grants",
-			],
-			effect.grants.map((grant) => grant.id),
-			(value) => `Duplicate grant id "${value}".`,
-		);
+				grantIndex,
+				"id",
+			];
+			const previousGrantPath = grantIds.get(grant.id);
+			if (previousGrantPath) {
+				addIssue(
+					ctx,
+					grantPath,
+					`Duplicate grant id "${grant.id}" already defined at ${formatIssuePath(previousGrantPath)}.`,
+				);
+				continue;
+			}
+			grantIds.set(grant.id, grantPath);
+		}
 	}
 };
 
@@ -1552,7 +1568,7 @@ const collectGrantDependencyItems = ({
 	}) => void;
 	config: GameConfig;
 	fromBlueprintItemId: string;
-	selector: z.infer<typeof GameGrantSelectorSchema> | undefined;
+	selector: z.infer<typeof ResolvedDomainSelectorSchema> | undefined;
 	path: GameConfigIssuePath;
 }) => {
 	if (!selector) return;
@@ -1682,7 +1698,7 @@ type GameplayRequirement =
 	| {
 			kind: "grantSelector";
 			path: GameConfigIssuePath;
-			selector: z.infer<typeof GameGrantSelectorSchema>;
+			selector: z.infer<typeof ResolvedDomainSelectorSchema>;
 	  }
 	| {
 			kind: "nearbyItemSelector";
@@ -2420,7 +2436,7 @@ const createGrantRequirement = ({
 	selector,
 }: {
 	path: GameConfigIssuePath;
-	selector: z.infer<typeof GameGrantSelectorSchema>;
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>;
 }): GameplayRequirement => ({
 	kind: "grantSelector",
 	path,
@@ -2498,7 +2514,7 @@ const doesItemSelectorMatchReachableBoardItem = ({
 
 const doesGameGrantSelectorMatchIdsLocal = (
 	grantIds: ReadonlySet<string>,
-	selector: z.infer<typeof GameGrantSelectorSchema>,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
 ) => {
 	if ("mode" in selector) return true;
 
@@ -2518,7 +2534,7 @@ const doesGameGrantSelectorMatchIdsLocal = (
 const hasAnyGrantId = (grantIds: ReadonlySet<string>, ids: readonly string[]) =>
 	ids.some((id) => grantIds.has(id));
 
-const readMandatoryGrantIds = (selector: z.infer<typeof GameGrantSelectorSchema>) => {
+const readMandatoryGrantIds = (selector: z.infer<typeof ResolvedDomainSelectorSchema>) => {
 	const grantIds = new Set<string>();
 	if ("mode" in selector) return grantIds;
 
@@ -2706,7 +2722,7 @@ const formatItemSelector = (
 
 const formatGrantSelector = (
 	config: GameConfig,
-	selector: z.infer<typeof GameGrantSelectorSchema>,
+	selector: z.infer<typeof ResolvedDomainSelectorSchema>,
 ) => {
 	const grantNameById = readGrantNameById(config);
 	return formatResolvedSelector(selector, (grantId) => {

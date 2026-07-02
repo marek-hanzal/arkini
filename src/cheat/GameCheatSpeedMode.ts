@@ -1,6 +1,6 @@
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
-export const gameCheatInstantDurationMs = 1000;
+const gameCheatInstantDurationMs = 1000;
 
 export type GameCheatSpeedMode = "normal" | "instant";
 

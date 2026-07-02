@@ -5,7 +5,6 @@ import {
 } from "~/config/schema/GameConfigScalarSchemas";
 import {
 	AuthoringDomainSelectorSchema,
-	GameGrantSelectorSchema,
 	ResolvedDomainSelectorSchema,
 } from "~/config/schema/GameDomainSelectorSchema";
 
@@ -30,21 +29,21 @@ export const GameLineEffectDisplaySchema = z
 	])
 	.default("whenActive");
 
-export const GameLineEffectPhaseSchema = z
+const GameLineEffectPhaseSchema = z
 	.enum([
 		"visibility",
 		"start",
 	])
 	.default("start");
 
-export const DurationMultiplierSchema = z
+const DurationMultiplierSchema = z
 	.number()
 	.min(0)
 	.refine((value) => value !== 1, {
 		message: "Duration multiplier must change timing; 1 is a no-op.",
 	});
 
-export const GameLineEffectDistanceBandSchema = z
+const GameLineEffectDistanceBandSchema = z
 	.object({
 		minDistance: NonNegativeIntegerSchema.default(0),
 		maxDistance: NonNegativeIntegerSchema.optional(),
@@ -67,18 +66,18 @@ export const GameNearbyItemAuthoringSelectorSchema = z
 	})
 	.strict();
 
-const createGameLineEffectSchema = <
+export const createGameLineEffectMemberSchemas = <
 	TItemSelectorSchema extends
 		| typeof GameNearbyItemSelectorSchema
 		| typeof GameNearbyItemAuthoringSelectorSchema,
 >(
 	itemSelectorSchema: TItemSelectorSchema,
 ) =>
-	z.discriminatedUnion("kind", [
+	[
 		z
 			.object({
 				kind: z.literal("grant.require"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				phase: GameLineEffectPhaseSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
@@ -88,7 +87,7 @@ const createGameLineEffectSchema = <
 		z
 			.object({
 				kind: z.literal("grant.blockStart"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 				reason: z.string().min(1).optional(),
@@ -119,13 +118,21 @@ const createGameLineEffectSchema = <
 		z
 			.object({
 				kind: z.literal("grant.duration.multiply"),
-				selector: GameGrantSelectorSchema,
+				selector: ResolvedDomainSelectorSchema,
 				multiplier: DurationMultiplierSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 			})
 			.strict(),
-	]);
+	] as const;
+
+const createGameLineEffectSchema = <
+	TItemSelectorSchema extends
+		| typeof GameNearbyItemSelectorSchema
+		| typeof GameNearbyItemAuthoringSelectorSchema,
+>(
+	itemSelectorSchema: TItemSelectorSchema,
+) => z.discriminatedUnion("kind", createGameLineEffectMemberSchemas(itemSelectorSchema));
 
 export const GameLineEffectSchema = createGameLineEffectSchema(GameNearbyItemSelectorSchema);
 export const GameLineEffectAuthoringSchema = createGameLineEffectSchema(

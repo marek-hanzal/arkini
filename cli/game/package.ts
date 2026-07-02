@@ -346,28 +346,12 @@ const normalizeLineEffects = ({
 	};
 	effects: unknown;
 	path: string;
-}) => {
-	if (!Array.isArray(effects)) return effects;
-	return effects.map((effectEntry, effectIndex) => {
-		if (!effectEntry || typeof effectEntry !== "object" || Array.isArray(effectEntry)) {
-			return effectEntry;
-		}
-		const effect = {
-			...(effectEntry as Record<string, unknown>),
-		};
-		if (
-			(effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") &&
-			effect.items !== undefined
-		) {
-			effect.items = normalizeAuthoringDomainSelector({
-				domain: domainIndexes.items,
-				path: `${path}.${effectIndex}.items`,
-				selector: asAuthoringDomainSelector(effect.items),
-			});
-		}
-		return effect;
+}) =>
+	normalizeEffectArray({
+		domainIndexes,
+		effects,
+		path,
 	});
-};
 
 const normalizeDropEffects = ({
 	domainIndexes,
@@ -379,46 +363,113 @@ const normalizeDropEffects = ({
 	};
 	effects: unknown;
 	path: string;
+}) =>
+	normalizeEffectArray({
+		domainIndexes,
+		effects,
+		normalizeEffect: ({ effect, effectIndex }) =>
+			normalizeNearbyLootSources({
+				domainIndexes,
+				effect,
+				effectIndex,
+				path,
+			}),
+		path,
+	});
+
+const normalizeEffectArray = ({
+	domainIndexes,
+	effects,
+	normalizeEffect = ({ effect }) => effect,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	effects: unknown;
+	normalizeEffect?: (props: {
+		effect: Record<string, unknown>;
+		effectIndex: number;
+	}) => Record<string, unknown>;
+	path: string;
 }) => {
 	if (!Array.isArray(effects)) return effects;
 	return effects.map((effectEntry, effectIndex) => {
 		if (!effectEntry || typeof effectEntry !== "object" || Array.isArray(effectEntry)) {
 			return effectEntry;
 		}
-		const effect = {
-			...(effectEntry as Record<string, unknown>),
-		};
-		if (
-			(effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") &&
-			effect.items !== undefined
-		) {
-			effect.items = normalizeAuthoringDomainSelector({
-				domain: domainIndexes.items,
+		return normalizeEffect({
+			effect: normalizeNearbyEffectItems({
+				domainIndexes,
+				effect: {
+					...(effectEntry as Record<string, unknown>),
+				},
 				path: `${path}.${effectIndex}.items`,
-				selector: asAuthoringDomainSelector(effect.items),
-			});
-		}
-		if (effect.kind === "nearby.loot.outputChance.add" && Array.isArray(effect.sources)) {
-			effect.sources = effect.sources.map((sourceEntry, sourceIndex) => {
-				if (!sourceEntry || typeof sourceEntry !== "object" || Array.isArray(sourceEntry)) {
-					return sourceEntry;
-				}
-
-				const source = {
-					...(sourceEntry as Record<string, unknown>),
-				};
-				if (source.items !== undefined) {
-					source.items = normalizeAuthoringDomainSelector({
-						domain: domainIndexes.items,
-						path: `${path}.${effectIndex}.sources.${sourceIndex}.items`,
-						selector: asAuthoringDomainSelector(source.items),
-					});
-				}
-				return source;
-			});
-		}
-		return effect;
+			}),
+			effectIndex,
+		});
 	});
+};
+
+const normalizeNearbyEffectItems = ({
+	domainIndexes,
+	effect,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	effect: Record<string, unknown>;
+	path: string;
+}) => {
+	if (
+		(effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") &&
+		effect.items !== undefined
+	) {
+		effect.items = normalizeAuthoringDomainSelector({
+			domain: domainIndexes.items,
+			path,
+			selector: asAuthoringDomainSelector(effect.items),
+		});
+	}
+	return effect;
+};
+
+const normalizeNearbyLootSources = ({
+	domainIndexes,
+	effect,
+	effectIndex,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	effect: Record<string, unknown>;
+	effectIndex: number;
+	path: string;
+}) => {
+	if (effect.kind !== "nearby.loot.outputChance.add" || !Array.isArray(effect.sources)) {
+		return effect;
+	}
+
+	effect.sources = effect.sources.map((sourceEntry, sourceIndex) => {
+		if (!sourceEntry || typeof sourceEntry !== "object" || Array.isArray(sourceEntry)) {
+			return sourceEntry;
+		}
+
+		const source = {
+			...(sourceEntry as Record<string, unknown>),
+		};
+		if (source.items !== undefined) {
+			source.items = normalizeAuthoringDomainSelector({
+				domain: domainIndexes.items,
+				path: `${path}.${effectIndex}.sources.${sourceIndex}.items`,
+				selector: asAuthoringDomainSelector(source.items),
+			});
+		}
+		return source;
+	});
+	return effect;
 };
 
 const normalizeActivationOutputEffects = ({

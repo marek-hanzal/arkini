@@ -5,7 +5,7 @@ import {
 	PositiveIntegerSchema,
 } from "~/config/schema/GameConfigScalarSchemas";
 
-export const ProducerInputSchema = z
+const ProducerInputSchema = z
 	.object({
 		itemId: IdSchema,
 		quantity: PositiveIntegerSchema.default(1),

@@ -146,6 +146,121 @@ describe("applyGameActionFx merge", () => {
 		]);
 	});
 
+	it("keeps the target and places output for keep-target merge rules", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				...baseConfig.items,
+				"item:water": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Water",
+					maxStackSize: 3,
+					merges: [
+						{
+							output: [
+								{
+									itemId: "item:seed",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+							targetMode: "keep",
+							withItemId: "item:micro-forest",
+						},
+					],
+					name: "Water",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+				"item:micro-forest": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Micro Forest",
+					maxStackSize: 1,
+					name: "Micro Forest",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+				"item:seed": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Seed",
+					maxStackSize: 3,
+					name: "Seed",
+					storage: "both",
+					tags: [],
+					tier: 0,
+				},
+			},
+
+			startingState: {
+				board: [
+					{
+						itemId: "item:water",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:micro-forest",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					kind: "board",
+					itemInstanceId: "item-instance:1",
+				},
+				targetItemInstanceId: "item-instance:2",
+				type: "item.merge",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:micro-forest",
+		});
+		expect(Object.values(result.save.board.items)).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					itemId: "item:seed",
+					x: 0,
+					y: 0,
+				}),
+			]),
+		);
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:water",
+				reason: "merge-source",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:seed",
+				reason: "merge-output",
+				type: "item.created",
+			},
+		]);
+	});
+
 	it("rejects merging into a target with preservable runtime state", () => {
 		const baseConfig = createEngineCraftTableTestConfig({
 			boardItemCount: 2,

@@ -3,11 +3,16 @@ import { checkItemMergeReadinessFx } from "~/merge/checkItemMergeReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
+import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
+import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMerge } from "~/action/GameActionItemMerge";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
+import type { GameEvent } from "~/event/GameEventSchema";
+import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace mergeItemFx {
@@ -56,35 +61,83 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		);
 	}
 
-	if (config.items[checked.merge.resultItemId]?.effects?.length) {
-		liveTarget.createdAtMs = nowMs;
-	} else {
-		delete liveTarget.createdAtMs;
+	const mergeEvents: GameEvent[] = [
+		...consumed.events,
+	];
+	if ("resultItemId" in checked.merge) {
+		if (config.items[checked.merge.resultItemId]?.effects?.length) {
+			liveTarget.createdAtMs = nowMs;
+		} else {
+			delete liveTarget.createdAtMs;
+		}
+		liveTarget.itemId = checked.merge.resultItemId;
+		removeBoardItemRuntimeState({
+			itemInstanceId: checked.target.id,
+			save: nextSave,
+		});
+		mergeEvents.push({
+			fromItemId: checked.target.itemId,
+			itemInstanceId: checked.target.id,
+			reason: "merge-result" as const,
+			atMs: nowMs,
+			toItemId: checked.merge.resultItemId,
+			type: "item.replaced" as const,
+		});
 	}
-	liveTarget.itemId = checked.merge.resultItemId;
-	removeBoardItemRuntimeState({
+
+	const seedCell = readBoardItemCell({
 		itemInstanceId: checked.target.id,
 		save: nextSave,
 	});
-	nextSave.updatedAtMs = nowMs;
+	const rolledOutput = checked.merge.output
+		? yield* rollLootTableItemsFx({
+				lootTable: {
+					name: `Merge ${checked.source.itemId} + ${checked.target.itemId}`,
+					output: checked.merge.output,
+				},
+			})
+		: {
+				items: [],
+			};
+	const placementRequests = rolledOutput.items.map(
+		(item) =>
+			({
+				...item,
+				originItemInstanceId: checked.target.id,
+				reason: "merge-output",
+			}) satisfies GameSaveItemPlacementRequest,
+	);
+	const sourceFreedBoardItemInstanceIds =
+		checked.source.kind === "board"
+			? new Set([
+					checked.source.itemInstanceId,
+				])
+			: undefined;
+	const placed = placementRequests.length
+		? yield* placeGameSaveItemsFx({
+				config,
+				freedBoardItemInstanceIds: sourceFreedBoardItemInstanceIds,
+				items: placementRequests,
+				nowMs,
+				save: nextSave,
+				seedCell,
+			})
+		: {
+				events: [] satisfies GameEvent[],
+				save: nextSave,
+			};
+	placed.save.updatedAtMs = nowMs;
 
 	return {
 		events: [
-			...consumed.events,
-			{
-				fromItemId: checked.target.itemId,
-				itemInstanceId: checked.target.id,
-				reason: "merge-result" as const,
-				atMs: nowMs,
-				toItemId: checked.merge.resultItemId,
-				type: "item.replaced" as const,
-			},
+			...mergeEvents,
+			...placed.events,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
 			config,
 			nowMs,
-			save: nextSave,
+			save: placed.save,
 		}),
-		save: nextSave,
+		save: placed.save,
 	} satisfies GameEngineResult;
 });

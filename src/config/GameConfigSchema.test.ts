@@ -274,6 +274,47 @@ describe("GameConfigSchema", () => {
 		expect(parseGameConfig(createValidConfigValue()).items["item:twig"].storage).toBe("both");
 	});
 
+	it("accepts keep-target merge rules with placement output", () => {
+		const config = createValidConfigValue();
+		(config.items["item:twig"] as any).merges = [
+			{
+				output: [
+					{
+						itemId: "item:plank",
+						quantity: 1,
+						type: "guaranteed",
+					},
+				],
+				targetMode: "keep",
+				withItemId: "item:producer",
+			},
+		];
+
+		expect(parseGameConfig(config).items["item:twig"].merges?.[0]).toMatchObject({
+			targetMode: "keep",
+			withItemId: "item:producer",
+		});
+	});
+
+	it("rejects keep-target merge rules with missing output items", () => {
+		const config = createValidConfigValue();
+		(config.items["item:twig"] as any).merges = [
+			{
+				output: [
+					{
+						itemId: "item:missing",
+						quantity: 1,
+						type: "guaranteed",
+					},
+				],
+				targetMode: "keep",
+				withItemId: "item:producer",
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(/item:missing/);
+	});
+
 	it("accepts optional item maxCount", () => {
 		const config = createValidConfigValue();
 		(config.items["item:twig"] as TestItemWithMaxCount).maxCount = 2;

@@ -120,7 +120,7 @@ const validateConfigDefinitionReferences = ({
 					`Missing item "${merge.withItemId}".`,
 				);
 			}
-			if (!hasItem(merge.resultItemId)) {
+			if ("resultItemId" in merge && !hasItem(merge.resultItemId)) {
 				addIssue(
 					ctx,
 					[
@@ -131,6 +131,24 @@ const validateConfigDefinitionReferences = ({
 						"resultItemId",
 					],
 					`Missing item "${merge.resultItemId}".`,
+				);
+			}
+			if (merge.output) {
+				validateActivationOutput(
+					ctx,
+					[
+						"items",
+						itemId,
+						"merges",
+						mergeIndex,
+						"output",
+					],
+					merge.output,
+					{
+						grantIds,
+						hasItem,
+						itemIds,
+					},
 				);
 			}
 		}
@@ -1450,28 +1468,37 @@ const collectMergeBlueprintDependencies = ({
 }) => {
 	for (const [sourceItemId, item] of Object.entries(config.items)) {
 		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
-			if (!blueprintItemIds.has(merge.resultItemId)) continue;
-			addDependencyItem({
-				fromBlueprintItemId: merge.resultItemId,
-				itemId: sourceItemId,
-				path: [
-					"items",
-					sourceItemId,
-					"merges",
-					mergeIndex,
-				],
-			});
-			addDependencyItem({
-				fromBlueprintItemId: merge.resultItemId,
-				itemId: merge.withItemId,
-				path: [
-					"items",
-					sourceItemId,
-					"merges",
-					mergeIndex,
-					"withItemId",
-				],
-			});
+			const outputBlueprintIds = [
+				...("resultItemId" in merge
+					? [
+							merge.resultItemId,
+						]
+					: []),
+				...readActivationOutputItemIds(merge.output ?? []),
+			].filter((itemId) => blueprintItemIds.has(itemId));
+			for (const blueprintItemId of outputBlueprintIds) {
+				addDependencyItem({
+					fromBlueprintItemId: blueprintItemId,
+					itemId: sourceItemId,
+					path: [
+						"items",
+						sourceItemId,
+						"merges",
+						mergeIndex,
+					],
+				});
+				addDependencyItem({
+					fromBlueprintItemId: blueprintItemId,
+					itemId: merge.withItemId,
+					path: [
+						"items",
+						sourceItemId,
+						"merges",
+						mergeIndex,
+						"withItemId",
+					],
+				});
+			}
 		}
 	}
 };
@@ -1810,38 +1837,48 @@ const createGameplaySources = (config: GameConfig) => {
 		}
 
 		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
-			addItemSource({
-				label: `merge ${mergeIndex} from ${formatItemLabel(config, itemId)}`,
-				path: [
-					"items",
-					itemId,
-					"merges",
-					mergeIndex,
-				],
-				requirements: [
-					createItemRequirement({
+			const outputItemIds = [
+				...("resultItemId" in merge
+					? [
+							merge.resultItemId,
+						]
+					: []),
+				...readActivationOutputItemIds(merge.output ?? []),
+			];
+			for (const outputItemId of outputItemIds) {
+				addItemSource({
+					label: `merge ${mergeIndex} from ${formatItemLabel(config, itemId)}`,
+					path: [
+						"items",
 						itemId,
-						path: [
-							"items",
+						"merges",
+						mergeIndex,
+					],
+					requirements: [
+						createItemRequirement({
 							itemId,
-							"merges",
-							mergeIndex,
-						],
-					}),
-					createItemRequirement({
-						itemId: merge.withItemId,
-						path: [
-							"items",
-							itemId,
-							"merges",
-							mergeIndex,
-							"withItemId",
-						],
-					}),
-				],
-				sourceId: `merge:${itemId}:${mergeIndex}:${merge.withItemId}`,
-				targetId: merge.resultItemId,
-			});
+							path: [
+								"items",
+								itemId,
+								"merges",
+								mergeIndex,
+							],
+						}),
+						createItemRequirement({
+							itemId: merge.withItemId,
+							path: [
+								"items",
+								itemId,
+								"merges",
+								mergeIndex,
+								"withItemId",
+							],
+						}),
+					],
+					sourceId: `merge:${itemId}:${mergeIndex}:${merge.withItemId}:${outputItemId}`,
+					targetId: outputItemId,
+				});
+			}
 		}
 
 		for (const [removeIndex, removal] of (item.removeBy ?? []).entries()) {

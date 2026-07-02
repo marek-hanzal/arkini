@@ -101,10 +101,16 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 
 		for (const merge of item.merges ?? []) {
 			usage.items.add(merge.withItemId);
-			usage.items.add(merge.resultItemId);
 			itemFlow.consumedItemIds.add(itemId);
 			itemFlow.consumedItemIds.add(merge.withItemId);
-			itemFlow.producedItemIds.add(merge.resultItemId);
+			if ("resultItemId" in merge) {
+				usage.items.add(merge.resultItemId);
+				itemFlow.producedItemIds.add(merge.resultItemId);
+			}
+			if (merge.output) {
+				collectLootOutputUsage(merge.output, itemFlow);
+				collectLootOutputEffectUsage(merge.output, config, usage);
+			}
 		}
 
 		for (const removal of item.removeBy ?? []) {

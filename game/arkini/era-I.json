@@ -260,6 +260,34 @@
 			],
 			"tier": 3
 		},
+		"item:seed": {
+			"description": "Tiny forest seed dropped by watering a mature micro-forest. Water it to grow a sapling.",
+			"maxStackSize": 50,
+			"name": "Seed",
+			"tags": [
+				"material",
+				"wood",
+				"forest",
+				"seed",
+				"era:I",
+				"tier-1-resource"
+			],
+			"tier": 1
+		},
+		"item:sapling": {
+			"description": "Young tree grown from a watered seed. Water it again to grow a full tree.",
+			"maxStackSize": 50,
+			"name": "Sapling",
+			"tags": [
+				"material",
+				"wood",
+				"forest",
+				"sapling",
+				"era:I",
+				"tier-1-resource"
+			],
+			"tier": 1
+		},
 		"item:plank": {
 			"description": "Processed wood material produced by sawmills.",
 			"maxStackSize": 50,
@@ -370,6 +398,25 @@
 				{
 					"resultItemId": "item:micro-forest",
 					"withItemId": "item:double-tree"
+				},
+				{
+					"output": [
+						{
+							"itemId": "item:seed",
+							"quantity": 1,
+							"type": "guaranteed"
+						}
+					],
+					"targetMode": "keep",
+					"withItemId": "item:micro-forest"
+				},
+				{
+					"resultItemId": "item:sapling",
+					"withItemId": "item:seed"
+				},
+				{
+					"resultItemId": "item:tree",
+					"withItemId": "item:sapling"
 				}
 			],
 			"name": "Water",

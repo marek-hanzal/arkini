@@ -68,41 +68,45 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 			),
 		);
 	}
-	if (!config.items[merge.resultItemId]) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing merge result "${merge.resultItemId}".`),
-		);
-	}
-	if (
-		readBoardItemMaxCountCapacity({
-			config,
-			ignoredBoardItemInstanceIds: new Set([
-				target.id,
-			]),
-			itemId: merge.resultItemId,
+	if ("resultItemId" in merge) {
+		if (!config.items[merge.resultItemId]) {
+			return yield* Effect.fail(
+				GameEngineError.configReferenceMissing(
+					`Missing merge result "${merge.resultItemId}".`,
+				),
+			);
+		}
+		if (
+			readBoardItemMaxCountCapacity({
+				config,
+				ignoredBoardItemInstanceIds: new Set([
+					target.id,
+				]),
+				itemId: merge.resultItemId,
+				save,
+			}) <= 0
+		) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"board:max-count",
+					`Board already has the maximum allowed count for "${merge.resultItemId}".`,
+				),
+			);
+		}
+		const targetStateStatus = readBoardItemRuntimeStateStatus({
+			itemInstanceId: target.id,
 			save,
-		}) <= 0
-	) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"board:max-count",
-				`Board already has the maximum allowed count for "${merge.resultItemId}".`,
-			),
-		);
-	}
-	const targetStateStatus = readBoardItemRuntimeStateStatus({
-		itemInstanceId: target.id,
-		save,
-	});
-	if (targetStateStatus.busy || targetStateStatus.preservable) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"item_busy",
-				targetStateStatus.busy
-					? "Merge target has a running job."
-					: "Merge target has stored runtime state and cannot be replaced by merge.",
-			),
-		);
+		});
+		if (targetStateStatus.busy || targetStateStatus.preservable) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"item_busy",
+					targetStateStatus.busy
+						? "Merge target has a running job."
+						: "Merge target has stored runtime state and cannot be replaced by merge.",
+				),
+			);
+		}
 	}
 
 	return {

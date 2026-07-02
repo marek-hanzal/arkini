@@ -13,6 +13,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"inventory-placement",
 	"board-stash",
 	"tile-remove-output",
+	"merge-output",
 	"debug",
 ]);
 

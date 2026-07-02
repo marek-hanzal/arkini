@@ -28,7 +28,9 @@ export const resolveItemToBoardItemInteractionPlan = ({
 	const canReplaceTarget =
 		!isBoardViewItemRuntimeBusy(targetItem) &&
 		!isBoardViewItemRuntimeStatePreserved(targetItem);
-	const canMerge = Boolean(mergeRule && canReplaceTarget);
+	const canMerge = Boolean(
+		mergeRule && (!("resultItemId" in mergeRule.merge) || canReplaceTarget),
+	);
 	const canCraft = Boolean(
 		targetItem.craft?.canAcceptInputs &&
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
@@ -71,7 +73,11 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				canMerge: true,
 			},
 			({ mergeRule }) => ({
-				resultItemId: mergeRule?.merge.resultItemId,
+				...(mergeRule && "resultItemId" in mergeRule.merge
+					? {
+							resultItemId: mergeRule.merge.resultItemId,
+						}
+					: {}),
 				type: "merge" as const,
 			}),
 		)

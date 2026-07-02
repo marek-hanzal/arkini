@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import {
+	readProducerProductLineDefinition,
+	readProducerProductLineIds,
+} from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionProducerInputWithdraw } from "~/v0/game/action/GameActionProducerInputWithdraw";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -21,7 +25,11 @@ export const checkProducerInputWithdrawReadinessFx = Effect.fn(
 		producerItemInstanceId: action.producerItemInstanceId,
 		save,
 	});
-	if (!producerDefinition.productIds.includes(action.productId)) {
+	if (
+		!readProducerProductLineIds({
+			producerDefinition,
+		}).includes(action.productId)
+	) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
@@ -30,9 +38,10 @@ export const checkProducerInputWithdrawReadinessFx = Effect.fn(
 		);
 	}
 
-	const inputSlot = config.products[action.productId]?.inputs?.find(
-		(input) => input.itemId === action.itemId,
-	);
+	const inputSlot = readProducerProductLineDefinition({
+		producerDefinition,
+		productId: action.productId,
+	})?.inputs?.find((input) => input.itemId === action.itemId);
 	if (!inputSlot) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

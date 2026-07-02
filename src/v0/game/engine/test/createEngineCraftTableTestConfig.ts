@@ -24,6 +24,19 @@ export const createEngineCraftTableTestConfig = ({
 				assetIds: [
 					"asset:test",
 				],
+				craft: {
+					durationMs: 1_000,
+					inputs: noRecipeInputs
+						? []
+						: [
+								{
+									consume: true,
+									itemId: "item:twig",
+									quantity: 2,
+								},
+							],
+					resultItemId: "item:plank",
+				},
 				description: "Craft table",
 				maxStackSize: 1,
 				name: "Craft Table",
@@ -32,15 +45,6 @@ export const createEngineCraftTableTestConfig = ({
 				tier: 0,
 			},
 		},
-		craftRecipes: noRecipeInputs
-			? {
-					...baseConfig.craftRecipes,
-					"item:craft-table": {
-						...baseConfig.craftRecipes["item:craft-table"],
-						inputs: [],
-					},
-				}
-			: baseConfig.craftRecipes,
 		startingState: {
 			board: Array.from(
 				{

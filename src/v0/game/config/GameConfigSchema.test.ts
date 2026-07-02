@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseGameConfig } from "~/v0/game/config/GameConfigSchema";
+import { parseGameConfig as parseGameConfigRaw } from "~/v0/game/config/GameConfigSchema";
 
 type TestProductInput = {
 	capacity: number;
@@ -46,6 +46,93 @@ type TestCraftRecipe = {
 	}[];
 	resultItemId: string;
 };
+
+const embedLegacyConfigForSchemaTest = (value: unknown): unknown => {
+	if (!value || typeof value !== "object") {
+		return value;
+	}
+
+	const legacy = value as Record<string, any>;
+	const items = {
+		...(legacy.items ?? {}),
+	};
+	const products = legacy.products ?? {};
+
+	for (const [producerId, producer] of Object.entries<any>(legacy.producers ?? {})) {
+		const item = {
+			...(items[producerId] ?? {}),
+		};
+		item.producer = {
+			charges: producer.charges,
+			lines: (producer.productIds ?? []).map((productId: string) => ({
+				...(products[productId] ?? {}),
+				id: products[productId]?.id ?? productId,
+			})),
+			maxQueueSize: producer.maxQueueSize,
+			onChargesDepleted: producer.onChargesDepleted,
+		};
+		items[producerId] = item;
+	}
+
+	for (const [stashId, stash] of Object.entries<any>(legacy.stashes ?? {})) {
+		const productId = stash.productIds?.[0];
+		const item = {
+			...(items[stashId] ?? {}),
+		};
+		item.stash = {
+			charges: stash.charges,
+			line: {
+				...(products[productId] ?? {}),
+				id: products[productId]?.id ?? productId,
+			},
+			maxQueueSize: stash.maxQueueSize,
+			onChargesDepleted: stash.onChargesDepleted,
+		};
+		items[stashId] = item;
+	}
+
+	for (const [itemId, craft] of Object.entries<any>(legacy.craftRecipes ?? {})) {
+		items[itemId] = {
+			...(items[itemId] ?? {}),
+			craft,
+		};
+	}
+
+	for (const [itemId, item] of Object.entries<any>(items)) {
+		if (!Array.isArray(item.mergeIds)) {
+			continue;
+		}
+		items[itemId] = {
+			...item,
+			mergeIds: undefined,
+			merges: item.mergeIds.map((mergeId: string) => legacy.merge?.[mergeId]).filter(Boolean),
+		};
+		delete items[itemId].mergeIds;
+	}
+
+	const {
+		craftRecipes: _craftRecipes,
+		merge: _merge,
+		producers: _producers,
+		products: _products,
+		stashes: _stashes,
+		...next
+	} = legacy;
+
+	void _craftRecipes;
+	void _merge;
+	void _producers;
+	void _products;
+	void _stashes;
+
+	return {
+		...next,
+		items,
+	};
+};
+
+const parseGameConfig = (value: unknown) =>
+	parseGameConfigRaw(embedLegacyConfigForSchemaTest(value));
 
 const createValidConfigValue = () => ({
 	version: 1,
@@ -291,27 +378,34 @@ describe("GameConfigSchema", () => {
 		const config = createValidConfigValue();
 		config.producers["item:producer"].productIds.push("product:test");
 
-		expect(() => parseGameConfig(config)).toThrow(/Duplicate product/);
+		expect(() => parseGameConfig(config)).toThrow(/Duplicate producer line/);
 	});
 
-	it("rejects product definitions shared across producers", () => {
-		const config = createValidConfigValue();
-		(
-			config.producers as Record<
-				string,
-				{
-					maxQueueSize: number;
-					productIds: string[];
-				}
-			>
-		)["producer:second"] = {
+	it("accepts same local line id under different producers", () => {
+		const config: any = createValidConfigValue();
+		config.items["producer:second"] = {
+			assetIds: [
+				"asset:item",
+			],
+			description: "Second producer",
+			maxStackSize: 1,
+			name: "Second Producer",
+			tags: [],
+			tier: 0,
+		};
+		config.producers["producer:second"] = {
 			maxQueueSize: 1,
 			productIds: [
 				"product:test",
 			],
 		};
+		config.startingState.board.push({
+			itemId: "producer:second",
+			x: 1,
+			y: 1,
+		});
 
-		expect(() => parseGameConfig(config)).toThrow(/owned by exactly one producer/);
+		expect(() => parseGameConfig(config)).not.toThrow();
 	});
 
 	it("rejects activation input slots with capacity below required quantity", () => {
@@ -332,7 +426,9 @@ describe("GameConfigSchema", () => {
 			quantity: 4,
 		};
 
-		expect(parseGameConfig(config).products["product:test"].inputs![0]).toMatchObject({
+		expect(
+			parseGameConfig(config).items["item:producer"].producer?.lines[0]?.inputs?.[0],
+		).toMatchObject({
 			itemId: "item:twig",
 			mode: "upTo",
 			quantity: 4,

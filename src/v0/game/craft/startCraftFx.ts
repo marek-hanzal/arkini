@@ -8,6 +8,7 @@ import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuanti
 import { readNextWakeAtMsFx } from "~/v0/game/job/readNextWakeAtMsFx";
 import { readCraftJobEffectiveTimingFx } from "~/v0/game/craft/readCraftJobEffectiveTimingFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionCraftStart } from "~/v0/game/action/GameActionCraftStart";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
@@ -28,7 +29,7 @@ const readCraftStoredInputsReadyFx = Effect.fn("readCraftStoredInputsReadyFx")(f
 	save,
 	targetItemInstanceId,
 }: {
-	inputs: readonly GameConfig["craftRecipes"][string]["inputs"][number][];
+	inputs: readonly GameCraftRecipeDefinition["inputs"][number][];
 	save: GameSave;
 	targetItemInstanceId: string;
 }) {

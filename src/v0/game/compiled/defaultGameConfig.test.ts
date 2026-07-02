@@ -1,6 +1,42 @@
 import { describe, expect, it } from "vitest";
 import { defaultGameConfig } from "~/v0/game/compiled/defaultGameConfig";
 
+const readProductLine = (productId: string) =>
+	Object.values(defaultGameConfig.items)
+		.flatMap((item) => [
+			...(item.producer?.lines ?? []),
+			...(item.stash
+				? [
+						item.stash.line,
+					]
+				: []),
+		])
+		.find((line) => line.id === productId);
+
+const readProductLines = () =>
+	Object.values(defaultGameConfig.items).flatMap((item) => [
+		...(item.producer?.lines ?? []),
+		...(item.stash
+			? [
+					item.stash.line,
+				]
+			: []),
+	]);
+
+const readCraftRecipe = (recipeId: string) => defaultGameConfig.items[recipeId]?.craft;
+
+const readCraftRecipes = () =>
+	Object.entries(defaultGameConfig.items).flatMap(([itemId, item]) =>
+		item.craft
+			? ([
+					[
+						itemId,
+						item.craft,
+					],
+				] as const)
+			: [],
+	);
+
 describe("defaultGameConfig", () => {
 	it("is compiled to the output-owned producer effect model without legacy mutator fields", () => {
 		expect(JSON.stringify(defaultGameConfig)).not.toContain("grantSelector");
@@ -19,7 +55,7 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("authors work requirements directly on product outputs", () => {
-		const output = defaultGameConfig.products["product:lumberjack-t1:log"]?.output?.[0];
+		const output = readProductLine("product:lumberjack-t1:log")?.output?.[0];
 
 		expect(output && "effects" in output ? output.effects?.[2] : undefined).toMatchObject({
 			display: "always",
@@ -65,7 +101,7 @@ describe("defaultGameConfig", () => {
 		} as const;
 
 		for (const [productId, durationMs] of Object.entries(townHallUpgradePlanDurations)) {
-			const product = defaultGameConfig.products[productId];
+			const product = readProductLine(productId);
 
 			expect(product?.durationMs).toBe(durationMs);
 			expect(product?.tags).toContain("shrine:haste-target");
@@ -82,11 +118,18 @@ describe("defaultGameConfig", () => {
 	});
 
 	it("does not ship placeholder one-second gameplay timings", () => {
-		const oneSecondProductIds = Object.entries(defaultGameConfig.products)
+		const oneSecondProductIds = readProductLines()
+			.map(
+				(product) =>
+					[
+						product.id,
+						product,
+					] as const,
+			)
 			.filter(([, product]) => product.durationMs === 1000)
 			.map(([productId]) => productId)
 			.sort();
-		const oneSecondCraftIds = Object.entries(defaultGameConfig.craftRecipes)
+		const oneSecondCraftIds = readCraftRecipes()
 			.filter(([, craftRecipe]) => craftRecipe.durationMs === 1000)
 			.map(([craftRecipeId]) => craftRecipeId)
 			.sort();
@@ -95,13 +138,20 @@ describe("defaultGameConfig", () => {
 		expect(oneSecondCraftIds).toEqual([]);
 	});
 	it("keeps blueprint planning costs separate from construction costs", () => {
-		const repeatedBlueprintCosts = Object.entries(defaultGameConfig.products)
+		const repeatedBlueprintCosts = readProductLines()
+			.map(
+				(product) =>
+					[
+						product.id,
+						product,
+					] as const,
+			)
 			.flatMap(([productId, product]) =>
 				(product.output ?? []).flatMap((output) => {
 					if (!("itemId" in output)) return [];
 					const blueprintItemId = output.itemId;
 					if (!blueprintItemId.includes(":blueprint-")) return [];
-					const craftRecipe = defaultGameConfig.craftRecipes[blueprintItemId];
+					const craftRecipe = readCraftRecipe(blueprintItemId);
 					if (craftRecipe === undefined) return [];
 
 					const productInputItemIds = new Set(
@@ -120,14 +170,12 @@ describe("defaultGameConfig", () => {
 
 	it("keeps feasts as construction labor cost instead of town hall plan cost", () => {
 		expect(
-			defaultGameConfig.products["product:townhall-t3:blueprint-townhall-t4"]?.inputs?.map(
+			readProductLine("product:townhall-t3:blueprint-townhall-t4")?.inputs?.map(
 				(input) => input.itemId,
 			),
 		).not.toContain("item:feast");
 		expect(
-			defaultGameConfig.craftRecipes["item:blueprint-townhall-t4"]?.inputs.map(
-				(input) => input.itemId,
-			),
+			readCraftRecipe("item:blueprint-townhall-t4")?.inputs.map((input) => input.itemId),
 		).toContain("item:feast");
 	});
 });

@@ -1,11 +1,12 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readCraftRecipeDurationMs } from "~/v0/game/craft/readCraftRecipeDurationMs";
 
 export namespace readCraftJobEffectiveTimingFx {
 	export interface Props {
-		recipe: GameConfig["craftRecipes"][string];
+		recipe: GameCraftRecipeDefinition;
 		save: GameSave;
 		startAtMs: number;
 		targetItemInstanceId: string;

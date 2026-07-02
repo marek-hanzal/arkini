@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameActionResolvedInputRef } from "~/v0/game/action/GameActionResolvedInputRef";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/v0/game/event/GameEventSchema";
 import { readCraftInputQuantitiesFx } from "~/v0/game/craft/readCraftInputQuantitiesFx";
@@ -12,7 +13,7 @@ import { readGameItemQuantity } from "~/v0/game/quantity/GameItemQuantityIndex";
 export namespace autoFillCraftInputsFx {
 	export interface Props {
 		events: GameEvent[];
-		inputs: readonly GameConfig["craftRecipes"][string]["inputs"][number][];
+		inputs: readonly GameCraftRecipeDefinition["inputs"][number][];
 		nextSave: GameSave;
 		nowMs: number;
 		recipeId: string;

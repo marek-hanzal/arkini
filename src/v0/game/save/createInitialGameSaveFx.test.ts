@@ -37,6 +37,17 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				description: "Producer",
 				maxStackSize: 1,
 				name: "Producer",
+				producer: {
+					maxQueueSize: 1,
+					lines: [
+						{
+							durationMs: 1000,
+							id: "product:test",
+							name: "Test product",
+							placement: "board_then_inventory",
+						},
+					],
+				},
 				tags: [],
 				tier: 0,
 			},
@@ -51,23 +62,6 @@ const createConfig = (overrides: Partial<GameConfig> = {}) =>
 				tier: 0,
 			},
 		},
-		merge: {},
-		producers: {
-			"item:producer": {
-				maxQueueSize: 1,
-				productIds: [
-					"product:test",
-				],
-			},
-		},
-		products: {
-			"product:test": {
-				durationMs: 1000,
-				name: "Test product",
-			},
-		},
-		stashes: {},
-		craftRecipes: {},
 		startingState: {
 			board: [
 				{

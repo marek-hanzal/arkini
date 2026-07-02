@@ -5,6 +5,10 @@ import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisiblePro
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/v0/game/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import {
+	readProducerProductLineDefinition,
+	readProducerProductLineIds,
+} from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionProducerInputStore } from "~/v0/game/action/GameActionProducerInputStore";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -57,7 +61,9 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			config,
 			producerItemInstanceId: action.producerItemInstanceId,
 			nowMs,
-			productIds: producerDefinition.productIds,
+			productIds: readProducerProductLineIds({
+				producerDefinition,
+			}),
 			save,
 		});
 		const productIds = action.productId
@@ -71,7 +77,11 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				});
 
 		for (const productId of productIds) {
-			if (!producerDefinition.productIds.includes(productId)) {
+			if (
+				!readProducerProductLineIds({
+					producerDefinition,
+				}).includes(productId)
+			) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
 						"invalid_actor",
@@ -88,9 +98,10 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 				);
 			}
 
-			const inputSlot = config.products[productId]?.inputs?.find(
-				(input) => input.itemId === resolvedRef.itemId,
-			);
+			const inputSlot = readProducerProductLineDefinition({
+				producerDefinition,
+				productId,
+			})?.inputs?.find((input) => input.itemId === resolvedRef.itemId);
 			if (!inputSlot) {
 				continue;
 			}

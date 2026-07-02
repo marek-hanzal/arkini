@@ -80,7 +80,7 @@ describe("resolveBoardDropFeedback", () => {
 				"item:inventory-only": {
 					...config.items["item:twig"],
 					description: "Inventory only",
-					mergeIds: [],
+					merges: [],
 					name: "Inventory Only",
 					storage: "inventory",
 				},

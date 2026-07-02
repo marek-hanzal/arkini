@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
@@ -10,7 +11,7 @@ export namespace checkProducerProductStartRuntimeConstraintsFx {
 	export interface Props {
 		config: GameConfig;
 		producerItemInstanceId: string;
-		product: GameConfig["products"][string];
+		product: GameProducerLineDefinition;
 		productId: string;
 		save: GameSave;
 		startAtMs: number;

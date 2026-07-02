@@ -25,7 +25,7 @@ export const readStashBoardItemFx = Effect.fn("readStashBoardItemFx")(function* 
 			),
 		);
 	}
-	if (!config.stashes[boardItem.itemId]) {
+	if (!config.items[boardItem.itemId]?.stash) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",

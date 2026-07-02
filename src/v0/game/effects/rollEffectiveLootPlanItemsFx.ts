@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { EffectiveProducerProductLine } from "~/v0/game/effects/EffectiveProducerProductLine";
 import { rollGameQuantityFx } from "~/v0/game/loot/rollGameQuantityFx";
 import { rollLootTableItemsFx } from "~/v0/game/loot/rollLootTableItemsFx";
@@ -16,7 +17,7 @@ export namespace rollEffectiveLootPlanItemsFx {
 const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
 	output,
 }: {
-	output: NonNullable<GameConfig["products"][string]["output"]>;
+	output: NonNullable<GameProducerLineDefinition["output"]>;
 }) {
 	return yield* rollLootTableItemsFx({
 		lootTable: {

@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { doesGameGrantSelectorMatchIds } from "~/v0/game/effects/doesGameGrantSelectorMatchIds";
 import { readGameWorldGrantIds } from "~/v0/game/effects/readGameWorldGrantIds";
@@ -7,7 +8,7 @@ export namespace readCraftLineEffectState {
 	export interface Props {
 		config: GameConfig;
 		nowMs?: number;
-		recipe: GameConfig["craftRecipes"][string];
+		recipe: GameCraftRecipeDefinition;
 		save: GameSave;
 	}
 }

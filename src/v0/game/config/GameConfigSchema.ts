@@ -1,870 +1,59 @@
 import { z } from "zod";
 import { doesResolvedDomainSelectorMatchId } from "~/v0/game/selector/doesResolvedDomainSelectorMatchId";
-
-/**
- * Canonical Arkini v0 game package contract.
- *
- * This file is intentionally owned by the runtime game source, not by the CLI. The
- * local `game:compile` and `game:validate` commands import the same schema that the
- * browser-side loader will eventually use, so JSON authoring feedback and runtime
- * package loading do not drift into two similar-but-different religions. Humanity
- * already tried that with date formats and somehow survived, but we should not test
- * its luck again.
- *
- * `GameConfig` is the compiled, canonical shape consumed by the game engine. Authoring
- * files under `./game/<package>/` may be split into any number of JSON fragments, but
- * after compile/merge the engine must only see this single shape:
- *
- * ```txt
- * resources -> assets -> items -> merge/producers/products/stashes/craft/effects
- * ```
- *
- * The package contains static game truth only. Mutable save state such as occupied
- * board slots, producer line progress, selected default product lines, running craft jobs
- * belong to the save/runtime engine state, not here.
- *
- * Important gameplay contracts represented by this schema:
- *
- * - Board tiles never stack. Produced/crafted/dropped items are placed onto empty board
- *   cells first and then into inventory stacks/slots through `board_then_inventory`.
- * - Inventory may stack items up to each item's `maxStackSize`.
- * - Item `storage` declares where the item may persist: `board`, `inventory`, or
- *   `both`. Missing storage defaults to `both`. Board-only danger tiles can therefore
- *   spawn on the board without letting the player launder the problem through inventory.
- * - Item `maxCount` optionally caps how many copies may exist on the board. Missing
- *   `maxCount` means unlimited, because sometimes restraint should be explicit.
- * - Merge definitions are explicit source-owned rules. If both drag directions should
- *   work, both source items must reference their own rule. The engine must not invent
- *   reverse merges from target-owned rules.
- * - Activation inputs always say whether they are consumed. Product-line/stash/craft
- *   code must not guess consumption from context, because guessing is just a bug wearing a hat. Input quantity defaults to 1.
- *   Product inputs may use `mode: "upTo"` when a run should consume 1..quantity items for the same fixed output.
- * - Passive and active `effects` only publish global grant facts. They do not target,
- *   mutate, or reach into product lines. Producer output entries and craft recipes
- *   own their own visibility requirements, start requirements, proximity checks,
- *   and modifiers.
- * - Nearby output/craft effects use Chebyshev grid distance, so radius 1 includes
- *   diagonals around the producer/craft tile. Duration changes are authored as
- *   explicit output-owned distance bands or grant-driven multipliers.
- * - Producer/stash `productIds` are ordered production lines. Runtime board-click activation
- *   only uses an explicitly selected default product line. Without a user-selected
- *   default, clicking a producer tile is intentionally a noop. Product
- *   definitions are owned by exactly one producer line. Producer shells do not own
- *   inputs. Runtime may still choose between multiple product lines accepting the same dragged
- *   item by default-line priority, then configured order. `maxQueueSize` is a hard per-capability-instance cap
- *   covering both running and queued jobs. Optional `charges` live on the producer capability,
- *   product lines spend `chargeCost`, and `onChargesDepleted` decides whether depletion stops
- *   future starts or removes the tile.
- * - Product inputs are stored per product line. Craft inputs are stored per craft
- *   target instance until the player explicitly starts the craft. Completion replaces
- *   the target with exactly one result item.
- * - Product lines own their normal `output` inline and may spend producer charges with `chargeCost`. A product without `output` is valid.
- *   That is a delayed sink/destructor such as a shredder.
- * - `items.*.removeBy` is a generic board/tile removal rule. It is not producer logic.
- *   Removal rules may emit inline loot output after the target tile is removed.
- *
- * Minimal source fragment example:
- *
- * ```json
- * {
- *   "items": {
- *     "item:twig": {
- *       "name": "Twig",
- *       "tier": 0,
- *       "maxStackSize": 32,
- *       "description": "A tiny piece of future infrastructure.",
- *       "tags": ["wood"],
- *       "mergeIds": ["merge:twig-to-stick"]
- *     }
- *   },
- *   "merge": {
- *     "merge:twig-to-stick": {
- *       "withItemId": "item:twig",
- *       "resultItemId": "item:stick"
- *     }
- *   },
- *   "effects": {}
- * }
- * ```
- *
- * Producer line example:
- *
- * ```json
- * {
- *   "producers": {
- *     "producer:lumber-camp": {
- *       "type": "producer",
- *       "maxQueueSize": 1,
- *       "productIds": ["product:lumber-camp.basic", "product:lumber-camp.saw"]
- *     }
- *   },
- *   "products": {
- *     "product:lumber-camp.saw": {
- *       "name": "Saw logs",
- *       "durationMs": 5000,
- *       "placement": "board_then_inventory",
- *       "inputs": [{ "itemId": "item:log", "quantity": 1, "capacity": 1, "consume": true }],
- *       "output": [{ "type": "guaranteed", "itemId": "item:plank", "quantity": 1 }]
- *     }
- *   }
- * }
- * ```
- *
- * The schema validates structure and cross-reference integrity. It does not run the
- * economy. The standalone engine should still be tested against this contract by
- * applying actions/ticks to `(config, save)` and asserting emitted events plus resulting
- * save changes. In other words: this file says what the game is allowed to mean; engine
- * tests prove the runtime actually respects it instead of performing interpretive dance.
- */
-
-/** Stable authoring ID. IDs are plain strings so JSON fragments can cross-link by key. */
-const IdSchema = z.string().min(1);
-const NonNegativeIntegerSchema = z.number().int().min(0);
-const PositiveIntegerSchema = z.number().int().positive();
-const NonNegativeNumberSchema = z.number().min(0);
-const PositiveNumberSchema = z.number().positive();
-const PositiveProbabilitySchema = z.number().gt(0).max(1);
-const ActivationInputModeSchema = z.enum([
-	"exact",
-	"upTo",
-]);
-/**
- * Output placement policy.
- *
- * Keep this as an enum even while it has one value so runtime code can use exhaustive
- * matching when future placement modes finally arrive to make our lives worse.
- */
-const PlacementSchema = z
-	.enum([
-		"board_then_inventory",
-	])
-	.default("board_then_inventory");
-
-/** Persistent location policy for item definitions. */
-const ItemStoragePolicySchema = z
-	.enum([
-		"board",
-		"inventory",
-		"both",
-	])
-	.default("both");
-
-/** Fixed or ranged output quantity used by loot tables. */
-const QuantitySchema = z.union([
+import { AssetFragmentSchema, AssetSchema } from "~/v0/game/config/schema/GameAssetSchema";
+import { CraftRecipeSchema } from "~/v0/game/config/schema/GameCraftRecipeSchema";
+import { ActivationOutputSchema } from "~/v0/game/config/schema/GameActivationOutputSchema";
+import {
+	IdSchema,
+	NonNegativeIntegerSchema,
 	PositiveIntegerSchema,
-	z
-		.object({
-			min: PositiveIntegerSchema,
-			max: PositiveIntegerSchema,
-		})
-		.strict()
-		.refine((value) => value.max >= value.min, {
-			message: "max must be >= min",
-		}),
-]);
+} from "~/v0/game/config/schema/GameConfigScalarSchemas";
+import {
+	GameGrantSelectorSchema,
+	ResolvedDomainSelectorClauseSchema,
+	ResolvedDomainSelectorSchema,
+} from "~/v0/game/config/schema/GameDomainSelectorSchema";
+import { GameDropEffectSchema } from "~/v0/game/config/schema/GameDropEffectSchema";
+import {
+	GameEffectAuthoringDefinitionSchema,
+	GameEffectDefinitionSchema,
+} from "~/v0/game/config/schema/GameEffectDefinitionSchema";
+import { GameLineEffectSchema } from "~/v0/game/config/schema/GameLineEffectSchema";
+import { GameMetaSchema } from "~/v0/game/config/schema/GameMetaSchema";
+import { ItemFragmentSchema, ItemSchema } from "~/v0/game/config/schema/GameItemSchema";
+import { ResourceSchema } from "~/v0/game/config/schema/GameResourceSchema";
+import { StartingStateSchema } from "~/v0/game/config/schema/GameStartingStateSchema";
 
-const SortSchema = z.number().finite();
-
-/**
- * Input slot for activations that can be gradually filled by product lines.
- * `consume` is required because config authors must see whether a fed item disappears. Missing quantity defaults to 1 because needing one item is the boring common case, not a revelation.
- * Missing `mode` means `exact`: the product needs and consumes exactly `quantity`.
- * `mode: "upTo"` means the product can start with at least one stored item and consumes up to `quantity` for the same fixed output.
- */
-const ItemStackInputSchema = z
-	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema.default(1),
-		capacity: PositiveIntegerSchema,
-		consume: z.boolean(),
-		mode: ActivationInputModeSchema.optional(),
-	})
-	.strict();
-
-/** Craft input slot gradually filled on the concrete craft target before explicit start. */
-const CraftRecipeInputSchema = z
-	.object({
-		itemId: IdSchema,
-		quantity: PositiveIntegerSchema.default(1),
-		consume: z.boolean(),
-	})
-	.strict();
-
-const ActivationInputSchema = z.array(ItemStackInputSchema);
-
-const TagSchema = z.string().min(1);
-
-const ResolvedDomainSelectorClauseSchema = z
-	.object({
-		ids: z.array(IdSchema).min(1),
-	})
-	.strict();
-
-/** Canonical runtime selector. Tags are resolved to id clauses during package normalization. */
-const ResolvedDomainSelectorSchema = z.union([
-	z
-		.object({
-			mode: z.literal("all"),
-		})
-		.strict(),
-	z
-		.object({
-			anyOf: z.array(ResolvedDomainSelectorClauseSchema).min(1).optional(),
-			allOf: z.array(ResolvedDomainSelectorClauseSchema).min(1).optional(),
-			noneOf: z.array(ResolvedDomainSelectorClauseSchema).min(1).optional(),
-		})
-		.strict(),
-]);
-
-const AuthoringDomainSelectorRefSchema = z.union([
-	z
-		.object({
-			id: IdSchema,
-		})
-		.strict(),
-	z
-		.object({
-			ids: z.array(IdSchema).min(1),
-		})
-		.strict(),
-	z
-		.object({
-			tag: TagSchema,
-		})
-		.strict(),
-]);
-
-/** Source-only selector accepted by game package fragments before compile-time tag expansion. */
-const AuthoringDomainSelectorSchema = z.union([
-	z
-		.object({
-			mode: z.literal("all"),
-		})
-		.strict(),
-	z
-		.object({
-			anyOf: z.array(AuthoringDomainSelectorRefSchema).min(1).optional(),
-			allOf: z.array(AuthoringDomainSelectorRefSchema).min(1).optional(),
-			noneOf: z.array(AuthoringDomainSelectorRefSchema).min(1).optional(),
-		})
-		.strict(),
-]);
-
-/** Grant selectors describe domain capabilities, not concrete source items. */
-const GameGrantSelectorSchema = ResolvedDomainSelectorSchema;
-
-const GameEffectSourceScopeSchema = z.enum([
-	"board",
-	"inventory",
-	"both",
-]);
-
-const GameEffectPolaritySchema = z.enum([
-	"buff",
-	"debuff",
-	"neutral",
-	"mixed",
-]);
-
-const GameLineEffectDisplaySchema = z
-	.enum([
-		"always",
-		"whenActive",
-		"whenMissing",
-		"never",
-	])
-	.default("whenActive");
-
-const GameLineEffectPhaseSchema = z
-	.enum([
-		"visibility",
-		"start",
-	])
-	.default("start");
-
-const DurationMultiplierSchema = z
-	.number()
-	.min(0)
-	.refine((value) => value !== 1, {
-		message: "Duration multiplier must change timing; 1 is a no-op.",
-	});
-
-const GameLineEffectDistanceBandSchema = z
-	.object({
-		minDistance: NonNegativeIntegerSchema.default(0),
-		maxDistance: NonNegativeIntegerSchema.optional(),
-		multiplier: z.number().min(0),
-	})
-	.strict()
-	.refine((value) => value.maxDistance === undefined || value.maxDistance >= value.minDistance, {
-		message: "maxDistance must be >= minDistance",
-	});
-
-const GameNearbyItemSelectorSchema = z
-	.object({
-		items: ResolvedDomainSelectorSchema,
-	})
-	.strict();
-
-const GameNearbyItemAuthoringSelectorSchema = z
-	.object({
-		items: AuthoringDomainSelectorSchema,
-	})
-	.strict();
-
-const createGameNearbyLootChanceSourceSchema = <
-	TItemSelectorSchema extends
-		| typeof GameNearbyItemSelectorSchema
-		| typeof GameNearbyItemAuthoringSelectorSchema,
->(
-	itemSelectorSchema: TItemSelectorSchema,
-) =>
-	z
-		.object({
-			...itemSelectorSchema.shape,
-			chance: PositiveNumberSchema,
-			label: z.string().min(1).optional(),
-		})
-		.strict();
-
-const createGameLineEffectSchema = <
-	TItemSelectorSchema extends
-		| typeof GameNearbyItemSelectorSchema
-		| typeof GameNearbyItemAuthoringSelectorSchema,
->(
-	itemSelectorSchema: TItemSelectorSchema,
-) =>
-	z.discriminatedUnion("kind", [
-		z
-			.object({
-				kind: z.literal("grant.require"),
-				selector: GameGrantSelectorSchema,
-				phase: GameLineEffectPhaseSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.blockStart"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.require"),
-				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				phase: GameLineEffectPhaseSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.duration.multiply"),
-				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				bands: z.array(GameLineEffectDistanceBandSchema).min(1),
-				maxSources: PositiveIntegerSchema.optional(),
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.duration.multiply"),
-				selector: GameGrantSelectorSchema,
-				multiplier: DurationMultiplierSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-	]);
-
-const GameLineEffectSchema = createGameLineEffectSchema(GameNearbyItemSelectorSchema);
-const GameLineEffectAuthoringSchema = createGameLineEffectSchema(
-	GameNearbyItemAuthoringSelectorSchema,
-);
-
-const createGameDropEffectSchema = <
-	TItemSelectorSchema extends
-		| typeof GameNearbyItemSelectorSchema
-		| typeof GameNearbyItemAuthoringSelectorSchema,
->(
-	itemSelectorSchema: TItemSelectorSchema,
-) =>
-	z.discriminatedUnion("kind", [
-		z
-			.object({
-				kind: z.literal("grant.require"),
-				selector: GameGrantSelectorSchema,
-				phase: GameLineEffectPhaseSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.blockStart"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.require"),
-				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				phase: GameLineEffectPhaseSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.duration.multiply"),
-				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				bands: z.array(GameLineEffectDistanceBandSchema).min(1),
-				maxSources: PositiveIntegerSchema.optional(),
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.duration.multiply"),
-				selector: GameGrantSelectorSchema,
-				multiplier: DurationMultiplierSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.drop.hide"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.drop.show"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.drop.disable"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.drop.enable"),
-				selector: GameGrantSelectorSchema,
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-				reason: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("grant.loot.extraOutputChance.add"),
-				selector: GameGrantSelectorSchema,
-				chance: PositiveProbabilitySchema,
-				quantity: QuantitySchema.default(1),
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-		z
-			.object({
-				kind: z.literal("nearby.loot.outputChance.add"),
-				radius: NonNegativeIntegerSchema,
-				sources: z.array(createGameNearbyLootChanceSourceSchema(itemSelectorSchema)).min(1),
-				quantity: QuantitySchema.default(1),
-				display: GameLineEffectDisplaySchema,
-				label: z.string().min(1).optional(),
-			})
-			.strict(),
-	]);
-
-const GameDropEffectSchema = createGameDropEffectSchema(GameNearbyItemSelectorSchema);
-const GameDropEffectAuthoringSchema = createGameDropEffectSchema(
-	GameNearbyItemAuthoringSelectorSchema,
-);
-
-const createActivationOutputSchema = <
-	TDropEffectSchema extends typeof GameDropEffectSchema | typeof GameDropEffectAuthoringSchema,
->(
-	dropEffectSchema: TDropEffectSchema,
-) => {
-	const dropEffectFields = {
-		enabled: z.boolean().optional(),
-		effects: z.array(dropEffectSchema).optional(),
-		visibility: z
-			.enum([
-				"visible",
-				"hidden",
-			])
-			.optional(),
-	};
-
-	return z.array(
-		z.discriminatedUnion("type", [
-			z
-				.object({
-					type: z.literal("guaranteed"),
-					itemId: IdSchema,
-					quantity: QuantitySchema.default(1),
-					sort: SortSchema.optional(),
-					...dropEffectFields,
-				})
-				.strict(),
-			z
-				.object({
-					type: z.literal("chance"),
-					itemId: IdSchema,
-					chance: z.number().min(0).max(1),
-					quantity: QuantitySchema.default(1),
-					sort: SortSchema.optional(),
-					...dropEffectFields,
-				})
-				.strict(),
-			z
-				.object({
-					type: z.literal("weighted"),
-					rolls: QuantitySchema.default(1),
-					sort: SortSchema.optional(),
-					entries: z
-						.array(
-							z
-								.object({
-									itemId: IdSchema,
-									weight: PositiveIntegerSchema,
-									quantity: QuantitySchema.default(1),
-									sort: SortSchema.optional(),
-									...dropEffectFields,
-								})
-								.strict(),
-						)
-						.min(1),
-				})
-				.strict(),
-		]),
-	);
-};
-
-/**
- * Loot output model.
- *
- * `guaranteed` always emits, `chance` is an independent probability roll, and
- * `weighted` chooses from weighted entries for the configured number of rolls.
- * Drop-local effects are evaluated from top to bottom on the concrete output entry.
- */
-const ActivationOutputSchema = createActivationOutputSchema(GameDropEffectSchema);
-const ActivationOutputAuthoringSchema = createActivationOutputSchema(GameDropEffectAuthoringSchema);
-
-const GameEffectGrantDefinitionSchema = z
-	.object({
-		id: IdSchema,
-		name: z.string().min(1),
-	})
-	.strict();
-
-const GameEffectDefinitionSchema = z
-	.object({
-		name: z.string().min(1),
-		polarity: GameEffectPolaritySchema,
-		grants: z.array(GameEffectGrantDefinitionSchema).min(1),
-		sourceScope: GameEffectSourceScopeSchema.optional(),
-	})
-	.strict();
-
-const GameEffectAuthoringDefinitionSchema = GameEffectDefinitionSchema;
-
-/** Package-level board/inventory dimensions and human-readable title. */
-const GameMetaSchema = z
-	.object({
-		id: IdSchema,
-		title: z.string().min(1),
-		board: z
-			.object({
-				width: PositiveIntegerSchema,
-				height: PositiveIntegerSchema,
-			})
-			.strict(),
-		inventory: z
-			.object({
-				slots: PositiveIntegerSchema,
-			})
-			.strict(),
-	})
-	.strict();
-
-/** Generated base64 resource payload, usually from PNG files under `game/<id>/assets`. */
-const ResourceDefinitionSchema = z
-	.object({
-		data: z.string().min(1),
-	})
-	.strict();
-
-/** Render-facing asset metadata that maps game definitions to generated resources. Asset ids carry the domain convention; no duplicate kind field. */
-const AssetDefinitionSchema = z
-	.object({
-		label: z.string().min(1).optional(),
-		resourceId: IdSchema,
-		overlayAssetId: IdSchema.optional(),
-		render: z
-			.enum([
-				"plain",
-				"blueprint",
-			])
-			.default("plain"),
-	})
-	.strict();
-
-const AssetDefinitionFragmentSchema = AssetDefinitionSchema.extend({
-	resourceId: IdSchema.optional(),
-});
-
-/** Explicit source-owned two-item merge option referenced from `items.*.mergeIds`. */
-const MergeDefinitionSchema = z
-	.object({
-		withItemId: IdSchema,
-		resultItemId: IdSchema,
-		secret: z.boolean().optional(),
-	})
-	.strict();
-
-/** Generic tile removal tool rule. `keep` returns the tool; `consume` destroys it. */
-const RemoveByDefinitionSchema = z
-	.object({
-		itemId: IdSchema,
-		mode: z.enum([
-			"keep",
-			"consume",
-		]),
-		output: ActivationOutputSchema.min(1).optional(),
-	})
-	.strict();
-
-/**
- * Core tile/item definition.
- *
- * An item may be plain merge content, a producer tile, stash/container tile, craft
- * blueprint, removable obstacle, tool, currency-like stackable object, or any tasteful
- * combination the future economy decides to inflict on us.
- */
-const ItemDefinitionSchema = z
-	.object({
-		assetIds: z.array(IdSchema).min(1),
-		name: z.string().min(1),
-		tier: NonNegativeIntegerSchema.default(0),
-		maxStackSize: PositiveIntegerSchema.default(10),
-		maxCount: PositiveIntegerSchema.optional(),
-		storage: ItemStoragePolicySchema,
-		description: z.string(),
-		label: z.string().optional(),
-		tags: z.array(z.string().min(1)).default([]),
-		mergeIds: z.array(IdSchema).optional(),
-		passiveEffectIds: z.array(IdSchema).optional(),
-		removeBy: z.array(RemoveByDefinitionSchema).optional(),
-	})
-	.strict();
-
-const ItemDefinitionFragmentSchema = ItemDefinitionSchema.extend({
-	assetIds: z.array(IdSchema).min(1).optional(),
-});
-
-const ProducerDepletedModeSchema = z.enum([
-	"stop",
-	"remove",
-]);
-
-/** Producer-like capability with ordered product lines. Output gates live on product output entries. */
-const ProducerDefinitionSchema = z
-	.object({
-		maxQueueSize: PositiveIntegerSchema.default(1),
-		productIds: z.array(IdSchema).min(1),
-		charges: PositiveNumberSchema.optional(),
-		onChargesDepleted: ProducerDepletedModeSchema.default("stop"),
-	})
-	.strict();
-
-/** Stash is a producer-like shell with exactly one product line and finite charges. */
-const StashDefinitionSchema = ProducerDefinitionSchema.extend({
-	productIds: z.array(IdSchema).length(1),
-	charges: PositiveNumberSchema.default(1),
-	onChargesDepleted: ProducerDepletedModeSchema.default("remove"),
-})
-	.strict()
-	.superRefine((stash, ctx) => {
-		if (stash.onChargesDepleted !== "remove") {
-			ctx.addIssue({
-				code: "custom",
-				message: "Stashes must remove themselves when charges are depleted.",
-				path: [
-					"onChargesDepleted",
-				],
-			});
-		}
-	});
-
-/**
- * Delayed recipe outside two-item merge.
- *
- * Inputs are gradually stored on the concrete target before explicit start. Completion
- * replaces the target item in-place with exactly one result item. Source blueprint recipes
- * may omit resultItemId when it is conventionally derived from the craft target id.
- */
-const CraftRecipeSchema = z
-	.object({
-		resultItemId: IdSchema,
-		inputs: z.array(CraftRecipeInputSchema),
-		effects: z.array(GameLineEffectSchema).optional(),
-		durationMs: NonNegativeIntegerSchema,
-	})
-	.strict();
-
-const CraftRecipeFragmentSchema = CraftRecipeSchema.extend({
-	resultItemId: IdSchema.optional(),
-	effects: z.array(GameLineEffectAuthoringSchema).optional(),
-});
-
-/**
- * Producer product line.
- *
- * Missing `output` means a valid delayed sink/destructor product.
- * `visibility: "hidden"` is baseline line visibility. Producer-specific gates,
- * blockers, duration modifiers, and loot modifiers live on concrete output entries
- * so sibling drops do not inherit rules by accident.
- */
-const ProductDefinitionSchema = z
-	.object({
-		name: z.string().min(1),
-		tags: z.array(z.string().min(1)).default([]),
-		visibility: z
-			.enum([
-				"visible",
-				"hidden",
-			])
-			.default("visible"),
-		durationMs: NonNegativeIntegerSchema,
-		placement: PlacementSchema,
-		chargeCost: NonNegativeNumberSchema.default(0),
-		inputs: ActivationInputSchema.optional(),
-		output: ActivationOutputSchema.min(1).optional(),
-		activatesEffectId: IdSchema.optional(),
-	})
-	.strict();
-
-const ProductDefinitionFragmentSchema = ProductDefinitionSchema.extend({
-	name: z.string().min(1).optional(),
-	output: ActivationOutputAuthoringSchema.min(1).optional(),
-});
-
-/** New-game seed. Board entries are individual tiles; inventory entries may stack. */
-const StartingStateDefinitionSchema = z
-	.object({
-		inventory: z.array(
-			z
-				.object({
-					itemId: IdSchema,
-					quantity: PositiveIntegerSchema,
-				})
-				.strict(),
-		),
-		board: z.array(
-			z
-				.object({
-					itemId: IdSchema,
-					x: NonNegativeIntegerSchema,
-					y: NonNegativeIntegerSchema,
-				})
-				.strict(),
-		),
-	})
-	.strict();
-
-/**
- * Authoring fragment shape. Any source JSON may contain any subset of these sections;
- * the CLI merges fragments into `BaseGameConfigSchema` before full validation.
- */
 const GameConfigFragmentSchema = z
 	.object({
 		version: z.literal(1).optional(),
 		game: GameMetaSchema.optional(),
-		resources: z.record(IdSchema, ResourceDefinitionSchema).optional(),
-		assets: z.record(IdSchema, AssetDefinitionFragmentSchema).optional(),
-		items: z.record(IdSchema, ItemDefinitionFragmentSchema).optional(),
-		merge: z.record(IdSchema, MergeDefinitionSchema).optional(),
+		resources: z.record(IdSchema, ResourceSchema).optional(),
+		assets: z.record(IdSchema, AssetFragmentSchema).optional(),
+		items: z.record(IdSchema, ItemFragmentSchema).optional(),
 		effects: z.record(IdSchema, GameEffectAuthoringDefinitionSchema).optional(),
-		producers: z.record(IdSchema, ProducerDefinitionSchema).optional(),
-		stashes: z.record(IdSchema, StashDefinitionSchema).optional(),
-		craftRecipes: z.record(IdSchema, CraftRecipeFragmentSchema).optional(),
-		products: z.record(IdSchema, ProductDefinitionFragmentSchema).optional(),
-		startingState: StartingStateDefinitionSchema.optional(),
+		startingState: StartingStateSchema.optional(),
 	})
 	.strict();
 
-/** Fully compiled canonical package shape before cross-reference validation. */
 const BaseGameConfigSchema = z
 	.object({
 		version: z.literal(1),
 		game: GameMetaSchema,
-		resources: z.record(IdSchema, ResourceDefinitionSchema),
-		assets: z.record(IdSchema, AssetDefinitionSchema),
-		items: z.record(IdSchema, ItemDefinitionSchema),
-		merge: z.record(IdSchema, MergeDefinitionSchema),
+		resources: z.record(IdSchema, ResourceSchema),
+		assets: z.record(IdSchema, AssetSchema),
+		items: z.record(IdSchema, ItemSchema),
 		effects: z.record(IdSchema, GameEffectDefinitionSchema).default({}),
-		producers: z.record(IdSchema, ProducerDefinitionSchema),
-		stashes: z.record(IdSchema, StashDefinitionSchema),
-		craftRecipes: z.record(IdSchema, CraftRecipeSchema),
-		products: z.record(IdSchema, ProductDefinitionSchema),
-		startingState: StartingStateDefinitionSchema,
+		startingState: StartingStateSchema,
 	})
 	.strict();
 
-/**
- * Canonical config parser with cross-reference validation.
- *
- * Structural Zod validation catches malformed sections. This refinement catches the
- * problems that actually ruin content work: missing referenced items/assets/resources,
- * broken product/loot links, invalid starting board coordinates and broken product-line ownership.
- */
 export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) => {
 	const hasResource = createRecordGuard(value.resources);
 	const hasAsset = createRecordGuard(value.assets);
 	const hasItem = createRecordGuard(value.items);
-	const hasMerge = createRecordGuard(value.merge);
 	const hasEffect = createRecordGuard(value.effects);
-	const hasProducer = createRecordGuard(value.producers);
-	const hasProduct = createRecordGuard(value.products);
-	const hasStash = createRecordGuard(value.stashes);
 	const itemIds = Object.keys(value.items);
-	const producerIds = Object.keys(value.producers);
-	const productIds = Object.keys(value.products);
-	const hasCraftRecipe = createRecordGuard(value.craftRecipes);
 	const grantIds = readGameEffectGrantIds(value);
 
 	for (const [assetId, asset] of Object.entries(value.assets)) {
@@ -879,7 +68,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Missing resource "${asset.resourceId}".`,
 			);
 		}
-
 		if (asset.overlayAssetId && !hasAsset(asset.overlayAssetId)) {
 			addIssue(
 				ctx,
@@ -914,16 +102,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			[
 				"items",
 				itemId,
-				"mergeIds",
-			],
-			item.mergeIds ?? [],
-			(value) => `Duplicate merge "${value}".`,
-		);
-		validateUniqueStringList(
-			ctx,
-			[
-				"items",
-				itemId,
 				"tags",
 			],
 			item.tags,
@@ -940,21 +118,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			(value) => `Duplicate passive effect "${value}".`,
 		);
 
-		for (const [index, mergeId] of (item.mergeIds ?? []).entries()) {
-			if (!hasMerge(mergeId)) {
-				addIssue(
-					ctx,
-					[
-						"items",
-						itemId,
-						"mergeIds",
-						index,
-					],
-					`Missing merge "${mergeId}".`,
-				);
-			}
-		}
-
 		for (const [index, effectId] of (item.passiveEffectIds ?? []).entries()) {
 			if (!hasEffect(effectId)) {
 				addIssue(
@@ -966,6 +129,35 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 						index,
 					],
 					`Missing effect "${effectId}".`,
+				);
+			}
+		}
+
+		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
+			if (!hasItem(merge.withItemId)) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"merges",
+						mergeIndex,
+						"withItemId",
+					],
+					`Missing item "${merge.withItemId}".`,
+				);
+			}
+			if (!hasItem(merge.resultItemId)) {
+				addIssue(
+					ctx,
+					[
+						"items",
+						itemId,
+						"merges",
+						mergeIndex,
+						"resultItemId",
+					],
+					`Missing item "${merge.resultItemId}".`,
 				);
 			}
 		}
@@ -984,7 +176,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 					`Missing item "${removal.itemId}".`,
 				);
 			}
-
 			if (removal.output) {
 				validateActivationOutput(
 					ctx,
@@ -1004,31 +195,52 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				);
 			}
 		}
-	}
 
-	for (const [mergeId, merge] of Object.entries(value.merge)) {
-		if (!hasItem(merge.withItemId)) {
+		if (item.producer && item.stash) {
 			addIssue(
 				ctx,
 				[
-					"merge",
-					mergeId,
-					"withItemId",
+					"items",
+					itemId,
 				],
-				`Missing item "${merge.withItemId}".`,
+				`Item "${itemId}" must not define both producer and stash capabilities.`,
 			);
 		}
 
-		if (!hasItem(merge.resultItemId)) {
-			addIssue(
+		if (item.producer) {
+			validateProducerCapability({
+				capability: item.producer,
+				capabilityId: itemId,
 				ctx,
-				[
-					"merge",
-					mergeId,
-					"resultItemId",
-				],
-				`Missing item "${merge.resultItemId}".`,
-			);
+				grantIds,
+				hasEffect,
+				hasItem,
+				itemIds,
+				section: "producer",
+			});
+		}
+		if (item.stash) {
+			validateProducerCapability({
+				capability: item.stash,
+				capabilityId: itemId,
+				ctx,
+				grantIds,
+				hasEffect,
+				hasItem,
+				itemIds,
+				section: "stash",
+			});
+		}
+		if (item.craft) {
+			validateCraftCapability({
+				craftItemId: itemId,
+				ctx,
+				grantIds,
+				hasItem,
+				itemIds,
+				recipe: item.craft,
+				value,
+			});
 		}
 	}
 
@@ -1045,253 +257,9 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 		);
 	}
 
-	for (const producerId of Object.keys(value.producers)) {
-		if (!hasItem(producerId)) {
-			addIssue(
-				ctx,
-				[
-					"producers",
-					producerId,
-				],
-				`Producer "${producerId}" must be keyed by its item id.`,
-			);
-		}
-	}
-
-	for (const stashId of Object.keys(value.stashes)) {
-		if (!hasItem(stashId)) {
-			addIssue(
-				ctx,
-				[
-					"stashes",
-					stashId,
-				],
-				`Stash "${stashId}" must be keyed by its item id.`,
-			);
-		}
-	}
-
-	for (const craftRecipeId of Object.keys(value.craftRecipes)) {
-		if (!hasItem(craftRecipeId)) {
-			addIssue(
-				ctx,
-				[
-					"craftRecipes",
-					craftRecipeId,
-				],
-				`Craft recipe "${craftRecipeId}" must be keyed by its craft target item id.`,
-			);
-		}
-	}
-
-	const validateProducerCapability = ({
-		capability,
-		capabilityId,
-		section,
-	}: {
-		capability: GameConfig["producers"][string] | GameConfig["stashes"][string];
-		capabilityId: string;
-		section: "producers" | "stashes";
-	}) => {
-		validateUniqueStringList(
-			ctx,
-			[
-				section,
-				capabilityId,
-				"productIds",
-			],
-			capability.productIds,
-			(value) => `Duplicate product "${value}".`,
-		);
-
-		for (const [index, productId] of capability.productIds.entries()) {
-			const product = value.products[productId];
-			if (!product) {
-				addIssue(
-					ctx,
-					[
-						section,
-						capabilityId,
-						"productIds",
-						index,
-					],
-					`Missing product "${productId}".`,
-				);
-				continue;
-			}
-
-			if (section === "stashes" && product.chargeCost <= 0) {
-				addIssue(
-					ctx,
-					[
-						section,
-						capabilityId,
-						"productIds",
-						index,
-					],
-					`Stash product "${productId}" must spend charges with chargeCost > 0.`,
-				);
-			}
-		}
-	};
-
-	for (const [producerId, producer] of Object.entries(value.producers)) {
-		validateProducerCapability({
-			capability: producer,
-			capabilityId: producerId,
-			section: "producers",
-		});
-	}
-
-	for (const [stashId, stash] of Object.entries(value.stashes)) {
-		validateProducerCapability({
-			capability: stash,
-			capabilityId: stashId,
-			section: "stashes",
-		});
-	}
-
-	for (const [craftRecipeId, recipe] of Object.entries(value.craftRecipes)) {
-		if (!hasItem(recipe.resultItemId)) {
-			addIssue(
-				ctx,
-				[
-					"craftRecipes",
-					craftRecipeId,
-					"resultItemId",
-				],
-				`Missing item "${recipe.resultItemId}".`,
-			);
-		} else if (value.items[recipe.resultItemId]?.storage === "inventory") {
-			addIssue(
-				ctx,
-				[
-					"craftRecipes",
-					craftRecipeId,
-					"resultItemId",
-				],
-				`Craft recipe result "${recipe.resultItemId}" must be placeable on the board because craft completion replaces the board target.`,
-			);
-		}
-
-		validateCraftRecipeInputs(
-			ctx,
-			[
-				"craftRecipes",
-				craftRecipeId,
-				"inputs",
-			],
-			recipe.inputs,
-			hasItem,
-		);
-		validateGameLineEffects(
-			ctx,
-			[
-				"craftRecipes",
-				craftRecipeId,
-				"effects",
-			],
-			recipe.effects ?? [],
-			{
-				grantIds,
-				hasItem,
-				itemIds,
-			},
-		);
-		validateCraftRecipeEffectRuntimeSupport(
-			ctx,
-			[
-				"craftRecipes",
-				craftRecipeId,
-				"effects",
-			],
-			recipe.effects ?? [],
-		);
-	}
-
-	for (const [productId, product] of Object.entries(value.products)) {
-		if (product.inputs) {
-			validateItemInputs(
-				ctx,
-				[
-					"products",
-					productId,
-					"inputs",
-				],
-				product.inputs,
-				hasItem,
-			);
-		}
-		validateUniqueStringList(
-			ctx,
-			[
-				"products",
-				productId,
-				"tags",
-			],
-			product.tags,
-			(value) => `Duplicate tag "${value}".`,
-		);
-		if (product.output) {
-			validateActivationOutput(
-				ctx,
-				[
-					"products",
-					productId,
-					"output",
-				],
-				product.output,
-				{
-					grantIds,
-					hasItem,
-					itemIds,
-				},
-			);
-		}
-
-		if (product.activatesEffectId && !hasEffect(product.activatesEffectId)) {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"activatesEffectId",
-				],
-				`Missing effect "${product.activatesEffectId}".`,
-			);
-		}
-
-		const activatedEffect = product.activatesEffectId
-			? value.effects[product.activatesEffectId]
-			: undefined;
-		if (activatedEffect?.sourceScope === "inventory") {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"activatesEffectId",
-				],
-				`Active effect product "${productId}" activates board-source effect "${product.activatesEffectId}" and cannot use inventory-only sourceScope.`,
-			);
-		}
-
-		if (product.activatesEffectId && product.output) {
-			addIssue(
-				ctx,
-				[
-					"products",
-					productId,
-					"activatesEffectId",
-				],
-				"Active effect product lines must not also define output.",
-			);
-		}
-	}
-
-	validateProductLineOwnership(ctx, value);
 	validateBlueprintDependencyCycles(ctx, value);
 	validateGameplaySoftLockRisks(ctx, value);
+
 	if (value.startingState.inventory.length > value.game.inventory.slots) {
 		addIssue(
 			ctx,
@@ -1317,7 +285,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 			);
 			continue;
 		}
-
 		const item = value.items[entry.itemId];
 		if (item?.storage === "board") {
 			addIssue(
@@ -1331,7 +298,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Item "${entry.itemId}" storage policy forbids inventory placement.`,
 			);
 		}
-
 		if (item && entry.quantity > item.maxStackSize) {
 			addIssue(
 				ctx,
@@ -1372,7 +338,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`Item "${entry.itemId}" storage policy forbids board placement.`,
 			);
 		}
-
 		if (entry.x >= value.game.board.width) {
 			addIssue(
 				ctx,
@@ -1385,7 +350,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`x must be < board width (${value.game.board.width}).`,
 			);
 		}
-
 		if (entry.y >= value.game.board.height) {
 			addIssue(
 				ctx,
@@ -1398,12 +362,10 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 				`y must be < board height (${value.game.board.height}).`,
 			);
 		}
-
 		startingBoardItemCountByItemId.set(
 			entry.itemId,
 			(startingBoardItemCountByItemId.get(entry.itemId) ?? 0) + 1,
 		);
-
 		const cellKey = `${entry.x}:${entry.y}`;
 		if (usedStartingBoardCells.has(cellKey)) {
 			addIssue(
@@ -1422,7 +384,6 @@ export const GameConfigSchema = BaseGameConfigSchema.superRefine((value, ctx) =>
 	for (const [itemId, quantity] of startingBoardItemCountByItemId) {
 		const maxCount = value.items[itemId]?.maxCount;
 		if (maxCount === undefined || quantity <= maxCount) continue;
-
 		addIssue(
 			ctx,
 			[
@@ -1438,9 +399,7 @@ export type GameConfig = z.infer<typeof GameConfigSchema>;
 export type GameConfigFragment = z.infer<typeof GameConfigFragmentSchema>;
 export type GameConfigIssuePath = (string | number)[];
 
-/** Parse one authoring fragment before merge. */
 export const parseGameConfigFragment = (value: unknown) => GameConfigFragmentSchema.parse(value);
-/** Parse and fully validate the compiled canonical package. */
 export const parseGameConfig = (value: unknown) => GameConfigSchema.parse(value);
 
 const createRecordGuard = (record: Readonly<Record<string, unknown>>) => (key: string) =>
@@ -1931,60 +890,277 @@ const validateCraftRecipeEffectRuntimeSupport = (
 	}
 };
 
+const readConfigCraftRecipes = (config: z.infer<typeof BaseGameConfigSchema>) =>
+	Object.entries(config.items).flatMap(([itemId, item]) =>
+		item.craft
+			? [
+					[
+						itemId,
+						item.craft,
+					] as const,
+				]
+			: [],
+	);
+
+const readConfigProducerLines = (config: z.infer<typeof BaseGameConfigSchema>) =>
+	Object.entries(config.items).flatMap(([ownerItemId, item]) => {
+		const producerLines = (item.producer?.lines ?? []).map((line, lineIndex) => ({
+			line,
+			lineIndex,
+			linePath: [
+				"items",
+				ownerItemId,
+				"producer",
+				"lines",
+				lineIndex,
+			] satisfies GameConfigIssuePath,
+			ownerItemId,
+		}));
+		const stashLine = item.stash
+			? [
+					{
+						line: item.stash.line,
+						lineIndex: undefined,
+						linePath: [
+							"items",
+							ownerItemId,
+							"stash",
+							"line",
+						] satisfies GameConfigIssuePath,
+						ownerItemId,
+					},
+				]
+			: [];
+
+		return [
+			...producerLines,
+			...stashLine,
+		];
+	});
+
 const readGameEffectGrantIds = (config: z.infer<typeof BaseGameConfigSchema>) => [
 	...new Set(
 		Object.values(config.effects).flatMap((effect) => effect.grants.map((grant) => grant.id)),
 	),
 ];
 
-const validateProductLineOwnership = (
-	ctx: z.RefinementCtx,
-	config: z.infer<typeof BaseGameConfigSchema>,
-) => {
-	const ownerByProductId = new Map<string, string>();
-	const validateOwner = ({
+type ProducerLikeCapability = NonNullable<
+	z.infer<typeof BaseGameConfigSchema>["items"][string]["producer"]
+>;
+type StashLikeCapability = NonNullable<
+	z.infer<typeof BaseGameConfigSchema>["items"][string]["stash"]
+>;
+type ProducerLine = ProducerLikeCapability["lines"][number] | StashLikeCapability["line"];
+
+const readProducerCapabilityLines = (
+	capability: ProducerLikeCapability | StashLikeCapability,
+): readonly ProducerLine[] =>
+	"line" in capability
+		? [
+				capability.line,
+			]
+		: capability.lines;
+
+const validateProducerCapability = ({
+	capability,
+	capabilityId,
+	ctx,
+	grantIds,
+	hasEffect,
+	hasItem,
+	itemIds,
+	section,
+}: {
+	capability: ProducerLikeCapability | StashLikeCapability;
+	capabilityId: string;
+	ctx: z.RefinementCtx;
+	grantIds: readonly string[];
+	hasEffect: (itemId: string) => boolean;
+	hasItem: (itemId: string) => boolean;
+	itemIds: readonly string[];
+	section: "producer" | "stash";
+}) => {
+	const sectionPath = [
+		"items",
 		capabilityId,
-		productIds,
 		section,
-	}: {
-		capabilityId: string;
-		productIds: readonly string[];
-		section: "producers" | "stashes";
-	}) => {
-		for (const [productIndex, productId] of productIds.entries()) {
-			const previousCapabilityId = ownerByProductId.get(productId);
-			if (previousCapabilityId) {
-				addIssue(
-					ctx,
-					[
-						section,
-						capabilityId,
-						"productIds",
-						productIndex,
-					],
-					`Product "${productId}" must be owned by exactly one producer-like capability. First used by "${previousCapabilityId}".`,
-				);
-				continue;
-			}
+	] satisfies GameConfigIssuePath;
+	const lines = readProducerCapabilityLines(capability);
+	const linePathKey = section === "stash" ? "line" : "lines";
 
-			ownerByProductId.set(productId, capabilityId);
+	validateUniqueStringList(
+		ctx,
+		[
+			...sectionPath,
+			linePathKey,
+		],
+		lines.map((line) => line.id),
+		(value) => `Duplicate producer line "${value}".`,
+	);
+
+	for (const [lineIndex, line] of lines.entries()) {
+		const linePath =
+			section === "stash"
+				? [
+						...sectionPath,
+						"line",
+					]
+				: [
+						...sectionPath,
+						"lines",
+						lineIndex,
+					];
+
+		validateUniqueStringList(
+			ctx,
+			[
+				...linePath,
+				"tags",
+			],
+			line.tags,
+			(value) => `Duplicate tag "${value}".`,
+		);
+
+		if (line.inputs) {
+			validateItemInputs(
+				ctx,
+				[
+					...linePath,
+					"inputs",
+				],
+				line.inputs,
+				hasItem,
+			);
 		}
-	};
 
-	for (const [producerId, producer] of Object.entries(config.producers)) {
-		validateOwner({
-			capabilityId: producerId,
-			productIds: producer.productIds,
-			section: "producers",
-		});
+		if (line.output) {
+			validateActivationOutput(
+				ctx,
+				[
+					...linePath,
+					"output",
+				],
+				line.output,
+				{
+					grantIds,
+					hasItem,
+					itemIds,
+				},
+			);
+		}
+
+		if (section === "stash" && line.chargeCost <= 0) {
+			addIssue(
+				ctx,
+				[
+					...linePath,
+					"chargeCost",
+				],
+				`Stash line "${line.id}" must spend charges with chargeCost > 0.`,
+			);
+		}
+
+		if (line.activatesEffectId && !hasEffect(line.activatesEffectId)) {
+			addIssue(
+				ctx,
+				[
+					...linePath,
+					"activatesEffectId",
+				],
+				`Missing effect "${line.activatesEffectId}".`,
+			);
+		}
+
+		if (line.activatesEffectId && line.output) {
+			addIssue(
+				ctx,
+				[
+					...linePath,
+					"activatesEffectId",
+				],
+				"Active effect product lines must not also define output.",
+			);
+		}
 	}
-	for (const [stashId, stash] of Object.entries(config.stashes)) {
-		validateOwner({
-			capabilityId: stashId,
-			productIds: stash.productIds,
-			section: "stashes",
-		});
+};
+
+const validateCraftCapability = ({
+	craftItemId,
+	ctx,
+	grantIds,
+	hasItem,
+	itemIds,
+	recipe,
+	value,
+}: {
+	craftItemId: string;
+	ctx: z.RefinementCtx;
+	grantIds: readonly string[];
+	hasItem: (itemId: string) => boolean;
+	itemIds: readonly string[];
+	recipe: z.infer<typeof CraftRecipeSchema>;
+	value: z.infer<typeof BaseGameConfigSchema>;
+}) => {
+	if (!hasItem(recipe.resultItemId)) {
+		addIssue(
+			ctx,
+			[
+				"items",
+				craftItemId,
+				"craft",
+				"resultItemId",
+			],
+			`Missing item "${recipe.resultItemId}".`,
+		);
+	} else if (value.items[recipe.resultItemId]?.storage === "inventory") {
+		addIssue(
+			ctx,
+			[
+				"items",
+				craftItemId,
+				"craft",
+				"resultItemId",
+			],
+			`Craft recipe result "${recipe.resultItemId}" must be placeable on the board because craft completion replaces the board target.`,
+		);
 	}
+
+	validateCraftRecipeInputs(
+		ctx,
+		[
+			"items",
+			craftItemId,
+			"craft",
+			"inputs",
+		],
+		recipe.inputs,
+		hasItem,
+	);
+	validateGameLineEffects(
+		ctx,
+		[
+			"items",
+			craftItemId,
+			"craft",
+			"effects",
+		],
+		recipe.effects ?? [],
+		{
+			grantIds,
+			hasItem,
+			itemIds,
+		},
+	);
+	validateCraftRecipeEffectRuntimeSupport(
+		ctx,
+		[
+			"items",
+			craftItemId,
+			"craft",
+			"effects",
+		],
+		recipe.effects ?? [],
+	);
 };
 
 type BlueprintDependencyEdge = {
@@ -2082,9 +1258,8 @@ const readBlueprintItemIdsByCraftResultItemId = (
 ) => {
 	const result = new Map<string, string[]>();
 
-	for (const [craftRecipeId, recipe] of Object.entries(config.craftRecipes)) {
+	for (const [craftRecipeId, recipe] of readConfigCraftRecipes(config)) {
 		if (!blueprintItemIds.has(craftRecipeId)) continue;
-
 		result.set(recipe.resultItemId, [
 			...(result.get(recipe.resultItemId) ?? []),
 			craftRecipeId,
@@ -2104,15 +1279,10 @@ const readBlueprintDependenciesForItem = ({
 	itemId: string;
 }) => {
 	const dependencies = new Set<string>();
-
-	if (blueprintItemIds.has(itemId)) {
-		dependencies.add(itemId);
-	}
-
+	if (blueprintItemIds.has(itemId)) dependencies.add(itemId);
 	for (const blueprintItemId of blueprintItemIdsByCraftResultItemId.get(itemId) ?? []) {
 		dependencies.add(blueprintItemId);
 	}
-
 	return dependencies;
 };
 
@@ -2129,7 +1299,7 @@ const collectCraftRecipeBlueprintDependencies = ({
 	blueprintItemIds: ReadonlySet<string>;
 	config: z.infer<typeof BaseGameConfigSchema>;
 }) => {
-	for (const [craftRecipeId, recipe] of Object.entries(config.craftRecipes)) {
+	for (const [craftRecipeId, recipe] of readConfigCraftRecipes(config)) {
 		if (!blueprintItemIds.has(craftRecipeId)) continue;
 
 		for (const [inputIndex, input] of recipe.inputs.entries()) {
@@ -2137,8 +1307,9 @@ const collectCraftRecipeBlueprintDependencies = ({
 				fromBlueprintItemId: craftRecipeId,
 				itemId: input.itemId,
 				path: [
-					"craftRecipes",
+					"items",
 					craftRecipeId,
+					"craft",
 					"inputs",
 					inputIndex,
 					"itemId",
@@ -2152,8 +1323,9 @@ const collectCraftRecipeBlueprintDependencies = ({
 			fromBlueprintItemId: craftRecipeId,
 			lineEffects: recipe.effects ?? [],
 			path: [
-				"craftRecipes",
+				"items",
 				craftRecipeId,
+				"craft",
 				"effects",
 			],
 		});
@@ -2173,14 +1345,11 @@ const collectProductBlueprintDependencies = ({
 	blueprintItemIds: ReadonlySet<string>;
 	config: z.infer<typeof BaseGameConfigSchema>;
 }) => {
-	const productOwnerByProductId = readProductOwnerByProductId(config);
-
-	for (const [productId, product] of Object.entries(config.products)) {
+	for (const { line, lineIndex, linePath, ownerItemId } of readConfigProducerLines(config)) {
 		const outputEntries = readActivationOutputEffectEntries({
-			output: product.output ?? [],
+			output: line.output ?? [],
 			path: [
-				"products",
-				productId,
+				...linePath,
 				"output",
 			],
 		});
@@ -2188,27 +1357,31 @@ const collectProductBlueprintDependencies = ({
 		for (const outputEntry of outputEntries) {
 			if (!blueprintItemIds.has(outputEntry.itemId)) continue;
 			const fromBlueprintItemId = outputEntry.itemId;
-			const owner = productOwnerByProductId.get(productId);
-			if (owner) {
-				addDependencyItem({
-					fromBlueprintItemId,
-					itemId: owner.capabilityId,
-					path: [
-						owner.section,
-						owner.capabilityId,
-						"productIds",
-						owner.productIndex,
-					],
-				});
-			}
+			addDependencyItem({
+				fromBlueprintItemId,
+				itemId: ownerItemId,
+				path:
+					lineIndex === undefined
+						? [
+								...linePath,
+								"id",
+							]
+						: [
+								"items",
+								ownerItemId,
+								"producer",
+								"lines",
+								lineIndex,
+								"id",
+							],
+			});
 
-			for (const [inputIndex, input] of (product.inputs ?? []).entries()) {
+			for (const [inputIndex, input] of (line.inputs ?? []).entries()) {
 				addDependencyItem({
 					fromBlueprintItemId,
 					itemId: input.itemId,
 					path: [
-						"products",
-						productId,
+						...linePath,
 						"inputs",
 						inputIndex,
 						"itemId",
@@ -2244,17 +1417,15 @@ const collectMergeBlueprintDependencies = ({
 	config: z.infer<typeof BaseGameConfigSchema>;
 }) => {
 	for (const [sourceItemId, item] of Object.entries(config.items)) {
-		for (const [mergeIndex, mergeId] of (item.mergeIds ?? []).entries()) {
-			const merge = config.merge[mergeId];
-			if (!merge || !blueprintItemIds.has(merge.resultItemId)) continue;
-
+		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
+			if (!blueprintItemIds.has(merge.resultItemId)) continue;
 			addDependencyItem({
 				fromBlueprintItemId: merge.resultItemId,
 				itemId: sourceItemId,
 				path: [
 					"items",
 					sourceItemId,
-					"mergeIds",
+					"merges",
 					mergeIndex,
 				],
 			});
@@ -2262,48 +1433,15 @@ const collectMergeBlueprintDependencies = ({
 				fromBlueprintItemId: merge.resultItemId,
 				itemId: merge.withItemId,
 				path: [
-					"merge",
-					mergeId,
+					"items",
+					sourceItemId,
+					"merges",
+					mergeIndex,
 					"withItemId",
 				],
 			});
 		}
 	}
-};
-
-const readProductOwnerByProductId = (config: z.infer<typeof BaseGameConfigSchema>) => {
-	const owners = new Map<
-		string,
-		{
-			capability: GameConfig["producers"][string] | GameConfig["stashes"][string];
-			capabilityId: string;
-			productIndex: number;
-			section: "producers" | "stashes";
-		}
-	>();
-	const collectOwner = (
-		section: "producers" | "stashes",
-		capabilityId: string,
-		capability: GameConfig["producers"][string] | GameConfig["stashes"][string],
-	) => {
-		for (const [productIndex, productId] of capability.productIds.entries()) {
-			owners.set(productId, {
-				capability,
-				capabilityId,
-				productIndex,
-				section,
-			});
-		}
-	};
-
-	for (const [producerId, producer] of Object.entries(config.producers)) {
-		collectOwner("producers", producerId, producer);
-	}
-	for (const [stashId, stash] of Object.entries(config.stashes)) {
-		collectOwner("stashes", stashId, stash);
-	}
-
-	return owners;
 };
 
 const readOutputBlueprintItemIds = (
@@ -2569,7 +1707,6 @@ const validateGameplaySoftLockRisks = (
 
 const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => {
 	const sources: GameplaySource[] = [];
-	const productOwnerByProductId = readProductOwnerByProductId(config);
 	const addItemSource = ({
 		label,
 		path,
@@ -2674,16 +1811,13 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 			}
 		}
 
-		for (const [mergeIndex, mergeId] of (item.mergeIds ?? []).entries()) {
-			const merge = config.merge[mergeId];
-			if (!merge) continue;
-
+		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
 			addItemSource({
-				label: `merge "${mergeId}" from ${formatItemLabel(config, itemId)}`,
+				label: `merge ${mergeIndex} from ${formatItemLabel(config, itemId)}`,
 				path: [
 					"items",
 					itemId,
-					"mergeIds",
+					"merges",
 					mergeIndex,
 				],
 				requirements: [
@@ -2692,20 +1826,22 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 						path: [
 							"items",
 							itemId,
-							"mergeIds",
+							"merges",
 							mergeIndex,
 						],
 					}),
 					createItemRequirement({
 						itemId: merge.withItemId,
 						path: [
-							"merge",
-							mergeId,
+							"items",
+							itemId,
+							"merges",
+							mergeIndex,
 							"withItemId",
 						],
 					}),
 				],
-				sourceId: `merge:${itemId}:${mergeId}`,
+				sourceId: `merge:${itemId}:${mergeIndex}:${merge.withItemId}`,
 				targetId: merge.resultItemId,
 			});
 		}
@@ -2746,27 +1882,30 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 		}
 	}
 
-	for (const [craftRecipeId, recipe] of Object.entries(config.craftRecipes)) {
+	for (const [craftRecipeId, recipe] of readConfigCraftRecipes(config)) {
 		addItemSource({
 			label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
 			path: [
-				"craftRecipes",
+				"items",
 				craftRecipeId,
+				"craft",
 			],
 			requirements: [
 				createItemRequirement({
 					itemId: craftRecipeId,
 					path: [
-						"craftRecipes",
+						"items",
 						craftRecipeId,
+						"craft",
 					],
 				}),
 				...recipe.inputs.map((input, inputIndex) =>
 					createItemRequirement({
 						itemId: input.itemId,
 						path: [
-							"craftRecipes",
+							"items",
 							craftRecipeId,
+							"craft",
 							"inputs",
 							inputIndex,
 							"itemId",
@@ -2776,8 +1915,9 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 				...readLineEffectGameplayRequirements({
 					lineEffects: recipe.effects ?? [],
 					path: [
-						"craftRecipes",
+						"items",
 						craftRecipeId,
+						"craft",
 						"effects",
 					],
 				}),
@@ -2787,26 +1927,20 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 		});
 	}
 
-	for (const [productId, product] of Object.entries(config.products)) {
-		const owner = productOwnerByProductId.get(productId);
-		if (!owner) continue;
-
-		const productRequirements: GameplayRequirement[] = [
+	for (const { line, linePath, ownerItemId } of readConfigProducerLines(config)) {
+		const lineRequirements: GameplayRequirement[] = [
 			createItemRequirement({
-				itemId: owner.capabilityId,
+				itemId: ownerItemId,
 				path: [
-					owner.section,
-					owner.capabilityId,
-					"productIds",
-					owner.productIndex,
+					"items",
+					ownerItemId,
 				],
 			}),
-			...(product.inputs ?? []).map((input, inputIndex) =>
+			...(line.inputs ?? []).map((input, inputIndex) =>
 				createItemRequirement({
 					itemId: input.itemId,
 					path: [
-						"products",
-						productId,
+						...linePath,
 						"inputs",
 						inputIndex,
 						"itemId",
@@ -2816,15 +1950,14 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 		];
 
 		for (const outputEntry of readActivationOutputEffectEntries({
-			output: product.output ?? [],
+			output: line.output ?? [],
 			path: [
-				"products",
-				productId,
+				...linePath,
 				"output",
 			],
 		})) {
 			const outputRequirements = [
-				...productRequirements,
+				...lineRequirements,
 				...readLineEffectGameplayRequirements({
 					lineEffects: outputEntry.effects,
 					path: [
@@ -2835,32 +1968,27 @@ const createGameplaySources = (config: z.infer<typeof BaseGameConfigSchema>) => 
 			];
 
 			addItemSource({
-				label: `product "${productId}" (${product.name})`,
-				path: [
-					"products",
-					productId,
-				],
+				label: `producer line "${line.id}" (${line.name})`,
+				path: linePath,
 				requirements: outputRequirements,
-				sourceId: `product:${productId}:output:${outputEntry.sourceKey}`,
+				sourceId: `line:${ownerItemId}:${line.id}:output:${outputEntry.sourceKey}`,
 				targetId: outputEntry.itemId,
 			});
 		}
 
-		if (!product.activatesEffectId) continue;
-
-		const effect = config.effects[product.activatesEffectId];
+		if (!line.activatesEffectId) continue;
+		const effect = config.effects[line.activatesEffectId];
 		if (!effect) continue;
 
 		for (const grant of effect.grants) {
 			addGrantSource({
-				label: `active effect product "${productId}" (${product.name})`,
+				label: `active effect line "${line.id}" (${line.name})`,
 				path: [
-					"products",
-					productId,
+					...linePath,
 					"activatesEffectId",
 				],
-				requirements: productRequirements,
-				sourceId: `product:${productId}:active:${product.activatesEffectId}:${grant.id}`,
+				requirements: lineRequirements,
+				sourceId: `line:${ownerItemId}:${line.id}:active:${line.activatesEffectId}:${grant.id}`,
 				targetId: grant.id,
 			});
 		}
@@ -2925,23 +2053,26 @@ const validateProducerGameplayReachability = (
 	sources: readonly GameplaySource[],
 	reachability: GameplayReachability,
 ) => {
-	for (const producerId of Object.keys(config.producers).sort()) {
-		if (!isGameplayProgressionProducer(config, producerId)) continue;
-		if (reachability.reachableItemIds.has(producerId)) continue;
+	for (const [itemId, item] of Object.entries(config.items).sort(([left], [right]) =>
+		left.localeCompare(right),
+	)) {
+		if (!item.producer && !item.stash) continue;
+		if (!isGameplayProgressionProducer(config, itemId)) continue;
+		if (reachability.reachableItemIds.has(itemId)) continue;
 
 		addIssue(
 			ctx,
 			[
-				"producers",
-				producerId,
+				"items",
+				itemId,
 			],
 			formatUnreachableGameplayTargetMessage({
 				config,
 				reachability,
 				sources,
-				targetId: producerId,
+				targetId: itemId,
 				targetKind: "item",
-				targetLabel: `producer ${formatItemLabel(config, producerId)}`,
+				targetLabel: `producer ${formatItemLabel(config, itemId)}`,
 			}),
 		);
 	}
@@ -3072,44 +2203,36 @@ const validateGrantRequirementBlockerContradictions = (
 	}
 };
 
-const readLineEffectUsages = (config: z.infer<typeof BaseGameConfigSchema>) => {
-	const productOwnerByProductId = readProductOwnerByProductId(config);
-
-	return [
-		...Object.entries(config.products).flatMap(([productId, product]) => {
-			const owner = productOwnerByProductId.get(productId);
-
-			return readActivationOutputEffectEntries({
-				output: product.output ?? [],
-				path: [
-					"products",
-					productId,
-					"output",
-				],
-			}).map((outputEntry) => ({
-				enforceSoftLock:
-					owner !== undefined &&
-					isGameplayProgressionProducer(config, owner.capabilityId),
-				label: `product "${productId}" (${product.name}) output ${formatItemLabel(config, outputEntry.itemId)}`,
-				lineEffects: outputEntry.effects,
-				path: [
-					...outputEntry.path,
-					"effects",
-				] satisfies GameConfigIssuePath,
-			}));
-		}),
-		...Object.entries(config.craftRecipes).map(([craftRecipeId, recipe]) => ({
-			enforceSoftLock: isGameplayProgressionProducer(config, recipe.resultItemId),
-			label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
-			lineEffects: recipe.effects ?? [],
+const readLineEffectUsages = (config: z.infer<typeof BaseGameConfigSchema>) => [
+	...readConfigProducerLines(config).flatMap(({ line, linePath, ownerItemId }) =>
+		readActivationOutputEffectEntries({
+			output: line.output ?? [],
 			path: [
-				"craftRecipes",
-				craftRecipeId,
+				...linePath,
+				"output",
+			],
+		}).map((outputEntry) => ({
+			enforceSoftLock: isGameplayProgressionProducer(config, ownerItemId),
+			label: `producer line "${line.id}" (${line.name}) output ${formatItemLabel(config, outputEntry.itemId)}`,
+			lineEffects: outputEntry.effects,
+			path: [
+				...outputEntry.path,
 				"effects",
 			] satisfies GameConfigIssuePath,
 		})),
-	];
-};
+	),
+	...readConfigCraftRecipes(config).map(([craftRecipeId, recipe]) => ({
+		enforceSoftLock: isGameplayProgressionProducer(config, recipe.resultItemId),
+		label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
+		lineEffects: recipe.effects ?? [],
+		path: [
+			"items",
+			craftRecipeId,
+			"craft",
+			"effects",
+		] satisfies GameConfigIssuePath,
+	})),
+];
 
 const readLineEffectGameplayRequirements = ({
 	lineEffects,

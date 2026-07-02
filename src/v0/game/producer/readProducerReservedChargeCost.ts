@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProducerJobProductLine } from "~/v0/game/producer/readProducerJobProductLine";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export const readProducerReservedChargeCost = ({
@@ -12,4 +13,13 @@ export const readProducerReservedChargeCost = ({
 }) =>
 	Object.values(save.producerJobs)
 		.filter((job) => job.producerItemInstanceId === producerItemInstanceId)
-		.reduce((sum, job) => sum + (config.products[job.productId]?.chargeCost ?? 0), 0);
+		.reduce(
+			(sum, job) =>
+				sum +
+				(readProducerJobProductLine({
+					config,
+					job,
+					save,
+				})?.chargeCost ?? 0),
+			0,
+		);

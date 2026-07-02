@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/v0/game/producer/readProducerRuntimeTargetFx";
 import { readVisibleProducerProductIds } from "~/v0/game/producer/readVisibleProducerProductIds";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProducerProductLineIds } from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionProducerProductLineSetDefault } from "~/v0/game/action/GameActionProducerProductLineSetDefault";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -23,7 +24,11 @@ export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 		producerItemInstanceId: action.producerItemInstanceId,
 		save,
 	});
-	if (!producerDefinition.productIds.includes(action.productId)) {
+	if (
+		!readProducerProductLineIds({
+			producerDefinition,
+		}).includes(action.productId)
+	) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
@@ -35,7 +40,9 @@ export const checkProducerProductLineSetDefaultReadinessFx = Effect.fn(
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
 		nowMs,
-		productIds: producerDefinition.productIds,
+		productIds: readProducerProductLineIds({
+			producerDefinition,
+		}),
 		save,
 	});
 	if (!visibleProductIds.includes(action.productId)) {

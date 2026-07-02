@@ -1,13 +1,16 @@
 import type { ItemTargetLimit } from "~/v0/game/limit/ItemTargetLimit";
 import { readBoardItemCount } from "~/v0/game/board/readBoardItemCount";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
+import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerProductDurationMs";
 import type { ItemId } from "~/v0/game/config/GameIdSchema";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/v0/game/inventory/GameSaveInventorySlot";
+import { readProducerJobProductLine } from "~/v0/game/producer/readProducerJobProductLine";
 
-type ActivationOutput = NonNullable<GameConfig["products"][string]["output"]>;
+type ActivationOutput = NonNullable<GameProducerLineDefinition["output"]>;
 type ActivationOutputEntry = ActivationOutput[number];
 
 export namespace readItemTargetLimits {
@@ -74,7 +77,10 @@ const readItemTargetItemIds = ({ config, itemId }: { config: GameConfig; itemId:
 		itemIds,
 	});
 	appendTargetItemId({
-		itemId: config.craftRecipes[itemId]?.resultItemId,
+		itemId: readCraftRecipeDefinition({
+			config,
+			recipeId: itemId,
+		})?.resultItemId,
 		itemIds,
 	});
 	return itemIds;
@@ -110,7 +116,11 @@ const readPendingProducerOutputQuantity = ({
 	let quantity = 0;
 
 	for (const job of Object.values(save.producerJobs)) {
-		const product = config.products[job.productId];
+		const product = readProducerJobProductLine({
+			config,
+			job,
+			save,
+		});
 		if (!product?.output) continue;
 
 		const effectiveProductLine = readEffectiveProducerProductLine({
@@ -158,7 +168,10 @@ const readPendingCraftJobQuantity = ({
 
 	for (const job of Object.values(save.craftJobs)) {
 		if (ignoredBoardItemInstanceIds.has(job.targetItemInstanceId)) continue;
-		const recipe = config.craftRecipes[job.recipeId];
+		const recipe = readCraftRecipeDefinition({
+			config,
+			recipeId: job.recipeId,
+		});
 		if (recipe?.resultItemId === targetItemId) quantity += 1;
 	}
 
@@ -178,7 +191,9 @@ const readPendingCraftSourceItemQuantity = ({
 }) => {
 	let quantity = 0;
 
-	for (const [sourceItemId, recipe] of Object.entries(config.craftRecipes)) {
+	for (const [sourceItemId, item] of Object.entries(config.items)) {
+		const recipe = item.craft;
+		if (!recipe) continue;
 		if (sourceItemId === targetItemId) continue;
 		if (recipe.resultItemId !== targetItemId) continue;
 		quantity += readItemBoardAndInventoryQuantity({

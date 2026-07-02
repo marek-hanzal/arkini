@@ -25,9 +25,9 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 	nowMs,
 	save,
 }: readRuntimeStashActivationViewFromGameSave.Props): ActivationView | undefined => {
-	const stash = config.stashes[boardItem.itemId];
-	const productId = stash?.productIds[0];
-	const product = productId ? config.products[productId] : undefined;
+	const stash = config.items[boardItem.itemId]?.stash;
+	const productId = stash?.line.id;
+	const product = stash?.line;
 	if (!stash || !productId || !product) return undefined;
 
 	const storedInputs = save.producerInputs[boardItem.id]?.productInputs[productId]?.items ?? {};
@@ -46,7 +46,9 @@ export const readRuntimeStashActivationViewFromGameSave = ({
 		config,
 		maxQueueSize: stash.maxQueueSize,
 		nowMs,
-		productIds: stash.productIds,
+		productIds: [
+			stash.line.id,
+		],
 		save,
 		targetItemInstanceId: boardItem.id,
 	});

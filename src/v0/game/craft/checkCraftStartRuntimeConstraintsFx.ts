@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/v0/game/engine/model/GameSaveSchema";
 import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
@@ -10,7 +11,7 @@ export namespace checkCraftStartRuntimeConstraintsFx {
 	export interface Props {
 		config: GameConfig;
 		nowMs?: number;
-		recipe: GameConfig["craftRecipes"][string];
+		recipe: GameCraftRecipeDefinition;
 		save: GameSave;
 		targetItem: GameSaveBoardItem;
 		targetItemInstanceId: string;

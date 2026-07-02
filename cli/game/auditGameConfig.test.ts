@@ -1,6 +1,92 @@
 import { describe, expect, it } from "vitest";
-import { parseGameConfig } from "../../src/v0/game/config/GameConfigSchema";
+import { parseGameConfig as parseGameConfigRaw } from "../../src/v0/game/config/GameConfigSchema";
 import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
+
+const embedLegacyConfigForAuditTest = (value: unknown): unknown => {
+	if (!value || typeof value !== "object") return value;
+	const legacy = value as Record<string, any>;
+	const items = {
+		...(legacy.items ?? {}),
+	};
+	const products = legacy.products ?? {};
+
+	for (const [producerId, producer] of Object.entries<any>(legacy.producers ?? {})) {
+		items[producerId] = {
+			...(items[producerId] ?? {}),
+			producer: {
+				charges: producer.charges,
+				lines: (producer.productIds ?? []).flatMap((productId: string) => {
+					const product = products[productId];
+					return product
+						? [
+								{
+									...product,
+									id: product.id ?? productId,
+								},
+							]
+						: [];
+				}),
+				maxQueueSize: producer.maxQueueSize,
+				onChargesDepleted: producer.onChargesDepleted,
+			},
+		};
+	}
+
+	for (const [stashId, stash] of Object.entries<any>(legacy.stashes ?? {})) {
+		const productId = stash.productIds?.[0];
+		const product = productId ? products[productId] : undefined;
+		if (!product) continue;
+		items[stashId] = {
+			...(items[stashId] ?? {}),
+			stash: {
+				charges: stash.charges,
+				line: {
+					...product,
+					id: product.id ?? productId,
+				},
+				maxQueueSize: stash.maxQueueSize,
+				onChargesDepleted: stash.onChargesDepleted,
+			},
+		};
+	}
+
+	for (const [itemId, craft] of Object.entries<any>(legacy.craftRecipes ?? {})) {
+		items[itemId] = {
+			...(items[itemId] ?? {}),
+			craft,
+		};
+	}
+
+	for (const [itemId, item] of Object.entries<any>(items)) {
+		if (!Array.isArray(item.mergeIds)) continue;
+		items[itemId] = {
+			...item,
+			merges: item.mergeIds.map((mergeId: string) => legacy.merge?.[mergeId]).filter(Boolean),
+		};
+		delete items[itemId].mergeIds;
+	}
+
+	const {
+		craftRecipes: _craftRecipes,
+		merge: _merge,
+		producers: _producers,
+		products: _products,
+		stashes: _stashes,
+		...next
+	} = legacy;
+	void _craftRecipes;
+	void _merge;
+	void _producers;
+	void _products;
+	void _stashes;
+	return {
+		...next,
+		items,
+	};
+};
+
+const parseGameConfig = (value: unknown) =>
+	parseGameConfigRaw(embedLegacyConfigForAuditTest(value));
 
 const createConfigValue = () => ({
 	version: 1,

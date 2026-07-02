@@ -6,6 +6,8 @@ import {
 	readGamePausableJobResumedTiming,
 } from "~/v0/game/job/GamePausableJobTiming";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
@@ -27,7 +29,7 @@ const readCraftStartGateReady = ({
 }: {
 	config: GameConfig;
 	nowMs: number;
-	recipe: GameConfig["craftRecipes"][string];
+	recipe: GameCraftRecipeDefinition;
 	save: GameSave;
 }) =>
 	readCraftLineEffectState({
@@ -59,7 +61,10 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 	for (const job of jobs) {
 		if (job.delivery) continue;
 
-		const recipe = config.craftRecipes[job.recipeId];
+		const recipe = readCraftRecipeDefinition({
+			config,
+			recipeId: job.recipeId,
+		});
 		if (!recipe) {
 			return yield* Effect.fail(
 				GameEngineError.configReferenceMissing(`Missing craft recipe "${job.recipeId}".`),

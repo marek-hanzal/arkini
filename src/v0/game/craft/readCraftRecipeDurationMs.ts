@@ -1,10 +1,11 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readGameCheatEffectiveDurationMs } from "~/v0/game/cheat/GameCheatSpeedMode";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
 export namespace readCraftRecipeDurationMs {
 	export interface Props {
-		recipe: GameConfig["craftRecipes"][string];
+		recipe: GameCraftRecipeDefinition;
 		save?: GameSave;
 	}
 }

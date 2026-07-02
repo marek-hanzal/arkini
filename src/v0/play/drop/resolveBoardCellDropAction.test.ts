@@ -450,7 +450,7 @@ describe("resolveBoardCellDropAction", () => {
 				...config.items,
 				"item:twig": {
 					...config.items["item:twig"],
-					mergeIds: [],
+					merges: [],
 				},
 			},
 		});

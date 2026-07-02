@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProductLineDefinitionFromConfig } from "~/v0/game/config/GameItemCapabilities";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -20,7 +21,10 @@ export const readVisibleProducerProductIds = ({
 	save,
 }: readVisibleProducerProductIds.Props) =>
 	productIds.filter((productId) => {
-		const product = config.products[productId];
+		const product = readProductLineDefinitionFromConfig({
+			config,
+			productId,
+		});
 		return Boolean(
 			product &&
 				readEffectiveProducerProductLine({

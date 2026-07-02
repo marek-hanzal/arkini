@@ -26,8 +26,8 @@ export const openStashFx = Effect.fn("openStashFx")(function* ({
 		save,
 		stashItemInstanceId: action.stashItemInstanceId,
 	});
-	const stash = config.stashes[stashItem.itemId];
-	const productId = stash?.productIds[0];
+	const stash = config.items[stashItem.itemId]?.stash;
+	const productId = stash?.line.id;
 	if (!stash || !productId) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(

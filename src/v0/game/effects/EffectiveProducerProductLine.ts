@@ -1,6 +1,6 @@
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 
-type ProductDefinition = GameConfig["products"][string];
+type ProductDefinition = GameProducerLineDefinition;
 type ProductOutput = NonNullable<ProductDefinition["output"]>;
 type ProductOutputEntry = ProductOutput[number];
 type WeightedProductOutput = Extract<

@@ -6,6 +6,11 @@ import { readProducerDefaultEffectProductId } from "~/v0/game/producer/readProdu
 import { readProducerDefaultProductId } from "~/v0/game/producer/readProducerDefaultProductId";
 import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
+import {
+	readProducerProductLineDefinition,
+	readProducerProductLineIds,
+} from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionProducerProductLineSetDefault } from "~/v0/game/action/GameActionProducerProductLineSetDefault";
 import type { GameEngineResult } from "~/v0/game/engine/model/GameEngineResult";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -51,19 +56,34 @@ export const setProducerProductLineDefaultFx = Effect.fn("setProducerProductLine
 			nowMs,
 			save,
 		});
-		const product = config.products[action.productId];
+		const product = readProducerProductLineDefinition({
+			producerDefinition: checked.producerDefinition,
+			productId: action.productId,
+		});
+		if (!product) {
+			return yield* Effect.fail(
+				GameEngineError.configReferenceMissing(
+					`Missing producer line "${action.productId}".`,
+				),
+			);
+		}
+
 		const lineKind = readProducerLineKind({
 			product,
 		});
 		const previousProductId =
 			lineKind === "effect"
 				? readProducerDefaultEffectProductId({
-						productIds: checked.producerDefinition.productIds,
+						productIds: readProducerProductLineIds({
+							producerDefinition: checked.producerDefinition,
+						}),
 						producerItemInstanceId: action.producerItemInstanceId,
 						save,
 					})
 				: readProducerDefaultProductId({
-						productIds: checked.producerDefinition.productIds,
+						productIds: readProducerProductLineIds({
+							producerDefinition: checked.producerDefinition,
+						}),
 						producerItemInstanceId: action.producerItemInstanceId,
 						save,
 					});

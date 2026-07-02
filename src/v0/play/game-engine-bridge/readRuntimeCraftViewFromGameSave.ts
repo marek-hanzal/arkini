@@ -8,6 +8,7 @@ import { readCraftRecipeDurationMs } from "~/v0/game/craft/readCraftRecipeDurati
 import { readItemTargetLimits } from "~/v0/game/limit/readItemTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 import { readCraftLineEffectState } from "~/v0/game/craft/readCraftLineEffectState";
+import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 
 export namespace readRuntimeCraftViewFromGameSave {
 	export interface Props {
@@ -25,7 +26,10 @@ export const readRuntimeCraftViewFromGameSave = ({
 	save,
 }: readRuntimeCraftViewFromGameSave.Props): CraftProgressView | undefined => {
 	const recipeId = boardItem.itemId;
-	const recipe = config.craftRecipes[recipeId];
+	const recipe = readCraftRecipeDefinition({
+		config,
+		recipeId,
+	});
 	if (!recipe) return undefined;
 
 	const runningJob = Object.values(save.craftJobs).find(

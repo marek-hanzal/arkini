@@ -58,30 +58,23 @@ describe("game package normalization", () => {
 				"producer:test": {
 					description: "Producer",
 					name: "Producer",
+					producer: {
+						lines: [
+							{
+								durationMs: 1000,
+								id: "product:test",
+								output: [
+									{
+										itemId: "item:plank",
+										type: "guaranteed",
+									},
+								],
+							},
+						],
+					},
 				},
 			},
-			merge: {},
 			effects: {},
-			producers: {
-				"producer:test": {
-					productIds: [
-						"product:test",
-					],
-				},
-			},
-			stashes: {},
-			craftRecipes: {},
-			products: {
-				"product:test": {
-					durationMs: 1000,
-					output: [
-						{
-							itemId: "item:plank",
-							type: "guaranteed",
-						},
-					],
-				},
-			},
 			startingState: {
 				board: [
 					{
@@ -98,7 +91,7 @@ describe("game package normalization", () => {
 			path,
 		]);
 
-		expect(config.products["product:test"]?.name).toBe("Plank");
+		expect(config.items["producer:test"]?.producer?.lines[0]?.name).toBe("Plank");
 		expect(config.assets["asset:item:plank"]).not.toHaveProperty("kind");
 		expect(config.assets["asset:producer:test"]).not.toHaveProperty("kind");
 	});

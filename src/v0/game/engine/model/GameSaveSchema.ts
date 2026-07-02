@@ -2,6 +2,11 @@ import { z } from "zod";
 import { GameInstantMsSchema } from "~/v0/game/time/GameTimeSchema";
 import { GameConfigSchema, type GameConfig } from "~/v0/game/config/GameConfigSchema";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
+import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
+import {
+	readProducerProductLineDefinition,
+	readProducerProductLineIds,
+} from "~/v0/game/config/readProducerProductLineDefinition";
 import { readProducerLineKind } from "~/v0/game/producer/readProducerLineKind";
 import { GameItemCreatedReasonSchema } from "~/v0/game/event/GameEventSchema";
 
@@ -380,12 +385,41 @@ const readItemInstanceDefinition = ({
 };
 
 const readEffectiveProductInputSlots = ({
-	config,
+	producer,
 	productId,
 }: {
-	config: GameConfig;
+	producer: NonNullable<ReturnType<typeof readProducerCapabilityDefinition>>;
 	productId: string;
-}) => config.products[productId]?.inputs ?? [];
+}) =>
+	readProducerProductLineDefinition({
+		producerDefinition: producer,
+		productId,
+	})?.inputs ?? [];
+
+const readProducerProductLineFromJob = ({
+	config,
+	job,
+	save,
+}: {
+	config: GameConfig;
+	job: GameSaveProducerJob;
+	save: GameSave;
+}) => {
+	const producerItem = save.board.items[job.producerItemInstanceId];
+	const producer = producerItem
+		? readProducerCapabilityDefinition({
+				config,
+				producerId: producerItem.itemId,
+			})
+		: undefined;
+
+	return producer
+		? readProducerProductLineDefinition({
+				producerDefinition: producer,
+				productId: job.productId,
+			})
+		: undefined;
+};
 
 const isSaveProducerJobPaused = (job: GameSaveProducerJob) =>
 	job.pausedAtMs !== undefined && job.remainingMs !== undefined;
@@ -689,7 +723,11 @@ const validateGameSaveAgainstConfig = (
 				],
 				`Producer job target "${job.producerItemInstanceId}" must reference a producer-like item.`,
 			);
-		} else if (!producer.productIds.includes(job.productId)) {
+		} else if (
+			!readProducerProductLineIds({
+				producerDefinition: producer,
+			}).includes(job.productId)
+		) {
 			addSaveIssue(
 				ctx,
 				[
@@ -698,18 +736,6 @@ const validateGameSaveAgainstConfig = (
 					"productId",
 				],
 				`Product "${job.productId}" does not belong to producer "${producerId}".`,
-			);
-		}
-
-		if (!config.products[job.productId]) {
-			addSaveIssue(
-				ctx,
-				[
-					"producerJobs",
-					jobId,
-					"productId",
-				],
-				`Missing product "${job.productId}".`,
 			);
 		}
 
@@ -777,7 +803,13 @@ const validateGameSaveAgainstConfig = (
 				activeEffectId,
 			]);
 			const producerJob = save.producerJobs[activeEffect.producerJobId];
-			const product = producerJob ? config.products[producerJob.productId] : undefined;
+			const product = producerJob
+				? readProducerProductLineFromJob({
+						config,
+						save,
+						job: producerJob,
+					})
+				: undefined;
 
 			if (!producerJob) {
 				addSaveIssue(
@@ -839,7 +871,11 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
-		const product = config.products[job.productId];
+		const product = readProducerProductLineFromJob({
+			config,
+			save,
+			job,
+		});
 		if (!product?.activatesEffectId) continue;
 
 		const activeEffectIds = activeEffectIdsByProducerJobId.get(jobId) ?? [];
@@ -975,7 +1011,9 @@ const validateGameSaveAgainstConfig = (
 
 		if (
 			lineState.defaultProductId !== undefined &&
-			!producer.productIds.includes(lineState.defaultProductId)
+			!readProducerProductLineIds({
+				producerDefinition: producer,
+			}).includes(lineState.defaultProductId)
 		) {
 			addSaveIssue(
 				ctx,
@@ -987,7 +1025,10 @@ const validateGameSaveAgainstConfig = (
 				`Default product "${lineState.defaultProductId}" does not belong to producer "${producerId}".`,
 			);
 		} else if (lineState.defaultProductId !== undefined) {
-			const product = config.products[lineState.defaultProductId];
+			const product = readProducerProductLineDefinition({
+				producerDefinition: producer,
+				productId: lineState.defaultProductId,
+			});
 			if (
 				product &&
 				readProducerLineKind({
@@ -1008,7 +1049,9 @@ const validateGameSaveAgainstConfig = (
 
 		if (
 			lineState.defaultEffectProductId !== undefined &&
-			!producer.productIds.includes(lineState.defaultEffectProductId)
+			!readProducerProductLineIds({
+				producerDefinition: producer,
+			}).includes(lineState.defaultEffectProductId)
 		) {
 			addSaveIssue(
 				ctx,
@@ -1020,7 +1063,10 @@ const validateGameSaveAgainstConfig = (
 				`Default effect product "${lineState.defaultEffectProductId}" does not belong to producer "${producerId}".`,
 			);
 		} else if (lineState.defaultEffectProductId !== undefined) {
-			const effectProduct = config.products[lineState.defaultEffectProductId];
+			const effectProduct = readProducerProductLineDefinition({
+				producerDefinition: producer,
+				productId: lineState.defaultEffectProductId,
+			});
 			if (
 				effectProduct &&
 				readProducerLineKind({
@@ -1066,7 +1112,11 @@ const validateGameSaveAgainstConfig = (
 		}
 
 		for (const [productId, productInputState] of Object.entries(state.productInputs)) {
-			if (!producer.productIds.includes(productId)) {
+			if (
+				!readProducerProductLineIds({
+					producerDefinition: producer,
+				}).includes(productId)
+			) {
 				addSaveIssue(
 					ctx,
 					[
@@ -1081,7 +1131,7 @@ const validateGameSaveAgainstConfig = (
 			}
 
 			const inputSlots = readEffectiveProductInputSlots({
-				config,
+				producer,
 				productId,
 			});
 
@@ -1135,7 +1185,10 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		const recipe = config.craftRecipes[job.recipeId];
+		const recipe = readCraftRecipeDefinition({
+			config,
+			recipeId: job.recipeId,
+		});
 		if (!recipe) {
 			addSaveIssue(
 				ctx,
@@ -1201,7 +1254,12 @@ const validateGameSaveAgainstConfig = (
 			itemInstanceId: targetItemInstanceId,
 		});
 		const recipeId = target?.itemId;
-		const recipe = recipeId ? config.craftRecipes[recipeId] : undefined;
+		const recipe = recipeId
+			? readCraftRecipeDefinition({
+					config,
+					recipeId,
+				})
+			: undefined;
 		if (!target || !recipeId || !recipe) {
 			addSaveIssue(
 				ctx,

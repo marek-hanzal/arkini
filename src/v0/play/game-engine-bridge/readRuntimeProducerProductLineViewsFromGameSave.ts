@@ -25,6 +25,7 @@ import { readActivationInputRequiredQuantity } from "~/v0/game/activation/readAc
 import { readEffectiveOutputTargetLimits } from "~/v0/game/limit/readEffectiveOutputTargetLimits";
 import { readTargetLimitBlocked } from "~/v0/game/limit/readTargetLimitBlocked";
 import { readRuntimeProductLineOutputViews } from "~/v0/play/game-engine-bridge/readRuntimeProductLineOutputViews";
+import { readProducerProductLineDefinitionFromConfig } from "~/v0/game/config/readProducerProductLineDefinition";
 
 export namespace readRuntimeProducerProductLineViewsFromGameSave {
 	export interface Props {
@@ -126,8 +127,16 @@ export const readRuntimeProducerProductLineViewsFromGameSave = ({
 		visibleProductIds,
 	});
 
+	const producerItem = save.board.items[targetItemInstanceId];
+
 	return viewProductIds.flatMap((productId) => {
-		const product = config.products[productId];
+		const product = producerItem
+			? readProducerProductLineDefinitionFromConfig({
+					config,
+					producerId: producerItem.itemId,
+					productId,
+				})
+			: undefined;
 		if (!product) return [];
 		const lineKind = readProducerLineKind({
 			product,

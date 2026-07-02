@@ -14,6 +14,7 @@ import { readProducerProductDurationMs } from "~/v0/game/producer/readProducerPr
 import { readProducerProductStoredInputQuantitiesFx } from "~/v0/game/producer/readProducerProductStoredInputQuantitiesFx";
 import { readWorldProducerJobFacts } from "~/v0/game/world/readWorldProducerJobFacts";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProducerProductLineIds } from "~/v0/game/config/GameItemCapabilities";
 import type { GameActionProducerProductStart } from "~/v0/game/action/GameActionProducerProductStart";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
@@ -41,7 +42,9 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		config,
 		producerItemInstanceId: action.producerItemInstanceId,
 		nowMs,
-		productIds: producerDefinition.productIds,
+		productIds: readProducerProductLineIds({
+			producerDefinition,
+		}),
 		save,
 	});
 	const defaultEffectProductId = readProducerDefaultEffectProductId({
@@ -79,7 +82,12 @@ export const checkProducerProductStartReadinessFx = Effect.fn(
 		);
 	}
 
-	if (!productId || !producerDefinition.productIds.includes(productId)) {
+	if (
+		!productId ||
+		!readProducerProductLineIds({
+			producerDefinition,
+		}).includes(productId)
+	) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",

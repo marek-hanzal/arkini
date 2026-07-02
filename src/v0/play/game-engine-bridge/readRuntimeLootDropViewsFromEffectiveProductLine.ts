@@ -1,11 +1,11 @@
 import type { ActivationDropView } from "~/v0/board/view/ActivationDropViewSchema";
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type {
 	EffectiveDropEffectOutcome,
 	EffectiveProducerProductLine,
 } from "~/v0/game/effects/EffectiveProducerProductLine";
 
-type LootOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
+type LootOutput = NonNullable<GameProducerLineDefinition["output"]>[number];
 type LootQuantity = NonNullable<
 	Extract<
 		LootOutput,

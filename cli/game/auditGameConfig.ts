@@ -1,4 +1,5 @@
 import type { GameConfig } from "../../src/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "../../src/v0/game/config/GameItemCapabilities";
 
 export type GameConfigAuditWarning = {
 	code: "duplicate-definition-shape" | "terminal-item" | "unused-definition";
@@ -7,17 +8,7 @@ export type GameConfigAuditWarning = {
 	section: string;
 };
 
-type RecordName =
-	| "resources"
-	| "assets"
-	| "items"
-	| "merge"
-	| "effects"
-	| "producers"
-	| "stashes"
-	| "craftRecipes"
-	| "products";
-
+type RecordName = "resources" | "assets" | "items" | "effects";
 type UsageIndex = Record<RecordName, Set<string>>;
 
 type ItemFlowIndex = {
@@ -25,24 +16,28 @@ type ItemFlowIndex = {
 	producedItemIds: Set<string>;
 };
 
+type ActivationOutput = NonNullable<GameProducerLineDefinition["output"]>;
+type GameDropEffect = NonNullable<
+	Extract<
+		ActivationOutput[number],
+		{
+			type: "guaranteed" | "chance";
+		}
+	>["effects"]
+>[number];
+
 export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] => {
 	const usage = createUsageIndex();
 	const itemFlow = createItemFlowIndex();
 
 	collectItemUsage(config, usage, itemFlow);
-	collectMergeUsage(config, usage, itemFlow);
 	collectEffectUsage(config, usage, itemFlow);
-	collectProducerUsage(config, usage, itemFlow);
-	collectStashUsage(config, usage, itemFlow);
-	collectCraftRecipeUsage(config, itemFlow);
-	collectProductUsage(config, usage, itemFlow);
 	collectStartingStateUsage(config, itemFlow);
 	collectUsedAssetDependencyUsage(config, usage);
 	collectAssetResourceUsage(config, usage);
 
 	return [
 		...readUnusedDefinitionWarnings(config, usage),
-		...readDuplicateDefinitionShapeWarnings(config),
 		...readTerminalItemWarnings(config, itemFlow, usage),
 	].sort(compareGameConfigAuditWarnings);
 };
@@ -50,9 +45,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 export const formatGameConfigAuditWarnings = (
 	warnings: readonly GameConfigAuditWarning[],
 ): string => {
-	if (warnings.length === 0) {
-		return "";
-	}
+	if (warnings.length === 0) return "";
 
 	return [
 		"Game config warnings:",
@@ -64,12 +57,7 @@ const createUsageIndex = (): UsageIndex => ({
 	resources: new Set(),
 	assets: new Set(),
 	items: new Set(),
-	merge: new Set(),
 	effects: new Set(),
-	producers: new Set(),
-	stashes: new Set(),
-	craftRecipes: new Set(),
-	products: new Set(),
 });
 
 const createItemFlowIndex = (): ItemFlowIndex => ({
@@ -91,15 +79,11 @@ const collectUsedAssetDependencyUsage = (config: GameConfig, usage: UsageIndex) 
 
 	while (pendingAssetIds.length > 0) {
 		const assetId = pendingAssetIds.shift();
-		if (!assetId || visitedAssetIds.has(assetId)) {
-			continue;
-		}
+		if (!assetId || visitedAssetIds.has(assetId)) continue;
 
 		visitedAssetIds.add(assetId);
 		const asset = config.assets[assetId];
-		if (!asset) {
-			continue;
-		}
+		if (!asset) continue;
 
 		if (asset.overlayAssetId) {
 			usage.assets.add(asset.overlayAssetId);
@@ -110,30 +94,19 @@ const collectUsedAssetDependencyUsage = (config: GameConfig, usage: UsageIndex) 
 
 const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const [itemId, item] of Object.entries(config.items)) {
-		for (const assetId of item.assetIds) {
-			usage.assets.add(assetId);
-		}
+		for (const assetId of item.assetIds) usage.assets.add(assetId);
 
-		if (item.mergeIds && item.mergeIds.length > 0) {
+		for (const effectId of item.passiveEffectIds ?? []) {
+			usage.effects.add(effectId);
 			itemFlow.consumedItemIds.add(itemId);
 		}
 
-		if (item.passiveEffectIds && item.passiveEffectIds.length > 0) {
+		for (const merge of item.merges ?? []) {
+			usage.items.add(merge.withItemId);
+			usage.items.add(merge.resultItemId);
 			itemFlow.consumedItemIds.add(itemId);
-		}
-
-		for (const mergeId of item.mergeIds ?? []) {
-			usage.merge.add(mergeId);
-		}
-
-		if (config.producers[itemId]) {
-			usage.producers.add(itemId);
-		}
-		if (config.stashes[itemId]) {
-			usage.stashes.add(itemId);
-		}
-		if (config.craftRecipes[itemId]) {
-			usage.craftRecipes.add(itemId);
+			itemFlow.consumedItemIds.add(merge.withItemId);
+			itemFlow.producedItemIds.add(merge.resultItemId);
 		}
 
 		for (const removal of item.removeBy ?? []) {
@@ -144,15 +117,41 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 				collectLootOutputEffectUsage(removal.output, config, usage);
 			}
 		}
+
+		if (item.craft) {
+			itemFlow.consumedItemIds.add(itemId);
+			usage.items.add(item.craft.resultItemId);
+			usageItem(itemFlow, item.craft.resultItemId, "produced");
+			for (const input of item.craft.inputs) {
+				usage.items.add(input.itemId);
+				usageItem(itemFlow, input.itemId, "consumed");
+			}
+			collectLineEffectUsage(item.craft.effects ?? [], config, usage);
+		}
+
+		for (const line of item.producer?.lines ?? []) {
+			collectProducerLineUsage(line, config, usage, itemFlow);
+		}
+		if (item.stash?.line) {
+			collectProducerLineUsage(item.stash.line, config, usage, itemFlow);
+		}
 	}
 };
 
-const collectMergeUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
-	for (const merge of Object.values(config.merge)) {
-		usage.items.add(merge.withItemId);
-		usage.items.add(merge.resultItemId);
-		itemFlow.consumedItemIds.add(merge.withItemId);
-		itemFlow.producedItemIds.add(merge.resultItemId);
+const collectProducerLineUsage = (
+	line: GameProducerLineDefinition,
+	config: GameConfig,
+	usage: UsageIndex,
+	itemFlow: ItemFlowIndex,
+) => {
+	for (const input of line.inputs ?? []) {
+		usage.items.add(input.itemId);
+		itemFlow.consumedItemIds.add(input.itemId);
+	}
+	if (line.activatesEffectId) usage.effects.add(line.activatesEffectId);
+	if (line.output) {
+		collectLootOutputUsage(line.output, itemFlow);
+		collectLootOutputEffectUsage(line.output, config, usage);
 	}
 };
 
@@ -194,39 +193,35 @@ const doesResolvedSelectorMatchId = (
 		}[];
 	},
 ) => {
-	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(id))) {
-		return false;
-	}
-	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(id))) {
-		return false;
-	}
-	if (selector.noneOf?.some((clause) => clause.ids.includes(id))) {
-		return false;
-	}
+	if (selector.anyOf && !selector.anyOf.some((clause) => clause.ids.includes(id))) return false;
+	if (selector.allOf && !selector.allOf.every((clause) => clause.ids.includes(id))) return false;
+	if (selector.noneOf?.some((clause) => clause.ids.includes(id))) return false;
 	return true;
 };
 
 const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
 	for (const item of Object.values(config.items)) {
-		for (const effectId of item.passiveEffectIds ?? []) {
-			usage.effects.add(effectId);
+		for (const effectId of item.passiveEffectIds ?? []) usage.effects.add(effectId);
+		for (const line of item.producer?.lines ?? []) {
+			if (line.activatesEffectId) usage.effects.add(line.activatesEffectId);
+			collectActivationOutputEffectUsage(line.output ?? [], config, usage, itemFlow);
 		}
-	}
-
-	for (const product of Object.values(config.products)) {
-		if (product.activatesEffectId) {
-			usage.effects.add(product.activatesEffectId);
+		if (item.stash?.line) {
+			if (item.stash.line.activatesEffectId)
+				usage.effects.add(item.stash.line.activatesEffectId);
+			collectActivationOutputEffectUsage(
+				item.stash.line.output ?? [],
+				config,
+				usage,
+				itemFlow,
+			);
 		}
-		collectActivationOutputEffectUsage(product.output ?? [], config, usage, itemFlow);
-	}
-
-	for (const recipe of Object.values(config.craftRecipes)) {
-		collectLineEffectUsage(recipe.effects ?? [], config, usage, itemFlow);
+		if (item.craft) collectLineEffectUsage(item.craft.effects ?? [], config, usage);
 	}
 };
 
 const collectActivationOutputEffectUsage = (
-	output: NonNullable<GameConfig["products"][string]["output"]>,
+	output: ActivationOutput,
 	config: GameConfig,
 	usage: UsageIndex,
 	itemFlow: ItemFlowIndex,
@@ -234,12 +229,12 @@ const collectActivationOutputEffectUsage = (
 	for (const entry of output) {
 		if (entry.type === "weighted") {
 			for (const weightedEntry of entry.entries) {
-				collectLineEffectUsage(weightedEntry.effects ?? [], config, usage, itemFlow);
+				collectLineEffectUsage(weightedEntry.effects ?? [], config, usage);
 			}
 			continue;
 		}
 
-		collectLineEffectUsage(entry.effects ?? [], config, usage, itemFlow);
+		collectLineEffectUsage(entry.effects ?? [], config, usage);
 	}
 };
 
@@ -250,7 +245,6 @@ const collectLineEffectUsage = (
 	}[],
 	config: GameConfig,
 	usage: UsageIndex,
-	itemFlow: ItemFlowIndex,
 ) => {
 	for (const effect of effects) {
 		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
@@ -264,54 +258,8 @@ const collectLineEffectUsage = (
 	}
 };
 
-const collectProducerUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
-	for (const producer of Object.values(config.producers)) {
-		for (const productId of producer.productIds) {
-			usage.products.add(productId);
-		}
-	}
-};
-
-const collectStashUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
-	for (const stash of Object.values(config.stashes)) {
-		for (const productId of stash.productIds) {
-			usage.products.add(productId);
-		}
-	}
-};
-
-const collectCraftRecipeUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
-	for (const recipe of Object.values(config.craftRecipes)) {
-		usageItem(itemFlow, recipe.resultItemId, "produced");
-		for (const input of recipe.inputs) {
-			usageItem(itemFlow, input.itemId, "consumed");
-		}
-	}
-};
-
-const collectProductUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
-	for (const product of Object.values(config.products)) {
-		for (const input of product.inputs ?? []) {
-			itemFlow.consumedItemIds.add(input.itemId);
-		}
-		if (product.output) {
-			collectLootOutputUsage(product.output, itemFlow);
-			collectLootOutputEffectUsage(product.output, config, usage);
-		}
-	}
-};
-
-type GameDropEffect = NonNullable<
-	Extract<
-		NonNullable<GameConfig["products"][string]["output"]>[number],
-		{
-			type: "guaranteed" | "chance";
-		}
-	>["effects"]
->[number];
-
 const collectLootOutputEffectUsage = (
-	output: NonNullable<GameConfig["products"][string]["output"]>,
+	output: ActivationOutput,
 	config: GameConfig,
 	usage: UsageIndex,
 ) => {
@@ -333,21 +281,29 @@ const collectDropEffectUsage = (
 	usage: UsageIndex,
 ) => {
 	for (const effect of effects) {
-		if (effect.kind !== "nearby.require") continue;
+		if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
+			for (const itemId of readResolvedSelectorIds(
+				effect.items as Parameters<typeof readResolvedSelectorIds>[0],
+				config.items,
+			)) {
+				usage.items.add(itemId);
+			}
+		}
 
-		for (const itemId of readResolvedSelectorIds(
-			effect.items as Parameters<typeof readResolvedSelectorIds>[0],
-			config.items,
-		)) {
-			usage.items.add(itemId);
+		if (effect.kind === "nearby.loot.outputChance.add") {
+			for (const source of effect.sources) {
+				for (const itemId of readResolvedSelectorIds(
+					source.items as Parameters<typeof readResolvedSelectorIds>[0],
+					config.items,
+				)) {
+					usage.items.add(itemId);
+				}
+			}
 		}
 	}
 };
 
-const collectLootOutputUsage = (
-	output: NonNullable<GameConfig["products"][string]["output"]>,
-	itemFlow: ItemFlowIndex,
-) => {
+const collectLootOutputUsage = (output: ActivationOutput, itemFlow: ItemFlowIndex) => {
 	for (const entry of output) {
 		if (entry.type === "weighted") {
 			for (const weightedEntry of entry.entries) {
@@ -361,56 +317,8 @@ const collectLootOutputUsage = (
 };
 
 const collectStartingStateUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
-	for (const entry of config.startingState.board) {
-		itemFlow.producedItemIds.add(entry.itemId);
-	}
-	for (const entry of config.startingState.inventory) {
-		itemFlow.producedItemIds.add(entry.itemId);
-	}
-};
-
-const duplicateShapeSections = [
-	"stashes",
-	"craftRecipes",
-] as const;
-
-const readDuplicateDefinitionShapeWarnings = (config: GameConfig): GameConfigAuditWarning[] =>
-	duplicateShapeSections.flatMap((section) =>
-		readDuplicateRecordShapeWarnings(section, config[section]),
-	);
-
-const readDuplicateRecordShapeWarnings = (
-	section: (typeof duplicateShapeSections)[number],
-	record: Readonly<Record<string, unknown>>,
-): GameConfigAuditWarning[] => {
-	const idsByShape = new Map<string, string[]>();
-
-	for (const [id, value] of Object.entries(record)) {
-		const shapeKey = JSON.stringify(omitName(value));
-		idsByShape.set(shapeKey, [
-			...(idsByShape.get(shapeKey) ?? []),
-			id,
-		]);
-	}
-
-	return [
-		...idsByShape.values(),
-	]
-		.filter((ids) => ids.length > 1)
-		.map((ids) => ({
-			code: "duplicate-definition-shape" as const,
-			id: ids[0] ?? section,
-			section,
-			message: `${section} definitions share identical gameplay data and should be centralized: ${ids.join(", ")}.`,
-		}));
-};
-
-const omitName = (value: unknown) => {
-	if (!value || typeof value !== "object" || Array.isArray(value)) return value;
-
-	const entries = Object.entries(value).filter(([key]) => key !== "name");
-
-	return Object.fromEntries(entries);
+	for (const entry of config.startingState.board) itemFlow.producedItemIds.add(entry.itemId);
+	for (const entry of config.startingState.inventory) itemFlow.producedItemIds.add(entry.itemId);
 };
 
 const readUnusedDefinitionWarnings = (
@@ -419,12 +327,7 @@ const readUnusedDefinitionWarnings = (
 ): GameConfigAuditWarning[] => [
 	...readUnusedRecordWarnings("resources", config.resources, usage.resources),
 	...readUnusedRecordWarnings("assets", config.assets, usage.assets),
-	...readUnusedRecordWarnings("merge", config.merge, usage.merge),
 	...readUnusedRecordWarnings("effects", config.effects, usage.effects),
-	...readUnusedRecordWarnings("producers", config.producers, usage.producers),
-	...readUnusedRecordWarnings("stashes", config.stashes, usage.stashes),
-	...readUnusedRecordWarnings("craftRecipes", config.craftRecipes, usage.craftRecipes),
-	...readUnusedRecordWarnings("products", config.products, usage.products),
 ];
 
 const readTerminalItemWarnings = (
@@ -436,12 +339,12 @@ const readTerminalItemWarnings = (
 		.filter((itemId) => itemFlow.producedItemIds.has(itemId))
 		.filter((itemId) => !itemFlow.consumedItemIds.has(itemId))
 		.filter((itemId) => !usage.items.has(itemId))
-		.filter((itemId) => !hasConfiguredInteraction(config, itemId, config.items[itemId]))
+		.filter((itemId) => !hasConfiguredInteraction(config.items[itemId]))
 		.map((itemId) => ({
 			code: "terminal-item",
 			id: itemId,
 			section: "items",
-			message: `${itemId} is produced or starts in the save, but no configured input, grant/effect, merge, removal rule, craft, or stash references it.`,
+			message: `${itemId} is produced or starts in the save, but no configured input, grant/effect, merge, removal rule, craft, producer, or stash references it.`,
 		}));
 
 const readUnusedRecordWarnings = (
@@ -462,14 +365,10 @@ const readUnusedRecordWarningMessage = (
 	section: Exclude<RecordName, "items">,
 	id: string,
 ): string => {
-	if (section === "assets") {
+	if (section === "assets")
 		return `assets.${id} is defined but no item or used overlay references it.`;
-	}
-
-	if (section === "resources") {
+	if (section === "resources")
 		return `resources.${id} is packaged from assets but no asset references it.`;
-	}
-
 	return `${section}.${id} is defined but no other config entry references it.`;
 };
 
@@ -495,16 +394,12 @@ const compareGameConfigAuditWarnings = (
 	return left.id.localeCompare(right.id);
 };
 
-const hasConfiguredInteraction = (
-	config: GameConfig,
-	itemId: string,
-	item: GameConfig["items"][string] | undefined,
-) =>
+const hasConfiguredInteraction = (item: GameConfig["items"][string] | undefined) =>
 	Boolean(
-		config.producers[itemId] ||
-			config.stashes[itemId] ||
-			config.craftRecipes[itemId] ||
-			(item?.mergeIds && item.mergeIds.length > 0) ||
+		item?.producer ||
+			item?.stash ||
+			item?.craft ||
+			(item?.merges && item.merges.length > 0) ||
 			(item?.removeBy && item.removeBy.length > 0) ||
 			(item?.tags && item.tags.some((tag) => tag.startsWith("special:"))),
 	);

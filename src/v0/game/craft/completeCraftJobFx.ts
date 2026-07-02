@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readBoardItemMaxCountCapacity } from "~/v0/game/board/readBoardItemMaxCountCapacity";
 import { cloneGameSaveFx } from "~/v0/game/save/cloneGameSaveFx";
 import { isItemStorageAllowed } from "~/v0/game/config/isItemStorageAllowed";
@@ -102,7 +103,10 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const recipe = config.craftRecipes[liveJob.recipeId];
+	const recipe = readCraftRecipeDefinition({
+		config,
+		recipeId: liveJob.recipeId,
+	});
 
 	if (!recipe) {
 		return yield* Effect.fail(

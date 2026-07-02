@@ -12,8 +12,12 @@ export const createEngineMergeTestConfig = () => {
 				],
 				description: "Water",
 				maxStackSize: 3,
-				mergeIds: [
-					"merge:water-twig-sprout",
+				merges: [
+					{
+						resultItemId: "item:sprout",
+						secret: true,
+						withItemId: "item:twig",
+					},
 				],
 				name: "Water",
 				storage: "both",
@@ -30,14 +34,6 @@ export const createEngineMergeTestConfig = () => {
 				storage: "both",
 				tags: [],
 				tier: 1,
-			},
-		},
-		merge: {
-			...config.merge,
-			"merge:water-twig-sprout": {
-				resultItemId: "item:sprout",
-				secret: true,
-				withItemId: "item:twig",
 			},
 		},
 	});

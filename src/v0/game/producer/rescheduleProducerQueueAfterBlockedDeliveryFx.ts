@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readProducerJobProductLine } from "~/v0/game/producer/readProducerJobProductLine";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readProducerJobTimingFx } from "~/v0/game/producer/readProducerJobTimingFx";
@@ -55,10 +56,14 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 			startAtMs: timing.startAtMs,
 		};
 
-		const product = config.products[job.productId];
+		const product = readProducerJobProductLine({
+			config,
+			job,
+			save: nextSave,
+		});
 		if (!product) {
 			return yield* Effect.fail(
-				GameEngineError.configReferenceMissing(`Missing product "${job.productId}".`),
+				GameEngineError.configReferenceMissing(`Missing producer line "${job.productId}".`),
 			);
 		}
 		if (product.activatesEffectId) {

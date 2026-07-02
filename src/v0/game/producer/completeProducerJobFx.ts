@@ -9,6 +9,7 @@ import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/v0/game/produce
 import { isGamePlacementFailureRetryable } from "~/v0/game/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveProductLineFx } from "~/v0/game/producer/readProducerJobEffectiveProductLineFx";
 import { readProducerCapabilityDefinition } from "~/v0/game/config/readProducerCapabilityDefinition";
+import { readProducerProductLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/v0/game/producer/readProducerRemainingCharges";
 import { removeBoardItemRuntimeState } from "~/v0/game/board/removeBoardItemRuntimeState";
 import { rollEffectiveLootPlanItemsFx } from "~/v0/game/effects/rollEffectiveLootPlanItemsFx";
@@ -111,7 +112,12 @@ const readProducerChargeCompletionOutcome = ({
 		config,
 		producerId,
 	});
-	const product = config.products[job.productId];
+	const product = producer
+		? readProducerProductLineDefinition({
+				producerDefinition: producer,
+				productId: job.productId,
+			})
+		: undefined;
 	if (!producer || !product || producer.charges === undefined || product.chargeCost <= 0) {
 		return undefined;
 	}
@@ -230,10 +236,22 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		} satisfies GameEngineCompletionResult;
 	}
 
-	const product = config.products[liveJob.productId];
+	const producerItem = save.board.items[liveJob.producerItemInstanceId];
+	const producer = producerItem
+		? readProducerCapabilityDefinition({
+				config,
+				producerId: producerItem.itemId,
+			})
+		: undefined;
+	const product = producer
+		? readProducerProductLineDefinition({
+				producerDefinition: producer,
+				productId: liveJob.productId,
+			})
+		: undefined;
 	if (!product) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing product "${liveJob.productId}".`),
+			GameEngineError.configReferenceMissing(`Missing producer line "${liveJob.productId}".`),
 		);
 	}
 

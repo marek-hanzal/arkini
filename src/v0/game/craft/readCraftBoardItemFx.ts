@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import { readCraftRecipeDefinition } from "~/v0/game/config/GameItemCapabilities";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 
@@ -29,7 +30,12 @@ export const readCraftBoardItemFx = Effect.fn("readCraftBoardItemFx")(function* 
 	}
 
 	const targetRecipeId = targetItem.itemId;
-	if (!config.craftRecipes[targetRecipeId]) {
+	if (
+		!readCraftRecipeDefinition({
+			config,
+			recipeId: targetRecipeId,
+		})
+	) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
@@ -47,7 +53,10 @@ export const readCraftBoardItemFx = Effect.fn("readCraftBoardItemFx")(function* 
 		);
 	}
 
-	const recipe = config.craftRecipes[targetRecipeId];
+	const recipe = readCraftRecipeDefinition({
+		config,
+		recipeId: targetRecipeId,
+	});
 	if (!recipe) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(`Missing craft recipe "${targetRecipeId}".`),

@@ -13,12 +13,7 @@ const collectionKeys = [
 	"resources",
 	"assets",
 	"items",
-	"merge",
 	"effects",
-	"producers",
-	"stashes",
-	"craftRecipes",
-	"products",
 ] as const;
 
 type CollectionKey = (typeof collectionKeys)[number];
@@ -196,11 +191,16 @@ const normalizePackage = (value: unknown): unknown => {
 		...sourceAssets,
 	};
 	const normalizedItems: Record<string, unknown> = {};
-	const craftRecipes = asRecord(packageValue.craftRecipes);
-	const normalizedCraftRecipes: Record<string, unknown> = {};
-	const products = asRecord(packageValue.products);
-	const normalizedProducts: Record<string, unknown> = {};
 	const effects = asRecord(packageValue.effects);
+
+	const itemDomainIndex = createTaggedDomainIndex({
+		entries: items,
+		ids: Object.keys(items),
+		label: "item",
+	});
+	const productDomainIndexes = {
+		items: itemDomainIndex,
+	};
 
 	for (const [itemId, itemEntry] of Object.entries(items)) {
 		if (!itemEntry || typeof itemEntry !== "object" || Array.isArray(itemEntry)) {
@@ -218,6 +218,46 @@ const normalizePackage = (value: unknown): unknown => {
 				];
 
 		item.assetIds = assetIds;
+
+		if (item.craft && typeof item.craft === "object" && !Array.isArray(item.craft)) {
+			const craft = {
+				...(item.craft as Record<string, unknown>),
+			};
+			craft.resultItemId ??= readCraftResultItemIdFromCraftTargetId(itemId);
+			craft.effects = normalizeLineEffects({
+				domainIndexes: productDomainIndexes,
+				effects: craft.effects,
+				path: `items.${itemId}.craft.effects`,
+			});
+			item.craft = craft;
+		}
+
+		if (item.producer && typeof item.producer === "object" && !Array.isArray(item.producer)) {
+			const producer = {
+				...(item.producer as Record<string, unknown>),
+			};
+			producer.lines = normalizeProducerLines({
+				domainIndexes: productDomainIndexes,
+				items: normalizedItems,
+				lines: producer.lines,
+				path: `items.${itemId}.producer.lines`,
+			});
+			item.producer = producer;
+		}
+
+		if (item.stash && typeof item.stash === "object" && !Array.isArray(item.stash)) {
+			const stash = {
+				...(item.stash as Record<string, unknown>),
+			};
+			stash.line = normalizeProducerLine({
+				domainIndexes: productDomainIndexes,
+				items: normalizedItems,
+				line: stash.line,
+				path: `items.${itemId}.stash.line`,
+			});
+			item.stash = stash;
+		}
+
 		normalizedItems[itemId] = item;
 
 		for (const assetId of assetIds) {
@@ -226,76 +266,15 @@ const normalizePackage = (value: unknown): unknown => {
 		}
 	}
 
-	for (const [craftRecipeId, craftRecipeEntry] of Object.entries(craftRecipes)) {
-		if (
-			!craftRecipeEntry ||
-			typeof craftRecipeEntry !== "object" ||
-			Array.isArray(craftRecipeEntry)
-		) {
-			normalizedCraftRecipes[craftRecipeId] = craftRecipeEntry;
-			continue;
-		}
-
-		const craftRecipe = {
-			...(craftRecipeEntry as Record<string, unknown>),
-		};
-
-		craftRecipe.resultItemId ??= readCraftResultItemIdFromCraftTargetId(craftRecipeId);
-		craftRecipe.effects = normalizeLineEffects({
-			domainIndexes: {
-				items: createTaggedDomainIndex({
-					entries: normalizedItems,
-					ids: Object.keys(normalizedItems),
-					label: "item",
-				}),
-			},
-			effects: craftRecipe.effects,
-			path: `craftRecipes.${craftRecipeId}.effects`,
-		});
-		normalizedCraftRecipes[craftRecipeId] = craftRecipe;
-	}
-
-	for (const [productId, productEntry] of Object.entries(products)) {
-		if (!productEntry || typeof productEntry !== "object" || Array.isArray(productEntry)) {
-			normalizedProducts[productId] = productEntry;
-			continue;
-		}
-
-		const product = {
-			...(productEntry as Record<string, unknown>),
-		};
-
-		product.name ??= readProductNameFromPrimaryOutput(product, normalizedItems);
-		const productDomainIndexes = {
-			items: createTaggedDomainIndex({
-				entries: normalizedItems,
-				ids: Object.keys(normalizedItems),
-				label: "item",
-			}),
-		};
-		product.output = normalizeActivationOutputEffects({
-			domainIndexes: productDomainIndexes,
-			output: product.output,
-			path: `products.${productId}.output`,
-		});
-		normalizedProducts[productId] = product;
-	}
-
 	const normalizedEffects = normalizeEffectDefinitions({
-		craftRecipes: normalizedCraftRecipes,
 		effects,
-		items: normalizedItems,
-		producers: asRecord(packageValue.producers),
-		products: normalizedProducts,
 	});
 
 	return {
 		...packageValue,
 		assets,
-		craftRecipes: normalizedCraftRecipes,
 		effects: normalizedEffects,
 		items: normalizedItems,
-		products: normalizedProducts,
 	};
 };
 
@@ -367,11 +346,7 @@ type DomainIndex = {
 const normalizeEffectDefinitions = ({
 	effects,
 }: {
-	craftRecipes: Readonly<Record<string, unknown>>;
 	effects: Readonly<Record<string, unknown>>;
-	items: Readonly<Record<string, unknown>>;
-	producers: Readonly<Record<string, unknown>>;
-	products: Readonly<Record<string, unknown>>;
 }) => {
 	const normalizedEffects: Record<string, unknown> = {};
 
@@ -523,6 +498,56 @@ const normalizeActivationOutputEffects = ({
 		});
 		return entry;
 	});
+};
+
+const normalizeProducerLines = ({
+	domainIndexes,
+	items,
+	lines,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	items: Readonly<Record<string, unknown>>;
+	lines: unknown;
+	path: string;
+}) => {
+	if (!Array.isArray(lines)) return lines;
+	return lines.map((line, lineIndex) =>
+		normalizeProducerLine({
+			domainIndexes,
+			items,
+			line,
+			path: `${path}.${lineIndex}`,
+		}),
+	);
+};
+
+const normalizeProducerLine = ({
+	domainIndexes,
+	items,
+	line,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	items: Readonly<Record<string, unknown>>;
+	line: unknown;
+	path: string;
+}) => {
+	if (!line || typeof line !== "object" || Array.isArray(line)) return line;
+	const normalizedLine = {
+		...(line as Record<string, unknown>),
+	};
+	normalizedLine.name ??= readProductNameFromPrimaryOutput(normalizedLine, items);
+	normalizedLine.output = normalizeActivationOutputEffects({
+		domainIndexes,
+		output: normalizedLine.output,
+		path: `${path}.output`,
+	});
+	return normalizedLine;
 };
 
 const asAuthoringDomainSelector = (value: unknown): AuthoringDomainSelector =>
@@ -860,12 +885,7 @@ const createEmptyPackage = (): MergedGameConfig => ({
 	resources: {},
 	assets: {},
 	items: {},
-	merge: {},
-	producers: {},
-	stashes: {},
-	craftRecipes: {},
 	effects: {},
-	products: {},
 });
 
 const assignSingleton = <T>(

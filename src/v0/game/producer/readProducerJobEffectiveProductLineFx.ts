@@ -1,5 +1,9 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import {
+	readProducerProductLineDefinition,
+	readProducerProductLineIds,
+} from "~/v0/game/config/GameItemCapabilities";
 import { GameEngineError } from "~/v0/game/engine/model/GameEngineError";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import { readEffectiveProducerProductLine } from "~/v0/game/effects/readEffectiveProducerProductLine";
@@ -47,7 +51,11 @@ export const readProducerJobEffectiveProductLineFx = Effect.fn(
 			),
 		);
 	}
-	if (!producerDefinition.productIds.includes(productId)) {
+	if (
+		!readProducerProductLineIds({
+			producerDefinition,
+		}).includes(productId)
+	) {
 		return yield* Effect.fail(
 			GameEngineError.saveInvalid(
 				`Product "${productId}" does not belong to producer-like capability "${producerItem.itemId}".`,
@@ -55,10 +63,13 @@ export const readProducerJobEffectiveProductLineFx = Effect.fn(
 		);
 	}
 
-	const product = config.products[productId];
+	const product = readProducerProductLineDefinition({
+		producerDefinition,
+		productId,
+	});
 	if (!product) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing product "${productId}".`),
+			GameEngineError.configReferenceMissing(`Missing producer line "${productId}".`),
 		);
 	}
 

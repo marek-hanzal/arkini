@@ -1,8 +1,8 @@
-import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 
 export namespace readProducerProductDurationMs {
 	export interface Props {
-		product: GameConfig["products"][string];
+		product: GameProducerLineDefinition;
 	}
 }
 

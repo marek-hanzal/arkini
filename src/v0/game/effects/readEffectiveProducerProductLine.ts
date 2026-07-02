@@ -1,6 +1,7 @@
 import type { BoardCell } from "~/v0/game/board/BoardCell";
 import { readGameCheatEffectiveDurationMs } from "~/v0/game/cheat/GameCheatSpeedMode";
 import type { GameConfig } from "~/v0/game/config/GameConfigSchema";
+import type { GameProducerLineDefinition } from "~/v0/game/config/GameItemCapabilities";
 import type { GameSave } from "~/v0/game/engine/model/GameSaveSchema";
 import type {
 	AppliedGameEffectOperation,
@@ -23,13 +24,13 @@ export namespace readEffectiveProducerProductLine {
 		ignoredProducerJobIds?: ReadonlySet<string>;
 		nowMs?: number;
 		producerItemInstanceId: string;
-		product: GameConfig["products"][string];
+		product: GameProducerLineDefinition;
 		productId: string;
 		save: GameSave;
 	}
 }
 
-type ProducerProductLineOutput = NonNullable<GameConfig["products"][string]["output"]>[number];
+type ProducerProductLineOutput = NonNullable<GameProducerLineDefinition["output"]>[number];
 type NonWeightedProducerProductLineOutput = Exclude<
 	ProducerProductLineOutput,
 	{
@@ -791,7 +792,7 @@ const readEffectiveOutputEntries = ({
 }: {
 	config: GameConfig;
 	grantIds: ReadonlySet<string>;
-	output: NonNullable<GameConfig["products"][string]["output"]>;
+	output: NonNullable<GameProducerLineDefinition["output"]>;
 	producerItemInstanceId: string;
 	productId: string;
 	productVisible: boolean;

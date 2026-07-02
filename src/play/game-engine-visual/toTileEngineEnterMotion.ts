@@ -12,13 +12,11 @@ export const toTileEngineEnterMotion = (
 	options: toTileEngineEnterMotion.Options = {},
 ): TileEnterMotionSchema.Type => ({
 	kind:
-		motion.effect === "merge"
-			? "merge-in"
-			: motion.effect === "replace"
-				? "replace-in"
-				: options.fromTileId
-					? "spawn-from-tile"
-					: "fade-in",
+		motion.effect === "merge" || motion.effect === "replace" || motion.effect === "stage-update"
+			? "flip-in"
+			: options.fromTileId
+				? "spawn-from-tile"
+				: "fade-in",
 	delayMs: motion.delayMs,
 	durationMs: motion.durationMs,
 	fromTileId: options.fromTileId,

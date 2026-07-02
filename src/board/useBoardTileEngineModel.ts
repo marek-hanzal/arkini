@@ -94,8 +94,9 @@ export const useBoardTileEngineModel = ({
 				...transientTiles.map((tile) => ({
 					id: tile.id,
 					slotId: tile.slotId,
-					renderKey: `static-item:${tile.id}:${tile.slotId}:${tile.itemId}`,
+					renderKey: `static-item:${tile.id}:${tile.slotId}:${tile.itemId}:${tile.assetProgress ?? "none"}`,
 					data: {
+						assetProgress: tile.assetProgress,
 						kind: "static-item" as const,
 						itemId: tile.itemId,
 					},

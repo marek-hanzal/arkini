@@ -4,6 +4,7 @@ export const TileEnterMotionSchema = z.object({
 	kind: z
 		.enum([
 			"fade-in",
+			"flip-in",
 			"merge-in",
 			"pop-in",
 			"replace-in",

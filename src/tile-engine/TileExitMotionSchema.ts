@@ -3,6 +3,7 @@ import { z } from "zod";
 export const TileExitMotionSchema = z.object({
 	kind: z
 		.enum([
+			"flip-out",
 			"fly-to-tile",
 			"merge-out",
 			"replace-out",

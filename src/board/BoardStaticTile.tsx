@@ -5,11 +5,12 @@ import type { ItemId } from "~/config/GameIdSchema";
 
 export namespace BoardStaticTile {
 	export interface Props {
+		assetProgress?: number;
 		itemId: ItemId;
 	}
 }
 
-export const BoardStaticTile = memo(({ itemId }: BoardStaticTile.Props) => {
+export const BoardStaticTile = memo(({ assetProgress, itemId }: BoardStaticTile.Props) => {
 	const item = useGameItemView(itemId);
 
 	if (!item) return null;
@@ -17,6 +18,7 @@ export const BoardStaticTile = memo(({ itemId }: BoardStaticTile.Props) => {
 	return (
 		<div className="h-full w-full">
 			<GameItemView
+				assetProgress={assetProgress}
 				item={item}
 				variant="board"
 			/>

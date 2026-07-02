@@ -16,6 +16,7 @@ export namespace BoardSurface {
 				boardItemId: string;
 		  }
 		| {
+				assetProgress?: number;
 				kind: "static-item";
 				itemId: ItemId;
 		  };

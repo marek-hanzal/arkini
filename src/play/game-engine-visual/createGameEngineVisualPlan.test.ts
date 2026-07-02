@@ -7,6 +7,31 @@ import { createGameEngineVisualPlan } from "~/play/game-engine-visual/createGame
 const boardView = (items: Parameters<typeof rebuildBoardView>[0]) => rebuildBoardView(items);
 
 const emptyInventory = () => rebuildInventoryView([]);
+const craftProgress = (inputProgress: number) => ({
+	acceptedInputItemIds: [
+		"item:water",
+	],
+	canAcceptInputs: true,
+	complete: false,
+	delivered: {
+		"item:water": inputProgress > 0 ? 1 : 0,
+	},
+	durationMs: 1000,
+	effectBlockReasons: [],
+	id: "recipe:test",
+	inputProgress,
+	inputs: [
+		{
+			itemId: "item:water",
+			quantity: 2,
+		},
+	],
+	phase: "collecting_inputs" as const,
+	progress: inputProgress,
+	resultItemId: "item:tree",
+	startRequirementsReady: true,
+	timeProgress: 0,
+});
 
 describe("createGameEngineVisualPlan", () => {
 	it("maps board item creation directly from domain events to sequenced board enter motion", () => {
@@ -134,14 +159,14 @@ describe("createGameEngineVisualPlan", () => {
 
 		expect(plan.boardTransientTilePlans).toHaveLength(2);
 		expect(plan.boardTransientTilePlans.map((entry) => entry.request.exit?.kind)).toEqual([
-			"merge-out",
-			"merge-out",
+			"flip-out",
+			"flip-out",
 		]);
 		expect(plan.boardEnterRequests).toHaveLength(1);
 		expect(plan.boardEnterRequests[0]).toMatchObject({
 			enter: {
 				groupId: "engine:merge:source:target",
-				kind: "merge-in",
+				kind: "flip-in",
 			},
 			tileId: "target",
 		});
@@ -189,7 +214,7 @@ describe("createGameEngineVisualPlan", () => {
 			request: {
 				exit: {
 					groupId: "engine:craft-result:target",
-					kind: "replace-out",
+					kind: "flip-out",
 				},
 			},
 			tile: {
@@ -200,7 +225,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardEnterRequests[0]).toMatchObject({
 			enter: {
 				groupId: "engine:craft-result:target",
-				kind: "replace-in",
+				kind: "flip-in",
 			},
 			tileId: "target",
 		});
@@ -266,6 +291,70 @@ describe("createGameEngineVisualPlan", () => {
 				kind: "bounce",
 			},
 			tileId: "producer",
+		});
+	});
+
+	it("maps craft input storage to a flip stage update instead of plain bounce feedback", () => {
+		const previousBoard = boardView([
+			{
+				craft: craftProgress(0),
+				id: "blueprint",
+				itemId: "item:blueprint-tree",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+		const currentBoard = boardView([
+			{
+				craft: craftProgress(0.5),
+				id: "blueprint",
+				itemId: "item:blueprint-tree",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard,
+			currentInventory: undefined,
+			events: [
+				{
+					atMs: 123,
+					itemId: "item:water",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					recipeId: "recipe:test",
+					targetItemInstanceId: "blueprint",
+					type: "craft_input.stored",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(0);
+		expect(plan.boardTransientTilePlans).toHaveLength(1);
+		expect(plan.boardTransientTilePlans[0]).toMatchObject({
+			request: {
+				exit: {
+					groupId: "engine:craft-stage:blueprint:item:water:123",
+					kind: "flip-out",
+				},
+			},
+			tile: {
+				assetProgress: 0,
+				itemId: "item:blueprint-tree",
+				slotId: "1:0",
+			},
+		});
+		expect(plan.boardEnterRequests[0]).toMatchObject({
+			enter: {
+				groupId: "engine:craft-stage:blueprint:item:water:123",
+				kind: "flip-in",
+			},
+			tileId: "blueprint",
 		});
 	});
 

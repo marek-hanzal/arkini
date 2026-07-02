@@ -13,8 +13,10 @@ export const toTileEngineExitMotion = (
 ): TileExitMotionSchema.Type => ({
 	kind: options.toTileId
 		? "fly-to-tile"
-		: motion.effect === "replace"
-			? "replace-out"
+		: motion.effect === "merge" ||
+				motion.effect === "replace" ||
+				motion.effect === "stage-update"
+			? "flip-out"
 			: "merge-out",
 	delayMs: motion.delayMs,
 	durationMs: motion.durationMs,

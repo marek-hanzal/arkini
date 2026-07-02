@@ -4,44 +4,43 @@ import { appendBoardTargetTransformVisuals } from "~/play/game-engine-visual/app
 import { GameVisualMotion } from "~/play/game-engine-visual/GameVisualMotion";
 import type { GameEngineVisualPlanDraft } from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
 
-type ReplacedEvent = Extract<
+type CraftInputStoredEvent = Extract<
 	GameEvent,
 	{
-		type: "item.replaced";
+		type: "craft_input.stored";
 	}
 >;
 
-export namespace appendItemReplaceVisuals {
+export namespace appendCraftStageUpdateVisuals {
 	export interface Props {
 		currentBoard: BoardView | undefined;
 		previousBoard: BoardView | undefined;
-		event: ReplacedEvent;
 		plan: GameEngineVisualPlanDraft;
+		target: CraftInputStoredEvent;
 	}
 }
 
-export const appendItemReplaceVisuals = ({
+export const appendCraftStageUpdateVisuals = ({
 	currentBoard,
 	previousBoard,
-	event,
 	plan,
-}: appendItemReplaceVisuals.Props) => {
-	if (event.reason !== "craft-result") return;
-
-	const previousTarget = previousBoard?.byId[event.itemInstanceId];
-	const currentTarget = currentBoard?.byId[event.itemInstanceId];
+	target,
+}: appendCraftStageUpdateVisuals.Props) => {
+	const previousTarget = previousBoard?.byId[target.targetItemInstanceId];
+	const currentTarget = currentBoard?.byId[target.targetItemInstanceId];
 	if (!previousTarget || !currentTarget) return;
 
-	const motion = GameVisualMotion.replace({
+	const motion = GameVisualMotion.stageUpdate({
 		cause: "craft",
-		groupId: `engine:${event.reason}:${event.itemInstanceId}`,
+		groupId: `engine:craft-stage:${target.targetItemInstanceId}:${target.itemId}:${target.atMs}`,
 	});
 
 	appendBoardTargetTransformVisuals({
+		assetProgress: previousTarget.craft?.inputProgress,
 		currentTarget,
 		motion,
 		plan,
 		previousTarget,
-		transientId: `transient:replace-out:${motion.groupId}:target:${previousTarget.id}`,
+		transientId: `transient:craft-stage:${motion.groupId}:target:${previousTarget.id}`,
 	});
 };

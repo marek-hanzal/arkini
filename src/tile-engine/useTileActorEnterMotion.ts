@@ -67,34 +67,52 @@ export const useTileActorEnterMotion = ({
 							"translate3d(0px, 0px, 0px) scale(1)",
 						],
 					}
-				: kind === "fade-in" || kind === "replace-in"
+				: kind === "flip-in"
 					? {
 							opacity: [
 								0,
+								0.72,
 								1,
 							],
+							filter: [
+								"brightness(1.18) drop-shadow(0 10px 18px rgb(255 255 255 / 0.18))",
+								"brightness(1.32) drop-shadow(0 18px 24px rgb(168 85 247 / 0.36))",
+								"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+							],
+							transform: [
+								"perspective(640px) translate3d(0px, 5px, 0px) rotateY(-86deg) scale(0.82)",
+								"perspective(640px) translate3d(0px, -12px, 0px) rotateY(-22deg) scale(1.18)",
+								"perspective(640px) translate3d(0px, 0px, 0px) rotateY(0deg) scale(1)",
+							],
 						}
-					: kind === "merge-in"
+					: kind === "fade-in" || kind === "replace-in"
 						? {
 								opacity: [
 									0,
 									1,
 								],
-								transform: [
-									"translate3d(0px, 0px, 0px) scale(0.9)",
-									"translate3d(0px, 0px, 0px) scale(1)",
-								],
 							}
-						: {
-								opacity: [
-									0,
-									1,
-								],
-								transform: [
-									"translate3d(0px, 8px, 0px) scale(0.88)",
-									"translate3d(0px, 0px, 0px) scale(1)",
-								],
-							};
+						: kind === "merge-in"
+							? {
+									opacity: [
+										0,
+										1,
+									],
+									transform: [
+										"translate3d(0px, 0px, 0px) scale(0.9)",
+										"translate3d(0px, 0px, 0px) scale(1)",
+									],
+								}
+							: {
+									opacity: [
+										0,
+										1,
+									],
+									transform: [
+										"translate3d(0px, 8px, 0px) scale(0.88)",
+										"translate3d(0px, 0px, 0px) scale(1)",
+									],
+								};
 
 		const scope = tilePresenceMotionScope(tileId);
 		const token = createTilePresenceMotionToken({
@@ -113,6 +131,7 @@ export const useTileActorEnterMotion = ({
 		}).then((result) => {
 			clearPresenceMotion();
 			if (result.status !== "completed") return;
+			visualElement.style.filter = "";
 			visualElement.style.opacity = "";
 			visualElement.style.transform = "";
 		});

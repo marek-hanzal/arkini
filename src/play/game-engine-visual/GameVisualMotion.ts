@@ -2,10 +2,11 @@ const gameVisualSequenceDelayMs = 200;
 const gameVisualFadeDurationMs = 420;
 const gameVisualMergeDurationMs = 390;
 const gameVisualReplaceDurationMs = 420;
+const gameVisualStageUpdateDurationMs = 520;
 
 type GameVisualMotionCause = "activation" | "craft" | "inventory" | "merge" | "producer" | "stash";
 
-type GameVisualMotionEffect = "fade-in" | "merge" | "replace";
+type GameVisualMotionEffect = "fade-in" | "merge" | "replace" | "stage-update";
 
 export interface GameVisualMotion {
 	cause: GameVisualMotionCause;
@@ -48,6 +49,16 @@ export const GameVisualMotion = {
 		cause,
 		durationMs,
 		effect: "replace",
+		groupId,
+	}),
+	stageUpdate: ({
+		cause,
+		durationMs = gameVisualStageUpdateDurationMs,
+		groupId,
+	}: GameVisualMotion.BaseProps): GameVisualMotion => ({
+		cause,
+		durationMs,
+		effect: "stage-update",
 		groupId,
 	}),
 	sequenceFadeIn: ({

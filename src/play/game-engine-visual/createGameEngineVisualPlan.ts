@@ -6,13 +6,51 @@ import { appendItemMergeVisuals } from "~/play/game-engine-visual/appendItemMerg
 import { appendItemReplaceVisuals } from "~/play/game-engine-visual/appendItemReplaceVisuals";
 import { appendActivationInputStoreVisuals } from "~/play/game-engine-visual/appendActivationInputStoreVisuals";
 import { appendActivationInputTargetFeedback } from "~/play/game-engine-visual/appendActivationInputTargetFeedback";
+import { appendCraftStageUpdateVisuals } from "~/play/game-engine-visual/appendCraftStageUpdateVisuals";
 import { appendLineCompletedFeedback } from "~/play/game-engine-visual/appendLineCompletedFeedback";
 import { appendProducerDepletedRetainedTile } from "~/play/game-engine-visual/appendProducerDepletedRetainedTile";
 import type { GameEngineVisualPlan } from "~/play/game-engine-visual/GameEngineVisualPlan";
-import { createGameEngineVisualPlanDraft } from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
+import {
+	createGameEngineVisualPlanDraft,
+	type GameEngineVisualPlanDraft,
+} from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { findMergeResultEventIndex } from "~/play/game-engine-visual/findMergeResultEventIndex";
 import { findActivationInputTargetEventIndex } from "~/play/game-engine-visual/findActivationInputTargetEventIndex";
 import { shouldAnimateActivationInputStoreVisual } from "~/play/game-engine-visual/shouldAnimateActivationInputStoreVisual";
+
+type ActivationInputStoredEvent = Extract<
+	GameEvent,
+	{
+		type: "producer_input.stored" | "craft_input.stored";
+	}
+>;
+
+const appendActivationInputTargetVisuals = ({
+	currentBoard,
+	plan,
+	previousBoard,
+	target,
+}: {
+	currentBoard: BoardView | undefined;
+	plan: GameEngineVisualPlanDraft;
+	previousBoard: BoardView | undefined;
+	target: ActivationInputStoredEvent;
+}) => {
+	if (target.type === "craft_input.stored") {
+		appendCraftStageUpdateVisuals({
+			currentBoard,
+			plan,
+			previousBoard,
+			target,
+		});
+		return;
+	}
+
+	appendActivationInputTargetFeedback({
+		plan,
+		target,
+	});
+};
 
 export namespace createGameEngineVisualPlan {
 	export interface Props {
@@ -93,8 +131,10 @@ export const createGameEngineVisualPlan = ({
 						target?.type === "craft_input.stored"
 					) {
 						skipped.add(targetIndex);
-						appendActivationInputTargetFeedback({
+						appendActivationInputTargetVisuals({
+							currentBoard,
 							plan,
+							previousBoard,
 							target,
 						});
 
@@ -130,8 +170,10 @@ export const createGameEngineVisualPlan = ({
 
 			case "producer_input.stored":
 			case "craft_input.stored":
-				appendActivationInputTargetFeedback({
+				appendActivationInputTargetVisuals({
+					currentBoard,
 					plan,
+					previousBoard,
 					target: event,
 				});
 				break;

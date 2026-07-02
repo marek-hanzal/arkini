@@ -3,10 +3,14 @@ import { applyGameActionFx } from "~/engine/applyGameActionFx";
 import { createInitialGameSaveFx } from "~/save/createInitialGameSaveFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { TestRandomService } from "~/engine/test/TestRandomService";
+import type { RandomService } from "~/random/context/RandomService";
 import { withRandomService } from "~/random/logic/withRandomService";
 
 export const runAction = (props: applyGameActionFx.Props) =>
 	Effect.runSync(applyGameActionFx(props).pipe(withRandomService(TestRandomService)));
+
+export const runActionWithRandom = (props: applyGameActionFx.Props, random: RandomService) =>
+	Effect.runSync(applyGameActionFx(props).pipe(withRandomService(random)));
 
 export const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));

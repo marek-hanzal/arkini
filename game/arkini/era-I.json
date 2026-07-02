@@ -261,7 +261,7 @@
 			"tier": 3
 		},
 		"item:seed": {
-			"description": "Tiny forest seed dropped by watering a mature micro-forest. Water it to grow a sapling.",
+			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Water it to grow a sapling.",
 			"maxStackSize": 50,
 			"name": "Seed",
 			"tags": [
@@ -402,9 +402,10 @@
 				{
 					"output": [
 						{
+							"type": "chance",
 							"itemId": "item:seed",
 							"quantity": 1,
-							"type": "guaranteed"
+							"chance": 0.35
 						}
 					],
 					"targetMode": "keep",

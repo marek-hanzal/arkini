@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
-import { resolveExecutableItemMergeRule } from "~/engine/logic/resolveExecutableItemMergeRule";
+import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMerge } from "~/action/GameActionItemMerge";

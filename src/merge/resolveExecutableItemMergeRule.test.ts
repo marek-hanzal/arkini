@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createEngineMergeTestConfig } from "~/engine/test/createEngineMergeTestConfig";
-import { resolveExecutableItemMergeRule } from "~/engine/logic/resolveExecutableItemMergeRule";
+import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 
 const config = createEngineMergeTestConfig();
 

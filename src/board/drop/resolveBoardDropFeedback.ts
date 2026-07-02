@@ -6,7 +6,7 @@ import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
-import { resolveDropIntent } from "~/merge/resolveDropIntent";
+import { resolveDropIntent } from "~/play/interaction/resolveDropIntent";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
 import type { TileEngine } from "~/tile-engine/TileEngine.types";

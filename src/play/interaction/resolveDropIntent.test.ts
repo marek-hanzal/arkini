@@ -3,7 +3,7 @@ import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { LineView } from "~/board/view/LineViewSchema";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { createEngineMergeTestConfig } from "~/engine/test/createEngineMergeTestConfig";
-import { resolveDropIntent } from "~/merge/resolveDropIntent";
+import { resolveDropIntent } from "~/play/interaction/resolveDropIntent";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 const config = createEngineTestConfig();

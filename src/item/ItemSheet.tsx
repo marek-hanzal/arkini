@@ -1,6 +1,6 @@
 import { type FC, useMemo } from "react";
 import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
-import { useProducerClock } from "~/producer/hook/useProducerClock";
+import { useBoardItemClock } from "~/board/useBoardItemClock";
 import { toGameActionError } from "~/play/action/toGameActionError";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 import { useGameAction } from "~/play/runtime/useGameAction";
@@ -30,7 +30,7 @@ export const ItemSheet: FC<ItemSheet.Props> = ({ boardItemId, onClose }) => {
 			boardItem,
 		],
 	);
-	const nowMs = useProducerClock(clockItems);
+	const nowMs = useBoardItemClock(clockItems);
 	const liveBoardItem = readLiveBoardItemView({
 		boardItem,
 		nowMs,

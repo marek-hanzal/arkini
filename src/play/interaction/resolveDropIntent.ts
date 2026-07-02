@@ -53,7 +53,7 @@ export const resolveDropIntent = ({
 				type: "merge",
 			},
 			(plan) => ({
-				resultItemId: plan.resultItemId as ItemId | undefined,
+				resultItemId: plan.resultItemId,
 				type: "merge" as const,
 			}),
 		)

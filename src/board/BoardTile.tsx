@@ -5,7 +5,7 @@ import { readBoardTileStatus } from "~/board/logic/readBoardTileStatus";
 import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
 import { GameItemView } from "~/item/ui/GameItemView";
 import { cn } from "~/ui/cn";
-import { useProducerClock } from "~/producer/hook/useProducerClock";
+import { useBoardItemClock } from "~/board/useBoardItemClock";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/producer/logic/readProducerBoardProgress";
 import { useGameBoardItem, useGameItemView } from "~/play/runtime/useGameRuntimeViews";
@@ -29,7 +29,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			boardItem,
 		],
 	);
-	const nowMs = useProducerClock(clockItems);
+	const nowMs = useBoardItemClock(clockItems);
 	const item = useGameItemView(boardItem?.itemId);
 	const liveBoardItem = readLiveBoardItemView({
 		boardItem,

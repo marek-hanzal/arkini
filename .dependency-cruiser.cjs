@@ -15,15 +15,15 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "domain-fx-no-react-imports",
+		name: "domain-no-react-imports",
 		comment:
-			"Domain Fx roots are durable use-cases. React belongs in action/query hooks and components, not in Effect/persistence roots.",
+			"Core gameplay domains are durable state/Effect logic. React belongs in app, UI, play, board/inventory surfaces and TileEngine adapters, not in producer/craft/runtime rules.",
 		severity: "error",
 		from: {
-			path: "^src/(?:activation|board|craft|inventory|item|producer)/fx(?:/|$)",
+			path: "^src/(?:action|activation|cheat|config|craft|effects|engine|event|job|limit|loot|merge|placement|producer|quantity|random|remove|save|selector|stash|storage|world)(?:/|$)",
 		},
 		to: {
-			path: "^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
+			path: "^node_modules/(?:react|react-dom)(?:/|$)",
 		},
 	},
 	{
@@ -32,7 +32,7 @@ const boundaryRules = [
 			"Gameplay domains are pure state/Effect logic. UI, Play runtime and TileEngine depend on them, never the other way around.",
 		severity: "error",
 		from: {
-			path: "^src/(?:action|activation|cheat|config|craft|effects|engine|event|job|limit|loot|placement|quantity|remove|save|selector|stash|storage|world)(?:/|$)",
+			path: "^src/(?:action|activation|cheat|config|craft|effects|engine|event|job|limit|loot|merge|placement|producer|quantity|random|remove|save|selector|stash|storage|world)(?:/|$)",
 		},
 		to: {
 			path: [

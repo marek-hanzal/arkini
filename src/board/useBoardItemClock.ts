@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { useLiveNowMs } from "~/time/useLiveNowMs";
 
-export function useProducerClock(items: readonly BoardViewItem[]) {
+export function useBoardItemClock(items: readonly BoardViewItem[]) {
 	const activeUntilMs = useMemo(
 		() =>
 			items.flatMap((item) => [

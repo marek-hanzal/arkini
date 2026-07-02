@@ -1,11 +1,11 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 
 export namespace readProducerJobEffectiveLineFx {
 	export interface Props {

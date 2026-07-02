@@ -4,9 +4,9 @@ import { ZodError } from "zod";
 import {
 	parseGameConfig,
 	parseGameConfigFragment,
-	type GameConfig,
 	type GameConfigFragment,
 } from "../../src/config/GameConfigSchema";
+import type { GameConfig } from "../../src/config/GameConfigTypes";
 import { doesResolvedDomainSelectorMatchId } from "../../src/selector/doesResolvedDomainSelectorMatchId";
 
 const collectionKeys = [

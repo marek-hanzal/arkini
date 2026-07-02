@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import {
 	readLineDefinition,
 	type GameProducerCapabilityDefinition,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 
 export namespace readProducerBoardItemFx {

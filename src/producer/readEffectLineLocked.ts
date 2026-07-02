@@ -1,7 +1,7 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readWorldActiveEffectFacts } from "~/world/readWorldActiveEffectFacts";
-import { readLineDefinitionFromConfig } from "~/config/readLineDefinition";
+import { readLineDefinitionFromConfig } from "~/config/GameItemCapabilities";
 
 export namespace readEffectLineLocked {
 	export interface Props {

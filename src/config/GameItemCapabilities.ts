@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 
 type GameItemDefinition = GameConfig["items"][string];
 export type GameProducerDefinition = NonNullable<GameItemDefinition["producer"]>;

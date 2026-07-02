@@ -4,7 +4,7 @@ import { readLineIdsByPriority } from "~/producer/readLineIdsByPriority";
 import { readVisibleLineIds } from "~/producer/readVisibleLineIds";
 import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionProducerInputStore } from "~/action/GameActionProducerInputStore";
 import { GameEngineError } from "~/engine/model/GameEngineError";

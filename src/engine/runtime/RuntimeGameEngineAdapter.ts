@@ -7,7 +7,7 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { syncRealtimeWorldJobsFx } from "~/world/syncRealtimeWorldJobsFx";
 import { validateWorldSnapshotFx } from "~/world/validateWorldSnapshotFx";
 import { hasProcessableWorldJobs } from "~/world/hasProcessableWorldJobs";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { defaultGameConfig } from "~/config/compiled/defaultGameConfig";
 import type { GameAction } from "~/action/GameActionSchema";
 import type { GameActionReadiness } from "~/action/GameActionReadinessSchema";

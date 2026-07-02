@@ -2,12 +2,9 @@ import { type FC, useMemo } from "react";
 import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { toGameActionError } from "~/play/action/toGameActionError";
-import {
-	useGameAction,
-	useGameBoardItem,
-	useGameItemCatalogView,
-	useGameRuntimeStore,
-} from "~/play/runtime";
+import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
+import { useGameAction } from "~/play/runtime/useGameAction";
+import { useGameBoardItem, useGameItemCatalogView } from "~/play/runtime/useGameRuntimeViews";
 import { ItemDetailSheet } from "~/item-detail/ItemDetailSheet";
 
 export namespace ItemSheet {

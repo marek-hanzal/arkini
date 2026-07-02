@@ -1,6 +1,6 @@
 import type { BoardCell } from "~/board/logic/BoardCell";
 import { readGameCheatEffectiveDurationMs } from "~/cheat/GameCheatSpeedMode";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type {

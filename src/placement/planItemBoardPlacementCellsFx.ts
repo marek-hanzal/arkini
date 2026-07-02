@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { BoardCell } from "~/board/logic/BoardCell";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 

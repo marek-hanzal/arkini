@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readProducerBoardItemFx } from "~/producer/readProducerBoardItemFx";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 
 export namespace readProducerRuntimeTargetFx {
 	export interface Props {

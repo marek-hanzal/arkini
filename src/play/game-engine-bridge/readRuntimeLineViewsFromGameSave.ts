@@ -1,5 +1,5 @@
 import type { LineView } from "~/board/view/LineViewSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 import { readEffectiveLine } from "~/effects/readEffectiveLine";
@@ -28,7 +28,7 @@ import { readRuntimeLineOutputViews } from "~/play/game-engine-bridge/readRuntim
 import {
 	readLineDefinition,
 	type GameProducerCapabilityDefinition,
-} from "~/config/readLineDefinition";
+} from "~/config/GameItemCapabilities";
 
 export namespace readRuntimeLineViewsFromGameSave {
 	export interface Props {

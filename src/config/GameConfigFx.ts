@@ -1,5 +1,5 @@
 import { Context } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 
 export interface GameConfigFxService {
 	config: GameConfig;

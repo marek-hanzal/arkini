@@ -1,6 +1,6 @@
 import type { ItemTargetLimit } from "~/limit/ItemTargetLimit";
 import { readBoardItemCount } from "~/board/logic/readBoardItemCount";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { readEffectiveLine } from "~/effects/readEffectiveLine";

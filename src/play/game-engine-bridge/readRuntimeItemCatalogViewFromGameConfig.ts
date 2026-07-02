@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { ItemId } from "~/config/GameIdSchema";
 import type { ViewItem, ViewItemAsset } from "~/item/view/ViewItemSchema";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";

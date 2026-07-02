@@ -3,7 +3,7 @@ import { checkProducerInputStoreReadinessFx } from "~/producer/checkProducerInpu
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionProducerInputStore } from "~/action/GameActionProducerInputStore";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";

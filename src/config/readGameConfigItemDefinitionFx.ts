@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 
 export namespace readGameConfigItemDefinitionFx {

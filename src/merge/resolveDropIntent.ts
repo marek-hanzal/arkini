@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { ItemId } from "~/config/GameIdSchema";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 

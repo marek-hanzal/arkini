@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { isGameSaveInventoryStack } from "~/inventory/logic/GameSaveInventorySlot";

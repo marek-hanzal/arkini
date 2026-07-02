@@ -1,5 +1,5 @@
 import { createBoardTileBounceFeedbackRequest } from "~/play/game-engine-visual/createBoardTileBounceFeedbackRequest";
-import { registerTileEngineMotionRequests } from "~/tile-engine";
+import { registerTileEngineMotionRequests } from "~/tile-engine/TileEngineMotionRequestStore";
 
 export namespace registerBoardTileBounceFeedback {
 	export interface Props {

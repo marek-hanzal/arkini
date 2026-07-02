@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
-import { readLineDefinition } from "~/config/readLineDefinition";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
+import { readLineDefinition } from "~/config/GameItemCapabilities";
 
 export namespace readWorldProducerJobSubjectFx {
 	export interface Props {

@@ -1,7 +1,7 @@
 import { isBoardViewItemRuntimeBusy } from "~/board/logic/isBoardViewItemRuntimeBusy";
 import { isBoardViewItemRuntimeStatePreserved } from "~/board/logic/isBoardViewItemRuntimeStatePreserved";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 

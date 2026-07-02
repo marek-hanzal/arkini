@@ -7,8 +7,8 @@ import { renderBoardTile } from "~/board/renderBoardTile";
 import { useBoardTileEngineModel } from "~/board/useBoardTileEngineModel";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import { TileEngine } from "~/tile-engine";
-import type { TileEngineNamespace as TileEngineType } from "~/tile-engine";
+import { TileEngine } from "~/tile-engine/TileEngine";
+import type { TileEngine as TileEngineType } from "~/tile-engine/TileEngine.types";
 
 const boardCellFeedbackVariants = [
 	"primary",

@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
-import { useGameItemView } from "~/play/runtime";
+import { useGameItemView } from "~/play/runtime/useGameRuntimeViews";
 import type { ItemId } from "~/config/GameIdSchema";
 
 export namespace InventoryTile {

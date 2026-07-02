@@ -1,3 +1,3 @@
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
 export const ignoreDrop = (): TileEngine.DropOutcome => "ignore";

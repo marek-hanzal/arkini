@@ -1,5 +1,5 @@
 import type { GameVisualMotion } from "~/play/game-engine-visual/GameVisualMotion";
-import type { TileEnterMotionSchema } from "~/tile-engine";
+import type { TileEnterMotionSchema } from "~/tile-engine/TileEnterMotionSchema";
 
 export namespace toTileEngineEnterMotion {
 	export interface Options {

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { processItemSpawnJobFx } from "~/job/processItemSpawnJobFx";
 import { readDueItemSpawnJobsFx } from "~/job/readDueItemSpawnJobsFx";

@@ -1,4 +1,4 @@
-import { wipeDefaultDexieGameSaveStorage } from "~/storage";
+import { wipeDefaultDexieGameSaveStorage } from "~/storage/DexieGameSaveStorage";
 
 type OpfsStorageManager = StorageManager & {
 	getDirectory?: () => Promise<{

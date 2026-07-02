@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/producer/readProducerRuntimeTargetFx";
 import { readVisibleLineIds } from "~/producer/readVisibleLineIds";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionLineSetDefault } from "~/action/GameActionLineSetDefault";
 import { GameEngineError } from "~/engine/model/GameEngineError";

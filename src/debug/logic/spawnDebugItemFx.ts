@@ -10,7 +10,7 @@ import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInve
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameActionDebugItemSpawn } from "~/action/GameActionDebugItemSpawn";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

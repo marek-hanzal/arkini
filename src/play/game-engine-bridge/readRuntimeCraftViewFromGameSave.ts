@@ -1,5 +1,5 @@
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 import type { ItemId } from "~/config/GameIdSchema";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";

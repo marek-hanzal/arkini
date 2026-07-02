@@ -12,7 +12,7 @@ import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQ
 import { readProducerJobTimingFx } from "~/producer/readProducerJobTimingFx";
 import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";
 import type { GameActivationInput } from "~/activation/GameActivationInput";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionLineStart } from "~/action/GameActionLineStart";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

@@ -5,7 +5,10 @@ import {
 } from "~/board/animation/BoardTransientTileStore";
 import { applyGameEngineVisualPlan } from "~/play/game-engine-visual/applyGameEngineVisualPlan";
 import type { GameEngineVisualPlan } from "~/play/game-engine-visual/GameEngineVisualPlan";
-import { clearTileEngineMotionRequests, readTileEngineMotionRequests } from "~/tile-engine";
+import {
+	clearTileEngineMotionRequests,
+	readTileEngineMotionRequests,
+} from "~/tile-engine/TileEngineMotionRequestStore";
 
 afterEach(() => {
 	vi.useRealTimers();

@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdapter";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import { readBoardView } from "~/play/runtime/readers";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
 import {
 	readBoardTransientTiles,
 	upsertBoardTransientTiles,
 } from "~/board/animation/BoardTransientTileStore";
-import { readTileEngineMotionRequests, registerTileEngineMotionRequests } from "~/tile-engine";
+import {
+	readTileEngineMotionRequests,
+	registerTileEngineMotionRequests,
+} from "~/tile-engine/TileEngineMotionRequestStore";
 
 const createStore = async () => {
 	const config = createEngineTestConfig();

@@ -3,7 +3,7 @@ import { checkCraftTargetIdleFx } from "~/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputStore } from "~/action/GameActionCraftInputStore";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

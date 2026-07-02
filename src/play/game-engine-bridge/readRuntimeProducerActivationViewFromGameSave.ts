@@ -1,9 +1,9 @@
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readRuntimeLineViewsFromGameSave } from "~/play/game-engine-bridge/readRuntimeLineViewsFromGameSave";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 import { readProducerDeliveryBlocked } from "~/producer/readProducerDeliveryBlocked";
-import { readLineIds } from "~/config/readLineDefinition";
+import { readLineIds } from "~/config/GameItemCapabilities";
 
 export namespace readRuntimeProducerActivationViewFromGameSave {
 	export interface Props {

@@ -1,7 +1,7 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readGameConfigEffect } from "~/config/readGameConfigEffects";
-import { readLineDefinition } from "~/config/readLineDefinition";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
+import { readLineDefinition } from "~/config/GameItemCapabilities";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { isGameTimeWindowActive } from "~/time/GameTime";
 import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";

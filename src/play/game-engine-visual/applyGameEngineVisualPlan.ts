@@ -3,7 +3,7 @@ import {
 	removeBoardTransientTilesByGroup,
 	upsertBoardTransientTiles,
 } from "~/board/animation/BoardTransientTileStore";
-import { registerTileEngineMotionRequests } from "~/tile-engine";
+import { registerTileEngineMotionRequests } from "~/tile-engine/TileEngineMotionRequestStore";
 
 export namespace applyGameEngineVisualPlan {
 	export interface Props {

@@ -1,5 +1,5 @@
 import { type FC, useCallback, useState } from "react";
-import { createDefaultDexieGameSaveStorage } from "~/storage";
+import { createDefaultDexieGameSaveStorage } from "~/storage/DexieGameSaveStorage";
 import { SheetHeader } from "~/play/sheet/SheetHeader";
 import { UiButton } from "~/ui/UiButton";
 import { UiSection } from "~/ui/UiSection";

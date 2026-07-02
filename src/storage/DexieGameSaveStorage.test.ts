@@ -6,11 +6,11 @@ import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdap
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import {
 	activeGameSaveId,
-	DexieGameSaveStorage,
 	gameSaveStorageSchemaVersion,
-	hashRuntimeGameConfig,
 	type GameSaveStorageRecord,
-} from "~/storage";
+} from "~/storage/GameSaveStorage";
+import { DexieGameSaveStorage } from "~/storage/DexieGameSaveStorage";
+import { hashRuntimeGameConfig } from "~/storage/hashRuntimeGameConfig";
 
 const databaseNames = new Set<string>();
 

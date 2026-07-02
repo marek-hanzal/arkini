@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 import { rollGameQuantityFx } from "~/loot/rollGameQuantityFx";

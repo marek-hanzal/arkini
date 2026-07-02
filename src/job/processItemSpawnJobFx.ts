@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";

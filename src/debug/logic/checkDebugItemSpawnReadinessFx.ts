@@ -6,7 +6,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import type { GameActionDebugItemSpawn } from "~/action/GameActionDebugItemSpawn";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace checkDebugItemSpawnReadinessFx {

@@ -12,7 +12,7 @@ import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
 import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQuantitiesFx";
 import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionLineStart } from "~/action/GameActionLineStart";
 import { GameEngineError } from "~/engine/model/GameEngineError";

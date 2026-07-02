@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { checkBoardItemStashReadinessFx } from "~/stash/checkBoardItemStashReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { placeGameSaveInventoryInstanceFx } from "~/placement/placeGameSaveInventoryInstanceFx";

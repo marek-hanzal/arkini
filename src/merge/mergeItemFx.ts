@@ -4,7 +4,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMerge } from "~/action/GameActionItemMerge";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";

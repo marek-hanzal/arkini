@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { checkProducerInputWithdrawReadinessFx } from "~/producer/checkProducerInputWithdrawReadinessFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionProducerInputWithdraw } from "~/action/GameActionProducerInputWithdraw";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";

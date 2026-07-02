@@ -7,7 +7,7 @@ import { createGameJobIdFx } from "~/job/createGameJobIdFx";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { readCraftJobEffectiveTimingFx } from "~/craft/readCraftJobEffectiveTimingFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameActionCraftStart } from "~/action/GameActionCraftStart";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";

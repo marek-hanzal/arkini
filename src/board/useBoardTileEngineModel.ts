@@ -12,15 +12,13 @@ import type { DropTarget } from "~/play/drag/DropTarget";
 import { resolveDrop } from "~/play/drop/resolveDrop";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { registerBoardTileBounceFeedback } from "~/play/game-engine-visual/registerBoardTileBounceFeedback";
-import {
-	useGameBoardView,
-	useGameRuntimeDropActions,
-	useGameRuntimeSelector,
-	useGameRuntimeStore,
-} from "~/play/runtime";
-import { readBoardView, readInventoryView } from "~/play/runtime/readers";
+import { useGameRuntimeSelector, useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
+import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
+import { useGameBoardView } from "~/play/runtime/useGameRuntimeViews";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
 export namespace useBoardTileEngineModel {
 	export interface Props {
@@ -121,6 +119,25 @@ export const useBoardTileEngineModel = ({
 				.map(([key]) => key),
 		[
 			board.byCellKey,
+		],
+	);
+
+	const openBoardItemSheet = useCallback(
+		(boardItemId: string, expectedItemId: string) => {
+			const snapshot = runtimeStore.getSnapshot();
+			const liveBoardItem = readBoardView(snapshot, Date.now()).byId[boardItemId];
+			if (!liveBoardItem || liveBoardItem.itemId !== expectedItemId) return;
+
+			onOpenSheet(
+				readBoardItemSheet({
+					boardItemId: liveBoardItem.id,
+					itemId: liveBoardItem.itemId,
+				}),
+			);
+		},
+		[
+			onOpenSheet,
+			runtimeStore,
 		],
 	);
 
@@ -246,13 +263,7 @@ export const useBoardTileEngineModel = ({
 						boardItem,
 					},
 					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
-					onLongActivate: () =>
-						onOpenSheet(
-							readBoardItemSheet({
-								boardItemId: boardItem.id,
-								itemId: boardItem.itemId,
-							}),
-						),
+					onLongActivate: () => openBoardItemSheet(boardItem.id, boardItem.itemId),
 				};
 			},
 			slot(slot, targetTile) {
@@ -313,6 +324,7 @@ export const useBoardTileEngineModel = ({
 			activateBoardItem,
 			board,
 			feedback,
+			openBoardItemSheet,
 			runtimeStore,
 			onOpenSheet,
 		],

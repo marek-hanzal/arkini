@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { isGameTimeDue } from "~/time/GameTime";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";

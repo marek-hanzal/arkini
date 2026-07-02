@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/producer/readProducerRuntimeTargetFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionProducerInputWithdraw } from "~/action/GameActionProducerInputWithdraw";
 import { GameEngineError } from "~/engine/model/GameEngineError";

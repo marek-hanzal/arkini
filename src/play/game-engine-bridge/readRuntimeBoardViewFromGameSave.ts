@@ -1,10 +1,8 @@
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readRuntimeBoardItemViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeBoardItemViewFromGameSave";
-
-export { readRuntimeBoardItemViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeBoardItemViewFromGameSave";
 
 export namespace readRuntimeBoardViewFromGameSave {
 	export interface Props {

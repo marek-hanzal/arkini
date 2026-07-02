@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionTileRemove } from "~/action/GameActionTileRemove";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

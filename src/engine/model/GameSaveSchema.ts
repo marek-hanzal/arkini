@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { GameInstantMsSchema } from "~/time/GameTimeSchema";
-import { GameConfigSchema, type GameConfig } from "~/config/GameConfigSchema";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
+import { GameConfigSchema } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { readGameConfigEffect } from "~/config/readGameConfigEffects";
-import { readLineDefinition, readLineIds } from "~/config/readLineDefinition";
+import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import { readLineKind } from "~/producer/readLineKind";
 import { GameItemCreatedReasonSchema } from "~/event/GameEventSchema";
 

@@ -8,7 +8,7 @@ import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionTileRemove } from "~/action/GameActionTileRemove";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";

@@ -31,7 +31,6 @@ const BaseGameConfigSchema = z
 
 export const GameConfigSchema = BaseGameConfigSchema.superRefine(validateGameConfig);
 
-export type { GameConfig } from "~/config/GameConfigTypes";
 export type GameConfigFragment = z.infer<typeof GameConfigFragmentSchema>;
 
 export const parseGameConfigFragment = (value: unknown) => GameConfigFragmentSchema.parse(value);

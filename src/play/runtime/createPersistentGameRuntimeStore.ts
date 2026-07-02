@@ -1,14 +1,11 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { defaultGameConfig } from "~/config/compiled/defaultGameConfig";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdapter";
 import type { RandomService } from "~/random/context/RandomService";
-import {
-	createDefaultDexieGameSaveStorage,
-	hashRuntimeGameConfig,
-	type CloseableGameSaveStorage,
-	type GameSaveStorage,
-} from "~/storage";
+import { createDefaultDexieGameSaveStorage } from "~/storage/DexieGameSaveStorage";
+import type { CloseableGameSaveStorage, GameSaveStorage } from "~/storage/GameSaveStorage";
+import { hashRuntimeGameConfig } from "~/storage/hashRuntimeGameConfig";
 import { connectGameRuntimeSavePersistence } from "~/play/runtime/connectGameRuntimeSavePersistence";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 

@@ -1,7 +1,8 @@
 import { type FC, useEffect } from "react";
 import { applyGameEngineVisualPlan } from "~/play/game-engine-visual/applyGameEngineVisualPlan";
 import { createGameEngineVisualPlan } from "~/play/game-engine-visual/createGameEngineVisualPlan";
-import { readBoardView, readInventoryView } from "~/play/runtime/readers";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 
 export namespace GameRuntimeVisualEffects {

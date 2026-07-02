@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readWorldActiveEffectFacts } from "~/world/readWorldActiveEffectFacts";
 import { readWorldCraftJobFacts } from "~/world/readWorldCraftJobFacts";

@@ -3,7 +3,7 @@ import { checkCraftTargetIdleFx } from "~/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftStart } from "~/action/GameActionCraftStart";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 

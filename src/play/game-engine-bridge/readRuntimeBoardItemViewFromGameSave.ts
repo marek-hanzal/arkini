@@ -1,5 +1,5 @@
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { ItemId } from "~/config/GameIdSchema";
 import { readRuntimeActivationViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeActivationViewFromGameSave";

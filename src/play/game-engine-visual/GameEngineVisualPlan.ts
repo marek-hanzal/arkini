@@ -1,5 +1,5 @@
 import type { BoardTransientTile } from "~/board/animation/BoardTransientTile";
-import type { TileEngineMotionRequest } from "~/tile-engine";
+import type { TileEngineMotionRequest } from "~/tile-engine/TileEngineMotionRequest";
 
 interface GameEngineVisualTransientTilePlan {
 	cleanupDelayMs: number;

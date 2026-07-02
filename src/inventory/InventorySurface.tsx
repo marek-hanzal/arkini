@@ -6,8 +6,8 @@ import { useInventoryTileEngineModel } from "~/inventory/useInventoryTileEngineM
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
 import { SheetHeader } from "~/play/sheet/SheetHeader";
-import { TileEngine } from "~/tile-engine";
-import type { TileEngineNamespace as TileEngineType } from "~/tile-engine";
+import { TileEngine } from "~/tile-engine/TileEngine";
+import type { TileEngine as TileEngineType } from "~/tile-engine/TileEngine.types";
 
 export const InventorySurface = memo(
 	({ feedback, feedbackFlags, onClose, placementTarget }: InventorySurfaceType.Props) => {

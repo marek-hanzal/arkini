@@ -1,7 +1,7 @@
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 import { acceptDrop } from "~/play/drop/acceptDrop";
 import type { DropActions } from "~/play/drop/DropActions";
 import { ignoreDrop } from "~/play/drop/ignoreDrop";

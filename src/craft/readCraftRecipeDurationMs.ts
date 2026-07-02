@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { readGameCheatEffectiveDurationMs } from "~/cheat/GameCheatSpeedMode";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

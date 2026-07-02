@@ -1,5 +1,5 @@
 import type { GameEngineVisualPlan } from "~/play/game-engine-visual/GameEngineVisualPlan";
-import type { TileEngineMotionRequest } from "~/tile-engine";
+import type { TileEngineMotionRequest } from "~/tile-engine/TileEngineMotionRequest";
 
 export interface GameEngineVisualPlanDraft {
 	boardFeedbackRequests: TileEngineMotionRequest[];

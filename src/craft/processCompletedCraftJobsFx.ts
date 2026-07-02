@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { completeCraftJobFx } from "~/craft/completeCraftJobFx";
 import { readCompletedCraftJobsFx } from "~/craft/readCompletedCraftJobsFx";
 import { syncRealtimeCraftJobsFx } from "~/craft/syncRealtimeCraftJobsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { GameConfigFx } from "~/config/GameConfigFx";
 import { processWorldSnapshotFx } from "~/world/processWorldSnapshotFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 

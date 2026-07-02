@@ -1,7 +1,7 @@
 import { BoardStaticTile } from "~/board/BoardStaticTile";
 import { BoardTile } from "~/board/BoardTile";
 import type { BoardSurface } from "~/board/BoardSurface.types";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
 export const renderBoardTile = ({ tile }: TileEngine.RenderTileProps<BoardSurface.TileData>) => {
 	if (tile.data.kind === "static-item") {

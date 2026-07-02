@@ -1,5 +1,5 @@
-import type { TileEngineMotionRequest } from "~/tile-engine";
-import { TileEngineTiming } from "~/tile-engine";
+import type { TileEngineMotionRequest } from "~/tile-engine/TileEngineMotionRequest";
+import { TileEngineTiming } from "~/tile-engine/TileEngineTiming";
 
 export namespace createBoardTileBounceFeedbackRequest {
 	export interface Props {

@@ -1,4 +1,5 @@
-import { parseGameConfig, type GameConfig } from "~/config/GameConfigSchema";
+import { parseGameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEffect } from "~/config/readGameConfigEffects";
 import type {
 	GameCraftRecipeDefinition,

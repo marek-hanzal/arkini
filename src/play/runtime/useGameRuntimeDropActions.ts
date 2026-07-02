@@ -7,7 +7,8 @@ import { createGameActionFromItemToBoardItemInteractionPlan } from "~/play/inter
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 import type { GameRuntimeState, GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import { readBoardView, readInventoryView } from "~/play/runtime/readers";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
 
 const createFallbackMergeAction = ({
 	sourceRef,

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { completeProducerJobFx } from "~/producer/completeProducerJobFx";
 import { readCompletedProducerJobsFx } from "~/producer/readCompletedProducerJobsFx";
 import { syncRealtimeProducerJobsFx } from "~/producer/syncRealtimeProducerJobsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 

@@ -1,16 +1,19 @@
-# TileEngine public boundary
+# TileEngine boundary
 
-`src/tile-engine` is package-like generic interaction infrastructure. Code outside
-this directory must import from the public barrel only:
+`src/tile-engine` is package-like generic interaction infrastructure. It intentionally
+has no barrel/index file: consumers import the concrete API they use directly so ownership
+stays visible and harmless aliases do not grow into fake public surfaces.
 
 ```ts
-import { TileEngine } from "~/tile-engine";
-import type { TileEngineNamespace as TileEngineType } from "~/tile-engine";
+import { TileEngine } from "~/tile-engine/TileEngine";
+import type { TileEngine as TileEngineType } from "~/tile-engine/TileEngine.types";
 ```
 
-Do not deep-import files such as `TileEngine.types`, `TileEngineMotionRequestStore` or
-`TileEnterMotionSchema` from board, inventory or play code. Dependency Cruiser enforces
-this so future quick fixes have somewhere to bounce off, ideally before becoming folklore.
+Adapter code may also import narrow support APIs such as `TileEngineTiming`,
+`TileEngineMotionRequest`, or `TileEngineMotionRequestStore` directly. Internal hooks remain
+implementation details; do not reach into them from board, inventory, or play code unless the
+module is deliberately promoted into an explicit adapter API. Yes, this is slightly more typing.
+Somehow civilization will stagger onward.
 
 ## What TileEngine owns
 
@@ -36,15 +39,3 @@ TileEngine motion plans. Prefer a stable `TileEngine.Slot.dropId` over ad-hoc
 dynamic drop binding ids; the engine uses that id to scope hover feedback before rendering
 individual slots, so a drag-over transition only wakes the previous/current targets instead
 of politely asking every grid cell to participate in the drama.
-
-## Public exports
-
-The public barrel exports:
-
-- `TileEngine` component;
-- the `TileEngineNamespace` namespace type for slots, tiles, drag/drop configs and render props;
-- `TileEngineTiming` for adapter cleanup windows that must match engine presence timing;
-- motion request types and registry functions used by adapter code.
-
-Everything else in this directory is an implementation detail. Internal hooks and runtime
-files may be refactored freely as long as the public barrel contract stays intact.

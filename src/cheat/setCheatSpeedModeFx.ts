@@ -4,7 +4,7 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { isCheatSpeedItemId, readCheatSpeedItemIdFromMode } from "~/cheat/GameCheatSpeedItem";
 import { syncRealtimeWorldJobsFx } from "~/world/syncRealtimeWorldJobsFx";
 import type { GameActionCheatSpeedModeSet } from "~/action/GameActionCheatSpeedModeSet";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 

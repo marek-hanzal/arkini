@@ -1,6 +1,6 @@
 import { memo } from "react";
 import type { BoardCellView } from "~/board/boardCells";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 import { cn } from "~/ui/cn";
 
 export namespace BoardCell {

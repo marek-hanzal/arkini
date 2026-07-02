@@ -3,7 +3,7 @@ import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRunt
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/engine/logic/resolveExecutableItemMergeRule";
 import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMerge } from "~/action/GameActionItemMerge";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

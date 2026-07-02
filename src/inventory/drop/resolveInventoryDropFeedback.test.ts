@@ -5,7 +5,7 @@ import type { InventorySurface } from "~/inventory/InventorySurface.types";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
 const source = {
 	kind: "inventory",

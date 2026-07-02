@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";

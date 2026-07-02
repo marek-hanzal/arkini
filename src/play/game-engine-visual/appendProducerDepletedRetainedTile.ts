@@ -3,7 +3,7 @@ import type { BoardTransientTile } from "~/board/animation/BoardTransientTile";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameEngineVisualPlanDraft } from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
-import { TileEngineTiming } from "~/tile-engine";
+import { TileEngineTiming } from "~/tile-engine/TileEngineTiming";
 
 export namespace appendProducerDepletedRetainedTile {
 	export interface Props {

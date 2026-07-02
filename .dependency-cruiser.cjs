@@ -15,21 +15,6 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "tile-engine-public-api-only",
-		comment:
-			"Code outside TileEngine must import the public ~/tile-engine barrel instead of reaching into package internals.",
-		severity: "error",
-		from: {
-			path: "^src/(?!tile-engine(?:/|$)).+",
-		},
-		to: {
-			path: "^src/tile-engine/.+",
-			pathNot: [
-				"^src/tile-engine/index\\.ts$",
-			],
-		},
-	},
-	{
 		name: "domain-fx-no-react-imports",
 		comment:
 			"Domain Fx roots are durable use-cases. React belongs in action/query hooks and components, not in Effect/persistence roots.",
@@ -54,6 +39,18 @@ const boundaryRules = [
 				"^src/(?:item|play|tile-engine|ui)(?:/|$)",
 				"^node_modules/(?:@tanstack/react-query|react|react-dom)(?:/|$)",
 			],
+		},
+	},
+	{
+		name: "no-local-index-barrel-imports",
+		comment:
+			"Import concrete modules directly. Barrel/index files hide ownership and are not a domain boundary.",
+		severity: "error",
+		from: {
+			path: "^src(?:/|$)",
+		},
+		to: {
+			path: "^src/.+/index\\.ts$",
 		},
 	},
 	{

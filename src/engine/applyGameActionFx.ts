@@ -20,7 +20,7 @@ import { withdrawProducerInputFx } from "~/producer/withdrawProducerInputFx";
 import { startLineFx } from "~/producer/startLineFx";
 import { matchGameAction } from "~/engine/logic/matchGameAction";
 import { processWorldSnapshotFx } from "~/world/processWorldSnapshotFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

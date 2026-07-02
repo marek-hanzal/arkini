@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/producer/producerDeliveryTiming";
@@ -8,7 +8,7 @@ import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
-import { readProducerCapabilityDefinition } from "~/config/readProducerCapabilityDefinition";
+import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import { readLineDefinition } from "~/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/producer/readProducerRemainingCharges";
 import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";

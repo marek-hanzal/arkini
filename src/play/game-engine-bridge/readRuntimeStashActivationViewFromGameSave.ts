@@ -1,5 +1,5 @@
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";

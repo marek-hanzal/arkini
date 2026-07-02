@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { syncRealtimeCraftJobsFx } from "~/craft/syncRealtimeCraftJobsFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { syncRealtimeProducerJobsFx } from "~/producer/syncRealtimeProducerJobsFx";

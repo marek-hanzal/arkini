@@ -2,12 +2,10 @@ import { describe, expect, it } from "vitest";
 import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdapter";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
-import {
-	readBoardFirstEmptyCell,
-	readBoardItem,
-	readBoardView,
-	readInventorySlot,
-} from "~/play/runtime/readers";
+import { readBoardFirstEmptyCell } from "~/play/runtime/readers/readBoardFirstEmptyCell";
+import { readBoardItem } from "~/play/runtime/readers/readBoardItem";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readInventorySlot } from "~/play/runtime/readers/readInventorySlot";
 
 const createRuntimeState = async (): Promise<GameRuntimeState> => {
 	const adapter = await RuntimeGameEngineAdapter.create({

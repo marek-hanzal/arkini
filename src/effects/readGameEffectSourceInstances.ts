@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEffect } from "~/config/readGameConfigEffects";
 import type { GameSave, GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 import type { GameEffectSourceInstance } from "~/effects/GameEffectSourceInstance";

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { checkInventorySlotsSwapReadinessFx } from "~/inventory/logic/checkInventorySlotsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";

@@ -1,7 +1,7 @@
 import type { ItemTargetLimit } from "~/limit/ItemTargetLimit";
 import { mergeItemTargetLimits } from "~/limit/mergeItemTargetLimits";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readOutputTargetLimits } from "~/limit/readOutputTargetLimits";
 

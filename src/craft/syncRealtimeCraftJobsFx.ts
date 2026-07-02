@@ -5,7 +5,7 @@ import {
 	readGamePausableJobRemainingMsAtPause,
 	readGamePausableJobResumedTiming,
 } from "~/job/GamePausableJobTiming";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { GameEngineError } from "~/engine/model/GameEngineError";

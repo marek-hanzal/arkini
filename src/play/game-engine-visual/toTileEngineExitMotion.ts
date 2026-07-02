@@ -1,5 +1,5 @@
 import type { GameVisualMotion } from "~/play/game-engine-visual/GameVisualMotion";
-import type { TileExitMotionSchema } from "~/tile-engine";
+import type { TileExitMotionSchema } from "~/tile-engine/TileExitMotionSchema";
 
 export namespace toTileEngineExitMotion {
 	export interface Options {

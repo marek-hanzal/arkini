@@ -2,7 +2,7 @@ import { match, P } from "ts-pattern";
 import { isBoardViewItemRuntimeBusy } from "~/board/logic/isBoardViewItemRuntimeBusy";
 import { isBoardViewItemRuntimeStatePreserved } from "~/board/logic/isBoardViewItemRuntimeStatePreserved";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { resolveExecutableItemMergeRule } from "~/engine/logic/resolveExecutableItemMergeRule";
 import type { ItemId } from "~/config/GameIdSchema";
 import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";

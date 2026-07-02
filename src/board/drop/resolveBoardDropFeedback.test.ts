@@ -8,7 +8,7 @@ import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 import { resolveBoardDropFeedback } from "./resolveBoardDropFeedback";
 
 const boardItem = (props: Pick<BoardViewItem, "id" | "itemId" | "x" | "y">): BoardViewItem => ({

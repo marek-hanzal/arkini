@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { checkCraftTargetIdleFx } from "~/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputWithdraw } from "~/action/GameActionCraftInputWithdraw";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

@@ -10,7 +10,7 @@ import { BottomSheet } from "~/play/sheet/BottomSheet";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 import { useFeedbackFlags } from "~/play/feedback/useFeedbackFlags";
 import { toGameActionError } from "~/play/action/toGameActionError";
-import { GameRuntimeProvider } from "~/play/runtime";
+import { GameRuntimeProvider } from "~/play/runtime/GameRuntimeContext";
 
 const PlayShellContent: FC = () => {
 	const feedbackFlags = useFeedbackFlags();

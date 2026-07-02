@@ -5,7 +5,7 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { readDefaultEffectLineId } from "~/producer/readDefaultEffectLineId";
 import { readDefaultLineId } from "~/producer/readDefaultLineId";
 import { readLineKind } from "~/producer/readLineKind";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionLineSetDefault } from "~/action/GameActionLineSetDefault";

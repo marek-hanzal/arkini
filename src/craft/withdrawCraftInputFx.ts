@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { checkCraftInputWithdrawReadinessFx } from "~/craft/checkCraftInputWithdrawReadinessFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputWithdraw } from "~/action/GameActionCraftInputWithdraw";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";

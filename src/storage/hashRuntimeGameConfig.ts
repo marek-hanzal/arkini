@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { sha256 } from "~/hash/logic/sha256";
 
 const normalizeRuntimeGameConfig = (config: GameConfig) =>

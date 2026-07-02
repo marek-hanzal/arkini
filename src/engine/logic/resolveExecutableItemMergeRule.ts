@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameMergeRuleDefinition } from "~/config/GameItemCapabilities";
 import { readItemMergeRules } from "~/config/GameItemCapabilities";
 import type { ItemId } from "~/config/GameIdSchema";

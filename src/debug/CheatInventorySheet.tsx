@@ -4,7 +4,8 @@ import { GameItemView } from "~/item/ui/GameItemView";
 import type { ViewItem } from "~/item/view/ViewItemSchema";
 import { toGameActionError } from "~/play/action/toGameActionError";
 import { SheetHeader } from "~/play/sheet/SheetHeader";
-import { useGameAction, useGameItemCatalogView } from "~/play/runtime";
+import { useGameAction } from "~/play/runtime/useGameAction";
+import { useGameItemCatalogView } from "~/play/runtime/useGameRuntimeViews";
 import { cn } from "~/ui/cn";
 
 export namespace CheatInventorySheet {

@@ -8,7 +8,7 @@ import { cn } from "~/ui/cn";
 import { useProducerClock } from "~/producer/hook/useProducerClock";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/producer/logic/readProducerBoardProgress";
-import { useGameBoardItem, useGameItemView } from "~/play/runtime";
+import { useGameBoardItem, useGameItemView } from "~/play/runtime/useGameRuntimeViews";
 
 export namespace BoardTile {
 	export interface Props {

@@ -6,14 +6,13 @@ import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
 import { resolveDrop } from "~/play/drop/resolveDrop";
 import type { Feedback } from "~/play/feedback/Feedback";
-import {
-	useGameInventoryView,
-	useGameRuntimeDropActions,
-	useGameRuntimeSelector,
-	useGameRuntimeStore,
-} from "~/play/runtime";
-import { readBoardFirstEmptyCell, readBoardView, readInventoryView } from "~/play/runtime/readers";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import { useGameRuntimeSelector, useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
+import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
+import { useGameInventoryView } from "~/play/runtime/useGameRuntimeViews";
+import { readBoardFirstEmptyCell } from "~/play/runtime/readers/readBoardFirstEmptyCell";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
 export namespace useInventoryTileEngineModel {
 	export interface Props {

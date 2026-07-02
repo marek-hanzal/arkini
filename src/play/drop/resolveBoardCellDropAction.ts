@@ -1,11 +1,11 @@
 import { cellKey } from "~/board/cellKey";
 import { isInventoryBoardItemId } from "~/board/BoardUtilityItem";
 import type { BoardView } from "~/board/view/BoardViewSchema";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import type { TileEngineNamespace as TileEngine } from "~/tile-engine";
+import type { TileEngine } from "~/tile-engine/TileEngine.types";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import { readBoardItemInventoryStorageReadiness } from "~/play/drop/readBoardItemInventoryStorageReadiness";
 

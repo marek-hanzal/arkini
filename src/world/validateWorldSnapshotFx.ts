@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readWorldSnapshotFactsFx } from "~/world/readWorldSnapshotFactsFx";
 import type { WorldCheckIssue } from "~/world/WorldCheckIssue";

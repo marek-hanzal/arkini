@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { processCompletedCraftJobsFx } from "~/craft/processCompletedCraftJobsFx";
 import { processExpiredActiveEffectsFx } from "~/effects/processExpiredActiveEffectsFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

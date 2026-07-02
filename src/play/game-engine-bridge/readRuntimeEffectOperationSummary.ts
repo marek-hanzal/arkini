@@ -1,4 +1,4 @@
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { readGameConfigEffect } from "~/config/readGameConfigEffects";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 

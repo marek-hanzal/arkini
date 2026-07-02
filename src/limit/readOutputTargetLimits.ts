@@ -1,5 +1,5 @@
 import type { ItemTargetLimit } from "~/limit/ItemTargetLimit";
-import type { GameConfig } from "~/config/GameConfigSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readItemTargetLimits } from "~/limit/readItemTargetLimits";

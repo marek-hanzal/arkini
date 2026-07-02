@@ -1,4 +1,4 @@
-import type { GameConfig } from "../../src/config/GameConfigSchema";
+import type { GameConfig } from "../../src/config/GameConfigTypes";
 import type { GameLineDefinition } from "../../src/config/GameItemCapabilities";
 
 export type GameConfigAuditWarning = {

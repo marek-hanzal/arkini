@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createEngineCraftTableTestConfig } from "~/engine/test/createEngineCraftTableTestConfig";
 import { GameSaveConfigSchema } from "~/engine/model/GameSaveSchema";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { runGameTickFx } from "~/engine/runGameTickFx";
@@ -2870,7 +2869,6 @@ describe("applyGameActionFx Producer", () => {
 	});
 
 	it("queues product jobs for the same producer instead of running them in parallel", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
 				"item:producer": {

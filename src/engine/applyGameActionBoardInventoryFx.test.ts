@@ -111,7 +111,6 @@ describe("applyGameActionFx BoardInventory", () => {
 	});
 
 	it("swaps a board producer with a running producer job", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			startingState: {
 				board: [

@@ -23,16 +23,7 @@ export namespace useTilePointerUp {
 		clearLongTimer(): void;
 		handleTap(event: Pick<ReactPointerEvent<HTMLDivElement>, "clientX" | "clientY">): void;
 		animateBack(): Promise<boolean>;
-		animateToTarget(
-			targetRect: TileEngine.Rect | null,
-			meta?: {
-				motionId?: string;
-				animation?: TileEngine.DropAnimation;
-				role?: "source" | "target";
-				fromSlotId?: string;
-				toSlotId?: string;
-			},
-		): Promise<boolean>;
+		animateToTarget(targetRect: TileEngine.Rect | null): Promise<boolean>;
 		resolveDrop(rect: TileEngine.Rect): TileEngineDrop.Resolved<TSlot, TTile, TDrop> | null;
 		finishDrag(): void;
 		setActiveDropId(dropId: string | null): void;
@@ -105,10 +96,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					if (kind === "accept" && animation === "parallel-merge") {
 						if (
 							await runTileDropCommit({
-								motionId,
-								animation,
 								commit,
-								immediate: true,
 							})
 						) {
 							return;
@@ -138,8 +126,6 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						setHandoffs(motion.handoffs);
 						if (
 							await runTileDropCommit({
-								motionId,
-								animation,
 								commit,
 							})
 						) {

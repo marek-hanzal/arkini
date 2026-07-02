@@ -47,7 +47,7 @@ export const useTilePointerDown = <TTile, TDrag>({
 
 			clearTimers();
 			setHandoff(null);
-			cancelTileMotion(tileMotionScope(tileRef.current.id), "pointer-down");
+			cancelTileMotion(tileMotionScope(tileRef.current.id));
 			resetElementTransform(element);
 			element.setPointerCapture(event.pointerId);
 

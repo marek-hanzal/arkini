@@ -19,7 +19,6 @@ export namespace checkItemMergeReadinessFx {
 
 export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(function* ({
 	config,
-	nowMs,
 	save,
 	action,
 }: checkItemMergeReadinessFx.Props) {

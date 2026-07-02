@@ -5,7 +5,6 @@ import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefin
 import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
 import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import {
 	isGameSaveInventoryInstance,

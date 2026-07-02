@@ -207,7 +207,6 @@ describe("runtime invariants", () => {
 	});
 
 	it("allows already queued producer jobs behind a paused previous job", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
 				"item:producer": {
@@ -245,7 +244,6 @@ describe("runtime invariants", () => {
 	});
 
 	it("rejects stale queued producer timing behind blocked delivery", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
 				"item:producer": {
@@ -296,7 +294,6 @@ describe("runtime invariants", () => {
 		);
 	});
 	it("rejects blocked delivery on a non-head producer queue job", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
 				"item:producer": {

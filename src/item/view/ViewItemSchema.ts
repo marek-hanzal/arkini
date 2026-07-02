@@ -36,7 +36,7 @@ const ViewItemAssetSchema = z.object({
 		.optional(),
 });
 
-export const ViewItemSchema = z.object({
+const ViewItemSchema = z.object({
 	id: GameItemIdSchema,
 	name: z.string(),
 	description: z.string(),
@@ -52,11 +52,6 @@ export const ViewItemSchema = z.object({
 	generatedEffects: z.array(ViewItemGeneratedEffectSchema),
 });
 
-type ViewItemSchema = typeof ViewItemSchema;
-export namespace ViewItemSchema {
-	export type Type = z.infer<ViewItemSchema>;
-}
-
 export type ViewItemAsset = z.infer<typeof ViewItemAssetSchema>;
 export type ViewItemGeneratedEffect = z.infer<typeof ViewItemGeneratedEffectSchema>;
-export type ViewItem = ViewItemSchema.Type;
+export type ViewItem = z.infer<typeof ViewItemSchema>;

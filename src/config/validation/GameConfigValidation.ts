@@ -1476,30 +1476,6 @@ const collectMergeBlueprintDependencies = ({
 	}
 };
 
-const readOutputBlueprintItemIds = (
-	output: z.infer<typeof ActivationOutputSchema>,
-	blueprintItemIds: ReadonlySet<string>,
-) => {
-	const outputBlueprintItemIds = new Set<string>();
-
-	for (const outputEntry of output) {
-		if (outputEntry.type === "weighted") {
-			for (const entry of outputEntry.entries) {
-				if (blueprintItemIds.has(entry.itemId)) {
-					outputBlueprintItemIds.add(entry.itemId);
-				}
-			}
-			continue;
-		}
-
-		if (blueprintItemIds.has(outputEntry.itemId)) {
-			outputBlueprintItemIds.add(outputEntry.itemId);
-		}
-	}
-
-	return outputBlueprintItemIds;
-};
-
 type GameConfigRuntimeEffect =
 	| z.infer<typeof GameLineEffectSchema>
 	| z.infer<typeof GameDropEffectSchema>;

@@ -71,12 +71,6 @@ export const useTileActorFeedbackMotion = ({
 				((durationMs ?? TileEngineTiming.feedbackDurationSeconds * 1000) * pulseCount) /
 				1000,
 			ease: TileEngineTiming.moveEase,
-			meta: {
-				feedbackKind: kind,
-				groupId,
-				kind: "feedback",
-				tileId,
-			},
 		}).then((result) => {
 			if (result.status !== "completed") return;
 			element.style.filter = "";
@@ -84,7 +78,7 @@ export const useTileActorFeedbackMotion = ({
 		});
 
 		return () => {
-			cancelTileMotion(scope, "feedback-cleanup");
+			cancelTileMotion(scope);
 		};
 	}, [
 		actorRef,

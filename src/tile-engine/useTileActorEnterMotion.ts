@@ -110,14 +110,6 @@ export const useTileActorEnterMotion = ({
 			delay: delayMs / 1000,
 			duration: (durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
-			meta: {
-				kind: "enter",
-				enterKind: kind,
-				fromTileId,
-				groupId,
-				sequenceIndex,
-				tileId,
-			},
 		}).then((result) => {
 			clearPresenceMotion();
 			if (result.status !== "completed") return;
@@ -126,7 +118,7 @@ export const useTileActorEnterMotion = ({
 		});
 
 		return () => {
-			cancelTileMotion(scope, "presence-enter-cleanup");
+			cancelTileMotion(scope);
 			clearPresenceMotion();
 		};
 	}, [

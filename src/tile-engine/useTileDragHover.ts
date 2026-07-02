@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useRef } from "react";
+import { type RefObject, useCallback } from "react";
 import { dragSessionRect } from "~/tile-engine/dragSessionRect";
 import { rectFromElement } from "~/tile-engine/rect";
 import type { TileEngineActor } from "~/tile-engine/TileEngineActor.types";
@@ -24,9 +24,6 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 	setActiveDropId,
 	setActiveDropFeedback,
 }: useTileDragHover.Props<TTile, TSlot, TDrag, TDrop>) => {
-	const lastDropIdRef = useRef<string | null>(null);
-	const lastFeedbackKeyRef = useRef<string | null>(null);
-
 	return useCallback(() => {
 		const session = dragSessionRef.current;
 		if (!session || !session.started) return null;
@@ -54,22 +51,6 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 						...feedback,
 					}
 				: null;
-		const sourceElement = actorRef.current;
-		const sourceTileId = sourceElement?.dataset.akTileEngineTileId;
-		const sourceSlotId = sourceElement?.dataset.akTileEngineSlotId;
-		const feedbackKey = activeFeedback
-			? `${session.pointerId}:${activeFeedback.dropId}:${activeFeedback.targetTileId ?? ""}:${activeFeedback.effect}:${activeFeedback.variant ?? ""}`
-			: `${session.pointerId}:${nextDropId ?? "none"}:none`;
-
-		if (lastDropIdRef.current !== nextDropId) {
-			lastDropIdRef.current = nextDropId;
-		}
-
-		if (lastFeedbackKeyRef.current !== feedbackKey) {
-			const previousFeedbackKey = lastFeedbackKeyRef.current;
-			lastFeedbackKeyRef.current = feedbackKey;
-		}
-
 		setActiveDropId(nextDropId);
 		setActiveDropFeedback(activeFeedback);
 		dragRef.current?.onDragOver?.(context);

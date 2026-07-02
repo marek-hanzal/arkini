@@ -143,7 +143,6 @@ describe("GameSaveConfigSchema", () => {
 	});
 
 	it("rejects overlapping producer queue jobs for the same producer", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			producerOverrides: {
 				"item:producer": {

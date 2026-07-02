@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { planActivationInputRefsFx } from "~/activation/planActivationInputRefsFx";

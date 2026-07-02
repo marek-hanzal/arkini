@@ -8,7 +8,7 @@
 		"dev": "vite dev",
 		"build": "vite build --logLevel warn && cp public/.nojekyll dist/.nojekyll",
 		"serve": "vite preview",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
 		"dc": "depcruise src --output-type err-long",
 		"test": "vitest run --no-color",
 		"check": "npm run format:check && npm run game:validate -- game/arkini && npm run dc && npm run typecheck && npm run test",

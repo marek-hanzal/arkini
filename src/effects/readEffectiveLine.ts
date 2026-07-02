@@ -37,13 +37,6 @@ type NonWeightedLineOutput = Exclude<
 		type: "weighted";
 	}
 >;
-type WeightedLineOutput = Extract<
-	LineOutput,
-	{
-		type: "weighted";
-	}
->;
-type WeightedLineEntry = WeightedLineOutput["entries"][number];
 type DropEffect = NonNullable<NonWeightedLineOutput["effects"]>[number];
 
 type DropEvaluation = {

@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readCraftRecipeDurationMs } from "~/craft/readCraftRecipeDurationMs";
@@ -17,7 +16,6 @@ export const readCraftJobEffectiveTimingFx = Effect.fn("readCraftJobEffectiveTim
 	recipe,
 	save,
 	startAtMs,
-	targetItemInstanceId,
 }: readCraftJobEffectiveTimingFx.Props) {
 	const durationMs = readCraftRecipeDurationMs({
 		recipe,

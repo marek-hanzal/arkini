@@ -444,7 +444,6 @@ describe("runGameTickFx", () => {
 	});
 
 	it("reschedules queued producer work from a late blocked-delivery release", () => {
-		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
 				id: "game:test",

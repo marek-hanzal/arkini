@@ -31,7 +31,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	const itemFlow = createItemFlowIndex();
 
 	collectItemUsage(config, usage, itemFlow);
-	collectEffectUsage(config, usage, itemFlow);
+	collectEffectUsage(config, usage);
 	collectStartingStateUsage(config, itemFlow);
 	collectUsedAssetDependencyUsage(config, usage);
 	collectAssetResourceUsage(config, usage);
@@ -196,18 +196,13 @@ const doesResolvedSelectorMatchId = (
 	return true;
 };
 
-const collectEffectUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
+const collectEffectUsage = (config: GameConfig, usage: UsageIndex) => {
 	for (const item of Object.values(config.items)) {
 		for (const line of item.producer?.lines ?? []) {
-			collectActivationOutputEffectUsage(line.output ?? [], config, usage, itemFlow);
+			collectActivationOutputEffectUsage(line.output ?? [], config, usage);
 		}
 		if (item.stash?.line) {
-			collectActivationOutputEffectUsage(
-				item.stash.line.output ?? [],
-				config,
-				usage,
-				itemFlow,
-			);
+			collectActivationOutputEffectUsage(item.stash.line.output ?? [], config, usage);
 		}
 		if (item.craft) collectLineEffectUsage(item.craft.effects ?? [], config, usage);
 	}
@@ -217,7 +212,6 @@ const collectActivationOutputEffectUsage = (
 	output: ActivationOutput,
 	config: GameConfig,
 	usage: UsageIndex,
-	itemFlow: ItemFlowIndex,
 ) => {
 	for (const entry of output) {
 		if (entry.type === "weighted") {

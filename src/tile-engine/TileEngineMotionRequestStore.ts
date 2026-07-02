@@ -169,46 +169,6 @@ export const registerTileEngineMotionRequests = ({
 	}
 };
 
-const clearTileEngineMotionRequestsByGroup = ({
-	engineId,
-	groupId,
-}: {
-	engineId: string;
-	groupId: string;
-}) => {
-	const current = motionsByEngineId.get(engineId);
-	if (!current) return;
-
-	const motions = new Map(current);
-	let changed = false;
-	for (const [tileId, motion] of current) {
-		const next = {
-			...motion,
-			enter: motion.enter?.groupId === groupId ? undefined : motion.enter,
-			exit: motion.exit?.groupId === groupId ? undefined : motion.exit,
-			feedback: motion.feedback?.groupId === groupId ? undefined : motion.feedback,
-		};
-
-		if (
-			next.enter === motion.enter &&
-			next.exit === motion.exit &&
-			next.feedback === motion.feedback
-		)
-			continue;
-
-		changed = true;
-		if (isEmptyMotion(next)) {
-			motions.delete(tileId);
-		} else {
-			motions.set(tileId, next);
-		}
-	}
-
-	if (!changed) return;
-
-	storeEngineMotionMap(engineId, motions);
-};
-
 export const clearTileEngineMotionRequests = () => {
 	if (motionsByEngineId.size === 0) return;
 

@@ -160,7 +160,7 @@ Use the full local gate before committing non-trivial work:
 npm run check
 ```
 
-This runs `format:check`, dependency-cruiser boundaries, TypeScript, and Vitest. Run `npm run build` separately for the production bundle. `npm run dc` can be run alone when changing imports or architecture boundaries. `npm run test` runs the focused Vitest suite.
+This runs `format:check`, dependency-cruiser boundaries, TypeScript with unused locals/parameters rejected, and Vitest. Run `npm run build` separately for the production bundle. `npm run dc` can be run alone when changing imports or architecture boundaries. `npm run typecheck` is intentionally stricter than plain `tsc --noEmit` because dead locals are where little lies go to breed. `npm run test` runs the focused Vitest suite.
 
 Optional code hygiene passes live outside the hard check gate:
 

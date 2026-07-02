@@ -38,10 +38,6 @@ export const animateElementToRect = async ({
 		to: (snapshot) => translate3d(snapshot.translateX + delta.x, snapshot.translateY + delta.y),
 		duration: TileEngineTiming.snapDurationSeconds,
 		ease: TileEngineTiming.moveEase,
-		meta: {
-			kind: "peer-snap",
-			...meta,
-		},
 	});
 
 	if (result.status !== "completed") return false;

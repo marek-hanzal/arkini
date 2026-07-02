@@ -58,7 +58,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 	useEffect(() => {
 		const element = actorRef.current;
 		return () => {
-			cancelTileMotionForElement(element, "actor-unmount");
+			cancelTileMotionForElement(element);
 		};
 	}, []);
 	useTileActorEnterMotion({

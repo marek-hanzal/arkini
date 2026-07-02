@@ -33,7 +33,7 @@ export const useTileActorLayoutMotion = <TTile>({
 		if (!element) return;
 
 		if (consumeHandoff(tile.id, tile.slotId)) {
-			cancelTileMotion(tileMotionScope(tile.id), "handoff");
+			cancelTileMotion(tileMotionScope(tile.id));
 			resetElementTransform(element);
 			previousRectRef.current = rectFromElement(element);
 			previousSlotIdRef.current = tile.slotId;
@@ -59,12 +59,6 @@ export const useTileActorLayoutMotion = <TTile>({
 			to: translate3d(0, 0),
 			duration: TileEngineTiming.moveDurationSeconds,
 			ease: TileEngineTiming.moveEase,
-			meta: {
-				kind: "layout",
-				tileId: tile.id,
-				fromSlotId: previousSlotId,
-				toSlotId: tile.slotId,
-			},
 		}).then((result) => {
 			if (result.status !== "completed") return;
 		});

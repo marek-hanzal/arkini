@@ -1,4 +1,3 @@
-import { Effect } from "effect";
 import { applyGameActionFx } from "~/engine/applyGameActionFx";
 import { createInitialGameSaveFx } from "~/save/createInitialGameSaveFx";
 import { readActionReadinessFx } from "~/engine/readActionReadinessFx";

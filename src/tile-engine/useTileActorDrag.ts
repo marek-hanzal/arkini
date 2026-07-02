@@ -1,6 +1,5 @@
 import { type Dispatch, type RefObject, type SetStateAction } from "react";
 import type { TileEngineActor } from "~/tile-engine/TileEngineActor.types";
-import type { TileEngineDrop } from "~/tile-engine/TileEngineDrop.types";
 import type { TileEngine } from "~/tile-engine/TileEngine.types";
 import { useTileDragHover } from "~/tile-engine/useTileDragHover";
 import { useTileDragLifecycle } from "~/tile-engine/useTileDragLifecycle";

@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
-import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";

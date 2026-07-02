@@ -99,20 +99,13 @@ export const useTileActorExitMotion = ({
 			delay: delayMs / 1000,
 			duration: (durationMs ?? TileEngineTiming.presenceDurationSeconds * 1000) / 1000,
 			ease: TileEngineTiming.moveEase,
-			meta: {
-				kind: "exit",
-				exitKind: kind,
-				groupId,
-				tileId,
-				toTileId,
-			},
 		}).then((result) => {
 			clearPresenceMotion();
 			if (result.status !== "completed") return;
 		});
 
 		return () => {
-			cancelTileMotion(scope, "presence-exit-cleanup");
+			cancelTileMotion(scope);
 			clearPresenceMotion();
 		};
 	}, [

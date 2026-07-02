@@ -14,16 +14,7 @@ export namespace runTileDropMotion {
 		resolved: TileEngineDrop.Resolved<TSlot, TTile, TDrop>;
 		motionId: string;
 		animation: TileEngine.DropAnimation | undefined;
-		animateToTarget(
-			targetRect: TileEngine.Rect | null,
-			meta?: {
-				motionId?: string;
-				animation?: TileEngine.DropAnimation;
-				role?: "source" | "target";
-				fromSlotId?: string;
-				toSlotId?: string;
-			},
-		): Promise<boolean>;
+		animateToTarget(targetRect: TileEngine.Rect | null): Promise<boolean>;
 	}
 
 	export interface Result {
@@ -50,13 +41,7 @@ export const runTileDropMotion = async <TTile, TSlot, TDrag, TDrop>({
 			: null;
 
 	const [sourceMotionCompleted, targetMotionCompleted] = await Promise.all([
-		animateToTarget(rectFromElement(resolved.element), {
-			motionId,
-			animation,
-			role: "source",
-			fromSlotId: sourceTile.slotId,
-			toSlotId: resolved.slot?.id,
-		}),
+		animateToTarget(rectFromElement(resolved.element)),
 		targetActorElement
 			? animateElementToRect({
 					element: targetActorElement,

@@ -15,7 +15,6 @@ const collectionKeys = [
 	"items",
 ] as const;
 
-type CollectionKey = (typeof collectionKeys)[number];
 type MergedGameConfig = Omit<GameConfig, "game" | "startingState"> &
 	Partial<Pick<GameConfig, "game" | "startingState">>;
 type FileSource = {

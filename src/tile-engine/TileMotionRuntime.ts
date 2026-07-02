@@ -23,7 +23,6 @@ namespace TileMotionRuntime {
 		readonly delay?: number;
 		readonly duration: number;
 		readonly ease: readonly number[];
-		readonly meta?: Record<string, unknown>;
 	}
 
 	export interface StartTransformProps {
@@ -33,7 +32,6 @@ namespace TileMotionRuntime {
 		readonly to: string | ((snapshot: TileVisualSnapshot.Type) => string);
 		readonly duration: number;
 		readonly ease: readonly number[];
-		readonly meta?: Record<string, unknown>;
 	}
 
 	export interface MotionControl {
@@ -221,10 +219,7 @@ const commitElementVisualState = (
 	return snapshot;
 };
 
-export const cancelTileMotion = (
-	scope: string,
-	reason = "cancelled",
-): TileVisualSnapshot.Type | null => {
+export const cancelTileMotion = (scope: string): TileVisualSnapshot.Type | null => {
 	const active = activeMotions.get(scope);
 	if (!active) return null;
 
@@ -246,9 +241,8 @@ export const startTileStyleMotion = ({
 	delay = 0,
 	duration,
 	ease,
-	meta = {},
 }: TileMotionRuntime.StartStyleProps): Promise<TileMotionRuntime.Result> => {
-	cancelTileMotion(scope, "replaced");
+	cancelTileMotion(scope);
 	const snapshot = readTileVisualSnapshot(element);
 	const resolvedKeyframes = resolveKeyframes(keyframes, snapshot);
 	const motionId = createMotionId(scope);
@@ -305,7 +299,6 @@ export const startTileTransformMotion = ({
 	to,
 	duration,
 	ease,
-	meta = {},
 }: TileMotionRuntime.StartTransformProps): Promise<TileMotionRuntime.Result> =>
 	startTileStyleMotion({
 		scope,
@@ -318,14 +311,13 @@ export const startTileTransformMotion = ({
 		}),
 		duration,
 		ease,
-		meta,
 	});
 
-export const cancelTileMotionForElement = (element: HTMLElement | null, reason = "cancelled") => {
+export const cancelTileMotionForElement = (element: HTMLElement | null) => {
 	if (!element) return;
 
 	for (const [scope, active] of activeMotions) {
 		if (active.element !== element && !element.contains(active.element)) continue;
-		cancelTileMotion(scope, reason);
+		cancelTileMotion(scope);
 	}
 };

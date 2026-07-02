@@ -16,17 +16,9 @@ export namespace useTileActorMotion {
 		consumeHandoff(tileId: string, slotId: string): boolean;
 	}
 
-	export interface MotionMeta {
-		motionId?: string;
-		animation?: TileEngine.DropAnimation;
-		role?: "source" | "target";
-		fromSlotId?: string;
-		toSlotId?: string;
-	}
-
 	export interface Result {
 		animateBack(): Promise<boolean>;
-		animateToTarget(targetRect: TileEngine.Rect | null, meta?: MotionMeta): Promise<boolean>;
+		animateToTarget(targetRect: TileEngine.Rect | null): Promise<boolean>;
 	}
 }
 
@@ -56,11 +48,6 @@ export const useTileActorMotion = <TTile, TDrag>({
 			to: translate3d(0, 0),
 			duration: TileEngineTiming.rejectDurationSeconds,
 			ease: TileEngineTiming.rejectEase,
-			meta: {
-				kind: "reject",
-				tileId: tile.id,
-				slotId: tile.slotId,
-			},
 		});
 		if (result.status !== "completed") return false;
 
@@ -73,7 +60,7 @@ export const useTileActorMotion = <TTile, TDrag>({
 	]);
 
 	const animateToTarget = useCallback(
-		async (targetRect: TileEngine.Rect | null, meta: useTileActorMotion.MotionMeta = {}) => {
+		async (targetRect: TileEngine.Rect | null) => {
 			const session = dragSessionRef.current;
 			const element = actorRef.current;
 			if (!session || !element || !targetRect) return false;
@@ -90,11 +77,6 @@ export const useTileActorMotion = <TTile, TDrag>({
 				to: translate3d(target.x, target.y),
 				duration: TileEngineTiming.snapDurationSeconds,
 				ease: TileEngineTiming.moveEase,
-				meta: {
-					kind: "snap",
-					...meta,
-					tileId: tile.id,
-				},
 			});
 			session.currentX = result.snapshot.translateX;
 			session.currentY = result.snapshot.translateY;

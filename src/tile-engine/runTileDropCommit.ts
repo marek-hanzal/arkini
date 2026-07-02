@@ -1,11 +1,6 @@
-import type { TileEngine } from "~/tile-engine/TileEngine.types";
-
 export namespace runTileDropCommit {
 	export interface Props {
-		motionId: string;
-		animation: TileEngine.DropAnimation | undefined;
 		commit: (() => Promise<unknown> | unknown) | undefined;
-		immediate?: boolean;
 	}
 }
 

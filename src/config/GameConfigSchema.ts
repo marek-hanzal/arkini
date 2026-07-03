@@ -7,8 +7,9 @@ import { ItemFragmentSchema, ItemSchema } from "~/config/schema/GameItemSchema";
 import { ResourceSchema } from "~/config/schema/GameResourceSchema";
 import { StartingStateSchema } from "~/config/schema/GameStartingStateSchema";
 
-const GameConfigFragmentSchema = z
+export const GameConfigAuthoringSchema = z
 	.object({
+		$schema: z.string().min(1).optional(),
 		version: z.literal(1).optional(),
 		game: GameMetaSchema.optional(),
 		resources: z.record(IdSchema, ResourceSchema).optional(),
@@ -17,6 +18,8 @@ const GameConfigFragmentSchema = z
 		startingState: StartingStateSchema.optional(),
 	})
 	.strict();
+
+const GameConfigFragmentSchema = GameConfigAuthoringSchema;
 
 const BaseGameConfigSchema = z
 	.object({

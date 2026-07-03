@@ -1,4 +1,5 @@
 {
+	"$schema": "../arkini.schema.json",
 	"items": {
 		"item:beer": {
 			"description": "A single mug of beer served by taverns.",

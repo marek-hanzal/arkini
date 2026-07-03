@@ -1,4 +1,5 @@
 {
+	"$schema": "../arkini.schema.json",
 	"items": {
 		"item:clay-deposit": {
 			"description": "Movable clay source used by nearby clay pits.",

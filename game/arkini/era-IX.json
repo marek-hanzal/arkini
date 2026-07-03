@@ -1,4 +1,5 @@
 {
+	"$schema": "../arkini.schema.json",
 	"items": {
 		"item:aquamarine": {
 			"description": "A polished cyan gemstone reserved for late-game treasure economy.",

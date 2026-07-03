@@ -916,7 +916,11 @@ const findFiles = async (root: string, extension: string): Promise<string[]> => 
 				return findFiles(entryPath, extension);
 			}
 
-			if (entry.isFile() && entry.name.endsWith(extension)) {
+			if (
+				entry.isFile() &&
+				entry.name.endsWith(extension) &&
+				!entry.name.endsWith(".schema.json")
+			) {
 				return [
 					entryPath,
 				];

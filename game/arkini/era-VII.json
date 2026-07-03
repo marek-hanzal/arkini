@@ -1,4 +1,5 @@
 {
+	"$schema": "../arkini.schema.json",
 	"items": {
 		"item:advanced-knowledge": {
 			"description": "Advanced civic and technical knowledge produced by academies and used to unlock prospecting, mining, and later industrial plans.",

@@ -1,4 +1,5 @@
 {
+	"$schema": "../arkini.schema.json",
 	"items": {
 		"item:blueprint-dye-workshop-t1": {
 			"craft": {

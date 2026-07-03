@@ -1,4 +1,5 @@
 {
+	"$schema": "../arkini.schema.json",
 	"items": {
 		"item:blueprint-bio-waste-processor-t2": {
 			"craft": {

@@ -107,6 +107,58 @@ const createTempSourcePackage = async (value: unknown) => {
 };
 
 describe("game package compiler", () => {
+	it("ignores JSON Schema files alongside source fragments", async () => {
+		const sourceDir = await createTempSourcePackage({
+			$schema: "./arkini.schema.json",
+			version: 1,
+			game: {
+				id: "game:test",
+				title: "Test",
+				board: {
+					height: 1,
+					width: 1,
+				},
+				inventory: {
+					slots: 1,
+				},
+			},
+			resources: {
+				"item-test": {
+					data: "item-resource",
+				},
+			},
+			items: {
+				"item:test": {
+					description: "Test item",
+					name: "Test item",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:test",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		await writeFile(
+			join(sourceDir, "arkini.schema.json"),
+			JSON.stringify({
+				$schema: "https://json-schema.org/draft/2020-12/schema",
+				type: "not-a-game-config-fragment",
+			}),
+		);
+
+		const config = await validateSources([
+			sourceDir,
+		]);
+
+		expect(config.items["item:test"]?.name).toBe("Test item");
+	});
+
 	it("writes a binary arkpack and does not require split compiled artifacts", async () => {
 		const sourceDir = await createTempSourcePackage({
 			version: 1,

@@ -165,6 +165,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardEnterRequests).toHaveLength(1);
 		expect(plan.boardEnterRequests[0]).toMatchObject({
 			enter: {
+				durationMs: 1000,
 				groupId: "engine:merge:source:target",
 				kind: "flip-in",
 			},
@@ -213,6 +214,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardTransientTilePlans[0]).toMatchObject({
 			request: {
 				exit: {
+					durationMs: 1000,
 					groupId: "engine:craft-result:target",
 					kind: "flip-out",
 				},
@@ -224,6 +226,7 @@ describe("createGameEngineVisualPlan", () => {
 		});
 		expect(plan.boardEnterRequests[0]).toMatchObject({
 			enter: {
+				durationMs: 1000,
 				groupId: "engine:craft-result:target",
 				kind: "flip-in",
 			},
@@ -351,10 +354,111 @@ describe("createGameEngineVisualPlan", () => {
 		});
 		expect(plan.boardEnterRequests[0]).toMatchObject({
 			enter: {
+				durationMs: 1000,
 				groupId: "engine:craft-stage:blueprint:item:water:123",
 				kind: "flip-in",
 			},
 			tileId: "blueprint",
+		});
+	});
+
+	it("coalesces auto-filled craft stage updates into one target flip", () => {
+		const previousBoard = boardView([
+			{
+				craft: craftProgress(0),
+				id: "seed",
+				itemId: "item:seed",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+		const currentBoard = boardView([
+			{
+				craft: craftProgress(1),
+				id: "seed",
+				itemId: "item:seed",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard,
+			currentInventory: undefined,
+			events: [
+				{
+					from: {
+						kind: "inventory",
+						nextQuantity: 1,
+						previousQuantity: 2,
+						quantity: 1,
+						slotIndex: 0,
+					},
+					itemId: "item:water",
+					reason: "craft-input-auto-fill",
+					type: "item.consumed",
+				},
+				{
+					atMs: 123,
+					itemId: "item:water",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					recipeId: "recipe:test",
+					targetItemInstanceId: "seed",
+					type: "craft_input.stored",
+				},
+				{
+					from: {
+						kind: "inventory",
+						nextQuantity: 0,
+						previousQuantity: 1,
+						quantity: 1,
+						slotIndex: 0,
+					},
+					itemId: "item:water",
+					reason: "craft-input-auto-fill",
+					type: "item.consumed",
+				},
+				{
+					atMs: 123,
+					itemId: "item:water",
+					nextQuantity: 2,
+					previousQuantity: 1,
+					quantity: 1,
+					recipeId: "recipe:test",
+					targetItemInstanceId: "seed",
+					type: "craft_input.stored",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardTransientTilePlans).toHaveLength(1);
+		expect(plan.boardEnterRequests).toHaveLength(1);
+		expect(plan.boardTransientTilePlans[0]).toMatchObject({
+			request: {
+				exit: {
+					durationMs: 1000,
+					groupId: "engine:craft-stage:seed:item:water:123",
+					kind: "flip-out",
+				},
+			},
+			tile: {
+				assetProgress: 0,
+				itemId: "item:seed",
+				slotId: "1:0",
+			},
+		});
+		expect(plan.boardEnterRequests[0]).toMatchObject({
+			enter: {
+				durationMs: 1000,
+				groupId: "engine:craft-stage:seed:item:water:123",
+				kind: "flip-in",
+			},
+			tileId: "seed",
 		});
 	});
 

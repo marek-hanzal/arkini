@@ -1,8 +1,8 @@
 const gameVisualSequenceDelayMs = 200;
 const gameVisualFadeDurationMs = 420;
-const gameVisualMergeDurationMs = 390;
-const gameVisualReplaceDurationMs = 420;
-const gameVisualStageUpdateDurationMs = 520;
+const gameVisualMergeDurationMs = 1000;
+const gameVisualReplaceDurationMs = 1000;
+const gameVisualStageUpdateDurationMs = 1000;
 
 type GameVisualMotionCause = "activation" | "craft" | "inventory" | "merge" | "producer" | "stash";
 

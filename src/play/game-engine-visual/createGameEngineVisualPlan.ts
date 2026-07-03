@@ -26,17 +26,22 @@ type ActivationInputStoredEvent = Extract<
 >;
 
 const appendActivationInputTargetVisuals = ({
+	animatedCraftStageTargetIds,
 	currentBoard,
 	plan,
 	previousBoard,
 	target,
 }: {
+	animatedCraftStageTargetIds: Set<string>;
 	currentBoard: BoardView | undefined;
 	plan: GameEngineVisualPlanDraft;
 	previousBoard: BoardView | undefined;
 	target: ActivationInputStoredEvent;
 }) => {
 	if (target.type === "craft_input.stored") {
+		if (animatedCraftStageTargetIds.has(target.targetItemInstanceId)) return;
+
+		animatedCraftStageTargetIds.add(target.targetItemInstanceId);
 		appendCraftStageUpdateVisuals({
 			currentBoard,
 			plan,
@@ -69,6 +74,7 @@ export const createGameEngineVisualPlan = ({
 }: createGameEngineVisualPlan.Props): GameEngineVisualPlan => {
 	const plan = createGameEngineVisualPlanDraft();
 	const skipped = new Set<number>();
+	const animatedCraftStageTargetIds = new Set<string>();
 	const deferredStashDepletionRemovals: Extract<
 		GameEvent,
 		{
@@ -132,6 +138,7 @@ export const createGameEngineVisualPlan = ({
 					) {
 						skipped.add(targetIndex);
 						appendActivationInputTargetVisuals({
+							animatedCraftStageTargetIds,
 							currentBoard,
 							plan,
 							previousBoard,
@@ -171,6 +178,7 @@ export const createGameEngineVisualPlan = ({
 			case "producer_input.stored":
 			case "craft_input.stored":
 				appendActivationInputTargetVisuals({
+					animatedCraftStageTargetIds,
 					currentBoard,
 					plan,
 					previousBoard,

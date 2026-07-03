@@ -98,7 +98,7 @@ describe("applyBoardMemoryActivateFx", () => {
 		});
 	});
 
-	it("restores saved positions through inventory and clears memory after full restore", () => {
+	it("restores saved positions through inventory and clears memory after restore", () => {
 		const config = createMemoryTestConfig();
 		const save = runInitialSave({
 			config,
@@ -166,7 +166,7 @@ describe("applyBoardMemoryActivateFx", () => {
 		});
 	});
 
-	it("keeps saved memory when restore cannot output every stored item", () => {
+	it("clears saved memory when restore cannot output every stored item", () => {
 		const config = createMemoryTestConfig();
 		const save = runInitialSave({
 			config,
@@ -208,7 +208,7 @@ describe("applyBoardMemoryActivateFx", () => {
 			save: missingProducerSave,
 		});
 
-		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeDefined();
+		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeUndefined();
 		expect(restored.events).toContainEqual({
 			atMs: 200,
 			boardItemId: memory!.id,

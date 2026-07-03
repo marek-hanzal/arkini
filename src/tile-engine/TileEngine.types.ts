@@ -34,6 +34,11 @@ export namespace TileEngine {
 		height: number;
 	}
 
+	export interface Size {
+		width: number;
+		height: number;
+	}
+
 	export interface Slot<TSlot = unknown> {
 		id: Id;
 		/**

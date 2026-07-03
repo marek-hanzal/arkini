@@ -124,7 +124,7 @@ const TileEngineActorComponent = <TTile, TSlot, TDrag, TDrop>({
 			data-ak-tile-engine-drop-feedback={dropFeedback?.effect}
 			data-ak-tile-engine-drop-feedback-variant={dropFeedback?.variant}
 			className={cn(
-				"pointer-events-auto absolute select-none will-change-transform",
+				"pointer-events-auto relative select-none will-change-transform",
 				isOverlayLayer ? "[touch-action:pan-y]" : "touch-none",
 				tile.hidden && "pointer-events-none opacity-0",
 				disabled && "pointer-events-none",

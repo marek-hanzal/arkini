@@ -52,12 +52,19 @@ const TileEngineActorsComponent = <TTile, TSlot, TDrag, TDrop>({
 	renderTile,
 }: TileEngineActors.Props<TTile, TSlot, TDrag, TDrop>) => (
 	<div
-		className={cn("pointer-events-none absolute inset-0", actorLayerClassName)}
+		className={cn(
+			"pointer-events-none absolute inset-0 grid h-full w-full",
+			layerRole === "overlay" ? "[touch-action:pan-y]" : "touch-none",
+			actorLayerClassName,
+		)}
 		style={{
 			zIndex:
 				layerRole === "overlay"
 					? "var(--ak-layer-overlay-tile)"
 					: "var(--ak-layer-base-tile)",
+			gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+			gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
+			gap: gapPx,
 		}}
 	>
 		{tiles.map((tile) => {

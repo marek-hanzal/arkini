@@ -90,6 +90,16 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						targetRect: resolved?.element ? rectFromElement(resolved.element) : null,
 					});
 					const kind = dropOutcomeKind(outcome);
+					const notifyDropSettled = () =>
+						dragRef.current?.onDropSettled?.({
+							kind,
+							source: session.source,
+							sourceTile,
+							target: resolved?.payload ?? null,
+							targetSlot: resolved?.slot ?? null,
+							targetTile: resolved?.targetTile ?? null,
+						});
+					if (kind !== "accept") notifyDropSettled();
 					const animation = dropOutcomeAnimation(outcome);
 					const commit = dropOutcomeCommit(outcome);
 
@@ -99,6 +109,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 								commit,
 							})
 						) {
+							notifyDropSettled();
 							return;
 						}
 
@@ -129,6 +140,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 								commit,
 							})
 						) {
+							notifyDropSettled();
 							return;
 						}
 

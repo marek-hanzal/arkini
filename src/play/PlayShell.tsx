@@ -1,5 +1,6 @@
 import { match } from "ts-pattern";
 import { type FC, useCallback, useMemo, useState } from "react";
+import { GameAudioProvider, useGameAudio } from "~/audio/GameAudioProvider";
 import { BoardSurface } from "~/board/BoardSurface";
 import { CheatInventorySheet } from "~/debug/CheatInventorySheet";
 import { NukeSaveSheet } from "~/debug/NukeSaveSheet";
@@ -13,11 +14,27 @@ import { toGameActionError } from "~/play/action/toGameActionError";
 import { GameRuntimeProvider } from "~/play/runtime/GameRuntimeContext";
 
 const PlayShellContent: FC = () => {
+	const audio = useGameAudio();
 	const feedbackFlags = useFeedbackFlags();
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
-	const closeSheet = useCallback(() => setActiveSheet(undefined), []);
-	const openSheet = useCallback((sheet: ActiveSheetState) => setActiveSheet(sheet), []);
+	const closeSheet = useCallback(() => {
+		setActiveSheet((current) => {
+			if (current) audio.play("audio.ui.sheet.close");
+			return undefined;
+		});
+	}, [
+		audio,
+	]);
+	const openSheet = useCallback(
+		(sheet: ActiveSheetState) => {
+			audio.play("audio.ui.sheet.open");
+			setActiveSheet(sheet);
+		},
+		[
+			audio,
+		],
+	);
 	const feedback = useMemo<Feedback.Type>(
 		() => ({
 			pulseMergeCell() {
@@ -27,17 +44,23 @@ const PlayShellContent: FC = () => {
 				if (key) feedbackFlags.pulse(`board:feedback:${variant}:${key}`);
 			},
 			flashBoardCell(key) {
-				if (key) feedbackFlags.pulse(`board:error:${key}`);
+				if (!key) return;
+				audio.play("audio.ui.reject.board");
+				feedbackFlags.pulse(`board:error:${key}`);
 			},
 			flashInventorySlot(slotIndex) {
-				if (slotIndex !== undefined) feedbackFlags.pulse(`inventory:error:${slotIndex}`);
+				if (slotIndex === undefined) return;
+				audio.play("audio.ui.reject.inventory");
+				feedbackFlags.pulse(`inventory:error:${slotIndex}`);
 			},
 			showError(error) {
+				audio.play("audio.ui.error");
 				setLastError(toGameActionError(error).message);
 				feedbackFlags.pulse("toast:error");
 			},
 		}),
 		[
+			audio,
 			feedbackFlags.pulse,
 		],
 	);
@@ -115,7 +138,9 @@ const PlayShellContent: FC = () => {
 };
 
 export const PlayShell: FC = () => (
-	<GameRuntimeProvider>
-		<PlayShellContent />
-	</GameRuntimeProvider>
+	<GameAudioProvider>
+		<GameRuntimeProvider>
+			<PlayShellContent />
+		</GameRuntimeProvider>
+	</GameAudioProvider>
 );

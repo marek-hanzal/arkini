@@ -151,6 +151,45 @@ describe("setCheatSpeedModeFx", () => {
 			cheatSpeedDisableItemId,
 		]);
 	});
+	it("emits a speed mode change event only when the mode changes", () => {
+		const config = createLongTimingConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const enabled = runAction({
+			action: {
+				mode: "instant",
+				type: "cheat.speed_mode.set",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(enabled.events).toEqual([
+			{
+				atMs: 100,
+				nextMode: "instant",
+				previousMode: "normal",
+				type: "cheat.speed_mode.changed",
+			},
+		]);
+
+		const repeated = runAction({
+			action: {
+				mode: "instant",
+				type: "cheat.speed_mode.set",
+			},
+			config,
+			nowMs: 200,
+			save: enabled.save,
+		});
+
+		expect(repeated.events).toEqual([]);
+	});
+
 	it("makes newly started producer jobs finish after one second", () => {
 		const config = createLongTimingConfig();
 		const save = runInitialSave({

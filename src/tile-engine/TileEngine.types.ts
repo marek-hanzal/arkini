@@ -134,6 +134,14 @@ export namespace TileEngine {
 		onDrop?(
 			context: DropContext<TTile, TSlot, TDrag, TDrop>,
 		): DropOutcome | Promise<DropOutcome>;
+		onDropSettled?(context: {
+			kind: "accept" | "ignore" | "reject";
+			source: TDrag;
+			sourceTile: Tile<TTile>;
+			target: TDrop | null;
+			targetSlot: Slot<TSlot> | null;
+			targetTile: Tile<TTile> | null;
+		}): void;
 		onDragCancel?(context: { source: TDrag; tile: Tile<TTile> }): void;
 	}
 

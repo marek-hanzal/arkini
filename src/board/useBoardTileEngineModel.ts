@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { useGameAudio } from "~/audio/GameAudioProvider";
 import { readBoardCells, type BoardCellView } from "~/board/boardCells";
 import { cellKey } from "~/board/cellKey";
 import { resolveBoardDropFeedback } from "~/board/drop/resolveBoardDropFeedback";
@@ -55,6 +56,7 @@ export const useBoardTileEngineModel = ({
 	feedback,
 	onOpenSheet,
 }: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
+	const audio = useGameAudio();
 	const board = useGameBoardView();
 	const actions = useGameRuntimeDropActions();
 	const runtimeStore = useGameRuntimeStore();
@@ -264,7 +266,10 @@ export const useBoardTileEngineModel = ({
 						boardItem,
 					},
 					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
-					onLongActivate: () => openBoardItemSheet(boardItem.id, boardItem.itemId),
+					onLongActivate: () => {
+						audio.play("audio.tile.long_press");
+						openBoardItemSheet(boardItem.id, boardItem.itemId);
+					},
 				};
 			},
 			slot(slot, targetTile) {
@@ -282,14 +287,16 @@ export const useBoardTileEngineModel = ({
 					},
 					onLongActivate: targetBoardItemId
 						? undefined
-						: () =>
+						: () => {
+								audio.play("audio.tile.long_press");
 								onOpenSheet({
 									placementTarget: {
 										x: cell.x,
 										y: cell.y,
 									},
 									type: "inventory",
-								}),
+								});
+							},
 				};
 			},
 			dropFeedback(context) {
@@ -302,6 +309,9 @@ export const useBoardTileEngineModel = ({
 					context,
 					inventory: readInventoryView(snapshot),
 				});
+			},
+			onDragStart() {
+				audio.play("audio.tile.drag.start");
 			},
 			onDrop(context) {
 				const snapshot = runtimeStore.getSnapshot();
@@ -316,6 +326,13 @@ export const useBoardTileEngineModel = ({
 					actions,
 				});
 			},
+			onDropSettled({ kind }) {
+				if (kind === "accept") {
+					audio.play("audio.tile.drop.accept");
+					return;
+				}
+				if (kind === "reject") audio.play("audio.tile.drop.reject");
+			},
 			onDragCancel() {
 				// The runtime engine owns visual rollback. App state remains untouched until commit.
 			},
@@ -323,6 +340,7 @@ export const useBoardTileEngineModel = ({
 		[
 			actions,
 			activateBoardItem,
+			audio,
 			board,
 			feedback,
 			openBoardItemSheet,

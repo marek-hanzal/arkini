@@ -291,6 +291,20 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),
+	z
+		.object({
+			type: z.literal("cheat.speed_mode.changed"),
+			previousMode: z.enum([
+				"normal",
+				"instant",
+			]),
+			nextMode: z.enum([
+				"normal",
+				"instant",
+			]),
+			atMs: GameInstantMsSchema,
+		})
+		.strict(),
 ]);
 
 export type GameEvent = z.infer<typeof GameEventSchema>;

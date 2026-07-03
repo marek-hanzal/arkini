@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import { useGameAudio } from "~/audio/GameAudioProvider";
 import { resolveInventoryDropFeedback } from "~/inventory/drop/resolveInventoryDropFeedback";
 import { resolveInventorySlotTapAction } from "~/inventory/logic/resolveInventorySlotTapAction";
 import type { InventorySurface } from "~/inventory/InventorySurface.types";
@@ -40,6 +41,7 @@ export const useInventoryTileEngineModel = ({
 	feedback,
 	placementTarget,
 }: useInventoryTileEngineModel.Props): useInventoryTileEngineModel.Result => {
+	const audio = useGameAudio();
 	const inventory = useGameInventoryView();
 	const columns = useGameRuntimeSelector((state) => state.runtime.config.game.board.width);
 	const actions = useGameRuntimeDropActions();
@@ -198,6 +200,9 @@ export const useInventoryTileEngineModel = ({
 					inventory: readInventoryView(snapshot),
 				});
 			},
+			onDragStart() {
+				audio.play("audio.tile.drag.start");
+			},
 			onDrop(context) {
 				const snapshot = runtimeStore.getSnapshot();
 				const nowMs = Date.now();
@@ -211,9 +216,17 @@ export const useInventoryTileEngineModel = ({
 					actions,
 				});
 			},
+			onDropSettled({ kind }) {
+				if (kind === "accept") {
+					audio.play("audio.tile.drop.accept");
+					return;
+				}
+				if (kind === "reject") audio.play("audio.tile.drop.reject");
+			},
 		}),
 		[
 			actions,
+			audio,
 			feedback,
 			inventory,
 			placeInventoryOnBoard,

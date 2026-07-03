@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { isCheatSpeedItemId, readCheatSpeedItemIdFromMode } from "~/cheat/GameCheatSpeedItem";
+import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import { syncRealtimeWorldJobsFx } from "~/world/syncRealtimeWorldJobsFx";
 import type { GameActionCheatSpeedModeSet } from "~/action/GameActionCheatSpeedModeSet";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -23,6 +24,9 @@ export const setCheatSpeedModeFx = Effect.fn("setCheatSpeedModeFx")(function* ({
 	nowMs,
 	save,
 }: setCheatSpeedModeFx.Props) {
+	const previousMode = readGameCheatSpeedMode({
+		save,
+	});
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
@@ -55,7 +59,17 @@ export const setCheatSpeedModeFx = Effect.fn("setCheatSpeedModeFx")(function* ({
 	syncedSave.updatedAtMs = nowMs;
 
 	return {
-		events: [],
+		events:
+			previousMode === action.mode
+				? []
+				: [
+						{
+							atMs: nowMs,
+							nextMode: action.mode,
+							previousMode,
+							type: "cheat.speed_mode.changed" as const,
+						},
+					],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
 			config,
 			nowMs,

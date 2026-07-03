@@ -216,6 +216,7 @@ export const createGameEngineVisualPlan = ({
 			case "item.spawn.blocked":
 			case "item.spawn.failed":
 			case "line.default_changed":
+			case "cheat.speed_mode.changed":
 			case "producer_input.withdrawn":
 			case "line.blocked":
 			case "line.failed":

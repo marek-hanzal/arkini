@@ -12,6 +12,7 @@ import {
 import { createPersistentGameRuntimeStore } from "~/play/runtime/createPersistentGameRuntimeStore";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
+import { GameRuntimeAudioEffects } from "~/play/runtime/GameRuntimeAudioEffects";
 import { GameRuntimeVisualEffects } from "~/play/runtime/GameRuntimeVisualEffects";
 
 const GameRuntimeContext = createContext<GameRuntimeStore | null>(null);
@@ -68,6 +69,7 @@ export const GameRuntimeProvider: FC<GameRuntimeProvider.Props> = ({
 	return (
 		<GameRuntimeContext.Provider value={store}>
 			<GameRuntimeAutoTicker />
+			<GameRuntimeAudioEffects store={store} />
 			<GameRuntimeVisualEffects store={store} />
 			{children}
 		</GameRuntimeContext.Provider>

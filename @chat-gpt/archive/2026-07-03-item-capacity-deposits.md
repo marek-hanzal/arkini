@@ -9,3 +9,4 @@ Implemented finite item capacity for resource deposits.
 - Running producer jobs ignore capacity-spend requirements after start, so a job does not pause just because its source was spent on admission. Other live requirements and duration effects still evaluate normally.
 - Default Arkini starts this on wood sources and stone deposits: lumberjack spends nearby `wood-source`, quarry spends nearby `item:rock`.
 - UI exposes capacity as `remaining/max` on tiles and in detail hero cards.
+- Follow-up fix: runtime board view equality now includes `capacity`, so board tiles re-render when `save.itemCapacities` changes instead of showing stale `remaining/max` while detail sheets show the live value.

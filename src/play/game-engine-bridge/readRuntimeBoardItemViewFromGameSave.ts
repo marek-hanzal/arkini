@@ -4,6 +4,7 @@ import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { ItemId } from "~/config/GameIdSchema";
 import { readRuntimeActivationViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeActivationViewFromGameSave";
 import { readRuntimeCraftViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeCraftViewFromGameSave";
+import { readItemCapacityState } from "~/capacity/readItemCapacityState";
 
 export namespace readRuntimeBoardItemViewFromGameSave {
 	export interface Props {
@@ -34,6 +35,11 @@ export const readRuntimeBoardItemViewFromGameSave = ({
 			boardItem,
 			config,
 			nowMs,
+			save,
+		}),
+		capacity: readItemCapacityState({
+			config,
+			itemInstanceId: boardItem.id,
 			save,
 		}),
 		id: boardItem.id,

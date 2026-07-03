@@ -18,11 +18,12 @@ export namespace GameItemView {
 		quantity?: number;
 		overlaySize?: GameItemView.OverlaySize;
 		assetProgress?: number;
+		capacityLabel?: string;
 	}
 }
 
 export const GameItemView: FC<GameItemView.Props> = memo(
-	({ assetProgress, item, variant, sizeVariant, quantity, overlaySize }) => {
+	({ assetProgress, capacityLabel, item, variant, sizeVariant, quantity, overlaySize }) => {
 		const resolvedSizeVariant =
 			sizeVariant ?? (variant === "inventory" ? "inventory" : "board");
 
@@ -44,6 +45,7 @@ export const GameItemView: FC<GameItemView.Props> = memo(
 			>
 				<GameItemContent
 					assetProgress={assetProgress}
+					capacityLabel={capacityLabel}
 					item={item}
 					quantity={quantity}
 				/>

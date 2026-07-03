@@ -80,6 +80,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			line.startAtMs <= nowMs &&
 			(line.pausedAtMs !== undefined || line.readyAtMs > nowMs),
 	);
+	const capacity = liveBoardItem?.capacity;
 
 	if (!boardItem || !item) return null;
 
@@ -96,6 +97,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		>
 			<GameItemView
 				assetProgress={hasSavedMemory ? 1 : (liveBoardItem?.craft?.inputProgress ?? 0)}
+				capacityLabel={capacity ? `${capacity.remaining}/${capacity.max}` : undefined}
 				item={item}
 				variant="board"
 			/>
@@ -107,7 +109,10 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			<BoardCellProgress progress={liveBoardItem?.craft?.progress} />
 			<BoardCellCooldownProgress
 				progress={
-					memoryProgress ?? producerProgress?.progress ?? producerCooldown?.progress
+					memoryProgress ??
+					producerProgress?.progress ??
+					producerCooldown?.progress ??
+					(capacity ? capacity.remaining / capacity.max : undefined)
 				}
 			/>
 		</div>

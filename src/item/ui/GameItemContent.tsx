@@ -6,13 +6,14 @@ import type { ViewItem } from "~/item/view/ViewItemSchema";
 export namespace GameItemContent {
 	export interface Props {
 		assetProgress?: number;
+		capacityLabel?: string;
 		item: ViewItem;
 		quantity?: number;
 	}
 }
 
 export const GameItemContent: FC<GameItemContent.Props> = memo(
-	({ assetProgress, item, quantity }) => {
+	({ assetProgress, capacityLabel, item, quantity }) => {
 		const asset = readProgressItemAsset({
 			item,
 			progress: assetProgress,
@@ -49,6 +50,10 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 				{quantity && quantity > 1 ? (
 					<span className="absolute bottom-0 right-0 min-w-4 rounded-sm bg-ak-secondary px-1 text-center text-[0.62rem] font-bold text-white">
 						{quantity}
+					</span>
+				) : capacityLabel ? (
+					<span className="absolute bottom-0 left-0 min-w-4 rounded-sm border border-white/15 bg-ak-surface/85 px-1 text-center text-[0.58rem] font-black text-ak-text shadow-sm backdrop-blur-sm">
+						{capacityLabel}
 					</span>
 				) : item.label ? (
 					<ItemLevelBadge label={item.label} />

@@ -85,13 +85,13 @@ describe("defaultGameConfig", () => {
 		});
 	});
 
-	it("authors work requirements directly on product outputs", () => {
-		const output = readLine("line:lumberjack-t1:log")?.output?.[0];
+	it("authors finite wood source capacity on the product line", () => {
+		const line = readLine("line:lumberjack-t1:log");
 
-		expect(output && "effects" in output ? output.effects?.[2] : undefined).toMatchObject({
+		expect(line?.effects?.[0]).toMatchObject({
 			display: "always",
-			kind: "nearby.require",
-			phase: "start",
+			kind: "nearby.capacity.spend",
+			amount: 1,
 		});
 	});
 	it("keeps board memory devices unlimited", () => {

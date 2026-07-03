@@ -25,6 +25,7 @@ export const readWorldReplacementSafetyFactsForItem = ({
 	const blockReasons: WorldReplacementBlockReason[] = [];
 
 	if (save.craftInputs[itemInstanceId]) pushReason(blockReasons, "craft_input_state");
+	if (save.itemCapacities[itemInstanceId]) pushReason(blockReasons, "item_capacity_state");
 	if (Object.values(save.craftJobs).some((job) => job.targetItemInstanceId === itemInstanceId)) {
 		pushReason(blockReasons, "craft_job");
 	}

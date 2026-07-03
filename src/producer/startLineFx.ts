@@ -11,6 +11,7 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQuantitiesFx";
 import { readProducerJobTimingFx } from "~/producer/readProducerJobTimingFx";
 import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";
+import { spendLineCapacityEffectsFx } from "~/capacity/spendLineCapacityEffectsFx";
 import type { GameActivationInput } from "~/activation/GameActivationInput";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionLineStart } from "~/action/GameActionLineStart";
@@ -134,6 +135,13 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 		save: nextSave,
 		startAtMs: queuedStartAtMs,
 	});
+	const capacityEvents = yield* spendLineCapacityEffectsFx({
+		config,
+		itemInstanceId: action.itemInstanceId,
+		line: checked.line,
+		nextSave,
+		nowMs,
+	});
 	const jobId = yield* createGameJobIdFx();
 	const jobTiming = yield* readProducerJobTimingFx({
 		config,
@@ -170,6 +178,7 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 	return {
 		events: [
 			...consumed.events,
+			...capacityEvents,
 			{
 				atMs: nowMs,
 				readyAtMs,

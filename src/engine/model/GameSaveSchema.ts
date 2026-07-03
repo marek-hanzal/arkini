@@ -175,6 +175,12 @@ const GameSaveProducerChargeStateSchema = z
 	})
 	.strict();
 
+const GameSaveItemCapacityStateSchema = z
+	.object({
+		remaining: NonNegativeIntegerSchema,
+	})
+	.strict();
+
 const GameSaveBoardMemoryLayoutItemSchema = z
 	.object({
 		itemId: IdSchema,
@@ -297,6 +303,7 @@ const GameSaveSchema = z
 		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
 		cheats: GameSaveCheatStateSchema.optional(),
 		boardMemoryLayouts: z.record(IdSchema, GameSaveBoardMemoryLayoutSchema).default({}),
+		itemCapacities: z.record(IdSchema, GameSaveItemCapacityStateSchema).default({}),
 		lines: z.record(IdSchema, GameSaveLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),
@@ -1385,6 +1392,50 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	for (const [itemInstanceId, state] of Object.entries(save.itemCapacities)) {
+		const target = readItemInstanceDefinition({
+			config,
+			save,
+			itemInstanceId,
+		});
+		if (!target) {
+			addSaveIssue(
+				ctx,
+				[
+					"itemCapacities",
+					itemInstanceId,
+				],
+				`Item capacity state target "${itemInstanceId}" must reference a save item instance.`,
+			);
+			continue;
+		}
+
+		const capacity = target.item.capacity;
+		if (!capacity) {
+			addSaveIssue(
+				ctx,
+				[
+					"itemCapacities",
+					itemInstanceId,
+				],
+				`Item capacity state target "${itemInstanceId}" references item "${target.itemId}" without capacity.`,
+			);
+			continue;
+		}
+
+		if (state.remaining > capacity.max) {
+			addSaveIssue(
+				ctx,
+				[
+					"itemCapacities",
+					itemInstanceId,
+					"remaining",
+				],
+				`remaining must be <= item capacity max (${capacity.max}).`,
+			);
+		}
+	}
+
 	for (const [memoryItemInstanceId, layout] of Object.entries(save.boardMemoryLayouts)) {
 		const memoryItem = readItemInstanceDefinition({
 			config,
@@ -1493,6 +1544,7 @@ export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstance
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
 export type GameSaveBoardMemoryLayout = z.infer<typeof GameSaveBoardMemoryLayoutSchema>;
 export type GameSaveBoardMemoryLayoutItem = z.infer<typeof GameSaveBoardMemoryLayoutItemSchema>;
+export type GameSaveItemCapacityState = z.infer<typeof GameSaveItemCapacityStateSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;

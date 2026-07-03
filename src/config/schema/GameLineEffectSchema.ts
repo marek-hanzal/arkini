@@ -36,6 +36,12 @@ const GameLineEffectPhaseSchema = z
 	])
 	.default("start");
 
+const GameNearbyCapacitySelectionSchema = z
+	.enum([
+		"nearest",
+	])
+	.default("nearest");
+
 const DurationMultiplierSchema = z
 	.number()
 	.min(0)
@@ -99,6 +105,18 @@ export const createGameLineEffectMemberSchemas = <
 				...itemSelectorSchema.shape,
 				radius: NonNegativeIntegerSchema,
 				phase: GameLineEffectPhaseSchema,
+				display: GameLineEffectDisplaySchema,
+				label: z.string().min(1).optional(),
+				reason: z.string().min(1).optional(),
+			})
+			.strict(),
+		z
+			.object({
+				kind: z.literal("nearby.capacity.spend"),
+				...itemSelectorSchema.shape,
+				radius: NonNegativeIntegerSchema,
+				amount: PositiveIntegerSchema.default(1),
+				selection: GameNearbyCapacitySelectionSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
 				reason: z.string().min(1).optional(),

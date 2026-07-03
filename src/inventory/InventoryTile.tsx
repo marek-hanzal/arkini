@@ -18,6 +18,12 @@ export const InventoryTile = memo(({ stackId, itemId, quantity }: InventoryTile.
 		(state) => Boolean(state.runtime.save.boardMemoryLayouts[stackId]),
 		Object.is,
 	);
+	const capacityLabel = useGameRuntimeSelector((state) => {
+		const capacity = state.runtime.config.items[itemId]?.capacity;
+		if (!capacity) return undefined;
+		const remaining = state.runtime.save.itemCapacities[stackId]?.remaining ?? capacity.max;
+		return `${remaining}/${capacity.max}`;
+	}, Object.is);
 
 	if (!item) return null;
 
@@ -29,6 +35,7 @@ export const InventoryTile = memo(({ stackId, itemId, quantity }: InventoryTile.
 		>
 			<GameItemView
 				assetProgress={hasSavedMemory ? 1 : undefined}
+				capacityLabel={capacityLabel}
 				item={item}
 				variant="inventory"
 				quantity={quantity}

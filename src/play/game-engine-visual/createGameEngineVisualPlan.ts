@@ -288,6 +288,8 @@ export const createGameEngineVisualPlan = ({
 				plan.ignoredEventTypes.push(event.type);
 				break;
 			case "cheat.speed_mode.changed":
+			case "item.capacity.changed":
+			case "item.capacity.depleted":
 			case "producer_input.withdrawn":
 			case "line.blocked":
 			case "line.failed":

@@ -20,6 +20,7 @@ export type GameEngineError =
 				| "item_busy"
 				| "craft_in_progress"
 				| "effect:missing-grant"
+				| "effect:missing-capacity"
 				| "effect:disabled-output"
 				| GamePlacementFailureReason
 				| "producer_queue_full"

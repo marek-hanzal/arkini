@@ -16,11 +16,13 @@ import { readChebyshevDistance } from "~/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import { doesResolvedDomainSelectorMatchId } from "~/selector/doesResolvedDomainSelectorMatchId";
+import { readNearbyCapacitySpendSource } from "~/capacity/readNearbyCapacitySpendSource";
 
 export namespace readEffectiveLine {
 	export interface Props {
 		baseDurationMs: number;
 		config: GameConfig;
+		ignoreCapacitySpendRequirements?: boolean;
 		ignoredProducerJobIds?: ReadonlySet<string>;
 		nowMs?: number;
 		itemInstanceId: string;
@@ -38,6 +40,8 @@ type NonWeightedLineOutput = Exclude<
 	}
 >;
 type DropEffect = NonNullable<NonWeightedLineOutput["effects"]>[number];
+type LineEffect = NonNullable<GameLineDefinition["effects"]>[number];
+type RuntimeLineEffect = DropEffect | LineEffect;
 
 type DropEvaluation = {
 	chanceItems: EffectiveChanceItemEntry[];
@@ -47,9 +51,9 @@ type DropEvaluation = {
 };
 
 type RuntimeItemSelector = Extract<
-	DropEffect,
+	RuntimeLineEffect,
 	{
-		kind: "nearby.duration.multiply" | "nearby.require";
+		kind: "nearby.capacity.spend" | "nearby.duration.multiply" | "nearby.require";
 	}
 >["items"];
 
@@ -63,9 +67,9 @@ type NearbyLootChanceEffect = Extract<
 type NearbyLootChanceSource = NearbyLootChanceEffect["sources"][number];
 
 type NearbyLineEffect = Extract<
-	DropEffect,
+	RuntimeLineEffect,
 	{
-		kind: "nearby.duration.multiply" | "nearby.require";
+		kind: "nearby.capacity.spend" | "nearby.duration.multiply" | "nearby.require";
 	}
 >;
 
@@ -147,9 +151,13 @@ const readNearbyLineEffectLabel = ({
 		config,
 		selector: lineEffect.items as RuntimeItemSelector,
 	});
-	return lineEffect.kind === "nearby.duration.multiply"
-		? `Nearby ${itemLabel} enables production`
-		: `Nearby ${itemLabel}`;
+	if (lineEffect.kind === "nearby.duration.multiply") {
+		return `Nearby ${itemLabel} enables production`;
+	}
+	if (lineEffect.kind === "nearby.capacity.spend") {
+		return `Consumes nearby ${itemLabel} capacity`;
+	}
+	return `Nearby ${itemLabel}`;
 };
 
 const readNearbyLootChanceSourceLabel = ({
@@ -172,9 +180,9 @@ const readLineEffectLabel = ({
 }: {
 	config: GameConfig;
 	fallback: string;
-	lineEffect: DropEffect;
+	lineEffect: RuntimeLineEffect;
 }) => {
-	if (lineEffect.kind === "nearby.require") {
+	if (lineEffect.kind === "nearby.require" || lineEffect.kind === "nearby.capacity.spend") {
 		return readNearbyLineEffectLabel({
 			config,
 			lineEffect: lineEffect as NearbyLineEffect,
@@ -326,6 +334,135 @@ const readDropEffectGrantActive = ({
 		grantIds,
 		selector: effect.selector,
 	});
+
+type LineRequirementEvaluation = Pick<
+	EffectiveLine,
+	"blocked" | "blockReasons" | "requirements" | "startRequirementsReady"
+>;
+
+const shouldLineRequirementDisplay = (requirement: EffectiveLine["requirements"][number]) => {
+	if (requirement.display === "never") return false;
+	if (requirement.display === "always") return true;
+	if (requirement.display === "whenMissing") return !requirement.ready;
+	return requirement.ready;
+};
+
+const readLineRequirements = ({
+	config,
+	grantIds,
+	itemInstanceId,
+	ignoreCapacitySpendRequirements,
+	line,
+	lineId,
+	save,
+	targetCell,
+}: {
+	config: GameConfig;
+	grantIds: ReadonlySet<string>;
+	itemInstanceId: string;
+	ignoreCapacitySpendRequirements?: boolean;
+	line: GameLineDefinition;
+	lineId: string;
+	save: GameSave;
+	targetCell?: BoardCell;
+}): LineRequirementEvaluation => {
+	const requirements: EffectiveLine["requirements"] = [];
+	const blockReasons: EffectiveLine["blockReasons"] = [];
+	let startRequirementsReady = true;
+	let blocked = false;
+
+	for (const [effectIndex, effect] of (line.effects ?? []).entries()) {
+		const effectId = `${lineId}:effect:${effectIndex}`;
+		const effectName = readLineEffectLabel({
+			config,
+			fallback: effect.kind,
+			lineEffect: effect,
+		});
+
+		if (effect.kind === "grant.require") {
+			const ready = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: effect.selector,
+			});
+			if (effect.phase === "start" && !ready) startRequirementsReady = false;
+			const requirement = {
+				display: effect.display,
+				kind: effect.kind,
+				label: effect.label ?? effectName,
+				phase: effect.phase,
+				ready,
+			};
+			if (shouldLineRequirementDisplay(requirement)) requirements.push(requirement);
+			continue;
+		}
+
+		if (effect.kind === "nearby.require") {
+			const ready =
+				readNearbyMatches({
+					items: effect.items as RuntimeItemSelector,
+					radius: effect.radius,
+					save,
+					targetCell,
+				}).length > 0;
+			if (effect.phase === "start" && !ready) startRequirementsReady = false;
+			const requirement = {
+				display: effect.display,
+				kind: effect.kind,
+				label: effect.label ?? effectName,
+				phase: effect.phase,
+				ready,
+			};
+			if (shouldLineRequirementDisplay(requirement)) requirements.push(requirement);
+			continue;
+		}
+
+		if (effect.kind === "nearby.capacity.spend") {
+			if (ignoreCapacitySpendRequirements) continue;
+			const source = readNearbyCapacitySpendSource({
+				config,
+				effect,
+				itemInstanceId,
+				save,
+			});
+			const ready = source !== undefined;
+			if (!ready) startRequirementsReady = false;
+			const requirement = {
+				display: effect.display,
+				kind: effect.kind,
+				label: effect.label ?? effectName,
+				phase: "start" as const,
+				ready,
+			};
+			if (shouldLineRequirementDisplay(requirement)) requirements.push(requirement);
+			continue;
+		}
+
+		if (effect.kind === "grant.blockStart") {
+			const active = doesGameGrantSelectorMatchIds({
+				grantIds,
+				selector: effect.selector,
+			});
+			if (active) {
+				blocked = true;
+				blockReasons.push(
+					createAppliedOperation({
+						kind: effect.kind,
+						lineEffectId: effectId,
+						lineEffectName: effectName,
+						sourceItemInstanceId: itemInstanceId,
+					}),
+				);
+			}
+		}
+	}
+
+	return {
+		blocked,
+		blockReasons,
+		requirements,
+		startRequirementsReady,
+	};
+};
 
 const applyRequirementDropEffect = ({
 	chanceItems,
@@ -933,6 +1070,7 @@ const readEffectiveOutputEntries = ({
 export const readEffectiveLine = ({
 	baseDurationMs,
 	config,
+	ignoreCapacitySpendRequirements,
 	ignoredProducerJobIds,
 	nowMs,
 	itemInstanceId,
@@ -960,6 +1098,16 @@ export const readEffectiveLine = ({
 		save,
 		targetCell,
 	});
+	const lineRequirements = readLineRequirements({
+		config,
+		grantIds,
+		ignoreCapacitySpendRequirements,
+		itemInstanceId,
+		line,
+		lineId,
+		save,
+		targetCell,
+	});
 	const visible = line.output
 		? effectiveOutput.visibleOutput.length > 0
 		: line.visibility !== "hidden";
@@ -968,8 +1116,8 @@ export const readEffectiveLine = ({
 
 	return {
 		appliedEffects: effectiveOutput.appliedEffects,
-		blocked: false,
-		blockReasons: [],
+		blocked: lineRequirements.blocked,
+		blockReasons: lineRequirements.blockReasons,
 		durationMs: readGameCheatEffectiveDurationMs({
 			durationMs,
 			save,
@@ -978,13 +1126,13 @@ export const readEffectiveLine = ({
 		grantIds: [
 			...grantIds,
 		].sort(),
-		startRequirementsReady: true,
+		startRequirementsReady: lineRequirements.startRequirementsReady,
 		lootPlan: {
 			baseOutput: effectiveOutput.rollableOutput,
 			chanceItems: effectiveOutput.chanceItems,
 			visibleOutput: effectiveOutput.visibleOutput,
 		},
-		requirements: [],
+		requirements: lineRequirements.requirements,
 		visible,
 	};
 };

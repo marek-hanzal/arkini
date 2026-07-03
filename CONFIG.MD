@@ -220,7 +220,7 @@ Effect definitions are embedded where their source lives. Passive grant sources 
 }
 ```
 
-Effects do not contain operations, targets, line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Grant-publishing effects are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
+Effects do not contain operations, targets, line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Producer lines may also own start-only source capacity spending, because consuming a finite tree or rock deposit is a line admission cost, not a single-drop display rule. Grant-publishing effects are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
 
 Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each source ref is `{ "id": "..." }`, `{ "ids": ["..."] }`, or `{ "tag": "..." }`. Compile expands tags into deterministic runtime `{ "ids": [...] }` clauses.
 
@@ -234,6 +234,7 @@ Supported output-owned effect kinds:
 { "kind": "grant.require", "phase": "visibility", "display": "always", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
 { "kind": "grant.require", "phase": "start", "display": "always", "selector": { "allOf": [{ "id": "grant:tooling:advanced" }] } }
 { "kind": "nearby.require", "phase": "start", "display": "whenMissing", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 2 }
+{ "kind": "nearby.capacity.spend", "display": "always", "items": { "anyOf": [{ "tag": "wood-source" }] }, "radius": 2, "amount": 1, "selection": "nearest" }
 { "kind": "grant.blockStart", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
 { "kind": "nearby.duration.multiply", "display": "whenActive", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 3, "maxSources": 5, "bands": [{ "minDistance": 0, "maxDistance": 3, "multiplier": 0.9 }] }
 { "kind": "grant.duration.multiply", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:minor-haste" }] }, "multiplier": 0.75 }
@@ -248,6 +249,17 @@ Supported output-owned effect kinds:
 `phase: "visibility"` means the drop is completely absent when the condition fails. Use that for choose-the-path content where the player should not even see the other branch. `phase: "start"`, `grant.blockStart`, and `grant.drop.disable` leave the drop visible but unavailable, so UI can say exactly what is missing or blocking it. If a product has output and every visible output is disabled, runtime rejects the start with `effect:disabled-output`.
 
 `nearby.require` and `nearby.duration.multiply` use Chebyshev distance, so diagonals count. Nearby duration effects stack per matched source up to `maxSources`; at least one authored band must use a multiplier other than `1`, otherwise the whole effect is a pretty no-op. Grant duration effects activate when their grant selector is satisfied. `grant.duration.multiply.multiplier` must change timing, so `1` is rejected. Duration modifier effects are reported as active bonuses in UI, not as requirement rows.
+
+`nearby.capacity.spend` belongs on a line root, not a concrete output entry. It validates at job start, chooses the nearest matching capacity source, immediately subtracts `amount`, and can remove or replace the source when it reaches zero according to that item's `capacity.onDepleted` rule. Running jobs do not keep re-checking this spend rule after start; live proximity and duration effects still do their own normal live evaluation, because apparently one production line can contain both a ticket booth and weather.
+
+Items may define finite source capacity:
+
+```json
+{ "capacity": { "max": 18, "onDepleted": "remove" }, "maxStackSize": 1 }
+{ "capacity": { "max": 18, "onDepleted": "replace", "replaceItemId": "item:stump" }, "maxStackSize": 1 }
+```
+
+Capacity items must use `maxStackSize: 1` so partially depleted item instances do not collapse into anonymous inventory stacks. Runtime stores capacity per item instance and item detail UI shows the current `remaining/max` value.
 
 `display` controls only UI visibility for output effect rows: `always`, `whenActive`, `whenMissing`, or `never`. It must not change runtime validation. `grant.loot.extraOutputChance.add` adds an independent bonus roll for the same drop item; it does not accept `outputItems` because the drop is already the target. `nearby.loot.outputChance.add` can exceed 100%; runtime converts that into guaranteed quantity plus a remainder roll.
 

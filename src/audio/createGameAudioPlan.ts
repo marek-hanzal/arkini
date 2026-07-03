@@ -443,6 +443,22 @@ export const createGameAudioPlan = ({
 					sourceEventType: event.type,
 				});
 				break;
+			case "item.capacity.changed":
+				pushUniqueSound({
+					flags,
+					plan,
+					soundId: "audio.producer.input.store",
+					sourceEventType: event.type,
+				});
+				break;
+			case "item.capacity.depleted":
+				pushUniqueSound({
+					flags,
+					plan,
+					soundId: "audio.tile.remove",
+					sourceEventType: event.type,
+				});
+				break;
 			default: {
 				const exhaustive: never = event;
 				return exhaustive;

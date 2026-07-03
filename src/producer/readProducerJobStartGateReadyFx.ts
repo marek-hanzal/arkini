@@ -33,6 +33,7 @@ export const readProducerJobStartGateReadyFx = Effect.fn("readProducerJobStartGa
 				line: subject.line,
 			}),
 			config,
+			ignoreCapacitySpendRequirements: true,
 			ignoredProducerJobIds,
 			nowMs: evaluateAtMs,
 			itemInstanceId: job.itemInstanceId,

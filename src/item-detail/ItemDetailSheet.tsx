@@ -92,6 +92,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 		<DetailHeroCard
 			key="hero"
 			assetProgress={boardItem.craft?.inputProgress}
+			capacity={boardItem.capacity}
 			item={item}
 		/>,
 		<DetailGeneratedEffectsPanel

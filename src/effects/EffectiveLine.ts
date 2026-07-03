@@ -13,6 +13,8 @@ type NonWeightedLineOutput = Exclude<LineOutputEntry, WeightedLineOutput>;
 type WeightedLineOutputEntry = WeightedLineOutput["entries"][number];
 
 type LineDropEffect = NonNullable<NonWeightedLineOutput["effects"]>[number];
+type CommonLineEffect = NonNullable<LineDefinition["effects"]>[number];
+type RuntimeLineEffect = LineDropEffect | CommonLineEffect;
 
 export interface EffectiveChanceItemEntry {
 	dropEffects?: EffectiveDropEffectOutcome[];
@@ -32,7 +34,7 @@ export interface EffectiveChanceItemEntry {
 export interface AppliedGameEffectOperation {
 	effectId: string;
 	effectName: string;
-	kind: LineDropEffect["kind"];
+	kind: RuntimeLineEffect["kind"];
 	sourceId: string;
 	sourceItemInstanceId: string;
 }
@@ -40,8 +42,8 @@ export interface AppliedGameEffectOperation {
 interface RuntimeLineEffectRequirement {
 	label: string;
 	ready: boolean;
-	display: LineDropEffect["display"];
-	kind: LineDropEffect["kind"];
+	display: RuntimeLineEffect["display"];
+	kind: RuntimeLineEffect["kind"];
 	phase?: "start" | "visibility";
 }
 
@@ -51,7 +53,7 @@ export interface EffectiveDropEffectOutcome {
 	effectId: string;
 	effectName: string;
 	impact: "availability" | "chance" | "visibility";
-	kind: LineDropEffect["kind"];
+	kind: RuntimeLineEffect["kind"];
 	label: string;
 	phase?: "start" | "visibility";
 	ready: boolean;

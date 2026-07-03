@@ -6,11 +6,15 @@ import { DetailCard, DetailMutedPill } from "~/item-detail/ui/DetailCard";
 export namespace DetailHeroCard {
 	export interface Props {
 		assetProgress?: number;
+		capacity?: {
+			max: number;
+			remaining: number;
+		};
 		item: ViewItem;
 	}
 }
 
-export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ assetProgress, item }) => (
+export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ assetProgress, capacity, item }) => (
 	<DetailCard>
 		<div className="flex min-w-0 gap-4">
 			<div className="flex h-28 w-28 max-w-[34vw] shrink-0 items-center justify-center rounded-sm bg-ak-surface-soft p-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
@@ -37,6 +41,16 @@ export const DetailHeroCard: FC<DetailHeroCard.Props> = ({ assetProgress, item }
 						{item.tags.map((tag) => (
 							<DetailMutedPill key={tag}>{tag}</DetailMutedPill>
 						))}
+					</div>
+				) : null}
+				{capacity ? (
+					<div className="mt-3 flex items-center justify-between gap-3 rounded-sm border border-ak-primary/25 bg-ak-surface-soft px-3 py-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+						<span className="text-xs font-black uppercase tracking-[0.14em] text-ak-text-muted">
+							Capacity
+						</span>
+						<span className="text-xl font-black leading-none text-ak-text tabular-nums">
+							{capacity.remaining}/{capacity.max}
+						</span>
 					</div>
 				) : null}
 			</div>

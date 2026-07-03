@@ -6,6 +6,10 @@ import {
 } from "~/config/schema/GameActivationOutputSchema";
 import { GameEffectSchema } from "~/config/schema/GameEffectSchema";
 import {
+	GameLineEffectAuthoringSchema,
+	GameLineEffectSchema,
+} from "~/config/schema/GameLineEffectSchema";
+import {
 	IdSchema,
 	NonNegativeIntegerSchema,
 	NonNegativeNumberSchema,
@@ -26,6 +30,7 @@ export const LineSchema = z
 		durationMs: NonNegativeIntegerSchema,
 		placement: PlacementSchema,
 		chargeCost: NonNegativeNumberSchema.default(0),
+		effects: z.array(GameLineEffectSchema).optional(),
 		inputs: ProducerInputsSchema.optional(),
 		output: ActivationOutputSchema.min(1).optional(),
 		effect: GameEffectSchema.optional(),
@@ -34,5 +39,6 @@ export const LineSchema = z
 
 export const LineFragmentSchema = LineSchema.extend({
 	name: z.string().min(1).optional(),
+	effects: z.array(GameLineEffectAuthoringSchema).optional(),
 	output: ActivationOutputAuthoringSchema.min(1).optional(),
 });

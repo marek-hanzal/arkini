@@ -217,7 +217,11 @@
 				"tree:t2",
 				"era:I"
 			],
-			"tier": 2
+			"tier": 2,
+			"capacity": {
+				"max": 36,
+				"onDepleted": "remove"
+			}
 		},
 		"item:log": {
 			"description": "Basic wood material produced by lumberjacks.",
@@ -259,7 +263,11 @@
 				"forest",
 				"era:I"
 			],
-			"tier": 3
+			"tier": 3,
+			"capacity": {
+				"max": 72,
+				"onDepleted": "remove"
+			}
 		},
 		"item:seed": {
 			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Feed it water on the board until it grows into a sapling stage, then let it finish into a tree.",
@@ -327,7 +335,12 @@
 				"stone",
 				"era:I",
 				"stone-deposit"
-			]
+			],
+			"capacity": {
+				"max": 64,
+				"onDepleted": "remove"
+			},
+			"maxStackSize": 1
 		},
 		"item:stone": {
 			"description": "Basic stone material produced by quarries.",
@@ -389,7 +402,12 @@
 				"tree",
 				"tree:t1"
 			],
-			"tier": 1
+			"tier": 1,
+			"capacity": {
+				"max": 18,
+				"onDepleted": "remove"
+			},
+			"maxStackSize": 1
 		},
 		"item:water": {
 			"description": "Basic water resource produced by wells and consumed by farms.",
@@ -512,20 +530,6 @@
 										}
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"tag": "wood-source"
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby wood source",
-										"phase": "start",
-										"radius": 2
-									},
-									{
 										"bands": [
 											{
 												"maxDistance": 2,
@@ -569,7 +573,23 @@
 						"tags": [
 							"shrine:haste-target"
 						],
-						"visibility": "visible"
+						"visibility": "visible",
+						"effects": [
+							{
+								"display": "always",
+								"items": {
+									"anyOf": [
+										{
+											"tag": "wood-source"
+										}
+									]
+								},
+								"kind": "nearby.capacity.spend",
+								"label": "Nearby wood capacity",
+								"amount": 1,
+								"radius": 2
+							}
+						]
 					}
 				]
 			},
@@ -625,22 +645,6 @@
 										}
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:rock"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:rock",
-										"phase": "start",
-										"radius": 2
-									},
-									{
 										"display": "whenActive",
 										"kind": "grant.duration.multiply",
 										"label": "Minor Haste",
@@ -677,22 +681,6 @@
 												}
 											]
 										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:rock"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:rock",
-										"phase": "start",
-										"radius": 2
 									}
 								],
 								"itemId": "item:stone",
@@ -716,22 +704,6 @@
 												}
 											]
 										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:rock"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:rock",
-										"phase": "start",
-										"radius": 2
 									}
 								],
 								"itemId": "item:stone",
@@ -741,7 +713,23 @@
 						"tags": [
 							"shrine:haste-target"
 						],
-						"visibility": "visible"
+						"visibility": "visible",
+						"effects": [
+							{
+								"display": "always",
+								"items": {
+									"anyOf": [
+										{
+											"id": "item:rock"
+										}
+									]
+								},
+								"kind": "nearby.capacity.spend",
+								"label": "Nearby stone deposit capacity",
+								"amount": 1,
+								"radius": 2
+							}
+						]
 					}
 				]
 			},

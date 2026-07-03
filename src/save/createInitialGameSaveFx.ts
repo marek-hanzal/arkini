@@ -102,6 +102,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		inventory: {
 			slots: inventorySlots,
 		},
+		itemCapacities: {},
 		producerJobs: {},
 		lines: {},
 		producerInputs: {},

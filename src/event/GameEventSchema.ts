@@ -35,6 +35,7 @@ const GameItemConsumedReasonSchema = z.enum([
 ]);
 
 const GameBoardItemChangeReasonSchema = z.enum([
+	"capacity-depleted",
 	"producer-depleted",
 	"tile-remove",
 	"merge-result",
@@ -174,6 +175,26 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			lineId: IdSchema,
 			startAtMs: GameInstantMsSchema,
 			readyAtMs: GameInstantMsSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("item.capacity.changed"),
+			itemId: IdSchema,
+			itemInstanceId: IdSchema,
+			amount: PositiveIntegerSchema,
+			max: PositiveIntegerSchema,
+			previousRemaining: NonNegativeIntegerSchema,
+			nextRemaining: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("item.capacity.depleted"),
+			itemId: IdSchema,
+			itemInstanceId: IdSchema,
+			atMs: GameInstantMsSchema,
 		})
 		.strict(),
 

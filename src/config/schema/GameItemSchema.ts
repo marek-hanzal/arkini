@@ -15,6 +15,28 @@ import { ProducerFragmentSchema, ProducerSchema } from "~/config/schema/GameProd
 import { RemoveBySchema } from "~/config/schema/GameRemoveBySchema";
 import { StashFragmentSchema, StashSchema } from "~/config/schema/GameStashSchema";
 
+export const ItemCapacitySchema = z.discriminatedUnion("onDepleted", [
+	z
+		.object({
+			max: PositiveIntegerSchema,
+			onDepleted: z.literal("remove"),
+		})
+		.strict(),
+	z
+		.object({
+			max: PositiveIntegerSchema,
+			onDepleted: z.literal("replace"),
+			replaceItemId: IdSchema,
+		})
+		.strict(),
+	z
+		.object({
+			max: PositiveIntegerSchema,
+			onDepleted: z.literal("stop"),
+		})
+		.strict(),
+]);
+
 export const ItemSchema = z
 	.object({
 		assetIds: z.array(IdSchema).min(1),
@@ -22,6 +44,7 @@ export const ItemSchema = z
 		tier: NonNegativeIntegerSchema.default(0),
 		maxStackSize: PositiveIntegerSchema.default(10),
 		maxCount: PositiveIntegerSchema.optional(),
+		capacity: ItemCapacitySchema.optional(),
 		storage: ItemStoragePolicySchema,
 		description: z.string(),
 		label: z.string().optional(),

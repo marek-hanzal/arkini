@@ -106,6 +106,30 @@ const validateConfigDefinitionReferences = ({
 			item.tags,
 			(value) => `Duplicate tag "${value}".`,
 		);
+
+		if (item.capacity?.onDepleted === "replace" && !hasItem(item.capacity.replaceItemId)) {
+			addIssue(
+				ctx,
+				[
+					"items",
+					itemId,
+					"capacity",
+					"replaceItemId",
+				],
+				`Missing item "${item.capacity.replaceItemId}".`,
+			);
+		}
+		if (item.capacity && item.maxStackSize !== 1) {
+			addIssue(
+				ctx,
+				[
+					"items",
+					itemId,
+					"maxStackSize",
+				],
+				`Item "${itemId}" has capacity and must use maxStackSize 1 to preserve per-instance state.`,
+			);
+		}
 		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
 			if (!hasItem(merge.withItemId)) {
 				addIssue(
@@ -715,7 +739,11 @@ const validateCommonGameLineEffect = ({
 		);
 	}
 
-	if (effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") {
+	if (
+		effect.kind === "nearby.require" ||
+		effect.kind === "nearby.duration.multiply" ||
+		effect.kind === "nearby.capacity.spend"
+	) {
 		validateGameLineItemSelector(
 			ctx,
 			[
@@ -771,6 +799,19 @@ const validateGameDropEffects = (
 	entities: GameEffectValidationEntities,
 ) => {
 	for (const [effectIndex, effect] of effects.entries()) {
+		if (effect.kind === "nearby.capacity.spend") {
+			addIssue(
+				ctx,
+				[
+					...path,
+					effectIndex,
+					"kind",
+				],
+				"nearby.capacity.spend must be authored on the producer line, not on a concrete output entry.",
+			);
+			continue;
+		}
+
 		if (isCommonGameLineEffect(effect)) {
 			validateCommonGameLineEffect({
 				ctx,
@@ -828,6 +869,7 @@ const isCommonGameLineEffect = (effect: GameDropEffect): effect is CommonGameLin
 	effect.kind === "grant.blockStart" ||
 	effect.kind === "nearby.require" ||
 	effect.kind === "nearby.duration.multiply" ||
+	effect.kind === "nearby.capacity.spend" ||
 	effect.kind === "grant.duration.multiply";
 
 const validateCraftRecipeEffectRuntimeSupport = (
@@ -1112,6 +1154,20 @@ const validateProducerCapability = ({
 				},
 			);
 		}
+
+		validateGameLineEffects(
+			ctx,
+			[
+				...linePath,
+				"effects",
+			],
+			line.effects ?? [],
+			{
+				grantIds,
+				hasItem,
+				itemIds,
+			},
+		);
 
 		if (section === "stash" && line.chargeCost <= 0) {
 			addIssue(

@@ -451,7 +451,9 @@ const normalizeNearbyEffectItems = ({
 	path: string;
 }) => {
 	if (
-		(effect.kind === "nearby.require" || effect.kind === "nearby.duration.multiply") &&
+		(effect.kind === "nearby.require" ||
+			effect.kind === "nearby.duration.multiply" ||
+			effect.kind === "nearby.capacity.spend") &&
 		effect.items !== undefined
 	) {
 		effect.items = normalizeAuthoringDomainSelector({
@@ -592,6 +594,11 @@ const normalizeLine = ({
 		...(line as Record<string, unknown>),
 	};
 	normalizedLine.name ??= readLineNameFromPrimaryOutput(normalizedLine, items);
+	normalizedLine.effects = normalizeLineEffects({
+		domainIndexes,
+		effects: normalizedLine.effects,
+		path: `${path}.effects`,
+	});
 	normalizedLine.output = normalizeActivationOutputEffects({
 		domainIndexes,
 		output: normalizedLine.output,

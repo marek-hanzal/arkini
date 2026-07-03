@@ -11,6 +11,12 @@ export const BoardViewItemSchema = z.object({
 	y: z.number().int().nonnegative(),
 	state: BoardItemStateSchema,
 	activation: ActivationViewSchema.optional(),
+	capacity: z
+		.object({
+			max: z.number().int().positive(),
+			remaining: z.number().int().nonnegative(),
+		})
+		.optional(),
 	craft: CraftProgressViewSchema.optional(),
 });
 

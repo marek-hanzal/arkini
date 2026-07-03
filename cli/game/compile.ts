@@ -13,8 +13,7 @@ const main = async () => {
 	});
 
 	console.log(`Compiled ${result.packageName}`);
-	console.log(`  game: ${result.gamePath}`);
-	console.log(`  assets: ${result.assetsPath}`);
+	console.log(`  pack: ${result.packPath}`);
 	console.log(
 		`  ${Object.keys(result.package.items).length} items, ${Object.keys(result.package.resources).length} resources`,
 	);

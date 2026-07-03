@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { defaultGameConfig } from "~/config/compiled/defaultGameConfig";
+import { loadGameConfigPackFromFile } from "~/config/pack/loadGameConfigPackFromFile";
 import {
 	readRuntimeEffectBenefitLines,
 	readRuntimeLineActiveEffectBonusLines,
 } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
+
+const defaultGameConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack.gz");
 
 describe("readRuntimeEffectBenefitLines", () => {
 	it("describes shrine speed boosts in player-readable copy", () => {

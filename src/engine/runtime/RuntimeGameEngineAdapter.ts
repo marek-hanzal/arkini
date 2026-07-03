@@ -7,7 +7,7 @@ import { syncRealtimeWorldJobsFx } from "~/world/syncRealtimeWorldJobsFx";
 import { validateWorldSnapshotFx } from "~/world/validateWorldSnapshotFx";
 import { hasProcessableWorldJobs } from "~/world/hasProcessableWorldJobs";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import { defaultGameConfig } from "~/config/compiled/defaultGameConfig";
+import { loadDefaultGameConfig } from "~/config/compiled/defaultGameConfig";
 import type { GameAction } from "~/action/GameActionSchema";
 import type { GameActionReadiness } from "~/action/GameActionReadinessSchema";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
@@ -90,16 +90,17 @@ export class RuntimeGameEngineAdapter {
 	}
 
 	static async create({
-		config = defaultGameConfig,
+		config,
 		initialSave,
 		nowMs = Date.now(),
 		random,
 	}: RuntimeGameEngineAdapter.Options = {}) {
+		const resolvedConfig = config ?? (await loadDefaultGameConfig());
 		const save =
 			initialSave ??
 			(await runGameEngineEffect(
 				createInitialGameSaveFx({
-					config,
+					config: resolvedConfig,
 					nowMs,
 				}),
 				{
@@ -109,7 +110,7 @@ export class RuntimeGameEngineAdapter {
 
 		const syncedSave = await runGameEngineEffect(
 			syncRealtimeWorldJobsFx({
-				config,
+				config: resolvedConfig,
 				nowMs,
 				save,
 			}),
@@ -119,7 +120,7 @@ export class RuntimeGameEngineAdapter {
 		);
 		const nextWakeAtMs = await runGameEngineEffect(
 			readNextWakeAtMsFx({
-				config,
+				config: resolvedConfig,
 				nowMs,
 				save: syncedSave,
 			}),
@@ -129,7 +130,7 @@ export class RuntimeGameEngineAdapter {
 		);
 
 		return new RuntimeGameEngineAdapter({
-			config,
+			config: resolvedConfig,
 			initialSave: syncedSave,
 			nextWakeAtMs,
 			random,

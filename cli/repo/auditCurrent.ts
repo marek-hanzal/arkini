@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { validateSources } from "../game/package";
-import { defaultGameConfig } from "../../src/config/compiled/defaultGameConfig";
+import { loadGameConfigPackFromFile } from "../../src/config/pack/loadGameConfigPackFromFile";
 import type { GameConfig } from "../../src/config/GameConfigTypes";
 
 type Finding = {
@@ -33,6 +33,11 @@ const forbiddenDirectories = [
 	"src/v0",
 	"src/game",
 	"src/ancient",
+] as const;
+
+const forbiddenFiles = [
+	"game/arkini.game.json",
+	"game/arkini.assets.json",
 ] as const;
 
 const forbiddenRootConfigKeys = [
@@ -83,11 +88,12 @@ const forbiddenTextPatterns = [
 const main = async () => {
 	const findings = [
 		...auditForbiddenDirectories(),
+		...auditForbiddenFiles(),
 		...auditText(),
 		...auditIndexBarrels(),
 		...auditConfig({
-			config: defaultGameConfig,
-			label: "src/config/compiled/defaultGameConfig.ts",
+			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack.gz"),
+			label: "game/arkini.game.arkpack.gz",
 		}),
 		...auditConfig({
 			config: await validateSources([
@@ -116,6 +122,19 @@ const auditForbiddenDirectories = (): Finding[] =>
 					{
 						path,
 						message: "removed runtime directory must not exist",
+					},
+				]
+			: [],
+	);
+
+const auditForbiddenFiles = (): Finding[] =>
+	forbiddenFiles.flatMap((path) =>
+		existsSync(path)
+			? [
+					{
+						path,
+						message:
+							"compiled runtime config must be packaged as arkpack, not split JSON",
 					},
 				]
 			: [],

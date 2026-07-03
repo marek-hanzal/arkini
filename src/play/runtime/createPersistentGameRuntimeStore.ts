@@ -1,5 +1,5 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
-import { defaultGameConfig } from "~/config/compiled/defaultGameConfig";
+import { loadDefaultGameConfig } from "~/config/compiled/defaultGameConfig";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdapter";
 import type { RandomService } from "~/random/context/RandomService";
@@ -47,20 +47,21 @@ const saveThroughStorage = ({
 	});
 
 export const createPersistentGameRuntimeStore = async ({
-	config = defaultGameConfig,
+	config,
 	debounceMs,
 	nowMs = Date.now(),
 	onPersistenceError,
 	random,
 	storage = createDefaultDexieGameSaveStorage(),
 }: createPersistentGameRuntimeStore.Options = {}): Promise<createPersistentGameRuntimeStore.Result> => {
-	const configHash = await hashRuntimeGameConfig(config);
+	const resolvedConfig = config ?? (await loadDefaultGameConfig());
+	const configHash = await hashRuntimeGameConfig(resolvedConfig);
 	const loadedSave = await storage.loadActiveSave({
-		config,
+		config: resolvedConfig,
 		configHash,
 	});
 	const adapter = await RuntimeGameEngineAdapter.create({
-		config,
+		config: resolvedConfig,
 		initialSave: loadedSave ?? undefined,
 		nowMs,
 		random,
@@ -72,7 +73,7 @@ export const createPersistentGameRuntimeStore = async ({
 
 	if (!loadedSave) {
 		await saveThroughStorage({
-			config,
+			config: resolvedConfig,
 			configHash,
 			save: adapter.readSave(),
 			storage,
@@ -85,7 +86,7 @@ export const createPersistentGameRuntimeStore = async ({
 		storage: {
 			save: (save) =>
 				saveThroughStorage({
-					config,
+					config: resolvedConfig,
 					configHash,
 					save,
 					storage,

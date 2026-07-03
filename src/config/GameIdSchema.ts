@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Runtime IDs are authored in compiled JSON and cross-reference validated by
+ * Runtime IDs are authored in source JSON and cross-reference validated by
  * `GameConfigSchema` / `GameSaveConfigSchema`. Keep the local value schema generic;
  * config/save validation owns domain truth.
  */

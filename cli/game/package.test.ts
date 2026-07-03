@@ -1,8 +1,9 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { validateSources } from "./package";
+import { compileDirectory, validateSources } from "./package";
+import { loadGameConfigPackFromFile } from "../../src/config/pack/loadGameConfigPackFromFile";
 
 const tempDirs: string[] = [];
 
@@ -93,5 +94,60 @@ describe("game package normalization", () => {
 		expect(config.items["producer:test"]?.producer?.lines[0]?.name).toBe("Plank");
 		expect(config.assets["asset:item:plank"]).not.toHaveProperty("kind");
 		expect(config.assets["asset:producer:test"]).not.toHaveProperty("kind");
+	});
+});
+
+const pngMagicBytes = Buffer.from("89504e470d0a1a0a", "hex");
+
+const createTempSourcePackage = async (value: unknown) => {
+	const dir = await mkdtemp(join(tmpdir(), "arkini-game-source-package-"));
+	tempDirs.push(dir);
+	await writeFile(join(dir, "game.json"), JSON.stringify(value));
+	return dir;
+};
+
+describe("game package compiler", () => {
+	it("writes a binary arkpack and does not require split compiled artifacts", async () => {
+		const sourceDir = await createTempSourcePackage({
+			version: 1,
+			game: {
+				id: "game:test",
+				title: "Test",
+				board: {
+					height: 1,
+					width: 1,
+				},
+				inventory: {
+					slots: 1,
+				},
+			},
+			items: {
+				"item:test": {
+					description: "Test item",
+					name: "Test item",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:test",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		await mkdir(join(sourceDir, "assets"));
+		await writeFile(join(sourceDir, "assets", "item-test.png"), pngMagicBytes);
+
+		const result = await compileDirectory({
+			inputDir: sourceDir,
+		});
+		const decoded = await loadGameConfigPackFromFile(result.packPath);
+
+		expect(result.packPath.endsWith(".game.arkpack.gz")).toBe(true);
+		expect(decoded.items["item:test"]?.name).toBe("Test item");
+		expect(decoded.resources["item-test"]?.data).toBe(pngMagicBytes.toString("base64"));
 	});
 });

@@ -10,7 +10,7 @@ const fallbackAssetSrc =
 
 const resourceDataSrc = (data: string | undefined) => {
 	if (!data) return undefined;
-	if (data.startsWith("data:")) return data;
+	if (/^[a-z][a-z0-9+.-]*:/i.test(data)) return data;
 	return `data:image/png;base64,${data}`;
 };
 

@@ -1,8 +1,9 @@
-import defaultGameAssetsJson from "../../../game/arkini.assets.json";
-import defaultGameConfigJson from "../../../game/arkini.game.json";
-import { GameConfigSchema } from "~/config/GameConfigSchema";
+import { loadGameConfigPackFromUrl } from "~/config/pack/loadGameConfigPackFromUrl";
 
-export const defaultGameConfig = GameConfigSchema.parse({
-	...defaultGameConfigJson,
-	resources: defaultGameAssetsJson.resources,
-});
+const defaultGamePackUrl = new URL("../../../game/arkini.game.arkpack.gz", import.meta.url);
+let defaultGameConfigPromise: ReturnType<typeof loadGameConfigPackFromUrl> | undefined;
+
+export const loadDefaultGameConfig = () => {
+	defaultGameConfigPromise ??= loadGameConfigPackFromUrl(defaultGamePackUrl);
+	return defaultGameConfigPromise;
+};

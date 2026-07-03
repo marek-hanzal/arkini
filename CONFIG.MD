@@ -4,7 +4,7 @@
 
 ## Package shape
 
-Source packages under `game/arkini` are compiled into `game/arkini.game.json` plus `game/arkini.assets.json`.
+Source packages under `game/arkini` are compiled into `game/arkini.game.arkpack.gz`: a gzip-compressed Arkini pack containing the normalized MessagePack game config and raw PNG resources. The authoring source stays JSON; the runtime artifact is binary.
 
 Canonical game config keys:
 

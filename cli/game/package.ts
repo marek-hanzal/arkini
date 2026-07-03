@@ -1,4 +1,6 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
+import { gzip } from "node:zlib";
+import { promisify } from "node:util";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { ZodError } from "zod";
 import {
@@ -8,12 +10,19 @@ import {
 } from "../../src/config/GameConfigSchema";
 import type { GameConfig } from "../../src/config/GameConfigTypes";
 import { doesResolvedDomainSelectorMatchId } from "../../src/selector/doesResolvedDomainSelectorMatchId";
+import {
+	encodeArkiniPack,
+	type ArkiniPackResourcePayload,
+} from "../../src/config/pack/ArkiniPackFormat";
+import { loadGameConfigPackFromFile } from "../../src/config/pack/loadGameConfigPackFromFile";
 
 const collectionKeys = [
 	"resources",
 	"assets",
 	"items",
 ] as const;
+
+const gzipAsync = promisify(gzip);
 
 type MergedGameConfig = Omit<GameConfig, "game" | "startingState"> &
 	Partial<Pick<GameConfig, "game" | "startingState">>;
@@ -29,8 +38,7 @@ export interface CompileDirectoryOptions {
 
 export interface CompileDirectoryResult {
 	packageName: string;
-	gamePath: string;
-	assetsPath: string;
+	packPath: string;
 	package: GameConfig;
 }
 
@@ -54,21 +62,12 @@ export const compileDirectory = async (
 		},
 	]);
 	const compiledPackage = validatePackage(packageValue);
-	const gamePath = join(outDir, `${packageName}.game.json`);
-	const assetsPath = join(outDir, `${packageName}.assets.json`);
-	const gameOutput = withoutResources(compiledPackage);
-	const assetsOutput = {
-		version: compiledPackage.version,
-		resources: compiledPackage.resources,
-	};
-
-	await writePrettyJson(gamePath, gameOutput);
-	await writePrettyJson(assetsPath, assetsOutput);
+	const packPath = join(outDir, `${packageName}.game.arkpack.gz`);
+	await writeGamePack(packPath, compiledPackage);
 
 	return {
 		packageName,
-		gamePath,
-		assetsPath,
+		packPath,
 		package: compiledPackage,
 	};
 };
@@ -80,6 +79,16 @@ export const validateSources = async (paths: readonly string[]) => {
 					"game/arkini",
 				]
 			: paths;
+	const packPaths = resolvedPaths.filter((path) => path.endsWith(".arkpack.gz"));
+	if (packPaths.length > 0) {
+		if (packPaths.length !== resolvedPaths.length || packPaths.length !== 1) {
+			throw new Error(
+				"Validate either one Arkini pack or source JSON paths, not a mixed pile of transport formats.",
+			);
+		}
+		return loadGameConfigPackFromFile(resolve(packPaths[0]));
+	}
+
 	const sources: FileSource[] = [];
 
 	for (const path of resolvedPaths) {
@@ -866,6 +875,35 @@ const readPngResources = async (paths: readonly string[]) => {
 	return resources;
 };
 
+const writeGamePack = async (path: string, config: GameConfig) => {
+	const resources: ArkiniPackResourcePayload[] = Object.entries(config.resources).map(
+		([resourceId, resource]) => ({
+			id: resourceId,
+			mime: "image/png",
+			bytes: readResourceBytes(resource.data),
+		}),
+	);
+	const packBytes = encodeArkiniPack({
+		config: withoutResources(config),
+		resources,
+	});
+	await writeFile(path, await gzipAsync(packBytes));
+};
+
+const readResourceBytes = (data: string): Uint8Array => {
+	const base64 = data.startsWith("data:") ? readDataUrlBase64(data) : data;
+	return new Uint8Array(Buffer.from(base64, "base64"));
+};
+
+const readDataUrlBase64 = (data: string) => {
+	const marker = ";base64,";
+	const markerIndex = data.indexOf(marker);
+	if (markerIndex === -1) {
+		throw new Error("Only base64 data URLs can be packed as Arkini resources.");
+	}
+	return data.slice(markerIndex + marker.length);
+};
+
 const findFiles = async (root: string, extension: string): Promise<string[]> => {
 	const entries = await readdir(root, {
 		withFileTypes: true,
@@ -929,29 +967,6 @@ const withoutResources = (value: GameConfig) => {
 	const { resources: _resources, ...rest } = value;
 
 	return rest;
-};
-
-const writePrettyJson = async (path: string, value: unknown) => {
-	await writeFile(path, `${JSON.stringify(sortJson(value), null, "\t")}\n`);
-};
-
-const sortJson = (value: unknown): unknown => {
-	if (Array.isArray(value)) {
-		return value.map(sortJson);
-	}
-
-	if (!value || typeof value !== "object") {
-		return value;
-	}
-
-	return Object.fromEntries(
-		Object.entries(value)
-			.sort(([left], [right]) => left.localeCompare(right))
-			.map(([key, entry]) => [
-				key,
-				sortJson(entry),
-			]),
-	);
 };
 
 const assertPng = (bytes: Buffer, path: string) => {

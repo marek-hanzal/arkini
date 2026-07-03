@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { defaultGameConfig } from "~/config/compiled/defaultGameConfig";
+import { loadGameConfigPackFromFile } from "~/config/pack/loadGameConfigPackFromFile";
+
+const defaultGameConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack.gz");
 
 const readLine = (lineId: string) =>
 	Object.values(defaultGameConfig.items)

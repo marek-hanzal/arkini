@@ -4,16 +4,14 @@ import { checkCraftStartReadinessFx } from "~/craft/checkCraftStartReadinessFx";
 import { checkCraftStartRuntimeConstraintsFx } from "~/craft/checkCraftStartRuntimeConstraintsFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { createGameJobIdFx } from "~/job/createGameJobIdFx";
-import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
+import { readCraftStoredInputsReadyFx } from "~/craft/readCraftStoredInputsReadyFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { readCraftJobEffectiveTimingFx } from "~/craft/readCraftJobEffectiveTimingFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameActionCraftStart } from "~/action/GameActionCraftStart";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
 
 export namespace startCraftFx {
 	export interface Props {
@@ -23,28 +21,6 @@ export namespace startCraftFx {
 		nowMs: number;
 	}
 }
-
-const readCraftStoredInputsReadyFx = Effect.fn("readCraftStoredInputsReadyFx")(function* ({
-	inputs,
-	save,
-	targetItemInstanceId,
-}: {
-	inputs: readonly GameCraftRecipeDefinition["inputs"][number][];
-	save: GameSave;
-	targetItemInstanceId: string;
-}) {
-	const storedInputs = yield* readCraftInputQuantitiesFx({
-		save,
-		targetItemInstanceId,
-	});
-	return inputs.every(
-		(input) =>
-			readGameItemQuantity({
-				itemId: input.itemId,
-				quantities: storedInputs,
-			}) >= input.quantity,
-	);
-});
 
 export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 	config,

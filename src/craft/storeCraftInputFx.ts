@@ -2,7 +2,9 @@ import { Effect } from "effect";
 import { checkCraftInputStoreReadinessFx } from "~/craft/checkCraftInputStoreReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
+import { readCraftStoredInputsReadyFx } from "~/craft/readCraftStoredInputsReadyFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { startCraftFx } from "~/craft/startCraftFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputStore } from "~/action/GameActionCraftInputStore";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
@@ -59,7 +61,12 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 		type: "craft_input.stored",
 	});
 
-	return {
+	const storedInputsReady = yield* readCraftStoredInputsReadyFx({
+		inputs: checked.target.recipe.inputs,
+		save: nextSave,
+		targetItemInstanceId: action.targetItemInstanceId,
+	});
+	const storedResult = {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
 			config,
@@ -67,5 +74,33 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 			save: nextSave,
 		}),
 		save: nextSave,
+	} satisfies GameEngineResult;
+	if (!storedInputsReady) return storedResult;
+
+	const startEither = yield* Effect.either(
+		startCraftFx({
+			action: {
+				recipeId: checked.target.recipeId,
+				targetItemInstanceId: action.targetItemInstanceId,
+				type: "craft.start",
+			},
+			config,
+			nowMs,
+			save: nextSave,
+		}),
+	);
+	if (startEither._tag === "Left") {
+		const error = startEither.left;
+		if (error._tag === "GameActionRejected") return storedResult;
+		return yield* Effect.fail(error);
+	}
+
+	return {
+		events: [
+			...events,
+			...startEither.right.events,
+		],
+		nextWakeAtMs: startEither.right.nextWakeAtMs,
+		save: startEither.right.save,
 	} satisfies GameEngineResult;
 });

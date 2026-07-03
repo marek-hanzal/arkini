@@ -459,6 +459,206 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
+	it("keeps manually completed inputs stored while craft start requirements are blocked", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			itemEffects: {
+				"item:axe": [
+					{
+						id: "effect:test:required",
+						grants: [
+							{
+								id: "grant:test:required",
+								name: "Required",
+							},
+						],
+						name: "Required Grant",
+						polarity: "neutral",
+						sourceScope: "inventory",
+					},
+				],
+			},
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					durationMs: 1000,
+					effects: [
+						{
+							display: "whenMissing",
+							kind: "grant.require",
+							label: "Required",
+							phase: "start",
+							selector: {
+								allOf: [
+									{
+										ids: [
+											"grant:test:required",
+										],
+									},
+								],
+							},
+						},
+					],
+					inputs: [
+						{
+							consume: true,
+							itemId: "item:twig",
+							quantity: 1,
+						},
+					],
+					resultItemId: "item:plank",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.craftInputs).toEqual({
+			"item-instance:1": {
+				items: {
+					"item:twig": 1,
+				},
+			},
+		});
+		expect(result.save.craftJobs).toEqual({});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				reason: "craft-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 1,
+				type: "craft_input.stored",
+			},
+		]);
+	});
+
+	it("auto-starts craft when manual refill completes inputs after a withdraw", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+
+		const firstDeposit = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+		const withdrawn = runAction({
+			action: {
+				itemId: "item:twig",
+				quantity: 1,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.withdraw",
+			},
+			config,
+			nowMs: 200,
+			save: firstDeposit.save,
+		});
+
+		expect(withdrawn.save.craftInputs).toEqual({});
+		expect(
+			findBoardItem(withdrawn.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
+
+		const refilled = runAction({
+			action: {
+				inputRef: {
+					kind: "inventory",
+					quantity: 2,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 300,
+			save: withdrawn.save,
+		});
+
+		expect(refilled.save.craftInputs).toEqual({});
+		expect(refilled.save.inventory.slots[0]).toBeNull();
+		expect(readOnlyRecordValue(refilled.save.craftJobs)).toMatchObject({
+			readyAtMs: 1300,
+			recipeId: "item:craft-table",
+			targetItemInstanceId: "item-instance:1",
+			startAtMs: 300,
+		});
+		expect(refilled.events).toMatchObject([
+			{
+				itemId: "item:twig",
+				reason: "craft-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:twig",
+				nextQuantity: 2,
+				previousQuantity: 0,
+				type: "craft_input.stored",
+			},
+			{
+				readyAtMs: 1300,
+				recipeId: "item:craft-table",
+				startAtMs: 300,
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.started",
+			},
+		]);
+	});
+
 	it("completes zero-duration craft jobs in the same action", () => {
 		const baseConfig = createEngineCraftTableTestConfig();
 		const config = createEngineTestConfig({

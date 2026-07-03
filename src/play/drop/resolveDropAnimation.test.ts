@@ -81,6 +81,7 @@ describe("resolveDrop animation contract", () => {
 			showError: vi.fn(),
 		} as unknown as Feedback.Type;
 		const actions = {
+			deleteBoardItem: vi.fn(),
 			applyBoardItemToBoardItem: vi.fn(),
 			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),
@@ -150,6 +151,7 @@ describe("resolveDrop animation contract", () => {
 			showError: vi.fn(),
 		} as unknown as Feedback.Type;
 		const actions = {
+			deleteBoardItem: vi.fn(),
 			applyBoardItemToBoardItem: vi.fn(),
 			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),
@@ -203,6 +205,7 @@ describe("resolveDrop animation contract", () => {
 			showError: vi.fn(),
 		} as unknown as Feedback.Type;
 		const actions = {
+			deleteBoardItem: vi.fn(),
 			applyBoardItemToBoardItem,
 			applyInventoryItemToBoardItem: vi.fn(),
 			moveBoardItem: vi.fn(),

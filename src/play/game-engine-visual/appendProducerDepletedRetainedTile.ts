@@ -25,6 +25,7 @@ const readMotionEndMs = (cleanupDelayMs: number | undefined) =>
 	Math.max(0, (cleanupDelayMs ?? 0) - TileEngineTiming.motionCleanupBufferMs);
 
 const producerExitDurationMs = 1;
+const removedItemExitDurationMs = 260;
 
 const readRetainedTileExitDelayMs = ({
 	plan,
@@ -51,18 +52,21 @@ export const appendProducerDepletedRetainedTile = ({
 	plan,
 	previousBoard,
 }: appendProducerDepletedRetainedTile.Props) => {
-	if (event.reason !== "producer-depleted") return;
 	if (currentBoard?.byId[event.itemInstanceId]) return;
 
 	const previousItem = previousBoard?.byId[event.itemInstanceId];
 	if (!previousItem) return;
 
-	const delayMs = readRetainedTileExitDelayMs({
-		plan,
-		itemInstanceId: event.itemInstanceId,
-	});
-	const durationMs = producerExitDurationMs;
-	const groupId = `engine:producer-depleted-retain:${event.itemInstanceId}:${event.atMs}`;
+	const delayMs =
+		event.reason === "producer-depleted"
+			? readRetainedTileExitDelayMs({
+					plan,
+					itemInstanceId: event.itemInstanceId,
+				})
+			: 0;
+	const durationMs =
+		event.reason === "producer-depleted" ? producerExitDurationMs : removedItemExitDurationMs;
+	const groupId = `engine:item-removed:${event.reason}:${event.itemInstanceId}:${event.atMs}`;
 	const cleanupDelayMs = delayMs + durationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {
 		groupId,
@@ -80,7 +84,7 @@ export const appendProducerDepletedRetainedTile = ({
 				delayMs,
 				durationMs,
 				groupId,
-				kind: "merge-out",
+				kind: event.reason === "producer-depleted" ? "merge-out" : "remove",
 			},
 			tileId: tile.id,
 		},

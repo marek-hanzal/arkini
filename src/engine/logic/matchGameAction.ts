@@ -19,6 +19,7 @@ export namespace matchGameAction {
 		craftInputStore: (action: GameActionOfType<"craft.input.store">) => Result;
 		craftInputWithdraw: (action: GameActionOfType<"craft.input.withdraw">) => Result;
 		craftStart: (action: GameActionOfType<"craft.start">) => Result;
+		debugBoardItemDelete: (action: GameActionOfType<"debug.board_item.delete">) => Result;
 		debugItemSpawn: (action: GameActionOfType<"debug.item.spawn">) => Result;
 		inventoryItemPlace: (action: GameActionOfType<"inventory.item.place">) => Result;
 		inventorySlotsSwap: (action: GameActionOfType<"inventory.slots.swap">) => Result;
@@ -90,6 +91,12 @@ export const matchGameAction = <Result>(
 				type: "craft.start",
 			},
 			cases.craftStart,
+		)
+		.with(
+			{
+				type: "debug.board_item.delete",
+			},
+			cases.debugBoardItemDelete,
 		)
 		.with(
 			{

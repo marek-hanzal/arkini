@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inventoryBoardItemId } from "~/board/BoardUtilityItem";
+import { cheatBoardItemId, inventoryBoardItemId } from "~/board/BoardUtilityItem";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { createEngineMergeTestConfig } from "~/engine/test/createEngineMergeTestConfig";
@@ -152,6 +152,50 @@ describe("resolveBoardCellDropAction", () => {
 				expectedItemId: source.itemId,
 			},
 			type: "store-board-item-in-inventory",
+		});
+	});
+
+	it("deletes board items dropped onto the cheat inventory board item", () => {
+		const source = boardItem({
+			id: "source",
+			itemId: "item:twig",
+			x: 0,
+			y: 0,
+		});
+		const cheatTarget = boardItem({
+			id: "cheat",
+			itemId: cheatBoardItemId,
+			x: 1,
+			y: 0,
+		});
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: emptyInventory,
+				board: rebuildBoardView([
+					source,
+					cheatTarget,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: cheatTarget.x,
+					y: cheatTarget.y,
+					boardItemId: cheatTarget.id,
+				},
+			}),
+		).toEqual({
+			feedback: {
+				cellKey: "1:0",
+				kind: "cell-feedback",
+				variant: "danger",
+			},
+			input: {
+				boardItemId: source.id,
+				expectedItemId: source.itemId,
+			},
+			type: "delete-board-item",
 		});
 	});
 

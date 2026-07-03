@@ -8,6 +8,7 @@ import { GameActionCheatSpeedModeSetSchema } from "~/action/GameActionCheatSpeed
 import { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
 import { GameActionInventorySlotsSwapSchema } from "~/action/GameActionInventorySlotsSwapSchema";
 import { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
+import { GameActionDebugBoardItemDeleteSchema } from "~/action/GameActionDebugBoardItemDeleteSchema";
 import { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import { GameActionCraftInputWithdrawSchema } from "~/action/GameActionCraftInputWithdrawSchema";
 import { GameActionCraftStartSchema } from "~/action/GameActionCraftStartSchema";
@@ -29,6 +30,7 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionCraftInputStoreSchema,
 	GameActionCraftInputWithdrawSchema,
 	GameActionCraftStartSchema,
+	GameActionDebugBoardItemDeleteSchema,
 	GameActionDebugItemSpawnSchema,
 	GameActionItemMergeSchema,
 	GameActionInventoryItemPlaceSchema,

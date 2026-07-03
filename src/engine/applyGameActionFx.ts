@@ -14,6 +14,7 @@ import { removeTileFx } from "~/remove/removeTileFx";
 import { setLineDefaultFx } from "~/producer/setLineDefaultFx";
 import { setCheatSpeedModeFx } from "~/cheat/setCheatSpeedModeFx";
 import { startCraftFx } from "~/craft/startCraftFx";
+import { deleteDebugBoardItemFx } from "~/debug/logic/deleteDebugBoardItemFx";
 import { spawnDebugItemFx } from "~/debug/logic/spawnDebugItemFx";
 import { storeCraftInputFx } from "~/craft/storeCraftInputFx";
 import { withdrawCraftInputFx } from "~/craft/withdrawCraftInputFx";
@@ -112,6 +113,13 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		craftStart: (craftAction) =>
 			startCraftFx({
 				action: craftAction,
+				config,
+				nowMs,
+				save,
+			}),
+		debugBoardItemDelete: (deleteAction) =>
+			deleteDebugBoardItemFx({
+				action: deleteAction,
 				config,
 				nowMs,
 				save,

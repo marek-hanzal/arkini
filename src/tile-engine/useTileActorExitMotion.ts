@@ -74,41 +74,59 @@ export const useTileActorExitMotion = ({
 							`${translate3d(flyDelta.x, flyDelta.y)} scale(0.5)`,
 						],
 					}
-				: kind === "flip-out"
+				: kind === "remove"
 					? {
 							opacity: [
 								1,
-								0.42,
+								0.72,
 								0,
 							],
 							filter: [
-								"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
-								"brightness(1.24) drop-shadow(0 14px 20px rgb(168 85 247 / 0.28))",
-								"brightness(0.94) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+								"brightness(1) saturate(1)",
+								"brightness(1.22) saturate(0.85)",
+								"brightness(0.8) saturate(0.35)",
 							],
 							transform: [
-								"perspective(640px) translate3d(0px, 0px, 0px) rotateY(0deg) scale(1)",
-								"perspective(640px) translate3d(0px, -10px, 0px) rotateY(34deg) scale(1.12)",
-								"perspective(640px) translate3d(0px, 3px, 0px) rotateY(92deg) scale(0.82)",
+								"translate3d(0px, 0px, 0px) scale(1)",
+								"translate3d(0px, -3px, 0px) scale(1.06)",
+								"translate3d(0px, 5px, 0px) scale(0.58)",
 							],
 						}
-					: kind === "replace-out"
+					: kind === "flip-out"
 						? {
 								opacity: [
 									1,
+									0.42,
 									0,
 								],
-							}
-						: {
-								opacity: [
-									1,
-									0,
+								filter: [
+									"brightness(1) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
+									"brightness(1.24) drop-shadow(0 14px 20px rgb(168 85 247 / 0.28))",
+									"brightness(0.94) drop-shadow(0 0 0 rgb(168 85 247 / 0))",
 								],
 								transform: [
-									"translate3d(0px, 0px, 0px) scale(1)",
-									"translate3d(0px, 0px, 0px) scale(0.92)",
+									"perspective(640px) translate3d(0px, 0px, 0px) rotateY(0deg) scale(1)",
+									"perspective(640px) translate3d(0px, -10px, 0px) rotateY(34deg) scale(1.12)",
+									"perspective(640px) translate3d(0px, 3px, 0px) rotateY(92deg) scale(0.82)",
 								],
-							};
+							}
+						: kind === "replace-out"
+							? {
+									opacity: [
+										1,
+										0,
+									],
+								}
+							: {
+									opacity: [
+										1,
+										0,
+									],
+									transform: [
+										"translate3d(0px, 0px, 0px) scale(1)",
+										"translate3d(0px, 0px, 0px) scale(0.92)",
+									],
+								};
 
 		void startTileStyleMotion({
 			scope,

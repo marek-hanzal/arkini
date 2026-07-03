@@ -1,5 +1,5 @@
 import { cellKey } from "~/board/cellKey";
-import { isInventoryBoardItemId } from "~/board/BoardUtilityItem";
+import { cheatBoardItemId, isInventoryBoardItemId } from "~/board/BoardUtilityItem";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
@@ -18,6 +18,18 @@ export type BoardCellDropAction =
 			feedback: {
 				kind: "board-cell";
 				cellKey: string;
+			};
+	  }
+	| {
+			type: "delete-board-item";
+			feedback: {
+				kind: "cell-feedback";
+				cellKey: string;
+				variant: TileEngine.DropFeedbackVariant;
+			};
+			input: {
+				boardItemId: string;
+				expectedItemId: string;
 			};
 	  }
 	| {
@@ -147,6 +159,21 @@ export const resolveBoardCellDropAction = ({
 				x: target.x,
 				y: target.y,
 			},
+		};
+	}
+
+	if (targetItem.itemId === cheatBoardItemId) {
+		return {
+			feedback: {
+				cellKey: targetCellKey,
+				kind: "cell-feedback",
+				variant: "danger",
+			},
+			input: {
+				boardItemId: source.boardItemId,
+				expectedItemId: sourceItem.itemId,
+			},
+			type: "delete-board-item",
 		};
 	}
 

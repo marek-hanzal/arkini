@@ -35,6 +35,7 @@ const GameItemConsumedReasonSchema = z.enum([
 ]);
 
 const GameBoardItemChangeReasonSchema = z.enum([
+	"debug-delete",
 	"capacity-depleted",
 	"producer-depleted",
 	"tile-remove",

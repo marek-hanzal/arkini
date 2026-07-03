@@ -85,6 +85,22 @@ export const useGameRuntimeDropActions = (): DropActions => {
 
 	return useMemo(
 		() => ({
+			deleteBoardItem(input) {
+				const snapshot = store.getSnapshot();
+				const nowMs = Date.now();
+				const boardItem = readBoardView(snapshot, nowMs).byId[input.boardItemId];
+				if (!boardItem || boardItem.itemId !== input.expectedItemId)
+					return Promise.resolve();
+
+				return store.dispatch({
+					action: {
+						boardItemId: input.boardItemId,
+						expectedItemId: input.expectedItemId,
+						type: "debug.board_item.delete",
+					},
+					nowMs,
+				});
+			},
 			applyBoardItemToBoardItem(input) {
 				return dispatchItemToBoardItemAction({
 					expectedSourceItemId: input.expectedSourceItemId,

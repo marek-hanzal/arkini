@@ -6,6 +6,7 @@ export const TileExitMotionSchema = z.object({
 			"flip-out",
 			"fly-to-tile",
 			"merge-out",
+			"remove",
 			"replace-out",
 		])
 		.optional(),

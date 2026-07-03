@@ -1,7 +1,7 @@
 import type { BoardCellView } from "~/board/boardCells";
 import type { BoardSurface } from "~/board/BoardSurface.types";
 import { cellKey } from "~/board/cellKey";
-import { isInventoryBoardItemId } from "~/board/BoardUtilityItem";
+import { cheatBoardItemId, isInventoryBoardItemId } from "~/board/BoardUtilityItem";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
@@ -74,6 +74,17 @@ export const resolveBoardDropFeedback = ({
 	}
 
 	if (source.kind === "board" && targetItem.id === source.boardItemId) return null;
+
+	if (targetItem.itemId === cheatBoardItemId) {
+		return source.kind === "board"
+			? {
+					effect: "merge",
+					variant: "danger",
+				}
+			: {
+					effect: "blocked",
+				};
+	}
 
 	if (isInventoryBoardItemId(targetItem.itemId)) {
 		if (source.kind !== "board") {

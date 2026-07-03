@@ -30,7 +30,7 @@ export namespace applyBoardMemoryActivateFx {
 	}
 }
 
-const readBoardMemorySnapshot = ({ save }: { save: GameSave }) =>
+const readBoardMemorySnapshot = ({ config, save }: { config: GameConfig; save: GameSave }) =>
 	Object.values(save.board.items)
 		.sort(
 			(left, right) =>
@@ -42,8 +42,16 @@ const readBoardMemorySnapshot = ({ save }: { save: GameSave }) =>
 				save,
 			});
 
+			const inventoryStorageAllowed = isItemStorageAllowed({
+				config,
+				itemId: item.itemId,
+				location: "inventory",
+			});
+
 			return {
-				...(item.itemId === boardMemoryItemId || stateStatus.preservable
+				...(item.itemId === boardMemoryItemId ||
+				stateStatus.preservable ||
+				!inventoryStorageAllowed
 					? {
 							itemInstanceId: item.id,
 						}
@@ -255,6 +263,109 @@ const placeBoardItemInInventory = ({
 const cellIsOccupied = ({ save, x, y }: { save: GameSave; x: number; y: number }) =>
 	Object.values(save.board.items).some((item) => item.x === x && item.y === y);
 
+const readBoardOnlyRestoreSource = ({
+	config,
+	memoryItem,
+	save,
+	usedItemInstanceIds,
+}: {
+	config: GameConfig;
+	memoryItem: {
+		itemId: string;
+		itemInstanceId?: string;
+		x: number;
+		y: number;
+	};
+	save: GameSave;
+	usedItemInstanceIds: ReadonlySet<string>;
+}): GameSaveBoardItem | undefined => {
+	if (
+		isItemStorageAllowed({
+			config,
+			itemId: memoryItem.itemId,
+			location: "inventory",
+		})
+	)
+		return undefined;
+
+	if (memoryItem.itemInstanceId) {
+		const exactItem = save.board.items[memoryItem.itemInstanceId];
+		if (exactItem?.itemId === memoryItem.itemId) return exactItem;
+	}
+
+	const candidates = Object.values(save.board.items).filter(
+		(item) => item.itemId === memoryItem.itemId && !usedItemInstanceIds.has(item.id),
+	);
+
+	return (
+		candidates.find((item) => item.x === memoryItem.x && item.y === memoryItem.y) ??
+		candidates[0]
+	);
+};
+
+const restoreBoardOnlyLayoutItems = ({
+	config,
+	events,
+	savedItems,
+	save,
+}: {
+	config: GameConfig;
+	events: GameEvent[];
+	savedItems: readonly {
+		itemId: string;
+		itemInstanceId?: string;
+		x: number;
+		y: number;
+	}[];
+	save: GameSave;
+}): Set<number> => {
+	const restoredIndexes = new Set<number>();
+	const usedItemInstanceIds = new Set<string>();
+
+	for (const [index, memoryItem] of savedItems.entries()) {
+		const source = readBoardOnlyRestoreSource({
+			config,
+			memoryItem,
+			save,
+			usedItemInstanceIds,
+		});
+		if (!source) continue;
+		if (source.x === memoryItem.x && source.y === memoryItem.y) {
+			restoredIndexes.add(index);
+			usedItemInstanceIds.add(source.id);
+			continue;
+		}
+
+		events.push({
+			from: {
+				kind: "board",
+				itemInstanceId: source.id,
+			},
+			itemId: source.itemId,
+			reason: "memory-store",
+			type: "item.consumed",
+		});
+		source.x = memoryItem.x;
+		source.y = memoryItem.y;
+		events.push({
+			itemId: source.itemId,
+			originItemInstanceId: source.id,
+			reason: "memory-restore",
+			to: {
+				kind: "board",
+				itemInstanceId: source.id,
+				x: memoryItem.x,
+				y: memoryItem.y,
+			},
+			type: "item.created",
+		});
+		restoredIndexes.add(index);
+		usedItemInstanceIds.add(source.id);
+	}
+
+	return restoredIndexes;
+};
+
 export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx")(function* ({
 	action,
 	config,
@@ -276,6 +387,7 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 
 	if (!savedLayout) {
 		const items = readBoardMemorySnapshot({
+			config,
 			save: nextSave,
 		});
 		nextSave.boardMemoryLayouts[action.boardItemId] = {
@@ -312,8 +424,16 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 		});
 	}
 
-	let restoredCount = 0;
-	for (const memoryItem of savedLayout.items) {
+	const boardOnlyRestoredIndexes = restoreBoardOnlyLayoutItems({
+		config,
+		events,
+		savedItems: savedLayout.items,
+		save: nextSave,
+	});
+
+	let restoredCount = boardOnlyRestoredIndexes.size;
+	for (const [memoryItemIndex, memoryItem] of savedLayout.items.entries()) {
+		if (boardOnlyRestoredIndexes.has(memoryItemIndex)) continue;
 		if (
 			cellIsOccupied({
 				save: nextSave,

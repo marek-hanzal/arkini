@@ -12,6 +12,7 @@ export interface DropActions {
 		sourceSlotIndex: number;
 		targetBoardItemId: string;
 	}): Promise<unknown>;
+	deleteBoardItem(input: { boardItemId: string; expectedItemId: string }): Promise<unknown>;
 	moveBoardItem(input: {
 		boardItemId: string;
 		expectedItemId: string;

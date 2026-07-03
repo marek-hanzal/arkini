@@ -56,6 +56,13 @@ export const resolveBoardCellDrop = ({
 		return rejectDrop(() => feedback.flashBoardCell(action.feedback.cellKey));
 	}
 
+	if (action.type === "delete-board-item") {
+		return acceptDrop(async () => {
+			await actions.deleteBoardItem(action.input);
+			feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
+		});
+	}
+
 	if (action.type === "move-board-item") {
 		return acceptDrop(() => actions.moveBoardItem(action.input));
 	}

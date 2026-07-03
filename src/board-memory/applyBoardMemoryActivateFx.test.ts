@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { inventoryBoardItemId } from "~/board/BoardUtilityItem";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { findBoardItem, runAction, runInitialSave } from "~/engine/applyGameActionFx.testSupport";
@@ -25,6 +26,18 @@ const createMemoryTestConfig = () => {
 				maxStackSize: 1,
 				name: "Board Memory",
 				storage: "both",
+				tags: [],
+				tier: 0,
+			},
+			[inventoryBoardItemId]: {
+				assetIds: [
+					"asset:test",
+				],
+				description: "Inventory",
+				maxCount: 1,
+				maxStackSize: 1,
+				name: "Inventory",
+				storage: "board",
 				tags: [],
 				tier: 0,
 			},
@@ -295,6 +308,81 @@ describe("applyBoardMemoryActivateFx", () => {
 			x: 0,
 			y: 0,
 		});
+	});
+
+	it("restores board-only utility tiles by board layout instead of hiding them in inventory", () => {
+		const config = createMemoryTestConfig();
+		config.game.board.width = 4;
+		config.startingState.board.push({
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 1,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		const inventory = findBoardItem(save, {
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 1,
+		});
+		expect(memory).toBeDefined();
+		expect(inventory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		expect(saved.boardMemoryLayouts[memory!.id]?.items).toContainEqual({
+			itemId: inventoryBoardItemId,
+			itemInstanceId: inventory!.id,
+			x: 1,
+			y: 1,
+		});
+
+		const moved = runAction({
+			action: {
+				boardItemId: inventory!.id,
+				type: "board.item.move",
+				x: 3,
+				y: 1,
+			},
+			config,
+			nowMs: 200,
+			save: saved,
+		}).save;
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 300,
+			save: moved,
+		});
+
+		expect(restored.save.board.items[inventory!.id]).toMatchObject({
+			itemId: inventoryBoardItemId,
+			x: 1,
+			y: 1,
+		});
+		expect(restored.save.inventory.slots).not.toContainEqual(
+			expect.objectContaining({
+				itemId: inventoryBoardItemId,
+			}),
+		);
 	});
 
 	it("can store filled memory in inventory as an instance without losing its layout", () => {

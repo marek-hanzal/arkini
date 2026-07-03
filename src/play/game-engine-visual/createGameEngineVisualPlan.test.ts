@@ -869,6 +869,43 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("animates removed board items that are not retained producer depletion placeholders", () => {
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([]),
+			currentInventory: undefined,
+			events: [
+				{
+					atMs: 1000,
+					itemId: "item:tree",
+					itemInstanceId: "resource",
+					reason: "capacity-depleted",
+					type: "item.removed",
+				},
+			] satisfies GameEvent[],
+			previousBoard: boardView([
+				{
+					id: "resource",
+					itemId: "item:tree",
+					state: {},
+					x: 2,
+					y: 1,
+				},
+			]),
+		});
+
+		expect(plan.boardTransientTilePlans).toHaveLength(1);
+		expect(plan.boardTransientTilePlans[0]?.request.exit).toMatchObject({
+			delayMs: 0,
+			durationMs: 260,
+			kind: "remove",
+		});
+		expect(plan.boardTransientTilePlans[0]?.tile).toMatchObject({
+			id: "resource",
+			itemId: "item:tree",
+			slotId: "2:1",
+		});
+	});
+
 	it("does not let stash feedback hold a depleted stash tile on board", () => {
 		const previousBoard = boardView([
 			{

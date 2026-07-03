@@ -30,7 +30,7 @@ export const BoardCell = memo(
 			data-ak-board-cell-status={statusVariant}
 			data-ak-cell-invalid={invalid ? "true" : undefined}
 			className={cn(
-				"relative aspect-square touch-none bg-[linear-gradient(145deg,rgba(43,24,57,0.97),rgba(31,16,42,0.98)_58%,rgba(24,11,35,0.98))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.045),inset_0_10px_24px_rgba(236,72,153,0.028),inset_0_-18px_32px_rgba(0,0,0,0.12)]",
+				"relative aspect-square touch-none bg-black/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.075),inset_0_0_0_2px_rgba(0,0,0,0.08)]",
 				invalid &&
 					"bg-ak-danger/15 outline outline-1 -outline-offset-1 outline-ak-danger/35",
 			)}

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { cheatBoardItemId } from "~/board/BoardUtilityItem";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { resolveDrop } from "~/play/drop/resolveDrop";
 import type { BoardView } from "~/board/view/BoardViewSchema";
@@ -196,6 +197,100 @@ describe("resolveDrop animation contract", () => {
 		expect(outcome).toBe("reject");
 		expect(actions.applyBoardItemToBoardItem).not.toHaveBeenCalled();
 		expect(actions.moveBoardItem).not.toHaveBeenCalled();
+	});
+
+	it("marks cheat inventory deletes as consume animations without swap handoff", async () => {
+		const deleteBoardItem = vi.fn(async () => undefined);
+		const feedback = {
+			pulseBoardCellFeedback: vi.fn(),
+			showError: vi.fn(),
+		} as unknown as Feedback.Type;
+		const actions = {
+			deleteBoardItem,
+			applyBoardItemToBoardItem: vi.fn(),
+			applyInventoryItemToBoardItem: vi.fn(),
+			moveBoardItem: vi.fn(),
+			placeInventoryItem: vi.fn(),
+			swapBoardItems: vi.fn(),
+			storeBoardItem: vi.fn(),
+			swapInventorySlots: vi.fn(),
+		} satisfies DropActions;
+		const source = boardItem({
+			id: "source",
+			x: 0,
+			y: 0,
+		});
+		const cheatTarget = {
+			...boardItem({
+				id: "cheat",
+				x: 1,
+				y: 0,
+			}),
+			itemId: cheatBoardItemId,
+		} satisfies BoardViewItem;
+
+		const outcome = resolveDrop({
+			actions,
+			config,
+			feedback,
+			inventory: emptyInventory,
+			board: {
+				...emptyBoard,
+				byCellKey: {
+					"0:0": source,
+					"1:0": cheatTarget,
+				},
+				byId: {
+					source,
+					cheat: cheatTarget,
+				},
+			},
+			context: {
+				dragRect: rect,
+				source: {
+					kind: "board",
+					boardItemId: source.id,
+					itemId: source.itemId,
+					boardItem: source,
+				} satisfies DragSource,
+				sourceTile: {
+					id: source.id,
+					slotId: "0:0",
+					data: {},
+				},
+				target: {
+					kind: "cell",
+					x: cheatTarget.x,
+					y: cheatTarget.y,
+					boardItemId: cheatTarget.id,
+				} satisfies DropTarget,
+				targetRect: rect,
+				targetSlot: {
+					id: "1:0",
+					data: {},
+				},
+				targetTile: {
+					id: cheatTarget.id,
+					slotId: "1:0",
+					data: {},
+				},
+			},
+		});
+
+		expect(outcome).toMatchObject({
+			animation: "consume",
+			type: "accept",
+		});
+
+		if (typeof outcome !== "string" && outcome.type === "accept") {
+			await outcome.commit?.();
+		}
+
+		expect(deleteBoardItem).toHaveBeenCalledWith({
+			boardItemId: "source",
+			expectedItemId: "item:twig",
+		});
+		expect(feedback.pulseBoardCellFeedback).toHaveBeenCalledWith("1:0", "danger");
 	});
 
 	it("marks board merges as immediate parallel merge commit animations", async () => {

@@ -6,6 +6,7 @@ import { dropOutcomeCommit } from "~/tile-engine/dropOutcomeCommit";
 import { dropOutcomeKind } from "~/tile-engine/dropOutcomeKind";
 import { finishTileTapRelease } from "~/tile-engine/finishTileTapRelease";
 import { releasePointerCapture } from "~/tile-engine/releasePointerCapture";
+import { resetDropConsumeVisual } from "~/tile-engine/resetDropConsumeVisual";
 import { resetElementTransform } from "~/tile-engine/resetElementTransform";
 import { rectFromElement } from "~/tile-engine/rect";
 import { runTileDropCommit } from "~/tile-engine/runTileDropCommit";
@@ -74,6 +75,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 
 			void (async () => {
 				let resetAfterMotion = true;
+				let resolvedAnimation: TileEngine.DropAnimation | undefined;
 				try {
 					const sourceTile = tileRef.current;
 					const motionId = createTileDropMotionId({
@@ -101,6 +103,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						});
 					if (kind !== "accept") notifyDropSettled();
 					const animation = dropOutcomeAnimation(outcome);
+					resolvedAnimation = animation;
 					const commit = dropOutcomeCommit(outcome);
 
 					if (kind === "accept" && animation === "parallel-merge") {
@@ -141,9 +144,11 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 							})
 						) {
 							notifyDropSettled();
+							if (animation === "consume") resetAfterMotion = false;
 							return;
 						}
 
+						if (animation === "consume") resetDropConsumeVisual(element);
 						setHandoff(null);
 						resetAfterMotion = await animateBack();
 						return;
@@ -152,6 +157,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					setHandoff(null);
 					resetAfterMotion = await animateBack();
 				} catch {
+					if (resolvedAnimation === "consume") resetDropConsumeVisual(element);
 					setHandoff(null);
 					resetAfterMotion = await animateBack();
 				} finally {

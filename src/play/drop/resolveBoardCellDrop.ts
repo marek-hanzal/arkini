@@ -57,10 +57,15 @@ export const resolveBoardCellDrop = ({
 	}
 
 	if (action.type === "delete-board-item") {
-		return acceptDrop(async () => {
-			await actions.deleteBoardItem(action.input);
-			feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
-		});
+		return acceptDrop(
+			async () => {
+				await actions.deleteBoardItem(action.input);
+				feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
+			},
+			{
+				animation: action.animation,
+			},
+		);
 	}
 
 	if (action.type === "move-board-item") {

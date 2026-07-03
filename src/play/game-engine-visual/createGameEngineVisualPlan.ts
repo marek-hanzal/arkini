@@ -237,7 +237,7 @@ export const createGameEngineVisualPlan = ({
 			case "item.removed":
 				if (event.reason === "producer-depleted") {
 					deferredStashDepletionRemovals.push(event);
-				} else {
+				} else if (event.reason !== "debug-delete") {
 					appendProducerDepletedRetainedTile({
 						currentBoard,
 						event,

@@ -22,6 +22,7 @@ export type BoardCellDropAction =
 	  }
 	| {
 			type: "delete-board-item";
+			animation: "consume";
 			feedback: {
 				kind: "cell-feedback";
 				cellKey: string;
@@ -164,6 +165,7 @@ export const resolveBoardCellDropAction = ({
 
 	if (targetItem.itemId === cheatBoardItemId) {
 		return {
+			animation: "consume",
 			feedback: {
 				cellKey: targetCellKey,
 				kind: "cell-feedback",

@@ -10,7 +10,7 @@ interface TileEngineDropBinding<TDrop = unknown> {
 export namespace TileEngine {
 	export type Id = string;
 	export type LayerRole = "base" | "overlay";
-	export type DropAnimation = "parallel-swap" | "parallel-merge";
+	export type DropAnimation = "parallel-swap" | "parallel-merge" | "consume";
 	export type DropOutcome =
 		| "accept"
 		| "reject"

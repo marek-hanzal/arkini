@@ -906,6 +906,33 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("does not create a board-origin transient remove for cheat inventory deletes", () => {
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([]),
+			currentInventory: undefined,
+			events: [
+				{
+					atMs: 1000,
+					itemId: "item:twig",
+					itemInstanceId: "deleted",
+					reason: "debug-delete",
+					type: "item.removed",
+				},
+			] satisfies GameEvent[],
+			previousBoard: boardView([
+				{
+					id: "deleted",
+					itemId: "item:twig",
+					state: {},
+					x: 2,
+					y: 1,
+				},
+			]),
+		});
+
+		expect(plan.boardTransientTilePlans).toHaveLength(0);
+	});
+
 	it("does not let stash feedback hold a depleted stash tile on board", () => {
 		const previousBoard = boardView([
 			{

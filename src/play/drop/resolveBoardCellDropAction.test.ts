@@ -186,6 +186,7 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
+			animation: "consume",
 			feedback: {
 				cellKey: "1:0",
 				kind: "cell-feedback",

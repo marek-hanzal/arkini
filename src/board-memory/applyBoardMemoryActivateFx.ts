@@ -378,6 +378,10 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 		restoredCount += 1;
 	}
 
+	if (restoredCount === savedLayout.items.length) {
+		delete nextSave.boardMemoryLayouts[action.boardItemId];
+	}
+
 	nextSave.updatedAtMs = nowMs;
 	events.push({
 		atMs: nowMs,

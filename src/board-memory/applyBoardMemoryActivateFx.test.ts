@@ -98,7 +98,7 @@ describe("applyBoardMemoryActivateFx", () => {
 		});
 	});
 
-	it("restores saved positions through inventory without clearing memory", () => {
+	it("restores saved positions through inventory and clears memory after full restore", () => {
 		const config = createMemoryTestConfig();
 		const save = runInitialSave({
 			config,
@@ -156,11 +156,63 @@ describe("applyBoardMemoryActivateFx", () => {
 				y: 0,
 			}),
 		).toBeDefined();
-		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeDefined();
+		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeUndefined();
 		expect(restored.events).toContainEqual({
 			atMs: 300,
 			boardItemId: memory!.id,
 			restoredCount: 1,
+			storedCount: 1,
+			type: "board.memory.restored",
+		});
+	});
+
+	it("keeps saved memory when restore cannot output every stored item", () => {
+		const config = createMemoryTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const producer = findBoardItem(saved, {
+			itemId: "item:producer",
+			x: 1,
+			y: 0,
+		});
+		expect(producer).toBeDefined();
+
+		const missingProducerSave = structuredClone(saved);
+		delete missingProducerSave.board.items[producer!.id];
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 200,
+			save: missingProducerSave,
+		});
+
+		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeDefined();
+		expect(restored.events).toContainEqual({
+			atMs: 200,
+			boardItemId: memory!.id,
+			restoredCount: 0,
 			storedCount: 1,
 			type: "board.memory.restored",
 		});

@@ -4,8 +4,9 @@ import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameEngineVisualPlanDraft } from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { TileEngineTiming } from "~/tile-engine/TileEngineTiming";
+import { tileRemoveDurationMs } from "~/tile-engine/TileRemoveMotion";
 
-export namespace appendProducerDepletedRetainedTile {
+export namespace appendRemovedBoardItemVisuals {
 	export interface Props {
 		currentBoard: BoardView | undefined;
 		event: Extract<
@@ -25,7 +26,6 @@ const readMotionEndMs = (cleanupDelayMs: number | undefined) =>
 	Math.max(0, (cleanupDelayMs ?? 0) - TileEngineTiming.motionCleanupBufferMs);
 
 const producerExitDurationMs = 1;
-const removedItemExitDurationMs = 260;
 
 const readRetainedTileExitDelayMs = ({
 	plan,
@@ -46,12 +46,12 @@ const readRetainedTileExitDelayMs = ({
 	return linkedMotionMilestonesMs.length ? Math.max(...linkedMotionMilestonesMs) : 0;
 };
 
-export const appendProducerDepletedRetainedTile = ({
+export const appendRemovedBoardItemVisuals = ({
 	currentBoard,
 	event,
 	plan,
 	previousBoard,
-}: appendProducerDepletedRetainedTile.Props) => {
+}: appendRemovedBoardItemVisuals.Props) => {
 	if (currentBoard?.byId[event.itemInstanceId]) return;
 
 	const previousItem = previousBoard?.byId[event.itemInstanceId];
@@ -65,7 +65,7 @@ export const appendProducerDepletedRetainedTile = ({
 				})
 			: 0;
 	const durationMs =
-		event.reason === "producer-depleted" ? producerExitDurationMs : removedItemExitDurationMs;
+		event.reason === "producer-depleted" ? producerExitDurationMs : tileRemoveDurationMs;
 	const groupId = `engine:item-removed:${event.reason}:${event.itemInstanceId}:${event.atMs}`;
 	const cleanupDelayMs = delayMs + durationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {

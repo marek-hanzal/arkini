@@ -11,7 +11,7 @@ import { appendBoardTileBounceFeedback } from "~/play/game-engine-visual/appendB
 import { appendActivationInputTargetFeedback } from "~/play/game-engine-visual/appendActivationInputTargetFeedback";
 import { appendCraftStageUpdateVisuals } from "~/play/game-engine-visual/appendCraftStageUpdateVisuals";
 import { appendLineCompletedFeedback } from "~/play/game-engine-visual/appendLineCompletedFeedback";
-import { appendProducerDepletedRetainedTile } from "~/play/game-engine-visual/appendProducerDepletedRetainedTile";
+import { appendRemovedBoardItemVisuals } from "~/play/game-engine-visual/appendRemovedBoardItemVisuals";
 import type { GameEngineVisualPlan } from "~/play/game-engine-visual/GameEngineVisualPlan";
 import {
 	createGameEngineVisualPlanDraft,
@@ -238,7 +238,7 @@ export const createGameEngineVisualPlan = ({
 				if (event.reason === "producer-depleted") {
 					deferredStashDepletionRemovals.push(event);
 				} else if (event.reason !== "debug-delete") {
-					appendProducerDepletedRetainedTile({
+					appendRemovedBoardItemVisuals({
 						currentBoard,
 						event,
 						plan,
@@ -305,7 +305,7 @@ export const createGameEngineVisualPlan = ({
 	}
 
 	for (const event of deferredStashDepletionRemovals) {
-		appendProducerDepletedRetainedTile({
+		appendRemovedBoardItemVisuals({
 			currentBoard,
 			event,
 			plan,

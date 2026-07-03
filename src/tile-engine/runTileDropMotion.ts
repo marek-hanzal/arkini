@@ -1,4 +1,4 @@
-import { animateDropConsume } from "~/tile-engine/animateDropConsume";
+import { animateDropRemove } from "~/tile-engine/animateDropRemove";
 import { animateElementToRect } from "~/tile-engine/animateElementToRect";
 import { createTileDropHandoffs } from "~/tile-engine/createTileDropHandoffs";
 import { findTileEngineActorElement } from "~/tile-engine/findTileEngineActorElement";
@@ -41,7 +41,7 @@ export const runTileDropMotion = async <TTile, TSlot, TDrag, TDrop>({
 				})
 			: null;
 
-	if (animation === "consume") {
+	if (animation === "remove") {
 		const sourceMotionCompleted = await animateToTarget(rectFromElement(resolved.element));
 		if (!sourceMotionCompleted) {
 			return {
@@ -51,7 +51,7 @@ export const runTileDropMotion = async <TTile, TSlot, TDrag, TDrop>({
 		}
 
 		return {
-			completed: await animateDropConsume({
+			completed: await animateDropRemove({
 				element: sourceElement,
 				tileId: sourceTile.id,
 			}),

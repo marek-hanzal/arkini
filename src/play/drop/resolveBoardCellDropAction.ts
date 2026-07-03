@@ -22,7 +22,7 @@ export type BoardCellDropAction =
 	  }
 	| {
 			type: "delete-board-item";
-			animation: "consume";
+			animation: "remove";
 			feedback: {
 				kind: "cell-feedback";
 				cellKey: string;
@@ -68,6 +68,7 @@ export type BoardCellDropAction =
 	  }
 	| {
 			type: "apply-board-item-to-board-item";
+			animation?: "remove";
 			feedback?: {
 				kind: "cell-feedback";
 				cellKey: string;
@@ -82,6 +83,7 @@ export type BoardCellDropAction =
 	  }
 	| {
 			type: "store-board-item-in-inventory";
+			animation: "remove";
 			feedback: {
 				kind: "cell-feedback";
 				cellKey: string;
@@ -165,7 +167,7 @@ export const resolveBoardCellDropAction = ({
 
 	if (targetItem.itemId === cheatBoardItemId) {
 		return {
-			animation: "consume",
+			animation: "remove",
 			feedback: {
 				cellKey: targetCellKey,
 				kind: "cell-feedback",
@@ -197,6 +199,7 @@ export const resolveBoardCellDropAction = ({
 		}
 
 		return {
+			animation: "remove",
 			feedback: {
 				cellKey: targetCellKey,
 				kind: "cell-feedback",
@@ -265,12 +268,18 @@ export const resolveBoardCellDropAction = ({
 
 	if (plan.type === "producer-input") {
 		return {
+			animation: "remove",
 			input,
 			type: "apply-board-item-to-board-item",
 		};
 	}
 
 	return {
+		...(plan.consumesSource
+			? {
+					animation: "remove" as const,
+				}
+			: {}),
 		type: "apply-board-item-to-board-item",
 		feedback: {
 			cellKey: targetCellKey,

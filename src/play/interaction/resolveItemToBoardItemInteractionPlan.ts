@@ -56,9 +56,10 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
 			),
 	);
-	const canRemoveTile = Boolean(
-		config.items[targetItem.itemId]?.removeBy?.some((entry) => entry.itemId === sourceItemId),
+	const removal = config.items[targetItem.itemId]?.removeBy?.find(
+		(entry) => entry.itemId === sourceItemId,
 	);
+	const canRemoveTile = Boolean(removal);
 
 	return match({
 		canCraft,
@@ -67,6 +68,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		canSupplyStashInput,
 		mergeRule,
 		producerInputLineId,
+		removal,
 	})
 		.with(
 			{
@@ -86,6 +88,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				canCraft: true,
 			},
 			() => ({
+				consumesSource: true as const,
 				feedbackVariant: "secondary" as const,
 				type: "craft-input" as const,
 			}),
@@ -95,6 +98,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				canSupplyStashInput: true,
 			},
 			() => ({
+				consumesSource: true as const,
 				feedbackVariant: "secondary" as const,
 				type: "stash-input" as const,
 			}),
@@ -103,7 +107,8 @@ export const resolveItemToBoardItemInteractionPlan = ({
 			{
 				canRemoveTile: true,
 			},
-			() => ({
+			({ removal }) => ({
+				consumesSource: removal?.mode === "consume",
 				feedbackVariant: "primary" as const,
 				type: "tile-remove" as const,
 			}),
@@ -113,6 +118,7 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				producerInputLineId: P.string,
 			},
 			({ producerInputLineId }) => ({
+				consumesSource: true as const,
 				feedbackVariant: "secondary" as const,
 				lineId: producerInputLineId,
 				type: "producer-input" as const,

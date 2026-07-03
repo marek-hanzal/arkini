@@ -6,7 +6,7 @@ import { dropOutcomeCommit } from "~/tile-engine/dropOutcomeCommit";
 import { dropOutcomeKind } from "~/tile-engine/dropOutcomeKind";
 import { finishTileTapRelease } from "~/tile-engine/finishTileTapRelease";
 import { releasePointerCapture } from "~/tile-engine/releasePointerCapture";
-import { resetDropConsumeVisual } from "~/tile-engine/resetDropConsumeVisual";
+import { resetDropRemoveVisual } from "~/tile-engine/resetDropRemoveVisual";
 import { resetElementTransform } from "~/tile-engine/resetElementTransform";
 import { rectFromElement } from "~/tile-engine/rect";
 import { runTileDropCommit } from "~/tile-engine/runTileDropCommit";
@@ -144,11 +144,11 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 							})
 						) {
 							notifyDropSettled();
-							if (animation === "consume") resetAfterMotion = false;
+							if (animation === "remove") resetAfterMotion = false;
 							return;
 						}
 
-						if (animation === "consume") resetDropConsumeVisual(element);
+						if (animation === "remove") resetDropRemoveVisual(element);
 						setHandoff(null);
 						resetAfterMotion = await animateBack();
 						return;
@@ -157,7 +157,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 					setHandoff(null);
 					resetAfterMotion = await animateBack();
 				} catch {
-					if (resolvedAnimation === "consume") resetDropConsumeVisual(element);
+					if (resolvedAnimation === "remove") resetDropRemoveVisual(element);
 					setHandoff(null);
 					resetAfterMotion = await animateBack();
 				} finally {

@@ -142,6 +142,7 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
+			animation: "remove",
 			feedback: {
 				cellKey: "1:0",
 				kind: "cell-feedback",
@@ -186,7 +187,7 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
-			animation: "consume",
+			animation: "remove",
 			feedback: {
 				cellKey: "1:0",
 				kind: "cell-feedback",
@@ -660,6 +661,7 @@ describe("resolveBoardCellDropAction", () => {
 				},
 			}),
 		).toEqual({
+			animation: "remove",
 			type: "apply-board-item-to-board-item",
 			feedback: {
 				cellKey: "1:0",

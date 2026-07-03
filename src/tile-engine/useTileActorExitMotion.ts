@@ -10,6 +10,7 @@ import {
 	tilePresenceMotionScope,
 } from "~/tile-engine/TileMotionRuntime";
 import { TileEngineTiming } from "~/tile-engine/TileEngineTiming";
+import { tileRemoveKeyframes } from "~/tile-engine/TileRemoveMotion";
 import {
 	createTilePresenceMotionToken,
 	markTilePresenceMotion,
@@ -75,23 +76,7 @@ export const useTileActorExitMotion = ({
 						],
 					}
 				: kind === "remove"
-					? {
-							opacity: [
-								1,
-								0.72,
-								0,
-							],
-							filter: [
-								"brightness(1) saturate(1)",
-								"brightness(1.22) saturate(0.85)",
-								"brightness(0.8) saturate(0.35)",
-							],
-							transform: [
-								"translate3d(0px, 0px, 0px) scale(1)",
-								"translate3d(0px, -3px, 0px) scale(1.06)",
-								"translate3d(0px, 5px, 0px) scale(0.58)",
-							],
-						}
+					? tileRemoveKeyframes
 					: kind === "flip-out"
 						? {
 								opacity: [

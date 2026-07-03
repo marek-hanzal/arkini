@@ -79,14 +79,19 @@ export const resolveBoardCellDrop = ({
 	}
 
 	if (action.type === "store-board-item-in-inventory") {
-		return acceptDrop(async () => {
-			await actions.storeBoardItem(action.input);
-			feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
-		});
+		return acceptDrop(
+			async () => {
+				await actions.storeBoardItem(action.input);
+				feedback.pulseBoardCellFeedback(action.feedback.cellKey, action.feedback.variant);
+			},
+			{
+				animation: action.animation,
+			},
+		);
 	}
 
 	const options =
-		action.type === "merge-board-items"
+		action.type === "merge-board-items" || action.animation
 			? {
 					animation: action.animation,
 				}

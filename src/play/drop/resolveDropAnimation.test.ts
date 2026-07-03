@@ -199,7 +199,7 @@ describe("resolveDrop animation contract", () => {
 		expect(actions.moveBoardItem).not.toHaveBeenCalled();
 	});
 
-	it("marks cheat inventory deletes as consume animations without swap handoff", async () => {
+	it("marks cheat inventory deletes as remove animations without swap handoff", async () => {
 		const deleteBoardItem = vi.fn(async () => undefined);
 		const feedback = {
 			pulseBoardCellFeedback: vi.fn(),
@@ -278,7 +278,7 @@ describe("resolveDrop animation contract", () => {
 		});
 
 		expect(outcome).toMatchObject({
-			animation: "consume",
+			animation: "remove",
 			type: "accept",
 		});
 

@@ -241,6 +241,9 @@ export const readRuntimeLineViewsFromGameSave = ({
 			lootPlan: effectiveLine.lootPlan,
 			save,
 		});
+		const outputLimitBlocked = readTargetLimitBlocked(targetLimits);
+		if (kind === "product" && jobs.length === 0 && outputLimitBlocked) return [];
+
 		const hasEffectStartRequirements = effectiveLine.requirements.some(
 			(requirement) => requirement.phase === "start",
 		);
@@ -270,7 +273,7 @@ export const readRuntimeLineViewsFromGameSave = ({
 				effectLocked,
 				effectPolarity: line.effect?.polarity,
 				deliveryBlocked,
-				outputLimitBlocked: readTargetLimitBlocked(targetLimits),
+				outputLimitBlocked,
 				durationMs,
 				effectDurationMultiplier: effectiveLine.effectDurationMultiplier,
 				effectBenefits: line.effect

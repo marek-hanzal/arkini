@@ -3,6 +3,19 @@ import { GameItemIdSchema } from "~/config/GameIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
 import { ItemTargetLimitViewSchema } from "./ItemTargetLimitViewSchema";
 
+const CraftEffectRequirementViewSchema = z
+	.object({
+		kind: z
+			.enum([
+				"grant.blockStart",
+				"grant.require",
+			])
+			.optional(),
+		label: z.string().min(1),
+		ready: z.boolean(),
+	})
+	.strict();
+
 export const CraftProgressViewSchema = z.object({
 	id: z.string().min(1),
 	resultItemId: GameItemIdSchema,
@@ -22,6 +35,7 @@ export const CraftProgressViewSchema = z.object({
 	complete: z.boolean(),
 	canAcceptInputs: z.boolean(),
 	startRequirementsReady: z.boolean().optional(),
+	effectRequirements: z.array(CraftEffectRequirementViewSchema).optional(),
 	effectBlocked: z.boolean().optional(),
 	effectBlockReasons: z.array(z.string().min(1)).optional(),
 	startAtMs: z.number().optional(),

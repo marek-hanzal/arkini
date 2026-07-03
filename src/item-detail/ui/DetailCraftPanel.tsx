@@ -38,6 +38,9 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
 	const effectBlockReasons = craft.effectBlockReasons ?? [];
+	const missingEffectRequirements = (craft.effectRequirements ?? [])
+		.filter((requirement) => !requirement.ready && requirement.kind !== "grant.blockStart")
+		.map((requirement) => `Missing ${requirement.label}`);
 	const showInputs = craft.phase === "collecting_inputs";
 
 	return (
@@ -76,6 +79,19 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 						<ul className="mt-1 grid gap-1 leading-5 text-rose-100/80">
 							{effectBlockReasons.map((reason) => (
 								<li key={`${craft.id}:effect-block:${reason}`}>{reason}</li>
+							))}
+						</ul>
+					</div>
+				) : null}
+
+				{missingEffectRequirements.length ? (
+					<div className="rounded-sm bg-rose-400/14 px-2.5 py-2 text-xs text-rose-50">
+						<p className="font-black text-rose-100">Missing requirements</p>
+						<ul className="mt-1 grid gap-1 leading-5 text-rose-100/80">
+							{missingEffectRequirements.map((requirement) => (
+								<li key={`${craft.id}:effect-requirement:${requirement}`}>
+									{requirement}
+								</li>
 							))}
 						</ul>
 					</div>

@@ -88,6 +88,24 @@ describe("DetailCraftPanel", () => {
 		expect(html).toContain("Nearby Tree blocks crafting");
 	});
 
+	it("renders missing effect start requirements", () => {
+		const html = renderCraft(
+			createCraft({
+				effectRequirements: [
+					{
+						kind: "grant.require",
+						label: "Owns Town Hall II",
+						ready: false,
+					},
+				],
+				startRequirementsReady: false,
+			}),
+		);
+
+		expect(html).toContain("Missing requirements");
+		expect(html).toContain("Missing Owns Town Hall II");
+	});
+
 	it("keeps fulfilled resources visible until the craft starts running", () => {
 		const html = renderCraft(
 			createCraft({

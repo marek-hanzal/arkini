@@ -13,6 +13,23 @@ export namespace readCraftLineEffectState {
 	}
 }
 
+type CraftEffectRequirement = {
+	display: "always" | "whenActive" | "whenMissing" | "never";
+	kind: "grant.blockStart" | "grant.require";
+	label: string;
+	ready: boolean;
+};
+
+const isCraftEffectRequirementActive = (requirement: CraftEffectRequirement) =>
+	requirement.kind === "grant.blockStart" ? !requirement.ready : requirement.ready;
+
+const shouldDisplayCraftEffectRequirement = (requirement: CraftEffectRequirement) => {
+	if (requirement.display === "never") return false;
+	if (requirement.display === "always") return true;
+	if (requirement.display === "whenMissing") return !requirement.ready;
+	return isCraftEffectRequirementActive(requirement);
+};
+
 export const readCraftLineEffectState = ({
 	config,
 	nowMs,
@@ -27,6 +44,7 @@ export const readCraftLineEffectState = ({
 	let startRequirementsReady = true;
 	let blocked = false;
 	const blockReasons: string[] = [];
+	const requirements: CraftEffectRequirement[] = [];
 
 	for (const lineEffect of recipe.effects ?? []) {
 		if (lineEffect.kind === "grant.require") {
@@ -35,6 +53,15 @@ export const readCraftLineEffectState = ({
 				selector: lineEffect.selector,
 			});
 			if (lineEffect.phase === "start" && !ready) startRequirementsReady = false;
+			const requirement = {
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffect.label ?? lineEffect.reason ?? "Required grant",
+				ready,
+			};
+			if (shouldDisplayCraftEffectRequirement(requirement)) {
+				requirements.push(requirement);
+			}
 			continue;
 		}
 
@@ -43,6 +70,15 @@ export const readCraftLineEffectState = ({
 				grantIds,
 				selector: lineEffect.selector,
 			});
+			const requirement = {
+				display: lineEffect.display,
+				kind: lineEffect.kind,
+				label: lineEffect.reason ?? lineEffect.label ?? "Craft recipe is blocked.",
+				ready: !active,
+			};
+			if (shouldDisplayCraftEffectRequirement(requirement)) {
+				requirements.push(requirement);
+			}
 			if (active) {
 				blocked = true;
 				blockReasons.push(
@@ -56,6 +92,7 @@ export const readCraftLineEffectState = ({
 		blocked,
 		blockReasons,
 		grantIds,
+		requirements,
 		startRequirementsReady,
 		startGateReady: startRequirementsReady && !blocked,
 	};

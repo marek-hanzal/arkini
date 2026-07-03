@@ -221,6 +221,111 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 		]);
 	});
 
+	it("hides idle product lines whose outputs already reached max count", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				"item:twig": {
+					maxCount: 1,
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				board: [
+					...baseConfig.startingState.board,
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const producerItem = findBoardItem(save, {
+			itemId: "item:producer",
+			x: 0,
+			y: 0,
+		});
+		if (!producerItem) throw new Error("Missing test producer.");
+
+		const lines = readRuntimeLineViewsFromGameSave({
+			config,
+			maxQueueSize: 1,
+			producerDefinition: config.items["item:producer"].producer!,
+			nowMs: 0,
+			lineIds: [
+				"line:test",
+			],
+			save,
+			targetItemInstanceId: producerItem.id,
+		});
+
+		expect(lines).toEqual([]);
+	});
+
+	it("keeps maxed product lines visible while their jobs are still active", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			items: {
+				"item:twig": {
+					maxCount: 1,
+				},
+			},
+			startingState: {
+				...baseConfig.startingState,
+				board: [
+					...baseConfig.startingState.board,
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const producerItem = findBoardItem(save, {
+			itemId: "item:producer",
+			x: 0,
+			y: 0,
+		});
+		if (!producerItem) throw new Error("Missing test producer.");
+		save.producerJobs["job:maxed-line"] = {
+			id: "job:maxed-line",
+			itemInstanceId: producerItem.id,
+			lineId: "line:test",
+			readyAtMs: 1000,
+			startAtMs: 0,
+		};
+
+		const lines = readRuntimeLineViewsFromGameSave({
+			config,
+			maxQueueSize: 1,
+			producerDefinition: config.items["item:producer"].producer!,
+			nowMs: 500,
+			lineIds: [
+				"line:test",
+			],
+			save,
+			targetItemInstanceId: producerItem.id,
+		});
+
+		expect(lines).toMatchObject([
+			{
+				inProgress: true,
+				lineId: "line:test",
+				outputLimitBlocked: true,
+			},
+		]);
+	});
+
 	it("honors active and missing display policies separately for requirement rows", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

@@ -163,6 +163,7 @@ export namespace TileEngine {
 		slots: readonly Slot<TSlot>[];
 		tiles: readonly Tile<TTile>[];
 		className?: string;
+		rootClassName?: string;
 		cellClassName?: string;
 		actorLayerClassName?: string;
 		disabled?: boolean;

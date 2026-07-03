@@ -18,6 +18,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	slots,
 	tiles,
 	className,
+	rootClassName,
 	cellClassName,
 	actorLayerClassName,
 	disabled = false,
@@ -88,6 +89,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 					? "w-[min(100cqw,calc((100cqh-0.5rem)*var(--ak-tile-engine-ratio)+0.5rem))]"
 					: "w-full",
 				disabled && "pointer-events-none",
+				rootClassName,
 			)}
 			style={
 				{

@@ -7,6 +7,20 @@ import { readRuntimeBoardViewFromGameSave } from "~/play/game-engine-bridge/read
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
 
+const addRunningTestLineJob = (save: ReturnType<typeof runInitialSave>) => {
+	const producerItem = Object.values(save.board.items).find(
+		(item) => item.itemId === "item:producer",
+	);
+	if (!producerItem) throw new Error("Missing test producer.");
+	save.producerJobs["job:line-test"] = {
+		id: "job:line-test",
+		itemInstanceId: producerItem.id,
+		lineId: "line:test",
+		readyAtMs: 1000,
+		startAtMs: 0,
+	};
+};
+
 describe("readRuntimeBoardViewFromGameSave", () => {
 	it("derives first empty cell from the runtime config board dimensions", () => {
 		const baseConfig = createEngineTestConfig();
@@ -184,6 +198,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			config,
 			nowMs: 0,
 		});
+		addRunningTestLineJob(save);
 
 		const producer = readRuntimeBoardViewFromGameSave({
 			config,
@@ -197,7 +212,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				{
 					itemId: "item:plank",
 					maxCount: 1,
-					ownedQuantity: 1,
+					ownedQuantity: 2,
 					remainingQuantity: 0,
 					requiredQuantity: 1,
 					sourceItemId: "item:blueprint-plank",
@@ -276,6 +291,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			config,
 			nowMs: 0,
 		});
+		addRunningTestLineJob(save);
 
 		const producer = readRuntimeBoardViewFromGameSave({
 			config,
@@ -289,7 +305,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				{
 					itemId: "item:plank",
 					maxCount: 1,
-					ownedQuantity: 1,
+					ownedQuantity: 2,
 					remainingQuantity: 0,
 					requiredQuantity: 1,
 					sourceItemId: "item:blueprint-plank",
@@ -361,6 +377,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 			config,
 			nowMs: 0,
 		});
+		addRunningTestLineJob(save);
 
 		const producer = readRuntimeBoardViewFromGameSave({
 			config,
@@ -374,7 +391,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				{
 					itemId: "item:plank",
 					maxCount: 1,
-					ownedQuantity: 1,
+					ownedQuantity: 2,
 					remainingQuantity: 0,
 					requiredQuantity: 1,
 					sourceItemId: "item:blueprint-plank",

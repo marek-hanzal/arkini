@@ -132,6 +132,29 @@ describe("defaultGameConfig", () => {
 		}
 	});
 
+	it("grows forest seeds through craft input stages instead of merge-only saplings", () => {
+		const seed = defaultGameConfig.items["item:seed"];
+		const water = defaultGameConfig.items["item:water"];
+
+		expect(defaultGameConfig.items["item:sapling"]).toBeUndefined();
+		expect(seed?.assetIds).toEqual([
+			"asset:item:seed",
+			"asset:item:sapling",
+		]);
+		expect(seed?.craft).toMatchObject({
+			durationMs: 30000,
+			resultItemId: "item:tree",
+			inputs: [
+				{
+					consume: true,
+					itemId: "item:water",
+					quantity: 6,
+				},
+			],
+		});
+		expect(water?.merges?.some((merge) => merge.withItemId === "item:seed")).toBe(false);
+	});
+
 	it("does not ship placeholder one-second gameplay timings", () => {
 		const oneSecondLineIds = readLines()
 			.map(

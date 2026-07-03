@@ -691,6 +691,7 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 
 		expect(board.byId["item-instance:1"]?.craft).toMatchObject({
 			complete: false,
+			inputProgress: 1,
 			pausedAtMs: 250,
 			phase: "paused",
 			progress: 0.25,

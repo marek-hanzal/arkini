@@ -19,8 +19,8 @@ The game has one gameplay source of truth: compiled JSON parsed by `src/config/G
 
 Item definitions drive behavior. An item may define:
 
-- normal merge rules, for example `seed + seed -> sprout`
-- mixed/secret merge rules, for example `twig + water -> sprout`
+- normal merge rules, for example `tree + water -> double tree`
+- mixed/secret merge rules, for example `micro-forest + water -> chance seed drop`
 - click producers with batch output: guaranteed drops, chance drops, and weighted rolls
 - optional producer input inventories; producers can require stored consumables before they work
 - finite crates that exhaust all charges through their single-tap stash action
@@ -62,7 +62,7 @@ Rules for this layer:
 
 ## Gameplay model
 
-The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint imprinting is gone: build blueprints are concrete target-specific items acquired directly through gameplay. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed into a sprout/sapling/tree.
+The current content direction is Settlers-like: small producers create raw goods, raw goods merge into better materials, and finished materials are fed into craft targets on the board. Blueprint imprinting is gone: build blueprints are concrete target-specific items acquired directly through gameplay. Finished specific blueprints accept materials until they become buildings. The same craft model also handles non-building flows such as watering a seed through staged seed/sapling art until it grows into a tree.
 
 - Board size comes from `GameConfig.game.board`, currently 7×11.
 - Inventory size comes from `GameConfig.game.inventory`, currently 35 slots.

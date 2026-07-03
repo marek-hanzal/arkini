@@ -120,7 +120,7 @@ Examples:
 - beer
 - coin
 - coin stack
-- sprout
+- seed
 - bush
 - concrete building blueprint
 - lumber camp
@@ -285,7 +285,7 @@ Examples:
 
 - concrete blueprint becoming a lumber camp
 - lumber camp level 2 blueprint becoming lumber camp level 2
-- watered sprout becoming a sapling after a timer
+- watered seed switching to sapling art, then becoming a tree after a timer
 
 ### 4.17 Building tier progression
 
@@ -907,8 +907,7 @@ This mechanic applies to blueprints, building construction, growth, and similar 
 Examples:
 
 - concrete blueprint becoming a building
-- watered sprout becoming a sapling
-- sapling becoming a tree
+- watered seed switching to sapling art, then becoming a tree
 
 ### 14.2 Location behavior
 

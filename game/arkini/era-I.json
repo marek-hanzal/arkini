@@ -261,7 +261,7 @@
 			"tier": 3
 		},
 		"item:seed": {
-			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Water it to grow a sapling.",
+			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Feed it water on the board until it grows into a sapling stage, then let it finish into a tree.",
 			"maxStackSize": 50,
 			"name": "Seed",
 			"tags": [
@@ -269,24 +269,27 @@
 				"wood",
 				"forest",
 				"seed",
+				"craft-target",
+				"growth",
 				"era:I",
 				"tier-1-resource"
 			],
-			"tier": 1
-		},
-		"item:sapling": {
-			"description": "Young tree grown from a watered seed. Water it again to grow a full tree.",
-			"maxStackSize": 50,
-			"name": "Sapling",
-			"tags": [
-				"material",
-				"wood",
-				"forest",
-				"sapling",
-				"era:I",
-				"tier-1-resource"
+			"tier": 1,
+			"assetIds": [
+				"asset:item:seed",
+				"asset:item:sapling"
 			],
-			"tier": 1
+			"craft": {
+				"durationMs": 30000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:water",
+						"quantity": 6
+					}
+				],
+				"resultItemId": "item:tree"
+			}
 		},
 		"item:plank": {
 			"description": "Processed wood material produced by sawmills.",
@@ -410,14 +413,6 @@
 					],
 					"targetMode": "keep",
 					"withItemId": "item:micro-forest"
-				},
-				{
-					"resultItemId": "item:sapling",
-					"withItemId": "item:seed"
-				},
-				{
-					"resultItemId": "item:tree",
-					"withItemId": "item:sapling"
 				}
 			],
 			"name": "Water",

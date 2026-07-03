@@ -176,7 +176,7 @@ describe("createGameEngineVisualPlan", () => {
 		const previousBoard = boardView([
 			{
 				id: "target",
-				itemId: "item:sapling",
+				itemId: "item:seed",
 				state: {},
 				x: 1,
 				y: 0,
@@ -197,7 +197,7 @@ describe("createGameEngineVisualPlan", () => {
 			currentInventory: undefined,
 			events: [
 				{
-					fromItemId: "item:sapling",
+					fromItemId: "item:seed",
 					itemInstanceId: "target",
 					reason: "craft-result",
 					atMs: 1,
@@ -218,7 +218,7 @@ describe("createGameEngineVisualPlan", () => {
 				},
 			},
 			tile: {
-				itemId: "item:sapling",
+				itemId: "item:seed",
 				slotId: "1:0",
 			},
 		});

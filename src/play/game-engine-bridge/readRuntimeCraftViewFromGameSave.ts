@@ -42,7 +42,9 @@ export const readRuntimeCraftViewFromGameSave = ({
 		0,
 	);
 	const inputProgress =
-		totalInputQuantity === 0 ? 1 : deliveredInputQuantity / totalInputQuantity;
+		runningJob !== undefined || totalInputQuantity === 0
+			? 1
+			: deliveredInputQuantity / totalInputQuantity;
 	const durationMs = readCraftRecipeDurationMs({
 		recipe,
 		save,

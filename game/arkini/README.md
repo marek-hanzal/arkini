@@ -74,9 +74,9 @@ Town Hall II
   Egg + Grain -> Chicken Coop I Blueprint
   Wool + Grain -> Sheep Pasture I Blueprint
   Vegetables + Water -> Vegetable Garden I Blueprint
-  Grain + Piglet + Milk + Egg + Vegetables -> Food Supply
-  Food Supply + Water -> House I Blueprint
-  Food Supply + Wool + Plank + Stone Block + Morale I -> Town Hall III Blueprint
+  Grain + Piglet + Milk + Egg + Vegetables -> Feast
+  Feast + Water -> House I Blueprint
+  Feast + Wool + Plank + Stone Block + Morale I -> Town Hall III Blueprint
 
 Town Hall III
   Grain + Plank -> Windmill I Blueprint
@@ -181,7 +181,7 @@ Era II raw food
   Chicken Coop I + Grain + Water -> Egg
   Sheep Pasture I + Grain + Water -> Wool
   Vegetable Garden I + Water -> Vegetables
-  Town Hall II -> Food Supply
+  Town Hall II -> Feast
   House I + Water + Log -> Morale I
 
 Era III processing
@@ -426,15 +426,14 @@ The first food production line is wired into gameplay and uses these prepared as
 - `asset:item:egg` -> `game/arkini/assets/item-egg.png`
 - `asset:item:wool` -> `game/arkini/assets/item-wool.png`
 - `asset:item:vegetables` -> `game/arkini/assets/item-vegetables.png`
-- `asset:item:food-supply` -> `game/arkini/assets/item-food-supply.png`
 - `asset:producer:cattle-farm-t1` -> `game/arkini/assets/producer-cattle-farm-t1.png`
 - `asset:producer:chicken-coop-t1` -> `game/arkini/assets/producer-chicken-coop-t1.png`
 - `asset:producer:sheep-pasture-t1` -> `game/arkini/assets/producer-sheep-pasture-t1.png`
 - `asset:producer:vegetable-garden-t1` -> `game/arkini/assets/producer-vegetable-garden-t1.png`
 - `asset:item:cheese` -> `game/arkini/assets/item-cheese.png`
-- `asset:item:feast` -> `game/arkini/assets/item-feast.png`
 - `asset:producer:dairy-t1` -> `game/arkini/assets/producer-dairy-t1.png`
 - `asset:producer:cookhouse-t1` -> `game/arkini/assets/producer-cookhouse-t1.png`
+- `asset:item:feast` -> `game/arkini/assets/item-feast.png`
 - `asset:producer:market-t1` -> `game/arkini/assets/producer-market-t1.png`
 - `asset:item:coin` -> `game/arkini/assets/item-coin.png`
 - `asset:item:paper` -> `game/arkini/assets/item-paper.png`

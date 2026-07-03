@@ -343,7 +343,7 @@
 					},
 					{
 						"consume": true,
-						"itemId": "item:food-supply"
+						"itemId": "item:feast"
 					},
 					{
 						"consume": true,
@@ -429,17 +429,6 @@
 				"egg",
 				"era:II",
 				"tier-2-resource"
-			]
-		},
-		"item:food-supply": {
-			"description": "Packed base food supply prepared from grain, animal produce, and vegetables. Era II master item.",
-			"maxStackSize": 20,
-			"name": "Food Supply",
-			"tags": [
-				"food",
-				"master",
-				"era:II",
-				"tier-3-resource"
 			]
 		},
 		"item:grain": {
@@ -639,7 +628,8 @@
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:water"
+								"itemId": "item:water",
+								"quantity": 2
 							}
 						],
 						"output": [
@@ -748,7 +738,8 @@
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:water"
+								"itemId": "item:water",
+								"quantity": 2
 							}
 						],
 						"output": [
@@ -875,7 +866,8 @@
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:water"
+								"itemId": "item:water",
+								"quantity": 2
 							}
 						],
 						"output": [
@@ -1019,7 +1011,8 @@
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:water"
+								"itemId": "item:water",
+								"quantity": 2
 							},
 							{
 								"capacity": 4,
@@ -1586,7 +1579,7 @@
 					},
 					{
 						"durationMs": 24000,
-						"id": "line:townhall-t2:food-supply",
+						"id": "line:townhall-t2:feast",
 						"inputs": [
 							{
 								"capacity": 4,
@@ -1634,7 +1627,7 @@
 										}
 									}
 								],
-								"itemId": "item:food-supply",
+								"itemId": "item:feast",
 								"quantity": 2,
 								"type": "guaranteed"
 							}
@@ -1647,7 +1640,7 @@
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:food-supply"
+								"itemId": "item:feast"
 							}
 						],
 						"name": "Blueprint: House I",

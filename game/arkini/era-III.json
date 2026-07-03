@@ -938,6 +938,11 @@
 								"capacity": 4,
 								"consume": true,
 								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:plank"
 							}
 						],
 						"output": [
@@ -1027,6 +1032,11 @@
 								"consume": true,
 								"itemId": "item:beer",
 								"quantity": 4
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:plank"
 							}
 						],
 						"output": [
@@ -1871,7 +1881,7 @@
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:food-supply"
+								"itemId": "item:feast"
 							}
 						],
 						"name": "Blueprint: Town Hall IV",

@@ -2,6 +2,11 @@ import { match } from "ts-pattern";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { GameAudioProvider, useGameAudio } from "~/audio/GameAudioProvider";
 import { BoardSurface } from "~/board/BoardSurface";
+import {
+	BoardMemoryOperationProvider,
+	boardMemoryOperationDurationMs,
+	type BoardMemoryOperationState,
+} from "~/board-memory/BoardMemoryOperationContext";
 import { CheatInventorySheet } from "~/debug/CheatInventorySheet";
 import { BoardMemorySheet } from "~/debug/BoardMemorySheet";
 import { NukeSaveSheet } from "~/debug/NukeSaveSheet";
@@ -20,24 +25,35 @@ const PlayShellContent: FC = () => {
 	const feedbackFlags = useFeedbackFlags();
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
-	const [memoryBusy, setMemoryBusy] = useState(false);
+	const [memoryOperation, setMemoryOperation] = useState<BoardMemoryOperationState | undefined>();
 	useEffect(() => {
 		let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
 		const unsubscribe = runtimeStore.subscribeUpdate((update) => {
-			if (
-				!update.result.events.some(
-					(event) =>
-						event.type === "board.memory.saved" ||
-						event.type === "board.memory.restored" ||
-						event.type === "board.memory.cleared",
-				)
-			) {
-				return;
-			}
+			const event = update.result.events.find(
+				(event) =>
+					event.type === "board.memory.saved" ||
+					event.type === "board.memory.restored" ||
+					event.type === "board.memory.cleared",
+			);
+			if (!event) return;
 
-			setMemoryBusy(true);
+			const startedAtMs = Date.now();
+			setMemoryOperation({
+				boardItemId: event.boardItemId,
+				readyAtMs: startedAtMs + boardMemoryOperationDurationMs,
+				startedAtMs,
+				type:
+					event.type === "board.memory.saved"
+						? "save"
+						: event.type === "board.memory.restored"
+							? "restore"
+							: "clear",
+			});
 			if (timeout !== undefined) globalThis.clearTimeout(timeout);
-			timeout = globalThis.setTimeout(() => setMemoryBusy(false), 1350);
+			timeout = globalThis.setTimeout(
+				() => setMemoryOperation(undefined),
+				boardMemoryOperationDurationMs,
+			);
 		});
 
 		return () => {
@@ -94,6 +110,8 @@ const PlayShellContent: FC = () => {
 		],
 	);
 
+	const memoryBusy = Boolean(memoryOperation);
+
 	const sheetContent = activeSheet
 		? match(activeSheet)
 				.with(
@@ -148,16 +166,18 @@ const PlayShellContent: FC = () => {
 
 	return (
 		<div className="relative h-dvh w-dvw overflow-hidden bg-ak-page">
-			<BoardSurface
-				feedback={feedback}
-				feedbackFlags={feedbackFlags.flags}
-				onOpenSheet={openSheet}
-				disabled={Boolean(activeSheet) || memoryBusy}
-			/>
+			<BoardMemoryOperationProvider value={memoryOperation}>
+				<BoardSurface
+					feedback={feedback}
+					feedbackFlags={feedbackFlags.flags}
+					onOpenSheet={openSheet}
+					disabled={Boolean(activeSheet) || memoryBusy}
+				/>
+			</BoardMemoryOperationProvider>
 			{memoryBusy ? (
 				<div
 					data-ui="board memory busy shield"
-					className="pointer-events-auto absolute inset-0 bg-transparent"
+					className="pointer-events-auto absolute inset-0 bg-[#10051a]/38 backdrop-blur-[1px]"
 					style={{
 						zIndex: "var(--ak-layer-toast)",
 					}}

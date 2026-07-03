@@ -110,7 +110,7 @@
 			],
 			"description": "A layout memory device. Tap empty memory to save the current board layout, tap filled memory to restore it. Long press to clear the stored layout.",
 			"label": "Memory",
-			"maxCount": 1,
+			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Board Memory",
 			"storage": "board",
@@ -126,6 +126,21 @@
 	"startingState": {
 		"board": [
 			{
+				"itemId": "item:board-memory",
+				"x": 1,
+				"y": 0
+			},
+			{
+				"itemId": "item:cheat:speed-disable",
+				"x": 2,
+				"y": 0
+			},
+			{
+				"itemId": "item:board-memory",
+				"x": 3,
+				"y": 0
+			},
+			{
 				"itemId": "item:nuke-save",
 				"x": 4,
 				"y": 0
@@ -136,18 +151,8 @@
 				"y": 0
 			},
 			{
-				"itemId": "item:board-memory",
-				"x": 3,
-				"y": 0
-			},
-			{
 				"itemId": "item:inventory",
 				"x": 6,
-				"y": 0
-			},
-			{
-				"itemId": "item:cheat:speed-disable",
-				"x": 2,
 				"y": 0
 			},
 			{
@@ -159,6 +164,11 @@
 				"itemId": "producer:lumberjack-t1",
 				"x": 1,
 				"y": 1
+			},
+			{
+				"itemId": "producer:shrine-t1",
+				"x": 3,
+				"y": 2
 			},
 			{
 				"itemId": "producer:townhall-t1",
@@ -179,11 +189,6 @@
 				"itemId": "producer:quarry-t1",
 				"x": 1,
 				"y": 6
-			},
-			{
-				"itemId": "producer:shrine-t1",
-				"x": 3,
-				"y": 2
 			}
 		],
 		"inventory": []

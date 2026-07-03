@@ -38,7 +38,7 @@ const readBoardMemorySnapshot = ({
 	save: GameSave;
 }) =>
 	Object.values(save.board.items)
-		.filter((item) => item.id !== memoryItemId)
+		.filter((item) => item.id !== memoryItemId && item.itemId !== boardMemoryItemId)
 		.sort(
 			(left, right) =>
 				left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),

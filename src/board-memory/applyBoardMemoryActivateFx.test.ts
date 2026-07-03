@@ -22,7 +22,7 @@ const createMemoryTestConfig = () => {
 					"asset:test",
 				],
 				description: "Board memory",
-				maxCount: 1,
+				maxCount: 2,
 				maxStackSize: 1,
 				name: "Board Memory",
 				storage: "board",
@@ -43,6 +43,11 @@ const createMemoryTestConfig = () => {
 				{
 					itemId: "item:producer",
 					x: 1,
+					y: 0,
+				},
+				{
+					itemId: boardMemoryItemId,
+					x: 2,
 					y: 0,
 				},
 			],

@@ -6,6 +6,8 @@ import { appendItemMergeVisuals } from "~/play/game-engine-visual/appendItemMerg
 import { appendItemReplaceVisuals } from "~/play/game-engine-visual/appendItemReplaceVisuals";
 import { appendActivationInputStoreVisuals } from "~/play/game-engine-visual/appendActivationInputStoreVisuals";
 import { appendBoardMemoryStoreVisuals } from "~/play/game-engine-visual/appendBoardMemoryStoreVisuals";
+import { appendBoardMemoryRestoreVisuals } from "~/play/game-engine-visual/appendBoardMemoryRestoreVisuals";
+import { appendBoardTileBounceFeedback } from "~/play/game-engine-visual/appendBoardTileBounceFeedback";
 import { appendActivationInputTargetFeedback } from "~/play/game-engine-visual/appendActivationInputTargetFeedback";
 import { appendCraftStageUpdateVisuals } from "~/play/game-engine-visual/appendCraftStageUpdateVisuals";
 import { appendLineCompletedFeedback } from "~/play/game-engine-visual/appendLineCompletedFeedback";
@@ -83,12 +85,30 @@ export const createGameEngineVisualPlan = ({
 		}
 	>[] = [];
 	let createdSequenceIndex = 0;
+	let memoryRestoreSequenceIndex = 0;
+	const boardMemoryItemInstanceId = events.find(
+		(event) =>
+			event.type === "board.memory.saved" ||
+			event.type === "board.memory.restored" ||
+			event.type === "board.memory.cleared",
+	)?.boardItemId;
 
 	for (const [index, event] of events.entries()) {
 		if (skipped.has(index)) continue;
 
 		switch (event.type) {
 			case "item.created": {
+				if (event.reason === "memory-restore") {
+					appendBoardMemoryRestoreVisuals({
+						currentBoard,
+						event,
+						plan,
+						sequenceIndex: memoryRestoreSequenceIndex,
+					});
+					memoryRestoreSequenceIndex += 1;
+					break;
+				}
+
 				const sequenceIndex = event.spawnSequenceIndex ?? createdSequenceIndex;
 				appendItemCreatedVisuals({
 					currentBoard,
@@ -105,6 +125,7 @@ export const createGameEngineVisualPlan = ({
 				if (event.reason === "memory-store") {
 					appendBoardMemoryStoreVisuals({
 						event,
+						memoryItemInstanceId: boardMemoryItemInstanceId,
 						plan,
 						previousBoard,
 						sequenceIndex: createdSequenceIndex,
@@ -228,9 +249,36 @@ export const createGameEngineVisualPlan = ({
 			case "item.spawn.blocked":
 			case "item.spawn.failed":
 			case "line.default_changed":
+				plan.ignoredEventTypes.push(event.type);
+				break;
 			case "board.memory.saved":
+				appendBoardTileBounceFeedback({
+					durationMs: 520,
+					groupId: `engine:memory-saved-feedback:${event.boardItemId}:${event.atMs}`,
+					plan,
+					tileId: event.boardItemId,
+				});
+				plan.ignoredEventTypes.push(event.type);
+				break;
 			case "board.memory.restored":
+				appendBoardTileBounceFeedback({
+					durationMs: 380,
+					groupId: `engine:memory-restored-feedback:${event.boardItemId}:${event.atMs}`,
+					plan,
+					pulseCount: 2,
+					tileId: event.boardItemId,
+				});
+				plan.ignoredEventTypes.push(event.type);
+				break;
 			case "board.memory.cleared":
+				appendBoardTileBounceFeedback({
+					durationMs: 420,
+					groupId: `engine:memory-cleared-feedback:${event.boardItemId}:${event.atMs}`,
+					plan,
+					tileId: event.boardItemId,
+				});
+				plan.ignoredEventTypes.push(event.type);
+				break;
 			case "cheat.speed_mode.changed":
 			case "producer_input.withdrawn":
 			case "line.blocked":

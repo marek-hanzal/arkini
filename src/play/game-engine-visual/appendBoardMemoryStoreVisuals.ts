@@ -18,6 +18,7 @@ type MemoryStoreEvent = Extract<
 export namespace appendBoardMemoryStoreVisuals {
 	export interface Props {
 		event: MemoryStoreEvent;
+		memoryItemInstanceId: string | undefined;
 		plan: GameEngineVisualPlanDraft;
 		previousBoard: BoardView | undefined;
 		sequenceIndex: number;
@@ -26,6 +27,7 @@ export namespace appendBoardMemoryStoreVisuals {
 
 export const appendBoardMemoryStoreVisuals = ({
 	event,
+	memoryItemInstanceId,
 	plan,
 	previousBoard,
 	sequenceIndex,
@@ -33,7 +35,9 @@ export const appendBoardMemoryStoreVisuals = ({
 	if (event.from.kind !== "board") return;
 	const previousSource = previousBoard?.byId[event.from.itemInstanceId];
 	if (!previousSource) return;
-	const memoryItem = previousBoard?.items.find((item) => item.itemId === boardMemoryItemId);
+	const memoryItem = memoryItemInstanceId
+		? previousBoard?.byId[memoryItemInstanceId]
+		: previousBoard?.items.find((item) => item.itemId === boardMemoryItemId);
 	if (!memoryItem) return;
 
 	const motion = GameVisualMotion.merge({

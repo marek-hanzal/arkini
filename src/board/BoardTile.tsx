@@ -2,6 +2,7 @@ import { memo, useMemo } from "react";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
 import { readBoardTileStatus } from "~/board/logic/readBoardTileStatus";
+import { useBoardMemoryOperation } from "~/board-memory/BoardMemoryOperationContext";
 import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
 import { GameItemView } from "~/item/ui/GameItemView";
 import { cn } from "~/ui/cn";
@@ -10,6 +11,7 @@ import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/producer/logic/readProducerBoardProgress";
 import { useGameRuntimeSelector } from "~/play/runtime/GameRuntimeContext";
 import { useGameBoardItem, useGameItemView } from "~/play/runtime/useGameRuntimeViews";
+import { useLiveNowMs } from "~/time/useLiveNowMs";
 
 export namespace BoardTile {
 	export interface Props {
@@ -30,7 +32,14 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			boardItem,
 		],
 	);
-	const nowMs = useBoardItemClock(clockItems);
+	const memoryOperation = useBoardMemoryOperation();
+	const activeMemoryOperationUntil =
+		memoryOperation?.boardItemId === boardItemId ? memoryOperation.readyAtMs : undefined;
+	const boardNowMs = useBoardItemClock(clockItems);
+	const memoryNowMs = useLiveNowMs([
+		activeMemoryOperationUntil,
+	]);
+	const nowMs = activeMemoryOperationUntil === undefined ? boardNowMs : memoryNowMs;
 	const item = useGameItemView(boardItem?.itemId);
 	const hasSavedMemory = useGameRuntimeSelector(
 		(state) => Boolean(state.runtime.save.boardMemoryLayouts[boardItemId]),
@@ -52,6 +61,17 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 		activation: liveBoardItem?.activation,
 		nowMs,
 	});
+	const memoryProgress =
+		memoryOperation?.boardItemId === boardItemId
+			? Math.min(
+					1,
+					Math.max(
+						0,
+						(nowMs - memoryOperation.startedAtMs) /
+							(memoryOperation.readyAtMs - memoryOperation.startedAtMs),
+					),
+				)
+			: undefined;
 	const hasActiveEffect = liveBoardItem?.activation?.lines?.some(
 		(line) =>
 			line.kind === "effect" &&
@@ -86,7 +106,9 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			) : null}
 			<BoardCellProgress progress={liveBoardItem?.craft?.progress} />
 			<BoardCellCooldownProgress
-				progress={producerProgress?.progress ?? producerCooldown?.progress}
+				progress={
+					memoryProgress ?? producerProgress?.progress ?? producerCooldown?.progress
+				}
 			/>
 		</div>
 	);

@@ -1012,4 +1012,191 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardTransientTilePlans).toHaveLength(0);
 		expect(plan.inventoryEnterRequests).toHaveLength(0);
 	});
+
+	it("restores board memory items from memory without slow global creation sequencing", () => {
+		const previousBoard = boardView([
+			{
+				id: "other-memory",
+				itemId: "item:board-memory",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+			{
+				id: "memory",
+				itemId: "item:board-memory",
+				state: {},
+				x: 1,
+				y: 0,
+			},
+			{
+				id: "old:1",
+				itemId: "item:rock",
+				state: {},
+				x: 2,
+				y: 0,
+			},
+			{
+				id: "old:2",
+				itemId: "item:tree",
+				state: {},
+				x: 3,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "other-memory",
+					itemId: "item:board-memory",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+				{
+					id: "memory",
+					itemId: "item:board-memory",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+				{
+					id: "new:1",
+					itemId: "item:rock",
+					state: {},
+					x: 4,
+					y: 0,
+				},
+				{
+					id: "new:2",
+					itemId: "item:tree",
+					state: {},
+					x: 5,
+					y: 0,
+				},
+			]),
+			currentInventory: emptyInventory(),
+			events: [
+				{
+					from: {
+						itemInstanceId: "old:1",
+						kind: "board",
+					},
+					itemId: "item:rock",
+					reason: "memory-store",
+					type: "item.consumed",
+				},
+				{
+					from: {
+						itemInstanceId: "old:2",
+						kind: "board",
+					},
+					itemId: "item:tree",
+					reason: "memory-store",
+					type: "item.consumed",
+				},
+				{
+					itemId: "item:rock",
+					originItemInstanceId: "memory",
+					reason: "memory-restore",
+					to: {
+						itemInstanceId: "new:1",
+						kind: "board",
+						x: 3,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					itemId: "item:tree",
+					originItemInstanceId: "memory",
+					reason: "memory-restore",
+					to: {
+						itemInstanceId: "new:2",
+						kind: "board",
+						x: 4,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					atMs: 1000,
+					boardItemId: "memory",
+					restoredCount: 2,
+					storedCount: 2,
+					type: "board.memory.restored",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardTransientTilePlans).toHaveLength(2);
+		expect(
+			plan.boardTransientTilePlans.map((transient) => transient.request.exit?.toTileId),
+		).toEqual([
+			"memory",
+			"memory",
+		]);
+		expect(plan.boardEnterRequests).toHaveLength(2);
+		expect(plan.boardEnterRequests.map((request) => request.enter?.delayMs)).toEqual([
+			260,
+			294,
+		]);
+		expect(plan.boardEnterRequests[0]).toMatchObject({
+			enter: {
+				fromTileId: "memory",
+				kind: "spawn-from-tile",
+			},
+			tileId: "new:1",
+		});
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+				pulseCount: 2,
+			},
+			tileId: "memory",
+		});
+	});
+
+	it("adds board memory save feedback even when no board item moves", () => {
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "memory",
+					itemId: "item:board-memory",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+			]),
+			currentInventory: emptyInventory(),
+			events: [
+				{
+					atMs: 1000,
+					boardItemId: "memory",
+					itemCount: 0,
+					type: "board.memory.saved",
+				},
+			] satisfies GameEvent[],
+			previousBoard: boardView([
+				{
+					id: "memory",
+					itemId: "item:board-memory",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+			]),
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			feedback: {
+				kind: "bounce",
+			},
+			tileId: "memory",
+		});
+	});
 });

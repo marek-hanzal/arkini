@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { compileDirectory, validateSources } from "./package";
+import { GAME_HERO_ASSET_ID } from "../../src/config/GameWellKnownAssetIds";
 import { loadGameConfigPackFromFile } from "../../src/config/pack/loadGameConfigPackFromFile";
 
 const tempDirs: string[] = [];
@@ -191,6 +192,7 @@ describe("game package compiler", () => {
 			},
 		});
 		await mkdir(join(sourceDir, "assets"));
+		await writeFile(join(sourceDir, "assets", "hero.png"), pngMagicBytes);
 		await writeFile(join(sourceDir, "assets", "item-test.png"), pngMagicBytes);
 
 		const result = await compileDirectory({
@@ -200,6 +202,10 @@ describe("game package compiler", () => {
 
 		expect(result.packPath.endsWith(".game.arkpack")).toBe(true);
 		expect(decoded.items["item:test"]?.name).toBe("Test item");
+		expect(decoded.assets[GAME_HERO_ASSET_ID]).toMatchObject({
+			resourceId: "hero",
+		});
+		expect(decoded.resources["hero"]?.data).toBe(pngMagicBytes.toString("base64"));
 		expect(decoded.resources["item-test"]?.data).toBe(pngMagicBytes.toString("base64"));
 	});
 });

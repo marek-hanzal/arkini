@@ -1,5 +1,6 @@
 import type { GameConfig } from "../../src/config/GameConfigTypes";
 import type { GameLineDefinition } from "../../src/config/GameItemCapabilities";
+import { GAME_WELL_KNOWN_ASSET_IDS } from "../../src/config/GameWellKnownAssetIds";
 
 export type GameConfigAuditWarning = {
 	code: "duplicate-definition-shape" | "terminal-item" | "unused-definition";
@@ -31,6 +32,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	const itemFlow = createItemFlowIndex();
 
 	collectItemUsage(config, usage, itemFlow);
+	collectWellKnownAssetUsage(usage);
 	collectEffectUsage(config, usage);
 	collectStartingStateUsage(config, itemFlow);
 	collectUsedAssetDependencyUsage(config, usage);
@@ -63,6 +65,12 @@ const createItemFlowIndex = (): ItemFlowIndex => ({
 	consumedItemIds: new Set(),
 	producedItemIds: new Set(),
 });
+
+const collectWellKnownAssetUsage = (usage: UsageIndex) => {
+	for (const assetId of GAME_WELL_KNOWN_ASSET_IDS) {
+		usage.assets.add(assetId);
+	}
+};
 
 const collectAssetResourceUsage = (config: GameConfig, usage: UsageIndex) => {
 	for (const asset of Object.values(config.assets)) {
@@ -358,7 +366,7 @@ const readUnusedRecordWarningMessage = (
 	id: string,
 ): string => {
 	if (section === "assets")
-		return `assets.${id} is defined but no item or used overlay references it.`;
+		return `assets.${id} is defined but no item, well-known game surface, or used overlay references it.`;
 	if (section === "resources")
 		return `resources.${id} is packaged from assets but no asset references it.`;
 	return `${section}.${id} is defined but no other config entry references it.`;

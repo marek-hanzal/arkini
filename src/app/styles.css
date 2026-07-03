@@ -66,6 +66,7 @@ button:focus-visible,
 	--ak-layer-base-drag-tile: 20;
 	--ak-layer-toast: 40;
 	--ak-layer-overlay-root: 50;
+	--ak-layer-app-splash: 60;
 	--ak-layer-overlay-backdrop: 0;
 	--ak-layer-overlay-panel: 10;
 	--ak-layer-overlay-tile: 0;

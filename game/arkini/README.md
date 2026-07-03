@@ -381,6 +381,8 @@ Current gameplay definitions now point to dedicated asset IDs and dedicated PNG 
 
 Runtime asset note: the app runtime consumes the compiled `game/arkini.game.arkpack` binary package. Do not mirror authored PNGs into `src/assets`; `game/arkini/assets` is the source input and the Arkini pack is the runtime output.
 
+The splash hero is a well-known game asset: `asset:game:hero` points at the packaged `hero` PNG resource from `game/arkini/assets/hero.png`. Keep it in the game package, not in `src/app`, so custom config builds can replace the hero without shipping Arkini-branded app code by accident. Branding by hard-coded import is how games grow cursed launch screens.
+
 Current first-wave asset IDs:
 
 - `asset:item:tree` -> `game/arkini/assets/item-tree.png`

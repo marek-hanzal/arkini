@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { GAME_HERO_ASSET_ID } from "~/config/GameWellKnownAssetIds";
+import { readGameConfigAssetSrc } from "~/config/readGameConfigAssetSrc";
 import { loadGameConfigPackFromFile } from "~/config/pack/loadGameConfigPackFromFile";
 
 const defaultGameConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack");
@@ -60,6 +62,18 @@ const readEmbeddedEffect = (effectId: string) =>
 	readEmbeddedEffects().find((effect) => effect.id === effectId);
 
 describe("defaultGameConfig", () => {
+	it("ships the splash hero as a well-known game asset", () => {
+		expect(defaultGameConfig.assets[GAME_HERO_ASSET_ID]).toMatchObject({
+			resourceId: "hero",
+		});
+		expect(
+			readGameConfigAssetSrc({
+				assetId: GAME_HERO_ASSET_ID,
+				config: defaultGameConfig,
+			}),
+		).toMatch(/^data:image\/png;base64,/);
+	});
+
 	it("keeps active effects as line-owned grant sources", () => {
 		expect(readEmbeddedEffect("effect:shrine-minor-haste")).toMatchObject({
 			grants: [

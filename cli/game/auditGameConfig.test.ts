@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseGameConfig as parseGameConfigRaw } from "../../src/config/GameConfigSchema";
+import { GAME_HERO_ASSET_ID } from "../../src/config/GameWellKnownAssetIds";
 import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
 
 const parseGameConfig = parseGameConfigRaw;
@@ -205,6 +206,28 @@ describe("auditGameConfig", () => {
 			expect.objectContaining({
 				code: "unused-definition",
 				id: "asset:unused",
+				section: "assets",
+			}),
+		);
+	});
+
+	it("treats well-known game assets as used by app surfaces", () => {
+		const config: any = createConfigValue();
+		config.resources["resource:hero"] = {
+			data: "iVBOR-hero",
+		};
+		config.assets[GAME_HERO_ASSET_ID] = {
+			label: "Hero",
+			render: "plain",
+			resourceId: "resource:hero",
+		};
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "unused-definition",
+				id: GAME_HERO_ASSET_ID,
 				section: "assets",
 			}),
 		);

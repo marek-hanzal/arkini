@@ -1,4 +1,5 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
+import { readGameConfigAssetSrc } from "~/config/readGameConfigAssetSrc";
 import type { ItemId } from "~/config/GameIdSchema";
 import type { ViewItem, ViewItemAsset } from "~/item/view/ViewItemSchema";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
@@ -8,18 +9,11 @@ const catalogCache = new WeakMap<GameConfig, ItemCatalogView>();
 const fallbackAssetSrc =
 	"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='18' fill='%230f172a'/%3E%3Cpath d='M32 78 58 32h12l26 46-10 18H42z' fill='%23334155'/%3E%3Ccircle cx='64' cy='70' r='12' fill='%2394a3b8'/%3E%3C/svg%3E";
 
-const resourceDataSrc = (data: string | undefined) => {
-	if (!data) return undefined;
-	if (/^[a-z][a-z0-9+.-]*:/i.test(data)) return data;
-	return `data:image/png;base64,${data}`;
-};
-
-const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameConfig }) => {
-	const asset = config.assets[assetId];
-	if (!asset) return fallbackAssetSrc;
-
-	return resourceDataSrc(config.resources[asset.resourceId]?.data) ?? fallbackAssetSrc;
-};
+const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameConfig }) =>
+	readGameConfigAssetSrc({
+		assetId,
+		config,
+	}) ?? fallbackAssetSrc;
 
 const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	(config.items[itemId]?.effects ?? []).map((effect) => ({

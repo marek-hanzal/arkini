@@ -9,6 +9,7 @@ import {
 	type GameConfigFragment,
 } from "../../src/config/GameConfigSchema";
 import type { GameConfig } from "../../src/config/GameConfigTypes";
+import { GAME_HERO_ASSET_ID, GAME_HERO_RESOURCE_ID } from "../../src/config/GameWellKnownAssetIds";
 import { doesResolvedDomainSelectorMatchId } from "../../src/selector/doesResolvedDomainSelectorMatchId";
 import {
 	encodeArkiniPack,
@@ -193,11 +194,17 @@ const normalizePackage = (value: unknown): unknown => {
 
 	const packageValue = value as Record<string, unknown>;
 	const items = asRecord(packageValue.items);
+	const resources = asRecord(packageValue.resources);
 	const sourceAssets = asRecord(packageValue.assets);
 	const assets: Record<string, unknown> = {
 		...sourceAssets,
 	};
 	const normalizedItems: Record<string, unknown> = {};
+
+	normalizeWellKnownGameAssets({
+		assets,
+		resources,
+	});
 
 	const itemDomainIndex = createTaggedDomainIndex({
 		entries: items,
@@ -276,6 +283,19 @@ const normalizePackage = (value: unknown): unknown => {
 		...packageValue,
 		assets,
 		items: normalizedItems,
+	};
+};
+
+const normalizeWellKnownGameAssets = ({
+	assets,
+	resources,
+}: {
+	assets: Record<string, unknown>;
+	resources: Readonly<Record<string, unknown>>;
+}) => {
+	if (assets[GAME_HERO_ASSET_ID] || !resources[GAME_HERO_RESOURCE_ID]) return;
+	assets[GAME_HERO_ASSET_ID] = {
+		resourceId: GAME_HERO_RESOURCE_ID,
 	};
 };
 

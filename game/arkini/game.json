@@ -12,6 +12,10 @@
 		},
 		"asset:producer:shrine-t1": {
 			"resourceId": "producer-shrine-t1"
+		},
+		"asset:game:hero": {
+			"label": "Splash hero",
+			"resourceId": "hero"
 		}
 	},
 	"game": {

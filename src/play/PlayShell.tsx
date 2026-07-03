@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { GameAudioProvider, useGameAudio } from "~/audio/GameAudioProvider";
 import { BoardSurface } from "~/board/BoardSurface";
+import { BoardMemoryBusyShield } from "~/board-memory/BoardMemoryBusyShield";
 import {
 	BoardMemoryOperationProvider,
 	boardMemoryOperationDurationMs,
@@ -174,15 +175,7 @@ const PlayShellContent: FC = () => {
 					disabled={Boolean(activeSheet) || memoryBusy}
 				/>
 			</BoardMemoryOperationProvider>
-			{memoryBusy ? (
-				<div
-					data-ui="board memory busy shield"
-					className="pointer-events-auto absolute inset-0 bg-[#10051a]/38 backdrop-blur-[1px]"
-					style={{
-						zIndex: "var(--ak-layer-toast)",
-					}}
-				/>
-			) : null}
+			<BoardMemoryBusyShield operation={memoryOperation} />
 
 			{lastError && feedbackFlags.has("toast:error") ? (
 				<div

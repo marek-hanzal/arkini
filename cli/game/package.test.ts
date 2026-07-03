@@ -146,7 +146,7 @@ describe("game package compiler", () => {
 		});
 		const decoded = await loadGameConfigPackFromFile(result.packPath);
 
-		expect(result.packPath.endsWith(".game.arkpack.gz")).toBe(true);
+		expect(result.packPath.endsWith(".game.arkpack")).toBe(true);
 		expect(decoded.items["item:test"]?.name).toBe("Test item");
 		expect(decoded.resources["item-test"]?.data).toBe(pngMagicBytes.toString("base64"));
 	});

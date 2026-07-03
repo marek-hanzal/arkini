@@ -5,7 +5,7 @@ import {
 	readRuntimeLineActiveEffectBonusLines,
 } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
-const defaultGameConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack.gz");
+const defaultGameConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack");
 
 describe("readRuntimeEffectBenefitLines", () => {
 	it("describes shrine speed boosts in player-readable copy", () => {

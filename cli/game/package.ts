@@ -62,7 +62,7 @@ export const compileDirectory = async (
 		},
 	]);
 	const compiledPackage = validatePackage(packageValue);
-	const packPath = join(outDir, `${packageName}.game.arkpack.gz`);
+	const packPath = join(outDir, `${packageName}.game.arkpack`);
 	await writeGamePack(packPath, compiledPackage);
 
 	return {
@@ -79,7 +79,7 @@ export const validateSources = async (paths: readonly string[]) => {
 					"game/arkini",
 				]
 			: paths;
-	const packPaths = resolvedPaths.filter((path) => path.endsWith(".arkpack.gz"));
+	const packPaths = resolvedPaths.filter((path) => path.endsWith(".arkpack"));
 	if (packPaths.length > 0) {
 		if (packPaths.length !== resolvedPaths.length || packPaths.length !== 1) {
 			throw new Error(

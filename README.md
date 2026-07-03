@@ -204,7 +204,7 @@ The workflow uses Node + `npm install --no-package-lock`, then `npm run build`. 
 
 Current runtime boot is intentionally simple: `RuntimeGameEngineAdapter` loads the compiled default `GameConfig`, creates an in-memory `GameSave` from `startingState` when no save is injected, and publishes state through `GameRuntimeStore`. There is no active SQL persistence layer in this repo state.
 
-The developer sheet and root error boundary can still wipe browser storage and reload, because future persistence will use browser storage again and prototype saves are not sacred museum artifacts.
+The developer sheet and root error boundary expose an explicit browser-storage reset. Runtime crashes must stay visible instead of auto-reloading into the same failure loop like a very determined hamster.
 
 Future Dexie/IndexedDB persistence should wrap the runtime from outside: load a `GameSave`, create the adapter, subscribe to save changes, debounce writes and keep migrations/storage adapters out of `src/engine`.
 

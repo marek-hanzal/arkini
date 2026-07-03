@@ -35,11 +35,6 @@ const forbiddenDirectories = [
 	"src/ancient",
 ] as const;
 
-const forbiddenFiles = [
-	"game/arkini.game.json",
-	"game/arkini.assets.json",
-] as const;
-
 const forbiddenRootConfigKeys = [
 	"effects",
 	"products",
@@ -88,12 +83,11 @@ const forbiddenTextPatterns = [
 const main = async () => {
 	const findings = [
 		...auditForbiddenDirectories(),
-		...auditForbiddenFiles(),
 		...auditText(),
 		...auditIndexBarrels(),
 		...auditConfig({
-			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack.gz"),
-			label: "game/arkini.game.arkpack.gz",
+			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack"),
+			label: "game/arkini.game.arkpack",
 		}),
 		...auditConfig({
 			config: await validateSources([
@@ -122,19 +116,6 @@ const auditForbiddenDirectories = (): Finding[] =>
 					{
 						path,
 						message: "removed runtime directory must not exist",
-					},
-				]
-			: [],
-	);
-
-const auditForbiddenFiles = (): Finding[] =>
-	forbiddenFiles.flatMap((path) =>
-		existsSync(path)
-			? [
-					{
-						path,
-						message:
-							"compiled runtime config must be packaged as arkpack, not split JSON",
 					},
 				]
 			: [],

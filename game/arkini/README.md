@@ -379,7 +379,7 @@ The prestige construction pass adds dedicated 128x128 transparent PNGs for guild
 
 Current gameplay definitions now point to dedicated asset IDs and dedicated PNG filenames when possible.
 
-Runtime asset note: the app runtime consumes the compiled `game/arkini.assets.json` resource package. Do not mirror authored PNGs into `src/assets`; `game/arkini/assets` is the source input and `game/arkini.assets.json` is the runtime output.
+Runtime asset note: the app runtime consumes the compiled `game/arkini.game.arkpack` binary package. Do not mirror authored PNGs into `src/assets`; `game/arkini/assets` is the source input and the Arkini pack is the runtime output.
 
 Current first-wave asset IDs:
 

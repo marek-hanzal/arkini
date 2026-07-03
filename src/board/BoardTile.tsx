@@ -8,6 +8,7 @@ import { cn } from "~/ui/cn";
 import { useBoardItemClock } from "~/board/useBoardItemClock";
 import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
 import { readProducerBoardProgress } from "~/producer/logic/readProducerBoardProgress";
+import { useGameRuntimeSelector } from "~/play/runtime/GameRuntimeContext";
 import { useGameBoardItem, useGameItemView } from "~/play/runtime/useGameRuntimeViews";
 
 export namespace BoardTile {
@@ -31,6 +32,10 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 	);
 	const nowMs = useBoardItemClock(clockItems);
 	const item = useGameItemView(boardItem?.itemId);
+	const hasSavedMemory = useGameRuntimeSelector(
+		(state) => Boolean(state.runtime.save.boardMemoryLayouts[boardItemId]),
+		Object.is,
+	);
 	const liveBoardItem = readLiveBoardItemView({
 		boardItem,
 		nowMs,
@@ -70,7 +75,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 			)}
 		>
 			<GameItemView
-				assetProgress={liveBoardItem?.craft?.inputProgress}
+				assetProgress={hasSavedMemory ? 1 : (liveBoardItem?.craft?.inputProgress ?? 0)}
 				item={item}
 				variant="board"
 			/>

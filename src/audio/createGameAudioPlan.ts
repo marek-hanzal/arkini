@@ -422,6 +422,16 @@ export const createGameAudioPlan = ({
 					sourceEventType: event.type,
 				});
 				break;
+			case "board.memory.saved":
+			case "board.memory.restored":
+			case "board.memory.cleared":
+				pushUniqueSound({
+					flags,
+					plan,
+					soundId: "audio.effect.activated",
+					sourceEventType: event.type,
+				});
+				break;
 			case "cheat.speed_mode.changed":
 				pushUniqueSound({
 					flags,

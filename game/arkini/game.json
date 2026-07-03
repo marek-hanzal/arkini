@@ -16,6 +16,12 @@
 		"asset:game:hero": {
 			"label": "Splash hero",
 			"resourceId": "hero"
+		},
+		"asset:item:board-memory:empty": {
+			"resourceId": "item-board-memory-empty"
+		},
+		"asset:item:board-memory:full": {
+			"resourceId": "item-board-memory-full"
 		}
 	},
 	"game": {
@@ -25,7 +31,7 @@
 		},
 		"id": "arkini",
 		"inventory": {
-			"slots": 35
+			"slots": 49
 		},
 		"title": "Arkini"
 	},
@@ -96,6 +102,25 @@
 				"utility",
 				"ui"
 			]
+		},
+		"item:board-memory": {
+			"assetIds": [
+				"asset:item:board-memory:empty",
+				"asset:item:board-memory:full"
+			],
+			"description": "A layout memory device. Tap empty memory to save the current board layout, tap filled memory to restore it. Long press to clear the stored layout.",
+			"label": "Memory",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Board Memory",
+			"storage": "board",
+			"tags": [
+				"special:board-memory",
+				"memory",
+				"layout",
+				"utility",
+				"ui"
+			]
 		}
 	},
 	"startingState": {
@@ -108,6 +133,11 @@
 			{
 				"itemId": "item:cheat",
 				"x": 5,
+				"y": 0
+			},
+			{
+				"itemId": "item:board-memory",
+				"x": 3,
 				"y": 0
 			},
 			{

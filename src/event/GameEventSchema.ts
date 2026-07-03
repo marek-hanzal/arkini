@@ -14,6 +14,8 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"board-stash",
 	"tile-remove-output",
 	"merge-output",
+	"memory-restore",
+	"memory-store",
 	"debug",
 ]);
 
@@ -28,6 +30,8 @@ const GameItemConsumedReasonSchema = z.enum([
 	"board-stash",
 	"remove-tool",
 	"merge-source",
+	"memory-restore",
+	"memory-store",
 ]);
 
 const GameBoardItemChangeReasonSchema = z.enum([
@@ -288,6 +292,31 @@ const GameEventSchema = z.discriminatedUnion("type", [
 			itemInstanceId: IdSchema,
 			previousLineId: IdSchema.optional(),
 			nextLineId: IdSchema.optional(),
+			atMs: GameInstantMsSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("board.memory.saved"),
+			boardItemId: IdSchema,
+			itemCount: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("board.memory.restored"),
+			boardItemId: IdSchema,
+			restoredCount: NonNegativeIntegerSchema,
+			storedCount: NonNegativeIntegerSchema,
+			atMs: GameInstantMsSchema,
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("board.memory.cleared"),
+			boardItemId: IdSchema,
+			itemCount: NonNegativeIntegerSchema,
 			atMs: GameInstantMsSchema,
 		})
 		.strict(),

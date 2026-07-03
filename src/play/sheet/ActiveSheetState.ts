@@ -13,6 +13,10 @@ export type ActiveSheetState =
 			type: "nuke-save";
 	  }
 	| {
+			type: "board-memory";
+			boardItemId: string;
+	  }
+	| {
 			type: "item";
 			boardItemId: string;
 	  };

@@ -7,6 +7,7 @@ import { resolveBoardItemTapAction } from "~/board/logic/resolveBoardItemTapActi
 import { readProducerMissingResourceHintTileIds } from "~/producer/logic/readProducerMissingResourceHintTileIds";
 import type { BoardSurface } from "~/board/BoardSurface.types";
 import { readBoardUtilityItemSheet } from "~/board/BoardUtilityItem";
+import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { useBoardTransientTiles } from "~/board/animation/BoardTransientTileStore";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
@@ -46,11 +47,21 @@ const readBoardItemSheet = ({
 }: {
 	boardItemId: string;
 	itemId: string;
-}): ActiveSheetState =>
-	readBoardUtilityItemSheet(itemId) ?? {
-		boardItemId,
-		type: "item",
-	};
+}): ActiveSheetState => {
+	if (isBoardMemoryItemId(itemId)) {
+		return {
+			boardItemId,
+			type: "board-memory",
+		};
+	}
+
+	return (
+		readBoardUtilityItemSheet(itemId) ?? {
+			boardItemId,
+			type: "item",
+		}
+	);
+};
 
 export const useBoardTileEngineModel = ({
 	feedback,
@@ -182,6 +193,19 @@ export const useBoardTileEngineModel = ({
 
 			if (action.type === "open-sheet") {
 				onOpenSheet(action.sheet);
+				return;
+			}
+
+			if (action.type === "activate-board-memory") {
+				void runtimeStore
+					.dispatch({
+						action: {
+							boardItemId: action.boardItemId,
+							type: "board.memory.activate",
+						},
+						nowMs,
+					})
+					.catch(feedback.showError);
 				return;
 			}
 

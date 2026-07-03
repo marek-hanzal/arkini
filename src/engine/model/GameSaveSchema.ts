@@ -175,6 +175,21 @@ const GameSaveProducerChargeStateSchema = z
 	})
 	.strict();
 
+const GameSaveBoardMemoryLayoutItemSchema = z
+	.object({
+		itemId: IdSchema,
+		x: NonNegativeIntegerSchema,
+		y: NonNegativeIntegerSchema,
+	})
+	.strict();
+
+const GameSaveBoardMemoryLayoutSchema = z
+	.object({
+		items: z.array(GameSaveBoardMemoryLayoutItemSchema),
+		savedAtMs: GameInstantMsSchema,
+	})
+	.strict();
+
 const GameSaveCheatStateSchema = z
 	.object({
 		speedMode: z
@@ -280,6 +295,7 @@ const GameSaveSchema = z
 		producerJobs: z.record(IdSchema, GameSaveProducerJobSchema),
 		activeEffects: z.record(IdSchema, GameSaveActiveEffectSchema).default({}),
 		cheats: GameSaveCheatStateSchema.optional(),
+		boardMemoryLayouts: z.record(IdSchema, GameSaveBoardMemoryLayoutSchema).default({}),
 		lines: z.record(IdSchema, GameSaveLineStateSchema),
 		producerInputs: z.record(IdSchema, GameSaveProducerInputStateSchema),
 		producerCharges: z.record(IdSchema, GameSaveProducerChargeStateSchema).default({}),
@@ -1368,6 +1384,49 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
+	for (const [memoryItemInstanceId, layout] of Object.entries(save.boardMemoryLayouts)) {
+		const memoryItem = save.board.items[memoryItemInstanceId];
+		if (!memoryItem) {
+			addSaveIssue(
+				ctx,
+				[
+					"boardMemoryLayouts",
+					memoryItemInstanceId,
+				],
+				`Board memory layout owner "${memoryItemInstanceId}" must exist on board.`,
+			);
+		}
+
+		for (const [entryIndex, entry] of layout.items.entries()) {
+			if (!config.items[entry.itemId]) {
+				addSaveIssue(
+					ctx,
+					[
+						"boardMemoryLayouts",
+						memoryItemInstanceId,
+						"items",
+						entryIndex,
+						"itemId",
+					],
+					`Board memory item "${entry.itemId}" must exist in config.`,
+				);
+			}
+
+			if (entry.x >= config.game.board.width || entry.y >= config.game.board.height) {
+				addSaveIssue(
+					ctx,
+					[
+						"boardMemoryLayouts",
+						memoryItemInstanceId,
+						"items",
+						entryIndex,
+					],
+					`Board memory cell ${entry.x}:${entry.y} is outside board bounds.`,
+				);
+			}
+		}
+	}
+
 	for (const [jobId, job] of Object.entries(save.itemSpawnJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -1427,6 +1486,8 @@ export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;
 export type GameSaveInventoryStack = z.infer<typeof GameSaveInventoryStackSchema>;
 export type GameSaveInventoryInstance = z.infer<typeof GameSaveInventoryInstanceSchema>;
 export type GameSaveInventorySlot = z.infer<typeof GameSaveInventorySlotSchema>;
+export type GameSaveBoardMemoryLayout = z.infer<typeof GameSaveBoardMemoryLayoutSchema>;
+export type GameSaveBoardMemoryLayoutItem = z.infer<typeof GameSaveBoardMemoryLayoutItemSchema>;
 export type GameSaveProducerJob = z.infer<typeof GameSaveProducerJobSchema>;
 export type GameSaveCraftJob = z.infer<typeof GameSaveCraftJobSchema>;
 export type GameSaveItemSpawnJob = z.infer<typeof GameSaveItemSpawnJobSchema>;

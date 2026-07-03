@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { GameActionBoardItemMoveSchema } from "~/action/GameActionBoardItemMoveSchema";
 import { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
+import { GameActionBoardMemoryActivateSchema } from "~/action/GameActionBoardMemoryActivateSchema";
+import { GameActionBoardMemoryClearSchema } from "~/action/GameActionBoardMemoryClearSchema";
 import { GameActionBoardItemsSwapSchema } from "~/action/GameActionBoardItemsSwapSchema";
 import { GameActionCheatSpeedModeSetSchema } from "~/action/GameActionCheatSpeedModeSetSchema";
 import { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
@@ -20,6 +22,8 @@ import { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema"
 export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionBoardItemMoveSchema,
 	GameActionBoardItemStashSchema,
+	GameActionBoardMemoryActivateSchema,
+	GameActionBoardMemoryClearSchema,
 	GameActionBoardItemsSwapSchema,
 	GameActionCheatSpeedModeSetSchema,
 	GameActionCraftInputStoreSchema,

@@ -12,6 +12,8 @@ export namespace matchGameAction {
 	export interface Cases<Result> {
 		boardItemMove: (action: GameActionOfType<"board.item.move">) => Result;
 		boardItemStash: (action: GameActionOfType<"board.item.stash">) => Result;
+		boardMemoryActivate: (action: GameActionOfType<"board.memory.activate">) => Result;
+		boardMemoryClear: (action: GameActionOfType<"board.memory.clear">) => Result;
 		boardItemsSwap: (action: GameActionOfType<"board.items.swap">) => Result;
 		cheatSpeedModeSet: (action: GameActionOfType<"cheat.speed_mode.set">) => Result;
 		craftInputStore: (action: GameActionOfType<"craft.input.store">) => Result;
@@ -46,6 +48,18 @@ export const matchGameAction = <Result>(
 				type: "board.item.stash",
 			},
 			cases.boardItemStash,
+		)
+		.with(
+			{
+				type: "board.memory.activate",
+			},
+			cases.boardMemoryActivate,
+		)
+		.with(
+			{
+				type: "board.memory.clear",
+			},
+			cases.boardMemoryClear,
 		)
 		.with(
 			{

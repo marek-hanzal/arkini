@@ -4,7 +4,14 @@ const gameVisualMergeDurationMs = 1000;
 const gameVisualReplaceDurationMs = 1000;
 const gameVisualStageUpdateDurationMs = 1000;
 
-type GameVisualMotionCause = "activation" | "craft" | "inventory" | "merge" | "producer" | "stash";
+type GameVisualMotionCause =
+	| "activation"
+	| "craft"
+	| "inventory"
+	| "memory"
+	| "merge"
+	| "producer"
+	| "stash";
 
 type GameVisualMotionEffect = "fade-in" | "merge" | "replace" | "stage-update";
 

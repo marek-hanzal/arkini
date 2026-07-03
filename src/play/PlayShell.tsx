@@ -1,8 +1,9 @@
 import { match } from "ts-pattern";
-import { type FC, useCallback, useMemo, useState } from "react";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { GameAudioProvider, useGameAudio } from "~/audio/GameAudioProvider";
 import { BoardSurface } from "~/board/BoardSurface";
 import { CheatInventorySheet } from "~/debug/CheatInventorySheet";
+import { BoardMemorySheet } from "~/debug/BoardMemorySheet";
 import { NukeSaveSheet } from "~/debug/NukeSaveSheet";
 import { InventorySurface } from "~/inventory/InventorySurface";
 import { ItemSheet } from "~/item/ItemSheet";
@@ -11,13 +12,41 @@ import { BottomSheet } from "~/play/sheet/BottomSheet";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 import { useFeedbackFlags } from "~/play/feedback/useFeedbackFlags";
 import { toGameActionError } from "~/play/action/toGameActionError";
-import { GameRuntimeProvider } from "~/play/runtime/GameRuntimeContext";
+import { GameRuntimeProvider, useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 
 const PlayShellContent: FC = () => {
 	const audio = useGameAudio();
+	const runtimeStore = useGameRuntimeStore();
 	const feedbackFlags = useFeedbackFlags();
 	const [activeSheet, setActiveSheet] = useState<ActiveSheetState | undefined>();
 	const [lastError, setLastError] = useState<string | undefined>();
+	const [memoryBusy, setMemoryBusy] = useState(false);
+	useEffect(() => {
+		let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
+		const unsubscribe = runtimeStore.subscribeUpdate((update) => {
+			if (
+				!update.result.events.some(
+					(event) =>
+						event.type === "board.memory.saved" ||
+						event.type === "board.memory.restored" ||
+						event.type === "board.memory.cleared",
+				)
+			) {
+				return;
+			}
+
+			setMemoryBusy(true);
+			if (timeout !== undefined) globalThis.clearTimeout(timeout);
+			timeout = globalThis.setTimeout(() => setMemoryBusy(false), 1350);
+		});
+
+		return () => {
+			if (timeout !== undefined) globalThis.clearTimeout(timeout);
+			unsubscribe();
+		};
+	}, [
+		runtimeStore,
+	]);
 	const closeSheet = useCallback(() => {
 		setActiveSheet((current) => {
 			if (current) audio.play("audio.ui.sheet.close");
@@ -94,6 +123,17 @@ const PlayShellContent: FC = () => {
 				)
 				.with(
 					{
+						type: "board-memory",
+					},
+					(sheet) => (
+						<BoardMemorySheet
+							boardItemId={sheet.boardItemId}
+							onClose={closeSheet}
+						/>
+					),
+				)
+				.with(
+					{
 						type: "item",
 					},
 					(sheet) => (
@@ -112,8 +152,17 @@ const PlayShellContent: FC = () => {
 				feedback={feedback}
 				feedbackFlags={feedbackFlags.flags}
 				onOpenSheet={openSheet}
-				disabled={Boolean(activeSheet)}
+				disabled={Boolean(activeSheet) || memoryBusy}
 			/>
+			{memoryBusy ? (
+				<div
+					data-ui="board memory busy shield"
+					className="pointer-events-auto absolute inset-0 bg-transparent"
+					style={{
+						zIndex: "var(--ak-layer-toast)",
+					}}
+				/>
+			) : null}
 
 			{lastError && feedbackFlags.has("toast:error") ? (
 				<div

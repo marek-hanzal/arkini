@@ -5,6 +5,7 @@ import { readLineRunState } from "~/producer/logic/readLineRunState";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/board/BoardUtilityItem";
+import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { readCheatSpeedToggleModeFromItemId } from "~/cheat/GameCheatSpeedItem";
 import type { GameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 
@@ -37,6 +38,10 @@ export namespace resolveBoardItemTapAction {
 		| {
 				type: "set-cheat-speed-mode";
 				mode: GameCheatSpeedMode;
+		  }
+		| {
+				type: "activate-board-memory";
+				boardItemId: string;
 		  };
 }
 
@@ -49,6 +54,13 @@ export const resolveBoardItemTapAction = ({
 		return {
 			mode: cheatSpeedMode,
 			type: "set-cheat-speed-mode",
+		};
+	}
+
+	if (isBoardMemoryItemId(boardItem.itemId)) {
+		return {
+			boardItemId: boardItem.id,
+			type: "activate-board-memory",
 		};
 	}
 

@@ -5,6 +5,7 @@ import { appendItemCreatedVisuals } from "~/play/game-engine-visual/appendItemCr
 import { appendItemMergeVisuals } from "~/play/game-engine-visual/appendItemMergeVisuals";
 import { appendItemReplaceVisuals } from "~/play/game-engine-visual/appendItemReplaceVisuals";
 import { appendActivationInputStoreVisuals } from "~/play/game-engine-visual/appendActivationInputStoreVisuals";
+import { appendBoardMemoryStoreVisuals } from "~/play/game-engine-visual/appendBoardMemoryStoreVisuals";
 import { appendActivationInputTargetFeedback } from "~/play/game-engine-visual/appendActivationInputTargetFeedback";
 import { appendCraftStageUpdateVisuals } from "~/play/game-engine-visual/appendCraftStageUpdateVisuals";
 import { appendLineCompletedFeedback } from "~/play/game-engine-visual/appendLineCompletedFeedback";
@@ -101,6 +102,17 @@ export const createGameEngineVisualPlan = ({
 			}
 
 			case "item.consumed": {
+				if (event.reason === "memory-store") {
+					appendBoardMemoryStoreVisuals({
+						event,
+						plan,
+						previousBoard,
+						sequenceIndex: createdSequenceIndex,
+					});
+					createdSequenceIndex += 1;
+					break;
+				}
+
 				if (event.reason === "merge-source") {
 					const replacementIndex = findMergeResultEventIndex({
 						afterIndex: index,
@@ -216,6 +228,9 @@ export const createGameEngineVisualPlan = ({
 			case "item.spawn.blocked":
 			case "item.spawn.failed":
 			case "line.default_changed":
+			case "board.memory.saved":
+			case "board.memory.restored":
+			case "board.memory.cleared":
 			case "cheat.speed_mode.changed":
 			case "producer_input.withdrawn":
 			case "line.blocked":

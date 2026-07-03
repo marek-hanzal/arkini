@@ -1,6 +1,8 @@
 import { Effect, type Effect as EffectType } from "effect";
 import { GameConfigFx } from "~/config/GameConfigFx";
 import { moveBoardItemFx } from "~/board/logic/moveBoardItemFx";
+import { applyBoardMemoryActivateFx } from "~/board-memory/applyBoardMemoryActivateFx";
+import { applyBoardMemoryClearFx } from "~/board-memory/applyBoardMemoryClearFx";
 import { placeInventoryItemOnBoardFx } from "~/placement/placeInventoryItemOnBoardFx";
 import { stashBoardItemFx } from "~/stash/stashBoardItemFx";
 import { swapBoardItemsFx } from "~/board/logic/swapBoardItemsFx";
@@ -61,6 +63,20 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 		boardItemStash: (stashAction) =>
 			stashBoardItemFx({
 				action: stashAction,
+				config,
+				nowMs,
+				save,
+			}),
+		boardMemoryActivate: (memoryAction) =>
+			applyBoardMemoryActivateFx({
+				action: memoryAction,
+				config,
+				nowMs,
+				save,
+			}),
+		boardMemoryClear: (memoryAction) =>
+			applyBoardMemoryClearFx({
+				action: memoryAction,
 				config,
 				nowMs,
 				save,

@@ -37,8 +37,8 @@ These rules define how the game should be interpreted when implementation detail
 | --- | --- |
 | Board size | `7 x 11` |
 | Board slot count | `63` |
-| Inventory size | `7 x 5` |
-| Inventory slot count | `35` |
+| Inventory size | `7 x 7` |
+| Inventory slot count | `49` |
 | Inventory model | one canonical player inventory |
 | Inventory capacity changes | not part of current gameplay |
 | Merge role | basic mechanic, not complete core loop |
@@ -62,11 +62,15 @@ An item may be on the board when it occupies one board cell. If multi-cell items
 
 Board is an active location. Producers, stashes, craft timers, construction timers, and growth timers can run only while the relevant item is on the board and its own rules allow it. Active board timers use real-world wall-clock time, including time while the app is closed. Cheat speed mode is the explicit exception for testing: when enabled from the speed watch item, positive producer and craft timings are treated as one-second jobs and queued producer jobs are pulled forward accordingly.
 
+### 4.1.1 Board memory
+
+`item:board-memory` is a board-only utility item that can store a layout preset. Tapping empty memory saves current board item positions, excluding the memory item itself. Tapping filled memory restores the preset by first attempting to move current board items into inventory, then placing matching inventory items back onto remembered cells. Restore is best-effort and does not clear the saved memory. Long-press opens a clear-memory sheet.
+
 ### 4.2 Inventory
 
 The inventory is the only canonical player storage.
 
-The current inventory size is `7 x 5` slots, for `35` total slots.
+The current inventory size is `7 x 7` slots, for `49` total slots.
 
 There is no separate `playerInventory`, wallet inventory, currency inventory, or second player storage layer. Coins, diamonds, and other currency-like objects are normal inventory items unless a future mechanic explicitly introduces a different model.
 

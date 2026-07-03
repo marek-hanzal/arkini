@@ -91,6 +91,7 @@ export const createInitialGameSaveFx = Effect.fn("createInitialGameSaveFx")(func
 		board: {
 			items: boardItems,
 		},
+		boardMemoryLayouts: {},
 		createdAtMs: nowMs,
 		cheats: {
 			speedMode: "normal",

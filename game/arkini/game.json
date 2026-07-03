@@ -127,33 +127,33 @@
 		"board": [
 			{
 				"itemId": "item:board-memory",
-				"x": 1,
-				"y": 0
+				"x": 3,
+				"y": 10
 			},
 			{
 				"itemId": "item:cheat:speed-disable",
-				"x": 2,
-				"y": 0
+				"x": 5,
+				"y": 10
 			},
 			{
 				"itemId": "item:board-memory",
-				"x": 3,
-				"y": 0
+				"x": 4,
+				"y": 10
 			},
 			{
 				"itemId": "item:nuke-save",
-				"x": 4,
-				"y": 0
+				"x": 6,
+				"y": 8
 			},
 			{
 				"itemId": "item:cheat",
-				"x": 5,
-				"y": 0
+				"x": 6,
+				"y": 9
 			},
 			{
 				"itemId": "item:inventory",
 				"x": 6,
-				"y": 0
+				"y": 10
 			},
 			{
 				"itemId": "item:tree",

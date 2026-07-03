@@ -441,7 +441,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 4,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Lumberjack I",
 			"producer": {
@@ -576,7 +576,8 @@
 			"tags": [
 				"producer",
 				"wood",
-				"era:I"
+				"era:I",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -596,7 +597,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 4,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Quarry I",
 			"producer": {
@@ -747,7 +748,8 @@
 			"tags": [
 				"producer",
 				"stone",
-				"era:I"
+				"era:I",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -767,7 +769,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Sawmill I",
 			"producer": {
@@ -887,7 +889,8 @@
 			"tags": [
 				"producer",
 				"wood",
-				"era:I"
+				"era:I",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -999,7 +1002,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Stonemason I",
 			"producer": {
@@ -1062,7 +1065,8 @@
 			"tags": [
 				"producer",
 				"stone",
-				"era:I"
+				"era:I",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1075,33 +1079,11 @@
 				"lines": [
 					{
 						"durationMs": 7000,
-						"id": "line:townhall-t1:blueprint-lumberjack-t1",
-						"name": "Blueprint: Lumberjack I",
-						"output": [
-							{
-								"itemId": "item:blueprint-lumberjack-t1",
-								"type": "guaranteed"
-							}
-						]
-					},
-					{
-						"durationMs": 7000,
 						"id": "line:townhall-t1:blueprint-sawmill-t1",
 						"name": "Blueprint: Sawmill I",
 						"output": [
 							{
 								"itemId": "item:blueprint-sawmill-t1",
-								"type": "guaranteed"
-							}
-						]
-					},
-					{
-						"durationMs": 7000,
-						"id": "line:townhall-t1:blueprint-quarry-t1",
-						"name": "Blueprint: Quarry I",
-						"output": [
-							{
-								"itemId": "item:blueprint-quarry-t1",
 								"type": "guaranteed"
 							}
 						]
@@ -1197,7 +1179,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 4,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Well I",
 			"producer": {
@@ -1278,7 +1260,8 @@
 				"producer",
 				"food",
 				"water",
-				"era:I"
+				"era:I",
+				"unique"
 			],
 			"tier": 1
 		}

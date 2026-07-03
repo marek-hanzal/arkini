@@ -80,35 +80,45 @@ describe("defaultGameConfig", () => {
 			phase: "start",
 		});
 	});
-	it("caps every producer building item", () => {
+	it("keeps every producer building single-copy", () => {
 		const producerItemIds = Object.keys(defaultGameConfig.items)
 			.filter((itemId) => itemId.startsWith("producer:"))
 			.sort();
-		const uncappedProducerItemIds = producerItemIds.filter(
-			(itemId) => defaultGameConfig.items[itemId]?.maxCount === undefined,
+		const nonSingleCopyProducerItemIds = producerItemIds.filter(
+			(itemId) => defaultGameConfig.items[itemId]?.maxCount !== 1,
 		);
 
-		expect(uncappedProducerItemIds).toEqual([]);
+		expect(nonSingleCopyProducerItemIds).toEqual([]);
 	});
 
-	it("marks single-copy producer buildings as unique metadata", () => {
-		const singleCopyProducerItemIds = Object.keys(defaultGameConfig.items)
+	it("marks producer buildings as unique metadata", () => {
+		const producerItemIds = Object.keys(defaultGameConfig.items)
 			.filter((itemId) => itemId.startsWith("producer:"))
-			.filter((itemId) => defaultGameConfig.items[itemId]?.maxCount === 1)
 			.sort();
 
-		expect(singleCopyProducerItemIds).toEqual(
+		expect(producerItemIds).toEqual(
 			expect.arrayContaining([
 				"producer:townhall-t1",
+				"producer:lumberjack-t1",
+				"producer:quarry-t1",
 				"producer:library-t1",
 				"producer:school",
 				"producer:cathedral",
 			]),
 		);
 
-		for (const itemId of singleCopyProducerItemIds) {
+		for (const itemId of producerItemIds) {
 			expect(defaultGameConfig.items[itemId]?.tags).toContain("unique");
 		}
+	});
+
+	it("does not offer starter producer blueprints from Town Hall I", () => {
+		const townHallLineIds = defaultGameConfig.items[
+			"producer:townhall-t1"
+		]?.producer?.lines.map((line) => line.id);
+
+		expect(townHallLineIds).not.toContain("line:townhall-t1:blueprint-lumberjack-t1");
+		expect(townHallLineIds).not.toContain("line:townhall-t1:blueprint-quarry-t1");
 	});
 	it("makes town hall upgrade planning a real timed milestone", () => {
 		const townHallUpgradePlanDurations = {

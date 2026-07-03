@@ -923,7 +923,7 @@
 		"producer:bio-waste-processor-t2": {
 			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
 			"label": "II",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Bio-Waste Processor II",
 			"producer": {
@@ -1052,7 +1052,8 @@
 				"bio-waste",
 				"farm",
 				"industry",
-				"era:VIII"
+				"era:VIII",
+				"unique"
 			],
 			"tier": 8
 		},
@@ -1072,7 +1073,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Brickyard",
 			"producer": {
@@ -1243,7 +1244,8 @@
 				"construction",
 				"clay",
 				"era:VIII",
-				"industry"
+				"industry",
+				"unique"
 			],
 			"tier": 3
 		},
@@ -1263,7 +1265,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Charcoal Burner I",
 			"producer": {
@@ -1415,7 +1417,8 @@
 				"construction",
 				"fuel",
 				"era:VIII",
-				"industry"
+				"industry",
+				"unique"
 			],
 			"tier": 6
 		},
@@ -1435,7 +1438,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Clay Pit",
 			"producer": {
@@ -1540,7 +1543,8 @@
 				"construction",
 				"clay",
 				"era:VIII",
-				"industry"
+				"industry",
+				"unique"
 			],
 			"tier": 3
 		},
@@ -1727,7 +1731,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Glassworks",
 			"producer": {
@@ -1894,7 +1898,8 @@
 				"construction",
 				"glass",
 				"era:VIII",
-				"industry"
+				"industry",
+				"unique"
 			],
 			"tier": 4
 		},
@@ -1944,7 +1949,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Purifier I",
 			"producer": {
@@ -1970,7 +1975,8 @@
 				"industry",
 				"purifier",
 				"pollution",
-				"era:VIII"
+				"era:VIII",
+				"unique"
 			],
 			"tier": 7
 		},
@@ -1990,7 +1996,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Roof Tile Factory",
 			"producer": {
@@ -2161,7 +2167,8 @@
 				"construction",
 				"roof",
 				"era:VIII",
-				"industry"
+				"industry",
+				"unique"
 			],
 			"tier": 4
 		},
@@ -2181,7 +2188,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Sand Pit",
 			"producer": {
@@ -2280,7 +2287,8 @@
 				"sand",
 				"glass",
 				"era:VIII",
-				"industry"
+				"industry",
+				"unique"
 			],
 			"tier": 4
 		},
@@ -2300,7 +2308,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Smelter I",
 			"producer": {
@@ -2532,14 +2540,15 @@
 				"producer",
 				"industry",
 				"smelter",
-				"era:VIII"
+				"era:VIII",
+				"unique"
 			],
 			"tier": 7
 		},
 		"producer:waste-processor-t2": {
 			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
 			"label": "II",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Waste Processor II",
 			"producer": {
@@ -2667,7 +2676,8 @@
 				"waste",
 				"trash",
 				"industry",
-				"era:VIII"
+				"era:VIII",
+				"unique"
 			],
 			"tier": 8
 		}

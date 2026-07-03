@@ -378,7 +378,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Dye Workshop I",
 			"producer": {
@@ -480,14 +480,15 @@
 				"dye",
 				"cloth",
 				"textile",
-				"era:V"
+				"era:V",
+				"unique"
 			],
 			"tier": 5
 		},
 		"producer:house-t3": {
 			"description": "Prosperous housing that consumes clothing, food, and comfort goods to produce mid-tier morale and lower morale.",
 			"label": "3",
-			"maxCount": 4,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "House",
 			"producer": {
@@ -541,7 +542,8 @@
 				"house",
 				"housing",
 				"morale",
-				"era:V"
+				"era:V",
+				"unique"
 			],
 			"tier": 3
 		},
@@ -561,7 +563,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Tailor Workshop I",
 			"producer": {
@@ -715,7 +717,8 @@
 				"building",
 				"clothing",
 				"textile",
-				"era:V"
+				"era:V",
+				"unique"
 			],
 			"tier": 5
 		},
@@ -735,7 +738,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Tannery I",
 			"producer": {
@@ -789,7 +792,8 @@
 				"building",
 				"leather",
 				"textile",
-				"era:V"
+				"era:V",
+				"unique"
 			],
 			"tier": 5
 		},
@@ -809,7 +813,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Weaver Hut I",
 			"producer": {
@@ -858,7 +862,8 @@
 				"building",
 				"cloth",
 				"textile",
-				"era:V"
+				"era:V",
+				"unique"
 			],
 			"tier": 5
 		}

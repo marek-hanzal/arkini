@@ -888,7 +888,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Coal Mine I",
 			"producer": {
@@ -964,13 +964,14 @@
 				"industry",
 				"mine",
 				"coal",
-				"era:VII"
+				"era:VII",
+				"unique"
 			],
 			"tier": 7
 		},
 		"producer:gold-mine-t1": {
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Gold Mine I",
 			"producer": {
@@ -1046,13 +1047,14 @@
 				"industry",
 				"mine",
 				"gold",
-				"era:VII"
+				"era:VII",
+				"unique"
 			],
 			"tier": 7
 		},
 		"producer:iron-mine-t1": {
 			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Iron Mine I",
 			"producer": {
@@ -1128,7 +1130,8 @@
 				"industry",
 				"mine",
 				"iron",
-				"era:VII"
+				"era:VII",
+				"unique"
 			],
 			"tier": 7
 		},

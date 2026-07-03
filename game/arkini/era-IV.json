@@ -577,7 +577,7 @@
 		},
 		"producer:paper-mill-t1": {
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Paper Mill I",
 			"producer": {
@@ -631,7 +631,8 @@
 				"building",
 				"paper",
 				"civic",
-				"era:IV"
+				"era:IV",
+				"unique"
 			],
 			"tier": 4
 		},

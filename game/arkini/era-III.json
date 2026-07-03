@@ -669,7 +669,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Bakery I",
 			"producer": {
@@ -770,7 +770,8 @@
 				"producer",
 				"food",
 				"bread",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -790,7 +791,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Brewery I",
 			"producer": {
@@ -1112,7 +1113,8 @@
 				"producer",
 				"food",
 				"beer",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1132,7 +1134,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Cookhouse I",
 			"producer": {
@@ -1198,7 +1200,8 @@
 				"producer",
 				"food",
 				"cooking",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1218,7 +1221,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Dairy I",
 			"producer": {
@@ -1266,14 +1269,15 @@
 				"producer",
 				"food",
 				"dairy",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
 		"producer:house-t2": {
 			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
 			"label": "2",
-			"maxCount": 5,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "House",
 			"producer": {
@@ -1317,7 +1321,8 @@
 				"house",
 				"housing",
 				"morale",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 2
 		},
@@ -1486,7 +1491,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Slaughterhouse I",
 			"producer": {
@@ -1580,7 +1585,8 @@
 				"food",
 				"meat",
 				"leather",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1600,7 +1606,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Tavern I",
 			"producer": {
@@ -1683,7 +1689,8 @@
 				"producer",
 				"food",
 				"beer",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1922,7 +1929,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Windmill I",
 			"producer": {
@@ -1971,7 +1978,8 @@
 				"food",
 				"grain",
 				"flour",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1991,7 +1999,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Winery I",
 			"producer": {
@@ -2328,7 +2336,8 @@
 				"producer",
 				"food",
 				"wine",
-				"era:III"
+				"era:III",
+				"unique"
 			],
 			"tier": 1
 		}

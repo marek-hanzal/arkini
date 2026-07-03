@@ -538,7 +538,7 @@
 		"producer:bio-waste-processor-t1": {
 			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
 			"label": "I",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Bio-Waste Processor I",
 			"producer": {
@@ -600,7 +600,8 @@
 				"waste",
 				"bio-waste",
 				"farm",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 2
 		},
@@ -620,7 +621,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Cattle Farm I",
 			"producer": {
@@ -709,7 +710,8 @@
 				"producer",
 				"food",
 				"dairy",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -729,7 +731,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Chicken Coop I",
 			"producer": {
@@ -840,7 +842,8 @@
 				"producer",
 				"food",
 				"egg",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -860,7 +863,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Farm I",
 			"producer": {
@@ -1149,14 +1152,15 @@
 				"producer",
 				"food",
 				"grain",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
 		"producer:house-t1": {
 			"description": "Basic housing that turns warmth and water into early morale.",
 			"label": "1",
-			"maxCount": 6,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "House",
 			"producer": {
@@ -1191,7 +1195,8 @@
 				"house",
 				"housing",
 				"morale",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1241,7 +1246,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Pig Farm I",
 			"producer": {
@@ -1352,7 +1357,8 @@
 				"producer",
 				"food",
 				"pig",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1372,7 +1378,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Sheep Pasture I",
 			"producer": {
@@ -1460,7 +1466,8 @@
 				"producer",
 				"animal",
 				"wool",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
@@ -1709,7 +1716,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Vegetable Garden I",
 			"producer": {
@@ -1831,14 +1838,15 @@
 				"producer",
 				"food",
 				"vegetable",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 1
 		},
 		"producer:waste-processor-t1": {
 			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
 			"label": "I",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Waste Processor I",
 			"producer": {
@@ -1899,7 +1907,8 @@
 				"cleanup",
 				"waste",
 				"trash",
-				"era:II"
+				"era:II",
+				"unique"
 			],
 			"tier": 2
 		}

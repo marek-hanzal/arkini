@@ -851,7 +851,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Armory I",
 			"producer": {
@@ -991,7 +991,8 @@
 				"equipment",
 				"armor",
 				"guild",
-				"era:IX"
+				"era:IX",
+				"unique"
 			],
 			"tier": 9
 		},
@@ -1011,7 +1012,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Blacksmith I",
 			"producer": {
@@ -1405,7 +1406,8 @@
 				"equipment",
 				"weapon",
 				"guild",
-				"era:IX"
+				"era:IX",
+				"unique"
 			],
 			"tier": 9
 		},
@@ -1425,7 +1427,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Goldsmith I",
 			"producer": {
@@ -1915,7 +1917,8 @@
 				"coin",
 				"key",
 				"guild",
-				"era:IX"
+				"era:IX",
+				"unique"
 			],
 			"tier": 9
 		},

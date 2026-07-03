@@ -374,7 +374,7 @@
 					"sourceScope": "both"
 				}
 			],
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Glazier Workshop I",
 			"producer": {
@@ -720,14 +720,15 @@
 				"luxury",
 				"prestige",
 				"construction",
-				"era:X"
+				"era:X",
+				"unique"
 			],
 			"tier": 10
 		},
 		"producer:house-t4": {
 			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
 			"label": "4",
-			"maxCount": 3,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "House",
 			"producer": {
@@ -784,7 +785,8 @@
 				"house",
 				"housing",
 				"morale",
-				"era:X"
+				"era:X",
+				"unique"
 			],
 			"tier": 4
 		},
@@ -805,7 +807,7 @@
 				}
 			],
 			"label": "2",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Quarry",
 			"producer": {
@@ -989,7 +991,8 @@
 				"quarry",
 				"luxury",
 				"prestige",
-				"era:X"
+				"era:X",
+				"unique"
 			],
 			"tier": 10
 		},
@@ -1010,7 +1013,7 @@
 				}
 			],
 			"label": "2",
-			"maxCount": 2,
+			"maxCount": 1,
 			"maxStackSize": 1,
 			"name": "Stonemason",
 			"producer": {
@@ -1318,7 +1321,8 @@
 				"masonry",
 				"luxury",
 				"prestige",
-				"era:X"
+				"era:X",
+				"unique"
 			],
 			"tier": 10
 		}

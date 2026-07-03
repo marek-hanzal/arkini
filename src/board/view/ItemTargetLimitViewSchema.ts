@@ -9,3 +9,10 @@ export const ItemTargetLimitViewSchema = z.object({
 	requiredQuantity: z.number().int().positive(),
 	sourceItemId: GameItemIdSchema.optional(),
 });
+
+type ItemTargetLimitViewSchema = typeof ItemTargetLimitViewSchema;
+export namespace ItemTargetLimitViewSchema {
+	export type Type = z.infer<ItemTargetLimitViewSchema>;
+}
+
+export type ItemTargetLimitView = ItemTargetLimitViewSchema.Type;

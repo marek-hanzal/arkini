@@ -6,6 +6,7 @@ import type { LineView } from "~/board/view/LineViewSchema";
 import { ItemInlineAsset } from "~/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 import { readDetailItemName } from "~/item-detail/ui/readDetailItemName";
+import { DetailTargetLimits } from "~/item-detail/ui/DetailTargetLimits";
 import { formatMs } from "~/time/formatMs";
 import { UiButton } from "~/ui/UiButton";
 import { UiProgressButton } from "~/ui/UiProgressButton";
@@ -80,20 +81,6 @@ const readVisibleEffectRequirements = (line: LineView) =>
 const readLineEffectPolarity = (line: LineView): EffectDetailPolarity | undefined => {
 	if (line.kind !== "effect") return undefined;
 	return line.effectPolarity;
-};
-
-const readTargetLimitLabel = (
-	limit: NonNullable<LineView["targetLimits"]>[number],
-	items: ItemCatalogView,
-) => {
-	const itemName = readDetailItemName({
-		itemId: limit.itemId,
-		items,
-	});
-	const baseLabel = `${itemName} ${limit.ownedQuantity}/${limit.maxCount}`;
-	return limit.remainingQuantity < limit.requiredQuantity
-		? `${baseLabel} · limit reached`
-		: baseLabel;
 };
 
 const readProducerInputRowClassName = ({
@@ -347,13 +334,11 @@ const DetailLineCard: FC<{
 						tone="warn"
 					/>
 				) : null}
-				{targetLimits.length ? (
-					<DetailLineNoteList
-						items={targetLimits.map((limit) => readTargetLimitLabel(limit, items))}
-						title="Target limits"
-						tone="neutral"
-					/>
-				) : null}
+				<DetailTargetLimits
+					id={line.lineId}
+					items={items}
+					limits={targetLimits}
+				/>
 				<DetailLineOutputs
 					items={items}
 					line={line}

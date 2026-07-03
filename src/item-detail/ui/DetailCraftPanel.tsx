@@ -8,6 +8,7 @@ import { UiProgressButton } from "~/ui/UiProgressButton";
 import { cn } from "~/ui/cn";
 import type { DetailCraftControl } from "~/item-detail/control/DetailCraftControl";
 import { DetailCard } from "~/item-detail/ui/DetailCard";
+import { DetailTargetLimits } from "~/item-detail/ui/DetailTargetLimits";
 
 export namespace DetailCraftPanel {
 	export interface Props {
@@ -16,17 +17,6 @@ export namespace DetailCraftPanel {
 		items: ItemCatalogView;
 	}
 }
-
-const readTargetLimitLabel = (
-	limit: NonNullable<CraftProgressView["targetLimits"]>[number],
-	items: ItemCatalogView,
-) => {
-	const itemName = items[limit.itemId]?.name ?? limit.itemId;
-	const baseLabel = `${itemName} ${limit.ownedQuantity}/${limit.maxCount}`;
-	return limit.remainingQuantity < limit.requiredQuantity
-		? `${baseLabel} · limit reached`
-		: baseLabel;
-};
 
 const readCraftInputRowClassName = ({
 	available,
@@ -74,18 +64,11 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 					</div>
 				</div>
 
-				{targetLimits.length ? (
-					<div className="rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs">
-						<p className="font-black text-ak-text">Target limits</p>
-						<ul className="mt-1 grid gap-1 leading-5 text-ak-text-muted">
-							{targetLimits.map((limit) => (
-								<li key={`${craft.id}:target-limit:${limit.itemId}`}>
-									{readTargetLimitLabel(limit, items)}
-								</li>
-							))}
-						</ul>
-					</div>
-				) : null}
+				<DetailTargetLimits
+					id={craft.id}
+					items={items}
+					limits={targetLimits}
+				/>
 
 				{effectBlockReasons.length ? (
 					<div className="rounded-sm bg-rose-400/14 px-2.5 py-2 text-xs text-rose-50">

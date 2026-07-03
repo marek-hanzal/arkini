@@ -1,4 +1,4 @@
-import { memo, type ReactNode, useCallback, useMemo, useRef } from "react";
+import { memo, type ReactNode, useCallback, useMemo } from "react";
 import { BoardCell } from "~/board/BoardCell";
 import type { BoardSurface as BoardSurfaceType } from "~/board/BoardSurface.types";
 import type { BoardCellView } from "~/board/boardCells";
@@ -19,7 +19,6 @@ const boardCellFeedbackVariants = [
 
 export const BoardSurface = memo(
 	({ feedback, feedbackFlags, onOpenSheet, disabled = false }: BoardSurfaceType.Props) => {
-		const boardDragBoundsRef = useRef<HTMLDivElement | null>(null);
 		const { blockedCellKeys, columns, drag, slots, tiles } = useBoardTileEngineModel({
 			feedback,
 			onOpenSheet,
@@ -57,30 +56,35 @@ export const BoardSurface = memo(
 		return (
 			<div
 				data-ui="board surface"
-				className="flex h-full w-full items-center justify-center overflow-hidden"
+				className="flex h-full w-full items-center justify-center overflow-hidden px-3 py-3 sm:px-4 sm:py-4"
 				style={{
-					containerType: "size",
 					zIndex: "var(--ak-layer-base-surface)",
 				}}
 			>
-				<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
-					id="board"
-					rootRef={boardDragBoundsRef}
-					columns={columns}
-					slots={slots}
-					tiles={tiles}
-					gapPx={1}
-					rootClassName="rounded-[1.35rem] border border-fuchsia-200/15 bg-[linear-gradient(145deg,rgba(236,72,153,0.16),rgba(124,58,237,0.10)_42%,rgba(12,6,17,0.28))] p-2 shadow-[0_0_0_1px_rgba(255,255,255,0.045),0_0_38px_rgba(168,85,247,0.28),0_22px_70px_rgba(236,72,153,0.16),inset_0_1px_0_rgba(255,255,255,0.08)]"
-					className="overflow-hidden rounded-[0.95rem] border border-black/35 bg-ak-board-grid shadow-[inset_0_0_0_1px_rgba(255,255,255,0.035),inset_0_0_34px_rgba(236,72,153,0.08)]"
-					container="responsive"
-					actorLayerClassName="pointer-events-none"
-					layerRole="base"
-					disabled={disabled}
-					drag={drag}
-					dragConstraintsRef={boardDragBoundsRef}
-					renderSlot={renderSlot}
-					renderTile={renderBoardTile}
-				/>
+				<div
+					data-ui="board viewport"
+					className="flex h-full w-full min-w-0 items-center justify-center"
+					style={{
+						containerType: "size",
+					}}
+				>
+					<TileEngine<BoardSurfaceType.TileData, BoardCellView, DragSource, DropTarget>
+						id="board"
+						columns={columns}
+						slots={slots}
+						tiles={tiles}
+						gapPx={1}
+						rootClassName="rounded-[1.35rem] border border-fuchsia-300/20 bg-[linear-gradient(145deg,rgba(236,72,153,0.14),rgba(124,58,237,0.10)_44%,rgba(12,6,17,0.18))] shadow-[0_0_0_1px_rgba(255,255,255,0.045),0_0_46px_rgba(168,85,247,0.32),0_24px_80px_rgba(236,72,153,0.18),inset_0_1px_0_rgba(255,255,255,0.08)]"
+						className="overflow-hidden rounded-[1rem] border border-black/50 bg-[radial-gradient(circle_at_18%_14%,rgba(236,72,153,0.18),transparent_32%),radial-gradient(circle_at_82%_76%,rgba(124,58,237,0.18),transparent_36%),linear-gradient(145deg,rgb(39,21,51),rgb(20,9,30)_52%,rgb(13,6,19))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04),inset_0_0_34px_rgba(236,72,153,0.10)]"
+						container="responsive"
+						actorLayerClassName="pointer-events-none"
+						layerRole="base"
+						disabled={disabled}
+						drag={drag}
+						renderSlot={renderSlot}
+						renderTile={renderBoardTile}
+					/>
+				</div>
 			</div>
 		);
 	},

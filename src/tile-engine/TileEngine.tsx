@@ -1,4 +1,4 @@
-import { memo, type CSSProperties, useCallback, useState } from "react";
+import { memo, type CSSProperties, useCallback, useRef, useState } from "react";
 import { cn } from "~/ui/cn";
 import { preventNativeTileEngineContextMenu } from "~/tile-engine/preventNativeTileEngineContextMenu";
 import { TileEngineActors } from "~/tile-engine/TileEngineActors";
@@ -31,6 +31,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 	renderSlot,
 	renderTile,
 }: TileEngineType.Props<TTile, TSlot, TDrag, TDrop>) => {
+	const gridRef = useRef<HTMLDivElement | null>(null);
 	const [activeDropId, setRawActiveDropId] = useState<string | null>(null);
 	const [activeDropFeedback, setRawActiveDropFeedback] =
 		useState<TileEngineType.ActiveDropFeedback | null>(null);
@@ -99,6 +100,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 			}
 		>
 			<div
+				ref={gridRef}
 				data-ui="tile engine grid"
 				className={cn(
 					"relative w-full overflow-visible aspect-[var(--ak-tile-engine-aspect)]",
@@ -132,7 +134,7 @@ const TileEngineComponent = <TTile, TSlot, TDrag, TDrop>({
 					actorLayerClassName={actorLayerClassName}
 					dragRef={dragRef}
 					dragDisabled={disabled || !drag}
-					dragConstraintsRef={dragConstraintsRef}
+					dragConstraintsRef={dragConstraintsRef ?? gridRef}
 					motionByTileId={motionByTileId}
 					resolveDrop={drops.resolveDrop}
 					setActiveDropId={setActiveDropId}

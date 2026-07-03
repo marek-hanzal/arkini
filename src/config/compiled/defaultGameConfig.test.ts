@@ -94,6 +94,10 @@ describe("defaultGameConfig", () => {
 			phase: "start",
 		});
 	});
+	it("keeps board memory devices unlimited", () => {
+		expect(defaultGameConfig.items["item:board-memory"]?.maxCount).toBeUndefined();
+	});
+
 	it("keeps every producer building single-copy", () => {
 		const producerItemIds = Object.keys(defaultGameConfig.items)
 			.filter((itemId) => itemId.startsWith("producer:"))

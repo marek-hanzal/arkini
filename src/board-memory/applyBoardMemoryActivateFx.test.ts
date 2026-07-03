@@ -22,7 +22,6 @@ const createMemoryTestConfig = () => {
 					"asset:test",
 				],
 				description: "Board memory",
-				maxCount: 2,
 				maxStackSize: 1,
 				name: "Board Memory",
 				storage: "board",

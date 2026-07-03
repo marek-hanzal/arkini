@@ -110,7 +110,6 @@
 			],
 			"description": "A layout memory device. Tap empty memory to save the current board layout, tap filled memory to restore it. Long press to clear the stored layout.",
 			"label": "Memory",
-			"maxCount": 2,
 			"maxStackSize": 1,
 			"name": "Board Memory",
 			"storage": "board",

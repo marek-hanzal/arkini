@@ -178,6 +178,7 @@ const GameSaveProducerChargeStateSchema = z
 const GameSaveBoardMemoryLayoutItemSchema = z
 	.object({
 		itemId: IdSchema,
+		itemInstanceId: IdSchema.optional(),
 		x: NonNegativeIntegerSchema,
 		y: NonNegativeIntegerSchema,
 	})
@@ -1385,7 +1386,11 @@ const validateGameSaveAgainstConfig = (
 	}
 
 	for (const [memoryItemInstanceId, layout] of Object.entries(save.boardMemoryLayouts)) {
-		const memoryItem = save.board.items[memoryItemInstanceId];
+		const memoryItem = readItemInstanceDefinition({
+			config,
+			itemInstanceId: memoryItemInstanceId,
+			save,
+		});
 		if (!memoryItem) {
 			addSaveIssue(
 				ctx,
@@ -1393,7 +1398,7 @@ const validateGameSaveAgainstConfig = (
 					"boardMemoryLayouts",
 					memoryItemInstanceId,
 				],
-				`Board memory layout owner "${memoryItemInstanceId}" must exist on board.`,
+				`Board memory layout owner "${memoryItemInstanceId}" must exist as a board or inventory instance.`,
 			);
 		}
 

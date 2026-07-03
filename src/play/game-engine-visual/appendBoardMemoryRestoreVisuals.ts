@@ -17,6 +17,7 @@ export namespace appendBoardMemoryRestoreVisuals {
 		currentBoard: BoardView | undefined;
 		event: MemoryRestoreEvent;
 		plan: GameEngineVisualPlanDraft;
+		restoreOriginTileId?: string;
 		sequenceIndex: number;
 	}
 }
@@ -29,6 +30,7 @@ export const appendBoardMemoryRestoreVisuals = ({
 	currentBoard,
 	event,
 	plan,
+	restoreOriginTileId,
 	sequenceIndex,
 }: appendBoardMemoryRestoreVisuals.Props) => {
 	if (event.to.kind !== "board") return;
@@ -44,7 +46,7 @@ export const appendBoardMemoryRestoreVisuals = ({
 	plan.boardEnterRequests.push({
 		cleanupDelayMs: gameVisualMotionSettlementDelayMs(motion),
 		enter: toTileEngineEnterMotion(motion, {
-			fromTileId: event.originItemInstanceId,
+			fromTileId: restoreOriginTileId ?? event.originItemInstanceId,
 		}),
 		tileId: event.to.itemInstanceId,
 	});

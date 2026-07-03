@@ -3,6 +3,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
 import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
+import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { isGameSaveInventoryStack } from "~/inventory/logic/GameSaveInventorySlot";
@@ -79,7 +80,8 @@ export const checkBoardItemStashReadinessFx = Effect.fn("checkBoardItemStashRead
 			);
 		}
 
-		const hasInventoryTarget = stateStatus.preservable
+		const shouldPreserveInstance = stateStatus.preservable || item.itemId === boardMemoryItemId;
+		const hasInventoryTarget = shouldPreserveInstance
 			? save.inventory.slots.some((slot) => !slot)
 			: readInventoryStackCapacity({
 					itemId: item.itemId,

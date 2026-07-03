@@ -31,14 +31,14 @@ export const appendBoardMemoryStoreVisuals = ({
 	plan,
 	previousBoard,
 	sequenceIndex,
-}: appendBoardMemoryStoreVisuals.Props) => {
-	if (event.from.kind !== "board") return;
+}: appendBoardMemoryStoreVisuals.Props): string | undefined => {
+	if (event.from.kind !== "board") return undefined;
 	const previousSource = previousBoard?.byId[event.from.itemInstanceId];
-	if (!previousSource) return;
+	if (!previousSource) return undefined;
 	const memoryItem = memoryItemInstanceId
 		? previousBoard?.byId[memoryItemInstanceId]
 		: previousBoard?.items.find((item) => item.itemId === boardMemoryItemId);
-	if (!memoryItem) return;
+	if (!memoryItem) return undefined;
 
 	const motion = GameVisualMotion.merge({
 		cause: "memory",
@@ -65,4 +65,6 @@ export const appendBoardMemoryStoreVisuals = ({
 		},
 		tile,
 	});
+
+	return tile.id;
 };

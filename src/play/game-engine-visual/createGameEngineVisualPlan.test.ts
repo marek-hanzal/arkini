@@ -1160,6 +1160,76 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("spawns memory restore visuals from the activated memory start position when memory also moves", () => {
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "memory",
+					itemId: "item:board-memory",
+					state: {},
+					x: 1,
+					y: 0,
+				},
+				{
+					id: "restored:rock",
+					itemId: "item:rock",
+					state: {},
+					x: 2,
+					y: 0,
+				},
+			]),
+			currentInventory: emptyInventory(),
+			events: [
+				{
+					from: {
+						itemInstanceId: "memory",
+						kind: "board",
+					},
+					itemId: "item:board-memory",
+					reason: "memory-store",
+					type: "item.consumed",
+				},
+				{
+					itemId: "item:rock",
+					originItemInstanceId: "memory",
+					reason: "memory-restore",
+					to: {
+						itemInstanceId: "restored:rock",
+						kind: "board",
+						x: 2,
+						y: 0,
+					},
+					type: "item.created",
+				},
+				{
+					atMs: 1000,
+					boardItemId: "memory",
+					restoredCount: 1,
+					storedCount: 1,
+					type: "board.memory.restored",
+				},
+			] satisfies GameEvent[],
+			previousBoard: boardView([
+				{
+					id: "memory",
+					itemId: "item:board-memory",
+					state: {},
+					x: 5,
+					y: 0,
+				},
+			]),
+		});
+
+		expect(plan.boardTransientTilePlans).toHaveLength(1);
+		expect(plan.boardEnterRequests[0]).toMatchObject({
+			enter: {
+				fromTileId: "transient:memory-store:engine:memory-store:memory:0:source:memory",
+				kind: "spawn-from-tile",
+			},
+			tileId: "restored:rock",
+		});
+	});
+
 	it("adds board memory save feedback even when no board item moves", () => {
 		const plan = createGameEngineVisualPlan({
 			currentBoard: boardView([

@@ -85,6 +85,7 @@ export const createGameEngineVisualPlan = ({
 		}
 	>[] = [];
 	let createdSequenceIndex = 0;
+	let memoryRestoreOriginTileId: string | undefined;
 	let memoryRestoreSequenceIndex = 0;
 	const boardMemoryItemInstanceId = events.find(
 		(event) =>
@@ -103,6 +104,7 @@ export const createGameEngineVisualPlan = ({
 						currentBoard,
 						event,
 						plan,
+						restoreOriginTileId: memoryRestoreOriginTileId,
 						sequenceIndex: memoryRestoreSequenceIndex,
 					});
 					memoryRestoreSequenceIndex += 1;
@@ -123,13 +125,19 @@ export const createGameEngineVisualPlan = ({
 
 			case "item.consumed": {
 				if (event.reason === "memory-store") {
-					appendBoardMemoryStoreVisuals({
+					const transientTileId = appendBoardMemoryStoreVisuals({
 						event,
 						memoryItemInstanceId: boardMemoryItemInstanceId,
 						plan,
 						previousBoard,
 						sequenceIndex: createdSequenceIndex,
 					});
+					if (
+						event.from.kind === "board" &&
+						event.from.itemInstanceId === boardMemoryItemInstanceId
+					) {
+						memoryRestoreOriginTileId = transientTileId ?? event.from.itemInstanceId;
+					}
 					createdSequenceIndex += 1;
 					break;
 				}

@@ -6,6 +6,7 @@ import { placeGameSaveInventoryInstanceFx } from "~/placement/placeGameSaveInven
 import { placeGameSaveInventoryItemsFx } from "~/placement/placeGameSaveInventoryItemsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
@@ -48,7 +49,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		type: "item.consumed" as const,
 	} satisfies GameEvent;
 
-	if (stateStatus.preservable) {
+	if (stateStatus.preservable || item.itemId === boardMemoryItemId) {
 		const events: GameEvent[] = [];
 		yield* placeGameSaveInventoryInstanceFx({
 			config,

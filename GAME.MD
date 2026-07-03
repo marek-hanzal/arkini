@@ -64,7 +64,7 @@ Board is an active location. Producers, stashes, craft timers, construction time
 
 ### 4.1.1 Board memory
 
-`item:board-memory` is a board-only utility item that can store a layout preset. Tapping empty memory saves current board item positions, excluding the memory item itself. Tapping filled memory restores the preset by first attempting to move current board items into inventory, then placing matching inventory items back onto remembered cells. Restore is best-effort and one-shot: after a restore attempt, the memory clears itself whether every stored item was restored or only part of the layout could be placed. Long-press opens a clear-memory sheet.
+`item:board-memory` is an inventory-storable utility item that can store a layout preset. Tapping empty memory saves current board item positions, including all memory items and the activated memory itself. Tapping filled memory restores the preset by first attempting to move current board items into inventory, then placing matching inventory items back onto remembered cells. Memory items are preserved as inventory instances so filled memories keep their stored layout while stashed. Restore is best-effort and one-shot: after a restore attempt, the activated memory clears itself whether every stored item was restored or only part of the layout could be placed. Long-press opens a clear-memory sheet.
 
 ### 4.2 Inventory
 

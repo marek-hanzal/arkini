@@ -24,7 +24,7 @@ const createMemoryTestConfig = () => {
 				description: "Board memory",
 				maxStackSize: 1,
 				name: "Board Memory",
-				storage: "board",
+				storage: "both",
 				tags: [],
 				tier: 0,
 			},
@@ -79,11 +79,30 @@ describe("applyBoardMemoryActivateFx", () => {
 			save,
 		});
 
+		const otherMemory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 2,
+			y: 0,
+		});
+		expect(otherMemory).toBeDefined();
+
 		expect(result.save.boardMemoryLayouts[memory!.id]).toEqual({
 			items: [
 				{
+					itemId: boardMemoryItemId,
+					itemInstanceId: memory!.id,
+					x: 0,
+					y: 0,
+				},
+				{
 					itemId: "item:producer",
 					x: 1,
+					y: 0,
+				},
+				{
+					itemId: boardMemoryItemId,
+					itemInstanceId: otherMemory!.id,
+					x: 2,
 					y: 0,
 				},
 			],
@@ -92,7 +111,7 @@ describe("applyBoardMemoryActivateFx", () => {
 		expect(result.events).toContainEqual({
 			atMs: 100,
 			boardItemId: memory!.id,
-			itemCount: 1,
+			itemCount: 3,
 			type: "board.memory.saved",
 		});
 	});
@@ -156,11 +175,20 @@ describe("applyBoardMemoryActivateFx", () => {
 			}),
 		).toBeDefined();
 		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeUndefined();
+		expect(
+			findBoardItem(restored.save, {
+				itemId: boardMemoryItemId,
+				x: 0,
+				y: 0,
+			}),
+		)?.toMatchObject({
+			id: memory!.id,
+		});
 		expect(restored.events).toContainEqual({
 			atMs: 300,
 			boardItemId: memory!.id,
-			restoredCount: 1,
-			storedCount: 1,
+			restoredCount: 3,
+			storedCount: 3,
 			type: "board.memory.restored",
 		});
 	});
@@ -211,9 +239,103 @@ describe("applyBoardMemoryActivateFx", () => {
 		expect(restored.events).toContainEqual({
 			atMs: 200,
 			boardItemId: memory!.id,
-			restoredCount: 0,
-			storedCount: 1,
+			restoredCount: 2,
+			storedCount: 3,
 			type: "board.memory.restored",
 		});
+	});
+
+	it("restores the activated memory item back to its saved board cell", () => {
+		const config = createMemoryTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+
+		const moved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.item.move",
+				x: 0,
+				y: 1,
+			},
+			config,
+			nowMs: 200,
+			save: saved,
+		}).save;
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 300,
+			save: moved,
+		});
+
+		expect(restored.save.board.items[memory!.id]).toMatchObject({
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+	});
+
+	it("can store filled memory in inventory as an instance without losing its layout", () => {
+		const config = createMemoryTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+
+		const stashed = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.item.stash",
+			},
+			config,
+			nowMs: 200,
+			save: saved,
+		}).save;
+
+		expect(stashed.board.items[memory!.id]).toBeUndefined();
+		expect(stashed.inventory.slots).toContainEqual({
+			id: memory!.id,
+			itemId: boardMemoryItemId,
+			kind: "instance",
+		});
+		expect(stashed.boardMemoryLayouts[memory!.id]).toBeDefined();
 	});
 });

@@ -112,7 +112,7 @@
 			"label": "Memory",
 			"maxStackSize": 1,
 			"name": "Board Memory",
-			"storage": "board",
+			"storage": "both",
 			"tags": [
 				"special:board-memory",
 				"memory",

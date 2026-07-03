@@ -30,33 +30,40 @@ export namespace applyBoardMemoryActivateFx {
 	}
 }
 
-const readBoardMemorySnapshot = ({
-	memoryItemId,
-	save,
-}: {
-	memoryItemId: string;
-	save: GameSave;
-}) =>
+const readBoardMemorySnapshot = ({ save }: { save: GameSave }) =>
 	Object.values(save.board.items)
-		.filter((item) => item.id !== memoryItemId && item.itemId !== boardMemoryItemId)
 		.sort(
 			(left, right) =>
 				left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
 		)
-		.map((item) => ({
-			itemId: item.itemId,
-			x: item.x,
-			y: item.y,
-		}));
+		.map((item) => {
+			const stateStatus = readBoardItemRuntimeStateStatus({
+				itemInstanceId: item.id,
+				save,
+			});
+
+			return {
+				...(item.itemId === boardMemoryItemId || stateStatus.preservable
+					? {
+							itemInstanceId: item.id,
+						}
+					: {}),
+				itemId: item.itemId,
+				x: item.x,
+				y: item.y,
+			};
+		});
 
 const readBoardItemCount = ({ itemId, save }: { itemId: string; save: GameSave }) =>
 	Object.values(save.board.items).filter((item) => item.itemId === itemId).length;
 
 const consumeInventoryItem = ({
 	itemId,
+	preferredItemInstanceId,
 	slots,
 }: {
 	itemId: string;
+	preferredItemInstanceId?: string;
 	slots: GameSaveInventorySlot[];
 }):
 	| {
@@ -69,7 +76,10 @@ const consumeInventoryItem = ({
 	  }
 	| undefined => {
 	const instanceSlotIndex = slots.findIndex(
-		(slot) => isGameSaveInventoryInstance(slot) && slot.itemId === itemId,
+		(slot) =>
+			isGameSaveInventoryInstance(slot) &&
+			slot.itemId === itemId &&
+			(!preferredItemInstanceId || slot.id === preferredItemInstanceId),
 	);
 	if (instanceSlotIndex >= 0) {
 		const slot = slots[instanceSlotIndex];
@@ -84,6 +94,8 @@ const consumeInventoryItem = ({
 			slotIndex: instanceSlotIndex,
 		};
 	}
+
+	if (preferredItemInstanceId) return undefined;
 
 	const stackSlotIndex = slots.findIndex(
 		(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
@@ -146,7 +158,7 @@ const placeBoardItemInInventory = ({
 		type: "item.consumed",
 	});
 
-	if (stateStatus.preservable) {
+	if (stateStatus.preservable || item.itemId === boardMemoryItemId) {
 		const slotIndex = save.inventory.slots.findIndex((slot) => !slot);
 		if (slotIndex < 0) {
 			events.pop();
@@ -264,7 +276,6 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 
 	if (!savedLayout) {
 		const items = readBoardMemorySnapshot({
-			memoryItemId: action.boardItemId,
 			save: nextSave,
 		});
 		nextSave.boardMemoryLayouts[action.boardItemId] = {
@@ -293,7 +304,6 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 	for (const item of Object.values(nextSave.board.items).sort(
 		(left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
 	)) {
-		if (item.id === action.boardItemId) continue;
 		placeBoardItemInInventory({
 			config,
 			events,
@@ -335,6 +345,7 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 
 		const consumed = consumeInventoryItem({
 			itemId: memoryItem.itemId,
+			preferredItemInstanceId: memoryItem.itemInstanceId,
 			slots: nextSave.inventory.slots,
 		});
 		if (!consumed) continue;

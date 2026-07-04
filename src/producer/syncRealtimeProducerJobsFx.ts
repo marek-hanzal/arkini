@@ -8,6 +8,7 @@ import {
 	readGamePausableJobResumedTiming,
 } from "~/job/GamePausableJobTiming";
 import { findActiveEffectByProducerJobId } from "~/effects/findActiveEffectByProducerJobId";
+import { writeActiveEffectToSaveFx } from "~/effects/writeActiveEffectToSaveFx";
 import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import {
 	isWorldProducerJobPaused,
@@ -82,14 +83,17 @@ const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffect
 			),
 		);
 	}
-	draft.activeEffects[activeEffect.id] = {
-		...activeEffect,
-		effectId: line.effect.id,
-		endAtMs: readyAtMs,
-		producerJobId: job.id,
-		sourceItemInstanceId: job.itemInstanceId,
-		startAtMs,
-	};
+	yield* writeActiveEffectToSaveFx({
+		activeEffect: {
+			...activeEffect,
+			effectId: line.effect.id,
+			endAtMs: readyAtMs,
+			producerJobId: job.id,
+			sourceItemInstanceId: job.itemInstanceId,
+			startAtMs,
+		},
+		save: draft,
+	});
 });
 
 const readSortedProducerQueue = (queue: readonly GameSaveProducerJob[]) =>

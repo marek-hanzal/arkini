@@ -25,6 +25,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Stored activation input quantity map writes/deletes go through `src/activation/writeStoredActivationInputQuantityFx.ts`; do not reintroduce private producer/craft `items[itemId]` mutation snippets.
 - Board item removal goes through `src/board/removeBoardItemFromSaveFx.ts`; raw `delete save.board.items[...]` is forbidden outside that boundary so runtime-state removal vs preservation stays explicit.
 - Producer/craft/item-spawn job completion removal goes through `removeProducerJobFromSaveFx`, `removeCraftJobFromSaveFx`, and `removeItemSpawnJobFromSaveFx`; raw job-map deletes are forbidden outside those boundaries, with `removeBoardItemRuntimeStateFx` kept as the explicit board-item cascade cleanup exception.
+- Active effect lifecycle writes/removals go through `writeActiveEffectToSaveFx` and `removeActiveEffectFromSaveFx`; raw `save.activeEffects[...] =` / `delete save.activeEffects[...]` is forbidden outside those boundaries so producer start/resync/expiry/cascade cleanup do not grow parallel effect-state routes.
 - Shared event union extraction lives in `src/event/GameEventOfType.ts`; audio/visual planners should not carry local duplicate `Extract<GameEvent, ...>` aliases.
 - React reads runtime through `useGameRuntimeSelector` / focused hooks from `GameRuntimeStore`.
 - Gameplay mutations go through typed engine actions, not `useMutation` wrappers.

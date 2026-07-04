@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { removeActiveEffectFromSaveFx } from "~/effects/removeActiveEffectFromSaveFx";
 
 export namespace removeBoardItemRuntimeStateFx {
 	export interface Props {
@@ -28,7 +29,10 @@ export const removeBoardItemRuntimeStateFx = Effect.fn("removeBoardItemRuntimeSt
 
 	for (const [effectInstanceId, activeEffect] of Object.entries(save.activeEffects)) {
 		if (activeEffect.sourceItemInstanceId === itemInstanceId) {
-			delete save.activeEffects[effectInstanceId];
+			yield* removeActiveEffectFromSaveFx({
+				activeEffectId: effectInstanceId,
+				save,
+			});
 		}
 	}
 });

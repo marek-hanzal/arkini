@@ -89,6 +89,7 @@ const main = async () => {
 		...auditEffectFunctionNames(),
 		...auditBoardItemRemovalBoundaries(),
 		...auditJobRemovalBoundaries(),
+		...auditActiveEffectWriteBoundaries(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
@@ -234,6 +235,31 @@ const auditJobRemovalBoundaries = (): Finding[] =>
 				path,
 				message:
 					"job removal must go through a named job-removal Fx boundary; board item runtime cleanup is the only cascade exception",
+			},
+		];
+	});
+
+const activeEffectWriteBoundaryPaths = new Set([
+	"src/effects/removeActiveEffectFromSaveFx.ts",
+	"src/effects/writeActiveEffectToSaveFx.ts",
+]);
+
+const auditActiveEffectWriteBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (activeEffectWriteBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (!/(?:delete\s+[^;]*\.activeEffects\s*\[|\.activeEffects\s*\[[^\]]+\]\s*=)/.test(text)) {
+			return [];
+		}
+
+		return [
+			{
+				path,
+				message:
+					"active effect writes/removals must go through named Fx boundaries so effect lifecycle changes stay grepable",
 			},
 		];
 	});

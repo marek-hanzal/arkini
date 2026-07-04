@@ -6,6 +6,7 @@ import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readWorldActiveEffectFacts } from "~/world/readWorldActiveEffectFacts";
+import { removeActiveEffectFromSaveFx } from "~/effects/removeActiveEffectFromSaveFx";
 
 export namespace processExpiredActiveEffectsFx {
 	export interface Props {
@@ -58,7 +59,10 @@ export const processExpiredActiveEffectsFx = Effect.fn("processExpiredActiveEffe
 	const events: GameEvent[] = [];
 
 	for (const effect of expiredEffects) {
-		delete nextSave.activeEffects[effect.id];
+		yield* removeActiveEffectFromSaveFx({
+			activeEffectId: effect.id,
+			save: nextSave,
+		});
 		events.push({
 			effectId: effect.effectId,
 			atMs: nowMs,

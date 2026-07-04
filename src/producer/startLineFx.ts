@@ -6,6 +6,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { consumeProducerStoredInputsFx } from "~/producer/consumeProducerStoredInputsFx";
 import { createGameActiveEffectIdFx } from "~/effects/createGameActiveEffectIdFx";
+import { writeActiveEffectToSaveFx } from "~/effects/writeActiveEffectToSaveFx";
 import { createGameJobIdFx } from "~/job/createGameJobIdFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQuantitiesFx";
@@ -300,7 +301,10 @@ const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(funct
 		readyAtMs,
 	});
 	if (activatedEffect) {
-		nextSave.activeEffects[activatedEffect.id] = activatedEffect;
+		yield* writeActiveEffectToSaveFx({
+			activeEffect: activatedEffect,
+			save: nextSave,
+		});
 	}
 
 	nextSave.producerJobs[jobId] = {

@@ -5,6 +5,7 @@ import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readProducerJobTimingFx } from "~/producer/readProducerJobTimingFx";
 import { findActiveEffectByProducerJobId } from "~/effects/findActiveEffectByProducerJobId";
+import { writeActiveEffectToSaveFx } from "~/effects/writeActiveEffectToSaveFx";
 import { compareProducerQueueJobs } from "~/producer/compareProducerQueueJobs";
 
 export namespace rescheduleProducerQueueAfterBlockedDeliveryFx {
@@ -75,14 +76,17 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 					),
 				);
 			}
-			nextSave.activeEffects[activeEffect.id] = {
-				...activeEffect,
-				effectId: line.effect.id,
-				endAtMs: timing.readyAtMs,
-				producerJobId: job.id,
-				sourceItemInstanceId: job.itemInstanceId,
-				startAtMs: timing.startAtMs,
-			};
+			yield* writeActiveEffectToSaveFx({
+				activeEffect: {
+					...activeEffect,
+					effectId: line.effect.id,
+					endAtMs: timing.readyAtMs,
+					producerJobId: job.id,
+					sourceItemInstanceId: job.itemInstanceId,
+					startAtMs: timing.startAtMs,
+				},
+				save: nextSave,
+			});
 		}
 
 		cursorAtMs = timing.readyAtMs;

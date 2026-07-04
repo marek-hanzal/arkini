@@ -1,13 +1,14 @@
-import { readLiveBoardItemView } from "~/board/view/readLiveBoardItemView";
-import { readCraftRunState } from "~/craft/view/readCraftRunState";
-import { isProducerReady } from "~/producer/view/isProducerReady";
-import { readLineRunState } from "~/producer/view/readLineRunState";
+import { match, P } from "ts-pattern";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
+import { readLiveBoardItemView } from "~/board/view/readLiveBoardItemView";
 import { readBoardUtilityItemSheet } from "~/board/BoardUtilityItem";
 import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { readCheatSpeedToggleModeFromItemId } from "~/cheat/GameCheatSpeedItem";
 import type { GameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
+import { readCraftRunState } from "~/craft/view/readCraftRunState";
+import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
+import { isProducerReady } from "~/producer/view/isProducerReady";
+import { readLineRunState } from "~/producer/view/readLineRunState";
 
 export namespace resolveBoardItemTapAction {
 	export interface Props {
@@ -45,10 +46,23 @@ export namespace resolveBoardItemTapAction {
 		  };
 }
 
-export const resolveBoardItemTapAction = ({
+const createOpenBoardItemSheetAction = ({
+	boardItemId,
+}: {
+	boardItemId: string;
+}): resolveBoardItemTapAction.Result => ({
+	sheet: {
+		boardItemId,
+		type: "item",
+	},
+	type: "open-sheet",
+});
+
+const resolveSpecialBoardItemTapAction = ({
 	boardItem,
-	nowMs,
-}: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
+}: Pick<resolveBoardItemTapAction.Props, "boardItem">):
+	| resolveBoardItemTapAction.Result
+	| undefined => {
 	const cheatSpeedMode = readCheatSpeedToggleModeFromItemId(boardItem.itemId);
 	if (cheatSpeedMode) {
 		return {
@@ -65,104 +79,161 @@ export const resolveBoardItemTapAction = ({
 	}
 
 	const utilitySheet = readBoardUtilityItemSheet(boardItem.itemId);
-	if (utilitySheet) {
-		return {
-			sheet: utilitySheet,
-			type: "open-sheet",
-		};
-	}
+	return utilitySheet
+		? {
+				sheet: utilitySheet,
+				type: "open-sheet",
+			}
+		: undefined;
+};
 
-	const liveBoardItem = readLiveBoardItemView({
-		boardItem,
-		nowMs,
-	});
-	const liveCraft = liveBoardItem?.craft;
-
-	if (liveCraft?.complete) {
-		return {
-			type: "claim-craft",
-			boardItemId: boardItem.id,
-		};
-	}
-
-	if (liveCraft?.phase === "collecting_inputs") {
-		const craftRunState = readCraftRunState({
-			craft: liveCraft,
-		});
-
-		if (craftRunState.canRunAction) {
-			return {
-				type: "start-craft",
-				boardItemId: boardItem.id,
-				recipeId: liveCraft.id,
-			};
-		}
-
-		return {
-			sheet: {
-				boardItemId: boardItem.id,
-				type: "item",
+const resolveCraftBoardItemTapAction = ({
+	boardItem,
+	craft,
+}: {
+	boardItem: BoardViewItem;
+	craft: NonNullable<BoardViewItem["craft"]>;
+}): resolveBoardItemTapAction.Result =>
+	match(craft)
+		.with(
+			{
+				complete: true,
 			},
-			type: "open-sheet",
-		};
-	}
-
-	if (liveBoardItem?.activation?.kind === "stash") {
-		if (isProducerReady(liveBoardItem.activation, nowMs)) {
-			return {
-				type: "activate",
-				activation: "exhaust",
+			() => ({
 				boardItemId: boardItem.id,
-			};
-		}
-
-		return {
-			sheet: {
-				boardItemId: boardItem.id,
-				type: "item",
+				type: "claim-craft" as const,
+			}),
+		)
+		.with(
+			{
+				phase: "collecting_inputs",
 			},
-			type: "open-sheet",
-		};
-	}
-
-	if (liveBoardItem?.activation?.kind === "producer") {
-		const defaultLines = [
-			liveBoardItem.activation.lines?.find(
-				(line) => line.isDefault && line.kind === "effect",
-			),
-			liveBoardItem.activation.lines?.find(
-				(line) => line.isDefault && line.kind === "product",
-			),
-		].filter((line): line is NonNullable<typeof line> => Boolean(line));
-		const runnableDefaultLine = defaultLines.find(
-			(line) =>
-				readLineRunState({
-					line,
-				}).canRunAction,
+			(liveCraft) => {
+				const craftRunState = readCraftRunState({
+					craft: liveCraft,
+				});
+				return craftRunState.canRunAction
+					? {
+							boardItemId: boardItem.id,
+							recipeId: liveCraft.id,
+							type: "start-craft" as const,
+						}
+					: createOpenBoardItemSheetAction({
+							boardItemId: boardItem.id,
+						});
+			},
+		)
+		.otherwise(() =>
+			createOpenBoardItemSheetAction({
+				boardItemId: boardItem.id,
+			}),
 		);
 
-		if (runnableDefaultLine) {
-			return {
+const resolveStashBoardItemTapAction = ({
+	boardItem,
+	nowMs,
+}: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result =>
+	boardItem.activation && isProducerReady(boardItem.activation, nowMs)
+		? {
+				activation: "exhaust",
+				boardItemId: boardItem.id,
 				type: "activate",
+			}
+		: createOpenBoardItemSheetAction({
+				boardItemId: boardItem.id,
+			});
+
+const readRunnableDefaultProducerLine = ({ boardItem }: { boardItem: BoardViewItem }) => {
+	const defaultLines = [
+		boardItem.activation?.lines?.find((line) => line.isDefault && line.kind === "effect"),
+		boardItem.activation?.lines?.find((line) => line.isDefault && line.kind === "product"),
+	].filter((line): line is NonNullable<typeof line> => Boolean(line));
+
+	return defaultLines.find(
+		(line) =>
+			readLineRunState({
+				line,
+			}).canRunAction,
+	);
+};
+
+const resolveProducerBoardItemTapAction = ({
+	boardItem,
+}: Pick<resolveBoardItemTapAction.Props, "boardItem">): resolveBoardItemTapAction.Result => {
+	const runnableDefaultLine = readRunnableDefaultProducerLine({
+		boardItem,
+	});
+	return runnableDefaultLine
+		? {
 				activation: "single",
 				boardItemId: boardItem.id,
 				lineId: runnableDefaultLine.lineId,
-			};
-		}
-		return {
-			sheet: {
+				type: "activate",
+			}
+		: createOpenBoardItemSheetAction({
 				boardItemId: boardItem.id,
-				type: "item",
-			},
-			type: "open-sheet",
-		};
-	}
+			});
+};
 
-	return {
-		sheet: {
-			boardItemId: boardItem.id,
-			type: "item",
-		},
-		type: "open-sheet",
-	};
+const resolveLiveBoardItemTapAction = ({
+	boardItem,
+	nowMs,
+}: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result =>
+	match(boardItem)
+		.with(
+			{
+				craft: P.nonNullable,
+			},
+			({ craft }) =>
+				resolveCraftBoardItemTapAction({
+					boardItem,
+					craft,
+				}),
+		)
+		.with(
+			{
+				activation: {
+					kind: "stash",
+				},
+			},
+			() =>
+				resolveStashBoardItemTapAction({
+					boardItem,
+					nowMs,
+				}),
+		)
+		.with(
+			{
+				activation: {
+					kind: "producer",
+				},
+			},
+			() =>
+				resolveProducerBoardItemTapAction({
+					boardItem,
+				}),
+		)
+		.otherwise(() =>
+			createOpenBoardItemSheetAction({
+				boardItemId: boardItem.id,
+			}),
+		);
+
+export const resolveBoardItemTapAction = ({
+	boardItem,
+	nowMs,
+}: resolveBoardItemTapAction.Props): resolveBoardItemTapAction.Result => {
+	const specialAction = resolveSpecialBoardItemTapAction({
+		boardItem,
+	});
+	if (specialAction) return specialAction;
+
+	return resolveLiveBoardItemTapAction({
+		boardItem:
+			readLiveBoardItemView({
+				boardItem,
+				nowMs,
+			}) ?? boardItem,
+		nowMs,
+	});
 };

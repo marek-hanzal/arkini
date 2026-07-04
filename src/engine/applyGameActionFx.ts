@@ -1,4 +1,5 @@
-import { Effect, type Effect as EffectType } from "effect";
+import { Context, Effect, type Effect as EffectType } from "effect";
+import { match } from "ts-pattern";
 import { GameConfigFx } from "~/config/GameConfigFx";
 import { moveBoardItemFx } from "~/board/logic/moveBoardItemFx";
 import { applyBoardMemoryActivateFx } from "~/board-memory/applyBoardMemoryActivateFx";
@@ -21,13 +22,11 @@ import { withdrawCraftInputFx } from "~/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/producer/withdrawProducerInputFx";
 import { startLineFx } from "~/producer/startLineFx";
-import { matchGameAction } from "~/engine/matchGameAction";
 import { processWorldSnapshotFx } from "~/world/processWorldSnapshotFx";
+import type { GameAction } from "~/action/GameActionSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import type { RandomServiceFx } from "~/random/context/RandomServiceFx";
 
 export namespace applyGameActionFx {
 	export interface Props {
@@ -38,6 +37,240 @@ export namespace applyGameActionFx {
 	}
 }
 
+namespace GameActionApplicationScopeFx {
+	export interface Service {
+		readonly config: GameConfig;
+		readonly nowMs: number;
+		readonly save: GameSave;
+	}
+}
+
+class GameActionApplicationScopeFx extends Context.Tag("GameActionApplicationScopeFx")<
+	GameActionApplicationScopeFx,
+	GameActionApplicationScopeFx.Service
+>() {
+	//
+}
+
+const provideGameActionApplicationScopeFx = <A, E, R>(
+	effect: EffectType.Effect<A, E, R | GameActionApplicationScopeFx>,
+	service: GameActionApplicationScopeFx.Service,
+) => Effect.provideService(effect, GameActionApplicationScopeFx, service);
+
+const dispatchParsedGameActionFx = Effect.fn("applyGameActionFx.dispatchParsedGameActionFx")(
+	function* (action: GameAction) {
+		const scope = yield* GameActionApplicationScopeFx;
+		const actionContext = {
+			config: scope.config,
+			nowMs: scope.nowMs,
+			save: scope.save,
+		};
+
+		return yield* match(action)
+			.with(
+				{
+					type: "board.item.move",
+				},
+				(parsedAction) =>
+					moveBoardItemFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "board.item.stash",
+				},
+				(parsedAction) =>
+					stashBoardItemFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "board.memory.activate",
+				},
+				(parsedAction) =>
+					applyBoardMemoryActivateFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "board.memory.clear",
+				},
+				(parsedAction) =>
+					applyBoardMemoryClearFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "board.items.swap",
+				},
+				(parsedAction) =>
+					swapBoardItemsFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "cheat.speed_mode.set",
+				},
+				(parsedAction) =>
+					setCheatSpeedModeFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "craft.input.store",
+				},
+				(parsedAction) =>
+					storeCraftInputFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "craft.input.withdraw",
+				},
+				(parsedAction) =>
+					withdrawCraftInputFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "craft.start",
+				},
+				(parsedAction) =>
+					startCraftFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "debug.board_item.delete",
+				},
+				(parsedAction) =>
+					deleteDebugBoardItemFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "debug.item.spawn",
+				},
+				(parsedAction) =>
+					spawnDebugItemFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "inventory.item.place",
+				},
+				(parsedAction) =>
+					placeInventoryItemOnBoardFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "inventory.slots.swap",
+				},
+				(parsedAction) =>
+					swapInventorySlotsFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "item.merge",
+				},
+				(parsedAction) =>
+					mergeItemFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "producer.input.store",
+				},
+				(parsedAction) =>
+					storeProducerInputFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "producer.input.withdraw",
+				},
+				(parsedAction) =>
+					withdrawProducerInputFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "line.set_default",
+				},
+				(parsedAction) =>
+					setLineDefaultFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "line.start",
+				},
+				(parsedAction) =>
+					startLineFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "stash.open",
+				},
+				(parsedAction) =>
+					openStashFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "tile.remove",
+				},
+				(parsedAction) =>
+					removeTileFx({
+						...actionContext,
+						action: parsedAction,
+					}),
+			)
+			.exhaustive();
+	},
+);
+
 export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	config,
 	save,
@@ -47,156 +280,15 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	const parsedAction = yield* parseGameActionFx({
 		action,
 	});
-	const result: EffectType.Effect<
-		GameEngineResult,
-		GameEngineError,
-		GameConfigFx | RandomServiceFx
-	> = matchGameAction<
-		EffectType.Effect<GameEngineResult, GameEngineError, GameConfigFx | RandomServiceFx>
-	>(parsedAction, {
-		boardItemMove: (moveAction) =>
-			moveBoardItemFx({
-				action: moveAction,
-				config,
-				nowMs,
-				save,
-			}),
-		boardItemStash: (stashAction) =>
-			stashBoardItemFx({
-				action: stashAction,
-				config,
-				nowMs,
-				save,
-			}),
-		boardMemoryActivate: (memoryAction) =>
-			applyBoardMemoryActivateFx({
-				action: memoryAction,
-				config,
-				nowMs,
-				save,
-			}),
-		boardMemoryClear: (memoryAction) =>
-			applyBoardMemoryClearFx({
-				action: memoryAction,
-				config,
-				nowMs,
-				save,
-			}),
-		boardItemsSwap: (swapAction) =>
-			swapBoardItemsFx({
-				action: swapAction,
-				config,
-				nowMs,
-				save,
-			}),
-		cheatSpeedModeSet: (setSpeedModeAction) =>
-			setCheatSpeedModeFx({
-				action: setSpeedModeAction,
-				config,
-				nowMs,
-				save,
-			}),
-		craftInputStore: (storeCraftInputAction) =>
-			storeCraftInputFx({
-				action: storeCraftInputAction,
-				config,
-				nowMs,
-				save,
-			}),
-		craftInputWithdraw: (withdrawCraftInputAction) =>
-			withdrawCraftInputFx({
-				action: withdrawCraftInputAction,
-				config,
-				nowMs,
-				save,
-			}),
-		craftStart: (craftAction) =>
-			startCraftFx({
-				action: craftAction,
-				config,
-				nowMs,
-				save,
-			}),
-		debugBoardItemDelete: (deleteAction) =>
-			deleteDebugBoardItemFx({
-				action: deleteAction,
-				config,
-				nowMs,
-				save,
-			}),
-		debugItemSpawn: (spawnAction) =>
-			spawnDebugItemFx({
-				action: spawnAction,
-				config,
-				nowMs,
-				save,
-			}),
-		inventoryItemPlace: (placeAction) =>
-			placeInventoryItemOnBoardFx({
-				action: placeAction,
-				config,
-				nowMs,
-				save,
-			}),
-		inventorySlotsSwap: (swapAction) =>
-			swapInventorySlotsFx({
-				action: swapAction,
-				config,
-				nowMs,
-				save,
-			}),
-		itemMerge: (mergeAction) =>
-			mergeItemFx({
-				action: mergeAction,
-				config,
-				nowMs,
-				save,
-			}),
-		producerInputStore: (storeInputAction) =>
-			storeProducerInputFx({
-				action: storeInputAction,
-				config,
-				nowMs,
-				save,
-			}),
-		producerInputWithdraw: (withdrawInputAction) =>
-			withdrawProducerInputFx({
-				action: withdrawInputAction,
-				config,
-				nowMs,
-				save,
-			}),
-		lineSetDefault: (setDefaultAction) =>
-			setLineDefaultFx({
-				action: setDefaultAction,
-				config,
-				nowMs,
-				save,
-			}),
-		lineStart: (startAction) =>
-			startLineFx({
-				action: startAction,
-				config,
-				nowMs,
-				save,
-			}),
-		stashOpen: (openAction) =>
-			openStashFx({
-				action: openAction,
-				config,
-				nowMs,
-				save,
-			}),
-		tileRemove: (removeAction) =>
-			removeTileFx({
-				action: removeAction,
-				config,
-				nowMs,
-				save,
-			}),
-	});
-
-	const actionResult = yield* Effect.provideService(result, GameConfigFx, {
+	const scopedActionEffect = provideGameActionApplicationScopeFx(
+		dispatchParsedGameActionFx(parsedAction),
+		{
+			config,
+			nowMs,
+			save,
+		},
+	);
+	const actionResult = yield* Effect.provideService(scopedActionEffect, GameConfigFx, {
 		config,
 	});
 

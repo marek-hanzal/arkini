@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { pastDueWorldJobWakeDelayMs } from "~/world/pastDueWorldJobWakeDelayMs";
 import { readWorldWakePlanFx } from "~/world/readWorldWakePlanFx";
-
-export const pastDueGameJobWakeDelayMs = pastDueWorldJobWakeDelayMs;
 
 export namespace readNextWakeAtMsFx {
 	export interface Props {

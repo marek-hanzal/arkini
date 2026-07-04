@@ -4,7 +4,8 @@ import { GameSaveConfigSchema, type GameSave } from "~/engine/model/GameSaveSche
 import { runGameTickFx } from "~/engine/runGameTickFx";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/engine/test/TestRandomService";
-import { pastDueGameJobWakeDelayMs, readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { pastDueWorldJobWakeDelayMs } from "~/world/pastDueWorldJobWakeDelayMs";
 import { createInitialGameSaveFx } from "~/save/createInitialGameSaveFx";
 import { withRandomService } from "~/random/withRandomService";
 
@@ -203,7 +204,7 @@ describe("runtime invariants", () => {
 				nowMs: 3000,
 				save,
 			}),
-		).toBe(3000 + pastDueGameJobWakeDelayMs);
+		).toBe(3000 + pastDueWorldJobWakeDelayMs);
 	});
 
 	it("allows already queued producer jobs behind a paused previous job", () => {

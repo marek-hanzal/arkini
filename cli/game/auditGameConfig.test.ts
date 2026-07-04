@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { parseGameConfig as parseGameConfigRaw } from "../../src/config/GameConfigSchema";
+import { parseGameConfig } from "../../src/config/GameConfigSchema";
 import { GAME_HERO_ASSET_ID } from "../../src/config/GameWellKnownAssetIds";
 import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
-
-const parseGameConfig = parseGameConfigRaw;
 
 const createConfigValue = () => ({
 	version: 1,

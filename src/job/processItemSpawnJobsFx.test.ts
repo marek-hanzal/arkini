@@ -6,7 +6,8 @@ import {
 	processItemSpawnJobsFx,
 } from "~/job/processItemSpawnJobsFx";
 import { createItemSpawnJobsFx } from "~/job/createItemSpawnJobsFx";
-import { pastDueGameJobWakeDelayMs, readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { pastDueWorldJobWakeDelayMs } from "~/world/pastDueWorldJobWakeDelayMs";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
@@ -89,7 +90,7 @@ describe("processItemSpawnJobsFx", () => {
 				nowMs: 1000,
 				save: lateTick.save,
 			}),
-		).toBe(1000 + pastDueGameJobWakeDelayMs);
+		).toBe(1000 + pastDueWorldJobWakeDelayMs);
 
 		const nextTick = runItemSpawn({
 			config,
@@ -310,7 +311,7 @@ describe("processItemSpawnJobsFx", () => {
 				nowMs: 500,
 				save,
 			}),
-		).toBe(500 + pastDueGameJobWakeDelayMs);
+		).toBe(500 + pastDueWorldJobWakeDelayMs);
 	});
 
 	it("does not wake on a past-due dependent spawn job before its dependency can run", () => {
@@ -399,7 +400,7 @@ describe("processItemSpawnJobsFx", () => {
 				nowMs: 1000,
 				save: lateTick.save,
 			}),
-		).toBe(1000 + pastDueGameJobWakeDelayMs);
+		).toBe(1000 + pastDueWorldJobWakeDelayMs);
 
 		const nextTick = runItemSpawn({
 			config,

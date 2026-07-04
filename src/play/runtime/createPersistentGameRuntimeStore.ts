@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { loadDefaultGameConfig } from "~/config/compiled/defaultGameConfig";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -5,7 +6,7 @@ import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdap
 import type { RandomService } from "~/random/context/RandomService";
 import { createDefaultDexieGameSaveStorage } from "~/storage/DexieGameSaveStorage";
 import type { CloseableGameSaveStorage, GameSaveStorage } from "~/storage/GameSaveStorage";
-import { hashRuntimeGameConfig } from "~/storage/hashRuntimeGameConfig";
+import { hashRuntimeGameConfigFx } from "~/storage/hashRuntimeGameConfigFx";
 import { connectGameRuntimeSavePersistence } from "~/play/runtime/connectGameRuntimeSavePersistence";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 
@@ -55,7 +56,7 @@ export const createPersistentGameRuntimeStore = async ({
 	storage = createDefaultDexieGameSaveStorage(),
 }: createPersistentGameRuntimeStore.Options = {}): Promise<createPersistentGameRuntimeStore.Result> => {
 	const resolvedConfig = config ?? (await loadDefaultGameConfig());
-	const configHash = await hashRuntimeGameConfig(resolvedConfig);
+	const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(resolvedConfig));
 	const loadedSave = await storage.loadActiveSave({
 		config: resolvedConfig,
 		configHash,

@@ -21,7 +21,7 @@ import { withdrawCraftInputFx } from "~/craft/withdrawCraftInputFx";
 import { storeProducerInputFx } from "~/producer/storeProducerInputFx";
 import { withdrawProducerInputFx } from "~/producer/withdrawProducerInputFx";
 import { startLineFx } from "~/producer/startLineFx";
-import { matchGameAction } from "~/engine/logic/matchGameAction";
+import { matchGameAction } from "~/engine/matchGameAction";
 import { processWorldSnapshotFx } from "~/world/processWorldSnapshotFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineError } from "~/engine/model/GameEngineError";

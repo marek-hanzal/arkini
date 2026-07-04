@@ -2,7 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createInitialGameSaveFx } from "~/save/createInitialGameSaveFx";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
-import { pastDueGameJobWakeDelayMs, readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { pastDueWorldJobWakeDelayMs } from "~/world/pastDueWorldJobWakeDelayMs";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));
@@ -30,7 +31,7 @@ describe("readNextWakeAtMsFx", () => {
 				nowMs: 500,
 				save,
 			}),
-		).toBe(500 + pastDueGameJobWakeDelayMs);
+		).toBe(500 + pastDueWorldJobWakeDelayMs);
 	});
 
 	it("wakes again when a craft job is already due in a loaded save", () => {
@@ -53,7 +54,7 @@ describe("readNextWakeAtMsFx", () => {
 				nowMs: 500,
 				save,
 			}),
-		).toBe(500 + pastDueGameJobWakeDelayMs);
+		).toBe(500 + pastDueWorldJobWakeDelayMs);
 	});
 
 	it("wakes again when an active effect is already expired in a loaded save", () => {
@@ -76,7 +77,7 @@ describe("readNextWakeAtMsFx", () => {
 				nowMs: 500,
 				save,
 			}),
-		).toBe(500 + pastDueGameJobWakeDelayMs);
+		).toBe(500 + pastDueWorldJobWakeDelayMs);
 	});
 
 	it("does not keep waking on an active effect start time that is already in the past", () => {

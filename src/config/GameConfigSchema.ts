@@ -19,8 +19,6 @@ export const GameConfigAuthoringSchema = z
 	})
 	.strict();
 
-const GameConfigFragmentSchema = GameConfigAuthoringSchema;
-
 const BaseGameConfigSchema = z
 	.object({
 		version: z.literal(1),
@@ -34,7 +32,7 @@ const BaseGameConfigSchema = z
 
 export const GameConfigSchema = BaseGameConfigSchema.superRefine(validateGameConfig);
 
-export type GameConfigFragment = z.infer<typeof GameConfigFragmentSchema>;
+export type GameConfigFragment = z.infer<typeof GameConfigAuthoringSchema>;
 
-export const parseGameConfigFragment = (value: unknown) => GameConfigFragmentSchema.parse(value);
+export const parseGameConfigFragment = (value: unknown) => GameConfigAuthoringSchema.parse(value);
 export const parseGameConfig = (value: unknown) => GameConfigSchema.parse(value);

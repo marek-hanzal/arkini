@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import "fake-indexeddb/auto";
 import Dexie from "dexie";
 import { afterEach, describe, expect, it } from "vitest";
@@ -10,7 +11,7 @@ import {
 	type GameSaveStorageRecord,
 } from "~/storage/GameSaveStorage";
 import { DexieGameSaveStorage } from "~/storage/DexieGameSaveStorage";
-import { hashRuntimeGameConfig } from "~/storage/hashRuntimeGameConfig";
+import { hashRuntimeGameConfigFx } from "~/storage/hashRuntimeGameConfigFx";
 
 const databaseNames = new Set<string>();
 
@@ -60,7 +61,7 @@ afterEach(async () => {
 describe("DexieGameSaveStorage", () => {
 	it("roundtrips the active save document", async () => {
 		const config = createEngineTestConfig();
-		const configHash = await hashRuntimeGameConfig(config);
+		const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(config));
 		const save = await createInitialSave();
 		const storage = new DexieGameSaveStorage({
 			databaseName: createDatabaseName(),
@@ -82,7 +83,7 @@ describe("DexieGameSaveStorage", () => {
 
 	it("drops stored saves when the stored config hash does not match", async () => {
 		const config = createEngineTestConfig();
-		const configHash = await hashRuntimeGameConfig(config);
+		const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(config));
 		const databaseName = createDatabaseName();
 		const save = await createInitialSave();
 		const storage = new DexieGameSaveStorage({
@@ -107,7 +108,7 @@ describe("DexieGameSaveStorage", () => {
 
 	it("drops stored saves when the storage schema version does not match", async () => {
 		const config = createEngineTestConfig();
-		const configHash = await hashRuntimeGameConfig(config);
+		const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(config));
 		const databaseName = createDatabaseName();
 		const save = await createInitialSave();
 		const storage = new DexieGameSaveStorage({
@@ -136,7 +137,7 @@ describe("DexieGameSaveStorage", () => {
 
 	it("drops stored saves for corrupt save payloads", async () => {
 		const config = createEngineTestConfig();
-		const configHash = await hashRuntimeGameConfig(config);
+		const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(config));
 		const databaseName = createDatabaseName();
 		const storage = new DexieGameSaveStorage({
 			databaseName,
@@ -166,7 +167,7 @@ describe("DexieGameSaveStorage", () => {
 
 	it("drops stored saves for semantically invalid save payloads", async () => {
 		const config = createEngineTestConfig();
-		const configHash = await hashRuntimeGameConfig(config);
+		const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(config));
 		const databaseName = createDatabaseName();
 		const save = await createInitialSave();
 		save.inventory.slots[0] = {
@@ -199,7 +200,7 @@ describe("DexieGameSaveStorage", () => {
 
 	it("deletes and wipes stored saves", async () => {
 		const config = createEngineTestConfig();
-		const configHash = await hashRuntimeGameConfig(config);
+		const configHash = await Effect.runPromise(hashRuntimeGameConfigFx(config));
 		const save = await createInitialSave();
 		const storage = new DexieGameSaveStorage({
 			databaseName: createDatabaseName(),

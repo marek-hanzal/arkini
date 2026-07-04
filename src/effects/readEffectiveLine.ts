@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { BoardCell } from "~/board/BoardCellPosition";
 import { readGameCheatEffectiveDurationMs } from "~/cheat/GameCheatSpeedMode";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -511,20 +512,7 @@ const applyRequirementDropEffect = ({
 	};
 };
 
-const applyDropEffect = ({
-	chanceItems,
-	config,
-	dropEffectId,
-	dropEffectName,
-	sourceDropId,
-	effect,
-	enabled,
-	grantIds,
-	itemId,
-	save,
-	targetCell,
-	visible,
-}: {
+type DropEffectApplicationProps = {
 	chanceItems: EffectiveChanceItemEntry[];
 	config: GameConfig;
 	dropEffectId: string;
@@ -537,54 +525,104 @@ const applyDropEffect = ({
 	save: GameSave;
 	targetCell?: BoardCell;
 	visible: boolean;
-}): DropEvaluation => {
-	const dropEffects: EffectiveDropEffectOutcome[] = [];
-	let nextVisible = visible;
-	let nextEnabled = enabled;
-	const nextChanceItems = [
+};
+
+type DropEffectApplicationPropsFor<Kind extends DropEffect["kind"]> = Omit<
+	DropEffectApplicationProps,
+	"effect"
+> & {
+	effect: Extract<
+		DropEffect,
+		{
+			kind: Kind;
+		}
+	>;
+};
+
+const readUnchangedDropEvaluation = ({
+	chanceItems,
+	enabled,
+	visible,
+}: Pick<DropEffectApplicationProps, "chanceItems" | "enabled" | "visible">): DropEvaluation => ({
+	chanceItems: [
 		...chanceItems,
-	];
+	],
+	dropEffects: [],
+	enabled,
+	visible,
+});
 
-	if (effect.kind === "grant.require") {
-		return applyRequirementDropEffect({
-			chanceItems: nextChanceItems,
-			dropEffectId,
-			dropEffectName,
-			effect,
-			enabled: nextEnabled,
-			ready: readDropEffectGrantActive({
-				effect,
-				grantIds,
-			}),
-			visible: nextVisible,
-		});
-	}
-
-	if (effect.kind === "nearby.require") {
-		return applyRequirementDropEffect({
-			chanceItems: nextChanceItems,
-			dropEffectId,
-			dropEffectName,
-			effect,
-			enabled: nextEnabled,
-			ready:
-				readNearbyMatches({
-					items: effect.items as Parameters<typeof readNearbyMatches>[0]["items"],
-					radius: effect.radius,
-					save,
-					targetCell,
-				}).length > 0,
-			visible: nextVisible,
-		});
-	}
-
-	if (effect.kind === "grant.blockStart") {
-		const active = readDropEffectGrantActive({
+const applyGrantRequirementDropEffect = ({
+	chanceItems,
+	dropEffectId,
+	dropEffectName,
+	effect,
+	enabled,
+	grantIds,
+	visible,
+}: DropEffectApplicationPropsFor<"grant.require">) =>
+	applyRequirementDropEffect({
+		chanceItems: [
+			...chanceItems,
+		],
+		dropEffectId,
+		dropEffectName,
+		effect,
+		enabled,
+		ready: readDropEffectGrantActive({
 			effect,
 			grantIds,
-		});
-		if (active) nextEnabled = false;
-		dropEffects.push(
+		}),
+		visible,
+	});
+
+const applyNearbyRequirementDropEffect = ({
+	chanceItems,
+	dropEffectId,
+	dropEffectName,
+	effect,
+	enabled,
+	save,
+	targetCell,
+	visible,
+}: DropEffectApplicationPropsFor<"nearby.require">) =>
+	applyRequirementDropEffect({
+		chanceItems: [
+			...chanceItems,
+		],
+		dropEffectId,
+		dropEffectName,
+		effect,
+		enabled,
+		ready:
+			readNearbyMatches({
+				items: effect.items as Parameters<typeof readNearbyMatches>[0]["items"],
+				radius: effect.radius,
+				save,
+				targetCell,
+			}).length > 0,
+		visible,
+	});
+
+const applyGrantBlockStartDropEffect = ({
+	chanceItems,
+	dropEffectId,
+	dropEffectName,
+	effect,
+	enabled,
+	grantIds,
+	visible,
+}: DropEffectApplicationPropsFor<"grant.blockStart">): DropEvaluation => {
+	const active = readDropEffectGrantActive({
+		effect,
+		grantIds,
+	});
+
+	return {
+		chanceItems: [
+			...chanceItems,
+		],
+		dropEffects: [
 			createDropEffectOutcome({
 				active,
 				effect,
@@ -594,187 +632,310 @@ const applyDropEffect = ({
 				ready: !active,
 				result: active ? "disabled" : "not blocked",
 			}),
-		);
-		return {
-			chanceItems: nextChanceItems,
-			dropEffects,
-			enabled: nextEnabled,
-			visible: nextVisible,
-		};
-	}
+		],
+		enabled: active ? false : enabled,
+		visible,
+	};
+};
 
-	if (
-		effect.kind === "grant.drop.hide" ||
-		effect.kind === "grant.drop.show" ||
-		effect.kind === "grant.drop.disable" ||
-		effect.kind === "grant.drop.enable"
-	) {
-		const active = readDropEffectGrantActive({
-			effect,
-			grantIds,
-		});
-		if (active && effect.kind === "grant.drop.hide") nextVisible = false;
-		if (active && effect.kind === "grant.drop.show") nextVisible = true;
-		if (active && effect.kind === "grant.drop.disable") nextEnabled = false;
-		if (active && effect.kind === "grant.drop.enable") nextEnabled = true;
-		dropEffects.push(
+type GrantDropToggleEffectKind =
+	| "grant.drop.disable"
+	| "grant.drop.enable"
+	| "grant.drop.hide"
+	| "grant.drop.show";
+
+const applyGrantDropToggleEffect = ({
+	chanceItems,
+	dropEffectId,
+	dropEffectName,
+	effect,
+	enabled,
+	grantIds,
+	visible,
+}: DropEffectApplicationPropsFor<GrantDropToggleEffectKind>): DropEvaluation => {
+	const active = readDropEffectGrantActive({
+		effect,
+		grantIds,
+	});
+	const nextState = match(effect.kind)
+		.with("grant.drop.hide", () => ({
+			enabled,
+			impact: "visibility" as const,
+			ready: !active,
+			result: active ? "hidden" : "inactive",
+			visible: active ? false : visible,
+		}))
+		.with("grant.drop.show", () => ({
+			enabled,
+			impact: "visibility" as const,
+			ready: active,
+			result: active ? "shown" : "inactive",
+			visible: active ? true : visible,
+		}))
+		.with("grant.drop.disable", () => ({
+			enabled: active ? false : enabled,
+			impact: "availability" as const,
+			ready: !active,
+			result: active ? "disabled" : "inactive",
+			visible,
+		}))
+		.with("grant.drop.enable", () => ({
+			enabled: active ? true : enabled,
+			impact: "availability" as const,
+			ready: active,
+			result: active ? "enabled" : "inactive",
+			visible,
+		}))
+		.exhaustive();
+
+	return {
+		chanceItems: [
+			...chanceItems,
+		],
+		dropEffects: [
 			createDropEffectOutcome({
 				active,
 				effect,
 				effectId: dropEffectId,
 				effectName: dropEffectName,
-				impact:
-					effect.kind === "grant.drop.hide" || effect.kind === "grant.drop.show"
-						? "visibility"
-						: "availability",
-				ready:
-					effect.kind === "grant.drop.hide" || effect.kind === "grant.drop.disable"
-						? !active
-						: active,
-				result: active
-					? effect.kind === "grant.drop.hide"
-						? "hidden"
-						: effect.kind === "grant.drop.show"
-							? "shown"
-							: effect.kind === "grant.drop.disable"
-								? "disabled"
-								: "enabled"
-					: "inactive",
+				impact: nextState.impact,
+				ready: nextState.ready,
+				result: nextState.result,
 			}),
-		);
-		return {
-			chanceItems: nextChanceItems,
-			dropEffects,
-			enabled: nextEnabled,
-			visible: nextVisible,
-		};
+		],
+		enabled: nextState.enabled,
+		visible: nextState.visible,
+	};
+};
+
+const applyNearbyLootChanceDropEffect = ({
+	chanceItems,
+	config,
+	dropEffectId,
+	dropEffectName,
+	sourceDropId,
+	effect,
+	enabled,
+	itemId,
+	save,
+	targetCell,
+	visible,
+}: DropEffectApplicationPropsFor<"nearby.loot.outputChance.add">): DropEvaluation => {
+	const activeSourceEffects: EffectiveDropEffectOutcome[] = [];
+	let totalChance = 0;
+
+	for (const [sourceIndex, source] of effect.sources.entries()) {
+		const matches = readNearbyMatches({
+			items: source.items as RuntimeItemSelector,
+			radius: effect.radius,
+			save,
+			targetCell,
+		});
+		const sourceTotalChance = matches.length * source.chance;
+		totalChance += sourceTotalChance;
+		const active = matches.length > 0;
+		const sourceEffectLabel = readNearbyLootChanceSourceLabel({
+			config,
+			source,
+		});
+		const sourceEffect = createDropEffectOutcome({
+			active,
+			effect,
+			effectId: `${dropEffectId}:source:${sourceIndex}`,
+			effectName: sourceEffectLabel,
+			impact: "chance",
+			label: sourceEffectLabel,
+			ready: active,
+			result: active
+				? `+${formatChancePercent(sourceTotalChance)} (${matches.length}× ${formatChancePercent(source.chance)})`
+				: "inactive",
+		});
+		if (shouldDropEffectDisplay(sourceEffect)) {
+			activeSourceEffects.push(sourceEffect);
+		}
 	}
 
-	if (effect.kind === "nearby.loot.outputChance.add") {
-		const activeSourceEffects: EffectiveDropEffectOutcome[] = [];
-		let totalChance = 0;
-
-		for (const [sourceIndex, source] of effect.sources.entries()) {
-			const matches = readNearbyMatches({
-				items: source.items as RuntimeItemSelector,
-				radius: effect.radius,
-				save,
-				targetCell,
-			});
-			const sourceTotalChance = matches.length * source.chance;
-			totalChance += sourceTotalChance;
-			const active = matches.length > 0;
-			const sourceEffect = createDropEffectOutcome({
-				active,
-				effect,
-				effectId: `${dropEffectId}:source:${sourceIndex}`,
-				effectName: readNearbyLootChanceSourceLabel({
-					config,
-					source,
-				}),
-				impact: "chance",
-				label: readNearbyLootChanceSourceLabel({
-					config,
-					source,
-				}),
-				ready: active,
-				result: active
-					? `+${formatChancePercent(sourceTotalChance)} (${matches.length}× ${formatChancePercent(source.chance)})`
-					: "inactive",
-			});
-			if (shouldDropEffectDisplay(sourceEffect)) {
-				activeSourceEffects.push(sourceEffect);
-			}
-		}
-
-		if (totalChance > 0) {
-			nextChanceItems.push({
-				chance: totalChance,
-				dropEffects: activeSourceEffects.length ? activeSourceEffects : undefined,
-				effectId: dropEffectId,
-				effectName: dropEffectName,
-				sourceDropId,
-				itemId,
-				quantity: effect.quantity,
-			});
-		}
-
-		const summaryEffect = createDropEffectOutcome({
-			active: totalChance > 0,
-			effect,
+	const nextChanceItems = [
+		...chanceItems,
+	];
+	if (totalChance > 0) {
+		nextChanceItems.push({
+			chance: totalChance,
+			dropEffects: activeSourceEffects.length ? activeSourceEffects : undefined,
 			effectId: dropEffectId,
 			effectName: dropEffectName,
-			impact: "chance",
-			ready: totalChance > 0,
-			result: totalChance > 0 ? `+${formatChancePercent(totalChance)} total` : "inactive",
+			sourceDropId,
+			itemId,
+			quantity: effect.quantity,
 		});
-		dropEffects.push(summaryEffect);
-
-		return {
-			chanceItems: nextChanceItems,
-			dropEffects,
-			enabled: nextEnabled,
-			visible: nextVisible,
-		};
-	}
-
-	if (effect.kind === "grant.loot.extraOutputChance.add") {
-		const active = readDropEffectGrantActive({
-			effect,
-			grantIds,
-		});
-		const activeChanceEffect = createDropEffectOutcome({
-			active: true,
-			effect,
-			effectId: dropEffectId,
-			effectName: dropEffectName,
-			impact: "chance",
-			ready: true,
-			result: `+${Math.round(effect.chance * 1000) / 10}% extra roll`,
-		});
-		if (active) {
-			nextChanceItems.push({
-				chance: effect.chance,
-				dropEffects: shouldDropEffectDisplay(activeChanceEffect)
-					? [
-							activeChanceEffect,
-						]
-					: undefined,
-				effectId: dropEffectId,
-				effectName: dropEffectName,
-				sourceDropId,
-				itemId,
-				quantity: effect.quantity,
-			});
-		}
-		dropEffects.push(
-			createDropEffectOutcome({
-				active,
-				effect,
-				effectId: dropEffectId,
-				effectName: dropEffectName,
-				impact: "chance",
-				ready: active,
-				result: active
-					? `+${Math.round(effect.chance * 1000) / 10}% extra roll`
-					: "inactive",
-			}),
-		);
-		return {
-			chanceItems: nextChanceItems,
-			dropEffects,
-			enabled: nextEnabled,
-			visible: nextVisible,
-		};
 	}
 
 	return {
 		chanceItems: nextChanceItems,
-		dropEffects,
-		enabled: nextEnabled,
-		visible: nextVisible,
+		dropEffects: [
+			createDropEffectOutcome({
+				active: totalChance > 0,
+				effect,
+				effectId: dropEffectId,
+				effectName: dropEffectName,
+				impact: "chance",
+				ready: totalChance > 0,
+				result: totalChance > 0 ? `+${formatChancePercent(totalChance)} total` : "inactive",
+			}),
+		],
+		enabled,
+		visible,
 	};
 };
+
+const formatExtraOutputChanceResult = (chance: number) =>
+	`+${Math.round(chance * 1000) / 10}% extra roll`;
+
+const applyGrantExtraOutputChanceDropEffect = ({
+	chanceItems,
+	dropEffectId,
+	dropEffectName,
+	sourceDropId,
+	effect,
+	enabled,
+	grantIds,
+	itemId,
+	visible,
+}: DropEffectApplicationPropsFor<"grant.loot.extraOutputChance.add">): DropEvaluation => {
+	const active = readDropEffectGrantActive({
+		effect,
+		grantIds,
+	});
+	const activeChanceEffect = createDropEffectOutcome({
+		active: true,
+		effect,
+		effectId: dropEffectId,
+		effectName: dropEffectName,
+		impact: "chance",
+		ready: true,
+		result: formatExtraOutputChanceResult(effect.chance),
+	});
+	const nextChanceItems = [
+		...chanceItems,
+	];
+	if (active) {
+		nextChanceItems.push({
+			chance: effect.chance,
+			dropEffects: shouldDropEffectDisplay(activeChanceEffect)
+				? [
+						activeChanceEffect,
+					]
+				: undefined,
+			effectId: dropEffectId,
+			effectName: dropEffectName,
+			sourceDropId,
+			itemId,
+			quantity: effect.quantity,
+		});
+	}
+
+	return {
+		chanceItems: nextChanceItems,
+		dropEffects: [
+			createDropEffectOutcome({
+				active,
+				effect,
+				effectId: dropEffectId,
+				effectName: dropEffectName,
+				impact: "chance",
+				ready: active,
+				result: active ? formatExtraOutputChanceResult(effect.chance) : "inactive",
+			}),
+		],
+		enabled,
+		visible,
+	};
+};
+
+const applyDropEffect = (props: DropEffectApplicationProps): DropEvaluation =>
+	match(props.effect)
+		.with(
+			{
+				kind: "grant.require",
+			},
+			(effect) =>
+				applyGrantRequirementDropEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "nearby.require",
+			},
+			(effect) =>
+				applyNearbyRequirementDropEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "grant.blockStart",
+			},
+			(effect) =>
+				applyGrantBlockStartDropEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "grant.drop.hide",
+			},
+			{
+				kind: "grant.drop.show",
+			},
+			{
+				kind: "grant.drop.disable",
+			},
+			{
+				kind: "grant.drop.enable",
+			},
+			(effect) =>
+				applyGrantDropToggleEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "nearby.loot.outputChance.add",
+			},
+			(effect) =>
+				applyNearbyLootChanceDropEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "grant.loot.extraOutputChance.add",
+			},
+			(effect) =>
+				applyGrantExtraOutputChanceDropEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "grant.duration.multiply",
+			},
+			{
+				kind: "nearby.capacity.spend",
+			},
+			{
+				kind: "nearby.duration.multiply",
+			},
+			() => readUnchangedDropEvaluation(props),
+		)
+		.exhaustive();
 
 const readEffectiveDrop = ({
 	config,

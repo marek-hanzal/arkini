@@ -65,68 +65,61 @@ const readBoardMemorySnapshot = ({ config, save }: { config: GameConfig; save: G
 const readBoardItemCount = ({ itemId, save }: { itemId: string; save: GameSave }) =>
 	Object.values(save.board.items).filter((item) => item.itemId === itemId).length;
 
-const consumeInventoryItem = ({
-	itemId,
-	preferredItemInstanceId,
-	slots,
-}: {
-	itemId: string;
-	preferredItemInstanceId?: string;
-	slots: GameSaveInventorySlot[];
-}):
-	| {
-			createdAtMs?: number;
-			itemInstanceId?: string;
-			previousQuantity: number;
-			nextQuantity: number;
-			quantity: number;
-			slotIndex: number;
-	  }
-	| undefined => {
-	const instanceSlotIndex = slots.findIndex(
-		(slot) =>
-			isGameSaveInventoryInstance(slot) &&
-			slot.itemId === itemId &&
-			(!preferredItemInstanceId || slot.id === preferredItemInstanceId),
-	);
-	if (instanceSlotIndex >= 0) {
-		const slot = slots[instanceSlotIndex];
-		if (!isGameSaveInventoryInstance(slot)) return undefined;
-		slots[instanceSlotIndex] = null;
+const consumeInventoryItemFx = Effect.fn("applyBoardMemoryActivateFx.consumeInventoryItemFx")(
+	function* ({
+		itemId,
+		preferredItemInstanceId,
+		slots,
+	}: {
+		itemId: string;
+		preferredItemInstanceId?: string;
+		slots: GameSaveInventorySlot[];
+	}) {
+		const instanceSlotIndex = slots.findIndex(
+			(slot) =>
+				isGameSaveInventoryInstance(slot) &&
+				slot.itemId === itemId &&
+				(!preferredItemInstanceId || slot.id === preferredItemInstanceId),
+		);
+		if (instanceSlotIndex >= 0) {
+			const slot = slots[instanceSlotIndex];
+			if (!isGameSaveInventoryInstance(slot)) return undefined;
+			slots[instanceSlotIndex] = null;
+			return {
+				createdAtMs: slot.createdAtMs,
+				itemInstanceId: slot.id,
+				nextQuantity: 0,
+				previousQuantity: 1,
+				quantity: 1,
+				slotIndex: instanceSlotIndex,
+			};
+		}
+
+		if (preferredItemInstanceId) return undefined;
+
+		const stackSlotIndex = slots.findIndex(
+			(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
+		);
+		if (stackSlotIndex < 0) return undefined;
+
+		const slot = slots[stackSlotIndex];
+		if (!isGameSaveInventoryStack(slot)) return undefined;
+		const previousQuantity = slot.quantity;
+		const nextQuantity = previousQuantity - 1;
+		if (nextQuantity > 0) {
+			slot.quantity = nextQuantity;
+		} else {
+			slots[stackSlotIndex] = null;
+		}
 		return {
 			createdAtMs: slot.createdAtMs,
-			itemInstanceId: slot.id,
-			nextQuantity: 0,
-			previousQuantity: 1,
+			nextQuantity,
+			previousQuantity,
 			quantity: 1,
-			slotIndex: instanceSlotIndex,
+			slotIndex: stackSlotIndex,
 		};
-	}
-
-	if (preferredItemInstanceId) return undefined;
-
-	const stackSlotIndex = slots.findIndex(
-		(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
-	);
-	if (stackSlotIndex < 0) return undefined;
-
-	const slot = slots[stackSlotIndex];
-	if (!isGameSaveInventoryStack(slot)) return undefined;
-	const previousQuantity = slot.quantity;
-	const nextQuantity = previousQuantity - 1;
-	if (nextQuantity > 0) {
-		slot.quantity = nextQuantity;
-	} else {
-		slots[stackSlotIndex] = null;
-	}
-	return {
-		createdAtMs: slot.createdAtMs,
-		nextQuantity,
-		previousQuantity,
-		quantity: 1,
-		slotIndex: stackSlotIndex,
-	};
-};
+	},
+);
 
 const placeBoardItemInInventoryFx = Effect.fn(
 	"applyBoardMemoryActivateFx.placeBoardItemInInventoryFx",
@@ -305,7 +298,9 @@ const readBoardOnlyRestoreSource = ({
 	);
 };
 
-const restoreBoardOnlyLayoutItems = ({
+const restoreBoardOnlyLayoutItemsFx = Effect.fn(
+	"applyBoardMemoryActivateFx.restoreBoardOnlyLayoutItemsFx",
+)(function* ({
 	config,
 	events,
 	savedItems,
@@ -320,7 +315,7 @@ const restoreBoardOnlyLayoutItems = ({
 		y: number;
 	}[];
 	save: GameSave;
-}): Set<number> => {
+}) {
 	const restoredIndexes = new Set<number>();
 	const usedItemInstanceIds = new Set<string>();
 
@@ -366,7 +361,7 @@ const restoreBoardOnlyLayoutItems = ({
 	}
 
 	return restoredIndexes;
-};
+});
 
 export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx")(function* ({
 	action,
@@ -426,7 +421,7 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 		});
 	}
 
-	const boardOnlyRestoredIndexes = restoreBoardOnlyLayoutItems({
+	const boardOnlyRestoredIndexes = yield* restoreBoardOnlyLayoutItemsFx({
 		config,
 		events,
 		savedItems: savedLayout.items,
@@ -465,7 +460,7 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 			continue;
 		}
 
-		const consumed = consumeInventoryItem({
+		const consumed = yield* consumeInventoryItemFx({
 			itemId: memoryItem.itemId,
 			preferredItemInstanceId: memoryItem.itemInstanceId,
 			slots: nextSave.inventory.slots,

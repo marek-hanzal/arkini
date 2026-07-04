@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
@@ -128,7 +128,9 @@ const consumeInventoryItem = ({
 	};
 };
 
-const placeBoardItemInInventory = ({
+const placeBoardItemInInventoryFx = Effect.fn(
+	"applyBoardMemoryActivateFx.placeBoardItemInInventoryFx",
+)(function* ({
 	config,
 	events,
 	item,
@@ -138,7 +140,7 @@ const placeBoardItemInInventory = ({
 	events: GameEvent[];
 	item: GameSaveBoardItem;
 	save: GameSave;
-}): boolean => {
+}) {
 	const itemDefinition = config.items[item.itemId];
 	if (!itemDefinition) return false;
 	if (
@@ -200,7 +202,7 @@ const placeBoardItemInInventory = ({
 		return true;
 	}
 
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: item.id,
 		save,
 	});
@@ -258,7 +260,7 @@ const placeBoardItemInInventory = ({
 		type: "item.created",
 	});
 	return true;
-};
+});
 
 const cellIsOccupied = ({ save, x, y }: { save: GameSave; x: number; y: number }) =>
 	Object.values(save.board.items).some((item) => item.x === x && item.y === y);
@@ -416,7 +418,7 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 	for (const item of Object.values(nextSave.board.items).sort(
 		(left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
 	)) {
-		placeBoardItemInInventory({
+		yield* placeBoardItemInInventoryFx({
 			config,
 			events,
 			item,

@@ -6,7 +6,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { blockedCraftCompletionRetryDelayMs } from "~/craft/craftCompletionTiming";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
@@ -185,7 +185,7 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 	}
 
 	delete nextSave.craftJobs[liveJob.id];
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: liveJob.targetItemInstanceId,
 		save: nextSave,
 	});

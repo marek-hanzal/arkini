@@ -5,7 +5,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { placeGameSaveInventoryInstanceFx } from "~/placement/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryItemsFx } from "~/placement/placeGameSaveInventoryItemsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -80,7 +80,7 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		} satisfies GameEngineResult;
 	}
 
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: item.id,
 		save: nextSave,
 	});

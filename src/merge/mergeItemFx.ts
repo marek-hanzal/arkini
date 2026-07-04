@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkItemMergeReadinessFx } from "~/merge/checkItemMergeReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
@@ -71,7 +71,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 			delete liveTarget.createdAtMs;
 		}
 		liveTarget.itemId = checked.merge.resultItemId;
-		removeBoardItemRuntimeState({
+		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: checked.target.id,
 			save: nextSave,
 		});

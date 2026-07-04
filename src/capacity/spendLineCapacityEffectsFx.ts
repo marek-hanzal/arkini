@@ -4,7 +4,7 @@ import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import {
 	readNearbyCapacitySpendSource,
 	type NearbyCapacitySpendEffect,
@@ -64,7 +64,7 @@ const createCapacityDepletedEvent = ({
 		type: "item.capacity.depleted" as const,
 	}) satisfies GameEvent;
 
-const applyDepletion = ({
+const applyDepletionFx = Effect.fn("spendLineCapacityEffectsFx.applyDepletionFx")(function* ({
 	config,
 	events,
 	nextSave,
@@ -78,7 +78,7 @@ const applyDepletion = ({
 	nowMs: number;
 	sourceItemId: string;
 	sourceItemInstanceId: string;
-}) => {
+}) {
 	const sourceItem = nextSave.board.items[sourceItemInstanceId];
 	const capacity = config.items[sourceItemId]?.capacity;
 	if (!sourceItem || !capacity || capacity.onDepleted === "stop") return;
@@ -91,7 +91,7 @@ const applyDepletion = ({
 				: sourceItem.createdAtMs,
 			itemId: capacity.replaceItemId,
 		};
-		removeBoardItemRuntimeState({
+		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: sourceItemInstanceId,
 			save: nextSave,
 		});
@@ -107,7 +107,7 @@ const applyDepletion = ({
 	}
 
 	delete nextSave.board.items[sourceItemInstanceId];
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: sourceItemInstanceId,
 		save: nextSave,
 	});
@@ -118,7 +118,7 @@ const applyDepletion = ({
 		reason: "capacity-depleted" as const,
 		type: "item.removed" as const,
 	});
-};
+});
 
 const readCapacitySpendEffects = (line: GameLineDefinition) =>
 	(line.effects ?? []).filter(
@@ -175,7 +175,7 @@ export const spendLineCapacityEffectsFx = Effect.fn("spendLineCapacityEffectsFx"
 				sourceItemInstanceId: source.itemInstanceId,
 			}),
 		);
-		applyDepletion({
+		yield* applyDepletionFx({
 			config,
 			events,
 			nextSave,

@@ -1,12 +1,17 @@
+import { Effect } from "effect";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
-export const removeBoardItemRuntimeState = ({
+export namespace removeBoardItemRuntimeStateFx {
+	export interface Props {
+		itemInstanceId: string;
+		save: GameSave;
+	}
+}
+
+export const removeBoardItemRuntimeStateFx = Effect.fn("removeBoardItemRuntimeStateFx")(function* ({
 	itemInstanceId,
 	save,
-}: {
-	itemInstanceId: string;
-	save: GameSave;
-}) => {
+}: removeBoardItemRuntimeStateFx.Props) {
 	delete save.producerCharges[itemInstanceId];
 	delete save.itemCapacities[itemInstanceId];
 	delete save.lines[itemInstanceId];
@@ -26,4 +31,4 @@ export const removeBoardItemRuntimeState = ({
 			delete save.activeEffects[effectInstanceId];
 		}
 	}
-};
+});

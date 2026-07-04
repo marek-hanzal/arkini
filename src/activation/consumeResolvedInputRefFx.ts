@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEvent } from "~/event/GameEventSchema";
 import {
@@ -35,23 +35,23 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 			{
 				kind: "board",
 			},
-			(boardRef) => {
-				delete nextSave.board.items[boardRef.itemInstanceId];
-				removeBoardItemRuntimeState({
-					itemInstanceId: boardRef.itemInstanceId,
-					save: nextSave,
-				});
-				events.push({
-					from: {
-						kind: "board",
+			(boardRef) =>
+				Effect.gen(function* () {
+					delete nextSave.board.items[boardRef.itemInstanceId];
+					yield* removeBoardItemRuntimeStateFx({
 						itemInstanceId: boardRef.itemInstanceId,
-					},
-					itemId: boardRef.itemId,
-					reason,
-					type: "item.consumed",
-				});
-				return Effect.void;
-			},
+						save: nextSave,
+					});
+					events.push({
+						from: {
+							kind: "board",
+							itemInstanceId: boardRef.itemInstanceId,
+						},
+						itemId: boardRef.itemId,
+						reason,
+						type: "item.consumed",
+					});
+				}),
 		)
 		.with(
 			{
@@ -80,7 +80,7 @@ export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(
 					}
 					if (isGameSaveInventoryInstance(slot)) {
 						nextSave.inventory.slots[inventoryRef.slotIndex] = null;
-						removeBoardItemRuntimeState({
+						yield* removeBoardItemRuntimeStateFx({
 							itemInstanceId: slot.id,
 							save: nextSave,
 						});

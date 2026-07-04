@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkTileRemoveReadinessFx } from "~/remove/checkTileRemoveReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
@@ -69,7 +69,7 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 		save: nextSave,
 	});
 	delete nextSave.board.items[checked.target.id];
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: checked.target.id,
 		save: nextSave,
 	});

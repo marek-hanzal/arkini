@@ -11,7 +11,7 @@ import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffect
 import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import { readLineDefinition } from "~/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/producer/readProducerRemainingCharges";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
@@ -149,7 +149,9 @@ const createProducerChargesDepletedRemovalEvent = ({
 	type: "item.removed" as const,
 });
 
-const spendProducerChargeCostAfterCompletedDelivery = ({
+const spendProducerChargeCostAfterCompletedDeliveryFx = Effect.fn(
+	"completeProducerJobFx.spendProducerChargeCostAfterCompletedDeliveryFx",
+)(function* ({
 	config,
 	job,
 	nextSave,
@@ -159,7 +161,7 @@ const spendProducerChargeCostAfterCompletedDelivery = ({
 	job: GameSaveProducerJob;
 	nextSave: GameSave;
 	nowMs: number;
-}) => {
+}) {
 	const outcome = readProducerChargeCompletionOutcome({
 		config,
 		job,
@@ -176,7 +178,7 @@ const spendProducerChargeCostAfterCompletedDelivery = ({
 	}
 
 	delete nextSave.board.items[job.itemInstanceId];
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: job.itemInstanceId,
 		save: nextSave,
 	});
@@ -188,7 +190,7 @@ const spendProducerChargeCostAfterCompletedDelivery = ({
 			producerId: outcome.producerId,
 		}),
 	] satisfies GameEngineCompletionResult["events"];
-};
+});
 
 const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
 	"completeProducerJobFx.rescheduleQueueAfterCompletedDeliveryFx",
@@ -266,7 +268,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			save,
 		});
 		delete nextSave.producerJobs[liveJob.id];
-		const chargeEvents = spendProducerChargeCostAfterCompletedDelivery({
+		const chargeEvents = yield* spendProducerChargeCostAfterCompletedDeliveryFx({
 			config,
 			job: liveJob,
 			nextSave,
@@ -423,7 +425,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 			placementEvents = replacedSource.events;
 			if (!replacedSource.replaced) {
 				delete placementResult.save.board.items[liveJob.itemInstanceId];
-				removeBoardItemRuntimeState({
+				yield* removeBoardItemRuntimeStateFx({
 					itemInstanceId: liveJob.itemInstanceId,
 					save: placementResult.save,
 				});
@@ -439,7 +441,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 					];
 		}
 	} else {
-		chargeEvents = spendProducerChargeCostAfterCompletedDelivery({
+		chargeEvents = yield* spendProducerChargeCostAfterCompletedDeliveryFx({
 			config,
 			job: liveJob,
 			nextSave: placementResult.save,

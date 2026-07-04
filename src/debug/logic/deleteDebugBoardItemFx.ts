@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { removeBoardItemRuntimeState } from "~/board/logic/removeBoardItemRuntimeState";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
@@ -34,7 +34,7 @@ export const deleteDebugBoardItemFx = Effect.fn("deleteDebugBoardItemFx")(functi
 		save,
 	});
 	delete nextSave.board.items[target.id];
-	removeBoardItemRuntimeState({
+	yield* removeBoardItemRuntimeStateFx({
 		itemInstanceId: target.id,
 		save: nextSave,
 	});

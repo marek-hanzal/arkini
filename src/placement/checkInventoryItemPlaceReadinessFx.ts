@@ -6,6 +6,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
+import { readInventoryStackCapacityFx } from "~/inventory/readInventoryStackCapacityFx";
 import type { GameSave, GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 import {
 	isGameSaveInventoryInstance,
@@ -76,29 +77,6 @@ const readBoardPlacementBlockReasonFx = Effect.fn(
 	})) <= 0
 		? "board:max-count"
 		: "board:full";
-});
-
-const readInventoryStackCapacityFx = Effect.fn(
-	"checkInventoryItemPlaceReadinessFx.readInventoryStackCapacityFx",
-)(function* ({
-	itemId,
-	maxStackSize,
-	slots,
-}: {
-	itemId: string;
-	maxStackSize: number;
-	slots: GameSaveInventorySlot[];
-}) {
-	return slots.reduce((capacity, slot) => {
-		return match(slot)
-			.with(null, () => capacity + maxStackSize)
-			.with(P.when(isGameSaveInventoryStack), (stack) =>
-				stack.itemId === itemId
-					? capacity + Math.max(0, maxStackSize - stack.quantity)
-					: capacity,
-			)
-			.otherwise(() => capacity);
-	}, 0);
 });
 
 const readSlotAfterInventoryRemovalFx = Effect.fn(

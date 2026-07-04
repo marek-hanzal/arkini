@@ -4,9 +4,9 @@ import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
+import { readInventoryStackCapacityFx } from "~/inventory/readInventoryStackCapacityFx";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace checkBoardItemStashReadinessFx {
@@ -16,27 +16,6 @@ export namespace checkBoardItemStashReadinessFx {
 		save: GameSave;
 	}
 }
-
-const readInventoryStackCapacity = ({
-	itemId,
-	maxStackSize,
-	save,
-}: {
-	itemId: string;
-	maxStackSize: number;
-	save: GameSave;
-}) =>
-	save.inventory.slots.reduce((capacity, slot) => {
-		if (!slot) {
-			return capacity + maxStackSize;
-		}
-
-		if (isGameSaveInventoryStack(slot) && slot.itemId === itemId) {
-			return capacity + Math.max(0, maxStackSize - slot.quantity);
-		}
-
-		return capacity;
-	}, 0);
 
 export const checkBoardItemStashReadinessFx = Effect.fn("checkBoardItemStashReadinessFx")(
 	function* ({ action, config, save }: checkBoardItemStashReadinessFx.Props) {
@@ -83,11 +62,11 @@ export const checkBoardItemStashReadinessFx = Effect.fn("checkBoardItemStashRead
 		const shouldPreserveInstance = stateStatus.preservable || item.itemId === boardMemoryItemId;
 		const hasInventoryTarget = shouldPreserveInstance
 			? save.inventory.slots.some((slot) => !slot)
-			: readInventoryStackCapacity({
+			: (yield* readInventoryStackCapacityFx({
 					itemId: item.itemId,
 					maxStackSize: itemDefinition.maxStackSize,
-					save,
-				}) >= 1;
+					slots: save.inventory.slots,
+				})) >= 1;
 
 		if (!hasInventoryTarget) {
 			return yield* Effect.fail(

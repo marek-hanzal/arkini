@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readMinGameWakeAtMs } from "~/time/GameTime";
@@ -18,13 +18,6 @@ export namespace readWorldWakePlanFx {
 	}
 }
 
-class WorldWakePlanScopeFx extends Context.Tag("WorldWakePlanScopeFx")<
-	WorldWakePlanScopeFx,
-	readWorldWakePlanFx.Props
->() {
-	//
-}
-
 const sortWakeReasons = (left: WorldWakeReason, right: WorldWakeReason) =>
 	left.atMs - right.atMs ||
 	left.reason.localeCompare(right.reason) ||
@@ -32,8 +25,7 @@ const sortWakeReasons = (left: WorldWakeReason, right: WorldWakeReason) =>
 
 const readItemSpawnJobWakeReasonsFx = Effect.fn(
 	"readWorldWakePlanFx.readItemSpawnJobWakeReasonsFx",
-)(function* () {
-	const { nowMs, save } = yield* WorldWakePlanScopeFx;
+)(function* ({ nowMs, save }: { nowMs: number | undefined; save: GameSave }) {
 	return Object.values(save.itemSpawnJobs).flatMap((job): WorldWakeReason[] => {
 		if (
 			isItemSpawnJobWaitingForDependencies({
@@ -62,8 +54,7 @@ const readItemSpawnJobWakeReasonsFx = Effect.fn(
 
 const readProducerQueueWakeReasonsFx = Effect.fn(
 	"readWorldWakePlanFx.readProducerQueueWakeReasonsFx",
-)(function* () {
-	const { nowMs, save } = yield* WorldWakePlanScopeFx;
+)(function* ({ nowMs, save }: { nowMs: number | undefined; save: GameSave }) {
 	return readWorldProducerJobFacts({
 		nowMs,
 		save,
@@ -88,8 +79,7 @@ const readProducerQueueWakeReasonsFx = Effect.fn(
 
 const readActiveEffectWakeReasonsFx = Effect.fn(
 	"readWorldWakePlanFx.readActiveEffectWakeReasonsFx",
-)(function* () {
-	const { config, nowMs, save } = yield* WorldWakePlanScopeFx;
+)(function* ({ config, nowMs, save }: readWorldWakePlanFx.Props) {
 	return readWorldActiveEffectFacts({
 		config,
 		nowMs,
@@ -131,8 +121,7 @@ const readActiveEffectWakeReasonsFx = Effect.fn(
 });
 
 const readCraftJobWakeReasonsFx = Effect.fn("readWorldWakePlanFx.readCraftJobWakeReasonsFx")(
-	function* () {
-		const { nowMs, save } = yield* WorldWakePlanScopeFx;
+	function* ({ nowMs, save }: { nowMs: number | undefined; save: GameSave }) {
 		return readWorldCraftJobFacts({
 			nowMs,
 			save,
@@ -156,27 +145,48 @@ const readCraftJobWakeReasonsFx = Effect.fn("readWorldWakePlanFx.readCraftJobWak
 	},
 );
 
-const readAllWakeReasonsFx = Effect.fn("readWorldWakePlanFx.readAllWakeReasonsFx")(function* () {
+const readAllWakeReasonsFx = Effect.fn("readWorldWakePlanFx.readAllWakeReasonsFx")(function* ({
+	config,
+	nowMs,
+	save,
+}: readWorldWakePlanFx.Props) {
 	const wakeReasonGroups = yield* Effect.all([
-		readItemSpawnJobWakeReasonsFx(),
-		readProducerQueueWakeReasonsFx(),
-		readActiveEffectWakeReasonsFx(),
-		readCraftJobWakeReasonsFx(),
+		readItemSpawnJobWakeReasonsFx({
+			nowMs,
+			save,
+		}),
+		readProducerQueueWakeReasonsFx({
+			nowMs,
+			save,
+		}),
+		readActiveEffectWakeReasonsFx({
+			config,
+			nowMs,
+			save,
+		}),
+		readCraftJobWakeReasonsFx({
+			nowMs,
+			save,
+		}),
 	]);
 	return wakeReasonGroups.flat().sort(sortWakeReasons);
 });
 
-export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* (
-	props: readWorldWakePlanFx.Props,
-) {
-	return yield* Effect.gen(function* () {
-		const wakeReasons = yield* readAllWakeReasonsFx();
-		return {
-			nextWakeAtMs: readMinGameWakeAtMs({
-				nowMs: props.nowMs,
-				values: wakeReasons.map((reason) => reason.atMs),
-			}),
-			wakeReasons,
-		} satisfies WorldWakePlanFacts;
-	}).pipe(Effect.provideService(WorldWakePlanScopeFx, props));
+export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* ({
+	config,
+	nowMs,
+	save,
+}: readWorldWakePlanFx.Props) {
+	const wakeReasons = yield* readAllWakeReasonsFx({
+		config,
+		nowMs,
+		save,
+	});
+	return {
+		nextWakeAtMs: readMinGameWakeAtMs({
+			nowMs,
+			values: wakeReasons.map((reason) => reason.atMs),
+		}),
+		wakeReasons,
+	} satisfies WorldWakePlanFacts;
 });

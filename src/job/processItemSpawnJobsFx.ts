@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
@@ -32,17 +32,9 @@ type ItemSpawnJobsProcessingState = {
 	processedExclusiveGroupKeys: Set<string>;
 };
 
-class ItemSpawnJobsProcessingScopeFx extends Context.Tag("ItemSpawnJobsProcessingScopeFx")<
-	ItemSpawnJobsProcessingScopeFx,
-	processItemSpawnJobsFx.Props
->() {
-	//
-}
-
 const createItemSpawnJobsProcessingStateFx = Effect.fn(
 	"processItemSpawnJobsFx.createItemSpawnJobsProcessingStateFx",
-)(function* () {
-	const { save } = yield* ItemSpawnJobsProcessingScopeFx;
+)(function* ({ save }: { save: GameSave }) {
 	return {
 		events: [] as GameEvent[],
 		nextSave: yield* cloneGameSaveFx({
@@ -51,16 +43,6 @@ const createItemSpawnJobsProcessingStateFx = Effect.fn(
 		processedExclusiveGroupKeys: new Set<string>(),
 	} satisfies ItemSpawnJobsProcessingState;
 });
-
-const readDueItemSpawnJobBatchFx = Effect.fn("processItemSpawnJobsFx.readDueItemSpawnJobBatchFx")(
-	function* () {
-		const { nowMs, save } = yield* ItemSpawnJobsProcessingScopeFx;
-		return yield* readDueItemSpawnJobsFx({
-			nowMs,
-			save,
-		});
-	},
-);
 
 const readItemSpawnJobSkippedFx = Effect.fn("processItemSpawnJobsFx.readItemSpawnJobSkippedFx")(
 	function* ({ job, state }: { job: DueItemSpawnJob; state: ItemSpawnJobsProcessingState }) {
@@ -83,8 +65,15 @@ const rememberProcessedExclusiveGroupFx = Effect.fn(
 
 const markBlockedItemSpawnJobForRetryFx = Effect.fn(
 	"processItemSpawnJobsFx.markBlockedItemSpawnJobForRetryFx",
-)(function* ({ job, state }: { job: DueItemSpawnJob; state: ItemSpawnJobsProcessingState }) {
-	const { nowMs } = yield* ItemSpawnJobsProcessingScopeFx;
+)(function* ({
+	job,
+	nowMs,
+	state,
+}: {
+	job: DueItemSpawnJob;
+	nowMs: number;
+	state: ItemSpawnJobsProcessingState;
+}) {
 	state.nextSave.itemSpawnJobs[job.id] = {
 		...job,
 		readyAtMs: nowMs + blockedItemSpawnJobRetryDelayMs,
@@ -97,10 +86,12 @@ const applyBlockedItemSpawnJobResultFx = Effect.fn(
 	"processItemSpawnJobsFx.applyBlockedItemSpawnJobResultFx",
 )(function* ({
 	job,
+	nowMs,
 	result,
 	state,
 }: {
 	job: DueItemSpawnJob;
+	nowMs: number;
 	result: Extract<
 		GameEngineCompletionResult,
 		{
@@ -111,6 +102,7 @@ const applyBlockedItemSpawnJobResultFx = Effect.fn(
 }) {
 	yield* markBlockedItemSpawnJobForRetryFx({
 		job,
+		nowMs,
 		state,
 	});
 	if (job.lastBlockedAtMs === undefined) {
@@ -139,10 +131,12 @@ const applyCompletedItemSpawnJobResultFx = Effect.fn(
 const applyItemSpawnJobResultFx = Effect.fn("processItemSpawnJobsFx.applyItemSpawnJobResultFx")(
 	function* ({
 		job,
+		nowMs,
 		result,
 		state,
 	}: {
 		job: DueItemSpawnJob;
+		nowMs: number;
 		result: GameEngineCompletionResult;
 		state: ItemSpawnJobsProcessingState;
 	}) {
@@ -154,6 +148,7 @@ const applyItemSpawnJobResultFx = Effect.fn("processItemSpawnJobsFx.applyItemSpa
 				(blockedResult) =>
 					applyBlockedItemSpawnJobResultFx({
 						job,
+						nowMs,
 						result: blockedResult,
 						state,
 					}),
@@ -173,7 +168,17 @@ const applyItemSpawnJobResultFx = Effect.fn("processItemSpawnJobsFx.applyItemSpa
 );
 
 const processDueItemSpawnJobFx = Effect.fn("processItemSpawnJobsFx.processDueItemSpawnJobFx")(
-	function* ({ job, state }: { job: DueItemSpawnJob; state: ItemSpawnJobsProcessingState }) {
+	function* ({
+		config,
+		job,
+		nowMs,
+		state,
+	}: {
+		config: GameConfig;
+		job: DueItemSpawnJob;
+		nowMs: number;
+		state: ItemSpawnJobsProcessingState;
+	}) {
 		if (
 			yield* readItemSpawnJobSkippedFx({
 				job,
@@ -183,7 +188,6 @@ const processDueItemSpawnJobFx = Effect.fn("processItemSpawnJobsFx.processDueIte
 			return;
 		}
 
-		const { config, nowMs } = yield* ItemSpawnJobsProcessingScopeFx;
 		const result = yield* processItemSpawnJobFx({
 			config,
 			nowMs,
@@ -197,6 +201,7 @@ const processDueItemSpawnJobFx = Effect.fn("processItemSpawnJobsFx.processDueIte
 		});
 		yield* applyItemSpawnJobResultFx({
 			job,
+			nowMs,
 			result,
 			state,
 		});
@@ -204,11 +209,25 @@ const processDueItemSpawnJobFx = Effect.fn("processItemSpawnJobsFx.processDueIte
 );
 
 const processDueItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx.processDueItemSpawnJobsFx")(
-	function* ({ dueJobs }: { dueJobs: DueItemSpawnJob[] }) {
-		const state = yield* createItemSpawnJobsProcessingStateFx();
+	function* ({
+		config,
+		dueJobs,
+		nowMs,
+		save,
+	}: {
+		config: GameConfig;
+		dueJobs: DueItemSpawnJob[];
+		nowMs: number;
+		save: GameSave;
+	}) {
+		const state = yield* createItemSpawnJobsProcessingStateFx({
+			save,
+		});
 		for (const job of dueJobs) {
 			yield* processDueItemSpawnJobFx({
+				config,
 				job,
+				nowMs,
 				state,
 			});
 		}
@@ -219,9 +238,15 @@ const processDueItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx.processDueIt
 	},
 );
 
-const processItemSpawnJobsProgramFx = Effect.fn("processItemSpawnJobsFx.programFx")(function* () {
-	const { save } = yield* ItemSpawnJobsProcessingScopeFx;
-	const dueJobs = yield* readDueItemSpawnJobBatchFx();
+export const processItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx")(function* ({
+	config,
+	save,
+	nowMs,
+}: processItemSpawnJobsFx.Props) {
+	const dueJobs = yield* readDueItemSpawnJobsFx({
+		nowMs,
+		save,
+	});
 	if (dueJobs.length === 0) {
 		return {
 			events: [] as GameEvent[],
@@ -229,14 +254,9 @@ const processItemSpawnJobsProgramFx = Effect.fn("processItemSpawnJobsFx.programF
 		};
 	}
 	return yield* processDueItemSpawnJobsFx({
+		config,
 		dueJobs,
+		nowMs,
+		save,
 	});
-});
-
-export const processItemSpawnJobsFx = Effect.fn("processItemSpawnJobsFx")(function* (
-	props: processItemSpawnJobsFx.Props,
-) {
-	return yield* processItemSpawnJobsProgramFx().pipe(
-		Effect.provideService(ItemSpawnJobsProcessingScopeFx, props),
-	);
 });

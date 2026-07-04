@@ -13,11 +13,20 @@ import type {
 	EffectiveWeightedLineOutputSubEntry,
 } from "~/effects/EffectiveLine";
 import { doesGameGrantSelectorMatchIds } from "~/effects/doesGameGrantSelectorMatchIds";
-import { readChebyshevDistance } from "~/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
+import { createAppliedGameEffectOperation } from "~/effects/createAppliedGameEffectOperation";
+import { readEffectiveLineRequirements } from "~/effects/readEffectiveLineRequirements";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
-import { doesResolvedDomainSelectorMatchId } from "~/selector/doesResolvedDomainSelectorMatchId";
-import { readNearbyCapacitySpendSource } from "~/capacity/readNearbyCapacitySpendSource";
+import {
+	readNearbyDurationMultiplier,
+	readNearbyLineEffectMatches,
+	type RuntimeItemSelector,
+} from "~/effects/readNearbyLineEffectMatches";
+import {
+	formatChancePercent,
+	readNearbyLootChanceSourceLabel,
+	readRuntimeLineEffectLabel,
+} from "~/effects/readRuntimeLineEffectLabel";
 
 export namespace readEffectiveLine {
 	export interface Props {
@@ -41,245 +50,12 @@ type NonWeightedLineOutput = Exclude<
 	}
 >;
 type DropEffect = NonNullable<NonWeightedLineOutput["effects"]>[number];
-type LineEffect = NonNullable<GameLineDefinition["effects"]>[number];
-type RuntimeLineEffect = DropEffect | LineEffect;
-
 type DropEvaluation = {
 	chanceItems: EffectiveChanceItemEntry[];
 	dropEffects: EffectiveDropEffectOutcome[];
 	enabled: boolean;
 	visible: boolean;
 };
-
-type RuntimeItemSelector = Extract<
-	RuntimeLineEffect,
-	{
-		kind: "nearby.capacity.spend" | "nearby.duration.multiply" | "nearby.require";
-	}
->["items"];
-
-type NearbyLootChanceEffect = Extract<
-	DropEffect,
-	{
-		kind: "nearby.loot.outputChance.add";
-	}
->;
-
-type NearbyLootChanceSource = NearbyLootChanceEffect["sources"][number];
-
-type NearbyLineEffect = Extract<
-	RuntimeLineEffect,
-	{
-		kind: "nearby.capacity.spend" | "nearby.duration.multiply" | "nearby.require";
-	}
->;
-
-const readItemName = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	config.items[itemId]?.name ?? itemId;
-
-const readSelectorClauseIds = (
-	clause:
-		| {
-				id: string;
-		  }
-		| {
-				ids: string[];
-		  }
-		| {
-				tag: string;
-		  },
-) => {
-	if ("ids" in clause) return clause.ids;
-	if ("id" in clause)
-		return [
-			clause.id,
-		];
-	return [];
-};
-
-const readSelectorPositiveIds = (selector: RuntimeItemSelector) => {
-	if ("mode" in selector) return [];
-
-	const ids = new Set<string>();
-	for (const clause of selector.anyOf ?? []) {
-		for (const id of readSelectorClauseIds(clause)) ids.add(id);
-	}
-	for (const clause of selector.allOf ?? []) {
-		for (const id of readSelectorClauseIds(clause)) ids.add(id);
-	}
-
-	return [
-		...ids,
-	];
-};
-
-const formatList = (values: readonly string[]) => {
-	if (values.length === 0) return "matching item";
-	if (values.length === 1) return values[0] ?? "matching item";
-	return `${values.slice(0, -1).join(", ")} or ${values[values.length - 1]}`;
-};
-
-const formatChancePercent = (chance: number) => {
-	const percent = chance * 100;
-	const rounded = Math.round(percent * 10) / 10;
-	return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)}%`;
-};
-
-const readNearbyItemSelectorLabel = ({
-	config,
-	selector,
-}: {
-	config: GameConfig;
-	selector: RuntimeItemSelector;
-}) =>
-	formatList(
-		readSelectorPositiveIds(selector).map((itemId) =>
-			readItemName({
-				config,
-				itemId,
-			}),
-		),
-	);
-
-const readNearbyLineEffectLabel = ({
-	config,
-	lineEffect,
-}: {
-	config: GameConfig;
-	lineEffect: NearbyLineEffect;
-}) => {
-	const itemLabel = readNearbyItemSelectorLabel({
-		config,
-		selector: lineEffect.items as RuntimeItemSelector,
-	});
-	if (lineEffect.kind === "nearby.duration.multiply") {
-		return `Nearby ${itemLabel} enables production`;
-	}
-	if (lineEffect.kind === "nearby.capacity.spend") {
-		return `Consumes nearby ${itemLabel} capacity`;
-	}
-	return `Nearby ${itemLabel}`;
-};
-
-const readNearbyLootChanceSourceLabel = ({
-	config,
-	source,
-}: {
-	config: GameConfig;
-	source: NearbyLootChanceSource;
-}) =>
-	source.label ??
-	`Nearby ${readNearbyItemSelectorLabel({
-		config,
-		selector: source.items as RuntimeItemSelector,
-	})}`;
-
-const readLineEffectLabel = ({
-	config,
-	fallback,
-	lineEffect,
-}: {
-	config: GameConfig;
-	fallback: string;
-	lineEffect: RuntimeLineEffect;
-}) => {
-	if (lineEffect.kind === "nearby.require" || lineEffect.kind === "nearby.capacity.spend") {
-		return readNearbyLineEffectLabel({
-			config,
-			lineEffect: lineEffect as NearbyLineEffect,
-		});
-	}
-	if (lineEffect.kind === "nearby.duration.multiply") {
-		return readNearbyLineEffectLabel({
-			config,
-			lineEffect,
-		});
-	}
-	return lineEffect.label ?? fallback;
-};
-
-const createAppliedOperation = ({
-	kind,
-	lineEffectId,
-	lineEffectName,
-	sourceId = lineEffectId,
-	sourceItemInstanceId,
-}: {
-	kind: AppliedGameEffectOperation["kind"];
-	lineEffectId: string;
-	lineEffectName: string;
-	sourceId?: string;
-	sourceItemInstanceId: string;
-}): AppliedGameEffectOperation => ({
-	effectId: lineEffectId,
-	effectName: lineEffectName,
-	kind,
-	sourceId,
-	sourceItemInstanceId,
-});
-
-const readNearbyMatches = ({
-	items,
-	radius,
-	save,
-	targetCell,
-}: {
-	items: RuntimeItemSelector;
-	radius: number;
-	save: GameSave;
-	targetCell?: BoardCell;
-}) => {
-	if (!targetCell) return [];
-
-	return Object.values(save.board.items)
-		.flatMap((item) => {
-			const cell = readGameEffectSourceCell({
-				save,
-				sourceItemInstanceId: item.id,
-			});
-			if (!cell) return [];
-			if (
-				!doesResolvedDomainSelectorMatchId({
-					entityId: item.itemId,
-					selector: items as Parameters<
-						typeof doesResolvedDomainSelectorMatchId
-					>[0]["selector"],
-				})
-			) {
-				return [];
-			}
-			const distance = readChebyshevDistance(cell, targetCell);
-			if (distance > radius) return [];
-			return [
-				{
-					distance,
-					item,
-				},
-			];
-		})
-		.sort(
-			(left, right) =>
-				left.distance - right.distance || left.item.id.localeCompare(right.item.id),
-		);
-};
-
-const readDistanceMultiplier = ({
-	bands,
-	distance,
-}: {
-	bands: Extract<
-		DropEffect,
-		{
-			kind: "nearby.duration.multiply";
-		}
-	>["bands"];
-	distance: number;
-}) =>
-	bands.find(
-		(band) =>
-			distance >= band.minDistance &&
-			(band.maxDistance === undefined || distance <= band.maxDistance),
-	)?.multiplier;
 
 const shouldDropEffectDisplay = (effect: EffectiveDropEffectOutcome) => {
 	if (effect.display === "never") return false;
@@ -335,135 +111,6 @@ const readDropEffectGrantActive = ({
 		grantIds,
 		selector: effect.selector,
 	});
-
-type LineRequirementEvaluation = Pick<
-	EffectiveLine,
-	"blocked" | "blockReasons" | "requirements" | "startRequirementsReady"
->;
-
-const shouldLineRequirementDisplay = (requirement: EffectiveLine["requirements"][number]) => {
-	if (requirement.display === "never") return false;
-	if (requirement.display === "always") return true;
-	if (requirement.display === "whenMissing") return !requirement.ready;
-	return requirement.ready;
-};
-
-const readLineRequirements = ({
-	config,
-	grantIds,
-	itemInstanceId,
-	ignoreCapacitySpendRequirements,
-	line,
-	lineId,
-	save,
-	targetCell,
-}: {
-	config: GameConfig;
-	grantIds: ReadonlySet<string>;
-	itemInstanceId: string;
-	ignoreCapacitySpendRequirements?: boolean;
-	line: GameLineDefinition;
-	lineId: string;
-	save: GameSave;
-	targetCell?: BoardCell;
-}): LineRequirementEvaluation => {
-	const requirements: EffectiveLine["requirements"] = [];
-	const blockReasons: EffectiveLine["blockReasons"] = [];
-	let startRequirementsReady = true;
-	let blocked = false;
-
-	for (const [effectIndex, effect] of (line.effects ?? []).entries()) {
-		const effectId = `${lineId}:effect:${effectIndex}`;
-		const effectName = readLineEffectLabel({
-			config,
-			fallback: effect.kind,
-			lineEffect: effect,
-		});
-
-		if (effect.kind === "grant.require") {
-			const ready = doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: effect.selector,
-			});
-			if (effect.phase === "start" && !ready) startRequirementsReady = false;
-			const requirement = {
-				display: effect.display,
-				kind: effect.kind,
-				label: effect.label ?? effectName,
-				phase: effect.phase,
-				ready,
-			};
-			if (shouldLineRequirementDisplay(requirement)) requirements.push(requirement);
-			continue;
-		}
-
-		if (effect.kind === "nearby.require") {
-			const ready =
-				readNearbyMatches({
-					items: effect.items as RuntimeItemSelector,
-					radius: effect.radius,
-					save,
-					targetCell,
-				}).length > 0;
-			if (effect.phase === "start" && !ready) startRequirementsReady = false;
-			const requirement = {
-				display: effect.display,
-				kind: effect.kind,
-				label: effect.label ?? effectName,
-				phase: effect.phase,
-				ready,
-			};
-			if (shouldLineRequirementDisplay(requirement)) requirements.push(requirement);
-			continue;
-		}
-
-		if (effect.kind === "nearby.capacity.spend") {
-			if (ignoreCapacitySpendRequirements) continue;
-			const source = readNearbyCapacitySpendSource({
-				config,
-				effect,
-				itemInstanceId,
-				save,
-			});
-			const ready = source !== undefined;
-			if (!ready) startRequirementsReady = false;
-			const requirement = {
-				display: effect.display,
-				kind: effect.kind,
-				label: effect.label ?? effectName,
-				phase: "start" as const,
-				ready,
-			};
-			if (shouldLineRequirementDisplay(requirement)) requirements.push(requirement);
-			continue;
-		}
-
-		if (effect.kind === "grant.blockStart") {
-			const active = doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: effect.selector,
-			});
-			if (active) {
-				blocked = true;
-				blockReasons.push(
-					createAppliedOperation({
-						kind: effect.kind,
-						lineEffectId: effectId,
-						lineEffectName: effectName,
-						sourceItemInstanceId: itemInstanceId,
-					}),
-				);
-			}
-		}
-	}
-
-	return {
-		blocked,
-		blockReasons,
-		requirements,
-		startRequirementsReady,
-	};
-};
 
 const applyRequirementDropEffect = ({
 	chanceItems,
@@ -595,8 +242,8 @@ const applyNearbyRequirementDropEffect = ({
 		effect,
 		enabled,
 		ready:
-			readNearbyMatches({
-				items: effect.items as Parameters<typeof readNearbyMatches>[0]["items"],
+			readNearbyLineEffectMatches({
+				items: effect.items as Parameters<typeof readNearbyLineEffectMatches>[0]["items"],
 				radius: effect.radius,
 				save,
 				targetCell,
@@ -725,7 +372,7 @@ const applyNearbyLootChanceDropEffect = ({
 	let totalChance = 0;
 
 	for (const [sourceIndex, source] of effect.sources.entries()) {
-		const matches = readNearbyMatches({
+		const matches = readNearbyLineEffectMatches({
 			items: source.items as RuntimeItemSelector,
 			radius: effect.radius,
 			save,
@@ -969,7 +616,7 @@ const readEffectiveDrop = ({
 
 	for (const [dropEffectIndex, effect] of (dropEffects ?? []).entries()) {
 		const dropEffectId = `${dropEffectIdPrefix}:effect:${dropEffectIndex}`;
-		const dropEffectName = readLineEffectLabel({
+		const dropEffectName = readRuntimeLineEffectLabel({
 			config,
 			fallback: effect.kind,
 			lineEffect: effect,
@@ -1024,28 +671,28 @@ const readOutputDurationEffects = ({
 
 	for (const [dropEffectIndex, effect] of (dropEffects ?? []).entries()) {
 		const effectId = `${dropEffectIdPrefix}:effect:${dropEffectIndex}`;
-		const effectName = readLineEffectLabel({
+		const effectName = readRuntimeLineEffectLabel({
 			config,
 			fallback: effect.kind,
 			lineEffect: effect,
 		});
 
 		if (effect.kind === "nearby.duration.multiply") {
-			const matches = readNearbyMatches({
+			const matches = readNearbyLineEffectMatches({
 				items: effect.items as RuntimeItemSelector,
 				radius: effect.radius,
 				save,
 				targetCell,
 			}).slice(0, effect.maxSources ?? Number.POSITIVE_INFINITY);
 			for (const match of matches) {
-				const multiplier = readDistanceMultiplier({
+				const multiplier = readNearbyDurationMultiplier({
 					bands: effect.bands,
 					distance: match.distance,
 				});
 				if (multiplier === undefined) continue;
 				durationMultiplier *= multiplier;
 				appliedEffects.push(
-					createAppliedOperation({
+					createAppliedGameEffectOperation({
 						kind: effect.kind,
 						lineEffectId: effectId,
 						lineEffectName: effectName,
@@ -1066,7 +713,7 @@ const readOutputDurationEffects = ({
 
 			durationMultiplier *= effect.multiplier;
 			appliedEffects.push(
-				createAppliedOperation({
+				createAppliedGameEffectOperation({
 					kind: effect.kind,
 					lineEffectId: effectId,
 					lineEffectName: effectName,
@@ -1259,7 +906,7 @@ export const readEffectiveLine = ({
 		save,
 		targetCell,
 	});
-	const lineRequirements = readLineRequirements({
+	const lineRequirements = readEffectiveLineRequirements({
 		config,
 		grantIds,
 		ignoreCapacitySpendRequirements,

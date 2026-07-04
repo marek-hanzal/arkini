@@ -3,7 +3,7 @@ import { checkItemMergeReadinessFx } from "~/merge/checkItemMergeReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
-import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
+import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
@@ -85,7 +85,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		});
 	}
 
-	const seedCell = readBoardItemCell({
+	const seedCell = yield* readBoardItemCellFx({
 		itemInstanceId: checked.target.id,
 		save: nextSave,
 	});

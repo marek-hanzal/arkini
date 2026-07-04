@@ -1,8 +1,8 @@
 import { Effect } from "effect";
-import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
+import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
-import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
+import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -77,14 +77,14 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 			);
 		}
 		if (
-			readBoardItemMaxCountCapacity({
+			(yield* readBoardItemMaxCountCapacityFx({
 				config,
 				ignoredBoardItemInstanceIds: new Set([
 					target.id,
 				]),
 				itemId: merge.resultItemId,
 				save,
-			}) <= 0
+			})) <= 0
 		) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(

@@ -4,7 +4,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/producer/producerDeliveryTiming";
-import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
+import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
@@ -299,7 +299,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 		items: deliveryItems,
 		itemInstanceId: liveJob.itemInstanceId,
 	});
-	const seedCell = readBoardItemCell({
+	const seedCell = yield* readBoardItemCellFx({
 		itemInstanceId: liveJob.itemInstanceId,
 		save,
 	});

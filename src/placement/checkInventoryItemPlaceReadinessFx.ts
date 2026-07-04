@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
-import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
+import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
 import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
@@ -27,43 +27,34 @@ const readEmptyBoardCellCount = ({ config, save }: { config: GameConfig; save: G
 	return Math.max(0, boardCellCount - Object.keys(save.board.items).length);
 };
 
-const readBoardPlacementCapacity = ({
-	config,
-	itemId,
-	save,
-}: {
-	config: GameConfig;
-	itemId: string;
-	save: GameSave;
-}) =>
-	Math.min(
+const readBoardPlacementCapacityFx = Effect.fn(
+	"checkInventoryItemPlaceReadinessFx.readBoardPlacementCapacityFx",
+)(function* ({ config, itemId, save }: { config: GameConfig; itemId: string; save: GameSave }) {
+	const boardItemMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
+		config,
+		itemId,
+		save,
+	});
+	return Math.min(
 		readEmptyBoardCellCount({
 			config,
 			save,
 		}),
-		readBoardItemMaxCountCapacity({
-			config,
-			itemId,
-			save,
-		}),
+		boardItemMaxCountCapacity,
 	);
+});
 
-const readBoardPlacementBlockReason = ({
-	config,
-	itemId,
-	save,
-}: {
-	config: GameConfig;
-	itemId: string;
-	save: GameSave;
-}) =>
-	readBoardItemMaxCountCapacity({
+const readBoardPlacementBlockReasonFx = Effect.fn(
+	"checkInventoryItemPlaceReadinessFx.readBoardPlacementBlockReasonFx",
+)(function* ({ config, itemId, save }: { config: GameConfig; itemId: string; save: GameSave }) {
+	return (yield* readBoardItemMaxCountCapacityFx({
 		config,
 		itemId,
 		save,
-	}) <= 0
+	})) <= 0
 		? "board:max-count"
 		: "board:full";
+});
 
 const readInventoryStackCapacity = ({
 	itemId,
@@ -194,13 +185,12 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 		}
 
 		if (placementMode === "exact") {
-			if (
-				readBoardItemMaxCountCapacity({
-					config,
-					itemId: slot.itemId,
-					save,
-				}) <= 0
-			) {
+			const boardItemMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
+				config,
+				itemId: slot.itemId,
+				save,
+			});
+			if (boardItemMaxCountCapacity <= 0) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
 						"board:max-count",
@@ -233,16 +223,15 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 				);
 			}
 
-			if (
-				readBoardPlacementCapacity({
-					config,
-					itemId: liveSlot.itemId,
-					save,
-				}) === 0
-			) {
+			const boardPlacementCapacity = yield* readBoardPlacementCapacityFx({
+				config,
+				itemId: liveSlot.itemId,
+				save,
+			});
+			if (boardPlacementCapacity === 0) {
 				return yield* Effect.fail(
 					GameEngineError.actionRejected(
-						readBoardPlacementBlockReason({
+						yield* readBoardPlacementBlockReasonFx({
 							config,
 							itemId: liveSlot.itemId,
 							save,
@@ -277,7 +266,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 			};
 		}
 
-		const boardCapacity = readBoardPlacementCapacity({
+		const boardCapacity = yield* readBoardPlacementCapacityFx({
 			config,
 			itemId: liveSlot.itemId,
 			save,
@@ -299,7 +288,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 		if (allowedBoardCapacity === 0) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
-					readBoardPlacementBlockReason({
+					yield* readBoardPlacementBlockReasonFx({
 						config,
 						itemId: liveSlot.itemId,
 						save,
@@ -318,7 +307,7 @@ export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemP
 		if (quantity > allowedBoardCapacity + inventoryCapacity) {
 			const reason =
 				boardCapacity === 0
-					? readBoardPlacementBlockReason({
+					? yield* readBoardPlacementBlockReasonFx({
 							config,
 							itemId: liveSlot.itemId,
 							save,

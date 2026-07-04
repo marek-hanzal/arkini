@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
-import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
+import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
@@ -75,7 +75,7 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 		const quantity = action.quantity ?? 1;
 
 		if (action.location === "board") {
-			const boardMaxCountCapacity = readBoardItemMaxCountCapacity({
+			const boardMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
 				config,
 				itemId: action.itemId,
 				save,

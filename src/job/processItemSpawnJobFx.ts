@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
-import { readBoardItemCell } from "~/board/logic/readBoardItemCell";
+import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
@@ -29,10 +29,10 @@ export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function
 }: processItemSpawnJobFx.Props) {
 	const seedCell =
 		itemSpawnJob.seedCell ??
-		readBoardItemCell({
+		(yield* readBoardItemCellFx({
 			itemInstanceId: itemSpawnJob.originItemInstanceId,
 			save,
-		});
+		}));
 	const placementEither = yield* Effect.either(
 		placeGameSaveItemsFx({
 			config,

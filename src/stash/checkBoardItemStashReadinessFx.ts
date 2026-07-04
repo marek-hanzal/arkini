@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
-import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
+import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";

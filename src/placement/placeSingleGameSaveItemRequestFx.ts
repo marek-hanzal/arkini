@@ -4,7 +4,7 @@ import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
-import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
+import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
 import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { BoardCell } from "~/board/BoardCellPosition";
@@ -65,12 +65,12 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 
 		while (canPlaceOnBoard && remainingQuantity > 0) {
 			if (
-				readBoardItemMaxCountCapacity({
+				(yield* readBoardItemMaxCountCapacityFx({
 					config,
 					ignoredBoardItemInstanceIds: freedBoardItemInstanceIds,
 					itemId: item.itemId,
 					save,
-				}) <= 0
+				})) <= 0
 			) {
 				boardHitMaxCount = true;
 				break;

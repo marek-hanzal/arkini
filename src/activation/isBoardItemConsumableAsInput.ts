@@ -1,4 +1,4 @@
-import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
+import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export const isBoardItemConsumableAsInput = ({

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/activation/checkActivationInputsFx";
 import { planLineAutoFillInputRefsFx } from "~/producer/planLineAutoFillInputRefsFx";
-import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
+import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { readProducerRuntimeTargetFx } from "~/producer/readProducerRuntimeTargetFx";
 import { readDefaultEffectLineId } from "~/producer/readDefaultEffectLineId";
 import { readDefaultLineId } from "~/producer/readDefaultLineId";

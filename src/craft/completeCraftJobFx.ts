@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
-import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
+import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
@@ -155,14 +155,14 @@ export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
 	}
 
 	if (
-		readBoardItemMaxCountCapacity({
+		(yield* readBoardItemMaxCountCapacityFx({
 			config,
 			ignoredBoardItemInstanceIds: new Set([
 				liveJob.targetItemInstanceId,
 			]),
 			itemId: recipe.resultItemId,
 			save,
-		}) <= 0
+		})) <= 0
 	) {
 		return yield* completeBlockedCraftJobFx({
 			job: liveJob,

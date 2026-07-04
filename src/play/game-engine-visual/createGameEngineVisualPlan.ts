@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
@@ -21,12 +22,84 @@ import { findMergeResultEventIndex } from "~/play/game-engine-visual/findMergeRe
 import { findActivationInputTargetEventIndex } from "~/play/game-engine-visual/findActivationInputTargetEventIndex";
 import { shouldAnimateActivationInputStoreVisual } from "~/play/game-engine-visual/shouldAnimateActivationInputStoreVisual";
 
-type ActivationInputStoredEvent = Extract<
+type GameEventOfType<TType extends GameEvent["type"]> = Extract<
 	GameEvent,
 	{
-		type: "producer_input.stored" | "craft_input.stored";
+		type: TType;
 	}
 >;
+
+type ActivationInputStoredEvent = GameEventOfType<"producer_input.stored" | "craft_input.stored">;
+
+type BoardMemoryEvent = GameEventOfType<
+	"board.memory.saved" | "board.memory.restored" | "board.memory.cleared"
+>;
+
+type VisualPlanContext = createGameEngineVisualPlan.Props & {
+	animatedCraftStageTargetIds: Set<string>;
+	boardMemoryItemInstanceId?: string;
+	createdSequenceIndex: number;
+	deferredStashDepletionRemovals: GameEventOfType<"item.removed">[];
+	memoryRestoreOriginTileId?: string;
+	memoryRestoreSequenceIndex: number;
+	plan: GameEngineVisualPlanDraft;
+	skipped: Set<number>;
+};
+
+const ignoredEventTypeValues = [
+	"craft.completed",
+	"craft.blocked",
+	"craft.failed",
+	"effect.activated",
+	"effect.expired",
+	"craft.started",
+	"craft_input.withdrawn",
+	"item.spawn.blocked",
+	"item.spawn.failed",
+	"line.default_changed",
+	"cheat.speed_mode.changed",
+	"item.capacity.changed",
+	"item.capacity.depleted",
+	"producer_input.withdrawn",
+	"line.blocked",
+	"line.failed",
+	"line.started",
+] as const satisfies readonly GameEvent["type"][];
+
+type IgnoredVisualEventType = (typeof ignoredEventTypeValues)[number];
+type IgnoredVisualEvent = Extract<
+	GameEvent,
+	{
+		type: IgnoredVisualEventType;
+	}
+>;
+const ignoredEventTypes = new Set<GameEvent["type"]>(ignoredEventTypeValues);
+
+const isIgnoredVisualEvent = (event: GameEvent): event is IgnoredVisualEvent =>
+	ignoredEventTypes.has(event.type);
+
+const readBoardMemoryItemInstanceId = (events: readonly GameEvent[]) =>
+	events.find(
+		(event) =>
+			event.type === "board.memory.saved" ||
+			event.type === "board.memory.restored" ||
+			event.type === "board.memory.cleared",
+	)?.boardItemId;
+
+const createVisualPlanContext = (props: createGameEngineVisualPlan.Props): VisualPlanContext => ({
+	...props,
+	animatedCraftStageTargetIds: new Set<string>(),
+	boardMemoryItemInstanceId: readBoardMemoryItemInstanceId(props.events),
+	createdSequenceIndex: 0,
+	deferredStashDepletionRemovals: [],
+	memoryRestoreSequenceIndex: 0,
+	plan: createGameEngineVisualPlanDraft(),
+	skipped: new Set<number>(),
+});
+
+const ignoreVisualEvent = ({ plan }: VisualPlanContext, event: GameEvent) => {
+	plan.ignoredEventTypes.push(event.type);
+};
 
 const appendActivationInputTargetVisuals = ({
 	animatedCraftStageTargetIds,
@@ -69,249 +142,348 @@ export namespace createGameEngineVisualPlan {
 	}
 }
 
-export const createGameEngineVisualPlan = ({
-	currentBoard,
-	currentInventory,
-	events,
-	previousBoard,
-}: createGameEngineVisualPlan.Props): GameEngineVisualPlan => {
-	const plan = createGameEngineVisualPlanDraft();
-	const skipped = new Set<number>();
-	const animatedCraftStageTargetIds = new Set<string>();
-	const deferredStashDepletionRemovals: Extract<
-		GameEvent,
-		{
-			type: "item.removed";
-		}
-	>[] = [];
-	let createdSequenceIndex = 0;
-	let memoryRestoreOriginTileId: string | undefined;
-	let memoryRestoreSequenceIndex = 0;
-	const boardMemoryItemInstanceId = events.find(
-		(event) =>
-			event.type === "board.memory.saved" ||
-			event.type === "board.memory.restored" ||
-			event.type === "board.memory.cleared",
-	)?.boardItemId;
-
-	for (const [index, event] of events.entries()) {
-		if (skipped.has(index)) continue;
-
-		switch (event.type) {
-			case "item.created": {
-				if (event.reason === "memory-restore") {
-					appendBoardMemoryRestoreVisuals({
-						currentBoard,
-						event,
-						plan,
-						restoreOriginTileId: memoryRestoreOriginTileId,
-						sequenceIndex: memoryRestoreSequenceIndex,
-					});
-					memoryRestoreSequenceIndex += 1;
-					break;
-				}
-
-				const sequenceIndex = event.spawnSequenceIndex ?? createdSequenceIndex;
-				appendItemCreatedVisuals({
-					currentBoard,
-					currentInventory,
-					event,
-					plan,
-					sequenceIndex,
-				});
-				createdSequenceIndex = Math.max(createdSequenceIndex + 1, sequenceIndex + 1);
-				break;
-			}
-
-			case "item.consumed": {
-				if (event.reason === "memory-store") {
-					const transientTileId = appendBoardMemoryStoreVisuals({
-						event,
-						memoryItemInstanceId: boardMemoryItemInstanceId,
-						plan,
-						previousBoard,
-						sequenceIndex: createdSequenceIndex,
-					});
-					if (
-						event.from.kind === "board" &&
-						event.from.itemInstanceId === boardMemoryItemInstanceId
-					) {
-						memoryRestoreOriginTileId = transientTileId ?? event.from.itemInstanceId;
-					}
-					createdSequenceIndex += 1;
-					break;
-				}
-
-				if (event.reason === "merge-source") {
-					const replacementIndex = findMergeResultEventIndex({
-						afterIndex: index,
-						events,
-						skipped,
-					});
-					const replacement = events[replacementIndex];
-					if (replacement?.type === "item.replaced") {
-						skipped.add(replacementIndex);
-						appendItemMergeVisuals({
-							currentBoard,
-							plan,
-							previousBoard,
-							replaced: replacement,
-							source: event,
-						});
-						break;
-					}
-				}
-
-				if (
-					event.reason === "producer-input-auto-fill" ||
-					event.reason === "craft-input-auto-fill"
-				) {
-					const targetIndex = findActivationInputTargetEventIndex({
-						afterIndex: index,
-						events,
-						skipped,
-						source: event,
-					});
-					const target = events[targetIndex];
-					if (
-						target?.type === "producer_input.stored" ||
-						target?.type === "craft_input.stored"
-					) {
-						skipped.add(targetIndex);
-						appendActivationInputTargetVisuals({
-							animatedCraftStageTargetIds,
-							currentBoard,
-							plan,
-							previousBoard,
-							target,
-						});
-
-						if (
-							shouldAnimateActivationInputStoreVisual({
-								target,
-							})
-						) {
-							appendActivationInputStoreVisuals({
-								plan,
-								previousBoard,
-								source: event,
-								target,
-							});
-						}
-
-						break;
-					}
-				}
-
-				plan.ignoredEventTypes.push(event.type);
-				break;
-			}
-
-			case "item.replaced":
-				appendItemReplaceVisuals({
-					currentBoard,
-					event,
-					plan,
-					previousBoard,
-				});
-				break;
-
-			case "producer_input.stored":
-			case "craft_input.stored":
-				appendActivationInputTargetVisuals({
-					animatedCraftStageTargetIds,
-					currentBoard,
-					plan,
-					previousBoard,
-					target: event,
-				});
-				break;
-
-			case "line.completed":
-				appendLineCompletedFeedback({
-					event,
-					plan,
-				});
-				break;
-
-			case "item.removed":
-				if (event.reason === "producer-depleted") {
-					deferredStashDepletionRemovals.push(event);
-				} else if (event.reason !== "debug-delete") {
-					appendRemovedBoardItemVisuals({
-						currentBoard,
-						event,
-						plan,
-						previousBoard,
-					});
-				}
-				plan.ignoredEventTypes.push(event.type);
-				break;
-			case "craft.completed":
-			case "craft.blocked":
-			case "craft.failed":
-			case "effect.activated":
-			case "effect.expired":
-			case "craft.started":
-			case "craft_input.withdrawn":
-			case "item.spawn.blocked":
-			case "item.spawn.failed":
-			case "line.default_changed":
-				plan.ignoredEventTypes.push(event.type);
-				break;
-			case "board.memory.saved":
-				appendBoardTileBounceFeedback({
-					durationMs: 520,
-					groupId: `engine:memory-saved-feedback:${event.boardItemId}:${event.atMs}`,
-					plan,
-					tileId: event.boardItemId,
-				});
-				plan.ignoredEventTypes.push(event.type);
-				break;
-			case "board.memory.restored":
-				appendBoardTileBounceFeedback({
-					durationMs: 380,
-					groupId: `engine:memory-restored-feedback:${event.boardItemId}:${event.atMs}`,
-					plan,
-					pulseCount: 2,
-					tileId: event.boardItemId,
-				});
-				plan.ignoredEventTypes.push(event.type);
-				break;
-			case "board.memory.cleared":
-				appendBoardTileBounceFeedback({
-					durationMs: 420,
-					groupId: `engine:memory-cleared-feedback:${event.boardItemId}:${event.atMs}`,
-					plan,
-					tileId: event.boardItemId,
-				});
-				plan.ignoredEventTypes.push(event.type);
-				break;
-			case "cheat.speed_mode.changed":
-			case "item.capacity.changed":
-			case "item.capacity.depleted":
-			case "producer_input.withdrawn":
-			case "line.blocked":
-			case "line.failed":
-			case "line.started":
-				plan.ignoredEventTypes.push(event.type);
-				break;
-
-			default: {
-				const exhaustive: never = event;
-				return exhaustive;
-			}
-		}
+const appendItemCreatedEventVisuals = (
+	context: VisualPlanContext,
+	event: GameEventOfType<"item.created">,
+) => {
+	if (event.reason === "memory-restore") {
+		appendBoardMemoryRestoreVisuals({
+			currentBoard: context.currentBoard,
+			event,
+			plan: context.plan,
+			restoreOriginTileId: context.memoryRestoreOriginTileId,
+			sequenceIndex: context.memoryRestoreSequenceIndex,
+		});
+		context.memoryRestoreSequenceIndex += 1;
+		return;
 	}
 
-	for (const event of deferredStashDepletionRemovals) {
-		appendRemovedBoardItemVisuals({
-			currentBoard,
-			event,
-			plan,
-			previousBoard,
+	const sequenceIndex = event.spawnSequenceIndex ?? context.createdSequenceIndex;
+	appendItemCreatedVisuals({
+		currentBoard: context.currentBoard,
+		currentInventory: context.currentInventory,
+		event,
+		plan: context.plan,
+		sequenceIndex,
+	});
+	context.createdSequenceIndex = Math.max(context.createdSequenceIndex + 1, sequenceIndex + 1);
+};
+
+const appendBoardMemoryStoreEventVisuals = (
+	context: VisualPlanContext,
+	event: GameEventOfType<"item.consumed">,
+) => {
+	const transientTileId = appendBoardMemoryStoreVisuals({
+		event,
+		memoryItemInstanceId: context.boardMemoryItemInstanceId,
+		plan: context.plan,
+		previousBoard: context.previousBoard,
+		sequenceIndex: context.createdSequenceIndex,
+	});
+	if (
+		event.from.kind === "board" &&
+		event.from.itemInstanceId === context.boardMemoryItemInstanceId
+	) {
+		context.memoryRestoreOriginTileId = transientTileId ?? event.from.itemInstanceId;
+	}
+	context.createdSequenceIndex += 1;
+};
+
+const appendMergeSourceEventVisuals = ({
+	context,
+	event,
+	index,
+}: {
+	context: VisualPlanContext;
+	event: GameEventOfType<"item.consumed">;
+	index: number;
+}) => {
+	const replacementIndex = findMergeResultEventIndex({
+		afterIndex: index,
+		events: context.events,
+		skipped: context.skipped,
+	});
+	const replacement = context.events[replacementIndex];
+	if (replacement?.type !== "item.replaced") return false;
+
+	context.skipped.add(replacementIndex);
+	appendItemMergeVisuals({
+		currentBoard: context.currentBoard,
+		plan: context.plan,
+		previousBoard: context.previousBoard,
+		replaced: replacement,
+		source: event,
+	});
+	return true;
+};
+
+const appendActivationInputAutoFillEventVisuals = ({
+	context,
+	event,
+	index,
+}: {
+	context: VisualPlanContext;
+	event: GameEventOfType<"item.consumed">;
+	index: number;
+}) => {
+	const targetIndex = findActivationInputTargetEventIndex({
+		afterIndex: index,
+		events: context.events,
+		skipped: context.skipped,
+		source: event,
+	});
+	const target = context.events[targetIndex];
+	if (target?.type !== "producer_input.stored" && target?.type !== "craft_input.stored") {
+		return false;
+	}
+
+	context.skipped.add(targetIndex);
+	appendActivationInputTargetVisuals({
+		animatedCraftStageTargetIds: context.animatedCraftStageTargetIds,
+		currentBoard: context.currentBoard,
+		plan: context.plan,
+		previousBoard: context.previousBoard,
+		target,
+	});
+
+	if (
+		shouldAnimateActivationInputStoreVisual({
+			target,
+		})
+	) {
+		appendActivationInputStoreVisuals({
+			plan: context.plan,
+			previousBoard: context.previousBoard,
+			source: event,
+			target,
 		});
 	}
 
-	return plan;
+	return true;
+};
+
+const appendItemConsumedEventVisuals = ({
+	context,
+	event,
+	index,
+}: {
+	context: VisualPlanContext;
+	event: GameEventOfType<"item.consumed">;
+	index: number;
+}) => {
+	const handled = match(event.reason)
+		.with("memory-store", () => {
+			appendBoardMemoryStoreEventVisuals(context, event);
+			return true;
+		})
+		.with("merge-source", () =>
+			appendMergeSourceEventVisuals({
+				context,
+				event,
+				index,
+			}),
+		)
+		.with("producer-input-auto-fill", "craft-input-auto-fill", () =>
+			appendActivationInputAutoFillEventVisuals({
+				context,
+				event,
+				index,
+			}),
+		)
+		.with(
+			"line-input",
+			"producer-input-store",
+			"craft-input",
+			"craft-input-store",
+			"inventory-placement",
+			"board-stash",
+			"remove-tool",
+			"memory-restore",
+			() => false,
+		)
+		.exhaustive();
+	if (!handled) ignoreVisualEvent(context, event);
+};
+
+const appendActivationInputStoredEventVisuals = (
+	context: VisualPlanContext,
+	event: ActivationInputStoredEvent,
+) =>
+	appendActivationInputTargetVisuals({
+		animatedCraftStageTargetIds: context.animatedCraftStageTargetIds,
+		currentBoard: context.currentBoard,
+		plan: context.plan,
+		previousBoard: context.previousBoard,
+		target: event,
+	});
+
+const appendItemRemovedEventVisuals = (
+	context: VisualPlanContext,
+	event: GameEventOfType<"item.removed">,
+) => {
+	if (event.reason === "producer-depleted") {
+		context.deferredStashDepletionRemovals.push(event);
+	} else if (event.reason !== "debug-delete") {
+		appendRemovedBoardItemVisuals({
+			currentBoard: context.currentBoard,
+			event,
+			plan: context.plan,
+			previousBoard: context.previousBoard,
+		});
+	}
+	ignoreVisualEvent(context, event);
+};
+
+const appendBoardMemoryFeedbackEventVisuals = (
+	context: VisualPlanContext,
+	event: BoardMemoryEvent,
+) => {
+	const feedback = match(event.type)
+		.with("board.memory.saved", () => ({
+			durationMs: 520,
+			groupId: `engine:memory-saved-feedback:${event.boardItemId}:${event.atMs}`,
+			pulseCount: undefined,
+		}))
+		.with("board.memory.restored", () => ({
+			durationMs: 380,
+			groupId: `engine:memory-restored-feedback:${event.boardItemId}:${event.atMs}`,
+			pulseCount: 2,
+		}))
+		.with("board.memory.cleared", () => ({
+			durationMs: 420,
+			groupId: `engine:memory-cleared-feedback:${event.boardItemId}:${event.atMs}`,
+			pulseCount: undefined,
+		}))
+		.exhaustive();
+
+	appendBoardTileBounceFeedback({
+		durationMs: feedback.durationMs,
+		groupId: feedback.groupId,
+		plan: context.plan,
+		pulseCount: feedback.pulseCount,
+		tileId: event.boardItemId,
+	});
+	ignoreVisualEvent(context, event);
+};
+
+const appendVisualPlanEvent = ({
+	context,
+	event,
+	index,
+}: {
+	context: VisualPlanContext;
+	event: GameEvent;
+	index: number;
+}) => {
+	if (isIgnoredVisualEvent(event)) {
+		ignoreVisualEvent(context, event);
+		return;
+	}
+
+	return match(event)
+		.with(
+			{
+				type: "item.created",
+			},
+			(matchedEvent) => appendItemCreatedEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "item.consumed",
+			},
+			(matchedEvent) =>
+				appendItemConsumedEventVisuals({
+					context,
+					event: matchedEvent,
+					index,
+				}),
+		)
+		.with(
+			{
+				type: "item.replaced",
+			},
+			(matchedEvent) =>
+				appendItemReplaceVisuals({
+					currentBoard: context.currentBoard,
+					event: matchedEvent,
+					plan: context.plan,
+					previousBoard: context.previousBoard,
+				}),
+		)
+		.with(
+			{
+				type: "producer_input.stored",
+			},
+			(matchedEvent) => appendActivationInputStoredEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "craft_input.stored",
+			},
+			(matchedEvent) => appendActivationInputStoredEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "line.completed",
+			},
+			(matchedEvent) =>
+				appendLineCompletedFeedback({
+					event: matchedEvent,
+					plan: context.plan,
+				}),
+		)
+		.with(
+			{
+				type: "item.removed",
+			},
+			(matchedEvent) => appendItemRemovedEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "board.memory.saved",
+			},
+			(matchedEvent) => appendBoardMemoryFeedbackEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "board.memory.restored",
+			},
+			(matchedEvent) => appendBoardMemoryFeedbackEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "board.memory.cleared",
+			},
+			(matchedEvent) => appendBoardMemoryFeedbackEventVisuals(context, matchedEvent),
+		)
+		.exhaustive();
+};
+
+const appendDeferredVisualPlanEvents = (context: VisualPlanContext) => {
+	for (const event of context.deferredStashDepletionRemovals) {
+		appendRemovedBoardItemVisuals({
+			currentBoard: context.currentBoard,
+			event,
+			plan: context.plan,
+			previousBoard: context.previousBoard,
+		});
+	}
+};
+
+export const createGameEngineVisualPlan = (
+	props: createGameEngineVisualPlan.Props,
+): GameEngineVisualPlan => {
+	const context = createVisualPlanContext(props);
+
+	for (const [index, event] of props.events.entries()) {
+		if (context.skipped.has(index)) continue;
+		appendVisualPlanEvent({
+			context,
+			event,
+			index,
+		});
+	}
+
+	appendDeferredVisualPlanEvents(context);
+	return context.plan;
 };

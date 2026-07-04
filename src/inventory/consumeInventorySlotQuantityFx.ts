@@ -9,6 +9,7 @@ import {
 	readGameSaveInventorySlotQuantity,
 } from "~/inventory/model/GameSaveInventorySlot";
 import { readInventorySlotAfterQuantityRemovalFx } from "~/inventory/readInventorySlotAfterQuantityRemovalFx";
+import { writeInventorySlotFx } from "~/inventory/writeInventorySlotFx";
 
 export namespace consumeInventorySlotQuantityFx {
 	export interface Props {
@@ -67,9 +68,13 @@ export const consumeInventorySlotQuantityFx = Effect.fn("consumeInventorySlotQua
 			);
 		}
 
-		nextSave.inventory.slots[slotIndex] = yield* readInventorySlotAfterQuantityRemovalFx({
-			quantity,
-			slot,
+		yield* writeInventorySlotFx({
+			slot: yield* readInventorySlotAfterQuantityRemovalFx({
+				quantity,
+				slot,
+			}),
+			slotIndex,
+			slots: nextSave.inventory.slots,
 		});
 		if (runtimeState === "remove-instance" && isGameSaveInventoryInstance(slot)) {
 			yield* removeBoardItemRuntimeStateFx({

@@ -5,6 +5,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionInventorySlotsSwapSchema } from "~/action/GameActionInventorySlotsSwapSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { writeInventorySlotFx } from "~/inventory/writeInventorySlotFx";
 
 export namespace swapInventorySlotsFx {
 	export interface Props {
@@ -38,9 +39,17 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 		save,
 	});
 	const source = nextSave.inventory.slots[action.sourceSlotIndex] ?? null;
-	nextSave.inventory.slots[action.sourceSlotIndex] =
-		nextSave.inventory.slots[action.targetSlotIndex] ?? null;
-	nextSave.inventory.slots[action.targetSlotIndex] = source;
+	const target = nextSave.inventory.slots[action.targetSlotIndex] ?? null;
+	yield* writeInventorySlotFx({
+		slot: target,
+		slotIndex: action.sourceSlotIndex,
+		slots: nextSave.inventory.slots,
+	});
+	yield* writeInventorySlotFx({
+		slot: source,
+		slotIndex: action.targetSlotIndex,
+		slots: nextSave.inventory.slots,
+	});
 	nextSave.updatedAtMs = nowMs;
 
 	return yield* createGameEngineResultFx({

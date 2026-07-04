@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
+import { writeInventorySlotFx } from "~/inventory/writeInventorySlotFx";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { pushInventoryItemCreatedEventFx } from "~/placement/pushInventoryItemCreatedEventFx";
 
@@ -71,10 +72,18 @@ const placeIntoExistingInventoryStacksFx = Effect.fn(
 
 		const previousQuantity = slot.quantity;
 		const placedQuantity = Math.min(props.maxStackSize - previousQuantity, remaining);
-		slot.quantity += placedQuantity;
+		const nextQuantity = previousQuantity + placedQuantity;
+		yield* writeInventorySlotFx({
+			slot: {
+				...slot,
+				quantity: nextQuantity,
+			},
+			slotIndex,
+			slots: props.slots,
+		});
 		remaining -= placedQuantity;
 		yield* pushInventoryStackPlacementEventFx({
-			nextQuantity: slot.quantity,
+			nextQuantity,
 			placedQuantity,
 			previousQuantity,
 			props,
@@ -102,15 +111,19 @@ const placeIntoEmptyInventorySlotsFx = Effect.fn(
 		}
 
 		const placedQuantity = Math.min(props.maxStackSize, remaining);
-		props.slots[slotIndex] = {
-			...(props.createdAtMs !== undefined
-				? {
-						createdAtMs: props.createdAtMs,
-					}
-				: {}),
-			itemId: props.item.itemId,
-			quantity: placedQuantity,
-		};
+		yield* writeInventorySlotFx({
+			slot: {
+				...(props.createdAtMs !== undefined
+					? {
+							createdAtMs: props.createdAtMs,
+						}
+					: {}),
+				itemId: props.item.itemId,
+				quantity: placedQuantity,
+			},
+			slotIndex,
+			slots: props.slots,
+		});
 		remaining -= placedQuantity;
 		yield* pushInventoryStackPlacementEventFx({
 			nextQuantity: placedQuantity,

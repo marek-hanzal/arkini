@@ -3,8 +3,9 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEvent } from "~/event/GameEventSchema";
-import { pushInventoryItemCreatedEventFx } from "~/placement/pushInventoryItemCreatedEventFx";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
+import { writeInventorySlotFx } from "~/inventory/writeInventorySlotFx";
+import { pushInventoryItemCreatedEventFx } from "~/placement/pushInventoryItemCreatedEventFx";
 
 export namespace placeGameSaveInventoryInstanceFx {
 	export interface Props {
@@ -55,16 +56,20 @@ export const placeGameSaveInventoryInstanceFx = Effect.fn("placeGameSaveInventor
 			);
 		}
 
-		slots[slotIndex] = {
-			...(createdAtMs !== undefined
-				? {
-						createdAtMs,
-					}
-				: {}),
-			id: itemInstanceId,
-			itemId,
-			kind: "instance",
-		};
+		yield* writeInventorySlotFx({
+			slot: {
+				...(createdAtMs !== undefined
+					? {
+							createdAtMs,
+						}
+					: {}),
+				id: itemInstanceId,
+				itemId,
+				kind: "instance",
+			},
+			slotIndex,
+			slots,
+		});
 		yield* pushInventoryItemCreatedEventFx({
 			events,
 			itemId,

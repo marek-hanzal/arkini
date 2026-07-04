@@ -90,6 +90,7 @@ const main = async () => {
 		...auditBoardItemRemovalBoundaries(),
 		...auditBoardItemWriteBoundaries(),
 		...auditRuntimeStateWriteBoundaries(),
+		...auditInventorySlotWriteBoundaries(),
 		...auditJobRemovalBoundaries(),
 		...auditJobWriteBoundaries(),
 		...auditActiveEffectWriteBoundaries(),
@@ -269,6 +270,34 @@ const auditRuntimeStateWriteBoundaries = (): Finding[] =>
 				path,
 				message:
 					"runtime state writes/removals must go through named Fx boundaries so board/producer lifecycle changes stay grepable",
+			},
+		];
+	});
+
+const inventorySlotWriteBoundaryPaths = new Set([
+	"src/inventory/writeInventorySlotFx.ts",
+]);
+
+const auditInventorySlotWriteBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (inventorySlotWriteBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (
+			!/(?:\.inventory\.slots\s*\[[^\]]+\]\s*=|(?:^|[^A-Za-z0-9_.])(?:props\.)?slots\s*\[[^\]]+\]\s*=|\bslot\.quantity\s*(?:[+\-*/]?=|\+\+|--))/.test(
+				text,
+			)
+		) {
+			return [];
+		}
+
+		return [
+			{
+				path,
+				message:
+					"inventory slot writes must go through writeInventorySlotFx so stack/instance slot lifecycle changes stay grepable",
 			},
 		];
 	});

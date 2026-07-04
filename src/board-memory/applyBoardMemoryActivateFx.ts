@@ -195,16 +195,15 @@ const placeBoardItemInInventoryFx = Effect.fn(
 		return true;
 	}
 
-	yield* removeBoardItemRuntimeStateFx({
-		itemInstanceId: item.id,
-		save,
-	});
-
 	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
 		if (!isGameSaveInventoryStack(slot) || slot.itemId !== item.itemId) continue;
 		if (slot.quantity >= itemDefinition.maxStackSize) continue;
 
 		const previousQuantity = slot.quantity;
+		yield* removeBoardItemRuntimeStateFx({
+			itemInstanceId: item.id,
+			save,
+		});
 		slot.quantity += 1;
 		delete save.board.items[item.id];
 		events.push({
@@ -229,6 +228,10 @@ const placeBoardItemInInventoryFx = Effect.fn(
 		return false;
 	}
 
+	yield* removeBoardItemRuntimeStateFx({
+		itemInstanceId: item.id,
+		save,
+	});
 	save.inventory.slots[emptySlotIndex] = {
 		...(item.createdAtMs !== undefined
 			? {

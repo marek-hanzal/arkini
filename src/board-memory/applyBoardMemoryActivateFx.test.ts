@@ -385,6 +385,61 @@ describe("applyBoardMemoryActivateFx", () => {
 		);
 	});
 
+	it("does not drop runtime state when inventory is too full to store a board item", () => {
+		const config = createMemoryTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		const producer = findBoardItem(save, {
+			itemId: "item:producer",
+			x: 1,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+		expect(producer).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const fullInventorySave = structuredClone(saved);
+		fullInventorySave.inventory.slots = [
+			{ itemId: "item:twig", quantity: 3 },
+			{ itemId: "item:twig", quantity: 3 },
+			{ itemId: "item:twig", quantity: 3 },
+			{ itemId: "item:twig", quantity: 3 },
+		];
+		fullInventorySave.producerCharges[producer!.id] = {
+			remainingCharges: 7,
+		};
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 200,
+			save: fullInventorySave,
+		});
+
+		expect(restored.save.board.items[producer!.id]).toBeDefined();
+		expect(restored.save.producerCharges[producer!.id]).toEqual({
+			remainingCharges: 7,
+		});
+	});
+
 	it("can store filled memory in inventory as an instance without losing its layout", () => {
 		const config = createMemoryTestConfig();
 		const save = runInitialSave({

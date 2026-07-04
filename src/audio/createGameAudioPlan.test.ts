@@ -211,6 +211,54 @@ describe("createGameAudioPlan", () => {
 		]);
 	});
 
+	it("deduplicates repeated utility sounds inside one runtime event batch", () => {
+		const events = [
+			{
+				atMs: 0,
+				itemId: "item:twig",
+				itemInstanceId: "item-instance:1",
+				lineId: "line:test",
+				nextQuantity: 1,
+				previousQuantity: 0,
+				quantity: 1,
+				type: "producer_input.stored",
+			},
+			{
+				atMs: 0,
+				itemId: "item:twig",
+				itemInstanceId: "item-instance:1",
+				lineId: "line:test",
+				nextQuantity: 2,
+				previousQuantity: 1,
+				quantity: 1,
+				type: "producer_input.stored",
+			},
+			{
+				atMs: 0,
+				effectId: "effect:test",
+				endAtMs: 1000,
+				id: "active-effect:1",
+				sourceItemInstanceId: "item-instance:1",
+				startAtMs: 0,
+				type: "effect.activated",
+			},
+			{
+				atMs: 0,
+				effectId: "effect:test",
+				endAtMs: 1000,
+				id: "active-effect:2",
+				sourceItemInstanceId: "item-instance:1",
+				startAtMs: 0,
+				type: "effect.activated",
+			},
+		] satisfies GameEvent[];
+
+		expect(readSoundIds(createPlan(events))).toEqual([
+			"audio.producer.input.store",
+			"audio.effect.activated",
+		]);
+	});
+
 	it("maps cheat speed changes to direction-specific sounds", () => {
 		const enable = createPlan([
 			{

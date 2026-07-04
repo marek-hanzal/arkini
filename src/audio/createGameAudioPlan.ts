@@ -273,7 +273,7 @@ export const createGameAudioPlan = ({
 				break;
 			}
 			case "producer_input.stored":
-				pushSound({
+				pushUniqueSound({
 					flags,
 					plan,
 					soundId: "audio.producer.input.store",
@@ -281,7 +281,7 @@ export const createGameAudioPlan = ({
 				});
 				break;
 			case "producer_input.withdrawn":
-				pushSound({
+				pushUniqueSound({
 					flags,
 					plan,
 					soundId: "audio.producer.input.withdraw",
@@ -289,7 +289,7 @@ export const createGameAudioPlan = ({
 				});
 				break;
 			case "craft_input.stored":
-				pushSound({
+				pushUniqueSound({
 					flags,
 					plan,
 					soundId: "audio.craft.input.store",
@@ -297,7 +297,7 @@ export const createGameAudioPlan = ({
 				});
 				break;
 			case "craft_input.withdrawn":
-				pushSound({
+				pushUniqueSound({
 					flags,
 					plan,
 					soundId: "audio.craft.input.withdraw",
@@ -351,7 +351,7 @@ export const createGameAudioPlan = ({
 				});
 				break;
 			case "effect.activated":
-				pushSound({
+				pushUniqueSound({
 					flags,
 					plan,
 					soundId: "audio.effect.activated",
@@ -359,7 +359,7 @@ export const createGameAudioPlan = ({
 				});
 				break;
 			case "effect.expired":
-				pushSound({
+				pushUniqueSound({
 					flags,
 					plan,
 					soundId: "audio.effect.expired",

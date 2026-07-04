@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
 import { assertBoardCellInsideBoundsFx } from "~/board/assertBoardCellInsideBoundsFx";
@@ -8,7 +8,6 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { readInventoryStackCapacityFx } from "~/inventory/readInventoryStackCapacityFx";
 import type { GameSave, GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 import {
 	isGameSaveInventoryInstance,
@@ -16,6 +15,7 @@ import {
 	readGameSaveInventorySlotQuantity,
 } from "~/inventory/model/GameSaveInventorySlot";
 import { readInventorySlotAfterQuantityRemovalFx } from "~/inventory/readInventorySlotAfterQuantityRemovalFx";
+import { readInventoryStackCapacityFx } from "~/inventory/readInventoryStackCapacityFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 
 export namespace checkInventoryItemPlaceReadinessFx {
@@ -38,13 +38,6 @@ type InventoryPlacementDraft = {
 	saveAfterInventoryRemoval: GameSave;
 	slot: InventoryPlacementSlot;
 };
-
-class InventoryItemPlaceReadinessScopeFx extends Context.Tag("InventoryItemPlaceReadinessScopeFx")<
-	InventoryItemPlaceReadinessScopeFx,
-	checkInventoryItemPlaceReadinessFx.Props
->() {
-	//
-}
 
 const readEmptyBoardCellCountFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.readEmptyBoardCellCountFx",
@@ -116,8 +109,7 @@ const readSaveAfterInventoryRemovalPreviewFx = Effect.fn(
 
 const assertTargetCellInsideBoardFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertTargetCellInsideBoardFx",
-)(function* () {
-	const { action, config } = yield* InventoryItemPlaceReadinessScopeFx;
+)(function* ({ action, config }: checkInventoryItemPlaceReadinessFx.Props) {
 	yield* assertBoardCellInsideBoundsFx({
 		config,
 		x: action.x,
@@ -127,8 +119,7 @@ const assertTargetCellInsideBoardFx = Effect.fn(
 
 const readInventoryPlacementSlotFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.readInventoryPlacementSlotFx",
-)(function* () {
-	const { action, save } = yield* InventoryItemPlaceReadinessScopeFx;
+)(function* ({ action, save }: checkInventoryItemPlaceReadinessFx.Props) {
 	const slot = save.inventory.slots[action.slotIndex];
 	if (slot) return slot;
 
@@ -139,8 +130,7 @@ const readInventoryPlacementSlotFx = Effect.fn(
 
 const assertInventoryPlacementStorageFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertInventoryPlacementStorageFx",
-)(function* ({ slot }: { slot: InventoryPlacementSlot }) {
-	const { config } = yield* InventoryItemPlaceReadinessScopeFx;
+)(function* ({ config, slot }: { config: GameConfig; slot: InventoryPlacementSlot }) {
 	if (
 		isItemStorageAllowed({
 			config,
@@ -161,8 +151,13 @@ const assertInventoryPlacementStorageFx = Effect.fn(
 
 const readInventoryPlacementQuantityFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.readInventoryPlacementQuantityFx",
-)(function* ({ slot }: { slot: InventoryPlacementSlot }) {
-	const { action } = yield* InventoryItemPlaceReadinessScopeFx;
+)(function* ({
+	action,
+	slot,
+}: {
+	action: GameActionInventoryItemPlaceSchema.Type;
+	slot: InventoryPlacementSlot;
+}) {
 	const quantity = action.quantity ?? 1;
 	const slotQuantity = readGameSaveInventorySlotQuantity(slot);
 	if (quantity <= slotQuantity) return quantity;
@@ -177,28 +172,29 @@ const readInventoryPlacementQuantityFx = Effect.fn(
 
 const readInventoryPlacementDraftFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.readInventoryPlacementDraftFx",
-)(function* () {
-	const { action, config, save } = yield* InventoryItemPlaceReadinessScopeFx;
-	const slot = yield* readInventoryPlacementSlotFx();
+)(function* (props: checkInventoryItemPlaceReadinessFx.Props) {
+	const slot = yield* readInventoryPlacementSlotFx(props);
 	const itemDefinition = yield* readGameConfigItemDefinitionFx({
-		config,
+		config: props.config,
 		itemId: slot.itemId,
 	});
 	yield* assertInventoryPlacementStorageFx({
+		config: props.config,
 		slot,
 	});
 	const quantity = yield* readInventoryPlacementQuantityFx({
+		action: props.action,
 		slot,
 	});
 
 	return {
 		itemDefinition,
-		placementMode: action.placementMode ?? "exact",
+		placementMode: props.action.placementMode ?? "exact",
 		quantity,
 		saveAfterInventoryRemoval: yield* readSaveAfterInventoryRemovalPreviewFx({
 			quantity,
-			save,
-			slotIndex: action.slotIndex,
+			save: props.save,
+			slotIndex: props.action.slotIndex,
 		}),
 		slot,
 	} satisfies InventoryPlacementDraft;
@@ -206,9 +202,14 @@ const readInventoryPlacementDraftFx = Effect.fn(
 
 const assertExactPlacementReadinessFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertExactPlacementReadinessFx",
-)(function* ({ quantity, slot }: InventoryPlacementDraft) {
-	const { action, config, save } = yield* InventoryItemPlaceReadinessScopeFx;
-	if (quantity !== 1) {
+)(function* ({
+	draft,
+	props,
+}: {
+	draft: InventoryPlacementDraft;
+	props: checkInventoryItemPlaceReadinessFx.Props;
+}) {
+	if (draft.quantity !== 1) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"unsupported_target",
@@ -218,9 +219,9 @@ const assertExactPlacementReadinessFx = Effect.fn(
 	}
 
 	const occupied = yield* readBoardItemAtCellFx({
-		save,
-		x: action.x,
-		y: action.y,
+		save: props.save,
+		x: props.action.x,
+		y: props.action.y,
 	});
 	if (occupied) {
 		return yield* Effect.fail(
@@ -229,25 +230,30 @@ const assertExactPlacementReadinessFx = Effect.fn(
 	}
 
 	const boardItemMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
-		config,
-		itemId: slot.itemId,
-		save,
+		config: props.config,
+		itemId: draft.slot.itemId,
+		save: props.save,
 	});
 	if (boardItemMaxCountCapacity > 0) return;
 
 	return yield* Effect.fail(
 		GameEngineError.actionRejected(
 			"board:max-count",
-			`Board already has the maximum allowed count for "${slot.itemId}".`,
+			`Board already has the maximum allowed count for "${draft.slot.itemId}".`,
 		),
 	);
 });
 
 const assertNearestInstancePlacementReadinessFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertNearestInstancePlacementReadinessFx",
-)(function* ({ quantity, saveAfterInventoryRemoval, slot }: InventoryPlacementDraft) {
-	const { action, config, nowMs, save } = yield* InventoryItemPlaceReadinessScopeFx;
-	if (quantity !== 1) {
+)(function* ({
+	draft,
+	props,
+}: {
+	draft: InventoryPlacementDraft;
+	props: checkInventoryItemPlaceReadinessFx.Props;
+}) {
+	if (draft.quantity !== 1) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"unsupported_target",
@@ -257,17 +263,17 @@ const assertNearestInstancePlacementReadinessFx = Effect.fn(
 	}
 
 	const boardPlacementCapacity = yield* readBoardPlacementCapacityFx({
-		config,
-		itemId: slot.itemId,
-		save,
+		config: props.config,
+		itemId: draft.slot.itemId,
+		save: props.save,
 	});
 	if (boardPlacementCapacity === 0) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				yield* readBoardPlacementBlockReasonFx({
-					config,
-					itemId: slot.itemId,
-					save,
+					config: props.config,
+					itemId: draft.slot.itemId,
+					save: props.save,
 				}),
 				"No board placement target available.",
 			),
@@ -275,13 +281,13 @@ const assertNearestInstancePlacementReadinessFx = Effect.fn(
 	}
 
 	const [targetCell] = yield* planItemBoardPlacementCellsFx({
-		config,
-		itemId: slot.itemId,
-		nowMs,
-		save: saveAfterInventoryRemoval,
+		config: props.config,
+		itemId: draft.slot.itemId,
+		nowMs: props.nowMs,
+		save: draft.saveAfterInventoryRemoval,
 		seedCell: {
-			x: action.x,
-			y: action.y,
+			x: props.action.x,
+			y: props.action.y,
 		},
 	});
 	if (targetCell) return;
@@ -294,27 +300,27 @@ const assertNearestInstancePlacementReadinessFx = Effect.fn(
 const assertNearestStackPlacementReadinessFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertNearestStackPlacementReadinessFx",
 )(function* ({
-	itemDefinition,
-	quantity,
-	saveAfterInventoryRemoval,
-	slot,
-}: InventoryPlacementDraft) {
-	const { action, config, nowMs, save } = yield* InventoryItemPlaceReadinessScopeFx;
+	draft,
+	props,
+}: {
+	draft: InventoryPlacementDraft;
+	props: checkInventoryItemPlaceReadinessFx.Props;
+}) {
 	const boardCapacity = yield* readBoardPlacementCapacityFx({
-		config,
-		itemId: slot.itemId,
-		save,
+		config: props.config,
+		itemId: draft.slot.itemId,
+		save: props.save,
 	});
 	const boardPlacementCells =
 		boardCapacity > 0
 			? yield* planItemBoardPlacementCellsFx({
-					config,
-					itemId: slot.itemId,
-					nowMs,
-					save: saveAfterInventoryRemoval,
+					config: props.config,
+					itemId: draft.slot.itemId,
+					nowMs: props.nowMs,
+					save: draft.saveAfterInventoryRemoval,
 					seedCell: {
-						x: action.x,
-						y: action.y,
+						x: props.action.x,
+						y: props.action.y,
 					},
 				})
 			: [];
@@ -323,9 +329,9 @@ const assertNearestStackPlacementReadinessFx = Effect.fn(
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				yield* readBoardPlacementBlockReasonFx({
-					config,
-					itemId: slot.itemId,
-					save,
+					config: props.config,
+					itemId: draft.slot.itemId,
+					save: props.save,
 				}),
 				"No board placement target available.",
 			),
@@ -333,18 +339,18 @@ const assertNearestStackPlacementReadinessFx = Effect.fn(
 	}
 
 	const inventoryCapacity = yield* readInventoryStackCapacityFx({
-		itemId: slot.itemId,
-		maxStackSize: itemDefinition.maxStackSize,
-		slots: saveAfterInventoryRemoval.inventory.slots,
+		itemId: draft.slot.itemId,
+		maxStackSize: draft.itemDefinition.maxStackSize,
+		slots: draft.saveAfterInventoryRemoval.inventory.slots,
 	});
-	if (quantity <= allowedBoardCapacity + inventoryCapacity) return;
+	if (draft.quantity <= allowedBoardCapacity + inventoryCapacity) return;
 
 	const reason =
 		boardCapacity === 0
 			? yield* readBoardPlacementBlockReasonFx({
-					config,
-					itemId: slot.itemId,
-					save,
+					config: props.config,
+					itemId: draft.slot.itemId,
+					save: props.save,
 				})
 			: "inventory:full";
 	return yield* Effect.fail(
@@ -354,43 +360,59 @@ const assertNearestStackPlacementReadinessFx = Effect.fn(
 
 const assertNearestPlacementReadinessFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertNearestPlacementReadinessFx",
-)(function* (draft: InventoryPlacementDraft) {
+)(function* ({
+	draft,
+	props,
+}: {
+	draft: InventoryPlacementDraft;
+	props: checkInventoryItemPlaceReadinessFx.Props;
+}) {
 	yield* match(draft)
 		.with(
 			{
 				slot: P.when(isGameSaveInventoryInstance),
 			},
-			assertNearestInstancePlacementReadinessFx,
+			() =>
+				assertNearestInstancePlacementReadinessFx({
+					draft,
+					props,
+				}),
 		)
 		.with(
 			{
 				slot: P.when(isGameSaveInventoryStack),
 			},
-			assertNearestStackPlacementReadinessFx,
+			() =>
+				assertNearestStackPlacementReadinessFx({
+					draft,
+					props,
+				}),
 		)
 		.exhaustive();
 });
 
-const checkInventoryItemPlaceReadinessProgramFx = Effect.fn(
-	"checkInventoryItemPlaceReadinessFx.programFx",
-)(function* () {
-	yield* assertTargetCellInsideBoardFx();
-	const draft = yield* readInventoryPlacementDraftFx();
-	yield* match(draft.placementMode)
-		.with("exact", () => assertExactPlacementReadinessFx(draft))
-		.with("nearest_by_manhattan", () => assertNearestPlacementReadinessFx(draft))
-		.exhaustive();
-
-	return {
-		itemDefinition: draft.itemDefinition,
-		slot: draft.slot,
-	};
-});
-
 export const checkInventoryItemPlaceReadinessFx = Effect.fn("checkInventoryItemPlaceReadinessFx")(
 	function* (props: checkInventoryItemPlaceReadinessFx.Props) {
-		return yield* checkInventoryItemPlaceReadinessProgramFx().pipe(
-			Effect.provideService(InventoryItemPlaceReadinessScopeFx, props),
-		);
+		yield* assertTargetCellInsideBoardFx(props);
+		const draft = yield* readInventoryPlacementDraftFx(props);
+		yield* match(draft.placementMode)
+			.with("exact", () =>
+				assertExactPlacementReadinessFx({
+					draft,
+					props,
+				}),
+			)
+			.with("nearest_by_manhattan", () =>
+				assertNearestPlacementReadinessFx({
+					draft,
+					props,
+				}),
+			)
+			.exhaustive();
+
+		return {
+			itemDefinition: draft.itemDefinition,
+			slot: draft.slot,
+		};
 	},
 );

@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
@@ -25,17 +25,9 @@ type DebugSpawnReadiness = {
 	quantity: number;
 };
 
-class DebugItemSpawnReadinessScopeFx extends Context.Tag("DebugItemSpawnReadinessScopeFx")<
-	DebugItemSpawnReadinessScopeFx,
-	checkDebugItemSpawnReadinessFx.Props
->() {
-	//
-}
-
 const readDebugSpawnItemDefinitionFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.readDebugSpawnItemDefinitionFx",
-)(function* () {
-	const { action, config } = yield* DebugItemSpawnReadinessScopeFx;
+)(function* ({ action, config }: checkDebugItemSpawnReadinessFx.Props) {
 	const item = config.items[action.itemId];
 	if (item) return item;
 
@@ -46,8 +38,7 @@ const readDebugSpawnItemDefinitionFx = Effect.fn(
 
 const assertDebugSpawnStorageAllowedFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.assertDebugSpawnStorageAllowedFx",
-)(function* () {
-	const { action, config } = yield* DebugItemSpawnReadinessScopeFx;
+)(function* ({ action, config }: checkDebugItemSpawnReadinessFx.Props) {
 	if (
 		isItemStorageAllowed({
 			config,
@@ -68,38 +59,48 @@ const assertDebugSpawnStorageAllowedFx = Effect.fn(
 
 const readDebugSpawnReadinessFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.readDebugSpawnReadinessFx",
-)(function* () {
+)(function* (props: checkDebugItemSpawnReadinessFx.Props) {
 	return {
-		item: yield* readDebugSpawnItemDefinitionFx(),
-		quantity: (yield* DebugItemSpawnReadinessScopeFx).action.quantity ?? 1,
+		item: yield* readDebugSpawnItemDefinitionFx(props),
+		quantity: props.action.quantity ?? 1,
 	} satisfies DebugSpawnReadiness;
 });
 
 const assertDebugBoardMaxCountCapacityFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.assertDebugBoardMaxCountCapacityFx",
-)(function* ({ quantity }: DebugSpawnReadiness) {
-	const { action, config, save } = yield* DebugItemSpawnReadinessScopeFx;
+)(function* ({
+	props,
+	quantity,
+}: {
+	props: checkDebugItemSpawnReadinessFx.Props;
+	quantity: number;
+}) {
 	const boardMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
-		config,
-		itemId: action.itemId,
-		save,
+		config: props.config,
+		itemId: props.action.itemId,
+		save: props.save,
 	});
 	if (boardMaxCountCapacity >= quantity) return;
 
 	return yield* Effect.fail(
 		GameEngineError.actionRejected(
 			"board:max-count",
-			`Board already has the maximum allowed count for "${action.itemId}".`,
+			`Board already has the maximum allowed count for "${props.action.itemId}".`,
 		),
 	);
 });
 
 const readNextDebugBoardPlacementCellFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.readNextDebugBoardPlacementCellFx",
-)(function* ({ simulatedSave }: { simulatedSave: GameSave }) {
-	const { action, config, nowMs } = yield* DebugItemSpawnReadinessScopeFx;
+)(function* ({
+	props,
+	simulatedSave,
+}: {
+	props: checkDebugItemSpawnReadinessFx.Props;
+	simulatedSave: GameSave;
+}) {
 	const emptyCells = yield* planEmptyBoardCellsFx({
-		config,
+		config: props.config,
 		save: simulatedSave,
 	});
 	if (emptyCells.length === 0) {
@@ -109,9 +110,9 @@ const readNextDebugBoardPlacementCellFx = Effect.fn(
 	}
 
 	const [targetCell] = yield* planItemBoardPlacementCellsFx({
-		config,
-		itemId: action.itemId,
-		nowMs,
+		config: props.config,
+		itemId: props.action.itemId,
+		nowMs: props.nowMs,
 		save: simulatedSave,
 	});
 	if (targetCell) return targetCell;
@@ -126,23 +127,26 @@ const reserveDebugBoardPlacementCellFx = Effect.fn(
 )(function* ({
 	index,
 	item,
+	props,
 	simulatedSave,
-}: DebugSpawnReadiness & {
+}: {
 	index: number;
+	item: DebugSpawnReadiness["item"];
+	props: checkDebugItemSpawnReadinessFx.Props;
 	simulatedSave: GameSave;
 }) {
-	const { action, nowMs } = yield* DebugItemSpawnReadinessScopeFx;
 	const targetCell = yield* readNextDebugBoardPlacementCellFx({
+		props,
 		simulatedSave,
 	});
 	simulatedSave.board.items[`debug-readiness:${index}`] = {
 		...(item.effects?.length
 			? {
-					createdAtMs: nowMs,
+					createdAtMs: props.nowMs,
 				}
 			: {}),
 		id: `debug-readiness:${index}`,
-		itemId: action.itemId,
+		itemId: props.action.itemId,
 		x: targetCell.x,
 		y: targetCell.y,
 	};
@@ -150,16 +154,25 @@ const reserveDebugBoardPlacementCellFx = Effect.fn(
 
 const assertDebugBoardSpawnReadinessFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.assertDebugBoardSpawnReadinessFx",
-)(function* (readiness: DebugSpawnReadiness) {
-	const { save } = yield* DebugItemSpawnReadinessScopeFx;
-	yield* assertDebugBoardMaxCountCapacityFx(readiness);
+)(function* ({
+	props,
+	readiness,
+}: {
+	props: checkDebugItemSpawnReadinessFx.Props;
+	readiness: DebugSpawnReadiness;
+}) {
+	yield* assertDebugBoardMaxCountCapacityFx({
+		props,
+		quantity: readiness.quantity,
+	});
 	const simulatedSave = yield* cloneGameSaveFx({
-		save,
+		save: props.save,
 	});
 	for (let index = 0; index < readiness.quantity; index += 1) {
 		yield* reserveDebugBoardPlacementCellFx({
-			...readiness,
 			index,
+			item: readiness.item,
+			props,
 			simulatedSave,
 		});
 	}
@@ -167,14 +180,19 @@ const assertDebugBoardSpawnReadinessFx = Effect.fn(
 
 const assertDebugInventorySpawnReadinessFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.assertDebugInventorySpawnReadinessFx",
-)(function* ({ item, quantity }: DebugSpawnReadiness) {
-	const { action, save } = yield* DebugItemSpawnReadinessScopeFx;
+)(function* ({
+	props,
+	readiness,
+}: {
+	props: checkDebugItemSpawnReadinessFx.Props;
+	readiness: DebugSpawnReadiness;
+}) {
 	const inventoryCapacity = yield* readInventoryStackCapacityFx({
-		itemId: action.itemId,
-		maxStackSize: item.maxStackSize,
-		slots: save.inventory.slots,
+		itemId: props.action.itemId,
+		maxStackSize: readiness.item.maxStackSize,
+		slots: props.save.inventory.slots,
 	});
-	if (inventoryCapacity >= quantity) return;
+	if (inventoryCapacity >= readiness.quantity) return;
 
 	return yield* Effect.fail(
 		GameEngineError.actionRejected("inventory:full", "Inventory has no space for debug item."),
@@ -183,25 +201,35 @@ const assertDebugInventorySpawnReadinessFx = Effect.fn(
 
 const assertDebugSpawnLocationReadinessFx = Effect.fn(
 	"checkDebugItemSpawnReadinessFx.assertDebugSpawnLocationReadinessFx",
-)(function* (readiness: DebugSpawnReadiness) {
-	const { action } = yield* DebugItemSpawnReadinessScopeFx;
-	return yield* match(action.location)
-		.with("board", () => assertDebugBoardSpawnReadinessFx(readiness))
-		.with("inventory", () => assertDebugInventorySpawnReadinessFx(readiness))
+)(function* ({
+	props,
+	readiness,
+}: {
+	props: checkDebugItemSpawnReadinessFx.Props;
+	readiness: DebugSpawnReadiness;
+}) {
+	return yield* match(props.action.location)
+		.with("board", () =>
+			assertDebugBoardSpawnReadinessFx({
+				props,
+				readiness,
+			}),
+		)
+		.with("inventory", () =>
+			assertDebugInventorySpawnReadinessFx({
+				props,
+				readiness,
+			}),
+		)
 		.exhaustive();
 });
 
-const checkDebugItemSpawnReadinessProgramFx = Effect.fn("checkDebugItemSpawnReadinessFx.programFx")(
-	function* () {
-		yield* assertDebugSpawnStorageAllowedFx();
-		yield* assertDebugSpawnLocationReadinessFx(yield* readDebugSpawnReadinessFx());
-	},
-);
-
 export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnReadinessFx")(
 	function* (props: checkDebugItemSpawnReadinessFx.Props) {
-		return yield* checkDebugItemSpawnReadinessProgramFx().pipe(
-			Effect.provideService(DebugItemSpawnReadinessScopeFx, props),
-		);
+		yield* assertDebugSpawnStorageAllowedFx(props);
+		yield* assertDebugSpawnLocationReadinessFx({
+			props,
+			readiness: yield* readDebugSpawnReadinessFx(props),
+		});
 	},
 );

@@ -1,9 +1,10 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import { isCheatSpeedItemId, readCheatSpeedItemIdFromMode } from "~/cheat/GameCheatSpeedItem";
 import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import type { GameConfig } from "~/config/GameConfigTypes";
+import { checkDebugItemSpawnReadinessFx } from "~/debug/checkDebugItemSpawnReadinessFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
@@ -13,7 +14,6 @@ import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInve
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { checkDebugItemSpawnReadinessFx } from "~/debug/checkDebugItemSpawnReadinessFx";
 
 export namespace spawnDebugItemFx {
 	export interface Props {
@@ -38,15 +38,10 @@ type DebugSpawnWorkingState = DebugSpawnRequest & {
 	nextSave: GameSave;
 };
 
-class DebugItemSpawnScopeFx extends Context.Tag("DebugItemSpawnScopeFx")<
-	DebugItemSpawnScopeFx,
-	spawnDebugItemFx.Props
->() {
-	//
-}
-
-const readDebugSpawnItemIdFx = Effect.fn("spawnDebugItemFx.readDebugSpawnItemIdFx")(function* () {
-	const { action, save } = yield* DebugItemSpawnScopeFx;
+const readDebugSpawnItemIdFx = Effect.fn("spawnDebugItemFx.readDebugSpawnItemIdFx")(function* ({
+	action,
+	save,
+}: Pick<spawnDebugItemFx.Props, "action" | "save">) {
 	return isCheatSpeedItemId(action.itemId)
 		? readCheatSpeedItemIdFromMode(
 				readGameCheatSpeedMode({
@@ -56,26 +51,28 @@ const readDebugSpawnItemIdFx = Effect.fn("spawnDebugItemFx.readDebugSpawnItemIdF
 		: action.itemId;
 });
 
-const readDebugSpawnActionFx = Effect.fn("spawnDebugItemFx.readDebugSpawnActionFx")(function* () {
-	const { action } = yield* DebugItemSpawnScopeFx;
+const readDebugSpawnActionFx = Effect.fn("spawnDebugItemFx.readDebugSpawnActionFx")(function* (
+	props: spawnDebugItemFx.Props,
+) {
 	return {
-		...action,
-		itemId: yield* readDebugSpawnItemIdFx(),
+		...props.action,
+		itemId: yield* readDebugSpawnItemIdFx(props),
 	} satisfies DebugSpawnAction;
 });
 
-const readDebugSpawnRequestFx = Effect.fn("spawnDebugItemFx.readDebugSpawnRequestFx")(function* () {
-	const { config, nowMs, save } = yield* DebugItemSpawnScopeFx;
-	const action = yield* readDebugSpawnActionFx();
+const readDebugSpawnRequestFx = Effect.fn("spawnDebugItemFx.readDebugSpawnRequestFx")(function* (
+	props: spawnDebugItemFx.Props,
+) {
+	const action = yield* readDebugSpawnActionFx(props);
 
 	yield* checkDebugItemSpawnReadinessFx({
 		action,
-		config,
-		nowMs,
-		save,
+		config: props.config,
+		nowMs: props.nowMs,
+		save: props.save,
 	});
 
-	const itemDefinition = config.items[action.itemId];
+	const itemDefinition = props.config.items[action.itemId];
 	if (!itemDefinition) {
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(`Missing item "${action.itemId}".`),
@@ -84,31 +81,29 @@ const readDebugSpawnRequestFx = Effect.fn("spawnDebugItemFx.readDebugSpawnReques
 
 	return {
 		action,
-		createdAtMs: itemDefinition.effects?.length ? nowMs : undefined,
+		createdAtMs: itemDefinition.effects?.length ? props.nowMs : undefined,
 		itemDefinition,
 		quantity: action.quantity ?? 1,
 	} satisfies DebugSpawnRequest;
 });
 
 const createDebugSpawnWorkingStateFx = Effect.fn("spawnDebugItemFx.createDebugSpawnWorkingStateFx")(
-	function* () {
-		const { save } = yield* DebugItemSpawnScopeFx;
+	function* (props: spawnDebugItemFx.Props) {
 		return {
-			...(yield* readDebugSpawnRequestFx()),
+			...(yield* readDebugSpawnRequestFx(props)),
 			events: [] as GameEvent[],
 			nextSave: yield* cloneGameSaveFx({
-				save,
+				save: props.save,
 			}),
 		} satisfies DebugSpawnWorkingState;
 	},
 );
 
 const assertDebugBoardHasEmptyCellFx = Effect.fn("spawnDebugItemFx.assertDebugBoardHasEmptyCellFx")(
-	function* ({ nextSave }: DebugSpawnWorkingState) {
-		const { config } = yield* DebugItemSpawnScopeFx;
+	function* ({ props, state }: { props: spawnDebugItemFx.Props; state: DebugSpawnWorkingState }) {
 		const emptyCells = yield* planEmptyBoardCellsFx({
-			config,
-			save: nextSave,
+			config: props.config,
+			save: state.nextSave,
 		});
 		if (emptyCells.length > 0) return;
 
@@ -119,13 +114,12 @@ const assertDebugBoardHasEmptyCellFx = Effect.fn("spawnDebugItemFx.assertDebugBo
 );
 
 const readDebugBoardSpawnCellFx = Effect.fn("spawnDebugItemFx.readDebugBoardSpawnCellFx")(
-	function* ({ action, nextSave }: DebugSpawnWorkingState) {
-		const { config, nowMs } = yield* DebugItemSpawnScopeFx;
+	function* ({ props, state }: { props: spawnDebugItemFx.Props; state: DebugSpawnWorkingState }) {
 		const [emptyCell] = yield* planItemBoardPlacementCellsFx({
-			config,
-			itemId: action.itemId,
-			nowMs,
-			save: nextSave,
+			config: props.config,
+			itemId: state.action.itemId,
+			nowMs: props.nowMs,
+			save: state.nextSave,
 		});
 		if (emptyCell) return emptyCell;
 
@@ -135,11 +129,21 @@ const readDebugBoardSpawnCellFx = Effect.fn("spawnDebugItemFx.readDebugBoardSpaw
 	},
 );
 
-const spawnDebugBoardItemFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemFx")(function* (
-	state: DebugSpawnWorkingState,
-) {
-	yield* assertDebugBoardHasEmptyCellFx(state);
-	const cell = yield* readDebugBoardSpawnCellFx(state);
+const spawnDebugBoardItemFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemFx")(function* ({
+	props,
+	state,
+}: {
+	props: spawnDebugItemFx.Props;
+	state: DebugSpawnWorkingState;
+}) {
+	yield* assertDebugBoardHasEmptyCellFx({
+		props,
+		state,
+	});
+	const cell = yield* readDebugBoardSpawnCellFx({
+		props,
+		state,
+	});
 	yield* placeBoardItemInstanceFx({
 		cell,
 		createdAtMs: state.createdAtMs,
@@ -150,11 +154,18 @@ const spawnDebugBoardItemFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemFx"
 	});
 });
 
-const spawnDebugBoardItemsFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemsFx")(function* (
-	state: DebugSpawnWorkingState,
-) {
+const spawnDebugBoardItemsFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemsFx")(function* ({
+	props,
+	state,
+}: {
+	props: spawnDebugItemFx.Props;
+	state: DebugSpawnWorkingState;
+}) {
 	for (let index = 0; index < state.quantity; index += 1) {
-		yield* spawnDebugBoardItemFx(state);
+		yield* spawnDebugBoardItemFx({
+			props,
+			state,
+		});
 	}
 });
 
@@ -184,32 +195,33 @@ const spawnDebugInventoryItemsFx = Effect.fn("spawnDebugItemFx.spawnDebugInvento
 );
 
 const applyDebugSpawnLocationFx = Effect.fn("spawnDebugItemFx.applyDebugSpawnLocationFx")(
-	function* (state: DebugSpawnWorkingState) {
+	function* ({ props, state }: { props: spawnDebugItemFx.Props; state: DebugSpawnWorkingState }) {
 		return yield* match(state.action.location)
-			.with("board", () => spawnDebugBoardItemsFx(state))
+			.with("board", () =>
+				spawnDebugBoardItemsFx({
+					props,
+					state,
+				}),
+			)
 			.with("inventory", () => spawnDebugInventoryItemsFx(state))
 			.exhaustive();
 	},
 );
 
-const spawnDebugItemProgramFx = Effect.fn("spawnDebugItemFx.programFx")(function* () {
-	const { config, nowMs } = yield* DebugItemSpawnScopeFx;
-	const state = yield* createDebugSpawnWorkingStateFx();
-	yield* applyDebugSpawnLocationFx(state);
-	state.nextSave.updatedAtMs = nowMs;
-
-	return yield* createGameEngineResultFx({
-		config,
-		events: state.events,
-		nowMs,
-		save: state.nextSave,
-	});
-});
-
 export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* (
 	props: spawnDebugItemFx.Props,
 ) {
-	return yield* spawnDebugItemProgramFx().pipe(
-		Effect.provideService(DebugItemSpawnScopeFx, props),
-	);
+	const state = yield* createDebugSpawnWorkingStateFx(props);
+	yield* applyDebugSpawnLocationFx({
+		props,
+		state,
+	});
+	state.nextSave.updatedAtMs = props.nowMs;
+
+	return yield* createGameEngineResultFx({
+		config: props.config,
+		events: state.events,
+		nowMs: props.nowMs,
+		save: state.nextSave,
+	});
 });

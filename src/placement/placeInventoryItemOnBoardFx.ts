@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -42,33 +42,20 @@ type InventoryPlacementState = {
 	quantity: number;
 };
 
-class InventoryItemBoardPlacementScopeFx extends Context.Tag("InventoryItemBoardPlacementScopeFx")<
-	InventoryItemBoardPlacementScopeFx,
-	placeInventoryItemOnBoardFx.Props
->() {
-	//
-}
-
 const readPlacementStateFx = Effect.fn("placeInventoryItemOnBoardFx.readPlacementStateFx")(
-	function* () {
-		const { action, config, nowMs, save } = yield* InventoryItemBoardPlacementScopeFx;
-		yield* checkInventoryItemPlaceReadinessFx({
-			action,
-			config,
-			nowMs,
-			save,
-		});
+	function* (props: placeInventoryItemOnBoardFx.Props) {
+		yield* checkInventoryItemPlaceReadinessFx(props);
 
-		const quantity = action.quantity ?? 1;
+		const quantity = props.action.quantity ?? 1;
 		const nextSave = yield* cloneGameSaveFx({
-			save,
+			save: props.save,
 		});
 		const consumed = yield* consumeInventorySlotQuantityFx({
 			nextSave,
 			quantity,
 			reason: "inventory-placement",
 			runtimeState: "preserve-instance",
-			slotIndex: action.slotIndex,
+			slotIndex: props.action.slotIndex,
 		});
 		return {
 			consumedEvent: consumed.consumedEvent,
@@ -77,8 +64,8 @@ const readPlacementStateFx = Effect.fn("placeInventoryItemOnBoardFx.readPlacemen
 			nextSave,
 			placedCreatedAtMs:
 				consumed.slot.createdAtMs ??
-				(config.items[consumed.itemId]?.effects?.length ? nowMs : undefined),
-			placementMode: action.placementMode ?? "exact",
+				(props.config.items[consumed.itemId]?.effects?.length ? props.nowMs : undefined),
+			placementMode: props.action.placementMode ?? "exact",
 			quantity,
 		} satisfies InventoryPlacementState;
 	},
@@ -86,37 +73,49 @@ const readPlacementStateFx = Effect.fn("placeInventoryItemOnBoardFx.readPlacemen
 
 const readGameEnginePlacementResultFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.readGameEnginePlacementResultFx",
-)(function* ({ events, save }: { events: GameEvent[]; save: GameSave }) {
-	const { config, nowMs } = yield* InventoryItemBoardPlacementScopeFx;
+)(function* ({
+	events,
+	props,
+	save,
+}: {
+	events: GameEvent[];
+	props: placeInventoryItemOnBoardFx.Props;
+	save: GameSave;
+}) {
 	return yield* createGameEngineResultFx({
-		config,
+		config: props.config,
 		events,
-		nowMs,
+		nowMs: props.nowMs,
 		save,
 	});
 });
 
 const readInventoryInstanceTargetCellFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.readInventoryInstanceTargetCellFx",
-)(function* ({ itemId, nextSave, placementMode }: InventoryPlacementState) {
-	const { action, config, nowMs } = yield* InventoryItemBoardPlacementScopeFx;
-	return yield* match(placementMode)
+)(function* ({
+	props,
+	state,
+}: {
+	props: placeInventoryItemOnBoardFx.Props;
+	state: InventoryPlacementState;
+}) {
+	return yield* match(state.placementMode)
 		.with("exact", () =>
 			Effect.succeed({
-				x: action.x,
-				y: action.y,
+				x: props.action.x,
+				y: props.action.y,
 			}),
 		)
 		.with("nearest_by_manhattan", () =>
 			Effect.gen(function* () {
 				const [nearestAllowedCell] = yield* planItemBoardPlacementCellsFx({
-					config,
-					itemId,
-					nowMs,
-					save: nextSave,
+					config: props.config,
+					itemId: state.itemId,
+					nowMs: props.nowMs,
+					save: state.nextSave,
 					seedCell: {
-						x: action.x,
-						y: action.y,
+						x: props.action.x,
+						y: props.action.y,
 					},
 				});
 				if (nearestAllowedCell) return nearestAllowedCell;
@@ -134,12 +133,15 @@ const readInventoryInstanceTargetCellFx = Effect.fn(
 
 const placeInventoryInstanceOnBoardFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.placeInventoryInstanceOnBoardFx",
-)(function* (
+)(function* ({
+	props,
+	state,
+}: {
+	props: placeInventoryItemOnBoardFx.Props;
 	state: InventoryPlacementState & {
 		liveSlot: GameSaveInventoryInstance;
-	},
-) {
-	const { nowMs } = yield* InventoryItemBoardPlacementScopeFx;
+	};
+}) {
 	if (state.quantity !== 1) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
@@ -149,7 +151,10 @@ const placeInventoryInstanceOnBoardFx = Effect.fn(
 		);
 	}
 
-	const targetCell = yield* readInventoryInstanceTargetCellFx(state);
+	const targetCell = yield* readInventoryInstanceTargetCellFx({
+		props,
+		state,
+	});
 	const events = [
 		state.consumedEvent,
 	];
@@ -162,10 +167,11 @@ const placeInventoryInstanceOnBoardFx = Effect.fn(
 		reason: "inventory-placement",
 		save: state.nextSave,
 	});
-	state.nextSave.updatedAtMs = nowMs;
+	state.nextSave.updatedAtMs = props.nowMs;
 
 	return yield* readGameEnginePlacementResultFx({
 		events,
+		props,
 		save: state.nextSave,
 	});
 });
@@ -176,10 +182,15 @@ type InventoryPlacementStackState = InventoryPlacementState & {
 
 const placeInventoryStackByNearestPlacementFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.placeInventoryStackByNearestPlacementFx",
-)(function* (state: InventoryPlacementStackState) {
-	const { action, config, nowMs } = yield* InventoryItemBoardPlacementScopeFx;
+)(function* ({
+	props,
+	state,
+}: {
+	props: placeInventoryItemOnBoardFx.Props;
+	state: InventoryPlacementStackState;
+}) {
 	const placed = yield* placeGameSaveItemsFx({
-		config,
+		config: props.config,
 		items: [
 			{
 				createdAtMs: state.placedCreatedAtMs,
@@ -188,11 +199,11 @@ const placeInventoryStackByNearestPlacementFx = Effect.fn(
 				reason: "inventory-placement",
 			},
 		],
-		nowMs,
+		nowMs: props.nowMs,
 		save: state.nextSave,
 		seedCell: {
-			x: action.x,
-			y: action.y,
+			x: props.action.x,
+			y: props.action.y,
 		},
 	}).pipe(
 		Effect.catchTag("GamePlacementFailed", (error) =>
@@ -207,21 +218,27 @@ const placeInventoryStackByNearestPlacementFx = Effect.fn(
 			state.consumedEvent,
 			...placed.events,
 		],
+		props,
 		save: placed.save,
 	});
 });
 
 const placeInventoryStackExactlyFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.placeInventoryStackExactlyFx",
-)(function* (state: InventoryPlacementStackState) {
-	const { action, nowMs } = yield* InventoryItemBoardPlacementScopeFx;
+)(function* ({
+	props,
+	state,
+}: {
+	props: placeInventoryItemOnBoardFx.Props;
+	state: InventoryPlacementStackState;
+}) {
 	const events = [
 		state.consumedEvent,
 	];
 	yield* placeBoardItemInstanceFx({
 		cell: {
-			x: action.x,
-			y: action.y,
+			x: props.action.x,
+			y: props.action.y,
 		},
 		createdAtMs: state.placedCreatedAtMs,
 		events,
@@ -229,55 +246,70 @@ const placeInventoryStackExactlyFx = Effect.fn(
 		reason: "inventory-placement",
 		save: state.nextSave,
 	});
-	state.nextSave.updatedAtMs = nowMs;
+	state.nextSave.updatedAtMs = props.nowMs;
 
 	return yield* readGameEnginePlacementResultFx({
 		events,
+		props,
 		save: state.nextSave,
 	});
 });
 
 const placeInventoryStackOnBoardFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.placeInventoryStackOnBoardFx",
-)(function* (state: InventoryPlacementStackState) {
+)(function* ({
+	props,
+	state,
+}: {
+	props: placeInventoryItemOnBoardFx.Props;
+	state: InventoryPlacementStackState;
+}) {
 	return yield* match(state.placementMode)
-		.with("nearest_by_manhattan", () => placeInventoryStackByNearestPlacementFx(state))
-		.with("exact", () => placeInventoryStackExactlyFx(state))
+		.with("nearest_by_manhattan", () =>
+			placeInventoryStackByNearestPlacementFx({
+				props,
+				state,
+			}),
+		)
+		.with("exact", () =>
+			placeInventoryStackExactlyFx({
+				props,
+				state,
+			}),
+		)
 		.exhaustive();
 });
-
-const placeInventoryItemOnBoardProgramFx = Effect.fn("placeInventoryItemOnBoardFx.programFx")(
-	function* () {
-		const state = yield* readPlacementStateFx();
-		return yield* match(state)
-			.with(
-				{
-					liveSlot: P.when(isGameSaveInventoryInstance),
-				},
-				(instanceState) =>
-					placeInventoryInstanceOnBoardFx({
-						...instanceState,
-						liveSlot: instanceState.liveSlot,
-					}),
-			)
-			.with(
-				{
-					liveSlot: P.when(isGameSaveInventoryStack),
-				},
-				(stackState) =>
-					placeInventoryStackOnBoardFx({
-						...stackState,
-						liveSlot: stackState.liveSlot,
-					}),
-			)
-			.exhaustive();
-	},
-);
 
 export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardFx")(function* (
 	props: placeInventoryItemOnBoardFx.Props,
 ) {
-	return yield* placeInventoryItemOnBoardProgramFx().pipe(
-		Effect.provideService(InventoryItemBoardPlacementScopeFx, props),
-	);
+	const state = yield* readPlacementStateFx(props);
+	return yield* match(state)
+		.with(
+			{
+				liveSlot: P.when(isGameSaveInventoryInstance),
+			},
+			(instanceState) =>
+				placeInventoryInstanceOnBoardFx({
+					props,
+					state: {
+						...instanceState,
+						liveSlot: instanceState.liveSlot,
+					},
+				}),
+		)
+		.with(
+			{
+				liveSlot: P.when(isGameSaveInventoryStack),
+			},
+			(stackState) =>
+				placeInventoryStackOnBoardFx({
+					props,
+					state: {
+						...stackState,
+						liveSlot: stackState.liveSlot,
+					},
+				}),
+		)
+		.exhaustive();
 });

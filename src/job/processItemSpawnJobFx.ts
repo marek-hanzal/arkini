@@ -1,12 +1,12 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
 import type { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveItemSpawnJob } from "~/engine/model/GameSaveSchema";
-import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
+import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
@@ -24,16 +24,8 @@ export namespace processItemSpawnJobFx {
 	}
 }
 
-class ItemSpawnJobProcessingScopeFx extends Context.Tag("ItemSpawnJobProcessingScopeFx")<
-	ItemSpawnJobProcessingScopeFx,
-	processItemSpawnJobFx.Props
->() {
-	//
-}
-
 const readItemSpawnSeedCellFx = Effect.fn("processItemSpawnJobFx.readItemSpawnSeedCellFx")(
-	function* () {
-		const { itemSpawnJob, save } = yield* ItemSpawnJobProcessingScopeFx;
+	function* ({ itemSpawnJob, save }: processItemSpawnJobFx.Props) {
 		return (
 			itemSpawnJob.seedCell ??
 			(yield* readBoardItemCellFx({
@@ -46,43 +38,61 @@ const readItemSpawnSeedCellFx = Effect.fn("processItemSpawnJobFx.readItemSpawnSe
 
 const readItemSpawnPlacementEitherFx = Effect.fn(
 	"processItemSpawnJobFx.readItemSpawnPlacementEitherFx",
-)(function* () {
-	const { config, itemSpawnJob, nowMs, save } = yield* ItemSpawnJobProcessingScopeFx;
+)(function* (props: processItemSpawnJobFx.Props) {
 	return yield* Effect.either(
 		placeGameSaveItemsFx({
-			config,
+			config: props.config,
 			items: [
 				{
-					itemId: itemSpawnJob.itemId,
-					originItemInstanceId: itemSpawnJob.originItemInstanceId,
-					quantity: itemSpawnJob.quantity,
-					reason: itemSpawnJob.reason,
+					itemId: props.itemSpawnJob.itemId,
+					originItemInstanceId: props.itemSpawnJob.originItemInstanceId,
+					quantity: props.itemSpawnJob.quantity,
+					reason: props.itemSpawnJob.reason,
 				},
 			],
-			nowMs,
-			save,
-			seedCell: yield* readItemSpawnSeedCellFx(),
+			nowMs: props.nowMs,
+			save: props.save,
+			seedCell: yield* readItemSpawnSeedCellFx(props),
 		}),
 	);
 });
 
+const removeItemSpawnJobFromSaveFx = Effect.fn(
+	"processItemSpawnJobFx.removeItemSpawnJobFromSaveFx",
+)(function* ({
+	itemSpawnJob,
+	save,
+}: Pick<processItemSpawnJobFx.Props, "itemSpawnJob"> & {
+	save: GameSave;
+}) {
+	delete save.itemSpawnJobs[itemSpawnJob.id];
+});
+
 const completeFailedItemSpawnJobFx = Effect.fn(
 	"processItemSpawnJobFx.completeFailedItemSpawnJobFx",
-)(function* ({ reason }: { reason: GamePlacementFailureReason }) {
-	const { itemSpawnJob, nowMs, save } = yield* ItemSpawnJobProcessingScopeFx;
+)(function* ({
+	props,
+	reason,
+}: {
+	props: processItemSpawnJobFx.Props;
+	reason: GamePlacementFailureReason;
+}) {
 	const nextSave = yield* cloneGameSaveFx({
-		save,
+		save: props.save,
 	});
-	delete nextSave.itemSpawnJobs[itemSpawnJob.id];
-	nextSave.updatedAtMs = nowMs;
+	yield* removeItemSpawnJobFromSaveFx({
+		itemSpawnJob: props.itemSpawnJob,
+		save: nextSave,
+	});
+	nextSave.updatedAtMs = props.nowMs;
 
 	return {
 		events: [
 			{
-				atMs: nowMs,
-				itemId: itemSpawnJob.itemId,
+				atMs: props.nowMs,
+				itemId: props.itemSpawnJob.itemId,
 				reason,
-				jobId: itemSpawnJob.id,
+				jobId: props.itemSpawnJob.id,
 				type: "item.spawn.failed" as const,
 			},
 		],
@@ -92,29 +102,30 @@ const completeFailedItemSpawnJobFx = Effect.fn(
 });
 
 const blockItemSpawnJobFx = Effect.fn("processItemSpawnJobFx.blockItemSpawnJobFx")(function* ({
+	props,
 	reason,
 }: {
+	props: processItemSpawnJobFx.Props;
 	reason: GamePlacementFailureReason;
 }) {
-	const { itemSpawnJob, nowMs, save } = yield* ItemSpawnJobProcessingScopeFx;
 	return {
 		events: [
 			{
-				atMs: nowMs,
-				itemId: itemSpawnJob.itemId,
+				atMs: props.nowMs,
+				itemId: props.itemSpawnJob.itemId,
 				reason,
-				jobId: itemSpawnJob.id,
+				jobId: props.itemSpawnJob.id,
 				type: "item.spawn.blocked" as const,
 			},
 		],
-		save,
+		save: props.save,
 		type: "blocked" as const,
 	} satisfies GameEngineCompletionResult;
 });
 
 const handleItemSpawnPlacementFailureFx = Effect.fn(
 	"processItemSpawnJobFx.handleItemSpawnPlacementFailureFx",
-)(function* ({ error }: { error: GameEngineError }) {
+)(function* ({ error, props }: { error: GameEngineError; props: processItemSpawnJobFx.Props }) {
 	return yield* match(error)
 		.with(
 			{
@@ -123,9 +134,11 @@ const handleItemSpawnPlacementFailureFx = Effect.fn(
 			({ reason }) =>
 				isGamePlacementFailureRetryable(reason)
 					? blockItemSpawnJobFx({
+							props,
 							reason,
 						})
 					: completeFailedItemSpawnJobFx({
+							props,
 							reason,
 						}),
 		)
@@ -136,20 +149,24 @@ const completePlacedItemSpawnJobFx = Effect.fn(
 	"processItemSpawnJobFx.completePlacedItemSpawnJobFx",
 )(function* ({
 	placement,
+	props,
 }: {
 	placement: Effect.Effect.Success<ReturnType<typeof placeGameSaveItemsFx>>;
+	props: processItemSpawnJobFx.Props;
 }) {
-	const { itemSpawnJob, nowMs } = yield* ItemSpawnJobProcessingScopeFx;
-	delete placement.save.itemSpawnJobs[itemSpawnJob.id];
-	placement.save.updatedAtMs = nowMs;
+	yield* removeItemSpawnJobFromSaveFx({
+		itemSpawnJob: props.itemSpawnJob,
+		save: placement.save,
+	});
+	placement.save.updatedAtMs = props.nowMs;
 
 	return {
 		events: placement.events.map((event) =>
 			event.type === "item.created"
 				? {
 						...event,
-						spawnJobId: itemSpawnJob.id,
-						spawnSequenceIndex: itemSpawnJob.sequenceIndex,
+						spawnJobId: props.itemSpawnJob.id,
+						spawnSequenceIndex: props.itemSpawnJob.sequenceIndex,
 					}
 				: event,
 		),
@@ -158,10 +175,10 @@ const completePlacedItemSpawnJobFx = Effect.fn(
 	} satisfies GameEngineCompletionResult;
 });
 
-const processItemSpawnPlacementResultFx = Effect.fn(
-	"processItemSpawnJobFx.processItemSpawnPlacementResultFx",
-)(function* () {
-	const placementEither = yield* readItemSpawnPlacementEitherFx();
+export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function* (
+	props: processItemSpawnJobFx.Props,
+) {
+	const placementEither = yield* readItemSpawnPlacementEitherFx(props);
 	return yield* match(placementEither)
 		.with(
 			{
@@ -170,6 +187,7 @@ const processItemSpawnPlacementResultFx = Effect.fn(
 			({ left }) =>
 				handleItemSpawnPlacementFailureFx({
 					error: left,
+					props,
 				}),
 		)
 		.with(
@@ -179,15 +197,8 @@ const processItemSpawnPlacementResultFx = Effect.fn(
 			({ right }) =>
 				completePlacedItemSpawnJobFx({
 					placement: right,
+					props,
 				}),
 		)
 		.exhaustive();
-});
-
-export const processItemSpawnJobFx = Effect.fn("processItemSpawnJobFx")(function* (
-	props: processItemSpawnJobFx.Props,
-) {
-	return yield* processItemSpawnPlacementResultFx().pipe(
-		Effect.provideService(ItemSpawnJobProcessingScopeFx, props),
-	);
 });

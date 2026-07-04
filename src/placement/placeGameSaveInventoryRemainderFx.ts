@@ -1,6 +1,6 @@
-import { Context, Effect } from "effect";
-import type { GameEvent } from "~/event/GameEventSchema";
+import { Effect } from "effect";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { pushInventoryItemCreatedEventFx } from "~/placement/pushInventoryItemCreatedEventFx";
@@ -20,64 +20,64 @@ export namespace placeGameSaveInventoryRemainderFx {
 	}
 }
 
-class InventoryRemainderPlacementScopeFx extends Context.Tag("InventoryRemainderPlacementScopeFx")<
-	InventoryRemainderPlacementScopeFx,
-	placeGameSaveInventoryRemainderFx.Props
->() {
-	//
-}
-
 const pushInventoryStackPlacementEventFx = Effect.fn(
 	"placeGameSaveInventoryRemainderFx.pushInventoryStackPlacementEventFx",
 )(function* ({
 	nextQuantity,
 	placedQuantity,
 	previousQuantity,
+	props,
 	slotIndex,
 }: {
 	nextQuantity: number;
 	placedQuantity: number;
 	previousQuantity: number;
+	props: placeGameSaveInventoryRemainderFx.Props;
 	slotIndex: number;
 }) {
-	const { events, item } = yield* InventoryRemainderPlacementScopeFx;
-	if (!item.reason) return;
+	if (!props.item.reason) return;
 	yield* pushInventoryItemCreatedEventFx({
-		events,
-		itemId: item.itemId,
+		events: props.events,
+		itemId: props.item.itemId,
 		nextQuantity,
-		originItemInstanceId: item.originItemInstanceId,
+		originItemInstanceId: props.item.originItemInstanceId,
 		previousQuantity,
 		quantity: placedQuantity,
-		reason: item.reason,
+		reason: props.item.reason,
 		slotIndex,
 	});
 });
 
 const placeIntoExistingInventoryStacksFx = Effect.fn(
 	"placeGameSaveInventoryRemainderFx.placeIntoExistingInventoryStacksFx",
-)(function* ({ remainingQuantity }: { remainingQuantity: number }) {
-	const { item, maxStackSize, slots } = yield* InventoryRemainderPlacementScopeFx;
+)(function* ({
+	props,
+	remainingQuantity,
+}: {
+	props: placeGameSaveInventoryRemainderFx.Props;
+	remainingQuantity: number;
+}) {
 	let remaining = remainingQuantity;
 
-	for (let slotIndex = 0; slotIndex < slots.length && remaining > 0; slotIndex += 1) {
-		const slot = slots[slotIndex];
+	for (let slotIndex = 0; slotIndex < props.slots.length && remaining > 0; slotIndex += 1) {
+		const slot = props.slots[slotIndex];
 		if (
 			!isGameSaveInventoryStack(slot) ||
-			slot.itemId !== item.itemId ||
-			slot.quantity >= maxStackSize
+			slot.itemId !== props.item.itemId ||
+			slot.quantity >= props.maxStackSize
 		) {
 			continue;
 		}
 
 		const previousQuantity = slot.quantity;
-		const placedQuantity = Math.min(maxStackSize - previousQuantity, remaining);
+		const placedQuantity = Math.min(props.maxStackSize - previousQuantity, remaining);
 		slot.quantity += placedQuantity;
 		remaining -= placedQuantity;
 		yield* pushInventoryStackPlacementEventFx({
 			nextQuantity: slot.quantity,
 			placedQuantity,
 			previousQuantity,
+			props,
 			slotIndex,
 		});
 	}
@@ -87,23 +87,28 @@ const placeIntoExistingInventoryStacksFx = Effect.fn(
 
 const placeIntoEmptyInventorySlotsFx = Effect.fn(
 	"placeGameSaveInventoryRemainderFx.placeIntoEmptyInventorySlotsFx",
-)(function* ({ remainingQuantity }: { remainingQuantity: number }) {
-	const { createdAtMs, item, maxStackSize, slots } = yield* InventoryRemainderPlacementScopeFx;
+)(function* ({
+	props,
+	remainingQuantity,
+}: {
+	props: placeGameSaveInventoryRemainderFx.Props;
+	remainingQuantity: number;
+}) {
 	let remaining = remainingQuantity;
 
-	for (let slotIndex = 0; slotIndex < slots.length && remaining > 0; slotIndex += 1) {
-		if (slots[slotIndex]) {
+	for (let slotIndex = 0; slotIndex < props.slots.length && remaining > 0; slotIndex += 1) {
+		if (props.slots[slotIndex]) {
 			continue;
 		}
 
-		const placedQuantity = Math.min(maxStackSize, remaining);
-		slots[slotIndex] = {
-			...(createdAtMs !== undefined
+		const placedQuantity = Math.min(props.maxStackSize, remaining);
+		props.slots[slotIndex] = {
+			...(props.createdAtMs !== undefined
 				? {
-						createdAtMs,
+						createdAtMs: props.createdAtMs,
 					}
 				: {}),
-			itemId: item.itemId,
+			itemId: props.item.itemId,
 			quantity: placedQuantity,
 		};
 		remaining -= placedQuantity;
@@ -111,6 +116,7 @@ const placeIntoEmptyInventorySlotsFx = Effect.fn(
 			nextQuantity: placedQuantity,
 			placedQuantity,
 			previousQuantity: 0,
+			props,
 			slotIndex,
 		});
 	}
@@ -118,23 +124,16 @@ const placeIntoEmptyInventorySlotsFx = Effect.fn(
 	return remaining;
 });
 
-const placeInventoryRemainderProgramFx = Effect.fn(
-	"placeGameSaveInventoryRemainderFx.placeInventoryRemainderProgramFx",
-)(function* () {
-	const { remainingQuantity } = yield* InventoryRemainderPlacementScopeFx;
-	const remainingAfterExistingStacks = yield* placeIntoExistingInventoryStacksFx({
-		remainingQuantity,
-	});
-	const remainingAfterEmptySlots = yield* placeIntoEmptyInventorySlotsFx({
-		remainingQuantity: remainingAfterExistingStacks,
-	});
-	return remainingAfterEmptySlots === 0;
-});
-
 export const placeGameSaveInventoryRemainderFx = Effect.fn("placeGameSaveInventoryRemainderFx")(
 	function* (props: placeGameSaveInventoryRemainderFx.Props) {
-		return yield* placeInventoryRemainderProgramFx().pipe(
-			Effect.provideService(InventoryRemainderPlacementScopeFx, props),
-		);
+		const remainingAfterExistingStacks = yield* placeIntoExistingInventoryStacksFx({
+			props,
+			remainingQuantity: props.remainingQuantity,
+		});
+		const remainingAfterEmptySlots = yield* placeIntoEmptyInventorySlotsFx({
+			props,
+			remainingQuantity: remainingAfterExistingStacks,
+		});
+		return remainingAfterEmptySlots === 0;
 	},
 );

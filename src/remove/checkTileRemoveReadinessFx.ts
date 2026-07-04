@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
 import { assertResolvedInputRefQuantityFx } from "~/activation/assertResolvedInputRefQuantityFx";
 import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
@@ -19,15 +19,10 @@ export namespace checkTileRemoveReadinessFx {
 
 type TileRemoveTarget = NonNullable<GameSave["board"]["items"][string]>;
 
-class TileRemoveReadinessScopeFx extends Context.Tag("TileRemoveReadinessScopeFx")<
-	TileRemoveReadinessScopeFx,
-	checkTileRemoveReadinessFx.Props & {
-		readonly target: TileRemoveTarget;
-		readonly tool: GameActionResolvedInputRef;
-	}
->() {
-	//
-}
+type TileRemoveReadinessContext = checkTileRemoveReadinessFx.Props & {
+	readonly target: TileRemoveTarget;
+	readonly tool: GameActionResolvedInputRef;
+};
 
 const readTileRemoveTargetFx = Effect.fn("checkTileRemoveReadinessFx.readTileRemoveTargetFx")(
 	function* ({ action, save }: checkTileRemoveReadinessFx.Props) {
@@ -72,8 +67,7 @@ const readTileRemoveToolFx = Effect.fn("checkTileRemoveReadinessFx.readTileRemov
 
 const assertTileRemoveTargetNotBusyFx = Effect.fn(
 	"checkTileRemoveReadinessFx.assertTileRemoveTargetNotBusyFx",
-)(function* () {
-	const { save, target } = yield* TileRemoveReadinessScopeFx;
+)(function* ({ save, target }: Pick<TileRemoveReadinessContext, "save" | "target">) {
 	const stateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: target.id,
 		save,
@@ -91,8 +85,11 @@ const assertTileRemoveTargetNotBusyFx = Effect.fn(
 });
 
 const readTileRemovalRuleFx = Effect.fn("checkTileRemoveReadinessFx.readTileRemovalRuleFx")(
-	function* () {
-		const { config, target, tool } = yield* TileRemoveReadinessScopeFx;
+	function* ({
+		config,
+		target,
+		tool,
+	}: Pick<TileRemoveReadinessContext, "config" | "target" | "tool">) {
 		const targetDefinition = config.items[target.itemId];
 		const removal = targetDefinition?.removeBy?.find((entry) => entry.itemId === tool.itemId);
 		if (targetDefinition && removal) return removal;
@@ -106,20 +103,6 @@ const readTileRemovalRuleFx = Effect.fn("checkTileRemoveReadinessFx.readTileRemo
 	},
 );
 
-const checkTileRemoveReadinessProgramFx = Effect.fn(
-	"checkTileRemoveReadinessFx.checkTileRemoveReadinessProgramFx",
-)(function* () {
-	const { target, tool } = yield* TileRemoveReadinessScopeFx;
-	yield* assertTileRemoveTargetNotBusyFx();
-	const removal = yield* readTileRemovalRuleFx();
-
-	return {
-		removal,
-		target,
-		tool,
-	};
-});
-
 export const checkTileRemoveReadinessFx = Effect.fn("checkTileRemoveReadinessFx")(function* (
 	props: checkTileRemoveReadinessFx.Props,
 ) {
@@ -128,12 +111,17 @@ export const checkTileRemoveReadinessFx = Effect.fn("checkTileRemoveReadinessFx"
 		...props,
 		target,
 	});
+	const context = {
+		...props,
+		target,
+		tool,
+	} satisfies TileRemoveReadinessContext;
+	yield* assertTileRemoveTargetNotBusyFx(context);
+	const removal = yield* readTileRemovalRuleFx(context);
 
-	return yield* checkTileRemoveReadinessProgramFx().pipe(
-		Effect.provideService(TileRemoveReadinessScopeFx, {
-			...props,
-			target,
-			tool,
-		}),
-	);
+	return {
+		removal,
+		target,
+		tool,
+	};
 });

@@ -1,18 +1,18 @@
-import { Effect } from "effect";
+import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
-import { checkTileRemoveReadinessFx } from "~/remove/checkTileRemoveReadinessFx";
-import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
+import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
+import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
-import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
-import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
-import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { checkTileRemoveReadinessFx } from "~/remove/checkTileRemoveReadinessFx";
+import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export namespace removeTileFx {
 	export interface Props {
@@ -23,18 +23,38 @@ export namespace removeTileFx {
 	}
 }
 
-export const removeTileFx = Effect.fn("removeTileFx")(function* ({
-	config,
-	save,
-	action,
-	nowMs,
-}: removeTileFx.Props) {
-	const checked = yield* checkTileRemoveReadinessFx({
+type TileRemoveReadiness = Effect.Effect.Success<ReturnType<typeof checkTileRemoveReadinessFx>>;
+
+type TileRemoveWorkingState = {
+	checked: TileRemoveReadiness;
+	nextSave: GameSave;
+	removalEvents: GameEvent[];
+	seedCell: Effect.Effect.Success<ReturnType<typeof readBoardItemCellFx>>;
+};
+
+class RemoveTileScopeFx extends Context.Tag("RemoveTileScopeFx")<
+	RemoveTileScopeFx,
+	removeTileFx.Props
+>() {
+	//
+}
+
+const readTileRemoveReadinessFx = Effect.fn("removeTileFx.readTileRemoveReadinessFx")(function* () {
+	const { action, config, save } = yield* RemoveTileScopeFx;
+	return yield* checkTileRemoveReadinessFx({
 		action,
 		config,
 		save,
 	});
-	const consumed = yield* match(checked.removal.mode)
+});
+
+const consumeRemoveToolFx = Effect.fn("removeTileFx.consumeRemoveToolFx")(function* ({
+	checked,
+}: {
+	checked: TileRemoveReadiness;
+}) {
+	const { action, nowMs, save } = yield* RemoveTileScopeFx;
+	return yield* match(checked.removal.mode)
 		.with("consume", () =>
 			consumeActivationInputsFx({
 				inputRefs: [
@@ -59,32 +79,58 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 			}),
 		)
 		.exhaustive();
+});
 
-	const nextSave = yield* cloneGameSaveFx({
-		save: consumed.save,
-	});
-	const seedCell = yield* readBoardItemCellFx({
-		itemInstanceId: checked.target.id,
-		save: nextSave,
-	});
-	delete nextSave.board.items[checked.target.id];
-	yield* removeBoardItemRuntimeStateFx({
-		itemInstanceId: checked.target.id,
-		save: nextSave,
-	});
-	nextSave.updatedAtMs = nowMs;
-
-	const removalEvents = [
-		...consumed.events,
-		{
-			itemId: checked.target.itemId,
+const removeTileTargetFromBoardFx = Effect.fn("removeTileFx.removeTileTargetFromBoardFx")(
+	function* ({ checked, nextSave }: { checked: TileRemoveReadiness; nextSave: GameSave }) {
+		delete nextSave.board.items[checked.target.id];
+		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: checked.target.id,
-			reason: "tile-remove" as const,
-			atMs: nowMs,
-			type: "item.removed" as const,
-		},
-	] satisfies GameEvent[];
+			save: nextSave,
+		});
+	},
+);
 
+const createTileRemoveWorkingStateFx = Effect.fn("removeTileFx.createTileRemoveWorkingStateFx")(
+	function* ({ checked }: { checked: TileRemoveReadiness }) {
+		const { nowMs } = yield* RemoveTileScopeFx;
+		const consumed = yield* consumeRemoveToolFx({
+			checked,
+		});
+		const nextSave = yield* cloneGameSaveFx({
+			save: consumed.save,
+		});
+		const seedCell = yield* readBoardItemCellFx({
+			itemInstanceId: checked.target.id,
+			save: nextSave,
+		});
+		yield* removeTileTargetFromBoardFx({
+			checked,
+			nextSave,
+		});
+		nextSave.updatedAtMs = nowMs;
+
+		return {
+			checked,
+			nextSave,
+			removalEvents: [
+				...consumed.events,
+				{
+					itemId: checked.target.itemId,
+					itemInstanceId: checked.target.id,
+					reason: "tile-remove" as const,
+					atMs: nowMs,
+					type: "item.removed" as const,
+				},
+			],
+			seedCell,
+		} satisfies TileRemoveWorkingState;
+	},
+);
+
+const rollTileRemoveOutputPlacementRequestsFx = Effect.fn(
+	"removeTileFx.rollTileRemoveOutputPlacementRequestsFx",
+)(function* ({ checked }: TileRemoveWorkingState) {
 	const rolledOutput = checked.removal.output
 		? yield* rollLootTableItemsFx({
 				lootTable: {
@@ -96,7 +142,7 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 				items: [],
 			};
 
-	const placementRequests = rolledOutput.items.map(
+	return rolledOutput.items.map(
 		(item) =>
 			({
 				...item,
@@ -104,29 +150,69 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 				reason: "tile-remove-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
-	const placed = placementRequests.length
-		? yield* placeGameSaveItemsFx({
-				config,
-				freedBoardItemInstanceIds: new Set([
-					checked.target.id,
-				]),
-				items: placementRequests,
-				nowMs,
-				save: nextSave,
-				seedCell,
-			})
-		: {
-				events: [] satisfies GameEvent[],
-				save: nextSave,
-			};
+});
+
+const placeTileRemoveOutputsFx = Effect.fn("removeTileFx.placeTileRemoveOutputsFx")(function* (
+	state: TileRemoveWorkingState,
+) {
+	const { config, nowMs } = yield* RemoveTileScopeFx;
+	const placementRequests = yield* rollTileRemoveOutputPlacementRequestsFx(state);
+	if (placementRequests.length === 0) {
+		return {
+			events: [] satisfies GameEvent[],
+			save: state.nextSave,
+		};
+	}
+
+	return yield* placeGameSaveItemsFx({
+		config,
+		freedBoardItemInstanceIds: new Set([
+			state.checked.target.id,
+		]),
+		items: placementRequests,
+		nowMs,
+		save: state.nextSave,
+		seedCell: state.seedCell,
+	});
+});
+
+const buildRemoveTileResultFx = Effect.fn("removeTileFx.buildRemoveTileResultFx")(function* (
+	state: TileRemoveWorkingState,
+) {
+	const { config, nowMs } = yield* RemoveTileScopeFx;
+	const placed = yield* placeTileRemoveOutputsFx(state);
 
 	return yield* createGameEngineResultFx({
 		config,
 		events: [
-			...removalEvents,
+			...state.removalEvents,
 			...placed.events,
 		],
 		nowMs,
 		save: placed.save,
 	});
+});
+
+const removeTileProgramFx = Effect.fn("removeTileFx.removeTileProgramFx")(function* () {
+	const checked = yield* readTileRemoveReadinessFx();
+	const state = yield* createTileRemoveWorkingStateFx({
+		checked,
+	});
+	return yield* buildRemoveTileResultFx(state);
+});
+
+export const removeTileFx = Effect.fn("removeTileFx")(function* ({
+	action,
+	config,
+	nowMs,
+	save,
+}: removeTileFx.Props) {
+	return yield* removeTileProgramFx().pipe(
+		Effect.provideService(RemoveTileScopeFx, {
+			action,
+			config,
+			nowMs,
+			save,
+		}),
+	);
 });

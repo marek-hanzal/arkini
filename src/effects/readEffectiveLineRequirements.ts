@@ -5,10 +5,8 @@ import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 import { createAppliedGameEffectOperation } from "~/effects/createAppliedGameEffectOperation";
 import { doesGameGrantSelectorMatchIds } from "~/effects/doesGameGrantSelectorMatchIds";
-import {
-	readNearbyLineEffectMatches,
-	type RuntimeItemSelector,
-} from "~/effects/readNearbyLineEffectMatches";
+import type { RuntimeItemSelector } from "~/effects/RuntimeLineEffectTypes";
+import { readNearbyLineEffectMatches } from "~/effects/readNearbyLineEffectMatches";
 import { readRuntimeLineEffectLabel } from "~/effects/readRuntimeLineEffectLabel";
 import { readNearbyCapacitySpendSource } from "~/capacity/readNearbyCapacitySpendSource";
 

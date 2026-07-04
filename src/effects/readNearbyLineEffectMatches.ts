@@ -1,27 +1,9 @@
 import type { BoardCell } from "~/board/BoardCellPosition";
-import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readChebyshevDistance } from "~/effects/readChebyshevDistance";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
+import type { DropEffect, RuntimeItemSelector } from "~/effects/RuntimeLineEffectTypes";
 import { doesResolvedDomainSelectorMatchId } from "~/selector/doesResolvedDomainSelectorMatchId";
-
-type LineOutput = NonNullable<GameLineDefinition["output"]>[number];
-type NonWeightedLineOutput = Exclude<
-	LineOutput,
-	{
-		type: "weighted";
-	}
->;
-type DropEffect = NonNullable<NonWeightedLineOutput["effects"]>[number];
-type LineEffect = NonNullable<GameLineDefinition["effects"]>[number];
-type RuntimeLineEffect = DropEffect | LineEffect;
-
-export type RuntimeItemSelector = Extract<
-	RuntimeLineEffect,
-	{
-		kind: "nearby.capacity.spend" | "nearby.duration.multiply" | "nearby.require";
-	}
->["items"];
 
 export const readNearbyLineEffectMatches = ({
 	items,

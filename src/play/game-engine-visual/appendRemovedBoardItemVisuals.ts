@@ -62,9 +62,8 @@ export const appendRemovedBoardItemVisuals = ({
 					itemInstanceId: event.itemInstanceId,
 				})
 			: 0;
-	const durationMs = tileRemoveDurationMs;
 	const groupId = `engine:item-removed:${event.reason}:${event.itemInstanceId}:${event.atMs}`;
-	const cleanupDelayMs = delayMs + durationMs + TileEngineTiming.motionCleanupBufferMs;
+	const cleanupDelayMs = delayMs + tileRemoveDurationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {
 		groupId,
 		id: event.itemInstanceId,
@@ -79,7 +78,7 @@ export const appendRemovedBoardItemVisuals = ({
 			cleanupDelayMs,
 			exit: {
 				delayMs,
-				durationMs,
+				durationMs: tileRemoveDurationMs,
 				groupId,
 				kind: "remove",
 			},

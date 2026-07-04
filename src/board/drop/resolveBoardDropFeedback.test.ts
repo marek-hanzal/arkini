@@ -16,8 +16,6 @@ const boardItem = (props: Pick<BoardViewItem, "id" | "itemId" | "x" | "y">): Boa
 	state: {},
 });
 
-const boardView = rebuildBoardView;
-
 const context = (
 	props: Pick<
 		TileEngine.DragOverContext<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>,
@@ -50,7 +48,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 				]),
 				context: context({
@@ -101,7 +99,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config: inventoryOnlyConfig,
 				inventory,
-				board: boardView([]),
+				board: rebuildBoardView([]),
 				context: context({
 					source: {
 						kind: "inventory",
@@ -127,7 +125,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([]),
+				board: rebuildBoardView([]),
 				context: context({
 					source: {
 						kind: "inventory",
@@ -162,7 +160,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 				]),
 				context: context({
@@ -206,7 +204,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 					target,
 				]),
@@ -256,7 +254,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: inventoryWithEmptySlot,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 					target,
 				]),
@@ -307,7 +305,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: inventoryWithEmptySlot,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 					target,
 				]),
@@ -392,7 +390,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 					target,
 				]),
@@ -486,7 +484,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 					target,
 				]),
@@ -537,7 +535,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					source,
 					target,
 				]),
@@ -580,7 +578,7 @@ describe("resolveBoardDropFeedback", () => {
 			resolveBoardDropFeedback({
 				config,
 				inventory: emptyInventory,
-				board: boardView([
+				board: rebuildBoardView([
 					target,
 				]),
 				context: context({

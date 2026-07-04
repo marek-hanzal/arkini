@@ -3,6 +3,7 @@ import { readLineRunState } from "~/producer/logic/readLineRunState";
 import { formatMs } from "~/time/formatMs";
 import type { DetailActionControl } from "~/item-detail/control/DetailActionControl";
 import type { DetailLineControl } from "~/item-detail/control/DetailLineControl";
+import { joinTextParts } from "~/ui/joinTextParts";
 
 export namespace readDetailLineControl {
 	export interface Props {
@@ -30,13 +31,11 @@ const readLineActionLabel = ({ line, runState }: { line: LineView; runState: Lin
 	const timeLabel = line.remainingMs === undefined ? undefined : formatMs(line.remainingMs);
 	const queuedLabel = line.jobs > 1 ? `+${line.jobs - 1} queued` : undefined;
 
-	return [
+	return joinTextParts([
 		statusLabel,
 		timeLabel,
 		queuedLabel,
-	]
-		.filter(Boolean)
-		.join(" · ");
+	]);
 };
 
 const readWithdrawInputActionsByItemId = ({

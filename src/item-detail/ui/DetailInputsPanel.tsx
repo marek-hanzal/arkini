@@ -7,6 +7,7 @@ import { ItemInlineAsset } from "~/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 import { cn } from "~/ui/cn";
 import { DetailCard, DetailMutedPill } from "~/item-detail/ui/DetailCard";
+import { joinTextParts } from "~/ui/joinTextParts";
 
 export namespace DetailInputsPanel {
 	export interface Props {
@@ -41,14 +42,12 @@ export const DetailInputsPanel: FC<DetailInputsPanel.Props> = ({
 				{rows.map(({ input, ready }) => {
 					const item = items[input.itemId];
 					const fillableQuantity = readActivationInputViewFillableQuantity(input);
-					const meta = [
+					const meta = joinTextParts([
 						readActivationInputViewLabel(input),
 						input.capacity > input.quantity ? `cap ${input.capacity}` : undefined,
 						fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined,
 						input.consume ? "consumed" : "kept",
-					]
-						.filter(Boolean)
-						.join(" · ");
+					]);
 
 					return (
 						<div

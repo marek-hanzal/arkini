@@ -2629,16 +2629,13 @@ const readMandatoryGrantIds = (selector: z.infer<typeof ResolvedDomainSelectorSc
 	if ("mode" in selector) return grantIds;
 
 	for (const clause of selector.allOf ?? []) {
-		if (clause.ids.length === 1) {
-			grantIds.add(clause.ids[0] ?? "");
+		const [grantId] = clause.ids;
+		if (clause.ids.length === 1 && grantId) {
+			grantIds.add(grantId);
 		}
 	}
 
-	return new Set(
-		[
-			...grantIds,
-		].filter(Boolean),
-	);
+	return grantIds;
 };
 
 const readActivationOutputItemIds = (output: z.infer<typeof ActivationOutputSchema>) =>

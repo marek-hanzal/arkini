@@ -3,6 +3,7 @@ import type { ActivationDropView } from "~/board/view/ActivationDropViewSchema";
 import { ItemInlineAsset } from "~/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 import { DetailCard, DetailMutedPill } from "~/item-detail/ui/DetailCard";
+import { joinTextParts } from "~/ui/joinTextParts";
 
 export namespace DetailDropsPanel {
 	export interface Props {
@@ -29,13 +30,11 @@ const readDropGroups = (drops: readonly ActivationDropView[]): DropGroup[] =>
 	].filter((group) => group.drops.length > 0);
 
 const readDropMeta = (drop: ActivationDropView) =>
-	[
+	joinTextParts([
 		drop.enabled === false ? "disabled" : undefined,
 		drop.rollLabel,
 		`Quantity ${drop.quantityLabel}`,
-	]
-		.filter(Boolean)
-		.join(" · ");
+	]);
 
 const readDropEffectLines = (drop: ActivationDropView) =>
 	(drop.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);

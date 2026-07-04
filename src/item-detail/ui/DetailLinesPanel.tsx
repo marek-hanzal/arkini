@@ -18,6 +18,7 @@ import {
 	DetailSeparator,
 	DetailTabs,
 } from "~/item-detail/ui/DetailCard";
+import { joinTextParts } from "~/ui/joinTextParts";
 import {
 	effectDetailPolarityTabs,
 	readEffectDetailPolarityClassName,
@@ -58,15 +59,13 @@ const readOutputProbabilityLabel = (output: NonNullable<LineView["outputs"]>[num
 };
 
 const readOutputMeta = (output: NonNullable<LineView["outputs"]>[number]) =>
-	[
+	joinTextParts([
 		output.enabled === false ? "disabled" : undefined,
 		readQuantityLabel(output.quantity),
 		readOutputProbabilityLabel(output),
 		output.rollLabel,
 		`Owned ${output.ownedQuantity}`,
-	]
-		.filter(Boolean)
-		.join(" · ");
+	]);
 
 const readOutputEffectLines = (output: NonNullable<LineView["outputs"]>[number]) =>
 	(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
@@ -220,13 +219,11 @@ const DetailLineInputs: FC<{
 				const fillableQuantity = readActivationInputViewFillableQuantity(input);
 				const ready = readActivationInputViewReady(input);
 				const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
-				const meta = [
+				const meta = joinTextParts([
 					readActivationInputViewLabel(input),
 					fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined,
 					input.capacity > input.quantity ? `cap ${input.capacity}` : undefined,
-				]
-					.filter(Boolean)
-					.join(" · ");
+				]);
 
 				return (
 					<div
@@ -294,7 +291,7 @@ const DetailLineCard: FC<{
 		(requirement) => `${readEffectRequirementPrefix(requirement)} ${requirement.label}`,
 	);
 	const showInputs = !line.inProgress;
-	const meta = [
+	const meta = joinTextParts([
 		line.kind === "effect"
 			? `Window ${formatMs(line.durationMs)}`
 			: `Queue ${line.queueUsed}/${line.queueMax}`,
@@ -304,9 +301,7 @@ const DetailLineCard: FC<{
 			: line.effectDurationMultiplier && line.effectDurationMultiplier > 1
 				? `slowed ${formatMultiplier(line.effectDurationMultiplier)}×`
 				: undefined,
-	]
-		.filter(Boolean)
-		.join(" · ");
+	]);
 
 	return (
 		<article className="min-w-0">

@@ -1,5 +1,8 @@
 import { Effect } from "effect";
 import { writeStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
+import { pruneEmptyCraftInputStateFx } from "~/craft/pruneEmptyCraftInputStateFx";
+import { readOrCreateCraftInputStateFx } from "~/craft/readOrCreateCraftInputStateFx";
+import { writeCraftInputStateToSaveFx } from "~/craft/writeCraftInputStateToSaveFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 
@@ -25,26 +28,29 @@ const removeCraftInputQuantityFx = Effect.fn(
 	nextSave,
 	targetItemInstanceId,
 }: withdrawCraftStoredInputFx.Props) {
-	const craftInputState = nextSave.craftInputs[targetItemInstanceId] ?? {
-		items: {},
-	};
+	const craftInputState = yield* readOrCreateCraftInputStateFx({
+		save: nextSave,
+		targetItemInstanceId,
+	});
 
 	yield* writeStoredActivationInputQuantityFx({
 		itemId,
 		nextQuantity,
 		state: craftInputState,
 	});
-	if (nextQuantity > 0) {
-		nextSave.craftInputs[targetItemInstanceId] = craftInputState;
+	if (nextQuantity > 0 || Object.keys(craftInputState.items).length > 0) {
+		yield* writeCraftInputStateToSaveFx({
+			save: nextSave,
+			state: craftInputState,
+			targetItemInstanceId,
+		});
 		return;
 	}
 
-	if (Object.keys(craftInputState.items).length > 0) {
-		nextSave.craftInputs[targetItemInstanceId] = craftInputState;
-		return;
-	}
-
-	delete nextSave.craftInputs[targetItemInstanceId];
+	yield* pruneEmptyCraftInputStateFx({
+		save: nextSave,
+		targetItemInstanceId,
+	});
 });
 
 const appendCraftInputWithdrawnEventFx = Effect.fn(

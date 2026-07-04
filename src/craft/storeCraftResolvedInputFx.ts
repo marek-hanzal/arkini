@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import { increaseStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
+import { readOrCreateCraftInputStateFx } from "~/craft/readOrCreateCraftInputStateFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 
@@ -23,8 +24,9 @@ export const storeCraftResolvedInputFx = Effect.fn("storeCraftResolvedInputFx")(
 	ref,
 	targetItemInstanceId,
 }: storeCraftResolvedInputFx.Props) {
-	const craftInputState = (nextSave.craftInputs[targetItemInstanceId] ??= {
-		items: {},
+	const craftInputState = yield* readOrCreateCraftInputStateFx({
+		save: nextSave,
+		targetItemInstanceId,
 	});
 	const { nextQuantity, previousQuantity } = yield* increaseStoredActivationInputQuantityFx({
 		itemId: ref.itemId,

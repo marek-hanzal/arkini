@@ -1,6 +1,8 @@
 import { Effect } from "effect";
+import { removeCraftInputStateFromSaveFx } from "~/craft/removeCraftInputStateFromSaveFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { removeActiveEffectFromSaveFx } from "~/effects/removeActiveEffectFromSaveFx";
+import { removeProducerInputStateFromSaveFx } from "~/producer/removeProducerInputStateFromSaveFx";
 
 export namespace removeBoardItemRuntimeStateFx {
 	export interface Props {
@@ -16,8 +18,14 @@ export const removeBoardItemRuntimeStateFx = Effect.fn("removeBoardItemRuntimeSt
 	delete save.producerCharges[itemInstanceId];
 	delete save.itemCapacities[itemInstanceId];
 	delete save.lines[itemInstanceId];
-	delete save.producerInputs[itemInstanceId];
-	delete save.craftInputs[itemInstanceId];
+	yield* removeProducerInputStateFromSaveFx({
+		itemInstanceId,
+		save,
+	});
+	yield* removeCraftInputStateFromSaveFx({
+		save,
+		targetItemInstanceId: itemInstanceId,
+	});
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
 		if (job.itemInstanceId === itemInstanceId) delete save.producerJobs[jobId];

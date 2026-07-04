@@ -91,6 +91,7 @@ const main = async () => {
 		...auditJobRemovalBoundaries(),
 		...auditJobWriteBoundaries(),
 		...auditActiveEffectWriteBoundaries(),
+		...auditStoredInputWriteBoundaries(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
@@ -287,6 +288,39 @@ const auditActiveEffectWriteBoundaries = (): Finding[] =>
 				path,
 				message:
 					"active effect writes/removals must go through named Fx boundaries so effect lifecycle changes stay grepable",
+			},
+		];
+	});
+
+const storedInputWriteBoundaryPaths = new Set([
+	"src/craft/readOrCreateCraftInputStateFx.ts",
+	"src/craft/removeCraftInputStateFromSaveFx.ts",
+	"src/craft/writeCraftInputStateToSaveFx.ts",
+	"src/producer/pruneEmptyProducerInputStateFx.ts",
+	"src/producer/readOrCreateProducerLineInputStateFx.ts",
+	"src/producer/removeProducerInputStateFromSaveFx.ts",
+]);
+
+const auditStoredInputWriteBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (storedInputWriteBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (
+			!/(?:delete\s+[^;]*\.(?:producerInputs|craftInputs|lineInputs)\s*\[|\.(?:producerInputs|craftInputs|lineInputs)\s*\[[^\]]+\]\s*(?:\?\?=|=))/.test(
+				text,
+			)
+		) {
+			return [];
+		}
+
+		return [
+			{
+				path,
+				message:
+					"stored input writes/removals must go through named Fx boundaries so producer/craft input lifecycle changes stay grepable",
 			},
 		];
 	});

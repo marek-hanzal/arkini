@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { GameActivationInput } from "~/activation/GameActivationInput";
 import { readActivationInputMode } from "~/activation/readActivationInputMode";
 import { writeStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
+import { pruneEmptyProducerInputStateFx } from "~/producer/pruneEmptyProducerInputStateFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace consumeProducerStoredInputsFx {
@@ -39,10 +40,9 @@ export const consumeProducerStoredInputsFx = Effect.fn("consumeProducerStoredInp
 		});
 	}
 
-	if (Object.keys(lineInputState.items).length === 0) {
-		delete producerInputState.lineInputs[lineId];
-	}
-	if (Object.keys(producerInputState.lineInputs).length === 0) {
-		delete nextSave.producerInputs[itemInstanceId];
-	}
+	yield* pruneEmptyProducerInputStateFx({
+		itemInstanceId,
+		lineId,
+		save: nextSave,
+	});
 });

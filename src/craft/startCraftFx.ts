@@ -11,6 +11,7 @@ import type { GameEvent } from "~/event/GameEventSchema";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { createGameJobIdFx } from "~/job/createGameJobIdFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
+import { removeCraftInputStateFromSaveFx } from "~/craft/removeCraftInputStateFromSaveFx";
 import { writeCraftJobToSaveFx } from "~/craft/writeCraftJobToSaveFx";
 
 export namespace startCraftFx {
@@ -138,7 +139,10 @@ const finishCraftStartWithRunningJobFx = Effect.fn("startCraftFx.finishCraftStar
 			props,
 			state,
 		});
-		delete state.nextSave.craftInputs[props.action.targetItemInstanceId];
+		yield* removeCraftInputStateFromSaveFx({
+			save: state.nextSave,
+			targetItemInstanceId: props.action.targetItemInstanceId,
+		});
 		const { jobId, timing } = yield* insertCraftJobFx({
 			props,
 			state,

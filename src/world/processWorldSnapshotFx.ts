@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Context, Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { processCompletedCraftJobsFx } from "~/craft/processCompletedCraftJobsFx";
 import { processExpiredActiveEffectsFx } from "~/effects/processExpiredActiveEffectsFx";
@@ -22,63 +22,152 @@ export namespace processWorldSnapshotFx {
 	}
 }
 
-export const processWorldSnapshotFx = Effect.fn("processWorldSnapshotFx")(function* ({
-	config,
-	nowMs,
-	save,
-}: processWorldSnapshotFx.Props) {
-	let nextSave = save;
-	const events: GameEvent[] = [];
+type WorldProcessingStepResult = {
+	events: GameEvent[];
+	save: GameSave;
+};
 
-	const itemSpawnBeforeJobs = yield* processItemSpawnJobsFx({
+type WorldSnapshotProcessingState = {
+	events: GameEvent[];
+	nextSave: GameSave;
+};
+
+class WorldSnapshotProcessingScopeFx extends Context.Tag("WorldSnapshotProcessingScopeFx")<
+	WorldSnapshotProcessingScopeFx,
+	processWorldSnapshotFx.Props
+>() {
+	//
+}
+
+const createWorldSnapshotProcessingStateFx = Effect.fn(
+	"processWorldSnapshotFx.createWorldSnapshotProcessingStateFx",
+)(function* () {
+	const { save } = yield* WorldSnapshotProcessingScopeFx;
+	const state: WorldSnapshotProcessingState = {
+		events: [],
+		nextSave: save,
+	};
+	return state;
+});
+
+const appendWorldProcessingStepResultFx = Effect.fn(
+	"processWorldSnapshotFx.appendWorldProcessingStepResultFx",
+)(function* ({
+	result,
+	state,
+}: {
+	result: WorldProcessingStepResult;
+	state: WorldSnapshotProcessingState;
+}) {
+	state.nextSave = result.save;
+	state.events.push(...result.events);
+});
+
+const processItemSpawnJobsBeforeRuntimeJobsFx = Effect.fn(
+	"processWorldSnapshotFx.processItemSpawnJobsBeforeRuntimeJobsFx",
+)(function* (state: WorldSnapshotProcessingState) {
+	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+	yield* appendWorldProcessingStepResultFx({
+		result: yield* processItemSpawnJobsFx({
+			config,
+			nowMs,
+			save: state.nextSave,
+		}),
+		state,
+	});
+});
+
+const processProducerJobsFx = Effect.fn("processWorldSnapshotFx.processProducerJobsFx")(function* ({
+	state,
+}: {
+	state: WorldSnapshotProcessingState;
+}) {
+	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+	yield* appendWorldProcessingStepResultFx({
+		result: yield* processCompletedProducerJobsFx({
+			config,
+			nowMs,
+			save: state.nextSave,
+		}),
+		state,
+	});
+});
+
+const processCraftJobsFx = Effect.fn("processWorldSnapshotFx.processCraftJobsFx")(function* ({
+	state,
+}: {
+	state: WorldSnapshotProcessingState;
+}) {
+	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+	yield* appendWorldProcessingStepResultFx({
+		result: yield* processCompletedCraftJobsFx({
+			config,
+			nowMs,
+			save: state.nextSave,
+		}),
+		state,
+	});
+});
+
+const processExpiredEffectsFx = Effect.fn("processWorldSnapshotFx.processExpiredEffectsFx")(
+	function* (state: WorldSnapshotProcessingState) {
+		const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+		yield* appendWorldProcessingStepResultFx({
+			result: yield* processExpiredActiveEffectsFx({
+				config,
+				nowMs,
+				save: state.nextSave,
+			}),
+			state,
+		});
+	},
+);
+
+const processRuntimeJobsUntilStableFx = Effect.fn(
+	"processWorldSnapshotFx.processRuntimeJobsUntilStableFx",
+)(function* (state: WorldSnapshotProcessingState) {
+	yield* processProducerJobsFx({
+		state,
+	});
+	yield* processCraftJobsFx({
+		state,
+	});
+	yield* processProducerJobsFx({
+		state,
+	});
+});
+
+const readProcessedWorldWakePlanFx = Effect.fn(
+	"processWorldSnapshotFx.readProcessedWorldWakePlanFx",
+)(function* (state: WorldSnapshotProcessingState) {
+	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+	return yield* readWorldWakePlanFx({
 		config,
 		nowMs,
-		save: nextSave,
+		save: state.nextSave,
 	});
-	nextSave = itemSpawnBeforeJobs.save;
-	events.push(...itemSpawnBeforeJobs.events);
+});
 
-	const producerJobs = yield* processCompletedProducerJobsFx({
-		config,
-		nowMs,
-		save: nextSave,
-	});
-	nextSave = producerJobs.save;
-	events.push(...producerJobs.events);
-
-	const craftJobs = yield* processCompletedCraftJobsFx({
-		config,
-		nowMs,
-		save: nextSave,
-	});
-	nextSave = craftJobs.save;
-	events.push(...craftJobs.events);
-
-	const producerJobsAfterCraft = yield* processCompletedProducerJobsFx({
-		config,
-		nowMs,
-		save: nextSave,
-	});
-	nextSave = producerJobsAfterCraft.save;
-	events.push(...producerJobsAfterCraft.events);
-
-	const activeEffects = yield* processExpiredActiveEffectsFx({
-		config,
-		nowMs,
-		save: nextSave,
-	});
-	nextSave = activeEffects.save;
-	events.push(...activeEffects.events);
-
-	const wakePlan = yield* readWorldWakePlanFx({
-		config,
-		nowMs,
-		save: nextSave,
-	});
+const processWorldSnapshotProgramFx = Effect.fn(
+	"processWorldSnapshotFx.processWorldSnapshotProgramFx",
+)(function* () {
+	const state = yield* createWorldSnapshotProcessingStateFx();
+	yield* processItemSpawnJobsBeforeRuntimeJobsFx(state);
+	yield* processRuntimeJobsUntilStableFx(state);
+	yield* processExpiredEffectsFx(state);
+	const wakePlan = yield* readProcessedWorldWakePlanFx(state);
 
 	return {
-		events,
+		events: state.events,
 		nextWakeAtMs: wakePlan.nextWakeAtMs,
-		save: nextSave,
+		save: state.nextSave,
 	} satisfies processWorldSnapshotFx.Result;
+});
+
+export const processWorldSnapshotFx = Effect.fn("processWorldSnapshotFx")(function* (
+	props: processWorldSnapshotFx.Props,
+) {
+	return yield* processWorldSnapshotProgramFx().pipe(
+		Effect.provideService(WorldSnapshotProcessingScopeFx, props),
+	);
 });

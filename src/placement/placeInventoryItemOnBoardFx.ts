@@ -3,7 +3,6 @@ import { match, P } from "ts-pattern";
 import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type {
 	GameSave,
 	GameSaveInventoryInstance,
@@ -16,7 +15,7 @@ import {
 	isGameSaveInventoryStack,
 	readGameSaveInventorySlotQuantity,
 } from "~/inventory/model/GameSaveInventorySlot";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { checkInventoryItemPlaceReadinessFx } from "~/placement/checkInventoryItemPlaceReadinessFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
@@ -107,15 +106,12 @@ const readGameEnginePlacementResultFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.readGameEnginePlacementResultFx",
 )(function* ({ events, save }: { events: GameEvent[]; save: GameSave }) {
 	const { config, nowMs } = yield* InventoryItemBoardPlacementScopeFx;
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events,
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save,
-		}),
+		nowMs,
 		save,
-	} satisfies GameEngineResult;
+	});
 });
 
 const createBoardItemCreatedEventFx = Effect.fn(

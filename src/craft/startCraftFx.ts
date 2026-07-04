@@ -5,11 +5,10 @@ import { checkCraftStartRuntimeConstraintsFx } from "~/craft/checkCraftStartRunt
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { createGameJobIdFx } from "~/job/createGameJobIdFx";
 import { readCraftStoredInputsReadyFx } from "~/craft/readCraftStoredInputsReadyFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { readCraftJobEffectiveTimingFx } from "~/craft/readCraftJobEffectiveTimingFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftStartSchema } from "~/action/GameActionCraftStartSchema";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -56,15 +55,12 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 		}));
 	if (!storedInputsReady) {
 		if (events.length > 0) nextSave.updatedAtMs = nowMs;
-		return {
+		return yield* createGameEngineResultFx({
+			config,
 			events,
-			nextWakeAtMs: yield* readNextWakeAtMsFx({
-				config,
-				nowMs,
-				save: nextSave,
-			}),
+			nowMs,
 			save: nextSave,
-		} satisfies GameEngineResult;
+		});
 	}
 
 	yield* checkCraftStartRuntimeConstraintsFx({
@@ -92,7 +88,8 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 	};
 	nextSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [
 			...events,
 			{
@@ -105,11 +102,7 @@ export const startCraftFx = Effect.fn("startCraftFx")(function* ({
 				type: "craft.started" as const,
 			},
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

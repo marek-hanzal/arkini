@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkLineSetDefaultReadinessFx } from "~/producer/checkLineSetDefaultReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { readDefaultEffectLineId } from "~/producer/readDefaultEffectLineId";
 import { readDefaultLineId } from "~/producer/readDefaultLineId";
 import { readLineKind } from "~/producer/readLineKind";
@@ -9,7 +9,6 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionLineSetDefaultSchema } from "~/action/GameActionLineSetDefaultSchema";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace setLineDefaultFx {
@@ -103,7 +102,8 @@ export const setLineDefaultFx = Effect.fn("setLineDefaultFx")(function* ({
 	}
 	nextSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [
 			{
 				atMs: nowMs,
@@ -113,11 +113,7 @@ export const setLineDefaultFx = Effect.fn("setLineDefaultFx")(function* ({
 				type: "line.default_changed" as const,
 			},
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

@@ -5,13 +5,12 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -205,18 +204,15 @@ const buildMergeResultFx = Effect.fn("mergeItemFx.buildMergeResultFx")(function*
 	const placed = yield* placeMergeOutputsFx(state);
 	placed.save.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [
 			...state.mergeEvents,
 			...placed.events,
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: placed.save,
-		}),
+		nowMs,
 		save: placed.save,
-	} satisfies GameEngineResult;
+	});
 });
 
 const mergeItemProgramFx = Effect.fn("mergeItemFx.mergeItemProgramFx")(function* () {

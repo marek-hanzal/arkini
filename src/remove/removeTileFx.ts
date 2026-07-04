@@ -5,12 +5,11 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -121,16 +120,13 @@ export const removeTileFx = Effect.fn("removeTileFx")(function* ({
 				save: nextSave,
 			};
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [
 			...removalEvents,
 			...placed.events,
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: placed.save,
-		}),
+		nowMs,
 		save: placed.save,
-	} satisfies GameEngineResult;
+	});
 });

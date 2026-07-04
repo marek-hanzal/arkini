@@ -4,12 +4,11 @@ import { checkBoardItemStashReadinessFx } from "~/stash/checkBoardItemStashReadi
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { placeGameSaveInventoryInstanceFx } from "~/placement/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryItemsFx } from "~/placement/placeGameSaveInventoryItemsFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -66,18 +65,15 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 		);
 		nextSave.updatedAtMs = nowMs;
 
-		return {
+		return yield* createGameEngineResultFx({
+			config,
 			events: [
 				consumedEvent,
 				...events,
 			],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({
-				config,
-				nowMs,
-				save: nextSave,
-			}),
+			nowMs,
 			save: nextSave,
-		} satisfies GameEngineResult;
+		});
 	}
 
 	yield* removeBoardItemRuntimeStateFx({
@@ -106,16 +102,13 @@ export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* ({
 
 	placed.save.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [
 			consumedEvent,
 			...placed.events,
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: placed.save,
-		}),
+		nowMs,
 		save: placed.save,
-	} satisfies GameEngineResult;
+	});
 });

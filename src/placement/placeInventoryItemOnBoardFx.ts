@@ -15,6 +15,7 @@ import {
 	isGameSaveInventoryStack,
 	readGameSaveInventorySlotQuantity,
 } from "~/inventory/model/GameSaveInventorySlot";
+import { createInventoryItemConsumedEventFx } from "~/inventory/createInventoryItemConsumedEventFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { checkInventoryItemPlaceReadinessFx } from "~/placement/checkInventoryItemPlaceReadinessFx";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
@@ -78,18 +79,14 @@ const readPlacementStateFx = Effect.fn("placeInventoryItemOnBoardFx.readPlacemen
 		const previousQuantity = readGameSaveInventorySlotQuantity(liveSlot);
 		const nextQuantity = previousQuantity - quantity;
 		return {
-			consumedEvent: {
-				from: {
-					kind: "inventory",
-					nextQuantity,
-					previousQuantity,
-					quantity,
-					slotIndex: action.slotIndex,
-				},
+			consumedEvent: yield* createInventoryItemConsumedEventFx({
 				itemId,
+				nextQuantity,
+				previousQuantity,
+				quantity,
 				reason: "inventory-placement",
-				type: "item.consumed",
-			},
+				slotIndex: action.slotIndex,
+			}),
 			itemId,
 			liveSlot,
 			nextQuantity,

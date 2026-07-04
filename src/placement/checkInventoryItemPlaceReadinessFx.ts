@@ -13,6 +13,7 @@ import {
 	isGameSaveInventoryStack,
 	readGameSaveInventorySlotQuantity,
 } from "~/inventory/model/GameSaveInventorySlot";
+import { readInventorySlotAfterQuantityRemovalFx } from "~/inventory/readInventorySlotAfterQuantityRemovalFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 
 export namespace checkInventoryItemPlaceReadinessFx {
@@ -79,24 +80,6 @@ const readBoardPlacementBlockReasonFx = Effect.fn(
 		: "board:full";
 });
 
-const readSlotAfterInventoryRemovalFx = Effect.fn(
-	"checkInventoryItemPlaceReadinessFx.readSlotAfterInventoryRemovalFx",
-)(function* ({ quantity, slot }: { quantity: number; slot: GameSaveInventorySlot }) {
-	return match(slot)
-		.with(null, () => null)
-		.with(P.when(isGameSaveInventoryInstance), () => null)
-		.with(P.when(isGameSaveInventoryStack), (stack) => {
-			const nextQuantity = stack.quantity - quantity;
-			return nextQuantity > 0
-				? {
-						...stack,
-						quantity: nextQuantity,
-					}
-				: null;
-		})
-		.exhaustive();
-});
-
 const readSaveAfterInventoryRemovalPreviewFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.readSaveAfterInventoryRemovalPreviewFx",
 )(function* ({
@@ -112,7 +95,7 @@ const readSaveAfterInventoryRemovalPreviewFx = Effect.fn(
 	for (const [index, slot] of save.inventory.slots.entries()) {
 		slots.push(
 			index === slotIndex
-				? yield* readSlotAfterInventoryRemovalFx({
+				? yield* readInventorySlotAfterQuantityRemovalFx({
 						quantity,
 						slot,
 					})

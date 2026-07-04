@@ -8,7 +8,9 @@ import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
 } from "~/inventory/model/GameSaveInventorySlot";
-import type { GameSave, GameSaveInventoryStack } from "~/engine/model/GameSaveSchema";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { createInventoryItemConsumedEventFx } from "~/inventory/createInventoryItemConsumedEventFx";
+import { readInventorySlotAfterQuantityRemovalFx } from "~/inventory/readInventorySlotAfterQuantityRemovalFx";
 
 export namespace consumeResolvedInputRefFx {
 	export interface Props {
@@ -75,25 +77,6 @@ const consumeBoardInputRefFx = Effect.fn("consumeResolvedInputRefFx.consumeBoard
 	},
 );
 
-const createRemainingInventoryStack = ({
-	nextQuantity,
-	slot,
-}: {
-	nextQuantity: number;
-	slot: GameSaveInventoryStack;
-}) =>
-	nextQuantity === 0
-		? null
-		: ({
-				...(slot.createdAtMs !== undefined
-					? {
-							createdAtMs: slot.createdAtMs,
-						}
-					: {}),
-				itemId: slot.itemId,
-				quantity: nextQuantity,
-			} satisfies GameSaveInventoryStack);
-
 const consumeInventoryInputRefFx = Effect.fn(
 	"consumeResolvedInputRefFx.consumeInventoryInputRefFx",
 )(function* (
@@ -126,32 +109,27 @@ const consumeInventoryInputRefFx = Effect.fn(
 		);
 	}
 
+	nextSave.inventory.slots[inventoryRef.slotIndex] =
+		yield* readInventorySlotAfterQuantityRemovalFx({
+			quantity: inventoryRef.quantity,
+			slot,
+		});
 	if (isGameSaveInventoryInstance(slot)) {
-		nextSave.inventory.slots[inventoryRef.slotIndex] = null;
 		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: slot.id,
 			save: nextSave,
 		});
-	} else {
-		nextSave.inventory.slots[inventoryRef.slotIndex] = createRemainingInventoryStack({
-			nextQuantity,
-			slot,
-		});
 	}
 
 	yield* pushConsumedEvent({
-		event: {
-			from: {
-				kind: "inventory",
-				nextQuantity,
-				previousQuantity,
-				quantity: inventoryRef.quantity,
-				slotIndex: inventoryRef.slotIndex,
-			},
+		event: yield* createInventoryItemConsumedEventFx({
 			itemId: inventoryRef.itemId,
+			nextQuantity,
+			previousQuantity,
+			quantity: inventoryRef.quantity,
 			reason,
-			type: "item.consumed" as const,
-		},
+			slotIndex: inventoryRef.slotIndex,
+		}),
 	});
 });
 

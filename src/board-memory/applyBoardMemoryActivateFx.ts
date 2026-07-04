@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionBoardMemoryActivateSchema } from "~/action/GameActionBoardMemoryActivateSchema";
 import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
@@ -56,13 +56,6 @@ type BoardMemoryActivationScope = applyBoardMemoryActivateFx.Props & {
 	nextSave: GameSave;
 };
 
-class BoardMemoryActivationScopeFx extends Context.Tag("BoardMemoryActivationScopeFx")<
-	BoardMemoryActivationScopeFx,
-	BoardMemoryActivationScope
->() {
-	//
-}
-
 const readSortedBoardItems = ({ save }: { save: GameSave }) =>
 	Object.values(save.board.items).sort(
 		(left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
@@ -70,8 +63,8 @@ const readSortedBoardItems = ({ save }: { save: GameSave }) =>
 
 const readBoardMemorySnapshotItemFx = Effect.fn(
 	"applyBoardMemoryActivateFx.readBoardMemorySnapshotItemFx",
-)(function* ({ item }: { item: GameSaveBoardItem }) {
-	const { config, nextSave } = yield* BoardMemoryActivationScopeFx;
+)(function* ({ item, scope }: { item: GameSaveBoardItem; scope: BoardMemoryActivationScope }) {
+	const { config, nextSave } = scope;
 	const stateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: item.id,
 		save: nextSave,
@@ -95,8 +88,8 @@ const readBoardMemorySnapshotItemFx = Effect.fn(
 });
 
 const readBoardMemorySnapshotFx = Effect.fn("applyBoardMemoryActivateFx.readBoardMemorySnapshotFx")(
-	function* () {
-		const { nextSave } = yield* BoardMemoryActivationScopeFx;
+	function* ({ scope }: { scope: BoardMemoryActivationScope }) {
+		const { nextSave } = scope;
 		const items: BoardMemoryLayoutItem[] = [];
 		for (const item of readSortedBoardItems({
 			save: nextSave,
@@ -104,6 +97,7 @@ const readBoardMemorySnapshotFx = Effect.fn("applyBoardMemoryActivateFx.readBoar
 			items.push(
 				yield* readBoardMemorySnapshotItemFx({
 					item,
+					scope,
 				}),
 			);
 		}
@@ -115,12 +109,14 @@ const readMemoryRestoreSourceBoardItemFx = Effect.fn(
 	"applyBoardMemoryActivateFx.readMemoryRestoreSourceBoardItemFx",
 )(function* ({
 	memoryItem,
+	scope,
 	usedItemInstanceIds,
 }: {
 	memoryItem: BoardMemoryLayoutItem;
+	scope: BoardMemoryActivationScope;
 	usedItemInstanceIds: ReadonlySet<string>;
 }) {
-	const { config, nextSave } = yield* BoardMemoryActivationScopeFx;
+	const { config, nextSave } = scope;
 	if (
 		isItemStorageAllowed({
 			config,
@@ -148,8 +144,8 @@ const readMemoryRestoreSourceBoardItemFx = Effect.fn(
 
 const storeBoardItemInInventoryFx = Effect.fn(
 	"applyBoardMemoryActivateFx.storeBoardItemInInventoryFx",
-)(function* ({ item }: { item: GameSaveBoardItem }) {
-	const { config, events, nextSave } = yield* BoardMemoryActivationScopeFx;
+)(function* ({ item, scope }: { item: GameSaveBoardItem; scope: BoardMemoryActivationScope }) {
+	const { config, events, nextSave } = scope;
 	if (!config.items[item.itemId]) return false;
 	if (
 		!isItemStorageAllowed({
@@ -182,27 +178,35 @@ const storeBoardItemInInventoryFx = Effect.fn(
 
 const storeCurrentBoardItemsInInventoryFx = Effect.fn(
 	"applyBoardMemoryActivateFx.storeCurrentBoardItemsInInventoryFx",
-)(function* () {
-	const { nextSave } = yield* BoardMemoryActivationScopeFx;
+)(function* ({ scope }: { scope: BoardMemoryActivationScope }) {
+	const { nextSave } = scope;
 	for (const item of readSortedBoardItems({
 		save: nextSave,
 	})) {
 		yield* storeBoardItemInInventoryFx({
 			item,
+			scope,
 		});
 	}
 });
 
 const restoreBoardOnlyLayoutItemsFx = Effect.fn(
 	"applyBoardMemoryActivateFx.restoreBoardOnlyLayoutItemsFx",
-)(function* ({ savedItems }: { savedItems: readonly BoardMemoryLayoutItem[] }) {
-	const { events } = yield* BoardMemoryActivationScopeFx;
+)(function* ({
+	savedItems,
+	scope,
+}: {
+	savedItems: readonly BoardMemoryLayoutItem[];
+	scope: BoardMemoryActivationScope;
+}) {
+	const { events } = scope;
 	const restoredIndexes = new Set<number>();
 	const usedItemInstanceIds = new Set<string>();
 
 	for (const [index, memoryItem] of savedItems.entries()) {
 		const source = yield* readMemoryRestoreSourceBoardItemFx({
 			memoryItem,
+			scope,
 			usedItemInstanceIds,
 		});
 		if (!source) continue;
@@ -241,12 +245,14 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 )(function* ({
 	itemId,
 	preferredItemInstanceId,
+	scope,
 }: {
 	itemId: string;
 	preferredItemInstanceId?: string;
+	scope: BoardMemoryActivationScope;
 }) {
 	if (!preferredItemInstanceId) return undefined;
-	const { nextSave } = yield* BoardMemoryActivationScopeFx;
+	const { nextSave } = scope;
 	const slotIndex = nextSave.inventory.slots.findIndex(
 		(slot) =>
 			isGameSaveInventoryInstance(slot) &&
@@ -273,8 +279,8 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 
 const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 	"applyBoardMemoryActivateFx.consumeInventoryStackForMemoryRestoreFx",
-)(function* ({ itemId }: { itemId: string }) {
-	const { nextSave } = yield* BoardMemoryActivationScopeFx;
+)(function* ({ itemId, scope }: { itemId: string; scope: BoardMemoryActivationScope }) {
+	const { nextSave } = scope;
 	const slotIndex = nextSave.inventory.slots.findIndex(
 		(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
 	);
@@ -297,24 +303,38 @@ const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 
 const consumeInventoryItemForMemoryRestoreFx = Effect.fn(
 	"applyBoardMemoryActivateFx.consumeInventoryItemForMemoryRestoreFx",
-)(function* ({ memoryItem }: { memoryItem: BoardMemoryLayoutItem }) {
+)(function* ({
+	memoryItem,
+	scope,
+}: {
+	memoryItem: BoardMemoryLayoutItem;
+	scope: BoardMemoryActivationScope;
+}) {
 	return (
 		(yield* consumePreferredInventoryInstanceForMemoryRestoreFx({
 			itemId: memoryItem.itemId,
 			preferredItemInstanceId: memoryItem.itemInstanceId,
+			scope,
 		})) ??
 		(memoryItem.itemInstanceId
 			? undefined
 			: yield* consumeInventoryStackForMemoryRestoreFx({
 					itemId: memoryItem.itemId,
+					scope,
 				}))
 	);
 });
 
 const canRestoreInventoryBackedLayoutItemFx = Effect.fn(
 	"applyBoardMemoryActivateFx.canRestoreInventoryBackedLayoutItemFx",
-)(function* ({ memoryItem }: { memoryItem: BoardMemoryLayoutItem }) {
-	const { config, nextSave } = yield* BoardMemoryActivationScopeFx;
+)(function* ({
+	memoryItem,
+	scope,
+}: {
+	memoryItem: BoardMemoryLayoutItem;
+	scope: BoardMemoryActivationScope;
+}) {
+	const { config, nextSave } = scope;
 	if (
 		yield* readBoardItemAtCellFx({
 			save: nextSave,
@@ -349,22 +369,29 @@ const canRestoreInventoryBackedLayoutItemFx = Effect.fn(
 
 const restoreInventoryBackedLayoutItemFx = Effect.fn(
 	"applyBoardMemoryActivateFx.restoreInventoryBackedLayoutItemFx",
-)(function* ({ memoryItem }: { memoryItem: BoardMemoryLayoutItem }) {
-	const { nextSave } = yield* BoardMemoryActivationScopeFx;
+)(function* ({
+	memoryItem,
+	scope,
+}: {
+	memoryItem: BoardMemoryLayoutItem;
+	scope: BoardMemoryActivationScope;
+}) {
+	const { action, events, nextSave } = scope;
 	if (
 		!(yield* canRestoreInventoryBackedLayoutItemFx({
 			memoryItem,
+			scope,
 		}))
 	)
 		return false;
 
 	const consumed = yield* consumeInventoryItemForMemoryRestoreFx({
 		memoryItem,
+		scope,
 	});
 	if (!consumed) return false;
 
 	const itemInstanceId = consumed.itemInstanceId ?? (yield* createGameItemInstanceIdFx());
-	const { action, events } = yield* BoardMemoryActivationScopeFx;
 	events.push(consumed.consumedEvent);
 	yield* placeBoardItemInstanceFx({
 		cell: {
@@ -387,9 +414,11 @@ const restoreInventoryBackedLayoutItemsFx = Effect.fn(
 )(function* ({
 	restoredIndexes,
 	savedItems,
+	scope,
 }: {
 	restoredIndexes: Set<number>;
 	savedItems: readonly BoardMemoryLayoutItem[];
+	scope: BoardMemoryActivationScope;
 }) {
 	let restoredCount = restoredIndexes.size;
 	for (const [memoryItemIndex, memoryItem] of savedItems.entries()) {
@@ -397,6 +426,7 @@ const restoreInventoryBackedLayoutItemsFx = Effect.fn(
 		if (
 			yield* restoreInventoryBackedLayoutItemFx({
 				memoryItem,
+				scope,
 			})
 		) {
 			restoredCount += 1;
@@ -407,8 +437,8 @@ const restoreInventoryBackedLayoutItemsFx = Effect.fn(
 
 const readBoardMemoryEngineResultFx = Effect.fn(
 	"applyBoardMemoryActivateFx.readBoardMemoryEngineResultFx",
-)(function* () {
-	const { config, events, nextSave, nowMs } = yield* BoardMemoryActivationScopeFx;
+)(function* ({ scope }: { scope: BoardMemoryActivationScope }) {
+	const { config, events, nextSave, nowMs } = scope;
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
@@ -422,9 +452,11 @@ const readBoardMemoryEngineResultFx = Effect.fn(
 
 const saveCurrentBoardMemoryLayoutFx = Effect.fn(
 	"applyBoardMemoryActivateFx.saveCurrentBoardMemoryLayoutFx",
-)(function* ({ boardItemId }: { boardItemId: string }) {
-	const { events, nextSave, nowMs } = yield* BoardMemoryActivationScopeFx;
-	const items = yield* readBoardMemorySnapshotFx();
+)(function* ({ boardItemId, scope }: { boardItemId: string; scope: BoardMemoryActivationScope }) {
+	const { events, nextSave, nowMs } = scope;
+	const items = yield* readBoardMemorySnapshotFx({
+		scope,
+	});
 	nextSave.boardMemoryLayouts[boardItemId] = {
 		items,
 		savedAtMs: nowMs,
@@ -437,7 +469,9 @@ const saveCurrentBoardMemoryLayoutFx = Effect.fn(
 		type: "board.memory.saved",
 	});
 
-	return yield* readBoardMemoryEngineResultFx();
+	return yield* readBoardMemoryEngineResultFx({
+		scope,
+	});
 });
 
 const restoreSavedBoardMemoryLayoutFx = Effect.fn(
@@ -445,18 +479,24 @@ const restoreSavedBoardMemoryLayoutFx = Effect.fn(
 )(function* ({
 	boardItemId,
 	savedItems,
+	scope,
 }: {
 	boardItemId: string;
 	savedItems: readonly BoardMemoryLayoutItem[];
+	scope: BoardMemoryActivationScope;
 }) {
-	const { events, nextSave, nowMs } = yield* BoardMemoryActivationScopeFx;
-	yield* storeCurrentBoardItemsInInventoryFx();
+	const { events, nextSave, nowMs } = scope;
+	yield* storeCurrentBoardItemsInInventoryFx({
+		scope,
+	});
 	const boardOnlyRestoredIndexes = yield* restoreBoardOnlyLayoutItemsFx({
 		savedItems,
+		scope,
 	});
 	const restoredCount = yield* restoreInventoryBackedLayoutItemsFx({
 		restoredIndexes: boardOnlyRestoredIndexes,
 		savedItems,
+		scope,
 	});
 
 	delete nextSave.boardMemoryLayouts[boardItemId];
@@ -469,12 +509,14 @@ const restoreSavedBoardMemoryLayoutFx = Effect.fn(
 		type: "board.memory.restored",
 	});
 
-	return yield* readBoardMemoryEngineResultFx();
+	return yield* readBoardMemoryEngineResultFx({
+		scope,
+	});
 });
 
 const readBoardMemoryActorFx = Effect.fn("applyBoardMemoryActivateFx.readBoardMemoryActorFx")(
-	function* () {
-		const { action, nextSave } = yield* BoardMemoryActivationScopeFx;
+	function* ({ scope }: { scope: BoardMemoryActivationScope }) {
+		const { action, nextSave } = scope;
 		const memoryItem = nextSave.board.items[action.boardItemId];
 		if (memoryItem?.itemId === boardMemoryItemId) return memoryItem;
 
@@ -486,9 +528,11 @@ const readBoardMemoryActorFx = Effect.fn("applyBoardMemoryActivateFx.readBoardMe
 
 const applyBoardMemoryActivateProgramFx = Effect.fn(
 	"applyBoardMemoryActivateFx.applyBoardMemoryActivateProgramFx",
-)(function* () {
-	const { action, nextSave } = yield* BoardMemoryActivationScopeFx;
-	yield* readBoardMemoryActorFx();
+)(function* ({ scope }: { scope: BoardMemoryActivationScope }) {
+	const { action, nextSave } = scope;
+	yield* readBoardMemoryActorFx({
+		scope,
+	});
 	const savedLayout = nextSave.boardMemoryLayouts[action.boardItemId];
 	const activationRoute = savedLayout
 		? ({
@@ -507,6 +551,7 @@ const applyBoardMemoryActivateProgramFx = Effect.fn(
 			() =>
 				saveCurrentBoardMemoryLayoutFx({
 					boardItemId: action.boardItemId,
+					scope,
 				}),
 		)
 		.with(
@@ -517,6 +562,7 @@ const applyBoardMemoryActivateProgramFx = Effect.fn(
 				restoreSavedBoardMemoryLayoutFx({
 					boardItemId: action.boardItemId,
 					savedItems,
+					scope,
 				}),
 		)
 		.exhaustive();
@@ -529,13 +575,11 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 		save: props.save,
 	});
 
-	return yield* Effect.provideService(
-		applyBoardMemoryActivateProgramFx(),
-		BoardMemoryActivationScopeFx,
-		{
+	return yield* applyBoardMemoryActivateProgramFx({
+		scope: {
 			...props,
 			events: [],
 			nextSave,
 		},
-	);
+	});
 });

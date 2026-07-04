@@ -10,6 +10,7 @@ import { hashRuntimeGameConfigFx } from "~/storage/hashRuntimeGameConfigFx";
 import { connectGameRuntimeSavePersistence } from "~/play/runtime/connectGameRuntimeSavePersistence";
 import { GameRuntimeStartupError } from "~/play/runtime/GameRuntimeStartupError";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
+import { runGameRuntimeEffect } from "~/play/runtime/runGameRuntimeEffect";
 
 export namespace createPersistentGameRuntimeStoreFx {
 	export interface Options {
@@ -163,17 +164,23 @@ export const createPersistentGameRuntimeStoreFx = Effect.fn("createPersistentGam
 			});
 		}
 
+		const random = yield* RandomServiceFx;
 		const persistence = connectGameRuntimeSavePersistence({
 			debounceMs,
 			onError: onPersistenceError,
 			storage: {
 				save: (save) =>
-					saveActiveSaveFx({
-						config: resolvedConfig,
-						configHash,
-						save,
-						storage,
-					}).pipe(Effect.runPromise),
+					runGameRuntimeEffect(
+						saveActiveSaveFx({
+							config: resolvedConfig,
+							configHash,
+							save,
+							storage,
+						}),
+						{
+							random,
+						},
+					),
 			},
 			store,
 		});

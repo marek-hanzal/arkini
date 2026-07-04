@@ -89,6 +89,7 @@ const main = async () => {
 		...auditLogicFolderExports(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
+		...auditEffectRunnerBoundaries(),
 		...auditConfig({
 			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack"),
 			label: "game/arkini.game.arkpack",
@@ -217,6 +218,29 @@ const auditImpureIdGenerationBoundaries = (): Finding[] =>
 			{
 				path,
 				message: "impure id generation must stay inside an Fx boundary",
+			},
+		];
+	});
+
+const effectRunnerBoundaryPaths = new Set([
+	"src/engine/runtime/runGameEngineEffect.ts",
+	"src/play/runtime/runGameRuntimeEffect.ts",
+]);
+
+const auditEffectRunnerBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (effectRunnerBoundaryPaths.has(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (!text.includes("Effect.runPromise")) return [];
+
+		return [
+			{
+				path,
+				message:
+					"Effect programs must run through a named runtime runner at the UI/hook boundary",
 			},
 		];
 	});

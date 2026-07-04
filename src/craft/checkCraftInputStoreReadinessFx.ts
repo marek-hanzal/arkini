@@ -2,7 +2,8 @@ import { Effect } from "effect";
 import { checkCraftTargetIdleFx } from "~/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
-import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
+import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
+import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -31,30 +32,16 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 			targetItemInstanceId: action.targetItemInstanceId,
 		});
 
-		const resolvedRefs = yield* resolveInputRefsFx({
-			inputRefs: [
-				action.inputRef,
-			],
+		const resolvedRef = yield* resolveSingleInputRefFx({
+			inputRef: action.inputRef,
+			missingMessage: "Missing craft input.",
 			save,
 		});
-		const resolvedRef = resolvedRefs[0];
-		if (!resolvedRef) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected("input_unavailable", "Missing craft input."),
-			);
-		}
-
-		if (
-			resolvedRef.kind === "board" &&
-			resolvedRef.itemInstanceId === action.targetItemInstanceId
-		) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"invalid_actor",
-					"Craft input target cannot store itself.",
-				),
-			);
-		}
+		yield* assertResolvedInputRefIsNotBoardItemFx({
+			inputRef: resolvedRef,
+			message: "Craft input target cannot store itself.",
+			targetItemInstanceId: action.targetItemInstanceId,
+		});
 
 		const inputSlot = target.recipe.inputs.find((input) => input.itemId === resolvedRef.itemId);
 		if (!inputSlot) {

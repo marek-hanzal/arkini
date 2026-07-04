@@ -1,5 +1,7 @@
 import { Effect } from "effect";
-import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
+import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
+import { assertResolvedInputRefQuantityFx } from "~/activation/assertResolvedInputRefQuantityFx";
+import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -28,30 +30,21 @@ export const checkTileRemoveReadinessFx = Effect.fn("checkTileRemoveReadinessFx"
 		);
 	}
 
-	const [tool] = yield* resolveInputRefsFx({
-		inputRefs: [
-			action.toolRef,
-		],
+	const tool = yield* resolveSingleInputRefFx({
+		inputRef: action.toolRef,
+		missingMessage: "Missing removal tool.",
 		save,
 	});
-	if (!tool) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("input_unavailable", "Missing removal tool."),
-		);
-	}
-	if (tool.kind === "board" && tool.itemInstanceId === target.id) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("invalid_actor", "Tile cannot remove itself."),
-		);
-	}
-	if (tool.quantity !== 1) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"input_mismatch",
-				"Tile removal tool quantity must be 1.",
-			),
-		);
-	}
+	yield* assertResolvedInputRefIsNotBoardItemFx({
+		inputRef: tool,
+		message: "Tile cannot remove itself.",
+		targetItemInstanceId: target.id,
+	});
+	yield* assertResolvedInputRefQuantityFx({
+		expectedQuantity: 1,
+		inputRef: tool,
+		message: "Tile removal tool quantity must be 1.",
+	});
 	if (Object.values(save.producerJobs).some((job) => job.itemInstanceId === target.id)) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(

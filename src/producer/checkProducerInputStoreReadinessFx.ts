@@ -3,7 +3,8 @@ import { readProducerRuntimeTargetFx } from "~/producer/readProducerRuntimeTarge
 import { readLineIdsByPriority } from "~/producer/readLineIdsByPriority";
 import { readVisibleLineIds } from "~/producer/readVisibleLineIds";
 import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQuantitiesFx";
-import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
+import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
+import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
 import type { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
@@ -30,26 +31,16 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 			},
 		);
 
-		const resolvedRefs = yield* resolveInputRefsFx({
-			inputRefs: [
-				action.inputRef,
-			],
+		const resolvedRef = yield* resolveSingleInputRefFx({
+			inputRef: action.inputRef,
+			missingMessage: "Missing producer input.",
 			save,
 		});
-		const resolvedRef = resolvedRefs[0];
-		if (!resolvedRef) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected("input_unavailable", "Missing producer input."),
-			);
-		}
-		if (resolvedRef.kind === "board" && resolvedRef.itemInstanceId === action.itemInstanceId) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"invalid_actor",
-					"Producer input target cannot store itself.",
-				),
-			);
-		}
+		yield* assertResolvedInputRefIsNotBoardItemFx({
+			inputRef: resolvedRef,
+			message: "Producer input target cannot store itself.",
+			targetItemInstanceId: action.itemInstanceId,
+		});
 
 		const visibleLineIds = readVisibleLineIds({
 			config,

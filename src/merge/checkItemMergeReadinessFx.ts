@@ -1,6 +1,8 @@
 import { Effect } from "effect";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
-import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
+import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
+import { assertResolvedInputRefQuantityFx } from "~/activation/assertResolvedInputRefQuantityFx";
+import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -32,27 +34,21 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 		);
 	}
 
-	const [source] = yield* resolveInputRefsFx({
-		inputRefs: [
-			action.sourceRef,
-		],
+	const source = yield* resolveSingleInputRefFx({
+		inputRef: action.sourceRef,
+		missingMessage: "Missing merge source.",
 		save,
 	});
-	if (!source) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("input_unavailable", "Missing merge source."),
-		);
-	}
-	if (source.kind === "board" && source.itemInstanceId === target.id) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("invalid_merge", "Item cannot merge with itself."),
-		);
-	}
-	if (source.quantity !== 1) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("input_mismatch", "Merge source quantity must be 1."),
-		);
-	}
+	yield* assertResolvedInputRefIsNotBoardItemFx({
+		inputRef: source,
+		message: "Item cannot merge with itself.",
+		targetItemInstanceId: target.id,
+	});
+	yield* assertResolvedInputRefQuantityFx({
+		expectedQuantity: 1,
+		inputRef: source,
+		message: "Merge source quantity must be 1.",
+	});
 
 	const sourceDefinition = config.items[source.itemId];
 	const merge = resolveExecutableItemMergeRule({

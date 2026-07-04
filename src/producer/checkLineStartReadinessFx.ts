@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/activation/checkActivationInputsFx";
 import { planLineAutoFillInputRefsFx } from "~/producer/planLineAutoFillInputRefsFx";
@@ -29,27 +29,56 @@ export namespace checkLineStartReadinessFx {
 	}
 }
 
-export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(function* ({
-	config,
-	nowMs,
-	save,
-	action,
-}: checkLineStartReadinessFx.Props) {
-	const { producerDefinition, producerId, producerItem } = yield* readProducerRuntimeTargetFx({
-		config,
-		itemInstanceId: action.itemInstanceId,
-		save,
-	});
-	const visibleLineIds = readVisibleLineIds({
-		config,
-		producerDefinition,
-		itemInstanceId: action.itemInstanceId,
-		nowMs,
-		lineIds: readLineIds({
+type LineStartTarget = Effect.Effect.Success<ReturnType<typeof readProducerRuntimeTargetFx>>;
+
+type LineStartSelection = LineStartTarget & {
+	lineId: string;
+	visibleLineIds: readonly string[];
+};
+
+type LineStartDefinition = LineStartSelection & {
+	line: NonNullable<ReturnType<typeof readLineDefinition>>;
+	lineInputs: NonNullable<NonNullable<ReturnType<typeof readLineDefinition>>["inputs"]>;
+};
+
+class LineStartReadinessScopeFx extends Context.Tag("LineStartReadinessScopeFx")<
+	LineStartReadinessScopeFx,
+	checkLineStartReadinessFx.Props
+>() {
+	//
+}
+
+const readLineStartTargetFx = Effect.fn("checkLineStartReadinessFx.readLineStartTargetFx")(
+	function* () {
+		const { action, config, save } = yield* LineStartReadinessScopeFx;
+		return yield* readProducerRuntimeTargetFx({
+			config,
+			itemInstanceId: action.itemInstanceId,
+			save,
+		});
+	},
+);
+
+const readVisibleLineIdsFx = Effect.fn("checkLineStartReadinessFx.readVisibleLineIdsFx")(
+	function* ({ producerDefinition }: LineStartTarget) {
+		const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
+		return readVisibleLineIds({
+			config,
 			producerDefinition,
-		}),
-		save,
-	});
+			itemInstanceId: action.itemInstanceId,
+			nowMs,
+			lineIds: readLineIds({
+				producerDefinition,
+			}),
+			save,
+		});
+	},
+);
+
+const readRequestedOrDefaultLineIdFx = Effect.fn(
+	"checkLineStartReadinessFx.readRequestedOrDefaultLineIdFx",
+)(function* ({ visibleLineIds }: { visibleLineIds: readonly string[] }) {
+	const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
 	const defaultEffectLineId = readDefaultEffectLineId({
 		lineIds: visibleLineIds,
 		itemInstanceId: action.itemInstanceId,
@@ -60,7 +89,7 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 		itemInstanceId: action.itemInstanceId,
 		save,
 	});
-	const lineId =
+	return (
 		action.lineId ??
 		(defaultEffectLineId &&
 		!readEffectLineLocked({
@@ -71,22 +100,39 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 			save,
 		})
 			? defaultEffectLineId
-			: defaultLineId);
+			: defaultLineId)
+	);
+});
+
+const assertProducerTargetNotCraftBusyFx = Effect.fn(
+	"checkLineStartReadinessFx.assertProducerTargetNotCraftBusyFx",
+)(function* () {
+	const { action, save } = yield* LineStartReadinessScopeFx;
 	const producerStateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: action.itemInstanceId,
 		save,
 	});
-	if (producerStateStatus.craftBusy) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"item_busy",
-				`Producer item "${action.itemInstanceId}" has a running craft job.`,
-			),
-		);
-	}
+	if (!producerStateStatus.craftBusy) return;
 
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"item_busy",
+			`Producer item "${action.itemInstanceId}" has a running craft job.`,
+		),
+	);
+});
+
+const assertLineOwnedAndVisibleFx = Effect.fn(
+	"checkLineStartReadinessFx.assertLineOwnedAndVisibleFx",
+)(function* ({
+	lineId,
+	producerDefinition,
+	producerId,
+	producerItem,
+	visibleLineIds,
+}: LineStartSelection) {
+	const { action } = yield* LineStartReadinessScopeFx;
 	if (
-		!lineId ||
 		!readLineIds({
 			producerDefinition,
 		}).includes(lineId)
@@ -98,15 +144,47 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 			),
 		);
 	}
-	if (!visibleLineIds.includes(lineId)) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"invalid_actor",
-				`Line "${lineId}" is hidden for the current game state.`,
-			),
-		);
-	}
 
+	if (visibleLineIds.includes(lineId)) return;
+
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"invalid_actor",
+			`Line "${lineId}" is hidden for the current game state.`,
+		),
+	);
+});
+
+const readLineStartSelectionFx = Effect.fn("checkLineStartReadinessFx.readLineStartSelectionFx")(
+	function* () {
+		const target = yield* readLineStartTargetFx();
+		const visibleLineIds = yield* readVisibleLineIdsFx(target);
+		const lineId = yield* readRequestedOrDefaultLineIdFx({
+			visibleLineIds,
+		});
+		if (!lineId) {
+			return yield* Effect.fail(
+				GameEngineError.actionRejected(
+					"invalid_actor",
+					`Line "<default>" does not belong to producer "${target.producerId}" on item "${target.producerItem.itemId}".`,
+				),
+			);
+		}
+
+		const selection = {
+			...target,
+			lineId,
+			visibleLineIds,
+		} satisfies LineStartSelection;
+		yield* assertLineOwnedAndVisibleFx(selection);
+		return selection;
+	},
+);
+
+const assertProducerQueueReadyFx = Effect.fn(
+	"checkLineStartReadinessFx.assertProducerQueueReadyFx",
+)(function* ({ producerDefinition }: LineStartSelection) {
+	const { action, nowMs, save } = yield* LineStartReadinessScopeFx;
 	const producerJobFacts = readWorldProducerJobFacts({
 		nowMs,
 		save,
@@ -130,26 +208,42 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 		);
 	}
 
-	if (producerJobCount >= producerDefinition.maxQueueSize) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"producer_queue_full",
-				`Producer item "${action.itemInstanceId}" queue is full (${producerJobCount}/${producerDefinition.maxQueueSize}).`,
-			),
-		);
-	}
+	if (producerJobCount < producerDefinition.maxQueueSize) return;
 
-	const line = readLineDefinition({
-		producerDefinition,
-		lineId,
-	});
-	if (!line) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(
-				`Missing line "${lineId}" on producer "${producerId}".`,
-			),
-		);
-	}
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"producer_queue_full",
+			`Producer item "${action.itemInstanceId}" queue is full (${producerJobCount}/${producerDefinition.maxQueueSize}).`,
+		),
+	);
+});
+
+const readLineStartDefinitionFx = Effect.fn("checkLineStartReadinessFx.readLineStartDefinitionFx")(
+	function* (selection: LineStartSelection) {
+		const line = readLineDefinition({
+			producerDefinition: selection.producerDefinition,
+			lineId: selection.lineId,
+		});
+		if (!line) {
+			return yield* Effect.fail(
+				GameEngineError.configReferenceMissing(
+					`Missing line "${selection.lineId}" on producer "${selection.producerId}".`,
+				),
+			);
+		}
+
+		return {
+			...selection,
+			line,
+			lineInputs: line.inputs ?? [],
+		} satisfies LineStartDefinition;
+	},
+);
+
+const assertEffectiveLineReadyFx = Effect.fn(
+	"checkLineStartReadinessFx.assertEffectiveLineReadyFx",
+)(function* ({ line, lineId }: LineStartDefinition) {
+	const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
 	const effectiveLine = readEffectiveLine({
 		baseDurationMs: readLineDurationMs({
 			line,
@@ -177,17 +271,23 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 			),
 		);
 	}
-	if (line.output && effectiveLine.lootPlan.baseOutput.length === 0) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"effect:disabled-output",
-				`Line "${lineId}" has no enabled drops for the current game state.`,
-			),
-		);
-	}
+	if (!line.output || effectiveLine.lootPlan.baseOutput.length > 0) return;
+
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"effect:disabled-output",
+			`Line "${lineId}" has no enabled drops for the current game state.`,
+		),
+	);
+});
+
+const assertEffectLineNotLockedFx = Effect.fn(
+	"checkLineStartReadinessFx.assertEffectLineNotLockedFx",
+)(function* ({ line, lineId }: LineStartDefinition) {
+	if (!line.effect) return;
+	const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
 	if (
-		line.effect &&
-		readEffectLineLocked({
+		!readEffectLineLocked({
 			config,
 			nowMs,
 			itemInstanceId: action.itemInstanceId,
@@ -195,16 +295,29 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 			save,
 		})
 	) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"item_busy",
-				`Effect line "${lineId}" is already active for producer item "${action.itemInstanceId}".`,
-			),
-		);
+		return;
 	}
+
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"item_busy",
+			`Effect line "${lineId}" is already active for producer item "${action.itemInstanceId}".`,
+		),
+	);
+});
+
+const assertLinePlacementSupportedFx = Effect.fn(
+	"checkLineStartReadinessFx.assertLinePlacementSupportedFx",
+)(function* ({ line }: LineStartDefinition) {
 	yield* match(line.placement)
 		.with("board_then_inventory", () => Effect.void)
 		.exhaustive();
+});
+
+const assertProducerChargesReadyFx = Effect.fn(
+	"checkLineStartReadinessFx.assertProducerChargesReadyFx",
+)(function* ({ line, producerId }: LineStartDefinition) {
+	const { action, config, save } = yield* LineStartReadinessScopeFx;
 	yield* checkProducerChargesAvailableFx({
 		config,
 		producerId,
@@ -212,43 +325,82 @@ export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(
 		lineChargeCost: line.chargeCost,
 		save,
 	});
+});
 
-	const lineInputs = line.inputs ?? [];
-	if (action.inputRefs.length > 0) {
-		yield* checkActivationInputsFx({
-			inputRefs: action.inputRefs,
-			inputs: lineInputs,
-			save,
-		});
-	} else {
-		const storedInputs = yield* readLineStoredInputQuantitiesFx({
-			itemInstanceId: action.itemInstanceId,
-			lineId,
-			save,
-		});
-		const needsAutoFill = lineInputs.some(
-			(input) =>
-				readGameItemQuantity({
-					itemId: input.itemId,
-					quantities: storedInputs,
-				}) < input.quantity,
-		);
-		if (needsAutoFill) {
-			yield* planLineAutoFillInputRefsFx({
-				inputs: lineInputs,
-				itemInstanceId: action.itemInstanceId,
-				lineId,
-				save,
-			});
-		}
-	}
+const assertExplicitLineInputsReadyFx = Effect.fn(
+	"checkLineStartReadinessFx.assertExplicitLineInputsReadyFx",
+)(function* ({ lineInputs }: LineStartDefinition) {
+	const { action, save } = yield* LineStartReadinessScopeFx;
+	yield* checkActivationInputsFx({
+		inputRefs: action.inputRefs,
+		inputs: lineInputs,
+		save,
+	});
+});
 
-	return {
-		producerDefinition,
-		producerId,
-		producerItem,
-		line,
+const assertStoredOrAutoFilledLineInputsReadyFx = Effect.fn(
+	"checkLineStartReadinessFx.assertStoredOrAutoFilledLineInputsReadyFx",
+)(function* ({ lineId, lineInputs }: LineStartDefinition) {
+	const { action, save } = yield* LineStartReadinessScopeFx;
+	const storedInputs = yield* readLineStoredInputQuantitiesFx({
+		itemInstanceId: action.itemInstanceId,
 		lineId,
-		lineInputs,
-	};
+		save,
+	});
+	const needsAutoFill = lineInputs.some(
+		(input) =>
+			readGameItemQuantity({
+				itemId: input.itemId,
+				quantities: storedInputs,
+			}) < input.quantity,
+	);
+	if (!needsAutoFill) return;
+
+	yield* planLineAutoFillInputRefsFx({
+		inputs: lineInputs,
+		itemInstanceId: action.itemInstanceId,
+		lineId,
+		save,
+	});
+});
+
+const assertLineInputsReadyFx = Effect.fn("checkLineStartReadinessFx.assertLineInputsReadyFx")(
+	function* (definition: LineStartDefinition) {
+		const { action } = yield* LineStartReadinessScopeFx;
+		yield* match(action.inputRefs.length > 0)
+			.with(true, () => assertExplicitLineInputsReadyFx(definition))
+			.with(false, () => assertStoredOrAutoFilledLineInputsReadyFx(definition))
+			.exhaustive();
+	},
+);
+
+const checkLineStartReadinessProgramFx = Effect.fn("checkLineStartReadinessFx.programFx")(
+	function* () {
+		yield* assertProducerTargetNotCraftBusyFx();
+		const selection = yield* readLineStartSelectionFx();
+		yield* assertProducerQueueReadyFx(selection);
+		const definition = yield* readLineStartDefinitionFx(selection);
+		yield* assertEffectiveLineReadyFx(definition);
+		yield* assertEffectLineNotLockedFx(definition);
+		yield* assertLinePlacementSupportedFx(definition);
+		yield* assertProducerChargesReadyFx(definition);
+		yield* assertLineInputsReadyFx(definition);
+
+		return {
+			producerDefinition: definition.producerDefinition,
+			producerId: definition.producerId,
+			producerItem: definition.producerItem,
+			line: definition.line,
+			lineId: definition.lineId,
+			lineInputs: definition.lineInputs,
+		};
+	},
+);
+
+export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(function* (
+	props: checkLineStartReadinessFx.Props,
+) {
+	return yield* checkLineStartReadinessProgramFx().pipe(
+		Effect.provideService(LineStartReadinessScopeFx, props),
+	);
 });

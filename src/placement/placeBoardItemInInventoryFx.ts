@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
-import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
@@ -103,7 +103,11 @@ const placePreservedBoardItemInInventoryFx = Effect.fn(
 		placementEvents,
 		reason,
 	});
-	delete save.board.items[item.id];
+	yield* removeBoardItemFromSaveFx({
+		itemInstanceId: item.id,
+		runtimeState: "preserve",
+		save,
+	});
 });
 
 const placeStackCopiedBoardItemInInventoryFx = Effect.fn(
@@ -135,11 +139,11 @@ const placeStackCopiedBoardItemInInventoryFx = Effect.fn(
 		placementEvents,
 		reason,
 	});
-	yield* removeBoardItemRuntimeStateFx({
+	yield* removeBoardItemFromSaveFx({
 		itemInstanceId: item.id,
+		runtimeState: "remove",
 		save,
 	});
-	delete save.board.items[item.id];
 	return true;
 });
 

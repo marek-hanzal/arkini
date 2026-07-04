@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
@@ -32,9 +32,9 @@ export const deleteDebugBoardItemFx = Effect.fn("deleteDebugBoardItemFx")(functi
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
-	delete nextSave.board.items[target.id];
-	yield* removeBoardItemRuntimeStateFx({
+	yield* removeBoardItemFromSaveFx({
 		itemInstanceId: target.id,
+		runtimeState: "remove",
 		save: nextSave,
 	});
 	nextSave.updatedAtMs = nowMs;

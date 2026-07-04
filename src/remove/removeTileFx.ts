@@ -2,7 +2,7 @@ import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
-import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -83,9 +83,9 @@ const consumeRemoveToolFx = Effect.fn("removeTileFx.consumeRemoveToolFx")(functi
 
 const removeTileTargetFromBoardFx = Effect.fn("removeTileFx.removeTileTargetFromBoardFx")(
 	function* ({ checked, nextSave }: { checked: TileRemoveReadiness; nextSave: GameSave }) {
-		delete nextSave.board.items[checked.target.id];
-		yield* removeBoardItemRuntimeStateFx({
+		yield* removeBoardItemFromSaveFx({
 			itemInstanceId: checked.target.id,
+			runtimeState: "remove",
 			save: nextSave,
 		});
 	},

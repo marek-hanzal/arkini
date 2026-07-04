@@ -11,7 +11,7 @@ import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffect
 import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import { readLineDefinition } from "~/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/producer/readProducerRemainingCharges";
-import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
@@ -270,9 +270,9 @@ const spendProducerChargeCostAfterCompletedDeliveryFx = Effect.fn(
 		return [] satisfies ProducerCompletionEvents;
 	}
 
-	delete nextSave.board.items[job.itemInstanceId];
-	yield* removeBoardItemRuntimeStateFx({
+	yield* removeBoardItemFromSaveFx({
 		itemInstanceId: job.itemInstanceId,
+		runtimeState: "remove",
 		save: nextSave,
 	});
 
@@ -533,9 +533,9 @@ const readPlacementSuccessEffectsFx = Effect.fn(
 		};
 	}
 
-	delete placementSave.board.items[liveJob.itemInstanceId];
-	yield* removeBoardItemRuntimeStateFx({
+	yield* removeBoardItemFromSaveFx({
 		itemInstanceId: liveJob.itemInstanceId,
+		runtimeState: "remove",
 		save: placementSave,
 	});
 	return {

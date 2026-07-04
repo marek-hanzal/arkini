@@ -4,6 +4,7 @@ import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import {
 	readNearbyCapacitySpendSource,
@@ -106,9 +107,9 @@ const applyDepletionFx = Effect.fn("spendLineCapacityEffectsFx.applyDepletionFx"
 		return;
 	}
 
-	delete nextSave.board.items[sourceItemInstanceId];
-	yield* removeBoardItemRuntimeStateFx({
+	yield* removeBoardItemFromSaveFx({
 		itemInstanceId: sourceItemInstanceId,
+		runtimeState: "remove",
 		save: nextSave,
 	});
 	events.push({

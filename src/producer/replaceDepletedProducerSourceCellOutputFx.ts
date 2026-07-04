@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type {
 	GameSave,
@@ -66,7 +67,11 @@ export const replaceDepletedProducerSourceCellOutputFx = Effect.fn(
 		};
 	}
 
-	delete nextSave.board.items[sourceOutputEvent.to.itemInstanceId];
+	yield* removeBoardItemFromSaveFx({
+		itemInstanceId: sourceOutputEvent.to.itemInstanceId,
+		runtimeState: "remove",
+		save: nextSave,
+	});
 	nextSave.board.items[job.itemInstanceId] = {
 		...outputItem,
 		id: job.itemInstanceId,

@@ -87,6 +87,7 @@ const main = async () => {
 		...auditIndexBarrels(),
 		...auditForbiddenLogicDirectories(),
 		...auditEffectFunctionNames(),
+		...auditBoardItemRemovalBoundaries(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
@@ -190,6 +191,24 @@ const auditForbiddenLogicDirectories = (): Finding[] =>
 				]
 			: [],
 	);
+
+const auditBoardItemRemovalBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (path === "src/board/removeBoardItemFromSaveFx.ts") return [];
+
+		const text = readFileSync(path, "utf8");
+		if (!/delete\s+[^;]*\.board\.items\s*\[/.test(text)) return [];
+
+		return [
+			{
+				path,
+				message:
+					"board item removal must go through removeBoardItemFromSaveFx so runtime-state cleanup/preservation is explicit",
+			},
+		];
+	});
 
 const auditRedundantSchemaTypeAliases = (): Finding[] =>
 	readFiles("src").flatMap((path) => {

@@ -2,7 +2,7 @@ import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
-import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
@@ -53,9 +53,9 @@ const consumeBoardInputRefFx = Effect.fn("consumeResolvedInputRefFx.consumeBoard
 		>,
 	) {
 		const { nextSave, reason } = yield* ConsumeResolvedInputRefScopeFx;
-		delete nextSave.board.items[boardRef.itemInstanceId];
-		yield* removeBoardItemRuntimeStateFx({
+		yield* removeBoardItemFromSaveFx({
 			itemInstanceId: boardRef.itemInstanceId,
+			runtimeState: "remove",
 			save: nextSave,
 		});
 		yield* pushConsumedEvent({

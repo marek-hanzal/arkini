@@ -1,0 +1,50 @@
+import { Effect } from "effect";
+import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
+
+export namespace storeProducerResolvedInputFx {
+	export interface Props {
+		events: GameEvent[];
+		itemInstanceId: string;
+		lineId: string;
+		nextSave: GameSave;
+		nowMs: number;
+		ref: GameActionResolvedInputRef;
+	}
+}
+
+export const storeProducerResolvedInputFx = Effect.fn("storeProducerResolvedInputFx")(function* ({
+	events,
+	itemInstanceId,
+	lineId,
+	nextSave,
+	nowMs,
+	ref,
+}: storeProducerResolvedInputFx.Props) {
+	const producerInputState = (nextSave.producerInputs[itemInstanceId] ??= {
+		lineInputs: {},
+	});
+	const lineInputState = (producerInputState.lineInputs[lineId] ??= {
+		items: {},
+	});
+	const previousQuantity = lineInputState.items[ref.itemId] ?? 0;
+	const nextQuantity = previousQuantity + ref.quantity;
+	lineInputState.items[ref.itemId] = nextQuantity;
+
+	events.push({
+		itemId: ref.itemId,
+		nextQuantity,
+		previousQuantity,
+		itemInstanceId,
+		lineId,
+		quantity: ref.quantity,
+		atMs: nowMs,
+		type: "producer_input.stored",
+	});
+
+	return {
+		nextQuantity,
+		previousQuantity,
+	};
+});

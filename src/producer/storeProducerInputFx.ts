@@ -3,6 +3,7 @@ import { checkProducerInputStoreReadinessFx } from "~/producer/checkProducerInpu
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
+import { storeProducerResolvedInputFx } from "~/producer/storeProducerResolvedInputFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
@@ -41,25 +42,15 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 		ref: checked.resolvedRef,
 	});
 
-	const producerInputState = (nextSave.producerInputs[action.itemInstanceId] ??= {
-		lineInputs: {},
-	});
-	const lineInputState = (producerInputState.lineInputs[checked.lineId] ??= {
-		items: {},
-	});
-	lineInputState.items[checked.resolvedRef.itemId] = checked.nextQuantity;
-	nextSave.updatedAtMs = nowMs;
-
-	events.push({
-		itemId: checked.resolvedRef.itemId,
-		nextQuantity: checked.nextQuantity,
-		previousQuantity: checked.previousQuantity,
+	yield* storeProducerResolvedInputFx({
+		events,
 		itemInstanceId: action.itemInstanceId,
 		lineId: checked.lineId,
-		quantity: checked.resolvedRef.quantity,
-		atMs: nowMs,
-		type: "producer_input.stored",
+		nextSave,
+		nowMs,
+		ref: checked.resolvedRef,
 	});
+	nextSave.updatedAtMs = nowMs;
 
 	return yield* createGameEngineResultFx({
 		config,

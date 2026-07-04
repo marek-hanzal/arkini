@@ -1,9 +1,9 @@
 import { Effect } from "effect";
-import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
+import { storeCraftResolvedInputFx } from "~/craft/storeCraftResolvedInputFx";
 import { planCraftAutoFillInputRefsFx } from "~/craft/planCraftAutoFillInputRefsFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
@@ -19,40 +19,6 @@ export namespace autoFillCraftInputsFx {
 		targetItemInstanceId: string;
 	}
 }
-
-const storeCraftResolvedInput = ({
-	events,
-	nextSave,
-	nowMs,
-	recipeId,
-	targetItemInstanceId,
-	ref,
-}: {
-	events: GameEvent[];
-	nextSave: GameSave;
-	nowMs: number;
-	recipeId: string;
-	targetItemInstanceId: string;
-	ref: GameActionResolvedInputRef;
-}) => {
-	const craftInputState = (nextSave.craftInputs[targetItemInstanceId] ??= {
-		items: {},
-	});
-	const previousQuantity = craftInputState.items[ref.itemId] ?? 0;
-	const nextQuantity = previousQuantity + ref.quantity;
-	craftInputState.items[ref.itemId] = nextQuantity;
-
-	events.push({
-		itemId: ref.itemId,
-		nextQuantity,
-		previousQuantity,
-		quantity: ref.quantity,
-		recipeId,
-		atMs: nowMs,
-		targetItemInstanceId,
-		type: "craft_input.stored",
-	});
-};
 
 export const autoFillCraftInputsFx = Effect.fn("autoFillCraftInputsFx")(function* ({
 	events,
@@ -79,7 +45,7 @@ export const autoFillCraftInputsFx = Effect.fn("autoFillCraftInputsFx")(function
 			reason: "craft-input-auto-fill",
 			ref,
 		});
-		storeCraftResolvedInput({
+		yield* storeCraftResolvedInputFx({
 			events,
 			nextSave,
 			nowMs,

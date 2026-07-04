@@ -3,6 +3,7 @@ import { checkCraftInputStoreReadinessFx } from "~/craft/checkCraftInputStoreRea
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
 import { readCraftStoredInputsReadyFx } from "~/craft/readCraftStoredInputsReadyFx";
+import { storeCraftResolvedInputFx } from "~/craft/storeCraftResolvedInputFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { startCraftFx } from "~/craft/startCraftFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -44,22 +45,15 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 		ref: checked.resolvedRef,
 	});
 
-	const craftInputState = (nextSave.craftInputs[action.targetItemInstanceId] ??= {
-		items: {},
-	});
-	craftInputState.items[checked.resolvedRef.itemId] = checked.nextQuantity;
-	nextSave.updatedAtMs = nowMs;
-
-	events.push({
-		itemId: checked.resolvedRef.itemId,
-		nextQuantity: checked.nextQuantity,
-		previousQuantity: checked.previousQuantity,
-		quantity: checked.resolvedRef.quantity,
+	yield* storeCraftResolvedInputFx({
+		events,
+		nextSave,
+		nowMs,
 		recipeId: checked.target.recipeId,
-		atMs: nowMs,
 		targetItemInstanceId: action.targetItemInstanceId,
-		type: "craft_input.stored",
+		ref: checked.resolvedRef,
 	});
+	nextSave.updatedAtMs = nowMs;
 
 	const storedInputsReady = yield* readCraftStoredInputsReadyFx({
 		inputs: checked.target.recipe.inputs,

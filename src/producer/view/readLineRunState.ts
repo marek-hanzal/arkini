@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { readActivationInputViewFillableQuantity } from "~/board/view/readActivationInputViewFillableQuantity";
 import type { LineView } from "~/board/view/LineViewSchema";
 
@@ -17,6 +18,14 @@ export namespace readLineRunState {
 	}
 }
 
+type LineRunFacts = {
+	canRunAction: boolean;
+	inputsPartiallyAvailable: boolean;
+	line: LineView;
+	outputsDisabled: boolean;
+	queueBlocked: boolean;
+};
+
 const readInputsPartiallyAvailable = (line: LineView) =>
 	!line.inputsReady &&
 	line.inputs.some((input) => readActivationInputViewFillableQuantity(input) > 0);
@@ -26,18 +35,45 @@ const readOutputsDisabled = (line: LineView) => {
 	return outputs.length > 0 && outputs.every((output) => output.enabled === false);
 };
 
+const readLineRunFacts = ({ line }: { line: LineView }): LineRunFacts => {
+	const inputsPartiallyAvailable = readInputsPartiallyAvailable(line);
+	const outputsDisabled = readOutputsDisabled(line);
+	const queueBlocked = line.queueBlockedReason !== undefined;
+	return {
+		canRunAction:
+			(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
+			line.pausedAtMs === undefined &&
+			!line.deliveryBlocked &&
+			!queueBlocked &&
+			line.visible !== false &&
+			line.startRequirementsReady !== false &&
+			!line.effectLocked &&
+			!line.outputLimitBlocked &&
+			!outputsDisabled &&
+			!line.blocked &&
+			!line.queueFull,
+		inputsPartiallyAvailable,
+		line,
+		outputsDisabled,
+		queueBlocked,
+	};
+};
+
+const readLineActionVerb = ({ line }: { line: LineView }) =>
+	line.kind === "effect" ? "activate" : "run";
+
 const readInputAvailabilityLabel = ({
 	inputsPartiallyAvailable,
 	line,
-}: {
-	inputsPartiallyAvailable: boolean;
-	line: LineView;
-}) => {
+	outputsDisabled,
+}: LineRunFacts) => {
 	if (line.visible === false) return "line hidden";
 	if (line.startRequirementsReady === false) return "requirements missing";
-	if (readOutputsDisabled(line)) return "drops disabled";
+	if (outputsDisabled) return "drops disabled";
 
-	const actionLabel = line.kind === "effect" ? "activate" : "run";
+	const actionLabel = readLineActionVerb({
+		line,
+	});
 	if (line.inputItemIds.length === 0) return `tap to ${actionLabel}`;
 	if (line.inputsReady) return "input ready";
 	if (line.inputsAvailable) return "auto-fill ready";
@@ -45,192 +81,238 @@ const readInputAvailabilityLabel = ({
 	return "missing items";
 };
 
-const readStatusMetaLabel = (line: LineView) => {
-	if (line.deliveryBlocked || line.queueBlockedReason === "delivery_blocked") {
-		return "delivery blocked";
-	}
-	if (line.queueBlockedReason === "paused") return "queue paused";
-	if (line.pausedAtMs !== undefined) return "paused";
-	if (line.queueFull) return "queue full";
-	if (line.visible === false) return "line hidden";
-	if (line.startRequirementsReady === false) return "requirements missing";
-	if (line.effectLocked) return line.kind === "effect" ? "effect active" : "locked";
-	if (line.outputLimitBlocked) return "limit reached";
-	if (readOutputsDisabled(line)) return "drops disabled";
-	if (line.blocked) return "blocked by effect";
-	return undefined;
-};
-
-const withCommonState = ({
-	canRunAction,
-	inputsPartiallyAvailable,
-	label,
-	line,
-}: {
-	canRunAction: boolean;
-	inputsPartiallyAvailable: boolean;
-	label: string;
-	line: LineView;
-}): readLineRunState.Result => ({
-	canRunAction,
-	inputsPartiallyAvailable,
-	inputAvailabilityLabel: readInputAvailabilityLabel({
-		inputsPartiallyAvailable,
+const readStatusMetaLabel = ({ line, outputsDisabled }: LineRunFacts) =>
+	match({
 		line,
+		outputsDisabled,
+	})
+		.with(
+			{
+				line: {
+					deliveryBlocked: true,
+				},
+			},
+			() => "delivery blocked",
+		)
+		.with(
+			{
+				line: {
+					queueBlockedReason: "delivery_blocked",
+				},
+			},
+			() => "delivery blocked",
+		)
+		.with(
+			{
+				line: {
+					queueBlockedReason: "paused",
+				},
+			},
+			() => "queue paused",
+		)
+		.when(
+			({ line }) => line.pausedAtMs !== undefined,
+			() => "paused",
+		)
+		.with(
+			{
+				line: {
+					queueFull: true,
+				},
+			},
+			() => "queue full",
+		)
+		.with(
+			{
+				line: {
+					visible: false,
+				},
+			},
+			() => "line hidden",
+		)
+		.with(
+			{
+				line: {
+					startRequirementsReady: false,
+				},
+			},
+			() => "requirements missing",
+		)
+		.with(
+			{
+				line: {
+					effectLocked: true,
+				},
+			},
+			({ line }) => (line.kind === "effect" ? "effect active" : "locked"),
+		)
+		.with(
+			{
+				line: {
+					outputLimitBlocked: true,
+				},
+			},
+			() => "limit reached",
+		)
+		.with(
+			{
+				outputsDisabled: true,
+			},
+			() => "drops disabled",
+		)
+		.with(
+			{
+				line: {
+					blocked: true,
+				},
+			},
+			() => "blocked by effect",
+		)
+		.otherwise(() => undefined);
+
+const readProgressLabel = ({ line }: { line: LineView }) =>
+	match(line)
+		.when(
+			({ pausedAtMs }) => pausedAtMs !== undefined,
+			() => "Paused",
+		)
+		.with(
+			{
+				kind: "effect",
+			},
+			() => "Active",
+		)
+		.otherwise(() => "Running");
+
+const readLineRunLabel = (facts: LineRunFacts) =>
+	match(facts)
+		.when(
+			({ line }) => line.pausedAtMs !== undefined,
+			() => "Paused",
+		)
+		.with(
+			{
+				line: {
+					deliveryBlocked: true,
+				},
+			},
+			() => "Delivery blocked",
+		)
+		.with(
+			{
+				line: {
+					queueBlockedReason: "delivery_blocked",
+				},
+			},
+			() => "Delivery blocked",
+		)
+		.with(
+			{
+				line: {
+					queueBlockedReason: "paused",
+				},
+			},
+			() => "Queue paused",
+		)
+		.with(
+			{
+				line: {
+					queueFull: true,
+				},
+			},
+			() => "Queue full",
+		)
+		.with(
+			{
+				line: {
+					visible: false,
+				},
+			},
+			() => "Line hidden",
+		)
+		.with(
+			{
+				line: {
+					startRequirementsReady: false,
+				},
+			},
+			() => "Requirements missing",
+		)
+		.with(
+			{
+				line: {
+					effectLocked: true,
+				},
+			},
+			({ line }) => (line.kind === "effect" ? "Active" : "Locked"),
+		)
+		.with(
+			{
+				line: {
+					outputLimitBlocked: true,
+				},
+			},
+			() => "Limit reached",
+		)
+		.with(
+			{
+				outputsDisabled: true,
+			},
+			() => "Drops disabled",
+		)
+		.with(
+			{
+				line: {
+					blocked: true,
+				},
+			},
+			() => "Blocked by effect",
+		)
+		.with(
+			{
+				canRunAction: false,
+			},
+			() => "Missing items",
+		)
+		.with(
+			{
+				line: {
+					inputsReady: true,
+				},
+			},
+			({ line }) => (line.kind === "effect" ? "Activate" : "Start"),
+		)
+		.with(
+			{
+				line: {
+					inputsAvailable: true,
+				},
+			},
+			({ line }) => (line.kind === "effect" ? "Auto-fill & activate" : "Auto-fill & start"),
+		)
+		.with(
+			{
+				inputsPartiallyAvailable: true,
+			},
+			() => "Partial fill",
+		)
+		.otherwise(() => "Missing items");
+
+const createLineRunState = (facts: LineRunFacts): readLineRunState.Result => ({
+	canRunAction: facts.canRunAction,
+	inputsPartiallyAvailable: facts.inputsPartiallyAvailable,
+	inputAvailabilityLabel: readInputAvailabilityLabel(facts),
+	label: readLineRunLabel(facts),
+	progressLabel: readProgressLabel({
+		line: facts.line,
 	}),
-	label,
-	progressLabel:
-		line.pausedAtMs !== undefined ? "Paused" : line.kind === "effect" ? "Active" : "Running",
-	showProgress: line.inProgress && !line.deliveryBlocked,
-	statusMetaLabel: readStatusMetaLabel(line),
+	showProgress: facts.line.inProgress && !facts.line.deliveryBlocked,
+	statusMetaLabel: readStatusMetaLabel(facts),
 });
 
-export const readLineRunState = ({ line }: readLineRunState.Props): readLineRunState.Result => {
-	const inputsPartiallyAvailable = readInputsPartiallyAvailable(line);
-	const queueBlocked = line.queueBlockedReason !== undefined;
-	const canRunAction =
-		(line.inputsReady || line.inputsAvailable || inputsPartiallyAvailable) &&
-		line.pausedAtMs === undefined &&
-		!line.deliveryBlocked &&
-		!queueBlocked &&
-		line.visible !== false &&
-		line.startRequirementsReady !== false &&
-		!line.effectLocked &&
-		!line.outputLimitBlocked &&
-		!readOutputsDisabled(line) &&
-		!line.blocked &&
-		!line.queueFull;
-
-	if (line.pausedAtMs !== undefined) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Paused",
+export const readLineRunState = ({ line }: readLineRunState.Props): readLineRunState.Result =>
+	createLineRunState(
+		readLineRunFacts({
 			line,
-		});
-	}
-
-	if (line.deliveryBlocked || line.queueBlockedReason === "delivery_blocked") {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Delivery blocked",
-			line,
-		});
-	}
-
-	if (line.queueBlockedReason === "paused") {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Queue paused",
-			line,
-		});
-	}
-
-	if (line.queueFull) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Queue full",
-			line,
-		});
-	}
-
-	if (line.visible === false) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Line hidden",
-			line,
-		});
-	}
-
-	if (line.startRequirementsReady === false) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Requirements missing",
-			line,
-		});
-	}
-
-	if (line.effectLocked) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: line.kind === "effect" ? "Active" : "Locked",
-			line,
-		});
-	}
-
-	if (line.outputLimitBlocked) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Limit reached",
-			line,
-		});
-	}
-
-	if (readOutputsDisabled(line)) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Drops disabled",
-			line,
-		});
-	}
-
-	if (line.blocked) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Blocked by effect",
-			line,
-		});
-	}
-
-	if (!canRunAction) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Missing items",
-			line,
-		});
-	}
-
-	if (line.inputsReady) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: line.kind === "effect" ? "Activate" : "Start",
-			line,
-		});
-	}
-
-	if (line.inputsAvailable) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: line.kind === "effect" ? "Auto-fill & activate" : "Auto-fill & start",
-			line,
-		});
-	}
-
-	if (inputsPartiallyAvailable) {
-		return withCommonState({
-			canRunAction,
-			inputsPartiallyAvailable,
-			label: "Partial fill",
-			line,
-		});
-	}
-
-	return withCommonState({
-		canRunAction,
-		inputsPartiallyAvailable,
-		label: "Missing items",
-		line,
-	});
-};
+		}),
+	);

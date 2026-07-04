@@ -415,10 +415,22 @@ describe("applyBoardMemoryActivateFx", () => {
 		}).save;
 		const fullInventorySave = structuredClone(saved);
 		fullInventorySave.inventory.slots = [
-			{ itemId: "item:twig", quantity: 3 },
-			{ itemId: "item:twig", quantity: 3 },
-			{ itemId: "item:twig", quantity: 3 },
-			{ itemId: "item:twig", quantity: 3 },
+			{
+				itemId: "item:twig",
+				quantity: 3,
+			},
+			{
+				itemId: "item:twig",
+				quantity: 3,
+			},
+			{
+				itemId: "item:twig",
+				quantity: 3,
+			},
+			{
+				itemId: "item:twig",
+				quantity: 3,
+			},
 		];
 		fullInventorySave.producerCharges[producer!.id] = {
 			remainingCharges: 7,

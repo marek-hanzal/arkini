@@ -3,7 +3,7 @@ import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailur
 export type GameActionReadiness =
 	| {
 			type: "ready";
-		}
+	  }
 	| {
 			errorTag:
 				| "GameActionInvalid"
@@ -29,4 +29,4 @@ export type GameActionReadiness =
 				| "unsupported_target"
 				| GamePlacementFailureReason;
 			type: "rejected";
-		};
+	  };

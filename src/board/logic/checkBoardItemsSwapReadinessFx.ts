@@ -12,13 +12,6 @@ export namespace checkBoardItemsSwapReadinessFx {
 
 export const checkBoardItemsSwapReadinessFx = Effect.fn("checkBoardItemsSwapReadinessFx")(
 	function* ({ action, save }: checkBoardItemsSwapReadinessFx.Props) {
-		if (action.sourceBoardItemId === action.targetBoardItemId) {
-			return {
-				source: save.board.items[action.sourceBoardItemId],
-				target: save.board.items[action.targetBoardItemId],
-			};
-		}
-
 		const source = save.board.items[action.sourceBoardItemId];
 		const target = save.board.items[action.targetBoardItemId];
 		if (!source || !target) {

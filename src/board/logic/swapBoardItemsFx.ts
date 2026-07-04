@@ -23,23 +23,12 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	save,
 	nowMs,
 }: swapBoardItemsFx.Props) {
-	if (action.sourceBoardItemId === action.targetBoardItemId) {
-		return {
-			events: [],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({
-				config,
-				nowMs,
-				save,
-			}),
-			save,
-		} satisfies GameEngineResult;
-	}
-
 	const { source, target } = yield* checkBoardItemsSwapReadinessFx({
 		action,
 		save,
 	});
-	if (!source || !target) {
+
+	if (action.sourceBoardItemId === action.targetBoardItemId) {
 		return {
 			events: [],
 			nextWakeAtMs: yield* readNextWakeAtMsFx({

@@ -110,6 +110,33 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
+	it("rejects same-id board swaps when the board item is missing", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runActionEither({
+			action: {
+				sourceBoardItemId: "item-instance:missing",
+				targetBoardItemId: "item-instance:missing",
+				type: "board.items.swap",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameActionRejected",
+				reason: "invalid_actor",
+			},
+		});
+	});
+
 	it("swaps a board producer with a running producer job", () => {
 		const config = createEngineTestConfig({
 			startingState: {

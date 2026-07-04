@@ -1,5 +1,5 @@
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
-import { isProducerStocked } from "~/producer/logic/isProducerStocked";
+import { isProducerStocked } from "~/producer/view/isProducerStocked";
 
 export function isProducerReady(activation: ActivationView | undefined, nowMs: number) {
 	if (!activation) return false;

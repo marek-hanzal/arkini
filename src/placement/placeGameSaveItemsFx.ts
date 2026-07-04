@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { placeSingleGameSaveItemRequestFx } from "~/placement/placeSingleGameSaveItemRequestFx";
-import type { BoardCell } from "~/board/logic/BoardCell";
+import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSaveItemPlacementResult } from "~/placement/GameSaveItemPlacementResult";

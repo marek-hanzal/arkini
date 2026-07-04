@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { TestRandomService } from "~/engine/test/TestRandomService";
-import { withRandomService } from "~/random/logic/withRandomService";
+import { withRandomService } from "~/random/withRandomService";
 
 const runRoll = (props: rollEffectiveLootPlanItemsFx.Props) =>
 	Effect.runSync(rollEffectiveLootPlanItemsFx(props).pipe(withRandomService(TestRandomService)));

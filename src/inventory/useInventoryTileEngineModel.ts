@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useGameAudio } from "~/audio/GameAudioProvider";
 import { resolveInventoryDropFeedback } from "~/inventory/drop/resolveInventoryDropFeedback";
-import { resolveInventorySlotTapAction } from "~/inventory/logic/resolveInventorySlotTapAction";
+import { resolveInventorySlotTapAction } from "~/inventory/control/resolveInventorySlotTapAction";
 import type { InventorySurface } from "~/inventory/InventorySurface.types";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";

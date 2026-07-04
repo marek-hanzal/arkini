@@ -1,4 +1,4 @@
-import { readActivationInputViewFillableQuantity } from "~/board/logic/readActivationInputViewFillableQuantity";
+import { readActivationInputViewFillableQuantity } from "~/board/view/readActivationInputViewFillableQuantity";
 import type { LineView } from "~/board/view/LineViewSchema";
 
 export namespace readLineRunState {

@@ -1,8 +1,8 @@
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
-import { readCraftRunState } from "~/craft/logic/readCraftRunState";
+import { readCraftRunState } from "~/craft/view/readCraftRunState";
 import type { DetailActionControl } from "~/item-detail/control/DetailActionControl";
 import type { DetailCraftControl } from "~/item-detail/control/DetailCraftControl";
-import { craftStatusLabel } from "~/item-detail/logic/craftStatusLabel";
+import { craftStatusLabel } from "~/item-detail/control/craftStatusLabel";
 
 export namespace readDetailCraftControl {
 	export interface Props {

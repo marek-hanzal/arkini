@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { BoardCell } from "~/board/logic/BoardCell";
+import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 const boardCellKey = (cell: BoardCell) => `${cell.x}:${cell.y}`;

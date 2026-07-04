@@ -1,5 +1,5 @@
 import { type FC, useMemo } from "react";
-import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
+import { readLiveBoardItemView } from "~/board/view/readLiveBoardItemView";
 import { useBoardItemClock } from "~/board/useBoardItemClock";
 import { toGameActionError } from "~/play/action/toGameActionError";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";

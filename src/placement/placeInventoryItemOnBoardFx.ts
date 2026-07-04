@@ -13,7 +13,7 @@ import type { GameEvent } from "~/event/GameEventSchema";
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
-} from "~/inventory/logic/GameSaveInventorySlot";
+} from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace placeInventoryItemOnBoardFx {

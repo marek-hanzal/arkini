@@ -4,7 +4,7 @@ import { createInitialGameSaveFx } from "~/save/createInitialGameSaveFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { TestRandomService } from "~/engine/test/TestRandomService";
 import type { RandomService } from "~/random/context/RandomService";
-import { withRandomService } from "~/random/logic/withRandomService";
+import { withRandomService } from "~/random/withRandomService";
 
 export const runAction = (props: applyGameActionFx.Props) =>
 	Effect.runSync(applyGameActionFx(props).pipe(withRandomService(TestRandomService)));

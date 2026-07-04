@@ -4,7 +4,7 @@ import { createEngineCraftTableTestConfig } from "~/engine/test/createEngineCraf
 import { runGameTickFx } from "~/engine/runGameTickFx";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/engine/test/TestRandomService";
-import { withRandomService } from "~/random/logic/withRandomService";
+import { withRandomService } from "~/random/withRandomService";
 import {
 	findBoardItem,
 	readOnlyRecordValue,

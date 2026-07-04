@@ -1,6 +1,6 @@
-import { readLiveCraftView } from "~/board/logic/readLiveCraftView";
+import { readLiveCraftView } from "~/board/view/readLiveCraftView";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import { readLiveLineView } from "~/producer/logic/readLiveLineView";
+import { readLiveLineView } from "~/producer/view/readLiveLineView";
 
 export namespace readLiveBoardItemView {
 	export interface Props {

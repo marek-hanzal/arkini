@@ -1,5 +1,5 @@
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { readGameSaveInventorySlotQuantity } from "~/inventory/logic/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameItemQuantityScope } from "~/activation/GameItemQuantityScope";
 
 export namespace readGameSaveItemQuantityByScope {

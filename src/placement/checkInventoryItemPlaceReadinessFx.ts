@@ -10,7 +10,7 @@ import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
 	readGameSaveInventorySlotQuantity,
-} from "~/inventory/logic/GameSaveInventorySlot";
+} from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave, GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 
 export namespace checkInventoryItemPlaceReadinessFx {

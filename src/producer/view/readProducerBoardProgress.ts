@@ -1,6 +1,6 @@
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
 import type { LineView } from "~/board/view/LineViewSchema";
-import { readLiveLineView } from "~/producer/logic/readLiveLineView";
+import { readLiveLineView } from "~/producer/view/readLiveLineView";
 
 const readBoardProgressDisplay = (line: LineView) => {
 	const progress = line.progress ?? 0;

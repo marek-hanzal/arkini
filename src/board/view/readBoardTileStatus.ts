@@ -1,5 +1,5 @@
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
-import { isProducerReady } from "~/producer/logic/isProducerReady";
+import { isProducerReady } from "~/producer/view/isProducerReady";
 
 export namespace readBoardTileStatus {
 	export interface Props {

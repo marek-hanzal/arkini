@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { LineView } from "~/board/view/LineViewSchema";
-import { readLineRunState } from "~/producer/logic/readLineRunState";
+import { readLineRunState } from "~/producer/view/readLineRunState";
 
 const line = (overrides: Partial<LineView> = {}): LineView => ({
 	blocked: false,

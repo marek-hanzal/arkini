@@ -3,7 +3,7 @@ import type { ItemId } from "~/config/GameIdSchema";
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,
-} from "~/inventory/logic/GameSaveInventorySlot";
+} from "~/inventory/model/GameSaveInventorySlot";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 
 export namespace readRuntimeInventorySlotFromGameSave {

@@ -1,6 +1,6 @@
 import { isBoardItemConsumableAsInput } from "~/activation/isBoardItemConsumableAsInput";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { readGameSaveInventorySlotQuantity } from "~/inventory/logic/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 
 export namespace readRuntimeActivationInputAvailableQuantityFromGameSave {
 	export interface Props {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { RandomServiceLive } from "~/random/logic/RandomServiceLive";
+import { RandomServiceLive } from "~/random/RandomServiceLive";
 
 describe("RandomServiceLive", () => {
 	afterEach(() => {

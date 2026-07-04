@@ -7,7 +7,7 @@ import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
 import type { ItemId } from "~/config/GameIdSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { readGameSaveInventorySlotQuantity } from "~/inventory/logic/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import { readProducerJobLine } from "~/producer/readProducerJobLine";
 
 type ActivationOutput = NonNullable<GameLineDefinition["output"]>;

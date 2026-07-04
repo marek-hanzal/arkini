@@ -1,4 +1,4 @@
-import type { BoardCell } from "~/board/logic/BoardCell";
+import type { BoardCell } from "~/board/BoardCellPosition";
 import { readGameCheatEffectiveDurationMs } from "~/cheat/GameCheatSpeedMode";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";

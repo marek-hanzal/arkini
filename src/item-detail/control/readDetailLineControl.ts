@@ -1,5 +1,5 @@
 import type { LineView } from "~/board/view/LineViewSchema";
-import { readLineRunState } from "~/producer/logic/readLineRunState";
+import { readLineRunState } from "~/producer/view/readLineRunState";
 import { formatMs } from "~/time/formatMs";
 import type { DetailActionControl } from "~/item-detail/control/DetailActionControl";
 import type { DetailLineControl } from "~/item-detail/control/DetailLineControl";

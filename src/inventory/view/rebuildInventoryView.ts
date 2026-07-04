@@ -1,4 +1,4 @@
-import { groupSlotsByItemId } from "~/inventory/logic/groupSlotsByItemId";
+import { groupSlotsByItemId } from "~/inventory/view/groupSlotsByItemId";
 import type { InventorySlot } from "./InventorySlotSchema";
 import type { InventoryView } from "./InventoryViewSchema";
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { LineView } from "~/board/view/LineViewSchema";
-import { readLiveLineView } from "~/producer/logic/readLiveLineView";
+import { readLiveLineView } from "~/producer/view/readLiveLineView";
 
 const createLine = (overrides: Partial<LineView> = {}): LineView => ({
 	durationMs: 1000,

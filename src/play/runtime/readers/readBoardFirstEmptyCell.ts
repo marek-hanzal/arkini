@@ -1,6 +1,6 @@
 import type { BoardCellSchema } from "~/board/schema/BoardCellSchema";
 import { cellKey } from "~/board/cellKey";
-import { findFirstEmptyCell } from "~/board/logic/findFirstEmptyCell";
+import { findFirstEmptyCell } from "~/board/findFirstEmptyCell";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
 
 export const readBoardFirstEmptyCell = (

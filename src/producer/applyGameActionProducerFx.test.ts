@@ -4,7 +4,7 @@ import { GameSaveConfigSchema } from "~/engine/model/GameSaveSchema";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { runGameTickFx } from "~/engine/runGameTickFx";
 import { TestRandomService } from "~/engine/test/TestRandomService";
-import { withRandomService } from "~/random/logic/withRandomService";
+import { withRandomService } from "~/random/withRandomService";
 import {
 	findBoardItem,
 	readOnlyRecordValue,

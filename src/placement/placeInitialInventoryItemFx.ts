@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { isGameSaveInventoryStack } from "~/inventory/logic/GameSaveInventorySlot";
+import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 
 export namespace placeInitialInventoryItemFx {

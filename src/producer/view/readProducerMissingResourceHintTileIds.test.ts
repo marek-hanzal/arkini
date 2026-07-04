@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readProducerMissingResourceHintTileIds } from "~/producer/logic/readProducerMissingResourceHintTileIds";
+import { readProducerMissingResourceHintTileIds } from "~/producer/view/readProducerMissingResourceHintTileIds";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { LineView } from "~/board/view/LineViewSchema";

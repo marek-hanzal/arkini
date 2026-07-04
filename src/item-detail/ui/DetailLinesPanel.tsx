@@ -1,7 +1,7 @@
 import { Fragment, type FC, useState } from "react";
-import { readActivationInputViewFillableQuantity } from "~/board/logic/readActivationInputViewFillableQuantity";
-import { readActivationInputViewLabel } from "~/board/logic/readActivationInputViewLabel";
-import { readActivationInputViewReady } from "~/board/logic/readActivationInputViewReady";
+import { readActivationInputViewFillableQuantity } from "~/board/view/readActivationInputViewFillableQuantity";
+import { readActivationInputViewLabel } from "~/board/view/readActivationInputViewLabel";
+import { readActivationInputViewReady } from "~/board/view/readActivationInputViewReady";
 import type { LineView } from "~/board/view/LineViewSchema";
 import { ItemInlineAsset } from "~/item/ui/ItemInlineAsset";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";

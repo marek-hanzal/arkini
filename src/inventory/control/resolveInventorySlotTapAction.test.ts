@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveInventorySlotTapAction } from "~/inventory/logic/resolveInventorySlotTapAction";
+import { resolveInventorySlotTapAction } from "~/inventory/control/resolveInventorySlotTapAction";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 
 const slot = (overrides: Partial<InventorySlot> = {}): InventorySlot => ({

@@ -5,7 +5,7 @@ import { createInitialGameSaveFx } from "~/save/createInitialGameSaveFx";
 import { createEngineCraftTableTestConfig } from "~/engine/test/createEngineCraftTableTestConfig";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { TestRandomService } from "~/engine/test/TestRandomService";
-import { withRandomService } from "~/random/logic/withRandomService";
+import { withRandomService } from "~/random/withRandomService";
 
 const runInitialSave = (props: createInitialGameSaveFx.Props) =>
 	Effect.runSync(createInitialGameSaveFx(props));

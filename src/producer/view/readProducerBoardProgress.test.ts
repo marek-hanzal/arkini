@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
-import { readProducerBoardProgress } from "~/producer/logic/readProducerBoardProgress";
+import { readProducerBoardProgress } from "~/producer/view/readProducerBoardProgress";
 
 const producerActivation = (
 	lines: ActivationView["lines"],

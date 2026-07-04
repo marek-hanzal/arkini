@@ -7,7 +7,7 @@ import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
 import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { BoardCell } from "~/board/logic/BoardCell";
+import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

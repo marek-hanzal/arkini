@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { LineView } from "~/board/view/LineViewSchema";
-import { readBoardTileStatus } from "~/board/logic/readBoardTileStatus";
+import { readBoardTileStatus } from "~/board/view/readBoardTileStatus";
 
 const line = (overrides: Partial<LineView> = {}): LineView => ({
 	blocked: false,

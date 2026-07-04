@@ -4,7 +4,7 @@ import type { GameActionItemRefSchema } from "~/action/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRuntimeStateStatus";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { readGameSaveInventorySlotQuantity } from "~/inventory/logic/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace resolveInputRefsFx {

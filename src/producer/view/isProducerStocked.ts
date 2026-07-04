@@ -1,7 +1,7 @@
-import { readActivationInputViewFillableQuantity } from "~/board/logic/readActivationInputViewFillableQuantity";
-import { readActivationInputViewReady } from "~/board/logic/readActivationInputViewReady";
+import { readActivationInputViewFillableQuantity } from "~/board/view/readActivationInputViewFillableQuantity";
+import { readActivationInputViewReady } from "~/board/view/readActivationInputViewReady";
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
-import { readLineRunState } from "~/producer/logic/readLineRunState";
+import { readLineRunState } from "~/producer/view/readLineRunState";
 
 export function isProducerStocked(activation: ActivationView | undefined) {
 	if (!activation) return false;

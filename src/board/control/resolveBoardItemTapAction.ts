@@ -1,7 +1,7 @@
-import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
-import { readCraftRunState } from "~/craft/logic/readCraftRunState";
-import { isProducerReady } from "~/producer/logic/isProducerReady";
-import { readLineRunState } from "~/producer/logic/readLineRunState";
+import { readLiveBoardItemView } from "~/board/view/readLiveBoardItemView";
+import { readCraftRunState } from "~/craft/view/readCraftRunState";
+import { isProducerReady } from "~/producer/view/isProducerReady";
+import { readLineRunState } from "~/producer/view/readLineRunState";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 import { readBoardUtilityItemSheet } from "~/board/BoardUtilityItem";

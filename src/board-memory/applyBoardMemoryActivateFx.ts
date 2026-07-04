@@ -9,7 +9,7 @@ import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
-} from "~/inventory/logic/GameSaveInventorySlot";
+} from "~/inventory/model/GameSaveInventorySlot";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import type { GameActionBoardMemoryActivateSchema } from "~/action/GameActionBoardMemoryActivateSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";

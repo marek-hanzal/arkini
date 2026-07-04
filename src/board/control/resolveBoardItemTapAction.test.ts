@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveBoardItemTapAction } from "~/board/logic/resolveBoardItemTapAction";
+import { resolveBoardItemTapAction } from "~/board/control/resolveBoardItemTapAction";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import {
 	cheatBoardItemId,

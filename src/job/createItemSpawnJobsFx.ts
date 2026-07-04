@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { BoardCell } from "~/board/logic/BoardCell";
+import type { BoardCell } from "~/board/BoardCellPosition";
 import { createGameItemSpawnJobIdFx } from "~/job/createGameItemSpawnJobIdFx";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

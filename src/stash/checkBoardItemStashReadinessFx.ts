@@ -6,7 +6,7 @@ import { readBoardItemRuntimeStateStatus } from "~/board/logic/readBoardItemRunt
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { isGameSaveInventoryStack } from "~/inventory/logic/GameSaveInventorySlot";
+import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace checkBoardItemStashReadinessFx {

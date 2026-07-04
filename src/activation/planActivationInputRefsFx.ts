@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { readGameSaveInventorySlotQuantity } from "~/inventory/logic/GameSaveInventorySlot";
+import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import { isBoardItemConsumableAsInput } from "~/activation/isBoardItemConsumableAsInput";
 import { type GameItemQuantityIndex, readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
 

@@ -1,14 +1,14 @@
 import { memo, useMemo } from "react";
 import { BoardCellCooldownProgress } from "~/board/ui/BoardCellCooldownProgress";
 import { BoardCellProgress } from "~/board/ui/BoardCellProgress";
-import { readBoardTileStatus } from "~/board/logic/readBoardTileStatus";
+import { readBoardTileStatus } from "~/board/view/readBoardTileStatus";
 import { useBoardMemoryOperation } from "~/board-memory/BoardMemoryOperationContext";
-import { readLiveBoardItemView } from "~/board/logic/readLiveBoardItemView";
+import { readLiveBoardItemView } from "~/board/view/readLiveBoardItemView";
 import { GameItemView } from "~/item/ui/GameItemView";
 import { cn } from "~/ui/cn";
 import { useBoardItemClock } from "~/board/useBoardItemClock";
-import { readProducerCooldown } from "~/producer/logic/readProducerCooldown";
-import { readProducerBoardProgress } from "~/producer/logic/readProducerBoardProgress";
+import { readProducerCooldown } from "~/producer/view/readProducerCooldown";
+import { readProducerBoardProgress } from "~/producer/view/readProducerBoardProgress";
 import { useGameRuntimeSelector } from "~/play/runtime/GameRuntimeContext";
 import { useGameBoardItem, useGameItemView } from "~/play/runtime/useGameRuntimeViews";
 import { useLiveNowMs } from "~/time/useLiveNowMs";

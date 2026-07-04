@@ -1,8 +1,8 @@
 import { Effect, type Effect as EffectType } from "effect";
 import type { RandomService } from "~/random/context/RandomService";
 import { type RandomServiceFx } from "~/random/context/RandomServiceFx";
-import { RandomServiceLive } from "~/random/logic/RandomServiceLive";
-import { withRandomService } from "~/random/logic/withRandomService";
+import { RandomServiceLive } from "~/random/RandomServiceLive";
+import { withRandomService } from "~/random/withRandomService";
 
 export type GameEngineRuntimeServiceFx = RandomServiceFx;
 

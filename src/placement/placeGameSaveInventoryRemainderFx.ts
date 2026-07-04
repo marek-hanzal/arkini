@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
-import { isGameSaveInventoryStack } from "~/inventory/logic/GameSaveInventorySlot";
+import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 
 export namespace placeGameSaveInventoryRemainderFx {

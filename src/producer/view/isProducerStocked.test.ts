@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ActivationView } from "~/board/view/ActivationViewSchema";
-import { isProducerStocked } from "~/producer/logic/isProducerStocked";
+import { isProducerStocked } from "~/producer/view/isProducerStocked";
 
 const line = (overrides: Partial<NonNullable<ActivationView["lines"]>[number]> = {}) => ({
 	durationMs: 1000,

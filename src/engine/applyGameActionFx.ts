@@ -1,10 +1,10 @@
-import { Context, Effect, type Effect as EffectType } from "effect";
-import { match, P } from "ts-pattern";
+import { Effect } from "effect";
+import { match } from "ts-pattern";
 import type { GameAction } from "~/action/GameActionSchema";
-import { moveBoardItemFx } from "~/board/moveBoardItemFx";
-import { swapBoardItemsFx } from "~/board/swapBoardItemsFx";
 import { applyBoardMemoryActivateFx } from "~/board-memory/applyBoardMemoryActivateFx";
 import { applyBoardMemoryClearFx } from "~/board-memory/applyBoardMemoryClearFx";
+import { moveBoardItemFx } from "~/board/moveBoardItemFx";
+import { swapBoardItemsFx } from "~/board/swapBoardItemsFx";
 import { setCheatSpeedModeFx } from "~/cheat/setCheatSpeedModeFx";
 import { GameConfigFx } from "~/config/GameConfigFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -37,96 +37,10 @@ export namespace applyGameActionFx {
 	}
 }
 
-namespace GameActionApplicationScopeFx {
-	export interface Service {
-		readonly config: GameConfig;
-		readonly nowMs: number;
-		readonly save: GameSave;
-	}
-}
+type GameActionContext = Omit<applyGameActionFx.Props, "action">;
 
-type BoardGameAction = Extract<
-	GameAction,
-	{
-		type:
-			| "board.item.move"
-			| "board.item.stash"
-			| "board.memory.activate"
-			| "board.memory.clear"
-			| "board.items.swap"
-			| "item.merge"
-			| "tile.remove";
-	}
->;
-type BoardItemGameAction = Extract<
-	BoardGameAction,
-	{
-		type: "board.item.move" | "board.item.stash";
-	}
->;
-type BoardMemoryGameAction = Extract<
-	BoardGameAction,
-	{
-		type: "board.memory.activate" | "board.memory.clear";
-	}
->;
-type BoardInteractionGameAction = Extract<
-	BoardGameAction,
-	{
-		type: "board.items.swap" | "item.merge" | "tile.remove";
-	}
->;
-type InventoryGameAction = Extract<
-	GameAction,
-	{
-		type: "inventory.item.place" | "inventory.slots.swap";
-	}
->;
-type CraftGameAction = Extract<
-	GameAction,
-	{
-		type: "craft.input.store" | "craft.input.withdraw" | "craft.start";
-	}
->;
-type ProducerGameAction = Extract<
-	GameAction,
-	{
-		type:
-			| "producer.input.store"
-			| "producer.input.withdraw"
-			| "line.set_default"
-			| "line.start"
-			| "stash.open";
-	}
->;
-type DebugGameAction = Extract<
-	GameAction,
-	{
-		type: "cheat.speed_mode.set" | "debug.board_item.delete" | "debug.item.spawn";
-	}
->;
-
-class GameActionApplicationScopeFx extends Context.Tag("GameActionApplicationScopeFx")<
-	GameActionApplicationScopeFx,
-	GameActionApplicationScopeFx.Service
->() {
-	//
-}
-
-const provideGameActionApplicationScopeFx = <A, E, R>(
-	effect: EffectType.Effect<A, E, R | GameActionApplicationScopeFx>,
-	service: GameActionApplicationScopeFx.Service,
-) => Effect.provideService(effect, GameActionApplicationScopeFx, service);
-
-const readGameActionContextFx = Effect.fn("applyGameActionFx.readGameActionContextFx")(
-	function* () {
-		return yield* GameActionApplicationScopeFx;
-	},
-);
-
-const dispatchBoardItemGameActionFx = Effect.fn("applyGameActionFx.dispatchBoardItemGameActionFx")(
-	function* (action: BoardItemGameAction) {
-		const actionContext = yield* readGameActionContextFx();
+const dispatchParsedGameActionFx = Effect.fn("applyGameActionFx.dispatchParsedGameActionFx")(
+	function* ({ action, context }: { action: GameAction; context: GameActionContext }) {
 		return yield* match(action)
 			.with(
 				{
@@ -134,7 +48,7 @@ const dispatchBoardItemGameActionFx = Effect.fn("applyGameActionFx.dispatchBoard
 				},
 				(parsedAction) =>
 					moveBoardItemFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -144,116 +58,67 @@ const dispatchBoardItemGameActionFx = Effect.fn("applyGameActionFx.dispatchBoard
 				},
 				(parsedAction) =>
 					stashBoardItemFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
-			.exhaustive();
-	},
-);
-
-const dispatchBoardMemoryGameActionFx = Effect.fn(
-	"applyGameActionFx.dispatchBoardMemoryGameActionFx",
-)(function* (action: BoardMemoryGameAction) {
-	const actionContext = yield* readGameActionContextFx();
-	return yield* match(action)
-		.with(
-			{
-				type: "board.memory.activate",
-			},
-			(parsedAction) =>
-				applyBoardMemoryActivateFx({
-					...actionContext,
-					action: parsedAction,
-				}),
-		)
-		.with(
-			{
-				type: "board.memory.clear",
-			},
-			(parsedAction) =>
-				applyBoardMemoryClearFx({
-					...actionContext,
-					action: parsedAction,
-				}),
-		)
-		.exhaustive();
-});
-
-const dispatchBoardInteractionGameActionFx = Effect.fn(
-	"applyGameActionFx.dispatchBoardInteractionGameActionFx",
-)(function* (action: BoardInteractionGameAction) {
-	const actionContext = yield* readGameActionContextFx();
-	return yield* match(action)
-		.with(
-			{
-				type: "board.items.swap",
-			},
-			(parsedAction) =>
-				swapBoardItemsFx({
-					...actionContext,
-					action: parsedAction,
-				}),
-		)
-		.with(
-			{
-				type: "item.merge",
-			},
-			(parsedAction) =>
-				mergeItemFx({
-					...actionContext,
-					action: parsedAction,
-				}),
-		)
-		.with(
-			{
-				type: "tile.remove",
-			},
-			(parsedAction) =>
-				removeTileFx({
-					...actionContext,
-					action: parsedAction,
-				}),
-		)
-		.exhaustive();
-});
-
-const dispatchBoardGameActionFx = Effect.fn("applyGameActionFx.dispatchBoardGameActionFx")(
-	function* (action: BoardGameAction) {
-		return yield* match(action)
 			.with(
 				{
-					type: P.union("board.item.move", "board.item.stash"),
+					type: "board.memory.activate",
 				},
-				(parsedAction) => dispatchBoardItemGameActionFx(parsedAction),
+				(parsedAction) =>
+					applyBoardMemoryActivateFx({
+						...context,
+						action: parsedAction,
+					}),
 			)
 			.with(
 				{
-					type: P.union("board.memory.activate", "board.memory.clear"),
+					type: "board.memory.clear",
 				},
-				(parsedAction) => dispatchBoardMemoryGameActionFx(parsedAction),
+				(parsedAction) =>
+					applyBoardMemoryClearFx({
+						...context,
+						action: parsedAction,
+					}),
 			)
 			.with(
 				{
-					type: P.union("board.items.swap", "item.merge", "tile.remove"),
+					type: "board.items.swap",
 				},
-				(parsedAction) => dispatchBoardInteractionGameActionFx(parsedAction),
+				(parsedAction) =>
+					swapBoardItemsFx({
+						...context,
+						action: parsedAction,
+					}),
 			)
-			.exhaustive();
-	},
-);
-
-const dispatchInventoryGameActionFx = Effect.fn("applyGameActionFx.dispatchInventoryGameActionFx")(
-	function* (action: InventoryGameAction) {
-		const actionContext = yield* readGameActionContextFx();
-		return yield* match(action)
+			.with(
+				{
+					type: "item.merge",
+				},
+				(parsedAction) =>
+					mergeItemFx({
+						...context,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "tile.remove",
+				},
+				(parsedAction) =>
+					removeTileFx({
+						...context,
+						action: parsedAction,
+					}),
+			)
 			.with(
 				{
 					type: "inventory.item.place",
 				},
 				(parsedAction) =>
 					placeInventoryItemOnBoardFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -263,25 +128,17 @@ const dispatchInventoryGameActionFx = Effect.fn("applyGameActionFx.dispatchInven
 				},
 				(parsedAction) =>
 					swapInventorySlotsFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
-			.exhaustive();
-	},
-);
-
-const dispatchCraftGameActionFx = Effect.fn("applyGameActionFx.dispatchCraftGameActionFx")(
-	function* (action: CraftGameAction) {
-		const actionContext = yield* readGameActionContextFx();
-		return yield* match(action)
 			.with(
 				{
 					type: "craft.input.store",
 				},
 				(parsedAction) =>
 					storeCraftInputFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -291,7 +148,7 @@ const dispatchCraftGameActionFx = Effect.fn("applyGameActionFx.dispatchCraftGame
 				},
 				(parsedAction) =>
 					withdrawCraftInputFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -301,25 +158,17 @@ const dispatchCraftGameActionFx = Effect.fn("applyGameActionFx.dispatchCraftGame
 				},
 				(parsedAction) =>
 					startCraftFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
-			.exhaustive();
-	},
-);
-
-const dispatchProducerGameActionFx = Effect.fn("applyGameActionFx.dispatchProducerGameActionFx")(
-	function* (action: ProducerGameAction) {
-		const actionContext = yield* readGameActionContextFx();
-		return yield* match(action)
 			.with(
 				{
 					type: "producer.input.store",
 				},
 				(parsedAction) =>
 					storeProducerInputFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -329,7 +178,7 @@ const dispatchProducerGameActionFx = Effect.fn("applyGameActionFx.dispatchProduc
 				},
 				(parsedAction) =>
 					withdrawProducerInputFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -339,7 +188,7 @@ const dispatchProducerGameActionFx = Effect.fn("applyGameActionFx.dispatchProduc
 				},
 				(parsedAction) =>
 					setLineDefaultFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -349,7 +198,7 @@ const dispatchProducerGameActionFx = Effect.fn("applyGameActionFx.dispatchProduc
 				},
 				(parsedAction) =>
 					startLineFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -359,25 +208,17 @@ const dispatchProducerGameActionFx = Effect.fn("applyGameActionFx.dispatchProduc
 				},
 				(parsedAction) =>
 					openStashFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
-			.exhaustive();
-	},
-);
-
-const dispatchDebugGameActionFx = Effect.fn("applyGameActionFx.dispatchDebugGameActionFx")(
-	function* (action: DebugGameAction) {
-		const actionContext = yield* readGameActionContextFx();
-		return yield* match(action)
 			.with(
 				{
 					type: "cheat.speed_mode.set",
 				},
 				(parsedAction) =>
 					setCheatSpeedModeFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -387,7 +228,7 @@ const dispatchDebugGameActionFx = Effect.fn("applyGameActionFx.dispatchDebugGame
 				},
 				(parsedAction) =>
 					deleteDebugBoardItemFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
 			)
@@ -397,64 +238,9 @@ const dispatchDebugGameActionFx = Effect.fn("applyGameActionFx.dispatchDebugGame
 				},
 				(parsedAction) =>
 					spawnDebugItemFx({
-						...actionContext,
+						...context,
 						action: parsedAction,
 					}),
-			)
-			.exhaustive();
-	},
-);
-
-const dispatchParsedGameActionFx = Effect.fn("applyGameActionFx.dispatchParsedGameActionFx")(
-	function* (action: GameAction) {
-		return yield* match(action)
-			.with(
-				{
-					type: P.union(
-						"board.item.move",
-						"board.item.stash",
-						"board.memory.activate",
-						"board.memory.clear",
-						"board.items.swap",
-						"item.merge",
-						"tile.remove",
-					),
-				},
-				(parsedAction) => dispatchBoardGameActionFx(parsedAction),
-			)
-			.with(
-				{
-					type: P.union("inventory.item.place", "inventory.slots.swap"),
-				},
-				(parsedAction) => dispatchInventoryGameActionFx(parsedAction),
-			)
-			.with(
-				{
-					type: P.union("craft.input.store", "craft.input.withdraw", "craft.start"),
-				},
-				(parsedAction) => dispatchCraftGameActionFx(parsedAction),
-			)
-			.with(
-				{
-					type: P.union(
-						"producer.input.store",
-						"producer.input.withdraw",
-						"line.set_default",
-						"line.start",
-						"stash.open",
-					),
-				},
-				(parsedAction) => dispatchProducerGameActionFx(parsedAction),
-			)
-			.with(
-				{
-					type: P.union(
-						"cheat.speed_mode.set",
-						"debug.board_item.delete",
-						"debug.item.spawn",
-					),
-				},
-				(parsedAction) => dispatchDebugGameActionFx(parsedAction),
 			)
 			.exhaustive();
 	},
@@ -469,17 +255,18 @@ export const applyGameActionFx = Effect.fn("applyGameActionFx")(function* ({
 	const parsedAction = yield* parseGameActionFx({
 		action,
 	});
-	const scopedActionEffect = provideGameActionApplicationScopeFx(
-		dispatchParsedGameActionFx(parsedAction),
-		{
+	const actionResult = yield* dispatchParsedGameActionFx({
+		action: parsedAction,
+		context: {
 			config,
 			nowMs,
 			save,
 		},
+	}).pipe(
+		Effect.provideService(GameConfigFx, {
+			config,
+		}),
 	);
-	const actionResult = yield* Effect.provideService(scopedActionEffect, GameConfigFx, {
-		config,
-	});
 
 	const processedWorld = yield* processWorldSnapshotFx({
 		config,

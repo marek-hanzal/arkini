@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { writeStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 
@@ -21,7 +22,11 @@ const clearProducerInputQuantityFx = Effect.fn(
 	const lineInputState = producerInputState?.lineInputs[lineId];
 	if (!producerInputState || !lineInputState) return;
 
-	delete lineInputState.items[itemId];
+	yield* writeStoredActivationInputQuantityFx({
+		itemId,
+		nextQuantity: 0,
+		state: lineInputState,
+	});
 	if (Object.keys(lineInputState.items).length === 0) {
 		delete producerInputState.lineInputs[lineId];
 	}

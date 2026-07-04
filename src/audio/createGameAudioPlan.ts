@@ -4,6 +4,7 @@ import type { GameAudioSoundId } from "~/audio/GameAudioSound";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
+import type { GameEventOfType } from "~/event/GameEventOfType";
 
 const maxCreatedItemSoundsPerPlan = 3;
 
@@ -34,13 +35,6 @@ type AudioBatchFacts = {
 };
 
 type AudioPlanContext = createGameAudioPlan.Props & AudioPlanWriter & AudioBatchFacts;
-
-type GameEventOfType<TType extends GameEvent["type"]> = Extract<
-	GameEvent,
-	{
-		type: TType;
-	}
->;
 
 const staticSoundByEventType = {
 	"producer_input.stored": "audio.producer.input.store",

@@ -20,6 +20,9 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 - Action contracts live in `src/action`; output event contracts live in `src/event`; dense save contract stays in `src/engine/model`.
 - Exported Effect boundaries must be named and filed as `*Fx`; domain folders stay primary, but a file exporting `Effect.fn` without an `Fx` filename is a navigation lie and `audit:current` should reject it.
 - Board item -> inventory transfer uses `src/placement/placeBoardItemInInventoryFx.ts`; do not reintroduce private stash/board-memory copies of preserve-instance vs stack-copy placement, consumed events, or runtime-state deletion.
+- `applyGameActionFx` is the single explicit parsed action dispatch edge. Do not rebuild nested action-category routers or local Context services just to pass `{ config, save, nowMs }`; add new actions as direct exhaustive branches to the parsed action match.
+- Stored activation input quantity map writes/deletes go through `src/activation/writeStoredActivationInputQuantityFx.ts`; do not reintroduce private producer/craft `items[itemId]` mutation snippets.
+- Shared event union extraction lives in `src/event/GameEventOfType.ts`; audio/visual planners should not carry local duplicate `Extract<GameEvent, ...>` aliases.
 - React reads runtime through `useGameRuntimeSelector` / focused hooks from `GameRuntimeStore`.
 - Gameplay mutations go through typed engine actions, not `useMutation` wrappers.
 - Persistence is Dexie snapshot plumbing around `GameSave`; it is not gameplay truth.

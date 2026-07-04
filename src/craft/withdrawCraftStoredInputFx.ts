@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { writeStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 
@@ -28,13 +29,16 @@ const removeCraftInputQuantityFx = Effect.fn(
 		items: {},
 	};
 
+	yield* writeStoredActivationInputQuantityFx({
+		itemId,
+		nextQuantity,
+		state: craftInputState,
+	});
 	if (nextQuantity > 0) {
-		craftInputState.items[itemId] = nextQuantity;
 		nextSave.craftInputs[targetItemInstanceId] = craftInputState;
 		return;
 	}
 
-	delete craftInputState.items[itemId];
 	if (Object.keys(craftInputState.items).length > 0) {
 		nextSave.craftInputs[targetItemInstanceId] = craftInputState;
 		return;

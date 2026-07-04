@@ -1,6 +1,7 @@
 import { match } from "ts-pattern";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
+import type { GameEventOfType } from "~/event/GameEventOfType";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import { appendItemCreatedVisuals } from "~/play/game-engine-visual/appendItemCreatedVisuals";
 import { appendItemMergeVisuals } from "~/play/game-engine-visual/appendItemMergeVisuals";
@@ -21,13 +22,6 @@ import {
 import { findMergeResultEventIndex } from "~/play/game-engine-visual/findMergeResultEventIndex";
 import { findActivationInputTargetEventIndex } from "~/play/game-engine-visual/findActivationInputTargetEventIndex";
 import { shouldAnimateActivationInputStoreVisual } from "~/play/game-engine-visual/shouldAnimateActivationInputStoreVisual";
-
-type GameEventOfType<TType extends GameEvent["type"]> = Extract<
-	GameEvent,
-	{
-		type: TType;
-	}
->;
 
 type ActivationInputStoredEvent = GameEventOfType<"producer_input.stored" | "craft_input.stored">;
 

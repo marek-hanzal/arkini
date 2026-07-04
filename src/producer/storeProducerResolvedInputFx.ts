@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
+import { increaseStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 
@@ -28,9 +29,11 @@ export const storeProducerResolvedInputFx = Effect.fn("storeProducerResolvedInpu
 	const lineInputState = (producerInputState.lineInputs[lineId] ??= {
 		items: {},
 	});
-	const previousQuantity = lineInputState.items[ref.itemId] ?? 0;
-	const nextQuantity = previousQuantity + ref.quantity;
-	lineInputState.items[ref.itemId] = nextQuantity;
+	const { nextQuantity, previousQuantity } = yield* increaseStoredActivationInputQuantityFx({
+		itemId: ref.itemId,
+		quantity: ref.quantity,
+		state: lineInputState,
+	});
 
 	events.push({
 		itemId: ref.itemId,

@@ -3,6 +3,7 @@ import type { BoardCell } from "~/board/BoardCellPosition";
 import { createGameItemSpawnJobIdFx } from "~/job/createGameItemSpawnJobIdFx";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { writeItemSpawnJobToSaveFx } from "~/job/writeItemSpawnJobToSaveFx";
 
 export namespace createItemSpawnJobsFx {
 	export interface Props {
@@ -33,24 +34,27 @@ export const createItemSpawnJobsFx = Effect.fn("createItemSpawnJobsFx")(function
 			const itemSpawnDueAtMs = readyAtMs + itemSpawnIndex * intervalMs;
 			lastDueAtMs = itemSpawnDueAtMs;
 			const id = yield* createGameItemSpawnJobIdFx();
-			save.itemSpawnJobs[id] = {
-				readyAtMs: itemSpawnDueAtMs,
-				afterJobIds:
-					exclusiveGroupKey && previousJobId
-						? [
-								previousJobId,
-							]
-						: undefined,
-				exclusiveGroupKey,
-				id,
-				itemId: item.itemId,
-				originItemInstanceId: item.originItemInstanceId,
-				quantity: 1,
-				reason: item.reason,
-				seedCell,
-				sequenceIndex: itemSpawnIndex,
-				type: "item.spawn",
-			};
+			yield* writeItemSpawnJobToSaveFx({
+				job: {
+					readyAtMs: itemSpawnDueAtMs,
+					afterJobIds:
+						exclusiveGroupKey && previousJobId
+							? [
+									previousJobId,
+								]
+							: undefined,
+					exclusiveGroupKey,
+					id,
+					itemId: item.itemId,
+					originItemInstanceId: item.originItemInstanceId,
+					quantity: 1,
+					reason: item.reason,
+					seedCell,
+					sequenceIndex: itemSpawnIndex,
+					type: "item.spawn",
+				},
+				save,
+			});
 			jobIds.push(id);
 			previousJobId = id;
 			itemSpawnIndex += 1;

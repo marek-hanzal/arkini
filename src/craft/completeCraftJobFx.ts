@@ -13,6 +13,7 @@ import { blockedCraftCompletionRetryDelayMs } from "~/craft/craftCompletionTimin
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
+import { writeCraftJobToSaveFx } from "~/craft/writeCraftJobToSaveFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export namespace completeCraftJobFx {
@@ -277,13 +278,16 @@ const createRetryingCraftCompletionFx = Effect.fn(
 		save: scope.save,
 	});
 	const nextAttemptAtMs = scope.nowMs + blockedCraftCompletionRetryDelayMs;
-	nextSave.craftJobs[job.id] = {
-		...job,
-		delivery: {
-			lastBlockedAtMs: scope.nowMs,
-			nextAttemptAtMs,
+	yield* writeCraftJobToSaveFx({
+		job: {
+			...job,
+			delivery: {
+				lastBlockedAtMs: scope.nowMs,
+				nextAttemptAtMs,
+			},
 		},
-	};
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = scope.nowMs;
 
 	return {

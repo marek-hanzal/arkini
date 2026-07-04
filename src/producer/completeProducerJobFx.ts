@@ -6,6 +6,7 @@ import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/producer/producerDeliveryTiming";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
+import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
 import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
@@ -426,13 +427,16 @@ const completeBlockedProducerDeliveryFx = Effect.fn(
 		save,
 	});
 	const nextAttemptAtMs = nowMs + blockedProducerDeliveryRetryDelayMs;
-	nextSave.producerJobs[liveJob.id] = {
-		...liveJob,
-		delivery: {
-			lastBlockedAtMs: nowMs,
-			nextAttemptAtMs,
+	yield* writeProducerJobToSaveFx({
+		job: {
+			...liveJob,
+			delivery: {
+				lastBlockedAtMs: nowMs,
+				nextAttemptAtMs,
+			},
 		},
-	};
+		save: nextSave,
+	});
 	yield* rescheduleProducerQueueAfterBlockedDeliveryFx({
 		blockedJobId: liveJob.id,
 		config,

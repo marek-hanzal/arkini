@@ -8,6 +8,7 @@ import { readDueItemSpawnJobsFx } from "~/job/readDueItemSpawnJobsFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import type { GameSave, GameSaveItemSpawnJob } from "~/engine/model/GameSaveSchema";
 import { isItemSpawnJobWaitingForDependencies } from "~/world/isItemSpawnJobWaitingForDependencies";
+import { writeItemSpawnJobToSaveFx } from "~/job/writeItemSpawnJobToSaveFx";
 
 export const blockedItemSpawnJobRetryDelayMs = 1000;
 
@@ -74,11 +75,14 @@ const markBlockedItemSpawnJobForRetryFx = Effect.fn(
 	nowMs: number;
 	state: ItemSpawnJobsProcessingState;
 }) {
-	state.nextSave.itemSpawnJobs[job.id] = {
-		...job,
-		readyAtMs: nowMs + blockedItemSpawnJobRetryDelayMs,
-		lastBlockedAtMs: nowMs,
-	};
+	yield* writeItemSpawnJobToSaveFx({
+		job: {
+			...job,
+			readyAtMs: nowMs + blockedItemSpawnJobRetryDelayMs,
+			lastBlockedAtMs: nowMs,
+		},
+		save: state.nextSave,
+	});
 	state.nextSave.updatedAtMs = nowMs;
 });
 

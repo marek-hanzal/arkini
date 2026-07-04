@@ -7,6 +7,7 @@ import {
 } from "~/config/GameItemCapabilities";
 import { readCraftJobEffectiveTimingFx } from "~/craft/readCraftJobEffectiveTimingFx";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
+import { writeCraftJobToSaveFx } from "~/craft/writeCraftJobToSaveFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
 import {
@@ -135,13 +136,16 @@ const resumePausedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.resumePausedCr
 		const liveJob = draft.craftJobs[job.id];
 		if (!liveJob) return;
 
-		draft.craftJobs[job.id] = {
-			...liveJob,
-			pausedAtMs: undefined,
-			readyAtMs: resumedTiming.readyAtMs,
-			remainingMs: undefined,
-			startAtMs: resumedTiming.startAtMs,
-		};
+		yield* writeCraftJobToSaveFx({
+			job: {
+				...liveJob,
+				pausedAtMs: undefined,
+				readyAtMs: resumedTiming.readyAtMs,
+				remainingMs: undefined,
+				startAtMs: resumedTiming.startAtMs,
+			},
+			save: draft,
+		});
 	},
 );
 
@@ -155,13 +159,16 @@ const pauseBlockedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.pauseBlockedCr
 		const liveJob = draft.craftJobs[job.id];
 		if (!liveJob) return;
 
-		draft.craftJobs[job.id] = {
-			...liveJob,
-			pausedAtMs: scope.nowMs,
-			readyAtMs: scope.nowMs + remainingMs,
-			remainingMs,
-			startAtMs: job.startAtMs,
-		};
+		yield* writeCraftJobToSaveFx({
+			job: {
+				...liveJob,
+				pausedAtMs: scope.nowMs,
+				readyAtMs: scope.nowMs + remainingMs,
+				remainingMs,
+				startAtMs: job.startAtMs,
+			},
+			save: draft,
+		});
 	},
 );
 
@@ -181,11 +188,14 @@ const retimeReadyCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.retimeReadyCraf
 		const liveJob = draft.craftJobs[job.id];
 		if (!liveJob) return;
 
-		draft.craftJobs[job.id] = {
-			...liveJob,
-			readyAtMs: timing.readyAtMs,
-			startAtMs: timing.startAtMs,
-		};
+		yield* writeCraftJobToSaveFx({
+			job: {
+				...liveJob,
+				readyAtMs: timing.readyAtMs,
+				startAtMs: timing.startAtMs,
+			},
+			save: draft,
+		});
 	},
 );
 

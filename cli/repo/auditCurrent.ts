@@ -89,6 +89,7 @@ const main = async () => {
 		...auditEffectFunctionNames(),
 		...auditBoardItemRemovalBoundaries(),
 		...auditJobRemovalBoundaries(),
+		...auditJobWriteBoundaries(),
 		...auditActiveEffectWriteBoundaries(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
@@ -235,6 +236,32 @@ const auditJobRemovalBoundaries = (): Finding[] =>
 				path,
 				message:
 					"job removal must go through a named job-removal Fx boundary; board item runtime cleanup is the only cascade exception",
+			},
+		];
+	});
+
+const jobWriteBoundaryPaths = new Set([
+	"src/craft/writeCraftJobToSaveFx.ts",
+	"src/job/writeItemSpawnJobToSaveFx.ts",
+	"src/producer/writeProducerJobToSaveFx.ts",
+]);
+
+const auditJobWriteBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (jobWriteBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (!/\.(?:producerJobs|craftJobs|itemSpawnJobs)\s*\[[^\]]+\]\s*=/.test(text)) {
+			return [];
+		}
+
+		return [
+			{
+				path,
+				message:
+					"job writes must go through named job-write Fx boundaries so lifecycle updates stay grepable",
 			},
 		];
 	});

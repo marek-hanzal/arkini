@@ -7,6 +7,7 @@ import { readProducerJobTimingFx } from "~/producer/readProducerJobTimingFx";
 import { findActiveEffectByProducerJobId } from "~/effects/findActiveEffectByProducerJobId";
 import { writeActiveEffectToSaveFx } from "~/effects/writeActiveEffectToSaveFx";
 import { compareProducerQueueJobs } from "~/producer/compareProducerQueueJobs";
+import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 
 export namespace rescheduleProducerQueueAfterBlockedDeliveryFx {
 	export interface Props {
@@ -48,11 +49,14 @@ export const rescheduleProducerQueueAfterBlockedDeliveryFx = Effect.fn(
 			save: nextSave,
 			startAtMs: nextStartAtMs,
 		});
-		nextSave.producerJobs[job.id] = {
-			...job,
-			readyAtMs: timing.readyAtMs,
-			startAtMs: timing.startAtMs,
-		};
+		yield* writeProducerJobToSaveFx({
+			job: {
+				...job,
+				readyAtMs: timing.readyAtMs,
+				startAtMs: timing.startAtMs,
+			},
+			save: nextSave,
+		});
 
 		const line = readProducerJobLine({
 			config,

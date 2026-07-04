@@ -11,6 +11,7 @@ import type { GameEvent } from "~/event/GameEventSchema";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { createGameJobIdFx } from "~/job/createGameJobIdFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
+import { writeCraftJobToSaveFx } from "~/craft/writeCraftJobToSaveFx";
 
 export namespace startCraftFx {
 	export interface Props {
@@ -115,13 +116,16 @@ const insertCraftJobFx = Effect.fn("startCraftFx.insertCraftJobFx")(function* ({
 		startAtMs: props.nowMs,
 		targetItemInstanceId: props.action.targetItemInstanceId,
 	});
-	state.nextSave.craftJobs[jobId] = {
-		id: jobId,
-		readyAtMs: timing.readyAtMs,
-		recipeId: props.action.recipeId,
-		startAtMs: timing.startAtMs,
-		targetItemInstanceId: props.action.targetItemInstanceId,
-	};
+	yield* writeCraftJobToSaveFx({
+		job: {
+			id: jobId,
+			readyAtMs: timing.readyAtMs,
+			recipeId: props.action.recipeId,
+			startAtMs: timing.startAtMs,
+			targetItemInstanceId: props.action.targetItemInstanceId,
+		},
+		save: state.nextSave,
+	});
 	return {
 		jobId,
 		timing,

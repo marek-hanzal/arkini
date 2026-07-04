@@ -7,6 +7,7 @@ import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsF
 import { consumeProducerStoredInputsFx } from "~/producer/consumeProducerStoredInputsFx";
 import { createGameActiveEffectIdFx } from "~/effects/createGameActiveEffectIdFx";
 import { writeActiveEffectToSaveFx } from "~/effects/writeActiveEffectToSaveFx";
+import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { createGameJobIdFx } from "~/job/createGameJobIdFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQuantitiesFx";
@@ -307,13 +308,16 @@ const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(funct
 		});
 	}
 
-	nextSave.producerJobs[jobId] = {
-		readyAtMs,
-		id: jobId,
-		itemInstanceId: action.itemInstanceId,
-		lineId: checked.lineId,
-		startAtMs: queuedStartAtMs,
-	};
+	yield* writeProducerJobToSaveFx({
+		job: {
+			readyAtMs,
+			id: jobId,
+			itemInstanceId: action.itemInstanceId,
+			lineId: checked.lineId,
+			startAtMs: queuedStartAtMs,
+		},
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = nowMs;
 
 	return {

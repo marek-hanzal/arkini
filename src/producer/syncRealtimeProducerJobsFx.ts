@@ -17,6 +17,7 @@ import {
 import { readProducerJobEffectiveTimingFx } from "~/producer/readProducerJobEffectiveTimingFx";
 import { compareProducerQueueJobs } from "~/producer/compareProducerQueueJobs";
 import { readProducerJobStartGateReadyFx } from "~/producer/readProducerJobStartGateReadyFx";
+import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { groupWorldProducerJobs } from "~/world/groupWorldProducerJobs";
 import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import {
@@ -223,7 +224,10 @@ const resumePausedProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.resumePa
 			remainingMs: undefined,
 			startAtMs: resumedTiming.startAtMs,
 		};
-		draft.producerJobs[job.id] = resumedJob;
+		yield* writeProducerJobToSaveFx({
+			job: resumedJob,
+			save: draft,
+		});
 		yield* updateProducerJobActiveEffectFx({
 			job: resumedJob,
 			readyAtMs: resumedTiming.readyAtMs,
@@ -267,7 +271,10 @@ const pauseProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.pauseProducerJo
 		remainingMs,
 		startAtMs: pausedStartAtMs,
 	};
-	draft.producerJobs[job.id] = pausedJob;
+	yield* writeProducerJobToSaveFx({
+		job: pausedJob,
+		save: draft,
+	});
 	yield* updateProducerJobActiveEffectFx({
 		job: pausedJob,
 		readyAtMs,
@@ -313,7 +320,10 @@ const retimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.retimeProducer
 		readyAtMs: timing.readyAtMs,
 		startAtMs: timing.startAtMs,
 	};
-	draft.producerJobs[job.id] = retimedJob;
+	yield* writeProducerJobToSaveFx({
+		job: retimedJob,
+		save: draft,
+	});
 	yield* updateProducerJobActiveEffectFx({
 		job: retimedJob,
 		readyAtMs: timing.readyAtMs,

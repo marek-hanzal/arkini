@@ -5,7 +5,6 @@ import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedE
 import { readBoardItemAtCellFx } from "~/board/readBoardItemAtCellFx";
 import { readBoardItemCount } from "~/board/readBoardItemCount";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
-import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
@@ -13,16 +12,15 @@ import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
-import { createInventoryItemConsumedEventFx } from "~/inventory/createInventoryItemConsumedEventFx";
 import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
 } from "~/inventory/model/GameSaveInventorySlot";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
-import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
+import { placeBoardItemInInventoryFx } from "~/placement/placeBoardItemInInventoryFx";
 import { pushBoardItemCreatedEventFx } from "~/placement/pushBoardItemCreatedEventFx";
-import { pushInventoryItemCreatedEventFx } from "~/placement/pushInventoryItemCreatedEventFx";
+import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
@@ -43,12 +41,14 @@ type BoardMemoryLayoutItem = {
 };
 
 type InventoryConsumedForMemoryRestore = {
+	consumedEvent: Extract<
+		GameEvent,
+		{
+			type: "item.consumed";
+		}
+	>;
 	createdAtMs?: number;
 	itemInstanceId?: string;
-	nextQuantity: number;
-	previousQuantity: number;
-	quantity: number;
-	slotIndex: number;
 };
 
 type BoardMemoryActivationScope = applyBoardMemoryActivateFx.Props & {
@@ -146,114 +146,10 @@ const readMemoryRestoreSourceBoardItemFx = Effect.fn(
 	);
 });
 
-const appendMemoryStoreBoardConsumedEventFx = Effect.fn(
-	"applyBoardMemoryActivateFx.appendMemoryStoreBoardConsumedEventFx",
-)(function* ({ item }: { item: GameSaveBoardItem }) {
-	const { events } = yield* BoardMemoryActivationScopeFx;
-	events.push(
-		yield* createBoardItemConsumedEventFx({
-			itemId: item.itemId,
-			itemInstanceId: item.id,
-			reason: "memory-store",
-		}),
-	);
-});
-
-const appendMemoryStoreInventoryCreatedEventFx = Effect.fn(
-	"applyBoardMemoryActivateFx.appendMemoryStoreInventoryCreatedEventFx",
-)(function* ({
-	item,
-	nextQuantity,
-	previousQuantity,
-	slotIndex,
-}: {
-	item: GameSaveBoardItem;
-	nextQuantity: number;
-	previousQuantity: number;
-	slotIndex: number;
-}) {
-	const { events } = yield* BoardMemoryActivationScopeFx;
-	yield* pushInventoryItemCreatedEventFx({
-		events,
-		itemId: item.itemId,
-		nextQuantity,
-		originItemInstanceId: item.id,
-		previousQuantity,
-		quantity: 1,
-		reason: "memory-store",
-		slotIndex,
-	});
-});
-
-const placeRuntimeStatePreservingBoardItemInInventoryFx = Effect.fn(
-	"applyBoardMemoryActivateFx.placeRuntimeStatePreservingBoardItemInInventoryFx",
-)(function* ({ item }: { item: GameSaveBoardItem }) {
-	const { nextSave } = yield* BoardMemoryActivationScopeFx;
-	const slotIndex = nextSave.inventory.slots.findIndex((slot) => !slot);
-	if (slotIndex < 0) return false;
-
-	yield* appendMemoryStoreBoardConsumedEventFx({
-		item,
-	});
-	nextSave.inventory.slots[slotIndex] = {
-		...(item.createdAtMs !== undefined
-			? {
-					createdAtMs: item.createdAtMs,
-				}
-			: {}),
-		id: item.id,
-		itemId: item.itemId,
-		kind: "instance",
-	};
-	delete nextSave.board.items[item.id];
-	yield* appendMemoryStoreInventoryCreatedEventFx({
-		item,
-		nextQuantity: 1,
-		previousQuantity: 0,
-		slotIndex,
-	});
-	return true;
-});
-
-const placeStackableBoardItemInInventoryFx = Effect.fn(
-	"applyBoardMemoryActivateFx.placeStackableBoardItemInInventoryFx",
+const storeBoardItemInInventoryFx = Effect.fn(
+	"applyBoardMemoryActivateFx.storeBoardItemInInventoryFx",
 )(function* ({ item }: { item: GameSaveBoardItem }) {
 	const { config, events, nextSave } = yield* BoardMemoryActivationScopeFx;
-	const itemDefinition = config.items[item.itemId];
-	if (!itemDefinition) return false;
-
-	const placementEvents: GameEvent[] = [];
-	const placed = yield* placeGameSaveInventoryRemainderFx({
-		createdAtMs: item.createdAtMs,
-		events: placementEvents,
-		item: {
-			itemId: item.itemId,
-			originItemInstanceId: item.id,
-			quantity: 1,
-			reason: "memory-store",
-		},
-		maxStackSize: itemDefinition.maxStackSize,
-		remainingQuantity: 1,
-		slots: nextSave.inventory.slots,
-	});
-	if (!placed) return false;
-
-	yield* appendMemoryStoreBoardConsumedEventFx({
-		item,
-	});
-	events.push(...placementEvents);
-	yield* removeBoardItemRuntimeStateFx({
-		itemInstanceId: item.id,
-		save: nextSave,
-	});
-	delete nextSave.board.items[item.id];
-	return true;
-});
-
-const placeBoardItemInInventoryFx = Effect.fn(
-	"applyBoardMemoryActivateFx.placeBoardItemInInventoryFx",
-)(function* ({ item }: { item: GameSaveBoardItem }) {
-	const { config, nextSave } = yield* BoardMemoryActivationScopeFx;
 	if (!config.items[item.itemId]) return false;
 	if (
 		!isItemStorageAllowed({
@@ -271,18 +167,17 @@ const placeBoardItemInInventoryFx = Effect.fn(
 	});
 	if (stateStatus.busy) return false;
 
-	return yield* match(stateStatus.preservable || item.itemId === boardMemoryItemId)
-		.with(true, () =>
-			placeRuntimeStatePreservingBoardItemInInventoryFx({
-				item,
-			}),
-		)
-		.with(false, () =>
-			placeStackableBoardItemInInventoryFx({
-				item,
-			}),
-		)
-		.exhaustive();
+	return yield* placeBoardItemInInventoryFx({
+		config,
+		events,
+		item,
+		mode:
+			stateStatus.preservable || item.itemId === boardMemoryItemId
+				? "preserve-instance"
+				: "stack-copy",
+		reason: "memory-store",
+		save: nextSave,
+	}).pipe(Effect.catchTag("GamePlacementFailed", () => Effect.succeed(false)));
 });
 
 const storeCurrentBoardItemsInInventoryFx = Effect.fn(
@@ -292,7 +187,7 @@ const storeCurrentBoardItemsInInventoryFx = Effect.fn(
 	for (const item of readSortedBoardItems({
 		save: nextSave,
 	})) {
-		yield* placeBoardItemInInventoryFx({
+		yield* storeBoardItemInInventoryFx({
 			item,
 		});
 	}
@@ -352,54 +247,52 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 }) {
 	if (!preferredItemInstanceId) return undefined;
 	const { nextSave } = yield* BoardMemoryActivationScopeFx;
-	const instanceSlotIndex = nextSave.inventory.slots.findIndex(
+	const slotIndex = nextSave.inventory.slots.findIndex(
 		(slot) =>
 			isGameSaveInventoryInstance(slot) &&
 			slot.itemId === itemId &&
 			slot.id === preferredItemInstanceId,
 	);
-	if (instanceSlotIndex < 0) return undefined;
+	if (slotIndex < 0) return undefined;
 
-	const slot = nextSave.inventory.slots[instanceSlotIndex];
-	if (!isGameSaveInventoryInstance(slot)) return undefined;
-	nextSave.inventory.slots[instanceSlotIndex] = null;
-	const consumed: InventoryConsumedForMemoryRestore = {
-		createdAtMs: slot.createdAtMs,
-		itemInstanceId: slot.id,
-		nextQuantity: 0,
-		previousQuantity: 1,
+	const consumed = yield* consumeInventorySlotQuantityFx({
+		nextSave,
 		quantity: 1,
-		slotIndex: instanceSlotIndex,
-	};
-	return consumed;
+		reason: "memory-restore",
+		runtimeState: "preserve-instance",
+		slotIndex,
+	});
+	if (!isGameSaveInventoryInstance(consumed.slot)) return undefined;
+
+	return {
+		consumedEvent: consumed.consumedEvent,
+		createdAtMs: consumed.slot.createdAtMs,
+		itemInstanceId: consumed.slot.id,
+	} satisfies InventoryConsumedForMemoryRestore;
 });
 
 const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 	"applyBoardMemoryActivateFx.consumeInventoryStackForMemoryRestoreFx",
 )(function* ({ itemId }: { itemId: string }) {
 	const { nextSave } = yield* BoardMemoryActivationScopeFx;
-	const stackSlotIndex = nextSave.inventory.slots.findIndex(
+	const slotIndex = nextSave.inventory.slots.findIndex(
 		(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
 	);
-	if (stackSlotIndex < 0) return undefined;
+	if (slotIndex < 0) return undefined;
 
-	const slot = nextSave.inventory.slots[stackSlotIndex];
-	if (!isGameSaveInventoryStack(slot)) return undefined;
-	const previousQuantity = slot.quantity;
-	const nextQuantity = previousQuantity - 1;
-	if (nextQuantity > 0) {
-		slot.quantity = nextQuantity;
-	} else {
-		nextSave.inventory.slots[stackSlotIndex] = null;
-	}
-	const consumed: InventoryConsumedForMemoryRestore = {
-		createdAtMs: slot.createdAtMs,
-		nextQuantity,
-		previousQuantity,
+	const consumed = yield* consumeInventorySlotQuantityFx({
+		nextSave,
 		quantity: 1,
-		slotIndex: stackSlotIndex,
-	};
-	return consumed;
+		reason: "memory-restore",
+		runtimeState: "remove-instance",
+		slotIndex,
+	});
+
+	return {
+		consumedEvent: consumed.consumedEvent,
+		createdAtMs: consumed.slot.createdAtMs,
+		itemInstanceId: undefined,
+	} satisfies InventoryConsumedForMemoryRestore;
 });
 
 const consumeInventoryItemForMemoryRestoreFx = Effect.fn(
@@ -454,28 +347,6 @@ const canRestoreInventoryBackedLayoutItemFx = Effect.fn(
 	);
 });
 
-const appendMemoryRestoreInventoryConsumedEventFx = Effect.fn(
-	"applyBoardMemoryActivateFx.appendMemoryRestoreInventoryConsumedEventFx",
-)(function* ({
-	consumed,
-	itemId,
-}: {
-	consumed: InventoryConsumedForMemoryRestore;
-	itemId: string;
-}) {
-	const { events } = yield* BoardMemoryActivationScopeFx;
-	events.push(
-		yield* createInventoryItemConsumedEventFx({
-			itemId,
-			nextQuantity: consumed.nextQuantity,
-			previousQuantity: consumed.previousQuantity,
-			quantity: consumed.quantity,
-			reason: "memory-restore",
-			slotIndex: consumed.slotIndex,
-		}),
-	);
-});
-
 const restoreInventoryBackedLayoutItemFx = Effect.fn(
 	"applyBoardMemoryActivateFx.restoreInventoryBackedLayoutItemFx",
 )(function* ({ memoryItem }: { memoryItem: BoardMemoryLayoutItem }) {
@@ -493,11 +364,8 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn(
 	if (!consumed) return false;
 
 	const itemInstanceId = consumed.itemInstanceId ?? (yield* createGameItemInstanceIdFx());
-	yield* appendMemoryRestoreInventoryConsumedEventFx({
-		consumed,
-		itemId: memoryItem.itemId,
-	});
 	const { action, events } = yield* BoardMemoryActivationScopeFx;
+	events.push(consumed.consumedEvent);
 	yield* placeBoardItemInstanceFx({
 		cell: {
 			x: memoryItem.x,

@@ -85,6 +85,7 @@ const main = async () => {
 		...auditForbiddenDirectories(),
 		...auditText(),
 		...auditIndexBarrels(),
+		...auditEffectFunctionNames(),
 		...auditConfig({
 			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack"),
 			label: "game/arkini.game.arkpack",
@@ -148,6 +149,23 @@ const auditIndexBarrels = (): Finding[] =>
 				]
 			: [],
 	);
+
+const auditEffectFunctionNames = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		const text = readFileSync(path, "utf8");
+		const findings: Finding[] = [];
+		const effectFnPattern = /export\s+const\s+(\w+)\s*=\s*Effect\.fn/g;
+		for (const match of text.matchAll(effectFnPattern)) {
+			const name = match[1];
+			if (!name || name.endsWith("Fx")) continue;
+			findings.push({
+				path,
+				message: `Effect function "${name}" must use the Fx suffix`,
+			});
+		}
+		return findings;
+	});
 
 const auditConfig = ({ config, label }: { config: GameConfig; label: string }): Finding[] => {
 	const findings: Finding[] = [];

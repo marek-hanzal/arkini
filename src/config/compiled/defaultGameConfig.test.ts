@@ -205,43 +205,49 @@ describe("defaultGameConfig", () => {
 		expect(oneSecondLineIds).toEqual([]);
 		expect(oneSecondCraftIds).toEqual([]);
 	});
-	it("keeps blueprint planning costs separate from construction costs", () => {
-		const repeatedBlueprintCosts = readLines()
-			.map(
-				(product) =>
-					[
-						product.id,
-						product,
-					] as const,
-			)
-			.flatMap(([lineId, product]) =>
-				(product.output ?? []).flatMap((output) => {
-					if (!("itemId" in output)) return [];
-					const blueprintItemId = output.itemId;
-					if (!blueprintItemId.includes(":blueprint-")) return [];
-					const craftRecipe = readCraftRecipe(blueprintItemId);
-					if (craftRecipe === undefined) return [];
+	it("keeps shrine and well out of the initial board", () => {
+		const startingBoardItemIds = defaultGameConfig.startingState.board.map(
+			(entry) => entry.itemId,
+		);
 
-					const productInputItemIds = new Set(
-						(product.inputs ?? []).map((input) => input.itemId),
-					);
-					return craftRecipe.inputs
-						.map((input) => input.itemId)
-						.filter((itemId) => productInputItemIds.has(itemId))
-						.map((itemId) => `${lineId} repeats ${itemId}`);
-				}),
-			)
-			.sort();
-
-		expect(repeatedBlueprintCosts).toEqual([]);
+		expect(startingBoardItemIds).not.toContain("producer:shrine-t1");
+		expect(startingBoardItemIds).not.toContain("producer:well-t1");
 	});
 
-	it("keeps feasts as construction labor cost instead of town hall plan cost", () => {
+	it("charges symbolic materials for Town Hall I blueprint planning", () => {
+		const townHallBlueprintLineIds = [
+			"line:townhall-t1:blueprint-sawmill-t1",
+			"line:townhall-t1:blueprint-stonemason-t1",
+			"line:townhall-t1:blueprint-shrine-t1",
+			"line:townhall-t1:blueprint-well-t1",
+			"line:townhall-t1:blueprint-library-t1",
+			"line:townhall-t1:blueprint-townhall-t2",
+		] as const;
+
+		for (const lineId of townHallBlueprintLineIds) {
+			expect(readLine(lineId)?.inputs).toEqual([
+				{
+					capacity: 1,
+					consume: true,
+					itemId: "item:log",
+					quantity: 1,
+				},
+				{
+					capacity: 1,
+					consume: true,
+					itemId: "item:stone",
+					quantity: 1,
+				},
+			]);
+		}
+	});
+
+	it("keeps feasts as the Town Hall IV milestone labor cost", () => {
 		expect(
 			readLine("line:townhall-t3:blueprint-townhall-t4")?.inputs?.map(
 				(input) => input.itemId,
 			),
-		).not.toContain("item:feast");
+		).toContain("item:feast");
 		expect(
 			readCraftRecipe("item:blueprint-townhall-t4")?.inputs.map((input) => input.itemId),
 		).toContain("item:feast");

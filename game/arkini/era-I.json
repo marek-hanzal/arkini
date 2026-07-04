@@ -72,6 +72,29 @@
 				"era:I"
 			]
 		},
+		"item:blueprint-shrine-t1": {
+			"craft": {
+				"durationMs": 9000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Wayside Shrine.",
+			"name": "Wayside Shrine Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		},
 		"item:blueprint-stonemason-t1": {
 			"craft": {
 				"durationMs": 12000,
@@ -1068,6 +1091,18 @@
 					{
 						"durationMs": 7000,
 						"id": "line:townhall-t1:blueprint-sawmill-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
 						"name": "Blueprint: Sawmill I",
 						"output": [
 							{
@@ -1079,6 +1114,18 @@
 					{
 						"durationMs": 7000,
 						"id": "line:townhall-t1:blueprint-stonemason-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
 						"name": "Blueprint: Stonemason I",
 						"output": [
 							{
@@ -1089,7 +1136,42 @@
 					},
 					{
 						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-shrine-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Wayside Shrine",
+						"output": [
+							{
+								"itemId": "item:blueprint-shrine-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
 						"id": "line:townhall-t1:blueprint-well-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
 						"name": "Blueprint: Well I",
 						"output": [
 							{
@@ -1101,6 +1183,18 @@
 					{
 						"durationMs": 7000,
 						"id": "line:townhall-t1:blueprint-library-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
 						"name": "Blueprint: Library I",
 						"output": [
 							{
@@ -1112,6 +1206,18 @@
 					{
 						"durationMs": 60000,
 						"id": "line:townhall-t1:blueprint-townhall-t2",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
 						"name": "Blueprint: Town Hall II",
 						"output": [
 							{

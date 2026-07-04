@@ -165,18 +165,8 @@
 				"y": 1
 			},
 			{
-				"itemId": "producer:shrine-t1",
-				"x": 3,
-				"y": 2
-			},
-			{
 				"itemId": "producer:townhall-t1",
 				"x": 3,
-				"y": 4
-			},
-			{
-				"itemId": "producer:well-t1",
-				"x": 5,
 				"y": 4
 			},
 			{

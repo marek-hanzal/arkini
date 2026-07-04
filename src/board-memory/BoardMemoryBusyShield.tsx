@@ -2,7 +2,7 @@ import { type FC, useEffect, useState } from "react";
 import type { BoardMemoryOperationState } from "~/board-memory/BoardMemoryOperationContext";
 import { cn } from "~/ui/cn";
 
-export const boardMemoryBusyShieldFadeMs = 180;
+const boardMemoryBusyShieldFadeMs = 180;
 
 export namespace BoardMemoryBusyShield {
 	export interface Props {

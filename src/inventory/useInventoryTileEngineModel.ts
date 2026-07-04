@@ -5,13 +5,12 @@ import { resolveInventorySlotTapAction } from "~/inventory/logic/resolveInventor
 import type { InventorySurface } from "~/inventory/InventorySurface.types";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import { resolveDrop } from "~/play/drop/resolveDrop";
+import { createRuntimeDropLifecycle } from "~/play/drag/createRuntimeDropLifecycle";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { useGameRuntimeSelector, useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
 import { useGameInventoryView } from "~/play/runtime/useGameRuntimeViews";
 import { readBoardFirstEmptyCell } from "~/play/runtime/readers/readBoardFirstEmptyCell";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
 import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
 import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
@@ -200,29 +199,12 @@ export const useInventoryTileEngineModel = ({
 					inventory: readInventoryView(snapshot),
 				});
 			},
-			onDragStart() {
-				audio.play("audio.tile.drag.start");
-			},
-			onDrop(context) {
-				const snapshot = runtimeStore.getSnapshot();
-				const nowMs = Date.now();
-
-				return resolveDrop({
-					context,
-					board: readBoardView(snapshot, nowMs),
-					config: snapshot.runtime.config,
-					inventory: readInventoryView(snapshot),
-					feedback,
-					actions,
-				});
-			},
-			onDropSettled({ kind }) {
-				if (kind === "accept") {
-					audio.play("audio.tile.drop.accept");
-					return;
-				}
-				if (kind === "reject") audio.play("audio.tile.drop.reject");
-			},
+			...createRuntimeDropLifecycle<InventorySurface.TileData, InventorySurface.SlotData>({
+				actions,
+				audio,
+				feedback,
+				runtimeStore,
+			}),
 		}),
 		[
 			actions,

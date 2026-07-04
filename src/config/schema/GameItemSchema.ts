@@ -15,7 +15,7 @@ import { ProducerFragmentSchema, ProducerSchema } from "~/config/schema/GameProd
 import { RemoveBySchema } from "~/config/schema/GameRemoveBySchema";
 import { StashFragmentSchema, StashSchema } from "~/config/schema/GameStashSchema";
 
-export const ItemCapacitySchema = z.discriminatedUnion("onDepleted", [
+const ItemCapacitySchema = z.discriminatedUnion("onDepleted", [
 	z
 		.object({
 			max: PositiveIntegerSchema,

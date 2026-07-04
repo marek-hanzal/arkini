@@ -11,7 +11,7 @@ import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { useBoardTransientTiles } from "~/board/animation/BoardTransientTileStore";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
-import { resolveDrop } from "~/play/drop/resolveDrop";
+import { createRuntimeDropLifecycle } from "~/play/drag/createRuntimeDropLifecycle";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { registerBoardTileBounceFeedback } from "~/play/game-engine-visual/registerBoardTileBounceFeedback";
 import { useGameRuntimeSelector, useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
@@ -334,29 +334,12 @@ export const useBoardTileEngineModel = ({
 					inventory: readInventoryView(snapshot),
 				});
 			},
-			onDragStart() {
-				audio.play("audio.tile.drag.start");
-			},
-			onDrop(context) {
-				const snapshot = runtimeStore.getSnapshot();
-				const nowMs = Date.now();
-
-				return resolveDrop({
-					context,
-					board: readBoardView(snapshot, nowMs),
-					config: snapshot.runtime.config,
-					inventory: readInventoryView(snapshot),
-					feedback,
-					actions,
-				});
-			},
-			onDropSettled({ kind }) {
-				if (kind === "accept") {
-					audio.play("audio.tile.drop.accept");
-					return;
-				}
-				if (kind === "reject") audio.play("audio.tile.drop.reject");
-			},
+			...createRuntimeDropLifecycle<BoardSurface.TileData, BoardCellView>({
+				actions,
+				audio,
+				feedback,
+				runtimeStore,
+			}),
 			onDragCancel() {
 				// The runtime engine owns visual rollback. App state remains untouched until commit.
 			},

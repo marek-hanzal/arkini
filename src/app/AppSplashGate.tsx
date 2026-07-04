@@ -4,7 +4,7 @@ import { GAME_HERO_ASSET_ID } from "~/config/GameWellKnownAssetIds";
 import { readGameConfigAssetSrc } from "~/config/readGameConfigAssetSrc";
 import { AppSplashScreen } from "~/app/AppSplashScreen";
 
-export const APP_SPLASH_DURATION_MS = 3000;
+const APP_SPLASH_DURATION_MS = 3000;
 
 export namespace AppSplashGate {
 	export interface Props {

@@ -1,5 +1,3 @@
-import { TileEngineTiming } from "~/tile-engine/TileEngineTiming";
-
 export const tileRemoveDurationMs = 1000;
 
 export const tileRemoveDurationSeconds = tileRemoveDurationMs / 1000;
@@ -29,6 +27,3 @@ export const tileRemoveKeyframes = {
 		"translate3d(0px, 12px, 0px) rotate(0deg) scale(0.42)",
 	],
 } as const;
-
-export const tileRemoveCleanupDelayMs =
-	tileRemoveDurationMs + TileEngineTiming.motionCleanupBufferMs;

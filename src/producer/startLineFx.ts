@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { autoFillLineInputsFx } from "~/producer/autoFillLineInputsFx";
 import { checkLineStartReadinessFx } from "~/producer/checkLineStartReadinessFx";
 import { checkLineStartRuntimeConstraintsFx } from "~/producer/checkLineStartRuntimeConstraintsFx";
@@ -60,13 +60,6 @@ type LineStartExecutionScope = startLineFx.Props & {
 	checked: LineStartReadiness;
 };
 
-class LineStartExecutionScopeFx extends Context.Tag("LineStartExecutionScopeFx")<
-	LineStartExecutionScopeFx,
-	LineStartExecutionScope
->() {
-	//
-}
-
 const readProducerStoredInputsReadyFx = Effect.fn("readProducerStoredInputsReadyFx")(function* ({
 	inputs,
 	save,
@@ -96,8 +89,7 @@ const readProducerStoredInputsReadyFx = Effect.fn("readProducerStoredInputsReady
 
 const consumeExplicitLineStartInputRefsFx = Effect.fn(
 	"startLineFx.consumeExplicitLineStartInputRefsFx",
-)(function* () {
-	const { action, checked, nowMs, save } = yield* LineStartExecutionScopeFx;
+)(function* ({ action, checked, nowMs, save }: LineStartExecutionScope) {
 	if (action.inputRefs.length === 0) {
 		return {
 			events: [],
@@ -116,8 +108,17 @@ const consumeExplicitLineStartInputRefsFx = Effect.fn(
 
 const autoFillAndConsumeStoredLineInputsFx = Effect.fn(
 	"startLineFx.autoFillAndConsumeStoredLineInputsFx",
-)(function* ({ events, nextSave }: { events: GameEvent[]; nextSave: GameSave }) {
-	const { action, checked, nowMs } = yield* LineStartExecutionScopeFx;
+)(function* (
+	scope: LineStartExecutionScope,
+	{
+		events,
+		nextSave,
+	}: {
+		events: GameEvent[];
+		nextSave: GameSave;
+	},
+) {
+	const { action, checked, nowMs } = scope;
 	if (action.inputRefs.length > 0) return true;
 
 	yield* autoFillLineInputsFx({
@@ -145,13 +146,15 @@ const autoFillAndConsumeStoredLineInputsFx = Effect.fn(
 	return true;
 });
 
-const prepareLineStartInputsFx = Effect.fn("startLineFx.prepareLineStartInputsFx")(function* () {
-	const { nowMs } = yield* LineStartExecutionScopeFx;
-	const consumed = yield* consumeExplicitLineStartInputRefsFx();
+const prepareLineStartInputsFx = Effect.fn("startLineFx.prepareLineStartInputsFx")(function* (
+	scope: LineStartExecutionScope,
+) {
+	const { nowMs } = scope;
+	const consumed = yield* consumeExplicitLineStartInputRefsFx(scope);
 	const nextSave = yield* cloneGameSaveFx({
 		save: consumed.save,
 	});
-	const ready = yield* autoFillAndConsumeStoredLineInputsFx({
+	const ready = yield* autoFillAndConsumeStoredLineInputsFx(scope, {
 		events: consumed.events,
 		nextSave,
 	});
@@ -164,12 +167,15 @@ const prepareLineStartInputsFx = Effect.fn("startLineFx.prepareLineStartInputsFx
 	} satisfies LineStartPreparedInputs;
 });
 
-const readQueuedLineStartAtMsFx = Effect.fn("startLineFx.readQueuedLineStartAtMsFx")(function* ({
-	nextSave,
-}: {
-	nextSave: GameSave;
-}) {
-	const { action, nowMs } = yield* LineStartExecutionScopeFx;
+const readQueuedLineStartAtMsFx = Effect.fn("startLineFx.readQueuedLineStartAtMsFx")(function* (
+	scope: LineStartExecutionScope,
+	{
+		nextSave,
+	}: {
+		nextSave: GameSave;
+	},
+) {
+	const { action, nowMs } = scope;
 	return Math.max(
 		nowMs,
 		...readWorldProducerJobFacts({
@@ -182,8 +188,9 @@ const readQueuedLineStartAtMsFx = Effect.fn("startLineFx.readQueuedLineStartAtMs
 	);
 });
 
-const createActivatedLineEffectFx = Effect.fn("startLineFx.createActivatedLineEffectFx")(
-	function* ({
+const createActivatedLineEffectFx = Effect.fn("startLineFx.createActivatedLineEffectFx")(function* (
+	scope: LineStartExecutionScope,
+	{
 		jobId,
 		queuedStartAtMs,
 		readyAtMs,
@@ -191,35 +198,38 @@ const createActivatedLineEffectFx = Effect.fn("startLineFx.createActivatedLineEf
 		jobId: string;
 		queuedStartAtMs: number;
 		readyAtMs: number;
-	}) {
-		const { action, checked } = yield* LineStartExecutionScopeFx;
-		if (!checked.line.effect) return undefined;
-
-		return {
-			effectId: checked.line.effect.id,
-			endAtMs: readyAtMs,
-			id: yield* createGameActiveEffectIdFx(),
-			producerJobId: jobId,
-			sourceItemInstanceId: action.itemInstanceId,
-			startAtMs: queuedStartAtMs,
-		} satisfies ActivatedLineEffect;
 	},
-);
+) {
+	const { action, checked } = scope;
+	if (!checked.line.effect) return undefined;
 
-const readLineStartedEventsFx = Effect.fn("startLineFx.readLineStartedEventsFx")(function* ({
-	activatedEffect,
-	capacityEvents,
-	jobId,
-	queuedStartAtMs,
-	readyAtMs,
-}: {
-	activatedEffect: ActivatedLineEffect | undefined;
-	capacityEvents: readonly GameEvent[];
-	jobId: string;
-	queuedStartAtMs: number;
-	readyAtMs: number;
-}) {
-	const { action, checked, nowMs } = yield* LineStartExecutionScopeFx;
+	return {
+		effectId: checked.line.effect.id,
+		endAtMs: readyAtMs,
+		id: yield* createGameActiveEffectIdFx(),
+		producerJobId: jobId,
+		sourceItemInstanceId: action.itemInstanceId,
+		startAtMs: queuedStartAtMs,
+	} satisfies ActivatedLineEffect;
+});
+
+const readLineStartedEventsFx = Effect.fn("startLineFx.readLineStartedEventsFx")(function* (
+	scope: LineStartExecutionScope,
+	{
+		activatedEffect,
+		capacityEvents,
+		jobId,
+		queuedStartAtMs,
+		readyAtMs,
+	}: {
+		activatedEffect: ActivatedLineEffect | undefined;
+		capacityEvents: readonly GameEvent[];
+		jobId: string;
+		queuedStartAtMs: number;
+		readyAtMs: number;
+	},
+) {
+	const { action, checked, nowMs } = scope;
 	return [
 		...capacityEvents,
 		{
@@ -248,13 +258,16 @@ const readLineStartedEventsFx = Effect.fn("startLineFx.readLineStartedEventsFx")
 	] satisfies GameEvent[];
 });
 
-const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(function* ({
-	nextSave,
-}: {
-	nextSave: GameSave;
-}) {
-	const { action, checked, config, nowMs } = yield* LineStartExecutionScopeFx;
-	const queuedStartAtMs = yield* readQueuedLineStartAtMsFx({
+const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(function* (
+	scope: LineStartExecutionScope,
+	{
+		nextSave,
+	}: {
+		nextSave: GameSave;
+	},
+) {
+	const { action, checked, config, nowMs } = scope;
+	const queuedStartAtMs = yield* readQueuedLineStartAtMsFx(scope, {
 		nextSave,
 	});
 	yield* checkLineStartRuntimeConstraintsFx({
@@ -281,7 +294,7 @@ const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(funct
 		startAtMs: queuedStartAtMs,
 	});
 	const readyAtMs = jobTiming.readyAtMs;
-	const activatedEffect = yield* createActivatedLineEffectFx({
+	const activatedEffect = yield* createActivatedLineEffectFx(scope, {
 		jobId,
 		queuedStartAtMs,
 		readyAtMs,
@@ -300,7 +313,7 @@ const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(funct
 	nextSave.updatedAtMs = nowMs;
 
 	return {
-		events: yield* readLineStartedEventsFx({
+		events: yield* readLineStartedEventsFx(scope, {
 			activatedEffect,
 			capacityEvents,
 			jobId,
@@ -313,34 +326,31 @@ const startQueuedLineJobFx = Effect.fn("startLineFx.startQueuedLineJobFx")(funct
 
 export const startLineFx = Effect.fn("startLineFx")(function* (props: startLineFx.Props) {
 	const checked = yield* checkLineStartReadinessFx(props);
+	const scope = {
+		...props,
+		checked,
+	} satisfies LineStartExecutionScope;
 
-	return yield* Effect.gen(function* () {
-		const preparedInputs = yield* prepareLineStartInputsFx();
-		if (!preparedInputs.ready) {
-			return yield* createGameEngineResultFx({
-				config: props.config,
-				events: preparedInputs.events,
-				nowMs: props.nowMs,
-				save: preparedInputs.nextSave,
-			});
-		}
-
-		const started = yield* startQueuedLineJobFx({
-			nextSave: preparedInputs.nextSave,
-		});
+	const preparedInputs = yield* prepareLineStartInputsFx(scope);
+	if (!preparedInputs.ready) {
 		return yield* createGameEngineResultFx({
 			config: props.config,
-			events: [
-				...preparedInputs.events,
-				...started.events,
-			],
+			events: preparedInputs.events,
 			nowMs: props.nowMs,
-			save: started.nextSave,
+			save: preparedInputs.nextSave,
 		});
-	}).pipe(
-		Effect.provideService(LineStartExecutionScopeFx, {
-			...props,
-			checked,
-		}),
-	);
+	}
+
+	const started = yield* startQueuedLineJobFx(scope, {
+		nextSave: preparedInputs.nextSave,
+	});
+	return yield* createGameEngineResultFx({
+		config: props.config,
+		events: [
+			...preparedInputs.events,
+			...started.events,
+		],
+		nowMs: props.nowMs,
+		save: started.nextSave,
+	});
 });

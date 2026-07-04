@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { checkActivationInputsFx } from "~/activation/checkActivationInputsFx";
 import { planLineAutoFillInputRefsFx } from "~/producer/planLineAutoFillInputRefsFx";
@@ -41,16 +41,10 @@ type LineStartDefinition = LineStartSelection & {
 	lineInputs: NonNullable<NonNullable<ReturnType<typeof readLineDefinition>>["inputs"]>;
 };
 
-class LineStartReadinessScopeFx extends Context.Tag("LineStartReadinessScopeFx")<
-	LineStartReadinessScopeFx,
-	checkLineStartReadinessFx.Props
->() {
-	//
-}
+type LineStartReadinessScope = checkLineStartReadinessFx.Props;
 
 const readLineStartTargetFx = Effect.fn("checkLineStartReadinessFx.readLineStartTargetFx")(
-	function* () {
-		const { action, config, save } = yield* LineStartReadinessScopeFx;
+	function* ({ action, config, save }: LineStartReadinessScope) {
 		return yield* readProducerRuntimeTargetFx({
 			config,
 			itemInstanceId: action.itemInstanceId,
@@ -59,26 +53,34 @@ const readLineStartTargetFx = Effect.fn("checkLineStartReadinessFx.readLineStart
 	},
 );
 
-const readVisibleLineIdsFx = Effect.fn("checkLineStartReadinessFx.readVisibleLineIdsFx")(
-	function* ({ producerDefinition }: LineStartTarget) {
-		const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
-		return readVisibleLineIds({
-			config,
+const readVisibleLineIdsFx = Effect.fn("checkLineStartReadinessFx.readVisibleLineIdsFx")(function* (
+	scope: LineStartReadinessScope,
+	{ producerDefinition }: LineStartTarget,
+) {
+	const { action, config, nowMs, save } = scope;
+	return readVisibleLineIds({
+		config,
+		producerDefinition,
+		itemInstanceId: action.itemInstanceId,
+		nowMs,
+		lineIds: readLineIds({
 			producerDefinition,
-			itemInstanceId: action.itemInstanceId,
-			nowMs,
-			lineIds: readLineIds({
-				producerDefinition,
-			}),
-			save,
-		});
-	},
-);
+		}),
+		save,
+	});
+});
 
 const readRequestedOrDefaultLineIdFx = Effect.fn(
 	"checkLineStartReadinessFx.readRequestedOrDefaultLineIdFx",
-)(function* ({ visibleLineIds }: { visibleLineIds: readonly string[] }) {
-	const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
+)(function* (
+	scope: LineStartReadinessScope,
+	{
+		visibleLineIds,
+	}: {
+		visibleLineIds: readonly string[];
+	},
+) {
+	const { action, config, nowMs, save } = scope;
 	const defaultEffectLineId = readDefaultEffectLineId({
 		lineIds: visibleLineIds,
 		itemInstanceId: action.itemInstanceId,
@@ -106,8 +108,7 @@ const readRequestedOrDefaultLineIdFx = Effect.fn(
 
 const assertProducerTargetNotCraftBusyFx = Effect.fn(
 	"checkLineStartReadinessFx.assertProducerTargetNotCraftBusyFx",
-)(function* () {
-	const { action, save } = yield* LineStartReadinessScopeFx;
+)(function* ({ action, save }: LineStartReadinessScope) {
 	const producerStateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: action.itemInstanceId,
 		save,
@@ -124,14 +125,11 @@ const assertProducerTargetNotCraftBusyFx = Effect.fn(
 
 const assertLineOwnedAndVisibleFx = Effect.fn(
 	"checkLineStartReadinessFx.assertLineOwnedAndVisibleFx",
-)(function* ({
-	lineId,
-	producerDefinition,
-	producerId,
-	producerItem,
-	visibleLineIds,
-}: LineStartSelection) {
-	const { action } = yield* LineStartReadinessScopeFx;
+)(function* (
+	{ lineId, producerDefinition, producerId, producerItem, visibleLineIds }: LineStartSelection,
+	scope: LineStartReadinessScope,
+) {
+	const { action } = scope;
 	if (
 		!readLineIds({
 			producerDefinition,
@@ -156,10 +154,10 @@ const assertLineOwnedAndVisibleFx = Effect.fn(
 });
 
 const readLineStartSelectionFx = Effect.fn("checkLineStartReadinessFx.readLineStartSelectionFx")(
-	function* () {
-		const target = yield* readLineStartTargetFx();
-		const visibleLineIds = yield* readVisibleLineIdsFx(target);
-		const lineId = yield* readRequestedOrDefaultLineIdFx({
+	function* (scope: LineStartReadinessScope) {
+		const target = yield* readLineStartTargetFx(scope);
+		const visibleLineIds = yield* readVisibleLineIdsFx(scope, target);
+		const lineId = yield* readRequestedOrDefaultLineIdFx(scope, {
 			visibleLineIds,
 		});
 		if (!lineId) {
@@ -176,15 +174,15 @@ const readLineStartSelectionFx = Effect.fn("checkLineStartReadinessFx.readLineSt
 			lineId,
 			visibleLineIds,
 		} satisfies LineStartSelection;
-		yield* assertLineOwnedAndVisibleFx(selection);
+		yield* assertLineOwnedAndVisibleFx(selection, scope);
 		return selection;
 	},
 );
 
 const assertProducerQueueReadyFx = Effect.fn(
 	"checkLineStartReadinessFx.assertProducerQueueReadyFx",
-)(function* ({ producerDefinition }: LineStartSelection) {
-	const { action, nowMs, save } = yield* LineStartReadinessScopeFx;
+)(function* (scope: LineStartReadinessScope, { producerDefinition }: LineStartSelection) {
+	const { action, nowMs, save } = scope;
 	const producerJobFacts = readWorldProducerJobFacts({
 		nowMs,
 		save,
@@ -242,8 +240,8 @@ const readLineStartDefinitionFx = Effect.fn("checkLineStartReadinessFx.readLineS
 
 const assertEffectiveLineReadyFx = Effect.fn(
 	"checkLineStartReadinessFx.assertEffectiveLineReadyFx",
-)(function* ({ line, lineId }: LineStartDefinition) {
-	const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
+)(function* (scope: LineStartReadinessScope, { line, lineId }: LineStartDefinition) {
+	const { action, config, nowMs, save } = scope;
 	const effectiveLine = readEffectiveLine({
 		baseDurationMs: readLineDurationMs({
 			line,
@@ -283,9 +281,9 @@ const assertEffectiveLineReadyFx = Effect.fn(
 
 const assertEffectLineNotLockedFx = Effect.fn(
 	"checkLineStartReadinessFx.assertEffectLineNotLockedFx",
-)(function* ({ line, lineId }: LineStartDefinition) {
+)(function* (scope: LineStartReadinessScope, { line, lineId }: LineStartDefinition) {
 	if (!line.effect) return;
-	const { action, config, nowMs, save } = yield* LineStartReadinessScopeFx;
+	const { action, config, nowMs, save } = scope;
 	if (
 		!readEffectLineLocked({
 			config,
@@ -316,8 +314,8 @@ const assertLinePlacementSupportedFx = Effect.fn(
 
 const assertProducerChargesReadyFx = Effect.fn(
 	"checkLineStartReadinessFx.assertProducerChargesReadyFx",
-)(function* ({ line, producerId }: LineStartDefinition) {
-	const { action, config, save } = yield* LineStartReadinessScopeFx;
+)(function* (scope: LineStartReadinessScope, { line, producerId }: LineStartDefinition) {
+	const { action, config, save } = scope;
 	yield* checkProducerChargesAvailableFx({
 		config,
 		producerId,
@@ -329,8 +327,8 @@ const assertProducerChargesReadyFx = Effect.fn(
 
 const assertExplicitLineInputsReadyFx = Effect.fn(
 	"checkLineStartReadinessFx.assertExplicitLineInputsReadyFx",
-)(function* ({ lineInputs }: LineStartDefinition) {
-	const { action, save } = yield* LineStartReadinessScopeFx;
+)(function* (scope: LineStartReadinessScope, { lineInputs }: LineStartDefinition) {
+	const { action, save } = scope;
 	yield* checkActivationInputsFx({
 		inputRefs: action.inputRefs,
 		inputs: lineInputs,
@@ -340,8 +338,8 @@ const assertExplicitLineInputsReadyFx = Effect.fn(
 
 const assertStoredOrAutoFilledLineInputsReadyFx = Effect.fn(
 	"checkLineStartReadinessFx.assertStoredOrAutoFilledLineInputsReadyFx",
-)(function* ({ lineId, lineInputs }: LineStartDefinition) {
-	const { action, save } = yield* LineStartReadinessScopeFx;
+)(function* (scope: LineStartReadinessScope, { lineId, lineInputs }: LineStartDefinition) {
+	const { action, save } = scope;
 	const storedInputs = yield* readLineStoredInputQuantitiesFx({
 		itemInstanceId: action.itemInstanceId,
 		lineId,
@@ -365,26 +363,26 @@ const assertStoredOrAutoFilledLineInputsReadyFx = Effect.fn(
 });
 
 const assertLineInputsReadyFx = Effect.fn("checkLineStartReadinessFx.assertLineInputsReadyFx")(
-	function* (definition: LineStartDefinition) {
-		const { action } = yield* LineStartReadinessScopeFx;
+	function* (scope: LineStartReadinessScope, definition: LineStartDefinition) {
+		const { action } = scope;
 		yield* match(action.inputRefs.length > 0)
-			.with(true, () => assertExplicitLineInputsReadyFx(definition))
-			.with(false, () => assertStoredOrAutoFilledLineInputsReadyFx(definition))
+			.with(true, () => assertExplicitLineInputsReadyFx(scope, definition))
+			.with(false, () => assertStoredOrAutoFilledLineInputsReadyFx(scope, definition))
 			.exhaustive();
 	},
 );
 
 const checkLineStartReadinessProgramFx = Effect.fn("checkLineStartReadinessFx.programFx")(
-	function* () {
-		yield* assertProducerTargetNotCraftBusyFx();
-		const selection = yield* readLineStartSelectionFx();
-		yield* assertProducerQueueReadyFx(selection);
+	function* (scope: LineStartReadinessScope) {
+		yield* assertProducerTargetNotCraftBusyFx(scope);
+		const selection = yield* readLineStartSelectionFx(scope);
+		yield* assertProducerQueueReadyFx(scope, selection);
 		const definition = yield* readLineStartDefinitionFx(selection);
-		yield* assertEffectiveLineReadyFx(definition);
-		yield* assertEffectLineNotLockedFx(definition);
+		yield* assertEffectiveLineReadyFx(scope, definition);
+		yield* assertEffectLineNotLockedFx(scope, definition);
 		yield* assertLinePlacementSupportedFx(definition);
-		yield* assertProducerChargesReadyFx(definition);
-		yield* assertLineInputsReadyFx(definition);
+		yield* assertProducerChargesReadyFx(scope, definition);
+		yield* assertLineInputsReadyFx(scope, definition);
 
 		return {
 			producerDefinition: definition.producerDefinition,
@@ -400,7 +398,5 @@ const checkLineStartReadinessProgramFx = Effect.fn("checkLineStartReadinessFx.pr
 export const checkLineStartReadinessFx = Effect.fn("checkLineStartReadinessFx")(function* (
 	props: checkLineStartReadinessFx.Props,
 ) {
-	return yield* checkLineStartReadinessProgramFx().pipe(
-		Effect.provideService(LineStartReadinessScopeFx, props),
-	);
+	return yield* checkLineStartReadinessProgramFx(props);
 });

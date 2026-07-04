@@ -12,8 +12,6 @@ export const GameActionBoardItemMoveSchema = z
 	})
 	.strict();
 
-export type GameActionBoardItemMoveSchema = typeof GameActionBoardItemMoveSchema;
-
 export namespace GameActionBoardItemMoveSchema {
 	export type Type = z.infer<typeof GameActionBoardItemMoveSchema>;
 }

@@ -9,8 +9,6 @@ export const GameActionBoardItemStashSchema = z
 	})
 	.strict();
 
-export type GameActionBoardItemStashSchema = typeof GameActionBoardItemStashSchema;
-
 export namespace GameActionBoardItemStashSchema {
 	export type Type = z.infer<typeof GameActionBoardItemStashSchema>;
 }

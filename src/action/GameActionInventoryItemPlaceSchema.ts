@@ -19,8 +19,6 @@ export const GameActionInventoryItemPlaceSchema = z
 	})
 	.strict();
 
-export type GameActionInventoryItemPlaceSchema = typeof GameActionInventoryItemPlaceSchema;
-
 export namespace GameActionInventoryItemPlaceSchema {
 	export type Type = z.infer<typeof GameActionInventoryItemPlaceSchema>;
 }

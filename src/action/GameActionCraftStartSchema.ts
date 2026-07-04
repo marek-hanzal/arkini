@@ -10,8 +10,6 @@ export const GameActionCraftStartSchema = z
 	})
 	.strict();
 
-export type GameActionCraftStartSchema = typeof GameActionCraftStartSchema;
-
 export namespace GameActionCraftStartSchema {
 	export type Type = z.infer<typeof GameActionCraftStartSchema>;
 }

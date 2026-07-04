@@ -43,8 +43,6 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionTileRemoveSchema,
 ]);
 
-export type GameActionSchema = typeof GameActionSchema;
-
 export namespace GameActionSchema {
 	export type Type = z.infer<typeof GameActionSchema>;
 }

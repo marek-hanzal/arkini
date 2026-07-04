@@ -10,8 +10,6 @@ export const GameActionCheatSpeedModeSetSchema = z
 	})
 	.strict();
 
-export type GameActionCheatSpeedModeSetSchema = typeof GameActionCheatSpeedModeSetSchema;
-
 export namespace GameActionCheatSpeedModeSetSchema {
 	export type Type = z.infer<typeof GameActionCheatSpeedModeSetSchema>;
 }

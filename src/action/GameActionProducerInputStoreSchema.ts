@@ -12,8 +12,6 @@ export const GameActionProducerInputStoreSchema = z
 	})
 	.strict();
 
-export type GameActionProducerInputStoreSchema = typeof GameActionProducerInputStoreSchema;
-
 export namespace GameActionProducerInputStoreSchema {
 	export type Type = z.infer<typeof GameActionProducerInputStoreSchema>;
 }

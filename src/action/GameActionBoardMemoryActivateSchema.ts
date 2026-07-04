@@ -9,8 +9,6 @@ export const GameActionBoardMemoryActivateSchema = z
 	})
 	.strict();
 
-export type GameActionBoardMemoryActivateSchema = typeof GameActionBoardMemoryActivateSchema;
-
 export namespace GameActionBoardMemoryActivateSchema {
 	export type Type = z.infer<typeof GameActionBoardMemoryActivateSchema>;
 }

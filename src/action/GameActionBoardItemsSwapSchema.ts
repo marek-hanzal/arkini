@@ -10,8 +10,6 @@ export const GameActionBoardItemsSwapSchema = z
 	})
 	.strict();
 
-export type GameActionBoardItemsSwapSchema = typeof GameActionBoardItemsSwapSchema;
-
 export namespace GameActionBoardItemsSwapSchema {
 	export type Type = z.infer<typeof GameActionBoardItemsSwapSchema>;
 }

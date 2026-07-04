@@ -11,8 +11,6 @@ export const GameActionTileRemoveSchema = z
 	})
 	.strict();
 
-export type GameActionTileRemoveSchema = typeof GameActionTileRemoveSchema;
-
 export namespace GameActionTileRemoveSchema {
 	export type Type = z.infer<typeof GameActionTileRemoveSchema>;
 }

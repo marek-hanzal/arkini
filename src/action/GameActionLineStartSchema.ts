@@ -12,8 +12,6 @@ export const GameActionLineStartSchema = z
 	})
 	.strict();
 
-export type GameActionLineStartSchema = typeof GameActionLineStartSchema;
-
 export namespace GameActionLineStartSchema {
 	export type Type = z.infer<typeof GameActionLineStartSchema>;
 }

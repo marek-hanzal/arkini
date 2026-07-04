@@ -10,8 +10,6 @@ export const GameActionLineSetDefaultSchema = z
 	})
 	.strict();
 
-export type GameActionLineSetDefaultSchema = typeof GameActionLineSetDefaultSchema;
-
 export namespace GameActionLineSetDefaultSchema {
 	export type Type = z.infer<typeof GameActionLineSetDefaultSchema>;
 }

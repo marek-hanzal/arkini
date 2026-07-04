@@ -11,8 +11,6 @@ export const GameActionItemMergeSchema = z
 	})
 	.strict();
 
-export type GameActionItemMergeSchema = typeof GameActionItemMergeSchema;
-
 export namespace GameActionItemMergeSchema {
 	export type Type = z.infer<typeof GameActionItemMergeSchema>;
 }

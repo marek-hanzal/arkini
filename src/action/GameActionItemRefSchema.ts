@@ -20,8 +20,6 @@ export const GameActionItemRefSchema = z.discriminatedUnion("kind", [
 		.strict(),
 ]);
 
-export type GameActionItemRefSchema = typeof GameActionItemRefSchema;
-
 export namespace GameActionItemRefSchema {
 	export type Type = z.infer<typeof GameActionItemRefSchema>;
 }

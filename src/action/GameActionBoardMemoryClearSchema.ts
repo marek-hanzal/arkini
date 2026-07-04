@@ -9,8 +9,6 @@ export const GameActionBoardMemoryClearSchema = z
 	})
 	.strict();
 
-export type GameActionBoardMemoryClearSchema = typeof GameActionBoardMemoryClearSchema;
-
 export namespace GameActionBoardMemoryClearSchema {
 	export type Type = z.infer<typeof GameActionBoardMemoryClearSchema>;
 }

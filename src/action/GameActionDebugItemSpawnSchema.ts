@@ -17,8 +17,6 @@ export const GameActionDebugItemSpawnSchema = z
 	})
 	.strict();
 
-export type GameActionDebugItemSpawnSchema = typeof GameActionDebugItemSpawnSchema;
-
 export namespace GameActionDebugItemSpawnSchema {
 	export type Type = z.infer<typeof GameActionDebugItemSpawnSchema>;
 }

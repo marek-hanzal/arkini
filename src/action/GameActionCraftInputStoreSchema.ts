@@ -11,8 +11,6 @@ export const GameActionCraftInputStoreSchema = z
 	})
 	.strict();
 
-export type GameActionCraftInputStoreSchema = typeof GameActionCraftInputStoreSchema;
-
 export namespace GameActionCraftInputStoreSchema {
 	export type Type = z.infer<typeof GameActionCraftInputStoreSchema>;
 }

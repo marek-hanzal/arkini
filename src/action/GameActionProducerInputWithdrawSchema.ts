@@ -11,8 +11,6 @@ export const GameActionProducerInputWithdrawSchema = z
 	})
 	.strict();
 
-export type GameActionProducerInputWithdrawSchema = typeof GameActionProducerInputWithdrawSchema;
-
 export namespace GameActionProducerInputWithdrawSchema {
 	export type Type = z.infer<typeof GameActionProducerInputWithdrawSchema>;
 }

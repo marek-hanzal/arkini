@@ -10,8 +10,6 @@ export const GameActionDebugBoardItemDeleteSchema = z
 	})
 	.strict();
 
-export type GameActionDebugBoardItemDeleteSchema = typeof GameActionDebugBoardItemDeleteSchema;
-
 export namespace GameActionDebugBoardItemDeleteSchema {
 	export type Type = z.infer<typeof GameActionDebugBoardItemDeleteSchema>;
 }

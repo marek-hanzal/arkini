@@ -11,8 +11,6 @@ export const GameActionStashOpenSchema = z
 	})
 	.strict();
 
-export type GameActionStashOpenSchema = typeof GameActionStashOpenSchema;
-
 export namespace GameActionStashOpenSchema {
 	export type Type = z.infer<typeof GameActionStashOpenSchema>;
 }

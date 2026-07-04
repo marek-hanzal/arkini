@@ -10,8 +10,6 @@ export const GamePlacementFailureReasonSchema = z.enum([
 	"effect:block-create",
 ]);
 
-export type GamePlacementFailureReasonSchema = typeof GamePlacementFailureReasonSchema;
-
 export namespace GamePlacementFailureReasonSchema {
 	export type Type = z.infer<typeof GamePlacementFailureReasonSchema>;
 }

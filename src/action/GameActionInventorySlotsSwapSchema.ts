@@ -10,8 +10,6 @@ export const GameActionInventorySlotsSwapSchema = z
 	})
 	.strict();
 
-export type GameActionInventorySlotsSwapSchema = typeof GameActionInventorySlotsSwapSchema;
-
 export namespace GameActionInventorySlotsSwapSchema {
 	export type Type = z.infer<typeof GameActionInventorySlotsSwapSchema>;
 }

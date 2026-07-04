@@ -3,17 +3,15 @@ import { useGameAudio } from "~/audio/GameAudioProvider";
 import { readBoardCells, type BoardCellView } from "~/board/boardCells";
 import { cellKey } from "~/board/cellKey";
 import { resolveBoardDropFeedback } from "~/board/drop/resolveBoardDropFeedback";
-import { resolveBoardItemTapAction } from "~/board/control/resolveBoardItemTapAction";
-import { readProducerMissingResourceHintTileIds } from "~/producer/view/readProducerMissingResourceHintTileIds";
 import type { BoardSurface } from "~/board/BoardSurface.types";
 import { readBoardUtilityItemSheet } from "~/board/BoardUtilityItem";
 import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { useBoardTransientTiles } from "~/board/animation/BoardTransientTileStore";
+import { useBoardItemActivation } from "~/board/useBoardItemActivation";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
 import { createRuntimeDropLifecycle } from "~/play/drag/createRuntimeDropLifecycle";
 import type { Feedback } from "~/play/feedback/Feedback";
-import { registerBoardTileBounceFeedback } from "~/play/game-engine-visual/registerBoardTileBounceFeedback";
 import { useGameRuntimeSelector, useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
 import { useGameBoardView } from "~/play/runtime/useGameRuntimeViews";
@@ -36,6 +34,17 @@ export namespace useBoardTileEngineModel {
 		slots: TileEngine.Slot<BoardCellView>[];
 	}
 }
+
+type BoardTileEngineDragConfig = TileEngine.DragConfig<
+	BoardSurface.TileData,
+	BoardCellView,
+	DragSource,
+	DropTarget
+>;
+
+type BoardTileEngineTile = Parameters<BoardTileEngineDragConfig["tile"]>[0];
+type BoardTileEngineSlot = Parameters<BoardTileEngineDragConfig["slot"]>[0];
+type BoardTileEngineTargetTile = Parameters<BoardTileEngineDragConfig["slot"]>[1];
 
 const transientTileStyle = {
 	pointerEvents: "none" as const,
@@ -63,18 +72,8 @@ const readBoardItemSheet = ({
 	);
 };
 
-export const useBoardTileEngineModel = ({
-	feedback,
-	onOpenSheet,
-}: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
-	const audio = useGameAudio();
-	const board = useGameBoardView();
-	const actions = useGameRuntimeDropActions();
-	const runtimeStore = useGameRuntimeStore();
-	const boardLayout = useGameRuntimeSelector((state) => state.runtime.config.game.board);
-	const transientTiles = useBoardTransientTiles();
-
-	const slots = useMemo(
+const useBoardSurfaceSlots = ({ boardLayout }: { boardLayout: readBoardCells.Props }) =>
+	useMemo(
 		() =>
 			readBoardCells(boardLayout).map((cell) => ({
 				id: cell.key,
@@ -87,7 +86,14 @@ export const useBoardTileEngineModel = ({
 		],
 	);
 
-	const tiles = useMemo(
+const useBoardSurfaceTiles = ({
+	board,
+	transientTiles,
+}: {
+	board: ReturnType<typeof useGameBoardView>;
+	transientTiles: ReturnType<typeof useBoardTransientTiles>;
+}) =>
+	useMemo(
 		() =>
 			[
 				...board.items.map((boardItem) => {
@@ -123,7 +129,8 @@ export const useBoardTileEngineModel = ({
 		],
 	);
 
-	const blockedCellKeys = useMemo(
+const useBlockedBoardCellKeys = ({ board }: { board: ReturnType<typeof useGameBoardView> }) =>
+	useMemo(
 		() =>
 			Object.entries(board.byCellKey)
 				.filter(
@@ -136,7 +143,106 @@ export const useBoardTileEngineModel = ({
 		],
 	);
 
-	const openBoardItemSheet = useCallback(
+const readBoardTileDragActor = ({
+	activateBoardItem,
+	audio,
+	board,
+	openBoardItemSheet,
+	tile,
+}: {
+	activateBoardItem: useBoardItemActivation.Result;
+	audio: ReturnType<typeof useGameAudio>;
+	board: ReturnType<typeof useGameBoardView>;
+	openBoardItemSheet(boardItemId: string, expectedItemId: string): void;
+	tile: BoardTileEngineTile;
+}) => {
+	if (tile.data.kind !== "board-item") return undefined;
+
+	const boardItem = board.byId[tile.data.boardItemId];
+	if (!boardItem) return undefined;
+
+	return {
+		id: `board:${boardItem.id}`,
+		data: {
+			kind: "board" as const,
+			boardItemId: boardItem.id,
+			itemId: boardItem.itemId,
+			boardItem,
+		},
+		onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
+		onLongActivate: () => {
+			audio.play("audio.tile.long_press");
+			openBoardItemSheet(boardItem.id, boardItem.itemId);
+		},
+	};
+};
+
+const readBoardCellDropTarget = ({
+	audio,
+	board,
+	onOpenSheet,
+	slot,
+	targetTile,
+}: {
+	audio: ReturnType<typeof useGameAudio>;
+	board: ReturnType<typeof useGameBoardView>;
+	onOpenSheet(sheet: ActiveSheetState): void;
+	slot: BoardTileEngineSlot;
+	targetTile: BoardTileEngineTargetTile;
+}) => {
+	const cell = slot.data;
+	const targetBoardItemId =
+		targetTile?.data.kind === "board-item"
+			? board.byId[targetTile.data.boardItemId]?.id
+			: undefined;
+	return {
+		data: {
+			kind: "cell" as const,
+			x: cell.x,
+			y: cell.y,
+			boardItemId: targetBoardItemId,
+		},
+		onLongActivate: targetBoardItemId
+			? undefined
+			: () => {
+					audio.play("audio.tile.long_press");
+					onOpenSheet({
+						placementTarget: {
+							x: cell.x,
+							y: cell.y,
+						},
+						type: "inventory",
+					});
+				},
+	};
+};
+
+const readBoardDropFeedbackForRuntimeSnapshot = ({
+	context,
+	runtimeStore,
+}: {
+	context: Parameters<NonNullable<BoardTileEngineDragConfig["dropFeedback"]>>[0];
+	runtimeStore: ReturnType<typeof useGameRuntimeStore>;
+}) => {
+	const snapshot = runtimeStore.getSnapshot();
+	const nowMs = Date.now();
+
+	return resolveBoardDropFeedback({
+		board: readBoardView(snapshot, nowMs),
+		config: snapshot.runtime.config,
+		context,
+		inventory: readInventoryView(snapshot),
+	});
+};
+
+const useOpenBoardItemSheet = ({
+	onOpenSheet,
+	runtimeStore,
+}: {
+	onOpenSheet(sheet: ActiveSheetState): void;
+	runtimeStore: ReturnType<typeof useGameRuntimeStore>;
+}) =>
+	useCallback(
 		(boardItemId: string, expectedItemId: string) => {
 			const snapshot = runtimeStore.getSnapshot();
 			const liveBoardItem = readBoardView(snapshot, Date.now()).byId[boardItemId];
@@ -155,185 +261,48 @@ export const useBoardTileEngineModel = ({
 		],
 	);
 
-	const activateBoardItem = useCallback(
-		(boardItemId: string, expectedItemId: string) => {
-			const snapshot = runtimeStore.getSnapshot();
-			const nowMs = Date.now();
-			const liveBoard = readBoardView(snapshot, nowMs);
-			const liveBoardItem = liveBoard.byId[boardItemId];
-			if (!liveBoardItem || liveBoardItem.itemId !== expectedItemId) return;
-
-			const action = resolveBoardItemTapAction({
-				boardItem: liveBoardItem,
-				nowMs,
-			});
-
-			if (action.type === "claim-craft") {
-				void runtimeStore
-					.tick({
-						nowMs,
-					})
-					.catch(feedback.showError);
-				return;
-			}
-
-			if (action.type === "start-craft") {
-				void runtimeStore
-					.dispatch({
-						action: {
-							recipeId: action.recipeId,
-							targetItemInstanceId: action.boardItemId,
-							type: "craft.start",
-						},
-						nowMs,
-					})
-					.catch(feedback.showError);
-				return;
-			}
-
-			if (action.type === "open-sheet") {
-				onOpenSheet(action.sheet);
-				return;
-			}
-
-			if (action.type === "activate-board-memory") {
-				void runtimeStore
-					.dispatch({
-						action: {
-							boardItemId: action.boardItemId,
-							type: "board.memory.activate",
-						},
-						nowMs,
-					})
-					.catch(feedback.showError);
-				return;
-			}
-
-			if (action.type === "set-cheat-speed-mode") {
-				void runtimeStore
-					.dispatch({
-						action: {
-							mode: action.mode,
-							type: "cheat.speed_mode.set",
-						},
-						nowMs,
-					})
-					.catch(feedback.showError);
-				return;
-			}
-
-			if (action.type !== "activate") return;
-
-			const activation = liveBoardItem.activation;
-			if (!activation) return;
-
-			if (activation.kind === "stash") {
-				void runtimeStore
-					.dispatch({
-						action: {
-							inputRefs: [],
-							stashItemInstanceId: liveBoardItem.id,
-							type: "stash.open",
-						},
-						nowMs,
-					})
-					.catch(feedback.showError);
-				return;
-			}
-
-			const hintTileIds = readProducerMissingResourceHintTileIds({
-				board: liveBoard,
-				producerItem: liveBoardItem,
-			});
-			if (hintTileIds.length > 0) {
-				registerBoardTileBounceFeedback({
-					groupId: `producer-missing-resource-hint:${liveBoardItem.id}:${nowMs}`,
-					tileIds: hintTileIds,
-				});
-			}
-
-			void runtimeStore
-				.dispatch({
-					action: {
-						inputRefs: [],
-						itemInstanceId: liveBoardItem.id,
-						lineId: action.lineId,
-						type: "line.start",
-					},
-					nowMs,
-				})
-				.catch(feedback.showError);
-		},
-		[
-			feedback.showError,
-			onOpenSheet,
-			runtimeStore,
-		],
-	);
-
-	const drag = useMemo<
-		TileEngine.DragConfig<BoardSurface.TileData, BoardCellView, DragSource, DropTarget>
-	>(
+const useBoardDragConfig = ({
+	actions,
+	activateBoardItem,
+	audio,
+	board,
+	feedback,
+	onOpenSheet,
+	openBoardItemSheet,
+	runtimeStore,
+}: {
+	actions: ReturnType<typeof useGameRuntimeDropActions>;
+	activateBoardItem: useBoardItemActivation.Result;
+	audio: ReturnType<typeof useGameAudio>;
+	board: ReturnType<typeof useGameBoardView>;
+	feedback: Feedback.Type;
+	onOpenSheet(sheet: ActiveSheetState): void;
+	openBoardItemSheet(boardItemId: string, expectedItemId: string): void;
+	runtimeStore: ReturnType<typeof useGameRuntimeStore>;
+}): BoardTileEngineDragConfig =>
+	useMemo(
 		() => ({
-			tile(tile) {
-				if (tile.data.kind !== "board-item") return undefined;
-
-				const boardItem = board.byId[tile.data.boardItemId];
-				if (!boardItem) return undefined;
-
-				return {
-					id: `board:${boardItem.id}`,
-					data: {
-						kind: "board",
-						boardItemId: boardItem.id,
-						itemId: boardItem.itemId,
-						boardItem,
-					},
-					onSingleActivate: () => activateBoardItem(boardItem.id, boardItem.itemId),
-					onLongActivate: () => {
-						audio.play("audio.tile.long_press");
-						openBoardItemSheet(boardItem.id, boardItem.itemId);
-					},
-				};
-			},
-			slot(slot, targetTile) {
-				const cell = slot.data;
-				const targetBoardItemId =
-					targetTile?.data.kind === "board-item"
-						? board.byId[targetTile.data.boardItemId]?.id
-						: undefined;
-				return {
-					data: {
-						kind: "cell",
-						x: cell.x,
-						y: cell.y,
-						boardItemId: targetBoardItemId,
-					},
-					onLongActivate: targetBoardItemId
-						? undefined
-						: () => {
-								audio.play("audio.tile.long_press");
-								onOpenSheet({
-									placementTarget: {
-										x: cell.x,
-										y: cell.y,
-									},
-									type: "inventory",
-								});
-							},
-				};
-			},
-			dropFeedback(context) {
-				const snapshot = runtimeStore.getSnapshot();
-				const nowMs = Date.now();
-
-				return resolveBoardDropFeedback({
-					board: readBoardView(snapshot, nowMs),
-					config: snapshot.runtime.config,
+			tile: (tile) =>
+				readBoardTileDragActor({
+					activateBoardItem,
+					audio,
+					board,
+					openBoardItemSheet,
+					tile,
+				}),
+			slot: (slot, targetTile) =>
+				readBoardCellDropTarget({
+					audio,
+					board,
+					onOpenSheet,
+					slot,
+					targetTile,
+				}),
+			dropFeedback: (context) =>
+				readBoardDropFeedbackForRuntimeSnapshot({
 					context,
-					inventory: readInventoryView(snapshot),
-				});
-			},
+					runtimeStore,
+				}),
 			...createRuntimeDropLifecycle<BoardSurface.TileData, BoardCellView>({
 				actions,
 				audio,
@@ -350,11 +319,52 @@ export const useBoardTileEngineModel = ({
 			audio,
 			board,
 			feedback,
+			onOpenSheet,
 			openBoardItemSheet,
 			runtimeStore,
-			onOpenSheet,
 		],
 	);
+
+export const useBoardTileEngineModel = ({
+	feedback,
+	onOpenSheet,
+}: useBoardTileEngineModel.Props): useBoardTileEngineModel.Result => {
+	const audio = useGameAudio();
+	const board = useGameBoardView();
+	const actions = useGameRuntimeDropActions();
+	const runtimeStore = useGameRuntimeStore();
+	const boardLayout = useGameRuntimeSelector((state) => state.runtime.config.game.board);
+	const transientTiles = useBoardTransientTiles();
+
+	const slots = useBoardSurfaceSlots({
+		boardLayout,
+	});
+	const tiles = useBoardSurfaceTiles({
+		board,
+		transientTiles,
+	});
+	const blockedCellKeys = useBlockedBoardCellKeys({
+		board,
+	});
+
+	const openBoardItemSheet = useOpenBoardItemSheet({
+		onOpenSheet,
+		runtimeStore,
+	});
+	const activateBoardItem = useBoardItemActivation({
+		feedback,
+		onOpenSheet,
+	});
+	const drag = useBoardDragConfig({
+		actions,
+		activateBoardItem,
+		audio,
+		board,
+		feedback,
+		onOpenSheet,
+		openBoardItemSheet,
+		runtimeStore,
+	});
 
 	return {
 		blockedCellKeys,

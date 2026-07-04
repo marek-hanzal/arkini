@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { z } from "zod";
 import { GameInstantMsSchema } from "~/time/GameTimeSchema";
 import { GameConfigSchema } from "~/config/GameConfigSchema";
@@ -485,11 +486,23 @@ const readItemSpawnDependencyCycleJobIds = (save: GameSave) => {
 	return cycleJobIds;
 };
 
-const validateGameSaveAgainstConfig = (
-	ctx: z.RefinementCtx,
-	save: GameSave,
-	config: GameConfig,
-) => {
+type GameSaveValidationContext = {
+	config: GameConfig;
+	ctx: z.RefinementCtx;
+	save: GameSave;
+};
+
+type ProducerJobEntry = {
+	job: GameSaveProducerJob;
+	jobId: string;
+};
+
+type ProducerJobValidationState = {
+	jobCountByItemInstanceId: Map<string, number>;
+	jobsByItemInstanceId: Map<string, ProducerJobEntry[]>;
+};
+
+const validateSaveIdentityAndShape = ({ config, ctx, save }: GameSaveValidationContext) => {
 	if (save.gameId !== config.game.id) {
 		addSaveIssue(
 			ctx,
@@ -510,9 +523,12 @@ const validateGameSaveAgainstConfig = (
 			`Inventory slot count must equal config inventory slots (${config.game.inventory.slots}).`,
 		);
 	}
+};
 
+const validateSaveBoardItems = ({ config, ctx, save }: GameSaveValidationContext) => {
 	const usedBoardCells = new Map<string, string>();
 	const boardItemCountByItemId = new Map<string, number>();
+
 	for (const [itemInstanceId, boardItem] of Object.entries(save.board.items)) {
 		if (boardItem.id !== itemInstanceId) {
 			addSaveIssue(
@@ -600,7 +616,16 @@ const validateGameSaveAgainstConfig = (
 		}
 	}
 
-	const inventoryInstanceIds = new Set<string>();
+	return boardItemCountByItemId;
+};
+
+const validateSaveBoardItemMaxCounts = ({
+	boardItemCountByItemId,
+	config,
+	ctx,
+}: Pick<GameSaveValidationContext, "config" | "ctx"> & {
+	boardItemCountByItemId: ReadonlyMap<string, number>;
+}) => {
 	for (const [itemId, quantity] of boardItemCountByItemId) {
 		const maxCount = config.items[itemId]?.maxCount;
 		if (maxCount === undefined || quantity <= maxCount) continue;
@@ -614,7 +639,75 @@ const validateGameSaveAgainstConfig = (
 			`Board has ${quantity} item(s) of "${itemId}" but maxCount is ${maxCount}.`,
 		);
 	}
+};
 
+const validateSaveInventoryInstanceSlot = ({
+	ctx,
+	inventoryInstanceIds,
+	save,
+	slot,
+	slotIndex,
+}: Pick<GameSaveValidationContext, "ctx" | "save"> & {
+	inventoryInstanceIds: Set<string>;
+	slot: GameSaveInventoryInstance;
+	slotIndex: number;
+}) => {
+	if (save.board.items[slot.id]) {
+		addSaveIssue(
+			ctx,
+			[
+				"inventory",
+				"slots",
+				slotIndex,
+				"id",
+			],
+			`Inventory instance id "${slot.id}" already exists on board.`,
+		);
+	}
+
+	if (inventoryInstanceIds.has(slot.id)) {
+		addSaveIssue(
+			ctx,
+			[
+				"inventory",
+				"slots",
+				slotIndex,
+				"id",
+			],
+			`Duplicate inventory instance id "${slot.id}".`,
+		);
+		return;
+	}
+
+	inventoryInstanceIds.add(slot.id);
+};
+
+const validateSaveInventoryStackSlot = ({
+	ctx,
+	item,
+	slot,
+	slotIndex,
+}: Pick<GameSaveValidationContext, "ctx"> & {
+	item: GameConfig["items"][string];
+	slot: GameSaveInventoryStack;
+	slotIndex: number;
+}) => {
+	if (slot.quantity <= item.maxStackSize) return;
+
+	addSaveIssue(
+		ctx,
+		[
+			"inventory",
+			"slots",
+			slotIndex,
+			"quantity",
+		],
+		`Quantity must be <= item maxStackSize (${item.maxStackSize}).`,
+	);
+};
+
+const validateSaveInventorySlots = ({ config, ctx, save }: GameSaveValidationContext) => {
+	const inventoryInstanceIds = new Set<string>();
 	for (const [slotIndex, slot] of save.inventory.slots.entries()) {
 		if (!slot) continue;
 
@@ -646,60 +739,37 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if ("kind" in slot && slot.kind === "instance") {
-			if (save.board.items[slot.id]) {
-				addSaveIssue(
-					ctx,
-					[
-						"inventory",
-						"slots",
+		match(slot)
+			.with(
+				{
+					kind: "instance",
+				},
+				(instanceSlot) =>
+					validateSaveInventoryInstanceSlot({
+						ctx,
+						inventoryInstanceIds,
+						save,
+						slot: instanceSlot,
 						slotIndex,
-						"id",
-					],
-					`Inventory instance id "${slot.id}" already exists on board.`,
-				);
-			}
-
-			if (inventoryInstanceIds.has(slot.id)) {
-				addSaveIssue(
+					}),
+			)
+			.otherwise((stackSlot) =>
+				validateSaveInventoryStackSlot({
 					ctx,
-					[
-						"inventory",
-						"slots",
-						slotIndex,
-						"id",
-					],
-					`Duplicate inventory instance id "${slot.id}".`,
-				);
-			} else {
-				inventoryInstanceIds.add(slot.id);
-			}
-
-			continue;
-		}
-
-		if (!("kind" in slot) && slot.quantity > item.maxStackSize) {
-			addSaveIssue(
-				ctx,
-				[
-					"inventory",
-					"slots",
+					item,
+					slot: stackSlot,
 					slotIndex,
-					"quantity",
-				],
-				`Quantity must be <= item maxStackSize (${item.maxStackSize}).`,
+				}),
 			);
-		}
 	}
+};
 
-	const jobCountByItemInstanceId = new Map<string, number>();
-	const jobsByItemInstanceId = new Map<
-		string,
-		{
-			job: GameSaveProducerJob;
-			jobId: string;
-		}[]
-	>();
+const validateSaveProducerJobs = ({ config, ctx, save }: GameSaveValidationContext) => {
+	const state: ProducerJobValidationState = {
+		jobCountByItemInstanceId: new Map(),
+		jobsByItemInstanceId: new Map(),
+	};
+
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -762,18 +832,23 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		jobCountByItemInstanceId.set(
+		state.jobCountByItemInstanceId.set(
 			job.itemInstanceId,
-			(jobCountByItemInstanceId.get(job.itemInstanceId) ?? 0) + 1,
+			(state.jobCountByItemInstanceId.get(job.itemInstanceId) ?? 0) + 1,
 		);
-		const producerJobs = jobsByItemInstanceId.get(job.itemInstanceId) ?? [];
-		producerJobs.push({
-			job,
-			jobId,
-		});
-		jobsByItemInstanceId.set(job.itemInstanceId, producerJobs);
+		state.jobsByItemInstanceId.set(job.itemInstanceId, [
+			...(state.jobsByItemInstanceId.get(job.itemInstanceId) ?? []),
+			{
+				job,
+				jobId,
+			},
+		]);
 	}
 
+	return state;
+};
+
+const validateSaveActiveEffects = ({ config, ctx, save }: GameSaveValidationContext) => {
 	const activeEffectIdsByProducerJobId = new Map<string, string[]>();
 
 	for (const [activeEffectId, activeEffect] of Object.entries(save.activeEffects ?? {})) {
@@ -824,79 +899,91 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 
-		if (activeEffect.producerJobId !== undefined) {
-			activeEffectIdsByProducerJobId.set(activeEffect.producerJobId, [
-				...(activeEffectIdsByProducerJobId.get(activeEffect.producerJobId) ?? []),
-				activeEffectId,
-			]);
-			const producerJob = save.producerJobs[activeEffect.producerJobId];
-			const line = producerJob
-				? readLineFromJob({
-						config,
-						save,
-						job: producerJob,
-					})
-				: undefined;
+		if (activeEffect.producerJobId === undefined) continue;
 
-			if (!producerJob) {
-				addSaveIssue(
-					ctx,
-					[
-						"activeEffects",
-						activeEffectId,
-						"producerJobId",
-					],
-					`Active effect producer job "${activeEffect.producerJobId}" must reference a producer job.`,
-				);
-			} else {
-				if (activeEffect.sourceItemInstanceId !== producerJob.itemInstanceId) {
-					addSaveIssue(
-						ctx,
-						[
-							"activeEffects",
-							activeEffectId,
-							"sourceItemInstanceId",
-						],
-						`Active effect source must match producer job "${producerJob.id}" source.`,
-					);
-				}
-				if (activeEffect.startAtMs !== producerJob.startAtMs) {
-					addSaveIssue(
-						ctx,
-						[
-							"activeEffects",
-							activeEffectId,
-							"startAtMs",
-						],
-						`Active effect startAtMs must match producer job "${producerJob.id}" startAtMs.`,
-					);
-				}
-				if (activeEffect.endAtMs !== producerJob.readyAtMs) {
-					addSaveIssue(
-						ctx,
-						[
-							"activeEffects",
-							activeEffectId,
-							"endAtMs",
-						],
-						`Active effect endAtMs must match producer job "${producerJob.id}" readyAtMs.`,
-					);
-				}
-				if (line?.effect?.id !== activeEffect.effectId) {
-					addSaveIssue(
-						ctx,
-						[
-							"activeEffects",
-							activeEffectId,
-							"effectId",
-						],
-						`Active effect must match producer job "${producerJob.id}" activated effect.`,
-					);
-				}
-			}
+		activeEffectIdsByProducerJobId.set(activeEffect.producerJobId, [
+			...(activeEffectIdsByProducerJobId.get(activeEffect.producerJobId) ?? []),
+			activeEffectId,
+		]);
+		const producerJob = save.producerJobs[activeEffect.producerJobId];
+		const line = producerJob
+			? readLineFromJob({
+					config,
+					save,
+					job: producerJob,
+				})
+			: undefined;
+
+		if (!producerJob) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"producerJobId",
+				],
+				`Active effect producer job "${activeEffect.producerJobId}" must reference a producer job.`,
+			);
+			continue;
+		}
+
+		if (activeEffect.sourceItemInstanceId !== producerJob.itemInstanceId) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"sourceItemInstanceId",
+				],
+				`Active effect source must match producer job "${producerJob.id}" source.`,
+			);
+		}
+		if (activeEffect.startAtMs !== producerJob.startAtMs) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"startAtMs",
+				],
+				`Active effect startAtMs must match producer job "${producerJob.id}" startAtMs.`,
+			);
+		}
+		if (activeEffect.endAtMs !== producerJob.readyAtMs) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"endAtMs",
+				],
+				`Active effect endAtMs must match producer job "${producerJob.id}" readyAtMs.`,
+			);
+		}
+		if (line?.effect?.id !== activeEffect.effectId) {
+			addSaveIssue(
+				ctx,
+				[
+					"activeEffects",
+					activeEffectId,
+					"effectId",
+				],
+				`Active effect must match producer job "${producerJob.id}" activated effect.`,
+			);
 		}
 	}
 
+	return activeEffectIdsByProducerJobId;
+};
+
+const validateProducerJobActiveEffectLinks = ({
+	activeEffectIdsByProducerJobId,
+	config,
+	ctx,
+	save,
+}: GameSaveValidationContext & {
+	activeEffectIdsByProducerJobId: ReadonlyMap<string, readonly string[]>;
+}) => {
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
 		const line = readLineFromJob({
 			config,
@@ -920,12 +1007,21 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 	}
+};
 
+const validateProducerQueueSizes = ({
+	config,
+	ctx,
+	jobCountByItemInstanceId,
+	save,
+}: Pick<GameSaveValidationContext, "config" | "ctx" | "save"> & {
+	jobCountByItemInstanceId: ReadonlyMap<string, number>;
+}) => {
 	for (const [itemInstanceId, jobCount] of jobCountByItemInstanceId) {
 		const target = readBoardItemDefinition({
 			config,
 			save,
-			itemInstanceId: itemInstanceId,
+			itemInstanceId,
 		});
 		const producerId = target?.boardItem.itemId;
 		if (!producerId) continue;
@@ -945,16 +1041,26 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 	}
+};
 
+const readSortedProducerJobs = (producerJobs: readonly ProducerJobEntry[]) =>
+	[
+		...producerJobs,
+	].sort(
+		(left, right) =>
+			left.job.startAtMs - right.job.startAtMs ||
+			left.job.readyAtMs - right.job.readyAtMs ||
+			left.jobId.localeCompare(right.jobId),
+	);
+
+const validateProducerQueueOrdering = ({
+	ctx,
+	jobsByItemInstanceId,
+}: Pick<GameSaveValidationContext, "ctx"> & {
+	jobsByItemInstanceId: ReadonlyMap<string, readonly ProducerJobEntry[]>;
+}) => {
 	for (const [itemInstanceId, producerJobs] of jobsByItemInstanceId) {
-		const sortedProducerJobs = [
-			...producerJobs,
-		].sort(
-			(left, right) =>
-				left.job.startAtMs - right.job.startAtMs ||
-				left.job.readyAtMs - right.job.readyAtMs ||
-				left.jobId.localeCompare(right.jobId),
-		);
+		const sortedProducerJobs = readSortedProducerJobs(producerJobs);
 		for (let index = 1; index < sortedProducerJobs.length; index += 1) {
 			const previous = sortedProducerJobs[index - 1];
 			const current = sortedProducerJobs[index];
@@ -973,9 +1079,7 @@ const validateGameSaveAgainstConfig = (
 			}
 
 			const previousQueueBarrierAtMs = readProducerQueueBarrierAtMs(previous.job);
-			if (previousQueueBarrierAtMs === undefined) {
-				continue;
-			}
+			if (previousQueueBarrierAtMs === undefined) continue;
 
 			if (current.job.startAtMs < previousQueueBarrierAtMs) {
 				addSaveIssue(
@@ -1010,12 +1114,14 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 	}
+};
 
+const validateSaveLineStates = ({ config, ctx, save }: GameSaveValidationContext) => {
 	for (const [itemInstanceId, lineState] of Object.entries(save.lines)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: itemInstanceId,
+			itemInstanceId,
 		});
 		const producerId = target?.itemId;
 		const producer = producerId
@@ -1112,12 +1218,14 @@ const validateGameSaveAgainstConfig = (
 			}
 		}
 	}
+};
 
+const validateSaveProducerInputs = ({ config, ctx, save }: GameSaveValidationContext) => {
 	for (const [itemInstanceId, state] of Object.entries(save.producerInputs)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: itemInstanceId,
+			itemInstanceId,
 		});
 		const producerId = target?.itemId;
 		const producer = producerId
@@ -1197,7 +1305,9 @@ const validateGameSaveAgainstConfig = (
 			}
 		}
 	}
+};
 
+const validateSaveCraftJobs = ({ config, ctx, save }: GameSaveValidationContext) => {
 	const runningCraftJobsByTargetItemInstanceId = new Map<string, string>();
 	for (const [jobId, job] of Object.entries(save.craftJobs)) {
 		if (job.id !== jobId) {
@@ -1273,7 +1383,17 @@ const validateGameSaveAgainstConfig = (
 			runningCraftJobsByTargetItemInstanceId.set(job.targetItemInstanceId, jobId);
 		}
 	}
+	return runningCraftJobsByTargetItemInstanceId;
+};
 
+const validateSaveCraftInputs = ({
+	config,
+	ctx,
+	runningCraftJobsByTargetItemInstanceId,
+	save,
+}: GameSaveValidationContext & {
+	runningCraftJobsByTargetItemInstanceId: ReadonlyMap<string, string>;
+}) => {
 	for (const [targetItemInstanceId, state] of Object.entries(save.craftInputs)) {
 		const target = readItemInstanceDefinition({
 			config,
@@ -1341,12 +1461,14 @@ const validateGameSaveAgainstConfig = (
 			}
 		}
 	}
+};
 
+const validateSaveProducerCharges = ({ config, ctx, save }: GameSaveValidationContext) => {
 	for (const [itemInstanceId, state] of Object.entries(save.producerCharges)) {
 		const target = readItemInstanceDefinition({
 			config,
 			save,
-			itemInstanceId: itemInstanceId,
+			itemInstanceId,
 		});
 		const producerId = target?.itemId;
 		const producer = producerId
@@ -1391,7 +1513,9 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 	}
+};
 
+const validateSaveItemCapacities = ({ config, ctx, save }: GameSaveValidationContext) => {
 	for (const [itemInstanceId, state] of Object.entries(save.itemCapacities)) {
 		const target = readItemInstanceDefinition({
 			config,
@@ -1435,7 +1559,9 @@ const validateGameSaveAgainstConfig = (
 			);
 		}
 	}
+};
 
+const validateSaveBoardMemoryLayouts = ({ config, ctx, save }: GameSaveValidationContext) => {
 	for (const [memoryItemInstanceId, layout] of Object.entries(save.boardMemoryLayouts)) {
 		const memoryItem = readItemInstanceDefinition({
 			config,
@@ -1482,7 +1608,9 @@ const validateGameSaveAgainstConfig = (
 			}
 		}
 	}
+};
 
+const validateSaveItemSpawnJobs = ({ config, ctx, save }: GameSaveValidationContext) => {
 	for (const [jobId, job] of Object.entries(save.itemSpawnJobs)) {
 		if (job.id !== jobId) {
 			addSaveIssue(
@@ -1523,7 +1651,9 @@ const validateGameSaveAgainstConfig = (
 			}
 		}
 	}
+};
 
+const validateSaveItemSpawnDependencyCycles = ({ ctx, save }: GameSaveValidationContext) => {
 	const itemSpawnDependencyCycleJobIds = readItemSpawnDependencyCycleJobIds(save);
 	for (const jobId of itemSpawnDependencyCycleJobIds) {
 		addSaveIssue(
@@ -1536,6 +1666,54 @@ const validateGameSaveAgainstConfig = (
 			`Item spawn job "${jobId}" must not be part of a dependency cycle.`,
 		);
 	}
+};
+
+const validateGameSaveAgainstConfig = (
+	ctx: z.RefinementCtx,
+	save: GameSave,
+	config: GameConfig,
+) => {
+	const validationContext = {
+		config,
+		ctx,
+		save,
+	} satisfies GameSaveValidationContext;
+	validateSaveIdentityAndShape(validationContext);
+	const boardItemCountByItemId = validateSaveBoardItems(validationContext);
+	validateSaveBoardItemMaxCounts({
+		boardItemCountByItemId,
+		config,
+		ctx,
+	});
+	validateSaveInventorySlots(validationContext);
+	const producerJobState = validateSaveProducerJobs(validationContext);
+	const activeEffectIdsByProducerJobId = validateSaveActiveEffects(validationContext);
+	validateProducerJobActiveEffectLinks({
+		...validationContext,
+		activeEffectIdsByProducerJobId,
+	});
+	validateProducerQueueSizes({
+		config,
+		ctx,
+		jobCountByItemInstanceId: producerJobState.jobCountByItemInstanceId,
+		save,
+	});
+	validateProducerQueueOrdering({
+		ctx,
+		jobsByItemInstanceId: producerJobState.jobsByItemInstanceId,
+	});
+	validateSaveLineStates(validationContext);
+	validateSaveProducerInputs(validationContext);
+	const runningCraftJobsByTargetItemInstanceId = validateSaveCraftJobs(validationContext);
+	validateSaveCraftInputs({
+		...validationContext,
+		runningCraftJobsByTargetItemInstanceId,
+	});
+	validateSaveProducerCharges(validationContext);
+	validateSaveItemCapacities(validationContext);
+	validateSaveBoardMemoryLayouts(validationContext);
+	validateSaveItemSpawnJobs(validationContext);
+	validateSaveItemSpawnDependencyCycles(validationContext);
 };
 
 export type GameSaveBoardItem = z.infer<typeof GameSaveBoardItemSchema>;

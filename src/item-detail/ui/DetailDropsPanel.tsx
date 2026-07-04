@@ -40,6 +40,28 @@ const readDropMeta = (drop: ActivationDropView) =>
 const readDropEffectLines = (drop: ActivationDropView) =>
 	(drop.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
 
+const DetailDropEffectLines: FC<{
+	drop: ActivationDropView;
+	groupLabel: string;
+	rowIndex: number;
+}> = ({ drop, groupLabel, rowIndex }) => {
+	const effectLines = readDropEffectLines(drop);
+	if (effectLines.length === 0) return null;
+
+	return (
+		<ul className="mt-1 space-y-0.5 text-xs leading-5 text-ak-text-muted">
+			{effectLines.map((effectLine, effectLineIndex) => (
+				<li
+					key={`${groupLabel}:${rowIndex}:${drop.itemId}:effect:${effectLineIndex}`}
+					className="break-words"
+				>
+					{effectLine}
+				</li>
+			))}
+		</ul>
+	);
+};
+
 export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items }) => {
 	const groups = readDropGroups(drops);
 	if (groups.length === 0) return null;
@@ -81,20 +103,11 @@ export const DetailDropsPanel: FC<DetailDropsPanel.Props> = ({ drops = [], items
 											<p className="mt-0.5 break-words text-xs leading-5 text-ak-text-muted">
 												{readDropMeta(drop)}
 											</p>
-											{readDropEffectLines(drop).length ? (
-												<ul className="mt-1 space-y-0.5 text-xs leading-5 text-ak-text-muted">
-													{readDropEffectLines(drop).map(
-														(effectLine, effectLineIndex) => (
-															<li
-																key={`${group.label}:${index}:${drop.itemId}:effect:${effectLineIndex}`}
-																className="break-words"
-															>
-																{effectLine}
-															</li>
-														),
-													)}
-												</ul>
-											) : null}
+											<DetailDropEffectLines
+												drop={drop}
+												groupLabel={group.label}
+												rowIndex={index}
+											/>
 										</div>
 										<DetailMutedPill>{drop.chanceLabel}</DetailMutedPill>
 									</article>

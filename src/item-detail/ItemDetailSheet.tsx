@@ -88,7 +88,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 		);
 	}
 
-	const sections = [
+	const sections: ReactNode[] = [
 		<DetailHeroCard
 			key="hero"
 			assetProgress={boardItem.craft?.inputProgress}
@@ -99,37 +99,49 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 			key="generated-effects"
 			effects={item.generatedEffects}
 		/>,
-		boardItem.craft && craftControl ? (
+	];
+
+	if (boardItem.craft && craftControl) {
+		sections.push(
 			<DetailCraftPanel
 				key="craft"
 				control={craftControl}
 				craft={boardItem.craft}
 				items={items}
-			/>
-		) : null,
-		activation?.kind === "stash" ? (
+			/>,
+		);
+	}
+
+	if (activation?.kind === "stash") {
+		sections.push(
 			<DetailDropsPanel
 				key="drops"
 				drops={activation.drops}
 				items={items}
-			/>
-		) : null,
-		activation?.inputs.length ? (
+			/>,
+		);
+	}
+
+	if (activation?.inputs.length) {
+		sections.push(
 			<DetailInputsPanel
 				key="shared-inputs"
 				inputs={activation.inputs}
 				items={items}
 				title={activation.kind === "stash" ? "Needed to open" : "Shared inputs"}
-			/>
-		) : null,
-		lineModels.length ? (
+			/>,
+		);
+	}
+
+	if (lineModels.length) {
+		sections.push(
 			<DetailLinesPanel
 				key="lines"
 				items={items}
 				lines={lineModels}
-			/>
-		) : null,
-	].filter(Boolean) as ReactNode[];
+			/>,
+		);
+	}
 
 	return (
 		<section

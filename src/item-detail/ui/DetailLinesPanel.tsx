@@ -71,6 +71,28 @@ const readOutputMeta = (output: NonNullable<LineView["outputs"]>[number]) =>
 const readOutputEffectLines = (output: NonNullable<LineView["outputs"]>[number]) =>
 	(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
 
+const DetailOutputEffectLines: FC<{
+	lineId: string;
+	output: NonNullable<LineView["outputs"]>[number];
+	outputIndex: number;
+}> = ({ lineId, output, outputIndex }) => {
+	const effectLines = readOutputEffectLines(output);
+	if (effectLines.length === 0) return null;
+
+	return (
+		<ul className="mt-1 space-y-0.5 leading-5 text-ak-text-muted">
+			{effectLines.map((effectLine, effectLineIndex) => (
+				<li
+					key={`${lineId}:output:${outputIndex}:effect:${effectLineIndex}`}
+					className="break-words"
+				>
+					{effectLine}
+				</li>
+			))}
+		</ul>
+	);
+};
+
 const readEffectRequirementPrefix = (
 	requirement: NonNullable<LineView["effectRequirements"]>[number],
 ) => (requirement.kind === "grant.blockStart" ? "Blocked by" : "Missing");
@@ -170,20 +192,11 @@ const DetailLineOutputs: FC<{
 								>
 									{readOutputMeta(output)}
 								</p>
-								{readOutputEffectLines(output).length ? (
-									<ul className="mt-1 space-y-0.5 leading-5 text-ak-text-muted">
-										{readOutputEffectLines(output).map(
-											(effectLine, effectLineIndex) => (
-												<li
-													key={`${line.lineId}:output:${outputIndex}:effect:${effectLineIndex}`}
-													className="break-words"
-												>
-													{effectLine}
-												</li>
-											),
-										)}
-									</ul>
-								) : null}
+								<DetailOutputEffectLines
+									lineId={line.lineId}
+									output={output}
+									outputIndex={outputIndex}
+								/>
 							</div>
 						</div>
 					);

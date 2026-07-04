@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { GameAudioPlan } from "~/audio/GameAudioPlan";
 import type { GameAudioSoundId } from "~/audio/GameAudioSound";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -20,9 +21,70 @@ type PlanFlags = {
 	playedSoundIds: Set<GameAudioSoundId>;
 };
 
+type AudioPlanWriter = {
+	flags: PlanFlags;
+	plan: GameAudioPlan.Type;
+};
+
+type AudioBatchFacts = {
+	hasBoardStashCreated: boolean;
+	hasCraftCompleted: boolean;
+	hasLineCompleted: boolean;
+	hasMergeResult: boolean;
+};
+
+type AudioPlanContext = createGameAudioPlan.Props & AudioPlanWriter & AudioBatchFacts;
+
+type GameEventOfType<TType extends GameEvent["type"]> = Extract<
+	GameEvent,
+	{
+		type: TType;
+	}
+>;
+
+const staticSoundByEventType = {
+	"producer_input.stored": "audio.producer.input.store",
+	"producer_input.withdrawn": "audio.producer.input.withdraw",
+	"craft_input.stored": "audio.craft.input.store",
+	"craft_input.withdrawn": "audio.craft.input.withdraw",
+	"line.blocked": "audio.producer.blocked",
+	"line.failed": "audio.producer.failed",
+	"effect.activated": "audio.effect.activated",
+	"effect.expired": "audio.effect.expired",
+	"craft.started": "audio.craft.start",
+	"craft.completed": "audio.craft.complete",
+	"craft.blocked": "audio.craft.blocked",
+	"craft.failed": "audio.craft.failed",
+	"item.spawn.blocked": "audio.item.spawn.blocked",
+	"item.spawn.failed": "audio.item.spawn.failed",
+	"line.default_changed": "audio.line.default_changed",
+	"item.capacity.changed": "audio.producer.input.store",
+	"item.capacity.depleted": "audio.tile.remove",
+} as const satisfies Partial<Record<GameEvent["type"], GameAudioSoundId>>;
+
+type StaticAudioEventType = keyof typeof staticSoundByEventType;
+type StaticAudioEvent = Extract<
+	GameEvent,
+	{
+		type: StaticAudioEventType;
+	}
+>;
+type NonStaticAudioEvent = Exclude<GameEvent, StaticAudioEvent>;
+
 const createPlanFlags = (): PlanFlags => ({
 	createdItemSoundCount: 0,
 	playedSoundIds: new Set<GameAudioSoundId>(),
+});
+
+const readAudioBatchFacts = (events: readonly GameEvent[]): AudioBatchFacts => ({
+	hasCraftCompleted: events.some((event) => event.type === "craft.completed"),
+	hasLineCompleted: events.some((event) => event.type === "line.completed"),
+	hasMergeResult: events.some(
+		(event) => event.type === "item.replaced" && event.reason === "merge-result",
+	),
+	hasBoardStashCreated: events.some(
+		(event) => event.type === "item.created" && event.reason === "board-stash",
+	),
 });
 
 const readBoardItemId = ({
@@ -58,24 +120,12 @@ const isStashLineEvent = ({
 	return Boolean(config.items[itemId]?.stash);
 };
 
-const hasEventType = <TType extends GameEvent["type"]>(
-	events: readonly GameEvent[],
-	type: TType,
-): boolean => events.some((event) => event.type === type);
-
-const hasEvent = (
-	events: readonly GameEvent[],
-	predicate: (event: GameEvent) => boolean,
-): boolean => events.some(predicate);
-
 const pushSound = ({
 	flags,
 	plan,
 	soundId,
 	sourceEventType,
-}: {
-	flags: PlanFlags;
-	plan: GameAudioPlan.Type;
+}: AudioPlanWriter & {
 	soundId: GameAudioSoundId;
 	sourceEventType: string;
 }) => {
@@ -91,9 +141,7 @@ const pushUniqueSound = ({
 	plan,
 	soundId,
 	sourceEventType,
-}: {
-	flags: PlanFlags;
-	plan: GameAudioPlan.Type;
+}: AudioPlanWriter & {
 	soundId: GameAudioSoundId;
 	sourceEventType: string;
 }) => {
@@ -111,9 +159,7 @@ const pushCreatedItemSound = ({
 	plan,
 	soundId,
 	sourceEventType,
-}: {
-	flags: PlanFlags;
-	plan: GameAudioPlan.Type;
+}: AudioPlanWriter & {
 	soundId: GameAudioSoundId;
 	sourceEventType: string;
 }) => {
@@ -127,344 +173,293 @@ const pushCreatedItemSound = ({
 	});
 };
 
-export const createGameAudioPlan = ({
-	config,
-	currentSave,
-	events,
-	previousSave,
-}: createGameAudioPlan.Props): GameAudioPlan.Type => {
-	const plan: GameAudioPlan.Type = {
-		entries: [],
-	};
-	const flags = createPlanFlags();
-	const hasCraftCompleted = hasEventType(events, "craft.completed");
-	const hasLineCompleted = hasEventType(events, "line.completed");
-	const hasMergeResult = hasEvent(
-		events,
-		(event) => event.type === "item.replaced" && event.reason === "merge-result",
-	);
-	const hasBoardStashCreated = hasEvent(
-		events,
-		(event) => event.type === "item.created" && event.reason === "board-stash",
-	);
+const pushItemCreatedAudio = (context: AudioPlanContext, event: GameEventOfType<"item.created">) =>
+	match(event.reason)
+		.with("inventory-placement", () => {
+			if (event.to.kind !== "board") return;
+			pushCreatedItemSound({
+				...context,
+				soundId: "audio.inventory.place",
+				sourceEventType: event.type,
+			});
+		})
+		.with("board-stash", () =>
+			pushUniqueSound({
+				...context,
+				soundId: "audio.board.stash",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("tile-remove-output", () =>
+			pushCreatedItemSound({
+				...context,
+				soundId: "audio.tile.remove.output",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("merge-output", () =>
+			pushCreatedItemSound({
+				...context,
+				soundId: "audio.merge.output",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("debug", () =>
+			pushCreatedItemSound({
+				...context,
+				soundId:
+					event.to.kind === "board"
+						? "audio.debug.spawn.board"
+						: "audio.debug.spawn.inventory",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("line-output", () => {
+			if (context.hasLineCompleted) return;
+			pushUniqueSound({
+				...context,
+				soundId: "audio.producer.complete",
+				sourceEventType: event.type,
+			});
+		})
+		.with(
+			"producer-input-withdraw",
+			"craft-input-withdraw",
+			"memory-restore",
+			"memory-store",
+			() => undefined,
+		)
+		.exhaustive();
 
-	for (const event of events) {
-		switch (event.type) {
-			case "item.created": {
-				if (event.reason === "inventory-placement") {
-					if (event.to.kind === "board") {
-						pushCreatedItemSound({
-							flags,
-							plan,
-							soundId: "audio.inventory.place",
-							sourceEventType: event.type,
-						});
-					}
-					break;
-				}
+const pushItemConsumedAudio = (
+	context: AudioPlanContext,
+	event: GameEventOfType<"item.consumed">,
+) =>
+	match(event.reason)
+		.with("board-stash", () => {
+			if (context.hasBoardStashCreated) return;
+			pushUniqueSound({
+				...context,
+				soundId: "audio.board.stash",
+				sourceEventType: event.type,
+			});
+		})
+		.with("merge-source", () => undefined)
+		.with(
+			"line-input",
+			"producer-input-store",
+			"producer-input-auto-fill",
+			"craft-input",
+			"craft-input-store",
+			"craft-input-auto-fill",
+			"inventory-placement",
+			"remove-tool",
+			"memory-restore",
+			"memory-store",
+			() => undefined,
+		)
+		.exhaustive();
 
-				if (event.reason === "board-stash") {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.board.stash",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const pushItemRemovedAudio = (context: AudioPlanContext, event: GameEventOfType<"item.removed">) =>
+	match(event.reason)
+		.with("producer-depleted", () =>
+			pushUniqueSound({
+				...context,
+				soundId: "audio.producer.depleted",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("tile-remove", () =>
+			pushUniqueSound({
+				...context,
+				soundId: "audio.tile.remove",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("debug-delete", "capacity-depleted", "merge-result", "craft-result", () => undefined)
+		.exhaustive();
 
-				if (event.reason === "tile-remove-output") {
-					pushCreatedItemSound({
-						flags,
-						plan,
-						soundId: "audio.tile.remove.output",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const pushItemReplacedAudio = (
+	context: AudioPlanContext,
+	event: GameEventOfType<"item.replaced">,
+) =>
+	match(event.reason)
+		.with("merge-result", () =>
+			pushUniqueSound({
+				...context,
+				soundId: "audio.merge.success",
+				sourceEventType: event.type,
+			}),
+		)
+		.with("craft-result", () => {
+			if (context.hasCraftCompleted) return;
+			pushUniqueSound({
+				...context,
+				soundId: "audio.craft.result.replace",
+				sourceEventType: event.type,
+			});
+		})
+		.with(
+			"debug-delete",
+			"capacity-depleted",
+			"producer-depleted",
+			"tile-remove",
+			() => undefined,
+		)
+		.exhaustive();
 
-				if (event.reason === "merge-output") {
-					pushCreatedItemSound({
-						flags,
-						plan,
-						soundId: "audio.merge.output",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const readLineEventSoundId = (
+	context: AudioPlanContext,
+	event: GameEventOfType<"line.started" | "line.completed">,
+): GameAudioSoundId =>
+	match(event.type)
+		.with("line.started", () =>
+			isStashLineEvent({
+				...context,
+				itemInstanceId: event.itemInstanceId,
+			})
+				? "audio.stash.open.start"
+				: "audio.producer.start",
+		)
+		.with("line.completed", () =>
+			isStashLineEvent({
+				...context,
+				itemInstanceId: event.itemInstanceId,
+			})
+				? "audio.stash.release"
+				: "audio.producer.complete",
+		)
+		.exhaustive();
 
-				if (event.reason === "debug") {
-					pushCreatedItemSound({
-						flags,
-						plan,
-						soundId:
-							event.to.kind === "board"
-								? "audio.debug.spawn.board"
-								: "audio.debug.spawn.inventory",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const pushLineLifecycleAudio = (
+	context: AudioPlanContext,
+	event: GameEventOfType<"line.started" | "line.completed">,
+) =>
+	pushUniqueSound({
+		...context,
+		soundId: readLineEventSoundId(context, event),
+		sourceEventType: event.type,
+	});
 
-				if (event.reason === "line-output" && !hasLineCompleted) {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.producer.complete",
-						sourceEventType: event.type,
-					});
-				}
-				break;
-			}
-			case "item.consumed": {
-				if (event.reason === "board-stash" && !hasBoardStashCreated) {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.board.stash",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const pushMemoryAudio = (
+	context: AudioPlanContext,
+	event: GameEventOfType<"board.memory.saved" | "board.memory.restored" | "board.memory.cleared">,
+) =>
+	pushUniqueSound({
+		...context,
+		soundId: "audio.effect.activated",
+		sourceEventType: event.type,
+	});
 
-				if (event.reason === "merge-source" && hasMergeResult) break;
-				break;
-			}
-			case "item.removed": {
-				if (event.reason === "producer-depleted") {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.producer.depleted",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const pushCheatSpeedAudio = (
+	context: AudioPlanContext,
+	event: GameEventOfType<"cheat.speed_mode.changed">,
+) =>
+	pushUniqueSound({
+		...context,
+		soundId: match(event.nextMode)
+			.with("instant", () => "audio.cheat.speed.enable" as const)
+			.with("normal", () => "audio.cheat.speed.disable" as const)
+			.exhaustive(),
+		sourceEventType: event.type,
+	});
 
-				if (event.reason === "tile-remove") {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.tile.remove",
-						sourceEventType: event.type,
-					});
-				}
-				break;
-			}
-			case "item.replaced": {
-				if (event.reason === "merge-result") {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.merge.success",
-						sourceEventType: event.type,
-					});
-					break;
-				}
+const isStaticAudioEvent = (event: GameEvent): event is StaticAudioEvent =>
+	event.type in staticSoundByEventType;
 
-				if (event.reason === "craft-result" && !hasCraftCompleted) {
-					pushUniqueSound({
-						flags,
-						plan,
-						soundId: "audio.craft.result.replace",
-						sourceEventType: event.type,
-					});
-				}
-				break;
-			}
-			case "producer_input.stored":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.producer.input.store",
-					sourceEventType: event.type,
-				});
-				break;
-			case "producer_input.withdrawn":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.producer.input.withdraw",
-					sourceEventType: event.type,
-				});
-				break;
-			case "craft_input.stored":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.craft.input.store",
-					sourceEventType: event.type,
-				});
-				break;
-			case "craft_input.withdrawn":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.craft.input.withdraw",
-					sourceEventType: event.type,
-				});
-				break;
-			case "line.started":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: isStashLineEvent({
-						config,
-						currentSave,
-						itemInstanceId: event.itemInstanceId,
-						previousSave,
-					})
-						? "audio.stash.open.start"
-						: "audio.producer.start",
-					sourceEventType: event.type,
-				});
-				break;
-			case "line.completed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: isStashLineEvent({
-						config,
-						currentSave,
-						itemInstanceId: event.itemInstanceId,
-						previousSave,
-					})
-						? "audio.stash.release"
-						: "audio.producer.complete",
-					sourceEventType: event.type,
-				});
-				break;
-			case "line.blocked":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.producer.blocked",
-					sourceEventType: event.type,
-				});
-				break;
-			case "line.failed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.producer.failed",
-					sourceEventType: event.type,
-				});
-				break;
-			case "effect.activated":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.effect.activated",
-					sourceEventType: event.type,
-				});
-				break;
-			case "effect.expired":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.effect.expired",
-					sourceEventType: event.type,
-				});
-				break;
-			case "craft.started":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.craft.start",
-					sourceEventType: event.type,
-				});
-				break;
-			case "craft.completed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.craft.complete",
-					sourceEventType: event.type,
-				});
-				break;
-			case "craft.blocked":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.craft.blocked",
-					sourceEventType: event.type,
-				});
-				break;
-			case "craft.failed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.craft.failed",
-					sourceEventType: event.type,
-				});
-				break;
-			case "item.spawn.blocked":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.item.spawn.blocked",
-					sourceEventType: event.type,
-				});
-				break;
-			case "item.spawn.failed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.item.spawn.failed",
-					sourceEventType: event.type,
-				});
-				break;
-			case "line.default_changed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.line.default_changed",
-					sourceEventType: event.type,
-				});
-				break;
-			case "board.memory.saved":
-			case "board.memory.restored":
-			case "board.memory.cleared":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.effect.activated",
-					sourceEventType: event.type,
-				});
-				break;
-			case "cheat.speed_mode.changed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId:
-						event.nextMode === "instant"
-							? "audio.cheat.speed.enable"
-							: "audio.cheat.speed.disable",
-					sourceEventType: event.type,
-				});
-				break;
-			case "item.capacity.changed":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.producer.input.store",
-					sourceEventType: event.type,
-				});
-				break;
-			case "item.capacity.depleted":
-				pushUniqueSound({
-					flags,
-					plan,
-					soundId: "audio.tile.remove",
-					sourceEventType: event.type,
-				});
-				break;
-			default: {
-				const exhaustive: never = event;
-				return exhaustive;
-			}
-		}
+const pushStaticAudioEvent = (context: AudioPlanContext, event: StaticAudioEvent) =>
+	pushUniqueSound({
+		...context,
+		soundId: staticSoundByEventType[event.type],
+		sourceEventType: event.type,
+	});
+
+const pushNonStaticAudioEvent = (context: AudioPlanContext, event: NonStaticAudioEvent) =>
+	match(event)
+		.with(
+			{
+				type: "item.created",
+			},
+			(matchedEvent) => pushItemCreatedAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "item.consumed",
+			},
+			(matchedEvent) => pushItemConsumedAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "item.removed",
+			},
+			(matchedEvent) => pushItemRemovedAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "item.replaced",
+			},
+			(matchedEvent) => pushItemReplacedAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "line.started",
+			},
+			(matchedEvent) => pushLineLifecycleAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "line.completed",
+			},
+			(matchedEvent) => pushLineLifecycleAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "board.memory.saved",
+			},
+			(matchedEvent) => pushMemoryAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "board.memory.restored",
+			},
+			(matchedEvent) => pushMemoryAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "board.memory.cleared",
+			},
+			(matchedEvent) => pushMemoryAudio(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "cheat.speed_mode.changed",
+			},
+			(matchedEvent) => pushCheatSpeedAudio(context, matchedEvent),
+		)
+		.exhaustive();
+
+const pushAudioEvent = (context: AudioPlanContext, event: GameEvent) => {
+	if (isStaticAudioEvent(event)) {
+		pushStaticAudioEvent(context, event);
+		return;
 	}
 
-	return plan;
+	pushNonStaticAudioEvent(context, event);
+};
+
+export const createGameAudioPlan = (props: createGameAudioPlan.Props): GameAudioPlan.Type => {
+	const context: AudioPlanContext = {
+		...props,
+		...readAudioBatchFacts(props.events),
+		flags: createPlanFlags(),
+		plan: {
+			entries: [],
+		},
+	};
+
+	for (const event of props.events) {
+		pushAudioEvent(context, event);
+	}
+
+	return context.plan;
 };

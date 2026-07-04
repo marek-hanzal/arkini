@@ -4,6 +4,7 @@ import { gameAudioSoundCatalog } from "~/audio/GameAudioSound";
 import { playGameAudioSynth } from "~/audio/GameAudioSynth";
 
 export interface GameAudioPlayer {
+	destroy(): void;
 	play(soundId: GameAudioSoundId): void;
 	playPlan(plan: GameAudioPlan.Type): void;
 	unlock(): void;
@@ -72,6 +73,13 @@ export const createGameAudioPlayer = (): GameAudioPlayer => {
 	};
 
 	return {
+		destroy() {
+			lastPlayedAtMsBySoundId.clear();
+			unlocked = false;
+			const audioContext = context;
+			context = undefined;
+			void audioContext?.close().catch(() => undefined);
+		},
 		play,
 		playPlan(plan) {
 			for (const entry of plan.entries) {

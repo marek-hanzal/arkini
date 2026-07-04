@@ -30,6 +30,7 @@ export const GameAudioProvider: FC<GameAudioProvider.Props> = ({ children }) => 
 			window.removeEventListener("keydown", unlock, {
 				capture: true,
 			});
+			player.destroy();
 		};
 	}, [
 		player,

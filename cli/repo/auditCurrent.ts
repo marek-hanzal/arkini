@@ -86,6 +86,7 @@ const main = async () => {
 		...auditText(),
 		...auditIndexBarrels(),
 		...auditEffectFunctionNames(),
+		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditConfig({
 			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack"),
@@ -163,6 +164,22 @@ const auditEffectFunctionNames = (): Finding[] =>
 			findings.push({
 				path,
 				message: `Effect function "${name}" must use the Fx suffix`,
+			});
+		}
+		return findings;
+	});
+
+const auditRedundantSchemaTypeAliases = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		const text = readFileSync(path, "utf8");
+		const findings: Finding[] = [];
+		const schemaTypeAliasPattern = /export\s+type\s+(\w+Schema)\s*=\s*typeof\s+\1\s*;/g;
+		for (const match of text.matchAll(schemaTypeAliasPattern)) {
+			const name = match[1];
+			findings.push({
+				path,
+				message: `Schema type alias "${name}" is redundant; use the schema namespace Type`,
 			});
 		}
 		return findings;

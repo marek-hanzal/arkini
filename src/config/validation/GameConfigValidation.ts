@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { z } from "zod";
 import { doesResolvedDomainSelectorMatchId } from "~/selector/doesResolvedDomainSelectorMatchId";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -792,6 +793,132 @@ const validateGameLineEffects = (
 	}
 };
 
+type GameDropEffectValidationProps = {
+	ctx: z.RefinementCtx;
+	effect: GameDropEffect;
+	effectIndex: number;
+	entities: GameEffectValidationEntities;
+	path: GameConfigIssuePath;
+};
+
+const addDropCapacitySpendIssue = ({
+	ctx,
+	effectIndex,
+	path,
+}: Pick<GameDropEffectValidationProps, "ctx" | "effectIndex" | "path">) => {
+	addIssue(
+		ctx,
+		[
+			...path,
+			effectIndex,
+			"kind",
+		],
+		"nearby.capacity.spend must be authored on the producer line, not on a concrete output entry.",
+	);
+};
+
+const validateDropGrantSelectorEffect = ({
+	ctx,
+	effect,
+	effectIndex,
+	entities,
+	path,
+}: GameDropEffectValidationProps & {
+	effect: Extract<
+		GameDropEffect,
+		{
+			selector: z.infer<typeof ResolvedDomainSelectorSchema>;
+		}
+	>;
+}) => {
+	validateGameGrantSelector(
+		ctx,
+		[
+			...path,
+			effectIndex,
+			"selector",
+		],
+		effect.selector,
+		entities.grantIds,
+	);
+};
+
+const validateNearbyLootOutputChanceEffect = ({
+	ctx,
+	effect,
+	effectIndex,
+	entities,
+	path,
+}: GameDropEffectValidationProps & {
+	effect: Extract<
+		GameDropEffect,
+		{
+			kind: "nearby.loot.outputChance.add";
+		}
+	>;
+}) => {
+	for (const [sourceIndex, source] of effect.sources.entries()) {
+		validateGameLineItemSelector(
+			ctx,
+			[
+				...path,
+				effectIndex,
+				"sources",
+				sourceIndex,
+				"items",
+			],
+			source.items as z.infer<typeof ResolvedDomainSelectorSchema>,
+			{
+				entityIds: entities.itemIds,
+				hasEntity: entities.hasItem,
+			},
+		);
+	}
+};
+
+const validateGameDropEffect = (props: GameDropEffectValidationProps) => {
+	match(props.effect)
+		.with(
+			{
+				kind: "nearby.capacity.spend",
+			},
+			() => addDropCapacitySpendIssue(props),
+		)
+		.when(isCommonGameLineEffect, (effect) =>
+			validateCommonGameLineEffect({
+				...props,
+				effect,
+			}),
+		)
+		.with(
+			{
+				kind: P.union(
+					"grant.drop.hide",
+					"grant.drop.show",
+					"grant.drop.disable",
+					"grant.drop.enable",
+					"grant.loot.extraOutputChance.add",
+				),
+			},
+			(effect) =>
+				validateDropGrantSelectorEffect({
+					...props,
+					effect,
+				}),
+		)
+		.with(
+			{
+				kind: "nearby.loot.outputChance.add",
+			},
+			(effect) =>
+				validateNearbyLootOutputChanceEffect({
+					...props,
+					effect,
+				}),
+		)
+		.exhaustive();
+};
+
 const validateGameDropEffects = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
@@ -799,68 +926,13 @@ const validateGameDropEffects = (
 	entities: GameEffectValidationEntities,
 ) => {
 	for (const [effectIndex, effect] of effects.entries()) {
-		if (effect.kind === "nearby.capacity.spend") {
-			addIssue(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"kind",
-				],
-				"nearby.capacity.spend must be authored on the producer line, not on a concrete output entry.",
-			);
-			continue;
-		}
-
-		if (isCommonGameLineEffect(effect)) {
-			validateCommonGameLineEffect({
-				ctx,
-				effect,
-				effectIndex,
-				entities,
-				path,
-			});
-			continue;
-		}
-
-		if (
-			effect.kind === "grant.drop.hide" ||
-			effect.kind === "grant.drop.show" ||
-			effect.kind === "grant.drop.disable" ||
-			effect.kind === "grant.drop.enable" ||
-			effect.kind === "grant.loot.extraOutputChance.add"
-		) {
-			validateGameGrantSelector(
-				ctx,
-				[
-					...path,
-					effectIndex,
-					"selector",
-				],
-				effect.selector,
-				entities.grantIds,
-			);
-		}
-
-		if (effect.kind === "nearby.loot.outputChance.add") {
-			for (const [sourceIndex, source] of effect.sources.entries()) {
-				validateGameLineItemSelector(
-					ctx,
-					[
-						...path,
-						effectIndex,
-						"sources",
-						sourceIndex,
-						"items",
-					],
-					source.items as z.infer<typeof ResolvedDomainSelectorSchema>,
-					{
-						entityIds: entities.itemIds,
-						hasEntity: entities.hasItem,
-					},
-				);
-			}
-		}
+		validateGameDropEffect({
+			ctx,
+			effect,
+			effectIndex,
+			entities,
+			path,
+		});
 	}
 };
 
@@ -1278,68 +1350,110 @@ type BlueprintDependencyEdge = {
 	viaItemId: string;
 };
 
-const validateBlueprintDependencyCycles = (ctx: z.RefinementCtx, config: GameConfig) => {
+type BlueprintDependencyCollector = {
+	blueprintItemIds: ReadonlySet<string>;
+	blueprintItemIdsByCraftResultItemId: ReadonlyMap<string, readonly string[]>;
+	edgesByBlueprintItemId: Map<string, BlueprintDependencyEdge[]>;
+};
+
+type BlueprintDependencyItem = {
+	fromBlueprintItemId: string;
+	itemId: string;
+	path: GameConfigIssuePath;
+};
+
+const addBlueprintDependencyItem = (
+	collector: BlueprintDependencyCollector,
+	item: BlueprintDependencyItem,
+) => {
+	for (const toBlueprintItemId of readBlueprintDependenciesForItem({
+		blueprintItemIds: collector.blueprintItemIds,
+		blueprintItemIdsByCraftResultItemId: collector.blueprintItemIdsByCraftResultItemId,
+		itemId: item.itemId,
+	})) {
+		const edges = collector.edgesByBlueprintItemId.get(item.fromBlueprintItemId) ?? [];
+		edges.push({
+			path: item.path,
+			toBlueprintItemId,
+			viaItemId: item.itemId,
+		});
+		collector.edgesByBlueprintItemId.set(item.fromBlueprintItemId, edges);
+	}
+};
+
+const createBlueprintDependencyCollector = (config: GameConfig): BlueprintDependencyCollector => {
 	const blueprintItemIds = readBlueprintItemIds(config);
-	const blueprintItemIdsByCraftResultItemId = readBlueprintItemIdsByCraftResultItemId(
-		config,
+	return {
 		blueprintItemIds,
-	);
-	const edgesByBlueprintItemId = new Map<string, BlueprintDependencyEdge[]>();
-	const addDependencyItem = (props: {
-		fromBlueprintItemId: string;
-		itemId: string;
-		path: GameConfigIssuePath;
-	}) => {
-		for (const toBlueprintItemId of readBlueprintDependenciesForItem({
+		blueprintItemIdsByCraftResultItemId: readBlueprintItemIdsByCraftResultItemId(
+			config,
 			blueprintItemIds,
-			blueprintItemIdsByCraftResultItemId,
-			itemId: props.itemId,
-		})) {
-			const edges = edgesByBlueprintItemId.get(props.fromBlueprintItemId) ?? [];
-			edges.push({
-				path: props.path,
-				toBlueprintItemId,
-				viaItemId: props.itemId,
-			});
-			edgesByBlueprintItemId.set(props.fromBlueprintItemId, edges);
-		}
+		),
+		edgesByBlueprintItemId: new Map(),
 	};
+};
+
+const collectBlueprintDependencyEdges = (config: GameConfig) => {
+	const collector = createBlueprintDependencyCollector(config);
+	const addDependencyItem = (item: BlueprintDependencyItem) =>
+		addBlueprintDependencyItem(collector, item);
 
 	collectCraftRecipeBlueprintDependencies({
 		addDependencyItem,
-		blueprintItemIds,
+		blueprintItemIds: collector.blueprintItemIds,
 		config,
 	});
 	collectLineBlueprintDependencies({
 		addDependencyItem,
-		blueprintItemIds,
+		blueprintItemIds: collector.blueprintItemIds,
 		config,
 	});
 	collectMergeBlueprintDependencies({
 		addDependencyItem,
-		blueprintItemIds,
+		blueprintItemIds: collector.blueprintItemIds,
 		config,
 	});
 
-	for (const cycle of readBlueprintDependencyCycles({
-		blueprintItemIds,
-		edgesByBlueprintItemId,
-	})) {
-		const firstCycleEdge = cycle.edges[0];
-		const issuePath = firstCycleEdge?.path ?? [
-			"items",
-			cycle.blueprintItemIds[0] ?? "blueprints",
-		];
-		const cycleLabel = cycle.blueprintItemIds
-			.map((itemId) => readBlueprintItemDisplayName(config, itemId))
-			.join(" -> ");
-		const viaLabel = firstCycleEdge ? ` via required item "${firstCycleEdge.viaItemId}"` : "";
+	return collector;
+};
 
-		addIssue(
+const addBlueprintDependencyCycleIssue = ({
+	config,
+	ctx,
+	cycle,
+}: {
+	config: GameConfig;
+	ctx: z.RefinementCtx;
+	cycle: ReturnType<typeof readBlueprintDependencyCycles>[number];
+}) => {
+	const firstCycleEdge = cycle.edges[0];
+	const issuePath = firstCycleEdge?.path ?? [
+		"items",
+		cycle.blueprintItemIds[0] ?? "blueprints",
+	];
+	const cycleLabel = cycle.blueprintItemIds
+		.map((itemId) => readBlueprintItemDisplayName(config, itemId))
+		.join(" -> ");
+	const viaLabel = firstCycleEdge ? ` via required item "${firstCycleEdge.viaItemId}"` : "";
+
+	addIssue(
+		ctx,
+		issuePath,
+		`Blueprint dependency cycle detected${viaLabel}: ${cycleLabel}. Blueprint progression must not require itself directly or through another blueprint/building chain.`,
+	);
+};
+
+const validateBlueprintDependencyCycles = (ctx: z.RefinementCtx, config: GameConfig) => {
+	const collector = collectBlueprintDependencyEdges(config);
+	for (const cycle of readBlueprintDependencyCycles({
+		blueprintItemIds: collector.blueprintItemIds,
+		edgesByBlueprintItemId: collector.edgesByBlueprintItemId,
+	})) {
+		addBlueprintDependencyCycleIssue({
+			config,
 			ctx,
-			issuePath,
-			`Blueprint dependency cycle detected${viaLabel}: ${cycleLabel}. Blueprint progression must not require itself directly or through another blueprint/building chain.`,
-		);
+			cycle,
+		});
 	}
 };
 
@@ -2143,12 +2257,52 @@ const createGameplaySources = (config: GameConfig) => [
 	...createLineGameplaySources(config),
 ];
 
+const isGameplaySourceSatisfied = ({
+	config,
+	reachability,
+	source,
+}: {
+	config: GameConfig;
+	reachability: GameplayReachability;
+	source: GameplaySource;
+}) =>
+	source.requirements.every((requirement) =>
+		isGameplayRequirementSatisfied({
+			config,
+			reachableGrantIds: reachability.reachableGrantIds,
+			reachableItemIds: reachability.reachableItemIds,
+			requirement,
+		}),
+	);
+
+const applyGameplaySourceReachability = ({
+	reachability,
+	source,
+}: {
+	reachability: GameplayReachability;
+	source: GameplaySource;
+}) =>
+	match(source.targetKind)
+		.with("item", () => {
+			const changed = !reachability.reachableItemIds.has(source.targetId);
+			reachability.reachableItemIds.add(source.targetId);
+			return changed;
+		})
+		.with("grant", () => {
+			const changed = !reachability.reachableGrantIds.has(source.targetId);
+			reachability.reachableGrantIds.add(source.targetId);
+			return changed;
+		})
+		.exhaustive();
+
 const readGameplayReachability = (
 	config: GameConfig,
 	sources: readonly GameplaySource[],
 ): GameplayReachability => {
-	const reachableItemIds = new Set<string>();
-	const reachableGrantIds = new Set<string>();
+	const reachability = {
+		reachableGrantIds: new Set<string>(),
+		reachableItemIds: new Set<string>(),
+	};
 	const appliedSourceIds = new Set<string>();
 	let changed = true;
 
@@ -2158,39 +2312,24 @@ const readGameplayReachability = (
 		for (const source of sources) {
 			if (appliedSourceIds.has(source.sourceId)) continue;
 			if (
-				!source.requirements.every((requirement) =>
-					isGameplayRequirementSatisfied({
-						config,
-						reachableGrantIds,
-						reachableItemIds,
-						requirement,
-					}),
-				)
-			) {
+				!isGameplaySourceSatisfied({
+					config,
+					reachability,
+					source,
+				})
+			)
 				continue;
-			}
 
 			appliedSourceIds.add(source.sourceId);
-
-			if (source.targetKind === "item") {
-				if (!reachableItemIds.has(source.targetId)) {
-					reachableItemIds.add(source.targetId);
-					changed = true;
-				}
-				continue;
-			}
-
-			if (!reachableGrantIds.has(source.targetId)) {
-				reachableGrantIds.add(source.targetId);
-				changed = true;
-			}
+			changed =
+				applyGameplaySourceReachability({
+					reachability,
+					source,
+				}) || changed;
 		}
 	}
 
-	return {
-		reachableGrantIds,
-		reachableItemIds,
-	};
+	return reachability;
 };
 
 const validateProducerGameplayReachability = (
@@ -2286,65 +2425,126 @@ const validateGrantRequirementsHavePossibleSource = (
 	}
 };
 
+type GrantBlockerEntry = {
+	effectIndex: number;
+	lineEffect: Extract<
+		GameConfigRuntimeEffect,
+		{
+			kind: "grant.blockStart";
+		}
+	>;
+};
+
+type GrantRequirementEntry = {
+	effectIndex: number;
+	lineEffect: Extract<
+		GameConfigRuntimeEffect,
+		{
+			kind: "grant.require";
+		}
+	>;
+	requiredGrantIds: Set<string>;
+};
+
+const readGrantBlockerEntries = (lineEffects: readonly GameConfigRuntimeEffect[]) =>
+	lineEffects
+		.map((lineEffect, effectIndex) => ({
+			effectIndex,
+			lineEffect,
+		}))
+		.filter(
+			(entry): entry is GrantBlockerEntry => entry.lineEffect.kind === "grant.blockStart",
+		);
+
+const readGrantRequirementEntries = (lineEffects: readonly GameConfigRuntimeEffect[]) =>
+	lineEffects.flatMap((lineEffect, effectIndex): GrantRequirementEntry[] => {
+		if (lineEffect.kind !== "grant.require") return [];
+		const requiredGrantIds = readMandatoryGrantIds(lineEffect.selector);
+		return requiredGrantIds.size > 0
+			? [
+					{
+						effectIndex,
+						lineEffect,
+						requiredGrantIds,
+					},
+				]
+			: [];
+	});
+
+const addGrantRequirementBlockerContradictionIssue = ({
+	blocker,
+	config,
+	ctx,
+	requirement,
+	usage,
+}: {
+	blocker: GrantBlockerEntry;
+	config: GameConfig;
+	ctx: z.RefinementCtx;
+	requirement: GrantRequirementEntry;
+	usage: ReturnType<typeof readLineEffectUsages>[number];
+}) => {
+	addIssue(
+		ctx,
+		[
+			...usage.path,
+			requirement.effectIndex,
+			"selector",
+		],
+		`Soft-lock risk: ${usage.label} requires and blocks the same mandatory grant set. Required ${formatGrantSelector(config, requirement.lineEffect.selector)} conflicts with blocker ${formatGrantSelector(config, blocker.lineEffect.selector)} at ${formatIssuePath(
+			[
+				...usage.path,
+				blocker.effectIndex,
+				"selector",
+			],
+		)}.`,
+	);
+};
+
+const validateGrantRequirementBlockerUsageContradictions = ({
+	config,
+	ctx,
+	usage,
+}: {
+	config: GameConfig;
+	ctx: z.RefinementCtx;
+	usage: ReturnType<typeof readLineEffectUsages>[number];
+}) => {
+	const blockers = readGrantBlockerEntries(usage.lineEffects);
+	if (blockers.length === 0) return;
+
+	for (const requirement of readGrantRequirementEntries(usage.lineEffects)) {
+		for (const blocker of blockers) {
+			if (
+				!doesGameGrantSelectorMatchIdsLocal(
+					requirement.requiredGrantIds,
+					blocker.lineEffect.selector,
+				)
+			) {
+				continue;
+			}
+
+			addGrantRequirementBlockerContradictionIssue({
+				blocker,
+				config,
+				ctx,
+				requirement,
+				usage,
+			});
+		}
+	}
+};
+
 const validateGrantRequirementBlockerContradictions = (
 	ctx: z.RefinementCtx,
 	config: GameConfig,
 ) => {
 	for (const usage of readLineEffectUsages(config).filter((usage) => usage.enforceSoftLock)) {
-		const lineEffects = usage.lineEffects;
-		const blockers = lineEffects
-			.map((lineEffect, effectIndex) => ({
-				effectIndex,
-				lineEffect,
-			}))
-			.filter(
-				(
-					entry,
-				): entry is {
-					effectIndex: number;
-					lineEffect: Extract<
-						GameConfigRuntimeEffect,
-						{
-							kind: "grant.blockStart";
-						}
-					>;
-				} => entry.lineEffect.kind === "grant.blockStart",
-			);
-
-		if (blockers.length === 0) continue;
-
-		for (const [effectIndex, lineEffect] of lineEffects.entries()) {
-			if (lineEffect.kind !== "grant.require") continue;
-			const requiredGrantIds = readMandatoryGrantIds(lineEffect.selector);
-			if (requiredGrantIds.size === 0) continue;
-
-			for (const blocker of blockers) {
-				if (
-					!doesGameGrantSelectorMatchIdsLocal(
-						requiredGrantIds,
-						blocker.lineEffect.selector,
-					)
-				) {
-					continue;
-				}
-
-				addIssue(
-					ctx,
-					[
-						...usage.path,
-						effectIndex,
-						"selector",
-					],
-					`Soft-lock risk: ${usage.label} requires and blocks the same mandatory grant set. Required ${formatGrantSelector(config, lineEffect.selector)} conflicts with blocker ${formatGrantSelector(config, blocker.lineEffect.selector)} at ${formatIssuePath(
-						[
-							...usage.path,
-							blocker.effectIndex,
-							"selector",
-						],
-					)}.`,
-				);
-			}
-		}
+		validateGrantRequirementBlockerUsageContradictions({
+			config,
+			ctx,
+			usage,
+		});
 	}
 };
 

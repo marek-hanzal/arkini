@@ -86,6 +86,7 @@ const main = async () => {
 		...auditText(),
 		...auditIndexBarrels(),
 		...auditEffectFunctionNames(),
+		...auditLogicFolderExports(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditConfig({
@@ -164,6 +165,25 @@ const auditEffectFunctionNames = (): Finding[] =>
 			findings.push({
 				path,
 				message: `Effect function "${name}" must use the Fx suffix`,
+			});
+		}
+		return findings;
+	});
+
+const auditLogicFolderExports = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\/logic\/.*\.tsx?$/.test(path)) return [];
+		const text = readFileSync(path, "utf8");
+		const findings: Finding[] = [];
+		const exportedValuePattern = /export\s+(?:const|function|class)\s+(\w+)/g;
+		for (const match of text.matchAll(exportedValuePattern)) {
+			const name = match[1];
+			if (!name || name.endsWith("Fx")) {
+				continue;
+			}
+			findings.push({
+				path,
+				message: `logic export "${name}" must be an Fx boundary or move outside ./logic`,
 			});
 		}
 		return findings;

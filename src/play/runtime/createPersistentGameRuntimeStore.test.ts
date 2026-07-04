@@ -8,7 +8,8 @@ import type {
 	GameSaveStorageScope,
 	SaveActiveGameSaveProps,
 } from "~/storage/GameSaveStorage";
-import { createPersistentGameRuntimeStore } from "~/play/runtime/createPersistentGameRuntimeStore";
+import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStore";
+import { runGameRuntimeEffect } from "~/play/runtime/runGameRuntimeEffect";
 import { readBoardView } from "~/play/runtime/readers/readBoardView";
 
 const createInitialSave = async (): Promise<GameSave> => {
@@ -45,14 +46,16 @@ class MemoryGameSaveStorage implements GameSaveStorage {
 	}
 }
 
-describe("createPersistentGameRuntimeStore", () => {
+describe("createPersistentGameRuntimeStoreFx", () => {
 	it("creates and immediately persists an initial save when storage is empty", async () => {
 		const storage = new MemoryGameSaveStorage();
-		const runtime = await createPersistentGameRuntimeStore({
-			config: createEngineTestConfig(),
-			nowMs: 0,
-			storage,
-		});
+		const runtime = await runGameRuntimeEffect(
+			createPersistentGameRuntimeStoreFx({
+				config: createEngineTestConfig(),
+				nowMs: 0,
+				storage,
+			}),
+		);
 
 		expect(storage.saved).toHaveLength(1);
 		expect(storage.saved[0]).toEqual(runtime.store.getSnapshot().runtime.save);
@@ -67,11 +70,13 @@ describe("createPersistentGameRuntimeStore", () => {
 			x: 1,
 		};
 		const storage = new MemoryGameSaveStorage(loadedSave);
-		const runtime = await createPersistentGameRuntimeStore({
-			config: createEngineTestConfig(),
-			nowMs: 0,
-			storage,
-		});
+		const runtime = await runGameRuntimeEffect(
+			createPersistentGameRuntimeStoreFx({
+				config: createEngineTestConfig(),
+				nowMs: 0,
+				storage,
+			}),
+		);
 
 		expect(readBoardView(runtime.store.getSnapshot()).byId["item-instance:1"]?.x).toBe(1);
 		expect(storage.saved).toHaveLength(0);

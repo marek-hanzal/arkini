@@ -9,7 +9,8 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
-import { createPersistentGameRuntimeStore } from "~/play/runtime/createPersistentGameRuntimeStore";
+import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStore";
+import { runGameRuntimeEffect } from "~/play/runtime/runGameRuntimeEffect";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 import { GameRuntimeAudioEffects } from "~/play/runtime/GameRuntimeAudioEffects";
@@ -36,12 +37,12 @@ export const GameRuntimeProvider: FC<GameRuntimeProvider.Props> = ({
 }) => {
 	const [startupError, setStartupError] = useState<unknown>(null);
 	const [store, setStore] = useState<GameRuntimeStore | null>(null);
-	const runtimeRef = useRef<createPersistentGameRuntimeStore.Result | null>(null);
+	const runtimeRef = useRef<createPersistentGameRuntimeStoreFx.Result | null>(null);
 
 	useEffect(() => {
 		let disposed = false;
 
-		void createPersistentGameRuntimeStore()
+		void runGameRuntimeEffect(createPersistentGameRuntimeStoreFx())
 			.then((runtime) => {
 				if (disposed) {
 					void runtime.destroy();

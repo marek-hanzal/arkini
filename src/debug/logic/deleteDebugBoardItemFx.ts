@@ -2,10 +2,9 @@ import { Effect } from "effect";
 import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionDebugBoardItemDeleteSchema } from "~/action/GameActionDebugBoardItemDeleteSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace deleteDebugBoardItemFx {
@@ -40,7 +39,8 @@ export const deleteDebugBoardItemFx = Effect.fn("deleteDebugBoardItemFx")(functi
 	});
 	nextSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [
 			{
 				atMs: nowMs,
@@ -50,11 +50,7 @@ export const deleteDebugBoardItemFx = Effect.fn("deleteDebugBoardItemFx")(functi
 				type: "item.removed" as const,
 			},
 		],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

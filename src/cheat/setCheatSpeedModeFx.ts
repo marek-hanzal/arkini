@@ -1,12 +1,11 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { isCheatSpeedItemId, readCheatSpeedItemIdFromMode } from "~/cheat/GameCheatSpeedItem";
 import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import { syncRealtimeWorldJobsFx } from "~/world/syncRealtimeWorldJobsFx";
 import type { GameActionCheatSpeedModeSetSchema } from "~/action/GameActionCheatSpeedModeSetSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace setCheatSpeedModeFx {
@@ -58,7 +57,8 @@ export const setCheatSpeedModeFx = Effect.fn("setCheatSpeedModeFx")(function* ({
 	});
 	syncedSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events:
 			previousMode === action.mode
 				? []
@@ -70,11 +70,7 @@ export const setCheatSpeedModeFx = Effect.fn("setCheatSpeedModeFx")(function* ({
 							type: "cheat.speed_mode.changed" as const,
 						},
 					],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: syncedSave,
-		}),
+		nowMs,
 		save: syncedSave,
-	} satisfies GameEngineResult;
+	});
 });

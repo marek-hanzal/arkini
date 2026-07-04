@@ -2,10 +2,9 @@ import { Effect } from "effect";
 import { checkProducerInputStoreReadinessFx } from "~/producer/checkProducerInputStoreReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -62,13 +61,10 @@ export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* 
 		type: "producer_input.stored",
 	});
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events,
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

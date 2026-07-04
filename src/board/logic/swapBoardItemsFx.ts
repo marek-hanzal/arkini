@@ -2,10 +2,9 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { checkBoardItemsSwapReadinessFx } from "~/board/logic/checkBoardItemsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionBoardItemsSwapSchema } from "~/action/GameActionBoardItemsSwapSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace swapBoardItemsFx {
@@ -29,15 +28,12 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	});
 
 	if (action.sourceBoardItemId === action.targetBoardItemId) {
-		return {
+		return yield* createGameEngineResultFx({
+			config,
 			events: [],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({
-				config,
-				nowMs,
-				save,
-			}),
+			nowMs,
 			save,
-		} satisfies GameEngineResult;
+		});
 	}
 
 	const nextSave = yield* cloneGameSaveFx({
@@ -61,13 +57,10 @@ export const swapBoardItemsFx = Effect.fn("swapBoardItemsFx")(function* ({
 	liveTarget.y = sourcePosition.y;
 	nextSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

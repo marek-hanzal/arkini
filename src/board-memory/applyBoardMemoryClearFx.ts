@@ -1,11 +1,10 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameActionBoardMemoryClearSchema } from "~/action/GameActionBoardMemoryClearSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -49,13 +48,10 @@ export const applyBoardMemoryClearFx = Effect.fn("applyBoardMemoryClearFx")(func
 			]
 		: [];
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events,
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

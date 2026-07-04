@@ -2,10 +2,9 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { checkBoardItemMoveReadinessFx } from "~/board/logic/checkBoardItemMoveReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionBoardItemMoveSchema } from "~/action/GameActionBoardItemMoveSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace moveBoardItemFx {
@@ -43,13 +42,10 @@ export const moveBoardItemFx = Effect.fn("moveBoardItemFx")(function* ({
 	liveItem.y = action.y;
 	nextSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

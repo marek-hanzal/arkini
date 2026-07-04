@@ -2,9 +2,8 @@ import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { checkInventorySlotsSwapReadinessFx } from "~/inventory/logic/checkInventorySlotsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionInventorySlotsSwapSchema } from "~/action/GameActionInventorySlotsSwapSchema";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace swapInventorySlotsFx {
@@ -27,15 +26,12 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 		save,
 	});
 	if (action.sourceSlotIndex === action.targetSlotIndex) {
-		return {
+		return yield* createGameEngineResultFx({
+			config,
 			events: [],
-			nextWakeAtMs: yield* readNextWakeAtMsFx({
-				config,
-				nowMs,
-				save,
-			}),
+			nowMs,
 			save,
-		} satisfies GameEngineResult;
+		});
 	}
 
 	const nextSave = yield* cloneGameSaveFx({
@@ -47,13 +43,10 @@ export const swapInventorySlotsFx = Effect.fn("swapInventorySlotsFx")(function* 
 	nextSave.inventory.slots[action.targetSlotIndex] = source;
 	nextSave.updatedAtMs = nowMs;
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events: [],
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 });

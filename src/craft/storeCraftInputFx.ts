@@ -3,7 +3,7 @@ import { checkCraftInputStoreReadinessFx } from "~/craft/checkCraftInputStoreRea
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
 import { readCraftStoredInputsReadyFx } from "~/craft/readCraftStoredInputsReadyFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { startCraftFx } from "~/craft/startCraftFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
@@ -66,15 +66,12 @@ export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
 		save: nextSave,
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
-	const storedResult = {
+	const storedResult = yield* createGameEngineResultFx({
+		config,
 		events,
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: nextSave,
-		}),
+		nowMs,
 		save: nextSave,
-	} satisfies GameEngineResult;
+	});
 	if (!storedInputsReady) return storedResult;
 
 	const startEither = yield* Effect.either(

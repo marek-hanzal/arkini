@@ -3,18 +3,33 @@ import type { GameLineDefinition } from "../../src/config/GameItemCapabilities";
 import { GAME_WELL_KNOWN_ASSET_IDS } from "../../src/config/GameWellKnownAssetIds";
 
 export type GameConfigAuditWarning = {
-	code: "duplicate-definition-shape" | "terminal-item" | "unused-definition";
+	code:
+		| "duplicate-definition-shape"
+		| "limited-deposit-softlock"
+		| "terminal-item"
+		| "unused-definition";
 	id: string;
 	message: string;
 	section: string;
 };
 
 type RecordName = "resources" | "assets" | "items";
+type ItemCapacity = NonNullable<GameConfig["items"][string]["capacity"]>;
 type UsageIndex = Record<RecordName, Set<string>>;
 
 type ItemFlowIndex = {
 	consumedItemIds: Set<string>;
 	producedItemIds: Set<string>;
+};
+
+type ItemProductionRule = {
+	dependencies: ReadonlySet<string>;
+	producedItemIds: ReadonlySet<string>;
+};
+
+type LimitedDepositIndex = {
+	productionRules: ItemProductionRule[];
+	spentCapacityItemIds: Set<string>;
 };
 
 type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
@@ -30,8 +45,9 @@ type GameDropEffect = NonNullable<
 export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] => {
 	const usage = createUsageIndex();
 	const itemFlow = createItemFlowIndex();
+	const limitedDeposits = createLimitedDepositIndex();
 
-	collectItemUsage(config, usage, itemFlow);
+	collectItemUsage(config, usage, itemFlow, limitedDeposits);
 	collectWellKnownAssetUsage(usage);
 	collectEffectUsage(config, usage);
 	collectStartingStateUsage(config, itemFlow);
@@ -41,6 +57,7 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	return [
 		...readUnusedDefinitionWarnings(config, usage),
 		...readTerminalItemWarnings(config, itemFlow, usage),
+		...readLimitedDepositSoftlockWarnings(config, limitedDeposits),
 	].sort(compareGameConfigAuditWarnings);
 };
 
@@ -64,6 +81,11 @@ const createUsageIndex = (): UsageIndex => ({
 const createItemFlowIndex = (): ItemFlowIndex => ({
 	consumedItemIds: new Set(),
 	producedItemIds: new Set(),
+});
+
+const createLimitedDepositIndex = (): LimitedDepositIndex => ({
+	productionRules: [],
+	spentCapacityItemIds: new Set(),
 });
 
 const collectWellKnownAssetUsage = (usage: UsageIndex) => {
@@ -99,7 +121,12 @@ const collectUsedAssetDependencyUsage = (config: GameConfig, usage: UsageIndex) 
 	}
 };
 
-const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemFlowIndex) => {
+const collectItemUsage = (
+	config: GameConfig,
+	usage: UsageIndex,
+	itemFlow: ItemFlowIndex,
+	limitedDeposits: LimitedDepositIndex,
+) => {
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const assetId of item.assetIds) usage.assets.add(assetId);
 
@@ -114,9 +141,22 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 			if ("resultItemId" in merge) {
 				usage.items.add(merge.resultItemId);
 				itemFlow.producedItemIds.add(merge.resultItemId);
+				limitedDeposits.productionRules.push({
+					dependencies: new Set([
+						itemId,
+						merge.withItemId,
+					]),
+					producedItemIds: new Set([
+						merge.resultItemId,
+					]),
+				});
 			}
 			if (merge.output) {
 				collectLootOutputUsage(merge.output, itemFlow);
+				collectProductionRule(limitedDeposits, merge.output, [
+					itemId,
+					merge.withItemId,
+				]);
 				collectLootOutputEffectUsage(merge.output, config, usage);
 			}
 		}
@@ -126,6 +166,10 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 			itemFlow.consumedItemIds.add(removal.itemId);
 			if (removal.output) {
 				collectLootOutputUsage(removal.output, itemFlow);
+				collectProductionRule(limitedDeposits, removal.output, [
+					itemId,
+					removal.itemId,
+				]);
 				collectLootOutputEffectUsage(removal.output, config, usage);
 			}
 		}
@@ -134,6 +178,15 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 			itemFlow.consumedItemIds.add(itemId);
 			usage.items.add(item.craft.resultItemId);
 			usageItem(itemFlow, item.craft.resultItemId, "produced");
+			limitedDeposits.productionRules.push({
+				dependencies: new Set([
+					itemId,
+					...item.craft.inputs.map((input) => input.itemId),
+				]),
+				producedItemIds: new Set([
+					item.craft.resultItemId,
+				]),
+			});
 			for (const input of item.craft.inputs) {
 				usage.items.add(input.itemId);
 				usageItem(itemFlow, input.itemId, "consumed");
@@ -142,10 +195,10 @@ const collectItemUsage = (config: GameConfig, usage: UsageIndex, itemFlow: ItemF
 		}
 
 		for (const line of item.producer?.lines ?? []) {
-			collectLineUsage(line, config, usage, itemFlow);
+			collectLineUsage(line, config, usage, itemFlow, limitedDeposits);
 		}
 		if (item.stash?.line) {
-			collectLineUsage(item.stash.line, config, usage, itemFlow);
+			collectLineUsage(item.stash.line, config, usage, itemFlow, limitedDeposits);
 		}
 	}
 };
@@ -155,6 +208,7 @@ const collectLineUsage = (
 	config: GameConfig,
 	usage: UsageIndex,
 	itemFlow: ItemFlowIndex,
+	limitedDeposits: LimitedDepositIndex,
 ) => {
 	for (const input of line.inputs ?? []) {
 		usage.items.add(input.itemId);
@@ -162,7 +216,15 @@ const collectLineUsage = (
 	}
 	if (line.output) {
 		collectLootOutputUsage(line.output, itemFlow);
+		collectProductionRule(limitedDeposits, line.output, [
+			...(line.inputs ?? []).filter((input) => input.consume).map((input) => input.itemId),
+			...readLineSpentCapacityItemIds(config, line),
+		]);
 		collectLootOutputEffectUsage(line.output, config, usage);
+	}
+
+	for (const itemId of readLineSpentCapacityItemIds(config, line)) {
+		limitedDeposits.spentCapacityItemIds.add(itemId);
 	}
 };
 
@@ -317,6 +379,45 @@ const collectLootOutputUsage = (output: ActivationOutput, itemFlow: ItemFlowInde
 	}
 };
 
+const collectProductionRule = (
+	limitedDeposits: LimitedDepositIndex,
+	output: ActivationOutput,
+	dependencies: readonly string[],
+) => {
+	const producedItemIds = readLootOutputItemIds(output);
+	if (producedItemIds.size === 0) return;
+
+	limitedDeposits.productionRules.push({
+		dependencies: new Set(dependencies),
+		producedItemIds,
+	});
+};
+
+const readLootOutputItemIds = (output: ActivationOutput): Set<string> => {
+	const itemIds = new Set<string>();
+
+	for (const entry of output) {
+		if (entry.type === "weighted") {
+			for (const weightedEntry of entry.entries) itemIds.add(weightedEntry.itemId);
+			continue;
+		}
+
+		itemIds.add(entry.itemId);
+	}
+
+	return itemIds;
+};
+
+const readLineSpentCapacityItemIds = (config: GameConfig, line: GameLineDefinition): string[] =>
+	(line.effects ?? [])
+		.filter((effect) => effect.kind === "nearby.capacity.spend")
+		.flatMap((effect) =>
+			readResolvedSelectorIds(
+				effect.items as Parameters<typeof readResolvedSelectorIds>[0],
+				config.items,
+			),
+		);
+
 const collectStartingStateUsage = (config: GameConfig, itemFlow: ItemFlowIndex) => {
 	for (const entry of config.startingState.board) itemFlow.producedItemIds.add(entry.itemId);
 	for (const entry of config.startingState.inventory) itemFlow.producedItemIds.add(entry.itemId);
@@ -346,6 +447,77 @@ const readTerminalItemWarnings = (
 			section: "items",
 			message: `${itemId} is produced or starts in the save, but no configured input, grant/effect, merge, removal rule, craft, producer, or stash references it.`,
 		}));
+
+const readLimitedDepositSoftlockWarnings = (
+	config: GameConfig,
+	limitedDeposits: LimitedDepositIndex,
+): GameConfigAuditWarning[] => {
+	const riskyDepositIds = new Set(
+		Object.entries(config.items)
+			.filter(([, item]) => item.capacity && item.capacity.onDepleted !== "stop")
+			.map(([itemId]) => itemId),
+	);
+	const sustainableItemIds = readSustainableItemIds(limitedDeposits.productionRules);
+
+	return [
+		...limitedDeposits.spentCapacityItemIds,
+	]
+		.filter((itemId) => riskyDepositIds.has(itemId))
+		.filter((itemId) => !hasSustainableDepositReplacement(config, itemId, sustainableItemIds))
+		.map((itemId) => ({
+			code: "limited-deposit-softlock",
+			id: itemId,
+			section: "items",
+			message: `${itemId} has finite capacity that can be depleted by producer lines, but no sustainable production or replacement path recreates it. This may softlock production once the deposit disappears.`,
+		}));
+};
+
+const readSustainableItemIds = (productionRules: readonly ItemProductionRule[]) => {
+	const sustainableItemIds = new Set<string>();
+	let changed = true;
+
+	while (changed) {
+		changed = false;
+
+		for (const rule of productionRules) {
+			if (
+				![
+					...rule.dependencies,
+				].every((itemId) => sustainableItemIds.has(itemId))
+			)
+				continue;
+
+			for (const itemId of rule.producedItemIds) {
+				if (sustainableItemIds.has(itemId)) continue;
+				sustainableItemIds.add(itemId);
+				changed = true;
+			}
+		}
+	}
+
+	return sustainableItemIds;
+};
+
+const hasSustainableDepositReplacement = (
+	config: GameConfig,
+	itemId: string,
+	sustainableItemIds: ReadonlySet<string>,
+) => {
+	if (sustainableItemIds.has(itemId)) return true;
+
+	const visitedItemIds = new Set<string>();
+	let currentItemId: string | undefined = itemId;
+
+	while (currentItemId && !visitedItemIds.has(currentItemId)) {
+		visitedItemIds.add(currentItemId);
+		const capacity: ItemCapacity | undefined = config.items[currentItemId]?.capacity;
+		if (!capacity || capacity.onDepleted !== "replace") return false;
+		if (sustainableItemIds.has(capacity.replaceItemId)) return true;
+		currentItemId = capacity.replaceItemId;
+	}
+
+	return false;
+};
 
 const readUnusedRecordWarnings = (
 	section: Exclude<RecordName, "items">,

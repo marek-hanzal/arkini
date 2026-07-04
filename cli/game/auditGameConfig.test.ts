@@ -114,6 +114,46 @@ const readTestLine = (config: ReturnType<typeof createConfigValue>, lineId: stri
 	return line as any;
 };
 
+const addLimitedDepositItem = (
+	config: ReturnType<typeof createConfigValue>,
+	itemId: string,
+	options: {
+		max?: number;
+		tags?: string[];
+	} = {},
+) => {
+	(config.items as any)[itemId] = {
+		assetIds: [
+			"asset:item",
+		],
+		capacity: {
+			max: options.max ?? 3,
+			onDepleted: "remove",
+		},
+		description: `Limited test deposit ${itemId}.`,
+		maxStackSize: 1,
+		name: itemId,
+		tags: options.tags ?? [
+			"source",
+		],
+		tier: 0,
+	};
+};
+
+const createCapacitySpendEffect = (itemIds: readonly string[]) => ({
+	amount: 1,
+	display: "always",
+	items: {
+		anyOf: [
+			{
+				ids: itemIds,
+			},
+		],
+	},
+	kind: "nearby.capacity.spend",
+	radius: 2,
+});
+
 describe("auditGameConfig", () => {
 	it("warns about produced items with no downstream use", () => {
 		const warnings = auditGameConfig(parseGameConfig(createConfigValue()));
@@ -269,6 +309,137 @@ describe("auditGameConfig", () => {
 				code: "unused-definition",
 				id: "asset:overlay",
 				section: "assets",
+			}),
+		);
+	});
+
+	it("warns about limited deposits with no sustainable replacement path", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:deposit");
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:deposit",
+			]),
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:deposit",
+			}),
+		);
+	});
+
+	it("does not warn about limited deposits that can be produced sustainably", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:deposit");
+		config.items["item:nursery"] = {
+			assetIds: [
+				"asset:item",
+			],
+			description: "Renewable deposit producer",
+			maxStackSize: 1,
+			name: "Nursery",
+			producer: {
+				lines: [
+					{
+						durationMs: 1000,
+						id: "line:nursery:deposit",
+						name: "Grow deposit",
+						output: [
+							{
+								itemId: "item:deposit",
+								type: "guaranteed",
+							},
+						],
+					},
+				],
+			},
+			tags: [],
+			tier: 0,
+		};
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:deposit",
+			]),
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:deposit",
+			}),
+		);
+	});
+
+	it("does not treat finite deposit growth loops as sustainable replacement paths", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:tree", {
+			tags: [
+				"wood-source",
+			],
+		});
+		addLimitedDepositItem(config, "item:forest", {
+			max: 6,
+			tags: [
+				"wood-source",
+			],
+		});
+		config.items["item:seed"] = {
+			assetIds: [
+				"asset:item",
+			],
+			craft: {
+				durationMs: 1000,
+				inputs: [
+					{
+						consume: true,
+						itemId: "item:fuel",
+					},
+				],
+				resultItemId: "item:tree",
+			},
+			description: "Seed grown from forest",
+			maxStackSize: 10,
+			name: "Seed",
+			tags: [],
+			tier: 0,
+		};
+		config.items["item:fuel"].merges = [
+			{
+				output: [
+					{
+						itemId: "item:seed",
+						type: "guaranteed",
+					},
+				],
+				targetMode: "keep",
+				withItemId: "item:forest",
+			},
+		];
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:tree",
+				"item:forest",
+			]),
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:tree",
+			}),
+		);
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:forest",
 			}),
 		);
 	});

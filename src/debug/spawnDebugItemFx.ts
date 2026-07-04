@@ -13,7 +13,7 @@ import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInve
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { checkDebugItemSpawnReadinessFx } from "~/debug/logic/checkDebugItemSpawnReadinessFx";
+import { checkDebugItemSpawnReadinessFx } from "~/debug/checkDebugItemSpawnReadinessFx";
 
 export namespace spawnDebugItemFx {
 	export interface Props {

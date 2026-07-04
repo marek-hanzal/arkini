@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import { checkInventorySlotsSwapReadinessFx } from "~/inventory/logic/checkInventorySlotsSwapReadinessFx";
+import { checkInventorySlotsSwapReadinessFx } from "~/inventory/checkInventorySlotsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionInventorySlotsSwapSchema } from "~/action/GameActionInventorySlotsSwapSchema";

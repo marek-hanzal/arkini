@@ -4,7 +4,7 @@ import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
+import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import {
 	readNearbyCapacitySpendSource,
 	type NearbyCapacitySpendEffect,

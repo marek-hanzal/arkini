@@ -1,7 +1,7 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
-import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
+import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";

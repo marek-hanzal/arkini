@@ -5,7 +5,7 @@ import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
-import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
+import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameMergeRuleDefinition } from "~/config/GameItemCapabilities";
 import { GameEngineError } from "~/engine/model/GameEngineError";

@@ -1,8 +1,10 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionBoardMemoryActivateSchema } from "~/action/GameActionBoardMemoryActivateSchema";
-import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
+import { readBoardItemAtCellFx } from "~/board/readBoardItemAtCellFx";
+import { readBoardItemCount } from "~/board/readBoardItemCount";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
+import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
@@ -100,20 +102,6 @@ const readBoardMemorySnapshotFx = Effect.fn("applyBoardMemoryActivateFx.readBoar
 			);
 		}
 		return items;
-	},
-);
-
-const readBoardItemCountFx = Effect.fn("applyBoardMemoryActivateFx.readBoardItemCountFx")(
-	function* ({ itemId }: { itemId: string }) {
-		const { nextSave } = yield* BoardMemoryActivationScopeFx;
-		return Object.values(nextSave.board.items).filter((item) => item.itemId === itemId).length;
-	},
-);
-
-const readBoardCellOccupiedFx = Effect.fn("applyBoardMemoryActivateFx.readBoardCellOccupiedFx")(
-	function* ({ x, y }: { x: number; y: number }) {
-		const { nextSave } = yield* BoardMemoryActivationScopeFx;
-		return Object.values(nextSave.board.items).some((item) => item.x === x && item.y === y);
 	},
 );
 
@@ -479,8 +467,16 @@ const consumeInventoryItemForMemoryRestoreFx = Effect.fn(
 const canRestoreInventoryBackedLayoutItemFx = Effect.fn(
 	"applyBoardMemoryActivateFx.canRestoreInventoryBackedLayoutItemFx",
 )(function* ({ memoryItem }: { memoryItem: BoardMemoryLayoutItem }) {
-	const { config } = yield* BoardMemoryActivationScopeFx;
-	if (yield* readBoardCellOccupiedFx(memoryItem)) return false;
+	const { config, nextSave } = yield* BoardMemoryActivationScopeFx;
+	if (
+		yield* readBoardItemAtCellFx({
+			save: nextSave,
+			x: memoryItem.x,
+			y: memoryItem.y,
+		})
+	) {
+		return false;
+	}
 
 	const definition = config.items[memoryItem.itemId];
 	if (!definition) return false;
@@ -497,9 +493,10 @@ const canRestoreInventoryBackedLayoutItemFx = Effect.fn(
 	const maxCount = definition.maxCount;
 	return (
 		maxCount === undefined ||
-		(yield* readBoardItemCountFx({
+		readBoardItemCount({
 			itemId: memoryItem.itemId,
-		})) < maxCount
+			save: nextSave,
+		}) < maxCount
 	);
 });
 

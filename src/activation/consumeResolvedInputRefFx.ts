@@ -1,7 +1,7 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
-import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
+import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEvent } from "~/event/GameEventSchema";
 import {

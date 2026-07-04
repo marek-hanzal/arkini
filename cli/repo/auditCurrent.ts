@@ -85,9 +85,8 @@ const main = async () => {
 		...auditForbiddenDirectories(),
 		...auditText(),
 		...auditIndexBarrels(),
+		...auditForbiddenLogicDirectories(),
 		...auditEffectFunctionNames(),
-		...auditLogicFolderExports(),
-		...auditLogicFolderPureValues(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
@@ -172,43 +171,18 @@ const auditEffectFunctionNames = (): Finding[] =>
 		return findings;
 	});
 
-const auditLogicFolderExports = (): Finding[] =>
-	readFiles("src").flatMap((path) => {
-		if (!/\/logic\/.*\.tsx?$/.test(path)) return [];
-		const text = readFileSync(path, "utf8");
-		const findings: Finding[] = [];
-		const exportedValuePattern = /export\s+(?:const|function|class)\s+(\w+)/g;
-		for (const match of text.matchAll(exportedValuePattern)) {
-			const name = match[1];
-			if (!name || name.endsWith("Fx")) {
-				continue;
-			}
-			findings.push({
-				path,
-				message: `logic export "${name}" must be an Fx boundary or move outside ./logic`,
-			});
-		}
-		return findings;
-	});
-
-const auditLogicFolderPureValues = (): Finding[] =>
-	readFiles("src").flatMap((path) => {
-		if (!/\/logic\/.*\.tsx?$/.test(path)) return [];
-		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
-
-		const text = readFileSync(path, "utf8");
-		const findings: Finding[] = [];
-		const topLevelConstPattern = /^const\s+(\w+)\s*=\s*(?!Effect\.fn)/gm;
-		for (const match of text.matchAll(topLevelConstPattern)) {
-			const name = match[1];
-			if (!name || name.endsWith("Fx")) continue;
-			findings.push({
-				path,
-				message: `logic value "${name}" must be an Fx boundary or move outside ./logic`,
-			});
-		}
-		return findings;
-	});
+const auditForbiddenLogicDirectories = (): Finding[] =>
+	readFiles("src").flatMap((path) =>
+		path.includes("/logic/")
+			? [
+					{
+						path,
+						message:
+							"./logic folders split ownership by vague intent; use concrete domain Fx modules",
+					},
+				]
+			: [],
+	);
 
 const auditRedundantSchemaTypeAliases = (): Finding[] =>
 	readFiles("src").flatMap((path) => {

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
+import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";

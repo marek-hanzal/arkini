@@ -1,7 +1,9 @@
 import { Context, Effect } from "effect";
 import { match, P } from "ts-pattern";
 import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
-import { readBoardItemMaxCountCapacityFx } from "~/board/logic/readBoardItemMaxCountCapacityFx";
+import { assertBoardCellInsideBoundsFx } from "~/board/assertBoardCellInsideBoundsFx";
+import { readBoardItemAtCellFx } from "~/board/readBoardItemAtCellFx";
+import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
@@ -116,11 +118,11 @@ const assertTargetCellInsideBoardFx = Effect.fn(
 	"checkInventoryItemPlaceReadinessFx.assertTargetCellInsideBoardFx",
 )(function* () {
 	const { action, config } = yield* InventoryItemPlaceReadinessScopeFx;
-	if (action.x < config.game.board.width && action.y < config.game.board.height) return;
-
-	return yield* Effect.fail(
-		GameEngineError.actionRejected("unsupported_target", "Board cell is outside board."),
-	);
+	yield* assertBoardCellInsideBoundsFx({
+		config,
+		x: action.x,
+		y: action.y,
+	});
 });
 
 const readInventoryPlacementSlotFx = Effect.fn(
@@ -215,9 +217,11 @@ const assertExactPlacementReadinessFx = Effect.fn(
 		);
 	}
 
-	const occupied = Object.values(save.board.items).find(
-		(entry) => entry.x === action.x && entry.y === action.y,
-	);
+	const occupied = yield* readBoardItemAtCellFx({
+		save,
+		x: action.x,
+		y: action.y,
+	});
 	if (occupied) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected("unsupported_target", "Board cell is occupied."),

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import { checkBoardItemsSwapReadinessFx } from "~/board/logic/checkBoardItemsSwapReadinessFx";
+import { checkBoardItemsSwapReadinessFx } from "~/board/checkBoardItemsSwapReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameActionBoardItemsSwapSchema } from "~/action/GameActionBoardItemsSwapSchema";

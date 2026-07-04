@@ -1,6 +1,6 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
-import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
+import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
 import type { GameEngineError } from "~/engine/model/GameEngineError";

@@ -1,8 +1,8 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
-import { readBoardItemCellFx } from "~/board/logic/readBoardItemCellFx";
-import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
+import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
+import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

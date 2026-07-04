@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
+import { writeBoardItemToSaveFx } from "~/board/writeBoardItemToSaveFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -139,17 +140,20 @@ const reserveDebugBoardPlacementCellFx = Effect.fn(
 		props,
 		simulatedSave,
 	});
-	simulatedSave.board.items[`debug-readiness:${index}`] = {
-		...(item.effects?.length
-			? {
-					createdAtMs: props.nowMs,
-				}
-			: {}),
-		id: `debug-readiness:${index}`,
-		itemId: props.action.itemId,
-		x: targetCell.x,
-		y: targetCell.y,
-	};
+	yield* writeBoardItemToSaveFx({
+		item: {
+			...(item.effects?.length
+				? {
+						createdAtMs: props.nowMs,
+					}
+				: {}),
+			id: `debug-readiness:${index}`,
+			itemId: props.action.itemId,
+			x: targetCell.x,
+			y: targetCell.y,
+		},
+		save: simulatedSave,
+	});
 });
 
 const assertDebugBoardSpawnReadinessFx = Effect.fn(

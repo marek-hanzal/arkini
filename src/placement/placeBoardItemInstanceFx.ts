@@ -3,6 +3,7 @@ import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { pushBoardItemCreatedEventFx } from "~/placement/pushBoardItemCreatedEventFx";
+import { writeBoardItemToSaveFx } from "~/board/writeBoardItemToSaveFx";
 import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
 export namespace placeBoardItemInstanceFx {
@@ -34,17 +35,20 @@ export const placeBoardItemInstanceFx = Effect.fn("placeBoardItemInstanceFx")(fu
 	save,
 }: placeBoardItemInstanceFx.Props) {
 	const placedItemInstanceId = itemInstanceId ?? (yield* createGameItemInstanceIdFx());
-	save.board.items[placedItemInstanceId] = {
-		...(createdAtMs !== undefined
-			? {
-					createdAtMs,
-				}
-			: {}),
-		id: placedItemInstanceId,
-		itemId,
-		x: cell.x,
-		y: cell.y,
-	};
+	yield* writeBoardItemToSaveFx({
+		item: {
+			...(createdAtMs !== undefined
+				? {
+						createdAtMs,
+					}
+				: {}),
+			id: placedItemInstanceId,
+			itemId,
+			x: cell.x,
+			y: cell.y,
+		},
+		save,
+	});
 	yield* pushBoardItemCreatedEventFx({
 		cell,
 		events,

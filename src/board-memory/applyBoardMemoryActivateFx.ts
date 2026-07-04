@@ -6,6 +6,8 @@ import { readBoardItemAtCellFx } from "~/board/readBoardItemAtCellFx";
 import { readBoardItemCount } from "~/board/readBoardItemCount";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
+import { removeBoardMemoryLayoutFromSaveFx } from "~/board-memory/removeBoardMemoryLayoutFromSaveFx";
+import { writeBoardMemoryLayoutToSaveFx } from "~/board-memory/writeBoardMemoryLayoutToSaveFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -457,10 +459,14 @@ const saveCurrentBoardMemoryLayoutFx = Effect.fn(
 	const items = yield* readBoardMemorySnapshotFx({
 		scope,
 	});
-	nextSave.boardMemoryLayouts[boardItemId] = {
-		items,
-		savedAtMs: nowMs,
-	};
+	yield* writeBoardMemoryLayoutToSaveFx({
+		boardItemId,
+		layout: {
+			items,
+			savedAtMs: nowMs,
+		},
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = nowMs;
 	events.push({
 		atMs: nowMs,
@@ -499,7 +505,10 @@ const restoreSavedBoardMemoryLayoutFx = Effect.fn(
 		scope,
 	});
 
-	delete nextSave.boardMemoryLayouts[boardItemId];
+	yield* removeBoardMemoryLayoutFromSaveFx({
+		boardItemId,
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = nowMs;
 	events.push({
 		atMs: nowMs,

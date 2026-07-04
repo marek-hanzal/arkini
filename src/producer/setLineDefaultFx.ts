@@ -10,6 +10,8 @@ import { checkLineSetDefaultReadinessFx } from "~/producer/checkLineSetDefaultRe
 import { readDefaultEffectLineId } from "~/producer/readDefaultEffectLineId";
 import { readDefaultLineId } from "~/producer/readDefaultLineId";
 import { readLineKind } from "~/producer/readLineKind";
+import { removeProducerLineStateFromSaveFx } from "~/producer/removeProducerLineStateFromSaveFx";
+import { writeProducerLineStateToSaveFx } from "~/producer/writeProducerLineStateToSaveFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export namespace setLineDefaultFx {
@@ -168,9 +170,16 @@ const writeLineDefaultSelectionFx = Effect.fn("setLineDefaultFx.writeLineDefault
 		});
 
 		if (nextLineState) {
-			nextSave.lines[itemInstanceId] = nextLineState;
+			yield* writeProducerLineStateToSaveFx({
+				itemInstanceId,
+				save: nextSave,
+				state: nextLineState,
+			});
 		} else {
-			delete nextSave.lines[itemInstanceId];
+			yield* removeProducerLineStateFromSaveFx({
+				itemInstanceId,
+				save: nextSave,
+			});
 		}
 	},
 );

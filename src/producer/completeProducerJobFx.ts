@@ -6,6 +6,7 @@ import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/producer/producerDeliveryTiming";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
+import { writeProducerChargeStateToSaveFx } from "~/producer/writeProducerChargeStateToSaveFx";
 import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
@@ -281,9 +282,13 @@ const spendProducerChargeCostAfterCompletedDeliveryFx = Effect.fn(
 	});
 	if (!outcome) return [] satisfies ProducerCompletionEvents;
 
-	nextSave.producerCharges[job.itemInstanceId] = {
-		remainingCharges: outcome.nextRemainingCharges,
-	};
+	yield* writeProducerChargeStateToSaveFx({
+		itemInstanceId: job.itemInstanceId,
+		save: nextSave,
+		state: {
+			remainingCharges: outcome.nextRemainingCharges,
+		},
+	});
 
 	if (!outcome.removeOnDepleted) {
 		return [] satisfies ProducerCompletionEvents;

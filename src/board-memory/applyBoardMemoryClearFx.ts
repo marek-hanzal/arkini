@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { removeBoardMemoryLayoutFromSaveFx } from "~/board-memory/removeBoardMemoryLayoutFromSaveFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
@@ -34,7 +35,10 @@ export const applyBoardMemoryClearFx = Effect.fn("applyBoardMemoryClearFx")(func
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
-	delete nextSave.boardMemoryLayouts[action.boardItemId];
+	yield* removeBoardMemoryLayoutFromSaveFx({
+		boardItemId: action.boardItemId,
+		save: nextSave,
+	});
 	nextSave.updatedAtMs = nowMs;
 
 	const events: GameEvent[] = previous

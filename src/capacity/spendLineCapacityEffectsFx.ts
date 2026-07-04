@@ -6,6 +6,8 @@ import type { GameEvent } from "~/event/GameEventSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import { writeBoardItemToSaveFx } from "~/board/writeBoardItemToSaveFx";
+import { writeItemCapacityStateToSaveFx } from "~/capacity/writeItemCapacityStateToSaveFx";
 import {
 	readNearbyCapacitySpendSource,
 	type NearbyCapacitySpendEffect,
@@ -85,13 +87,16 @@ const applyDepletionFx = Effect.fn("spendLineCapacityEffectsFx.applyDepletionFx"
 	if (!sourceItem || !capacity || capacity.onDepleted === "stop") return;
 
 	if (capacity.onDepleted === "replace") {
-		nextSave.board.items[sourceItemInstanceId] = {
-			...sourceItem,
-			createdAtMs: config.items[capacity.replaceItemId]?.effects
-				? nowMs
-				: sourceItem.createdAtMs,
-			itemId: capacity.replaceItemId,
-		};
+		yield* writeBoardItemToSaveFx({
+			item: {
+				...sourceItem,
+				createdAtMs: config.items[capacity.replaceItemId]?.effects
+					? nowMs
+					: sourceItem.createdAtMs,
+				itemId: capacity.replaceItemId,
+			},
+			save: nextSave,
+		});
 		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: sourceItemInstanceId,
 			save: nextSave,
@@ -152,9 +157,13 @@ export const spendLineCapacityEffectsFx = Effect.fn("spendLineCapacityEffectsFx"
 		}
 
 		const nextRemaining = Math.max(0, source.remaining - effect.amount);
-		nextSave.itemCapacities[source.itemInstanceId] = {
-			remaining: nextRemaining,
-		};
+		yield* writeItemCapacityStateToSaveFx({
+			itemInstanceId: source.itemInstanceId,
+			save: nextSave,
+			state: {
+				remaining: nextRemaining,
+			},
+		});
 		events.push(
 			createCapacityChangedEvent({
 				amount: effect.amount,

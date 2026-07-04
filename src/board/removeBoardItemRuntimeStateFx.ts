@@ -1,8 +1,13 @@
 import { Effect } from "effect";
+import { removeItemCapacityStateFromSaveFx } from "~/capacity/removeItemCapacityStateFromSaveFx";
+import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
 import { removeCraftInputStateFromSaveFx } from "~/craft/removeCraftInputStateFromSaveFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { removeActiveEffectFromSaveFx } from "~/effects/removeActiveEffectFromSaveFx";
+import { removeProducerChargeStateFromSaveFx } from "~/producer/removeProducerChargeStateFromSaveFx";
 import { removeProducerInputStateFromSaveFx } from "~/producer/removeProducerInputStateFromSaveFx";
+import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
+import { removeProducerLineStateFromSaveFx } from "~/producer/removeProducerLineStateFromSaveFx";
 
 export namespace removeBoardItemRuntimeStateFx {
 	export interface Props {
@@ -15,9 +20,18 @@ export const removeBoardItemRuntimeStateFx = Effect.fn("removeBoardItemRuntimeSt
 	itemInstanceId,
 	save,
 }: removeBoardItemRuntimeStateFx.Props) {
-	delete save.producerCharges[itemInstanceId];
-	delete save.itemCapacities[itemInstanceId];
-	delete save.lines[itemInstanceId];
+	yield* removeProducerChargeStateFromSaveFx({
+		itemInstanceId,
+		save,
+	});
+	yield* removeItemCapacityStateFromSaveFx({
+		itemInstanceId,
+		save,
+	});
+	yield* removeProducerLineStateFromSaveFx({
+		itemInstanceId,
+		save,
+	});
 	yield* removeProducerInputStateFromSaveFx({
 		itemInstanceId,
 		save,
@@ -28,11 +42,21 @@ export const removeBoardItemRuntimeStateFx = Effect.fn("removeBoardItemRuntimeSt
 	});
 
 	for (const [jobId, job] of Object.entries(save.producerJobs)) {
-		if (job.itemInstanceId === itemInstanceId) delete save.producerJobs[jobId];
+		if (job.itemInstanceId === itemInstanceId) {
+			yield* removeProducerJobFromSaveFx({
+				jobId,
+				save,
+			});
+		}
 	}
 
 	for (const [jobId, job] of Object.entries(save.craftJobs)) {
-		if (job.targetItemInstanceId === itemInstanceId) delete save.craftJobs[jobId];
+		if (job.targetItemInstanceId === itemInstanceId) {
+			yield* removeCraftJobFromSaveFx({
+				jobId,
+				save,
+			});
+		}
 	}
 
 	for (const [effectInstanceId, activeEffect] of Object.entries(save.activeEffects)) {

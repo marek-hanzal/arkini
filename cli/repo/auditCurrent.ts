@@ -88,6 +88,8 @@ const main = async () => {
 		...auditForbiddenLogicDirectories(),
 		...auditEffectFunctionNames(),
 		...auditBoardItemRemovalBoundaries(),
+		...auditBoardItemWriteBoundaries(),
+		...auditRuntimeStateWriteBoundaries(),
 		...auditJobRemovalBoundaries(),
 		...auditJobWriteBoundaries(),
 		...auditActiveEffectWriteBoundaries(),
@@ -210,6 +212,63 @@ const auditBoardItemRemovalBoundaries = (): Finding[] =>
 				path,
 				message:
 					"board item removal must go through removeBoardItemFromSaveFx so runtime-state cleanup/preservation is explicit",
+			},
+		];
+	});
+
+const boardItemWriteBoundaryPaths = new Set([
+	"src/board/writeBoardItemToSaveFx.ts",
+]);
+
+const auditBoardItemWriteBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (boardItemWriteBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (!/\.board\.items\s*\[[^\]]+\]\s*=/.test(text)) return [];
+
+		return [
+			{
+				path,
+				message:
+					"board item writes must go through writeBoardItemToSaveFx so placement/replacement lifecycle changes stay grepable",
+			},
+		];
+	});
+
+const runtimeStateWriteBoundaryPaths = new Set([
+	"src/board-memory/removeBoardMemoryLayoutFromSaveFx.ts",
+	"src/board-memory/writeBoardMemoryLayoutToSaveFx.ts",
+	"src/capacity/removeItemCapacityStateFromSaveFx.ts",
+	"src/capacity/writeItemCapacityStateToSaveFx.ts",
+	"src/producer/removeProducerChargeStateFromSaveFx.ts",
+	"src/producer/removeProducerLineStateFromSaveFx.ts",
+	"src/producer/writeProducerChargeStateToSaveFx.ts",
+	"src/producer/writeProducerLineStateToSaveFx.ts",
+]);
+
+const auditRuntimeStateWriteBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (runtimeStateWriteBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (
+			!/(?:delete\s+[^;]*\.(?:boardMemoryLayouts|itemCapacities|lines|producerCharges)\s*\[|\.(?:boardMemoryLayouts|itemCapacities|lines|producerCharges)\s*\[[^\]]+\]\s*=)/.test(
+				text,
+			)
+		) {
+			return [];
+		}
+
+		return [
+			{
+				path,
+				message:
+					"runtime state writes/removals must go through named Fx boundaries so board/producer lifecycle changes stay grepable",
 			},
 		];
 	});

@@ -18,7 +18,9 @@ export namespace checkDebugItemSpawnReadinessFx {
 	}
 }
 
-const hasInventoryCapacity = ({
+const readDebugInventoryCapacityReadyFx = Effect.fn(
+	"checkDebugItemSpawnReadinessFx.readDebugInventoryCapacityReadyFx",
+)(function* ({
 	config,
 	itemId,
 	quantity,
@@ -28,7 +30,7 @@ const hasInventoryCapacity = ({
 	itemId: string;
 	quantity: number;
 	save: GameSave;
-}) => {
+}) {
 	const item = config.items[itemId];
 	if (!item) return false;
 
@@ -46,7 +48,7 @@ const hasInventoryCapacity = ({
 	}
 
 	return available >= quantity;
-};
+});
 
 export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnReadinessFx")(
 	function* ({ action, config, nowMs, save }: checkDebugItemSpawnReadinessFx.Props) {
@@ -136,14 +138,13 @@ export const checkDebugItemSpawnReadinessFx = Effect.fn("checkDebugItemSpawnRead
 			return;
 		}
 
-		if (
-			!hasInventoryCapacity({
-				config,
-				itemId: action.itemId,
-				quantity,
-				save,
-			})
-		) {
+		const hasInventoryCapacity = yield* readDebugInventoryCapacityReadyFx({
+			config,
+			itemId: action.itemId,
+			quantity,
+			save,
+		});
+		if (!hasInventoryCapacity) {
 			return yield* Effect.fail(
 				GameEngineError.actionRejected(
 					"inventory:full",

@@ -87,6 +87,7 @@ const main = async () => {
 		...auditIndexBarrels(),
 		...auditEffectFunctionNames(),
 		...auditLogicFolderExports(),
+		...auditLogicFolderPureValues(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
@@ -185,6 +186,25 @@ const auditLogicFolderExports = (): Finding[] =>
 			findings.push({
 				path,
 				message: `logic export "${name}" must be an Fx boundary or move outside ./logic`,
+			});
+		}
+		return findings;
+	});
+
+const auditLogicFolderPureValues = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\/logic\/.*\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		const findings: Finding[] = [];
+		const topLevelConstPattern = /^const\s+(\w+)\s*=\s*(?!Effect\.fn)/gm;
+		for (const match of text.matchAll(topLevelConstPattern)) {
+			const name = match[1];
+			if (!name || name.endsWith("Fx")) continue;
+			findings.push({
+				path,
+				message: `logic value "${name}" must be an Fx boundary or move outside ./logic`,
 			});
 		}
 		return findings;

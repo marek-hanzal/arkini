@@ -2038,6 +2038,13 @@ const createGameplaySources = (config: GameConfig) => {
 					],
 				}),
 			),
+			...readLineEffectGameplayRequirements({
+				lineEffects: line.effects ?? [],
+				path: [
+					...linePath,
+					"effects",
+				],
+			}),
 		];
 
 		for (const outputEntry of readGameplayOutputSourceEntries({
@@ -2177,7 +2184,12 @@ const isGameplayProgressionProducer = (config: GameConfig, producerId: string) =
 const validateNearbyRequirementsHaveBoardSource = (ctx: z.RefinementCtx, config: GameConfig) => {
 	for (const usage of readLineEffectUsages(config).filter((usage) => usage.enforceSoftLock)) {
 		for (const [effectIndex, lineEffect] of usage.lineEffects.entries()) {
-			if (lineEffect.kind !== "nearby.require") continue;
+			if (
+				lineEffect.kind !== "nearby.require" &&
+				lineEffect.kind !== "nearby.capacity.spend"
+			) {
+				continue;
+			}
 
 			const matchingBoardItemIds = readSelectorMatchingIds({
 				entityIds: Object.keys(config.items),
@@ -2193,7 +2205,7 @@ const validateNearbyRequirementsHaveBoardSource = (ctx: z.RefinementCtx, config:
 					effectIndex,
 					"items",
 				],
-				`Soft-lock risk: nearby requirement on ${usage.label} cannot be satisfied because its selector matches no board-placeable item. Selector: ${formatItemSelector(config, lineEffect.items as z.infer<typeof ResolvedDomainSelectorSchema>)}.`,
+				`Soft-lock risk: ${lineEffect.kind} on ${usage.label} cannot be satisfied because its selector matches no board-placeable item. Selector: ${formatItemSelector(config, lineEffect.items as z.infer<typeof ResolvedDomainSelectorSchema>)}.`,
 			);
 		}
 	}
@@ -2289,6 +2301,15 @@ const validateGrantRequirementBlockerContradictions = (
 };
 
 const readLineEffectUsages = (config: GameConfig) => [
+	...readConfigLines(config).map(({ line, linePath, ownerItemId }) => ({
+		enforceSoftLock: isGameplayProgressionProducer(config, ownerItemId),
+		label: `line "${line.id}" (${line.name})`,
+		lineEffects: line.effects ?? [],
+		path: [
+			...linePath,
+			"effects",
+		] satisfies GameConfigIssuePath,
+	})),
 	...readConfigLines(config).flatMap(({ line, linePath, ownerItemId }) =>
 		readActivationOutputEffectEntries({
 			output: line.output ?? [],
@@ -2341,7 +2362,7 @@ const readLineEffectGameplayRequirements = ({
 			});
 		}
 
-		if (lineEffect.kind === "nearby.require") {
+		if (lineEffect.kind === "nearby.require" || lineEffect.kind === "nearby.capacity.spend") {
 			requirements.push({
 				kind: "nearbyItemSelector",
 				path: [

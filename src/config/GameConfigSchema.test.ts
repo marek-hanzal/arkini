@@ -1125,6 +1125,82 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/requires and blocks the same/);
 	});
 
+	it("rejects line-owned nearby capacity spend that only matches inventory-only items", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:producer"].tags = [
+			"producer",
+		];
+		config.items["item:twig"].storage = "inventory";
+		readTestLine(config, "line:test").effects = [
+			{
+				display: "always",
+				items: {
+					anyOf: [
+						{
+							ids: [
+								"item:twig",
+							],
+						},
+					],
+				},
+				kind: "nearby.capacity.spend",
+				radius: 1,
+			},
+		];
+
+		expect(() => parseGameConfig(config)).toThrow(
+			/nearby\.capacity\.spend.*matches no board-placeable item/,
+		);
+	});
+
+	it("rejects progression that is gated behind an unreachable line-owned capacity deposit", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:rare-deposit"] = {
+			assetIds: [
+				"asset:item",
+			],
+			description: "Rare Deposit",
+			maxStackSize: 1,
+			name: "Rare Deposit",
+			storage: "board",
+			tags: [],
+			tier: 1,
+		};
+		addReachabilityTargetProducer(config);
+		appendTestLine(config, "item:producer", {
+			durationMs: 1000,
+			effects: [
+				{
+					display: "always",
+					items: {
+						anyOf: [
+							{
+								ids: [
+									"item:rare-deposit",
+								],
+							},
+						],
+					},
+					kind: "nearby.capacity.spend",
+					radius: 1,
+				},
+			],
+			id: "line:gated-future",
+			name: "Gated Future",
+			output: [
+				{
+					itemId: "producer:future",
+					type: "guaranteed",
+				},
+			],
+			placement: "board_then_inventory",
+		});
+
+		expect(() => parseGameConfig(config)).toThrow(
+			/Soft-lock risk.*producer:future.*item:rare-deposit/s,
+		);
+	});
+
 	it("rejects nearby requirements that only match inventory-only items", () => {
 		const config: any = createValidConfigValue();
 		config.items["item:producer"].tags = [

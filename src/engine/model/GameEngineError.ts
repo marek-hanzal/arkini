@@ -1,7 +1,7 @@
 import { Data } from "effect";
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
 
-export type GameActionRejectedReason =
+type GameActionRejectedReason =
 	| "input_mismatch"
 	| "input_unavailable"
 	| "invalid_actor"
@@ -18,27 +18,25 @@ export type GameActionRejectedReason =
 	| "storage_restricted"
 	| "unsupported_target";
 
-export class GameActionInvalidError extends Data.TaggedError("GameActionInvalid")<{
+class GameActionInvalidError extends Data.TaggedError("GameActionInvalid")<{
 	readonly message: string;
 }> {}
 
-export class GamePlacementFailedError extends Data.TaggedError("GamePlacementFailed")<{
+class GamePlacementFailedError extends Data.TaggedError("GamePlacementFailed")<{
 	readonly reason: GamePlacementFailureReason;
 	readonly message: string;
 }> {}
 
-export class GameActionRejectedError extends Data.TaggedError("GameActionRejected")<{
+class GameActionRejectedError extends Data.TaggedError("GameActionRejected")<{
 	readonly reason: GameActionRejectedReason;
 	readonly message: string;
 }> {}
 
-export class GameConfigReferenceMissingError extends Data.TaggedError(
-	"GameConfigReferenceMissing",
-)<{
+class GameConfigReferenceMissingError extends Data.TaggedError("GameConfigReferenceMissing")<{
 	readonly message: string;
 }> {}
 
-export class GameSaveInvalidError extends Data.TaggedError("GameSaveInvalid")<{
+class GameSaveInvalidError extends Data.TaggedError("GameSaveInvalid")<{
 	readonly message: string;
 }> {}
 

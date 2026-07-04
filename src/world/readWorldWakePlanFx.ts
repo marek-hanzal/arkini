@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Context, Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readMinGameWakeAtMs } from "~/time/GameTime";
@@ -18,123 +18,165 @@ export namespace readWorldWakePlanFx {
 	}
 }
 
+class WorldWakePlanScopeFx extends Context.Tag("WorldWakePlanScopeFx")<
+	WorldWakePlanScopeFx,
+	readWorldWakePlanFx.Props
+>() {
+	//
+}
+
 const sortWakeReasons = (left: WorldWakeReason, right: WorldWakeReason) =>
 	left.atMs - right.atMs ||
 	left.reason.localeCompare(right.reason) ||
 	JSON.stringify(left.entity).localeCompare(JSON.stringify(right.entity));
 
-export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* ({
-	config,
-	nowMs,
-	save,
-}: readWorldWakePlanFx.Props): Generator<never, WorldWakePlanFacts> {
-	const wakeReasons: WorldWakeReason[] = [];
-
-	for (const job of Object.values(save.itemSpawnJobs)) {
+const readItemSpawnJobWakeReasonsFx = Effect.fn(
+	"readWorldWakePlanFx.readItemSpawnJobWakeReasonsFx",
+)(function* () {
+	const { nowMs, save } = yield* WorldWakePlanScopeFx;
+	return Object.values(save.itemSpawnJobs).flatMap((job): WorldWakeReason[] => {
 		if (
 			isItemSpawnJobWaitingForDependencies({
 				job,
 				save,
 			})
 		) {
-			continue;
+			return [];
 		}
 
-		wakeReasons.push({
-			atMs: readProcessableWorldWakeAtMs({
-				nowMs,
-				readyAtMs: job.readyAtMs,
-			}),
-			entity: {
-				id: job.id,
-				kind: "itemSpawnJob",
+		return [
+			{
+				atMs: readProcessableWorldWakeAtMs({
+					nowMs,
+					readyAtMs: job.readyAtMs,
+				}),
+				entity: {
+					id: job.id,
+					kind: "itemSpawnJob",
+				},
+				reason: "item_spawn_ready",
 			},
-			reason: "item_spawn_ready",
-		});
-	}
+		];
+	});
+});
 
-	for (const producerJobFacts of readWorldProducerJobFacts({
+const readProducerQueueWakeReasonsFx = Effect.fn(
+	"readWorldWakePlanFx.readProducerQueueWakeReasonsFx",
+)(function* () {
+	const { nowMs, save } = yield* WorldWakePlanScopeFx;
+	return readWorldProducerJobFacts({
 		nowMs,
 		save,
-	})) {
-		if (producerJobFacts.releaseAtMs === undefined) continue;
-		wakeReasons.push({
-			atMs: readProcessableWorldWakeAtMs({
-				nowMs,
-				readyAtMs: producerJobFacts.releaseAtMs,
-			}),
-			entity: {
-				id: producerJobFacts.job.id,
-				kind: "producerJob",
-			},
-			reason: "producer_queue_ready",
-		});
-	}
+	}).flatMap((producerJobFacts): WorldWakeReason[] => {
+		if (producerJobFacts.releaseAtMs === undefined) return [];
 
-	for (const effectFacts of readWorldActiveEffectFacts({
+		return [
+			{
+				atMs: readProcessableWorldWakeAtMs({
+					nowMs,
+					readyAtMs: producerJobFacts.releaseAtMs,
+				}),
+				entity: {
+					id: producerJobFacts.job.id,
+					kind: "producerJob",
+				},
+				reason: "producer_queue_ready",
+			},
+		];
+	});
+});
+
+const readActiveEffectWakeReasonsFx = Effect.fn(
+	"readWorldWakePlanFx.readActiveEffectWakeReasonsFx",
+)(function* () {
+	const { config, nowMs, save } = yield* WorldWakePlanScopeFx;
+	return readWorldActiveEffectFacts({
 		config,
 		nowMs,
 		save,
-	})) {
+	}).flatMap((effectFacts): WorldWakeReason[] => {
 		if (
 			effectFacts.status === "producer_paused" ||
 			effectFacts.status === "blocked_by_paused_queue_head"
 		) {
-			continue;
+			return [];
 		}
 
-		if (nowMs === undefined || effectFacts.status === "scheduled") {
-			wakeReasons.push({
-				atMs: effectFacts.effect.startAtMs,
+		return [
+			...(nowMs === undefined || effectFacts.status === "scheduled"
+				? [
+						{
+							atMs: effectFacts.effect.startAtMs,
+							entity: {
+								id: effectFacts.effect.id,
+								kind: "activeEffect" as const,
+							},
+							reason: "active_effect_start" as const,
+						},
+					]
+				: []),
+			{
+				atMs: readProcessableWorldWakeAtMs({
+					nowMs,
+					readyAtMs: effectFacts.effect.endAtMs,
+				}),
 				entity: {
 					id: effectFacts.effect.id,
 					kind: "activeEffect",
 				},
-				reason: "active_effect_start",
-			});
-		}
-
-		wakeReasons.push({
-			atMs: readProcessableWorldWakeAtMs({
-				nowMs,
-				readyAtMs: effectFacts.effect.endAtMs,
-			}),
-			entity: {
-				id: effectFacts.effect.id,
-				kind: "activeEffect",
+				reason: "active_effect_end",
 			},
-			reason: "active_effect_end",
-		});
-	}
+		];
+	});
+});
 
-	for (const craftJobFacts of readWorldCraftJobFacts({
-		nowMs,
-		save,
-	})) {
-		if (craftJobFacts.releaseAtMs === undefined) continue;
-
-		wakeReasons.push({
-			atMs: readProcessableWorldWakeAtMs({
-				nowMs,
-				readyAtMs: craftJobFacts.releaseAtMs,
-			}),
-			entity: {
-				id: craftJobFacts.job.id,
-				kind: "craftJob",
-			},
-			reason: "craft_ready",
-		});
-	}
-
-	const sortedWakeReasons = [
-		...wakeReasons,
-	].sort(sortWakeReasons);
-
-	return {
-		nextWakeAtMs: readMinGameWakeAtMs({
+const readCraftJobWakeReasonsFx = Effect.fn("readWorldWakePlanFx.readCraftJobWakeReasonsFx")(
+	function* () {
+		const { nowMs, save } = yield* WorldWakePlanScopeFx;
+		return readWorldCraftJobFacts({
 			nowMs,
-			values: sortedWakeReasons.map((reason) => reason.atMs),
-		}),
-		wakeReasons: sortedWakeReasons,
-	};
+			save,
+		}).flatMap((craftJobFacts): WorldWakeReason[] => {
+			if (craftJobFacts.releaseAtMs === undefined) return [];
+
+			return [
+				{
+					atMs: readProcessableWorldWakeAtMs({
+						nowMs,
+						readyAtMs: craftJobFacts.releaseAtMs,
+					}),
+					entity: {
+						id: craftJobFacts.job.id,
+						kind: "craftJob",
+					},
+					reason: "craft_ready",
+				},
+			];
+		});
+	},
+);
+
+const readAllWakeReasonsFx = Effect.fn("readWorldWakePlanFx.readAllWakeReasonsFx")(function* () {
+	const wakeReasonGroups = yield* Effect.all([
+		readItemSpawnJobWakeReasonsFx(),
+		readProducerQueueWakeReasonsFx(),
+		readActiveEffectWakeReasonsFx(),
+		readCraftJobWakeReasonsFx(),
+	]);
+	return wakeReasonGroups.flat().sort(sortWakeReasons);
+});
+
+export const readWorldWakePlanFx = Effect.fn("readWorldWakePlanFx")(function* (
+	props: readWorldWakePlanFx.Props,
+) {
+	return yield* Effect.gen(function* () {
+		const wakeReasons = yield* readAllWakeReasonsFx();
+		return {
+			nextWakeAtMs: readMinGameWakeAtMs({
+				nowMs: props.nowMs,
+				values: wakeReasons.map((reason) => reason.atMs),
+			}),
+			wakeReasons,
+		} satisfies WorldWakePlanFacts;
+	}).pipe(Effect.provideService(WorldWakePlanScopeFx, props));
 });

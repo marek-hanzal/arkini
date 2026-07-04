@@ -1,18 +1,19 @@
-import { Effect } from "effect";
-import { checkDebugItemSpawnReadinessFx } from "~/debug/logic/checkDebugItemSpawnReadinessFx";
-import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
+import { Context, Effect } from "effect";
+import { match } from "ts-pattern";
+import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import { isCheatSpeedItemId, readCheatSpeedItemIdFromMode } from "~/cheat/GameCheatSpeedItem";
-import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
+import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import { GameEngineError } from "~/engine/model/GameEngineError";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
+import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
+import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
-import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
-import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
-import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
-import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameEvent } from "~/event/GameEventSchema";
-import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
+import { checkDebugItemSpawnReadinessFx } from "~/debug/logic/checkDebugItemSpawnReadinessFx";
 
 export namespace spawnDebugItemFx {
 	export interface Props {
@@ -23,128 +24,192 @@ export namespace spawnDebugItemFx {
 	}
 }
 
-export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* ({
-	action,
-	config,
-	nowMs,
-	save,
-}: spawnDebugItemFx.Props) {
-	const itemId = isCheatSpeedItemId(action.itemId)
+type DebugSpawnAction = GameActionDebugItemSpawnSchema.Type;
+
+type DebugSpawnRequest = {
+	action: DebugSpawnAction;
+	createdAtMs: number | undefined;
+	itemDefinition: NonNullable<GameConfig["items"][string]>;
+	quantity: number;
+};
+
+type DebugSpawnWorkingState = DebugSpawnRequest & {
+	events: GameEvent[];
+	nextSave: GameSave;
+};
+
+class DebugItemSpawnScopeFx extends Context.Tag("DebugItemSpawnScopeFx")<
+	DebugItemSpawnScopeFx,
+	spawnDebugItemFx.Props
+>() {
+	//
+}
+
+const readDebugSpawnItemIdFx = Effect.fn("spawnDebugItemFx.readDebugSpawnItemIdFx")(function* () {
+	const { action, save } = yield* DebugItemSpawnScopeFx;
+	return isCheatSpeedItemId(action.itemId)
 		? readCheatSpeedItemIdFromMode(
 				readGameCheatSpeedMode({
 					save,
 				}),
 			)
 		: action.itemId;
-	const spawnAction = {
+});
+
+const readDebugSpawnActionFx = Effect.fn("spawnDebugItemFx.readDebugSpawnActionFx")(function* () {
+	const { action } = yield* DebugItemSpawnScopeFx;
+	return {
 		...action,
-		itemId,
-	};
+		itemId: yield* readDebugSpawnItemIdFx(),
+	} satisfies DebugSpawnAction;
+});
+
+const readDebugSpawnRequestFx = Effect.fn("spawnDebugItemFx.readDebugSpawnRequestFx")(function* () {
+	const { config, nowMs, save } = yield* DebugItemSpawnScopeFx;
+	const action = yield* readDebugSpawnActionFx();
 
 	yield* checkDebugItemSpawnReadinessFx({
-		action: spawnAction,
+		action,
 		config,
 		nowMs,
 		save,
 	});
 
-	const item = config.items[itemId];
-	if (!item) {
+	const itemDefinition = config.items[action.itemId];
+	if (!itemDefinition) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing item "${spawnAction.itemId}".`),
+			GameEngineError.configReferenceMissing(`Missing item "${action.itemId}".`),
 		);
 	}
 
-	const nextSave = yield* cloneGameSaveFx({
-		save,
+	return {
+		action,
+		createdAtMs: itemDefinition.effects?.length ? nowMs : undefined,
+		itemDefinition,
+		quantity: action.quantity ?? 1,
+	} satisfies DebugSpawnRequest;
+});
+
+const createDebugSpawnWorkingStateFx = Effect.fn("spawnDebugItemFx.createDebugSpawnWorkingStateFx")(
+	function* () {
+		const { save } = yield* DebugItemSpawnScopeFx;
+		return {
+			...(yield* readDebugSpawnRequestFx()),
+			events: [] as GameEvent[],
+			nextSave: yield* cloneGameSaveFx({
+				save,
+			}),
+		} satisfies DebugSpawnWorkingState;
+	},
+);
+
+const assertDebugBoardHasEmptyCellFx = Effect.fn("spawnDebugItemFx.assertDebugBoardHasEmptyCellFx")(
+	function* ({ nextSave }: DebugSpawnWorkingState) {
+		const { config } = yield* DebugItemSpawnScopeFx;
+		const emptyCells = yield* planEmptyBoardCellsFx({
+			config,
+			save: nextSave,
+		});
+		if (emptyCells.length > 0) return;
+
+		return yield* Effect.fail(
+			GameEngineError.actionRejected("board:full", "Board has no space for debug item."),
+		);
+	},
+);
+
+const readDebugBoardSpawnCellFx = Effect.fn("spawnDebugItemFx.readDebugBoardSpawnCellFx")(
+	function* ({ action, nextSave }: DebugSpawnWorkingState) {
+		const { config, nowMs } = yield* DebugItemSpawnScopeFx;
+		const [emptyCell] = yield* planItemBoardPlacementCellsFx({
+			config,
+			itemId: action.itemId,
+			nowMs,
+			save: nextSave,
+		});
+		if (emptyCell) return emptyCell;
+
+		return yield* Effect.fail(
+			GameEngineError.actionRejected("board:full", "Board has no space for debug item."),
+		);
+	},
+);
+
+const spawnDebugBoardItemFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemFx")(function* (
+	state: DebugSpawnWorkingState,
+) {
+	yield* assertDebugBoardHasEmptyCellFx(state);
+	const cell = yield* readDebugBoardSpawnCellFx(state);
+	yield* placeBoardItemInstanceFx({
+		cell,
+		createdAtMs: state.createdAtMs,
+		events: state.events,
+		itemId: state.action.itemId,
+		reason: "debug",
+		save: state.nextSave,
 	});
-	const events: GameEvent[] = [];
-	const quantity = action.quantity ?? 1;
+});
 
-	if (action.location === "board") {
-		for (let index = 0; index < quantity; index += 1) {
-			const emptyCells = yield* planEmptyBoardCellsFx({
-				config,
-				save: nextSave,
-			});
-			if (emptyCells.length === 0) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						"board:full",
-						"Board has no space for debug item.",
-					),
-				);
-			}
+const spawnDebugBoardItemsFx = Effect.fn("spawnDebugItemFx.spawnDebugBoardItemsFx")(function* (
+	state: DebugSpawnWorkingState,
+) {
+	for (let index = 0; index < state.quantity; index += 1) {
+		yield* spawnDebugBoardItemFx(state);
+	}
+});
 
-			const [emptyCell] = yield* planItemBoardPlacementCellsFx({
-				config,
-				itemId: spawnAction.itemId,
-				nowMs,
-				save: nextSave,
-			});
-			if (!emptyCell) {
-				return yield* Effect.fail(
-					GameEngineError.actionRejected(
-						"board:full",
-						"Board has no space for debug item.",
-					),
-				);
-			}
-
-			const itemInstanceId = yield* createGameItemInstanceIdFx();
-			nextSave.board.items[itemInstanceId] = {
-				...(item.effects?.length
-					? {
-							createdAtMs: nowMs,
-						}
-					: {}),
-				id: itemInstanceId,
-				itemId: spawnAction.itemId,
-				x: emptyCell.x,
-				y: emptyCell.y,
-			};
-			events.push({
-				itemId: spawnAction.itemId,
-				reason: "debug",
-				to: {
-					kind: "board",
-					itemInstanceId,
-					x: emptyCell.x,
-					y: emptyCell.y,
-				},
-				type: "item.created",
-			});
-		}
-	} else {
+const spawnDebugInventoryItemsFx = Effect.fn("spawnDebugItemFx.spawnDebugInventoryItemsFx")(
+	function* (state: DebugSpawnWorkingState) {
 		const placed = yield* placeGameSaveInventoryRemainderFx({
-			createdAtMs: item.effects?.length ? nowMs : undefined,
-			events,
+			createdAtMs: state.createdAtMs,
+			events: state.events,
 			item: {
-				itemId: spawnAction.itemId,
-				quantity,
+				itemId: state.action.itemId,
+				quantity: state.quantity,
 				reason: "debug",
 			},
-			maxStackSize: item.maxStackSize,
-			remainingQuantity: quantity,
-			slots: nextSave.inventory.slots,
+			maxStackSize: state.itemDefinition.maxStackSize,
+			remainingQuantity: state.quantity,
+			slots: state.nextSave.inventory.slots,
 		});
 
-		if (!placed) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					"inventory:full",
-					"Inventory has no space for debug item.",
-				),
-			);
-		}
-	}
+		if (placed) return;
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"inventory:full",
+				"Inventory has no space for debug item.",
+			),
+		);
+	},
+);
 
-	nextSave.updatedAtMs = nowMs;
+const applyDebugSpawnLocationFx = Effect.fn("spawnDebugItemFx.applyDebugSpawnLocationFx")(
+	function* (state: DebugSpawnWorkingState) {
+		return yield* match(state.action.location)
+			.with("board", () => spawnDebugBoardItemsFx(state))
+			.with("inventory", () => spawnDebugInventoryItemsFx(state))
+			.exhaustive();
+	},
+);
+
+const spawnDebugItemProgramFx = Effect.fn("spawnDebugItemFx.programFx")(function* () {
+	const { config, nowMs } = yield* DebugItemSpawnScopeFx;
+	const state = yield* createDebugSpawnWorkingStateFx();
+	yield* applyDebugSpawnLocationFx(state);
+	state.nextSave.updatedAtMs = nowMs;
 
 	return yield* createGameEngineResultFx({
 		config,
-		events,
+		events: state.events,
 		nowMs,
-		save: nextSave,
+		save: state.nextSave,
 	});
+});
+
+export const spawnDebugItemFx = Effect.fn("spawnDebugItemFx")(function* (
+	props: spawnDebugItemFx.Props,
+) {
+	return yield* spawnDebugItemProgramFx().pipe(
+		Effect.provideService(DebugItemSpawnScopeFx, props),
+	);
 });

@@ -81,71 +81,65 @@ const readInputAvailabilityLabel = ({
 	return "missing items";
 };
 
-const readStatusMetaLabel = ({ line, outputsDisabled }: LineRunFacts) =>
-	match({
-		line,
-		outputsDisabled,
-	})
+const readDeliveryStatusMetaLabel = ({ line }: LineRunFacts) =>
+	match(line)
 		.with(
 			{
-				line: {
-					deliveryBlocked: true,
-				},
+				deliveryBlocked: true,
 			},
 			() => "delivery blocked",
 		)
 		.with(
 			{
-				line: {
-					queueBlockedReason: "delivery_blocked",
-				},
+				queueBlockedReason: "delivery_blocked",
 			},
 			() => "delivery blocked",
 		)
 		.with(
 			{
-				line: {
-					queueBlockedReason: "paused",
-				},
+				queueBlockedReason: "paused",
 			},
 			() => "queue paused",
 		)
 		.when(
-			({ line }) => line.pausedAtMs !== undefined,
+			({ pausedAtMs }) => pausedAtMs !== undefined,
 			() => "paused",
 		)
 		.with(
 			{
-				line: {
-					queueFull: true,
-				},
+				queueFull: true,
 			},
 			() => "queue full",
 		)
+		.otherwise(() => undefined);
+
+const readVisibilityStatusMetaLabel = ({ line }: LineRunFacts) =>
+	match(line)
 		.with(
 			{
-				line: {
-					visible: false,
-				},
+				visible: false,
 			},
 			() => "line hidden",
 		)
 		.with(
 			{
-				line: {
-					startRequirementsReady: false,
-				},
+				startRequirementsReady: false,
 			},
 			() => "requirements missing",
 		)
 		.with(
 			{
-				line: {
-					effectLocked: true,
-				},
+				effectLocked: true,
 			},
-			({ line }) => (line.kind === "effect" ? "effect active" : "locked"),
+			({ kind }) => (kind === "effect" ? "effect active" : "locked"),
 		)
+		.otherwise(() => undefined);
+
+const readOutputStatusMetaLabel = ({ line, outputsDisabled }: LineRunFacts) =>
+	match({
+		line,
+		outputsDisabled,
+	})
 		.with(
 			{
 				line: {
@@ -170,6 +164,11 @@ const readStatusMetaLabel = ({ line, outputsDisabled }: LineRunFacts) =>
 		)
 		.otherwise(() => undefined);
 
+const readStatusMetaLabel = (facts: LineRunFacts) =>
+	readDeliveryStatusMetaLabel(facts) ??
+	readVisibilityStatusMetaLabel(facts) ??
+	readOutputStatusMetaLabel(facts);
+
 const readProgressLabel = ({ line }: { line: LineView }) =>
 	match(line)
 		.when(
@@ -184,68 +183,62 @@ const readProgressLabel = ({ line }: { line: LineView }) =>
 		)
 		.otherwise(() => "Running");
 
-const readLineRunLabel = (facts: LineRunFacts) =>
-	match(facts)
+const readExecutionBlockedLineRunLabel = (facts: LineRunFacts) =>
+	match(facts.line)
 		.when(
-			({ line }) => line.pausedAtMs !== undefined,
+			({ pausedAtMs }) => pausedAtMs !== undefined,
 			() => "Paused",
 		)
 		.with(
 			{
-				line: {
-					deliveryBlocked: true,
-				},
+				deliveryBlocked: true,
 			},
 			() => "Delivery blocked",
 		)
 		.with(
 			{
-				line: {
-					queueBlockedReason: "delivery_blocked",
-				},
+				queueBlockedReason: "delivery_blocked",
 			},
 			() => "Delivery blocked",
 		)
 		.with(
 			{
-				line: {
-					queueBlockedReason: "paused",
-				},
+				queueBlockedReason: "paused",
 			},
 			() => "Queue paused",
 		)
 		.with(
 			{
-				line: {
-					queueFull: true,
-				},
+				queueFull: true,
 			},
 			() => "Queue full",
 		)
+		.otherwise(() => undefined);
+
+const readVisibilityBlockedLineRunLabel = (facts: LineRunFacts) =>
+	match(facts.line)
 		.with(
 			{
-				line: {
-					visible: false,
-				},
+				visible: false,
 			},
 			() => "Line hidden",
 		)
 		.with(
 			{
-				line: {
-					startRequirementsReady: false,
-				},
+				startRequirementsReady: false,
 			},
 			() => "Requirements missing",
 		)
 		.with(
 			{
-				line: {
-					effectLocked: true,
-				},
+				effectLocked: true,
 			},
-			({ line }) => (line.kind === "effect" ? "Active" : "Locked"),
+			({ kind }) => (kind === "effect" ? "Active" : "Locked"),
 		)
+		.otherwise(() => undefined);
+
+const readOutputBlockedLineRunLabel = (facts: LineRunFacts) =>
+	match(facts)
 		.with(
 			{
 				line: {
@@ -268,6 +261,10 @@ const readLineRunLabel = (facts: LineRunFacts) =>
 			},
 			() => "Blocked by effect",
 		)
+		.otherwise(() => undefined);
+
+const readInputDrivenLineRunLabel = (facts: LineRunFacts) =>
+	match(facts)
 		.with(
 			{
 				canRunAction: false,
@@ -297,6 +294,12 @@ const readLineRunLabel = (facts: LineRunFacts) =>
 			() => "Partial fill",
 		)
 		.otherwise(() => "Missing items");
+
+const readLineRunLabel = (facts: LineRunFacts) =>
+	readExecutionBlockedLineRunLabel(facts) ??
+	readVisibilityBlockedLineRunLabel(facts) ??
+	readOutputBlockedLineRunLabel(facts) ??
+	readInputDrivenLineRunLabel(facts);
 
 const createLineRunState = (facts: LineRunFacts): readLineRunState.Result => ({
 	canRunAction: facts.canRunAction,

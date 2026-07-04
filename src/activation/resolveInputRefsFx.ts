@@ -1,11 +1,11 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionItemRefSchema } from "~/action/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 
 export namespace resolveInputRefsFx {
 	export interface Props {
@@ -14,22 +14,17 @@ export namespace resolveInputRefsFx {
 	}
 }
 
-class ResolveInputRefsScopeFx extends Context.Tag("ResolveInputRefsScopeFx")<
-	ResolveInputRefsScopeFx,
-	{
-		readonly save: GameSave;
-		readonly seen: Set<string>;
-	}
->() {
-	//
-}
+type InputRefResolutionState = {
+	readonly save: GameSave;
+	readonly seen: Set<string>;
+};
 
 const assertUniqueInputRefFx = Effect.fn("resolveInputRefsFx.assertUniqueInputRefFx")(function* ({
 	key,
+	seen,
 }: {
 	key: string;
-}) {
-	const { seen } = yield* ResolveInputRefsScopeFx;
+} & Pick<InputRefResolutionState, "seen">) {
 	if (!seen.has(key)) {
 		seen.add(key);
 		return;
@@ -42,16 +37,19 @@ const assertUniqueInputRefFx = Effect.fn("resolveInputRefsFx.assertUniqueInputRe
 
 const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRefFx")(function* ({
 	itemInstanceId,
+	save,
+	seen,
 }: Extract<
 	GameActionItemRefSchema.Type,
 	{
 		kind: "board";
 	}
->) {
-	const { save } = yield* ResolveInputRefsScopeFx;
+> &
+	InputRefResolutionState) {
 	const key = `board:${itemInstanceId}`;
 	yield* assertUniqueInputRefFx({
 		key,
+		seen,
 	});
 
 	const item = save.board.items[itemInstanceId];
@@ -88,17 +86,20 @@ const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRe
 const resolveInventoryInputRefFx = Effect.fn("resolveInputRefsFx.resolveInventoryInputRefFx")(
 	function* ({
 		quantity,
+		save,
+		seen,
 		slotIndex,
 	}: Extract<
 		GameActionItemRefSchema.Type,
 		{
 			kind: "inventory";
 		}
-	>) {
-		const { save } = yield* ResolveInputRefsScopeFx;
+	> &
+		InputRefResolutionState) {
 		const key = `inventory:${slotIndex}`;
 		yield* assertUniqueInputRefFx({
 			key,
+			seen,
 		});
 
 		const slot = save.inventory.slots[slotIndex];
@@ -122,32 +123,47 @@ const resolveInventoryInputRefFx = Effect.fn("resolveInputRefsFx.resolveInventor
 
 const resolveInputRefFx = Effect.fn("resolveInputRefsFx.resolveInputRefFx")(function* ({
 	ref,
+	save,
+	seen,
 }: {
 	ref: GameActionItemRefSchema.Type;
-}) {
+} & InputRefResolutionState) {
 	return yield* match(ref)
 		.with(
 			{
 				kind: "board",
 			},
-			resolveBoardInputRefFx,
+			(boardRef) =>
+				resolveBoardInputRefFx({
+					...boardRef,
+					save,
+					seen,
+				}),
 		)
 		.with(
 			{
 				kind: "inventory",
 			},
-			resolveInventoryInputRefFx,
+			(inventoryRef) =>
+				resolveInventoryInputRefFx({
+					...inventoryRef,
+					save,
+					seen,
+				}),
 		)
 		.exhaustive();
 });
 
 const resolveInputRefsProgramFx = Effect.fn("resolveInputRefsFx.resolveInputRefsProgramFx")(
-	function* ({ inputRefs }: { inputRefs: readonly GameActionItemRefSchema.Type[] }) {
+	function* ({ inputRefs, save }: resolveInputRefsFx.Props) {
+		const seen = new Set<string>();
 		const resolved: GameActionResolvedInputRef[] = [];
 		for (const ref of inputRefs) {
 			resolved.push(
 				yield* resolveInputRefFx({
 					ref,
+					save,
+					seen,
 				}),
 			);
 		}
@@ -155,16 +171,8 @@ const resolveInputRefsProgramFx = Effect.fn("resolveInputRefsFx.resolveInputRefs
 	},
 );
 
-export const resolveInputRefsFx = Effect.fn("resolveInputRefsFx")(function* ({
-	inputRefs,
-	save,
-}: resolveInputRefsFx.Props) {
-	return yield* resolveInputRefsProgramFx({
-		inputRefs,
-	}).pipe(
-		Effect.provideService(ResolveInputRefsScopeFx, {
-			save,
-			seen: new Set<string>(),
-		}),
-	);
+export const resolveInputRefsFx = Effect.fn("resolveInputRefsFx")(function* (
+	props: resolveInputRefsFx.Props,
+) {
+	return yield* resolveInputRefsProgramFx(props);
 });

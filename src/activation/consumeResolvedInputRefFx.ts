@@ -1,10 +1,10 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
-import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
 
 export namespace consumeResolvedInputRefFx {
@@ -21,109 +21,113 @@ export namespace consumeResolvedInputRefFx {
 	}
 }
 
-class ConsumeResolvedInputRefScopeFx extends Context.Tag("ConsumeResolvedInputRefScopeFx")<
-	ConsumeResolvedInputRefScopeFx,
-	Pick<consumeResolvedInputRefFx.Props, "events" | "nextSave" | "reason">
->() {
-	//
-}
+type ResolvedInputConsumptionContext = Pick<
+	consumeResolvedInputRefFx.Props,
+	"events" | "nextSave" | "reason"
+>;
 
-const pushConsumedEvent = ({
+const pushConsumedEventFx = Effect.fn("consumeResolvedInputRefFx.pushConsumedEventFx")(function* ({
 	event,
-}: {
+	events,
+}: Pick<ResolvedInputConsumptionContext, "events"> & {
 	event: Extract<
 		GameEvent,
 		{
 			type: "item.consumed";
 		}
 	>;
-}) =>
-	Effect.gen(function* () {
-		const { events } = yield* ConsumeResolvedInputRefScopeFx;
-		events.push(event);
-	});
+}) {
+	events.push(event);
+});
 
 const consumeBoardInputRefFx = Effect.fn("consumeResolvedInputRefFx.consumeBoardInputRefFx")(
-	function* (
-		boardRef: Extract<
+	function* ({
+		events,
+		nextSave,
+		reason,
+		ref,
+	}: ResolvedInputConsumptionContext & {
+		ref: Extract<
 			GameActionResolvedInputRef,
 			{
 				kind: "board";
 			}
-		>,
-	) {
-		const { nextSave, reason } = yield* ConsumeResolvedInputRefScopeFx;
+		>;
+	}) {
 		yield* removeBoardItemFromSaveFx({
-			itemInstanceId: boardRef.itemInstanceId,
+			itemInstanceId: ref.itemInstanceId,
 			runtimeState: "remove",
 			save: nextSave,
 		});
-		yield* pushConsumedEvent({
+		yield* pushConsumedEventFx({
 			event: yield* createBoardItemConsumedEventFx({
-				itemId: boardRef.itemId,
-				itemInstanceId: boardRef.itemInstanceId,
+				itemId: ref.itemId,
+				itemInstanceId: ref.itemInstanceId,
 				reason,
 			}),
+			events,
 		});
 	},
 );
 
 const consumeInventoryInputRefFx = Effect.fn(
 	"consumeResolvedInputRefFx.consumeInventoryInputRefFx",
-)(function* (
-	inventoryRef: Extract<
+)(function* ({
+	events,
+	nextSave,
+	reason,
+	ref,
+}: ResolvedInputConsumptionContext & {
+	ref: Extract<
 		GameActionResolvedInputRef,
 		{
 			kind: "inventory";
 		}
-	>,
-) {
-	const { nextSave, reason } = yield* ConsumeResolvedInputRefScopeFx;
+	>;
+}) {
 	const consumed = yield* consumeInventorySlotQuantityFx({
 		nextSave,
-		quantity: inventoryRef.quantity,
+		quantity: ref.quantity,
 		reason,
 		runtimeState: "remove-instance",
-		slotIndex: inventoryRef.slotIndex,
+		slotIndex: ref.slotIndex,
 	});
 
-	yield* pushConsumedEvent({
+	yield* pushConsumedEventFx({
 		event: consumed.consumedEvent,
+		events,
 	});
 });
 
 const consumeResolvedInputRefProgramFx = Effect.fn(
 	"consumeResolvedInputRefFx.consumeResolvedInputRefProgramFx",
-)(function* ({ ref }: { ref: GameActionResolvedInputRef }) {
+)(function* ({ ref, ...context }: consumeResolvedInputRefFx.Props) {
 	return yield* match(ref)
 		.with(
 			{
 				kind: "board",
 			},
-			consumeBoardInputRefFx,
+			(boardRef) =>
+				consumeBoardInputRefFx({
+					...context,
+					ref: boardRef,
+				}),
 		)
 		.with(
 			{
 				kind: "inventory",
 			},
-			consumeInventoryInputRefFx,
+			(inventoryRef) =>
+				consumeInventoryInputRefFx({
+					...context,
+					ref: inventoryRef,
+				}),
 		)
 		.exhaustive();
 });
 
-export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(function* ({
-	events,
-	nextSave,
-	reason,
-	ref,
-}: consumeResolvedInputRefFx.Props) {
-	return yield* consumeResolvedInputRefProgramFx({
-		ref,
-	}).pipe(
-		Effect.provideService(ConsumeResolvedInputRefScopeFx, {
-			events,
-			nextSave,
-			reason,
-		}),
-	);
+export const consumeResolvedInputRefFx = Effect.fn("consumeResolvedInputRefFx")(function* (
+	props: consumeResolvedInputRefFx.Props,
+) {
+	return yield* consumeResolvedInputRefProgramFx(props);
 });

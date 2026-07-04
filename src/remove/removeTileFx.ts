@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
@@ -32,15 +32,11 @@ type TileRemoveWorkingState = {
 	seedCell: Effect.Effect.Success<ReturnType<typeof readBoardItemCellFx>>;
 };
 
-class RemoveTileScopeFx extends Context.Tag("RemoveTileScopeFx")<
-	RemoveTileScopeFx,
-	removeTileFx.Props
->() {
-	//
-}
-
-const readTileRemoveReadinessFx = Effect.fn("removeTileFx.readTileRemoveReadinessFx")(function* () {
-	const { action, config, save } = yield* RemoveTileScopeFx;
+const readTileRemoveReadinessFx = Effect.fn("removeTileFx.readTileRemoveReadinessFx")(function* ({
+	action,
+	config,
+	save,
+}: Pick<removeTileFx.Props, "action" | "config" | "save">) {
 	return yield* checkTileRemoveReadinessFx({
 		action,
 		config,
@@ -49,11 +45,13 @@ const readTileRemoveReadinessFx = Effect.fn("removeTileFx.readTileRemoveReadines
 });
 
 const consumeRemoveToolFx = Effect.fn("removeTileFx.consumeRemoveToolFx")(function* ({
+	action,
 	checked,
-}: {
+	nowMs,
+	save,
+}: Pick<removeTileFx.Props, "action" | "nowMs" | "save"> & {
 	checked: TileRemoveReadiness;
 }) {
-	const { action, nowMs, save } = yield* RemoveTileScopeFx;
 	return yield* match(checked.removal.mode)
 		.with("consume", () =>
 			consumeActivationInputsFx({
@@ -92,10 +90,19 @@ const removeTileTargetFromBoardFx = Effect.fn("removeTileFx.removeTileTargetFrom
 );
 
 const createTileRemoveWorkingStateFx = Effect.fn("removeTileFx.createTileRemoveWorkingStateFx")(
-	function* ({ checked }: { checked: TileRemoveReadiness }) {
-		const { nowMs } = yield* RemoveTileScopeFx;
+	function* ({
+		action,
+		checked,
+		nowMs,
+		save,
+	}: Pick<removeTileFx.Props, "action" | "nowMs" | "save"> & {
+		checked: TileRemoveReadiness;
+	}) {
 		const consumed = yield* consumeRemoveToolFx({
+			action,
 			checked,
+			nowMs,
+			save,
 		});
 		const nextSave = yield* cloneGameSaveFx({
 			save: consumed.save,
@@ -152,10 +159,13 @@ const rollTileRemoveOutputPlacementRequestsFx = Effect.fn(
 	);
 });
 
-const placeTileRemoveOutputsFx = Effect.fn("removeTileFx.placeTileRemoveOutputsFx")(function* (
-	state: TileRemoveWorkingState,
-) {
-	const { config, nowMs } = yield* RemoveTileScopeFx;
+const placeTileRemoveOutputsFx = Effect.fn("removeTileFx.placeTileRemoveOutputsFx")(function* ({
+	config,
+	nowMs,
+	state,
+}: Pick<removeTileFx.Props, "config" | "nowMs"> & {
+	state: TileRemoveWorkingState;
+}) {
 	const placementRequests = yield* rollTileRemoveOutputPlacementRequestsFx(state);
 	if (placementRequests.length === 0) {
 		return {
@@ -176,11 +186,18 @@ const placeTileRemoveOutputsFx = Effect.fn("removeTileFx.placeTileRemoveOutputsF
 	});
 });
 
-const buildRemoveTileResultFx = Effect.fn("removeTileFx.buildRemoveTileResultFx")(function* (
-	state: TileRemoveWorkingState,
-) {
-	const { config, nowMs } = yield* RemoveTileScopeFx;
-	const placed = yield* placeTileRemoveOutputsFx(state);
+const buildRemoveTileResultFx = Effect.fn("removeTileFx.buildRemoveTileResultFx")(function* ({
+	config,
+	nowMs,
+	state,
+}: Pick<removeTileFx.Props, "config" | "nowMs"> & {
+	state: TileRemoveWorkingState;
+}) {
+	const placed = yield* placeTileRemoveOutputsFx({
+		config,
+		nowMs,
+		state,
+	});
 
 	return yield* createGameEngineResultFx({
 		config,
@@ -193,26 +210,30 @@ const buildRemoveTileResultFx = Effect.fn("removeTileFx.buildRemoveTileResultFx"
 	});
 });
 
-const removeTileProgramFx = Effect.fn("removeTileFx.removeTileProgramFx")(function* () {
-	const checked = yield* readTileRemoveReadinessFx();
-	const state = yield* createTileRemoveWorkingStateFx({
-		checked,
-	});
-	return yield* buildRemoveTileResultFx(state);
-});
-
-export const removeTileFx = Effect.fn("removeTileFx")(function* ({
+const removeTileProgramFx = Effect.fn("removeTileFx.removeTileProgramFx")(function* ({
 	action,
 	config,
 	nowMs,
 	save,
 }: removeTileFx.Props) {
-	return yield* removeTileProgramFx().pipe(
-		Effect.provideService(RemoveTileScopeFx, {
-			action,
-			config,
-			nowMs,
-			save,
-		}),
-	);
+	const checked = yield* readTileRemoveReadinessFx({
+		action,
+		config,
+		save,
+	});
+	const state = yield* createTileRemoveWorkingStateFx({
+		action,
+		checked,
+		nowMs,
+		save,
+	});
+	return yield* buildRemoveTileResultFx({
+		config,
+		nowMs,
+		state,
+	});
+});
+
+export const removeTileFx = Effect.fn("removeTileFx")(function* (props: removeTileFx.Props) {
+	return yield* removeTileProgramFx(props);
 });

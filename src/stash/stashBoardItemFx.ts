@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -31,21 +31,17 @@ type BoardItemStashState = BoardItemStashReadiness & {
 	stashMode: BoardItemStashMode;
 };
 
-class BoardItemStashScopeFx extends Context.Tag("BoardItemStashScopeFx")<
-	BoardItemStashScopeFx,
-	stashBoardItemFx.Props
->() {
-	//
-}
-
 const readBoardItemStashMode = ({ item, stateStatus }: BoardItemStashReadiness) =>
 	stateStatus.preservable || item.itemId === boardMemoryItemId
 		? "preserve-instance"
 		: "stack-copy";
 
 const readBoardItemStashStateFx = Effect.fn("stashBoardItemFx.readBoardItemStashStateFx")(
-	function* () {
-		const { action, config, save } = yield* BoardItemStashScopeFx;
+	function* ({
+		action,
+		config,
+		save,
+	}: Pick<stashBoardItemFx.Props, "action" | "config" | "save">) {
 		const readiness = yield* checkBoardItemStashReadinessFx({
 			action,
 			config,
@@ -70,8 +66,12 @@ const mapInventoryPlacementFailureFx = Effect.fn("stashBoardItemFx.mapInventoryP
 
 const placeStashedBoardItemInInventoryFx = Effect.fn(
 	"stashBoardItemFx.placeStashedBoardItemInInventoryFx",
-)(function* (state: BoardItemStashState) {
-	const { config } = yield* BoardItemStashScopeFx;
+)(function* ({
+	config,
+	state,
+}: Pick<stashBoardItemFx.Props, "config"> & {
+	state: BoardItemStashState;
+}) {
 	const placed = yield* placeBoardItemInInventoryFx({
 		config,
 		events: state.events,
@@ -93,10 +93,21 @@ const placeStashedBoardItemInInventoryFx = Effect.fn(
 	});
 });
 
-const stashBoardItemProgramFx = Effect.fn("stashBoardItemFx.programFx")(function* () {
-	const { config, nowMs } = yield* BoardItemStashScopeFx;
-	const state = yield* readBoardItemStashStateFx();
-	const nextSave = yield* placeStashedBoardItemInInventoryFx(state);
+const stashBoardItemProgramFx = Effect.fn("stashBoardItemFx.programFx")(function* ({
+	action,
+	config,
+	nowMs,
+	save,
+}: stashBoardItemFx.Props) {
+	const state = yield* readBoardItemStashStateFx({
+		action,
+		config,
+		save,
+	});
+	const nextSave = yield* placeStashedBoardItemInInventoryFx({
+		config,
+		state,
+	});
 	nextSave.updatedAtMs = nowMs;
 
 	return yield* createGameEngineResultFx({
@@ -110,7 +121,5 @@ const stashBoardItemProgramFx = Effect.fn("stashBoardItemFx.programFx")(function
 export const stashBoardItemFx = Effect.fn("stashBoardItemFx")(function* (
 	props: stashBoardItemFx.Props,
 ) {
-	return yield* stashBoardItemProgramFx().pipe(
-		Effect.provideService(BoardItemStashScopeFx, props),
-	);
+	return yield* stashBoardItemProgramFx(props);
 });

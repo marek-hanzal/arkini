@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { processCompletedCraftJobsFx } from "~/craft/processCompletedCraftJobsFx";
 import { processExpiredActiveEffectsFx } from "~/effects/processExpiredActiveEffectsFx";
@@ -32,17 +32,9 @@ type WorldSnapshotProcessingState = {
 	nextSave: GameSave;
 };
 
-class WorldSnapshotProcessingScopeFx extends Context.Tag("WorldSnapshotProcessingScopeFx")<
-	WorldSnapshotProcessingScopeFx,
-	processWorldSnapshotFx.Props
->() {
-	//
-}
-
 const createWorldSnapshotProcessingStateFx = Effect.fn(
 	"processWorldSnapshotFx.createWorldSnapshotProcessingStateFx",
-)(function* () {
-	const { save } = yield* WorldSnapshotProcessingScopeFx;
+)(function* ({ save }: { save: GameSave }) {
 	const state: WorldSnapshotProcessingState = {
 		events: [],
 		nextSave: save,
@@ -65,8 +57,13 @@ const appendWorldProcessingStepResultFx = Effect.fn(
 
 const processItemSpawnJobsBeforeRuntimeJobsFx = Effect.fn(
 	"processWorldSnapshotFx.processItemSpawnJobsBeforeRuntimeJobsFx",
-)(function* (state: WorldSnapshotProcessingState) {
-	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+)(function* ({
+	config,
+	nowMs,
+	state,
+}: Pick<processWorldSnapshotFx.Props, "config" | "nowMs"> & {
+	state: WorldSnapshotProcessingState;
+}) {
 	yield* appendWorldProcessingStepResultFx({
 		result: yield* processItemSpawnJobsFx({
 			config,
@@ -78,11 +75,12 @@ const processItemSpawnJobsBeforeRuntimeJobsFx = Effect.fn(
 });
 
 const processProducerJobsFx = Effect.fn("processWorldSnapshotFx.processProducerJobsFx")(function* ({
+	config,
+	nowMs,
 	state,
-}: {
+}: Pick<processWorldSnapshotFx.Props, "config" | "nowMs"> & {
 	state: WorldSnapshotProcessingState;
 }) {
-	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
 	yield* appendWorldProcessingStepResultFx({
 		result: yield* processCompletedProducerJobsFx({
 			config,
@@ -94,11 +92,12 @@ const processProducerJobsFx = Effect.fn("processWorldSnapshotFx.processProducerJ
 });
 
 const processCraftJobsFx = Effect.fn("processWorldSnapshotFx.processCraftJobsFx")(function* ({
+	config,
+	nowMs,
 	state,
-}: {
+}: Pick<processWorldSnapshotFx.Props, "config" | "nowMs"> & {
 	state: WorldSnapshotProcessingState;
 }) {
-	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
 	yield* appendWorldProcessingStepResultFx({
 		result: yield* processCompletedCraftJobsFx({
 			config,
@@ -110,8 +109,13 @@ const processCraftJobsFx = Effect.fn("processWorldSnapshotFx.processCraftJobsFx"
 });
 
 const processExpiredEffectsFx = Effect.fn("processWorldSnapshotFx.processExpiredEffectsFx")(
-	function* (state: WorldSnapshotProcessingState) {
-		const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+	function* ({
+		config,
+		nowMs,
+		state,
+	}: Pick<processWorldSnapshotFx.Props, "config" | "nowMs"> & {
+		state: WorldSnapshotProcessingState;
+	}) {
 		yield* appendWorldProcessingStepResultFx({
 			result: yield* processExpiredActiveEffectsFx({
 				config,
@@ -125,22 +129,39 @@ const processExpiredEffectsFx = Effect.fn("processWorldSnapshotFx.processExpired
 
 const processRuntimeJobsUntilStableFx = Effect.fn(
 	"processWorldSnapshotFx.processRuntimeJobsUntilStableFx",
-)(function* (state: WorldSnapshotProcessingState) {
+)(function* ({
+	config,
+	nowMs,
+	state,
+}: Pick<processWorldSnapshotFx.Props, "config" | "nowMs"> & {
+	state: WorldSnapshotProcessingState;
+}) {
 	yield* processProducerJobsFx({
+		config,
+		nowMs,
 		state,
 	});
 	yield* processCraftJobsFx({
+		config,
+		nowMs,
 		state,
 	});
 	yield* processProducerJobsFx({
+		config,
+		nowMs,
 		state,
 	});
 });
 
 const readProcessedWorldWakePlanFx = Effect.fn(
 	"processWorldSnapshotFx.readProcessedWorldWakePlanFx",
-)(function* (state: WorldSnapshotProcessingState) {
-	const { config, nowMs } = yield* WorldSnapshotProcessingScopeFx;
+)(function* ({
+	config,
+	nowMs,
+	state,
+}: Pick<processWorldSnapshotFx.Props, "config" | "nowMs"> & {
+	state: WorldSnapshotProcessingState;
+}) {
 	return yield* readWorldWakePlanFx({
 		config,
 		nowMs,
@@ -150,12 +171,30 @@ const readProcessedWorldWakePlanFx = Effect.fn(
 
 const processWorldSnapshotProgramFx = Effect.fn(
 	"processWorldSnapshotFx.processWorldSnapshotProgramFx",
-)(function* () {
-	const state = yield* createWorldSnapshotProcessingStateFx();
-	yield* processItemSpawnJobsBeforeRuntimeJobsFx(state);
-	yield* processRuntimeJobsUntilStableFx(state);
-	yield* processExpiredEffectsFx(state);
-	const wakePlan = yield* readProcessedWorldWakePlanFx(state);
+)(function* ({ config, nowMs, save }: processWorldSnapshotFx.Props) {
+	const state = yield* createWorldSnapshotProcessingStateFx({
+		save,
+	});
+	yield* processItemSpawnJobsBeforeRuntimeJobsFx({
+		config,
+		nowMs,
+		state,
+	});
+	yield* processRuntimeJobsUntilStableFx({
+		config,
+		nowMs,
+		state,
+	});
+	yield* processExpiredEffectsFx({
+		config,
+		nowMs,
+		state,
+	});
+	const wakePlan = yield* readProcessedWorldWakePlanFx({
+		config,
+		nowMs,
+		state,
+	});
 
 	return {
 		events: state.events,
@@ -167,7 +206,5 @@ const processWorldSnapshotProgramFx = Effect.fn(
 export const processWorldSnapshotFx = Effect.fn("processWorldSnapshotFx")(function* (
 	props: processWorldSnapshotFx.Props,
 ) {
-	return yield* processWorldSnapshotProgramFx().pipe(
-		Effect.provideService(WorldSnapshotProcessingScopeFx, props),
-	);
+	return yield* processWorldSnapshotProgramFx(props);
 });

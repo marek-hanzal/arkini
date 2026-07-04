@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameActivationInput } from "~/activation/GameActivationInput";
 import { readActivationInputMode } from "~/activation/readActivationInputMode";
+import { writeStoredActivationInputQuantityFx } from "~/activation/writeStoredActivationInputQuantityFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace consumeProducerStoredInputsFx {
@@ -31,11 +32,11 @@ export const consumeProducerStoredInputsFx = Effect.fn("consumeProducerStoredInp
 				? Math.min(previousQuantity, input.quantity)
 				: input.quantity;
 		const nextQuantity = previousQuantity - consumedQuantity;
-		if (nextQuantity > 0) {
-			lineInputState.items[input.itemId] = nextQuantity;
-		} else {
-			delete lineInputState.items[input.itemId];
-		}
+		yield* writeStoredActivationInputQuantityFx({
+			itemId: input.itemId,
+			nextQuantity,
+			state: lineInputState,
+		});
 	}
 
 	if (Object.keys(lineInputState.items).length === 0) {

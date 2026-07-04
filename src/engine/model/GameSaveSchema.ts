@@ -1668,6 +1668,33 @@ const validateSaveItemSpawnDependencyCycles = ({ ctx, save }: GameSaveValidation
 	}
 };
 
+const validateSaveProducerState = (validationContext: GameSaveValidationContext) => {
+	const producerJobState = validateSaveProducerJobs(validationContext);
+	const activeEffectIdsByProducerJobId = validateSaveActiveEffects(validationContext);
+	validateProducerJobActiveEffectLinks({
+		...validationContext,
+		activeEffectIdsByProducerJobId,
+	});
+	validateProducerQueueSizes({
+		config: validationContext.config,
+		ctx: validationContext.ctx,
+		jobCountByItemInstanceId: producerJobState.jobCountByItemInstanceId,
+		save: validationContext.save,
+	});
+	validateProducerQueueOrdering({
+		ctx: validationContext.ctx,
+		jobsByItemInstanceId: producerJobState.jobsByItemInstanceId,
+	});
+};
+
+const validateSaveCraftState = (validationContext: GameSaveValidationContext) => {
+	const runningCraftJobsByTargetItemInstanceId = validateSaveCraftJobs(validationContext);
+	validateSaveCraftInputs({
+		...validationContext,
+		runningCraftJobsByTargetItemInstanceId,
+	});
+};
+
 const validateGameSaveAgainstConfig = (
 	ctx: z.RefinementCtx,
 	save: GameSave,
@@ -1686,29 +1713,10 @@ const validateGameSaveAgainstConfig = (
 		ctx,
 	});
 	validateSaveInventorySlots(validationContext);
-	const producerJobState = validateSaveProducerJobs(validationContext);
-	const activeEffectIdsByProducerJobId = validateSaveActiveEffects(validationContext);
-	validateProducerJobActiveEffectLinks({
-		...validationContext,
-		activeEffectIdsByProducerJobId,
-	});
-	validateProducerQueueSizes({
-		config,
-		ctx,
-		jobCountByItemInstanceId: producerJobState.jobCountByItemInstanceId,
-		save,
-	});
-	validateProducerQueueOrdering({
-		ctx,
-		jobsByItemInstanceId: producerJobState.jobsByItemInstanceId,
-	});
+	validateSaveProducerState(validationContext);
 	validateSaveLineStates(validationContext);
 	validateSaveProducerInputs(validationContext);
-	const runningCraftJobsByTargetItemInstanceId = validateSaveCraftJobs(validationContext);
-	validateSaveCraftInputs({
-		...validationContext,
-		runningCraftJobsByTargetItemInstanceId,
-	});
+	validateSaveCraftState(validationContext);
 	validateSaveProducerCharges(validationContext);
 	validateSaveItemCapacities(validationContext);
 	validateSaveBoardMemoryLayouts(validationContext);

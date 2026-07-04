@@ -635,6 +635,38 @@ const validateResolvedDomainSelector = ({
 	}
 };
 
+type GrantSelectorClauseKey = "allOf" | "anyOf" | "noneOf";
+
+const validateGameGrantSelectorClauseGroup = ({
+	ctx,
+	grantIds,
+	path,
+	selector,
+	selectorKey,
+}: {
+	ctx: z.RefinementCtx;
+	grantIds: readonly string[];
+	path: GameConfigIssuePath;
+	selector: Exclude<
+		z.infer<typeof ResolvedDomainSelectorSchema>,
+		{
+			mode: "all";
+		}
+	>;
+	selectorKey: GrantSelectorClauseKey;
+}) => {
+	validateResolvedDomainSelectorClauses({
+		clauses: selector[selectorKey],
+		ctx,
+		hasEntity: (grantId) => grantIds.includes(grantId),
+		label: "grant",
+		path: [
+			...path,
+			selectorKey,
+		],
+	});
+};
+
 const validateGameGrantSelector = (
 	ctx: z.RefinementCtx,
 	path: GameConfigIssuePath,
@@ -649,37 +681,19 @@ const validateGameGrantSelector = (
 		addIssue(ctx, path, `Grant selector must define anyOf, allOf, noneOf, or mode: "all".`);
 	}
 
-	const hasGrant = (grantId: string) => grantIds.includes(grantId);
-	validateResolvedDomainSelectorClauses({
-		clauses: selector.anyOf,
-		ctx,
-		hasEntity: hasGrant,
-		label: "grant",
-		path: [
-			...path,
-			"anyOf",
-		],
-	});
-	validateResolvedDomainSelectorClauses({
-		clauses: selector.allOf,
-		ctx,
-		hasEntity: hasGrant,
-		label: "grant",
-		path: [
-			...path,
-			"allOf",
-		],
-	});
-	validateResolvedDomainSelectorClauses({
-		clauses: selector.noneOf,
-		ctx,
-		hasEntity: hasGrant,
-		label: "grant",
-		path: [
-			...path,
-			"noneOf",
-		],
-	});
+	for (const selectorKey of [
+		"anyOf",
+		"allOf",
+		"noneOf",
+	] satisfies GrantSelectorClauseKey[]) {
+		validateGameGrantSelectorClauseGroup({
+			ctx,
+			grantIds,
+			path,
+			selector,
+			selectorKey,
+		});
+	}
 };
 
 const validateGameLineItemSelector = (
@@ -876,6 +890,14 @@ const validateNearbyLootOutputChanceEffect = ({
 	}
 };
 
+const GrantDropEffectKindPattern = P.union(
+	"grant.drop.hide",
+	"grant.drop.show",
+	"grant.drop.disable",
+	"grant.drop.enable",
+	"grant.loot.extraOutputChance.add",
+);
+
 const validateGameDropEffect = (props: GameDropEffectValidationProps) => {
 	match(props.effect)
 		.with(
@@ -892,13 +914,7 @@ const validateGameDropEffect = (props: GameDropEffectValidationProps) => {
 		)
 		.with(
 			{
-				kind: P.union(
-					"grant.drop.hide",
-					"grant.drop.show",
-					"grant.drop.disable",
-					"grant.drop.enable",
-					"grant.loot.extraOutputChance.add",
-				),
+				kind: GrantDropEffectKindPattern,
 			},
 			(effect) =>
 				validateDropGrantSelectorEffect({
@@ -1773,6 +1789,129 @@ const readPassiveGrantSourceItemIdsByGrantId = (config: GameConfig) => {
 	return result;
 };
 
+type BlueprintDependencyCycle = {
+	blueprintItemIds: string[];
+	edges: BlueprintDependencyEdge[];
+};
+
+type BlueprintDependencyCycleWalkState = {
+	cycles: BlueprintDependencyCycle[];
+	edgeStack: BlueprintDependencyEdge[];
+	edgesByBlueprintItemId: ReadonlyMap<string, readonly BlueprintDependencyEdge[]>;
+	reportedCycleKeys: Set<string>;
+	stack: string[];
+	stackIndexByBlueprintItemId: Map<string, number>;
+	visited: Set<string>;
+	visiting: Set<string>;
+};
+
+const createBlueprintDependencyCycleWalkState = (
+	edgesByBlueprintItemId: ReadonlyMap<string, readonly BlueprintDependencyEdge[]>,
+): BlueprintDependencyCycleWalkState => ({
+	cycles: [],
+	edgeStack: [],
+	edgesByBlueprintItemId,
+	reportedCycleKeys: new Set(),
+	stack: [],
+	stackIndexByBlueprintItemId: new Map(),
+	visited: new Set(),
+	visiting: new Set(),
+});
+
+const enterBlueprintDependencyNode = (
+	state: BlueprintDependencyCycleWalkState,
+	blueprintItemId: string,
+) => {
+	state.visiting.add(blueprintItemId);
+	state.stackIndexByBlueprintItemId.set(blueprintItemId, state.stack.length);
+	state.stack.push(blueprintItemId);
+};
+
+const leaveBlueprintDependencyNode = (
+	state: BlueprintDependencyCycleWalkState,
+	blueprintItemId: string,
+) => {
+	state.stack.pop();
+	state.stackIndexByBlueprintItemId.delete(blueprintItemId);
+	state.visiting.delete(blueprintItemId);
+	state.visited.add(blueprintItemId);
+};
+
+const readBlueprintDependencyCycleForEdge = ({
+	edge,
+	state,
+}: {
+	edge: BlueprintDependencyEdge;
+	state: BlueprintDependencyCycleWalkState;
+}): BlueprintDependencyCycle | undefined => {
+	const cycleStartIndex = state.stackIndexByBlueprintItemId.get(edge.toBlueprintItemId);
+	if (cycleStartIndex === undefined) return undefined;
+
+	return {
+		blueprintItemIds: [
+			...state.stack.slice(cycleStartIndex),
+			edge.toBlueprintItemId,
+		],
+		edges: [
+			...state.edgeStack.slice(cycleStartIndex),
+			edge,
+		],
+	};
+};
+
+const recordBlueprintDependencyCycle = (
+	state: BlueprintDependencyCycleWalkState,
+	cycle: BlueprintDependencyCycle,
+) => {
+	const cycleKey = readBlueprintDependencyCycleKey(cycle.blueprintItemIds);
+	if (state.reportedCycleKeys.has(cycleKey)) return;
+
+	state.reportedCycleKeys.add(cycleKey);
+	state.cycles.push(cycle);
+};
+
+const visitBlueprintDependencyEdge = ({
+	edge,
+	state,
+	visit,
+}: {
+	edge: BlueprintDependencyEdge;
+	state: BlueprintDependencyCycleWalkState;
+	visit: (blueprintItemId: string) => void;
+}) => {
+	const cycle = readBlueprintDependencyCycleForEdge({
+		edge,
+		state,
+	});
+	if (cycle) {
+		recordBlueprintDependencyCycle(state, cycle);
+		return;
+	}
+
+	if (state.visiting.has(edge.toBlueprintItemId)) return;
+	state.edgeStack.push(edge);
+	visit(edge.toBlueprintItemId);
+	state.edgeStack.pop();
+};
+
+const visitBlueprintDependencyNode = (
+	state: BlueprintDependencyCycleWalkState,
+	blueprintItemId: string,
+) => {
+	if (state.visited.has(blueprintItemId)) return;
+
+	enterBlueprintDependencyNode(state, blueprintItemId);
+	for (const edge of state.edgesByBlueprintItemId.get(blueprintItemId) ?? []) {
+		visitBlueprintDependencyEdge({
+			edge,
+			state,
+			visit: (nextBlueprintItemId) =>
+				visitBlueprintDependencyNode(state, nextBlueprintItemId),
+		});
+	}
+	leaveBlueprintDependencyNode(state, blueprintItemId);
+};
+
 const readBlueprintDependencyCycles = ({
 	blueprintItemIds,
 	edgesByBlueprintItemId,
@@ -1780,67 +1919,13 @@ const readBlueprintDependencyCycles = ({
 	blueprintItemIds: ReadonlySet<string>;
 	edgesByBlueprintItemId: ReadonlyMap<string, readonly BlueprintDependencyEdge[]>;
 }) => {
-	const cycles: {
-		blueprintItemIds: string[];
-		edges: BlueprintDependencyEdge[];
-	}[] = [];
-	const reportedCycleKeys = new Set<string>();
-	const visited = new Set<string>();
-	const visiting = new Set<string>();
-	const stack: string[] = [];
-	const edgeStack: BlueprintDependencyEdge[] = [];
-	const stackIndexByBlueprintItemId = new Map<string, number>();
-
-	const visit = (blueprintItemId: string) => {
-		if (visited.has(blueprintItemId)) return;
-
-		visiting.add(blueprintItemId);
-		stackIndexByBlueprintItemId.set(blueprintItemId, stack.length);
-		stack.push(blueprintItemId);
-
-		for (const edge of edgesByBlueprintItemId.get(blueprintItemId) ?? []) {
-			const nextBlueprintItemId = edge.toBlueprintItemId;
-			const cycleStartIndex = stackIndexByBlueprintItemId.get(nextBlueprintItemId);
-			if (cycleStartIndex !== undefined) {
-				const cycleBlueprintItemIds = [
-					...stack.slice(cycleStartIndex),
-					nextBlueprintItemId,
-				];
-				const cycleEdges = [
-					...edgeStack.slice(cycleStartIndex),
-					edge,
-				];
-				const cycleKey = readBlueprintDependencyCycleKey(cycleBlueprintItemIds);
-				if (!reportedCycleKeys.has(cycleKey)) {
-					reportedCycleKeys.add(cycleKey);
-					cycles.push({
-						blueprintItemIds: cycleBlueprintItemIds,
-						edges: cycleEdges,
-					});
-				}
-				continue;
-			}
-
-			if (!visiting.has(nextBlueprintItemId)) {
-				edgeStack.push(edge);
-				visit(nextBlueprintItemId);
-				edgeStack.pop();
-			}
-		}
-
-		stack.pop();
-		stackIndexByBlueprintItemId.delete(blueprintItemId);
-		visiting.delete(blueprintItemId);
-		visited.add(blueprintItemId);
-	};
-
+	const state = createBlueprintDependencyCycleWalkState(edgesByBlueprintItemId);
 	for (const blueprintItemId of [
 		...blueprintItemIds,
 	].sort()) {
-		visit(blueprintItemId);
+		visitBlueprintDependencyNode(state, blueprintItemId);
 	}
-
-	return cycles;
+	return state.cycles;
 };
 
 const readBlueprintDependencyCycleKey = (cycleBlueprintItemIds: readonly string[]) => {

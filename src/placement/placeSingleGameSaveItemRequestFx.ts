@@ -7,11 +7,11 @@ import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
+import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
-import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
 type GameSaveSingleItemPlacementResult = {
 	type: "placed";
@@ -151,29 +151,14 @@ const readBoardPlacementTargetFx = Effect.fn(
 const placeBoardItemAtCellFx = Effect.fn("placeSingleGameSaveItemRequestFx.placeBoardItemAtCellFx")(
 	function* ({ cell }: { cell: BoardCell }) {
 		const { createdAtMs, events, item, save } = yield* SingleItemPlacementScopeFx;
-		const itemInstanceId = yield* createGameItemInstanceIdFx();
-		save.board.items[itemInstanceId] = {
-			...(createdAtMs !== undefined
-				? {
-						createdAtMs,
-					}
-				: {}),
-			id: itemInstanceId,
-			itemId: item.itemId,
-			x: cell.x,
-			y: cell.y,
-		};
-		events.push({
+		yield* placeBoardItemInstanceFx({
+			cell,
+			createdAtMs,
+			events,
 			itemId: item.itemId,
 			originItemInstanceId: item.originItemInstanceId,
 			reason: item.reason,
-			to: {
-				kind: "board",
-				itemInstanceId,
-				x: cell.x,
-				y: cell.y,
-			},
-			type: "item.created",
+			save,
 		});
 	},
 );

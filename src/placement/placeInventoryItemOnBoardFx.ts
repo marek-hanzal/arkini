@@ -17,10 +17,10 @@ import {
 } from "~/inventory/model/GameSaveInventorySlot";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import { checkInventoryItemPlaceReadinessFx } from "~/placement/checkInventoryItemPlaceReadinessFx";
+import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
 export namespace placeInventoryItemOnBoardFx {
 	export interface Props {
@@ -114,60 +114,6 @@ const readGameEnginePlacementResultFx = Effect.fn(
 	});
 });
 
-const createBoardItemCreatedEventFx = Effect.fn(
-	"placeInventoryItemOnBoardFx.createBoardItemCreatedEventFx",
-)(function* ({
-	itemId,
-	itemInstanceId,
-	x,
-	y,
-}: {
-	itemId: string;
-	itemInstanceId: string;
-	x: number;
-	y: number;
-}) {
-	return {
-		itemId,
-		reason: "inventory-placement",
-		to: {
-			kind: "board",
-			itemInstanceId,
-			x,
-			y,
-		},
-		type: "item.created",
-	} satisfies GameEvent;
-});
-
-const placeBoardItemFx = Effect.fn("placeInventoryItemOnBoardFx.placeBoardItemFx")(function* ({
-	itemId,
-	itemInstanceId,
-	nextSave,
-	placedCreatedAtMs,
-	x,
-	y,
-}: {
-	itemId: string;
-	itemInstanceId: string;
-	nextSave: GameSave;
-	placedCreatedAtMs: number | undefined;
-	x: number;
-	y: number;
-}) {
-	nextSave.board.items[itemInstanceId] = {
-		...(placedCreatedAtMs !== undefined
-			? {
-					createdAtMs: placedCreatedAtMs,
-				}
-			: {}),
-		id: itemInstanceId,
-		itemId,
-		x,
-		y,
-	};
-});
-
 const readInventoryInstanceTargetCellFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.readInventoryInstanceTargetCellFx",
 )(function* ({ itemId, nextSave, placementMode }: InventoryPlacementState) {
@@ -223,26 +169,22 @@ const placeInventoryInstanceOnBoardFx = Effect.fn(
 
 	state.nextSave.inventory.slots[action.slotIndex] = null;
 	const targetCell = yield* readInventoryInstanceTargetCellFx(state);
-	yield* placeBoardItemFx({
+	const events = [
+		state.consumedEvent,
+	];
+	yield* placeBoardItemInstanceFx({
+		cell: targetCell,
+		createdAtMs: state.placedCreatedAtMs,
+		events,
 		itemId: state.itemId,
 		itemInstanceId: state.liveSlot.id,
-		nextSave: state.nextSave,
-		placedCreatedAtMs: state.placedCreatedAtMs,
-		x: targetCell.x,
-		y: targetCell.y,
+		reason: "inventory-placement",
+		save: state.nextSave,
 	});
 	state.nextSave.updatedAtMs = nowMs;
 
 	return yield* readGameEnginePlacementResultFx({
-		events: [
-			state.consumedEvent,
-			yield* createBoardItemCreatedEventFx({
-				itemId: state.itemId,
-				itemInstanceId: state.liveSlot.id,
-				x: targetCell.x,
-				y: targetCell.y,
-			}),
-		],
+		events,
 		save: state.nextSave,
 	});
 });
@@ -311,27 +253,24 @@ const placeInventoryStackExactlyFx = Effect.fn(
 	"placeInventoryItemOnBoardFx.placeInventoryStackExactlyFx",
 )(function* (state: InventoryPlacementStackState) {
 	const { action, nowMs } = yield* InventoryItemBoardPlacementScopeFx;
-	const itemInstanceId = yield* createGameItemInstanceIdFx();
-	yield* placeBoardItemFx({
+	const events = [
+		state.consumedEvent,
+	];
+	yield* placeBoardItemInstanceFx({
+		cell: {
+			x: action.x,
+			y: action.y,
+		},
+		createdAtMs: state.placedCreatedAtMs,
+		events,
 		itemId: state.itemId,
-		itemInstanceId,
-		nextSave: state.nextSave,
-		placedCreatedAtMs: state.placedCreatedAtMs,
-		x: action.x,
-		y: action.y,
+		reason: "inventory-placement",
+		save: state.nextSave,
 	});
 	state.nextSave.updatedAtMs = nowMs;
 
 	return yield* readGameEnginePlacementResultFx({
-		events: [
-			state.consumedEvent,
-			yield* createBoardItemCreatedEventFx({
-				itemId: state.itemId,
-				itemInstanceId,
-				x: action.x,
-				y: action.y,
-			}),
-		],
+		events,
 		save: state.nextSave,
 	});
 });

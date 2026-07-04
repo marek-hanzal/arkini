@@ -9,7 +9,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
-import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStore";
+import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStoreFx";
 import { runGameRuntimeEffect } from "~/play/runtime/runGameRuntimeEffect";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";

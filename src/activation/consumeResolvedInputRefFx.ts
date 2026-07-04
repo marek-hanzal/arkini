@@ -1,16 +1,11 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
+import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
-import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEvent } from "~/event/GameEventSchema";
-import {
-	isGameSaveInventoryInstance,
-	readGameSaveInventorySlotQuantity,
-} from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { createInventoryItemConsumedEventFx } from "~/inventory/createInventoryItemConsumedEventFx";
-import { readInventorySlotAfterQuantityRemovalFx } from "~/inventory/readInventorySlotAfterQuantityRemovalFx";
+import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
 
 export namespace consumeResolvedInputRefFx {
 	export interface Props {
@@ -64,15 +59,11 @@ const consumeBoardInputRefFx = Effect.fn("consumeResolvedInputRefFx.consumeBoard
 			save: nextSave,
 		});
 		yield* pushConsumedEvent({
-			event: {
-				from: {
-					kind: "board",
-					itemInstanceId: boardRef.itemInstanceId,
-				},
+			event: yield* createBoardItemConsumedEventFx({
 				itemId: boardRef.itemId,
+				itemInstanceId: boardRef.itemInstanceId,
 				reason,
-				type: "item.consumed" as const,
-			},
+			}),
 		});
 	},
 );
@@ -88,48 +79,16 @@ const consumeInventoryInputRefFx = Effect.fn(
 	>,
 ) {
 	const { nextSave, reason } = yield* ConsumeResolvedInputRefScopeFx;
-	const slot = nextSave.inventory.slots[inventoryRef.slotIndex];
-	if (!slot) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"input_unavailable",
-				`Missing inventory input at slot ${inventoryRef.slotIndex}.`,
-			),
-		);
-	}
-
-	const previousQuantity = readGameSaveInventorySlotQuantity(slot);
-	const nextQuantity = previousQuantity - inventoryRef.quantity;
-	if (nextQuantity < 0) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(
-				"input_unavailable",
-				`Inventory input at slot ${inventoryRef.slotIndex} is already spent.`,
-			),
-		);
-	}
-
-	nextSave.inventory.slots[inventoryRef.slotIndex] =
-		yield* readInventorySlotAfterQuantityRemovalFx({
-			quantity: inventoryRef.quantity,
-			slot,
-		});
-	if (isGameSaveInventoryInstance(slot)) {
-		yield* removeBoardItemRuntimeStateFx({
-			itemInstanceId: slot.id,
-			save: nextSave,
-		});
-	}
+	const consumed = yield* consumeInventorySlotQuantityFx({
+		nextSave,
+		quantity: inventoryRef.quantity,
+		reason,
+		runtimeState: "remove-instance",
+		slotIndex: inventoryRef.slotIndex,
+	});
 
 	yield* pushConsumedEvent({
-		event: yield* createInventoryItemConsumedEventFx({
-			itemId: inventoryRef.itemId,
-			nextQuantity,
-			previousQuantity,
-			quantity: inventoryRef.quantity,
-			reason,
-			slotIndex: inventoryRef.slotIndex,
-		}),
+		event: consumed.consumedEvent,
 	});
 });
 

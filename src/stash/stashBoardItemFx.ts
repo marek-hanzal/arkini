@@ -1,6 +1,7 @@
 import { Context, Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionBoardItemStashSchema } from "~/action/GameActionBoardItemStashSchema";
+import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -46,17 +47,6 @@ const readBoardItemStashMode = ({ item, stateStatus }: BoardItemStashReadiness) 
 		? "preserve-instance"
 		: "stack-copy";
 
-const createBoardItemStashedEvent = ({ item }: BoardItemStashReadiness) =>
-	({
-		from: {
-			kind: "board" as const,
-			itemInstanceId: item.id,
-		},
-		itemId: item.itemId,
-		reason: "board-stash" as const,
-		type: "item.consumed" as const,
-	}) satisfies GameEvent;
-
 const readBoardItemStashStateFx = Effect.fn("stashBoardItemFx.readBoardItemStashStateFx")(
 	function* () {
 		const { action, config, save } = yield* BoardItemStashScopeFx;
@@ -73,7 +63,11 @@ const readBoardItemStashStateFx = Effect.fn("stashBoardItemFx.readBoardItemStash
 		return {
 			...readiness,
 			events: [
-				createBoardItemStashedEvent(readiness),
+				yield* createBoardItemConsumedEventFx({
+					itemId: readiness.item.itemId,
+					itemInstanceId: readiness.item.id,
+					reason: "board-stash",
+				}),
 			],
 			nextSave,
 			stashMode: readBoardItemStashMode(readiness),

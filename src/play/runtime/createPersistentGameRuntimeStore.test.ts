@@ -9,7 +9,7 @@ import type {
 	GameSaveStorageScope,
 	SaveActiveGameSaveProps,
 } from "~/storage/GameSaveStorage";
-import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStore";
+import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStoreFx";
 import { runGameRuntimeEffect } from "~/play/runtime/runGameRuntimeEffect";
 import { readBoardView } from "~/play/runtime/readers/readBoardView";
 import { RandomServiceLive } from "~/random/RandomServiceLive";

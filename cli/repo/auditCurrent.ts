@@ -162,10 +162,17 @@ const auditEffectFunctionNames = (): Finding[] =>
 		const effectFnPattern = /export\s+const\s+(\w+)\s*=\s*Effect\.fn/g;
 		for (const match of text.matchAll(effectFnPattern)) {
 			const name = match[1];
-			if (!name || name.endsWith("Fx")) continue;
+			if (!name) continue;
+			if (!name.endsWith("Fx")) {
+				findings.push({
+					path,
+					message: `Effect function "${name}" must use the Fx suffix`,
+				});
+			}
+			if (/Fx\.tsx?$/.test(path)) continue;
 			findings.push({
 				path,
-				message: `Effect function "${name}" must use the Fx suffix`,
+				message: `Exported Effect function "${name}" must live in an Fx-suffixed file`,
 			});
 		}
 		return findings;

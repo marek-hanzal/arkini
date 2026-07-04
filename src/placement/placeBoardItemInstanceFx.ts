@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
+import { pushBoardItemCreatedEventFx } from "~/placement/pushBoardItemCreatedEventFx";
 import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
 export namespace placeBoardItemInstanceFx {
@@ -44,17 +45,13 @@ export const placeBoardItemInstanceFx = Effect.fn("placeBoardItemInstanceFx")(fu
 		x: cell.x,
 		y: cell.y,
 	};
-	events.push({
+	yield* pushBoardItemCreatedEventFx({
+		cell,
+		events,
 		itemId,
+		itemInstanceId: placedItemInstanceId,
 		originItemInstanceId,
 		reason,
-		to: {
-			kind: "board",
-			itemInstanceId: placedItemInstanceId,
-			x: cell.x,
-			y: cell.y,
-		},
-		type: "item.created",
 	});
 
 	return placedItemInstanceId;

@@ -6,7 +6,7 @@ import type {
 	GameSaveProducerJob,
 } from "~/engine/model/GameSaveSchema";
 
-export namespace replaceDepletedProducerSourceCellOutput {
+export namespace replaceDepletedProducerSourceCellOutputFx {
 	export interface Props {
 		events: GameEvent[];
 		job: GameSaveProducerJob;
@@ -27,15 +27,15 @@ const isSameBoardCell = (
 	},
 ) => left.x === right.x && left.y === right.y;
 
-export const replaceDepletedProducerSourceCellOutput = Effect.fn(
-	"replaceDepletedProducerSourceCellOutput",
+export const replaceDepletedProducerSourceCellOutputFx = Effect.fn(
+	"replaceDepletedProducerSourceCellOutputFx",
 )(function* ({
 	events,
 	job,
 	nextSave,
 	nowMs,
 	producerItem,
-}: replaceDepletedProducerSourceCellOutput.Props) {
+}: replaceDepletedProducerSourceCellOutputFx.Props) {
 	const sourceOutputIndex = events.findIndex(
 		(event) =>
 			event.type === "item.created" &&

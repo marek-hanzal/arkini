@@ -17,7 +17,7 @@ import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
 import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
-import { replaceDepletedProducerSourceCellOutput } from "~/producer/replaceDepletedProducerSourceCellOutput";
+import { replaceDepletedProducerSourceCellOutputFx } from "~/producer/replaceDepletedProducerSourceCellOutputFx";
 
 export namespace completeProducerJobFx {
 	export interface Props {
@@ -415,7 +415,7 @@ export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function
 				}),
 			];
 		} else {
-			const replacedSource = yield* replaceDepletedProducerSourceCellOutput({
+			const replacedSource = yield* replaceDepletedProducerSourceCellOutputFx({
 				events: placementEvents,
 				job: liveJob,
 				nextSave: placementResult.save,

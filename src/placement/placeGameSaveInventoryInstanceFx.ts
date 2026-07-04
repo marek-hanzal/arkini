@@ -3,6 +3,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEvent } from "~/event/GameEventSchema";
+import { pushInventoryItemCreatedEventFx } from "~/placement/pushInventoryItemCreatedEventFx";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
 
 export namespace placeGameSaveInventoryInstanceFx {
@@ -64,18 +65,15 @@ export const placeGameSaveInventoryInstanceFx = Effect.fn("placeGameSaveInventor
 			itemId,
 			kind: "instance",
 		};
-		events.push({
+		yield* pushInventoryItemCreatedEventFx({
+			events,
 			itemId,
+			nextQuantity: 1,
 			originItemInstanceId: itemInstanceId,
+			previousQuantity: 0,
+			quantity: 1,
 			reason,
-			to: {
-				kind: "inventory",
-				nextQuantity: 1,
-				previousQuantity: 0,
-				quantity: 1,
-				slotIndex,
-			},
-			type: "item.created",
+			slotIndex,
 		});
 	},
 );

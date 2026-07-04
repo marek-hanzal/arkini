@@ -1,9 +1,11 @@
 import { Effect } from "effect";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
+import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefinitionFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import { isGameSaveInventoryStack } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
+import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 
 export namespace placeInitialInventoryItemFx {
 	export interface Props {
@@ -15,6 +17,24 @@ export namespace placeInitialInventoryItemFx {
 	}
 }
 
+const assertStartingInventoryStorageAllowedFx = Effect.fn(
+	"placeInitialInventoryItemFx.assertStartingInventoryStorageAllowedFx",
+)(function* ({ config, itemId }: { config: GameConfig; itemId: string }) {
+	if (
+		isItemStorageAllowed({
+			config,
+			itemId,
+			location: "inventory",
+		})
+	) {
+		return;
+	}
+
+	return yield* Effect.fail(
+		GameEngineError.saveInvalid(`Starting inventory cannot contain "${itemId}".`),
+	);
+});
+
 export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemFx")(function* ({
 	config,
 	inventorySlots,
@@ -22,67 +42,28 @@ export const placeInitialInventoryItemFx = Effect.fn("placeInitialInventoryItemF
 	nowMs,
 	quantity,
 }: placeInitialInventoryItemFx.Props) {
-	const item = config.items[itemId];
+	const item = yield* readGameConfigItemDefinitionFx({
+		config,
+		itemId,
+	});
+	yield* assertStartingInventoryStorageAllowedFx({
+		config,
+		itemId,
+	});
 
-	if (!item) {
-		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing item "${itemId}".`),
-		);
-	}
-
-	if (
-		!isItemStorageAllowed({
-			config,
+	const events: GameEvent[] = [];
+	const placed = yield* placeGameSaveInventoryRemainderFx({
+		createdAtMs: item.effects?.length ? nowMs : undefined,
+		events,
+		item: {
 			itemId,
-			location: "inventory",
-		})
-	) {
-		return yield* Effect.fail(
-			GameEngineError.saveInvalid(`Starting inventory cannot contain "${itemId}".`),
-		);
-	}
-
-	let remainingQuantity = quantity;
-
-	for (const slot of inventorySlots) {
-		if (
-			!isGameSaveInventoryStack(slot) ||
-			slot.itemId !== itemId ||
-			slot.quantity >= item.maxStackSize
-		) {
-			continue;
-		}
-
-		const placedQuantity = Math.min(item.maxStackSize - slot.quantity, remainingQuantity);
-		slot.quantity += placedQuantity;
-		remainingQuantity -= placedQuantity;
-
-		if (remainingQuantity === 0) {
-			return;
-		}
-	}
-
-	for (let slotIndex = 0; slotIndex < inventorySlots.length; slotIndex += 1) {
-		if (inventorySlots[slotIndex]) {
-			continue;
-		}
-
-		const placedQuantity = Math.min(item.maxStackSize, remainingQuantity);
-		inventorySlots[slotIndex] = {
-			...(item.effects?.length
-				? {
-						createdAtMs: nowMs,
-					}
-				: {}),
-			itemId,
-			quantity: placedQuantity,
-		};
-		remainingQuantity -= placedQuantity;
-
-		if (remainingQuantity === 0) {
-			return;
-		}
-	}
+			quantity,
+		},
+		maxStackSize: item.maxStackSize,
+		remainingQuantity: quantity,
+		slots: inventorySlots,
+	});
+	if (placed) return;
 
 	return yield* Effect.fail(
 		GameEngineError.saveInvalid(`Starting inventory cannot fit ${quantity} of "${itemId}".`),

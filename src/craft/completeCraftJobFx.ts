@@ -1,18 +1,18 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameConfig } from "~/config/GameConfigTypes";
-import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
-import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
-import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
-import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
-import { blockedCraftCompletionRetryDelayMs } from "~/craft/craftCompletionTiming";
 import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeStateFx";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
+import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
+import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import type { GameEngineCompletionResult } from "~/engine/model/GameEngineCompletionResult";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
 import type { GameSave, GameSaveBoardItem, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
+import { blockedCraftCompletionRetryDelayMs } from "~/craft/craftCompletionTiming";
+import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
+import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
+import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export namespace completeCraftJobFx {
 	export interface Props {
@@ -23,18 +23,13 @@ export namespace completeCraftJobFx {
 	}
 }
 
+type CraftCompletionScope = completeCraftJobFx.Props;
+
 type CraftCompletionTarget = {
 	liveJob: GameSaveCraftJob;
 	liveTarget: GameSaveBoardItem;
 	recipe: GameCraftRecipeDefinition;
 };
-
-class CraftJobCompletionScopeFx extends Context.Tag("CraftJobCompletionScopeFx")<
-	CraftJobCompletionScopeFx,
-	completeCraftJobFx.Props
->() {
-	//
-}
 
 const createCraftCompletedResult = ({
 	fromItemId,
@@ -110,16 +105,17 @@ const createCraftBlockedEvent = ({
 	type: "craft.blocked" as const,
 });
 
-const readLiveCraftJobFx = Effect.fn("completeCraftJobFx.readLiveCraftJobFx")(function* () {
-	const { job, save } = yield* CraftJobCompletionScopeFx;
+const readLiveCraftJobFx = Effect.fn("completeCraftJobFx.readLiveCraftJobFx")(function* ({
+	job,
+	save,
+}: CraftCompletionScope) {
 	return save.craftJobs[job.id];
 });
 
 const readCraftCompletionRecipeFx = Effect.fn("completeCraftJobFx.readCraftCompletionRecipeFx")(
-	function* ({ liveJob }: { liveJob: GameSaveCraftJob }) {
-		const { config } = yield* CraftJobCompletionScopeFx;
+	function* ({ liveJob, scope }: { liveJob: GameSaveCraftJob; scope: CraftCompletionScope }) {
 		const recipe = readCraftRecipeDefinition({
-			config,
+			config: scope.config,
 			recipeId: liveJob.recipeId,
 		});
 		if (recipe) return recipe;
@@ -132,9 +128,8 @@ const readCraftCompletionRecipeFx = Effect.fn("completeCraftJobFx.readCraftCompl
 
 const readCraftCompletionBoardItemFx = Effect.fn(
 	"completeCraftJobFx.readCraftCompletionBoardItemFx",
-)(function* ({ liveJob }: { liveJob: GameSaveCraftJob }) {
-	const { save } = yield* CraftJobCompletionScopeFx;
-	const liveTarget = save.board.items[liveJob.targetItemInstanceId];
+)(function* ({ liveJob, scope }: { liveJob: GameSaveCraftJob; scope: CraftCompletionScope }) {
+	const liveTarget = scope.save.board.items[liveJob.targetItemInstanceId];
 	if (liveTarget) return liveTarget;
 
 	return yield* Effect.fail(
@@ -163,9 +158,14 @@ const assertCraftCompletionTargetMatchesRecipeFx = Effect.fn(
 });
 
 const assertCraftResultItemExistsFx = Effect.fn("completeCraftJobFx.assertCraftResultItemExistsFx")(
-	function* ({ recipe }: { recipe: GameCraftRecipeDefinition }) {
-		const { config } = yield* CraftJobCompletionScopeFx;
-		if (config.items[recipe.resultItemId]) return;
+	function* ({
+		recipe,
+		scope,
+	}: {
+		recipe: GameCraftRecipeDefinition;
+		scope: CraftCompletionScope;
+	}) {
+		if (scope.config.items[recipe.resultItemId]) return;
 
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(
@@ -176,12 +176,14 @@ const assertCraftResultItemExistsFx = Effect.fn("completeCraftJobFx.assertCraftR
 );
 
 const readCraftCompletionTargetFx = Effect.fn("completeCraftJobFx.readCraftCompletionTargetFx")(
-	function* ({ liveJob }: { liveJob: GameSaveCraftJob }) {
+	function* ({ liveJob, scope }: { liveJob: GameSaveCraftJob; scope: CraftCompletionScope }) {
 		const recipe = yield* readCraftCompletionRecipeFx({
 			liveJob,
+			scope,
 		});
 		const liveTarget = yield* readCraftCompletionBoardItemFx({
 			liveJob,
+			scope,
 		});
 		yield* assertCraftCompletionTargetMatchesRecipeFx({
 			liveJob,
@@ -189,6 +191,7 @@ const readCraftCompletionTargetFx = Effect.fn("completeCraftJobFx.readCraftCompl
 		});
 		yield* assertCraftResultItemExistsFx({
 			recipe,
+			scope,
 		});
 		return {
 			liveJob,
@@ -200,12 +203,11 @@ const readCraftCompletionTargetFx = Effect.fn("completeCraftJobFx.readCraftCompl
 
 const readCraftCompletionBlockedReasonFx = Effect.fn(
 	"completeCraftJobFx.readCraftCompletionBlockedReasonFx",
-)(function* ({ liveJob, recipe }: CraftCompletionTarget) {
-	const { config, save } = yield* CraftJobCompletionScopeFx;
+)(function* ({ scope, target }: { scope: CraftCompletionScope; target: CraftCompletionTarget }) {
 	if (
 		!isItemStorageAllowed({
-			config,
-			itemId: recipe.resultItemId,
+			config: scope.config,
+			itemId: target.recipe.resultItemId,
 			location: "board",
 		})
 	) {
@@ -213,13 +215,13 @@ const readCraftCompletionBlockedReasonFx = Effect.fn(
 	}
 
 	const targetIgnoredIds = new Set([
-		liveJob.targetItemInstanceId,
+		target.liveJob.targetItemInstanceId,
 	]);
 	const remainingCapacity = yield* readBoardItemMaxCountCapacityFx({
-		config,
+		config: scope.config,
 		ignoredBoardItemInstanceIds: targetIgnoredIds,
-		itemId: recipe.resultItemId,
-		save,
+		itemId: target.recipe.resultItemId,
+		save: scope.save,
 	});
 	return remainingCapacity <= 0
 		? ("board:max-count" satisfies GamePlacementFailureReason)
@@ -227,19 +229,26 @@ const readCraftCompletionBlockedReasonFx = Effect.fn(
 });
 
 const createFailedCraftCompletionFx = Effect.fn("completeCraftJobFx.createFailedCraftCompletionFx")(
-	function* ({ job, reason }: { job: GameSaveCraftJob; reason: GamePlacementFailureReason }) {
-		const { nowMs, save } = yield* CraftJobCompletionScopeFx;
+	function* ({
+		job,
+		reason,
+		scope,
+	}: {
+		job: GameSaveCraftJob;
+		reason: GamePlacementFailureReason;
+		scope: CraftCompletionScope;
+	}) {
 		const nextSave = yield* cloneGameSaveFx({
-			save,
+			save: scope.save,
 		});
 		delete nextSave.craftJobs[job.id];
-		nextSave.updatedAtMs = nowMs;
+		nextSave.updatedAtMs = scope.nowMs;
 
 		return {
 			events: [
 				createCraftFailedEvent({
 					job,
-					nowMs,
+					nowMs: scope.nowMs,
 					reason,
 				}),
 			],
@@ -251,20 +260,27 @@ const createFailedCraftCompletionFx = Effect.fn("completeCraftJobFx.createFailed
 
 const createRetryingCraftCompletionFx = Effect.fn(
 	"completeCraftJobFx.createRetryingCraftCompletionFx",
-)(function* ({ job, reason }: { job: GameSaveCraftJob; reason: GamePlacementFailureReason }) {
-	const { nowMs, save } = yield* CraftJobCompletionScopeFx;
+)(function* ({
+	job,
+	reason,
+	scope,
+}: {
+	job: GameSaveCraftJob;
+	reason: GamePlacementFailureReason;
+	scope: CraftCompletionScope;
+}) {
 	const nextSave = yield* cloneGameSaveFx({
-		save,
+		save: scope.save,
 	});
-	const nextAttemptAtMs = nowMs + blockedCraftCompletionRetryDelayMs;
+	const nextAttemptAtMs = scope.nowMs + blockedCraftCompletionRetryDelayMs;
 	nextSave.craftJobs[job.id] = {
 		...job,
 		delivery: {
-			lastBlockedAtMs: nowMs,
+			lastBlockedAtMs: scope.nowMs,
 			nextAttemptAtMs,
 		},
 	};
-	nextSave.updatedAtMs = nowMs;
+	nextSave.updatedAtMs = scope.nowMs;
 
 	return {
 		events:
@@ -272,7 +288,7 @@ const createRetryingCraftCompletionFx = Effect.fn(
 				? [
 						createCraftBlockedEvent({
 							job,
-							nowMs,
+							nowMs: scope.nowMs,
 							reason,
 						}),
 					]
@@ -283,18 +299,28 @@ const createRetryingCraftCompletionFx = Effect.fn(
 });
 
 const completeBlockedCraftJobFx = Effect.fn("completeCraftJobFx.completeBlockedCraftJobFx")(
-	function* ({ job, reason }: { job: GameSaveCraftJob; reason: GamePlacementFailureReason }) {
+	function* ({
+		job,
+		reason,
+		scope,
+	}: {
+		job: GameSaveCraftJob;
+		reason: GamePlacementFailureReason;
+		scope: CraftCompletionScope;
+	}) {
 		return yield* match(isGamePlacementFailureRetryable(reason))
 			.with(false, () =>
 				createFailedCraftCompletionFx({
 					job,
 					reason,
+					scope,
 				}),
 			)
 			.with(true, () =>
 				createRetryingCraftCompletionFx({
 					job,
 					reason,
+					scope,
 				}),
 			)
 			.exhaustive();
@@ -302,38 +328,37 @@ const completeBlockedCraftJobFx = Effect.fn("completeCraftJobFx.completeBlockedC
 );
 
 const applyCraftCompletionResultFx = Effect.fn("completeCraftJobFx.applyCraftCompletionResultFx")(
-	function* ({ liveJob, liveTarget, recipe }: CraftCompletionTarget) {
-		const { config, nowMs, save } = yield* CraftJobCompletionScopeFx;
+	function* ({ scope, target }: { scope: CraftCompletionScope; target: CraftCompletionTarget }) {
 		const nextSave = yield* cloneGameSaveFx({
-			save,
+			save: scope.save,
 		});
-		const nextTarget = nextSave.board.items[liveJob.targetItemInstanceId];
+		const nextTarget = nextSave.board.items[target.liveJob.targetItemInstanceId];
 		if (!nextTarget) {
 			return yield* Effect.fail(
 				GameEngineError.saveInvalid(
-					`Craft job "${liveJob.id}" target "${liveJob.targetItemInstanceId}" disappeared during completion.`,
+					`Craft job "${target.liveJob.id}" target "${target.liveJob.targetItemInstanceId}" disappeared during completion.`,
 				),
 			);
 		}
 
-		delete nextSave.craftJobs[liveJob.id];
+		delete nextSave.craftJobs[target.liveJob.id];
 		yield* removeBoardItemRuntimeStateFx({
-			itemInstanceId: liveJob.targetItemInstanceId,
+			itemInstanceId: target.liveJob.targetItemInstanceId,
 			save: nextSave,
 		});
-		if (config.items[recipe.resultItemId]?.effects?.length) {
-			nextTarget.createdAtMs = nowMs;
+		if (scope.config.items[target.recipe.resultItemId]?.effects?.length) {
+			nextTarget.createdAtMs = scope.nowMs;
 		} else {
 			delete nextTarget.createdAtMs;
 		}
-		nextTarget.itemId = recipe.resultItemId;
-		nextSave.updatedAtMs = nowMs;
+		nextTarget.itemId = target.recipe.resultItemId;
+		nextSave.updatedAtMs = scope.nowMs;
 
 		return createCraftCompletedResult({
-			fromItemId: liveTarget.itemId,
-			liveJob,
-			nowMs,
-			recipe,
+			fromItemId: target.liveTarget.itemId,
+			liveJob: target.liveJob,
+			nowMs: scope.nowMs,
+			recipe: target.recipe,
 			save: nextSave,
 		});
 	},
@@ -341,49 +366,49 @@ const applyCraftCompletionResultFx = Effect.fn("completeCraftJobFx.applyCraftCom
 
 const completeLiveCraftJobFx = Effect.fn("completeCraftJobFx.completeLiveCraftJobFx")(function* ({
 	liveJob,
+	scope,
 }: {
 	liveJob: GameSaveCraftJob;
+	scope: CraftCompletionScope;
 }) {
 	const target = yield* readCraftCompletionTargetFx({
 		liveJob,
+		scope,
 	});
-	const blockedReason = yield* readCraftCompletionBlockedReasonFx(target);
+	const blockedReason = yield* readCraftCompletionBlockedReasonFx({
+		scope,
+		target,
+	});
 	if (blockedReason) {
 		return yield* completeBlockedCraftJobFx({
 			job: target.liveJob,
 			reason: blockedReason,
+			scope,
 		});
 	}
-	return yield* applyCraftCompletionResultFx(target);
+	return yield* applyCraftCompletionResultFx({
+		scope,
+		target,
+	});
 });
 
 const completeCraftJobProgramFx = Effect.fn("completeCraftJobFx.completeCraftJobProgramFx")(
-	function* () {
-		const { save } = yield* CraftJobCompletionScopeFx;
-		const liveJob = yield* readLiveCraftJobFx();
+	function* (scope: CraftCompletionScope) {
+		const liveJob = yield* readLiveCraftJobFx(scope);
 		if (!liveJob) {
 			return createMissingCraftJobResult({
-				save,
+				save: scope.save,
 			});
 		}
 		return yield* completeLiveCraftJobFx({
 			liveJob,
+			scope,
 		});
 	},
 );
 
-export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
-	config,
-	job,
-	nowMs,
-	save,
-}: completeCraftJobFx.Props) {
-	return yield* completeCraftJobProgramFx().pipe(
-		Effect.provideService(CraftJobCompletionScopeFx, {
-			config,
-			job,
-			nowMs,
-			save,
-		}),
-	);
+export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* (
+	props: completeCraftJobFx.Props,
+) {
+	return yield* completeCraftJobProgramFx(props);
 });

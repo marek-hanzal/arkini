@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -26,27 +26,20 @@ const allWorldSnapshotCheckIds = [
 	"replacement-safety",
 ] as const satisfies readonly WorldSnapshotCheckId[];
 
-type WorldSnapshotValidationScope = validateWorldSnapshotFx.Props & {
+type WorldSnapshotValidationScope = {
+	checks?: readonly WorldSnapshotCheckId[];
 	facts: WorldSnapshotFacts;
+	save: GameSave;
 };
 
-class WorldSnapshotValidationScopeFx extends Context.Tag("WorldSnapshotValidationScopeFx")<
-	WorldSnapshotValidationScopeFx,
-	WorldSnapshotValidationScope
->() {
-	//
-}
-
 const readSelectedCheckIdsFx = Effect.fn("validateWorldSnapshotFx.readSelectedCheckIdsFx")(
-	function* () {
-		const { checks } = yield* WorldSnapshotValidationScopeFx;
+	function* ({ checks }: WorldSnapshotValidationScope) {
 		return checks ?? allWorldSnapshotCheckIds;
 	},
 );
 
 const readProducerJobFactsByIdFx = Effect.fn("validateWorldSnapshotFx.readProducerJobFactsByIdFx")(
-	function* () {
-		const { facts } = yield* WorldSnapshotValidationScopeFx;
+	function* ({ facts }: WorldSnapshotValidationScope) {
 		return new Map(
 			facts.producerJobs.map((producerJobFacts) => [
 				producerJobFacts.job.id,
@@ -80,10 +73,9 @@ const createProducerDeliveryBeforeReadyIssueFx = Effect.fn(
 
 const readProducerDeliveryBeforeReadyIssuesFx = Effect.fn(
 	"validateWorldSnapshotFx.readProducerDeliveryBeforeReadyIssuesFx",
-)(function* () {
-	const { facts } = yield* WorldSnapshotValidationScopeFx;
+)(function* (scope: WorldSnapshotValidationScope) {
 	const issues: WorldCheckIssue[] = [];
-	for (const producerJobFacts of facts.producerJobs) {
+	for (const producerJobFacts of scope.facts.producerJobs) {
 		issues.push(...(yield* createProducerDeliveryBeforeReadyIssueFx(producerJobFacts)));
 	}
 	return issues;
@@ -91,10 +83,9 @@ const readProducerDeliveryBeforeReadyIssuesFx = Effect.fn(
 
 const readCraftDeliveryBeforeReadyIssuesFx = Effect.fn(
 	"validateWorldSnapshotFx.readCraftDeliveryBeforeReadyIssuesFx",
-)(function* () {
-	const { facts } = yield* WorldSnapshotValidationScopeFx;
+)(function* (scope: WorldSnapshotValidationScope) {
 	const issues: WorldCheckIssue[] = [];
-	for (const { job } of facts.craftJobs) {
+	for (const { job } of scope.facts.craftJobs) {
 		if (!job.delivery || job.delivery.lastBlockedAtMs >= job.readyAtMs) continue;
 		issues.push({
 			code: "craft_delivery_before_ready",
@@ -115,10 +106,10 @@ const readCraftDeliveryBeforeReadyIssuesFx = Effect.fn(
 });
 
 const readJobDeliveryIssuesFx = Effect.fn("validateWorldSnapshotFx.readJobDeliveryIssuesFx")(
-	function* () {
+	function* (scope: WorldSnapshotValidationScope) {
 		return [
-			...(yield* readProducerDeliveryBeforeReadyIssuesFx()),
-			...(yield* readCraftDeliveryBeforeReadyIssuesFx()),
+			...(yield* readProducerDeliveryBeforeReadyIssuesFx(scope)),
+			...(yield* readCraftDeliveryBeforeReadyIssuesFx(scope)),
 		];
 	},
 );
@@ -167,9 +158,16 @@ const createProducerDeliveryPausedIssueFx = Effect.fn(
 
 const createProducerQueueBarrierIssueFx = Effect.fn(
 	"validateWorldSnapshotFx.createProducerQueueBarrierIssueFx",
-)(function* ({ job, previousJobId }: WorldProducerJobFacts) {
+)(function* ({
+	producerJobFacts,
+	scope,
+}: {
+	producerJobFacts: WorldProducerJobFacts;
+	scope: WorldSnapshotValidationScope;
+}) {
+	const { job, previousJobId } = producerJobFacts;
 	if (!previousJobId) return [];
-	const producerJobFactsById = yield* readProducerJobFactsByIdFx();
+	const producerJobFactsById = yield* readProducerJobFactsByIdFx(scope);
 	const previousFacts = producerJobFactsById.get(previousJobId);
 	if (previousFacts?.releaseAtMs === undefined || job.startAtMs >= previousFacts.releaseAtMs) {
 		return [];
@@ -194,13 +192,17 @@ const createProducerQueueBarrierIssueFx = Effect.fn(
 });
 
 const readProducerQueueIssuesFx = Effect.fn("validateWorldSnapshotFx.readProducerQueueIssuesFx")(
-	function* () {
-		const { facts } = yield* WorldSnapshotValidationScopeFx;
+	function* (scope: WorldSnapshotValidationScope) {
 		const issues: WorldCheckIssue[] = [];
-		for (const producerJobFacts of facts.producerJobs) {
+		for (const producerJobFacts of scope.facts.producerJobs) {
 			issues.push(...(yield* createProducerQueueDeliveryHeadIssueFx(producerJobFacts)));
 			issues.push(...(yield* createProducerDeliveryPausedIssueFx(producerJobFacts)));
-			issues.push(...(yield* createProducerQueueBarrierIssueFx(producerJobFacts)));
+			issues.push(
+				...(yield* createProducerQueueBarrierIssueFx({
+					producerJobFacts,
+					scope,
+				})),
+			);
 		}
 		return issues;
 	},
@@ -265,9 +267,15 @@ const createActiveEffectApplyStateIssueFx = Effect.fn(
 
 const createActiveEffectProducerIssueFx = Effect.fn(
 	"validateWorldSnapshotFx.createActiveEffectProducerIssueFx",
-)(function* (effectFacts: WorldActiveEffectFacts) {
+)(function* ({
+	effectFacts,
+	scope,
+}: {
+	effectFacts: WorldActiveEffectFacts;
+	scope: WorldSnapshotValidationScope;
+}) {
 	if (!effectFacts.producerJobId) return [];
-	const producerJobFactsById = yield* readProducerJobFactsByIdFx();
+	const producerJobFactsById = yield* readProducerJobFactsByIdFx(scope);
 	const producerJobFacts = producerJobFactsById.get(effectFacts.producerJobId);
 	if (!producerJobFacts) return [];
 	const deliveryIssues = yield* createActiveEffectDeliveryJobIssueFx({
@@ -283,11 +291,15 @@ const createActiveEffectProducerIssueFx = Effect.fn(
 });
 
 const readActiveEffectIssuesFx = Effect.fn("validateWorldSnapshotFx.readActiveEffectIssuesFx")(
-	function* () {
-		const { facts } = yield* WorldSnapshotValidationScopeFx;
+	function* (scope: WorldSnapshotValidationScope) {
 		const issues: WorldCheckIssue[] = [];
-		for (const effectFacts of facts.activeEffects) {
-			issues.push(...(yield* createActiveEffectProducerIssueFx(effectFacts)));
+		for (const effectFacts of scope.facts.activeEffects) {
+			issues.push(
+				...(yield* createActiveEffectProducerIssueFx({
+					effectFacts,
+					scope,
+				})),
+			);
 		}
 		return issues;
 	},
@@ -295,7 +307,13 @@ const readActiveEffectIssuesFx = Effect.fn("validateWorldSnapshotFx.readActiveEf
 
 const createReplacementSafetyIssueFx = Effect.fn(
 	"validateWorldSnapshotFx.createReplacementSafetyIssueFx",
-)(function* (replacementFacts: WorldReplacementSafetyFacts) {
+)(function* ({
+	replacementFacts,
+	scope,
+}: {
+	replacementFacts: WorldReplacementSafetyFacts;
+	scope: WorldSnapshotValidationScope;
+}) {
 	if (
 		!replacementFacts.blockReasons.includes("craft_job") ||
 		!replacementFacts.blockReasons.includes("producer_job")
@@ -303,11 +321,10 @@ const createReplacementSafetyIssueFx = Effect.fn(
 		return [];
 	}
 
-	const { save } = yield* WorldSnapshotValidationScopeFx;
-	const craftJobIds = Object.values(save.craftJobs)
+	const craftJobIds = Object.values(scope.save.craftJobs)
 		.filter((job) => job.targetItemInstanceId === replacementFacts.itemInstanceId)
 		.map((job) => job.id);
-	const producerJobIds = Object.values(save.producerJobs)
+	const producerJobIds = Object.values(scope.save.producerJobs)
 		.filter((job) => job.itemInstanceId === replacementFacts.itemInstanceId)
 		.map((job) => job.id);
 	return [
@@ -330,32 +347,47 @@ const createReplacementSafetyIssueFx = Effect.fn(
 
 const readReplacementSafetyIssuesFx = Effect.fn(
 	"validateWorldSnapshotFx.readReplacementSafetyIssuesFx",
-)(function* () {
-	const { facts } = yield* WorldSnapshotValidationScopeFx;
+)(function* (scope: WorldSnapshotValidationScope) {
 	const issues: WorldCheckIssue[] = [];
-	for (const replacementFacts of facts.replacementSafety) {
-		issues.push(...(yield* createReplacementSafetyIssueFx(replacementFacts)));
+	for (const replacementFacts of scope.facts.replacementSafety) {
+		issues.push(
+			...(yield* createReplacementSafetyIssueFx({
+				replacementFacts,
+				scope,
+			})),
+		);
 	}
 	return issues;
 });
 
 const readWorldSnapshotCheckIssuesFx = Effect.fn(
 	"validateWorldSnapshotFx.readWorldSnapshotCheckIssuesFx",
-)(function* (checkId: WorldSnapshotCheckId) {
+)(function* ({
+	checkId,
+	scope,
+}: {
+	checkId: WorldSnapshotCheckId;
+	scope: WorldSnapshotValidationScope;
+}) {
 	return yield* match(checkId)
-		.with("job-delivery", () => readJobDeliveryIssuesFx())
-		.with("producer-queues", () => readProducerQueueIssuesFx())
-		.with("active-effects", () => readActiveEffectIssuesFx())
-		.with("replacement-safety", () => readReplacementSafetyIssuesFx())
+		.with("job-delivery", () => readJobDeliveryIssuesFx(scope))
+		.with("producer-queues", () => readProducerQueueIssuesFx(scope))
+		.with("active-effects", () => readActiveEffectIssuesFx(scope))
+		.with("replacement-safety", () => readReplacementSafetyIssuesFx(scope))
 		.exhaustive();
 });
 
 const readWorldSnapshotIssuesFx = Effect.fn("validateWorldSnapshotFx.readWorldSnapshotIssuesFx")(
-	function* () {
-		const checkIds = yield* readSelectedCheckIdsFx();
+	function* (scope: WorldSnapshotValidationScope) {
+		const checkIds = yield* readSelectedCheckIdsFx(scope);
 		const issues: WorldCheckIssue[] = [];
 		for (const checkId of checkIds) {
-			issues.push(...(yield* readWorldSnapshotCheckIssuesFx(checkId)));
+			issues.push(
+				...(yield* readWorldSnapshotCheckIssuesFx({
+					checkId,
+					scope,
+				})),
+			);
 		}
 		return issues;
 	},
@@ -372,15 +404,11 @@ export const validateWorldSnapshotFx = Effect.fn("validateWorldSnapshotFx")(func
 		nowMs,
 		save,
 	});
-	const issues = yield* readWorldSnapshotIssuesFx().pipe(
-		Effect.provideService(WorldSnapshotValidationScopeFx, {
-			checks,
-			config,
-			facts,
-			nowMs,
-			save,
-		}),
-	);
+	const issues = yield* readWorldSnapshotIssuesFx({
+		checks,
+		facts,
+		save,
+	});
 
 	return {
 		facts,

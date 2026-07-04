@@ -8,6 +8,7 @@ import type { GameSave, GameSaveItemSpawnJob } from "~/engine/model/GameSaveSche
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
+import { removeItemSpawnJobFromSaveFx } from "~/job/removeItemSpawnJobFromSaveFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export namespace processItemSpawnJobFx {
@@ -57,17 +58,6 @@ const readItemSpawnPlacementEitherFx = Effect.fn(
 	);
 });
 
-const removeItemSpawnJobFromSaveFx = Effect.fn(
-	"processItemSpawnJobFx.removeItemSpawnJobFromSaveFx",
-)(function* ({
-	itemSpawnJob,
-	save,
-}: Pick<processItemSpawnJobFx.Props, "itemSpawnJob"> & {
-	save: GameSave;
-}) {
-	delete save.itemSpawnJobs[itemSpawnJob.id];
-});
-
 const completeFailedItemSpawnJobFx = Effect.fn(
 	"processItemSpawnJobFx.completeFailedItemSpawnJobFx",
 )(function* ({
@@ -81,7 +71,7 @@ const completeFailedItemSpawnJobFx = Effect.fn(
 		save: props.save,
 	});
 	yield* removeItemSpawnJobFromSaveFx({
-		itemSpawnJob: props.itemSpawnJob,
+		jobId: props.itemSpawnJob.id,
 		save: nextSave,
 	});
 	nextSave.updatedAtMs = props.nowMs;
@@ -155,7 +145,7 @@ const completePlacedItemSpawnJobFx = Effect.fn(
 	props: processItemSpawnJobFx.Props;
 }) {
 	yield* removeItemSpawnJobFromSaveFx({
-		itemSpawnJob: props.itemSpawnJob,
+		jobId: props.itemSpawnJob.id,
 		save: placement.save,
 	});
 	placement.save.updatedAtMs = props.nowMs;

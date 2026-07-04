@@ -8,6 +8,7 @@ import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
+import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
 import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import { readLineDefinition } from "~/config/GameItemCapabilities";
 import { readProducerRemainingCharges } from "~/producer/readProducerRemainingCharges";
@@ -340,7 +341,10 @@ const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
-	delete nextSave.producerJobs[liveJob.id];
+	yield* removeProducerJobFromSaveFx({
+		jobId: liveJob.id,
+		save: nextSave,
+	});
 	const chargeEvents = yield* spendProducerChargeCostAfterCompletedDeliveryFx({
 		job: liveJob,
 		nextSave,
@@ -377,7 +381,10 @@ const completeFailedProducerDeliveryFx = Effect.fn(
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
-	delete nextSave.producerJobs[liveJob.id];
+	yield* removeProducerJobFromSaveFx({
+		jobId: liveJob.id,
+		save: nextSave,
+	});
 	yield* rescheduleQueueAfterCompletedDeliveryFx({
 		liveJob,
 		nextSave,
@@ -605,7 +612,10 @@ const completeProducerPlacementSuccessFx = Effect.fn(
 	scope: ProducerJobCompletionScope;
 }) {
 	const { nowMs } = scope;
-	delete placementResult.save.producerJobs[liveJob.id];
+	yield* removeProducerJobFromSaveFx({
+		jobId: liveJob.id,
+		save: placementResult.save,
+	});
 	const { chargeEvents, placementEvents } = yield* readPlacementSuccessEffectsFx({
 		chargeOutcome,
 		liveJob,

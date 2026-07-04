@@ -12,6 +12,7 @@ import type { GameSave, GameSaveBoardItem, GameSaveCraftJob } from "~/engine/mod
 import { blockedCraftCompletionRetryDelayMs } from "~/craft/craftCompletionTiming";
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
+import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export namespace completeCraftJobFx {
@@ -241,7 +242,10 @@ const createFailedCraftCompletionFx = Effect.fn("completeCraftJobFx.createFailed
 		const nextSave = yield* cloneGameSaveFx({
 			save: scope.save,
 		});
-		delete nextSave.craftJobs[job.id];
+		yield* removeCraftJobFromSaveFx({
+			jobId: job.id,
+			save: nextSave,
+		});
 		nextSave.updatedAtMs = scope.nowMs;
 
 		return {
@@ -341,7 +345,10 @@ const applyCraftCompletionResultFx = Effect.fn("completeCraftJobFx.applyCraftCom
 			);
 		}
 
-		delete nextSave.craftJobs[target.liveJob.id];
+		yield* removeCraftJobFromSaveFx({
+			jobId: target.liveJob.id,
+			save: nextSave,
+		});
 		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: target.liveJob.targetItemInstanceId,
 			save: nextSave,

@@ -88,6 +88,7 @@ const main = async () => {
 		...auditForbiddenLogicDirectories(),
 		...auditEffectFunctionNames(),
 		...auditBoardItemRemovalBoundaries(),
+		...auditJobRemovalBoundaries(),
 		...auditRedundantSchemaTypeAliases(),
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
@@ -206,6 +207,33 @@ const auditBoardItemRemovalBoundaries = (): Finding[] =>
 				path,
 				message:
 					"board item removal must go through removeBoardItemFromSaveFx so runtime-state cleanup/preservation is explicit",
+			},
+		];
+	});
+
+const jobRemovalBoundaryPaths = new Set([
+	"src/board/removeBoardItemRuntimeStateFx.ts",
+	"src/craft/removeCraftJobFromSaveFx.ts",
+	"src/job/removeItemSpawnJobFromSaveFx.ts",
+	"src/producer/removeProducerJobFromSaveFx.ts",
+]);
+
+const auditJobRemovalBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		if (/[.](?:test|spec)[.]tsx?$/.test(path)) return [];
+		if (jobRemovalBoundaryPaths.has(path)) return [];
+
+		const text = readFileSync(path, "utf8");
+		if (!/delete\s+[^;]*\.(?:producerJobs|craftJobs|itemSpawnJobs)\s*\[/.test(text)) {
+			return [];
+		}
+
+		return [
+			{
+				path,
+				message:
+					"job removal must go through a named job-removal Fx boundary; board item runtime cleanup is the only cascade exception",
 			},
 		];
 	});

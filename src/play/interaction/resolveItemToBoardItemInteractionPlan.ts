@@ -1,10 +1,10 @@
 import { match, P } from "ts-pattern";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { isBoardViewItemRuntimeBusy } from "~/board/view/isBoardViewItemRuntimeBusy";
 import { isBoardViewItemRuntimeStatePreserved } from "~/board/view/isBoardViewItemRuntimeStatePreserved";
-import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import type { ItemId } from "~/config/GameIdSchema";
+import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
 
 export namespace resolveItemToBoardItemInteractionPlan {
@@ -15,27 +15,59 @@ export namespace resolveItemToBoardItemInteractionPlan {
 	}
 }
 
-export const resolveItemToBoardItemInteractionPlan = ({
+type ItemToBoardItemInteractionFacts = {
+	canCraft: boolean;
+	canMerge: boolean;
+	canRemoveTile: boolean;
+	canSupplyStashInput: boolean;
+	mergeResultItemId?: string;
+	producerInputLineId?: string;
+	removeConsumesSource: boolean;
+};
+
+const readTargetCanBeReplacedByMerge = ({ targetItem }: { targetItem: BoardViewItem }) =>
+	!isBoardViewItemRuntimeBusy(targetItem) && !isBoardViewItemRuntimeStatePreserved(targetItem);
+
+const readMergeInteractionFacts = ({
 	config,
 	sourceItemId,
 	targetItem,
-}: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan => {
+}: resolveItemToBoardItemInteractionPlan.Props) => {
 	const mergeRule = resolveExecutableItemMergeRule({
 		config,
 		sourceItemId,
 		targetItemId: targetItem.itemId,
 	});
-	const canReplaceTarget =
-		!isBoardViewItemRuntimeBusy(targetItem) &&
-		!isBoardViewItemRuntimeStatePreserved(targetItem);
-	const canMerge = Boolean(
-		mergeRule && (!("resultItemId" in mergeRule.merge) || canReplaceTarget),
-	);
-	const canCraft = Boolean(
+	const mergeResultItemId =
+		mergeRule?.merge && "resultItemId" in mergeRule.merge
+			? mergeRule.merge.resultItemId
+			: undefined;
+	return {
+		canMerge: Boolean(
+			mergeRule &&
+				(!mergeResultItemId ||
+					readTargetCanBeReplacedByMerge({
+						targetItem,
+					})),
+		),
+		mergeResultItemId,
+	};
+};
+
+const readCraftInputInteractionAvailable = ({
+	sourceItemId,
+	targetItem,
+}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceItemId" | "targetItem">) =>
+	Boolean(
 		targetItem.craft?.canAcceptInputs &&
 			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
 	);
-	const producerInputLineId = (targetItem.activation?.lines ?? [])
+
+const readDefaultFirstProducerInputLineId = ({
+	sourceItemId,
+	targetItem,
+}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceItemId" | "targetItem">) =>
+	(targetItem.activation?.lines ?? [])
 		.map((line, index) => ({
 			index,
 			line,
@@ -50,38 +82,62 @@ export const resolveItemToBoardItemInteractionPlan = ({
 				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
 			),
 		)?.line.lineId;
-	const canSupplyStashInput = Boolean(
+
+const readStashInputInteractionAvailable = ({
+	sourceItemId,
+	targetItem,
+}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceItemId" | "targetItem">) =>
+	Boolean(
 		targetItem.activation?.kind === "stash" &&
 			targetItem.activation.inputs.some(
 				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
 			),
 	);
+
+const readTileRemoveInteractionFacts = ({
+	config,
+	sourceItemId,
+	targetItem,
+}: resolveItemToBoardItemInteractionPlan.Props) => {
 	const removal = config.items[targetItem.itemId]?.removeBy?.find(
 		(entry) => entry.itemId === sourceItemId,
 	);
-	const canRemoveTile = Boolean(removal);
+	return {
+		canRemoveTile: Boolean(removal),
+		removeConsumesSource: removal?.mode === "consume",
+	};
+};
 
-	return match({
-		canCraft,
-		canMerge,
-		canRemoveTile,
-		canSupplyStashInput,
-		mergeRule,
-		producerInputLineId,
-		removal,
-	})
+const readItemToBoardItemInteractionFacts = (
+	props: resolveItemToBoardItemInteractionPlan.Props,
+): ItemToBoardItemInteractionFacts => ({
+	...readMergeInteractionFacts(props),
+	...readTileRemoveInteractionFacts(props),
+	canCraft: readCraftInputInteractionAvailable(props),
+	canSupplyStashInput: readStashInputInteractionAvailable(props),
+	producerInputLineId: readDefaultFirstProducerInputLineId(props),
+});
+
+const createMergeInteractionPlan = ({
+	mergeResultItemId,
+}: Pick<ItemToBoardItemInteractionFacts, "mergeResultItemId">): ItemToBoardItemInteractionPlan => ({
+	...(mergeResultItemId
+		? {
+				resultItemId: mergeResultItemId,
+			}
+		: {}),
+	type: "merge" as const,
+});
+
+export const resolveItemToBoardItemInteractionPlan = (
+	props: resolveItemToBoardItemInteractionPlan.Props,
+): ItemToBoardItemInteractionPlan =>
+	match(readItemToBoardItemInteractionFacts(props))
 		.with(
 			{
 				canMerge: true,
 			},
-			({ mergeRule }) => ({
-				...(mergeRule && "resultItemId" in mergeRule.merge
-					? {
-							resultItemId: mergeRule.merge.resultItemId,
-						}
-					: {}),
-				type: "merge" as const,
-			}),
+			createMergeInteractionPlan,
 		)
 		.with(
 			{
@@ -107,8 +163,8 @@ export const resolveItemToBoardItemInteractionPlan = ({
 			{
 				canRemoveTile: true,
 			},
-			({ removal }) => ({
-				consumesSource: removal?.mode === "consume",
+			({ removeConsumesSource }) => ({
+				consumesSource: removeConsumesSource,
 				feedbackVariant: "primary" as const,
 				type: "tile-remove" as const,
 			}),
@@ -127,4 +183,3 @@ export const resolveItemToBoardItemInteractionPlan = ({
 		.otherwise(() => ({
 			type: "swap" as const,
 		}));
-};

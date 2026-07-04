@@ -3,7 +3,7 @@ import { checkProducerInputWithdrawReadinessFx } from "~/producer/checkProducerI
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionProducerInputWithdraw } from "~/action/GameActionProducerInputWithdraw";
+import type { GameActionProducerInputWithdrawSchema } from "~/action/GameActionProducerInputWithdrawSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
@@ -13,7 +13,7 @@ export namespace withdrawProducerInputFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionProducerInputWithdraw;
+		action: GameActionProducerInputWithdrawSchema.Type;
 		nowMs: number;
 	}
 }

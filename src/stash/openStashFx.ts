@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { GameActionStashOpen } from "~/action/GameActionStashOpen";
+import type { GameActionStashOpenSchema } from "~/action/GameActionStashOpenSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -10,7 +10,7 @@ export namespace openStashFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionStashOpen;
+		action: GameActionStashOpenSchema.Type;
 		nowMs: number;
 	}
 }

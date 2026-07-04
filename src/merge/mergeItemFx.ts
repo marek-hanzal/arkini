@@ -8,7 +8,7 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionItemMerge } from "~/action/GameActionItemMerge";
+import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
@@ -19,7 +19,7 @@ export namespace mergeItemFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionItemMerge;
+		action: GameActionItemMergeSchema.Type;
 		nowMs: number;
 	}
 }

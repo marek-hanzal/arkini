@@ -4,14 +4,14 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { isCheatSpeedItemId, readCheatSpeedItemIdFromMode } from "~/cheat/GameCheatSpeedItem";
 import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import { syncRealtimeWorldJobsFx } from "~/world/syncRealtimeWorldJobsFx";
-import type { GameActionCheatSpeedModeSet } from "~/action/GameActionCheatSpeedModeSet";
+import type { GameActionCheatSpeedModeSetSchema } from "~/action/GameActionCheatSpeedModeSetSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace setCheatSpeedModeFx {
 	export interface Props {
-		action: GameActionCheatSpeedModeSet;
+		action: GameActionCheatSpeedModeSetSchema.Type;
 		config: GameConfig;
 		nowMs: number;
 		save: GameSave;

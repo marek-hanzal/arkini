@@ -9,7 +9,7 @@ import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionTileRemove } from "~/action/GameActionTileRemove";
+import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
@@ -19,7 +19,7 @@ export namespace removeTileFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionTileRemove;
+		action: GameActionTileRemoveSchema.Type;
 		nowMs: number;
 	}
 }

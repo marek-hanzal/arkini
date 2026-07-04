@@ -3,7 +3,7 @@ import { checkCraftTargetIdleFx } from "~/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionCraftInputWithdraw } from "~/action/GameActionCraftInputWithdraw";
+import type { GameActionCraftInputWithdrawSchema } from "~/action/GameActionCraftInputWithdrawSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
@@ -12,7 +12,7 @@ export namespace checkCraftInputWithdrawReadinessFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionCraftInputWithdraw;
+		action: GameActionCraftInputWithdrawSchema.Type;
 	}
 }
 

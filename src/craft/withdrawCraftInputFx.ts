@@ -3,7 +3,7 @@ import { checkCraftInputWithdrawReadinessFx } from "~/craft/checkCraftInputWithd
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionCraftInputWithdraw } from "~/action/GameActionCraftInputWithdraw";
+import type { GameActionCraftInputWithdrawSchema } from "~/action/GameActionCraftInputWithdrawSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
@@ -13,7 +13,7 @@ export namespace withdrawCraftInputFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionCraftInputWithdraw;
+		action: GameActionCraftInputWithdrawSchema.Type;
 		nowMs: number;
 	}
 }

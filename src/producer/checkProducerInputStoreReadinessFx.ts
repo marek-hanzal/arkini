@@ -6,7 +6,7 @@ import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQ
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
-import type { GameActionProducerInputStore } from "~/action/GameActionProducerInputStore";
+import type { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
@@ -16,7 +16,7 @@ export namespace checkProducerInputStoreReadinessFx {
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
-		action: GameActionProducerInputStore;
+		action: GameActionProducerInputStoreSchema.Type;
 	}
 }
 

@@ -4,7 +4,7 @@ import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import { readBoardItemMaxCountCapacity } from "~/board/logic/readBoardItemMaxCountCapacity";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionItemMerge } from "~/action/GameActionItemMerge";
+import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -13,7 +13,7 @@ export namespace checkItemMergeReadinessFx {
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
-		action: GameActionItemMerge;
+		action: GameActionItemMergeSchema.Type;
 	}
 }
 

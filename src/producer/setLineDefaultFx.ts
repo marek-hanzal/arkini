@@ -8,7 +8,7 @@ import { readLineKind } from "~/producer/readLineKind";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
-import type { GameActionLineSetDefault } from "~/action/GameActionLineSetDefault";
+import type { GameActionLineSetDefaultSchema } from "~/action/GameActionLineSetDefaultSchema";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -16,7 +16,7 @@ export namespace setLineDefaultFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionLineSetDefault;
+		action: GameActionLineSetDefaultSchema.Type;
 		nowMs: number;
 	}
 }

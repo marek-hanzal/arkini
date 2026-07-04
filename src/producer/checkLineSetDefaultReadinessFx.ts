@@ -3,7 +3,7 @@ import { readProducerRuntimeTargetFx } from "~/producer/readProducerRuntimeTarge
 import { readVisibleLineIds } from "~/producer/readVisibleLineIds";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineIds } from "~/config/GameItemCapabilities";
-import type { GameActionLineSetDefault } from "~/action/GameActionLineSetDefault";
+import type { GameActionLineSetDefaultSchema } from "~/action/GameActionLineSetDefaultSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -12,7 +12,7 @@ export namespace checkLineSetDefaultReadinessFx {
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
-		action: GameActionLineSetDefault;
+		action: GameActionLineSetDefaultSchema.Type;
 	}
 }
 

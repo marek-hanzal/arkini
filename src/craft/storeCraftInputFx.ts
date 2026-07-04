@@ -6,7 +6,7 @@ import { readCraftStoredInputsReadyFx } from "~/craft/readCraftStoredInputsReady
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { startCraftFx } from "~/craft/startCraftFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionCraftInputStore } from "~/action/GameActionCraftInputStore";
+import type { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -15,7 +15,7 @@ export namespace storeCraftInputFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionCraftInputStore;
+		action: GameActionCraftInputStoreSchema.Type;
 		nowMs: number;
 	}
 }

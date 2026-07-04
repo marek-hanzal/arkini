@@ -4,7 +4,7 @@ import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionCraftStart } from "~/action/GameActionCraftStart";
+import type { GameActionCraftStartSchema } from "~/action/GameActionCraftStartSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace checkCraftStartReadinessFx {
@@ -12,7 +12,7 @@ export namespace checkCraftStartReadinessFx {
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
-		action: GameActionCraftStart;
+		action: GameActionCraftStartSchema.Type;
 	}
 }
 

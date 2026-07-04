@@ -14,7 +14,7 @@ import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";
 import { spendLineCapacityEffectsFx } from "~/capacity/spendLineCapacityEffectsFx";
 import type { GameActivationInput } from "~/activation/GameActivationInput";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionLineStart } from "~/action/GameActionLineStart";
+import type { GameActionLineStartSchema } from "~/action/GameActionLineStartSchema";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
@@ -24,7 +24,7 @@ export namespace startLineFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionLineStart;
+		action: GameActionLineStartSchema.Type;
 		nowMs: number;
 	}
 }

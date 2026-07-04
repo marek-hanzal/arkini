@@ -4,7 +4,7 @@ import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
 import { readCraftInputQuantitiesFx } from "~/craft/readCraftInputQuantitiesFx";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionCraftInputStore } from "~/action/GameActionCraftInputStore";
+import type { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
@@ -14,7 +14,7 @@ export namespace checkCraftInputStoreReadinessFx {
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
-		action: GameActionCraftInputStore;
+		action: GameActionCraftInputStoreSchema.Type;
 	}
 }
 

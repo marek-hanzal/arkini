@@ -14,7 +14,7 @@ import { readLineStoredInputQuantitiesFx } from "~/producer/readLineStoredInputQ
 import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
-import type { GameActionLineStart } from "~/action/GameActionLineStart";
+import type { GameActionLineStartSchema } from "~/action/GameActionLineStartSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
@@ -25,7 +25,7 @@ export namespace checkLineStartReadinessFx {
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;
-		action: GameActionLineStart;
+		action: GameActionLineStartSchema.Type;
 	}
 }
 

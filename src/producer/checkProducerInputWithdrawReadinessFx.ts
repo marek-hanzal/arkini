@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { readProducerRuntimeTargetFx } from "~/producer/readProducerRuntimeTargetFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
-import type { GameActionProducerInputWithdraw } from "~/action/GameActionProducerInputWithdraw";
+import type { GameActionProducerInputWithdrawSchema } from "~/action/GameActionProducerInputWithdrawSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -10,7 +10,7 @@ export namespace checkProducerInputWithdrawReadinessFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionProducerInputWithdraw;
+		action: GameActionProducerInputWithdrawSchema.Type;
 	}
 }
 

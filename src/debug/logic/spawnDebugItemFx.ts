@@ -9,7 +9,7 @@ import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacemen
 import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameActionDebugItemSpawn } from "~/action/GameActionDebugItemSpawn";
+import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
@@ -17,7 +17,7 @@ import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace spawnDebugItemFx {
 	export interface Props {
-		action: GameActionDebugItemSpawn;
+		action: GameActionDebugItemSpawnSchema.Type;
 		config: GameConfig;
 		nowMs: number;
 		save: GameSave;

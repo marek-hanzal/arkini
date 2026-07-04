@@ -5,13 +5,13 @@ import { GameEngineError } from "~/engine/model/GameEngineError";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
-import type { GameActionDebugItemSpawn } from "~/action/GameActionDebugItemSpawn";
+import type { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpawnSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace checkDebugItemSpawnReadinessFx {
 	export interface Props {
-		action: GameActionDebugItemSpawn;
+		action: GameActionDebugItemSpawnSchema.Type;
 		config: GameConfig;
 		nowMs?: number;
 		save: GameSave;

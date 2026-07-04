@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { resolveInputRefsFx } from "~/activation/resolveInputRefsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameActionTileRemove } from "~/action/GameActionTileRemove";
+import type { GameActionTileRemoveSchema } from "~/action/GameActionTileRemoveSchema";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -9,7 +9,7 @@ export namespace checkTileRemoveReadinessFx {
 	export interface Props {
 		config: GameConfig;
 		save: GameSave;
-		action: GameActionTileRemove;
+		action: GameActionTileRemoveSchema.Type;
 	}
 }
 

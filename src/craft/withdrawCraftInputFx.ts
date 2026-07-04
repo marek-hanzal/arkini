@@ -1,11 +1,9 @@
 import { Effect } from "effect";
 import { checkCraftInputWithdrawReadinessFx } from "~/craft/checkCraftInputWithdrawReadinessFx";
-import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { placeWithdrawnActivationInputFx } from "~/activation/placeWithdrawnActivationInputFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftInputWithdrawSchema } from "~/action/GameActionCraftInputWithdrawSchema";
-import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -29,32 +27,20 @@ export const withdrawCraftInputFx = Effect.fn("withdrawCraftInputFx")(function* 
 		config,
 		save,
 	});
-	const placement = yield* placeGameSaveItemsFx({
+	const placement = yield* placeWithdrawnActivationInputFx({
 		config,
-		items: [
-			{
-				itemId: action.itemId,
-				originItemInstanceId: action.targetItemInstanceId,
-				quantity: action.quantity,
-				reason: "craft-input-withdraw",
-			},
-		],
+		failureSubject: "Craft",
+		itemId: action.itemId,
 		nowMs,
+		originItemInstanceId: action.targetItemInstanceId,
+		quantity: action.quantity,
+		reason: "craft-input-withdraw",
 		save,
 		seedCell: {
 			x: checked.target.targetItem.x,
 			y: checked.target.targetItem.y,
 		},
-	}).pipe(
-		Effect.catchTag("GamePlacementFailed", (error) =>
-			Effect.fail(
-				GameEngineError.actionRejected(
-					error.reason,
-					`Craft input "${action.itemId}" cannot be withdrawn because there is no placement space.`,
-				),
-			),
-		),
-	);
+	});
 
 	const craftInputState = placement.save.craftInputs[action.targetItemInstanceId] ?? {
 		items: {},
@@ -86,13 +72,10 @@ export const withdrawCraftInputFx = Effect.fn("withdrawCraftInputFx")(function* 
 		...placement.events,
 	];
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events,
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: placement.save,
-		}),
+		nowMs,
 		save: placement.save,
-	} satisfies GameEngineResult;
+	});
 });

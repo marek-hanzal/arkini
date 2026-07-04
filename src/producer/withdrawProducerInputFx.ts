@@ -1,11 +1,9 @@
 import { Effect } from "effect";
 import { checkProducerInputWithdrawReadinessFx } from "~/producer/checkProducerInputWithdrawReadinessFx";
-import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
-import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
+import { placeWithdrawnActivationInputFx } from "~/activation/placeWithdrawnActivationInputFx";
+import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionProducerInputWithdrawSchema } from "~/action/GameActionProducerInputWithdrawSchema";
-import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
@@ -29,32 +27,20 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 		config,
 		save,
 	});
-	const placement = yield* placeGameSaveItemsFx({
+	const placement = yield* placeWithdrawnActivationInputFx({
 		config,
-		items: [
-			{
-				itemId: action.itemId,
-				originItemInstanceId: action.itemInstanceId,
-				quantity: checked.previousQuantity,
-				reason: "producer-input-withdraw",
-			},
-		],
+		failureSubject: "Producer",
+		itemId: action.itemId,
 		nowMs,
+		originItemInstanceId: action.itemInstanceId,
+		quantity: checked.previousQuantity,
+		reason: "producer-input-withdraw",
 		save,
 		seedCell: {
 			x: checked.producerItem.x,
 			y: checked.producerItem.y,
 		},
-	}).pipe(
-		Effect.catchTag("GamePlacementFailed", (error) =>
-			Effect.fail(
-				GameEngineError.actionRejected(
-					error.reason,
-					`Producer input "${action.itemId}" cannot be withdrawn because there is no placement space.`,
-				),
-			),
-		),
-	);
+	});
 
 	const producerInputState = placement.save.producerInputs[action.itemInstanceId];
 	const lineInputState = producerInputState?.lineInputs[action.lineId];
@@ -83,13 +69,10 @@ export const withdrawProducerInputFx = Effect.fn("withdrawProducerInputFx")(func
 		...placement.events,
 	];
 
-	return {
+	return yield* createGameEngineResultFx({
+		config,
 		events,
-		nextWakeAtMs: yield* readNextWakeAtMsFx({
-			config,
-			nowMs,
-			save: placement.save,
-		}),
+		nowMs,
 		save: placement.save,
-	} satisfies GameEngineResult;
+	});
 });

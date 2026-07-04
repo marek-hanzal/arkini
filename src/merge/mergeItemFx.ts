@@ -1,4 +1,5 @@
-import { Effect } from "effect";
+import { Context, Effect } from "effect";
+import { match, P } from "ts-pattern";
 import { checkItemMergeReadinessFx } from "~/merge/checkItemMergeReadinessFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 import { removeBoardItemRuntimeStateFx } from "~/board/logic/removeBoardItemRuntimeStateFx";
@@ -24,19 +25,38 @@ export namespace mergeItemFx {
 	}
 }
 
-export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
-	config,
-	save,
-	action,
-	nowMs,
-}: mergeItemFx.Props) {
-	const checked = yield* checkItemMergeReadinessFx({
+type MergeReadiness = Effect.Effect.Success<ReturnType<typeof checkItemMergeReadinessFx>>;
+
+type MergeWorkingState = {
+	checked: MergeReadiness;
+	mergeEvents: GameEvent[];
+	nextSave: GameSave;
+};
+
+class MergeItemScopeFx extends Context.Tag("MergeItemScopeFx")<
+	MergeItemScopeFx,
+	mergeItemFx.Props
+>() {
+	//
+}
+
+const readMergeReadinessFx = Effect.fn("mergeItemFx.readMergeReadinessFx")(function* () {
+	const { action, config, nowMs, save } = yield* MergeItemScopeFx;
+	return yield* checkItemMergeReadinessFx({
 		action,
 		config,
 		nowMs,
 		save,
 	});
-	const consumed = yield* consumeActivationInputsFx({
+});
+
+const consumeMergeSourceFx = Effect.fn("mergeItemFx.consumeMergeSourceFx")(function* ({
+	checked,
+}: {
+	checked: MergeReadiness;
+}) {
+	const { action, nowMs, save } = yield* MergeItemScopeFx;
+	return yield* consumeActivationInputsFx({
 		inputRefs: [
 			action.sourceRef,
 		],
@@ -51,44 +71,79 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		reason: "merge-source",
 		save,
 	});
-	const nextSave = yield* cloneGameSaveFx({
-		save: consumed.save,
-	});
-	const liveTarget = nextSave.board.items[checked.target.id];
-	if (!liveTarget) {
-		return yield* Effect.fail(
-			GameEngineError.actionRejected("invalid_merge", "Merge target disappeared."),
-		);
-	}
+});
 
-	const mergeEvents: GameEvent[] = [
-		...consumed.events,
-	];
-	if ("resultItemId" in checked.merge) {
-		if (config.items[checked.merge.resultItemId]?.effects?.length) {
+const createMergeWorkingStateFx = Effect.fn("mergeItemFx.createMergeWorkingStateFx")(function* ({
+	checked,
+}: {
+	checked: MergeReadiness;
+}) {
+	const consumed = yield* consumeMergeSourceFx({
+		checked,
+	});
+	return {
+		checked,
+		mergeEvents: [
+			...consumed.events,
+		],
+		nextSave: yield* cloneGameSaveFx({
+			save: consumed.save,
+		}),
+	} satisfies MergeWorkingState;
+});
+
+const assertLiveMergeTargetFx = Effect.fn("mergeItemFx.assertLiveMergeTargetFx")(function* ({
+	checked,
+	nextSave,
+}: MergeWorkingState) {
+	const liveTarget = nextSave.board.items[checked.target.id];
+	if (liveTarget) return liveTarget;
+
+	return yield* Effect.fail(
+		GameEngineError.actionRejected("invalid_merge", "Merge target disappeared."),
+	);
+});
+
+const applyMergeResultReplacementFx = Effect.fn("mergeItemFx.applyMergeResultReplacementFx")(
+	function* (state: MergeWorkingState) {
+		const { config, nowMs } = yield* MergeItemScopeFx;
+		const { checked, mergeEvents, nextSave } = state;
+		const resultItemId = match(checked.merge)
+			.with(
+				{
+					resultItemId: P.string,
+				},
+				(merge) => merge.resultItemId,
+			)
+			.otherwise(() => undefined);
+		if (!resultItemId) return state;
+
+		const liveTarget = yield* assertLiveMergeTargetFx(state);
+		if (config.items[resultItemId]?.effects?.length) {
 			liveTarget.createdAtMs = nowMs;
 		} else {
 			delete liveTarget.createdAtMs;
 		}
-		liveTarget.itemId = checked.merge.resultItemId;
+		liveTarget.itemId = resultItemId;
 		yield* removeBoardItemRuntimeStateFx({
 			itemInstanceId: checked.target.id,
 			save: nextSave,
 		});
 		mergeEvents.push({
+			atMs: nowMs,
 			fromItemId: checked.target.itemId,
 			itemInstanceId: checked.target.id,
 			reason: "merge-result" as const,
-			atMs: nowMs,
-			toItemId: checked.merge.resultItemId,
+			toItemId: resultItemId,
 			type: "item.replaced" as const,
 		});
-	}
+		return state;
+	},
+);
 
-	const seedCell = yield* readBoardItemCellFx({
-		itemInstanceId: checked.target.id,
-		save: nextSave,
-	});
+const rollMergeOutputPlacementRequestsFx = Effect.fn(
+	"mergeItemFx.rollMergeOutputPlacementRequestsFx",
+)(function* ({ checked }: MergeWorkingState) {
 	const rolledOutput = checked.merge.output
 		? yield* rollLootTableItemsFx({
 				lootTable: {
@@ -99,7 +154,7 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		: {
 				items: [],
 			};
-	const placementRequests = rolledOutput.items.map(
+	return rolledOutput.items.map(
 		(item) =>
 			({
 				...item,
@@ -107,30 +162,52 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 				reason: "merge-output",
 			}) satisfies GameSaveItemPlacementRequest,
 	);
-	const sourceFreedBoardItemInstanceIds =
-		checked.source.kind === "board"
-			? new Set([
-					checked.source.itemInstanceId,
-				])
-			: undefined;
-	const placed = placementRequests.length
-		? yield* placeGameSaveItemsFx({
-				config,
-				freedBoardItemInstanceIds: sourceFreedBoardItemInstanceIds,
-				items: placementRequests,
-				nowMs,
-				save: nextSave,
-				seedCell,
-			})
-		: {
-				events: [] satisfies GameEvent[],
-				save: nextSave,
-			};
+});
+
+const readMergeSourceFreedBoardItemInstanceIds = ({ checked }: { checked: MergeReadiness }) =>
+	checked.source.kind === "board"
+		? new Set([
+				checked.source.itemInstanceId,
+			])
+		: undefined;
+
+const placeMergeOutputsFx = Effect.fn("mergeItemFx.placeMergeOutputsFx")(function* (
+	state: MergeWorkingState,
+) {
+	const { config, nowMs } = yield* MergeItemScopeFx;
+	const placementRequests = yield* rollMergeOutputPlacementRequestsFx(state);
+	if (placementRequests.length === 0) {
+		return {
+			events: [] satisfies GameEvent[],
+			save: state.nextSave,
+		};
+	}
+
+	return yield* placeGameSaveItemsFx({
+		config,
+		freedBoardItemInstanceIds: readMergeSourceFreedBoardItemInstanceIds({
+			checked: state.checked,
+		}),
+		items: placementRequests,
+		nowMs,
+		save: state.nextSave,
+		seedCell: yield* readBoardItemCellFx({
+			itemInstanceId: state.checked.target.id,
+			save: state.nextSave,
+		}),
+	});
+});
+
+const buildMergeResultFx = Effect.fn("mergeItemFx.buildMergeResultFx")(function* (
+	state: MergeWorkingState,
+) {
+	const { config, nowMs } = yield* MergeItemScopeFx;
+	const placed = yield* placeMergeOutputsFx(state);
 	placed.save.updatedAtMs = nowMs;
 
 	return {
 		events: [
-			...mergeEvents,
+			...state.mergeEvents,
 			...placed.events,
 		],
 		nextWakeAtMs: yield* readNextWakeAtMsFx({
@@ -140,4 +217,28 @@ export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
 		}),
 		save: placed.save,
 	} satisfies GameEngineResult;
+});
+
+const mergeItemProgramFx = Effect.fn("mergeItemFx.mergeItemProgramFx")(function* () {
+	const checked = yield* readMergeReadinessFx();
+	const state = yield* createMergeWorkingStateFx({
+		checked,
+	});
+	return yield* buildMergeResultFx(yield* applyMergeResultReplacementFx(state));
+});
+
+export const mergeItemFx = Effect.fn("mergeItemFx")(function* ({
+	action,
+	config,
+	nowMs,
+	save,
+}: mergeItemFx.Props) {
+	return yield* mergeItemProgramFx().pipe(
+		Effect.provideService(MergeItemScopeFx, {
+			action,
+			config,
+			nowMs,
+			save,
+		}),
+	);
 });

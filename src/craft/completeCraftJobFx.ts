@@ -200,7 +200,7 @@ const readCraftCompletionTargetFx = Effect.fn("completeCraftJobFx.readCraftCompl
 
 const readCraftCompletionBlockedReasonFx = Effect.fn(
 	"completeCraftJobFx.readCraftCompletionBlockedReasonFx",
-)(function* ({ recipe }: CraftCompletionTarget) {
+)(function* ({ liveJob, recipe }: CraftCompletionTarget) {
 	const { config, save } = yield* CraftJobCompletionScopeFx;
 	if (
 		!isItemStorageAllowed({
@@ -213,7 +213,7 @@ const readCraftCompletionBlockedReasonFx = Effect.fn(
 	}
 
 	const targetIgnoredIds = new Set([
-		(yield* CraftJobCompletionScopeFx).job.targetItemInstanceId,
+		liveJob.targetItemInstanceId,
 	]);
 	const remainingCapacity = yield* readBoardItemMaxCountCapacityFx({
 		config,

@@ -1,6 +1,6 @@
+import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
-import { createGameItemInstanceId } from "~/engine/logic/createGameEntityId";
 
 export const createGameItemInstanceIdFx = Effect.fn("createGameItemInstanceIdFx")(function* () {
-	return createGameItemInstanceId();
+	return `item-instance:${createId()}`;
 });

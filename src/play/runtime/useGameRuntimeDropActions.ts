@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { GameAction } from "~/action/GameActionSchema";
 import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import type { BoardView } from "~/board/view/BoardViewSchema";
+import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
 import type { DropActions } from "~/play/drop/DropActions";
 import { createGameActionFromItemToBoardItemInteractionPlan } from "~/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
@@ -73,8 +74,12 @@ const dispatchBoardItemActionWhenExpected = ({
 	expectedItemId: string;
 	readAction(): GameAction;
 }) => {
-	const boardItem = context.board.byId[boardItemId];
-	if (!boardItem || boardItem.itemId !== expectedItemId) return Promise.resolve();
+	const boardItem = readExpectedBoardViewItem({
+		board: context.board,
+		expectedItemId,
+		itemInstanceId: boardItemId,
+	});
+	if (!boardItem) return Promise.resolve();
 
 	return dispatchRuntimeDropAction({
 		action: readAction(),
@@ -97,14 +102,13 @@ const dispatchItemToBoardItemAction = ({
 }) => {
 	const { config } = context.snapshot.runtime;
 	const sourceItemId = source.readExpectedSourceItemId(context);
-	const target = context.board.byId[targetBoardItemId];
+	const target = readExpectedBoardViewItem({
+		board: context.board,
+		expectedItemId: expectedTargetItemId,
+		itemInstanceId: targetBoardItemId,
+	});
 
-	if (
-		!sourceItemId ||
-		sourceItemId !== expectedSourceItemId ||
-		!target ||
-		target.itemId !== expectedTargetItemId
-	) {
+	if (!sourceItemId || sourceItemId !== expectedSourceItemId || !target) {
 		return Promise.resolve();
 	}
 
@@ -293,14 +297,17 @@ const swapExpectedBoardItems = ({
 	const context = readRuntimeDropActionContext({
 		store,
 	});
-	const source = context.board.byId[input.sourceBoardItemId];
-	const target = context.board.byId[input.targetBoardItemId];
-	if (
-		!source ||
-		source.itemId !== input.expectedSourceItemId ||
-		!target ||
-		target.itemId !== input.expectedTargetItemId
-	) {
+	const source = readExpectedBoardViewItem({
+		board: context.board,
+		expectedItemId: input.expectedSourceItemId,
+		itemInstanceId: input.sourceBoardItemId,
+	});
+	const target = readExpectedBoardViewItem({
+		board: context.board,
+		expectedItemId: input.expectedTargetItemId,
+		itemInstanceId: input.targetBoardItemId,
+	});
+	if (!source || !target) {
 		return Promise.resolve();
 	}
 

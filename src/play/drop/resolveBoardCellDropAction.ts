@@ -3,6 +3,7 @@ import { cellKey } from "~/board/cellKey";
 import { cheatBoardItemId, isInventoryBoardItemId } from "~/board/BoardUtilityItem";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
@@ -353,11 +354,12 @@ export const resolveBoardCellDropAction = ({
 	target,
 }: resolveBoardCellDropAction.Props): BoardCellDropAction => {
 	const targetCellKey = cellKey(target.x, target.y);
-	const sourceItem = board.byId[source.boardItemId];
-
-	if (!sourceItem || sourceItem.itemId !== source.itemId) {
-		return createBoardCellRejectDropAction(targetCellKey);
-	}
+	const sourceItem = readExpectedBoardViewItem({
+		board,
+		expectedItemId: source.itemId,
+		itemInstanceId: source.boardItemId,
+	});
+	if (!sourceItem) return createBoardCellRejectDropAction(targetCellKey);
 
 	const targetItem = board.byCellKey[targetCellKey];
 	if (targetItem?.id === source.boardItemId) {

@@ -16,6 +16,7 @@ import { useGameRuntimeSelector, useGameRuntimeStore } from "~/play/runtime/Game
 import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
 import { useGameBoardView } from "~/play/runtime/useGameRuntimeViews";
 import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
 import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 import type { TileEngine } from "~/tile-engine/TileEngine.types";
@@ -245,8 +246,12 @@ const useOpenBoardItemSheet = ({
 	useCallback(
 		(boardItemId: string, expectedItemId: string) => {
 			const snapshot = runtimeStore.getSnapshot();
-			const liveBoardItem = readBoardView(snapshot, Date.now()).byId[boardItemId];
-			if (!liveBoardItem || liveBoardItem.itemId !== expectedItemId) return;
+			const liveBoardItem = readExpectedBoardViewItem({
+				board: readBoardView(snapshot, Date.now()),
+				expectedItemId,
+				itemInstanceId: boardItemId,
+			});
+			if (!liveBoardItem) return;
 
 			onOpenSheet(
 				readBoardItemSheet({

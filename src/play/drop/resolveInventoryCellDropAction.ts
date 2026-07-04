@@ -5,7 +5,8 @@ import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
-import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
+import { readExpectedInventorySlotStack } from "~/inventory/view/readExpectedInventorySlotStack";
+import type { ExpectedInventorySlotStack } from "~/inventory/view/readExpectedInventorySlotStack";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
@@ -76,8 +77,9 @@ type InventoryItemToBoardItemDropInput = Extract<
 	}
 >["input"];
 
-type SourceInventorySlotWithStack = InventorySlot & {
-	readonly stack: NonNullable<InventorySlot["stack"]>;
+type SourceInventorySlotWithStack = {
+	readonly slotIndex: number;
+	readonly stack: ExpectedInventorySlotStack;
 };
 
 const createBoardCellRejectDropAction = (targetCellKey: string): InventoryCellDropAction => ({
@@ -108,16 +110,18 @@ const readCurrentSourceInventorySlotWithStack = ({
 		}
 	>;
 }): SourceInventorySlotWithStack | undefined => {
-	const sourceSlot = inventory.bySlotIndex[String(source.slotIndex)];
-	if (
-		!sourceSlot?.stack ||
-		sourceSlot.stack.id !== source.slot.stack?.id ||
-		sourceSlot.stack.itemId !== source.itemId
-	) {
-		return undefined;
-	}
+	const stack = readExpectedInventorySlotStack({
+		expectedItemId: source.itemId,
+		expectedStackId: source.slot.stack?.id ?? "",
+		inventory,
+		slotIndex: source.slotIndex,
+	});
+	if (!stack) return undefined;
 
-	return sourceSlot as SourceInventorySlotWithStack;
+	return {
+		slotIndex: source.slotIndex,
+		stack,
+	};
 };
 
 const createInventoryItemToBoardItemDropInput = ({

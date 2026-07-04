@@ -9,6 +9,7 @@ import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 import type { GameRuntimeState, GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 import { readBoardView } from "~/play/runtime/readers/readBoardView";
 import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
+import { readExpectedInventorySlotStack } from "~/inventory/view/readExpectedInventorySlotStack";
 
 type RuntimeDropActionContext = {
 	board: BoardView;
@@ -190,18 +191,13 @@ const applyExpectedInventoryItemToBoardItem = ({
 		expectedSourceItemId: input.expectedSourceItemId,
 		expectedTargetItemId: input.expectedTargetItemId,
 		source: {
-			readExpectedSourceItemId: ({ snapshot }) => {
-				const stack =
-					readInventoryView(snapshot).bySlotIndex[String(input.sourceSlotIndex)]?.stack;
-				if (
-					!stack ||
-					stack.id !== input.expectedSourceStackId ||
-					stack.itemId !== input.expectedSourceItemId
-				) {
-					return undefined;
-				}
-				return stack.itemId;
-			},
+			readExpectedSourceItemId: ({ snapshot }) =>
+				readExpectedInventorySlotStack({
+					expectedItemId: input.expectedSourceItemId,
+					expectedStackId: input.expectedSourceStackId,
+					inventory: readInventoryView(snapshot),
+					slotIndex: input.sourceSlotIndex,
+				})?.itemId,
 			sourceRef: {
 				kind: "inventory",
 				quantity: 1,
@@ -266,10 +262,13 @@ const placeExpectedInventoryItem = ({
 	const context = readRuntimeDropActionContext({
 		store,
 	});
-	const stack = readInventoryView(context.snapshot).bySlotIndex[String(input.slotIndex)]?.stack;
-	if (!stack || stack.id !== input.expectedStackId || stack.itemId !== input.expectedItemId) {
-		return Promise.resolve();
-	}
+	const stack = readExpectedInventorySlotStack({
+		expectedItemId: input.expectedItemId,
+		expectedStackId: input.expectedStackId,
+		inventory: readInventoryView(context.snapshot),
+		slotIndex: input.slotIndex,
+	});
+	if (!stack) return Promise.resolve();
 
 	return dispatchRuntimeDropAction({
 		action: {
@@ -326,12 +325,15 @@ const swapExpectedInventorySlots = ({
 		store,
 	});
 	const inventory = readInventoryView(context.snapshot);
-	const source = inventory.bySlotIndex[String(input.sourceSlotIndex)]?.stack;
+	const source = readExpectedInventorySlotStack({
+		expectedItemId: input.expectedSourceItemId,
+		expectedStackId: input.expectedSourceStackId,
+		inventory,
+		slotIndex: input.sourceSlotIndex,
+	});
 	const target = inventory.bySlotIndex[String(input.targetSlotIndex)]?.stack;
 	if (
 		!source ||
-		source.id !== input.expectedSourceStackId ||
-		source.itemId !== input.expectedSourceItemId ||
 		target?.id !== input.expectedTargetStackId ||
 		target?.itemId !== input.expectedTargetItemId
 	) {

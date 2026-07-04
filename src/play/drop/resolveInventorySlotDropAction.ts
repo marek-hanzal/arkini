@@ -1,3 +1,4 @@
+import { readExpectedInventorySlotStack } from "~/inventory/view/readExpectedInventorySlotStack";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
@@ -51,12 +52,13 @@ export const resolveInventorySlotDropAction = ({
 		};
 	}
 
-	const sourceStack = inventory.bySlotIndex[String(source.slotIndex)]?.stack;
-	if (
-		!sourceStack ||
-		sourceStack.id !== source.slot.stack?.id ||
-		sourceStack.itemId !== source.itemId
-	) {
+	const sourceStack = readExpectedInventorySlotStack({
+		expectedItemId: source.itemId,
+		expectedStackId: source.slot.stack?.id ?? "",
+		inventory,
+		slotIndex: source.slotIndex,
+	});
+	if (!sourceStack) {
 		return {
 			type: "reject",
 		};

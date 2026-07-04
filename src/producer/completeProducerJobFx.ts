@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
@@ -50,12 +50,7 @@ type ProducerPlacementFailure = Extract<
 	}
 >;
 
-class ProducerJobCompletionScopeFx extends Context.Tag("ProducerJobCompletionScopeFx")<
-	ProducerJobCompletionScopeFx,
-	completeProducerJobFx.Props
->() {
-	//
-}
+type ProducerJobCompletionScope = completeProducerJobFx.Props;
 
 const createLineCompletedEvent = ({ job, nowMs }: { job: GameSaveProducerJob; nowMs: number }) => ({
 	atMs: nowMs,
@@ -157,36 +152,41 @@ const toPlacementRequests = ({
 			}) satisfies GameSaveItemPlacementRequest,
 	);
 
-const readLiveProducerJobFx = Effect.fn("completeProducerJobFx.readLiveProducerJobFx")(
-	function* () {
-		const { job, save } = yield* ProducerJobCompletionScopeFx;
-		return save.producerJobs[job.id];
+const readLiveProducerJobFx = Effect.fn("completeProducerJobFx.readLiveProducerJobFx")(function* (
+	scope: ProducerJobCompletionScope,
+) {
+	return scope.save.producerJobs[scope.job.id];
+});
+
+const readLiveProducerLineFx = Effect.fn("completeProducerJobFx.readLiveProducerLineFx")(
+	function* ({
+		liveJob,
+		scope,
+	}: {
+		liveJob: GameSaveProducerJob;
+		scope: ProducerJobCompletionScope;
+	}) {
+		const { config, save } = scope;
+		const producerItem = save.board.items[liveJob.itemInstanceId];
+		const producer = producerItem
+			? readProducerCapabilityDefinition({
+					config,
+					producerId: producerItem.itemId,
+				})
+			: undefined;
+		const line = producer
+			? readLineDefinition({
+					producerDefinition: producer,
+					lineId: liveJob.lineId,
+				})
+			: undefined;
+		if (line) return line;
+
+		return yield* Effect.fail(
+			GameEngineError.configReferenceMissing(`Missing line "${liveJob.lineId}".`),
+		);
 	},
 );
-
-const readLiveProducerLineFx = Effect.fn("completeProducerJobFx.readLiveProducerLineFx")(function* (
-	liveJob: GameSaveProducerJob,
-) {
-	const { config, save } = yield* ProducerJobCompletionScopeFx;
-	const producerItem = save.board.items[liveJob.itemInstanceId];
-	const producer = producerItem
-		? readProducerCapabilityDefinition({
-				config,
-				producerId: producerItem.itemId,
-			})
-		: undefined;
-	const line = producer
-		? readLineDefinition({
-				producerDefinition: producer,
-				lineId: liveJob.lineId,
-			})
-		: undefined;
-	if (line) return line;
-
-	return yield* Effect.fail(
-		GameEngineError.configReferenceMissing(`Missing line "${liveJob.lineId}".`),
-	);
-});
 
 const assertProducerLinePlacementSupportedFx = Effect.fn(
 	"completeProducerJobFx.assertProducerLinePlacementSupportedFx",
@@ -197,8 +197,8 @@ const assertProducerLinePlacementSupportedFx = Effect.fn(
 });
 
 const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProducerDeliveryItemsFx")(
-	function* (job: GameSaveProducerJob) {
-		const { config, nowMs, save } = yield* ProducerJobCompletionScopeFx;
+	function* ({ job, scope }: { job: GameSaveProducerJob; scope: ProducerJobCompletionScope }) {
+		const { config, nowMs, save } = scope;
 		const effectiveLine = yield* readProducerJobEffectiveLineFx({
 			config,
 			nowMs,
@@ -215,8 +215,16 @@ const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProduce
 
 const readProducerChargeCompletionOutcomeFx = Effect.fn(
 	"completeProducerJobFx.readProducerChargeCompletionOutcomeFx",
-)(function* ({ job, save }: { job: GameSaveProducerJob; save: GameSave }) {
-	const { config } = yield* ProducerJobCompletionScopeFx;
+)(function* ({
+	job,
+	save,
+	scope,
+}: {
+	job: GameSaveProducerJob;
+	save: GameSave;
+	scope: ProducerJobCompletionScope;
+}) {
+	const { config } = scope;
 	const producerItem = save.board.items[job.itemInstanceId];
 	if (!producerItem) return undefined;
 
@@ -254,11 +262,20 @@ const readProducerChargeCompletionOutcomeFx = Effect.fn(
 
 const spendProducerChargeCostAfterCompletedDeliveryFx = Effect.fn(
 	"completeProducerJobFx.spendProducerChargeCostAfterCompletedDeliveryFx",
-)(function* ({ job, nextSave }: { job: GameSaveProducerJob; nextSave: GameSave }) {
-	const { nowMs } = yield* ProducerJobCompletionScopeFx;
+)(function* ({
+	job,
+	nextSave,
+	scope,
+}: {
+	job: GameSaveProducerJob;
+	nextSave: GameSave;
+	scope: ProducerJobCompletionScope;
+}) {
+	const { nowMs } = scope;
 	const outcome = yield* readProducerChargeCompletionOutcomeFx({
 		job,
 		save: nextSave,
+		scope,
 	});
 	if (!outcome) return [] satisfies ProducerCompletionEvents;
 
@@ -291,13 +308,15 @@ const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
 	liveJob,
 	nextSave,
 	resumeAtMs,
+	scope,
 }: {
 	liveJob: GameSaveProducerJob;
 	nextSave: GameSave;
 	resumeAtMs: number;
+	scope: ProducerJobCompletionScope;
 }) {
 	if (!liveJob.delivery) return;
-	const { config } = yield* ProducerJobCompletionScopeFx;
+	const { config } = scope;
 
 	yield* rescheduleProducerQueueAfterBlockedDeliveryFx({
 		blockedJobId: liveJob.id,
@@ -310,8 +329,14 @@ const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
 
 const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 	"completeProducerJobFx.completeProducerJobWithoutDeliveryItemsFx",
-)(function* (liveJob: GameSaveProducerJob) {
-	const { nowMs, save } = yield* ProducerJobCompletionScopeFx;
+)(function* ({
+	liveJob,
+	scope,
+}: {
+	liveJob: GameSaveProducerJob;
+	scope: ProducerJobCompletionScope;
+}) {
+	const { nowMs, save } = scope;
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
@@ -319,11 +344,13 @@ const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 	const chargeEvents = yield* spendProducerChargeCostAfterCompletedDeliveryFx({
 		job: liveJob,
 		nextSave,
+		scope,
 	});
 	yield* rescheduleQueueAfterCompletedDeliveryFx({
 		liveJob,
 		nextSave,
 		resumeAtMs: nowMs,
+		scope,
 	});
 	nextSave.updatedAtMs = nowMs;
 
@@ -340,11 +367,13 @@ const completeFailedProducerDeliveryFx = Effect.fn(
 )(function* ({
 	error,
 	liveJob,
+	scope,
 }: {
 	error: ProducerPlacementFailure;
 	liveJob: GameSaveProducerJob;
+	scope: ProducerJobCompletionScope;
 }) {
-	const { nowMs, save } = yield* ProducerJobCompletionScopeFx;
+	const { nowMs, save } = scope;
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
@@ -353,6 +382,7 @@ const completeFailedProducerDeliveryFx = Effect.fn(
 		liveJob,
 		nextSave,
 		resumeAtMs: nowMs,
+		scope,
 	});
 	nextSave.updatedAtMs = nowMs;
 
@@ -378,11 +408,13 @@ const completeBlockedProducerDeliveryFx = Effect.fn(
 )(function* ({
 	error,
 	liveJob,
+	scope,
 }: {
 	error: ProducerPlacementFailure;
 	liveJob: GameSaveProducerJob;
+	scope: ProducerJobCompletionScope;
 }) {
-	const { config, nowMs, save } = yield* ProducerJobCompletionScopeFx;
+	const { config, nowMs, save } = scope;
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
@@ -424,21 +456,25 @@ const completeProducerPlacementFailureFx = Effect.fn(
 )(function* ({
 	error,
 	liveJob,
+	scope,
 }: {
 	error: ProducerPlacementFailure;
 	liveJob: GameSaveProducerJob;
+	scope: ProducerJobCompletionScope;
 }) {
 	return yield* match(isGamePlacementFailureRetryable(error.reason))
 		.with(false, () =>
 			completeFailedProducerDeliveryFx({
 				error,
 				liveJob,
+				scope,
 			}),
 		)
 		.with(true, () =>
 			completeBlockedProducerDeliveryFx({
 				error,
 				liveJob,
+				scope,
 			}),
 		)
 		.exhaustive();
@@ -450,12 +486,14 @@ const readProducerPlacementEitherFx = Effect.fn(
 	chargeOutcome,
 	deliveryItems,
 	liveJob,
+	scope,
 }: {
 	chargeOutcome: ProducerChargeCompletionOutcome | undefined;
 	deliveryItems: readonly ProducerDeliveryItem[];
 	liveJob: GameSaveProducerJob;
+	scope: ProducerJobCompletionScope;
 }) {
-	const { config, nowMs, save } = yield* ProducerJobCompletionScopeFx;
+	const { config, nowMs, save } = scope;
 	const placementRequests = toPlacementRequests({
 		items: deliveryItems,
 		itemInstanceId: liveJob.itemInstanceId,
@@ -488,18 +526,21 @@ const readPlacementSuccessEffectsFx = Effect.fn(
 	liveJob,
 	placementEvents,
 	placementSave,
+	scope,
 }: {
 	chargeOutcome: ProducerChargeCompletionOutcome | undefined;
 	liveJob: GameSaveProducerJob;
 	placementEvents: ProducerCompletionEvents;
 	placementSave: GameSave;
+	scope: ProducerJobCompletionScope;
 }) {
-	const { nowMs, save } = yield* ProducerJobCompletionScopeFx;
+	const { nowMs, save } = scope;
 	if (!chargeOutcome?.removeOnDepleted) {
 		return {
 			chargeEvents: yield* spendProducerChargeCostAfterCompletedDeliveryFx({
 				job: liveJob,
 				nextSave: placementSave,
+				scope,
 			}),
 			placementEvents,
 		};
@@ -556,23 +597,27 @@ const completeProducerPlacementSuccessFx = Effect.fn(
 	chargeOutcome,
 	liveJob,
 	placementResult,
+	scope,
 }: {
 	chargeOutcome: ProducerChargeCompletionOutcome | undefined;
 	liveJob: GameSaveProducerJob;
 	placementResult: ProducerPlacementSuccess;
+	scope: ProducerJobCompletionScope;
 }) {
-	const { nowMs } = yield* ProducerJobCompletionScopeFx;
+	const { nowMs } = scope;
 	delete placementResult.save.producerJobs[liveJob.id];
 	const { chargeEvents, placementEvents } = yield* readPlacementSuccessEffectsFx({
 		chargeOutcome,
 		liveJob,
 		placementEvents: placementResult.events,
 		placementSave: placementResult.save,
+		scope,
 	});
 	yield* rescheduleQueueAfterCompletedDeliveryFx({
 		liveJob,
 		nextSave: placementResult.save,
 		resumeAtMs: nowMs,
+		scope,
 	});
 	placementResult.save.updatedAtMs = nowMs;
 
@@ -590,19 +635,23 @@ const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 )(function* ({
 	deliveryItems,
 	liveJob,
+	scope,
 }: {
 	deliveryItems: readonly ProducerDeliveryItem[];
 	liveJob: GameSaveProducerJob;
+	scope: ProducerJobCompletionScope;
 }) {
-	const { save } = yield* ProducerJobCompletionScopeFx;
+	const { save } = scope;
 	const chargeOutcome = yield* readProducerChargeCompletionOutcomeFx({
 		job: liveJob,
 		save,
+		scope,
 	});
 	const placementEither = yield* readProducerPlacementEitherFx({
 		chargeOutcome,
 		deliveryItems,
 		liveJob,
+		scope,
 	});
 
 	return yield* match(placementEither)
@@ -615,6 +664,7 @@ const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 				return completeProducerPlacementFailureFx({
 					error: left,
 					liveJob,
+					scope,
 				});
 			},
 		)
@@ -627,23 +677,42 @@ const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 					chargeOutcome,
 					liveJob,
 					placementResult: right,
+					scope,
 				}),
 		)
 		.exhaustive();
 });
 
 const completeLiveProducerJobFx = Effect.fn("completeProducerJobFx.completeLiveProducerJobFx")(
-	function* (liveJob: GameSaveProducerJob) {
-		const line = yield* readLiveProducerLineFx(liveJob);
+	function* ({
+		liveJob,
+		scope,
+	}: {
+		liveJob: GameSaveProducerJob;
+		scope: ProducerJobCompletionScope;
+	}) {
+		const line = yield* readLiveProducerLineFx({
+			liveJob,
+			scope,
+		});
 		yield* assertProducerLinePlacementSupportedFx(line);
-		const deliveryItems = yield* rollProducerDeliveryItemsFx(liveJob);
+		const deliveryItems = yield* rollProducerDeliveryItemsFx({
+			job: liveJob,
+			scope,
+		});
 
 		return yield* match(deliveryItems.length === 0)
-			.with(true, () => completeProducerJobWithoutDeliveryItemsFx(liveJob))
+			.with(true, () =>
+				completeProducerJobWithoutDeliveryItemsFx({
+					liveJob,
+					scope,
+				}),
+			)
 			.with(false, () =>
 				completeProducerJobWithDeliveryItemsFx({
 					deliveryItems,
 					liveJob,
+					scope,
 				}),
 			)
 			.exhaustive();
@@ -651,19 +720,19 @@ const completeLiveProducerJobFx = Effect.fn("completeProducerJobFx.completeLiveP
 );
 
 export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function* (
-	props: completeProducerJobFx.Props,
+	scope: completeProducerJobFx.Props,
 ) {
-	return yield* Effect.gen(function* () {
-		const { save } = yield* ProducerJobCompletionScopeFx;
-		const liveJob = yield* readLiveProducerJobFx();
-		if (!liveJob) {
-			return {
-				events: [],
-				save,
-				type: "completed" as const,
-			} satisfies GameEngineCompletionResult;
-		}
+	const liveJob = yield* readLiveProducerJobFx(scope);
+	if (!liveJob) {
+		return {
+			events: [],
+			save: scope.save,
+			type: "completed" as const,
+		} satisfies GameEngineCompletionResult;
+	}
 
-		return yield* completeLiveProducerJobFx(liveJob);
-	}).pipe(Effect.provideService(ProducerJobCompletionScopeFx, props));
+	return yield* completeLiveProducerJobFx({
+		liveJob,
+		scope,
+	});
 });

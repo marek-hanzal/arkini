@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readProducerJobLine } from "~/producer/readProducerJobLine";
@@ -40,32 +40,24 @@ type ProducerQueueSyncStep = {
 
 type ProducerJobSyncState = "paused" | "sync_timing";
 
-class ProducerRealtimeSyncScopeFx extends Context.Tag("ProducerRealtimeSyncScopeFx")<
-	ProducerRealtimeSyncScopeFx,
-	Pick<syncRealtimeProducerJobsFx.Props, "config" | "nowMs">
->() {
-	//
-}
+type ProducerRealtimeSyncScope = Pick<syncRealtimeProducerJobsFx.Props, "config" | "nowMs">;
 
-class ProducerRealtimeQueueScopeFx extends Context.Tag("ProducerRealtimeQueueScopeFx")<
-	ProducerRealtimeQueueScopeFx,
-	{
-		readonly realtimeProducerJobIds: ReadonlySet<string>;
-	}
->() {
-	//
-}
+type ProducerRealtimeQueueScope = {
+	readonly realtimeProducerJobIds: ReadonlySet<string>;
+};
 
 const updateProducerJobActiveEffectFx = Effect.fn("updateProducerJobActiveEffectFx")(function* ({
 	job,
 	readyAtMs,
+	scope,
 	startAtMs,
 }: {
 	job: GameSaveProducerJob;
 	readyAtMs: number;
+	scope: ProducerRealtimeSyncScope;
 	startAtMs: number;
 }) {
-	const { config } = yield* ProducerRealtimeSyncScopeFx;
+	const { config } = scope;
 	const draft = yield* ensureGameSaveDraftFx();
 	const line = readProducerJobLine({
 		config,
@@ -137,8 +129,16 @@ const syncProducerDeliveryCursorFx = Effect.fn(
 
 const readProducerJobSyncStartAtMsFx = Effect.fn(
 	"syncRealtimeProducerJobsFx.readProducerJobSyncStartAtMsFx",
-)(function* ({ cursorAtMs, job }: { cursorAtMs: number; job: GameSaveProducerJob }) {
-	const { nowMs } = yield* ProducerRealtimeSyncScopeFx;
+)(function* ({
+	cursorAtMs,
+	job,
+	scope,
+}: {
+	cursorAtMs: number;
+	job: GameSaveProducerJob;
+	scope: ProducerRealtimeSyncScope;
+}) {
+	const { nowMs } = scope;
 	const save = yield* readGameSaveDraftCurrentFx();
 	return readGameCheatSpeedMode({
 		save,
@@ -149,9 +149,17 @@ const readProducerJobSyncStartAtMsFx = Effect.fn(
 
 const readProducerStartGateReadyFx = Effect.fn(
 	"syncRealtimeProducerJobsFx.readProducerStartGateReadyFx",
-)(function* ({ job }: { job: GameSaveProducerJob }) {
-	const { config, nowMs } = yield* ProducerRealtimeSyncScopeFx;
-	const { realtimeProducerJobIds } = yield* ProducerRealtimeQueueScopeFx;
+)(function* ({
+	job,
+	queueScope,
+	scope,
+}: {
+	job: GameSaveProducerJob;
+	queueScope: ProducerRealtimeQueueScope;
+	scope: ProducerRealtimeSyncScope;
+}) {
+	const { config, nowMs } = scope;
+	const { realtimeProducerJobIds } = queueScope;
 	const save = yield* readGameSaveDraftCurrentFx();
 	return yield* readProducerJobStartGateReadyFx({
 		config,
@@ -163,11 +171,23 @@ const readProducerStartGateReadyFx = Effect.fn(
 });
 
 const resumePausedProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.resumePausedProducerJobFx")(
-	function* ({ cursorAtMs, job }: { cursorAtMs: number; job: GameSaveProducerJob }) {
-		const { config, nowMs } = yield* ProducerRealtimeSyncScopeFx;
-		const { realtimeProducerJobIds } = yield* ProducerRealtimeQueueScopeFx;
+	function* ({
+		cursorAtMs,
+		job,
+		queueScope,
+		scope,
+	}: {
+		cursorAtMs: number;
+		job: GameSaveProducerJob;
+		queueScope: ProducerRealtimeQueueScope;
+		scope: ProducerRealtimeSyncScope;
+	}) {
+		const { config, nowMs } = scope;
+		const { realtimeProducerJobIds } = queueScope;
 		const startGateReady = yield* readProducerStartGateReadyFx({
 			job,
+			queueScope,
+			scope,
 		});
 		if (!startGateReady) return stopProducerQueueAt(cursorAtMs);
 
@@ -203,6 +223,7 @@ const resumePausedProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.resumePa
 		yield* updateProducerJobActiveEffectFx({
 			job: resumedJob,
 			readyAtMs: resumedTiming.readyAtMs,
+			scope,
 			startAtMs: resumedTiming.startAtMs,
 		});
 		return continueProducerQueueAt(resumedTiming.readyAtMs);
@@ -212,13 +233,15 @@ const resumePausedProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.resumePa
 const pauseProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.pauseProducerJobFx")(function* ({
 	hasPreviousNonDeliveryQueueJob,
 	job,
+	scope,
 	startAtMs,
 }: {
 	hasPreviousNonDeliveryQueueJob: boolean;
 	job: GameSaveProducerJob;
+	scope: ProducerRealtimeSyncScope;
 	startAtMs: number;
 }) {
-	const { nowMs } = yield* ProducerRealtimeSyncScopeFx;
+	const { nowMs } = scope;
 	const isRunningAtPause = startAtMs < nowMs && !hasPreviousNonDeliveryQueueJob;
 	const pausedStartAtMs = isRunningAtPause ? startAtMs : nowMs;
 	const remainingMs = isRunningAtPause
@@ -244,19 +267,24 @@ const pauseProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.pauseProducerJo
 	yield* updateProducerJobActiveEffectFx({
 		job: pausedJob,
 		readyAtMs,
+		scope,
 		startAtMs: pausedStartAtMs,
 	});
 });
 
 const retimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.retimeProducerJobFx")(function* ({
 	job,
+	queueScope,
+	scope,
 	startAtMs,
 }: {
 	job: GameSaveProducerJob;
+	queueScope: ProducerRealtimeQueueScope;
+	scope: ProducerRealtimeSyncScope;
 	startAtMs: number;
 }) {
-	const { config, nowMs } = yield* ProducerRealtimeSyncScopeFx;
-	const { realtimeProducerJobIds } = yield* ProducerRealtimeQueueScopeFx;
+	const { config, nowMs } = scope;
+	const { realtimeProducerJobIds } = queueScope;
 	const save = yield* readGameSaveDraftCurrentFx();
 	const evaluateAtMs = startAtMs <= nowMs ? nowMs : startAtMs;
 	const timing = yield* readProducerJobEffectiveTimingFx({
@@ -285,6 +313,7 @@ const retimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.retimeProducer
 	yield* updateProducerJobActiveEffectFx({
 		job: retimedJob,
 		readyAtMs: timing.readyAtMs,
+		scope,
 		startAtMs: timing.startAtMs,
 	});
 	return continueProducerQueueAt(timing.readyAtMs);
@@ -298,24 +327,31 @@ const syncProducerTimingJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncProduc
 		cursorAtMs,
 		hasPreviousNonDeliveryQueueJob,
 		job,
+		queueScope,
+		scope,
 		startAtMs,
 	}: {
 		cursorAtMs: number;
 		hasPreviousNonDeliveryQueueJob: boolean;
 		job: GameSaveProducerJob;
+		queueScope: ProducerRealtimeQueueScope;
+		scope: ProducerRealtimeSyncScope;
 		startAtMs: number;
 	}) {
-		const { nowMs } = yield* ProducerRealtimeSyncScopeFx;
+		const { nowMs } = scope;
 		const startGateReady =
 			startAtMs <= nowMs
 				? yield* readProducerStartGateReadyFx({
 						job,
+						queueScope,
+						scope,
 					})
 				: true;
 		if (!startGateReady) {
 			yield* pauseProducerJobFx({
 				hasPreviousNonDeliveryQueueJob,
 				job,
+				scope,
 				startAtMs,
 			});
 			return stopProducerQueueAt(cursorAtMs);
@@ -323,6 +359,8 @@ const syncProducerTimingJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncProduc
 
 		return yield* retimeProducerJobFx({
 			job,
+			queueScope,
+			scope,
 			startAtMs,
 		});
 	},
@@ -333,10 +371,14 @@ const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncReal
 		cursorAtMs,
 		hasPreviousNonDeliveryQueueJob,
 		job,
+		queueScope,
+		scope,
 	}: {
 		cursorAtMs: number;
 		hasPreviousNonDeliveryQueueJob: boolean;
 		job: GameSaveProducerJob;
+		queueScope: ProducerRealtimeQueueScope;
+		scope: ProducerRealtimeSyncScope;
 	}) {
 		if (job.delivery) {
 			return yield* syncProducerDeliveryCursorFx({
@@ -348,6 +390,7 @@ const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncReal
 		const startAtMs = yield* readProducerJobSyncStartAtMsFx({
 			cursorAtMs,
 			job,
+			scope,
 		});
 
 		return yield* match(
@@ -359,6 +402,8 @@ const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncReal
 				resumePausedProducerJobFx({
 					cursorAtMs,
 					job,
+					queueScope,
+					scope,
 				}),
 			)
 			.with("sync_timing", () =>
@@ -366,6 +411,8 @@ const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncReal
 					cursorAtMs,
 					hasPreviousNonDeliveryQueueJob,
 					job,
+					queueScope,
+					scope,
 					startAtMs,
 				}),
 			)
@@ -375,8 +422,12 @@ const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobsFx.syncReal
 
 const syncProducerQueueFx = Effect.fn("syncRealtimeProducerJobsFx.syncProducerQueueFx")(function* ({
 	queue,
+	queueScope,
+	scope,
 }: {
 	queue: readonly GameSaveProducerJob[];
+	queueScope: ProducerRealtimeQueueScope;
+	scope: ProducerRealtimeSyncScope;
 }) {
 	const sortedQueue = readSortedProducerQueue(queue);
 	let cursorAtMs = 0;
@@ -392,6 +443,8 @@ const syncProducerQueueFx = Effect.fn("syncRealtimeProducerJobsFx.syncProducerQu
 				queueIndex,
 			}),
 			job,
+			queueScope,
+			scope,
 		});
 		cursorAtMs = step.cursorAtMs;
 		if (step.stopQueue) break;
@@ -400,30 +453,36 @@ const syncProducerQueueFx = Effect.fn("syncRealtimeProducerJobsFx.syncProducerQu
 
 const syncProducerQueueWithScopeFx = Effect.fn(
 	"syncRealtimeProducerJobsFx.syncProducerQueueWithScopeFx",
-)(function* ({ queue }: { queue: readonly GameSaveProducerJob[] }) {
+)(function* ({
+	queue,
+	scope,
+}: {
+	queue: readonly GameSaveProducerJob[];
+	scope: ProducerRealtimeSyncScope;
+}) {
 	const sortedQueue = readSortedProducerQueue(queue);
 	return yield* syncProducerQueueFx({
 		queue: sortedQueue,
-	}).pipe(
-		Effect.provideService(ProducerRealtimeQueueScopeFx, {
+		queueScope: {
 			realtimeProducerJobIds: readRealtimeProducerJobIds(sortedQueue),
-		}),
-	);
+		},
+		scope,
+	});
 });
 
 const syncRealtimeProducerJobsProgramFx = Effect.fn(
 	"syncRealtimeProducerJobsFx.syncRealtimeProducerJobsProgramFx",
-)(function* () {
+)(function* (scope: ProducerRealtimeSyncScope) {
 	const save = yield* readGameSaveDraftCurrentFx();
 	for (const [, queue] of groupWorldProducerJobs(save)) {
 		yield* syncProducerQueueWithScopeFx({
 			queue,
+			scope,
 		});
 	}
 
-	const { nowMs } = yield* ProducerRealtimeSyncScopeFx;
 	return yield* readUpdatedGameSaveDraftResultFx({
-		nowMs,
+		nowMs: scope.nowMs,
 	});
 });
 
@@ -432,14 +491,12 @@ export const syncRealtimeProducerJobsFx = Effect.fn("syncRealtimeProducerJobsFx"
 	nowMs,
 	save,
 }: syncRealtimeProducerJobsFx.Props) {
-	return yield* syncRealtimeProducerJobsProgramFx().pipe(
-		Effect.provideService(ProducerRealtimeSyncScopeFx, {
-			config,
-			nowMs,
+	return yield* syncRealtimeProducerJobsProgramFx({
+		config,
+		nowMs,
+	}).pipe((effect) =>
+		provideGameSaveDraftScopeFx(effect, {
+			save,
 		}),
-		(effect) =>
-			provideGameSaveDraftScopeFx(effect, {
-				save,
-			}),
 	);
 });

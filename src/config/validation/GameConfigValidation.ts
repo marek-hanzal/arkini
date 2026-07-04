@@ -1789,55 +1789,51 @@ const validateGameplaySoftLockRisks = (ctx: z.RefinementCtx, config: GameConfig)
 	validateProducerGameplayReachability(ctx, config, sources, reachability);
 };
 
-const createGameplaySources = (config: GameConfig) => {
-	const sources: GameplaySource[] = [];
-	const addItemSource = ({
-		label,
-		path,
-		requirements,
-		sourceId,
-		targetId,
-	}: {
-		label: string;
-		path: GameConfigIssuePath;
-		requirements: GameplayRequirement[];
-		sourceId: string;
-		targetId: string;
-	}) => {
-		sources.push({
-			label,
-			path,
-			requirements,
-			sourceId,
-			targetId,
-			targetKind: "item",
-		});
-	};
-	const addGrantSource = ({
-		label,
-		path,
-		requirements,
-		sourceId,
-		targetId,
-	}: {
-		label: string;
-		path: GameConfigIssuePath;
-		requirements: GameplayRequirement[];
-		sourceId: string;
-		targetId: string;
-	}) => {
-		sources.push({
-			label,
-			path,
-			requirements,
-			sourceId,
-			targetId,
-			targetKind: "grant",
-		});
-	};
+const createGameplayItemSource = ({
+	label,
+	path,
+	requirements,
+	sourceId,
+	targetId,
+}: {
+	label: string;
+	path: GameConfigIssuePath;
+	requirements: GameplayRequirement[];
+	sourceId: string;
+	targetId: string;
+}): GameplaySource => ({
+	label,
+	path,
+	requirements,
+	sourceId,
+	targetId,
+	targetKind: "item",
+});
 
-	for (const [index, entry] of config.startingState.board.entries()) {
-		addItemSource({
+const createGameplayGrantSource = ({
+	label,
+	path,
+	requirements,
+	sourceId,
+	targetId,
+}: {
+	label: string;
+	path: GameConfigIssuePath;
+	requirements: GameplayRequirement[];
+	sourceId: string;
+	targetId: string;
+}): GameplaySource => ({
+	label,
+	path,
+	requirements,
+	sourceId,
+	targetId,
+	targetKind: "grant",
+});
+
+const createStartingBoardGameplaySources = (config: GameConfig) =>
+	config.startingState.board.map((entry, index) =>
+		createGameplayItemSource({
 			label: `starting board slot ${index}`,
 			path: [
 				"startingState",
@@ -1848,11 +1844,12 @@ const createGameplaySources = (config: GameConfig) => {
 			requirements: [],
 			sourceId: `starting:board:${index}:${entry.itemId}`,
 			targetId: entry.itemId,
-		});
-	}
+		}),
+	);
 
-	for (const [index, entry] of config.startingState.inventory.entries()) {
-		addItemSource({
+const createStartingInventoryGameplaySources = (config: GameConfig) =>
+	config.startingState.inventory.map((entry, index) =>
+		createGameplayItemSource({
 			label: `starting inventory stack ${index}`,
 			path: [
 				"startingState",
@@ -1863,13 +1860,14 @@ const createGameplaySources = (config: GameConfig) => {
 			requirements: [],
 			sourceId: `starting:inventory:${index}:${entry.itemId}`,
 			targetId: entry.itemId,
-		});
-	}
+		}),
+	);
 
-	for (const [itemId, item] of Object.entries(config.items)) {
-		for (const [effectIndex, effect] of (item.effects ?? []).entries()) {
-			for (const grant of effect.grants) {
-				addGrantSource({
+const createPassiveGrantGameplaySources = (config: GameConfig) =>
+	Object.entries(config.items).flatMap(([itemId, item]) =>
+		(item.effects ?? []).flatMap((effect, effectIndex) =>
+			effect.grants.map((grant) =>
+				createGameplayGrantSource({
 					label: `passive effect "${effect.id}" on ${formatItemLabel(config, itemId)}`,
 					path: [
 						"items",
@@ -1888,21 +1886,27 @@ const createGameplaySources = (config: GameConfig) => {
 					],
 					sourceId: `passive:${itemId}:${effect.id}:${grant.id}`,
 					targetId: grant.id,
-				});
-			}
-		}
+				}),
+			),
+		),
+	);
 
-		for (const [mergeIndex, merge] of (item.merges ?? []).entries()) {
-			const outputItemIds = [
-				...("resultItemId" in merge
-					? [
-							merge.resultItemId,
-						]
-					: []),
-				...readActivationOutputItemIds(merge.output ?? []),
-			];
-			for (const outputItemId of outputItemIds) {
-				addItemSource({
+const readMergeOutputItemIds = (
+	merge: NonNullable<GameConfig["items"][string]["merges"]>[number],
+) => [
+	...("resultItemId" in merge
+		? [
+				merge.resultItemId,
+			]
+		: []),
+	...readActivationOutputItemIds(merge.output ?? []),
+];
+
+const createMergeGameplaySources = (config: GameConfig) =>
+	Object.entries(config.items).flatMap(([itemId, item]) =>
+		(item.merges ?? []).flatMap((merge, mergeIndex) =>
+			readMergeOutputItemIds(merge).map((outputItemId) =>
+				createGameplayItemSource({
 					label: `merge ${mergeIndex} from ${formatItemLabel(config, itemId)}`,
 					path: [
 						"items",
@@ -1933,13 +1937,16 @@ const createGameplaySources = (config: GameConfig) => {
 					],
 					sourceId: `merge:${itemId}:${mergeIndex}:${merge.withItemId}:${outputItemId}`,
 					targetId: outputItemId,
-				});
-			}
-		}
+				}),
+			),
+		),
+	);
 
-		for (const [removeIndex, removal] of (item.removeBy ?? []).entries()) {
-			for (const outputItemId of readActivationOutputItemIds(removal.output ?? [])) {
-				addItemSource({
+const createRemovalGameplaySources = (config: GameConfig) =>
+	Object.entries(config.items).flatMap(([itemId, item]) =>
+		(item.removeBy ?? []).flatMap((removal, removeIndex) =>
+			readActivationOutputItemIds(removal.output ?? []).map((outputItemId) =>
+				createGameplayItemSource({
 					label: `tile removal of ${formatItemLabel(config, itemId)}`,
 					path: [
 						"items",
@@ -1968,13 +1975,14 @@ const createGameplaySources = (config: GameConfig) => {
 					],
 					sourceId: `remove:${itemId}:${removeIndex}:output:${outputItemId}`,
 					targetId: outputItemId,
-				});
-			}
-		}
-	}
+				}),
+			),
+		),
+	);
 
-	for (const [craftRecipeId, recipe] of readConfigCraftRecipes(config)) {
-		addItemSource({
+const createCraftGameplaySources = (config: GameConfig) =>
+	readConfigCraftRecipes(config).map(([craftRecipeId, recipe]) =>
+		createGameplayItemSource({
 			label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
 			path: [
 				"items",
@@ -2015,47 +2023,68 @@ const createGameplaySources = (config: GameConfig) => {
 			],
 			sourceId: `craft:${craftRecipeId}`,
 			targetId: recipe.resultItemId,
-		});
-	}
+		}),
+	);
 
-	for (const { line, linePath, ownerItemId } of readConfigLines(config)) {
-		const lineRequirements: GameplayRequirement[] = [
-			createItemRequirement({
-				itemId: ownerItemId,
-				path: [
-					"items",
-					ownerItemId,
-				],
-			}),
-			...(line.inputs ?? []).map((input, inputIndex) =>
-				createItemRequirement({
-					itemId: input.itemId,
-					path: [
-						...linePath,
-						"inputs",
-						inputIndex,
-						"itemId",
-					],
-				}),
-			),
-			...readLineEffectGameplayRequirements({
-				lineEffects: line.effects ?? [],
-				path: [
-					...linePath,
-					"effects",
-				],
-			}),
-		];
+type GameplayLineSourceEntry = Pick<
+	ReturnType<typeof readConfigLines>[number],
+	"line" | "linePath" | "ownerItemId"
+>;
 
-		for (const outputEntry of readGameplayOutputSourceEntries({
-			line,
-			output: line.output ?? [],
+const readLineBaseGameplayRequirements = ({
+	line,
+	linePath,
+	ownerItemId,
+}: GameplayLineSourceEntry): GameplayRequirement[] => [
+	createItemRequirement({
+		itemId: ownerItemId,
+		path: [
+			"items",
+			ownerItemId,
+		],
+	}),
+	...(line.inputs ?? []).map((input, inputIndex) =>
+		createItemRequirement({
+			itemId: input.itemId,
 			path: [
 				...linePath,
-				"output",
+				"inputs",
+				inputIndex,
+				"itemId",
 			],
-		})) {
-			const outputRequirements = [
+		}),
+	),
+	...readLineEffectGameplayRequirements({
+		lineEffects: line.effects ?? [],
+		path: [
+			...linePath,
+			"effects",
+		],
+	}),
+];
+
+const createLineOutputGameplaySources = ({
+	line,
+	linePath,
+	ownerItemId,
+}: GameplayLineSourceEntry) => {
+	const lineRequirements = readLineBaseGameplayRequirements({
+		line,
+		linePath,
+		ownerItemId,
+	});
+	return readGameplayOutputSourceEntries({
+		line,
+		output: line.output ?? [],
+		path: [
+			...linePath,
+			"output",
+		],
+	}).map((outputEntry) =>
+		createGameplayItemSource({
+			label: `line "${line.id}" (${line.name})`,
+			path: linePath,
+			requirements: [
 				...lineRequirements,
 				...outputEntry.availabilityRequirements,
 				...readLineEffectGameplayRequirements({
@@ -2065,35 +2094,54 @@ const createGameplaySources = (config: GameConfig) => {
 						"effects",
 					],
 				}),
-			];
-
-			addItemSource({
-				label: `line "${line.id}" (${line.name})`,
-				path: linePath,
-				requirements: outputRequirements,
-				sourceId: `line:${ownerItemId}:${line.id}:output:${outputEntry.sourceKey}`,
-				targetId: outputEntry.itemId,
-			});
-		}
-
-		if (!line.effect) continue;
-
-		for (const grant of line.effect.grants) {
-			addGrantSource({
-				label: `active effect line "${line.id}" (${line.name})`,
-				path: [
-					...linePath,
-					"effect",
-				],
-				requirements: lineRequirements,
-				sourceId: `line:${ownerItemId}:${line.id}:active:${line.effect.id}:${grant.id}`,
-				targetId: grant.id,
-			});
-		}
-	}
-
-	return sources;
+			],
+			sourceId: `line:${ownerItemId}:${line.id}:output:${outputEntry.sourceKey}`,
+			targetId: outputEntry.itemId,
+		}),
+	);
 };
+
+const createLineEffectGameplaySources = ({
+	line,
+	linePath,
+	ownerItemId,
+}: GameplayLineSourceEntry) => {
+	if (!line.effect) return [];
+
+	const lineRequirements = readLineBaseGameplayRequirements({
+		line,
+		linePath,
+		ownerItemId,
+	});
+	return line.effect.grants.map((grant) =>
+		createGameplayGrantSource({
+			label: `active effect line "${line.id}" (${line.name})`,
+			path: [
+				...linePath,
+				"effect",
+			],
+			requirements: lineRequirements,
+			sourceId: `line:${ownerItemId}:${line.id}:active:${line.effect?.id}:${grant.id}`,
+			targetId: grant.id,
+		}),
+	);
+};
+
+const createLineGameplaySources = (config: GameConfig) =>
+	readConfigLines(config).flatMap((entry) => [
+		...createLineOutputGameplaySources(entry),
+		...createLineEffectGameplaySources(entry),
+	]);
+
+const createGameplaySources = (config: GameConfig) => [
+	...createStartingBoardGameplaySources(config),
+	...createStartingInventoryGameplaySources(config),
+	...createPassiveGrantGameplaySources(config),
+	...createMergeGameplaySources(config),
+	...createRemovalGameplaySources(config),
+	...createCraftGameplaySources(config),
+	...createLineGameplaySources(config),
+];
 
 const readGameplayReachability = (
 	config: GameConfig,

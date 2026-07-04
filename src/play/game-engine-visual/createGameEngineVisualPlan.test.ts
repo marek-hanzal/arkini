@@ -3,6 +3,7 @@ import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { createGameEngineVisualPlan } from "~/play/game-engine-visual/createGameEngineVisualPlan";
+import { tileRemoveDurationMs } from "~/tile-engine/TileRemoveMotion";
 
 const boardView = (items: Parameters<typeof rebuildBoardView>[0]) => rebuildBoardView(items);
 
@@ -774,18 +775,15 @@ describe("createGameEngineVisualPlan", () => {
 		const outputStartDelayMs = Math.max(
 			...plan.boardEnterRequests.map((request) => request.enter?.delayMs ?? 0),
 		);
-		const lastOutputCleanupDelayMs = Math.max(
-			...plan.boardEnterRequests.map((request) => request.cleanupDelayMs ?? 0),
-		);
 		const retainedStash = plan.boardTransientTilePlans[0];
 		expect(retainedStash?.request).toMatchObject({
 			exit: expect.objectContaining({
 				delayMs: outputStartDelayMs,
-				kind: "merge-out",
+				durationMs: tileRemoveDurationMs,
+				kind: "remove",
 			}),
 			tileId: "stash",
 		});
-		expect(retainedStash?.cleanupDelayMs).toBeLessThan(lastOutputCleanupDelayMs);
 		expect(retainedStash?.tile).toMatchObject({
 			id: "stash",
 			itemId: "item:chest",
@@ -865,7 +863,8 @@ describe("createGameEngineVisualPlan", () => {
 		);
 		expect(plan.boardTransientTilePlans[0]?.request.exit).toMatchObject({
 			delayMs: lastOutputStartDelayMs,
-			kind: "merge-out",
+			durationMs: tileRemoveDurationMs,
+			kind: "remove",
 		});
 	});
 
@@ -896,7 +895,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardTransientTilePlans).toHaveLength(1);
 		expect(plan.boardTransientTilePlans[0]?.request.exit).toMatchObject({
 			delayMs: 0,
-			durationMs: 260,
+			durationMs: tileRemoveDurationMs,
 			kind: "remove",
 		});
 		expect(plan.boardTransientTilePlans[0]?.tile).toMatchObject({
@@ -933,7 +932,7 @@ describe("createGameEngineVisualPlan", () => {
 		expect(plan.boardTransientTilePlans).toHaveLength(0);
 	});
 
-	it("does not let stash feedback hold a depleted stash tile on board", () => {
+	it("uses shared remove motion for depleted stash tiles after feedback", () => {
 		const previousBoard = boardView([
 			{
 				id: "stash",
@@ -995,10 +994,10 @@ describe("createGameEngineVisualPlan", () => {
 		const retainedStash = plan.boardTransientTilePlans[0];
 		expect(retainedStash?.request.exit).toMatchObject({
 			delayMs: 0,
-			durationMs: 1,
-			kind: "merge-out",
+			durationMs: tileRemoveDurationMs,
+			kind: "remove",
 		});
-		expect(retainedStash?.cleanupDelayMs).toBeLessThan(200);
+		expect(retainedStash?.cleanupDelayMs).toBeGreaterThan(tileRemoveDurationMs);
 	});
 
 	it("maps product completion to producer bounce feedback", () => {

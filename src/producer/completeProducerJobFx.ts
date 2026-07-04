@@ -6,14 +6,12 @@ import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { blockedProducerDeliveryRetryDelayMs } from "~/producer/producerDeliveryTiming";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
-import { writeProducerChargeStateToSaveFx } from "~/producer/writeProducerChargeStateToSaveFx";
 import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
 import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
 import { readProducerCapabilityDefinition } from "~/config/GameItemCapabilities";
 import { readLineDefinition } from "~/config/GameItemCapabilities";
-import { readProducerRemainingCharges } from "~/producer/readProducerRemainingCharges";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -21,6 +19,19 @@ import type { GameEngineCompletionResult } from "~/engine/model/GameEngineComple
 import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { replaceDepletedProducerSourceCellOutputFx } from "~/producer/replaceDepletedProducerSourceCellOutputFx";
+import {
+	createCompletedProducerJobResult,
+	createLineBlockedEvent,
+	createLineCompletedEvent,
+	createLineFailedEvent,
+	createProducerChargesDepletedRemovalEvent,
+	type ProducerCompletionEvents,
+} from "~/producer/ProducerJobCompletionEvents";
+import {
+	readProducerChargeCompletionOutcomeFx,
+	spendProducerChargeCostAfterCompletedDeliveryFx,
+	type ProducerChargeCompletionOutcome,
+} from "~/producer/completeProducerJobChargesFx";
 
 export namespace completeProducerJobFx {
 	export interface Props {
@@ -36,14 +47,6 @@ type ProducerDeliveryItem = {
 	quantity: number;
 };
 
-type ProducerChargeCompletionOutcome = {
-	producerId: string;
-	nextRemainingCharges: number;
-	removeOnDepleted: boolean;
-};
-
-type ProducerCompletionEvents = GameEngineCompletionResult["events"];
-
 type ProducerPlacementSuccess = Effect.Effect.Success<ReturnType<typeof placeGameSaveItemsFx>>;
 
 type ProducerPlacementFailure = Extract<
@@ -54,90 +57,6 @@ type ProducerPlacementFailure = Extract<
 >;
 
 type ProducerJobCompletionScope = completeProducerJobFx.Props;
-
-const createLineCompletedEvent = ({ job, nowMs }: { job: GameSaveProducerJob; nowMs: number }) => ({
-	atMs: nowMs,
-	jobId: job.id,
-	itemInstanceId: job.itemInstanceId,
-	lineId: job.lineId,
-	type: "line.completed" as const,
-});
-
-const createLineFailedEvent = ({
-	error,
-	job,
-	nowMs,
-}: {
-	error: ProducerPlacementFailure;
-	job: GameSaveProducerJob;
-	nowMs: number;
-}) => ({
-	atMs: nowMs,
-	jobId: job.id,
-	itemInstanceId: job.itemInstanceId,
-	lineId: job.lineId,
-	reason: error.reason,
-	type: "line.failed" as const,
-});
-
-const createLineBlockedEvent = ({
-	error,
-	job,
-	nowMs,
-}: {
-	error: ProducerPlacementFailure;
-	job: GameSaveProducerJob;
-	nowMs: number;
-}) => ({
-	atMs: nowMs,
-	jobId: job.id,
-	itemInstanceId: job.itemInstanceId,
-	lineId: job.lineId,
-	reason: error.reason,
-	type: "line.blocked" as const,
-});
-
-const createProducerChargesDepletedRemovalEvent = ({
-	job,
-	nowMs,
-	producerId,
-}: {
-	job: GameSaveProducerJob;
-	nowMs: number;
-	producerId: string;
-}) => ({
-	atMs: nowMs,
-	itemId: producerId,
-	itemInstanceId: job.itemInstanceId,
-	reason: "producer-depleted" as const,
-	type: "item.removed" as const,
-});
-
-const createCompletedResult = ({
-	chargeEvents,
-	job,
-	nowMs,
-	placementEvents = [],
-	save,
-}: {
-	chargeEvents: ProducerCompletionEvents;
-	job: GameSaveProducerJob;
-	nowMs: number;
-	placementEvents?: ProducerCompletionEvents;
-	save: GameSave;
-}) =>
-	({
-		events: [
-			createLineCompletedEvent({
-				job,
-				nowMs,
-			}),
-			...chargeEvents,
-			...placementEvents,
-		],
-		save,
-		type: "completed" as const,
-	}) satisfies GameEngineCompletionResult;
 
 const toPlacementRequests = ({
 	items,
@@ -216,99 +135,6 @@ const rollProducerDeliveryItemsFx = Effect.fn("completeProducerJobFx.rollProduce
 	},
 );
 
-const readProducerChargeCompletionOutcomeFx = Effect.fn(
-	"completeProducerJobFx.readProducerChargeCompletionOutcomeFx",
-)(function* ({
-	job,
-	save,
-	scope,
-}: {
-	job: GameSaveProducerJob;
-	save: GameSave;
-	scope: ProducerJobCompletionScope;
-}) {
-	const { config } = scope;
-	const producerItem = save.board.items[job.itemInstanceId];
-	if (!producerItem) return undefined;
-
-	const producerId = producerItem.itemId;
-	const producer = readProducerCapabilityDefinition({
-		config,
-		producerId,
-	});
-	const line = producer
-		? readLineDefinition({
-				producerDefinition: producer,
-				lineId: job.lineId,
-			})
-		: undefined;
-	if (!producer || !line || producer.charges === undefined || line.chargeCost <= 0) {
-		return undefined;
-	}
-
-	const remainingCharges = readProducerRemainingCharges({
-		config,
-		producerId,
-		itemInstanceId: job.itemInstanceId,
-		save,
-	});
-	if (remainingCharges === undefined) return undefined;
-
-	const nextRemainingCharges = Math.max(0, remainingCharges - line.chargeCost);
-
-	return {
-		nextRemainingCharges,
-		producerId,
-		removeOnDepleted: nextRemainingCharges === 0 && producer.onChargesDepleted === "remove",
-	} satisfies ProducerChargeCompletionOutcome;
-});
-
-const spendProducerChargeCostAfterCompletedDeliveryFx = Effect.fn(
-	"completeProducerJobFx.spendProducerChargeCostAfterCompletedDeliveryFx",
-)(function* ({
-	job,
-	nextSave,
-	scope,
-}: {
-	job: GameSaveProducerJob;
-	nextSave: GameSave;
-	scope: ProducerJobCompletionScope;
-}) {
-	const { nowMs } = scope;
-	const outcome = yield* readProducerChargeCompletionOutcomeFx({
-		job,
-		save: nextSave,
-		scope,
-	});
-	if (!outcome) return [] satisfies ProducerCompletionEvents;
-
-	yield* writeProducerChargeStateToSaveFx({
-		itemInstanceId: job.itemInstanceId,
-		save: nextSave,
-		state: {
-			remainingCharges: outcome.nextRemainingCharges,
-		},
-	});
-
-	if (!outcome.removeOnDepleted) {
-		return [] satisfies ProducerCompletionEvents;
-	}
-
-	yield* removeBoardItemFromSaveFx({
-		itemInstanceId: job.itemInstanceId,
-		runtimeState: "remove",
-		save: nextSave,
-	});
-
-	return [
-		createProducerChargesDepletedRemovalEvent({
-			job,
-			nowMs,
-			producerId: outcome.producerId,
-		}),
-	] satisfies ProducerCompletionEvents;
-});
-
 const rescheduleQueueAfterCompletedDeliveryFx = Effect.fn(
 	"completeProducerJobFx.rescheduleQueueAfterCompletedDeliveryFx",
 )(function* ({
@@ -352,9 +178,10 @@ const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 		save: nextSave,
 	});
 	const chargeEvents = yield* spendProducerChargeCostAfterCompletedDeliveryFx({
+		config: scope.config,
 		job: liveJob,
 		nextSave,
-		scope,
+		nowMs,
 	});
 	yield* rescheduleQueueAfterCompletedDeliveryFx({
 		liveJob,
@@ -364,7 +191,7 @@ const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 	});
 	nextSave.updatedAtMs = nowMs;
 
-	return createCompletedResult({
+	return createCompletedProducerJobResult({
 		chargeEvents,
 		job: liveJob,
 		nowMs,
@@ -406,9 +233,9 @@ const completeFailedProducerDeliveryFx = Effect.fn(
 				nowMs,
 			}),
 			createLineFailedEvent({
-				error,
 				job: liveJob,
 				nowMs,
+				reason: error.reason,
 			}),
 		],
 		save: nextSave,
@@ -456,9 +283,9 @@ const completeBlockedProducerDeliveryFx = Effect.fn(
 			liveJob.delivery?.lastBlockedAtMs === undefined
 				? [
 						createLineBlockedEvent({
-							error,
 							job: liveJob,
 							nowMs,
+							reason: error.reason,
 						}),
 					]
 				: [],
@@ -554,9 +381,10 @@ const readPlacementSuccessEffectsFx = Effect.fn(
 	if (!chargeOutcome?.removeOnDepleted) {
 		return {
 			chargeEvents: yield* spendProducerChargeCostAfterCompletedDeliveryFx({
+				config: scope.config,
 				job: liveJob,
 				nextSave: placementSave,
-				scope,
+				nowMs,
 			}),
 			placementEvents,
 		};
@@ -640,7 +468,7 @@ const completeProducerPlacementSuccessFx = Effect.fn(
 	});
 	placementResult.save.updatedAtMs = nowMs;
 
-	return createCompletedResult({
+	return createCompletedProducerJobResult({
 		chargeEvents,
 		job: liveJob,
 		nowMs,
@@ -662,9 +490,9 @@ const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 }) {
 	const { save } = scope;
 	const chargeOutcome = yield* readProducerChargeCompletionOutcomeFx({
+		config: scope.config,
 		job: liveJob,
 		save,
-		scope,
 	});
 	const placementEither = yield* readProducerPlacementEitherFx({
 		chargeOutcome,

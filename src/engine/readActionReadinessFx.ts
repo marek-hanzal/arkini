@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { applyGameActionFx } from "~/engine/applyGameActionFx";
 import { GameConfigFx } from "~/config/GameConfigFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import type { GameActionReadiness } from "~/action/GameActionReadinessSchema";
+import type { GameActionReadiness } from "~/action/GameActionReadiness";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

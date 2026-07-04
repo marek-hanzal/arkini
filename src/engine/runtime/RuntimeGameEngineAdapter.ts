@@ -9,7 +9,7 @@ import { hasProcessableWorldJobs } from "~/world/hasProcessableWorldJobs";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { loadDefaultGameConfig } from "~/config/compiled/defaultGameConfig";
 import type { GameAction } from "~/action/GameActionSchema";
-import type { GameActionReadiness } from "~/action/GameActionReadinessSchema";
+import type { GameActionReadiness } from "~/action/GameActionReadiness";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
 import { assertResolvedInputRefQuantityFx } from "~/activation/assertResolvedInputRefQuantityFx";
 import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
@@ -23,15 +23,10 @@ export namespace checkItemMergeReadinessFx {
 
 type MergeReadinessTarget = NonNullable<GameSave["board"]["items"][string]>;
 
-class ItemMergeReadinessScopeFx extends Context.Tag("ItemMergeReadinessScopeFx")<
-	ItemMergeReadinessScopeFx,
-	checkItemMergeReadinessFx.Props & {
-		readonly source: GameActionResolvedInputRef;
-		readonly target: MergeReadinessTarget;
-	}
->() {
-	//
-}
+type ItemMergeReadinessScope = checkItemMergeReadinessFx.Props & {
+	readonly source: GameActionResolvedInputRef;
+	readonly target: MergeReadinessTarget;
+};
 
 const readMergeReadinessTargetFx = Effect.fn(
 	"checkItemMergeReadinessFx.readMergeReadinessTargetFx",
@@ -75,8 +70,7 @@ const readMergeReadinessSourceFx = Effect.fn(
 });
 
 const readExecutableMergeRuleFx = Effect.fn("checkItemMergeReadinessFx.readExecutableMergeRuleFx")(
-	function* () {
-		const { config, source, target } = yield* ItemMergeReadinessScopeFx;
+	function* ({ config, source, target }: ItemMergeReadinessScope) {
 		const sourceDefinition = config.items[source.itemId];
 		const merge = resolveExecutableItemMergeRule({
 			config,
@@ -96,8 +90,12 @@ const readExecutableMergeRuleFx = Effect.fn("checkItemMergeReadinessFx.readExecu
 
 const assertMergeResultItemDefinitionExistsFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeResultItemDefinitionExistsFx",
-)(function* ({ resultItemId }: { resultItemId: string }) {
-	const { config } = yield* ItemMergeReadinessScopeFx;
+)(function* ({
+	config,
+	resultItemId,
+}: Pick<ItemMergeReadinessScope, "config"> & {
+	resultItemId: string;
+}) {
 	if (config.items[resultItemId]) return;
 
 	return yield* Effect.fail(
@@ -107,8 +105,14 @@ const assertMergeResultItemDefinitionExistsFx = Effect.fn(
 
 const assertMergeResultBoardCapacityFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeResultBoardCapacityFx",
-)(function* ({ resultItemId }: { resultItemId: string }) {
-	const { config, save, target } = yield* ItemMergeReadinessScopeFx;
+)(function* ({
+	config,
+	resultItemId,
+	save,
+	target,
+}: ItemMergeReadinessScope & {
+	resultItemId: string;
+}) {
 	const capacity = yield* readBoardItemMaxCountCapacityFx({
 		config,
 		ignoredBoardItemInstanceIds: new Set([
@@ -129,8 +133,7 @@ const assertMergeResultBoardCapacityFx = Effect.fn(
 
 const assertMergeTargetReplaceableFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeTargetReplaceableFx",
-)(function* () {
-	const { save, target } = yield* ItemMergeReadinessScopeFx;
+)(function* ({ save, target }: ItemMergeReadinessScope) {
 	const targetStateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: target.id,
 		save,
@@ -149,31 +152,33 @@ const assertMergeTargetReplaceableFx = Effect.fn(
 
 const assertMergeResultReadinessFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeResultReadinessFx",
-)(function* ({ merge }: { merge: GameMergeRuleDefinition }) {
+)(function* ({ merge, scope }: { merge: GameMergeRuleDefinition; scope: ItemMergeReadinessScope }) {
 	if (!("resultItemId" in merge)) return;
 
 	yield* assertMergeResultItemDefinitionExistsFx({
+		config: scope.config,
 		resultItemId: merge.resultItemId,
 	});
 	yield* assertMergeResultBoardCapacityFx({
+		...scope,
 		resultItemId: merge.resultItemId,
 	});
-	yield* assertMergeTargetReplaceableFx();
+	yield* assertMergeTargetReplaceableFx(scope);
 });
 
 const checkItemMergeReadinessProgramFx = Effect.fn(
 	"checkItemMergeReadinessFx.checkItemMergeReadinessProgramFx",
-)(function* () {
-	const { source, target } = yield* ItemMergeReadinessScopeFx;
-	const merge = yield* readExecutableMergeRuleFx();
+)(function* (scope: ItemMergeReadinessScope) {
+	const merge = yield* readExecutableMergeRuleFx(scope);
 	yield* assertMergeResultReadinessFx({
 		merge,
+		scope,
 	});
 
 	return {
 		merge,
-		source,
-		target,
+		source: scope.source,
+		target: scope.target,
 	};
 });
 
@@ -186,11 +191,9 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 		target,
 	});
 
-	return yield* checkItemMergeReadinessProgramFx().pipe(
-		Effect.provideService(ItemMergeReadinessScopeFx, {
-			...props,
-			source,
-			target,
-		}),
-	);
+	return yield* checkItemMergeReadinessProgramFx({
+		...props,
+		source,
+		target,
+	});
 });

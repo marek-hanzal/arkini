@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
 import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
@@ -34,15 +34,10 @@ type CraftInputStoreQuantityCandidate = {
 	previousQuantity: number;
 };
 
-class CraftInputStoreReadinessScopeFx extends Context.Tag("CraftInputStoreReadinessScopeFx")<
-	CraftInputStoreReadinessScopeFx,
-	checkCraftInputStoreReadinessFx.Props & {
-		readonly resolvedRef: GameActionResolvedInputRef;
-		readonly target: CraftInputStoreTarget;
-	}
->() {
-	//
-}
+type CraftInputStoreReadinessScope = checkCraftInputStoreReadinessFx.Props & {
+	readonly resolvedRef: GameActionResolvedInputRef;
+	readonly target: CraftInputStoreTarget;
+};
 
 const readCraftInputStoreTargetFx = Effect.fn(
 	"checkCraftInputStoreReadinessFx.readCraftInputStoreTargetFx",
@@ -77,8 +72,7 @@ const readCraftInputStoreResolvedRefFx = Effect.fn(
 
 const readCraftInputStoreSlotFx = Effect.fn(
 	"checkCraftInputStoreReadinessFx.readCraftInputStoreSlotFx",
-)(function* () {
-	const { resolvedRef, target } = yield* CraftInputStoreReadinessScopeFx;
+)(function* ({ resolvedRef, target }: CraftInputStoreReadinessScope) {
 	const inputSlot = target.recipe.inputs.find((input) => input.itemId === resolvedRef.itemId);
 	if (inputSlot) return inputSlot;
 
@@ -92,17 +86,22 @@ const readCraftInputStoreSlotFx = Effect.fn(
 
 const readCraftInputStoreQuantityCandidateFx = Effect.fn(
 	"checkCraftInputStoreReadinessFx.readCraftInputStoreQuantityCandidateFx",
-)(function* ({ inputSlot }: { inputSlot: CraftInputSlot }) {
-	const { action, resolvedRef, save } = yield* CraftInputStoreReadinessScopeFx;
+)(function* ({
+	inputSlot,
+	scope,
+}: {
+	inputSlot: CraftInputSlot;
+	scope: CraftInputStoreReadinessScope;
+}) {
 	const storedInputs = yield* readCraftInputQuantitiesFx({
-		save,
-		targetItemInstanceId: action.targetItemInstanceId,
+		save: scope.save,
+		targetItemInstanceId: scope.action.targetItemInstanceId,
 	});
 	const previousQuantity = readGameItemQuantity({
-		itemId: resolvedRef.itemId,
+		itemId: scope.resolvedRef.itemId,
 		quantities: storedInputs,
 	});
-	const nextQuantity = previousQuantity + resolvedRef.quantity;
+	const nextQuantity = previousQuantity + scope.resolvedRef.quantity;
 	if (nextQuantity <= inputSlot.quantity) {
 		return {
 			inputSlot,
@@ -114,24 +113,24 @@ const readCraftInputStoreQuantityCandidateFx = Effect.fn(
 	return yield* Effect.fail(
 		GameEngineError.actionRejected(
 			"input_mismatch",
-			`Craft input "${resolvedRef.itemId}" capacity exceeded (${nextQuantity}/${inputSlot.quantity}).`,
+			`Craft input "${scope.resolvedRef.itemId}" capacity exceeded (${nextQuantity}/${inputSlot.quantity}).`,
 		),
 	);
 });
 
 const checkCraftInputStoreReadinessProgramFx = Effect.fn(
 	"checkCraftInputStoreReadinessFx.checkCraftInputStoreReadinessProgramFx",
-)(function* () {
-	const { resolvedRef, target } = yield* CraftInputStoreReadinessScopeFx;
-	const inputSlot = yield* readCraftInputStoreSlotFx();
+)(function* (scope: CraftInputStoreReadinessScope) {
+	const inputSlot = yield* readCraftInputStoreSlotFx(scope);
 	const quantityCandidate = yield* readCraftInputStoreQuantityCandidateFx({
 		inputSlot,
+		scope,
 	});
 
 	return {
 		...quantityCandidate,
-		resolvedRef,
-		target,
+		resolvedRef: scope.resolvedRef,
+		target: scope.target,
 	};
 });
 
@@ -140,12 +139,10 @@ export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreRe
 		const target = yield* readCraftInputStoreTargetFx(props);
 		const resolvedRef = yield* readCraftInputStoreResolvedRefFx(props);
 
-		return yield* checkCraftInputStoreReadinessProgramFx().pipe(
-			Effect.provideService(CraftInputStoreReadinessScopeFx, {
-				...props,
-				resolvedRef,
-				target,
-			}),
-		);
+		return yield* checkCraftInputStoreReadinessProgramFx({
+			...props,
+			resolvedRef,
+			target,
+		});
 	},
 );

@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { BoardCell } from "~/board/BoardCellPosition";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
@@ -51,13 +51,6 @@ type BoardPlacementProgress = {
 	stopReason?: BoardPlacementStopReason;
 };
 
-class SingleItemPlacementScopeFx extends Context.Tag("SingleItemPlacementScopeFx")<
-	SingleItemPlacementScopeFx,
-	SingleItemPlacementScope
->() {
-	//
-}
-
 const readPlacementItemDefinitionFx = Effect.fn(
 	"placeSingleGameSaveItemRequestFx.readPlacementItemDefinitionFx",
 )(function* ({ config, item }: { config: GameConfig; item: GameSaveItemPlacementRequest }) {
@@ -79,38 +72,28 @@ const readPlacementCreatedAtMs = ({
 	nowMs: number;
 }) => item.createdAtMs ?? (itemDefinition.effects?.length ? nowMs : undefined);
 
-const readItemBoardStorageAllowedFx = Effect.fn(
-	"placeSingleGameSaveItemRequestFx.readItemBoardStorageAllowedFx",
-)(function* () {
-	const { config, item } = yield* SingleItemPlacementScopeFx;
-	return isItemStorageAllowed({
+const readItemBoardStorageAllowed = ({ config, item }: SingleItemPlacementScope) =>
+	isItemStorageAllowed({
 		config,
 		itemId: item.itemId,
 		location: "board",
 	});
-});
 
-const readItemInventoryStorageAllowedFx = Effect.fn(
-	"placeSingleGameSaveItemRequestFx.readItemInventoryStorageAllowedFx",
-)(function* () {
-	const { config, item } = yield* SingleItemPlacementScopeFx;
-	return isItemStorageAllowed({
+const readItemInventoryStorageAllowed = ({ config, item }: SingleItemPlacementScope) =>
+	isItemStorageAllowed({
 		config,
 		itemId: item.itemId,
 		location: "inventory",
 	});
-});
 
 const readBoardPlacementTargetFx = Effect.fn(
 	"placeSingleGameSaveItemRequestFx.readBoardPlacementTargetFx",
-)(function* () {
-	const { config, freedBoardItemInstanceIds, item, nowMs, save, seedCell } =
-		yield* SingleItemPlacementScopeFx;
+)(function* (scope: SingleItemPlacementScope) {
 	const maxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
-		config,
-		ignoredBoardItemInstanceIds: freedBoardItemInstanceIds,
-		itemId: item.itemId,
-		save,
+		config: scope.config,
+		ignoredBoardItemInstanceIds: scope.freedBoardItemInstanceIds,
+		itemId: scope.item.itemId,
+		save: scope.save,
 	});
 	if (maxCountCapacity <= 0) {
 		return {
@@ -119,10 +102,10 @@ const readBoardPlacementTargetFx = Effect.fn(
 	}
 
 	const emptyCells = yield* planEmptyBoardCellsFx({
-		config,
-		freedBoardItemInstanceIds,
-		save,
-		seedCell,
+		config: scope.config,
+		freedBoardItemInstanceIds: scope.freedBoardItemInstanceIds,
+		save: scope.save,
+		seedCell: scope.seedCell,
 	});
 	if (emptyCells.length === 0) {
 		return {
@@ -131,12 +114,12 @@ const readBoardPlacementTargetFx = Effect.fn(
 	}
 
 	const [emptyCell] = yield* planItemBoardPlacementCellsFx({
-		config,
-		freedBoardItemInstanceIds,
-		itemId: item.itemId,
-		nowMs,
-		save,
-		seedCell,
+		config: scope.config,
+		freedBoardItemInstanceIds: scope.freedBoardItemInstanceIds,
+		itemId: scope.item.itemId,
+		nowMs: scope.nowMs,
+		save: scope.save,
+		seedCell: scope.seedCell,
 	});
 	return emptyCell
 		? ({
@@ -149,32 +132,30 @@ const readBoardPlacementTargetFx = Effect.fn(
 });
 
 const placeBoardItemAtCellFx = Effect.fn("placeSingleGameSaveItemRequestFx.placeBoardItemAtCellFx")(
-	function* ({ cell }: { cell: BoardCell }) {
-		const { createdAtMs, events, item, save } = yield* SingleItemPlacementScopeFx;
+	function* ({ cell, scope }: { cell: BoardCell; scope: SingleItemPlacementScope }) {
 		yield* placeBoardItemInstanceFx({
 			cell,
-			createdAtMs,
-			events,
-			itemId: item.itemId,
-			originItemInstanceId: item.originItemInstanceId,
-			reason: item.reason,
-			save,
+			createdAtMs: scope.createdAtMs,
+			events: scope.events,
+			itemId: scope.item.itemId,
+			originItemInstanceId: scope.item.originItemInstanceId,
+			reason: scope.item.reason,
+			save: scope.save,
 		});
 	},
 );
 
 const placeBoardCopiesUntilBlockedFx = Effect.fn(
 	"placeSingleGameSaveItemRequestFx.placeBoardCopiesUntilBlockedFx",
-)(function* () {
-	const { item } = yield* SingleItemPlacementScopeFx;
+)(function* (scope: SingleItemPlacementScope) {
 	const progress: BoardPlacementProgress = {
 		placedQuantity: 0,
-		remainingQuantity: item.quantity,
+		remainingQuantity: scope.item.quantity,
 	};
-	if (!(yield* readItemBoardStorageAllowedFx())) return progress;
+	if (!readItemBoardStorageAllowed(scope)) return progress;
 
 	while (progress.remainingQuantity > 0) {
-		const target = yield* readBoardPlacementTargetFx();
+		const target = yield* readBoardPlacementTargetFx(scope);
 		const placed = yield* match(target)
 			.with(
 				{
@@ -184,6 +165,7 @@ const placeBoardCopiesUntilBlockedFx = Effect.fn(
 					Effect.gen(function* () {
 						yield* placeBoardItemAtCellFx({
 							cell,
+							scope,
 						});
 						return true;
 					}),
@@ -219,38 +201,48 @@ const placeBoardCopiesUntilBlockedFx = Effect.fn(
 
 const placeInventoryRemainderFx = Effect.fn(
 	"placeSingleGameSaveItemRequestFx.placeInventoryRemainderFx",
-)(function* ({ remainingQuantity }: { remainingQuantity: number }) {
-	const { createdAtMs, events, item, itemDefinition, save } = yield* SingleItemPlacementScopeFx;
-	if (!(yield* readItemInventoryStorageAllowedFx())) return remainingQuantity === 0;
+)(function* ({
+	remainingQuantity,
+	scope,
+}: {
+	remainingQuantity: number;
+	scope: SingleItemPlacementScope;
+}) {
+	if (!readItemInventoryStorageAllowed(scope)) return remainingQuantity === 0;
 
 	return yield* placeGameSaveInventoryRemainderFx({
-		createdAtMs,
-		events,
-		item,
-		maxStackSize: itemDefinition.maxStackSize,
+		createdAtMs: scope.createdAtMs,
+		events: scope.events,
+		item: scope.item,
+		maxStackSize: scope.itemDefinition.maxStackSize,
 		remainingQuantity,
-		slots: save.inventory.slots,
+		slots: scope.save.inventory.slots,
 	});
 });
 
-const readPlacementFailureReasonFx = Effect.fn(
-	"placeSingleGameSaveItemRequestFx.readPlacementFailureReasonFx",
-)(function* ({ progress }: { progress: BoardPlacementProgress }) {
-	const canPlaceOnBoard = yield* readItemBoardStorageAllowedFx();
-	const canPlaceInInventory = yield* readItemInventoryStorageAllowedFx();
+const readPlacementFailureReason = ({
+	progress,
+	scope,
+}: {
+	progress: BoardPlacementProgress;
+	scope: SingleItemPlacementScope;
+}) => {
+	const canPlaceOnBoard = readItemBoardStorageAllowed(scope);
+	const canPlaceInInventory = readItemInventoryStorageAllowed(scope);
 	if (canPlaceOnBoard && (!canPlaceInInventory || progress.placedQuantity === 0)) {
 		return progress.stopReason ?? "board:full";
 	}
 	return "inventory:full" as const;
-});
+};
 
 const placeSingleGameSaveItemRequestProgramFx = Effect.fn(
 	"placeSingleGameSaveItemRequestFx.placeSingleGameSaveItemRequestProgramFx",
-)(function* () {
-	const progress = yield* placeBoardCopiesUntilBlockedFx();
+)(function* (scope: SingleItemPlacementScope) {
+	const progress = yield* placeBoardCopiesUntilBlockedFx(scope);
 	if (
 		yield* placeInventoryRemainderFx({
 			remainingQuantity: progress.remainingQuantity,
+			scope,
 		})
 	) {
 		return {
@@ -260,8 +252,9 @@ const placeSingleGameSaveItemRequestProgramFx = Effect.fn(
 
 	return yield* Effect.fail(
 		GameEngineError.placementFailed(
-			yield* readPlacementFailureReasonFx({
+			readPlacementFailureReason({
 				progress,
+				scope,
 			}),
 			"Placement target is full.",
 		),
@@ -274,18 +267,14 @@ export const placeSingleGameSaveItemRequestFx = Effect.fn("placeSingleGameSaveIt
 			config: props.config,
 			item: props.item,
 		});
-		return yield* Effect.provideService(
-			placeSingleGameSaveItemRequestProgramFx(),
-			SingleItemPlacementScopeFx,
-			{
-				...props,
-				createdAtMs: readPlacementCreatedAtMs({
-					item: props.item,
-					itemDefinition,
-					nowMs: props.nowMs,
-				}),
+		return yield* placeSingleGameSaveItemRequestProgramFx({
+			...props,
+			createdAtMs: readPlacementCreatedAtMs({
+				item: props.item,
 				itemDefinition,
-			},
-		);
+				nowMs: props.nowMs,
+			}),
+			itemDefinition,
+		});
 	},
 );

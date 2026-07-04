@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
 import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
@@ -40,17 +40,12 @@ type ProducerInputStoreLineCandidate = {
 	previousQuantity: number;
 };
 
-class ProducerInputStoreReadinessScopeFx extends Context.Tag("ProducerInputStoreReadinessScopeFx")<
-	ProducerInputStoreReadinessScopeFx,
-	checkProducerInputStoreReadinessFx.Props & {
-		readonly declaredLineIds: readonly string[];
-		readonly resolvedRef: GameActionResolvedInputRef;
-		readonly target: ProducerInputStoreTarget;
-		readonly visibleLineIds: readonly string[];
-	}
->() {
-	//
-}
+type ProducerInputStoreReadinessScope = checkProducerInputStoreReadinessFx.Props & {
+	readonly declaredLineIds: readonly string[];
+	readonly resolvedRef: GameActionResolvedInputRef;
+	readonly target: ProducerInputStoreTarget;
+	readonly visibleLineIds: readonly string[];
+};
 
 const readProducerInputStoreTargetFx = Effect.fn(
 	"checkProducerInputStoreReadinessFx.readProducerInputStoreTargetFx",
@@ -117,17 +112,16 @@ const readProducerInputStoreCandidateLineIds = ({
 
 const assertProducerInputStoreCandidateLineAccessibleFx = Effect.fn(
 	"checkProducerInputStoreReadinessFx.assertProducerInputStoreCandidateLineAccessibleFx",
-)(function* ({ lineId }: { lineId: string }) {
-	const { declaredLineIds, target, visibleLineIds } = yield* ProducerInputStoreReadinessScopeFx;
-	if (!declaredLineIds.includes(lineId)) {
+)(function* ({ lineId, scope }: { lineId: string; scope: ProducerInputStoreReadinessScope }) {
+	if (!scope.declaredLineIds.includes(lineId)) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"invalid_actor",
-				`Line "${lineId}" does not belong to producer "${target.producerId}".`,
+				`Line "${lineId}" does not belong to producer "${scope.target.producerId}".`,
 			),
 		);
 	}
-	if (visibleLineIds.includes(lineId)) return;
+	if (scope.visibleLineIds.includes(lineId)) return;
 
 	return yield* Effect.fail(
 		GameEngineError.actionRejected(
@@ -139,28 +133,28 @@ const assertProducerInputStoreCandidateLineAccessibleFx = Effect.fn(
 
 const readProducerInputStoreLineCandidateFx = Effect.fn(
 	"checkProducerInputStoreReadinessFx.readProducerInputStoreLineCandidateFx",
-)(function* ({ lineId }: { lineId: string }) {
-	const { action, save, resolvedRef, target } = yield* ProducerInputStoreReadinessScopeFx;
+)(function* ({ lineId, scope }: { lineId: string; scope: ProducerInputStoreReadinessScope }) {
 	yield* assertProducerInputStoreCandidateLineAccessibleFx({
 		lineId,
+		scope,
 	});
 
 	const inputSlot = readLineDefinition({
-		producerDefinition: target.producerDefinition,
+		producerDefinition: scope.target.producerDefinition,
 		lineId,
-	})?.inputs?.find((input) => input.itemId === resolvedRef.itemId);
+	})?.inputs?.find((input) => input.itemId === scope.resolvedRef.itemId);
 	if (!inputSlot) return undefined;
 
 	const storedInputs = yield* readLineStoredInputQuantitiesFx({
-		itemInstanceId: action.itemInstanceId,
+		itemInstanceId: scope.action.itemInstanceId,
 		lineId,
-		save,
+		save: scope.save,
 	});
 	const previousQuantity = readGameItemQuantity({
-		itemId: resolvedRef.itemId,
+		itemId: scope.resolvedRef.itemId,
 		quantities: storedInputs,
 	});
-	const nextQuantity = previousQuantity + resolvedRef.quantity;
+	const nextQuantity = previousQuantity + scope.resolvedRef.quantity;
 	if (nextQuantity > inputSlot.capacity) return undefined;
 
 	return {
@@ -173,36 +167,48 @@ const readProducerInputStoreLineCandidateFx = Effect.fn(
 
 const readAcceptedProducerInputStoreLineCandidateFx = Effect.fn(
 	"checkProducerInputStoreReadinessFx.readAcceptedProducerInputStoreLineCandidateFx",
-)(function* ({ lineIds }: { lineIds: readonly string[] }) {
+)(function* ({
+	lineIds,
+	scope,
+}: {
+	lineIds: readonly string[];
+	scope: ProducerInputStoreReadinessScope;
+}) {
 	for (const lineId of lineIds) {
 		const candidate = yield* readProducerInputStoreLineCandidateFx({
 			lineId,
+			scope,
 		});
 		if (candidate) return candidate;
 	}
 
-	const { resolvedRef } = yield* ProducerInputStoreReadinessScopeFx;
 	return yield* Effect.fail(
 		GameEngineError.actionRejected(
 			"input_mismatch",
-			`Producer input "${resolvedRef.itemId}" is not accepted by any line with capacity.`,
+			`Producer input "${scope.resolvedRef.itemId}" is not accepted by any line with capacity.`,
 		),
 	);
 });
 
 const checkProducerInputStoreReadinessProgramFx = Effect.fn(
 	"checkProducerInputStoreReadinessFx.checkProducerInputStoreReadinessProgramFx",
-)(function* ({ lineIds }: { lineIds: readonly string[] }) {
-	const { resolvedRef, target } = yield* ProducerInputStoreReadinessScopeFx;
+)(function* ({
+	lineIds,
+	scope,
+}: {
+	lineIds: readonly string[];
+	scope: ProducerInputStoreReadinessScope;
+}) {
 	const lineCandidate = yield* readAcceptedProducerInputStoreLineCandidateFx({
 		lineIds,
+		scope,
 	});
 
 	return {
 		...lineCandidate,
-		producerDefinition: target.producerDefinition,
-		producerItem: target.producerItem,
-		resolvedRef,
+		producerDefinition: scope.target.producerDefinition,
+		producerItem: scope.target.producerItem,
+		resolvedRef: scope.resolvedRef,
 	};
 });
 
@@ -225,14 +231,13 @@ export const checkProducerInputStoreReadinessFx = Effect.fn("checkProducerInputS
 
 		return yield* checkProducerInputStoreReadinessProgramFx({
 			lineIds,
-		}).pipe(
-			Effect.provideService(ProducerInputStoreReadinessScopeFx, {
+			scope: {
 				...props,
 				declaredLineIds,
 				resolvedRef,
 				target,
 				visibleLineIds,
-			}),
-		);
+			},
+		});
 	},
 );

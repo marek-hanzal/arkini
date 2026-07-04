@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionLineSetDefaultSchema } from "~/action/GameActionLineSetDefaultSchema";
 import { readLineDefinition, readLineIds } from "~/config/GameItemCapabilities";
@@ -33,16 +33,8 @@ type LineDefaultSelection = {
 	previousLineId: string | undefined;
 };
 
-class LineDefaultSelectionScopeFx extends Context.Tag("LineDefaultSelectionScopeFx")<
-	LineDefaultSelectionScopeFx,
-	setLineDefaultFx.Props
->() {
-	//
-}
-
 const readLineSetDefaultReadinessFx = Effect.fn("setLineDefaultFx.readLineSetDefaultReadinessFx")(
-	function* () {
-		const { action, config, nowMs, save } = yield* LineDefaultSelectionScopeFx;
+	function* ({ action, config, nowMs, save }: setLineDefaultFx.Props) {
 		return yield* checkLineSetDefaultReadinessFx({
 			action,
 			config,
@@ -54,17 +46,18 @@ const readLineSetDefaultReadinessFx = Effect.fn("setLineDefaultFx.readLineSetDef
 
 const readSelectedLineKindFx = Effect.fn("setLineDefaultFx.readSelectedLineKindFx")(function* ({
 	checked,
+	lineId,
 }: {
 	checked: LineSetDefaultReadiness;
+	lineId: string;
 }) {
-	const { action } = yield* LineDefaultSelectionScopeFx;
 	const line = readLineDefinition({
-		lineId: action.lineId,
+		lineId,
 		producerDefinition: checked.producerDefinition,
 	});
 	if (!line) {
 		return yield* Effect.fail(
-			GameEngineError.configReferenceMissing(`Missing line "${action.lineId}".`),
+			GameEngineError.configReferenceMissing(`Missing line "${lineId}".`),
 		);
 	}
 
@@ -74,8 +67,15 @@ const readSelectedLineKindFx = Effect.fn("setLineDefaultFx.readSelectedLineKindF
 });
 
 const readPreviousDefaultLineIdFx = Effect.fn("setLineDefaultFx.readPreviousDefaultLineIdFx")(
-	function* ({ checked, kind }: { checked: LineSetDefaultReadiness; kind: LineDefaultKind }) {
-		const { action, save } = yield* LineDefaultSelectionScopeFx;
+	function* ({
+		checked,
+		kind,
+		props,
+	}: {
+		checked: LineSetDefaultReadiness;
+		kind: LineDefaultKind;
+		props: setLineDefaultFx.Props;
+	}) {
 		const lineIds = readLineIds({
 			producerDefinition: checked.producerDefinition,
 		});
@@ -83,18 +83,18 @@ const readPreviousDefaultLineIdFx = Effect.fn("setLineDefaultFx.readPreviousDefa
 			.with("effect", () =>
 				Effect.succeed(
 					readDefaultEffectLineId({
-						itemInstanceId: action.itemInstanceId,
+						itemInstanceId: props.action.itemInstanceId,
 						lineIds,
-						save,
+						save: props.save,
 					}),
 				),
 			)
 			.with("product", () =>
 				Effect.succeed(
 					readDefaultLineId({
-						itemInstanceId: action.itemInstanceId,
+						itemInstanceId: props.action.itemInstanceId,
 						lineIds,
-						save,
+						save: props.save,
 					}),
 				),
 			)
@@ -103,18 +103,25 @@ const readPreviousDefaultLineIdFx = Effect.fn("setLineDefaultFx.readPreviousDefa
 );
 
 const readLineDefaultSelectionFx = Effect.fn("setLineDefaultFx.readLineDefaultSelectionFx")(
-	function* ({ checked }: { checked: LineSetDefaultReadiness }) {
-		const { action } = yield* LineDefaultSelectionScopeFx;
+	function* ({
+		checked,
+		props,
+	}: {
+		checked: LineSetDefaultReadiness;
+		props: setLineDefaultFx.Props;
+	}) {
 		const kind = yield* readSelectedLineKindFx({
 			checked,
+			lineId: props.action.lineId,
 		});
 		const previousLineId = yield* readPreviousDefaultLineIdFx({
 			checked,
 			kind,
+			props,
 		});
 		return {
 			kind,
-			nextLineId: previousLineId === action.lineId ? undefined : action.lineId,
+			nextLineId: previousLineId === props.action.lineId ? undefined : props.action.lineId,
 			previousLineId,
 		} satisfies LineDefaultSelection;
 	},
@@ -145,56 +152,73 @@ const readNextLineState = ({
 };
 
 const writeLineDefaultSelectionFx = Effect.fn("setLineDefaultFx.writeLineDefaultSelectionFx")(
-	function* ({ nextSave, selection }: { nextSave: GameSave; selection: LineDefaultSelection }) {
-		const { action } = yield* LineDefaultSelectionScopeFx;
+	function* ({
+		itemInstanceId,
+		nextSave,
+		selection,
+	}: {
+		itemInstanceId: string;
+		nextSave: GameSave;
+		selection: LineDefaultSelection;
+	}) {
 		const nextLineState = readNextLineState({
 			kind: selection.kind,
 			nextLineId: selection.nextLineId,
-			previousState: nextSave.lines[action.itemInstanceId],
+			previousState: nextSave.lines[itemInstanceId],
 		});
 
 		if (nextLineState) {
-			nextSave.lines[action.itemInstanceId] = nextLineState;
+			nextSave.lines[itemInstanceId] = nextLineState;
 		} else {
-			delete nextSave.lines[action.itemInstanceId];
+			delete nextSave.lines[itemInstanceId];
 		}
 	},
 );
 
 const finishLineDefaultSelectionFx = Effect.fn("setLineDefaultFx.finishLineDefaultSelectionFx")(
-	function* ({ selection }: { selection: LineDefaultSelection }) {
-		const { action, config, nowMs, save } = yield* LineDefaultSelectionScopeFx;
+	function* ({
+		props,
+		selection,
+	}: {
+		props: setLineDefaultFx.Props;
+		selection: LineDefaultSelection;
+	}) {
 		const nextSave = yield* cloneGameSaveFx({
-			save,
+			save: props.save,
 		});
 		yield* writeLineDefaultSelectionFx({
+			itemInstanceId: props.action.itemInstanceId,
 			nextSave,
 			selection,
 		});
-		nextSave.updatedAtMs = nowMs;
+		nextSave.updatedAtMs = props.nowMs;
 
 		return yield* createGameEngineResultFx({
-			config,
+			config: props.config,
 			events: [
 				{
-					atMs: nowMs,
-					itemInstanceId: action.itemInstanceId,
+					atMs: props.nowMs,
+					itemInstanceId: props.action.itemInstanceId,
 					nextLineId: selection.nextLineId,
 					previousLineId: selection.previousLineId,
 					type: "line.default_changed" as const,
 				},
 			],
-			nowMs,
+			nowMs: props.nowMs,
 			save: nextSave,
 		});
 	},
 );
 
-const setLineDefaultProgramFx = Effect.fn("setLineDefaultFx.setLineDefaultProgramFx")(function* () {
-	const checked = yield* readLineSetDefaultReadinessFx();
+const setLineDefaultProgramFx = Effect.fn("setLineDefaultFx.setLineDefaultProgramFx")(function* (
+	props: setLineDefaultFx.Props,
+) {
+	const checked = yield* readLineSetDefaultReadinessFx(props);
 	return yield* finishLineDefaultSelectionFx({
+		props,
 		selection: yield* readLineDefaultSelectionFx({
 			checked,
+			props,
 		}),
 	});
 });
@@ -202,7 +226,5 @@ const setLineDefaultProgramFx = Effect.fn("setLineDefaultFx.setLineDefaultProgra
 export const setLineDefaultFx = Effect.fn("setLineDefaultFx")(function* (
 	props: setLineDefaultFx.Props,
 ) {
-	return yield* setLineDefaultProgramFx().pipe(
-		Effect.provideService(LineDefaultSelectionScopeFx, props),
-	);
+	return yield* setLineDefaultProgramFx(props);
 });

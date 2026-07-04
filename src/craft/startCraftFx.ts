@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import type { GameActionCraftStartSchema } from "~/action/GameActionCraftStartSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { autoFillCraftInputsFx } from "~/craft/autoFillCraftInputsFx";
@@ -29,15 +29,12 @@ type CraftStartWorkingState = {
 	nextSave: GameSave;
 };
 
-class CraftStartExecutionScopeFx extends Context.Tag("CraftStartExecutionScopeFx")<
-	CraftStartExecutionScopeFx,
-	startCraftFx.Props
->() {
-	//
-}
-
-const readCraftStartReadinessFx = Effect.fn("startCraftFx.readCraftStartReadinessFx")(function* () {
-	const { action, config, nowMs, save } = yield* CraftStartExecutionScopeFx;
+const readCraftStartReadinessFx = Effect.fn("startCraftFx.readCraftStartReadinessFx")(function* ({
+	action,
+	config,
+	nowMs,
+	save,
+}: startCraftFx.Props) {
 	return yield* checkCraftStartReadinessFx({
 		action,
 		config,
@@ -47,8 +44,7 @@ const readCraftStartReadinessFx = Effect.fn("startCraftFx.readCraftStartReadines
 });
 
 const createCraftStartWorkingStateFx = Effect.fn("startCraftFx.createCraftStartWorkingStateFx")(
-	function* ({ checked }: { checked: CraftStartReadiness }) {
-		const { save } = yield* CraftStartExecutionScopeFx;
+	function* ({ checked, save }: { checked: CraftStartReadiness; save: GameSave }) {
 		return {
 			checked,
 			events: [],
@@ -61,71 +57,70 @@ const createCraftStartWorkingStateFx = Effect.fn("startCraftFx.createCraftStartW
 
 const readCraftInputsReadyAfterAutoFillFx = Effect.fn(
 	"startCraftFx.readCraftInputsReadyAfterAutoFillFx",
-)(function* ({ checked, events, nextSave }: CraftStartWorkingState) {
-	const { action, nowMs } = yield* CraftStartExecutionScopeFx;
+)(function* ({ props, state }: { props: startCraftFx.Props; state: CraftStartWorkingState }) {
 	const autoFillInputsReady = yield* autoFillCraftInputsFx({
-		events,
-		inputs: checked.recipe.inputs,
-		nextSave,
-		nowMs,
-		recipeId: action.recipeId,
-		targetItemInstanceId: action.targetItemInstanceId,
+		events: state.events,
+		inputs: state.checked.recipe.inputs,
+		nextSave: state.nextSave,
+		nowMs: props.nowMs,
+		recipeId: props.action.recipeId,
+		targetItemInstanceId: props.action.targetItemInstanceId,
 	});
 	return (
 		autoFillInputsReady ||
 		(yield* readCraftStoredInputsReadyFx({
-			inputs: checked.recipe.inputs,
-			save: nextSave,
-			targetItemInstanceId: action.targetItemInstanceId,
+			inputs: state.checked.recipe.inputs,
+			save: state.nextSave,
+			targetItemInstanceId: props.action.targetItemInstanceId,
 		}))
 	);
 });
 
 const finishCraftStartWithoutRunningJobFx = Effect.fn(
 	"startCraftFx.finishCraftStartWithoutRunningJobFx",
-)(function* ({ events, nextSave }: CraftStartWorkingState) {
-	const { config, nowMs } = yield* CraftStartExecutionScopeFx;
-	if (events.length > 0) nextSave.updatedAtMs = nowMs;
+)(function* ({ props, state }: { props: startCraftFx.Props; state: CraftStartWorkingState }) {
+	if (state.events.length > 0) state.nextSave.updatedAtMs = props.nowMs;
 	return yield* createGameEngineResultFx({
-		config,
-		events,
-		nowMs,
-		save: nextSave,
+		config: props.config,
+		events: state.events,
+		nowMs: props.nowMs,
+		save: state.nextSave,
 	});
 });
 
 const assertCraftStartRuntimeConstraintsFx = Effect.fn(
 	"startCraftFx.assertCraftStartRuntimeConstraintsFx",
-)(function* ({ checked, nextSave }: CraftStartWorkingState) {
-	const { action, config, nowMs } = yield* CraftStartExecutionScopeFx;
+)(function* ({ props, state }: { props: startCraftFx.Props; state: CraftStartWorkingState }) {
 	yield* checkCraftStartRuntimeConstraintsFx({
-		config,
-		nowMs,
-		recipe: checked.recipe,
-		save: nextSave,
-		targetItem: checked.targetItem,
-		targetItemInstanceId: action.targetItemInstanceId,
+		config: props.config,
+		nowMs: props.nowMs,
+		recipe: state.checked.recipe,
+		save: state.nextSave,
+		targetItem: state.checked.targetItem,
+		targetItemInstanceId: props.action.targetItemInstanceId,
 	});
 });
 
 const insertCraftJobFx = Effect.fn("startCraftFx.insertCraftJobFx")(function* ({
-	checked,
-	nextSave,
-}: CraftStartWorkingState) {
-	const { action, nowMs } = yield* CraftStartExecutionScopeFx;
+	props,
+	state,
+}: {
+	props: startCraftFx.Props;
+	state: CraftStartWorkingState;
+}) {
 	const jobId = yield* createGameJobIdFx();
 	const timing = yield* readCraftJobEffectiveTimingFx({
-		recipe: checked.recipe,
-		save: nextSave,
-		startAtMs: nowMs,
-		targetItemInstanceId: action.targetItemInstanceId,
+		recipe: state.checked.recipe,
+		save: state.nextSave,
+		startAtMs: props.nowMs,
+		targetItemInstanceId: props.action.targetItemInstanceId,
 	});
-	nextSave.craftJobs[jobId] = {
+	state.nextSave.craftJobs[jobId] = {
 		id: jobId,
 		readyAtMs: timing.readyAtMs,
-		recipeId: action.recipeId,
+		recipeId: props.action.recipeId,
 		startAtMs: timing.startAtMs,
-		targetItemInstanceId: action.targetItemInstanceId,
+		targetItemInstanceId: props.action.targetItemInstanceId,
 	};
 	return {
 		jobId,
@@ -134,45 +129,60 @@ const insertCraftJobFx = Effect.fn("startCraftFx.insertCraftJobFx")(function* ({
 });
 
 const finishCraftStartWithRunningJobFx = Effect.fn("startCraftFx.finishCraftStartWithRunningJobFx")(
-	function* (state: CraftStartWorkingState) {
-		const { action, config, nowMs } = yield* CraftStartExecutionScopeFx;
-		yield* assertCraftStartRuntimeConstraintsFx(state);
-		delete state.nextSave.craftInputs[action.targetItemInstanceId];
-		const { jobId, timing } = yield* insertCraftJobFx(state);
-		state.nextSave.updatedAtMs = nowMs;
+	function* ({ props, state }: { props: startCraftFx.Props; state: CraftStartWorkingState }) {
+		yield* assertCraftStartRuntimeConstraintsFx({
+			props,
+			state,
+		});
+		delete state.nextSave.craftInputs[props.action.targetItemInstanceId];
+		const { jobId, timing } = yield* insertCraftJobFx({
+			props,
+			state,
+		});
+		state.nextSave.updatedAtMs = props.nowMs;
 
 		return yield* createGameEngineResultFx({
-			config,
+			config: props.config,
 			events: [
 				...state.events,
 				{
-					atMs: nowMs,
+					atMs: props.nowMs,
 					jobId,
 					readyAtMs: timing.readyAtMs,
-					recipeId: action.recipeId,
+					recipeId: props.action.recipeId,
 					startAtMs: timing.startAtMs,
-					targetItemInstanceId: action.targetItemInstanceId,
+					targetItemInstanceId: props.action.targetItemInstanceId,
 					type: "craft.started" as const,
 				},
 			],
-			nowMs,
+			nowMs: props.nowMs,
 			save: state.nextSave,
 		});
 	},
 );
 
-const startCraftProgramFx = Effect.fn("startCraftFx.startCraftProgramFx")(function* () {
+const startCraftProgramFx = Effect.fn("startCraftFx.startCraftProgramFx")(function* (
+	props: startCraftFx.Props,
+) {
 	const state = yield* createCraftStartWorkingStateFx({
-		checked: yield* readCraftStartReadinessFx(),
+		checked: yield* readCraftStartReadinessFx(props),
+		save: props.save,
 	});
-	const inputsReady = yield* readCraftInputsReadyAfterAutoFillFx(state);
+	const inputsReady = yield* readCraftInputsReadyAfterAutoFillFx({
+		props,
+		state,
+	});
 	return inputsReady
-		? yield* finishCraftStartWithRunningJobFx(state)
-		: yield* finishCraftStartWithoutRunningJobFx(state);
+		? yield* finishCraftStartWithRunningJobFx({
+				props,
+				state,
+			})
+		: yield* finishCraftStartWithoutRunningJobFx({
+				props,
+				state,
+			});
 });
 
 export const startCraftFx = Effect.fn("startCraftFx")(function* (props: startCraftFx.Props) {
-	return yield* startCraftProgramFx().pipe(
-		Effect.provideService(CraftStartExecutionScopeFx, props),
-	);
+	return yield* startCraftProgramFx(props);
 });

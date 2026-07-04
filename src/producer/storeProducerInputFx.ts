@@ -1,4 +1,4 @@
-import { Context, Effect } from "effect";
+import { Effect } from "effect";
 import { consumeResolvedInputRefFx } from "~/activation/consumeResolvedInputRefFx";
 import type { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -28,17 +28,9 @@ type ProducerInputStoreWorkingState = {
 	nextSave: GameSave;
 };
 
-class StoreProducerInputScopeFx extends Context.Tag("StoreProducerInputScopeFx")<
-	StoreProducerInputScopeFx,
-	storeProducerInputFx.Props
->() {
-	//
-}
-
 const readProducerInputStoreReadinessFx = Effect.fn(
 	"storeProducerInputFx.readProducerInputStoreReadinessFx",
-)(function* () {
-	const { action, config, nowMs, save } = yield* StoreProducerInputScopeFx;
+)(function* ({ action, config, nowMs, save }: storeProducerInputFx.Props) {
 	return yield* checkProducerInputStoreReadinessFx({
 		action,
 		config,
@@ -49,10 +41,15 @@ const readProducerInputStoreReadinessFx = Effect.fn(
 
 const createStoredProducerInputWorkingStateFx = Effect.fn(
 	"storeProducerInputFx.createStoredProducerInputWorkingStateFx",
-)(function* ({ checked }: { checked: ProducerInputStoreReadiness }) {
-	const { action, nowMs, save } = yield* StoreProducerInputScopeFx;
+)(function* ({
+	checked,
+	props,
+}: {
+	checked: ProducerInputStoreReadiness;
+	props: storeProducerInputFx.Props;
+}) {
 	const nextSave = yield* cloneGameSaveFx({
-		save,
+		save: props.save,
 	});
 	const events: GameEvent[] = [];
 
@@ -64,13 +61,13 @@ const createStoredProducerInputWorkingStateFx = Effect.fn(
 	});
 	yield* storeProducerResolvedInputFx({
 		events,
-		itemInstanceId: action.itemInstanceId,
+		itemInstanceId: props.action.itemInstanceId,
 		lineId: checked.lineId,
 		nextSave,
-		nowMs,
+		nowMs: props.nowMs,
 		ref: checked.resolvedRef,
 	});
-	nextSave.updatedAtMs = nowMs;
+	nextSave.updatedAtMs = props.nowMs;
 
 	return {
 		checked,
@@ -81,38 +78,37 @@ const createStoredProducerInputWorkingStateFx = Effect.fn(
 
 const buildStoredProducerInputResultFx = Effect.fn(
 	"storeProducerInputFx.buildStoredProducerInputResultFx",
-)(function* ({ events, nextSave }: ProducerInputStoreWorkingState) {
-	const { config, nowMs } = yield* StoreProducerInputScopeFx;
+)(function* ({
+	events,
+	nextSave,
+	props,
+}: ProducerInputStoreWorkingState & {
+	props: storeProducerInputFx.Props;
+}) {
 	return yield* createGameEngineResultFx({
-		config,
+		config: props.config,
 		events,
-		nowMs,
+		nowMs: props.nowMs,
 		save: nextSave,
 	});
 });
 
 const storeProducerInputProgramFx = Effect.fn("storeProducerInputFx.storeProducerInputProgramFx")(
-	function* () {
-		const checked = yield* readProducerInputStoreReadinessFx();
+	function* (props: storeProducerInputFx.Props) {
+		const checked = yield* readProducerInputStoreReadinessFx(props);
 		const state = yield* createStoredProducerInputWorkingStateFx({
 			checked,
+			props,
 		});
-		return yield* buildStoredProducerInputResultFx(state);
+		return yield* buildStoredProducerInputResultFx({
+			...state,
+			props,
+		});
 	},
 );
 
-export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* ({
-	action,
-	config,
-	nowMs,
-	save,
-}: storeProducerInputFx.Props) {
-	return yield* storeProducerInputProgramFx().pipe(
-		Effect.provideService(StoreProducerInputScopeFx, {
-			action,
-			config,
-			nowMs,
-			save,
-		}),
-	);
+export const storeProducerInputFx = Effect.fn("storeProducerInputFx")(function* (
+	props: storeProducerInputFx.Props,
+) {
+	return yield* storeProducerInputProgramFx(props);
 });

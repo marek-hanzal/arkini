@@ -86,6 +86,7 @@ const main = async () => {
 		...auditText(),
 		...auditIndexBarrels(),
 		...auditEffectFunctionNames(),
+		...auditImpureIdGenerationBoundaries(),
 		...auditConfig({
 			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack"),
 			label: "game/arkini.game.arkpack",
@@ -165,6 +166,22 @@ const auditEffectFunctionNames = (): Finding[] =>
 			});
 		}
 		return findings;
+	});
+
+const auditImpureIdGenerationBoundaries = (): Finding[] =>
+	readFiles("src").flatMap((path) => {
+		if (!/\.tsx?$/.test(path)) return [];
+		const text = readFileSync(path, "utf8");
+		if (!text.includes('"@paralleldrive/cuid2"') && !text.includes("'@paralleldrive/cuid2'")) {
+			return [];
+		}
+		if (/Fx\.tsx?$/.test(path)) return [];
+		return [
+			{
+				path,
+				message: "impure id generation must stay inside an Fx boundary",
+			},
+		];
 	});
 
 const auditConfig = ({ config, label }: { config: GameConfig; label: string }): Finding[] => {

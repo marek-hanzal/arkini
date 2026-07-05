@@ -41,6 +41,7 @@ export const appendItemConsumedEventVisuals = ({
 			"craft-input-store",
 			"inventory-placement",
 			"board-stash",
+			"board-stack",
 			"remove-tool",
 			"memory-restore",
 			() => false,

@@ -1,3 +1,4 @@
+import type { GameAction } from "~/action/GameActionSchema";
 import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
 import type { DropActions } from "~/play/drop/DropActions";
@@ -12,6 +13,7 @@ import {
 
 type ItemToBoardItemActionSource = {
 	readExpectedSourceItemId(context: RuntimeDropActionContext): string | undefined;
+	readStackSourceRef?(context: RuntimeDropActionContext): GameActionItemRef | undefined;
 	sourceRef: GameActionItemRef;
 };
 
@@ -26,6 +28,23 @@ const createFallbackMergeAction = ({
 	targetItemInstanceId,
 	type: "item.merge" as const,
 });
+
+const createStackAction = ({
+	context,
+	source,
+	targetItemInstanceId,
+}: {
+	context: RuntimeDropActionContext;
+	source: ItemToBoardItemActionSource;
+	targetItemInstanceId: string;
+}): GameAction | undefined => {
+	const sourceRef = source.readStackSourceRef?.(context) ?? source.sourceRef;
+	return {
+		sourceRef,
+		targetItemInstanceId,
+		type: "item.stack" as const,
+	};
+};
 
 const dispatchBoardItemActionWhenExpected = ({
 	boardItemId,
@@ -76,15 +95,23 @@ export const dispatchItemToBoardItemAction = ({
 		return Promise.resolve();
 	}
 
-	const action = createGameActionFromItemToBoardItemInteractionPlan({
-		plan: resolveItemToBoardItemInteractionPlan({
-			config,
-			sourceItemId,
-			targetItem: target,
-		}),
-		sourceRef: source.sourceRef,
-		targetItemInstanceId: target.id,
+	const plan = resolveItemToBoardItemInteractionPlan({
+		config,
+		sourceItemId,
+		targetItem: target,
 	});
+	const action =
+		plan.type === "stack"
+			? createStackAction({
+					context,
+					source,
+					targetItemInstanceId: target.id,
+				})
+			: createGameActionFromItemToBoardItemInteractionPlan({
+					plan,
+					sourceRef: source.sourceRef,
+					targetItemInstanceId: target.id,
+				});
 
 	return dispatchRuntimeDropAction({
 		action:
@@ -135,6 +162,15 @@ export const applyExpectedBoardItemToBoardItem = ({
 		expectedTargetItemId: input.expectedTargetItemId,
 		source: {
 			readExpectedSourceItemId: ({ board }) => board.byId[input.sourceBoardItemId]?.itemId,
+			readStackSourceRef: ({ board }) => {
+				const sourceItem = board.byId[input.sourceBoardItemId];
+				if (!sourceItem) return undefined;
+				return {
+					kind: "board" as const,
+					itemInstanceId: input.sourceBoardItemId,
+					quantity: sourceItem.quantity ?? 1,
+				};
+			},
 			sourceRef: {
 				kind: "board",
 				itemInstanceId: input.sourceBoardItemId,

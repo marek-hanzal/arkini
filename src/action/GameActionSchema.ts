@@ -13,6 +13,7 @@ import { GameActionDebugItemSpawnSchema } from "~/action/GameActionDebugItemSpaw
 import { GameActionCraftInputWithdrawSchema } from "~/action/GameActionCraftInputWithdrawSchema";
 import { GameActionCraftStartSchema } from "~/action/GameActionCraftStartSchema";
 import { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
+import { GameActionItemStackSchema } from "~/action/GameActionItemStackSchema";
 import { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
 import { GameActionProducerInputWithdrawSchema } from "~/action/GameActionProducerInputWithdrawSchema";
 import { GameActionLineSetDefaultSchema } from "~/action/GameActionLineSetDefaultSchema";
@@ -33,6 +34,7 @@ export const GameActionSchema = z.discriminatedUnion("type", [
 	GameActionDebugBoardItemDeleteSchema,
 	GameActionDebugItemSpawnSchema,
 	GameActionItemMergeSchema,
+	GameActionItemStackSchema,
 	GameActionInventoryItemPlaceSchema,
 	GameActionInventorySlotsSwapSchema,
 	GameActionProducerInputStoreSchema,

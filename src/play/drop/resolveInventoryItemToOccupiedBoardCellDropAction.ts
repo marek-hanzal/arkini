@@ -43,6 +43,9 @@ export const resolveInventoryItemToOccupiedBoardCellDropAction = ({
 				type: "merge",
 			},
 			{
+				type: "stack",
+			},
+			{
 				type: "producer-input",
 			},
 			() => ({

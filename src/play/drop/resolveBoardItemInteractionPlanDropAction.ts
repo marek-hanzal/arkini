@@ -36,6 +36,9 @@ export const resolveBoardItemInteractionPlanDropAction = ({
 			{
 				type: "merge",
 			},
+			{
+				type: "stack",
+			},
 			() => ({
 				animation: "parallel-merge" as const,
 				feedback: {

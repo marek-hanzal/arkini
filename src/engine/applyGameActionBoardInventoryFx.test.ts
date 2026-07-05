@@ -198,6 +198,212 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
+	it("stacks matching board items instead of swapping them", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 3,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:1"] = {
+			...save.board.items["item-instance:1"],
+			quantity: 2,
+		};
+		save.board.items["item-instance:2"] = {
+			...save.board.items["item-instance:2"],
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					itemInstanceId: "item-instance:1",
+					kind: "board",
+					quantity: 2,
+				},
+				targetItemInstanceId: "item-instance:2",
+				type: "item.stack",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			quantity: 1,
+			x: 0,
+			y: 0,
+		});
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			quantity: 3,
+			x: 1,
+			y: 0,
+		});
+		expect(result.events).toMatchObject([
+			{
+				from: {
+					itemInstanceId: "item-instance:1",
+					nextQuantity: 1,
+					previousQuantity: 2,
+					quantity: 1,
+				},
+				reason: "board-stack",
+				type: "item.consumed",
+			},
+			{
+				reason: "board-stack",
+				to: {
+					itemInstanceId: "item-instance:2",
+				},
+				type: "item.created",
+			},
+		]);
+	});
+
+	it("removes the source board item when stacking consumes the whole source", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 3,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					itemInstanceId: "item-instance:1",
+					kind: "board",
+					quantity: 1,
+				},
+				targetItemInstanceId: "item-instance:2",
+				type: "item.stack",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			quantity: 2,
+			x: 1,
+			y: 0,
+		});
+	});
+
+	it("stacks inventory items into matching board stacks", () => {
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				inventory: {
+					slots: 1,
+				},
+				board: {
+					height: 1,
+					width: 2,
+				},
+				title: "Test",
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:twig",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:1"] = {
+			...save.board.items["item-instance:1"],
+			quantity: 2,
+		};
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				sourceRef: {
+					kind: "inventory",
+					quantity: 1,
+					slotIndex: 0,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "item.stack",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toMatchObject({
+			quantity: 3,
+		});
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+	});
+
 	it("places one inventory item on a board cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

@@ -59,6 +59,14 @@ export const resolveDropIntent = ({
 		)
 		.with(
 			{
+				type: "stack",
+			},
+			() => ({
+				type: "merge" as const,
+			}),
+		)
+		.with(
+			{
 				type: "craft-input",
 			},
 			() => ({

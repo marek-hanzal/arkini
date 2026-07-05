@@ -506,12 +506,15 @@ describe("resolveBoardCellDropAction", () => {
 			x: 0,
 			y: 0,
 		});
-		const target = boardItem({
-			id: "target",
-			itemId: "item:twig",
-			x: 1,
-			y: 0,
-		});
+		const target = {
+			...boardItem({
+				id: "target",
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+			quantity: 3,
+		};
 
 		expect(
 			resolveBoardCellDropAction({

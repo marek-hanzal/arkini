@@ -29,6 +29,16 @@ export const createGameActionFromItemToBoardItemInteractionPlan = ({
 		)
 		.with(
 			{
+				type: "stack",
+			},
+			() => ({
+				sourceRef,
+				targetItemInstanceId,
+				type: "item.stack" as const,
+			}),
+		)
+		.with(
+			{
 				type: "craft-input",
 			},
 			() => ({

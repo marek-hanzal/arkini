@@ -2,6 +2,7 @@ import { match, P } from "ts-pattern";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { isBoardViewItemRuntimeBusy } from "~/board/view/isBoardViewItemRuntimeBusy";
 import { isBoardViewItemRuntimeStatePreserved } from "~/board/view/isBoardViewItemRuntimeStatePreserved";
+import { readBoardViewItemQuantity } from "~/board/view/readBoardViewItemQuantity";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { ItemId } from "~/config/GameIdSchema";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
@@ -19,6 +20,7 @@ type ItemToBoardItemInteractionFacts = {
 	canCraft: boolean;
 	canMerge: boolean;
 	canRemoveTile: boolean;
+	canStack: boolean;
 	canSupplyStashInput: boolean;
 	mergeResultItemId?: string;
 	producerInputLineId?: string;
@@ -52,6 +54,23 @@ const readMergeInteractionFacts = ({
 		),
 		mergeResultItemId,
 	};
+};
+
+const readStackInteractionAvailable = ({
+	config,
+	sourceItemId,
+	targetItem,
+}: resolveItemToBoardItemInteractionPlan.Props) => {
+	if (sourceItemId !== targetItem.itemId) return false;
+	if (
+		isBoardViewItemRuntimeBusy(targetItem) ||
+		isBoardViewItemRuntimeStatePreserved(targetItem)
+	) {
+		return false;
+	}
+
+	const maxStackSize = config.items[targetItem.itemId]?.maxStackSize ?? 1;
+	return maxStackSize > 1 && readBoardViewItemQuantity(targetItem) < maxStackSize;
 };
 
 const readCraftInputInteractionAvailable = ({
@@ -114,6 +133,7 @@ const readItemToBoardItemInteractionFacts = (
 	...readMergeInteractionFacts(props),
 	...readTileRemoveInteractionFacts(props),
 	canCraft: readCraftInputInteractionAvailable(props),
+	canStack: readStackInteractionAvailable(props),
 	canSupplyStashInput: readStashInputInteractionAvailable(props),
 	producerInputLineId: readDefaultFirstProducerInputLineId(props),
 });
@@ -133,6 +153,14 @@ export const resolveItemToBoardItemInteractionPlan = (
 	props: resolveItemToBoardItemInteractionPlan.Props,
 ): ItemToBoardItemInteractionPlan =>
 	match(readItemToBoardItemInteractionFacts(props))
+		.with(
+			{
+				canStack: true,
+			},
+			() => ({
+				type: "stack" as const,
+			}),
+		)
 		.with(
 			{
 				canMerge: true,

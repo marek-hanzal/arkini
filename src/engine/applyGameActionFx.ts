@@ -18,6 +18,7 @@ import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { parseGameActionFx } from "~/engine/parseGameActionFx";
 import { swapInventorySlotsFx } from "~/inventory/swapInventorySlotsFx";
 import { mergeItemFx } from "~/merge/mergeItemFx";
+import { stackItemFx } from "~/stack/stackItemFx";
 import { placeInventoryItemOnBoardFx } from "~/placement/placeInventoryItemOnBoardFx";
 import { removeTileFx } from "~/remove/removeTileFx";
 import { setLineDefaultFx } from "~/producer/setLineDefaultFx";
@@ -98,6 +99,16 @@ const dispatchParsedGameActionFx = Effect.fn("applyGameActionFx.dispatchParsedGa
 				},
 				(parsedAction) =>
 					mergeItemFx({
+						...context,
+						action: parsedAction,
+					}),
+			)
+			.with(
+				{
+					type: "item.stack",
+				},
+				(parsedAction) =>
+					stackItemFx({
 						...context,
 						action: parsedAction,
 					}),

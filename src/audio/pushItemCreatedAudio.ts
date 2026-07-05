@@ -59,6 +59,7 @@ export const pushItemCreatedAudio = (
 		.with(
 			"producer-input-withdraw",
 			"craft-input-withdraw",
+			"board-stack",
 			"memory-restore",
 			"memory-store",
 			() => undefined,

@@ -25,6 +25,7 @@ export const pushItemConsumedAudio = (
 			"craft-input-store",
 			"craft-input-auto-fill",
 			"inventory-placement",
+			"board-stack",
 			"remove-tool",
 			"memory-restore",
 			"memory-store",

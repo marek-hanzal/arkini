@@ -3,19 +3,19 @@ import { describe, expect, it } from "vitest";
 import { DetailGeneratedEffectsPanel } from "~/item-detail/ui/DetailGeneratedEffectsPanel";
 
 describe("DetailGeneratedEffectsPanel", () => {
-	it("renders authored grant names instead of raw grant ids", () => {
+	it("renders authored player-facing grant names instead of raw grant ids", () => {
 		const html = renderToStaticMarkup(
 			<DetailGeneratedEffectsPanel
 				effects={[
 					{
 						grants: [
 							{
-								id: "grant:owned:producer:quarry-t1",
-								name: "Owns Quarry I",
+								id: "grant:path:faith",
+								name: "Faith path chosen",
 							},
 						],
-						id: "effect:grant-owned:producer-quarry-t1",
-						name: "Owned Quarry I grant",
+						id: "effect:path-faith-lock",
+						name: "Faith path lock",
 						polarity: "neutral",
 						sourceScope: "both",
 					},
@@ -23,8 +23,8 @@ describe("DetailGeneratedEffectsPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Owns Quarry I");
-		expect(html).not.toContain("grant:owned:producer:quarry-t1");
+		expect(html).toContain("Faith path chosen");
+		expect(html).not.toContain("grant:path:faith");
 	});
 
 	it("does not render a duplicate header count badge", () => {

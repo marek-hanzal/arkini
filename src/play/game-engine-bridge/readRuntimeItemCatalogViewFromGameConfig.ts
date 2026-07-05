@@ -1,6 +1,7 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readGameConfigAssetSrc } from "~/config/readGameConfigAssetSrc";
 import type { ItemId } from "~/config/GameIdSchema";
+import { isPlayerVisibleGeneratedEffect } from "~/play/game-engine-bridge/isPlayerVisibleGeneratedEffect";
 import type { ViewItem, ViewItemAsset } from "~/item/view/ViewItemSchema";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";
 
@@ -16,7 +17,7 @@ const resolveAssetSrc = ({ assetId, config }: { assetId: string; config: GameCon
 	}) ?? fallbackAssetSrc;
 
 const readGeneratedEffects = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	(config.items[itemId]?.effects ?? []).map((effect) => ({
+	(config.items[itemId]?.effects ?? []).filter(isPlayerVisibleGeneratedEffect).map((effect) => ({
 		id: effect.id,
 		name: effect.name,
 		polarity: effect.polarity,

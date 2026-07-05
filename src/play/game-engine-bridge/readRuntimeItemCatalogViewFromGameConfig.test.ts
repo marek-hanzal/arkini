@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createEngineMergeTestConfig } from "~/engine/test/createEngineMergeTestConfig";
+import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { readRuntimeItemCatalogViewFromGameConfig } from "~/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
 
 const config = createEngineMergeTestConfig();
@@ -44,6 +45,69 @@ describe("readRuntimeItemCatalogViewFromGameConfig", () => {
 		expect(catalog["item:water"]?.assets.map((asset) => asset.src)).toEqual([
 			"data:image/png;base64,x",
 			"data:image/png;base64,late-bytes",
+		]);
+	});
+
+	it("hides background owned grants from item detail generated effects", () => {
+		const catalog = readRuntimeItemCatalogViewFromGameConfig(
+			createEngineTestConfig({
+				itemEffects: {
+					"item:producer": [
+						{
+							grants: [
+								{
+									id: "grant:owned:item:producer",
+									name: "Owns Producer",
+								},
+							],
+							id: "effect:grant-owned:item-producer",
+							name: "Owned Producer grant",
+							polarity: "neutral",
+							sourceScope: "both",
+						},
+					],
+				},
+			}),
+		);
+
+		expect(catalog["item:producer"]?.generatedEffects).toEqual([]);
+	});
+
+	it("keeps player-facing grant source effects in item detail generated effects", () => {
+		const catalog = readRuntimeItemCatalogViewFromGameConfig(
+			createEngineTestConfig({
+				itemEffects: {
+					"item:producer": [
+						{
+							grants: [
+								{
+									id: "grant:path:faith",
+									name: "Faith path chosen",
+								},
+							],
+							id: "effect:path-faith-lock",
+							name: "Faith path lock",
+							polarity: "neutral",
+							sourceScope: "both",
+						},
+					],
+				},
+			}),
+		);
+
+		expect(catalog["item:producer"]?.generatedEffects).toEqual([
+			{
+				grants: [
+					{
+						id: "grant:path:faith",
+						name: "Faith path chosen",
+					},
+				],
+				id: "effect:path-faith-lock",
+				name: "Faith path lock",
+				polarity: "neutral",
+				sourceScope: "both",
+			},
 		]);
 	});
 });

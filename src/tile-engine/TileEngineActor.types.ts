@@ -16,6 +16,7 @@ export namespace TileEngineActor {
 		source: TDrag;
 		started: boolean;
 		longFired: boolean;
+		released: boolean;
 	}
 
 	export interface LastTap {

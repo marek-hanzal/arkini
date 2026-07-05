@@ -1,6 +1,7 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback } from "react";
 import { clampDragDelta } from "~/tile-engine/clampDragDelta";
 import { distance } from "~/tile-engine/distance";
+import { isLiveDragSessionForPointer } from "~/tile-engine/isLiveDragSessionForPointer";
 import { rectFromElement } from "~/tile-engine/rect";
 import { translateElement } from "~/tile-engine/translateElement";
 import { TileEngineTiming } from "~/tile-engine/TileEngineTiming";
@@ -28,7 +29,15 @@ export const useTilePointerMove = <TDrag>({
 	useCallback(
 		(event: ReactPointerEvent<HTMLDivElement>) => {
 			const session = dragSessionRef.current;
-			if (!session || session.pointerId !== event.pointerId) return;
+			if (
+				!session ||
+				!isLiveDragSessionForPointer({
+					pointerId: event.pointerId,
+					session,
+				})
+			) {
+				return;
+			}
 
 			const rawX = event.clientX - session.startX;
 			const rawY = event.clientY - session.startY;

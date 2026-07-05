@@ -26,7 +26,7 @@ export const useTileDragHover = <TTile, TSlot, TDrag, TDrop>({
 }: useTileDragHover.Props<TTile, TSlot, TDrag, TDrop>) => {
 	return useCallback(() => {
 		const session = dragSessionRef.current;
-		if (!session || !session.started) return null;
+		if (!session || !session.started || session.released) return null;
 
 		const element = actorRef.current;
 		const rect = element ? rectFromElement(element) : dragSessionRect(session);

@@ -51,10 +51,11 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 	useCallback(
 		(event: ReactPointerEvent<HTMLDivElement>) => {
 			const session = dragSessionRef.current;
-			if (!session || session.pointerId !== event.pointerId) return;
+			if (!session || session.pointerId !== event.pointerId || session.released) return;
 
 			const element = actorRef.current;
 			releasePointerCapture(element, event.pointerId);
+			session.released = true;
 			clearLongTimer();
 
 			if (!session.started) {

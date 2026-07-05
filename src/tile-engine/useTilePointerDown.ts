@@ -61,6 +61,7 @@ export const useTilePointerDown = <TTile, TDrag>({
 				source: binding.data,
 				started: false,
 				longFired: false,
+				released: false,
 			};
 
 			if (binding.onLongActivate) {

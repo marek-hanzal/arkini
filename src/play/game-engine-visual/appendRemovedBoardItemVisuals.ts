@@ -25,10 +25,17 @@ const readMotionStartMs = (delayMs: number | undefined) => Math.max(0, delayMs ?
 const readMotionEndMs = (cleanupDelayMs: number | undefined) =>
 	Math.max(0, (cleanupDelayMs ?? 0) - TileEngineTiming.motionCleanupBufferMs);
 
+const shouldRetainBeforeExit = (reason: string) =>
+	reason === "producer-depleted" || reason === "capacity-depleted";
+
+const shouldRetainThroughFeedback = (reason: string) => reason === "capacity-depleted";
+
 const readRetainedTileExitDelayMs = ({
+	includeFeedback,
 	plan,
 	itemInstanceId,
 }: {
+	includeFeedback: boolean;
 	plan: GameEngineVisualPlanDraft;
 	itemInstanceId: string;
 }) => {
@@ -39,6 +46,11 @@ const readRetainedTileExitDelayMs = ({
 		...plan.boardTransientTilePlans
 			.filter((entry) => entry.request.exit?.toTileId === itemInstanceId)
 			.map((entry) => readMotionEndMs(entry.cleanupDelayMs)),
+		...(includeFeedback
+			? plan.boardFeedbackRequests
+					.filter((request) => request.tileId === itemInstanceId)
+					.map((request) => readMotionEndMs(request.cleanupDelayMs))
+			: []),
 	];
 
 	return linkedMotionMilestonesMs.length ? Math.max(...linkedMotionMilestonesMs) : 0;
@@ -55,13 +67,13 @@ export const appendRemovedBoardItemVisuals = ({
 	const previousItem = previousBoard?.byId[event.itemInstanceId];
 	if (!previousItem) return;
 
-	const delayMs =
-		event.reason === "producer-depleted"
-			? readRetainedTileExitDelayMs({
-					plan,
-					itemInstanceId: event.itemInstanceId,
-				})
-			: 0;
+	const delayMs = shouldRetainBeforeExit(event.reason)
+		? readRetainedTileExitDelayMs({
+				includeFeedback: shouldRetainThroughFeedback(event.reason),
+				plan,
+				itemInstanceId: event.itemInstanceId,
+			})
+		: 0;
 	const groupId = `engine:item-removed:${event.reason}:${event.itemInstanceId}:${event.atMs}`;
 	const cleanupDelayMs = delayMs + tileRemoveDurationMs + TileEngineTiming.motionCleanupBufferMs;
 	const tile: BoardTransientTile = {

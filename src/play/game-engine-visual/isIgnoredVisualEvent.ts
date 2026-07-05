@@ -12,7 +12,6 @@ const ignoredEventTypeValues = [
 	"item.spawn.failed",
 	"line.default_changed",
 	"cheat.speed_mode.changed",
-	"item.capacity.changed",
 	"item.capacity.depleted",
 	"producer_input.withdrawn",
 	"line.blocked",

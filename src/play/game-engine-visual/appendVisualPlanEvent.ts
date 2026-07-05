@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { appendActivationInputStoredEventVisuals } from "~/play/game-engine-visual/appendActivationInputStoredEventVisuals";
 import { appendBoardMemoryFeedbackEventVisuals } from "~/play/game-engine-visual/appendBoardMemoryFeedbackEventVisuals";
+import { appendItemCapacityChangedEventVisuals } from "~/play/game-engine-visual/appendItemCapacityChangedEventVisuals";
 import { appendItemConsumedEventVisuals } from "~/play/game-engine-visual/appendItemConsumedEventVisuals";
 import { appendItemCreatedEventVisuals } from "~/play/game-engine-visual/appendItemCreatedEventVisuals";
 import { appendItemRemovedEventVisuals } from "~/play/game-engine-visual/appendItemRemovedEventVisuals";
@@ -31,6 +32,12 @@ export const appendVisualPlanEvent = ({
 				type: "item.created",
 			},
 			(matchedEvent) => appendItemCreatedEventVisuals(context, matchedEvent),
+		)
+		.with(
+			{
+				type: "item.capacity.changed",
+			},
+			(matchedEvent) => appendItemCapacityChangedEventVisuals(context, matchedEvent),
 		)
 		.with(
 			{

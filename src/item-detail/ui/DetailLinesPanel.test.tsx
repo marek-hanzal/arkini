@@ -144,6 +144,49 @@ describe("DetailLinesPanel", () => {
 		expect(html).not.toContain('text-ak-text-muted">Queue 0/1');
 	});
 
+	it("merges repeated outputs for the same resource into one readable row", () => {
+		const html = renderToStaticMarkup(
+			<DetailLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							name: "Stone",
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 2,
+									quantity: 1,
+								},
+								{
+									itemId: "item:grain",
+									kind: "chance",
+									ownedQuantity: 2,
+									probability: 0.4,
+									quantity: 1,
+								},
+								{
+									itemId: "item:grain",
+									kind: "chance",
+									ownedQuantity: 2,
+									probability: 0.15,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html.match(/>Grain</g)?.length).toBe(1);
+		expect(html).toContain("1× · guaranteed");
+		expect(html).toContain("1× · 40% chance");
+		expect(html).toContain("1× · 15% chance");
+		expect(html.match(/Owned 2/g)?.length).toBe(1);
+	});
+
 	it("keeps line icons only in outputs, not duplicated in the header", () => {
 		const html = renderToStaticMarkup(
 			<DetailLinesPanel

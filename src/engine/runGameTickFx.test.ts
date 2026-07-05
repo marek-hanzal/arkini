@@ -37,7 +37,7 @@ describe("runGameTickFx", () => {
 		expect(result.save.producerJobs).toHaveProperty("job:1");
 	});
 
-	it("completes product jobs and places output board first, then inventory", () => {
+	it("completes product jobs and places output as a board stack", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -59,10 +59,7 @@ describe("runGameTickFx", () => {
 
 		expect(result.save.producerJobs).not.toHaveProperty("job:1");
 		expect(result.save.inventory.slots).toEqual([
-			{
-				itemId: "item:twig",
-				quantity: 1,
-			},
+			null,
 			null,
 		]);
 		expect(result.events).toMatchObject([
@@ -75,17 +72,9 @@ describe("runGameTickFx", () => {
 				itemId: "item:twig",
 				to: {
 					kind: "board",
+					quantity: 2,
 					x: 1,
 					y: 0,
-				},
-				type: "item.created",
-			},
-			{
-				itemId: "item:twig",
-				to: {
-					kind: "inventory",
-					quantity: 1,
-					slotIndex: 0,
 				},
 				type: "item.created",
 			},
@@ -143,18 +132,16 @@ describe("runGameTickFx", () => {
 					}
 
 					return {
+						quantity: event.to.quantity,
 						x: event.to.x,
 						y: event.to.y,
 					};
 				}),
 		).toEqual([
 			{
+				quantity: 2,
 				x: 1,
 				y: 0,
-			},
-			{
-				x: 0,
-				y: 1,
 			},
 		]);
 	});
@@ -256,6 +243,7 @@ describe("runGameTickFx", () => {
 				...baseConfig.items,
 				"item:twig": {
 					...baseConfig.items["item:twig"],
+					maxStackSize: 1,
 					storage: "board",
 				},
 			},

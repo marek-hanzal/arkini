@@ -36,11 +36,12 @@ export const useBoardSurfaceTiles = ({
 				...transientTiles.map((tile) => ({
 					id: tile.id,
 					slotId: tile.slotId,
-					renderKey: `static-item:${tile.id}:${tile.slotId}:${tile.itemId}:${tile.assetProgress ?? "none"}`,
+					renderKey: `static-item:${tile.id}:${tile.slotId}:${tile.itemId}:${tile.quantity ?? 1}:${tile.assetProgress ?? "none"}`,
 					data: {
 						assetProgress: tile.assetProgress,
 						kind: "static-item" as const,
 						itemId: tile.itemId,
+						quantity: tile.quantity,
 					},
 					disabled: true,
 					style: transientTileStyle,

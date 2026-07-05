@@ -9,6 +9,7 @@ export const renderBoardTile = ({ tile }: TileEngine.RenderTileProps<BoardSurfac
 			<BoardStaticTile
 				assetProgress={tile.data.assetProgress}
 				itemId={tile.data.itemId}
+				quantity={tile.data.quantity}
 			/>
 		);
 	}

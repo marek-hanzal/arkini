@@ -99,6 +99,7 @@ export const BoardTile = memo(({ boardItemId }: BoardTile.Props) => {
 				assetProgress={hasSavedMemory ? 1 : (liveBoardItem?.craft?.inputProgress ?? 0)}
 				capacityLabel={capacity ? `${capacity.remaining}/${capacity.max}` : undefined}
 				item={item}
+				quantity={boardItem.quantity}
 				variant="board"
 			/>
 			{hasActiveEffect ? (

@@ -7,6 +7,7 @@ import { CraftProgressViewSchema } from "./CraftProgressViewSchema";
 export const BoardViewItemSchema = z.object({
 	id: z.string().min(1),
 	itemId: GameItemIdSchema,
+	quantity: z.number().int().positive().optional(),
 	x: z.number().int().nonnegative(),
 	y: z.number().int().nonnegative(),
 	state: BoardItemStateSchema,

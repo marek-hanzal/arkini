@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { BoardCell } from "~/board/BoardCellPosition";
+import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { readSingleBoardPlacementTargetFx } from "~/placement/readSingleBoardPlacementTargetFx";
 import { readSingleItemBoardStorageAllowed } from "~/placement/readSinglePlacementStorageAllowed";
@@ -11,9 +12,11 @@ import type {
 
 const placeSingleBoardItemAtCellFx = Effect.fn("placeSingleBoardItemAtCellFx")(function* ({
 	cell,
+	quantity,
 	scope,
 }: {
 	cell: BoardCell;
+	quantity: number;
 	scope: SingleItemPlacementScope;
 }) {
 	yield* placeBoardItemInstanceFx({
@@ -21,6 +24,7 @@ const placeSingleBoardItemAtCellFx = Effect.fn("placeSingleBoardItemAtCellFx")(f
 		createdAtMs: scope.createdAtMs,
 		events: scope.events,
 		itemId: scope.item.itemId,
+		quantity,
 		originItemInstanceId: scope.item.originItemInstanceId,
 		reason: scope.item.reason,
 		save: scope.save,
@@ -37,6 +41,17 @@ export const placeSingleBoardCopiesUntilBlockedFx = Effect.fn(
 	if (!readSingleItemBoardStorageAllowed(scope)) return progress;
 
 	while (progress.remainingQuantity > 0) {
+		const maxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
+			config: scope.config,
+			ignoredBoardItemInstanceIds: scope.freedBoardItemInstanceIds,
+			itemId: scope.item.itemId,
+			save: scope.save,
+		});
+		const placedQuantity = Math.min(
+			progress.remainingQuantity,
+			scope.itemDefinition.maxStackSize,
+			maxCountCapacity,
+		);
 		const target = yield* readSingleBoardPlacementTargetFx(scope);
 		const placed = yield* match(target)
 			.with(
@@ -47,6 +62,7 @@ export const placeSingleBoardCopiesUntilBlockedFx = Effect.fn(
 					Effect.gen(function* () {
 						yield* placeSingleBoardItemAtCellFx({
 							cell,
+							quantity: placedQuantity,
 							scope,
 						});
 						return true;
@@ -74,8 +90,8 @@ export const placeSingleBoardCopiesUntilBlockedFx = Effect.fn(
 			)
 			.exhaustive();
 		if (!placed) break;
-		progress.remainingQuantity -= 1;
-		progress.placedQuantity += 1;
+		progress.remainingQuantity -= placedQuantity;
+		progress.placedQuantity += placedQuantity;
 	}
 
 	return progress;

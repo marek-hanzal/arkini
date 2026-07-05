@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type {
 	BoardMemoryActivationScope,
@@ -27,6 +28,8 @@ const readBoardMemorySnapshotItemFx = Effect.fn("readBoardMemorySnapshotItemFx")
 		location: "inventory",
 	});
 
+	const quantity = readGameSaveBoardItemQuantity(item);
+
 	return {
 		...(item.itemId === boardMemoryItemId || stateStatus.preservable || !inventoryStorageAllowed
 			? {
@@ -34,6 +37,11 @@ const readBoardMemorySnapshotItemFx = Effect.fn("readBoardMemorySnapshotItemFx")
 				}
 			: {}),
 		itemId: item.itemId,
+		...(quantity > 1
+			? {
+					quantity,
+				}
+			: {}),
 		x: item.x,
 		y: item.y,
 	} satisfies BoardMemoryLayoutItem;

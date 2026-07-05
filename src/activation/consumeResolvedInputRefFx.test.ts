@@ -63,6 +63,55 @@ describe("consumeResolvedInputRefFx", () => {
 		]);
 	});
 
+	it("decrements a stacked board input and preserves the board item", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			quantity: 3,
+			x: 1,
+			y: 0,
+		};
+		const events: GameEvent[] = [];
+
+		runFx(
+			consumeResolvedInputRefFx({
+				events,
+				nextSave: save,
+				reason: "line-input",
+				ref: {
+					itemId: "item:twig",
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+					quantity: 2,
+				},
+			}),
+		);
+
+		expect(save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(events).toMatchObject([
+			{
+				from: {
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+					nextQuantity: 1,
+					previousQuantity: 3,
+					quantity: 2,
+				},
+				itemId: "item:twig",
+				reason: "line-input",
+				type: "item.consumed",
+			},
+		]);
+	});
+
 	it("preserves inventory stack creation time when only part of a passive stack is consumed", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -99,6 +148,43 @@ describe("consumeResolvedInputRefFx", () => {
 });
 
 describe("resolveInputRefsFx", () => {
+	it("resolves partial quantities from board stacks", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			quantity: 3,
+			x: 1,
+			y: 0,
+		};
+
+		const result = runFx(
+			resolveInputRefsFx({
+				inputRefs: [
+					{
+						itemInstanceId: "item-instance:2",
+						kind: "board",
+						quantity: 2,
+					},
+				],
+				save,
+			}),
+		);
+
+		expect(result).toEqual([
+			{
+				itemId: "item:twig",
+				itemInstanceId: "item-instance:2",
+				kind: "board",
+				quantity: 2,
+			},
+		]);
+	});
+
 	it("rejects board inputs with preservable runtime state", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

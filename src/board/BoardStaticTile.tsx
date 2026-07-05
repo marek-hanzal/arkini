@@ -7,21 +7,25 @@ export namespace BoardStaticTile {
 	export interface Props {
 		assetProgress?: number;
 		itemId: ItemId;
+		quantity?: number;
 	}
 }
 
-export const BoardStaticTile = memo(({ assetProgress, itemId }: BoardStaticTile.Props) => {
-	const item = useGameItemView(itemId);
+export const BoardStaticTile = memo(
+	({ assetProgress, itemId, quantity }: BoardStaticTile.Props) => {
+		const item = useGameItemView(itemId);
 
-	if (!item) return null;
+		if (!item) return null;
 
-	return (
-		<div className="h-full w-full">
-			<GameItemView
-				assetProgress={assetProgress}
-				item={item}
-				variant="board"
-			/>
-		</div>
-	);
-});
+		return (
+			<div className="h-full w-full">
+				<GameItemView
+					assetProgress={assetProgress}
+					item={item}
+					quantity={quantity}
+					variant="board"
+				/>
+			</div>
+		);
+	},
+);

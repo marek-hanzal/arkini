@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
@@ -74,6 +75,9 @@ const pushBoardItemInventoryTransferEventsFx = Effect.fn(
 		yield* createBoardItemConsumedEventFx({
 			itemId: item.itemId,
 			itemInstanceId: item.id,
+			nextQuantity: 0,
+			previousQuantity: readGameSaveBoardItemQuantity(item),
+			quantity: readGameSaveBoardItemQuantity(item),
 			reason,
 		}),
 	);

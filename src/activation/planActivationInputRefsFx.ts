@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import { isBoardItemConsumableAsInput } from "~/activation/isBoardItemConsumableAsInput";
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import { type GameItemQuantityIndex, readGameItemQuantity } from "~/quantity/GameItemQuantityIndex";
@@ -22,7 +23,7 @@ export namespace planActivationInputRefsFx {
 
 type ActivationInputPlannerState = {
 	inputRefs: GameActionItemRef[];
-	reservedBoardItemIds: Set<string>;
+	reservedBoardItemQuantities: Record<string, number>;
 	reservedInventorySlotQuantities: number[];
 };
 
@@ -33,7 +34,7 @@ type ActivationInputPlannerScope = Omit<planActivationInputRefsFx.Props, "exclud
 
 const createActivationInputPlannerState = (): ActivationInputPlannerState => ({
 	inputRefs: [],
-	reservedBoardItemIds: new Set<string>(),
+	reservedBoardItemQuantities: {},
 	reservedInventorySlotQuantities: [],
 });
 
@@ -72,7 +73,10 @@ const appendBoardActivationInputRefsFx = Effect.fn("appendBoardActivationInputRe
 		if (remainingQuantity <= 0) break;
 		if (scope.excludedBoardItemIds.has(boardItem.id)) continue;
 		if (boardItem.itemId !== input.itemId) continue;
-		if (scope.state.reservedBoardItemIds.has(boardItem.id)) continue;
+		const reservedQuantity = scope.state.reservedBoardItemQuantities[boardItem.id] ?? 0;
+		const availableQuantity = readGameSaveBoardItemQuantity(boardItem) - reservedQuantity;
+		const quantity = Math.min(remainingQuantity, availableQuantity);
+		if (quantity <= 0) continue;
 		if (
 			!isBoardItemConsumableAsInput({
 				itemInstanceId: boardItem.id,
@@ -82,12 +86,13 @@ const appendBoardActivationInputRefsFx = Effect.fn("appendBoardActivationInputRe
 			continue;
 		}
 
-		scope.state.reservedBoardItemIds.add(boardItem.id);
+		scope.state.reservedBoardItemQuantities[boardItem.id] = reservedQuantity + quantity;
 		scope.state.inputRefs.push({
 			itemInstanceId: boardItem.id,
 			kind: "board",
+			quantity,
 		});
-		remainingQuantity -= 1;
+		remainingQuantity -= quantity;
 	}
 
 	return remainingQuantity;

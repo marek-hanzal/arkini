@@ -3,7 +3,7 @@ export type GameActionResolvedInputRef =
 			kind: "board";
 			itemId: string;
 			itemInstanceId: string;
-			quantity: 1;
+			quantity: number;
 	  }
 	| {
 			kind: "inventory";

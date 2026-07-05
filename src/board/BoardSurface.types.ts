@@ -19,5 +19,6 @@ export namespace BoardSurface {
 				assetProgress?: number;
 				kind: "static-item";
 				itemId: ItemId;
+				quantity?: number;
 		  };
 }

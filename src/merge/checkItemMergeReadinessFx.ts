@@ -5,6 +5,7 @@ import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameMergeRuleDefinition } from "~/config/GameItemCapabilities";
@@ -131,6 +132,19 @@ const assertMergeResultBoardCapacityFx = Effect.fn(
 	);
 });
 
+const assertMergeTargetSingleQuantityFx = Effect.fn(
+	"checkItemMergeReadinessFx.assertMergeTargetSingleQuantityFx",
+)(function* ({ target }: ItemMergeReadinessScope) {
+	if (readGameSaveBoardItemQuantity(target) === 1) return;
+
+	return yield* Effect.fail(
+		GameEngineError.actionRejected(
+			"unsupported_target",
+			"Stacked board targets cannot be replaced by merge.",
+		),
+	);
+});
+
 const assertMergeTargetReplaceableFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeTargetReplaceableFx",
 )(function* ({ save, target }: ItemMergeReadinessScope) {
@@ -163,6 +177,7 @@ const assertMergeResultReadinessFx = Effect.fn(
 		...scope,
 		resultItemId: merge.resultItemId,
 	});
+	yield* assertMergeTargetSingleQuantityFx(scope);
 	yield* assertMergeTargetReplaceableFx(scope);
 });
 

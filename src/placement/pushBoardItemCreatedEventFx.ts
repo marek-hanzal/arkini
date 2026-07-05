@@ -9,6 +9,7 @@ export namespace pushBoardItemCreatedEventFx {
 		itemId: string;
 		itemInstanceId: string;
 		originItemInstanceId?: string;
+		quantity?: number;
 		reason: Extract<
 			GameEvent,
 			{
@@ -24,6 +25,7 @@ export const pushBoardItemCreatedEventFx = Effect.fn("pushBoardItemCreatedEventF
 	itemId,
 	itemInstanceId,
 	originItemInstanceId,
+	quantity = 1,
 	reason,
 }: pushBoardItemCreatedEventFx.Props) {
 	events.push({
@@ -33,6 +35,11 @@ export const pushBoardItemCreatedEventFx = Effect.fn("pushBoardItemCreatedEventF
 		to: {
 			kind: "board",
 			itemInstanceId,
+			...(quantity > 1
+				? {
+						quantity,
+					}
+				: {}),
 			x: cell.x,
 			y: cell.y,
 		},

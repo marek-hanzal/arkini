@@ -1,3 +1,4 @@
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -44,6 +45,7 @@ export const readRuntimeBoardItemViewFromGameSave = ({
 		}),
 		id: boardItem.id,
 		itemId: boardItem.itemId as ItemId,
+		quantity: readGameSaveBoardItemQuantity(boardItem),
 		state: {},
 		x: boardItem.x,
 		y: boardItem.y,

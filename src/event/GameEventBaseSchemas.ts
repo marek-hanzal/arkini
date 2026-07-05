@@ -46,6 +46,7 @@ export const GameEventPlacementTargetSchema = z.discriminatedUnion("kind", [
 		.object({
 			kind: z.literal("board"),
 			itemInstanceId: IdSchema,
+			quantity: PositiveIntegerSchema.optional(),
 			x: NonNegativeIntegerSchema,
 			y: NonNegativeIntegerSchema,
 		})
@@ -66,6 +67,9 @@ export const GameEventItemConsumedSourceSchema = z.discriminatedUnion("kind", [
 		.object({
 			kind: z.literal("board"),
 			itemInstanceId: IdSchema,
+			quantity: PositiveIntegerSchema.optional(),
+			previousQuantity: PositiveIntegerSchema.optional(),
+			nextQuantity: NonNegativeIntegerSchema.optional(),
 		})
 		.strict(),
 	z

@@ -1,8 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
-import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
-import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
+import { consumeBoardItemQuantityFx } from "~/board/consumeBoardItemQuantityFx";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
@@ -54,17 +53,16 @@ const consumeBoardInputRefFx = Effect.fn("consumeResolvedInputRefFx.consumeBoard
 			}
 		>;
 	}) {
-		yield* removeBoardItemFromSaveFx({
+		const consumed = yield* consumeBoardItemQuantityFx({
 			itemInstanceId: ref.itemInstanceId,
+			nextSave,
+			quantity: ref.quantity,
+			reason,
 			runtimeState: "remove",
-			save: nextSave,
 		});
+
 		yield* pushConsumedEventFx({
-			event: yield* createBoardItemConsumedEventFx({
-				itemId: ref.itemId,
-				itemInstanceId: ref.itemInstanceId,
-				reason,
-			}),
+			event: consumed.consumedEvent,
 			events,
 		});
 	},

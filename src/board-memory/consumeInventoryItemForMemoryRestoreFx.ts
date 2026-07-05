@@ -49,7 +49,15 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 
 const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 	"consumeInventoryStackForMemoryRestoreFx",
-)(function* ({ itemId, scope }: { itemId: string; scope: BoardMemoryActivationScope }) {
+)(function* ({
+	itemId,
+	quantity,
+	scope,
+}: {
+	itemId: string;
+	quantity: number;
+	scope: BoardMemoryActivationScope;
+}) {
 	const { nextSave } = scope;
 	const slotIndex = nextSave.inventory.slots.findIndex(
 		(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
@@ -58,7 +66,7 @@ const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 
 	const consumed = yield* consumeInventorySlotQuantityFx({
 		nextSave,
-		quantity: 1,
+		quantity,
 		reason: "memory-restore",
 		runtimeState: "remove-instance",
 		slotIndex,
@@ -90,6 +98,7 @@ export const consumeInventoryItemForMemoryRestoreFx = Effect.fn(
 			? undefined
 			: yield* consumeInventoryStackForMemoryRestoreFx({
 					itemId: memoryItem.itemId,
+					quantity: memoryItem.quantity ?? 1,
 					scope,
 				}))
 	);

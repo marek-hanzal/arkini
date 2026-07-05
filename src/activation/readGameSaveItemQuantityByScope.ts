@@ -1,3 +1,4 @@
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import type { GameItemQuantityScope } from "~/activation/GameItemQuantityScope";
@@ -19,7 +20,7 @@ export const readGameSaveItemQuantityByScope = ({
 
 	if (scope === "board" || scope === "board_or_inventory") {
 		for (const item of Object.values(save.board.items)) {
-			if (item.itemId === itemId) quantity += 1;
+			if (item.itemId === itemId) quantity += readGameSaveBoardItemQuantity(item);
 		}
 	}
 

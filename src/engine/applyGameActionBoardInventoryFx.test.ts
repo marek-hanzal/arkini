@@ -316,11 +316,10 @@ describe("applyGameActionFx BoardInventory", () => {
 				x: 1,
 				y: 0,
 			}),
-		).toBeDefined();
-		expect(result.save.inventory.slots[0]).toEqual({
-			itemId: "item:twig",
-			quantity: 1,
+		).toMatchObject({
+			quantity: 2,
 		});
+		expect(result.save.inventory.slots[0]).toBeNull();
 		expect(result.events).toMatchObject([
 			{
 				from: {
@@ -335,18 +334,9 @@ describe("applyGameActionFx BoardInventory", () => {
 			{
 				to: {
 					kind: "board",
+					quantity: 2,
 					x: 1,
 					y: 0,
-				},
-				type: "item.created",
-			},
-			{
-				to: {
-					kind: "inventory",
-					nextQuantity: 1,
-					previousQuantity: 0,
-					quantity: 1,
-					slotIndex: 0,
 				},
 				type: "item.created",
 			},

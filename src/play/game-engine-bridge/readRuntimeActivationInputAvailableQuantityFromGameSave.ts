@@ -1,4 +1,5 @@
 import { isBoardItemConsumableAsInput } from "~/activation/isBoardItemConsumableAsInput";
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 
@@ -15,15 +16,18 @@ export const readRuntimeActivationInputAvailableQuantityFromGameSave = ({
 	save,
 	targetItemInstanceId,
 }: readRuntimeActivationInputAvailableQuantityFromGameSave.Props) => {
-	const boardQuantity = Object.values(save.board.items).filter(
-		(item) =>
-			item.id !== targetItemInstanceId &&
-			item.itemId === itemId &&
-			isBoardItemConsumableAsInput({
+	const boardQuantity = Object.values(save.board.items).reduce((total, item) => {
+		if (item.id === targetItemInstanceId || item.itemId !== itemId) return total;
+		if (
+			!isBoardItemConsumableAsInput({
 				itemInstanceId: item.id,
 				save,
-			}),
-	).length;
+			})
+		) {
+			return total;
+		}
+		return total + readGameSaveBoardItemQuantity(item);
+	}, 0);
 	const inventoryQuantity = save.inventory.slots.reduce((total, slot) => {
 		if (!slot || slot.itemId !== itemId) return total;
 		return total + readGameSaveInventorySlotQuantity(slot);

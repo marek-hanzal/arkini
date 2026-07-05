@@ -12,7 +12,7 @@ const runPlacementEither = (props: placeGameSaveItemsFx.Props) =>
 	Effect.runSync(Effect.either(placeGameSaveItemsFx(props)));
 
 describe("placeGameSaveItemsFx", () => {
-	it("places loose board tiles first and stacks the remainder in inventory", () => {
+	it("places board output as a stack before spilling to inventory", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
 			config,
@@ -46,6 +46,7 @@ describe("placeGameSaveItemsFx", () => {
 			},
 			expect.objectContaining({
 				itemId: "item:twig",
+				quantity: 3,
 				x: 1,
 				y: 0,
 			}),
@@ -53,7 +54,7 @@ describe("placeGameSaveItemsFx", () => {
 		expect(result.save.inventory.slots).toEqual([
 			{
 				itemId: "item:twig",
-				quantity: 3,
+				quantity: 1,
 			},
 			null,
 		]);
@@ -63,11 +64,17 @@ describe("placeGameSaveItemsFx", () => {
 					return null;
 				}
 
-				return event.to.kind;
+				return event.to;
 			}),
 		).toEqual([
-			"board",
-			"inventory",
+			expect.objectContaining({
+				kind: "board",
+				quantity: 3,
+			}),
+			expect.objectContaining({
+				kind: "inventory",
+				quantity: 1,
+			}),
 		]);
 	});
 
@@ -129,22 +136,16 @@ describe("placeGameSaveItemsFx", () => {
 				}
 
 				return {
+					quantity: event.to.quantity,
 					x: event.to.x,
 					y: event.to.y,
 				};
 			}),
 		).toEqual([
 			{
+				quantity: 3,
 				x: 1,
 				y: 0,
-			},
-			{
-				x: 0,
-				y: 1,
-			},
-			{
-				x: 2,
-				y: 1,
 			},
 		]);
 	});

@@ -1,3 +1,4 @@
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import {
 	addSaveIssue,
 	type GameSaveValidationContext,
@@ -23,7 +24,8 @@ const validateSaveBoardItems = ({ config, ctx, save }: GameSaveValidationContext
 
 		boardItemCountByItemId.set(
 			boardItem.itemId,
-			(boardItemCountByItemId.get(boardItem.itemId) ?? 0) + 1,
+			(boardItemCountByItemId.get(boardItem.itemId) ?? 0) +
+				readGameSaveBoardItemQuantity(boardItem),
 		);
 
 		const boardItemDefinition = config.items[boardItem.itemId];
@@ -48,6 +50,22 @@ const validateSaveBoardItems = ({ config, ctx, save }: GameSaveValidationContext
 					"itemId",
 				],
 				`Item "${boardItem.itemId}" storage policy forbids board location.`,
+			);
+		}
+
+		if (
+			boardItemDefinition &&
+			readGameSaveBoardItemQuantity(boardItem) > boardItemDefinition.maxStackSize
+		) {
+			addSaveIssue(
+				ctx,
+				[
+					"board",
+					"items",
+					itemInstanceId,
+					"quantity",
+				],
+				`Board item quantity must be <= item maxStackSize (${boardItemDefinition.maxStackSize}).`,
 			);
 		}
 

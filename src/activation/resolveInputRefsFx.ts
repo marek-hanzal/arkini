@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameActionItemRefSchema } from "~/action/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -37,6 +38,7 @@ const assertUniqueInputRefFx = Effect.fn("resolveInputRefsFx.assertUniqueInputRe
 
 const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRefFx")(function* ({
 	itemInstanceId,
+	quantity = 1,
 	save,
 	seen,
 }: Extract<
@@ -62,6 +64,15 @@ const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRe
 		);
 	}
 
+	if (readGameSaveBoardItemQuantity(item) < quantity) {
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"input_unavailable",
+				`Board input "${itemInstanceId}" does not have enough quantity.`,
+			),
+		);
+	}
+
 	const stateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId,
 		save,
@@ -79,7 +90,7 @@ const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRe
 		kind: "board" as const,
 		itemId: item.itemId,
 		itemInstanceId: item.id,
-		quantity: 1,
+		quantity,
 	} satisfies GameActionResolvedInputRef;
 });
 

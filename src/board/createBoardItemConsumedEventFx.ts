@@ -5,6 +5,9 @@ export namespace createBoardItemConsumedEventFx {
 	export interface Props {
 		itemId: string;
 		itemInstanceId: string;
+		nextQuantity?: number;
+		previousQuantity?: number;
+		quantity?: number;
 		reason: Extract<
 			GameEvent,
 			{
@@ -15,11 +18,36 @@ export namespace createBoardItemConsumedEventFx {
 }
 
 export const createBoardItemConsumedEventFx = Effect.fn("createBoardItemConsumedEventFx")(
-	function* ({ itemId, itemInstanceId, reason }: createBoardItemConsumedEventFx.Props) {
+	function* ({
+		itemId,
+		itemInstanceId,
+		nextQuantity,
+		previousQuantity,
+		quantity = 1,
+		reason,
+	}: createBoardItemConsumedEventFx.Props) {
+		const shouldIncludeQuantity =
+			quantity > 1 || previousQuantity !== undefined || nextQuantity !== undefined;
+
 		return {
 			from: {
 				kind: "board",
 				itemInstanceId,
+				...(shouldIncludeQuantity
+					? {
+							quantity,
+						}
+					: {}),
+				...(previousQuantity !== undefined
+					? {
+							previousQuantity,
+						}
+					: {}),
+				...(nextQuantity !== undefined
+					? {
+							nextQuantity,
+						}
+					: {}),
 			},
 			itemId,
 			reason,

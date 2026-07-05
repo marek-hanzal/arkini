@@ -1,3 +1,4 @@
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameEffect } from "~/config/readGameConfigEffects";
 import type { GameSave, GameSaveInventorySlot } from "~/engine/model/GameSaveSchema";
@@ -40,18 +41,21 @@ const readPassiveBoardSources = ({
 				return [];
 			}
 
-			return [
+			return Array.from(
 				{
+					length: readGameSaveBoardItemQuantity(item),
+				},
+				(_, quantityIndex) => ({
 					effect,
 					effectId: effect.id,
 					kind: "passive" as const,
 					sourceCreatedAtMs: item.createdAtMs ?? 0,
-					sourceId: item.id,
+					sourceId: `${item.id}:${quantityIndex}`,
 					sourceItemInstanceId: item.id,
 					sourceLocation: "board" as const,
 					startAtMs: item.createdAtMs ?? 0,
-				},
-			];
+				}),
+			);
 		});
 	});
 

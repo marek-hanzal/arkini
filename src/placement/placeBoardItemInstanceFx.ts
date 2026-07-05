@@ -13,6 +13,7 @@ export namespace placeBoardItemInstanceFx {
 		events: GameEvent[];
 		itemId: string;
 		itemInstanceId?: string;
+		quantity?: number;
 		originItemInstanceId?: string;
 		reason: Extract<
 			GameEvent,
@@ -31,6 +32,7 @@ export const placeBoardItemInstanceFx = Effect.fn("placeBoardItemInstanceFx")(fu
 	itemId,
 	itemInstanceId,
 	originItemInstanceId,
+	quantity = 1,
 	reason,
 	save,
 }: placeBoardItemInstanceFx.Props) {
@@ -44,6 +46,11 @@ export const placeBoardItemInstanceFx = Effect.fn("placeBoardItemInstanceFx")(fu
 				: {}),
 			id: placedItemInstanceId,
 			itemId,
+			...(quantity > 1
+				? {
+						quantity,
+					}
+				: {}),
 			x: cell.x,
 			y: cell.y,
 		},
@@ -54,6 +61,7 @@ export const placeBoardItemInstanceFx = Effect.fn("placeBoardItemInstanceFx")(fu
 		events,
 		itemId,
 		itemInstanceId: placedItemInstanceId,
+		quantity,
 		originItemInstanceId,
 		reason,
 	});

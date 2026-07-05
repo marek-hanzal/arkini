@@ -43,6 +43,7 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayo
 			events,
 			itemId: memoryItem.itemId,
 			itemInstanceId,
+			quantity: memoryItem.quantity ?? 1,
 			originItemInstanceId: action.boardItemId,
 			reason: "memory-restore",
 			save: nextSave,

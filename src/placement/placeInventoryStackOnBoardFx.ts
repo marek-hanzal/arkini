@@ -70,6 +70,7 @@ const placeInventoryStackExactlyFx = Effect.fn("placeInventoryStackExactlyFx")(f
 		createdAtMs: state.placedCreatedAtMs,
 		events,
 		itemId: state.itemId,
+		quantity: state.quantity,
 		reason: "inventory-placement",
 		save: state.nextSave,
 	});

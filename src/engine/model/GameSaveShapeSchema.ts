@@ -12,6 +12,7 @@ const GameSaveBoardItemSchema = z
 		createdAtMs: GameInstantMsSchema.optional(),
 		id: IdSchema,
 		itemId: IdSchema,
+		quantity: PositiveIntegerSchema.optional(),
 		x: NonNegativeIntegerSchema,
 		y: NonNegativeIntegerSchema,
 	})
@@ -178,6 +179,7 @@ const GameSaveBoardMemoryLayoutItemSchema = z
 	.object({
 		itemId: IdSchema,
 		itemInstanceId: IdSchema.optional(),
+		quantity: PositiveIntegerSchema.optional(),
 		x: NonNegativeIntegerSchema,
 		y: NonNegativeIntegerSchema,
 	})

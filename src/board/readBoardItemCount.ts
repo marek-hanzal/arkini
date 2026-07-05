@@ -1,3 +1,4 @@
+import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace readBoardItemCount {
@@ -17,7 +18,7 @@ export const readBoardItemCount = ({
 
 	for (const boardItem of Object.values(save.board.items)) {
 		if (ignoredBoardItemInstanceIds.has(boardItem.id)) continue;
-		if (boardItem.itemId === itemId) count += 1;
+		if (boardItem.itemId === itemId) count += readGameSaveBoardItemQuantity(boardItem);
 	}
 
 	return count;

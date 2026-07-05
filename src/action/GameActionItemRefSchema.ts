@@ -9,6 +9,7 @@ export const GameActionItemRefSchema = z.discriminatedUnion("kind", [
 		.object({
 			kind: z.literal("board"),
 			itemInstanceId: IdSchema,
+			quantity: PositiveIntegerSchema.optional(),
 		})
 		.strict(),
 	z

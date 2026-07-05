@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
+import { planBoardStackItemsFx } from "~/placement/planBoardStackItemsFx";
 import { planEmptyBoardCellsFx } from "~/placement/planEmptyBoardCellsFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import type {
@@ -18,6 +19,20 @@ export const readSingleBoardPlacementTargetFx = Effect.fn("readSingleBoardPlacem
 		if (maxCountCapacity <= 0) {
 			return {
 				type: "board:max-count",
+			} satisfies BoardPlacementTarget;
+		}
+
+		const [stackTarget] = yield* planBoardStackItemsFx({
+			config: scope.config,
+			freedBoardItemInstanceIds: scope.freedBoardItemInstanceIds,
+			itemId: scope.item.itemId,
+			save: scope.save,
+			seedCell: scope.seedCell,
+		});
+		if (stackTarget) {
+			return {
+				itemInstanceId: stackTarget.id,
+				type: "stack",
 			} satisfies BoardPlacementTarget;
 		}
 

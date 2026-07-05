@@ -1,7 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { BoardCell } from "~/board/BoardCellPosition";
+import { addBoardItemQuantityFx } from "~/board/addBoardItemQuantityFx";
 import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
+import { readBoardItemStackCapacity } from "~/board/readBoardItemStackCapacity";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { readSingleBoardPlacementTargetFx } from "~/placement/readSingleBoardPlacementTargetFx";
 import { readSingleItemBoardStorageAllowed } from "~/placement/readSinglePlacementStorageAllowed";
@@ -31,6 +33,35 @@ const placeSingleBoardItemAtCellFx = Effect.fn("placeSingleBoardItemAtCellFx")(f
 	});
 });
 
+const placeSingleBoardItemIntoStackFx = Effect.fn("placeSingleBoardItemIntoStackFx")(function* ({
+	quantity,
+	scope,
+	targetItemInstanceId,
+}: {
+	quantity: number;
+	scope: SingleItemPlacementScope;
+	targetItemInstanceId: string;
+}) {
+	const added = yield* addBoardItemQuantityFx({
+		itemInstanceId: targetItemInstanceId,
+		quantity,
+		save: scope.save,
+	});
+	scope.events.push({
+		itemId: scope.item.itemId,
+		originItemInstanceId: scope.item.originItemInstanceId,
+		reason: scope.item.reason,
+		to: {
+			itemInstanceId: targetItemInstanceId,
+			kind: "board",
+			quantity,
+			x: added.item.x,
+			y: added.item.y,
+		},
+		type: "item.created",
+	});
+});
+
 export const placeSingleBoardCopiesUntilBlockedFx = Effect.fn(
 	"placeSingleBoardCopiesUntilBlockedFx",
 )(function* (scope: SingleItemPlacementScope) {
@@ -47,13 +78,34 @@ export const placeSingleBoardCopiesUntilBlockedFx = Effect.fn(
 			itemId: scope.item.itemId,
 			save: scope.save,
 		});
+		const target = yield* readSingleBoardPlacementTargetFx(scope);
+		const targetStackCapacity =
+			target.type === "stack"
+				? readBoardItemStackCapacity({
+						config: scope.config,
+						item: scope.save.board.items[target.itemInstanceId],
+					})
+				: scope.itemDefinition.maxStackSize;
 		const placedQuantity = Math.min(
 			progress.remainingQuantity,
-			scope.itemDefinition.maxStackSize,
+			targetStackCapacity,
 			maxCountCapacity,
 		);
-		const target = yield* readSingleBoardPlacementTargetFx(scope);
 		const placed = yield* match(target)
+			.with(
+				{
+					type: "stack",
+				},
+				({ itemInstanceId }) =>
+					Effect.gen(function* () {
+						yield* placeSingleBoardItemIntoStackFx({
+							quantity: placedQuantity,
+							scope,
+							targetItemInstanceId: itemInstanceId,
+						});
+						return true;
+					}),
+			)
 			.with(
 				{
 					type: "cell",

@@ -27,6 +27,10 @@ export type BoardPlacementStopReason = "board:full" | "board:max-count";
 
 export type BoardPlacementTarget =
 	| {
+			itemInstanceId: string;
+			type: "stack";
+	  }
+	| {
 			cell: BoardCell;
 			type: "cell";
 	  }

@@ -78,6 +78,58 @@ describe("placeGameSaveItemsFx", () => {
 		]);
 	});
 
+	it("stacks board output into existing board stacks before using empty cells", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			quantity: 2,
+			x: 1,
+			y: 0,
+		};
+
+		const result = runPlacement({
+			config,
+			items: [
+				{
+					itemId: "item:twig",
+					quantity: 2,
+					reason: "line-output",
+				},
+			],
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			quantity: 3,
+			x: 1,
+			y: 0,
+		});
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(
+			result.events.filter((event) => event.type === "item.created").map((event) => event.to),
+		).toEqual([
+			expect.objectContaining({
+				itemInstanceId: "item-instance:2",
+				kind: "board",
+				quantity: 1,
+			}),
+			expect.objectContaining({
+				kind: "inventory",
+				quantity: 1,
+			}),
+		]);
+	});
+
 	it("places board output near a provided seed cell before using global scan order", () => {
 		const config = createEngineTestConfig({
 			game: {

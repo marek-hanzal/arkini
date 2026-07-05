@@ -1,6 +1,7 @@
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
+import { appendBoardStackCreatedVisuals } from "~/play/game-engine-visual/appendBoardStackCreatedVisuals";
 import { createGameVisualCreatedGroupId } from "~/play/game-engine-visual/createGameVisualCreatedGroupId";
 import { gameVisualMotionSettlementDelayMs } from "~/play/game-engine-visual/gameVisualMotionSettlementDelayMs";
 import { GameVisualMotion } from "~/play/game-engine-visual/GameVisualMotion";
@@ -20,6 +21,7 @@ export namespace appendItemCreatedVisuals {
 		currentBoard: BoardView | undefined;
 		currentInventory: InventoryView | undefined;
 		event: CreatedEvent;
+		previousBoard: BoardView | undefined;
 		plan: GameEngineVisualPlanDraft;
 		sequenceIndex: number;
 	}
@@ -30,9 +32,22 @@ export const appendItemCreatedVisuals = ({
 	currentInventory,
 	event,
 	plan,
+	previousBoard,
 	sequenceIndex,
 }: appendItemCreatedVisuals.Props) => {
 	if (event.to.kind === "board") {
+		if (
+			appendBoardStackCreatedVisuals({
+				currentBoard,
+				event,
+				plan,
+				previousBoard,
+				sequenceIndex,
+			})
+		) {
+			return;
+		}
+
 		if (!currentBoard?.byId[event.to.itemInstanceId]) return;
 
 		const motion = GameVisualMotion.sequenceFadeIn({

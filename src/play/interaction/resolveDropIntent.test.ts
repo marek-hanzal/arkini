@@ -72,7 +72,7 @@ describe("resolveDropIntent", () => {
 			type: "swap",
 		});
 	});
-	it("keeps regular merge as the first merge-like board interaction", () => {
+	it("keeps stack as merge-like feedback for stackable same-item board interaction", () => {
 		expect(
 			resolveDropIntent({
 				config,
@@ -83,7 +83,6 @@ describe("resolveDropIntent", () => {
 				}),
 			}),
 		).toEqual({
-			resultItemId: "item:plank",
 			type: "merge",
 		});
 	});

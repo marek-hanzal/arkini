@@ -24,6 +24,7 @@ export const appendItemCreatedEventVisuals = (
 		currentBoard: context.currentBoard,
 		currentInventory: context.currentInventory,
 		event,
+		previousBoard: context.previousBoard,
 		plan: context.plan,
 		sequenceIndex,
 	});

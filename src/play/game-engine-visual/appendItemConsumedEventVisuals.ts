@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 import type { GameEventOfType } from "~/event/GameEventOfType";
 import { appendActivationInputAutoFillEventVisuals } from "~/play/game-engine-visual/appendActivationInputAutoFillEventVisuals";
 import { appendBoardMemoryStoreEventVisuals } from "~/play/game-engine-visual/appendBoardMemoryStoreEventVisuals";
+import { appendBoardStackConsumedEventVisuals } from "~/play/game-engine-visual/appendBoardStackConsumedEventVisuals";
 import { appendMergeSourceEventVisuals } from "~/play/game-engine-visual/appendMergeSourceEventVisuals";
 import type { GameEngineVisualPlanContext } from "~/play/game-engine-visual/GameEngineVisualPlanContext";
 import { ignoreVisualEvent } from "~/play/game-engine-visual/ignoreVisualEvent";
@@ -27,6 +28,13 @@ export const appendItemConsumedEventVisuals = ({
 				index,
 			}),
 		)
+		.with("board-stack", () =>
+			appendBoardStackConsumedEventVisuals({
+				context,
+				event,
+				index,
+			}),
+		)
 		.with("producer-input-auto-fill", "craft-input-auto-fill", () =>
 			appendActivationInputAutoFillEventVisuals({
 				context,
@@ -41,7 +49,6 @@ export const appendItemConsumedEventVisuals = ({
 			"craft-input-store",
 			"inventory-placement",
 			"board-stash",
-			"board-stack",
 			"remove-tool",
 			"memory-restore",
 			() => false,

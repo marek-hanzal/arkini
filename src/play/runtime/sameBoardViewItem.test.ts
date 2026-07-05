@@ -12,6 +12,18 @@ const createBoardViewItem = (overrides: Partial<BoardViewItem> = {}): BoardViewI
 });
 
 describe("sameBoardViewItem", () => {
+	it("treats quantity changes as board view changes", () => {
+		expect(
+			sameBoardViewItem(
+				createBoardViewItem({
+					quantity: 2,
+				}),
+				createBoardViewItem({
+					quantity: 3,
+				}),
+			),
+		).toBe(false);
+	});
 	it("treats capacity changes as board view changes", () => {
 		expect(
 			sameBoardViewItem(

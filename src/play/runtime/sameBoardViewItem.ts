@@ -9,6 +9,7 @@ export const sameBoardViewItem = (left: BoardViewItem | null, right: BoardViewIt
 	return (
 		left.id === right.id &&
 		left.itemId === right.itemId &&
+		left.quantity === right.quantity &&
 		left.x === right.x &&
 		left.y === right.y &&
 		stableStringify(left.activation) === stableStringify(right.activation) &&

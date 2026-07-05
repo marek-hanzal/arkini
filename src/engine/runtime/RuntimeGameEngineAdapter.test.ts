@@ -122,13 +122,11 @@ describe("RuntimeGameEngineAdapter", () => {
 		expect(result.events.map((event) => event.type)).toEqual([
 			"line.completed",
 			"item.created",
-			"item.created",
 		]);
 		expect(adapter.readSnapshot().save.producerJobs).toEqual({});
 		expect(emitted).toEqual([
 			"line.started",
 			"line.completed",
-			"item.created",
 			"item.created",
 		]);
 	});

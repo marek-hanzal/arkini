@@ -89,11 +89,10 @@ describe("applyGameActionFx Stash", () => {
 				x: 1,
 				y: 0,
 			}),
-		).toBeDefined();
-		expect(result.save.inventory.slots[0]).toEqual({
-			itemId: "item:twig",
-			quantity: 1,
+		).toMatchObject({
+			quantity: 2,
 		});
+		expect(result.save.inventory.slots[0]).toBeNull();
 		expect(result.events).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
@@ -129,11 +128,6 @@ describe("applyGameActionFx Stash", () => {
 					reason: "producer-depleted",
 					toItemId: "item:twig",
 					type: "item.replaced",
-				}),
-				expect.objectContaining({
-					itemId: "item:twig",
-					reason: "line-output",
-					type: "item.created",
 				}),
 			]),
 		);

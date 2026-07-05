@@ -632,11 +632,10 @@ describe("applyGameActionFx Producer inputs", () => {
 				x: 1,
 				y: 0,
 			}),
-		).toBeDefined();
-		expect(result.save.inventory.slots[0]).toEqual({
-			itemId: "item:twig",
-			quantity: 1,
+		).toMatchObject({
+			quantity: 2,
 		});
+		expect(result.save.inventory.slots[0]).toBeNull();
 		expect(result.events).toMatchObject([
 			{
 				itemId: "item:twig",
@@ -650,18 +649,9 @@ describe("applyGameActionFx Producer inputs", () => {
 				reason: "producer-input-withdraw",
 				to: {
 					kind: "board",
+					quantity: 2,
 					x: 1,
 					y: 0,
-				},
-				type: "item.created",
-			},
-			{
-				itemId: "item:twig",
-				reason: "producer-input-withdraw",
-				to: {
-					kind: "inventory",
-					quantity: 1,
-					slotIndex: 0,
 				},
 				type: "item.created",
 			},

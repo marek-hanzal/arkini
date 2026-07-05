@@ -6,6 +6,13 @@ import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 
 export type ProducerCompletionEvents = GameEngineCompletionResult["events"];
 
+export const createMissingProducerJobResult = ({ save }: { save: GameSave }) =>
+	({
+		events: [],
+		save,
+		type: "completed" as const,
+	}) satisfies GameEngineCompletionResult;
+
 export const createLineCompletedEvent = ({
 	job,
 	nowMs,

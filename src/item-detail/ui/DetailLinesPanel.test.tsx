@@ -439,6 +439,50 @@ describe("DetailLinesPanel", () => {
 		expect(html).toContain("1/1");
 	});
 
+	it("renders resource flow as inputs then arrow then outputs", () => {
+		const html = renderToStaticMarkup(
+			<DetailLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							inputItemIds: [
+								"item:water",
+							],
+							inputs: [
+								{
+									available: 2,
+									capacity: 2,
+									consume: true,
+									itemId: "item:water",
+									quantity: 2,
+									stored: 0,
+								},
+							],
+							inputsAvailable: true,
+							inputsReady: false,
+							name: "Stone Block",
+							outputs: [
+								{
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 7,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain('data-ui="detail line flow arrow"');
+		expect(html.indexOf("Inputs")).toBeLessThan(html.indexOf("Water"));
+		expect(html.indexOf("Water")).toBeLessThan(html.indexOf("↓"));
+		expect(html.indexOf("↓")).toBeLessThan(html.indexOf("Outputs"));
+		expect(html.indexOf("Outputs")).toBeLessThan(html.indexOf("Grain"));
+	});
+
 	it("uses short default labels and missing-item copy", () => {
 		const html = renderToStaticMarkup(
 			<DetailLinesPanel

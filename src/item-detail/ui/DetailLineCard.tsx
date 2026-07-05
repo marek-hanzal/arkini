@@ -14,6 +14,18 @@ import {
 import { readDetailLineEffectPolarity } from "~/item-detail/ui/readDetailLineEffectPolarity";
 import { readDetailLineEffectRequirementSummary } from "~/item-detail/ui/readDetailLineEffectRequirementSummary";
 
+const DetailLineFlowArrow: FC = () => (
+	<div
+		aria-hidden="true"
+		className="flex items-center justify-center py-0.5"
+		data-ui="detail line flow arrow"
+	>
+		<span className="rounded-full border border-fuchsia-300/35 bg-fuchsia-300/12 px-3 py-1 text-sm font-black leading-none text-fuchsia-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
+			↓
+		</span>
+	</div>
+);
+
 export const DetailLineCard: FC<{
 	items: ItemCatalogView;
 	model: DetailLineModel;
@@ -25,6 +37,8 @@ export const DetailLineCard: FC<{
 	const effectBonusLines = line.effectBonusLines ?? [];
 	const effectRequirements = readDetailLineEffectRequirementSummary(line);
 	const showInputs = !line.inProgress;
+	const showOutputs = (line.outputs ?? []).length > 0;
+	const showFlowArrow = showInputs && line.inputs.length > 0 && showOutputs;
 
 	return (
 		<article className="min-w-0">
@@ -69,16 +83,17 @@ export const DetailLineCard: FC<{
 					items={items}
 					limits={targetLimits}
 				/>
-				<DetailLineOutputs
-					items={items}
-					line={line}
-				/>
 				{showInputs ? (
 					<DetailLineInputs
 						items={items}
 						model={model}
 					/>
 				) : null}
+				{showFlowArrow ? <DetailLineFlowArrow /> : null}
+				<DetailLineOutputs
+					items={items}
+					line={line}
+				/>
 			</div>
 
 			<DetailLineActions control={control} />

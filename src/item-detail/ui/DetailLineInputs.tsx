@@ -34,61 +34,64 @@ export const DetailLineInputs: FC<{
 	if (line.inputs.length === 0) return null;
 
 	return (
-		<div className="grid gap-2">
-			{line.inputs.map((input) => {
-				const inputItem = items[input.itemId];
-				const fillableQuantity = readActivationInputViewFillableQuantity(input);
-				const ready = readActivationInputViewReady(input);
-				const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
-				const meta = joinTextParts([
-					readActivationInputViewLabel(input),
-					fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined,
-					input.capacity > input.quantity ? `cap ${input.capacity}` : undefined,
-				]);
+		<div className="rounded-sm bg-ak-surface/80 px-2.5 py-2 text-xs">
+			<p className="font-black text-ak-text">Inputs</p>
+			<div className="mt-2 grid gap-2">
+				{line.inputs.map((input) => {
+					const inputItem = items[input.itemId];
+					const fillableQuantity = readActivationInputViewFillableQuantity(input);
+					const ready = readActivationInputViewReady(input);
+					const withdrawAction = control.withdrawInputActionsByItemId[input.itemId];
+					const meta = joinTextParts([
+						readActivationInputViewLabel(input),
+						fillableQuantity > 0 ? `+${fillableQuantity} available` : undefined,
+						input.capacity > input.quantity ? `cap ${input.capacity}` : undefined,
+					]);
 
-				return (
-					<div
-						key={input.itemId}
-						className={readProducerInputRowClassName({
-							available: fillableQuantity > 0,
-							fulfilled: ready,
-						})}
-					>
-						<ItemInlineAsset
-							item={inputItem}
-							className="h-9 w-9"
-						/>
-						<div className="min-w-0 flex-1">
-							<p className="break-words font-black text-ak-text">
-								{inputItem?.name ??
-									readDetailItemName({
-										itemId: input.itemId,
-										items,
-									})}
-							</p>
-							<p
-								className={cn(
-									"mt-0.5 break-words leading-5",
-									ready ? "font-bold text-emerald-300" : "text-ak-text-muted",
-								)}
-							>
-								{meta}
-							</p>
+					return (
+						<div
+							key={input.itemId}
+							className={readProducerInputRowClassName({
+								available: fillableQuantity > 0,
+								fulfilled: ready,
+							})}
+						>
+							<ItemInlineAsset
+								item={inputItem}
+								className="h-9 w-9"
+							/>
+							<div className="min-w-0 flex-1">
+								<p className="break-words font-black text-ak-text">
+									{inputItem?.name ??
+										readDetailItemName({
+											itemId: input.itemId,
+											items,
+										})}
+								</p>
+								<p
+									className={cn(
+										"mt-0.5 break-words leading-5",
+										ready ? "font-bold text-emerald-300" : "text-ak-text-muted",
+									)}
+								>
+									{meta}
+								</p>
+							</div>
+							{withdrawAction ? (
+								<UiButton
+									data-ui="withdraw action"
+									disabled={withdrawAction.disabled}
+									fullWidth={false}
+									tone={withdrawAction.tone}
+									onClick={withdrawAction.onClick}
+								>
+									{withdrawAction.label}
+								</UiButton>
+							) : null}
 						</div>
-						{withdrawAction ? (
-							<UiButton
-								data-ui="withdraw action"
-								disabled={withdrawAction.disabled}
-								fullWidth={false}
-								tone={withdrawAction.tone}
-								onClick={withdrawAction.onClick}
-							>
-								{withdrawAction.label}
-							</UiButton>
-						) : null}
-					</div>
-				);
-			})}
+					);
+				})}
+			</div>
 		</div>
 	);
 };

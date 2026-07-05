@@ -463,7 +463,15 @@ const readLimitedDepositSoftlockWarnings = (
 		...limitedDeposits.spentCapacityItemIds,
 	]
 		.filter((itemId) => riskyDepositIds.has(itemId))
-		.filter((itemId) => !hasSustainableDepositReplacement(config, itemId, sustainableItemIds))
+		.filter(
+			(itemId) =>
+				!hasSustainableDepositReplacement({
+					config,
+					itemId,
+					productionRules: limitedDeposits.productionRules,
+					sustainableItemIds,
+				}),
+		)
 		.map((itemId) => ({
 			code: "limited-deposit-softlock",
 			id: itemId,
@@ -498,25 +506,68 @@ const readSustainableItemIds = (productionRules: readonly ItemProductionRule[]) 
 	return sustainableItemIds;
 };
 
-const hasSustainableDepositReplacement = (
-	config: GameConfig,
-	itemId: string,
-	sustainableItemIds: ReadonlySet<string>,
-) => {
+const hasSustainableDepositReplacement = ({
+	config,
+	itemId,
+	productionRules,
+	sustainableItemIds,
+}: {
+	config: GameConfig;
+	itemId: string;
+	productionRules: readonly ItemProductionRule[];
+	sustainableItemIds: ReadonlySet<string>;
+}) => {
 	if (sustainableItemIds.has(itemId)) return true;
 
-	const visitedItemIds = new Set<string>();
-	let currentItemId: string | undefined = itemId;
+	const capacity: ItemCapacity | undefined = config.items[itemId]?.capacity;
+	if (!capacity || capacity.onDepleted !== "replace") return false;
 
-	while (currentItemId && !visitedItemIds.has(currentItemId)) {
-		visitedItemIds.add(currentItemId);
-		const capacity: ItemCapacity | undefined = config.items[currentItemId]?.capacity;
-		if (!capacity || capacity.onDepleted !== "replace") return false;
-		if (sustainableItemIds.has(capacity.replaceItemId)) return true;
-		currentItemId = capacity.replaceItemId;
+	return canReplacementRegrowItem({
+		itemId,
+		productionRules,
+		replaceItemId: capacity.replaceItemId,
+		sustainableItemIds,
+	});
+};
+
+const canReplacementRegrowItem = ({
+	itemId,
+	productionRules,
+	replaceItemId,
+	sustainableItemIds,
+}: {
+	itemId: string;
+	productionRules: readonly ItemProductionRule[];
+	replaceItemId: string;
+	sustainableItemIds: ReadonlySet<string>;
+}) => {
+	const availableItemIds = new Set([
+		...sustainableItemIds,
+		replaceItemId,
+	]);
+	let changed = true;
+
+	while (changed) {
+		if (availableItemIds.has(itemId)) return true;
+		changed = false;
+
+		for (const rule of productionRules) {
+			if (
+				![
+					...rule.dependencies,
+				].every((dependencyItemId) => availableItemIds.has(dependencyItemId))
+			)
+				continue;
+
+			for (const producedItemId of rule.producedItemIds) {
+				if (availableItemIds.has(producedItemId)) continue;
+				availableItemIds.add(producedItemId);
+				changed = true;
+			}
+		}
 	}
 
-	return false;
+	return availableItemIds.has(itemId);
 };
 
 const readUnusedRecordWarnings = (

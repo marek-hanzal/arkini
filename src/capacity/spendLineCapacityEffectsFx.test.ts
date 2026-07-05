@@ -170,6 +170,119 @@ describe("line capacity spend effects", () => {
 		);
 	});
 
+	it("replaces depleted capacity sources with their configured renewal item", () => {
+		const config = createEngineTestConfig({
+			items: {
+				"item:rock": {
+					capacity: {
+						max: 1,
+						onDepleted: "replace",
+						replaceItemId: "item:seed",
+					},
+					maxStackSize: 1,
+				},
+				"item:seed": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Seed",
+					maxStackSize: 10,
+					name: "Seed",
+					tags: [],
+					tier: 0,
+				},
+			},
+			lineOverrides: {
+				"line:test": {
+					effects: [
+						{
+							amount: 1,
+							display: "always",
+							items: {
+								anyOf: [
+									{
+										ids: [
+											"item:rock",
+										],
+									},
+								],
+							},
+							kind: "nearby.capacity.spend",
+							label: "Nearby rock capacity",
+							radius: 1,
+							selection: "nearest",
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:rock",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const rock = findBoardItem(save, {
+			itemId: "item:rock",
+			x: 1,
+			y: 0,
+		});
+		if (!rock) throw new Error("Missing rock fixture.");
+
+		const started = runAction({
+			action: {
+				inputRefs: [],
+				itemInstanceId: "item-instance:1",
+				lineId: "line:test",
+				type: "line.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(started.save.board.items[rock.id]).toEqual(
+			expect.objectContaining({
+				id: rock.id,
+				itemId: "item:seed",
+				x: 1,
+				y: 0,
+			}),
+		);
+		expect(started.save.itemCapacities[rock.id]).toBeUndefined();
+		expect(started.events).toEqual(
+			expect.arrayContaining([
+				{
+					atMs: 100,
+					itemId: "item:rock",
+					itemInstanceId: rock.id,
+					type: "item.capacity.depleted",
+				},
+				{
+					atMs: 100,
+					fromItemId: "item:rock",
+					itemInstanceId: rock.id,
+					reason: "capacity-depleted",
+					toItemId: "item:seed",
+					type: "item.replaced",
+				},
+			]),
+		);
+	});
+
 	it("rejects starting a capacity-backed line without a charged nearby source", () => {
 		const config = createCapacityTestConfig(1);
 		const save = runInitialSave({

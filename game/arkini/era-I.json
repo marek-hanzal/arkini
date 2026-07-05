@@ -243,7 +243,8 @@
 			"tier": 2,
 			"capacity": {
 				"max": 36,
-				"onDepleted": "remove"
+				"onDepleted": "replace",
+				"replaceItemId": "item:seed"
 			}
 		},
 		"item:log": {
@@ -289,7 +290,8 @@
 			"tier": 3,
 			"capacity": {
 				"max": 72,
-				"onDepleted": "remove"
+				"onDepleted": "replace",
+				"replaceItemId": "item:seed"
 			}
 		},
 		"item:seed": {
@@ -428,7 +430,8 @@
 			"tier": 1,
 			"capacity": {
 				"max": 18,
-				"onDepleted": "remove"
+				"onDepleted": "replace",
+				"replaceItemId": "item:seed"
 			},
 			"maxStackSize": 1
 		},

@@ -442,6 +442,133 @@ describe("auditGameConfig", () => {
 		);
 	});
 
+	it("does not warn about finite deposits that deplete into a sustainable regrowth item", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:tree", {
+			tags: [
+				"wood-source",
+			],
+		});
+		addLimitedDepositItem(config, "item:double-tree", {
+			tags: [
+				"wood-source",
+			],
+		});
+		addLimitedDepositItem(config, "item:micro-forest", {
+			tags: [
+				"wood-source",
+			],
+		});
+		config.items["item:tree"].capacity = {
+			max: 3,
+			onDepleted: "replace",
+			replaceItemId: "item:seed",
+		};
+		config.items["item:double-tree"].capacity = {
+			max: 6,
+			onDepleted: "replace",
+			replaceItemId: "item:seed",
+		};
+		config.items["item:micro-forest"].capacity = {
+			max: 9,
+			onDepleted: "replace",
+			replaceItemId: "item:seed",
+		};
+		config.items["item:seed"] = {
+			assetIds: [
+				"asset:item",
+			],
+			craft: {
+				durationMs: 1000,
+				inputs: [
+					{
+						consume: true,
+						itemId: "item:water",
+					},
+				],
+				resultItemId: "item:tree",
+			},
+			description: "Seed grown from water",
+			maxStackSize: 10,
+			name: "Seed",
+			tags: [],
+			tier: 0,
+		};
+		config.items["item:water"] = {
+			assetIds: [
+				"asset:item",
+			],
+			description: "Sustainable water",
+			maxStackSize: 10,
+			merges: [
+				{
+					resultItemId: "item:double-tree",
+					withItemId: "item:tree",
+				},
+				{
+					resultItemId: "item:micro-forest",
+					withItemId: "item:double-tree",
+				},
+			],
+			name: "Water",
+			tags: [],
+			tier: 0,
+		};
+		config.items["item:well"] = {
+			assetIds: [
+				"asset:item",
+			],
+			description: "Water source",
+			maxStackSize: 1,
+			name: "Well",
+			producer: {
+				lines: [
+					{
+						durationMs: 1000,
+						id: "line:well:water",
+						name: "Water",
+						output: [
+							{
+								itemId: "item:water",
+								type: "guaranteed",
+							},
+						],
+					},
+				],
+			},
+			tags: [],
+			tier: 0,
+		};
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:tree",
+				"item:double-tree",
+				"item:micro-forest",
+			]),
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:tree",
+			}),
+		);
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:double-tree",
+			}),
+		);
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-softlock",
+				id: "item:micro-forest",
+			}),
+		);
+	});
+
 	it("formats warnings for CLI output", () => {
 		const warnings = auditGameConfig(parseGameConfig(createConfigValue()));
 

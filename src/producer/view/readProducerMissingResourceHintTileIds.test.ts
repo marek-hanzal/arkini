@@ -165,6 +165,67 @@ describe("readProducerMissingResourceHintTileIds", () => {
 		).toEqual([]);
 	});
 
+	it("does not bounce producers when one board stack covers the missing input quantity", () => {
+		const target = item({
+			id: "target",
+			itemId: "item:target-producer",
+			line: line({
+				inputs: [
+					{
+						capacity: 4,
+						consume: true,
+						itemId: "item:stone",
+						quantity: 4,
+						stored: 0,
+					},
+				],
+				inputItemIds: [
+					"item:stone",
+				],
+			}),
+			x: 0,
+			y: 0,
+		});
+		const source = item({
+			id: "source",
+			itemId: "item:source-producer",
+			line: line({
+				outputs: [
+					{
+						enabled: true,
+						itemId: "item:stone",
+						kind: "guaranteed",
+						ownedQuantity: 0,
+						quantity: 1,
+					},
+				],
+				lineId: "line:source-stone",
+			}),
+			x: 1,
+			y: 0,
+		});
+		const stoneStack = {
+			...item({
+				id: "stone-stack",
+				itemId: "item:stone",
+				x: 2,
+				y: 0,
+			}),
+			quantity: 6,
+		};
+
+		expect(
+			readProducerMissingResourceHintTileIds({
+				board: board([
+					target,
+					source,
+					stoneStack,
+				]),
+				producerItem: target,
+			}),
+		).toEqual([]);
+	});
+
 	it("bounces producers for input items missing from the board", () => {
 		const target = item({
 			id: "target",

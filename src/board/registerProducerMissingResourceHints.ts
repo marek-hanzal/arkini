@@ -4,11 +4,14 @@ import { readProducerMissingResourceHintTileIds } from "~/producer/view/readProd
 
 export const registerProducerMissingResourceHints = ({
 	context,
+	lineId,
 }: {
 	context: BoardItemActivationContext;
+	lineId?: string;
 }) => {
 	const hintTileIds = readProducerMissingResourceHintTileIds({
 		board: context.liveBoard,
+		lineId,
 		producerItem: context.liveBoardItem,
 	});
 	if (hintTileIds.length === 0) return;

@@ -1,6 +1,7 @@
 import { readActivationInputRequiredQuantity } from "~/activation/readActivationInputRequiredQuantity";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
+import { readBoardViewItemQuantity } from "~/board/view/readBoardViewItemQuantity";
 import type { LineView } from "~/board/view/LineViewSchema";
 
 export namespace readProducerMissingResourceHintTileIds {
@@ -33,9 +34,13 @@ const readBoardItemQuantity = ({
 	itemId: string;
 	producerItemId: string;
 }) =>
-	board.items.filter(
-		(boardItem) => boardItem.id !== producerItemId && boardItem.itemId === itemId,
-	).length;
+	board.items.reduce(
+		(total, boardItem) =>
+			boardItem.id !== producerItemId && boardItem.itemId === itemId
+				? total + readBoardViewItemQuantity(boardItem)
+				: total,
+		0,
+	);
 
 const readInputItemIdsMissingOnBoard = ({
 	board,

@@ -24,6 +24,7 @@ const activateProducerLineFromBoardTap = ({
 	if (!lineId) return;
 	registerProducerMissingResourceHints({
 		context,
+		lineId,
 	});
 	dispatchBoardItemActivationRuntimeAction({
 		action: {

@@ -547,6 +547,98 @@ describe("createGameEngineVisualPlan", () => {
 		});
 	});
 
+	it("maps partial board stack auto-fill to a boomerang transient tile", () => {
+		const previousBoard = boardView([
+			{
+				id: "producer",
+				itemId: "item:producer",
+				state: {},
+				x: 0,
+				y: 0,
+			},
+			{
+				id: "source",
+				itemId: "item:twig",
+				quantity: 3,
+				state: {},
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		const plan = createGameEngineVisualPlan({
+			currentBoard: boardView([
+				{
+					id: "producer",
+					itemId: "item:producer",
+					state: {},
+					x: 0,
+					y: 0,
+				},
+				{
+					id: "source",
+					itemId: "item:twig",
+					quantity: 2,
+					state: {},
+					x: 1,
+					y: 0,
+				},
+			]),
+			currentInventory: undefined,
+			events: [
+				{
+					from: {
+						itemInstanceId: "source",
+						kind: "board",
+						nextQuantity: 2,
+						previousQuantity: 3,
+						quantity: 1,
+					},
+					itemId: "item:twig",
+					reason: "producer-input-auto-fill",
+					type: "item.consumed",
+				},
+				{
+					atMs: 1,
+					itemId: "item:twig",
+					itemInstanceId: "producer",
+					lineId: "line:test",
+					nextQuantity: 1,
+					previousQuantity: 0,
+					quantity: 1,
+					type: "producer_input.stored",
+				},
+			] satisfies GameEvent[],
+			previousBoard,
+		});
+
+		expect(plan.boardFeedbackRequests).toHaveLength(2);
+		expect(plan.boardFeedbackRequests[0]).toMatchObject({
+			tileId: "producer",
+		});
+		expect(plan.boardFeedbackRequests[1]).toMatchObject({
+			feedback: {
+				delayMs: 1400,
+				kind: "bounce",
+			},
+			tileId: "source",
+		});
+		expect(plan.boardTransientTilePlans[0]).toMatchObject({
+			request: {
+				exit: {
+					durationMs: 1400,
+					kind: "boomerang-to-tile",
+					toTileId: "producer",
+				},
+			},
+			tile: {
+				itemId: "item:twig",
+				quantity: 3,
+				slotId: "1:0",
+			},
+		});
+	});
+
 	it("maps auto-filled board stash input to a transient tile flying into the stash", () => {
 		const previousBoard = boardView([
 			{

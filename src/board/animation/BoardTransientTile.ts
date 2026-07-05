@@ -5,5 +5,6 @@ export interface BoardTransientTile {
 	assetProgress?: number;
 	groupId: string;
 	itemId: ItemId;
+	quantity?: number;
 	slotId: string;
 }

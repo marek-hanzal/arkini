@@ -12,9 +12,9 @@ export const DetailLineNoteList: FC<{
 		<div
 			className={cn(
 				"rounded-sm px-2.5 py-2 text-xs",
-				tone === "good" && "bg-emerald-400/12 text-emerald-50",
-				tone === "warn" && "bg-rose-400/14 text-rose-50",
-				tone === "neutral" && "bg-violet-300/10",
+				tone === "good" && "bg-emerald-100/85 text-emerald-900",
+				tone === "warn" && "bg-rose-100/90 text-rose-900",
+				tone === "neutral" && "bg-violet-100/70",
 			)}
 		>
 			<p className="font-black text-ak-text">{title}</p>

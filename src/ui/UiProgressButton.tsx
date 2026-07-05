@@ -34,7 +34,7 @@ export const UiProgressButton: FC<UiProgressButton.Props> = ({
 			{progressFillStyle !== undefined ? (
 				<span
 					aria-hidden
-					className="pointer-events-none absolute inset-0 origin-left bg-white/20 transition-transform duration-200 ease-linear"
+					className="pointer-events-none absolute inset-0 origin-left bg-white/35 transition-transform duration-200 ease-linear"
 					style={progressFillStyle}
 				/>
 			) : null}

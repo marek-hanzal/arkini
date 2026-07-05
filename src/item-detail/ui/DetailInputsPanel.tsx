@@ -70,8 +70,8 @@ export const DetailInputsPanel: FC<DetailInputsPanel.Props> = ({
 								className={cn(
 									"shrink-0 rounded-full border px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
 									ready
-										? "border-emerald-300/55 bg-emerald-400/18 text-emerald-100"
-										: "border-rose-300/55 bg-rose-400/18 text-rose-100",
+										? "border-emerald-300/70 bg-emerald-100/90 text-emerald-800"
+										: "border-rose-300/70 bg-rose-100/90 text-rose-800",
 								)}
 							>
 								{ready ? "Ready" : "Missing"}

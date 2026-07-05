@@ -16,10 +16,10 @@ const DetailOutputMetaBadge: FC<{
 		className={cn(
 			"rounded-full border px-2 py-1 text-[0.68rem] font-black leading-none shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
 			badge.one === "owned"
-				? "border-fuchsia-300/40 bg-fuchsia-300/16 text-fuchsia-50"
+				? "border-fuchsia-300/70 bg-fuchsia-300/16 text-fuchsia-900"
 				: badge.one === "warn"
-					? "border-rose-300/35 bg-rose-300/14 text-rose-100"
-					: "border-violet-200/20 bg-white/8 text-violet-50",
+					? "border-rose-300/35 bg-rose-300/14 text-rose-800"
+					: "border-violet-300/55 bg-white/70 text-violet-900",
 		)}
 	>
 		{badge.label}
@@ -32,7 +32,7 @@ const DetailOutputEffectLines: FC<{
 	if (effectLines.length === 0) return null;
 
 	return (
-		<ul className="mt-1.5 space-y-0.5 text-[0.72rem] leading-5 text-violet-100/78">
+		<ul className="mt-1.5 space-y-0.5 text-[0.72rem] leading-5 text-violet-800/78">
 			{effectLines.map((effectLine, effectLineIndex) => (
 				<li
 					key={`effect:${effectLineIndex}:${effectLine}`}
@@ -63,7 +63,7 @@ export const DetailLineOutputs: FC<{
 					return (
 						<div
 							key={`${line.lineId}:output:${row.itemId}`}
-							className="flex min-w-0 items-start gap-2.5 rounded-sm border border-violet-300/14 bg-black/10 px-2 py-2"
+							className="flex min-w-0 items-start gap-2.5 rounded-sm border border-violet-200/70 bg-white/45 px-2 py-2"
 						>
 							<ItemInlineAsset
 								item={outputItem}

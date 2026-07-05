@@ -57,8 +57,8 @@ export const BoardMemoryBusyShield: FC<BoardMemoryBusyShield.Props> = ({ operati
 				"absolute inset-0 transition-[opacity,backdrop-filter,background-color] duration-200 ease-out",
 				operation ? "pointer-events-auto" : "pointer-events-none",
 				visible
-					? "bg-[#10051a]/38 opacity-100 backdrop-blur-[1px]"
-					: "bg-[#10051a]/0 opacity-0 backdrop-blur-none",
+					? "bg-fuchsia-100/45 opacity-100 backdrop-blur-[1px]"
+					: "bg-fuchsia-100/0 opacity-0 backdrop-blur-none",
 			)}
 			style={{
 				zIndex: "var(--ak-layer-toast)",

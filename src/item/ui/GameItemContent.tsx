@@ -52,7 +52,7 @@ export const GameItemContent: FC<GameItemContent.Props> = memo(
 						{quantity}
 					</span>
 				) : capacityLabel ? (
-					<span className="absolute bottom-0 left-0 min-w-4 rounded-sm border border-white/15 bg-ak-surface/85 px-1 text-center text-[0.58rem] font-black text-ak-text shadow-sm backdrop-blur-sm">
+					<span className="absolute bottom-0 left-0 min-w-4 rounded-sm border border-violet-300/55 bg-white/80 px-1 text-center text-[0.58rem] font-black text-ak-text shadow-sm backdrop-blur-sm">
 						{capacityLabel}
 					</span>
 				) : item.label ? (

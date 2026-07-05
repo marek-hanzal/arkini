@@ -55,7 +55,7 @@ export const NukeSaveSheet: FC<NukeSaveSheet.Props> = ({ onClose }) => {
 						</UiButton>
 					</div>
 					{status === "failed" ? (
-						<p className="mt-3 text-sm font-semibold text-rose-300">
+						<p className="mt-3 text-sm font-semibold text-rose-700">
 							Nuke failed. Check the console, because naturally even deletion can
 							break.
 						</p>

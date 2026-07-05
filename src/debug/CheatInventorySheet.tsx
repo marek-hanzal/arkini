@@ -216,11 +216,11 @@ export const CheatInventorySheet = memo(({ onClose }: CheatInventorySheet.Props)
 			</div>
 
 			{lastError ? (
-				<div className="border-b border-rose-500/20 bg-ak-danger-soft px-3 py-2 text-center text-xs font-extrabold text-rose-200">
+				<div className="border-b border-rose-300/50 bg-ak-danger-soft px-3 py-2 text-center text-xs font-extrabold text-rose-800">
 					{lastError}
 				</div>
 			) : lastResult ? (
-				<div className="border-b border-emerald-400/20 bg-ak-success-soft px-3 py-2 text-center text-xs font-extrabold text-emerald-200">
+				<div className="border-b border-emerald-300/50 bg-ak-success-soft px-3 py-2 text-center text-xs font-extrabold text-emerald-800">
 					{lastResult}
 				</div>
 			) : null}

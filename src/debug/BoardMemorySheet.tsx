@@ -43,7 +43,7 @@ export const BoardMemorySheet: FC<BoardMemorySheet.Props> = ({ boardItemId, onCl
 				as a layout preset.
 			</div>
 			<UiButton
-				className="w-full border-rose-300/50 bg-rose-500/20 text-rose-100 hover:bg-rose-500/30"
+				className="w-full border-rose-300/70 bg-rose-100 text-rose-800 hover:bg-rose-200"
 				disabled={itemCount === 0}
 				onClick={clearMemory}
 			>

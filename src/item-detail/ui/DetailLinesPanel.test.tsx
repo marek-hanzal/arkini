@@ -108,7 +108,7 @@ describe("DetailLinesPanel", () => {
 		);
 
 		expect(html.match(/data-ui="detail separator"/g)?.length).toBe(1);
-		expect(html).toContain("border-t border-violet-300/18");
+		expect(html).toContain("border-t border-violet-300/70");
 		expect(html).toContain("gap-4");
 	});
 

@@ -22,7 +22,7 @@ const readProducerInputRowClassName = ({
 		fulfilled
 			? "border-emerald-300/30 bg-emerald-400/10 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.07)]"
 			: available
-				? "border-fuchsia-300/35 bg-fuchsia-400/10 shadow-[inset_0_0_0_1px_rgba(236,72,153,0.07)]"
+				? "border-fuchsia-300/65 bg-fuchsia-400/10 shadow-[inset_0_0_0_1px_rgba(236,72,153,0.07)]"
 				: "border-transparent bg-ak-surface/80",
 	);
 
@@ -71,7 +71,7 @@ export const DetailLineInputs: FC<{
 								<p
 									className={cn(
 										"mt-0.5 break-words leading-5",
-										ready ? "font-bold text-emerald-300" : "text-ak-text-muted",
+										ready ? "font-bold text-emerald-700" : "text-ak-text-muted",
 									)}
 								>
 									{meta}

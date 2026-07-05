@@ -154,7 +154,7 @@ export const ItemDetailSheet: FC<ItemDetailSheet.Props> = ({
 			/>
 			<div className="mx-auto min-h-0 w-full max-w-[540px] flex-1 overflow-y-auto overscroll-contain px-4 py-4 text-sm text-ak-text [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 				{actionErrorMessage ? (
-					<div className="rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-bold text-rose-100">
+					<div className="rounded-sm border border-rose-300/80 bg-rose-100/90 px-3 py-2 text-sm font-bold text-rose-800">
 						{actionErrorMessage}
 					</div>
 				) : null}

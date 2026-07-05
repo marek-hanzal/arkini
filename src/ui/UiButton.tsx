@@ -12,12 +12,12 @@ export namespace UiButton {
 }
 
 const toneClassName: Record<UiButton.Tone, string> = {
-	danger: "border-rose-400/45 bg-rose-500/15 text-rose-100 shadow-[0_0_0_1px_rgba(244,63,94,0.08)] hover:border-rose-300/60 hover:bg-rose-500/22",
-	ghost: "border-violet-300/20 bg-violet-300/8 text-ak-text shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:border-ak-border-accent hover:bg-ak-primary-soft",
+	danger: "border-rose-300/70 bg-rose-100 text-rose-800 shadow-[0_6px_16px_rgba(244,63,94,0.12)] hover:border-rose-400 hover:bg-rose-200",
+	ghost: "border-violet-200/70 bg-white/55 text-ak-text shadow-[0_8px_18px_rgba(168,85,247,0.10)] hover:border-ak-border-accent hover:bg-ak-primary-soft",
 	primary:
-		"border-fuchsia-300/75 bg-ak-primary text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_8px_20px_rgba(236,72,153,0.18)] hover:border-fuchsia-200 hover:bg-fuchsia-400",
+		"border-pink-300/95 bg-ak-primary text-white shadow-[0_10px_24px_rgba(236,72,153,0.24),inset_0_1px_0_rgba(255,255,255,0.28)] hover:border-pink-200 hover:bg-pink-400",
 	secondary:
-		"border-violet-300/35 bg-ak-primary-soft text-ak-text shadow-[0_0_0_1px_rgba(255,255,255,0.04)] hover:border-ak-border-accent hover:bg-fuchsia-400/18",
+		"border-violet-200/80 bg-ak-primary-soft text-ak-text shadow-[0_8px_18px_rgba(168,85,247,0.12),inset_0_1px_0_rgba(255,255,255,0.55)] hover:border-ak-border-accent hover:bg-pink-100",
 };
 
 export const UiButton: FC<UiButton.Props> = ({

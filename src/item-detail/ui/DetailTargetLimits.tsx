@@ -37,8 +37,8 @@ export const DetailTargetLimits: FC<DetailTargetLimits.Props> = ({ id, limits })
 						className={cn(
 							"inline-flex min-w-0 items-center rounded-full border px-2.5 py-1 text-[0.68rem] font-black uppercase leading-none tracking-[0.14em] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
 							limitReached
-								? "border-rose-300/40 bg-rose-400/15 text-rose-100"
-								: "border-violet-200/25 bg-violet-300/12 text-violet-50",
+								? "border-rose-300/40 bg-rose-400/15 text-rose-800"
+								: "border-violet-300/55 bg-violet-100/80 text-violet-900",
 						)}
 					>
 						{readLimitLabel(limit)}

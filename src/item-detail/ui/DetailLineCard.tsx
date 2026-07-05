@@ -20,7 +20,7 @@ const DetailLineFlowArrow: FC = () => (
 		className="flex items-center justify-center py-0.5"
 		data-ui="detail line flow arrow"
 	>
-		<span className="rounded-full border border-fuchsia-300/35 bg-fuchsia-300/12 px-3 py-1 text-sm font-black leading-none text-fuchsia-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
+		<span className="rounded-full border border-fuchsia-300/65 bg-fuchsia-300/12 px-3 py-1 text-sm font-black leading-none text-fuchsia-800 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
 			↓
 		</span>
 	</div>

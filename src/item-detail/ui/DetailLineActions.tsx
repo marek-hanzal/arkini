@@ -11,7 +11,7 @@ const DetailPrimaryActionLabel: FC<{
 	<span className="flex min-w-0 items-center justify-center gap-2">
 		<span className="min-w-0 truncate">{label}</span>
 		{metaLabel ? (
-			<span className="shrink-0 text-xs font-black leading-none text-white/75">
+			<span className="shrink-0 text-xs font-black leading-none text-white/85">
 				{metaLabel}
 			</span>
 		) : null}

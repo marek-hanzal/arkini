@@ -30,7 +30,7 @@ const readCraftInputRowClassName = ({
 		fulfilled
 			? "border-emerald-300/30 bg-emerald-400/10 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.07)]"
 			: available
-				? "border-fuchsia-300/35 bg-fuchsia-400/10 shadow-[inset_0_0_0_1px_rgba(236,72,153,0.07)]"
+				? "border-fuchsia-300/65 bg-fuchsia-400/10 shadow-[inset_0_0_0_1px_rgba(236,72,153,0.07)]"
 				: "border-transparent bg-ak-surface/80",
 	);
 
@@ -74,9 +74,9 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 				/>
 
 				{effectBlockReasons.length ? (
-					<div className="rounded-sm bg-rose-400/14 px-2.5 py-2 text-xs text-rose-50">
-						<p className="font-black text-rose-100">Blocked by effects</p>
-						<ul className="mt-1 grid gap-1 leading-5 text-rose-100/80">
+					<div className="rounded-sm bg-rose-100/90 px-2.5 py-2 text-xs text-rose-900">
+						<p className="font-black text-rose-800">Blocked by effects</p>
+						<ul className="mt-1 grid gap-1 leading-5 text-rose-700/80">
 							{effectBlockReasons.map((reason) => (
 								<li key={`${craft.id}:effect-block:${reason}`}>{reason}</li>
 							))}
@@ -85,9 +85,9 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 				) : null}
 
 				{missingEffectRequirements.length ? (
-					<div className="rounded-sm bg-rose-400/14 px-2.5 py-2 text-xs text-rose-50">
-						<p className="font-black text-rose-100">Missing requirements</p>
-						<ul className="mt-1 grid gap-1 leading-5 text-rose-100/80">
+					<div className="rounded-sm bg-rose-100/90 px-2.5 py-2 text-xs text-rose-900">
+						<p className="font-black text-rose-800">Missing requirements</p>
+						<ul className="mt-1 grid gap-1 leading-5 text-rose-700/80">
 							{missingEffectRequirements.map((requirement) => (
 								<li key={`${craft.id}:effect-requirement:${requirement}`}>
 									{requirement}
@@ -129,7 +129,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 											className={cn(
 												"mt-0.5 text-xs leading-5",
 												ready
-													? "font-bold text-emerald-300"
+													? "font-bold text-emerald-700"
 													: "text-ak-text-muted",
 											)}
 										>
@@ -164,7 +164,7 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 				onClick={control.primaryAction.onClick}
 			>
 				<span className="flex min-w-0 flex-col items-center justify-center gap-1 leading-none">
-					<span className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/75">
+					<span className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/85">
 						{control.statusLabel}
 					</span>
 					<span>{control.primaryAction.label}</span>

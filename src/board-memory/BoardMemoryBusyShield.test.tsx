@@ -16,7 +16,7 @@ describe("BoardMemoryBusyShield", () => {
 		expect(html).toContain('data-ui="board memory busy shield"');
 		expect(html).toContain('data-state="hidden"');
 		expect(html).toContain("transition-[opacity,backdrop-filter,background-color]");
-		expect(html).toContain("bg-[#10051a]/0");
+		expect(html).toContain("bg-fuchsia-100/0");
 		expect(html).toContain("opacity-0");
 		expect(html).toContain("pointer-events-auto");
 	});

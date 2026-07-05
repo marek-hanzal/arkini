@@ -166,7 +166,7 @@ const PlayShellContent: FC = () => {
 		: null;
 
 	return (
-		<div className="relative h-dvh w-dvw overflow-hidden bg-ak-page">
+		<div className="relative h-dvh w-dvw overflow-hidden bg-[radial-gradient(circle_at_12%_12%,rgba(255,183,230,0.70),transparent_32%),radial-gradient(circle_at_88%_18%,rgba(196,181,253,0.62),transparent_30%),radial-gradient(circle_at_74%_86%,rgba(254,202,202,0.62),transparent_34%),linear-gradient(135deg,#fff8fd,#f7edff_48%,#fff0f7)]">
 			<BoardMemoryOperationProvider value={memoryOperation}>
 				<BoardSurface
 					feedback={feedback}
@@ -180,7 +180,7 @@ const PlayShellContent: FC = () => {
 			{lastError && feedbackFlags.has("toast:error") ? (
 				<div
 					data-ui="error toast"
-					className="pointer-events-none absolute inset-x-3 bottom-3 mx-auto max-w-[430px] rounded-sm border border-rose-400/70 bg-rose-950/60 px-3 py-2 text-sm font-semibold text-rose-100"
+					className="pointer-events-none absolute inset-x-3 bottom-3 mx-auto max-w-[430px] rounded-sm border border-rose-300/80 bg-rose-100/90 px-3 py-2 text-sm font-semibold text-rose-800 shadow-[0_12px_30px_rgba(244,63,94,0.18)]"
 					style={{
 						zIndex: "var(--ak-layer-toast)",
 					}}

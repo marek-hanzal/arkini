@@ -48,7 +48,7 @@ export const DetailSeparator: FC<{
 }> = ({ className }) => (
 	<div
 		aria-hidden="true"
-		className={cn("border-t border-violet-300/18", className)}
+		className={cn("border-t border-violet-300/70", className)}
 		data-ui="detail separator"
 	/>
 );
@@ -59,7 +59,7 @@ export const DetailMutedPill: FC<{
 }> = ({ children, className }) => (
 	<span
 		className={cn(
-			"rounded-full border border-violet-300/30 bg-violet-300/12 px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-violet-100 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
+			"rounded-full border border-violet-300/65 bg-violet-100/80 px-2 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-violet-800 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.03)]",
 			className,
 		)}
 	>
@@ -84,8 +84,8 @@ export const DetailTabs: FC<{
 				className={cn(
 					"shrink-0 rounded-full border px-3 py-1.5 text-xs font-black shadow-[0_0_0_1px_rgba(255,255,255,0.03)] transition-[background,border-color,color,transform,opacity] active:translate-y-px",
 					item.id === selectedId
-						? "border-fuchsia-300/75 bg-ak-primary text-white"
-						: "border-violet-300/25 bg-violet-300/10 text-violet-100/75 hover:border-ak-border-accent hover:bg-ak-primary-soft hover:text-ak-text",
+						? "border-fuchsia-300/95 bg-ak-primary text-white"
+						: "border-violet-300/60 bg-violet-100/70 text-violet-800/75 hover:border-ak-border-accent hover:bg-ak-primary-soft hover:text-ak-text",
 				)}
 				onClick={() => onSelect(item.id)}
 			>

@@ -2,12 +2,22 @@ import { describe, expect, it } from "vitest";
 import { rebuildBoardView } from "~/board/view/rebuildBoardView";
 import { rebuildInventoryView } from "~/inventory/view/rebuildInventoryView";
 import type { GameEvent } from "~/event/GameEventSchema";
+import { boardStackFeedbackDurationMs } from "~/play/game-engine-visual/boardStackFeedbackDurationMs";
+import { boardStackFlyDurationMs } from "~/play/game-engine-visual/boardStackFlyDurationMs";
+import { readBoardStackFeedbackDelayMs } from "~/play/game-engine-visual/readBoardStackFeedbackDelayMs";
 import { createGameEngineVisualPlan } from "~/play/game-engine-visual/createGameEngineVisualPlan";
 
 const boardView = (items: Parameters<typeof rebuildBoardView>[0]) => rebuildBoardView(items);
 const emptyInventory = () => rebuildInventoryView([]);
 
 describe("createGameEngineVisualPlan board stack visuals", () => {
+	it("starts stack feedback early enough for the first bounce peak to land with the fly impact", () => {
+		expect(
+			readBoardStackFeedbackDelayMs({
+				durationMs: boardStackFlyDurationMs,
+			}),
+		).toBeLessThan(boardStackFlyDurationMs);
+	});
 	it("maps producer output stacked onto an existing board item to a transient fly and stack feedback", () => {
 		const previousBoard = boardView([
 			{
@@ -68,7 +78,7 @@ describe("createGameEngineVisualPlan board stack visuals", () => {
 		expect(plan.boardTransientTilePlans[0]).toMatchObject({
 			request: {
 				exit: {
-					durationMs: 1000,
+					durationMs: boardStackFlyDurationMs,
 					kind: "fly-to-tile",
 					toTileId: "stack",
 				},
@@ -81,8 +91,11 @@ describe("createGameEngineVisualPlan board stack visuals", () => {
 		expect(plan.boardFeedbackRequests).toHaveLength(1);
 		expect(plan.boardFeedbackRequests[0]).toMatchObject({
 			feedback: {
-				delayMs: 1000,
+				delayMs: readBoardStackFeedbackDelayMs({
+					durationMs: boardStackFlyDurationMs,
+				}),
 				kind: "bounce",
+				durationMs: boardStackFeedbackDurationMs,
 			},
 			tileId: "stack",
 		});
@@ -162,7 +175,7 @@ describe("createGameEngineVisualPlan board stack visuals", () => {
 		expect(plan.boardTransientTilePlans[0]).toMatchObject({
 			request: {
 				exit: {
-					durationMs: 1000,
+					durationMs: boardStackFlyDurationMs,
 					kind: "fly-to-tile",
 					toTileId: "target",
 				},
@@ -175,8 +188,11 @@ describe("createGameEngineVisualPlan board stack visuals", () => {
 		expect(plan.boardFeedbackRequests).toHaveLength(1);
 		expect(plan.boardFeedbackRequests[0]).toMatchObject({
 			feedback: {
-				delayMs: 1000,
+				delayMs: readBoardStackFeedbackDelayMs({
+					durationMs: boardStackFlyDurationMs,
+				}),
 				kind: "bounce",
+				durationMs: boardStackFeedbackDurationMs,
 			},
 			tileId: "target",
 		});

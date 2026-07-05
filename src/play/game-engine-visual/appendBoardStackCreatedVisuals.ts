@@ -2,9 +2,12 @@ import { cellKey } from "~/board/cellKey";
 import type { BoardTransientTile } from "~/board/animation/BoardTransientTile";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
+import { boardStackFeedbackDurationMs } from "~/play/game-engine-visual/boardStackFeedbackDurationMs";
+import { boardStackFlyDurationMs } from "~/play/game-engine-visual/boardStackFlyDurationMs";
 import { createBoardTileBounceFeedbackRequest } from "~/play/game-engine-visual/createBoardTileBounceFeedbackRequest";
 import { gameVisualMotionSettlementDelayMs } from "~/play/game-engine-visual/gameVisualMotionSettlementDelayMs";
 import { GameVisualMotion } from "~/play/game-engine-visual/GameVisualMotion";
+import { readBoardStackFeedbackDelayMs } from "~/play/game-engine-visual/readBoardStackFeedbackDelayMs";
 import type { GameEngineVisualPlanDraft } from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
 import { toTileEngineExitMotion } from "~/play/game-engine-visual/toTileEngineExitMotion";
 
@@ -79,6 +82,7 @@ export const appendBoardStackCreatedVisuals = ({
 	const groupId = `engine:board-stack:${sourceTile?.id ?? event.originItemInstanceId ?? event.itemId}:${currentTarget.id}:${sequenceIndex}`;
 	const motion = GameVisualMotion.merge({
 		cause: "merge",
+		durationMs: boardStackFlyDurationMs,
 		groupId,
 	});
 	const cleanupDelayMs = gameVisualMotionSettlementDelayMs(motion);
@@ -112,7 +116,10 @@ export const appendBoardStackCreatedVisuals = ({
 	plan.boardFeedbackRequests.push(
 		createBoardTileBounceFeedbackRequest({
 			delayMs:
-				sourceTile && sourceTile.id !== currentTarget.id ? (motion.durationMs ?? 0) : 0,
+				sourceTile && sourceTile.id !== currentTarget.id
+					? readBoardStackFeedbackDelayMs(motion)
+					: 0,
+			durationMs: boardStackFeedbackDurationMs,
 			groupId,
 			tileId: currentTarget.id,
 		}),

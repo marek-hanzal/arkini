@@ -1,13 +1,7 @@
 import { useMemo } from "react";
-import { useBoardTransientTiles } from "~/board/animation/BoardTransientTileStore";
-import { cellKey } from "~/board/cellKey";
-import type { BoardSurface } from "~/board/BoardSurface.types";
-import { useGameBoardView } from "~/play/runtime/useGameRuntimeViews";
-import type { TileEngine } from "~/tile-engine/TileEngine.types";
-
-const transientTileStyle = {
-	pointerEvents: "none" as const,
-};
+import { createBoardSurfaceTiles } from "~/board/createBoardSurfaceTiles";
+import type { useBoardTransientTiles } from "~/board/animation/BoardTransientTileStore";
+import type { useGameBoardView } from "~/play/runtime/useGameRuntimeViews";
 
 export const useBoardSurfaceTiles = ({
 	board,
@@ -18,37 +12,12 @@ export const useBoardSurfaceTiles = ({
 }) =>
 	useMemo(
 		() =>
-			[
-				...board.items.map((boardItem) => {
-					const slotId = cellKey(boardItem.x, boardItem.y);
-
-					return {
-						id: boardItem.id,
-						slotId,
-						renderKey: `board-item:${boardItem.id}:${slotId}`,
-						data: {
-							kind: "board-item" as const,
-							boardItemId: boardItem.id,
-						},
-						disabled: false,
-					};
-				}),
-				...transientTiles.map((tile) => ({
-					id: tile.id,
-					slotId: tile.slotId,
-					renderKey: `static-item:${tile.id}:${tile.slotId}:${tile.itemId}:${tile.quantity ?? 1}:${tile.assetProgress ?? "none"}`,
-					data: {
-						assetProgress: tile.assetProgress,
-						kind: "static-item" as const,
-						itemId: tile.itemId,
-						quantity: tile.quantity,
-					},
-					disabled: true,
-					style: transientTileStyle,
-				})),
-			] satisfies TileEngine.Tile<BoardSurface.TileData>[],
+			createBoardSurfaceTiles({
+				board,
+				transientTiles,
+			}),
 		[
-			board.items,
+			board,
 			transientTiles,
 		],
 	);

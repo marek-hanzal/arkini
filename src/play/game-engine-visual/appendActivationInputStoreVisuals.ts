@@ -86,8 +86,10 @@ export const appendActivationInputStoreVisuals = ({
 		groupId: `engine:input-store:${source.from.itemInstanceId}:${targetItemInstanceId}:${source.itemId}`,
 	});
 	const cleanupDelayMs = gameVisualMotionSettlementDelayMs(motion);
+	const hidesLiveSource = shouldBoomerangBoardStack(source);
 	const tile: BoardTransientTile = {
 		groupId: motion.groupId,
+		hiddenBoardItemId: hidesLiveSource ? previousSource.id : undefined,
 		id: `transient:input-store:${motion.groupId}:source:${previousSource.id}`,
 		itemId: source.itemId as BoardTransientTile["itemId"],
 		quantity: source.from.previousQuantity ?? source.from.quantity,
@@ -109,7 +111,7 @@ export const appendActivationInputStoreVisuals = ({
 				...toTileEngineExitMotion(motion, {
 					toTileId: targetItemInstanceId,
 				}),
-				...(shouldBoomerangBoardStack(source)
+				...(hidesLiveSource
 					? {
 							kind: "boomerang-to-tile" as const,
 						}

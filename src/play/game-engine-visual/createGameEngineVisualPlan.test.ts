@@ -632,6 +632,7 @@ describe("createGameEngineVisualPlan", () => {
 				},
 			},
 			tile: {
+				hiddenBoardItemId: "source",
 				itemId: "item:twig",
 				quantity: 3,
 				slotId: "1:0",

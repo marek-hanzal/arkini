@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import type { AuditFinding } from "./AuditFinding";
 import { readFiles } from "./readAuditFiles";
 
-const sourceProductionLineLimit = 400;
+const sourceProductionLineLimit = 350;
 const sourceTestLineLimit = 1500;
 
 export const auditFileSizeGuardrails = (): AuditFinding[] =>

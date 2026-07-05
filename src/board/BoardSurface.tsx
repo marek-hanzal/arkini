@@ -17,6 +17,8 @@ const boardCellFeedbackVariants = [
 	"danger",
 ] as const;
 
+const boardGridGapPx = 4;
+
 export const BoardSurface = memo(
 	({ feedback, feedbackFlags, onOpenSheet, disabled = false }: BoardSurfaceType.Props) => {
 		const { blockedCellKeys, columns, drag, slots, tiles } = useBoardTileEngineModel({
@@ -73,9 +75,9 @@ export const BoardSurface = memo(
 						columns={columns}
 						slots={slots}
 						tiles={tiles}
-						gapPx={1}
+						gapPx={boardGridGapPx}
 						rootClassName="rounded-[1.35rem] border border-fuchsia-200/80 bg-[radial-gradient(circle_at_18%_12%,rgba(255,183,230,0.72),transparent_38%),radial-gradient(circle_at_84%_82%,rgba(196,181,253,0.64),transparent_40%),linear-gradient(145deg,rgba(255,241,252,0.96),rgba(245,226,255,0.92)_44%,rgba(255,228,239,0.88))] shadow-[0_18px_56px_rgba(168,85,247,0.24),0_24px_84px_rgba(236,72,153,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]"
-						className="overflow-hidden rounded-[1rem] border border-white/80 bg-[radial-gradient(ellipse_at_12%_10%,rgba(255,126,205,0.32),transparent_34%),radial-gradient(ellipse_at_88%_18%,rgba(251,113,133,0.22),transparent_28%),radial-gradient(ellipse_at_74%_88%,rgba(139,92,246,0.24),transparent_42%),radial-gradient(circle_at_36%_66%,rgba(253,186,116,0.18),transparent_30%),conic-gradient(from_225deg_at_50%_48%,rgba(236,72,153,0.10),rgba(139,92,246,0.12),rgba(255,255,255,0.16),rgba(236,72,153,0.10)),linear-gradient(145deg,#fff1fb,#f2ddff_54%,#ffe8f2)] shadow-[inset_0_0_0_1px_rgba(124,58,237,0.10),inset_0_0_42px_rgba(236,72,153,0.12),inset_0_-28px_62px_rgba(255,255,255,0.34)]"
+						className="overflow-hidden rounded-[1rem] border border-white/80 bg-[radial-gradient(ellipse_at_18%_12%,rgba(236,72,153,0.28),transparent_35%),radial-gradient(ellipse_at_82%_18%,rgba(139,92,246,0.24),transparent_31%),radial-gradient(ellipse_at_78%_88%,rgba(244,114,182,0.26),transparent_42%),linear-gradient(145deg,rgba(217,70,239,0.36),rgba(168,85,247,0.30)_48%,rgba(236,72,153,0.34))] shadow-[inset_0_0_0_1px_rgba(124,58,237,0.12),inset_0_0_42px_rgba(236,72,153,0.11),inset_0_-28px_62px_rgba(255,255,255,0.28)]"
 						container="responsive"
 						actorLayerClassName="pointer-events-none"
 						layerRole="base"

@@ -5,7 +5,6 @@ import {
 	type InventoryPlacementStackState,
 	type PlaceInventoryItemOnBoardProps,
 } from "~/placement/InventoryItemOnBoardPlacementTypes";
-import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readInventoryPlacementResultFx } from "~/placement/readInventoryPlacementResultFx";
 
@@ -59,27 +58,9 @@ const placeInventoryStackExactlyFx = Effect.fn("placeInventoryStackExactlyFx")(f
 	props: PlaceInventoryItemOnBoardProps;
 	state: InventoryPlacementStackState;
 }) {
-	const events = [
-		state.consumedEvent,
-	];
-	yield* placeBoardItemInstanceFx({
-		cell: {
-			x: props.action.x,
-			y: props.action.y,
-		},
-		createdAtMs: state.placedCreatedAtMs,
-		events,
-		itemId: state.itemId,
-		quantity: state.quantity,
-		reason: "inventory-placement",
-		save: state.nextSave,
-	});
-	state.nextSave.updatedAtMs = props.nowMs;
-
-	return yield* readInventoryPlacementResultFx({
-		events,
+	return yield* placeInventoryStackByNearestPlacementFx({
 		props,
-		save: state.nextSave,
+		state,
 	});
 });
 

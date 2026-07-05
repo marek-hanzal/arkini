@@ -23,18 +23,20 @@ export const readBoardPlacementCapacityFx = Effect.fn("readBoardPlacementCapacit
 	itemId: string;
 	save: GameSave;
 }) {
+	const itemDefinition = config.items[itemId];
+	if (!itemDefinition) return 0;
+
 	const boardItemMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
 		config,
 		itemId,
 		save,
 	});
-	return Math.min(
-		yield* readEmptyBoardCellCountFx({
+	const emptyCellStackCapacity =
+		(yield* readEmptyBoardCellCountFx({
 			config,
 			save,
-		}),
-		boardItemMaxCountCapacity,
-	);
+		})) * itemDefinition.maxStackSize;
+	return Math.min(emptyCellStackCapacity, boardItemMaxCountCapacity);
 });
 
 export const readBoardPlacementBlockReasonFx = Effect.fn("readBoardPlacementBlockReasonFx")(

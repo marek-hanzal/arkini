@@ -343,6 +343,84 @@ describe("applyGameActionFx BoardInventory", () => {
 		]);
 	});
 
+	it("fills board stack cells before spilling an inventory stack remainder", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 7,
+		};
+
+		const result = runAction({
+			action: {
+				quantity: 7,
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toMatchObject({
+			quantity: 3,
+		});
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 2,
+				y: 0,
+			}),
+		).toMatchObject({
+			quantity: 3,
+		});
+		expect(result.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 1,
+		});
+		expect(
+			result.events.filter((event) => event.type === "item.created").map((event) => event.to),
+		).toEqual([
+			expect.objectContaining({
+				kind: "board",
+				quantity: 3,
+				x: 1,
+				y: 0,
+			}),
+			expect.objectContaining({
+				kind: "board",
+				quantity: 3,
+				x: 2,
+				y: 0,
+			}),
+			expect.objectContaining({
+				kind: "inventory",
+				quantity: 1,
+				slotIndex: 0,
+			}),
+		]);
+	});
+
 	it("places seeded inventory items around an occupied seed cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

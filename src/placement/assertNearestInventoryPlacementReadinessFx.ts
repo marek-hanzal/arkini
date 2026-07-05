@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 import { GameEngineError } from "~/engine/model/GameEngineError";
+import { assertInventoryStackPlacementCapacityFx } from "~/placement/assertInventoryStackPlacementCapacityFx";
 import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
 } from "~/inventory/model/GameSaveInventorySlot";
-import { readInventoryStackCapacityFx } from "~/inventory/readInventoryStackCapacityFx";
 import type {
 	InventoryItemPlaceReadinessProps,
 	InventoryPlacementDraft,
@@ -95,38 +95,12 @@ const assertNearestStackPlacementReadinessFx = Effect.fn("assertNearestStackPlac
 						},
 					})
 				: [];
-		const allowedBoardCapacity = Math.min(boardCapacity, boardPlacementCells.length);
-		if (allowedBoardCapacity === 0) {
-			return yield* Effect.fail(
-				GameEngineError.actionRejected(
-					yield* readBoardPlacementBlockReasonFx({
-						config: props.config,
-						itemId: draft.slot.itemId,
-						save: props.save,
-					}),
-					"No board placement target available.",
-				),
-			);
-		}
-
-		const inventoryCapacity = yield* readInventoryStackCapacityFx({
-			itemId: draft.slot.itemId,
-			maxStackSize: draft.itemDefinition.maxStackSize,
-			slots: draft.saveAfterInventoryRemoval.inventory.slots,
+		const allowedBoardCapacity = boardPlacementCells.length > 0 ? boardCapacity : 0;
+		yield* assertInventoryStackPlacementCapacityFx({
+			boardCapacity: allowedBoardCapacity,
+			draft,
+			props,
 		});
-		if (draft.quantity <= allowedBoardCapacity + inventoryCapacity) return;
-
-		const reason =
-			boardCapacity === 0
-				? yield* readBoardPlacementBlockReasonFx({
-						config: props.config,
-						itemId: draft.slot.itemId,
-						save: props.save,
-					})
-				: "inventory:full";
-		return yield* Effect.fail(
-			GameEngineError.actionRejected(reason, "No placement target available."),
-		);
 	},
 );
 

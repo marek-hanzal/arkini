@@ -17,7 +17,7 @@ const boardCellFeedbackVariants = [
 	"danger",
 ] as const;
 
-const boardGridGapPx = 4;
+const boardGridGapPx = 2;
 
 export const BoardSurface = memo(
 	({ feedback, feedbackFlags, onOpenSheet, disabled = false }: BoardSurfaceType.Props) => {
@@ -77,7 +77,7 @@ export const BoardSurface = memo(
 						tiles={tiles}
 						gapPx={boardGridGapPx}
 						rootClassName="rounded-[1.35rem] border border-[rgba(232,178,240,0.92)] bg-[radial-gradient(circle_at_18%_12%,rgba(255,183,230,0.72),transparent_38%),radial-gradient(circle_at_84%_82%,rgba(196,181,253,0.64),transparent_40%),linear-gradient(145deg,rgba(255,241,252,0.96),rgba(245,226,255,0.92)_44%,rgba(255,228,239,0.88))] shadow-[0_18px_56px_rgba(168,85,247,0.24),0_24px_84px_rgba(236,72,153,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]"
-						className="overflow-hidden rounded-[1rem] border border-[rgba(243,214,248,0.92)] bg-[radial-gradient(ellipse_at_18%_12%,rgba(236,72,153,0.28),transparent_35%),radial-gradient(ellipse_at_82%_18%,rgba(139,92,246,0.24),transparent_31%),radial-gradient(ellipse_at_78%_88%,rgba(244,114,182,0.26),transparent_42%),linear-gradient(145deg,rgba(217,70,239,0.36),rgba(168,85,247,0.30)_48%,rgba(236,72,153,0.34))] shadow-[inset_0_0_0_1px_rgba(124,58,237,0.12),inset_0_0_42px_rgba(236,72,153,0.11),inset_0_-28px_62px_rgba(255,255,255,0.28)]"
+						className="overflow-hidden rounded-[1rem] border border-[rgba(243,214,248,0.92)] bg-[radial-gradient(ellipse_at_18%_12%,rgba(236,72,153,0.18),transparent_35%),radial-gradient(ellipse_at_82%_18%,rgba(139,92,246,0.16),transparent_31%),radial-gradient(ellipse_at_78%_88%,rgba(244,114,182,0.16),transparent_42%),linear-gradient(145deg,rgba(217,70,239,0.22),rgba(168,85,247,0.20)_48%,rgba(236,72,153,0.22))] shadow-[inset_0_0_0_1px_rgba(124,58,237,0.12),inset_0_0_42px_rgba(236,72,153,0.11),inset_0_-28px_62px_rgba(255,255,255,0.28)]"
 						container="responsive"
 						actorLayerClassName="pointer-events-none"
 						layerRole="base"

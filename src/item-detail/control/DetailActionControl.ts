@@ -8,5 +8,6 @@ export interface DetailActionControl {
 }
 
 export interface DetailProgressActionControl extends DetailActionControl {
+	metaLabel?: string;
 	progress?: number;
 }

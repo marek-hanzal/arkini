@@ -37,7 +37,25 @@ describe("readDetailLineControl", () => {
 
 		expect(onStart).toHaveBeenCalledWith("line:lumberjack:log");
 		expect(control.primaryAction.label).toBe("Start");
+		expect(control.primaryAction.metaLabel).toBe("Queue 0/1 · 1s");
 		expect(control.primaryAction.tone).toBe("primary");
+	});
+
+	it("shows effect window and duration multipliers in the primary action metadata", () => {
+		const control = readDetailLineControl({
+			canSetDefault: false,
+			line: createLine({
+				durationMs: 45000,
+				effectDurationMultiplier: 0.75,
+				kind: "effect",
+			}),
+			onSetDefault: () => undefined,
+			onStart: () => undefined,
+			onWithdrawInput: () => undefined,
+			pending: false,
+		});
+
+		expect(control.primaryAction.metaLabel).toBe("Window 45s · faster 0.75×");
 	});
 
 	it("keeps disabled actions inert", () => {

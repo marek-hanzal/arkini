@@ -127,6 +127,23 @@ describe("DetailLinesPanel", () => {
 		expect(html).not.toContain(">1</span>");
 	});
 
+	it("moves queue size and duration into the primary action button", () => {
+		const html = renderToStaticMarkup(
+			<DetailLinesPanel
+				items={items}
+				lines={[
+					lineModel(createLine()),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Start");
+		expect(html).toContain("Queue 0/1 · 5s");
+		expect(html.match(/Queue 0\/1/g)?.length).toBe(1);
+		expect(html.indexOf("Start")).toBeLessThan(html.indexOf("Queue 0/1 · 5s"));
+		expect(html).not.toContain('text-ak-text-muted">Queue 0/1');
+	});
+
 	it("keeps line icons only in outputs, not duplicated in the header", () => {
 		const html = renderToStaticMarkup(
 			<DetailLinesPanel

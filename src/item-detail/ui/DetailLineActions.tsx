@@ -4,6 +4,20 @@ import { UiButton } from "~/ui/UiButton";
 import { UiProgressButton } from "~/ui/UiProgressButton";
 import { cn } from "~/ui/cn";
 
+const DetailPrimaryActionLabel: FC<{
+	label: string;
+	metaLabel?: string;
+}> = ({ label, metaLabel }) => (
+	<span className="flex min-w-0 items-center justify-center gap-2">
+		<span className="min-w-0 truncate">{label}</span>
+		{metaLabel ? (
+			<span className="shrink-0 text-xs font-black leading-none text-white/75">
+				{metaLabel}
+			</span>
+		) : null}
+	</span>
+);
+
 export const DetailLineActions: FC<{
 	control: DetailLineModel["control"];
 }> = ({ control }) => (
@@ -15,7 +29,10 @@ export const DetailLineActions: FC<{
 			className={control.defaultAction ? "col-span-2" : undefined}
 			onClick={control.primaryAction.onClick}
 		>
-			{control.primaryAction.label}
+			<DetailPrimaryActionLabel
+				label={control.primaryAction.label}
+				metaLabel={control.primaryAction.metaLabel}
+			/>
 		</UiProgressButton>
 		{control.defaultAction ? (
 			<UiButton

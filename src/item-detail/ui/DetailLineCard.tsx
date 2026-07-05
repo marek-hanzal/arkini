@@ -13,7 +13,6 @@ import {
 } from "~/item-detail/ui/effectDetailPresentation";
 import { readDetailLineEffectPolarity } from "~/item-detail/ui/readDetailLineEffectPolarity";
 import { readDetailLineEffectRequirementSummary } from "~/item-detail/ui/readDetailLineEffectRequirementSummary";
-import { readDetailLineMeta } from "~/item-detail/ui/readDetailLineMeta";
 
 export const DetailLineCard: FC<{
 	items: ItemCatalogView;
@@ -26,7 +25,6 @@ export const DetailLineCard: FC<{
 	const effectBonusLines = line.effectBonusLines ?? [];
 	const effectRequirements = readDetailLineEffectRequirementSummary(line);
 	const showInputs = !line.inProgress;
-	const meta = readDetailLineMeta(line);
 
 	return (
 		<article className="min-w-0">
@@ -45,7 +43,6 @@ export const DetailLineCard: FC<{
 							</DetailMutedPill>
 						) : null}
 					</div>
-					<p className="mt-1 break-words text-xs leading-5 text-ak-text-muted">{meta}</p>
 				</div>
 			</header>
 

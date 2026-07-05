@@ -1,6 +1,7 @@
 import type { LineView } from "~/board/view/LineViewSchema";
 import { readLineRunState } from "~/producer/view/readLineRunState";
 import { formatMs } from "~/time/formatMs";
+import { formatDetailLineMultiplier } from "~/item-detail/control/formatDetailLineMultiplier";
 import type { DetailActionControl } from "~/item-detail/control/DetailActionControl";
 import type { DetailLineControl } from "~/item-detail/control/DetailLineControl";
 import { joinTextParts } from "~/ui/joinTextParts";
@@ -22,6 +23,19 @@ const readLineProgressDisplay = (line: LineView) => {
 	const progress = line.progress ?? 0;
 	return line.kind === "effect" ? 1 - progress : progress;
 };
+
+const readLineActionMetaLabel = (line: LineView) =>
+	joinTextParts([
+		line.kind === "effect"
+			? `Window ${formatMs(line.durationMs)}`
+			: `Queue ${line.queueUsed}/${line.queueMax}`,
+		line.kind === "product" ? formatMs(line.durationMs) : undefined,
+		line.effectDurationMultiplier && line.effectDurationMultiplier < 1
+			? `faster ${formatDetailLineMultiplier(line.effectDurationMultiplier)}×`
+			: line.effectDurationMultiplier && line.effectDurationMultiplier > 1
+				? `slowed ${formatDetailLineMultiplier(line.effectDurationMultiplier)}×`
+				: undefined,
+	]);
 
 const readLineActionLabel = ({ line, runState }: { line: LineView; runState: LineRunState }) => {
 	if (!runState.showProgress) return runState.label;
@@ -103,6 +117,7 @@ export const readDetailLineControl = ({
 				line,
 				runState,
 			}),
+			metaLabel: readLineActionMetaLabel(line),
 			onClick: () => {
 				if (primaryActionDisabled) return;
 				onStart(line.lineId);

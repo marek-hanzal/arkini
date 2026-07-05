@@ -17,7 +17,31 @@ const items: ItemCatalogView = {
 };
 
 describe("DetailTargetLimits", () => {
-	it("keeps the target name on the left and the count in a dedicated right-side node", () => {
+	it("renders unique limits as a compact badge without repeating the target name", () => {
+		const html = renderToStaticMarkup(
+			<DetailTargetLimits
+				id="line:blueprint:lumberjack-t1"
+				items={items}
+				limits={[
+					{
+						itemId: "producer:lumberjack-t1",
+						maxCount: 1,
+						ownedQuantity: 0,
+						remainingQuantity: 1,
+						requiredQuantity: 1,
+					},
+				]}
+			/>,
+		);
+
+		expect(html).toContain('data-ui="target limit badge"');
+		expect(html).toContain("Unique");
+		expect(html).not.toContain("Target limits");
+		expect(html).not.toContain("Lumberjack I");
+		expect(html).not.toContain(">0/1<");
+	});
+
+	it("renders multi-count limits as one concise count badge", () => {
 		const html = renderToStaticMarkup(
 			<DetailTargetLimits
 				id="line:blueprint:lumberjack-t1"
@@ -34,15 +58,12 @@ describe("DetailTargetLimits", () => {
 			/>,
 		);
 
-		expect(html).toContain('data-ui="target limit name"');
-		expect(html).toContain('data-ui="target limit count"');
-		expect(html).toContain("Lumberjack I");
-		expect(html).toContain(">1<span");
-		expect(html).toContain(">/4</span>");
-		expect(html).not.toContain("Lumberjack I 1/4");
+		expect(html).toContain("Limit 1/4");
+		expect(html).not.toContain("Lumberjack I");
+		expect(html).not.toContain("Limit reached");
 	});
 
-	it("marks exhausted limits without hiding their count", () => {
+	it("keeps exhausted limits highlighted without adding extra copy", () => {
 		const html = renderToStaticMarkup(
 			<DetailTargetLimits
 				id="line:blueprint:lumberjack-t1"
@@ -59,8 +80,8 @@ describe("DetailTargetLimits", () => {
 			/>,
 		);
 
-		expect(html).toContain("Limit reached");
-		expect(html).toContain(">4<span");
-		expect(html).toContain(">/4</span>");
+		expect(html).toContain("Limit 4/4");
+		expect(html).toContain("border-rose-300/40");
+		expect(html).not.toContain("Limit reached");
 	});
 });

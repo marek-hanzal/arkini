@@ -389,9 +389,9 @@ describe("DetailLinesPanel", () => {
 		);
 
 		expect(html).toContain("Blueprint: Library I");
-		expect(html).toContain("Limit reached");
+		expect(html).toContain("Unique");
 		expect(html).toContain("Outputs");
-		expect(html).toContain("Target limits");
+		expect(html).not.toContain("Target limits");
 		expect(html).toContain("Water");
 		expect(html).toContain("Default");
 	});

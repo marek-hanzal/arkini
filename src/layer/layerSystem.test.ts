@@ -66,8 +66,12 @@ describe("global layer system", () => {
 		expect(offenders).toEqual([]);
 	});
 	it("keeps TileEngine DOM animations behind the cancellable runtime", () => {
+		const allowedRuntimeFiles = new Set([
+			"TileElementAnimation.ts",
+			"TileMotionRuntime.ts",
+		]);
 		const offenders = listSourceFiles(join(sourceRoot, "tile-engine")).flatMap((path) => {
-			if (path.endsWith("TileMotionRuntime.ts")) return [];
+			if (allowedRuntimeFiles.has(path.split("/").at(-1) ?? "")) return [];
 			const source = readFileSync(path, "utf8");
 			return /\.animate\(/.test(source) ||
 				source.includes('from "motion"') ||

@@ -1,18 +1,33 @@
-import type { FC } from "react";
+import type { CSSProperties, FC } from "react";
+import type { AppSplashPhase } from "~/app/AppSplashPhase";
 
 export namespace AppSplashScreen {
 	export interface Props {
+		fadeDurationMs: number;
 		heroSrc?: string;
+		phase: AppSplashPhase;
 	}
 }
 
-export const AppSplashScreen: FC<AppSplashScreen.Props> = ({ heroSrc }) => (
+const readSplashClassName = (phase: AppSplashPhase) =>
+	phase === "fading"
+		? "fixed inset-0 grid place-items-center bg-ak-page px-6 opacity-0"
+		: "fixed inset-0 grid place-items-center bg-ak-page px-6 opacity-100";
+
+const readSplashStyle = (fadeDurationMs: number): CSSProperties => ({
+	transitionDuration: `${fadeDurationMs}ms`,
+	transitionProperty: "opacity",
+	transitionTimingFunction: "ease-in-out",
+	willChange: "opacity",
+	zIndex: "var(--ak-layer-app-splash)",
+});
+
+export const AppSplashScreen: FC<AppSplashScreen.Props> = ({ fadeDurationMs, heroSrc, phase }) => (
 	<div
 		data-ui="app splash"
-		className="fixed inset-0 grid place-items-center bg-ak-page px-6"
-		style={{
-			zIndex: "var(--ak-layer-app-splash)",
-		}}
+		className={readSplashClassName(phase)}
+		data-state={phase}
+		style={readSplashStyle(fadeDurationMs)}
 	>
 		<div className="pointer-events-none relative grid w-full max-w-6xl place-items-center">
 			<div className="absolute inset-x-[8%] top-1/2 h-20 -translate-y-1/2 rounded-full bg-ak-primary/20 blur-3xl" />

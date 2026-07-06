@@ -1,0 +1,82 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:prospector-guild-t1": {
+			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"label": "1",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Prospector Guild",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 14000,
+						"id": "line:prospector-guild-t1:clay-deposit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"name": "Prospect: Clay Deposit",
+						"output": [
+							{
+								"itemId": "item:clay-deposit",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 14000,
+						"id": "line:prospector-guild-t1:sand-deposit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"name": "Prospect: Sand Deposit",
+						"output": [
+							{
+								"itemId": "item:sand-deposit",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"prospecting",
+				"guild",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		}
+	}
+}

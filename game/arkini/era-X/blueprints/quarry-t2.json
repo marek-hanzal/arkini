@@ -1,0 +1,66 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-quarry-t2": {
+			"craft": {
+				"durationMs": 72000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:item:marble-deposit"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:quarry-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:iron-ingot"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack"
+					}
+				]
+			},
+			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
+			"label": "2",
+			"name": "Quarry Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		}
+	}
+}

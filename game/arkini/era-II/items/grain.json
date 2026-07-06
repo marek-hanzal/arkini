@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:grain": {
+			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
+			"maxStackSize": 50,
+			"name": "Grain",
+			"tags": [
+				"material",
+				"food",
+				"grain",
+				"era:II",
+				"tier-1-resource"
+			]
+		}
+	}
+}

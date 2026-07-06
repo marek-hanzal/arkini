@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:luxury-clothing": {
+			"description": "Prestige clothing sewn from luxury cloth, leather, and coins.",
+			"maxStackSize": 20,
+			"name": "Luxury Clothing",
+			"tags": [
+				"clothing",
+				"luxury",
+				"master",
+				"textile",
+				"era:V",
+				"tier-5-resource"
+			],
+			"tier": 5
+		}
+	}
+}

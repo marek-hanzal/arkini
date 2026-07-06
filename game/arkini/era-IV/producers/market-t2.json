@@ -1,0 +1,101 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:market-t2": {
+			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Market II",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:market-t2:coin-from-paper",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 3
+							}
+						],
+						"name": "Coins from Paper",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 14000,
+						"id": "line:market-t2:coin-from-feast",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							}
+						],
+						"name": "Better Coins from Feast",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 7,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 15000,
+						"id": "line:market-t2:coin-from-common-clothing",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:common-clothing"
+							}
+						],
+						"name": "Coins from Common Clothing",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 5,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 18000,
+						"id": "line:market-t2:coin-from-luxury-clothing",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							}
+						],
+						"name": "Coins from Luxury Clothing",
+						"output": [
+							{
+								"itemId": "item:coin",
+								"quantity": 8,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"trade",
+				"market",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		}
+	}
+}

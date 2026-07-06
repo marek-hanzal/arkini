@@ -1,0 +1,75 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:windmill-t1": {
+			"description": "Mills grain into flour.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:windmill-t1",
+							"name": "Owns Windmill I"
+						}
+					],
+					"id": "effect:grant-owned:producer-windmill-t1",
+					"name": "Owned Windmill I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Windmill I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 12000,
+						"id": "line:windmill-t1:flour",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:flour",
+								"quantity": 3,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"grain",
+				"flour",
+				"era:III",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

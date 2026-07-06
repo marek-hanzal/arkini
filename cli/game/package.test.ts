@@ -160,6 +160,60 @@ describe("game package compiler", () => {
 		expect(config.items["item:test"]?.name).toBe("Test item");
 	});
 
+	it("recursively reads nested source fragments", async () => {
+		const sourceDir = await createTempSourcePackage({
+			$schema: "./arkini.schema.json",
+			version: 1,
+			game: {
+				id: "game:test",
+				title: "Test",
+				board: {
+					height: 1,
+					width: 1,
+				},
+				inventory: {
+					slots: 1,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:nested",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		await mkdir(join(sourceDir, "era-I", "items"), {
+			recursive: true,
+		});
+		await writeFile(
+			join(sourceDir, "era-I", "items", "nested.json"),
+			JSON.stringify({
+				$schema: "../../../arkini.schema.json",
+				resources: {
+					"item-nested": {
+						data: "nested-resource",
+					},
+				},
+				items: {
+					"item:nested": {
+						description: "Nested item",
+						name: "Nested item",
+					},
+				},
+			}),
+		);
+
+		const config = await validateSources([
+			sourceDir,
+		]);
+
+		expect(config.items["item:nested"]?.name).toBe("Nested item");
+	});
+
 	it("writes a binary arkpack and does not require split compiled artifacts", async () => {
 		const sourceDir = await createTempSourcePackage({
 			version: 1,

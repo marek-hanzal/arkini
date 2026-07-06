@@ -1,0 +1,76 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-waste-processor-t2": {
+			"craft": {
+				"durationMs": 46000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:academy"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:charcoal-burner-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:coal-mine-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:waste-processor-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coal"
+					},
+					{
+						"consume": true,
+						"itemId": "item:charcoal"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 3
+					}
+				],
+				"resultItemId": "producer:waste-processor-t2"
+			},
+			"description": "Build plan that upgrades Waste Processor I into Waste Processor II for coal and charcoal disposal lines.",
+			"name": "Waste Processor II Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"industry",
+				"era:VIII"
+			]
+		}
+	}
+}

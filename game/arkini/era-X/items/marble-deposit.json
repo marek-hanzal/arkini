@@ -1,0 +1,34 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:marble-deposit": {
+			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:marble-deposit",
+							"name": "Owns Marble Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-marble-deposit",
+					"name": "Owned Marble Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Marble Deposit",
+			"tags": [
+				"source",
+				"construction",
+				"stone",
+				"marble",
+				"deposit",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"tier": 10
+		}
+	}
+}

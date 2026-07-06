@@ -1,0 +1,148 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:vegetable-garden-t1": {
+			"description": "Consumes water to produce vegetables.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:vegetable-garden-t1",
+							"name": "Owns Vegetable Garden I"
+						}
+					],
+					"id": "effect:grant-owned:producer-vegetable-garden-t1",
+					"name": "Owned Vegetable Garden I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Vegetable Garden I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 20000,
+						"id": "line:vegetable-garden-t1:vegetables",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:vegetables",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.35,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:vegetables",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2",
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"vegetable",
+				"era:II",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

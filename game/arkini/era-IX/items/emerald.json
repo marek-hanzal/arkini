@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:emerald": {
+			"description": "A polished green gemstone prepared for later treasure recipes.",
+			"maxStackSize": 20,
+			"name": "Emerald",
+			"tags": [
+				"treasure",
+				"gem",
+				"emerald",
+				"era:IX"
+			],
+			"tier": 1
+		}
+	}
+}

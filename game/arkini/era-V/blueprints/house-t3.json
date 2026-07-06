@@ -1,0 +1,69 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-house-t3": {
+			"craft": {
+				"durationMs": 36000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:civic-office-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:tailor-workshop-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:house-t2"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:common-clothing"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t2"
+					}
+				]
+			},
+			"description": "Build plan for House III, a housing producer that generates morale.",
+			"name": "House III Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:V"
+			]
+		}
+	}
+}

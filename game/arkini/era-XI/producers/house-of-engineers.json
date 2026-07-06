@@ -1,0 +1,36 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:house-of-engineers": {
+			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:engineers",
+							"name": "Engineers path chosen"
+						}
+					],
+					"id": "effect:path-engineers-locks-counter-keystones",
+					"name": "Engineers path locks Faith and Mages keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "House of Engineers",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		}
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:building-permit": {
+			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
+			"maxStackSize": 20,
+			"name": "Building Permit",
+			"tags": [
+				"resource",
+				"master",
+				"permit",
+				"civic",
+				"era:IV"
+			],
+			"tier": 4
+		}
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-stonemason-t1": {
+			"craft": {
+				"durationMs": 12000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Stonemason I.",
+			"name": "Stonemason I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		}
+	}
+}

@@ -1,0 +1,41 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:micro-forest": {
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it. Harvesting it with a single-use axe removes the source and drops logs.",
+			"maxStackSize": 1,
+			"name": "Micro-Forest",
+			"removeBy": [
+				{
+					"itemId": "item:axe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:log",
+							"quantity": {
+								"max": 3,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t3",
+				"forest",
+				"era:I"
+			],
+			"tier": 3,
+			"capacity": {
+				"max": 72,
+				"onDepleted": "replace",
+				"replaceItemId": "item:seed"
+			}
+		}
+	}
+}

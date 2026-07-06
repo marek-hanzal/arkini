@@ -1,0 +1,75 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-blacksmith-t1": {
+			"craft": {
+				"durationMs": 65000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:academy"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:purifier-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:smelter-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:bricks",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:iron-ingot",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:charcoal",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 8
+					}
+				]
+			},
+			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
+			"name": "Blacksmith I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"blacksmith",
+				"era:IX"
+			]
+		}
+	}
+}

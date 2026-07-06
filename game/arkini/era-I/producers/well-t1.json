@@ -1,0 +1,107 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:well-t1": {
+			"description": "Produces water.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:well-t1",
+							"name": "Owns Well I"
+						}
+					],
+					"id": "effect:grant-owned:producer-well-t1",
+					"name": "Owned Well I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Well I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 5000,
+						"id": "line:well-t1:water",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:water",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.5,
+								"effects": [
+									{
+										"chance": 0.35,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:water",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"water",
+				"era:I",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

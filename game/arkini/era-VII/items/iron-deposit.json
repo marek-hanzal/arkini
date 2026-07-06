@@ -1,0 +1,31 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:iron-deposit": {
+			"description": "Movable iron source used by nearby iron mines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:iron-deposit",
+							"name": "Owns Iron Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-iron-deposit",
+					"name": "Owned Iron Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Iron Deposit",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"iron",
+				"era:VII"
+			],
+			"tier": 7
+		}
+	}
+}

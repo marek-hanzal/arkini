@@ -1,0 +1,117 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-townhall-t4": {
+			"craft": {
+				"durationMs": 60000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:item:hop-field"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:item:vineyard"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:bakery-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:brewery-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:cookhouse-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:dairy-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:market-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:slaughterhouse-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:tavern-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:windmill-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:winery-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:townhall-t3"
+					},
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 5
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 5
+					},
+					{
+						"consume": true,
+						"itemId": "item:feast"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t2"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t1"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
+			"name": "Town Hall IV Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			]
+		}
+	}
+}

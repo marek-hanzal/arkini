@@ -1,0 +1,180 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:tailor-workshop-t1": {
+			"description": "Clothing producer that sews common and luxury clothing.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:tailor-workshop-t1",
+							"name": "Owns Tailor Workshop I"
+						}
+					],
+					"id": "effect:grant-owned:producer-tailor-workshop-t1",
+					"name": "Owned Tailor Workshop I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Tailor Workshop I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 26000,
+						"id": "line:tailor-workshop-t1:common-clothing",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:common-cloth",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:leather"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.15,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:common-clothing",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 35000,
+						"id": "line:tailor-workshop-t1:luxury-clothing",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-cloth",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:leather"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.15,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:luxury-clothing",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 30000,
+						"id": "line:tailor-workshop-t1:luxury-clothing-morale-t3",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-cloth",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:leather"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t3"
+							}
+						],
+						"name": "Luxury Clothing (Inspired)",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.15,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:luxury-clothing",
+								"quantity": 3,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"clothing",
+				"textile",
+				"era:V",
+				"unique"
+			],
+			"tier": 5
+		}
+	}
+}

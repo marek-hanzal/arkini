@@ -1,0 +1,97 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:shrine-t1": {
+			"assetIds": [
+				"asset:producer:shrine-t1"
+			],
+			"description": "A small roadside shrine that turns simple offerings into temporary production blessings.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Wayside Shrine",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 300000,
+						"effect": {
+							"grants": [
+								{
+									"id": "grant:active:shrine-minor-haste",
+									"name": "Minor Haste active"
+								}
+							],
+							"id": "effect:shrine-minor-haste",
+							"name": "Minor Haste",
+							"polarity": "buff",
+							"sourceScope": "board"
+						},
+						"id": "line:shrine-t1:minor-haste",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Minor Haste",
+						"tags": [
+							"shrine:effect"
+						]
+					},
+					{
+						"durationMs": 180000,
+						"effect": {
+							"grants": [
+								{
+									"id": "grant:active:shrine-bountiful-offering",
+									"name": "Bountiful Offering active"
+								}
+							],
+							"id": "effect:shrine-bountiful-offering",
+							"name": "Bountiful Offering",
+							"polarity": "buff",
+							"sourceScope": "board"
+						},
+						"id": "line:shrine-t1:bountiful-offering",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:stone"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"name": "Bountiful Offering",
+						"tags": [
+							"shrine:effect"
+						]
+					}
+				],
+				"maxQueueSize": 2
+			},
+			"tags": [
+				"building",
+				"producer",
+				"shrine",
+				"effect-source",
+				"unique",
+				"era:I"
+			],
+			"tier": 1
+		}
+	}
+}

@@ -1,0 +1,146 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:sawmill-t1": {
+			"description": "Turns logs into planks when placed near a lumberjack.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sawmill-t1",
+							"name": "Owns Sawmill I"
+						}
+					],
+					"id": "effect:grant-owned:producer-sawmill-t1",
+					"name": "Owned Sawmill I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Sawmill I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:sawmill-t1:plank",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:lumberjack-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:lumberjack-t1",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:plank",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.25,
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:lumberjack-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:lumberjack-t1",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:plank",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"wood",
+				"era:I",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

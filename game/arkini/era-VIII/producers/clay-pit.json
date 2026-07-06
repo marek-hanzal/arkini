@@ -1,0 +1,131 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:clay-pit": {
+			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:clay-pit",
+							"name": "Owns Clay Pit"
+						}
+					],
+					"id": "effect:grant-owned:producer-clay-pit",
+					"name": "Owned Clay Pit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Clay Pit",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:clay-pit:clay",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:clay-deposit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:clay-deposit",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:clay",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.3,
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:clay-deposit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:clay-deposit",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:clay",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"clay",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"tier": 3
+		}
+	}
+}

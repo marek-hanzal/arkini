@@ -1,0 +1,33 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-dairy-t1": {
+			"craft": {
+				"durationMs": 22000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block"
+					},
+					{
+						"consume": true,
+						"itemId": "item:milk"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Dairy I.",
+			"name": "Dairy I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			]
+		}
+	}
+}

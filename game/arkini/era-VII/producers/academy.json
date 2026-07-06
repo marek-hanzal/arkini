@@ -1,0 +1,472 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:academy": {
+			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:academy",
+							"name": "Owns Academy"
+						}
+					],
+					"id": "effect:grant-owned:producer-academy",
+					"name": "Owned Academy grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Academy",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 28000,
+						"id": "line:academy:basic-knowledge",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							},
+							{
+								"capacity": 12,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:basic-knowledge",
+								"quantity": 4,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 36000,
+						"id": "line:academy:advanced-knowledge",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:basic-knowledge",
+								"quantity": 3
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							},
+							{
+								"capacity": 12,
+								"consume": true,
+								"itemId": "item:coin",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:advanced-knowledge",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-prospector-guild-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							}
+						],
+						"name": "Blueprint: Prospector Guild 2",
+						"output": [
+							{
+								"itemId": "item:blueprint-prospector-guild-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-coal-mine-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper"
+							}
+						],
+						"name": "Blueprint: Coal Mine I",
+						"output": [
+							{
+								"itemId": "item:blueprint-coal-mine-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-iron-mine-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper"
+							}
+						],
+						"name": "Blueprint: Iron Mine I",
+						"output": [
+							{
+								"itemId": "item:blueprint-iron-mine-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-gold-mine-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper"
+							}
+						],
+						"name": "Blueprint: Gold Mine I",
+						"output": [
+							{
+								"itemId": "item:blueprint-gold-mine-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-purifier-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Purifier I",
+						"output": [
+							{
+								"itemId": "item:blueprint-purifier-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-charcoal-burner-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper"
+							}
+						],
+						"name": "Blueprint: Charcoal Burner I",
+						"output": [
+							{
+								"itemId": "item:blueprint-charcoal-burner-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-waste-processor-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Waste Processor II",
+						"output": [
+							{
+								"itemId": "item:blueprint-waste-processor-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-bio-waste-processor-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Bio-Waste Processor II",
+						"output": [
+							{
+								"itemId": "item:blueprint-bio-waste-processor-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-clay-pit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:clay-deposit"
+							}
+						],
+						"name": "Blueprint: Clay Pit",
+						"output": [
+							{
+								"itemId": "item:blueprint-clay-pit",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-sand-pit",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sand-deposit"
+							}
+						],
+						"name": "Blueprint: Sand Pit",
+						"output": [
+							{
+								"itemId": "item:blueprint-sand-pit",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-brickyard",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Brickyard",
+						"output": [
+							{
+								"itemId": "item:blueprint-brickyard",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-glassworks",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Glassworks",
+						"output": [
+							{
+								"itemId": "item:blueprint-glassworks",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-roof-tile-factory",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Roof Tile Factory",
+						"output": [
+							{
+								"itemId": "item:blueprint-roof-tile-factory",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-smelter-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Smelter I",
+						"output": [
+							{
+								"itemId": "item:blueprint-smelter-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-construction-yard-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Construction Yard I",
+						"output": [
+							{
+								"itemId": "item:blueprint-construction-yard-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-blacksmith-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Blacksmith I",
+						"output": [
+							{
+								"itemId": "item:blueprint-blacksmith-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-armory-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Armory I",
+						"output": [
+							{
+								"itemId": "item:blueprint-armory-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-goldsmith-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							}
+						],
+						"name": "Blueprint: Goldsmith I",
+						"output": [
+							{
+								"itemId": "item:blueprint-goldsmith-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:academy:blueprint-university",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge",
+								"quantity": 2
+							}
+						],
+						"name": "Blueprint: University",
+						"output": [
+							{
+								"itemId": "item:blueprint-university",
+								"type": "guaranteed"
+							}
+						]
+					}
+				],
+				"maxQueueSize": 2
+			},
+			"tags": [
+				"producer",
+				"building",
+				"education",
+				"knowledge",
+				"unique",
+				"era:VII"
+			],
+			"tier": 7
+		}
+	}
+}

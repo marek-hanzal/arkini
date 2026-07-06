@@ -1,0 +1,20 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:pickaxe": {
+			"description": "Single-use mining tool. Drag onto a stone deposit to harvest a random pile of stones.",
+			"maxStackSize": 20,
+			"name": "Pickaxe",
+			"tags": [
+				"equipment",
+				"tool",
+				"mining",
+				"stone",
+				"blacksmith",
+				"single-use",
+				"era:IX"
+			],
+			"tier": 1
+		}
+	}
+}

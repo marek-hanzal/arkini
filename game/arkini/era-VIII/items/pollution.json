@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:pollution": {
+			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
+			"maxStackSize": 1,
+			"name": "Pollution",
+			"storage": "board",
+			"tags": [
+				"danger",
+				"industry",
+				"pollution",
+				"era:VIII"
+			],
+			"tier": 7
+		}
+	}
+}

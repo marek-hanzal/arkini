@@ -1,0 +1,20 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:gold-ore": {
+			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
+			"maxStackSize": 20,
+			"name": "Gold Ore Cart",
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"gold",
+				"era:VII",
+				"master",
+				"tier-7-resource"
+			],
+			"tier": 7
+		}
+	}
+}

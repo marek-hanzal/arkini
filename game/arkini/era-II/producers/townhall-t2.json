@@ -1,0 +1,234 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:townhall-t2": {
+			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall II",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:wheat-field",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"name": "Survey: Wheat Field",
+						"output": [
+							{
+								"itemId": "item:wheat-field",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-farm-t1",
+						"name": "Blueprint: Farm I",
+						"output": [
+							{
+								"itemId": "item:blueprint-farm-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-pig-farm-t1",
+						"name": "Blueprint: Pig Farm I",
+						"output": [
+							{
+								"itemId": "item:blueprint-pig-farm-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-cattle-farm-t1",
+						"name": "Blueprint: Cattle Farm I",
+						"output": [
+							{
+								"itemId": "item:blueprint-cattle-farm-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-chicken-coop-t1",
+						"name": "Blueprint: Chicken Coop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-chicken-coop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-sheep-pasture-t1",
+						"name": "Blueprint: Sheep Pasture I",
+						"output": [
+							{
+								"itemId": "item:blueprint-sheep-pasture-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-vegetable-garden-t1",
+						"name": "Blueprint: Vegetable Garden I",
+						"output": [
+							{
+								"itemId": "item:blueprint-vegetable-garden-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-waste-processor-t1",
+						"name": "Blueprint: Waste Processor I",
+						"output": [
+							{
+								"itemId": "item:blueprint-waste-processor-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-bio-waste-processor-t1",
+						"name": "Blueprint: Bio-Waste Processor I",
+						"output": [
+							{
+								"itemId": "item:blueprint-bio-waste-processor-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:townhall-t2:feast",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:piglet"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:milk"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:egg"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:vegetables"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:feast",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-house-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							}
+						],
+						"name": "Blueprint: House I",
+						"output": [
+							{
+								"itemId": "item:blueprint-house-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 90000,
+						"id": "line:townhall-t2:blueprint-townhall-t3",
+						"name": "Blueprint: Town Hall III",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-townhall-t3",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:II"
+			],
+			"tier": 2
+		}
+	}
+}

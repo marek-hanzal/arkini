@@ -4,6 +4,7 @@ import { loadGameConfigPackFromFile } from "../../src/config/pack/loadGameConfig
 import type { AuditFinding } from "./audit/AuditFinding";
 import { auditConfig } from "./audit/auditConfigModel";
 import { auditFileSizeGuardrails } from "./audit/auditFileSizeGuardrails";
+import { auditGameSourceJsonSchemas } from "./audit/auditGameSourceJsonSchemas";
 import { auditForbiddenDirectories, auditText } from "./audit/auditForbiddenRuntimeArtifacts";
 import {
 	auditEffectFunctionNames,
@@ -72,6 +73,7 @@ const main = async () => {
 		...auditForbiddenLogicDirectories(),
 		...auditEffectFunctionNames(),
 		...auditFileSizeGuardrails(),
+		...auditGameSourceJsonSchemas(),
 		...auditBoardItemRemovalBoundaries(),
 		...auditBoardItemWriteBoundaries(),
 		...auditRuntimeStateWriteBoundaries(),

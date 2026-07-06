@@ -1,0 +1,20 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:roof-tiles": {
+			"description": "Curved fired roof tiles prepared for higher-tier building construction.",
+			"maxStackSize": 50,
+			"name": "Roof Tiles",
+			"tags": [
+				"material",
+				"construction",
+				"clay",
+				"roof",
+				"era:VIII",
+				"industry",
+				"tier-4-resource"
+			],
+			"tier": 4
+		}
+	}
+}

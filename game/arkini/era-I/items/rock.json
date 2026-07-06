@@ -1,0 +1,37 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:rock": {
+			"description": "Movable stone deposit used by nearby quarries or mined manually with a single-use pickaxe.",
+			"name": "Stone Deposit",
+			"removeBy": [
+				{
+					"itemId": "item:pickaxe",
+					"mode": "consume",
+					"output": [
+						{
+							"itemId": "item:stone",
+							"quantity": {
+								"max": 4,
+								"min": 1
+							},
+							"type": "guaranteed"
+						}
+					]
+				}
+			],
+			"tags": [
+				"source",
+				"stone",
+				"era:I",
+				"stone-deposit"
+			],
+			"capacity": {
+				"max": 64,
+				"onDepleted": "replace",
+				"replaceItemId": "item:cracked-rock"
+			},
+			"maxStackSize": 1
+		}
+	}
+}

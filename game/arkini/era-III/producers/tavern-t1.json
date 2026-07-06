@@ -1,0 +1,109 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:tavern-t1": {
+			"description": "Serves beer barrels as individual beers.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:tavern-t1",
+							"name": "Owns Tavern I"
+						}
+					],
+					"id": "effect:grant-owned:producer-tavern-t1",
+					"name": "Owned Tavern I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Tavern I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 12000,
+						"id": "line:tavern-t1:beer",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:beer-barrel"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:beer",
+								"quantity": 4,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:tavern-t1:wine-glass",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:wine-barrel"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.2,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:wine-glass",
+								"quantity": 4,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"beer",
+				"era:III",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

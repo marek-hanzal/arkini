@@ -1,0 +1,320 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:heroes-guild-t1": {
+			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:heroes-guild-t1",
+							"name": "Owns Heroes Guild I"
+						}
+					],
+					"id": "effect:grant-owned:producer-heroes-guild-t1",
+					"name": "Owned Heroes Guild I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Heroes Guild I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 45000,
+						"id": "line:heroes-guild-t1:chest-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:axe"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:leather-armor"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							},
+							{
+								"capacity": 12,
+								"consume": true,
+								"itemId": "item:coin",
+								"quantity": 4
+							}
+						],
+						"name": "Chest I Expedition",
+						"output": [
+							{
+								"itemId": "item:chest-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 55000,
+						"id": "line:heroes-guild-t1:chest-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sword"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:iron-armor"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:coin-stack"
+							}
+						],
+						"name": "Chest II Expedition",
+						"output": [
+							{
+								"itemId": "item:chest-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 65000,
+						"id": "line:heroes-guild-t1:chest-t3",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sword"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:iron-armor"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t1"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:coin-stack"
+							}
+						],
+						"name": "Chest III Expedition",
+						"output": [
+							{
+								"itemId": "item:chest-t3",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 75000,
+						"id": "line:heroes-guild-t1:chest-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sword"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:iron-armor"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t2"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:coin-stack"
+							}
+						],
+						"name": "Chest IV Expedition",
+						"output": [
+							{
+								"itemId": "item:chest-t4",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 90000,
+						"id": "line:heroes-guild-t1:treasure-chest",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sword"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:iron-armor"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t4"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:topaz"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:aquamarine"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:coin-stack",
+								"quantity": 2
+							}
+						],
+						"name": "Grand Expedition",
+						"output": [
+							{
+								"itemId": "item:treasure-chest",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 80000,
+						"id": "line:heroes-guild-t1:treasure-chest-morale-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sword"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:iron-armor"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t4"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:topaz"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:aquamarine"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:coin-stack",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t4"
+							}
+						],
+						"name": "Grand Expedition (Inspired)",
+						"output": [
+							{
+								"itemId": "item:treasure-chest",
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.3,
+								"itemId": "item:aquamarine",
+								"type": "chance"
+							},
+							{
+								"chance": 0.3,
+								"itemId": "item:topaz",
+								"type": "chance"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"hero",
+				"guild",
+				"expedition",
+				"master",
+				"unique",
+				"era:IX"
+			],
+			"tier": 9
+		}
+	}
+}

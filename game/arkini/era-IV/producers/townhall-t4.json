@@ -1,0 +1,166 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:townhall-t4": {
+			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall IV",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-paper-mill-t1",
+						"name": "Blueprint: Paper Mill I",
+						"output": [
+							{
+								"itemId": "item:blueprint-paper-mill-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-school",
+						"name": "Blueprint: School",
+						"output": [
+							{
+								"itemId": "item:blueprint-school",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-library-t2",
+						"name": "Blueprint: Library II",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-library-t3",
+						"name": "Blueprint: Library III",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t3",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-library-t4",
+						"name": "Blueprint: Library IV",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t4",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-civic-office-t1",
+						"name": "Blueprint: Civic Office I",
+						"output": [
+							{
+								"itemId": "item:blueprint-civic-office-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-market-t2",
+						"name": "Blueprint: Market II",
+						"output": [
+							{
+								"itemId": "item:blueprint-market-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-prospector-guild-t1",
+						"name": "Blueprint: Prospector Guild 1",
+						"output": [
+							{
+								"itemId": "item:blueprint-prospector-guild-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-tannery-t1",
+						"name": "Blueprint: Tannery I",
+						"output": [
+							{
+								"itemId": "item:blueprint-tannery-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-weaver-hut-t1",
+						"name": "Blueprint: Weaver Hut I",
+						"output": [
+							{
+								"itemId": "item:blueprint-weaver-hut-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-dye-workshop-t1",
+						"name": "Blueprint: Dye Workshop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-dye-workshop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-tailor-workshop-t1",
+						"name": "Blueprint: Tailor Workshop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-tailor-workshop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:townhall-t4:blueprint-house-t3",
+						"name": "Blueprint: House III",
+						"output": [
+							{
+								"itemId": "item:blueprint-house-t3",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"tier": 4
+		}
+	}
+}

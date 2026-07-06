@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:guild-charter": {
+			"description": "Formal civic charter that authorizes advanced guild, university, and expedition buildings after the city has advanced construction capacity.",
+			"maxStackSize": 20,
+			"name": "Guild Charter",
+			"tags": [
+				"civic",
+				"charter",
+				"guild",
+				"permit",
+				"era:IX"
+			],
+			"tier": 9
+		}
+	}
+}

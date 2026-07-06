@@ -1,0 +1,78 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:school": {
+			"description": "Education building that turns civic support into Basic Knowledge.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "School",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 22000,
+						"id": "line:school:basic-knowledge",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:basic-knowledge",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 18000,
+						"id": "line:school:basic-knowledge-morale-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:coin"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t2"
+							}
+						],
+						"name": "Basic Knowledge (Inspired)",
+						"output": [
+							{
+								"itemId": "item:basic-knowledge",
+								"quantity": 4,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"education",
+				"knowledge",
+				"unique",
+				"era:IV"
+			],
+			"tier": 2
+		}
+	}
+}

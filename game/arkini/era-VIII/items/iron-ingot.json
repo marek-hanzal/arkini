@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:iron-ingot": {
+			"description": "Refined iron produced by smelters from iron ore and coal.",
+			"maxStackSize": 50,
+			"name": "Iron Ingot",
+			"tags": [
+				"material",
+				"industry",
+				"ingot",
+				"iron",
+				"era:VIII",
+				"tier-7-resource"
+			],
+			"tier": 7
+		}
+	}
+}

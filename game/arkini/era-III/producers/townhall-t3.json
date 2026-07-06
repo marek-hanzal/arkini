@@ -1,0 +1,224 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:townhall-t3": {
+			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, cookhouse, brewing, wine, market, and Era IV plans.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall III",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-windmill-t1",
+						"name": "Blueprint: Windmill I",
+						"output": [
+							{
+								"itemId": "item:blueprint-windmill-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-bakery-t1",
+						"name": "Blueprint: Bakery I",
+						"output": [
+							{
+								"itemId": "item:blueprint-bakery-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-slaughterhouse-t1",
+						"name": "Blueprint: Slaughterhouse I",
+						"output": [
+							{
+								"itemId": "item:blueprint-slaughterhouse-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-dairy-t1",
+						"name": "Blueprint: Dairy I",
+						"output": [
+							{
+								"itemId": "item:blueprint-dairy-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-cookhouse-t1",
+						"name": "Blueprint: Cookhouse I",
+						"output": [
+							{
+								"itemId": "item:blueprint-cookhouse-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 13000,
+						"id": "line:townhall-t3:hop-field",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"name": "Survey: Hop Field",
+						"output": [
+							{
+								"itemId": "item:hop-field",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-brewery-t1",
+						"name": "Blueprint: Brewery I",
+						"output": [
+							{
+								"itemId": "item:blueprint-brewery-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-tavern-t1",
+						"name": "Blueprint: Tavern I",
+						"output": [
+							{
+								"itemId": "item:blueprint-tavern-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 15000,
+						"id": "line:townhall-t3:vineyard",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"name": "Survey: Vineyard",
+						"output": [
+							{
+								"itemId": "item:vineyard",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-winery-t1",
+						"name": "Blueprint: Winery I",
+						"output": [
+							{
+								"itemId": "item:blueprint-winery-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-market-t1",
+						"name": "Blueprint: Market",
+						"output": [
+							{
+								"itemId": "item:blueprint-market-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 12000,
+						"id": "line:townhall-t3:blueprint-house-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:beer"
+							}
+						],
+						"name": "Blueprint: House II",
+						"output": [
+							{
+								"itemId": "item:blueprint-house-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 120000,
+						"id": "line:townhall-t3:blueprint-townhall-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:feast"
+							}
+						],
+						"name": "Blueprint: Town Hall IV",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-townhall-t4",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:III"
+			],
+			"tier": 3
+		}
+	}
+}

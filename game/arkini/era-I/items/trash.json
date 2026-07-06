@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:trash": {
+			"description": "Generic board waste byproduct from messy production lines. It is harmless, ugly, and should eventually be cleaned instead of hidden away.",
+			"maxStackSize": 1,
+			"name": "Trash",
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"trash",
+				"cleanup",
+				"era:I"
+			],
+			"tier": 1
+		}
+	}
+}

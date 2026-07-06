@@ -1,0 +1,63 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-academy": {
+			"craft": {
+				"durationMs": 55000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:civic-office-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:library-t2"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:school"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:luxury-clothing"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t2"
+					}
+				]
+			},
+			"description": "Build plan that upgrades a School into an Academy.",
+			"name": "Academy Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"education",
+				"knowledge",
+				"era:VII"
+			]
+		}
+	}
+}

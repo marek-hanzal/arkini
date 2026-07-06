@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:vegetables": {
+			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Vegetables",
+			"tags": [
+				"food",
+				"vegetable",
+				"era:II",
+				"tier-1-resource"
+			]
+		}
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:glass": {
+			"description": "Finished glass panels prepared for advanced building and luxury chains.",
+			"maxStackSize": 50,
+			"name": "Glass",
+			"tags": [
+				"material",
+				"construction",
+				"glass",
+				"era:VIII",
+				"industry",
+				"tier-4-resource"
+			],
+			"tier": 4
+		}
+	}
+}

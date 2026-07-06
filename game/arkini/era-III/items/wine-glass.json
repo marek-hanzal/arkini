@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:wine-glass": {
+			"description": "A single glass of wine served by taverns.",
+			"maxStackSize": 50,
+			"name": "Wine Glass",
+			"tags": [
+				"food",
+				"wine",
+				"era:III",
+				"tier-4-resource"
+			]
+		}
+	}
+}

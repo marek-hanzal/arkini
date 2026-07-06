@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:sapphire": {
+			"description": "A polished blue gemstone from better guild rewards.",
+			"maxStackSize": 20,
+			"name": "Sapphire",
+			"tags": [
+				"treasure",
+				"gem",
+				"sapphire",
+				"era:IX"
+			],
+			"tier": 2
+		}
+	}
+}

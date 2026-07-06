@@ -1,0 +1,67 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-stonemason-t2": {
+			"craft": {
+				"durationMs": 75000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:quarry-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:stonemason-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack"
+					}
+				]
+			},
+			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
+			"label": "2",
+			"name": "Stonemason Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			]
+		}
+	}
+}

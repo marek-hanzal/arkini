@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:key-t1": {
+			"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
+			"maxStackSize": 20,
+			"name": "Key I",
+			"tags": [
+				"key",
+				"goldsmith",
+				"era:IX"
+			],
+			"tier": 1
+		}
+	}
+}

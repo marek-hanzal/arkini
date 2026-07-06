@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:log": {
+			"description": "Basic wood material produced by lumberjacks.",
+			"maxStackSize": 50,
+			"name": "Log",
+			"tags": [
+				"material",
+				"wood",
+				"era:I",
+				"tier-1-resource"
+			]
+		}
+	}
+}

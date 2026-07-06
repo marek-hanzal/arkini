@@ -1,0 +1,92 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:cookhouse-t1": {
+			"description": "Combines processed food into feasts.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:cookhouse-t1",
+							"name": "Owns Cookhouse I"
+						}
+					],
+					"id": "effect:grant-owned:producer-cookhouse-t1",
+					"name": "Owned Cookhouse I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Cookhouse I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 34000,
+						"id": "line:cookhouse-t1:feast",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:bread"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sausage"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:cheese"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:vegetables"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:egg"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.2,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:feast",
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"cooking",
+				"era:III",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

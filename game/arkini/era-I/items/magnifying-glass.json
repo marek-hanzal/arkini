@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:magnifying-glass": {
+			"description": "Reusable survey tool used to search exhausted cracks and later other depleted deposits for fresh sources.",
+			"maxStackSize": 1,
+			"name": "Magnifying Glass",
+			"tags": [
+				"equipment",
+				"tool",
+				"search",
+				"survey",
+				"deposit-search",
+				"era:I"
+			],
+			"tier": 1
+		}
+	}
+}

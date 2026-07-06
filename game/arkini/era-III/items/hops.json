@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:hops": {
+			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
+			"maxStackSize": 50,
+			"name": "Hops",
+			"tags": [
+				"material",
+				"food",
+				"beer",
+				"hops",
+				"era:III",
+				"tier-3-resource"
+			]
+		}
+	}
+}

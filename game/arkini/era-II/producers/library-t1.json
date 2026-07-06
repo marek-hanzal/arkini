@@ -1,0 +1,35 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:library-t1": {
+			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:library-t1",
+							"name": "Owns Library I"
+						}
+					],
+					"id": "effect:grant-owned:producer-library-t1",
+					"name": "Owned Library I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Library I",
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:II"
+			],
+			"tier": 2
+		}
+	}
+}

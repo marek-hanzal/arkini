@@ -1,0 +1,65 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-charcoal-burner-t1": {
+			"craft": {
+				"durationMs": 44000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:academy"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:purifier-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:log",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coal"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
+			"name": "Charcoal Burner I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			]
+		}
+	}
+}

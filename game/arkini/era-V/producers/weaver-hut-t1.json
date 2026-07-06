@@ -1,0 +1,75 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:weaver-hut-t1": {
+			"description": "Textile producer that weaves wool into common cloth.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:weaver-hut-t1",
+							"name": "Owns Weaver Hut I"
+						}
+					],
+					"id": "effect:grant-owned:producer-weaver-hut-t1",
+					"name": "Owned Weaver Hut I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Weaver Hut I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 18000,
+						"id": "line:weaver-hut-t1:common-cloth",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:wool",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.15,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:common-cloth",
+								"quantity": 3,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cloth",
+				"textile",
+				"era:V",
+				"unique"
+			],
+			"tier": 5
+		}
+	}
+}

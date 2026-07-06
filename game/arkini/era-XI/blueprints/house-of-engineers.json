@@ -1,0 +1,136 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-house-of-engineers": {
+			"craft": {
+				"durationMs": 140000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:blacksmith-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:glazier-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:library-t4"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Faith path locks Engineers and Mages keystone plans",
+						"reason": "Faith path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:faith"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Mages path locks Engineers and Faith keystone plans",
+						"reason": "Mages path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:mages"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:treasure-chest"
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block"
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:iron-ingot",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:gold-ingot"
+					},
+					{
+						"consume": true,
+						"itemId": "item:nails",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t4"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
+			"name": "House of Engineers Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"era:XI"
+			]
+		}
+	}
+}

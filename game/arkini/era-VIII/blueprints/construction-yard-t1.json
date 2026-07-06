@@ -1,0 +1,92 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-construction-yard-t1": {
+			"craft": {
+				"durationMs": 70000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:brickyard"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:glassworks"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:roof-tile-factory"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:smelter-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:bricks",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:roof-tiles",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:gold-ingot"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:luxury-clothing"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
+			"name": "Construction Yard I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			]
+		}
+	}
+}

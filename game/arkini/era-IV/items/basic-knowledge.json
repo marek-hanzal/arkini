@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:basic-knowledge": {
+			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
+			"maxStackSize": 50,
+			"name": "Basic Knowledge",
+			"tags": [
+				"knowledge",
+				"education",
+				"research",
+				"era:IV"
+			],
+			"tier": 2
+		}
+	}
+}

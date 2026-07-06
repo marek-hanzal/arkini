@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:aquamarine": {
+			"description": "A polished cyan gemstone reserved for late-game treasure economy.",
+			"maxStackSize": 20,
+			"name": "Aquamarine",
+			"tags": [
+				"treasure",
+				"gem",
+				"aquamarine",
+				"era:IX"
+			],
+			"tier": 4
+		}
+	}
+}

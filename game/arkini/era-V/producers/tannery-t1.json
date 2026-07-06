@@ -1,0 +1,80 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:tannery-t1": {
+			"description": "Leatherworking producer that turns raw hide and water into leather.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:tannery-t1",
+							"name": "Owns Tannery I"
+						}
+					],
+					"id": "effect:grant-owned:producer-tannery-t1",
+					"name": "Owned Tannery I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Tannery I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 22000,
+						"id": "line:tannery-t1:leather",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:raw-hide"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.15,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:leather",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"leather",
+				"textile",
+				"era:V",
+				"unique"
+			],
+			"tier": 5
+		}
+	}
+}

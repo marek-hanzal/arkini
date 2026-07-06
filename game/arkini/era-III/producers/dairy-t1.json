@@ -1,0 +1,74 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:dairy-t1": {
+			"description": "Processes milk into cheese.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:dairy-t1",
+							"name": "Owns Dairy I"
+						}
+					],
+					"id": "effect:grant-owned:producer-dairy-t1",
+					"name": "Owned Dairy I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Dairy I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 18000,
+						"id": "line:dairy-t1:cheese",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:milk",
+								"quantity": 3
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:cheese",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:III",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

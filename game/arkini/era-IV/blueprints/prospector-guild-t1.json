@@ -1,0 +1,48 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-prospector-guild-t1": {
+			"craft": {
+				"durationMs": 38000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 2
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
+			"label": "1",
+			"name": "Prospector Guild Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"prospecting",
+				"guild",
+				"civic",
+				"era:IV"
+			]
+		}
+	}
+}

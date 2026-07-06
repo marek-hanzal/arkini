@@ -1,0 +1,43 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-library-t2": {
+			"craft": {
+				"durationMs": 38000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:library-t1"
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					}
+				],
+				"resultItemId": "producer:library-t2"
+			},
+			"description": "Build plan that upgrades Library I into Library II.",
+			"name": "Library II Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:IV"
+			],
+			"tier": 4
+		}
+	}
+}

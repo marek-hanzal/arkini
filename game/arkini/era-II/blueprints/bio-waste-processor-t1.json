@@ -1,0 +1,42 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-bio-waste-processor-t1": {
+			"craft": {
+				"durationMs": 34000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:grain"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				],
+				"resultItemId": "producer:bio-waste-processor-t1"
+			},
+			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
+			"name": "Bio-Waste Processor I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"era:II"
+			]
+		}
+	}
+}

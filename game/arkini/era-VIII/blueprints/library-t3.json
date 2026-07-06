@@ -1,0 +1,49 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-library-t3": {
+			"craft": {
+				"durationMs": 48000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "producer:library-t2"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					},
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:bricks",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:advanced-knowledge"
+					}
+				],
+				"resultItemId": "producer:library-t3"
+			},
+			"description": "Build plan that upgrades Library II into Library III.",
+			"name": "Library III Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:VIII"
+			],
+			"tier": 8
+		}
+	}
+}

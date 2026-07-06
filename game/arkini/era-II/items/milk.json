@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:milk": {
+			"description": "Fresh milk produced by cattle farms for base food supply chains.",
+			"maxStackSize": 50,
+			"name": "Milk",
+			"tags": [
+				"food",
+				"dairy",
+				"era:II",
+				"tier-2-resource"
+			]
+		}
+	}
+}

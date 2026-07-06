@@ -1,0 +1,61 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-dye-workshop-t1": {
+			"craft": {
+				"durationMs": 40000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:weaver-hut-t1"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:vegetables",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
+			"name": "Dye Workshop I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"dye",
+				"textile",
+				"era:V"
+			]
+		}
+	}
+}

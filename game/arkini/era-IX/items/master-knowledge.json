@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:master-knowledge": {
+			"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
+			"maxStackSize": 50,
+			"name": "Master Knowledge",
+			"tags": [
+				"knowledge",
+				"education",
+				"research",
+				"university",
+				"era:IX"
+			],
+			"tier": 4
+		}
+	}
+}

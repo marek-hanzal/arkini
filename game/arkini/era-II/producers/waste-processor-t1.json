@@ -1,0 +1,74 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:waste-processor-t1": {
+			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
+			"label": "I",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Waste Processor I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 90000,
+						"id": "line:waste-processor-t1:recycle-trash",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:trash",
+								"mode": "upTo",
+								"quantity": 4
+							}
+						],
+						"name": "Recycle Trash",
+						"placement": "board_then_inventory"
+					},
+					{
+						"durationMs": 45000,
+						"id": "line:waste-processor-t1:burn-trash-log",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:trash",
+								"mode": "upTo",
+								"quantity": 4
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:log",
+								"quantity": 1
+							}
+						],
+						"name": "Burn Trash: Wood",
+						"output": [
+							{
+								"chance": 0.25,
+								"itemId": "item:pollution",
+								"type": "chance"
+							},
+							{
+								"chance": 0.05,
+								"itemId": "item:pollution",
+								"type": "chance"
+							}
+						],
+						"placement": "board_then_inventory"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"era:II",
+				"unique"
+			],
+			"tier": 2
+		}
+	}
+}

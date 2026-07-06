@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:clay": {
+			"description": "Raw clay prepared for brick and ceramic production.",
+			"maxStackSize": 50,
+			"name": "Clay",
+			"tags": [
+				"material",
+				"construction",
+				"earth",
+				"era:VIII",
+				"industry",
+				"tier-3-resource"
+			],
+			"tier": 3
+		}
+	}
+}

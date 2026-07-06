@@ -1,0 +1,78 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-glassworks": {
+			"craft": {
+				"durationMs": 55000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:academy"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:purifier-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:sand-pit"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:bricks",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:sand",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:charcoal",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Glassworks.",
+			"name": "Glassworks Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"glass",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			]
+		}
+	}
+}

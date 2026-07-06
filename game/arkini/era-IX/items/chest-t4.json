@@ -1,0 +1,62 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:chest-t4": {
+			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
+			"maxStackSize": 1,
+			"name": "Chest IV",
+			"stash": {
+				"charges": 1,
+				"line": {
+					"chargeCost": 1,
+					"durationMs": 24000,
+					"id": "line:chest-t4:open",
+					"inputs": [
+						{
+							"capacity": 1,
+							"consume": true,
+							"itemId": "item:key-t4"
+						}
+					],
+					"name": "Open Chest T4",
+					"output": [
+						{
+							"itemId": "item:coin",
+							"quantity": {
+								"max": 15,
+								"min": 10
+							},
+							"type": "guaranteed"
+						},
+						{
+							"chance": 0.35,
+							"itemId": "item:sapphire",
+							"type": "chance"
+						},
+						{
+							"chance": 0.55,
+							"itemId": "item:topaz",
+							"type": "chance"
+						},
+						{
+							"chance": 0.35,
+							"itemId": "item:aquamarine",
+							"type": "chance"
+						}
+					],
+					"placement": "board_then_inventory"
+				},
+				"maxQueueSize": 1,
+				"onChargesDepleted": "remove"
+			},
+			"tags": [
+				"chest",
+				"locked",
+				"stash",
+				"guild",
+				"era:IX"
+			],
+			"tier": 4
+		}
+	}
+}

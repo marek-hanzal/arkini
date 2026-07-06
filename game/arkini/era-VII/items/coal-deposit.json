@@ -1,0 +1,31 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:coal-deposit": {
+			"description": "Movable coal source used by nearby coal mines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:item:coal-deposit",
+							"name": "Owns Coal Deposit"
+						}
+					],
+					"id": "effect:grant-owned:item-coal-deposit",
+					"name": "Owned Coal Deposit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"name": "Coal Deposit",
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"coal",
+				"era:VII"
+			],
+			"tier": 7
+		}
+	}
+}

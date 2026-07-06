@@ -1,0 +1,21 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:stained-glass": {
+			"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
+			"maxStackSize": 20,
+			"name": "Stained Glass",
+			"tags": [
+				"material",
+				"construction",
+				"luxury",
+				"glass",
+				"prestige",
+				"master",
+				"era:X",
+				"tier-10-resource"
+			],
+			"tier": 10
+		}
+	}
+}

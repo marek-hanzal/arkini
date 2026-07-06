@@ -1,0 +1,39 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:water": {
+			"description": "Basic water resource produced by wells and consumed by farms.",
+			"maxStackSize": 50,
+			"merges": [
+				{
+					"resultItemId": "item:double-tree",
+					"withItemId": "item:tree"
+				},
+				{
+					"resultItemId": "item:micro-forest",
+					"withItemId": "item:double-tree"
+				},
+				{
+					"output": [
+						{
+							"type": "chance",
+							"itemId": "item:seed",
+							"quantity": 1,
+							"chance": 0.35
+						}
+					],
+					"targetMode": "keep",
+					"withItemId": "item:micro-forest"
+				}
+			],
+			"name": "Water",
+			"tags": [
+				"material",
+				"food",
+				"water",
+				"era:I",
+				"tier-1-resource"
+			]
+		}
+	}
+}

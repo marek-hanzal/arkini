@@ -1,0 +1,29 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-sawmill-t1": {
+			"craft": {
+				"durationMs": 12000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Sawmill I.",
+			"name": "Sawmill I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			]
+		}
+	}
+}

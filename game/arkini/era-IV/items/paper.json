@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:paper": {
+			"description": "Processed writing material used by schools, civic offices, prospectors, and improved trade.",
+			"maxStackSize": 50,
+			"name": "Paper",
+			"tags": [
+				"resource",
+				"paper",
+				"civic",
+				"era:IV",
+				"tier-4-resource"
+			],
+			"tier": 4
+		}
+	}
+}

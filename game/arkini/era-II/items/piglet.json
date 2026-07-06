@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:piglet": {
+			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
+			"maxStackSize": 20,
+			"name": "Piglet",
+			"tags": [
+				"animal",
+				"food",
+				"pig",
+				"era:II",
+				"tier-2-resource"
+			]
+		}
+	}
+}

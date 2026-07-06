@@ -1,0 +1,404 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:university": {
+			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:university",
+							"name": "Owns University"
+						}
+					],
+					"id": "effect:grant-owned:producer-university",
+					"name": "Owned University grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "University",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 25000,
+						"id": "line:university:basic-knowledge",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:bread"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:basic-knowledge",
+								"quantity": 4,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 35000,
+						"id": "line:university:advanced-knowledge",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:basic-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:coin"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:advanced-knowledge",
+								"quantity": 3,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 60000,
+						"id": "line:university:master-knowledge",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:advanced-knowledge",
+								"quantity": 3
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 3
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:glass",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:coin-stack"
+							}
+						],
+						"output": [
+							{
+								"itemId": "item:master-knowledge",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 52000,
+						"id": "line:university:master-knowledge-morale-t4",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:advanced-knowledge",
+								"quantity": 3
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 3
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:glass",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:coin-stack"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t4"
+							}
+						],
+						"name": "Master Knowledge (Inspired)",
+						"output": [
+							{
+								"itemId": "item:master-knowledge",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-heroes-guild-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: Heroes Guild I",
+						"output": [
+							{
+								"itemId": "item:blueprint-heroes-guild-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-glazier-workshop-t1",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: Glazier Workshop I",
+						"output": [
+							{
+								"itemId": "item:blueprint-glazier-workshop-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-quarry-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: Quarry 2",
+						"output": [
+							{
+								"itemId": "item:blueprint-quarry-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-stonemason-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: Stonemason 2",
+						"output": [
+							{
+								"itemId": "item:blueprint-stonemason-t2",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-house-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: House IV",
+						"output": [
+							{
+								"itemId": "item:blueprint-house-t4",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-house-of-engineers",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: House of Engineers",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.drop.hide",
+										"label": "Faith path locks Engineers and Mages keystone plans",
+										"reason": "Faith path is already chosen.",
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:path:faith"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.drop.hide",
+										"label": "Mages path locks Engineers and Faith keystone plans",
+										"reason": "Mages path is already chosen.",
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:path:mages"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-house-of-engineers",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-cathedral",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:paper",
+								"quantity": 2
+							}
+						],
+						"name": "Blueprint: Cathedral",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.drop.hide",
+										"label": "Engineers path locks Faith and Mages keystone plans",
+										"reason": "Engineers path is already chosen.",
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:path:engineers"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.drop.hide",
+										"label": "Mages path locks Engineers and Faith keystone plans",
+										"reason": "Mages path is already chosen.",
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:path:mages"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-cathedral",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:university:blueprint-mage-lodge",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:master-knowledge"
+							}
+						],
+						"name": "Blueprint: Mage Lodge",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.drop.hide",
+										"label": "Engineers path locks Faith and Mages keystone plans",
+										"reason": "Engineers path is already chosen.",
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:path:engineers"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "whenActive",
+										"kind": "grant.drop.hide",
+										"label": "Faith path locks Engineers and Mages keystone plans",
+										"reason": "Faith path is already chosen.",
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:path:faith"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-mage-lodge",
+								"type": "guaranteed"
+							}
+						]
+					}
+				],
+				"maxQueueSize": 2
+			},
+			"tags": [
+				"producer",
+				"building",
+				"education",
+				"knowledge",
+				"university",
+				"unique",
+				"era:IX"
+			],
+			"tier": 9
+		}
+	}
+}

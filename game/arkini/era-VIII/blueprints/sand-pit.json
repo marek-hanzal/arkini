@@ -1,0 +1,59 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-sand-pit": {
+			"craft": {
+				"durationMs": 42000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:item:sand-deposit"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:academy"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone-block",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:building-permit"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
+			"name": "Sand Pit Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"sand",
+				"glass",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			]
+		}
+	}
+}

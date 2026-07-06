@@ -1,0 +1,37 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-waste-processor-t1": {
+			"craft": {
+				"durationMs": 34000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				],
+				"resultItemId": "producer:waste-processor-t1"
+			},
+			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
+			"name": "Waste Processor I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"waste",
+				"era:II"
+			]
+		}
+	}
+}

@@ -1,0 +1,37 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:mage-lodge": {
+			"description": "Choose The Path keystone for the Mages branch. Owning it locks Engineers and Faith and prepares later rune, mana, and arcane-science lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:mages",
+							"name": "Mages path chosen"
+						}
+					],
+					"id": "effect:path-mages-locks-counter-keystones",
+					"name": "Mages path locks Engineers and Faith keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Mage Lodge",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"mages",
+				"magic",
+				"arcane",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		}
+	}
+}

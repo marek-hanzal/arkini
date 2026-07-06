@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:stone": {
+			"description": "Basic stone material produced by quarries.",
+			"maxStackSize": 50,
+			"name": "Stone",
+			"tags": [
+				"material",
+				"stone",
+				"era:I",
+				"tier-1-resource"
+			]
+		}
+	}
+}

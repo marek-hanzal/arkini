@@ -1,0 +1,40 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-weaver-hut-t1": {
+			"craft": {
+				"durationMs": 36000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:plank",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:wool",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:paper"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
+			"name": "Weaver Hut I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cloth",
+				"textile",
+				"era:V"
+			]
+		}
+	}
+}

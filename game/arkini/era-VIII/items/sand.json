@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:sand": {
+			"description": "Fine sand prepared as the base material for glassmaking.",
+			"maxStackSize": 50,
+			"name": "Sand",
+			"tags": [
+				"material",
+				"construction",
+				"glass",
+				"era:VIII",
+				"industry",
+				"tier-4-resource"
+			],
+			"tier": 4
+		}
+	}
+}

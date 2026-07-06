@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-farm-t1": {
+			"craft": {
+				"durationMs": 14000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log"
+					},
+					{
+						"consume": true,
+						"itemId": "item:water"
+					}
+				]
+			},
+			"description": "Build plan that can be filled with resources to construct Farm I.",
+			"name": "Farm I Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			]
+		}
+	}
+}

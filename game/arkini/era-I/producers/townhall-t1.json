@@ -1,0 +1,181 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:townhall-t1": {
+			"description": "Starter civic hub that issues basic settlement blueprints.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Town Hall I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-sawmill-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Sawmill I",
+						"output": [
+							{
+								"itemId": "item:blueprint-sawmill-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-stonemason-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Stonemason I",
+						"output": [
+							{
+								"itemId": "item:blueprint-stonemason-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-shrine-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Wayside Shrine",
+						"output": [
+							{
+								"itemId": "item:blueprint-shrine-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-well-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Well I",
+						"output": [
+							{
+								"itemId": "item:blueprint-well-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 7000,
+						"id": "line:townhall-t1:blueprint-library-t1",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Library I",
+						"output": [
+							{
+								"itemId": "item:blueprint-library-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 60000,
+						"id": "line:townhall-t1:blueprint-townhall-t2",
+						"inputs": [
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:log"
+							},
+							{
+								"capacity": 1,
+								"consume": true,
+								"itemId": "item:stone"
+							}
+						],
+						"name": "Blueprint: Town Hall II",
+						"output": [
+							{
+								"effects": [
+									{
+										"display": "whenActive",
+										"kind": "grant.duration.multiply",
+										"label": "Minor Haste",
+										"multiplier": 0.75,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-minor-haste"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:blueprint-townhall-t2",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"shrine:haste-target"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:I"
+			],
+			"tier": 1
+		}
+	}
+}

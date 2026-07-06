@@ -1,0 +1,114 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:sheep-pasture-t1": {
+			"description": "Consumes grain and water to produce wool.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sheep-pasture-t1",
+							"name": "Owns Sheep Pasture I"
+						}
+					],
+					"id": "effect:grant-owned:producer-sheep-pasture-t1",
+					"name": "Owned Sheep Pasture I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Sheep Pasture I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 28000,
+						"id": "line:sheep-pasture-t1:wool",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:wool",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"animal",
+				"wool",
+				"era:II",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

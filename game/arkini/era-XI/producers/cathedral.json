@@ -1,0 +1,36 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:cathedral": {
+			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:path:faith",
+							"name": "Faith path chosen"
+						}
+					],
+					"id": "effect:path-faith-locks-counter-keystones",
+					"name": "Faith path locks Engineers and Mages keystone plans",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Cathedral",
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"faith",
+				"cathedral",
+				"unique",
+				"era:XI"
+			],
+			"tier": 11
+		}
+	}
+}

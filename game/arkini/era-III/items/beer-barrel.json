@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:beer-barrel": {
+			"description": "A barrel of beer produced by breweries and served by taverns.",
+			"maxStackSize": 20,
+			"name": "Beer Barrel",
+			"tags": [
+				"material",
+				"food",
+				"beer",
+				"era:III",
+				"tier-3-resource"
+			]
+		}
+	}
+}

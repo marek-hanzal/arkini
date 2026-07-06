@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:bricks": {
+			"description": "Fired clay building material prepared for sturdier construction.",
+			"maxStackSize": 50,
+			"name": "Bricks",
+			"tags": [
+				"material",
+				"construction",
+				"clay",
+				"era:VIII",
+				"industry",
+				"tier-3-resource"
+			],
+			"tier": 3
+		}
+	}
+}

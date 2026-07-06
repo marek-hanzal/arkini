@@ -1,0 +1,16 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:plank": {
+			"description": "Processed wood material produced by sawmills.",
+			"maxStackSize": 50,
+			"name": "Plank",
+			"tags": [
+				"material",
+				"wood",
+				"era:I",
+				"tier-2-resource"
+			]
+		}
+	}
+}

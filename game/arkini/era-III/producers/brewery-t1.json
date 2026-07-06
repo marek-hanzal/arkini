@@ -1,0 +1,358 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:brewery-t1": {
+			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:brewery-t1",
+							"name": "Owns Brewery I"
+						}
+					],
+					"id": "effect:grant-owned:producer-brewery-t1",
+					"name": "Owned Brewery I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Brewery I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 16000,
+						"id": "line:brewery-t1:hops",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:hop-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:hop-field",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:hops",
+								"quantity": 2,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.25,
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:hop-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:hop-field",
+										"phase": "start",
+										"radius": 2
+									}
+								],
+								"itemId": "item:hops",
+								"type": "chance"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 24000,
+						"id": "line:brewery-t1:beer-barrel",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:hops",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:plank"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:hop-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:hop-field",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:beer-barrel",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 16000,
+						"id": "line:brewery-t1:beer-barrel-from-beer",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:beer",
+								"quantity": 4
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:plank"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:hop-field"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby item:hop-field",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:beer-barrel",
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"beer",
+				"era:III",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:bio-waste": {
+			"description": "Farm byproduct from animals and messy food chains. It belongs on the board until processed, because pretending manure fits neatly in a pocket is how UI crimes begin.",
+			"maxStackSize": 1,
+			"name": "Bio Waste",
+			"storage": "board",
+			"tags": [
+				"byproduct",
+				"waste",
+				"bio-waste",
+				"farm",
+				"cleanup",
+				"era:II"
+			],
+			"tier": 2
+		}
+	}
+}

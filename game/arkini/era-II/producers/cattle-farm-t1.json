@@ -1,0 +1,116 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:cattle-farm-t1": {
+			"description": "Consumes grain and water to produce milk.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:cattle-farm-t1",
+							"name": "Owns Cattle Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-cattle-farm-t1",
+					"name": "Owned Cattle Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Cattle Farm I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 26000,
+						"id": "line:cattle-farm-t1:milk",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.3,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"bands": [
+											{
+												"maxDistance": 0,
+												"minDistance": 0,
+												"multiplier": 2.5
+											},
+											{
+												"maxDistance": 1,
+												"minDistance": 1,
+												"multiplier": 2
+											},
+											{
+												"maxDistance": 2,
+												"minDistance": 2,
+												"multiplier": 1.5
+											}
+										],
+										"display": "whenActive",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"item:pollution"
+													]
+												}
+											]
+										},
+										"kind": "nearby.duration.multiply",
+										"label": "Pollution slows nearby sensitive production",
+										"radius": 2
+									}
+								],
+								"itemId": "item:milk",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:radius-2"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:II",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
+}

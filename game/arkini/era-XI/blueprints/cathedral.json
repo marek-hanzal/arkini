@@ -1,0 +1,129 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:blueprint-cathedral": {
+			"craft": {
+				"durationMs": 150000,
+				"effects": [
+					{
+						"display": "always",
+						"kind": "grant.require",
+						"phase": "start",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:owned:producer:civic-office-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:glazier-workshop-t1"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:library-t4"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:stonemason-t2"
+									]
+								},
+								{
+									"ids": [
+										"grant:owned:producer:university"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Engineers path locks Faith and Mages keystone plans",
+						"reason": "Engineers path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:engineers"
+									]
+								}
+							]
+						}
+					},
+					{
+						"display": "whenActive",
+						"kind": "grant.blockStart",
+						"label": "Mages path locks Engineers and Faith keystone plans",
+						"reason": "Mages path is already chosen.",
+						"selector": {
+							"allOf": [
+								{
+									"ids": [
+										"grant:path:mages"
+									]
+								}
+							]
+						}
+					}
+				],
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:construction-bundle"
+					},
+					{
+						"consume": true,
+						"itemId": "item:guild-charter"
+					},
+					{
+						"consume": true,
+						"itemId": "item:treasure-chest"
+					},
+					{
+						"consume": true,
+						"itemId": "item:marble-block",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:stained-glass",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:luxury-clothing",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin-stack",
+						"quantity": 3
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t4"
+					},
+					{
+						"consume": true,
+						"itemId": "item:morale-t3"
+					}
+				]
+			},
+			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
+			"name": "Cathedral Blueprint",
+			"tags": [
+				"blueprint",
+				"building",
+				"path",
+				"keystone",
+				"faith",
+				"cathedral",
+				"era:XI"
+			]
+		}
+	}
+}

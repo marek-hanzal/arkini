@@ -1,0 +1,172 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:construction-yard-t1": {
+			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:construction-yard-t1",
+							"name": "Owns Construction Yard I"
+						}
+					],
+					"id": "effect:grant-owned:producer-construction-yard-t1",
+					"name": "Owned Construction Yard I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Construction Yard I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 45000,
+						"id": "line:construction-yard-t1:construction-bundle",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:bricks",
+								"quantity": 2
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:glass"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:roof-tiles",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 12,
+								"consume": true,
+								"itemId": "item:coin",
+								"quantity": 3
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.12,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:construction-bundle",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 38000,
+						"id": "line:construction-yard-t1:construction-bundle-morale-t3",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:bricks",
+								"quantity": 2
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:glass"
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:roof-tiles",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:building-permit"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							},
+							{
+								"capacity": 12,
+								"consume": true,
+								"itemId": "item:coin",
+								"quantity": 3
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:morale-t3"
+							}
+						],
+						"name": "Construction Bundle (Inspired)",
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.12,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									}
+								],
+								"itemId": "item:construction-bundle",
+								"quantity": 2,
+								"type": "guaranteed"
+							}
+						]
+					}
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"master",
+				"unique",
+				"era:VIII",
+				"industry"
+			],
+			"tier": 6
+		}
+	}
+}

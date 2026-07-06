@@ -1,0 +1,197 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:brickyard": {
+			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:brickyard",
+							"name": "Owns Brickyard"
+						}
+					],
+					"id": "effect:grant-owned:producer-brickyard",
+					"name": "Owned Brickyard grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Brickyard",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 22000,
+						"id": "line:brickyard:bricks",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:clay",
+								"quantity": 2
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"effects": [
+									{
+										"chance": 0.25,
+										"display": "whenActive",
+										"kind": "grant.loot.extraOutputChance.add",
+										"label": "Bountiful Offering",
+										"quantity": 1,
+										"selector": {
+											"allOf": [
+												{
+													"ids": [
+														"grant:active:shrine-bountiful-offering"
+													]
+												}
+											]
+										}
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:clay-pit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:clay-pit",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									}
+								],
+								"itemId": "item:bricks",
+								"quantity": 4,
+								"type": "guaranteed"
+							},
+							{
+								"chance": 0.55,
+								"effects": [
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:clay-pit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:clay-pit",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									}
+								],
+								"itemId": "item:pollution",
+								"type": "chance"
+							},
+							{
+								"chance": 0.12,
+								"effects": [
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:clay-pit"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:clay-pit",
+										"phase": "start",
+										"radius": 2
+									},
+									{
+										"display": "always",
+										"items": {
+											"anyOf": [
+												{
+													"ids": [
+														"producer:purifier-t1"
+													]
+												}
+											]
+										},
+										"kind": "nearby.require",
+										"label": "Nearby producer:purifier-t1",
+										"phase": "start",
+										"radius": 3
+									}
+								],
+								"itemId": "item:pollution",
+								"type": "chance"
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"clay",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"tier": 3
+		}
+	}
+}

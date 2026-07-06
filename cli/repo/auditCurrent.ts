@@ -26,7 +26,45 @@ import {
 	auditRedundantSchemaTypeAliases,
 } from "./audit/auditSchemaAndEffectBoundaries";
 
+const readCanonicalJson = (value: unknown): string => JSON.stringify(readCanonicalValue(value));
+
+const readCanonicalValue = (value: unknown): unknown => {
+	if (Array.isArray(value)) return value.map(readCanonicalValue);
+	if (!value || typeof value !== "object") return value;
+
+	return Object.fromEntries(
+		Object.entries(value as Record<string, unknown>)
+			.sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+			.map(([key, entry]) => [
+				key,
+				readCanonicalValue(entry),
+			]),
+	);
+};
+
+const auditDefaultPackMatchesSources = ({
+	packConfig,
+	sourceConfig,
+}: {
+	packConfig: unknown;
+	sourceConfig: unknown;
+}): AuditFinding[] => {
+	if (readCanonicalJson(packConfig) === readCanonicalJson(sourceConfig)) return [];
+
+	return [
+		{
+			message:
+				'Default game pack is stale compared to game/arkini sources. Run "npm run game:compile" and commit game/arkini.game.arkpack.',
+			path: "game/arkini.game.arkpack",
+		},
+	];
+};
+
 const main = async () => {
+	const packConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack");
+	const sourceConfig = await validateSources([
+		"game/arkini",
+	]);
 	const findings: AuditFinding[] = [
 		...auditForbiddenDirectories(),
 		...auditText(),
@@ -46,14 +84,16 @@ const main = async () => {
 		...auditImpureIdGenerationBoundaries(),
 		...auditEffectRunnerBoundaries(),
 		...auditConfig({
-			config: await loadGameConfigPackFromFile("game/arkini.game.arkpack"),
+			config: packConfig,
 			label: "game/arkini.game.arkpack",
 		}),
 		...auditConfig({
-			config: await validateSources([
-				"game/arkini",
-			]),
+			config: sourceConfig,
 			label: "game/arkini",
+		}),
+		...auditDefaultPackMatchesSources({
+			packConfig,
+			sourceConfig,
 		}),
 	];
 

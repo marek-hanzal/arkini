@@ -162,6 +162,42 @@ describe("defaultGameConfig", () => {
 		}
 	});
 
+	it("ships depleted source renewal placeholders in the default pack", () => {
+		expect(defaultGameConfig.items["item:rock"]?.capacity).toMatchObject({
+			max: 64,
+			onDepleted: "replace",
+			replaceItemId: "item:cracked-rock",
+		});
+		expect(defaultGameConfig.items["item:tree"]?.capacity).toMatchObject({
+			onDepleted: "replace",
+			replaceItemId: "item:seed",
+		});
+		expect(defaultGameConfig.items["item:cracked-rock"]?.craft).toMatchObject({
+			durationMs: 120000,
+			resultItemId: "item:rock",
+			resultPlacement: "random-board",
+			inputs: [
+				{
+					consume: false,
+					itemId: "item:magnifying-glass",
+				},
+			],
+		});
+		expect(defaultGameConfig.items["item:magnifying-glass"]?.name).toBe("Magnifying Glass");
+		expect(
+			readGameConfigAssetSrc({
+				assetId: "asset:item:cracked-rock",
+				config: defaultGameConfig,
+			}),
+		).toMatch(/^data:image\/png;base64,/);
+		expect(
+			readGameConfigAssetSrc({
+				assetId: "asset:item:magnifying-glass",
+				config: defaultGameConfig,
+			}),
+		).toMatch(/^data:image\/png;base64,/);
+	});
+
 	it("grows forest seeds through craft input stages instead of merge-only saplings", () => {
 		const seed = defaultGameConfig.items["item:seed"];
 		const water = defaultGameConfig.items["item:water"];

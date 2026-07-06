@@ -1,5 +1,5 @@
 import { isBoardViewItemRuntimeBusy } from "~/board/view/isBoardViewItemRuntimeBusy";
-import { isBoardViewItemRuntimeStatePreserved } from "~/board/view/isBoardViewItemRuntimeStatePreserved";
+import { requiresBoardViewItemInstancePreservation } from "~/board/view/readBoardViewItemPreservationFacts";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
@@ -70,7 +70,7 @@ export const readBoardItemInventoryStorageReadiness = ({
 		};
 	}
 
-	const hasInventoryTarget = isBoardViewItemRuntimeStatePreserved(sourceItem)
+	const hasInventoryTarget = requiresBoardViewItemInstancePreservation(sourceItem)
 		? hasInstanceCapacity({
 				inventory,
 			})

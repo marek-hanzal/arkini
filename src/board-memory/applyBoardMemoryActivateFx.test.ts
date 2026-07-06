@@ -493,4 +493,132 @@ describe("applyBoardMemoryActivateFx", () => {
 		});
 		expect(stashed.boardMemoryLayouts[memory!.id]).toBeDefined();
 	});
+	it("keeps an already matching layout on board instead of routing it through inventory", () => {
+		const config = createMemoryTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 200,
+			save: saved,
+		});
+
+		expect(restored.save.inventory.slots.every((slot) => slot === null)).toBe(true);
+		expect(restored.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					reason: "memory-store",
+					type: "item.consumed",
+				}),
+			]),
+		);
+		expect(
+			findBoardItem(restored.save, {
+				itemId: "item:producer",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
+	});
+
+	it("restores a moved board stack with its full saved quantity", () => {
+		const config = createMemoryTestConfig();
+		config.startingState.board.push({
+			itemId: "item:twig",
+			x: 1,
+			y: 1,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const startingTwig = findBoardItem(save, {
+			itemId: "item:twig",
+			x: 1,
+			y: 1,
+		});
+		expect(startingTwig).toBeDefined();
+		startingTwig!.quantity = 3;
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		const twig = findBoardItem(save, {
+			itemId: "item:twig",
+			x: 1,
+			y: 1,
+		});
+		expect(memory).toBeDefined();
+		expect(twig).toMatchObject({
+			quantity: 3,
+		});
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const moved = runAction({
+			action: {
+				boardItemId: twig!.id,
+				type: "board.item.move",
+				x: 0,
+				y: 1,
+			},
+			config,
+			nowMs: 200,
+			save: saved,
+		}).save;
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 300,
+			save: moved,
+		});
+
+		expect(
+			findBoardItem(restored.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 1,
+			}),
+		).toMatchObject({
+			quantity: 3,
+		});
+		expect(restored.save.inventory.slots).not.toContainEqual(
+			expect.objectContaining({
+				itemId: "item:twig",
+			}),
+		);
+	});
 });

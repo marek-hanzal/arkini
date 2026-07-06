@@ -8,9 +8,11 @@ import { restoreInventoryBackedLayoutItemsFx } from "~/board-memory/restoreInven
 
 export const restoreBoardMemoryLayoutItemsFx = Effect.fn("restoreBoardMemoryLayoutItemsFx")(
 	function* ({
+		restoredIndexes = new Set(),
 		savedItems,
 		scope,
 	}: {
+		restoredIndexes?: Set<number>;
 		savedItems: readonly BoardMemoryLayoutItem[];
 		scope: BoardMemoryActivationScope;
 	}) {
@@ -18,8 +20,11 @@ export const restoreBoardMemoryLayoutItemsFx = Effect.fn("restoreBoardMemoryLayo
 			savedItems,
 			scope,
 		});
+		for (const index of boardOnlyRestoredIndexes) {
+			restoredIndexes.add(index);
+		}
 		return yield* restoreInventoryBackedLayoutItemsFx({
-			restoredIndexes: boardOnlyRestoredIndexes,
+			restoredIndexes,
 			savedItems,
 			scope,
 		});

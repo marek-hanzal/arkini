@@ -117,6 +117,7 @@ const placePreservedBoardItemInInventoryFx = Effect.fn(
 const placeStackCopiedBoardItemInInventoryFx = Effect.fn(
 	"placeBoardItemInInventoryFx.placeStackCopiedBoardItemInInventoryFx",
 )(function* ({ config, events, item, reason, save }: placeBoardItemInInventoryFx.Props) {
+	const quantity = readGameSaveBoardItemQuantity(item);
 	const itemDefinition = yield* assertInventoryStorageAllowedFx({
 		config,
 		itemId: item.itemId,
@@ -128,11 +129,11 @@ const placeStackCopiedBoardItemInInventoryFx = Effect.fn(
 		item: {
 			itemId: item.itemId,
 			originItemInstanceId: item.id,
-			quantity: 1,
+			quantity,
 			reason,
 		},
 		maxStackSize: itemDefinition.maxStackSize,
-		remainingQuantity: 1,
+		remainingQuantity: quantity,
 		slots: save.inventory.slots,
 	});
 	if (!placed) return false;

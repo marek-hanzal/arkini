@@ -46,11 +46,18 @@ const storeBoardItemInInventoryFx = Effect.fn("storeBoardItemInInventoryFx")(fun
 });
 
 export const storeCurrentBoardItemsInInventoryFx = Effect.fn("storeCurrentBoardItemsInInventoryFx")(
-	function* ({ scope }: { scope: BoardMemoryActivationScope }) {
+	function* ({
+		preservedBoardItemInstanceIds = new Set(),
+		scope,
+	}: {
+		preservedBoardItemInstanceIds?: ReadonlySet<string>;
+		scope: BoardMemoryActivationScope;
+	}) {
 		const { nextSave } = scope;
 		for (const item of readSortedBoardMemoryBoardItems({
 			save: nextSave,
 		})) {
+			if (preservedBoardItemInstanceIds.has(item.id)) continue;
 			yield* storeBoardItemInInventoryFx({
 				item,
 				scope,

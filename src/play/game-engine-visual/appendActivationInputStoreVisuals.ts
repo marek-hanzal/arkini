@@ -2,7 +2,6 @@ import { cellKey } from "~/board/cellKey";
 import type { BoardTransientTile } from "~/board/animation/BoardTransientTile";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
-import { appendBoardTileBounceFeedback } from "~/play/game-engine-visual/appendBoardTileBounceFeedback";
 import { gameVisualMotionSettlementDelayMs } from "~/play/game-engine-visual/gameVisualMotionSettlementDelayMs";
 import { GameVisualMotion } from "~/play/game-engine-visual/GameVisualMotion";
 import type { GameEngineVisualPlanDraft } from "~/play/game-engine-visual/GameEngineVisualPlanDraft";
@@ -48,25 +47,6 @@ const shouldBoomerangBoardStack = (source: ConsumedEvent) =>
 const readStackMotionDurationMs = (source: ConsumedEvent) =>
 	shouldBoomerangBoardStack(source) ? 1400 : undefined;
 
-const appendSourceReturnFeedback = ({
-	motion,
-	plan,
-	source,
-}: {
-	motion: GameVisualMotion;
-	plan: GameEngineVisualPlanDraft;
-	source: ConsumedEvent;
-}) => {
-	if (source.from.kind !== "board" || !shouldBoomerangBoardStack(source)) return;
-
-	appendBoardTileBounceFeedback({
-		delayMs: motion.durationMs,
-		groupId: `${motion.groupId}:source-return-feedback`,
-		plan,
-		tileId: source.from.itemInstanceId,
-	});
-};
-
 export const appendActivationInputStoreVisuals = ({
 	plan,
 	previousBoard,
@@ -86,21 +66,16 @@ export const appendActivationInputStoreVisuals = ({
 		groupId: `engine:input-store:${source.from.itemInstanceId}:${targetItemInstanceId}:${source.itemId}`,
 	});
 	const cleanupDelayMs = gameVisualMotionSettlementDelayMs(motion);
-	const hidesLiveSource = shouldBoomerangBoardStack(source);
+	const isBoardStackBoomerang = shouldBoomerangBoardStack(source);
 	const tile: BoardTransientTile = {
 		groupId: motion.groupId,
-		hiddenBoardItemId: hidesLiveSource ? previousSource.id : undefined,
 		id: `transient:input-store:${motion.groupId}:source:${previousSource.id}`,
 		itemId: source.itemId as BoardTransientTile["itemId"],
-		quantity: source.from.previousQuantity ?? source.from.quantity,
+		quantity: isBoardStackBoomerang
+			? source.from.quantity
+			: (source.from.previousQuantity ?? source.from.quantity),
 		slotId: cellKey(previousSource.x, previousSource.y),
 	};
-
-	appendSourceReturnFeedback({
-		motion,
-		plan,
-		source,
-	});
 
 	plan.boardTransientTilePlans.push({
 		cleanupDelayMs,
@@ -111,7 +86,7 @@ export const appendActivationInputStoreVisuals = ({
 				...toTileEngineExitMotion(motion, {
 					toTileId: targetItemInstanceId,
 				}),
-				...(hidesLiveSource
+				...(isBoardStackBoomerang
 					? {
 							kind: "boomerang-to-tile" as const,
 						}

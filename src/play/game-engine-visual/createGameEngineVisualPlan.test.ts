@@ -612,16 +612,9 @@ describe("createGameEngineVisualPlan", () => {
 			previousBoard,
 		});
 
-		expect(plan.boardFeedbackRequests).toHaveLength(2);
+		expect(plan.boardFeedbackRequests).toHaveLength(1);
 		expect(plan.boardFeedbackRequests[0]).toMatchObject({
 			tileId: "producer",
-		});
-		expect(plan.boardFeedbackRequests[1]).toMatchObject({
-			feedback: {
-				delayMs: 1400,
-				kind: "bounce",
-			},
-			tileId: "source",
 		});
 		expect(plan.boardTransientTilePlans[0]).toMatchObject({
 			request: {
@@ -632,12 +625,12 @@ describe("createGameEngineVisualPlan", () => {
 				},
 			},
 			tile: {
-				hiddenBoardItemId: "source",
 				itemId: "item:twig",
-				quantity: 3,
+				quantity: 1,
 				slotId: "1:0",
 			},
 		});
+		expect(plan.boardTransientTilePlans[0]?.tile).not.toHaveProperty("hiddenBoardItemId");
 	});
 
 	it("maps auto-filled board stash input to a transient tile flying into the stash", () => {

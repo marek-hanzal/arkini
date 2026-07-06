@@ -222,7 +222,7 @@ Effect definitions are embedded where their source lives. Passive grant sources 
 
 Effects do not contain operations, targets, line selectors, or config patches. Producer outputs and craft recipes own the question “what does this grant or nearby source do to me?” in their own local `effects` arrays. Producer lines may also own start-only source capacity spending, because consuming a finite tree or rock deposit is a line admission cost, not a single-drop display rule. Grant-publishing effects are just facts in the world. Riveting stuff, but at least it stops the engine from becoming a haunted spreadsheet.
 
-Authoring selectors use one normalized vocabulary: `mode: "all"`, `anyOf`, `allOf`, and `noneOf`. Each source ref is `{ "id": "..." }`, `{ "ids": ["..."] }`, or `{ "tag": "..." }`. Compile expands tags into deterministic runtime `{ "ids": [...] }` clauses.
+Selectors are documented in `SELECTOR.MD`. Short version: item selectors under nearby `items` fields may use authoring refs (`id`, `ids`, `tag`) that compile into resolved `ids` clauses; grant selectors use resolved `ids` clauses and test the current active grant set. Use `mode: "all"`, `anyOf`, `allOf`, and `noneOf`; do not invent selector dialects just to make future debugging more theatrical.
 
 ## Output-owned producer effects
 

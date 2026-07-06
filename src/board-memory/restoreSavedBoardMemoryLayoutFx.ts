@@ -3,64 +3,43 @@ import type {
 	BoardMemoryActivationScope,
 	BoardMemoryLayoutItem,
 } from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryRestorePlan } from "~/board-memory/BoardMemoryRestorePlan";
 import { readBoardMemoryEngineResultFx } from "~/board-memory/readBoardMemoryEngineResultFx";
-import { readBoardMemoryFulfillmentPlan } from "~/board-memory/readBoardMemoryFulfillmentPlan";
+import { readBoardMemoryRestorePlanFx } from "~/board-memory/readBoardMemoryRestorePlanFx";
 import { removeBoardMemoryLayoutFromSaveFx } from "~/board-memory/removeBoardMemoryLayoutFromSaveFx";
 import { restoreBoardMemoryLayoutItemsFx } from "~/board-memory/restoreBoardMemoryLayoutItemsFx";
 import { storeCurrentBoardItemsInInventoryFx } from "~/board-memory/storeCurrentBoardItemsInInventoryFx";
-import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
-const applyBoardMemoryRestoreTransferFx = Effect.fn("applyBoardMemoryRestoreTransferFx")(
-	function* ({
-		savedItems,
-		scope,
-	}: {
-		savedItems: readonly BoardMemoryLayoutItem[];
-		scope: BoardMemoryActivationScope;
-	}) {
-		const { config, nextSave } = scope;
-		const fulfillmentPlan = readBoardMemoryFulfillmentPlan({
-			config,
-			save: nextSave,
-			savedItems,
-		});
-		const storeResult = yield* storeCurrentBoardItemsInInventoryFx({
-			preservedBoardItemInstanceIds: fulfillmentPlan.preservedBoardItemInstanceIds,
-			scope,
-		});
-		const restoredCount = yield* restoreBoardMemoryLayoutItemsFx({
-			restoredIndexes: fulfillmentPlan.restoredIndexes,
-			savedItems,
-			scope,
-		});
-
-		return {
-			restoredCount,
-			storeResult,
-		};
-	},
-);
-
-const canApplyBoardMemoryRestoreFx = Effect.fn("canApplyBoardMemoryRestoreFx")(function* ({
+const applyBoardMemoryRestorePlanFx = Effect.fn("applyBoardMemoryRestorePlanFx")(function* ({
+	plan,
 	savedItems,
 	scope,
 }: {
+	plan: BoardMemoryRestorePlan.Type;
 	savedItems: readonly BoardMemoryLayoutItem[];
 	scope: BoardMemoryActivationScope;
 }) {
-	const dryRunScope: BoardMemoryActivationScope = {
-		...scope,
-		events: [],
-		nextSave: yield* cloneGameSaveFx({
-			save: scope.nextSave,
-		}),
-	};
-	const { storeResult } = yield* applyBoardMemoryRestoreTransferFx({
+	const storeResult = yield* storeCurrentBoardItemsInInventoryFx({
+		preservedBoardItemInstanceIds: plan.fulfillmentPlan.preservedBoardItemInstanceIds,
+		scope,
+	});
+	if (storeResult.failedItemInstanceIds.size > 0) {
+		return {
+			restoredCount: 0,
+			storeResult,
+		};
+	}
+
+	const restoredCount = yield* restoreBoardMemoryLayoutItemsFx({
+		restoredIndexes: new Set(plan.fulfillmentPlan.restoredIndexes),
 		savedItems,
-		scope: dryRunScope,
+		scope,
 	});
 
-	return storeResult.failedItemInstanceIds.size === 0;
+	return {
+		restoredCount,
+		storeResult,
+	};
 });
 
 export const restoreSavedBoardMemoryLayoutFx = Effect.fn("restoreSavedBoardMemoryLayoutFx")(
@@ -74,21 +53,26 @@ export const restoreSavedBoardMemoryLayoutFx = Effect.fn("restoreSavedBoardMemor
 		scope: BoardMemoryActivationScope;
 	}) {
 		const { events, nextSave, nowMs } = scope;
-		if (
-			!(yield* canApplyBoardMemoryRestoreFx({
-				savedItems,
-				scope,
-			}))
-		) {
+		const plan = yield* readBoardMemoryRestorePlanFx({
+			savedItems,
+			scope,
+		});
+		if (!plan.canCleanBoard) {
 			return yield* readBoardMemoryEngineResultFx({
 				scope,
 			});
 		}
 
-		const { restoredCount } = yield* applyBoardMemoryRestoreTransferFx({
+		const { restoredCount, storeResult } = yield* applyBoardMemoryRestorePlanFx({
+			plan,
 			savedItems,
 			scope,
 		});
+		if (storeResult.failedItemInstanceIds.size > 0) {
+			return yield* readBoardMemoryEngineResultFx({
+				scope,
+			});
+		}
 
 		yield* removeBoardMemoryLayoutFromSaveFx({
 			boardItemId,

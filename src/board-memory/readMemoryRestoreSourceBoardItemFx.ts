@@ -18,6 +18,16 @@ export const readMemoryRestoreSourceBoardItemFx = Effect.fn("readMemoryRestoreSo
 		usedItemInstanceIds: ReadonlySet<string>;
 	}) {
 		const { config, nextSave } = scope;
+		if (
+			isItemStorageAllowed({
+				config,
+				itemId: memoryItem.itemId,
+				location: "inventory",
+			})
+		) {
+			return undefined;
+		}
+
 		if (memoryItem.itemInstanceId) {
 			const exactItem = nextSave.board.items[memoryItem.itemInstanceId];
 			if (
@@ -29,16 +39,6 @@ export const readMemoryRestoreSourceBoardItemFx = Effect.fn("readMemoryRestoreSo
 			) {
 				return exactItem;
 			}
-		}
-
-		if (
-			isItemStorageAllowed({
-				config,
-				itemId: memoryItem.itemId,
-				location: "inventory",
-			})
-		) {
-			return undefined;
 		}
 
 		const candidates = Object.values(nextSave.board.items).filter(

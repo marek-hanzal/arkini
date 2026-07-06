@@ -1,6 +1,7 @@
-import { boardItemMatchesBoardMemoryIdentity } from "~/board-memory/boardItemMatchesBoardMemoryIdentity";
 import { boardItemMatchesBoardMemoryLayoutItem } from "~/board-memory/boardItemMatchesBoardMemoryLayoutItem";
 import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace BoardMemoryFulfillmentPlan {
@@ -11,9 +12,11 @@ export namespace BoardMemoryFulfillmentPlan {
 }
 
 export const readBoardMemoryFulfillmentPlan = ({
+	config,
 	save,
 	savedItems,
 }: {
+	config: GameConfig;
 	save: GameSave;
 	savedItems: readonly BoardMemoryLayoutItem[];
 }): BoardMemoryFulfillmentPlan.Type => {
@@ -22,7 +25,17 @@ export const readBoardMemoryFulfillmentPlan = ({
 	const boardItems = Object.values(save.board.items);
 
 	for (const [index, memoryItem] of savedItems.entries()) {
-		const restoredBoardItem = boardItems.find(
+		if (
+			isItemStorageAllowed({
+				config,
+				itemId: memoryItem.itemId,
+				location: "inventory",
+			})
+		) {
+			continue;
+		}
+
+		const boardItem = boardItems.find(
 			(candidate) =>
 				!preservedBoardItemInstanceIds.has(candidate.id) &&
 				boardItemMatchesBoardMemoryLayoutItem({
@@ -30,24 +43,10 @@ export const readBoardMemoryFulfillmentPlan = ({
 					memoryItem,
 				}),
 		);
-		if (restoredBoardItem) {
-			preservedBoardItemInstanceIds.add(restoredBoardItem.id);
-			restoredIndexes.add(index);
-			continue;
-		}
+		if (!boardItem) continue;
 
-		if (!memoryItem.itemInstanceId) continue;
-		const movableBoardItem = boardItems.find(
-			(candidate) =>
-				!preservedBoardItemInstanceIds.has(candidate.id) &&
-				boardItemMatchesBoardMemoryIdentity({
-					boardItem: candidate,
-					memoryItem,
-				}),
-		);
-		if (!movableBoardItem) continue;
-
-		preservedBoardItemInstanceIds.add(movableBoardItem.id);
+		preservedBoardItemInstanceIds.add(boardItem.id);
+		restoredIndexes.add(index);
 	}
 
 	return {

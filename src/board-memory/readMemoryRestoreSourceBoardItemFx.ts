@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+import { boardItemMatchesBoardMemoryCell } from "~/board-memory/boardItemMatchesBoardMemoryCell";
+import { boardItemMatchesBoardMemoryIdentity } from "~/board-memory/boardItemMatchesBoardMemoryIdentity";
 import type {
 	BoardMemoryActivationScope,
 	BoardMemoryLayoutItem,
@@ -28,16 +30,33 @@ export const readMemoryRestoreSourceBoardItemFx = Effect.fn("readMemoryRestoreSo
 
 		if (memoryItem.itemInstanceId) {
 			const exactItem = nextSave.board.items[memoryItem.itemInstanceId];
-			if (exactItem?.itemId === memoryItem.itemId) return exactItem;
+			if (
+				exactItem &&
+				boardItemMatchesBoardMemoryIdentity({
+					boardItem: exactItem,
+					memoryItem,
+				})
+			) {
+				return exactItem;
+			}
 		}
 
 		const candidates = Object.values(nextSave.board.items).filter(
-			(item) => item.itemId === memoryItem.itemId && !usedItemInstanceIds.has(item.id),
+			(item) =>
+				!usedItemInstanceIds.has(item.id) &&
+				boardItemMatchesBoardMemoryIdentity({
+					boardItem: item,
+					memoryItem,
+				}),
 		);
 
 		return (
-			candidates.find((item) => item.x === memoryItem.x && item.y === memoryItem.y) ??
-			candidates[0]
+			candidates.find((item) =>
+				boardItemMatchesBoardMemoryCell({
+					boardItem: item,
+					memoryItem,
+				}),
+			) ?? candidates[0]
 		);
 	},
 );

@@ -1,6 +1,6 @@
-import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
+import { boardItemMatchesBoardMemoryLayoutItem } from "~/board-memory/boardItemMatchesBoardMemoryLayoutItem";
 import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
-import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export namespace BoardMemoryFulfillmentPlan {
 	export interface Type {
@@ -8,21 +8,6 @@ export namespace BoardMemoryFulfillmentPlan {
 		restoredIndexes: Set<number>;
 	}
 }
-
-const readMemoryItemQuantity = (memoryItem: BoardMemoryLayoutItem) => memoryItem.quantity ?? 1;
-
-const boardItemMatchesMemoryItem = ({
-	boardItem,
-	memoryItem,
-}: {
-	boardItem: GameSaveBoardItem;
-	memoryItem: BoardMemoryLayoutItem;
-}) => {
-	if (boardItem.itemId !== memoryItem.itemId) return false;
-	if (boardItem.x !== memoryItem.x || boardItem.y !== memoryItem.y) return false;
-	if (memoryItem.itemInstanceId && boardItem.id !== memoryItem.itemInstanceId) return false;
-	return readGameSaveBoardItemQuantity(boardItem) === readMemoryItemQuantity(memoryItem);
-};
 
 export const readBoardMemoryFulfillmentPlan = ({
 	save,
@@ -39,7 +24,7 @@ export const readBoardMemoryFulfillmentPlan = ({
 		const boardItem = boardItems.find(
 			(candidate) =>
 				!preservedBoardItemInstanceIds.has(candidate.id) &&
-				boardItemMatchesMemoryItem({
+				boardItemMatchesBoardMemoryLayoutItem({
 					boardItem: candidate,
 					memoryItem,
 				}),

@@ -1,9 +1,7 @@
 import { Effect } from "effect";
-import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
-import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import type { BoardMemoryActivationScope } from "~/board-memory/BoardMemoryActivationTypes";
 import { readSortedBoardMemoryBoardItems } from "~/board-memory/readSortedBoardMemoryBoardItems";
-import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
+import { readBoardMemoryBoardItemStorePlan } from "~/board-memory/readBoardMemoryBoardItemStorePlan";
 import type { GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 import { placeBoardItemInInventoryFx } from "~/placement/placeBoardItemInInventoryFx";
 
@@ -15,31 +13,18 @@ const storeBoardItemInInventoryFx = Effect.fn("storeBoardItemInInventoryFx")(fun
 	scope: BoardMemoryActivationScope;
 }) {
 	const { config, events, nextSave } = scope;
-	if (!config.items[item.itemId]) return false;
-	if (
-		!isItemStorageAllowed({
-			config,
-			itemId: item.itemId,
-			location: "inventory",
-		})
-	) {
-		return false;
-	}
-
-	const stateStatus = readBoardItemRuntimeStateStatus({
-		itemInstanceId: item.id,
+	const storePlan = readBoardMemoryBoardItemStorePlan({
+		config,
+		item,
 		save: nextSave,
 	});
-	if (stateStatus.busy) return false;
+	if (storePlan.type === "skip") return false;
 
 	return yield* placeBoardItemInInventoryFx({
 		config,
 		events,
 		item,
-		mode:
-			stateStatus.preservable || item.itemId === boardMemoryItemId
-				? "preserve-instance"
-				: "stack-copy",
+		mode: storePlan.mode,
 		reason: "memory-store",
 		save: nextSave,
 	}).pipe(Effect.catchTag("GamePlacementFailed", () => Effect.succeed(false)));

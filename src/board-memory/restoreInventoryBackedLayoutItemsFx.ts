@@ -5,6 +5,7 @@ import type {
 } from "~/board-memory/BoardMemoryActivationTypes";
 import { canRestoreInventoryBackedLayoutItemFx } from "~/board-memory/canRestoreInventoryBackedLayoutItemFx";
 import { consumeInventoryItemForMemoryRestoreFx } from "~/board-memory/consumeInventoryItemForMemoryRestoreFx";
+import { readBoardMemoryLayoutItemQuantity } from "~/board-memory/readBoardMemoryLayoutItemQuantity";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
@@ -43,7 +44,7 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayo
 			events,
 			itemId: memoryItem.itemId,
 			itemInstanceId,
-			quantity: memoryItem.quantity ?? 1,
+			quantity: readBoardMemoryLayoutItemQuantity(memoryItem),
 			originItemInstanceId: action.boardItemId,
 			reason: "memory-restore",
 			save: nextSave,

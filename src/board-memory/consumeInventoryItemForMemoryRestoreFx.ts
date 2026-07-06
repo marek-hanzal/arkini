@@ -4,6 +4,7 @@ import type {
 	BoardMemoryLayoutItem,
 } from "~/board-memory/BoardMemoryActivationTypes";
 import type { InventoryConsumedForMemoryRestore } from "~/board-memory/BoardMemoryRestoreTypes";
+import { readBoardMemoryLayoutItemQuantity } from "~/board-memory/readBoardMemoryLayoutItemQuantity";
 import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
 import {
 	isGameSaveInventoryInstance,
@@ -98,7 +99,7 @@ export const consumeInventoryItemForMemoryRestoreFx = Effect.fn(
 			? undefined
 			: yield* consumeInventoryStackForMemoryRestoreFx({
 					itemId: memoryItem.itemId,
-					quantity: memoryItem.quantity ?? 1,
+					quantity: readBoardMemoryLayoutItemQuantity(memoryItem),
 					scope,
 				}))
 	);

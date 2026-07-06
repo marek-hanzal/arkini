@@ -101,7 +101,7 @@ describe("createGameEngineVisualPlan board stack visuals", () => {
 		});
 	});
 
-	it("maps board stack actions to consumed item fly and target feedback", () => {
+	it("maps board stack actions to immediate target feedback without replaying a source fly from the origin", () => {
 		const previousBoard = boardView([
 			{
 				id: "source",
@@ -171,26 +171,11 @@ describe("createGameEngineVisualPlan board stack visuals", () => {
 		});
 
 		expect(plan.boardEnterRequests).toHaveLength(0);
-		expect(plan.boardTransientTilePlans).toHaveLength(1);
-		expect(plan.boardTransientTilePlans[0]).toMatchObject({
-			request: {
-				exit: {
-					durationMs: boardStackFlyDurationMs,
-					kind: "fly-to-tile",
-					toTileId: "target",
-				},
-			},
-			tile: {
-				itemId: "item:twig",
-				slotId: "0:0",
-			},
-		});
+		expect(plan.boardTransientTilePlans).toHaveLength(0);
 		expect(plan.boardFeedbackRequests).toHaveLength(1);
 		expect(plan.boardFeedbackRequests[0]).toMatchObject({
 			feedback: {
-				delayMs: readBoardStackFeedbackDelayMs({
-					durationMs: boardStackFlyDurationMs,
-				}),
+				delayMs: 0,
 				kind: "bounce",
 				durationMs: boardStackFeedbackDurationMs,
 			},

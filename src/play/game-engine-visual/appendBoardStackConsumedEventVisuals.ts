@@ -21,13 +21,15 @@ export const appendBoardStackConsumedEventVisuals = ({
 	const created = context.events[createdIndex];
 	if (created?.type !== "item.created") return false;
 
+	// Board stack actions originate from a live DnD source that the player already
+	// dragged onto the target. Replaying a domain transient from the source cell
+	// would make the item visually teleport from its original board position.
 	const handled = appendBoardStackCreatedVisuals({
 		currentBoard: context.currentBoard,
 		event: created,
 		plan: context.plan,
 		previousBoard: context.previousBoard,
 		sequenceIndex: context.createdSequenceIndex,
-		source: event,
 	});
 	if (!handled) return false;
 

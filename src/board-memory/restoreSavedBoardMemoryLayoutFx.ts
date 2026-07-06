@@ -55,12 +55,12 @@ const canApplyBoardMemoryRestoreFx = Effect.fn("canApplyBoardMemoryRestoreFx")(f
 			save: scope.nextSave,
 		}),
 	};
-	const { restoredCount, storeResult } = yield* applyBoardMemoryRestoreTransferFx({
+	const { storeResult } = yield* applyBoardMemoryRestoreTransferFx({
 		savedItems,
 		scope: dryRunScope,
 	});
 
-	return storeResult.failedItemInstanceIds.size === 0 && restoredCount === savedItems.length;
+	return storeResult.failedItemInstanceIds.size === 0;
 });
 
 export const restoreSavedBoardMemoryLayoutFx = Effect.fn("restoreSavedBoardMemoryLayoutFx")(

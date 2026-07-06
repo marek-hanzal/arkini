@@ -206,7 +206,7 @@ describe("applyBoardMemoryActivateFx", () => {
 		});
 	});
 
-	it("keeps saved memory untouched when restore cannot output every stored item", () => {
+	it("restores available saved items and clears memory when some stored items are gone", () => {
 		const config = createMemoryTestConfig();
 		const save = runInitialSave({
 			config,
@@ -248,11 +248,28 @@ describe("applyBoardMemoryActivateFx", () => {
 			save: missingProducerSave,
 		});
 
-		expect(restored.save.boardMemoryLayouts[memory!.id]).toEqual(
-			saved.boardMemoryLayouts[memory!.id],
-		);
-		expect(restored.events).not.toContainEqual(
+		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeUndefined();
+		expect(
+			findBoardItem(restored.save, {
+				itemId: boardMemoryItemId,
+				x: 0,
+				y: 0,
+			}),
+		).toMatchObject({
+			id: memory!.id,
+		});
+		expect(
+			findBoardItem(restored.save, {
+				itemId: "item:producer",
+				x: 1,
+				y: 0,
+			}),
+		).toBeUndefined();
+		expect(restored.events).toContainEqual(
 			expect.objectContaining({
+				boardItemId: memory!.id,
+				restoredCount: 2,
+				storedCount: 3,
 				type: "board.memory.restored",
 			}),
 		);
@@ -644,6 +661,79 @@ describe("applyBoardMemoryActivateFx", () => {
 				itemId: "item:twig",
 			}),
 		);
+	});
+
+	it("restores a saved stack from split inventory quantities", () => {
+		const config = createMemoryTestConfig();
+		config.game.inventory.slots = 8;
+		config.startingState.board.push({
+			itemId: "item:twig",
+			x: 1,
+			y: 1,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const startingTwig = findBoardItem(save, {
+			itemId: "item:twig",
+			x: 1,
+			y: 1,
+		});
+		expect(startingTwig).toBeDefined();
+		startingTwig!.quantity = 3;
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const consumedTwigSave = structuredClone(saved);
+		delete consumedTwigSave.board.items[startingTwig!.id];
+		consumedTwigSave.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+		consumedTwigSave.inventory.slots[1] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 200,
+			save: consumedTwigSave,
+		});
+
+		expect(
+			findBoardItem(restored.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 1,
+			}),
+		).toMatchObject({
+			quantity: 3,
+		});
+		expect(restored.save.inventory.slots).not.toContainEqual(
+			expect.objectContaining({
+				itemId: "item:twig",
+			}),
+		);
+		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeUndefined();
 	});
 	it("keeps restore pending when inventory cannot clear a moved memory item", () => {
 		const config = createMemoryTestConfig();

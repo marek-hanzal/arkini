@@ -4,6 +4,7 @@ import type {
 	BoardMemoryLayoutItem,
 } from "~/board-memory/BoardMemoryActivationTypes";
 import type { InventoryConsumedForMemoryRestore } from "~/board-memory/BoardMemoryRestoreTypes";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { readBoardMemoryLayoutItemQuantity } from "~/board-memory/readBoardMemoryLayoutItemQuantity";
 import { consumeInventorySlotQuantityFx } from "~/inventory/consumeInventorySlotQuantityFx";
 import {
@@ -42,11 +43,25 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 	if (!isGameSaveInventoryInstance(consumed.slot)) return undefined;
 
 	return {
-		consumedEvent: consumed.consumedEvent,
+		consumedEvents: [
+			consumed.consumedEvent,
+		],
 		createdAtMs: consumed.slot.createdAtMs,
 		itemInstanceId: consumed.slot.id,
 	} satisfies InventoryConsumedForMemoryRestore;
 });
+
+const readInventoryStackQuantity = ({
+	itemId,
+	scope,
+}: {
+	itemId: string;
+	scope: BoardMemoryActivationScope;
+}) =>
+	scope.nextSave.inventory.slots.reduce((total, slot) => {
+		if (!isGameSaveInventoryStack(slot) || slot.itemId !== itemId) return total;
+		return total + slot.quantity;
+	}, 0);
 
 const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 	"consumeInventoryStackForMemoryRestoreFx",
@@ -60,22 +75,46 @@ const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 	scope: BoardMemoryActivationScope;
 }) {
 	const { nextSave } = scope;
-	const slotIndex = nextSave.inventory.slots.findIndex(
-		(slot) => isGameSaveInventoryStack(slot) && slot.itemId === itemId && slot.quantity > 0,
-	);
-	if (slotIndex < 0) return undefined;
+	if (
+		readInventoryStackQuantity({
+			itemId,
+			scope,
+		}) < quantity
+	) {
+		return undefined;
+	}
 
-	const consumed = yield* consumeInventorySlotQuantityFx({
-		nextSave,
-		quantity,
-		reason: "memory-restore",
-		runtimeState: "remove-instance",
-		slotIndex,
-	});
+	const consumedEvents: Extract<
+		GameEvent,
+		{
+			type: "item.consumed";
+		}
+	>[] = [];
+	let createdAtMs: number | undefined;
+	let remainingQuantity = quantity;
+
+	for (let slotIndex = 0; slotIndex < nextSave.inventory.slots.length; slotIndex += 1) {
+		if (remainingQuantity <= 0) break;
+		const slot = nextSave.inventory.slots[slotIndex];
+		if (!isGameSaveInventoryStack(slot) || slot.itemId !== itemId || slot.quantity <= 0)
+			continue;
+
+		const consumedQuantity = Math.min(slot.quantity, remainingQuantity);
+		const consumed = yield* consumeInventorySlotQuantityFx({
+			nextSave,
+			quantity: consumedQuantity,
+			reason: "memory-restore",
+			runtimeState: "remove-instance",
+			slotIndex,
+		});
+		consumedEvents.push(consumed.consumedEvent);
+		createdAtMs ??= consumed.slot.createdAtMs;
+		remainingQuantity -= consumedQuantity;
+	}
 
 	return {
-		consumedEvent: consumed.consumedEvent,
-		createdAtMs: consumed.slot.createdAtMs,
+		consumedEvents,
+		createdAtMs,
 		itemInstanceId: undefined,
 	} satisfies InventoryConsumedForMemoryRestore;
 });

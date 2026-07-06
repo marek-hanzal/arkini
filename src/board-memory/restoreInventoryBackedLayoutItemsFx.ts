@@ -34,7 +34,7 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayo
 		if (!consumed) return false;
 
 		const itemInstanceId = consumed.itemInstanceId ?? (yield* createGameItemInstanceIdFx());
-		events.push(consumed.consumedEvent);
+		events.push(...consumed.consumedEvents);
 		yield* placeBoardItemInstanceFx({
 			cell: {
 				x: memoryItem.x,

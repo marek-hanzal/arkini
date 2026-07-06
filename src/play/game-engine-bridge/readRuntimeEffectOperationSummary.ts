@@ -12,18 +12,11 @@ export namespace readRuntimeEffectBenefitLines {
 export namespace readRuntimeLineActiveEffectBonusEntries {
 	export interface Props {
 		baseDurationMs: number;
-		config: GameConfig;
 		effectiveLine: EffectiveLine;
 	}
 }
 
 const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
-
-const formatEffectInstanceLabel = ({ count, effectName }: { count: number; effectName: string }) =>
-	count > 1 ? `${effectName} ×${count}` : effectName;
-
-const readItemName = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
-	config.items[itemId]?.name ?? itemId;
 
 export const readRuntimeEffectBenefitLines = ({
 	config,
@@ -38,10 +31,7 @@ export const readRuntimeEffectBenefitLines = ({
 };
 
 type EffectInstanceGroup = {
-	count: number;
 	durationMultiplier?: number;
-	effectId: string;
-	effectName: string;
 	targetItemId?: string;
 };
 
@@ -112,7 +102,6 @@ const groupDurationEffectInstances = (
 		if (existing) {
 			if (existing.sourceKeys.has(sourceKey)) continue;
 			existing.sourceKeys.add(sourceKey);
-			existing.count = existing.sourceKeys.size;
 			if (effect.durationMultiplier !== undefined) {
 				existing.durationMultiplier =
 					(existing.durationMultiplier ?? 1) * effect.durationMultiplier;
@@ -121,10 +110,7 @@ const groupDurationEffectInstances = (
 		}
 
 		groups.set(groupKey, {
-			count: 1,
 			durationMultiplier: effect.durationMultiplier,
-			effectId: effect.effectId,
-			effectName: effect.effectName,
 			sourceKeys: new Set([
 				sourceKey,
 			]),
@@ -146,18 +132,14 @@ const readChanceRemainder = (chance: number) =>
 	Math.max(0, chance - readGuaranteedRollCount(chance));
 
 const readAggregatedChanceItemEntries = ({
-	config,
 	effectiveLine,
 }: {
-	config: GameConfig;
 	effectiveLine: EffectiveLine;
 }): RuntimeLineActiveEffectBonusEntry[] => {
 	const groups = new Map<
 		string,
 		{
 			chances: number[];
-			effectId: string;
-			effectName: string;
 			itemId: string;
 			quantityRanges: QuantityRange[];
 		}
@@ -186,8 +168,6 @@ const readAggregatedChanceItemEntries = ({
 			chances: [
 				chanceItem.chance,
 			],
-			effectId: chanceItem.effectId,
-			effectName: chanceItem.effectName,
 			itemId: chanceItem.itemId,
 			quantityRanges: [
 				quantityRange,
@@ -199,20 +179,11 @@ const readAggregatedChanceItemEntries = ({
 		...groups.values(),
 	].map((group) => {
 		const rollCount = group.chances.length;
-		const itemName = readItemName({
-			config,
-			itemId: group.itemId,
-		});
 		const firstSuccessMin = Math.min(...group.quantityRanges.map((quantity) => quantity.min));
 		const maxQuantity = group.quantityRanges.reduce(
 			(total, quantity) => total + quantity.max,
 			0,
 		);
-		const effectLabel = formatEffectInstanceLabel({
-			count: rollCount,
-			effectName: group.effectName,
-		});
-
 		const hasUncappedChance = group.chances.some((chance) => chance > 1);
 		if (rollCount === 1) {
 			const chance = group.chances[0] ?? 0;
@@ -226,24 +197,24 @@ const readAggregatedChanceItemEntries = ({
 			if (guaranteedQuantity > 0 && remainder > 0) {
 				return {
 					itemId: group.itemId,
-					label: `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed, ${formatPercent(
+					label: `Drop: +${formatQuantityNumber(guaranteedQuantity)} guaranteed, ${formatPercent(
 						remainder,
-					)} chance for +${formatQuantityNumber(quantityRange.min)} ${itemName}.`,
+					)} chance for +${formatQuantityNumber(quantityRange.min)}`,
 				};
 			}
 
 			if (guaranteedQuantity > 0) {
 				return {
 					itemId: group.itemId,
-					label: `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed.`,
+					label: `Drop: +${formatQuantityNumber(guaranteedQuantity)} guaranteed`,
 				};
 			}
 
 			return {
 				itemId: group.itemId,
-				label: `${effectLabel}: ${formatPercent(chance)} chance for +${formatQuantityNumber(
+				label: `Drop: ${formatPercent(chance)} chance for +${formatQuantityNumber(
 					firstSuccessMin,
-				)} ${itemName}.`,
+				)}`,
 			};
 		}
 
@@ -260,33 +231,33 @@ const readAggregatedChanceItemEntries = ({
 				.filter((chance) => chance > 0);
 			const guaranteedPrefix =
 				guaranteedQuantity > 0
-					? `+${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed`
+					? `+${formatQuantityNumber(guaranteedQuantity)} guaranteed`
 					: undefined;
 
 			if (guaranteedPrefix && remainderChances.length > 0) {
 				return {
 					itemId: group.itemId,
-					label: `${effectLabel}: ${guaranteedPrefix}, ${formatPercent(
+					label: `Drop: ${guaranteedPrefix}, ${formatPercent(
 						readChanceAtLeastOne(remainderChances),
-					)} chance for extra ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`,
+					)} chance for extra, max +${formatQuantityNumber(maxQuantity)}`,
 				};
 			}
 
 			if (guaranteedPrefix) {
 				return {
 					itemId: group.itemId,
-					label: `${effectLabel}: ${guaranteedPrefix} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`,
+					label: `Drop: ${guaranteedPrefix}, max +${formatQuantityNumber(maxQuantity)}`,
 				};
 			}
 		}
 
 		return {
 			itemId: group.itemId,
-			label: `${effectLabel}: ${formatPercent(
+			label: `Drop: ${formatPercent(
 				readChanceAtLeastOne(group.chances),
 			)} chance for at least +${formatQuantityNumber(
 				firstSuccessMin,
-			)} ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`,
+			)}, max +${formatQuantityNumber(maxQuantity)}`,
 		};
 	});
 };
@@ -302,25 +273,19 @@ const readDurationEffectBonusEntries = ({
 		const durationRatio = group.durationMultiplier ?? fallbackDurationRatio;
 		if (durationRatio === 1) return [];
 
-		const labelPrefix = formatEffectInstanceLabel({
-			count: group.count,
-			effectName: group.effectName,
-		});
-
 		return [
 			{
 				itemId: group.targetItemId,
 				label:
 					durationRatio < 1
-						? `${labelPrefix}: ${formatPercent(1 - durationRatio)} faster production.`
-						: `${labelPrefix}: ${formatPercent(durationRatio - 1)} slower production.`,
+						? `Speed: ${formatPercent(1 - durationRatio)} faster`
+						: `Speed: ${formatPercent(durationRatio - 1)} slower`,
 			},
 		];
 	});
 
 export const readRuntimeLineActiveEffectBonusEntries = ({
 	baseDurationMs,
-	config,
 	effectiveLine,
 }: readRuntimeLineActiveEffectBonusEntries.Props): RuntimeLineActiveEffectBonusEntry[] => {
 	const durationRatio =
@@ -333,7 +298,6 @@ export const readRuntimeLineActiveEffectBonusEntries = ({
 			fallbackDurationRatio: durationRatio,
 		}),
 		...readAggregatedChanceItemEntries({
-			config,
 			effectiveLine,
 		}),
 	];

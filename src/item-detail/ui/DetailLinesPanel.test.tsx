@@ -293,7 +293,7 @@ describe("DetailLinesPanel", () => {
 					lineModel(
 						createLine({
 							effectBonusLines: [
-								"Nearby Tree enables production: 10% faster production.",
+								"Speed: 10% faster",
 							],
 						}),
 					),
@@ -301,7 +301,7 @@ describe("DetailLinesPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Nearby Tree enables production");
+		expect(html).toContain("Speed: 10% faster");
 	});
 
 	it("hides fulfilled effect requirements and the parent requirement box", () => {
@@ -608,7 +608,7 @@ describe("DetailLinesPanel", () => {
 							outputs: [
 								{
 									bonusLines: [
-										"Nearby Tree: 10% faster production.",
+										"Speed: 10% faster",
 									],
 									itemId: "item:grain",
 									kind: "guaranteed",
@@ -622,8 +622,8 @@ describe("DetailLinesPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Applied effects");
-		expect(html).toContain("Nearby Tree: 10% faster production.");
+		expect(html).toContain("Effects");
+		expect(html).toContain("Speed: 10% faster");
 		expect(html).not.toContain("Active bonuses");
 		expect(html).not.toContain("This old global bonus should move away from the green box.");
 	});

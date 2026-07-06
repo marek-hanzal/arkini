@@ -59,7 +59,7 @@ describe("readDetailLineOutputRows", () => {
 		const rows = readDetailLineOutputRows([
 			{
 				bonusLines: [
-					"Nearby Tree: 10% faster production.",
+					"Speed: 10% faster",
 				],
 				itemId: "item:stone",
 				kind: "guaranteed",
@@ -68,8 +68,8 @@ describe("readDetailLineOutputRows", () => {
 			},
 			{
 				bonusLines: [
-					"Nearby Tree: 10% faster production.",
-					"Extra Stone: 25% chance for +1× Stone.",
+					"Speed: 10% faster",
+					"Drop: 25% chance for +1×",
 				],
 				itemId: "item:stone",
 				kind: "chance",
@@ -80,8 +80,8 @@ describe("readDetailLineOutputRows", () => {
 		]);
 
 		expect(rows[0]?.effectLines).toEqual([
-			"Nearby Tree: 10% faster production.",
-			"Extra Stone: 25% chance for +1× Stone.",
+			"Speed: 10% faster",
+			"Drop: 25% chance for +1×",
 		]);
 	});
 });

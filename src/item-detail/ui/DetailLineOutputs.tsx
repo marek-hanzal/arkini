@@ -34,7 +34,7 @@ const DetailOutputEffectLines: FC<{
 	return (
 		<div className="mt-2">
 			<p className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-violet-700/75">
-				Applied effects
+				Effects
 			</p>
 			<ul className="mt-1 space-y-0.5 text-[0.72rem] leading-5 text-violet-800/78">
 				{effectLines.map((effectLine, effectLineIndex) => (

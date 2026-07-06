@@ -35,7 +35,6 @@ describe("readRuntimeEffectBenefitLines", () => {
 		expect(
 			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
-				config: defaultGameConfig,
 				effectiveLine: {
 					appliedEffects: [
 						{
@@ -81,8 +80,8 @@ describe("readRuntimeEffectBenefitLines", () => {
 				},
 			}),
 		).toEqual([
-			"Minor Haste: 25% faster production.",
-			"Bountiful Offering: 35% chance for +1× Log.",
+			"Speed: 25% faster",
+			"Drop: 35% chance for +1×",
 		]);
 	});
 
@@ -90,7 +89,6 @@ describe("readRuntimeEffectBenefitLines", () => {
 		expect(
 			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 60000,
-				config: defaultGameConfig,
 				effectiveLine: {
 					appliedEffects: [
 						{
@@ -115,7 +113,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 				},
 			}),
 		).toEqual([
-			"Minor Haste: 25% faster production.",
+			"Speed: 25% faster",
 		]);
 	});
 
@@ -123,7 +121,6 @@ describe("readRuntimeEffectBenefitLines", () => {
 		expect(
 			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
-				config: defaultGameConfig,
 				effectiveLine: {
 					appliedEffects: [
 						{
@@ -197,8 +194,8 @@ describe("readRuntimeEffectBenefitLines", () => {
 				},
 			}),
 		).toEqual([
-			"Minor Haste ×2: 44% faster production.",
-			"Bountiful Offering ×2: 58% chance for at least +1× Log (2 rolls, max +2×).",
+			"Speed: 44% faster",
+			"Drop: 58% chance for at least +1×, max +2×",
 		]);
 	});
 
@@ -206,7 +203,6 @@ describe("readRuntimeEffectBenefitLines", () => {
 		expect(
 			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
-				config: defaultGameConfig,
 				effectiveLine: {
 					appliedEffects: [],
 					blocked: false,
@@ -244,7 +240,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 				},
 			}),
 		).toEqual([
-			"Nearby wood sources: +1× Log guaranteed, 15% chance for +1× Log.",
+			"Drop: +1× guaranteed, 15% chance for +1×",
 		]);
 	});
 
@@ -252,7 +248,6 @@ describe("readRuntimeEffectBenefitLines", () => {
 		expect(
 			readRuntimeLineActiveEffectBonusLines({
 				baseDurationMs: 1000,
-				config: defaultGameConfig,
 				effectiveLine: {
 					appliedEffects: [],
 					blocked: false,
@@ -283,7 +278,6 @@ describe("readRuntimeEffectBenefitLines", () => {
 		expect(
 			readRuntimeLineActiveEffectBonusEntries({
 				baseDurationMs: 1000,
-				config: defaultGameConfig,
 				effectiveLine: {
 					appliedEffects: [
 						{
@@ -333,11 +327,11 @@ describe("readRuntimeEffectBenefitLines", () => {
 		).toEqual([
 			{
 				itemId: "item:log",
-				label: "Minor Haste: 25% faster production.",
+				label: "Speed: 25% faster",
 			},
 			{
 				itemId: "item:log",
-				label: "Bountiful Offering: 35% chance for +1× Log.",
+				label: "Drop: 35% chance for +1×",
 			},
 		]);
 	});

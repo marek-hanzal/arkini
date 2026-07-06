@@ -78,7 +78,6 @@ export const readRuntimeLineViewFromDefinition = ({
 
 	const effectBonusEntries = readRuntimeLineActiveEffectBonusEntries({
 		baseDurationMs,
-		config,
 		effectiveLine,
 	});
 	const effectBonusLines = effectBonusEntries.map((entry) => entry.label);

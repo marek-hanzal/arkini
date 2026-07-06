@@ -454,7 +454,7 @@ describe("readRuntimeLineOutputViews", () => {
 			effectBonusEntries: [
 				{
 					itemId: "item:twig",
-					label: "Twig Haste: 10% faster production.",
+					label: "Speed: 10% faster",
 				},
 			],
 			effectiveLine,
@@ -462,7 +462,7 @@ describe("readRuntimeLineOutputViews", () => {
 		});
 
 		expect(outputs.find((output) => output.itemId === "item:twig")?.bonusLines).toEqual([
-			"Twig Haste: 10% faster production.",
+			"Speed: 10% faster",
 		]);
 		expect(
 			outputs.find((output) => output.itemId === "item:plank")?.bonusLines,

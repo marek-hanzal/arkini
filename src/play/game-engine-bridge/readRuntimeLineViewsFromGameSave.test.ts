@@ -496,12 +496,12 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 		expect(line.effectRequirements).toBeUndefined();
 		expect(line.startRequirementsReady).toBeUndefined();
 		expect(line.effectBonusLines).toEqual([
-			"Inventory Haste: 50% faster production.",
-			"Extra Twig: 25% chance for +1× Twig.",
+			"Speed: 50% faster",
+			"Drop: 25% chance for +1×",
 		]);
 		expect(line.outputs?.[0]?.bonusLines).toEqual([
-			"Inventory Haste: 50% faster production.",
-			"Extra Twig: 25% chance for +1× Twig.",
+			"Speed: 50% faster",
+			"Drop: 25% chance for +1×",
 		]);
 	});
 
@@ -560,10 +560,10 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 		});
 
 		expect(line.effectBonusLines).toEqual([
-			"Nearby Axe enables production: 10% faster production.",
+			"Speed: 10% faster",
 		]);
 		expect(line.outputs?.[0]?.bonusLines).toEqual([
-			"Nearby Axe enables production: 10% faster production.",
+			"Speed: 10% faster",
 		]);
 	});
 

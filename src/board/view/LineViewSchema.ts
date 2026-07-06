@@ -38,6 +38,7 @@ const EffectPolarityViewSchema = z.enum([
 
 const LineOutputViewSchema = z.object({
 	itemId: IdSchema,
+	bonusLines: z.array(z.string().min(1)).optional(),
 	ownedQuantity: z.number().int().nonnegative(),
 	enabled: z.boolean().optional(),
 	effects: z.array(ActivationEffectViewSchema).optional(),

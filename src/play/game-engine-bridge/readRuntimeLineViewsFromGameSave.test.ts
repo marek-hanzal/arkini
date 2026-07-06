@@ -499,6 +499,10 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 			"Inventory Haste: 50% faster production.",
 			"Extra Twig: 25% chance for +1× Twig.",
 		]);
+		expect(line.outputs?.[0]?.bonusLines).toEqual([
+			"Inventory Haste: 50% faster production.",
+			"Extra Twig: 25% chance for +1× Twig.",
+		]);
 	});
 
 	it("uses catalog item names for nearby active bonus labels", () => {
@@ -556,6 +560,9 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 		});
 
 		expect(line.effectBonusLines).toEqual([
+			"Nearby Axe enables production: 10% faster production.",
+		]);
+		expect(line.outputs?.[0]?.bonusLines).toEqual([
 			"Nearby Axe enables production: 10% faster production.",
 		]);
 	});

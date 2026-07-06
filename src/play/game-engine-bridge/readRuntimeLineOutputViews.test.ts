@@ -412,4 +412,60 @@ describe("readRuntimeLineOutputViews", () => {
 			},
 		]);
 	});
+
+	it("attaches active bonus lines only to matching output items", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const effectiveLine: EffectiveLine = {
+			appliedEffects: [],
+			blocked: false,
+			blockReasons: [],
+			durationMs: 1000,
+			lootPlan: {
+				baseOutput: [],
+				chanceItems: [],
+				visibleOutput: [
+					{
+						dropEffects: [],
+						enabled: true,
+						itemId: "item:twig",
+						quantity: 1,
+						type: "guaranteed",
+						visible: true,
+					},
+					{
+						dropEffects: [],
+						enabled: true,
+						itemId: "item:plank",
+						quantity: 1,
+						type: "guaranteed",
+						visible: true,
+					},
+				],
+			},
+			requirements: [],
+			visible: true,
+		};
+
+		const outputs = readRuntimeLineOutputViews({
+			effectBonusEntries: [
+				{
+					itemId: "item:twig",
+					label: "Twig Haste: 10% faster production.",
+				},
+			],
+			effectiveLine,
+			save,
+		});
+
+		expect(outputs.find((output) => output.itemId === "item:twig")?.bonusLines).toEqual([
+			"Twig Haste: 10% faster production.",
+		]);
+		expect(
+			outputs.find((output) => output.itemId === "item:plank")?.bonusLines,
+		).toBeUndefined();
+	});
 });

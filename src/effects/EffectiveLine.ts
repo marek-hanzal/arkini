@@ -32,11 +32,13 @@ export interface EffectiveChanceItemEntry {
 }
 
 export interface AppliedGameEffectOperation {
+	durationMultiplier?: number;
 	effectId: string;
 	effectName: string;
 	kind: RuntimeLineEffect["kind"];
 	sourceId: string;
 	sourceItemInstanceId: string;
+	targetItemId?: string;
 }
 
 interface RuntimeLineEffectRequirement {

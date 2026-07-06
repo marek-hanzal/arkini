@@ -32,16 +32,21 @@ const DetailOutputEffectLines: FC<{
 	if (effectLines.length === 0) return null;
 
 	return (
-		<ul className="mt-1.5 space-y-0.5 text-[0.72rem] leading-5 text-violet-800/78">
-			{effectLines.map((effectLine, effectLineIndex) => (
-				<li
-					key={`effect:${effectLineIndex}:${effectLine}`}
-					className="break-words"
-				>
-					{effectLine}
-				</li>
-			))}
-		</ul>
+		<div className="mt-2">
+			<p className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-violet-700/75">
+				Applied effects
+			</p>
+			<ul className="mt-1 space-y-0.5 text-[0.72rem] leading-5 text-violet-800/78">
+				{effectLines.map((effectLine, effectLineIndex) => (
+					<li
+						key={`effect:${effectLineIndex}:${effectLine}`}
+						className="break-words"
+					>
+						{effectLine}
+					</li>
+				))}
+			</ul>
+		</div>
 	);
 };
 

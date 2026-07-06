@@ -23,6 +23,7 @@ const readOutputDurationEffects = ({
 	dropEffectIdPrefix,
 	dropEffects,
 	grantIds,
+	outputItemId,
 	itemInstanceId,
 	save,
 	targetCell,
@@ -31,6 +32,7 @@ const readOutputDurationEffects = ({
 	dropEffectIdPrefix: string;
 	dropEffects: readonly DropEffect[] | undefined;
 	grantIds: ReadonlySet<string>;
+	outputItemId: string;
 	itemInstanceId: string;
 	save: GameSave;
 	targetCell?: BoardCell;
@@ -62,11 +64,13 @@ const readOutputDurationEffects = ({
 				durationMultiplier *= multiplier;
 				appliedEffects.push(
 					createAppliedGameEffectOperation({
+						durationMultiplier: multiplier,
 						kind: effect.kind,
 						lineEffectId: effectId,
 						lineEffectName: effectName,
 						sourceId: match.item.itemId,
 						sourceItemInstanceId: match.item.id,
+						targetItemId: outputItemId,
 					}),
 				);
 			}
@@ -83,10 +87,12 @@ const readOutputDurationEffects = ({
 			durationMultiplier *= effect.multiplier;
 			appliedEffects.push(
 				createAppliedGameEffectOperation({
+					durationMultiplier: effect.multiplier,
 					kind: effect.kind,
 					lineEffectId: effectId,
 					lineEffectName: effectName,
 					sourceItemInstanceId: itemInstanceId,
+					targetItemId: outputItemId,
 				}),
 			);
 		}
@@ -126,15 +132,18 @@ export const readEffectiveOutputEntries = ({
 	const applyDurationEffects = ({
 		dropEffectIdPrefix,
 		dropEffects,
+		outputItemId,
 	}: {
 		dropEffectIdPrefix: string;
 		dropEffects: readonly DropEffect[] | undefined;
+		outputItemId: string;
 	}) => {
 		const duration = readOutputDurationEffects({
 			config,
 			dropEffectIdPrefix,
 			dropEffects,
 			grantIds,
+			outputItemId,
 			itemInstanceId,
 			save,
 			targetCell,
@@ -176,6 +185,7 @@ export const readEffectiveOutputEntries = ({
 					applyDurationEffects({
 						dropEffectIdPrefix: sourceDropId,
 						dropEffects: weightedEntry.effects,
+						outputItemId: weightedEntry.itemId,
 					});
 				}
 			}
@@ -229,6 +239,7 @@ export const readEffectiveOutputEntries = ({
 			applyDurationEffects({
 				dropEffectIdPrefix: sourceDropId,
 				dropEffects: entry.effects,
+				outputItemId: entry.itemId,
 			});
 		}
 	}

@@ -9,7 +9,7 @@ export namespace readRuntimeEffectBenefitLines {
 	}
 }
 
-export namespace readRuntimeLineActiveEffectBonusLines {
+export namespace readRuntimeLineActiveEffectBonusEntries {
 	export interface Props {
 		baseDurationMs: number;
 		config: GameConfig;
@@ -21,13 +21,6 @@ const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
 
 const formatEffectInstanceLabel = ({ count, effectName }: { count: number; effectName: string }) =>
 	count > 1 ? `${effectName} ×${count}` : effectName;
-
-const formatEffectInstanceLabelList = (
-	instances: readonly {
-		count: number;
-		effectName: string;
-	}[],
-) => instances.map((instance) => formatEffectInstanceLabel(instance)).join(", ");
 
 const readItemName = ({ config, itemId }: { config: GameConfig; itemId: string }) =>
 	config.items[itemId]?.name ?? itemId;
@@ -46,14 +39,21 @@ export const readRuntimeEffectBenefitLines = ({
 
 type EffectInstanceGroup = {
 	count: number;
+	durationMultiplier?: number;
 	effectId: string;
 	effectName: string;
+	targetItemId?: string;
 };
 
 type QuantityRange = {
 	max: number;
 	min: number;
 };
+
+export interface RuntimeLineActiveEffectBonusEntry {
+	itemId?: string;
+	label: string;
+}
 
 const readQuantityRange = (
 	quantity:
@@ -82,6 +82,14 @@ const readQuantityRange = (
 
 const formatQuantityNumber = (value: number) => `${value}×`;
 
+const readDurationGroupKey = ({
+	effectId,
+	targetItemId,
+}: {
+	effectId: string;
+	targetItemId?: string;
+}) => `${effectId}:${targetItemId ?? "*"}`;
+
 const groupDurationEffectInstances = (
 	appliedEffects: EffectiveLine["appliedEffects"],
 ): EffectInstanceGroup[] => {
@@ -95,22 +103,32 @@ const groupDurationEffectInstances = (
 	for (const effect of appliedEffects) {
 		if (!effect.kind.includes("duration")) continue;
 
-		const groupKey = effect.effectId;
+		const groupKey = readDurationGroupKey({
+			effectId: effect.effectId,
+			targetItemId: effect.targetItemId,
+		});
 		const sourceKey = `${effect.sourceId}:${effect.sourceItemInstanceId}`;
 		const existing = groups.get(groupKey);
 		if (existing) {
+			if (existing.sourceKeys.has(sourceKey)) continue;
 			existing.sourceKeys.add(sourceKey);
 			existing.count = existing.sourceKeys.size;
+			if (effect.durationMultiplier !== undefined) {
+				existing.durationMultiplier =
+					(existing.durationMultiplier ?? 1) * effect.durationMultiplier;
+			}
 			continue;
 		}
 
 		groups.set(groupKey, {
 			count: 1,
+			durationMultiplier: effect.durationMultiplier,
 			effectId: effect.effectId,
 			effectName: effect.effectName,
 			sourceKeys: new Set([
 				sourceKey,
 			]),
+			targetItemId: effect.targetItemId,
 		});
 	}
 
@@ -127,13 +145,13 @@ const readGuaranteedRollCount = (chance: number) => Math.floor(Math.max(0, chanc
 const readChanceRemainder = (chance: number) =>
 	Math.max(0, chance - readGuaranteedRollCount(chance));
 
-const readAggregatedChanceItemLines = ({
+const readAggregatedChanceItemEntries = ({
 	config,
 	effectiveLine,
 }: {
 	config: GameConfig;
 	effectiveLine: EffectiveLine;
-}) => {
+}): RuntimeLineActiveEffectBonusEntry[] => {
 	const groups = new Map<
 		string,
 		{
@@ -206,18 +224,27 @@ const readAggregatedChanceItemLines = ({
 			const remainder = readChanceRemainder(chance);
 
 			if (guaranteedQuantity > 0 && remainder > 0) {
-				return `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed, ${formatPercent(
-					remainder,
-				)} chance for +${formatQuantityNumber(quantityRange.min)} ${itemName}.`;
+				return {
+					itemId: group.itemId,
+					label: `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed, ${formatPercent(
+						remainder,
+					)} chance for +${formatQuantityNumber(quantityRange.min)} ${itemName}.`,
+				};
 			}
 
 			if (guaranteedQuantity > 0) {
-				return `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed.`;
+				return {
+					itemId: group.itemId,
+					label: `${effectLabel}: +${formatQuantityNumber(guaranteedQuantity)} ${itemName} guaranteed.`,
+				};
 			}
 
-			return `${effectLabel}: ${formatPercent(chance)} chance for +${formatQuantityNumber(
-				firstSuccessMin,
-			)} ${itemName}.`;
+			return {
+				itemId: group.itemId,
+				label: `${effectLabel}: ${formatPercent(chance)} chance for +${formatQuantityNumber(
+					firstSuccessMin,
+				)} ${itemName}.`,
+			};
 		}
 
 		if (hasUncappedChance) {
@@ -237,50 +264,81 @@ const readAggregatedChanceItemLines = ({
 					: undefined;
 
 			if (guaranteedPrefix && remainderChances.length > 0) {
-				return `${effectLabel}: ${guaranteedPrefix}, ${formatPercent(
-					readChanceAtLeastOne(remainderChances),
-				)} chance for extra ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`;
+				return {
+					itemId: group.itemId,
+					label: `${effectLabel}: ${guaranteedPrefix}, ${formatPercent(
+						readChanceAtLeastOne(remainderChances),
+					)} chance for extra ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`,
+				};
 			}
 
 			if (guaranteedPrefix) {
-				return `${effectLabel}: ${guaranteedPrefix} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`;
+				return {
+					itemId: group.itemId,
+					label: `${effectLabel}: ${guaranteedPrefix} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`,
+				};
 			}
 		}
 
-		return `${effectLabel}: ${formatPercent(
-			readChanceAtLeastOne(group.chances),
-		)} chance for at least +${formatQuantityNumber(
-			firstSuccessMin,
-		)} ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`;
+		return {
+			itemId: group.itemId,
+			label: `${effectLabel}: ${formatPercent(
+				readChanceAtLeastOne(group.chances),
+			)} chance for at least +${formatQuantityNumber(
+				firstSuccessMin,
+			)} ${itemName} (${rollCount} rolls, max +${formatQuantityNumber(maxQuantity)}).`,
+		};
 	});
 };
 
-export const readRuntimeLineActiveEffectBonusLines = ({
+const readDurationEffectBonusEntries = ({
+	effectiveLine,
+	fallbackDurationRatio,
+}: {
+	effectiveLine: EffectiveLine;
+	fallbackDurationRatio: number;
+}): RuntimeLineActiveEffectBonusEntry[] =>
+	groupDurationEffectInstances(effectiveLine.appliedEffects).flatMap((group) => {
+		const durationRatio = group.durationMultiplier ?? fallbackDurationRatio;
+		if (durationRatio === 1) return [];
+
+		const labelPrefix = formatEffectInstanceLabel({
+			count: group.count,
+			effectName: group.effectName,
+		});
+
+		return [
+			{
+				itemId: group.targetItemId,
+				label:
+					durationRatio < 1
+						? `${labelPrefix}: ${formatPercent(1 - durationRatio)} faster production.`
+						: `${labelPrefix}: ${formatPercent(durationRatio - 1)} slower production.`,
+			},
+		];
+	});
+
+export const readRuntimeLineActiveEffectBonusEntries = ({
 	baseDurationMs,
 	config,
 	effectiveLine,
-}: readRuntimeLineActiveEffectBonusLines.Props) => {
-	const chanceItemLines = readAggregatedChanceItemLines({
-		config,
-		effectiveLine,
-	});
-	const durationEffectInstances = groupDurationEffectInstances(effectiveLine.appliedEffects);
+}: readRuntimeLineActiveEffectBonusEntries.Props): RuntimeLineActiveEffectBonusEntry[] => {
 	const durationRatio =
 		effectiveLine.effectDurationMultiplier ??
 		(baseDurationMs > 0 ? effectiveLine.durationMs / baseDurationMs : 1);
-	const durationLine =
-		durationEffectInstances.length === 0 || durationRatio === 1
-			? undefined
-			: durationRatio < 1
-				? `${formatEffectInstanceLabelList(durationEffectInstances)}: ${formatPercent(
-						1 - durationRatio,
-					)} faster production.`
-				: `${formatEffectInstanceLabelList(durationEffectInstances)}: ${formatPercent(
-						durationRatio - 1,
-					)} slower production.`;
 
 	return [
-		durationLine,
-		...chanceItemLines,
-	].filter((line): line is string => Boolean(line));
+		...readDurationEffectBonusEntries({
+			effectiveLine,
+			fallbackDurationRatio: durationRatio,
+		}),
+		...readAggregatedChanceItemEntries({
+			config,
+			effectiveLine,
+		}),
+	];
 };
+
+export const readRuntimeLineActiveEffectBonusLines = (
+	props: readRuntimeLineActiveEffectBonusEntries.Props,
+) => readRuntimeLineActiveEffectBonusEntries(props).map((entry) => entry.label);

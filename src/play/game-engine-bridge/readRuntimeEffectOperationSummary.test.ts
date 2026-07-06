@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadGameConfigPackFromFile } from "~/config/pack/loadGameConfigPackFromFile";
 import {
 	readRuntimeEffectBenefitLines,
+	readRuntimeLineActiveEffectBonusEntries,
 	readRuntimeLineActiveEffectBonusLines,
 } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
@@ -276,5 +277,68 @@ describe("readRuntimeEffectBenefitLines", () => {
 				},
 			}),
 		).toEqual([]);
+	});
+
+	it("keeps active bonus summaries attached to their affected output item", () => {
+		expect(
+			readRuntimeLineActiveEffectBonusEntries({
+				baseDurationMs: 1000,
+				config: defaultGameConfig,
+				effectiveLine: {
+					appliedEffects: [
+						{
+							durationMultiplier: 0.75,
+							effectId: "effect:shrine-minor-haste",
+							effectName: "Minor Haste",
+							kind: "grant.duration.multiply",
+							sourceId: "effect-source:1",
+							sourceItemInstanceId: "item-instance:shrine",
+							targetItemId: "item:log",
+						},
+					],
+					blocked: false,
+					blockReasons: [],
+					durationMs: 750,
+					lootPlan: {
+						baseOutput: [],
+						visibleOutput: [],
+						chanceItems: [
+							{
+								chance: 0.35,
+								dropEffects: [
+									{
+										active: true,
+										display: "whenActive",
+										effectId: "effect:shrine-bountiful-offering",
+										effectName: "Bountiful Offering",
+										impact: "chance",
+										kind: "grant.loot.extraOutputChance.add",
+										label: "Bountiful Offering",
+										ready: true,
+										result: "+35% extra roll",
+									},
+								],
+								effectId: "effect:shrine-bountiful-offering",
+								effectName: "Bountiful Offering",
+								itemId: "item:log",
+								quantity: 1,
+								sourceDropId: "line:test:output:0",
+							},
+						],
+					},
+					requirements: [],
+					visible: true,
+				},
+			}),
+		).toEqual([
+			{
+				itemId: "item:log",
+				label: "Minor Haste: 25% faster production.",
+			},
+			{
+				itemId: "item:log",
+				label: "Bountiful Offering: 35% chance for +1× Log.",
+			},
+		]);
 	});
 });

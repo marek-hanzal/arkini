@@ -54,4 +54,34 @@ describe("readDetailLineOutputRows", () => {
 		]);
 		expect(rows[0]?.metaBadges[0]?.one).toBe("warn");
 	});
+
+	it("keeps output bonus lines with their output row", () => {
+		const rows = readDetailLineOutputRows([
+			{
+				bonusLines: [
+					"Nearby Tree: 10% faster production.",
+				],
+				itemId: "item:stone",
+				kind: "guaranteed",
+				ownedQuantity: 2,
+				quantity: 1,
+			},
+			{
+				bonusLines: [
+					"Nearby Tree: 10% faster production.",
+					"Extra Stone: 25% chance for +1× Stone.",
+				],
+				itemId: "item:stone",
+				kind: "chance",
+				ownedQuantity: 2,
+				probability: 0.25,
+				quantity: 1,
+			},
+		]);
+
+		expect(rows[0]?.effectLines).toEqual([
+			"Nearby Tree: 10% faster production.",
+			"Extra Stone: 25% chance for +1× Stone.",
+		]);
+	});
 });

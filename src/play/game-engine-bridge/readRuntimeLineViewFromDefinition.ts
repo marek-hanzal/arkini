@@ -6,7 +6,7 @@ import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readEffectLineLocked } from "~/producer/readEffectLineLocked";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
 import { readLineKind } from "~/producer/readLineKind";
-import { readRuntimeLineActiveEffectBonusLines } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
+import { readRuntimeLineActiveEffectBonusEntries } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 import { readRuntimeLineEffectBenefitViewLines } from "~/play/game-engine-bridge/readRuntimeLineEffectBenefitViewLines";
 import { readRuntimeLineEffectRequirementViews } from "~/play/game-engine-bridge/readRuntimeLineEffectRequirementViews";
 import { readRuntimeLineInputViewState } from "~/play/game-engine-bridge/readRuntimeLineInputViewState";
@@ -76,11 +76,12 @@ export const readRuntimeLineViewFromDefinition = ({
 		return undefined;
 	}
 
-	const effectBonusLines = readRuntimeLineActiveEffectBonusLines({
+	const effectBonusEntries = readRuntimeLineActiveEffectBonusEntries({
 		baseDurationMs,
 		config,
 		effectiveLine,
 	});
+	const effectBonusLines = effectBonusEntries.map((entry) => entry.label);
 	const effectRequirements = readRuntimeLineEffectRequirementViews(effectiveLine);
 
 	return {
@@ -123,6 +124,7 @@ export const readRuntimeLineViewFromDefinition = ({
 		}),
 		name: line.name,
 		outputs: readRuntimeLineOutputViews({
+			effectBonusEntries,
 			effectiveLine,
 			save,
 		}),

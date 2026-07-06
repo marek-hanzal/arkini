@@ -43,8 +43,10 @@ const readOutputMetaLabel = (output: DetailLineOutputView) =>
 		output.rollLabel,
 	]);
 
-const readOutputEffectLines = (output: DetailLineOutputView) =>
-	(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`);
+const readOutputEffectLines = (output: DetailLineOutputView) => [
+	...(output.bonusLines ?? []),
+	...(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`),
+];
 
 export const readDetailLineOutputRows = (
 	outputs: readonly DetailLineOutputView[],

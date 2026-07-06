@@ -34,10 +34,10 @@ export const DetailLineCard: FC<{
 	const effectPolarity = readDetailLineEffectPolarity(line);
 	const targetLimits = line.targetLimits ?? [];
 	const effectBenefits = line.effectBenefits ?? [];
-	const effectBonusLines = line.effectBonusLines ?? [];
-	const effectRequirements = readDetailLineEffectRequirementSummary(line);
 	const showInputs = line.inputs.length > 0;
 	const showOutputs = (line.outputs ?? []).length > 0;
+	const effectBonusLines = showOutputs ? [] : (line.effectBonusLines ?? []);
+	const effectRequirements = readDetailLineEffectRequirementSummary(line);
 	const showFlowArrow = showInputs && line.inputs.length > 0 && showOutputs;
 
 	return (

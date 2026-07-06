@@ -594,4 +594,37 @@ describe("DetailLinesPanel", () => {
 		expect(html).toContain("Blocked effects");
 		expect(html).toContain("Blocked by Engineers path chosen");
 	});
+
+	it("renders active output bonuses inside the matching output row", () => {
+		const html = renderToStaticMarkup(
+			<DetailLinesPanel
+				items={items}
+				lines={[
+					lineModel(
+						createLine({
+							effectBonusLines: [
+								"This old global bonus should move away from the green box.",
+							],
+							outputs: [
+								{
+									bonusLines: [
+										"Nearby Tree: 10% faster production.",
+									],
+									itemId: "item:grain",
+									kind: "guaranteed",
+									ownedQuantity: 0,
+									quantity: 1,
+								},
+							],
+						}),
+					),
+				]}
+			/>,
+		);
+
+		expect(html).toContain("Applied effects");
+		expect(html).toContain("Nearby Tree: 10% faster production.");
+		expect(html).not.toContain("Active bonuses");
+		expect(html).not.toContain("This old global bonus should move away from the green box.");
+	});
 });

@@ -250,6 +250,23 @@ describe("defaultGameConfig", () => {
 		expect(startingBoardItemIds).not.toContain("producer:well-t1");
 	});
 
+	it("starts the lumberjack near at least three tree deposits", () => {
+		const lumberjack = defaultGameConfig.startingState.board.find(
+			(entry) => entry.itemId === "producer:lumberjack-t1",
+		);
+		expect(lumberjack).toBeDefined();
+
+		const nearbyTreeCount = defaultGameConfig.startingState.board.filter((entry) => {
+			if (entry.itemId !== "item:tree" || !lumberjack) return false;
+
+			const dx = Math.abs(entry.x - lumberjack.x);
+			const dy = Math.abs(entry.y - lumberjack.y);
+			return Math.max(dx, dy) === 1;
+		}).length;
+
+		expect(nearbyTreeCount).toBeGreaterThanOrEqual(3);
+	});
+
 	it("charges symbolic materials for Town Hall I blueprint planning", () => {
 		const townHallBlueprintLineIds = [
 			"line:townhall-t1:blueprint-sawmill-t1",

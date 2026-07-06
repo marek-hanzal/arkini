@@ -1,1 +1,1 @@
-export const capacityTapFeedbackDurationMs = 520;
+export const capacityTapFeedbackDurationMs = 900;

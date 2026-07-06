@@ -1,1 +1,1 @@
-export const boardStackFeedbackDurationMs = 900;
+export const boardStackFeedbackDurationMs = 1400;

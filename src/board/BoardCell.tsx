@@ -38,7 +38,7 @@ export const BoardCell = memo(
 			<span
 				aria-hidden="true"
 				className={cn(
-					"pointer-events-none absolute inset-[0.12rem] rounded-[0.12rem] outline outline-1 -outline-offset-1 outline-transparent transition-[opacity,background-color,outline-color] duration-150 ease-out",
+					"pointer-events-none absolute inset-[0.12rem] rounded-[0.12rem] outline outline-1 -outline-offset-1 outline-transparent transition-[opacity,background-color,outline-color] duration-300 ease-out",
 					statusVariant && "bg-ak-danger/15 opacity-100 outline-ak-danger/30",
 					!statusVariant && "opacity-0",
 				)}
@@ -46,7 +46,7 @@ export const BoardCell = memo(
 			<span
 				aria-hidden="true"
 				className={cn(
-					"pointer-events-none absolute inset-[0.12rem] rounded-[0.12rem] outline outline-1 -outline-offset-1 outline-transparent transition-[opacity,background-color,outline-color] duration-150 ease-out",
+					"pointer-events-none absolute inset-[0.12rem] rounded-[0.12rem] outline outline-1 -outline-offset-1 outline-transparent transition-[opacity,background-color,outline-color] duration-300 ease-out",
 					cellFeedbackClassName(feedbackVariant),
 				)}
 			/>

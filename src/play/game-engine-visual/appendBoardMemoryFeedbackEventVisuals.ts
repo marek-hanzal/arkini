@@ -1,6 +1,11 @@
 import { match } from "ts-pattern";
 import type { BoardMemoryEvent } from "~/play/game-engine-visual/BoardMemoryEvent";
 import { appendBoardTileBounceFeedback } from "~/play/game-engine-visual/appendBoardTileBounceFeedback";
+import {
+	boardMemoryClearedFeedbackDurationMs,
+	boardMemoryRestoredFeedbackDurationMs,
+	boardMemorySavedFeedbackDurationMs,
+} from "~/play/game-engine-visual/boardMemoryFeedbackDurations";
 import type { GameEngineVisualPlanContext } from "~/play/game-engine-visual/GameEngineVisualPlanContext";
 import { ignoreVisualEvent } from "~/play/game-engine-visual/ignoreVisualEvent";
 
@@ -10,17 +15,17 @@ export const appendBoardMemoryFeedbackEventVisuals = (
 ) => {
 	const feedback = match(event.type)
 		.with("board.memory.saved", () => ({
-			durationMs: 520,
+			durationMs: boardMemorySavedFeedbackDurationMs,
 			groupId: `engine:memory-saved-feedback:${event.boardItemId}:${event.atMs}`,
 			pulseCount: undefined,
 		}))
 		.with("board.memory.restored", () => ({
-			durationMs: 380,
+			durationMs: boardMemoryRestoredFeedbackDurationMs,
 			groupId: `engine:memory-restored-feedback:${event.boardItemId}:${event.atMs}`,
 			pulseCount: 2,
 		}))
 		.with("board.memory.cleared", () => ({
-			durationMs: 420,
+			durationMs: boardMemoryClearedFeedbackDurationMs,
 			groupId: `engine:memory-cleared-feedback:${event.boardItemId}:${event.atMs}`,
 			pulseCount: undefined,
 		}))

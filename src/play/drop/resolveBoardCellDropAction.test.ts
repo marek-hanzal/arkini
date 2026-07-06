@@ -39,6 +39,7 @@ const boardPairInput = (source: BoardViewItem, target: BoardViewItem) => ({
 	expectedSourceItemId: source.itemId,
 	expectedTargetItemId: target.itemId,
 	sourceBoardItemId: source.id,
+	sourceQuantity: source.quantity ?? 1,
 	targetBoardItemId: target.id,
 });
 
@@ -619,6 +620,84 @@ describe("resolveBoardCellDropAction", () => {
 		});
 	});
 
+	it("boomerangs excessive board stacks after applying only the accepted producer input", () => {
+		const source = {
+			...boardItem({
+				id: "source",
+				itemId: "item:twig",
+				x: 0,
+				y: 0,
+			}),
+			quantity: 5,
+		} satisfies BoardViewItem;
+		const target = {
+			id: "target",
+			itemId: "item:producer",
+			state: {},
+			x: 1,
+			y: 0,
+			activation: {
+				inputs: [],
+				kind: "producer",
+				lines: [
+					{
+						blocked: false,
+						durationMs: 1_000,
+						inProgress: false,
+						inputItemIds: [
+							"item:twig",
+						],
+						inputs: [
+							{
+								capacity: 1,
+								consume: true,
+								itemId: "item:twig",
+								quantity: 1,
+								stored: 0,
+							},
+						],
+						inputsAvailable: false,
+						inputsReady: false,
+						isDefault: true,
+						jobs: 0,
+						kind: "product",
+						lineId: "line:shred",
+						name: "Shred",
+						queueFull: false,
+						queueMax: 1,
+						queueUsed: 0,
+					},
+				],
+				trigger: "click",
+			},
+		} satisfies BoardViewItem;
+
+		expect(
+			resolveBoardCellDropAction({
+				config,
+				inventory: emptyInventory,
+				board: rebuildBoardView([
+					source,
+					target,
+				]),
+				source: boardSource(source),
+				target: {
+					kind: "cell",
+					x: 1,
+					y: 0,
+					boardItemId: target.id,
+				},
+			}),
+		).toEqual({
+			animation: "boomerang",
+			input: {
+				...boardPairInput(source, target),
+				consumedQuantity: 1,
+			},
+			type: "apply-board-item-to-board-item",
+		});
+	});
+
 	it("applies board items to stash inputs", () => {
 		const source = boardItem({
 			id: "source",
@@ -671,7 +750,10 @@ describe("resolveBoardCellDropAction", () => {
 				kind: "cell-feedback",
 				variant: "secondary",
 			},
-			input: boardPairInput(source, target),
+			input: {
+				...boardPairInput(source, target),
+				consumedQuantity: 1,
+			},
 		});
 	});
 });

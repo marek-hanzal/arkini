@@ -25,6 +25,7 @@ export const resolveInventoryItemToOccupiedBoardCellDropAction = ({
 	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
 		sourceItemId: sourceSlot.stack.itemId,
+		sourceQuantity: 1,
 		targetItem,
 	});
 

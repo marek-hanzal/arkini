@@ -6,6 +6,39 @@ import type {
 } from "~/play/drop/BoardCellDropAction";
 import { createBoardCellRejectDropAction } from "~/play/drop/createBoardCellDropActions";
 
+const readConsumedSourceAnimation = ({
+	input,
+	plan,
+}: {
+	input: BoardItemToBoardItemActionInput;
+	plan: Extract<
+		ItemToBoardItemInteractionPlan,
+		{
+			consumedQuantity: number;
+			consumesSource: boolean;
+		}
+	>;
+}): "boomerang" | "remove" | undefined => {
+	if (!plan.consumesSource) return undefined;
+	return input.sourceQuantity > plan.consumedQuantity ? "boomerang" : "remove";
+};
+
+const attachConsumedQuantity = ({
+	input,
+	plan,
+}: {
+	input: BoardItemToBoardItemActionInput;
+	plan: Extract<
+		ItemToBoardItemInteractionPlan,
+		{
+			consumedQuantity: number;
+		}
+	>;
+}): BoardItemToBoardItemActionInput => ({
+	...input,
+	consumedQuantity: plan.consumedQuantity,
+});
+
 export const resolveBoardItemInteractionPlanDropAction = ({
 	input,
 	plan,
@@ -53,9 +86,15 @@ export const resolveBoardItemInteractionPlanDropAction = ({
 			{
 				type: "producer-input",
 			},
-			() => ({
-				animation: "remove" as const,
-				input,
+			(matchedPlan) => ({
+				animation: readConsumedSourceAnimation({
+					input,
+					plan: matchedPlan,
+				}),
+				input: attachConsumedQuantity({
+					input,
+					plan: matchedPlan,
+				}),
 				type: "apply-board-item-to-board-item" as const,
 			}),
 		)
@@ -70,9 +109,15 @@ export const resolveBoardItemInteractionPlanDropAction = ({
 				type: "tile-remove",
 			},
 			(matchedPlan) => ({
-				...(matchedPlan.consumesSource
+				...(readConsumedSourceAnimation({
+					input,
+					plan: matchedPlan,
+				})
 					? {
-							animation: "remove" as const,
+							animation: readConsumedSourceAnimation({
+								input,
+								plan: matchedPlan,
+							}),
 						}
 					: {}),
 				feedback: {
@@ -80,7 +125,10 @@ export const resolveBoardItemInteractionPlanDropAction = ({
 					kind: "cell-feedback" as const,
 					variant: matchedPlan.feedbackVariant,
 				},
-				input,
+				input: attachConsumedQuantity({
+					input,
+					plan: matchedPlan,
+				}),
 				type: "apply-board-item-to-board-item" as const,
 			}),
 		)

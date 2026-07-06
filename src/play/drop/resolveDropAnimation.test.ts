@@ -391,6 +391,7 @@ describe("resolveDrop animation contract", () => {
 			expectedSourceItemId: "item:twig",
 			expectedTargetItemId: "item:twig",
 			sourceBoardItemId: "source",
+			sourceQuantity: 1,
 			targetBoardItemId: "target",
 		});
 	});

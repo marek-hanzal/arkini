@@ -127,6 +127,7 @@ describe("resolveDropIntent", () => {
 				}),
 			}),
 		).toEqual({
+			consumedQuantity: 1,
 			consumesSource: true,
 			feedbackVariant: "secondary",
 			lineId: "line:shred",

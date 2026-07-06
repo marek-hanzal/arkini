@@ -1,7 +1,9 @@
 import { Effect } from "effect";
+import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
+import { readBoardItemStackCapacity } from "~/board/readBoardItemStackCapacity";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import { readBoardItemMaxCountCapacityFx } from "~/board/readBoardItemMaxCountCapacityFx";
+import { planBoardStackItemsFx } from "~/placement/planBoardStackItemsFx";
 
 const readEmptyBoardCellCountFx = Effect.fn("readEmptyBoardCellCountFx")(function* ({
 	config,
@@ -12,6 +14,31 @@ const readEmptyBoardCellCountFx = Effect.fn("readEmptyBoardCellCountFx")(functio
 }) {
 	const boardCellCount = config.game.board.width * config.game.board.height;
 	return Math.max(0, boardCellCount - Object.keys(save.board.items).length);
+});
+
+const readExistingBoardStackCapacityFx = Effect.fn("readExistingBoardStackCapacityFx")(function* ({
+	config,
+	itemId,
+	save,
+}: {
+	config: GameConfig;
+	itemId: string;
+	save: GameSave;
+}) {
+	const stackTargets = yield* planBoardStackItemsFx({
+		config,
+		itemId,
+		save,
+	});
+	return stackTargets.reduce(
+		(capacity, item) =>
+			capacity +
+			readBoardItemStackCapacity({
+				config,
+				item,
+			}),
+		0,
+	);
 });
 
 export const readBoardPlacementCapacityFx = Effect.fn("readBoardPlacementCapacityFx")(function* ({
@@ -31,22 +58,32 @@ export const readBoardPlacementCapacityFx = Effect.fn("readBoardPlacementCapacit
 		itemId,
 		save,
 	});
+	const existingStackCapacity =
+		boardItemMaxCountCapacity > 0
+			? yield* readExistingBoardStackCapacityFx({
+					config,
+					itemId,
+					save,
+				})
+			: 0;
 	const emptyCellStackCapacity =
 		(yield* readEmptyBoardCellCountFx({
 			config,
 			save,
 		})) * itemDefinition.maxStackSize;
-	return Math.min(emptyCellStackCapacity, boardItemMaxCountCapacity);
+	const newBoardItemCapacity = Math.min(emptyCellStackCapacity, boardItemMaxCountCapacity);
+	return existingStackCapacity + newBoardItemCapacity;
 });
 
 export const readBoardPlacementBlockReasonFx = Effect.fn("readBoardPlacementBlockReasonFx")(
 	function* ({ config, itemId, save }: { config: GameConfig; itemId: string; save: GameSave }) {
-		return (yield* readBoardItemMaxCountCapacityFx({
+		const boardItemMaxCountCapacity = yield* readBoardItemMaxCountCapacityFx({
 			config,
 			itemId,
 			save,
-		})) <= 0
-			? "board:max-count"
-			: "board:full";
+		});
+		if (boardItemMaxCountCapacity <= 0) return "board:max-count";
+
+		return "board:full";
 	},
 );

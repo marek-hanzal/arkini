@@ -86,10 +86,13 @@ export const runTileDropMotion = async <TTile, TSlot, TDrag, TDrop>({
 
 	return {
 		completed: true,
-		handoffs: createTileDropHandoffs({
-			sourceTile,
-			resolved,
-			includeTarget: Boolean(targetActorElement),
-		}).all,
+		handoffs:
+			animation === "boomerang"
+				? []
+				: createTileDropHandoffs({
+						sourceTile,
+						resolved,
+						includeTarget: Boolean(targetActorElement),
+					}).all,
 	};
 };

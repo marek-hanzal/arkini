@@ -25,6 +25,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		expect(
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
+					consumedQuantity: 1,
 					consumesSource: true,
 					feedbackVariant: "secondary",
 					type: "craft-input",
@@ -41,6 +42,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		expect(
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
+					consumedQuantity: 1,
 					consumesSource: true,
 					feedbackVariant: "secondary",
 					lineId: "line:test",
@@ -59,6 +61,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		expect(
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
+					consumedQuantity: 1,
 					consumesSource: true,
 					feedbackVariant: "secondary",
 					type: "stash-input",
@@ -77,6 +80,7 @@ describe("createGameActionFromItemToBoardItemInteractionPlan", () => {
 		expect(
 			createGameActionFromItemToBoardItemInteractionPlan({
 				plan: {
+					consumedQuantity: 1,
 					consumesSource: true,
 					feedbackVariant: "primary",
 					type: "tile-remove",

@@ -76,6 +76,7 @@ export const resolveBoardCellDropAction = ({
 		plan: resolveItemToBoardItemInteractionPlan({
 			config,
 			sourceItemId: sourceItem.itemId,
+			sourceQuantity: sourceItem.quantity ?? 1,
 			targetItem,
 		}),
 		targetCellKey,

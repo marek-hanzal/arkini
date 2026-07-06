@@ -54,7 +54,7 @@ export type BoardCellDropAction =
 	  }
 	| {
 			type: "apply-board-item-to-board-item";
-			animation?: "remove";
+			animation?: "boomerang" | "remove";
 			feedback?: {
 				kind: "cell-feedback";
 				cellKey: string;
@@ -77,9 +77,11 @@ export type BoardCellDropAction =
 	  };
 
 export type BoardItemToBoardItemActionInput = {
+	consumedQuantity?: number;
 	expectedSourceItemId: string;
 	expectedTargetItemId: string;
 	sourceBoardItemId: string;
+	sourceQuantity: number;
 	targetBoardItemId: string;
 };
 

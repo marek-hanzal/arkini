@@ -38,6 +38,7 @@ type ProducerInputStoreLineCandidate = {
 	lineId: string;
 	nextQuantity: number;
 	previousQuantity: number;
+	resolvedRef: GameActionResolvedInputRef;
 };
 
 type ProducerInputStoreReadinessScope = checkProducerInputStoreReadinessFx.Props & {
@@ -154,14 +155,19 @@ const readProducerInputStoreLineCandidateFx = Effect.fn(
 		itemId: scope.resolvedRef.itemId,
 		quantities: storedInputs,
 	});
-	const nextQuantity = previousQuantity + scope.resolvedRef.quantity;
-	if (nextQuantity > inputSlot.capacity) return undefined;
+	const remainingQuantity = inputSlot.capacity - previousQuantity;
+	const storedQuantity = Math.min(scope.resolvedRef.quantity, remainingQuantity);
+	if (storedQuantity <= 0) return undefined;
 
 	return {
 		inputSlot,
 		lineId,
-		nextQuantity,
+		nextQuantity: previousQuantity + storedQuantity,
 		previousQuantity,
+		resolvedRef: {
+			...scope.resolvedRef,
+			quantity: storedQuantity,
+		},
 	} satisfies ProducerInputStoreLineCandidate;
 });
 
@@ -208,7 +214,6 @@ const checkProducerInputStoreReadinessProgramFx = Effect.fn(
 		...lineCandidate,
 		producerDefinition: scope.target.producerDefinition,
 		producerItem: scope.target.producerItem,
-		resolvedRef: scope.resolvedRef,
 	};
 });
 

@@ -146,6 +146,7 @@ export const useTilePointerUp = <TTile, TSlot, TDrag, TDrop>({
 						) {
 							notifyDropSettled();
 							if (animation === "remove") resetAfterMotion = false;
+							if (animation === "boomerang") resetAfterMotion = await animateBack();
 							return;
 						}
 

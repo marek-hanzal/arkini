@@ -82,22 +82,8 @@ const assertNearestStackPlacementReadinessFx = Effect.fn("assertNearestStackPlac
 			itemId: draft.slot.itemId,
 			save: props.save,
 		});
-		const boardPlacementCells =
-			boardCapacity > 0
-				? yield* planItemBoardPlacementCellsFx({
-						config: props.config,
-						itemId: draft.slot.itemId,
-						nowMs: props.nowMs,
-						save: draft.saveAfterInventoryRemoval,
-						seedCell: {
-							x: props.action.x,
-							y: props.action.y,
-						},
-					})
-				: [];
-		const allowedBoardCapacity = boardPlacementCells.length > 0 ? boardCapacity : 0;
 		yield* assertInventoryStackPlacementCapacityFx({
-			boardCapacity: allowedBoardCapacity,
+			boardCapacity,
 			draft,
 			props,
 		});

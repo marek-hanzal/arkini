@@ -31,6 +31,7 @@ export const createBoardItemToBoardItemActionInput = ({
 	expectedSourceItemId: sourceItem.itemId,
 	expectedTargetItemId: targetItem.itemId,
 	sourceBoardItemId: source.boardItemId,
+	sourceQuantity: sourceItem.quantity ?? 1,
 	targetBoardItemId: targetItem.id,
 });
 

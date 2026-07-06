@@ -3,6 +3,7 @@ import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
 import type { DropActions } from "~/play/drop/DropActions";
 import { createGameActionFromItemToBoardItemInteractionPlan } from "~/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
+import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 import {
@@ -13,6 +14,7 @@ import {
 
 type ItemToBoardItemActionSource = {
 	readExpectedSourceItemId(context: RuntimeDropActionContext): string | undefined;
+	readSourceQuantity?(context: RuntimeDropActionContext): number | undefined;
 	readStackSourceRef?(context: RuntimeDropActionContext): GameActionItemRef | undefined;
 	sourceRef: GameActionItemRef;
 };
@@ -45,6 +47,19 @@ const createStackAction = ({
 		type: "item.stack" as const,
 	};
 };
+
+const readInteractionSourceRef = ({
+	context,
+	plan,
+	source,
+}: {
+	context: RuntimeDropActionContext;
+	plan: ItemToBoardItemInteractionPlan;
+	source: ItemToBoardItemActionSource;
+}) =>
+	plan.type === "craft-input" || plan.type === "producer-input" || plan.type === "stack"
+		? (source.readStackSourceRef?.(context) ?? source.sourceRef)
+		: source.sourceRef;
 
 const dispatchBoardItemActionWhenExpected = ({
 	boardItemId,
@@ -98,7 +113,13 @@ export const dispatchItemToBoardItemAction = ({
 	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
 		sourceItemId,
+		sourceQuantity: source.readSourceQuantity?.(context) ?? 1,
 		targetItem: target,
+	});
+	const sourceRef = readInteractionSourceRef({
+		context,
+		plan,
+		source,
 	});
 	const action =
 		plan.type === "stack"
@@ -109,7 +130,7 @@ export const dispatchItemToBoardItemAction = ({
 				})
 			: createGameActionFromItemToBoardItemInteractionPlan({
 					plan,
-					sourceRef: source.sourceRef,
+					sourceRef,
 					targetItemInstanceId: target.id,
 				});
 
@@ -117,7 +138,7 @@ export const dispatchItemToBoardItemAction = ({
 		action:
 			action ??
 			createFallbackMergeAction({
-				sourceRef: source.sourceRef,
+				sourceRef,
 				targetItemInstanceId: target.id,
 			}),
 		context,
@@ -162,6 +183,7 @@ export const applyExpectedBoardItemToBoardItem = ({
 		expectedTargetItemId: input.expectedTargetItemId,
 		source: {
 			readExpectedSourceItemId: ({ board }) => board.byId[input.sourceBoardItemId]?.itemId,
+			readSourceQuantity: ({ board }) => board.byId[input.sourceBoardItemId]?.quantity ?? 1,
 			readStackSourceRef: ({ board }) => {
 				const sourceItem = board.byId[input.sourceBoardItemId];
 				if (!sourceItem) return undefined;

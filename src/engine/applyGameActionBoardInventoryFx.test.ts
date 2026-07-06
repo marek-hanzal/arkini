@@ -404,6 +404,104 @@ describe("applyGameActionFx BoardInventory", () => {
 		});
 	});
 
+	it("stores only the craft input capacity from an excessive board stack", () => {
+		const config = createEngineCraftTableTestConfig({
+			noRecipeInputs: false,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			quantity: 5,
+			x: 1,
+			y: 0,
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+					quantity: 5,
+				},
+				targetItemInstanceId: "item-instance:1",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			quantity: 3,
+		});
+		expect(result.events).toContainEqual(
+			expect.objectContaining({
+				from: expect.objectContaining({
+					nextQuantity: 3,
+					previousQuantity: 5,
+					quantity: 2,
+				}),
+				reason: "craft-input-store",
+				type: "item.consumed",
+			}),
+		);
+	});
+
+	it("stores only the producer input capacity from an excessive board stack", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			id: "item-instance:2",
+			itemId: "item:twig",
+			quantity: 5,
+			x: 1,
+			y: 0,
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					itemInstanceId: "item-instance:2",
+					kind: "board",
+					quantity: 5,
+				},
+				itemInstanceId: "item-instance:1",
+				lineId: "line:shred",
+				type: "producer.input.store",
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			quantity: 4,
+		});
+		expect(result.save.producerInputs["item-instance:1"]?.lineInputs["line:shred"]).toEqual({
+			items: {
+				"item:twig": 1,
+			},
+		});
+		expect(result.events).toContainEqual(
+			expect.objectContaining({
+				from: expect.objectContaining({
+					nextQuantity: 4,
+					previousQuantity: 5,
+					quantity: 1,
+				}),
+				reason: "producer-input-store",
+				type: "item.consumed",
+			}),
+		);
+	});
+
 	it("places one inventory item on a board cell", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({
@@ -448,6 +546,136 @@ describe("applyGameActionFx BoardInventory", () => {
 				type: "item.created",
 			},
 		]);
+	});
+
+	it("places the final inventory stack item on the board", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 1,
+		};
+
+		const result = runAction({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:twig",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
+	});
+
+	it("places the final inventory stack item into an existing board stack when the board is full", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 2,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:twig",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.board.items["item-instance:2"] = {
+			...save.board.items["item-instance:2"],
+			quantity: 2,
+		};
+
+		const result = runAction({
+			action: {
+				placementMode: "nearest_by_manhattan",
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:twig",
+			quantity: 3,
+			x: 1,
+			y: 0,
+		});
+	});
+
+	it("places the final inventory instance item on the board", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.inventory.slots[0] = {
+			createdAtMs: 1,
+			id: "item-instance:stored",
+			itemId: "item:plank",
+			kind: "instance",
+		};
+
+		const result = runAction({
+			action: {
+				slotIndex: 0,
+				type: "inventory.item.place",
+				x: 1,
+				y: 0,
+			},
+			config,
+			nowMs: 10,
+			save,
+		});
+
+		expect(result.save.inventory.slots[0]).toBeNull();
+		expect(result.save.board.items["item-instance:stored"]).toEqual({
+			createdAtMs: 1,
+			id: "item-instance:stored",
+			itemId: "item:plank",
+			x: 1,
+			y: 0,
+		});
 	});
 
 	it("rejects placing inventory-only items on the board", () => {

@@ -12,6 +12,7 @@ export namespace resolveItemToBoardItemInteractionPlan {
 	export interface Props {
 		config: GameConfig;
 		sourceItemId: ItemId | string;
+		sourceQuantity?: number;
 		targetItem: BoardViewItem;
 	}
 }
@@ -22,13 +23,29 @@ type ItemToBoardItemInteractionFacts = {
 	canRemoveTile: boolean;
 	canStack: boolean;
 	canSupplyStashInput: boolean;
+	craftConsumedQuantity: number;
 	mergeResultItemId?: string;
+	producerConsumedQuantity: number;
 	producerInputLineId?: string;
 	removeConsumesSource: boolean;
+	removeConsumedQuantity: number;
+	stashConsumedQuantity: number;
 };
 
 const readTargetCanBeReplacedByMerge = ({ targetItem }: { targetItem: BoardViewItem }) =>
 	!isBoardViewItemRuntimeBusy(targetItem) && !isBoardViewItemRuntimeStatePreserved(targetItem);
+
+const readSourceQuantity = ({
+	sourceQuantity,
+}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceQuantity">) => sourceQuantity ?? 1;
+
+const readAcceptedQuantity = ({
+	remainingQuantity,
+	sourceQuantity,
+}: {
+	remainingQuantity: number;
+	sourceQuantity: number;
+}) => Math.max(0, Math.min(sourceQuantity, remainingQuantity));
 
 const readMergeInteractionFacts = ({
 	config,
@@ -73,20 +90,44 @@ const readStackInteractionAvailable = ({
 	return maxStackSize > 1 && readBoardViewItemQuantity(targetItem) < maxStackSize;
 };
 
-const readCraftInputInteractionAvailable = ({
+const readCraftInputInteractionFacts = ({
 	sourceItemId,
+	sourceQuantity,
 	targetItem,
-}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceItemId" | "targetItem">) =>
-	Boolean(
-		targetItem.craft?.canAcceptInputs &&
-			targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId),
-	);
+}: Pick<
+	resolveItemToBoardItemInteractionPlan.Props,
+	"sourceItemId" | "sourceQuantity" | "targetItem"
+>) => {
+	const input = targetItem.craft?.inputs.find((entry) => entry.itemId === sourceItemId);
+	const deliveredQuantity = targetItem.craft?.delivered[sourceItemId] ?? 0;
+	const consumedQuantity = input
+		? readAcceptedQuantity({
+				remainingQuantity: input.quantity - deliveredQuantity,
+				sourceQuantity: readSourceQuantity({
+					sourceQuantity,
+				}),
+			})
+		: 0;
 
-const readDefaultFirstProducerInputLineId = ({
+	return {
+		canCraft: Boolean(
+			targetItem.craft?.canAcceptInputs &&
+				targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId) &&
+				consumedQuantity > 0,
+		),
+		craftConsumedQuantity: consumedQuantity,
+	};
+};
+
+const readDefaultFirstProducerInputFacts = ({
 	sourceItemId,
+	sourceQuantity,
 	targetItem,
-}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceItemId" | "targetItem">) =>
-	(targetItem.activation?.lines ?? [])
+}: Pick<
+	resolveItemToBoardItemInteractionPlan.Props,
+	"sourceItemId" | "sourceQuantity" | "targetItem"
+>) => {
+	const candidate = (targetItem.activation?.lines ?? [])
 		.map((line, index) => ({
 			index,
 			line,
@@ -96,22 +137,56 @@ const readDefaultFirstProducerInputLineId = ({
 				Number(right.line.isDefault) - Number(left.line.isDefault) ||
 				left.index - right.index,
 		)
-		.find(({ line }) =>
-			line.inputs.some(
-				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
-			),
-		)?.line.lineId;
+		.flatMap(({ line }) =>
+			line.inputs.map((input) => ({
+				input,
+				line,
+			})),
+		)
+		.find(({ input }) => input.itemId === sourceItemId && input.stored < input.capacity);
+	const consumedQuantity = candidate
+		? readAcceptedQuantity({
+				remainingQuantity: candidate.input.capacity - candidate.input.stored,
+				sourceQuantity: readSourceQuantity({
+					sourceQuantity,
+				}),
+			})
+		: 0;
 
-const readStashInputInteractionAvailable = ({
+	return {
+		producerConsumedQuantity: consumedQuantity,
+		producerInputLineId: consumedQuantity > 0 ? candidate?.line.lineId : undefined,
+	};
+};
+
+const readStashInputInteractionFacts = ({
 	sourceItemId,
+	sourceQuantity,
 	targetItem,
-}: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceItemId" | "targetItem">) =>
-	Boolean(
-		targetItem.activation?.kind === "stash" &&
-			targetItem.activation.inputs.some(
-				(input) => input.itemId === sourceItemId && input.stored < input.capacity,
-			),
-	);
+}: Pick<
+	resolveItemToBoardItemInteractionPlan.Props,
+	"sourceItemId" | "sourceQuantity" | "targetItem"
+>) => {
+	const input =
+		targetItem.activation?.kind === "stash"
+			? targetItem.activation.inputs.find(
+					(entry) => entry.itemId === sourceItemId && entry.stored < entry.capacity,
+				)
+			: undefined;
+	const consumedQuantity = input
+		? readAcceptedQuantity({
+				remainingQuantity: input.capacity - input.stored,
+				sourceQuantity: readSourceQuantity({
+					sourceQuantity,
+				}),
+			})
+		: 0;
+
+	return {
+		canSupplyStashInput: consumedQuantity > 0,
+		stashConsumedQuantity: consumedQuantity,
+	};
+};
 
 const readTileRemoveInteractionFacts = ({
 	config,
@@ -123,6 +198,7 @@ const readTileRemoveInteractionFacts = ({
 	);
 	return {
 		canRemoveTile: Boolean(removal),
+		removeConsumedQuantity: removal?.mode === "consume" ? 1 : 0,
 		removeConsumesSource: removal?.mode === "consume",
 	};
 };
@@ -131,11 +207,11 @@ const readItemToBoardItemInteractionFacts = (
 	props: resolveItemToBoardItemInteractionPlan.Props,
 ): ItemToBoardItemInteractionFacts => ({
 	...readMergeInteractionFacts(props),
+	...readCraftInputInteractionFacts(props),
+	...readDefaultFirstProducerInputFacts(props),
+	...readStashInputInteractionFacts(props),
 	...readTileRemoveInteractionFacts(props),
-	canCraft: readCraftInputInteractionAvailable(props),
 	canStack: readStackInteractionAvailable(props),
-	canSupplyStashInput: readStashInputInteractionAvailable(props),
-	producerInputLineId: readDefaultFirstProducerInputLineId(props),
 });
 
 const createMergeInteractionPlan = ({
@@ -171,7 +247,8 @@ export const resolveItemToBoardItemInteractionPlan = (
 			{
 				canCraft: true,
 			},
-			() => ({
+			({ craftConsumedQuantity }) => ({
+				consumedQuantity: craftConsumedQuantity,
 				consumesSource: true as const,
 				feedbackVariant: "secondary" as const,
 				type: "craft-input" as const,
@@ -181,7 +258,8 @@ export const resolveItemToBoardItemInteractionPlan = (
 			{
 				canSupplyStashInput: true,
 			},
-			() => ({
+			({ stashConsumedQuantity }) => ({
+				consumedQuantity: stashConsumedQuantity,
 				consumesSource: true as const,
 				feedbackVariant: "secondary" as const,
 				type: "stash-input" as const,
@@ -191,7 +269,8 @@ export const resolveItemToBoardItemInteractionPlan = (
 			{
 				canRemoveTile: true,
 			},
-			({ removeConsumesSource }) => ({
+			({ removeConsumedQuantity, removeConsumesSource }) => ({
+				consumedQuantity: removeConsumedQuantity,
 				consumesSource: removeConsumesSource,
 				feedbackVariant: "primary" as const,
 				type: "tile-remove" as const,
@@ -201,7 +280,8 @@ export const resolveItemToBoardItemInteractionPlan = (
 			{
 				producerInputLineId: P.string,
 			},
-			({ producerInputLineId }) => ({
+			({ producerConsumedQuantity, producerInputLineId }) => ({
+				consumedQuantity: producerConsumedQuantity,
 				consumesSource: true as const,
 				feedbackVariant: "secondary" as const,
 				lineId: producerInputLineId,

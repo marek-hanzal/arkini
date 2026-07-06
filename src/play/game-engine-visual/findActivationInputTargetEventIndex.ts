@@ -1,4 +1,5 @@
 import type { GameEvent } from "~/event/GameEventSchema";
+import { findNextUnskippedEventIndex } from "~/play/game-engine-visual/findNextUnskippedEventIndex";
 
 type ConsumedEvent = Extract<
 	GameEvent,
@@ -40,12 +41,13 @@ export const findActivationInputTargetEventIndex = ({
 	skipped,
 	source,
 }: findActivationInputTargetEventIndex.Props) =>
-	events.findIndex(
-		(candidate, candidateIndex) =>
-			candidateIndex > afterIndex &&
-			!skipped.has(candidateIndex) &&
+	findNextUnskippedEventIndex({
+		afterIndex,
+		events,
+		matches: (candidate) =>
 			matchesTargetEvent({
 				candidate,
 				source,
 			}),
-	);
+		skipped,
+	});

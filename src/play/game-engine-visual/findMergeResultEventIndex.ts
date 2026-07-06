@@ -1,4 +1,5 @@
 import type { GameEvent } from "~/event/GameEventSchema";
+import { findNextUnskippedEventIndex } from "~/play/game-engine-visual/findNextUnskippedEventIndex";
 
 export namespace findMergeResultEventIndex {
 	export interface Props {
@@ -13,10 +14,10 @@ export const findMergeResultEventIndex = ({
 	events,
 	skipped,
 }: findMergeResultEventIndex.Props) =>
-	events.findIndex(
-		(candidate, candidateIndex) =>
-			candidateIndex > afterIndex &&
-			!skipped.has(candidateIndex) &&
-			candidate.type === "item.replaced" &&
-			candidate.reason === "merge-result",
-	);
+	findNextUnskippedEventIndex({
+		afterIndex,
+		events,
+		matches: (candidate) =>
+			candidate.type === "item.replaced" && candidate.reason === "merge-result",
+		skipped,
+	});

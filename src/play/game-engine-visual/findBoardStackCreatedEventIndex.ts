@@ -1,4 +1,5 @@
 import type { GameEvent } from "~/event/GameEventSchema";
+import { findNextUnskippedEventIndex } from "~/play/game-engine-visual/findNextUnskippedEventIndex";
 
 export namespace findBoardStackCreatedEventIndex {
 	export interface Props {
@@ -32,12 +33,13 @@ export const findBoardStackCreatedEventIndex = ({
 	skipped,
 	source,
 }: findBoardStackCreatedEventIndex.Props) =>
-	events.findIndex(
-		(candidate, candidateIndex) =>
-			candidateIndex > afterIndex &&
-			!skipped.has(candidateIndex) &&
+	findNextUnskippedEventIndex({
+		afterIndex,
+		events,
+		matches: (candidate) =>
 			matchesBoardStackCreatedEvent({
 				candidate,
 				source,
 			}),
-	);
+		skipped,
+	});

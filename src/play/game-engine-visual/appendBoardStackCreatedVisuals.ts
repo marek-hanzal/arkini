@@ -18,13 +18,6 @@ export type StackCreatedEvent = Extract<
 	}
 >;
 
-export type StackConsumedEvent = Extract<
-	GameEvent,
-	{
-		type: "item.consumed";
-	}
->;
-
 export namespace appendBoardStackCreatedVisuals {
 	export interface Props {
 		currentBoard: BoardView | undefined;
@@ -32,31 +25,19 @@ export namespace appendBoardStackCreatedVisuals {
 		plan: GameEngineVisualPlanDraft;
 		previousBoard: BoardView | undefined;
 		sequenceIndex: number;
-		source?: StackConsumedEvent;
 	}
 }
 
-const readBoardStackSourceTile = ({
+const readBoardStackOriginTile = ({
 	event,
 	previousBoard,
-	source,
-}: Pick<appendBoardStackCreatedVisuals.Props, "event" | "previousBoard" | "source">) => {
-	if (source?.from.kind === "board") {
-		return previousBoard?.byId[source.from.itemInstanceId];
-	}
-
-	if (event.originItemInstanceId) {
-		return previousBoard?.byId[event.originItemInstanceId];
-	}
-
-	return undefined;
+}: Pick<appendBoardStackCreatedVisuals.Props, "event" | "previousBoard">) => {
+	if (!event.originItemInstanceId) return undefined;
+	return previousBoard?.byId[event.originItemInstanceId];
 };
 
-const readTransientQuantity = ({
-	event,
-	source,
-}: Pick<appendBoardStackCreatedVisuals.Props, "event" | "source">) => {
-	const quantity = source?.from.quantity ?? event.to.quantity ?? 1;
+const readTransientQuantity = (event: StackCreatedEvent) => {
+	const quantity = event.to.quantity ?? 1;
 	return quantity > 1 ? quantity : undefined;
 };
 
@@ -66,7 +47,6 @@ export const appendBoardStackCreatedVisuals = ({
 	plan,
 	previousBoard,
 	sequenceIndex,
-	source,
 }: appendBoardStackCreatedVisuals.Props) => {
 	if (event.to.kind !== "board") return false;
 
@@ -74,12 +54,14 @@ export const appendBoardStackCreatedVisuals = ({
 	const currentTarget = currentBoard?.byId[event.to.itemInstanceId];
 	if (!previousTarget || !currentTarget) return false;
 
-	const sourceTile = readBoardStackSourceTile({
+	// Board-stack item.created events have two distinct visual meanings:
+	// - line/craft/stash output into an existing stack has an origin tile and gets a fly animation;
+	// - manual board DnD stack already moved the live actor and should only bounce the target.
+	const originTile = readBoardStackOriginTile({
 		event,
 		previousBoard,
-		source,
 	});
-	const groupId = `engine:board-stack:${sourceTile?.id ?? event.originItemInstanceId ?? event.itemId}:${currentTarget.id}:${sequenceIndex}`;
+	const groupId = `engine:board-stack:${originTile?.id ?? event.originItemInstanceId ?? event.itemId}:${currentTarget.id}:${sequenceIndex}`;
 	const motion = GameVisualMotion.merge({
 		cause: "merge",
 		durationMs: boardStackFlyDurationMs,
@@ -87,16 +69,13 @@ export const appendBoardStackCreatedVisuals = ({
 	});
 	const cleanupDelayMs = gameVisualMotionSettlementDelayMs(motion);
 
-	if (sourceTile && sourceTile.id !== currentTarget.id) {
+	if (originTile && originTile.id !== currentTarget.id) {
 		const transientTile: BoardTransientTile = {
 			groupId,
-			id: `transient:board-stack:${groupId}:source:${sourceTile.id}`,
+			id: `transient:board-stack:${groupId}:source:${originTile.id}`,
 			itemId: event.itemId as BoardTransientTile["itemId"],
-			quantity: readTransientQuantity({
-				event,
-				source,
-			}),
-			slotId: cellKey(sourceTile.x, sourceTile.y),
+			quantity: readTransientQuantity(event),
+			slotId: cellKey(originTile.x, originTile.y),
 		};
 
 		plan.boardTransientTilePlans.push({
@@ -116,7 +95,7 @@ export const appendBoardStackCreatedVisuals = ({
 	plan.boardFeedbackRequests.push(
 		createBoardTileBounceFeedbackRequest({
 			delayMs:
-				sourceTile && sourceTile.id !== currentTarget.id
+				originTile && originTile.id !== currentTarget.id
 					? readBoardStackFeedbackDelayMs(motion)
 					: 0,
 			durationMs: boardStackFeedbackDurationMs,

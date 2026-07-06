@@ -124,6 +124,36 @@ describe("readDetailLineControl", () => {
 		expect(onWithdrawInput).toHaveBeenCalledWith("line:lumberjack:log", "item:log");
 	});
 
+	it("disables withdraw controls while the line is running", () => {
+		const onWithdrawInput = vi.fn();
+		const control = readDetailLineControl({
+			canSetDefault: false,
+			line: createLine({
+				inProgress: true,
+				inputs: [
+					{
+						available: 0,
+						capacity: 1,
+						consume: true,
+						itemId: "item:log",
+						quantity: 1,
+						stored: 1,
+					},
+				],
+				remainingMs: 500,
+			}),
+			onSetDefault: () => undefined,
+			onStart: () => undefined,
+			onWithdrawInput,
+			pending: false,
+		});
+
+		control.withdrawInputActionsByItemId["item:log"]?.onClick();
+
+		expect(control.withdrawInputActionsByItemId["item:log"]?.disabled).toBe(true);
+		expect(onWithdrawInput).not.toHaveBeenCalled();
+	});
+
 	it("disables default controls for hidden runtime-only lines", () => {
 		const onSetDefault = vi.fn();
 		const control = readDetailLineControl({

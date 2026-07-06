@@ -36,7 +36,7 @@ export const DetailLineCard: FC<{
 	const effectBenefits = line.effectBenefits ?? [];
 	const effectBonusLines = line.effectBonusLines ?? [];
 	const effectRequirements = readDetailLineEffectRequirementSummary(line);
-	const showInputs = !line.inProgress;
+	const showInputs = line.inputs.length > 0;
 	const showOutputs = (line.outputs ?? []).length > 0;
 	const showFlowArrow = showInputs && line.inputs.length > 0 && showOutputs;
 

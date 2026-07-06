@@ -60,16 +60,18 @@ const readWithdrawInputActionsByItemId = ({
 	line: LineView;
 	onWithdrawInput(lineId: string, itemId: string): void;
 	pending: boolean;
-}) =>
-	Object.fromEntries(
+}) => {
+	const withdrawDisabled = pending || line.inProgress;
+
+	return Object.fromEntries(
 		line.inputs.flatMap((input) => {
 			if (input.stored <= 0) return [];
 
 			const action: DetailActionControl = {
-				disabled: pending,
+				disabled: withdrawDisabled,
 				label: "Withdraw",
 				onClick: () => {
-					if (pending) return;
+					if (withdrawDisabled) return;
 					onWithdrawInput(line.lineId, input.itemId);
 				},
 				tone: "secondary",
@@ -83,6 +85,7 @@ const readWithdrawInputActionsByItemId = ({
 			];
 		}),
 	) satisfies Readonly<Record<string, DetailActionControl | undefined>>;
+};
 
 export const readDetailLineControl = ({
 	canSetDefault,

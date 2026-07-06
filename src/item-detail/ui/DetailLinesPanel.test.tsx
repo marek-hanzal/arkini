@@ -396,13 +396,15 @@ describe("DetailLinesPanel", () => {
 		expect(html).toContain("Default");
 	});
 
-	it("keeps fulfilled resources visible until a line starts running", () => {
+	it("keeps fulfilled resources visible while a line is running", () => {
 		const html = renderToStaticMarkup(
 			<DetailLinesPanel
 				items={items}
 				lines={[
 					lineModel(
 						createLine({
+							inProgress: true,
+							remainingMs: 3000,
 							inputItemIds: [
 								"item:water",
 							],
@@ -432,11 +434,12 @@ describe("DetailLinesPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Start");
+		expect(html).toContain("Running");
 		expect(html).toContain("Outputs");
 		expect(html).toContain("Water");
 		expect(html).toContain("Withdraw");
 		expect(html).toContain("1/1");
+		expect(html).toMatch(/data-ui="withdraw action"[^>]*disabled/);
 	});
 
 	it("renders resource flow as inputs then arrow then outputs", () => {

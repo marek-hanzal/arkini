@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
 import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
+import { readStoredActivationInputQuantityCandidateFx } from "~/activation/readStoredActivationInputQuantityCandidateFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import type { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -102,18 +103,15 @@ const readCraftInputStoreQuantityCandidateFx = Effect.fn(
 		itemId: scope.resolvedRef.itemId,
 		quantities: storedInputs,
 	});
-	const remainingQuantity = inputSlot.quantity - previousQuantity;
-	const storedQuantity = Math.min(scope.resolvedRef.quantity, remainingQuantity);
-	if (storedQuantity > 0) {
-		const nextQuantity = previousQuantity + storedQuantity;
+	const quantityCandidate = yield* readStoredActivationInputQuantityCandidateFx({
+		capacity: inputSlot.quantity,
+		previousQuantity,
+		resolvedRef: scope.resolvedRef,
+	});
+	if (quantityCandidate) {
 		return {
 			inputSlot,
-			nextQuantity,
-			previousQuantity,
-			resolvedRef: {
-				...scope.resolvedRef,
-				quantity: storedQuantity,
-			},
+			...quantityCandidate,
 		} satisfies CraftInputStoreQuantityCandidate;
 	}
 

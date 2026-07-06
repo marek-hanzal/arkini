@@ -7,6 +7,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import type { ItemId } from "~/config/GameIdSchema";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
+import { readAcceptedTransferQuantity } from "~/quantity/readAcceptedTransferQuantity";
 
 export namespace resolveItemToBoardItemInteractionPlan {
 	export interface Props {
@@ -38,14 +39,6 @@ const readTargetCanBeReplacedByMerge = ({ targetItem }: { targetItem: BoardViewI
 const readSourceQuantity = ({
 	sourceQuantity,
 }: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceQuantity">) => sourceQuantity ?? 1;
-
-const readAcceptedQuantity = ({
-	remainingQuantity,
-	sourceQuantity,
-}: {
-	remainingQuantity: number;
-	sourceQuantity: number;
-}) => Math.max(0, Math.min(sourceQuantity, remainingQuantity));
 
 const readMergeInteractionFacts = ({
 	config,
@@ -101,11 +94,11 @@ const readCraftInputInteractionFacts = ({
 	const input = targetItem.craft?.inputs.find((entry) => entry.itemId === sourceItemId);
 	const deliveredQuantity = targetItem.craft?.delivered[sourceItemId] ?? 0;
 	const consumedQuantity = input
-		? readAcceptedQuantity({
-				remainingQuantity: input.quantity - deliveredQuantity,
-				sourceQuantity: readSourceQuantity({
+		? readAcceptedTransferQuantity({
+				availableQuantity: readSourceQuantity({
 					sourceQuantity,
 				}),
+				remainingCapacity: input.quantity - deliveredQuantity,
 			})
 		: 0;
 
@@ -145,11 +138,11 @@ const readDefaultFirstProducerInputFacts = ({
 		)
 		.find(({ input }) => input.itemId === sourceItemId && input.stored < input.capacity);
 	const consumedQuantity = candidate
-		? readAcceptedQuantity({
-				remainingQuantity: candidate.input.capacity - candidate.input.stored,
-				sourceQuantity: readSourceQuantity({
+		? readAcceptedTransferQuantity({
+				availableQuantity: readSourceQuantity({
 					sourceQuantity,
 				}),
+				remainingCapacity: candidate.input.capacity - candidate.input.stored,
 			})
 		: 0;
 
@@ -174,11 +167,11 @@ const readStashInputInteractionFacts = ({
 				)
 			: undefined;
 	const consumedQuantity = input
-		? readAcceptedQuantity({
-				remainingQuantity: input.capacity - input.stored,
-				sourceQuantity: readSourceQuantity({
+		? readAcceptedTransferQuantity({
+				availableQuantity: readSourceQuantity({
 					sourceQuantity,
 				}),
+				remainingCapacity: input.capacity - input.stored,
 			})
 		: 0;
 

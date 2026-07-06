@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
 import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
+import { readStoredActivationInputQuantityCandidateFx } from "~/activation/readStoredActivationInputQuantityCandidateFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import type { GameActionProducerInputStoreSchema } from "~/action/GameActionProducerInputStoreSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -155,19 +156,17 @@ const readProducerInputStoreLineCandidateFx = Effect.fn(
 		itemId: scope.resolvedRef.itemId,
 		quantities: storedInputs,
 	});
-	const remainingQuantity = inputSlot.capacity - previousQuantity;
-	const storedQuantity = Math.min(scope.resolvedRef.quantity, remainingQuantity);
-	if (storedQuantity <= 0) return undefined;
+	const quantityCandidate = yield* readStoredActivationInputQuantityCandidateFx({
+		capacity: inputSlot.capacity,
+		previousQuantity,
+		resolvedRef: scope.resolvedRef,
+	});
+	if (!quantityCandidate) return undefined;
 
 	return {
 		inputSlot,
 		lineId,
-		nextQuantity: previousQuantity + storedQuantity,
-		previousQuantity,
-		resolvedRef: {
-			...scope.resolvedRef,
-			quantity: storedQuantity,
-		},
+		...quantityCandidate,
 	} satisfies ProducerInputStoreLineCandidate;
 });
 

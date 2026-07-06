@@ -1,11 +1,14 @@
 export interface DropActions {
 	applyBoardItemToBoardItem(input: {
+		consumedQuantity?: number;
 		expectedSourceItemId: string;
 		expectedTargetItemId: string;
 		sourceBoardItemId: string;
+		sourceQuantity: number;
 		targetBoardItemId: string;
 	}): Promise<unknown>;
 	applyInventoryItemToBoardItem(input: {
+		consumedQuantity?: number;
 		expectedSourceItemId: string;
 		expectedSourceStackId: string;
 		expectedTargetItemId: string;

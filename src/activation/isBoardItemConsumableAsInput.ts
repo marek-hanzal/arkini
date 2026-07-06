@@ -1,5 +1,5 @@
-import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { readWorldReplacementSafetyFactsForItem } from "~/world/readWorldReplacementSafetyFactsForItem";
 
 export const isBoardItemConsumableAsInput = ({
 	itemInstanceId,
@@ -8,9 +8,10 @@ export const isBoardItemConsumableAsInput = ({
 	itemInstanceId: string;
 	save: GameSave;
 }) => {
-	const status = readBoardItemRuntimeStateStatus({
+	const facts = readWorldReplacementSafetyFactsForItem({
 		itemInstanceId,
 		save,
 	});
-	return !status.busy && !status.preservable;
+
+	return facts.blockReasons.every((reason) => reason === "producer_line_state");
 };

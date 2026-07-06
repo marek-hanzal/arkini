@@ -18,6 +18,14 @@ const pushReason = (
 	if (!reasons.includes(reason)) reasons.push(reason);
 };
 
+const hasSelectedProducerLine = ({
+	itemInstanceId,
+	save,
+}: readWorldReplacementSafetyFactsForItem.Props) => {
+	const lineState = save.lines[itemInstanceId];
+	return Boolean(lineState?.defaultEffectLineId || lineState?.defaultLineId);
+};
+
 export const readWorldReplacementSafetyFactsForItem = ({
 	itemInstanceId,
 	save,
@@ -32,12 +40,16 @@ export const readWorldReplacementSafetyFactsForItem = ({
 	if (Object.values(save.producerJobs).some((job) => job.itemInstanceId === itemInstanceId)) {
 		pushReason(blockReasons, "producer_job");
 	}
-	if (
-		save.producerInputs[itemInstanceId] ||
-		save.lines[itemInstanceId] ||
-		save.producerCharges[itemInstanceId]
-	) {
+	if (save.producerInputs[itemInstanceId] || save.producerCharges[itemInstanceId]) {
 		pushReason(blockReasons, "producer_runtime_state");
+	}
+	if (
+		hasSelectedProducerLine({
+			itemInstanceId,
+			save,
+		})
+	) {
+		pushReason(blockReasons, "producer_line_state");
 	}
 	return {
 		blockReasons,

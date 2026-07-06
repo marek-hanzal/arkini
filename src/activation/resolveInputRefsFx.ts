@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { GameActionItemRefSchema } from "~/action/GameActionItemRefSchema";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
-import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
+import { isBoardItemConsumableAsInput } from "~/activation/isBoardItemConsumableAsInput";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
@@ -73,11 +73,12 @@ const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRe
 		);
 	}
 
-	const stateStatus = readBoardItemRuntimeStateStatus({
-		itemInstanceId,
-		save,
-	});
-	if (stateStatus.busy || stateStatus.preservable) {
+	if (
+		!isBoardItemConsumableAsInput({
+			itemInstanceId,
+			save,
+		})
+	) {
 		return yield* Effect.fail(
 			GameEngineError.actionRejected(
 				"item_busy",

@@ -5,6 +5,7 @@ export type WorldReplacementBlockReason =
 	| "craft_job"
 	| "item_capacity_state"
 	| "producer_job"
+	| "producer_line_state"
 	| "producer_runtime_state"
 	| "stash_runtime_state";
 

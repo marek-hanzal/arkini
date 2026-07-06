@@ -459,6 +459,159 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
+	it("stores a producer craft input that only has selected default line state", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					durationMs: 1000,
+					inputs: [
+						{
+							consume: true,
+							itemId: "item:producer",
+							quantity: 1,
+						},
+					],
+					resultItemId: "item:plank",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:craft-table",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.lines["item-instance:1"] = {
+			defaultLineId: "line:shred",
+		};
+
+		const result = runAction({
+			action: {
+				inputRef: {
+					itemInstanceId: "item-instance:1",
+					kind: "board",
+				},
+				targetItemInstanceId: "item-instance:2",
+				type: "craft.input.store",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.lines).toEqual({});
+		expect(readOnlyRecordValue(result.save.craftJobs)).toMatchObject({
+			readyAtMs: 1100,
+			recipeId: "item:craft-table",
+			startAtMs: 100,
+			targetItemInstanceId: "item-instance:2",
+		});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:producer",
+				reason: "craft-input-store",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:producer",
+				nextQuantity: 1,
+				previousQuantity: 0,
+				type: "craft_input.stored",
+			},
+			{
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:2",
+				type: "craft.started",
+			},
+		]);
+	});
+
+	it("auto-fills craft inputs from board producers with only selected default line state", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					durationMs: 1000,
+					inputs: [
+						{
+							consume: true,
+							itemId: "item:producer",
+							quantity: 1,
+						},
+					],
+					resultItemId: "item:plank",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:craft-table",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.lines["item-instance:1"] = {
+			defaultLineId: "line:shred",
+		};
+
+		const result = runAction({
+			action: {
+				recipeId: "item:craft-table",
+				targetItemInstanceId: "item-instance:2",
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.lines).toEqual({});
+		expect(result.events).toMatchObject([
+			{
+				itemId: "item:producer",
+				reason: "craft-input-auto-fill",
+				type: "item.consumed",
+			},
+			{
+				itemId: "item:producer",
+				type: "craft_input.stored",
+			},
+			{
+				type: "craft.started",
+			},
+		]);
+	});
+
 	it("keeps manually completed inputs stored while craft start requirements are blocked", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

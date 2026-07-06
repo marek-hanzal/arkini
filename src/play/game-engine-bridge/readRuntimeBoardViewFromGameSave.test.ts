@@ -903,6 +903,68 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		]);
 	});
 
+	it("counts producer board inputs with only selected default line state as craft-available", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					durationMs: 1000,
+					inputs: [
+						{
+							consume: true,
+							itemId: "item:producer",
+							quantity: 1,
+						},
+					],
+					resultItemId: "item:plank",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:producer",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:craft-table",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.lines["item-instance:1"] = {
+			defaultLineId: "line:shred",
+		};
+
+		const board = readRuntimeBoardViewFromGameSave({
+			config,
+			nowMs: 0,
+			save,
+		});
+
+		expect(board.byId["item-instance:2"]?.craft).toMatchObject({
+			acceptedInputItemIds: [
+				"item:producer",
+			],
+			canAcceptInputs: true,
+			inputs: [
+				{
+					available: 1,
+					itemId: "item:producer",
+					quantity: 1,
+				},
+			],
+		});
+	});
+
 	it("shows available stash input resources from board and inventory", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

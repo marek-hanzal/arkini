@@ -12,6 +12,9 @@ export namespace BoardCell {
 	}
 }
 
+export const readBoardCellBackgroundClassName = (cell: BoardCellView): string =>
+	(cell.x + cell.y) % 2 === 0 ? "bg-[rgba(255,255,255,0.58)]" : "bg-[rgba(255,229,247,0.46)]";
+
 const cellFeedbackClassName = (variant: TileEngine.DropFeedbackVariant | undefined): string => {
 	if (variant === "secondary") return "bg-ak-success/20 opacity-100 outline-ak-success/30";
 	if (variant === "subtle") return "bg-ak-secondary/20 opacity-100 outline-ak-secondary/30";
@@ -30,7 +33,8 @@ export const BoardCell = memo(
 			data-ak-board-cell-status={statusVariant}
 			data-ak-cell-invalid={invalid ? "true" : undefined}
 			className={cn(
-				"relative aspect-square touch-none bg-white/58 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.70),inset_0_0_0_2px_rgba(168,85,247,0.06)]",
+				"relative aspect-square touch-none shadow-[inset_0_0_0_1px_rgba(255,255,255,0.70),inset_0_0_0_2px_rgba(168,85,247,0.06)]",
+				readBoardCellBackgroundClassName(cell),
 				invalid &&
 					"bg-ak-danger/15 outline outline-1 -outline-offset-1 outline-ak-danger/35",
 			)}

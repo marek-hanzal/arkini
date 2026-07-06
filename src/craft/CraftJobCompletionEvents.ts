@@ -4,7 +4,13 @@ import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { GamePlacementFailureReason } from "~/placement/GamePlacementFailureReasonSchema";
 
-const createCraftCompletedEvent = ({ job, nowMs }: { job: GameSaveCraftJob; nowMs: number }) =>
+export const createCraftCompletedEvent = ({
+	job,
+	nowMs,
+}: {
+	job: GameSaveCraftJob;
+	nowMs: number;
+}) =>
 	({
 		atMs: nowMs,
 		jobId: job.id,
@@ -94,6 +100,29 @@ export const createCraftCompletedResult = ({
 				nowMs,
 				recipe,
 			}),
+		],
+		save,
+		type: "completed" as const,
+	}) satisfies GameEngineCompletionResult;
+
+export const createCraftSpawnCompletedResult = ({
+	events,
+	job,
+	nowMs,
+	save,
+}: {
+	events: GameEvent[];
+	job: GameSaveCraftJob;
+	nowMs: number;
+	save: GameSave;
+}) =>
+	({
+		events: [
+			createCraftCompletedEvent({
+				job,
+				nowMs,
+			}),
+			...events,
 		],
 		save,
 		type: "completed" as const,

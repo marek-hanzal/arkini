@@ -733,14 +733,14 @@ describe("GameConfigSchema", () => {
 		expect(() => parseGameConfig(config)).toThrow(/must be placeable on the board/);
 	});
 
-	it("rejects non-consumed craft inputs until craft can return preserved inputs", () => {
+	it("allows non-consumed craft inputs for reusable tools", () => {
 		const config = createValidConfigValue();
 		readTestCraft(config, "item:craft-target").inputs[0] = {
 			...readTestCraft(config, "item:craft-target").inputs[0],
 			consume: false,
 		};
 
-		expect(() => parseGameConfig(config)).toThrow(/Craft inputs must currently be consumed/);
+		expect(() => parseGameConfig(config)).not.toThrow();
 	});
 
 	it("rejects blueprint craft recipes that require their own target", () => {

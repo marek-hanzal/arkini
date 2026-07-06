@@ -180,7 +180,12 @@
 				"y": 6
 			}
 		],
-		"inventory": []
+		"inventory": [
+			{
+				"itemId": "item:magnifying-glass",
+				"quantity": 1
+			}
+		]
 	},
 	"version": 1
 }

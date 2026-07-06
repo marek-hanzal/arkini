@@ -659,6 +659,173 @@ describe("applyGameActionFx Craft", () => {
 		]);
 	});
 
+	it("keeps reusable craft tools and spawns random-board results away from the craft target", () => {
+		const maxIndexRandom = {
+			...TestRandomService,
+			integerInclusive(_min: number, max: number) {
+				return max;
+			},
+		};
+		const config = createEngineTestConfig({
+			game: {
+				id: "game:test",
+				title: "Test",
+				board: {
+					height: 1,
+					width: 3,
+				},
+				inventory: {
+					slots: 2,
+				},
+			},
+			items: {
+				"item:blocker": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Blocker",
+					maxStackSize: 1,
+					name: "Blocker",
+					tags: [],
+					tier: 0,
+				},
+				"item:cracked-rock": {
+					assetIds: [
+						"asset:test",
+					],
+					craft: {
+						durationMs: 1000,
+						inputs: [
+							{
+								consume: false,
+								itemId: "item:magnifying-glass",
+							},
+						],
+						resultItemId: "item:rock",
+						resultPlacement: "random-board",
+					},
+					description: "Cracked rock",
+					maxStackSize: 1,
+					name: "Cracked Rock",
+					tags: [],
+					tier: 0,
+				},
+				"item:magnifying-glass": {
+					assetIds: [
+						"asset:test",
+					],
+					description: "Magnifying glass",
+					maxStackSize: 1,
+					name: "Magnifying Glass",
+					tags: [],
+					tier: 0,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:cracked-rock",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:blocker",
+						x: 1,
+						y: 0,
+					},
+				],
+				inventory: [
+					{
+						itemId: "item:magnifying-glass",
+						quantity: 1,
+					},
+				],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const crackedRock = findBoardItem(save, {
+			itemId: "item:cracked-rock",
+			x: 0,
+			y: 0,
+		});
+		if (!crackedRock) throw new Error("Missing cracked rock fixture.");
+
+		const started = runAction({
+			action: {
+				recipeId: "item:cracked-rock",
+				targetItemInstanceId: crackedRock.id,
+				type: "craft.start",
+			},
+			config,
+			nowMs: 100,
+			save,
+		});
+
+		expect(started.save.inventory.slots[0]).toMatchObject({
+			itemId: "item:magnifying-glass",
+			quantity: 1,
+		});
+		expect(readOnlyRecordValue(started.save.craftJobs)).toMatchObject({
+			recipeId: "item:cracked-rock",
+			targetItemInstanceId: crackedRock.id,
+		});
+
+		const completed = Effect.runSync(
+			runGameTickFx({
+				config,
+				nowMs: 1200,
+				save: started.save,
+			}).pipe(withRandomService(maxIndexRandom)),
+		);
+
+		expect(completed.save.board.items[crackedRock.id]).toBeUndefined();
+		expect(
+			findBoardItem(completed.save, {
+				itemId: "item:rock",
+				x: 2,
+				y: 0,
+			}),
+		).toBeDefined();
+		expect(completed.save.inventory.slots[0]).toMatchObject({
+			itemId: "item:magnifying-glass",
+			quantity: 1,
+		});
+		expect(completed.events).toEqual(
+			expect.arrayContaining([
+				{
+					atMs: 1200,
+					jobId: readOnlyRecordValue(started.save.craftJobs).id,
+					recipeId: "item:cracked-rock",
+					targetItemInstanceId: crackedRock.id,
+					type: "craft.completed",
+				},
+				{
+					atMs: 1200,
+					itemId: "item:cracked-rock",
+					itemInstanceId: crackedRock.id,
+					reason: "craft-result",
+					type: "item.removed",
+				},
+				expect.objectContaining({
+					itemId: "item:rock",
+					reason: "craft-result",
+					type: "item.created",
+				}),
+			]),
+		);
+		expect(completed.events).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					reason: "craft-result",
+					type: "item.replaced",
+				}),
+			]),
+		);
+	});
+
 	it("completes zero-duration craft jobs in the same action", () => {
 		const baseConfig = createEngineCraftTableTestConfig();
 		const config = createEngineTestConfig({

@@ -6,12 +6,18 @@ import {
 	GameLineEffectSchema,
 } from "~/config/schema/GameLineEffectSchema";
 
+export const CraftResultPlacementSchema = z.enum([
+	"replace-target",
+	"random-board",
+]);
+
 export const CraftRecipeSchema = z
 	.object({
 		resultItemId: IdSchema,
 		inputs: z.array(CraftRecipeInputSchema),
 		effects: z.array(GameLineEffectSchema).optional(),
 		durationMs: NonNegativeIntegerSchema,
+		resultPlacement: CraftResultPlacementSchema.optional(),
 	})
 	.strict();
 

@@ -350,6 +350,13 @@
 							},
 							"durationMs": {
 								"$ref": "#/$defs/__schema2"
+							},
+							"resultPlacement": {
+								"type": "string",
+								"enum": [
+									"replace-target",
+									"random-board"
+								]
 							}
 						},
 						"required": [

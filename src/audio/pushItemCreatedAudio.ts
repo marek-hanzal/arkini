@@ -56,6 +56,14 @@ export const pushItemCreatedAudio = (
 				sourceEventType: event.type,
 			});
 		})
+		.with("craft-result", () => {
+			if (context.hasCraftCompleted) return;
+			pushUniqueGameAudioSound({
+				...context,
+				soundId: "audio.craft.complete",
+				sourceEventType: event.type,
+			});
+		})
 		.with(
 			"producer-input-withdraw",
 			"craft-input-withdraw",

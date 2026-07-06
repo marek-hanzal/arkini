@@ -181,7 +181,9 @@ const collectItemUsage = (
 			limitedDeposits.productionRules.push({
 				dependencies: new Set([
 					itemId,
-					...item.craft.inputs.map((input) => input.itemId),
+					...item.craft.inputs
+						.filter((input) => input.consume)
+						.map((input) => input.itemId),
 				]),
 				producedItemIds: new Set([
 					item.craft.resultItemId,
@@ -189,7 +191,7 @@ const collectItemUsage = (
 			});
 			for (const input of item.craft.inputs) {
 				usage.items.add(input.itemId);
-				usageItem(itemFlow, input.itemId, "consumed");
+				if (input.consume) usageItem(itemFlow, input.itemId, "consumed");
 			}
 			collectLineEffectUsage(item.craft.effects ?? [], config, usage);
 		}

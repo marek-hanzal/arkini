@@ -39,12 +39,15 @@ export const autoFillCraftInputsFx = Effect.fn("autoFillCraftInputsFx")(function
 	});
 
 	for (const ref of resolvedRefs) {
-		yield* consumeResolvedInputRefFx({
-			events,
-			nextSave,
-			reason: "craft-input-auto-fill",
-			ref,
-		});
+		const input = inputs.find((candidate) => candidate.itemId === ref.itemId);
+		if (input?.consume) {
+			yield* consumeResolvedInputRefFx({
+				events,
+				nextSave,
+				reason: "craft-input-auto-fill",
+				ref,
+			});
+		}
 		yield* storeCraftResolvedInputFx({
 			events,
 			nextSave,

@@ -369,7 +369,7 @@
 			"maxStackSize": 1
 		},
 		"item:cracked-rock": {
-			"description": "A mined-out rocky crack left behind after a stone deposit is exhausted. It is passive for now and marks a future renewal hook.",
+			"description": "A mined-out rocky crack. Use a Magnifying Glass to survey it for a fresh stone deposit somewhere on the board.",
 			"maxStackSize": 1,
 			"name": "Cracked Rock",
 			"storage": "board",
@@ -377,9 +377,21 @@
 				"source",
 				"stone",
 				"depleted",
+				"craft-target",
 				"era:I",
 				"stone-deposit"
-			]
+			],
+			"craft": {
+				"durationMs": 120000,
+				"inputs": [
+					{
+						"consume": false,
+						"itemId": "item:magnifying-glass"
+					}
+				],
+				"resultItemId": "item:rock",
+				"resultPlacement": "random-board"
+			}
 		},
 		"item:stone": {
 			"description": "Basic stone material produced by quarries.",
@@ -1373,6 +1385,20 @@
 				"water",
 				"era:I",
 				"unique"
+			],
+			"tier": 1
+		},
+		"item:magnifying-glass": {
+			"description": "Reusable survey tool used to search exhausted cracks and later other depleted deposits for fresh sources.",
+			"maxStackSize": 1,
+			"name": "Magnifying Glass",
+			"tags": [
+				"equipment",
+				"tool",
+				"search",
+				"survey",
+				"deposit-search",
+				"era:I"
 			],
 			"tier": 1
 		}

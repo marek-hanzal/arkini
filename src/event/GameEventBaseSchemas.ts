@@ -13,6 +13,7 @@ export const GameItemCreatedReasonSchema = z.enum([
 	"board-stack",
 	"tile-remove-output",
 	"merge-output",
+	"craft-result",
 	"memory-restore",
 	"memory-store",
 	"debug",

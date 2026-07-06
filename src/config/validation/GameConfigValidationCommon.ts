@@ -122,17 +122,5 @@ export const validateCraftRecipeInputs = (
 				`Missing item "${input.itemId}".`,
 			);
 		}
-
-		if (!input.consume) {
-			addIssue(
-				ctx,
-				[
-					...path,
-					index,
-					"consume",
-				],
-				"Craft inputs must currently be consumed because craft start clears stored input state and completion replaces the board target.",
-			);
-		}
 	}
 };

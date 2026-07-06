@@ -56,12 +56,14 @@ const createStoredCraftInputWorkingStateFx = Effect.fn(
 	});
 	const events: GameEvent[] = [];
 
-	yield* consumeResolvedInputRefFx({
-		events,
-		nextSave,
-		reason: "craft-input-store",
-		ref: checked.resolvedRef,
-	});
+	if (checked.inputSlot.consume) {
+		yield* consumeResolvedInputRefFx({
+			events,
+			nextSave,
+			reason: "craft-input-store",
+			ref: checked.resolvedRef,
+		});
+	}
 	yield* storeCraftResolvedInputFx({
 		events,
 		nextSave,

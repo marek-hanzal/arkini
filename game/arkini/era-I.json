@@ -363,9 +363,23 @@
 			],
 			"capacity": {
 				"max": 64,
-				"onDepleted": "remove"
+				"onDepleted": "replace",
+				"replaceItemId": "item:cracked-rock"
 			},
 			"maxStackSize": 1
+		},
+		"item:cracked-rock": {
+			"description": "A mined-out rocky crack left behind after a stone deposit is exhausted. It is passive for now and marks a future renewal hook.",
+			"maxStackSize": 1,
+			"name": "Cracked Rock",
+			"storage": "board",
+			"tags": [
+				"source",
+				"stone",
+				"depleted",
+				"era:I",
+				"stone-deposit"
+			]
 		},
 		"item:stone": {
 			"description": "Basic stone material produced by quarries.",

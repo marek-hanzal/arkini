@@ -4,7 +4,7 @@
 
 ## Package shape
 
-Source packages under `game/arkini` are compiled into `game/arkini.game.arkpack.gz`: a gzip-compressed Arkini pack containing the normalized MessagePack game config and raw PNG resources. The authoring source stays JSON; the runtime artifact is binary.
+Source packages under `game/arkini` are compiled into `game/arkini.game.arkpack`: an Arkini binary pack containing the normalized MessagePack game config and raw PNG resources. The authoring source stays strict JSON; the runtime artifact is binary.
 
 Canonical game config keys:
 
@@ -19,7 +19,350 @@ Canonical game config keys:
 }
 ```
 
-The authored Arkini package is intentionally small at the root: `game.json` owns version, game metadata, starting state, asset overrides, and global utility items; `era-I.json`, `era-II.json`, and the later era files own era gameplay items. There are no top-level line, stash, merge, craft, or effect registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, `removeBy`, and grant-publishing `effects`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
+The authored Arkini package is intentionally small at the root: `game.json` owns version, game metadata, starting state, asset overrides, and global utility items. Era gameplay is split into folders such as `era-I/items`, `era-I/producers`, and `era-I/blueprints`. There are no top-level line, stash, merge, craft, or effect registries. Item capabilities live directly on the item that owns them: `producer`, `stash`, `craft`, `merges`, `removeBy`, and grant-publishing `effects`. Referencing one-off behavior through another file was not architecture, it was paperwork with extra steps. Source fragments may omit conventional defaults; the compiler normalizes them into canonical `GameConfig`.
+
+## Commented JSONC examples
+
+The actual source files must remain **strict JSON**, not JSONC. The examples below are intentionally shown as `jsonc` because comments are the whole point of this section. Copy the shape, not the comments, unless your editor has achieved enlightenment and started compiling Markdown examples by accident.
+
+### Source fragment wrapper
+
+Every authored fragment is a partial package. The compiler recursively reads `game/arkini/**/*.json`, merges compatible top-level maps, and validates the normalized result. Every source JSON file must carry `$schema`; use the relative path from that file to `game/arkini.schema.json`.
+
+```jsonc
+{
+  // Required for editor hints and audit guardrails.
+  // Example from game/arkini/era-I/items/tree.json.
+  "$schema": "../../../arkini.schema.json",
+
+  // Most gameplay fragments only define a slice of the global item map.
+  // Fragment files may contain one item or several tightly-related items.
+  "items": {
+    "item:example": {
+      "name": "Example"
+    }
+  }
+}
+```
+
+### Normal item / stackable resource
+
+```jsonc
+{
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "item:log": {
+      // Player-facing name shown in tiles, inventory, and detail sheets.
+      "name": "Log",
+
+      // Keep descriptions gameplay-oriented. This is not flavor-text prison.
+      "description": "Basic wood material used by early crafting.",
+
+      // Tags are the coarse targeting surface for selectors.
+      // Use tags when several items should satisfy the same rule.
+      "tags": ["wood", "material", "era:I"],
+
+      // Omitted storage means both board and inventory are allowed.
+      // Use "board" for hazards/deposits/buildings that must not enter inventory.
+      "storage": "both",
+
+      // Stack cap for identical items without instance state.
+      // Items with instance state such as capacity must stay maxStackSize: 1.
+      "maxStackSize": 32,
+
+      // Optional progression metadata used by UI and balance review.
+      "tier": 1
+    }
+  }
+}
+```
+
+### Finite deposit with replacement on depletion
+
+Use this for sources such as trees and rocks. `capacity` is instance state, so the item must not stack. Producer line `nearby.capacity.spend` subtracts from this capacity when a job starts.
+
+```jsonc
+{
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "item:tree": {
+      "name": "Tree",
+      "tags": ["source", "wood-source", "tree", "tree:t1", "era:I"],
+
+      // Capacity is stored per board item instance.
+      // This item cannot safely be an anonymous inventory stack.
+      "maxStackSize": 1,
+
+      "capacity": {
+        // Runtime detail UI shows remaining/max.
+        "max": 18,
+
+        // "remove" deletes the exhausted source.
+        // "replace" keeps the cell occupied by another item.
+        "onDepleted": "replace",
+
+        // Replacement happens on the same board cell when capacity reaches 0.
+        "replaceItemId": "item:seed"
+      }
+    }
+  }
+}
+```
+
+### Producer with capacity spend, output, and output-owned effects
+
+A producer item owns its `producer` capability. The line below spends nearby wood capacity at job start, then rolls output from the line. Output-owned effects explain what modifies that one drop.
+
+```jsonc
+{
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:lumberjack-t1": {
+      "name": "Lumberjack I",
+      "tags": ["producer", "wood", "era:I", "unique"],
+      "maxStackSize": 1,
+
+      // maxCount caps how many of this producer may exist on board.
+      // The "unique" tag is informational; maxCount is the actual rule.
+      "maxCount": 1,
+
+      "producer": {
+        // Omitted maxQueueSize defaults to 1.
+        "lines": [
+          {
+            // Stable local id. Save jobs point here, so do not rename casually.
+            "id": "line:lumberjack-t1:log",
+
+            // Author real balance duration in ms.
+            "durationMs": 7000,
+
+            // Line-root effects are for admission costs / line-level rules.
+            // Capacity spend happens when the job starts, not when the output rolls.
+            "effects": [
+              {
+                "kind": "nearby.capacity.spend",
+                "display": "always",
+                "label": "Nearby wood capacity",
+
+                // Item selector refs are documented in SELECTOR.MD.
+                // This matches any nearby item tagged wood-source.
+                "items": { "anyOf": [{ "tag": "wood-source" }] },
+                "radius": 2,
+                "amount": 1
+              }
+            ],
+
+            "output": [
+              {
+                // chance: 0 is valid when output-owned effects provide chance.
+                "type": "chance",
+                "chance": 0,
+                "itemId": "item:log",
+
+                // These effects belong to this concrete log drop only.
+                "effects": [
+                  {
+                    "kind": "nearby.loot.outputChance.add",
+                    "display": "always",
+                    "label": "Nearby wood source drop chance",
+                    "radius": 2,
+                    "quantity": 1,
+                    "sources": [
+                      {
+                        "label": "Single Tree",
+                        "items": { "anyOf": [{ "id": "item:tree" }] },
+                        "chance": 0.5
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "grant.duration.multiply",
+                    "display": "whenActive",
+                    "label": "Minor Haste",
+                    "selector": {
+                      "allOf": [{ "ids": ["grant:active:shrine-minor-haste"] }]
+                    },
+                    "multiplier": 0.75
+                  }
+                ]
+              }
+            ],
+
+            // Omitted placement defaults to board_then_inventory.
+            "placement": "board_then_inventory"
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+### Craft with reusable input and random board result
+
+Craft lives on the target item. Inputs are filled through the normal DnD/autofill model. `consume: false` means the input is required but returned/kept instead of destroyed.
+
+```jsonc
+{
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "item:cracked-rock": {
+      "name": "Cracked Rock",
+      "description": "A mined-out rocky crack. Use a Magnifying Glass to survey it.",
+      "storage": "board",
+      "maxStackSize": 1,
+      "tags": ["source", "stone", "depleted", "craft-target", "era:I"],
+
+      "craft": {
+        // Two-minute survey job.
+        "durationMs": 120000,
+
+        "inputs": [
+          {
+            // Reusable tool. It satisfies the recipe but is not consumed.
+            "itemId": "item:magnifying-glass",
+            "consume": false
+          }
+        ],
+
+        // Craft result item.
+        "resultItemId": "item:rock",
+
+        // Default resultPlacement is in-place replacement of the craft target.
+        // random-board removes the craft target and spawns the result on a random free board cell.
+        "resultPlacement": "random-board"
+      }
+    }
+  }
+}
+```
+
+### Blueprint craft / construction item
+
+Blueprints are normal craft targets. If `resultItemId` is omitted, the compiler derives a conventional producer id from the blueprint id. Keep planning costs light; do not duplicate the full construction cost in both blueprint producer line and blueprint craft recipe unless you are deliberately balancing a tax simulator.
+
+```jsonc
+{
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "item:blueprint-sawmill-t1": {
+      "name": "Sawmill I Blueprint",
+      "storage": "both",
+      "maxStackSize": 1,
+      "tags": ["blueprint", "craft-target", "era:I"],
+
+      // maxCount on the blueprint limits the final built target too.
+      "maxCount": 1,
+
+      "craft": {
+        "durationMs": 30000,
+        "inputs": [
+          { "itemId": "item:log", "quantity": 2, "consume": true },
+          { "itemId": "item:stone", "quantity": 1, "consume": true }
+        ]
+
+        // Optional explicit form:
+        // "resultItemId": "producer:sawmill-t1"
+      }
+    }
+  }
+}
+```
+
+### Grant source and grant-gated output
+
+Items publish grants through item `effects`. Other producers/crafts then read current grants with grant selectors. Background ownership grants are useful for rules but should not be treated as juicy player-facing UI content. Humanity has suffered enough from labels like “Owned X grant”.
+
+```jsonc
+{
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:shrine-t1": {
+      "name": "Shrine I",
+      "producer": {
+        "lines": [
+          {
+            "id": "line:shrine-t1:minor-haste",
+            "name": "Minor Haste",
+            "durationMs": 45000,
+
+            // Effect lines publish temporary grants instead of item output.
+            "effect": {
+              "id": "effect:shrine-minor-haste",
+              "name": "Minor Haste",
+              "polarity": "buff",
+              "sourceScope": "both",
+              "grants": [
+                {
+                  "id": "grant:active:shrine-minor-haste",
+                  "name": "Minor Haste active"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+
+    "producer:sawmill-t1": {
+      "name": "Sawmill I",
+      "producer": {
+        "lines": [
+          {
+            "id": "line:sawmill-t1:plank",
+            "durationMs": 10000,
+            "inputs": [{ "itemId": "item:log", "quantity": 1, "consume": true }],
+            "output": [
+              {
+                "type": "guaranteed",
+                "itemId": "item:plank",
+                "quantity": 1,
+                "effects": [
+                  {
+                    // This specific plank output runs faster while the grant is active.
+                    "kind": "grant.duration.multiply",
+                    "display": "whenActive",
+                    "label": "Minor Haste",
+                    "selector": {
+                      "allOf": [{ "ids": ["grant:active:shrine-minor-haste"] }]
+                    },
+                    "multiplier": 0.75
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+### Starting board / inventory
+
+The root `game.json` owns starting state. Starting board entries need coordinates; inventory entries may carry quantity. Starting state is validated against board bounds, duplicate cells, storage policy, and stack caps.
+
+```jsonc
+{
+  "$schema": "./arkini.schema.json",
+  "startingState": {
+    "board": [
+      // Board cells use zero-based x/y coordinates.
+      { "itemId": "producer:townhall-t1", "x": 4, "y": 3 },
+
+      // Keep early nearby requirements safe. One tree near lumberjack is a soft-lock wearing leaves.
+      { "itemId": "producer:lumberjack-t1", "x": 1, "y": 1 },
+      { "itemId": "item:tree", "x": 0, "y": 1 },
+      { "itemId": "item:tree", "x": 1, "y": 0 },
+      { "itemId": "item:tree", "x": 2, "y": 1 }
+    ],
+    "inventory": [
+      { "itemId": "item:twig", "quantity": 3 }
+    ]
+  }
+}
+```
 
 ## Items
 

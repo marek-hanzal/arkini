@@ -12,6 +12,7 @@ export namespace DetailLineOutputRowModel {
 
 	export interface Type {
 		effectLines: string[];
+		effectBadges: MetaBadge[];
 		itemId: string;
 		metaBadges: MetaBadge[];
 		ownedQuantity: number;
@@ -43,9 +44,14 @@ const readOutputMetaLabel = (output: DetailLineOutputView) =>
 		output.rollLabel,
 	]);
 
+const readActiveOutputEffectLabels = (output: DetailLineOutputView) =>
+	(output.effects ?? [])
+		.filter((effect) => effect.active && effect.result !== "inactive")
+		.map((effect) => `${effect.label}: ${effect.result}`);
+
 const readOutputEffectLines = (output: DetailLineOutputView) => [
 	...(output.bonusLines ?? []),
-	...(output.effects ?? []).map((effect) => `${effect.label}: ${effect.result}`),
+	...readActiveOutputEffectLabels(output),
 ];
 
 export const readDetailLineOutputRows = (
@@ -56,10 +62,16 @@ export const readDetailLineOutputRows = (
 
 	for (const output of outputs) {
 		const existing = rowsByItemId.get(output.itemId);
+		const effectBadges = readActiveOutputEffectLabels(output).map((label) => ({
+			label,
+		}));
 		const effectLines = readOutputEffectLines(output);
 
 		if (!existing) {
 			const created: DetailLineOutputRowModel.Type = {
+				effectBadges: [
+					...effectBadges,
+				],
 				effectLines: [
 					...effectLines,
 				],
@@ -69,6 +81,7 @@ export const readDetailLineOutputRows = (
 						label: readOutputMetaLabel(output),
 						one: output.enabled === false ? "warn" : undefined,
 					},
+					...effectBadges,
 					{
 						label: `Owned ${output.ownedQuantity}`,
 						one: "owned",
@@ -86,6 +99,12 @@ export const readDetailLineOutputRows = (
 			label: readOutputMetaLabel(output),
 			one: output.enabled === false ? "warn" : undefined,
 		});
+
+		for (const effectBadge of effectBadges) {
+			if (existing.effectBadges.some((badge) => badge.label === effectBadge.label)) continue;
+			existing.effectBadges.push(effectBadge);
+			existing.metaBadges.splice(existing.metaBadges.length - 1, 0, effectBadge);
+		}
 
 		for (const effectLine of effectLines) {
 			if (existing.effectLines.includes(effectLine)) continue;

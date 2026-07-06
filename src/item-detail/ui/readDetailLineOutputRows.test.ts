@@ -61,6 +61,24 @@ describe("readDetailLineOutputRows", () => {
 				bonusLines: [
 					"Speed: 10% faster",
 				],
+				effects: [
+					{
+						active: true,
+						impact: "chance",
+						kind: "nearby.drop.chance",
+						label: "Single Tree",
+						ready: true,
+						result: "+50% (1× 50%)",
+					},
+					{
+						active: false,
+						impact: "chance",
+						kind: "nearby.drop.chance",
+						label: "Double Tree",
+						ready: false,
+						result: "inactive",
+					},
+				],
 				itemId: "item:stone",
 				kind: "guaranteed",
 				ownedQuantity: 2,
@@ -70,6 +88,16 @@ describe("readDetailLineOutputRows", () => {
 				bonusLines: [
 					"Speed: 10% faster",
 					"Drop: 25% chance for +1×",
+				],
+				effects: [
+					{
+						active: true,
+						impact: "chance",
+						kind: "nearby.drop.chance",
+						label: "Micro-Forest",
+						ready: true,
+						result: "+170% (2× 85%)",
+					},
 				],
 				itemId: "item:stone",
 				kind: "chance",
@@ -81,7 +109,16 @@ describe("readDetailLineOutputRows", () => {
 
 		expect(rows[0]?.effectLines).toEqual([
 			"Speed: 10% faster",
+			"Single Tree: +50% (1× 50%)",
 			"Drop: 25% chance for +1×",
+			"Micro-Forest: +170% (2× 85%)",
+		]);
+		expect(rows[0]?.metaBadges.map((badge) => badge.label)).toEqual([
+			"1× · guaranteed",
+			"Single Tree: +50% (1× 50%)",
+			"1× · 25% chance",
+			"Micro-Forest: +170% (2× 85%)",
+			"Owned 2",
 		]);
 	});
 });

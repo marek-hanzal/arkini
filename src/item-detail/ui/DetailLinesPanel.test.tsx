@@ -622,8 +622,8 @@ describe("DetailLinesPanel", () => {
 			/>,
 		);
 
-		expect(html).toContain("Effects");
 		expect(html).toContain("Speed: 10% faster");
+		expect(html).not.toContain("Effects");
 		expect(html).not.toContain("Active bonuses");
 		expect(html).not.toContain("This old global bonus should move away from the green box.");
 	});

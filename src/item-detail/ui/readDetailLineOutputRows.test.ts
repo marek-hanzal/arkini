@@ -115,8 +115,10 @@ describe("readDetailLineOutputRows", () => {
 		]);
 		expect(rows[0]?.metaBadges.map((badge) => badge.label)).toEqual([
 			"1× · guaranteed",
+			"Speed: 10% faster",
 			"Single Tree: +50% (1× 50%)",
 			"1× · 25% chance",
+			"Drop: 25% chance for +1×",
 			"Micro-Forest: +170% (2× 85%)",
 			"Owned 2",
 		]);

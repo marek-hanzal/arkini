@@ -26,30 +26,6 @@ const DetailOutputMetaBadge: FC<{
 	</span>
 );
 
-const DetailOutputEffectLines: FC<{
-	effectLines: readonly string[];
-}> = ({ effectLines }) => {
-	if (effectLines.length === 0) return null;
-
-	return (
-		<div className="mt-2">
-			<p className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-violet-700/75">
-				Effects
-			</p>
-			<ul className="mt-1 space-y-0.5 text-[0.72rem] leading-5 text-violet-800/78">
-				{effectLines.map((effectLine, effectLineIndex) => (
-					<li
-						key={`effect:${effectLineIndex}:${effectLine}`}
-						className="break-words"
-					>
-						{effectLine}
-					</li>
-				))}
-			</ul>
-		</div>
-	);
-};
-
 export const DetailLineOutputs: FC<{
 	items: ItemCatalogView;
 	line: Pick<LineView, "lineId" | "outputs">;
@@ -90,7 +66,6 @@ export const DetailLineOutputs: FC<{
 										/>
 									))}
 								</div>
-								<DetailOutputEffectLines effectLines={row.effectLines} />
 							</div>
 						</div>
 					);

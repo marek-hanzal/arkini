@@ -49,7 +49,7 @@ const readActiveOutputEffectLabels = (output: DetailLineOutputView) =>
 		.filter((effect) => effect.active && effect.result !== "inactive")
 		.map((effect) => `${effect.label}: ${effect.result}`);
 
-const readOutputEffectLines = (output: DetailLineOutputView) => [
+const readOutputEffectLabels = (output: DetailLineOutputView) => [
 	...(output.bonusLines ?? []),
 	...readActiveOutputEffectLabels(output),
 ];
@@ -62,10 +62,10 @@ export const readDetailLineOutputRows = (
 
 	for (const output of outputs) {
 		const existing = rowsByItemId.get(output.itemId);
-		const effectBadges = readActiveOutputEffectLabels(output).map((label) => ({
+		const effectLines = readOutputEffectLabels(output);
+		const effectBadges = effectLines.map((label) => ({
 			label,
 		}));
-		const effectLines = readOutputEffectLines(output);
 
 		if (!existing) {
 			const created: DetailLineOutputRowModel.Type = {

@@ -621,4 +621,132 @@ describe("applyBoardMemoryActivateFx", () => {
 			}),
 		);
 	});
+	it("restores a moved memory item directly when inventory is full", () => {
+		const config = createMemoryTestConfig();
+		config.game.inventory.slots = 1;
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(memory).toBeDefined();
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const moved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.item.move",
+				x: 0,
+				y: 1,
+			},
+			config,
+			nowMs: 200,
+			save: saved,
+		}).save;
+		moved.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 3,
+		};
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 300,
+			save: moved,
+		});
+
+		expect(restored.save.board.items[memory!.id]).toMatchObject({
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		expect(restored.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 3,
+		});
+		expect(restored.save.boardMemoryLayouts[memory!.id]).toBeUndefined();
+	});
+
+	it("does not partially copy a board stack when memory store cannot fit the full quantity", () => {
+		const config = createMemoryTestConfig();
+		config.game.inventory.slots = 1;
+		config.startingState.board.push({
+			itemId: "item:twig",
+			x: 0,
+			y: 1,
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const memory = findBoardItem(save, {
+			itemId: boardMemoryItemId,
+			x: 0,
+			y: 0,
+		});
+		const twig = findBoardItem(save, {
+			itemId: "item:twig",
+			x: 0,
+			y: 1,
+		});
+		expect(memory).toBeDefined();
+		expect(twig).toBeDefined();
+		twig!.quantity = 3;
+
+		const saved = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 100,
+			save,
+		}).save;
+		const extraStackSave = structuredClone(saved);
+		extraStackSave.board.items["item-instance:extra-twig"] = {
+			id: "item-instance:extra-twig",
+			itemId: "item:twig",
+			quantity: 3,
+			x: 1,
+			y: 1,
+		};
+		extraStackSave.inventory.slots[0] = {
+			itemId: "item:twig",
+			quantity: 2,
+		};
+
+		const restored = runAction({
+			action: {
+				boardItemId: memory!.id,
+				type: "board.memory.activate",
+			},
+			config,
+			nowMs: 200,
+			save: extraStackSave,
+		});
+
+		expect(restored.save.inventory.slots[0]).toEqual({
+			itemId: "item:twig",
+			quantity: 2,
+		});
+		expect(restored.save.board.items["item-instance:extra-twig"]).toMatchObject({
+			itemId: "item:twig",
+			quantity: 3,
+		});
+	});
 });

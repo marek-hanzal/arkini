@@ -8,6 +8,7 @@ import { readGameConfigItemDefinitionFx } from "~/config/readGameConfigItemDefin
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
+import { readInventoryStackCapacityFx } from "~/inventory/readInventoryStackCapacityFx";
 import { placeGameSaveInventoryInstanceFx } from "~/placement/placeGameSaveInventoryInstanceFx";
 import { placeGameSaveInventoryRemainderFx } from "~/placement/placeGameSaveInventoryRemainderFx";
 
@@ -122,6 +123,13 @@ const placeStackCopiedBoardItemInInventoryFx = Effect.fn(
 		config,
 		itemId: item.itemId,
 	});
+	const inventoryCapacity = yield* readInventoryStackCapacityFx({
+		itemId: item.itemId,
+		maxStackSize: itemDefinition.maxStackSize,
+		slots: save.inventory.slots,
+	});
+	if (inventoryCapacity < quantity) return false;
+
 	const placementEvents: GameEvent[] = [];
 	const placed = yield* placeGameSaveInventoryRemainderFx({
 		createdAtMs: item.createdAtMs,

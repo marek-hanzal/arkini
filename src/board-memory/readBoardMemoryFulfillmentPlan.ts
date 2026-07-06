@@ -1,3 +1,4 @@
+import { boardItemMatchesBoardMemoryIdentity } from "~/board-memory/boardItemMatchesBoardMemoryIdentity";
 import { boardItemMatchesBoardMemoryLayoutItem } from "~/board-memory/boardItemMatchesBoardMemoryLayoutItem";
 import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -21,7 +22,7 @@ export const readBoardMemoryFulfillmentPlan = ({
 	const boardItems = Object.values(save.board.items);
 
 	for (const [index, memoryItem] of savedItems.entries()) {
-		const boardItem = boardItems.find(
+		const restoredBoardItem = boardItems.find(
 			(candidate) =>
 				!preservedBoardItemInstanceIds.has(candidate.id) &&
 				boardItemMatchesBoardMemoryLayoutItem({
@@ -29,10 +30,24 @@ export const readBoardMemoryFulfillmentPlan = ({
 					memoryItem,
 				}),
 		);
-		if (!boardItem) continue;
+		if (restoredBoardItem) {
+			preservedBoardItemInstanceIds.add(restoredBoardItem.id);
+			restoredIndexes.add(index);
+			continue;
+		}
 
-		preservedBoardItemInstanceIds.add(boardItem.id);
-		restoredIndexes.add(index);
+		if (!memoryItem.itemInstanceId) continue;
+		const movableBoardItem = boardItems.find(
+			(candidate) =>
+				!preservedBoardItemInstanceIds.has(candidate.id) &&
+				boardItemMatchesBoardMemoryIdentity({
+					boardItem: candidate,
+					memoryItem,
+				}),
+		);
+		if (!movableBoardItem) continue;
+
+		preservedBoardItemInstanceIds.add(movableBoardItem.id);
 	}
 
 	return {

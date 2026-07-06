@@ -6,11 +6,42 @@ export type GameConfigAuditWarning = {
 	code:
 		| "duplicate-definition-shape"
 		| "limited-deposit-softlock"
+		| "limited-deposit-stochastic-softlock"
 		| "terminal-item"
 		| "unused-definition";
 	id: string;
 	message: string;
 	section: string;
+};
+
+export type GameConfigAuditSummary = {
+	assets: number;
+	boardCells: number;
+	crafts: number;
+	items: number;
+	limitedDeposits: number;
+	producerLines: number;
+	producers: number;
+	resources: number;
+	startingBoardItems: number;
+	startingInventoryItems: number;
+	stochasticCapacitySpendLines: number;
+};
+
+export type GameConfigAuditLimitedDepositReport = {
+	id: string;
+	max: number;
+	onDepleted: ItemCapacity["onDepleted"];
+	replaceItemId?: string;
+	spentByLineIds: string[];
+	stochasticSpendLineIds: string[];
+	sustainableReplacement: boolean;
+};
+
+export type GameConfigAuditReport = {
+	limitedDeposits: GameConfigAuditLimitedDepositReport[];
+	summary: GameConfigAuditSummary;
+	warnings: GameConfigAuditWarning[];
 };
 
 type RecordName = "resources" | "assets" | "items";
@@ -27,7 +58,15 @@ type ItemProductionRule = {
 	producedItemIds: ReadonlySet<string>;
 };
 
+type CapacitySpendLine = {
+	lineId: string;
+	ownerItemId: string;
+	spentItemIds: readonly string[];
+	stochasticOnly: boolean;
+};
+
 type LimitedDepositIndex = {
+	capacitySpendLines: CapacitySpendLine[];
 	productionRules: ItemProductionRule[];
 	spentCapacityItemIds: Set<string>;
 };
@@ -42,7 +81,10 @@ type GameDropEffect = NonNullable<
 	>["effects"]
 >[number];
 
-export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] => {
+export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
+	auditGameConfigReport(config).warnings;
+
+export const auditGameConfigReport = (config: GameConfig): GameConfigAuditReport => {
 	const usage = createUsageIndex();
 	const itemFlow = createItemFlowIndex();
 	const limitedDeposits = createLimitedDepositIndex();
@@ -54,11 +96,23 @@ export const auditGameConfig = (config: GameConfig): GameConfigAuditWarning[] =>
 	collectUsedAssetDependencyUsage(config, usage);
 	collectAssetResourceUsage(config, usage);
 
-	return [
+	const sustainableItemIds = readSustainableItemIds(limitedDeposits.productionRules);
+	const warnings = [
 		...readUnusedDefinitionWarnings(config, usage),
 		...readTerminalItemWarnings(config, itemFlow, usage),
-		...readLimitedDepositSoftlockWarnings(config, limitedDeposits),
+		...readLimitedDepositSoftlockWarnings(config, limitedDeposits, sustainableItemIds),
+		...readLimitedDepositStochasticSoftlockWarnings(config, limitedDeposits),
 	].sort(compareGameConfigAuditWarnings);
+
+	return {
+		limitedDeposits: readLimitedDepositReports({
+			config,
+			limitedDeposits,
+			sustainableItemIds,
+		}),
+		summary: readGameConfigAuditSummary(config, limitedDeposits),
+		warnings,
+	};
 };
 
 export const formatGameConfigAuditWarnings = (
@@ -72,6 +126,53 @@ export const formatGameConfigAuditWarnings = (
 	].join("\n");
 };
 
+export const formatGameConfigAuditReport = (report: GameConfigAuditReport): string => {
+	const summary = report.summary;
+	const lines = [
+		"Game config report:",
+		"  Summary:",
+		`    items: ${summary.items}`,
+		`    assets: ${summary.assets}`,
+		`    resources: ${summary.resources}`,
+		`    board cells: ${summary.boardCells}`,
+		`    starting board items: ${summary.startingBoardItems}`,
+		`    starting inventory stacks: ${summary.startingInventoryItems}`,
+		`    producers/stashes: ${summary.producers}`,
+		`    producer/stash lines: ${summary.producerLines}`,
+		`    craft recipes: ${summary.crafts}`,
+		`    limited deposits: ${summary.limitedDeposits}`,
+		`    stochastic capacity spend lines: ${summary.stochasticCapacitySpendLines}`,
+	];
+
+	if (report.limitedDeposits.length > 0) {
+		lines.push("", "  Limited deposits:");
+		for (const deposit of report.limitedDeposits) {
+			lines.push(
+				`    - ${deposit.id}: max ${deposit.max}, ${formatLimitedDepositDepletion(deposit)}, sustainable ${formatBoolean(deposit.sustainableReplacement)}`,
+			);
+			if (deposit.spentByLineIds.length > 0) {
+				lines.push(`      spent by: ${deposit.spentByLineIds.join(", ")}`);
+			}
+			if (deposit.stochasticSpendLineIds.length > 0) {
+				lines.push(`      RNG risk lines: ${deposit.stochasticSpendLineIds.join(", ")}`);
+			}
+		}
+	}
+
+	if (report.warnings.length > 0) {
+		lines.push("", formatGameConfigAuditWarnings(report.warnings));
+	}
+
+	return lines.join("\n");
+};
+
+const formatLimitedDepositDepletion = (deposit: GameConfigAuditLimitedDepositReport): string => {
+	if (deposit.onDepleted === "replace") return `replaces with ${deposit.replaceItemId}`;
+	return `onDepleted ${deposit.onDepleted}`;
+};
+
+const formatBoolean = (value: boolean): string => (value ? "yes" : "no");
+
 const createUsageIndex = (): UsageIndex => ({
 	resources: new Set(),
 	assets: new Set(),
@@ -84,6 +185,7 @@ const createItemFlowIndex = (): ItemFlowIndex => ({
 });
 
 const createLimitedDepositIndex = (): LimitedDepositIndex => ({
+	capacitySpendLines: [],
 	productionRules: [],
 	spentCapacityItemIds: new Set(),
 });
@@ -197,15 +299,16 @@ const collectItemUsage = (
 		}
 
 		for (const line of item.producer?.lines ?? []) {
-			collectLineUsage(line, config, usage, itemFlow, limitedDeposits);
+			collectLineUsage(itemId, line, config, usage, itemFlow, limitedDeposits);
 		}
 		if (item.stash?.line) {
-			collectLineUsage(item.stash.line, config, usage, itemFlow, limitedDeposits);
+			collectLineUsage(itemId, item.stash.line, config, usage, itemFlow, limitedDeposits);
 		}
 	}
 };
 
 const collectLineUsage = (
+	ownerItemId: string,
 	line: GameLineDefinition,
 	config: GameConfig,
 	usage: UsageIndex,
@@ -216,17 +319,28 @@ const collectLineUsage = (
 		usage.items.add(input.itemId);
 		itemFlow.consumedItemIds.add(input.itemId);
 	}
+	const spentCapacityItemIds = readLineSpentCapacityItemIds(config, line);
+
 	if (line.output) {
 		collectLootOutputUsage(line.output, itemFlow);
 		collectProductionRule(limitedDeposits, line.output, [
 			...(line.inputs ?? []).filter((input) => input.consume).map((input) => input.itemId),
-			...readLineSpentCapacityItemIds(config, line),
+			...spentCapacityItemIds,
 		]);
 		collectLootOutputEffectUsage(line.output, config, usage);
 	}
 
-	for (const itemId of readLineSpentCapacityItemIds(config, line)) {
+	for (const itemId of spentCapacityItemIds) {
 		limitedDeposits.spentCapacityItemIds.add(itemId);
+	}
+
+	if (spentCapacityItemIds.length > 0) {
+		limitedDeposits.capacitySpendLines.push({
+			lineId: line.id,
+			ownerItemId,
+			spentItemIds: spentCapacityItemIds,
+			stochasticOnly: !line.output || !hasGuaranteedOutput(line.output),
+		});
 	}
 };
 
@@ -453,14 +567,13 @@ const readTerminalItemWarnings = (
 const readLimitedDepositSoftlockWarnings = (
 	config: GameConfig,
 	limitedDeposits: LimitedDepositIndex,
+	sustainableItemIds: ReadonlySet<string>,
 ): GameConfigAuditWarning[] => {
 	const riskyDepositIds = new Set(
 		Object.entries(config.items)
 			.filter(([, item]) => item.capacity && item.capacity.onDepleted !== "stop")
 			.map(([itemId]) => itemId),
 	);
-	const sustainableItemIds = readSustainableItemIds(limitedDeposits.productionRules);
-
 	return [
 		...limitedDeposits.spentCapacityItemIds,
 	]
@@ -481,6 +594,108 @@ const readLimitedDepositSoftlockWarnings = (
 			message: `${itemId} has finite capacity that can be depleted by producer lines, but no sustainable production or replacement path recreates it. This may softlock production once the deposit disappears.`,
 		}));
 };
+
+const readLimitedDepositStochasticSoftlockWarnings = (
+	config: GameConfig,
+	limitedDeposits: LimitedDepositIndex,
+): GameConfigAuditWarning[] => {
+	const warningByItemId = new Map<string, GameConfigAuditWarning>();
+
+	for (const spendLine of limitedDeposits.capacitySpendLines) {
+		if (!spendLine.stochasticOnly) continue;
+
+		for (const itemId of spendLine.spentItemIds) {
+			const item = config.items[itemId];
+			if (!item?.capacity || item.capacity.onDepleted === "stop") continue;
+			if (warningByItemId.has(itemId)) continue;
+
+			warningByItemId.set(itemId, {
+				code: "limited-deposit-stochastic-softlock",
+				id: itemId,
+				section: "items",
+				message: `${itemId} is finite capacity spent by ${spendLine.ownerItemId}.${spendLine.lineId}, but that line has no guaranteed output. Bad RNG can drain the deposit without giving progression items.`,
+			});
+		}
+	}
+
+	return [
+		...warningByItemId.values(),
+	];
+};
+
+const readLimitedDepositReports = ({
+	config,
+	limitedDeposits,
+	sustainableItemIds,
+}: {
+	config: GameConfig;
+	limitedDeposits: LimitedDepositIndex;
+	sustainableItemIds: ReadonlySet<string>;
+}): GameConfigAuditLimitedDepositReport[] =>
+	Object.entries(config.items)
+		.filter(([, item]) => item.capacity)
+		.map(([itemId, item]) => {
+			const capacity = item.capacity as ItemCapacity;
+			const spentByLines = limitedDeposits.capacitySpendLines.filter((line) =>
+				line.spentItemIds.includes(itemId),
+			);
+			const sustainableReplacement = hasSustainableDepositReplacement({
+				config,
+				itemId,
+				productionRules: limitedDeposits.productionRules,
+				sustainableItemIds,
+			});
+
+			return {
+				id: itemId,
+				max: capacity.max,
+				onDepleted: capacity.onDepleted,
+				replaceItemId:
+					capacity.onDepleted === "replace" ? capacity.replaceItemId : undefined,
+				spentByLineIds: spentByLines.map(formatCapacitySpendLineId).sort(),
+				stochasticSpendLineIds: spentByLines
+					.filter((line) => line.stochasticOnly)
+					.map(formatCapacitySpendLineId)
+					.sort(),
+				sustainableReplacement,
+			};
+		})
+		.sort((left, right) => left.id.localeCompare(right.id));
+
+const readGameConfigAuditSummary = (
+	config: GameConfig,
+	limitedDeposits: LimitedDepositIndex,
+): GameConfigAuditSummary => {
+	const producerItems = Object.values(config.items).filter((item) => item.producer);
+	const stashItems = Object.values(config.items).filter((item) => item.stash);
+	const producerLines = producerItems.reduce(
+		(total, item) => total + (item.producer?.lines.length ?? 0),
+		0,
+	);
+	const stashLines = stashItems.reduce((total, item) => total + (item.stash?.line ? 1 : 0), 0);
+
+	return {
+		assets: Object.keys(config.assets).length,
+		boardCells: config.game.board.width * config.game.board.height,
+		crafts: Object.values(config.items).filter((item) => item.craft).length,
+		items: Object.keys(config.items).length,
+		limitedDeposits: Object.values(config.items).filter((item) => item.capacity).length,
+		producerLines: producerLines + stashLines,
+		producers: producerItems.length + stashItems.length,
+		resources: Object.keys(config.resources).length,
+		startingBoardItems: config.startingState.board.length,
+		startingInventoryItems: config.startingState.inventory.length,
+		stochasticCapacitySpendLines: limitedDeposits.capacitySpendLines.filter(
+			(line) => line.stochasticOnly,
+		).length,
+	};
+};
+
+const hasGuaranteedOutput = (output: ActivationOutput): boolean =>
+	output.some((entry) => entry.type === "guaranteed" && entry.enabled !== false);
+
+const formatCapacitySpendLineId = (line: CapacitySpendLine): string =>
+	`${line.ownerItemId}.${line.lineId}`;
 
 const readSustainableItemIds = (productionRules: readonly ItemProductionRule[]) => {
 	const sustainableItemIds = new Set<string>();

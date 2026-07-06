@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { parseGameConfig } from "../../src/config/GameConfigSchema";
 import { GAME_HERO_ASSET_ID } from "../../src/config/GameWellKnownAssetIds";
-import { auditGameConfig, formatGameConfigAuditWarnings } from "./auditGameConfig";
+import {
+	auditGameConfig,
+	auditGameConfigReport,
+	formatGameConfigAuditReport,
+	formatGameConfigAuditWarnings,
+} from "./auditGameConfig";
 
 const createConfigValue = () => ({
 	version: 1,
@@ -330,6 +335,62 @@ describe("auditGameConfig", () => {
 		);
 	});
 
+	it("warns when finite capacity is spent by stochastic-only output lines", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:deposit");
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:deposit",
+			]),
+		];
+		readTestLine(config, "line:test").output = [
+			{
+				chance: 0.5,
+				itemId: "item:pollution",
+				type: "chance",
+			},
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-stochastic-softlock",
+				id: "item:deposit",
+			}),
+		);
+	});
+
+	it("does not warn about stochastic capacity spend lines that also have guaranteed output", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:deposit");
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:deposit",
+			]),
+		];
+		readTestLine(config, "line:test").output = [
+			{
+				itemId: "item:pollution",
+				type: "guaranteed",
+			},
+			{
+				chance: 0.5,
+				itemId: "item:pollution",
+				type: "chance",
+			},
+		];
+
+		const warnings = auditGameConfig(parseGameConfig(config));
+
+		expect(warnings).not.toContainEqual(
+			expect.objectContaining({
+				code: "limited-deposit-stochastic-softlock",
+				id: "item:deposit",
+			}),
+		);
+	});
+
 	it("does not warn about limited deposits that can be produced sustainably", () => {
 		const config: any = createConfigValue();
 		addLimitedDepositItem(config, "item:deposit");
@@ -567,6 +628,33 @@ describe("auditGameConfig", () => {
 				id: "item:micro-forest",
 			}),
 		);
+	});
+
+	it("formats a verbose config audit report", () => {
+		const config: any = createConfigValue();
+		addLimitedDepositItem(config, "item:deposit");
+		readTestLine(config, "line:test").effects = [
+			createCapacitySpendEffect([
+				"item:deposit",
+			]),
+		];
+		readTestLine(config, "line:test").output = [
+			{
+				chance: 0.5,
+				itemId: "item:pollution",
+				type: "chance",
+			},
+		];
+
+		const reportText = formatGameConfigAuditReport(
+			auditGameConfigReport(parseGameConfig(config)),
+		);
+
+		expect(reportText).toContain("Game config report:");
+		expect(reportText).toContain("limited deposits: 1");
+		expect(reportText).toContain("item:deposit: max 3, onDepleted remove");
+		expect(reportText).toContain("RNG risk lines: item:producer.line:test");
+		expect(reportText).toContain("limited-deposit-stochastic-softlock");
 	});
 
 	it("formats warnings for CLI output", () => {

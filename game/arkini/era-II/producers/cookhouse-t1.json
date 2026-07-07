@@ -2,7 +2,7 @@
 	"$schema": "../../../arkini.schema.json",
 	"items": {
 		"producer:cookhouse-t1": {
-			"description": "Combines processed food into feasts.",
+			"description": "Prepares empty feast plates for manual assembly or slowly cooks complete feasts from Era II farm food.",
 			"effects": [
 				{
 					"grants": [
@@ -23,35 +23,47 @@
 			"producer": {
 				"lines": [
 					{
-						"durationMs": 34000,
+						"durationMs": 8000,
+						"id": "line:cookhouse-t1:feast-plate",
+						"name": "Feast Plate",
+						"output": [
+							{
+								"itemId": "item:feast-plate",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 60000,
 						"id": "line:cookhouse-t1:feast",
 						"inputs": [
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:bread"
+								"itemId": "item:grain"
 							},
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:sausage"
+								"itemId": "item:piglet"
 							},
 							{
 								"capacity": 4,
 								"consume": true,
-								"itemId": "item:cheese"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:vegetables"
+								"itemId": "item:milk"
 							},
 							{
 								"capacity": 4,
 								"consume": true,
 								"itemId": "item:egg"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:vegetables"
 							}
 						],
+						"name": "Auto-Cooked Feast",
 						"output": [
 							{
 								"effects": [
@@ -83,7 +95,7 @@
 				"producer",
 				"food",
 				"cooking",
-				"era:III",
+				"era:II",
 				"unique"
 			],
 			"tier": 1

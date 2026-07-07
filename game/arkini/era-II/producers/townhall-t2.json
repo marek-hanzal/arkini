@@ -94,6 +94,17 @@
 					},
 					{
 						"durationMs": 10000,
+						"id": "line:townhall-t2:blueprint-cookhouse-t1",
+						"name": "Blueprint: Cookhouse I",
+						"output": [
+							{
+								"itemId": "item:blueprint-cookhouse-t1",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"durationMs": 10000,
 						"id": "line:townhall-t2:blueprint-waste-processor-t1",
 						"name": "Blueprint: Waste Processor I",
 						"output": [

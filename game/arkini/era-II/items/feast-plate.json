@@ -13,28 +13,28 @@
 				"inputs": [
 					{
 						"consume": true,
-						"itemId": "item:bread"
+						"itemId": "item:grain"
 					},
 					{
 						"consume": true,
-						"itemId": "item:sausage"
+						"itemId": "item:piglet"
 					},
 					{
 						"consume": true,
-						"itemId": "item:cheese"
-					},
-					{
-						"consume": true,
-						"itemId": "item:vegetables"
+						"itemId": "item:milk"
 					},
 					{
 						"consume": true,
 						"itemId": "item:egg"
+					},
+					{
+						"consume": true,
+						"itemId": "item:vegetables"
 					}
 				],
 				"resultItemId": "item:feast"
 			},
-			"description": "An empty serving plate from the tavern. Fill it with food on the board to assemble a proper feast.",
+			"description": "An empty serving plate from the cookhouse. Fill it with Era II farm food on the board to assemble a proper feast.",
 			"maxStackSize": 1,
 			"name": "Feast Plate",
 			"storage": "both",
@@ -42,7 +42,7 @@
 				"food",
 				"feast",
 				"craft-target",
-				"era:III",
+				"era:II",
 				"tier-4-resource"
 			]
 		}

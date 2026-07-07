@@ -1,0 +1,50 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:feast-plate": {
+			"assetIds": [
+				"asset:item:feast-plate",
+				"asset:item:feast-plate-stage-1",
+				"asset:item:feast-plate-stage-2",
+				"asset:item:feast"
+			],
+			"craft": {
+				"durationMs": 9000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:bread"
+					},
+					{
+						"consume": true,
+						"itemId": "item:sausage"
+					},
+					{
+						"consume": true,
+						"itemId": "item:cheese"
+					},
+					{
+						"consume": true,
+						"itemId": "item:vegetables"
+					},
+					{
+						"consume": true,
+						"itemId": "item:egg"
+					}
+				],
+				"resultItemId": "item:feast"
+			},
+			"description": "An empty serving plate from the tavern. Fill it with food on the board to assemble a proper feast.",
+			"maxStackSize": 1,
+			"name": "Feast Plate",
+			"storage": "both",
+			"tags": [
+				"food",
+				"feast",
+				"craft-target",
+				"era:III",
+				"tier-4-resource"
+			]
+		}
+	}
+}

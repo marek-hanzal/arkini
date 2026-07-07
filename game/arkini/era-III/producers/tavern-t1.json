@@ -23,6 +23,17 @@
 			"producer": {
 				"lines": [
 					{
+						"durationMs": 8000,
+						"id": "line:tavern-t1:feast-plate",
+						"name": "Feast Plate",
+						"output": [
+							{
+								"itemId": "item:feast-plate",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
 						"durationMs": 12000,
 						"id": "line:tavern-t1:beer",
 						"inputs": [

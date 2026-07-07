@@ -115,62 +115,6 @@
 						]
 					},
 					{
-						"durationMs": 24000,
-						"id": "line:townhall-t2:feast",
-						"inputs": [
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:grain"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:piglet"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:milk"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:egg"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:vegetables"
-							}
-						],
-						"output": [
-							{
-								"effects": [
-									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									}
-								],
-								"itemId": "item:feast",
-								"quantity": 2,
-								"type": "guaranteed"
-							}
-						]
-					},
-					{
 						"durationMs": 10000,
 						"id": "line:townhall-t2:blueprint-house-t1",
 						"inputs": [

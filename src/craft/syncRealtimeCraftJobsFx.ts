@@ -30,8 +30,6 @@ export namespace syncRealtimeCraftJobsFx {
 	}
 }
 
-type CraftRealtimeSyncScope = Pick<syncRealtimeCraftJobsFx.Props, "config" | "nowMs">;
-
 const readSortedCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx.readSortedCraftJobsFx")(
 	function* () {
 		const save = yield* readGameSaveDraftCurrentFx();
@@ -42,14 +40,14 @@ const readSortedCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx.readSortedCraft
 );
 
 const readCraftJobRecipeFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobRecipeFx")(function* ({
+	config,
 	job,
-	scope,
 }: {
+	config: GameConfig;
 	job: GameSaveCraftJob;
-	scope: CraftRealtimeSyncScope;
 }) {
 	const recipe = readCraftRecipeDefinition({
-		config: scope.config,
+		config,
 		recipeId: job.recipeId,
 	});
 	if (recipe) return recipe;
@@ -61,16 +59,18 @@ const readCraftJobRecipeFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobReci
 
 const readCraftStartGateReadyFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftStartGateReadyFx")(
 	function* ({
+		config,
+		nowMs,
 		recipe,
-		scope,
 	}: {
+		config: GameConfig;
+		nowMs: number;
 		recipe: GameCraftRecipeDefinition;
-		scope: CraftRealtimeSyncScope;
 	}) {
 		const save = yield* readGameSaveDraftCurrentFx();
 		return readCraftLineEffectState({
-			config: scope.config,
-			nowMs: scope.nowMs,
+			config,
+			nowMs,
 			recipe,
 			save,
 		}).startGateReady;
@@ -80,23 +80,26 @@ const readCraftStartGateReadyFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftSt
 const readCraftJobSyncStateFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobSyncStateFx")(
 	function* ({
 		job,
+		nowMs,
 		recipe,
-		scope,
+		config,
 	}: {
 		job: GameSaveCraftJob;
+		nowMs: number;
 		recipe: GameCraftRecipeDefinition;
-		scope: CraftRealtimeSyncScope;
+		config: GameConfig;
 	}) {
 		const startGateReady = yield* readCraftStartGateReadyFx({
+			config,
+			nowMs,
 			recipe,
-			scope,
 		});
 
 		if (isGamePausableJobPaused(job)) {
 			return startGateReady ? "resumable" : "still_paused";
 		}
 
-		return !startGateReady && job.startAtMs <= scope.nowMs ? "blocked" : "ready";
+		return !startGateReady && job.startAtMs <= nowMs ? "blocked" : "ready";
 	},
 );
 
@@ -110,25 +113,25 @@ const readCraftTargetExistsFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftTarg
 const resumePausedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.resumePausedCraftJobFx")(
 	function* ({
 		job,
+		nowMs,
 		recipe,
-		scope,
 	}: {
 		job: GameSaveCraftJob;
+		nowMs: number;
 		recipe: GameCraftRecipeDefinition;
-		scope: CraftRealtimeSyncScope;
 	}) {
 		const save = yield* readGameSaveDraftCurrentFx();
 		const remainingMs = job.remainingMs ?? 0;
 		const effectiveTiming = yield* readCraftJobEffectiveTimingFx({
 			recipe,
 			save,
-			startAtMs: scope.nowMs,
+			startAtMs: nowMs,
 			targetItemInstanceId: job.targetItemInstanceId,
 		});
 		const durationMs = Math.max(0, effectiveTiming.readyAtMs - effectiveTiming.startAtMs);
 		const resumedTiming = readGamePausableJobResumedTiming({
 			durationMs,
-			nowMs: scope.nowMs,
+			nowMs,
 			remainingMs,
 		});
 
@@ -150,10 +153,10 @@ const resumePausedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.resumePausedCr
 );
 
 const pauseBlockedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.pauseBlockedCraftJobFx")(
-	function* ({ job, scope }: { job: GameSaveCraftJob; scope: CraftRealtimeSyncScope }) {
+	function* ({ job, nowMs }: { job: GameSaveCraftJob; nowMs: number }) {
 		const remainingMs = readGamePausableJobRemainingMsAtPause({
 			job,
-			nowMs: scope.nowMs,
+			nowMs,
 		});
 		const draft = yield* ensureGameSaveDraftFx();
 		const liveJob = draft.craftJobs[job.id];
@@ -162,8 +165,8 @@ const pauseBlockedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.pauseBlockedCr
 		yield* writeCraftJobToSaveFx({
 			job: {
 				...liveJob,
-				pausedAtMs: scope.nowMs,
-				readyAtMs: scope.nowMs + remainingMs,
+				pausedAtMs: nowMs,
+				readyAtMs: nowMs + remainingMs,
 				remainingMs,
 				startAtMs: job.startAtMs,
 			},
@@ -200,39 +203,44 @@ const retimeReadyCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.retimeReadyCraf
 );
 
 const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCraftJobFx")(
-	function* ({ job, scope }: { job: GameSaveCraftJob; scope: CraftRealtimeSyncScope }) {
+	function* ({
+		job,
+		config,
+		nowMs,
+	}: {
+		job: GameSaveCraftJob;
+		config: GameConfig;
+		nowMs: number;
+	}) {
 		if (job.delivery) return;
 
 		const recipe = yield* readCraftJobRecipeFx({
+			config,
 			job,
-			scope,
 		});
-		if (
-			!(yield* readCraftTargetExistsFx({
-				job,
-			}))
-		) {
+		if (!(yield* readCraftTargetExistsFx({ job }))) {
 			return;
 		}
 
 		const syncState = yield* readCraftJobSyncStateFx({
 			job,
+			config,
+			nowMs,
 			recipe,
-			scope,
 		});
 
 		return yield* match(syncState)
 			.with("resumable", () =>
 				resumePausedCraftJobFx({
 					job,
+					nowMs,
 					recipe,
-					scope,
 				}),
 			)
 			.with("blocked", () =>
 				pauseBlockedCraftJobFx({
 					job,
-					scope,
+					nowMs,
 				}),
 			)
 			.with("ready", () =>
@@ -246,33 +254,27 @@ const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCr
 	},
 );
 
-const syncRealtimeCraftJobsProgramFx = Effect.fn(
-	"syncRealtimeCraftJobsFx.syncRealtimeCraftJobsProgramFx",
-)(function* (scope: CraftRealtimeSyncScope) {
-	const jobs = yield* readSortedCraftJobsFx();
-	for (const job of jobs) {
-		yield* syncRealtimeCraftJobFx({
-			job,
-			scope,
-		});
-	}
-
-	return yield* readUpdatedGameSaveDraftResultFx({
-		nowMs: scope.nowMs,
-	});
-});
-
 export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(function* ({
 	config,
 	nowMs,
 	save,
 }: syncRealtimeCraftJobsFx.Props) {
-	return yield* syncRealtimeCraftJobsProgramFx({
-		config,
-		nowMs,
-	}).pipe((effect) =>
-		provideGameSaveDraftScopeFx(effect, {
-			save,
-		}),
-	);
+	const effect = Effect.gen(function* () {
+		const jobs = yield* readSortedCraftJobsFx();
+		for (const job of jobs) {
+			yield* syncRealtimeCraftJobFx({
+				job,
+				config,
+				nowMs,
+			});
+		}
+
+		return yield* readUpdatedGameSaveDraftResultFx({
+			nowMs,
+		});
+	});
+
+	return yield* provideGameSaveDraftScopeFx(effect, {
+		save,
+	});
 });

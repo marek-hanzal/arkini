@@ -100,7 +100,7 @@ export const applyNearbyRequirementDropEffect = ({
 		ready:
 			readNearbyLineEffectMatches({
 				items: effect.items as RuntimeItemSelector,
-				radius: effect.radius,
+				nearbyDistance: effect.distance,
 				save,
 				targetCell,
 			}).length > 0,

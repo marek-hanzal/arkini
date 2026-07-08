@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-	NonNegativeIntegerSchema,
 	PositiveNumberSchema,
 	PositiveProbabilitySchema,
 	QuantitySchema,
@@ -9,6 +8,7 @@ import { ResolvedDomainSelectorSchema } from "~/config/schema/GameDomainSelector
 import {
 	createGameLineEffectMemberSchemas,
 	GameLineEffectDisplaySchema,
+	GameNearbyDistanceSchema,
 	GameNearbyItemAuthoringSelectorSchema,
 	GameNearbyItemSelectorSchema,
 } from "~/config/schema/GameLineEffectSchema";
@@ -85,7 +85,7 @@ const createGameDropOnlyEffectMemberSchemas = <
 		z
 			.object({
 				kind: z.literal("nearby.loot.outputChance.add"),
-				radius: NonNegativeIntegerSchema,
+				distance: GameNearbyDistanceSchema,
 				sources: z.array(createGameNearbyLootChanceSourceSchema(itemSelectorSchema)).min(1),
 				quantity: QuantitySchema.default(1),
 				display: GameLineEffectDisplaySchema,

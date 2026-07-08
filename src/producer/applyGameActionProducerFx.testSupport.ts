@@ -122,7 +122,7 @@ export const readLocalTwigGrantConfig = (
 	baseConfig: ReturnType<typeof createEngineTestConfig>,
 	props: {
 		lineIds: readonly string[];
-		radius: number;
+		distance: "neighbour" | "near" | "any";
 	},
 ) => ({
 	lineOverrides: {
@@ -143,7 +143,7 @@ export const readLocalTwigGrantConfig = (
 						},
 						kind: "nearby.require" as const,
 						phase: "start" as const,
-						radius: props.radius,
+						distance: props.distance,
 					},
 				]),
 			]),

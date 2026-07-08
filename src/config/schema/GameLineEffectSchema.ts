@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-	NonNegativeIntegerSchema,
-	PositiveIntegerSchema,
-} from "~/config/schema/GameConfigScalarSchemas";
+import { PositiveIntegerSchema } from "~/config/schema/GameConfigScalarSchemas";
 import {
 	AuthoringDomainSelectorSchema,
 	ResolvedDomainSelectorSchema,
@@ -49,16 +46,18 @@ const DurationMultiplierSchema = z
 		message: "Duration multiplier must change timing; 1 is a no-op.",
 	});
 
-const GameLineEffectDistanceBandSchema = z
+export const GameNearbyDistanceSchema = z.enum([
+	"neighbour",
+	"near",
+	"any",
+]);
+
+export const GameLineEffectNearbyDistanceMultiplierSchema = z
 	.object({
-		minDistance: NonNegativeIntegerSchema.default(0),
-		maxDistance: NonNegativeIntegerSchema.optional(),
+		distance: GameNearbyDistanceSchema,
 		multiplier: z.number().min(0),
 	})
-	.strict()
-	.refine((value) => value.maxDistance === undefined || value.maxDistance >= value.minDistance, {
-		message: "maxDistance must be >= minDistance",
-	});
+	.strict();
 
 export const GameNearbyItemSelectorSchema = z
 	.object({
@@ -103,7 +102,7 @@ export const createGameLineEffectMemberSchemas = <
 			.object({
 				kind: z.literal("nearby.require"),
 				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
+				distance: GameNearbyDistanceSchema,
 				phase: GameLineEffectPhaseSchema,
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),
@@ -114,7 +113,7 @@ export const createGameLineEffectMemberSchemas = <
 			.object({
 				kind: z.literal("nearby.capacity.spend"),
 				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
+				distance: GameNearbyDistanceSchema,
 				amount: PositiveIntegerSchema.default(1),
 				selection: GameNearbyCapacitySelectionSchema,
 				display: GameLineEffectDisplaySchema,
@@ -126,8 +125,7 @@ export const createGameLineEffectMemberSchemas = <
 			.object({
 				kind: z.literal("nearby.duration.multiply"),
 				...itemSelectorSchema.shape,
-				radius: NonNegativeIntegerSchema,
-				bands: z.array(GameLineEffectDistanceBandSchema).min(1),
+				bands: z.array(GameLineEffectNearbyDistanceMultiplierSchema).min(1),
 				maxSources: PositiveIntegerSchema.optional(),
 				display: GameLineEffectDisplaySchema,
 				label: z.string().min(1).optional(),

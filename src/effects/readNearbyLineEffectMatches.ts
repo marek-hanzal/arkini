@@ -1,18 +1,19 @@
 import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readChebyshevDistance } from "~/effects/readChebyshevDistance";
+import { doesNearbyDistanceMatch, readNearbyDistanceBucket } from "~/effects/readNearbyDistance";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import type { DropEffect, RuntimeItemSelector } from "~/effects/RuntimeLineEffectTypes";
 import { doesResolvedDomainSelectorMatchId } from "~/selector/doesResolvedDomainSelectorMatchId";
 
 export const readNearbyLineEffectMatches = ({
 	items,
-	radius,
+	nearbyDistance,
 	save,
 	targetCell,
 }: {
 	items: RuntimeItemSelector;
-	radius: number;
+	nearbyDistance: Parameters<typeof doesNearbyDistanceMatch>[0]["nearbyDistance"];
 	save: GameSave;
 	targetCell?: BoardCell;
 }) => {
@@ -36,7 +37,7 @@ export const readNearbyLineEffectMatches = ({
 				return [];
 			}
 			const distance = readChebyshevDistance(cell, targetCell);
-			if (distance > radius) return [];
+			if (!doesNearbyDistanceMatch({ distance, nearbyDistance })) return [];
 			return [
 				{
 					distance,
@@ -61,9 +62,7 @@ export const readNearbyDurationMultiplier = ({
 		}
 	>["bands"];
 	distance: number;
-}) =>
-	bands.find(
-		(band) =>
-			distance >= band.minDistance &&
-			(band.maxDistance === undefined || distance <= band.maxDistance),
-	)?.multiplier;
+}) => {
+	const bucket = readNearbyDistanceBucket(distance);
+	return bands.find((band) => band.distance === bucket)?.multiplier;
+};

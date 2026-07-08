@@ -637,10 +637,9 @@ describe("GameConfigSchema", () => {
 						},
 					],
 				},
-				radius: 1,
 				bands: [
 					{
-						minDistance: 0,
+						distance: "neighbour",
 						multiplier: 1,
 					},
 				],
@@ -691,7 +690,7 @@ describe("GameConfigSchema", () => {
 				},
 				kind: "nearby.require",
 				phase: "start",
-				radius: 1,
+				distance: "neighbour",
 			},
 		];
 
@@ -704,8 +703,7 @@ describe("GameConfigSchema", () => {
 			{
 				bands: [
 					{
-						maxDistance: 1,
-						minDistance: 0,
+						distance: "neighbour",
 						multiplier: 0.5,
 					},
 				],
@@ -720,7 +718,6 @@ describe("GameConfigSchema", () => {
 					],
 				},
 				kind: "nearby.duration.multiply",
-				radius: 1,
 			},
 		];
 
@@ -1250,7 +1247,7 @@ describe("GameConfigSchema", () => {
 					],
 				},
 				kind: "nearby.capacity.spend",
-				radius: 1,
+				distance: "neighbour",
 			},
 		];
 
@@ -1288,7 +1285,7 @@ describe("GameConfigSchema", () => {
 						],
 					},
 					kind: "nearby.capacity.spend",
-					radius: 1,
+					distance: "neighbour",
 				},
 			],
 			id: "line:gated-future",
@@ -1331,7 +1328,7 @@ describe("GameConfigSchema", () => {
 				},
 				kind: "nearby.require",
 				phase: "start",
-				radius: 1,
+				distance: "neighbour",
 			},
 		];
 

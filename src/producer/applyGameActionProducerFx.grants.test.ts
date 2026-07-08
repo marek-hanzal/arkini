@@ -18,7 +18,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 1,
+			distance: "neighbour",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,
@@ -80,7 +80,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 2,
+			distance: "near",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,
@@ -205,7 +205,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 1,
+			distance: "neighbour",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,
@@ -380,7 +380,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 1,
+			distance: "neighbour",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,
@@ -543,7 +543,7 @@ describe("applyGameActionFx Producer grants", () => {
 											kind: "nearby.require",
 											label: "Nearby Axe Unlocks Drop",
 											phase: "start",
-											radius: 1,
+											distance: "neighbour",
 										},
 									],
 									itemId: "item:twig",
@@ -642,7 +642,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 1,
+			distance: "neighbour",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,
@@ -748,7 +748,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 2,
+			distance: "near",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,
@@ -815,7 +815,7 @@ describe("applyGameActionFx Producer grants", () => {
 			lineIds: [
 				"line:test",
 			],
-			radius: 1,
+			distance: "neighbour",
 		});
 		const config = createEngineTestConfig({
 			...grantConfig,

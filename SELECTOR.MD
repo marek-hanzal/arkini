@@ -187,7 +187,7 @@ Nearby rules use an `items` selector. These are item-domain selectors and can us
 {
   "kind": "nearby.require",
   "items": { "anyOf": [{ "tag": "tree" }] },
-  "radius": 2,
+  "distance": "near",
   "phase": "start",
   "display": "whenMissing"
 }
@@ -200,7 +200,7 @@ Used by rules such as:
 - `nearby.duration.multiply`
 - `nearby.loot.outputChance.add.sources[].items`
 
-Nearby distance and selection semantics belong to the individual effect kind. The selector only answers which item definitions are eligible before board position/capacity/radius logic runs.
+Nearby distance and selection semantics belong to the individual effect kind. The selector only answers which item definitions are eligible before board position/capacity/distance-bucket logic runs.
 
 ### Grant selectors
 

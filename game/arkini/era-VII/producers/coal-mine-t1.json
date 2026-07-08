@@ -1,106 +1,106 @@
 {
-	"$schema": "../../../arkini.schema.json",
-	"items": {
-		"producer:coal-mine-t1": {
-			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
-			"effects": [
-				{
-					"grants": [
-						{
-							"id": "grant:owned:producer:coal-mine-t1",
-							"name": "Owns Coal Mine I"
-						}
-					],
-					"id": "effect:grant-owned:producer-coal-mine-t1",
-					"name": "Owned Coal Mine I grant",
-					"polarity": "neutral",
-					"sourceScope": "both"
-				}
-			],
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"name": "Coal Mine I",
-			"producer": {
-				"lines": [
-					{
-						"durationMs": 50000,
-						"id": "line:coal-mine-t1:coal",
-						"inputs": [
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:bread",
-								"quantity": 2
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:water"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:common-clothing"
-							}
-						],
-						"output": [
-							{
-								"entries": [
-									{
-										"effects": [
-											{
-												"chance": 0.1,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											},
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"item:coal-deposit"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby item:coal-deposit",
-												"phase": "start",
-												"radius": 2
-											}
-										],
-										"itemId": "item:coal",
-										"quantity": 2,
-										"type": "guaranteed"
-									}
-								]
-							}
-						],
-						"visibility": "visible"
-					}
-				]
-			},
-			"tags": [
-				"producer",
-				"industry",
-				"mine",
-				"coal",
-				"era:VII",
-				"unique"
-			],
-			"tier": 7
-		}
-	}
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:coal-mine-t1": {
+      "description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
+      "effects": [
+        {
+          "grants": [
+            {
+              "id": "grant:owned:producer:coal-mine-t1",
+              "name": "Owns Coal Mine I"
+            }
+          ],
+          "id": "effect:grant-owned:producer-coal-mine-t1",
+          "name": "Owned Coal Mine I grant",
+          "polarity": "neutral",
+          "sourceScope": "both"
+        }
+      ],
+      "maxCount": 1,
+      "maxStackSize": 1,
+      "name": "Coal Mine I",
+      "producer": {
+        "lines": [
+          {
+            "durationMs": 50000,
+            "id": "line:coal-mine-t1:coal",
+            "inputs": [
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:bread",
+                "quantity": 2
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:water"
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:common-clothing"
+              }
+            ],
+            "output": [
+              {
+                "entries": [
+                  {
+                    "effects": [
+                      {
+                        "chance": 0.1,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "item:coal-deposit"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby item:coal-deposit",
+                        "phase": "start",
+                        "distance": "near"
+                      }
+                    ],
+                    "itemId": "item:coal",
+                    "quantity": 2,
+                    "type": "guaranteed"
+                  }
+                ]
+              }
+            ],
+            "visibility": "visible"
+          }
+        ]
+      },
+      "tags": [
+        "producer",
+        "industry",
+        "mine",
+        "coal",
+        "era:VII",
+        "unique"
+      ],
+      "tier": 7
+    }
+  }
 }

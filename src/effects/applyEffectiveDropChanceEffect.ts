@@ -34,7 +34,7 @@ export const applyNearbyLootChanceDropEffect = ({
 	for (const [sourceIndex, source] of effect.sources.entries()) {
 		const matches = readNearbyLineEffectMatches({
 			items: source.items as RuntimeItemSelector,
-			radius: effect.radius,
+			nearbyDistance: effect.distance,
 			save,
 			targetCell,
 		});

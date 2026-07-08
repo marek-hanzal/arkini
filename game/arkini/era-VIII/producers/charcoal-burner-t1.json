@@ -1,182 +1,182 @@
 {
-	"$schema": "../../../arkini.schema.json",
-	"items": {
-		"producer:charcoal-burner-t1": {
-			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
-			"effects": [
-				{
-					"grants": [
-						{
-							"id": "grant:owned:producer:charcoal-burner-t1",
-							"name": "Owns Charcoal Burner I"
-						}
-					],
-					"id": "effect:grant-owned:producer-charcoal-burner-t1",
-					"name": "Owned Charcoal Burner I grant",
-					"polarity": "neutral",
-					"sourceScope": "both"
-				}
-			],
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"name": "Charcoal Burner I",
-			"producer": {
-				"lines": [
-					{
-						"durationMs": 20000,
-						"id": "line:charcoal-burner-t1:charcoal",
-						"inputs": [
-							{
-								"capacity": 8,
-								"consume": true,
-								"itemId": "item:log",
-								"quantity": 2
-							}
-						],
-						"output": [
-							{
-								"entries": [
-									{
-										"effects": [
-											{
-												"chance": 0.12,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											},
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:charcoal",
-										"quantity": 3,
-										"type": "guaranteed"
-									},
-									{
-										"chance": 0.3,
-										"effects": [
-											{
-												"chance": 0.12,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											},
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:charcoal",
-										"type": "chance"
-									},
-									{
-										"chance": 0.35,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									},
-									{
-										"chance": 0.08,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									}
-								]
-							}
-						],
-						"visibility": "visible"
-					}
-				]
-			},
-			"tags": [
-				"building",
-				"producer",
-				"construction",
-				"fuel",
-				"era:VIII",
-				"industry",
-				"unique"
-			],
-			"tier": 6
-		}
-	}
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:charcoal-burner-t1": {
+      "description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
+      "effects": [
+        {
+          "grants": [
+            {
+              "id": "grant:owned:producer:charcoal-burner-t1",
+              "name": "Owns Charcoal Burner I"
+            }
+          ],
+          "id": "effect:grant-owned:producer-charcoal-burner-t1",
+          "name": "Owned Charcoal Burner I grant",
+          "polarity": "neutral",
+          "sourceScope": "both"
+        }
+      ],
+      "maxCount": 1,
+      "maxStackSize": 1,
+      "name": "Charcoal Burner I",
+      "producer": {
+        "lines": [
+          {
+            "durationMs": 20000,
+            "id": "line:charcoal-burner-t1:charcoal",
+            "inputs": [
+              {
+                "capacity": 8,
+                "consume": true,
+                "itemId": "item:log",
+                "quantity": 2
+              }
+            ],
+            "output": [
+              {
+                "entries": [
+                  {
+                    "effects": [
+                      {
+                        "chance": 0.12,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:charcoal",
+                    "quantity": 3,
+                    "type": "guaranteed"
+                  },
+                  {
+                    "chance": 0.3,
+                    "effects": [
+                      {
+                        "chance": 0.12,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:charcoal",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.35,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.08,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  }
+                ]
+              }
+            ],
+            "visibility": "visible"
+          }
+        ]
+      },
+      "tags": [
+        "building",
+        "producer",
+        "construction",
+        "fuel",
+        "era:VIII",
+        "industry",
+        "unique"
+      ],
+      "tier": 6
+    }
+  }
 }

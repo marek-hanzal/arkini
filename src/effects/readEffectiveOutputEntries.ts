@@ -55,7 +55,7 @@ const readOutputDurationEffects = ({
 		if (effect.kind === "nearby.duration.multiply") {
 			const matches = readNearbyLineEffectMatches({
 				items: effect.items as RuntimeItemSelector,
-				radius: effect.radius,
+				nearbyDistance: effect.distance,
 				save,
 				targetCell,
 			}).slice(0, effect.maxSources ?? Number.POSITIVE_INFINITY);

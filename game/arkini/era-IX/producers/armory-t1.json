@@ -1,174 +1,174 @@
 {
-	"$schema": "../../../arkini.schema.json",
-	"items": {
-		"producer:armory-t1": {
-			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
-			"effects": [
-				{
-					"grants": [
-						{
-							"id": "grant:owned:producer:armory-t1",
-							"name": "Owns Armory I"
-						}
-					],
-					"id": "effect:grant-owned:producer-armory-t1",
-					"name": "Owned Armory I grant",
-					"polarity": "neutral",
-					"sourceScope": "both"
-				}
-			],
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"name": "Armory I",
-			"producer": {
-				"lines": [
-					{
-						"durationMs": 30000,
-						"id": "line:armory-t1:leather-armor",
-						"inputs": [
-							{
-								"capacity": 8,
-								"consume": true,
-								"itemId": "item:leather",
-								"quantity": 2
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:common-clothing"
-							},
-							{
-								"capacity": 8,
-								"consume": true,
-								"itemId": "item:nails"
-							}
-						],
-						"output": [
-							{
-								"entries": [
-									{
-										"itemId": "item:leather-armor",
-										"type": "guaranteed"
-									}
-								]
-							}
-						]
-					},
-					{
-						"durationMs": 42000,
-						"id": "line:armory-t1:iron-armor",
-						"inputs": [
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:leather-armor"
-							},
-							{
-								"capacity": 8,
-								"consume": true,
-								"itemId": "item:iron-ingot",
-								"quantity": 2
-							},
-							{
-								"capacity": 8,
-								"consume": true,
-								"itemId": "item:nails",
-								"quantity": 2
-							},
-							{
-								"capacity": 6,
-								"consume": true,
-								"itemId": "item:charcoal"
-							}
-						],
-						"output": [
-							{
-								"entries": [
-									{
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:iron-armor",
-										"type": "guaranteed"
-									},
-									{
-										"chance": 0.45,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									},
-									{
-										"chance": 0.1,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									}
-								]
-							}
-						],
-						"visibility": "visible"
-					}
-				]
-			},
-			"tags": [
-				"producer",
-				"armory",
-				"equipment",
-				"armor",
-				"guild",
-				"era:IX",
-				"unique"
-			],
-			"tier": 9
-		}
-	}
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:armory-t1": {
+      "description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+      "effects": [
+        {
+          "grants": [
+            {
+              "id": "grant:owned:producer:armory-t1",
+              "name": "Owns Armory I"
+            }
+          ],
+          "id": "effect:grant-owned:producer-armory-t1",
+          "name": "Owned Armory I grant",
+          "polarity": "neutral",
+          "sourceScope": "both"
+        }
+      ],
+      "maxCount": 1,
+      "maxStackSize": 1,
+      "name": "Armory I",
+      "producer": {
+        "lines": [
+          {
+            "durationMs": 30000,
+            "id": "line:armory-t1:leather-armor",
+            "inputs": [
+              {
+                "capacity": 8,
+                "consume": true,
+                "itemId": "item:leather",
+                "quantity": 2
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:common-clothing"
+              },
+              {
+                "capacity": 8,
+                "consume": true,
+                "itemId": "item:nails"
+              }
+            ],
+            "output": [
+              {
+                "entries": [
+                  {
+                    "itemId": "item:leather-armor",
+                    "type": "guaranteed"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "durationMs": 42000,
+            "id": "line:armory-t1:iron-armor",
+            "inputs": [
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:leather-armor"
+              },
+              {
+                "capacity": 8,
+                "consume": true,
+                "itemId": "item:iron-ingot",
+                "quantity": 2
+              },
+              {
+                "capacity": 8,
+                "consume": true,
+                "itemId": "item:nails",
+                "quantity": 2
+              },
+              {
+                "capacity": 6,
+                "consume": true,
+                "itemId": "item:charcoal"
+              }
+            ],
+            "output": [
+              {
+                "entries": [
+                  {
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:iron-armor",
+                    "type": "guaranteed"
+                  },
+                  {
+                    "chance": 0.45,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.1,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  }
+                ]
+              }
+            ],
+            "visibility": "visible"
+          }
+        ]
+      },
+      "tags": [
+        "producer",
+        "armory",
+        "equipment",
+        "armor",
+        "guild",
+        "era:IX",
+        "unique"
+      ],
+      "tier": 9
+    }
+  }
 }

@@ -1,266 +1,266 @@
 {
-	"$schema": "../../../arkini.schema.json",
-	"items": {
-		"producer:smelter-t1": {
-			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
-			"effects": [
-				{
-					"grants": [
-						{
-							"id": "grant:owned:producer:smelter-t1",
-							"name": "Owns Smelter I"
-						}
-					],
-					"id": "effect:grant-owned:producer-smelter-t1",
-					"name": "Owned Smelter I grant",
-					"polarity": "neutral",
-					"sourceScope": "both"
-				}
-			],
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"name": "Smelter I",
-			"producer": {
-				"lines": [
-					{
-						"durationMs": 36000,
-						"id": "line:smelter-t1:iron-ingot",
-						"inputs": [
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:iron-ore",
-								"quantity": 2
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:coal"
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:water"
-							}
-						],
-						"output": [
-							{
-								"entries": [
-									{
-										"effects": [
-											{
-												"chance": 0.1,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											},
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:iron-ingot",
-										"quantity": 2,
-										"type": "guaranteed"
-									},
-									{
-										"chance": 0.75,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									},
-									{
-										"chance": 0.3,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									}
-								]
-							}
-						],
-						"visibility": "visible"
-					},
-					{
-						"durationMs": 48000,
-						"id": "line:smelter-t1:gold-ingot",
-						"inputs": [
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:gold-ore",
-								"quantity": 2
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:coal",
-								"quantity": 2
-							},
-							{
-								"capacity": 4,
-								"consume": true,
-								"itemId": "item:water"
-							}
-						],
-						"output": [
-							{
-								"entries": [
-									{
-										"effects": [
-											{
-												"chance": 0.1,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											},
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:gold-ingot",
-										"quantity": 2,
-										"type": "guaranteed"
-									},
-									{
-										"chance": 0.75,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									},
-									{
-										"chance": 0.3,
-										"effects": [
-											{
-												"display": "always",
-												"items": {
-													"anyOf": [
-														{
-															"ids": [
-																"producer:purifier-t1"
-															]
-														}
-													]
-												},
-												"kind": "nearby.require",
-												"label": "Nearby producer:purifier-t1",
-												"phase": "start",
-												"radius": 3
-											}
-										],
-										"itemId": "item:pollution",
-										"type": "chance"
-									}
-								]
-							}
-						],
-						"visibility": "visible"
-					}
-				]
-			},
-			"tags": [
-				"producer",
-				"industry",
-				"smelter",
-				"era:VIII",
-				"unique"
-			],
-			"tier": 7
-		}
-	}
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:smelter-t1": {
+      "description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
+      "effects": [
+        {
+          "grants": [
+            {
+              "id": "grant:owned:producer:smelter-t1",
+              "name": "Owns Smelter I"
+            }
+          ],
+          "id": "effect:grant-owned:producer-smelter-t1",
+          "name": "Owned Smelter I grant",
+          "polarity": "neutral",
+          "sourceScope": "both"
+        }
+      ],
+      "maxCount": 1,
+      "maxStackSize": 1,
+      "name": "Smelter I",
+      "producer": {
+        "lines": [
+          {
+            "durationMs": 36000,
+            "id": "line:smelter-t1:iron-ingot",
+            "inputs": [
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:iron-ore",
+                "quantity": 2
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:coal"
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:water"
+              }
+            ],
+            "output": [
+              {
+                "entries": [
+                  {
+                    "effects": [
+                      {
+                        "chance": 0.1,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:iron-ingot",
+                    "quantity": 2,
+                    "type": "guaranteed"
+                  },
+                  {
+                    "chance": 0.75,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.3,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  }
+                ]
+              }
+            ],
+            "visibility": "visible"
+          },
+          {
+            "durationMs": 48000,
+            "id": "line:smelter-t1:gold-ingot",
+            "inputs": [
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:gold-ore",
+                "quantity": 2
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:coal",
+                "quantity": 2
+              },
+              {
+                "capacity": 4,
+                "consume": true,
+                "itemId": "item:water"
+              }
+            ],
+            "output": [
+              {
+                "entries": [
+                  {
+                    "effects": [
+                      {
+                        "chance": 0.1,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:gold-ingot",
+                    "quantity": 2,
+                    "type": "guaranteed"
+                  },
+                  {
+                    "chance": 0.75,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.3,
+                    "effects": [
+                      {
+                        "display": "always",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "ids": [
+                                "producer:purifier-t1"
+                              ]
+                            }
+                          ]
+                        },
+                        "kind": "nearby.require",
+                        "label": "Nearby producer:purifier-t1",
+                        "phase": "start",
+                        "distance": "any"
+                      }
+                    ],
+                    "itemId": "item:pollution",
+                    "type": "chance"
+                  }
+                ]
+              }
+            ],
+            "visibility": "visible"
+          }
+        ]
+      },
+      "tags": [
+        "producer",
+        "industry",
+        "smelter",
+        "era:VIII",
+        "unique"
+      ],
+      "tier": 7
+    }
+  }
 }

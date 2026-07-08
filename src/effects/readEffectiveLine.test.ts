@@ -378,7 +378,7 @@ describe("readEffectiveLine", () => {
 		]);
 	});
 
-	it("evaluates nearby requirements and exact distance bands from the line", () => {
+	it("evaluates nearby requirements and simplified nearby distance buckets from the line", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({
 			game: {
@@ -405,25 +405,23 @@ describe("readEffectiveLine", () => {
 											kind: "nearby.require",
 											label: "Nearby Twig",
 											phase: "start",
-											radius: 1,
+											distance: "neighbour",
 										},
 										{
 											bands: [
 												{
-													maxDistance: 1,
-													minDistance: 0,
+													distance: "neighbour",
 													multiplier: 2,
 												},
 												{
-													minDistance: 2,
+													distance: "near",
 													multiplier: 3,
 												},
-											],
+												],
 											display: "whenActive",
 											items: anyOfItem("item:axe"),
 											kind: "nearby.duration.multiply",
 											label: "Nearby Axe Slowdown",
-											radius: 2,
 										},
 									],
 								},
@@ -663,17 +661,23 @@ describe("readEffectiveLine", () => {
 										{
 											bands: [
 												{
-													maxDistance: 3,
-													minDistance: 0,
+													distance: "neighbour",
 													multiplier: 0.5,
 												},
-											],
+												{
+													distance: "near",
+													multiplier: 0.5,
+												},
+												{
+													distance: "any",
+													multiplier: 0.5,
+												},
+												],
 											display: "whenActive",
 											items: anyOfItem("item:axe"),
 											kind: "nearby.duration.multiply",
 											label: "Nearby Axe Haste",
 											maxSources: 2,
-											radius: 3,
 										},
 									],
 								},
@@ -949,7 +953,7 @@ describe("readEffectiveLine", () => {
 											kind: "nearby.loot.outputChance.add",
 											label: "Nearby wood sources",
 											quantity: 1,
-											radius: 2,
+											distance: "near",
 											sources: [
 												{
 													chance: 0.5,

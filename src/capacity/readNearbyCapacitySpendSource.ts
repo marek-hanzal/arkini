@@ -2,10 +2,11 @@ import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
+import { readItemCapacityState } from "~/capacity/readItemCapacityState";
 import { readChebyshevDistance } from "~/effects/readChebyshevDistance";
+import { doesNearbyDistanceMatch } from "~/effects/readNearbyDistance";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { doesResolvedDomainSelectorMatchId } from "~/selector/doesResolvedDomainSelectorMatchId";
-import { readItemCapacityState } from "~/capacity/readItemCapacityState";
 
 type LineEffect = NonNullable<GameLineDefinition["effects"]>[number];
 export type NearbyCapacitySpendEffect = Extract<
@@ -67,7 +68,7 @@ export const readNearbyCapacitySpendSource = ({
 			if (!cell) return [];
 
 			const distance = readChebyshevDistance(cell, targetCell);
-			if (distance > effect.radius) return [];
+			if (!doesNearbyDistanceMatch({ distance, nearbyDistance: effect.distance })) return [];
 
 			return [
 				{

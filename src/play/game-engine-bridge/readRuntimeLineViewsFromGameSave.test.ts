@@ -533,8 +533,7 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 					{
 						bands: [
 							{
-								maxDistance: 1,
-								minDistance: 0,
+								distance: "neighbour",
 								multiplier: 0.9,
 							},
 						],
@@ -542,7 +541,6 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 						items: anyOfItem("item:axe"),
 						kind: "nearby.duration.multiply",
 						label: "Nearby item:axe enables production",
-						radius: 1,
 					},
 				]),
 			},

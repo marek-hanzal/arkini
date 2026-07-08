@@ -1,155 +1,155 @@
 {
-	"$schema": "../../../arkini.schema.json",
-	"items": {
-		"producer:quarry-t1": {
-			"description": "Produces stone when placed near a rock.",
-			"effects": [
-				{
-					"grants": [
-						{
-							"id": "grant:owned:producer:quarry-t1",
-							"name": "Owns Quarry I"
-						}
-					],
-					"id": "effect:grant-owned:producer-quarry-t1",
-					"name": "Owned Quarry I grant",
-					"polarity": "neutral",
-					"sourceScope": "both"
-				}
-			],
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"name": "Quarry I",
-			"producer": {
-				"lines": [
-					{
-						"durationMs": 8000,
-						"id": "line:quarry-t1:stone",
-						"output": [
-							{
-								"entries": [
-									{
-										"effects": [
-											{
-												"chance": 0.35,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											},
-											{
-												"display": "whenActive",
-												"kind": "grant.duration.multiply",
-												"label": "Minor Haste",
-												"multiplier": 0.75,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-minor-haste"
-															]
-														}
-													]
-												}
-											}
-										],
-										"itemId": "item:stone",
-										"type": "guaranteed"
-									},
-									{
-										"chance": 0.4,
-										"effects": [
-											{
-												"chance": 0.35,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											}
-										],
-										"itemId": "item:stone",
-										"type": "chance"
-									},
-									{
-										"chance": 0.15,
-										"effects": [
-											{
-												"chance": 0.35,
-												"display": "whenActive",
-												"kind": "grant.loot.extraOutputChance.add",
-												"label": "Bountiful Offering",
-												"quantity": 1,
-												"selector": {
-													"allOf": [
-														{
-															"ids": [
-																"grant:active:shrine-bountiful-offering"
-															]
-														}
-													]
-												}
-											}
-										],
-										"itemId": "item:stone",
-										"type": "chance"
-									},
-									{
-										"chance": 0.1,
-										"itemId": "item:quest:road-repair",
-										"sort": 900,
-										"type": "chance"
-									}
-								]
-							}
-						],
-						"tags": [
-							"shrine:haste-target"
-						],
-						"visibility": "visible",
-						"effects": [
-							{
-								"display": "always",
-								"items": {
-									"anyOf": [
-										{
-											"id": "item:rock"
-										}
-									]
-								},
-								"kind": "nearby.capacity.spend",
-								"label": "Nearby stone deposit capacity",
-								"amount": 1,
-								"radius": 2
-							}
-						]
-					}
-				]
-			},
-			"tags": [
-				"producer",
-				"stone",
-				"era:I",
-				"unique"
-			],
-			"tier": 1
-		}
-	}
+  "$schema": "../../../arkini.schema.json",
+  "items": {
+    "producer:quarry-t1": {
+      "description": "Produces stone when placed near a rock.",
+      "effects": [
+        {
+          "grants": [
+            {
+              "id": "grant:owned:producer:quarry-t1",
+              "name": "Owns Quarry I"
+            }
+          ],
+          "id": "effect:grant-owned:producer-quarry-t1",
+          "name": "Owned Quarry I grant",
+          "polarity": "neutral",
+          "sourceScope": "both"
+        }
+      ],
+      "maxCount": 1,
+      "maxStackSize": 1,
+      "name": "Quarry I",
+      "producer": {
+        "lines": [
+          {
+            "durationMs": 8000,
+            "id": "line:quarry-t1:stone",
+            "output": [
+              {
+                "entries": [
+                  {
+                    "effects": [
+                      {
+                        "chance": 0.35,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "display": "whenActive",
+                        "kind": "grant.duration.multiply",
+                        "label": "Minor Haste",
+                        "multiplier": 0.75,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-minor-haste"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "itemId": "item:stone",
+                    "type": "guaranteed"
+                  },
+                  {
+                    "chance": 0.4,
+                    "effects": [
+                      {
+                        "chance": 0.35,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "itemId": "item:stone",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.15,
+                    "effects": [
+                      {
+                        "chance": 0.35,
+                        "display": "whenActive",
+                        "kind": "grant.loot.extraOutputChance.add",
+                        "label": "Bountiful Offering",
+                        "quantity": 1,
+                        "selector": {
+                          "allOf": [
+                            {
+                              "ids": [
+                                "grant:active:shrine-bountiful-offering"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "itemId": "item:stone",
+                    "type": "chance"
+                  },
+                  {
+                    "chance": 0.1,
+                    "itemId": "item:quest:road-repair",
+                    "sort": 900,
+                    "type": "chance"
+                  }
+                ]
+              }
+            ],
+            "tags": [
+              "shrine:haste-target"
+            ],
+            "visibility": "visible",
+            "effects": [
+              {
+                "display": "always",
+                "items": {
+                  "anyOf": [
+                    {
+                      "id": "item:rock"
+                    }
+                  ]
+                },
+                "kind": "nearby.capacity.spend",
+                "label": "Nearby stone deposit capacity",
+                "amount": 1,
+                "distance": "near"
+              }
+            ]
+          }
+        ]
+      },
+      "tags": [
+        "producer",
+        "stone",
+        "era:I",
+        "unique"
+      ],
+      "tier": 1
+    }
+  }
 }

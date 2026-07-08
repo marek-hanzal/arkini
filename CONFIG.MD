@@ -147,7 +147,7 @@ A producer item owns its `producer` capability. The line below spends nearby woo
                 // Item selector refs are documented in SELECTOR.MD.
                 // This matches any nearby item tagged wood-source.
                 "items": { "anyOf": [{ "tag": "wood-source" }] },
-                "radius": 2,
+                "distance": "near",
                 "amount": 1
               }
             ],
@@ -170,7 +170,7 @@ A producer item owns its `producer` capability. The line below spends nearby woo
                         "kind": "nearby.loot.outputChance.add",
                         "display": "always",
                         "label": "Nearby wood source drop chance",
-                        "radius": 2,
+                        "distance": "near",
                         "quantity": 1,
                         "sources": [
                           {
@@ -595,17 +595,17 @@ Supported output-owned effect kinds:
 ```json
 { "kind": "grant.require", "phase": "visibility", "display": "always", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
 { "kind": "grant.require", "phase": "start", "display": "always", "selector": { "allOf": [{ "id": "grant:tooling:advanced" }] } }
-{ "kind": "nearby.require", "phase": "start", "display": "whenMissing", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 2 }
-{ "kind": "nearby.capacity.spend", "display": "always", "items": { "anyOf": [{ "tag": "wood-source" }] }, "radius": 2, "amount": 1, "selection": "nearest" }
+{ "kind": "nearby.require", "phase": "start", "display": "whenMissing", "items": { "anyOf": [{ "tag": "tree" }] }, "distance": "near" }
+{ "kind": "nearby.capacity.spend", "display": "always", "items": { "anyOf": [{ "tag": "wood-source" }] }, "distance": "near", "amount": 1, "selection": "nearest" }
 { "kind": "grant.blockStart", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
-{ "kind": "nearby.duration.multiply", "display": "whenActive", "items": { "anyOf": [{ "tag": "tree" }] }, "radius": 3, "maxSources": 5, "bands": [{ "minDistance": 0, "maxDistance": 3, "multiplier": 0.9 }] }
+{ "kind": "nearby.duration.multiply", "display": "whenActive", "items": { "anyOf": [{ "tag": "tree" }] }, "distance": "any", "maxSources": 5, "bands": [{ "distance": "neighbour", "multiplier": 0.9 }, { "distance": "near", "multiplier": 0.9 }, { "distance": "any", "multiplier": 0.9 }] }
 { "kind": "grant.duration.multiply", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:minor-haste" }] }, "multiplier": 0.75 }
 { "kind": "grant.drop.hide", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:faith" }] } }
 { "kind": "grant.drop.show", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:path:engineers" }] } }
 { "kind": "grant.drop.disable", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:polluted" }] } }
 { "kind": "grant.drop.enable", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:purified" }] } }
 { "kind": "grant.loot.extraOutputChance.add", "display": "whenActive", "selector": { "allOf": [{ "id": "grant:shrine:bountiful-offering" }] }, "chance": 0.35, "quantity": 1 }
-{ "kind": "nearby.loot.outputChance.add", "display": "always", "radius": 2, "quantity": 1, "sources": [{ "items": { "anyOf": [{ "tag": "wood-source" }] }, "chance": 0.5, "label": "Wood source" }] }
+{ "kind": "nearby.loot.outputChance.add", "display": "always", "distance": "near", "quantity": 1, "sources": [{ "items": { "anyOf": [{ "tag": "wood-source" }] }, "chance": 0.5, "label": "Wood source" }] }
 ```
 
 `phase: "visibility"` means the drop is completely absent when the condition fails. Use that for choose-the-path content where the player should not even see the other branch. `phase: "start"`, `grant.blockStart`, and `grant.drop.disable` leave the drop visible but unavailable, so UI can say exactly what is missing or blocking it. If a product has output and every visible output is disabled, runtime rejects the start with `effect:disabled-output`.

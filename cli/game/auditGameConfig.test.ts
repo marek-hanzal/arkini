@@ -158,7 +158,7 @@ const createCapacitySpendEffect = (itemIds: readonly string[]) => ({
 		],
 	},
 	kind: "nearby.capacity.spend",
-	radius: 2,
+	distance: "near",
 });
 
 describe("auditGameConfig", () => {
@@ -211,7 +211,7 @@ describe("auditGameConfig", () => {
 			{
 				bands: [
 					{
-						minDistance: 0,
+						distance: "neighbour",
 						multiplier: 2,
 					},
 				],
@@ -226,7 +226,6 @@ describe("auditGameConfig", () => {
 					],
 				},
 				kind: "nearby.duration.multiply",
-				radius: 1,
 			},
 		];
 

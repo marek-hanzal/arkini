@@ -28,11 +28,10 @@ describe("realtime line effects", () => {
 										{
 											bands: [
 												{
-													maxDistance: 1,
-													minDistance: 0,
+													distance: "neighbour",
 													multiplier: 0.5,
 												},
-											],
+												],
 											display: "whenActive",
 											items: {
 												anyOf: [
@@ -45,7 +44,6 @@ describe("realtime line effects", () => {
 											},
 											kind: "nearby.duration.multiply",
 											label: "Nearby Axe Haste",
-											radius: 1,
 										},
 									],
 								},

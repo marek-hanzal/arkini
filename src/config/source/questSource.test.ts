@@ -37,9 +37,25 @@ describe("quest source config", () => {
 		for (const file of questFiles) {
 			const item = Object.values<any>(readJson(file).items)[0];
 			const inputItemIds = item.craft.inputs.map((input: { itemId: string }) => input.itemId);
+			const outputItemIds = item.craft.output.flatMap(
+				(output: {
+					type: string;
+					itemId?: string;
+					entries?: {
+						itemId: string;
+					}[];
+				}) =>
+					output.type === "weighted"
+						? (output.entries ?? []).map((entry) => entry.itemId)
+						: [
+								output.itemId,
+							],
+			);
 
-			expect(item.craft.resultItemId).not.toMatch(/^item:blueprint-/);
-			expect(inputItemIds).not.toContain(item.craft.resultItemId);
+			for (const outputItemId of outputItemIds) {
+				expect(outputItemId).not.toMatch(/^item:blueprint-/);
+				expect(inputItemIds).not.toContain(outputItemId);
+			}
 		}
 	});
 

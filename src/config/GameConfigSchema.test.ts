@@ -104,7 +104,13 @@ const createValidConfigValue = () => ({
 						quantity: 1,
 					},
 				],
-				resultItemId: "item:plank",
+				output: [
+					{
+						type: "guaranteed",
+						quantity: 1,
+						itemId: "item:plank",
+					},
+				],
 			},
 			description: "Craft target",
 			maxStackSize: 1,
@@ -774,7 +780,13 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			resultItemId: "producer:house-t1",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "producer:house-t1",
+				},
+			],
 		});
 
 		expect(() => parseGameConfig(config)).toThrow(/House I Blueprint -> House I Blueprint/);
@@ -831,7 +843,13 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			resultItemId: "producer:a",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "producer:a",
+				},
+			],
 		});
 		setTestCraft(config, "item:blueprint-b", {
 			durationMs: 1000,
@@ -842,7 +860,13 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			resultItemId: "producer:b",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "producer:b",
+				},
+			],
 		});
 
 		expect(() => parseGameConfig(config)).toThrow(/Blueprint A -> Blueprint B -> Blueprint A/);
@@ -879,7 +903,13 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			resultItemId: "producer:a",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "producer:a",
+				},
+			],
 		});
 		setTestProducer(config, "producer:a", {
 			maxQueueSize: 1,
@@ -1007,7 +1037,13 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			resultItemId: "producer:a",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "producer:a",
+				},
+			],
 		});
 		setTestCraft(config, "item:blueprint-b", {
 			durationMs: 1000,
@@ -1018,7 +1054,13 @@ describe("GameConfigSchema", () => {
 					quantity: 1,
 				},
 			],
-			resultItemId: "producer:b",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "producer:b",
+				},
+			],
 		});
 		setTestProducer(config, "producer:a", {
 			maxQueueSize: 1,
@@ -1350,109 +1392,5 @@ describe("GameConfigSchema", () => {
 		readTestLine(config, "line:test").output = [];
 
 		expect(() => parseGameConfig(config)).toThrow(/Too small/);
-	});
-	it("allows quest craft targets with modest non-blueprint rewards", () => {
-		const config: any = createValidConfigValue();
-		config.items["item:quest:test"] = {
-			assetIds: [
-				"asset:item",
-			],
-			craft: {
-				durationMs: 1000,
-				inputs: [
-					{
-						consume: true,
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
-				resultItemId: "item:plank",
-			},
-			description: "Quest",
-			maxStackSize: 1,
-			name: "Quest",
-			storage: "both",
-			tags: [
-				"quest",
-				"craft-target",
-			],
-			tier: 0,
-		};
-
-		expect(() => parseGameConfig(config)).not.toThrow();
-	});
-
-	it("rejects quest rewards that hand out blueprints", () => {
-		const config: any = createValidConfigValue();
-		config.items["item:blueprint-test"] = {
-			assetIds: [
-				"asset:item",
-			],
-			description: "Blueprint",
-			maxStackSize: 1,
-			name: "Blueprint",
-			tags: [
-				"blueprint",
-			],
-			tier: 0,
-		};
-		config.items["item:quest:test"] = {
-			assetIds: [
-				"asset:item",
-			],
-			craft: {
-				durationMs: 1000,
-				inputs: [
-					{
-						consume: true,
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
-				resultItemId: "item:blueprint-test",
-			},
-			description: "Quest",
-			maxStackSize: 1,
-			name: "Quest",
-			storage: "both",
-			tags: [
-				"quest",
-				"craft-target",
-			],
-			tier: 0,
-		};
-
-		expect(() => parseGameConfig(config)).toThrow(/must not reward blueprint/);
-	});
-
-	it("rejects quests that take the same item they reward", () => {
-		const config: any = createValidConfigValue();
-		config.items["item:quest:test"] = {
-			assetIds: [
-				"asset:item",
-			],
-			craft: {
-				durationMs: 1000,
-				inputs: [
-					{
-						consume: true,
-						itemId: "item:twig",
-						quantity: 1,
-					},
-				],
-				resultItemId: "item:twig",
-			},
-			description: "Quest",
-			maxStackSize: 1,
-			name: "Quest",
-			storage: "both",
-			tags: [
-				"quest",
-				"craft-target",
-			],
-			tier: 0,
-		};
-
-		expect(() => parseGameConfig(config)).toThrow(/must not take the same item/);
 	});
 });

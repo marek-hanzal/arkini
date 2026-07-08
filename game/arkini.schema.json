@@ -316,9 +316,6 @@
 					"craft": {
 						"type": "object",
 						"properties": {
-							"resultItemId": {
-								"$ref": "#/$defs/__schema0"
-							},
 							"inputs": {
 								"type": "array",
 								"items": {
@@ -351,12 +348,9 @@
 							"durationMs": {
 								"$ref": "#/$defs/__schema2"
 							},
-							"resultPlacement": {
-								"type": "string",
-								"enum": [
-									"replace-target",
-									"random-board"
-								]
+							"output": {
+								"minItems": 1,
+								"$ref": "#/$defs/__schema36"
 							}
 						},
 						"required": [
@@ -369,13 +363,13 @@
 						"type": "object",
 						"properties": {
 							"maxQueueSize": {
-								"$ref": "#/$defs/__schema30"
+								"$ref": "#/$defs/__schema37"
 							},
 							"lines": {
 								"minItems": 1,
 								"type": "array",
 								"items": {
-									"$ref": "#/$defs/__schema31"
+									"$ref": "#/$defs/__schema38"
 								}
 							},
 							"charges": {
@@ -383,7 +377,7 @@
 							},
 							"onChargesDepleted": {
 								"default": "stop",
-								"$ref": "#/$defs/__schema38"
+								"$ref": "#/$defs/__schema39"
 							}
 						},
 						"required": [
@@ -395,7 +389,7 @@
 						"type": "object",
 						"properties": {
 							"maxQueueSize": {
-								"$ref": "#/$defs/__schema30"
+								"$ref": "#/$defs/__schema37"
 							},
 							"charges": {
 								"default": 1,
@@ -403,10 +397,10 @@
 							},
 							"onChargesDepleted": {
 								"default": "remove",
-								"$ref": "#/$defs/__schema38"
+								"$ref": "#/$defs/__schema39"
 							},
 							"line": {
-								"$ref": "#/$defs/__schema31"
+								"$ref": "#/$defs/__schema38"
 							}
 						},
 						"required": [
@@ -1560,108 +1554,6 @@
 			]
 		},
 		"__schema30": {
-			"default": 1,
-			"$ref": "#/$defs/__schema1"
-		},
-		"__schema31": {
-			"type": "object",
-			"properties": {
-				"id": {
-					"$ref": "#/$defs/__schema0"
-				},
-				"name": {
-					"type": "string",
-					"minLength": 1
-				},
-				"tags": {
-					"default": [],
-					"type": "array",
-					"items": {
-						"type": "string",
-						"minLength": 1
-					}
-				},
-				"visibility": {
-					"default": "visible",
-					"type": "string",
-					"enum": [
-						"visible",
-						"hidden"
-					]
-				},
-				"durationMs": {
-					"$ref": "#/$defs/__schema2"
-				},
-				"placement": {
-					"default": "board_then_inventory",
-					"type": "string",
-					"enum": [
-						"board_then_inventory"
-					]
-				},
-				"chargeCost": {
-					"default": 0,
-					"type": "number",
-					"minimum": 0
-				},
-				"effects": {
-					"type": "array",
-					"items": {
-						"$ref": "#/$defs/__schema27"
-					}
-				},
-				"inputs": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"properties": {
-							"itemId": {
-								"$ref": "#/$defs/__schema0"
-							},
-							"quantity": {
-								"default": 1,
-								"$ref": "#/$defs/__schema1"
-							},
-							"capacity": {
-								"$ref": "#/$defs/__schema1"
-							},
-							"consume": {
-								"type": "boolean"
-							},
-							"mode": {
-								"type": "string",
-								"enum": [
-									"exact",
-									"upTo"
-								]
-							}
-						},
-						"required": [
-							"itemId",
-							"capacity",
-							"consume"
-						],
-						"additionalProperties": false
-					}
-				},
-				"output": {
-					"minItems": 1,
-					"type": "array",
-					"items": {
-						"$ref": "#/$defs/__schema32"
-					}
-				},
-				"effect": {
-					"$ref": "#/$defs/__schema3"
-				}
-			},
-			"required": [
-				"id",
-				"durationMs"
-			],
-			"additionalProperties": false
-		},
-		"__schema32": {
 			"oneOf": [
 				{
 					"type": "object",
@@ -1681,13 +1573,13 @@
 							"$ref": "#/$defs/__schema8"
 						},
 						"enabled": {
-							"$ref": "#/$defs/__schema33"
+							"$ref": "#/$defs/__schema31"
 						},
 						"effects": {
-							"$ref": "#/$defs/__schema34"
+							"$ref": "#/$defs/__schema32"
 						},
 						"visibility": {
-							"$ref": "#/$defs/__schema36"
+							"$ref": "#/$defs/__schema34"
 						}
 					},
 					"required": [
@@ -1719,13 +1611,13 @@
 							"$ref": "#/$defs/__schema8"
 						},
 						"enabled": {
-							"$ref": "#/$defs/__schema33"
+							"$ref": "#/$defs/__schema31"
 						},
 						"effects": {
-							"$ref": "#/$defs/__schema34"
+							"$ref": "#/$defs/__schema32"
 						},
 						"visibility": {
-							"$ref": "#/$defs/__schema36"
+							"$ref": "#/$defs/__schema34"
 						}
 					},
 					"required": [
@@ -1753,7 +1645,7 @@
 							"minItems": 1,
 							"type": "array",
 							"items": {
-								"$ref": "#/$defs/__schema37"
+								"$ref": "#/$defs/__schema35"
 							}
 						}
 					},
@@ -1765,10 +1657,10 @@
 				}
 			]
 		},
-		"__schema33": {
+		"__schema31": {
 			"type": "boolean"
 		},
-		"__schema34": {
+		"__schema32": {
 			"type": "array",
 			"items": {
 				"oneOf": [
@@ -2130,7 +2022,7 @@
 								"minItems": 1,
 								"type": "array",
 								"items": {
-									"$ref": "#/$defs/__schema35"
+									"$ref": "#/$defs/__schema33"
 								}
 							},
 							"quantity": {
@@ -2155,7 +2047,7 @@
 				]
 			}
 		},
-		"__schema35": {
+		"__schema33": {
 			"type": "object",
 			"properties": {
 				"items": {
@@ -2175,14 +2067,14 @@
 			],
 			"additionalProperties": false
 		},
-		"__schema36": {
+		"__schema34": {
 			"type": "string",
 			"enum": [
 				"visible",
 				"hidden"
 			]
 		},
-		"__schema37": {
+		"__schema35": {
 			"type": "object",
 			"properties": {
 				"itemId": {
@@ -2199,13 +2091,13 @@
 					"$ref": "#/$defs/__schema8"
 				},
 				"enabled": {
-					"$ref": "#/$defs/__schema33"
+					"$ref": "#/$defs/__schema31"
 				},
 				"effects": {
-					"$ref": "#/$defs/__schema34"
+					"$ref": "#/$defs/__schema32"
 				},
 				"visibility": {
-					"$ref": "#/$defs/__schema36"
+					"$ref": "#/$defs/__schema34"
 				}
 			},
 			"required": [
@@ -2214,7 +2106,112 @@
 			],
 			"additionalProperties": false
 		},
+		"__schema36": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/__schema30"
+			}
+		},
+		"__schema37": {
+			"default": 1,
+			"$ref": "#/$defs/__schema1"
+		},
 		"__schema38": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"$ref": "#/$defs/__schema0"
+				},
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"tags": {
+					"default": [],
+					"type": "array",
+					"items": {
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"visibility": {
+					"default": "visible",
+					"type": "string",
+					"enum": [
+						"visible",
+						"hidden"
+					]
+				},
+				"durationMs": {
+					"$ref": "#/$defs/__schema2"
+				},
+				"placement": {
+					"default": "board_then_inventory",
+					"type": "string",
+					"enum": [
+						"board_then_inventory"
+					]
+				},
+				"chargeCost": {
+					"default": 0,
+					"type": "number",
+					"minimum": 0
+				},
+				"effects": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/__schema27"
+					}
+				},
+				"inputs": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"itemId": {
+								"$ref": "#/$defs/__schema0"
+							},
+							"quantity": {
+								"default": 1,
+								"$ref": "#/$defs/__schema1"
+							},
+							"capacity": {
+								"$ref": "#/$defs/__schema1"
+							},
+							"consume": {
+								"type": "boolean"
+							},
+							"mode": {
+								"type": "string",
+								"enum": [
+									"exact",
+									"upTo"
+								]
+							}
+						},
+						"required": [
+							"itemId",
+							"capacity",
+							"consume"
+						],
+						"additionalProperties": false
+					}
+				},
+				"output": {
+					"minItems": 1,
+					"$ref": "#/$defs/__schema36"
+				},
+				"effect": {
+					"$ref": "#/$defs/__schema3"
+				}
+			},
+			"required": [
+				"id",
+				"durationMs"
+			],
+			"additionalProperties": false
+		},
+		"__schema39": {
 			"type": "string",
 			"enum": [
 				"stop",

@@ -58,7 +58,12 @@
 						"quantity": 3
 					}
 				],
-				"resultItemId": "producer:bio-waste-processor-t2"
+				"output": [
+					{
+						"itemId": "producer:bio-waste-processor-t2",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that upgrades Bio-Waste Processor I into Bio-Waste Processor II for coal and charcoal disposal lines.",
 			"name": "Bio-Waste Processor II Blueprint",

@@ -87,7 +87,12 @@ describe("feast plate source config", () => {
 		expect(feastPlate.tags).toContain("era:II");
 		expect(feastPlate.craft).toMatchObject({
 			durationMs: 9000,
-			resultItemId: "item:feast",
+			output: [
+				{
+					type: "guaranteed",
+					itemId: "item:feast",
+				},
+			],
 			inputs: [
 				{
 					consume: true,

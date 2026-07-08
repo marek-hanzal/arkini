@@ -174,8 +174,13 @@ describe("defaultGameConfig", () => {
 		});
 		expect(defaultGameConfig.items["item:cracked-rock"]?.craft).toMatchObject({
 			durationMs: 120000,
-			resultItemId: "item:rock",
-			resultPlacement: "random-board",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "item:rock",
+				},
+			],
 			inputs: [
 				{
 					consume: false,
@@ -209,7 +214,13 @@ describe("defaultGameConfig", () => {
 		]);
 		expect(seed?.craft).toMatchObject({
 			durationMs: 30000,
-			resultItemId: "item:tree",
+			output: [
+				{
+					type: "guaranteed",
+					quantity: 1,
+					itemId: "item:tree",
+				},
+			],
 			inputs: [
 				{
 					consume: true,

@@ -29,7 +29,12 @@
 						"quantity": 2
 					}
 				],
-				"resultItemId": "producer:library-t4"
+				"output": [
+					{
+						"itemId": "producer:library-t4",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that upgrades Library III into Library IV.",
 			"name": "Library IV Blueprint",

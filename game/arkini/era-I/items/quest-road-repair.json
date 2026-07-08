@@ -19,7 +19,12 @@
 						"quantity": 2
 					}
 				],
-				"resultItemId": "item:stone-block"
+				"output": [
+					{
+						"itemId": "item:stone-block",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "A small board quest asking for raw building materials and rewarding a processed block.",
 			"maxStackSize": 1,

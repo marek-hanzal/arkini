@@ -25,7 +25,12 @@
 						"quantity": 2
 					}
 				],
-				"resultItemId": "producer:library-t2"
+				"output": [
+					{
+						"itemId": "producer:library-t2",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that upgrades Library I into Library II.",
 			"name": "Library II Blueprint",

@@ -20,7 +20,12 @@
 						"itemId": "item:water"
 					}
 				],
-				"resultItemId": "producer:waste-processor-t1"
+				"output": [
+					{
+						"itemId": "producer:waste-processor-t1",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
 			"name": "Waste Processor I Blueprint",

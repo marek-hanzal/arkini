@@ -1,4 +1,5 @@
 import type { GameConfig } from "../../src/config/GameConfigTypes";
+import { readCraftOutputItemIds } from "../../src/craft/readCraftRecipeOutput";
 import type { GameLineDefinition } from "../../src/config/GameItemCapabilities";
 import { GAME_WELL_KNOWN_ASSET_IDS } from "../../src/config/GameWellKnownAssetIds";
 
@@ -278,8 +279,11 @@ const collectItemUsage = (
 
 		if (item.craft) {
 			itemFlow.consumedItemIds.add(itemId);
-			usage.items.add(item.craft.resultItemId);
-			usageItem(itemFlow, item.craft.resultItemId, "produced");
+			const outputItemIds = readCraftOutputItemIds(item.craft);
+			for (const outputItemId of outputItemIds) {
+				usage.items.add(outputItemId);
+				usageItem(itemFlow, outputItemId, "produced");
+			}
 			limitedDeposits.productionRules.push({
 				dependencies: new Set([
 					itemId,
@@ -287,10 +291,10 @@ const collectItemUsage = (
 						.filter((input) => input.consume)
 						.map((input) => input.itemId),
 				]),
-				producedItemIds: new Set([
-					item.craft.resultItemId,
-				]),
+				producedItemIds: new Set(outputItemIds),
 			});
+			collectLootOutputUsage(item.craft.output, itemFlow);
+			collectLootOutputEffectUsage(item.craft.output, config, usage);
 			for (const input of item.craft.inputs) {
 				usage.items.add(input.itemId);
 				if (input.consume) usageItem(itemFlow, input.itemId, "consumed");

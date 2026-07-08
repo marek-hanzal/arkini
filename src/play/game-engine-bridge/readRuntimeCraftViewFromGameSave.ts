@@ -1,6 +1,10 @@
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
 import { readCraftRecipeDurationMs } from "~/craft/readCraftRecipeDurationMs";
+import {
+	readCraftOutputItemIds,
+	readCraftPrimaryOutputItemId,
+} from "~/craft/readCraftRecipeOutput";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import type { ItemId } from "~/config/GameIdSchema";
@@ -111,17 +115,19 @@ const readCraftInputViews = (scope: RuntimeCraftViewScope): CraftProgressView["i
 	}));
 
 const readCraftTargetLimitViews = (scope: RuntimeCraftViewScope) =>
-	readItemTargetLimits({
-		config: scope.config,
-		ignoredBoardItemInstanceIds: new Set([
-			scope.boardItem.id,
-		]),
-		includePendingCraftJobs: true,
-		includePendingProducerJobs: true,
-		itemId: scope.recipe.resultItemId,
-		nowMs: scope.nowMs,
-		save: scope.save,
-	});
+	readCraftOutputItemIds(scope.recipe).flatMap((itemId) =>
+		readItemTargetLimits({
+			config: scope.config,
+			ignoredBoardItemInstanceIds: new Set([
+				scope.boardItem.id,
+			]),
+			includePendingCraftJobs: true,
+			includePendingProducerJobs: true,
+			itemId,
+			nowMs: scope.nowMs,
+			save: scope.save,
+		}),
+	);
 
 const readCraftEffectRequirements = (scope: RuntimeCraftViewScope) => {
 	const effectState = readCraftLineEffectState({
@@ -195,7 +201,7 @@ const createRuntimeCraftView = (scope: RuntimeCraftViewScope): CraftProgressView
 						readyAtMs: scope.runningJob.readyAtMs,
 					})
 				: undefined,
-		resultItemId: scope.recipe.resultItemId as ItemId,
+		resultItemId: readCraftPrimaryOutputItemId(scope.recipe) as ItemId,
 		startAtMs: scope.runningJob?.startAtMs,
 		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
 		targetLimits: targetLimits.length ? targetLimits : undefined,

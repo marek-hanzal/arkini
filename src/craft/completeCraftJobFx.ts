@@ -3,7 +3,6 @@ import { applyCraftCompletionResultFx } from "~/craft/applyCraftCompletionResult
 import { completeBlockedCraftJobFx } from "~/craft/completeBlockedCraftJobFx";
 import { createMissingCraftJobResult } from "~/craft/CraftJobCompletionEvents";
 import type { CraftJobCompletionScope } from "~/craft/CraftJobCompletionTypes";
-import { readCraftCompletionBlockedReasonFx } from "~/craft/readCraftCompletionBlockedReasonFx";
 import { readCraftCompletionTargetFx } from "~/craft/readCraftCompletionTargetFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
@@ -34,20 +33,19 @@ const completeLiveCraftJobFx = Effect.fn("completeCraftJobFx.completeLiveCraftJo
 		liveJob,
 		scope,
 	});
-	const blockedReason = yield* readCraftCompletionBlockedReasonFx({
-		scope,
-		target,
-	});
-	if (blockedReason) {
-		return yield* completeBlockedCraftJobFx({
-			job: target.liveJob,
-			reason: blockedReason,
+	const resultEither = yield* Effect.either(
+		applyCraftCompletionResultFx({
 			scope,
-		});
-	}
-	return yield* applyCraftCompletionResultFx({
+			target,
+		}),
+	);
+	if (resultEither._tag === "Right") return resultEither.right;
+	if (resultEither.left._tag !== "GamePlacementFailed")
+		return yield* Effect.fail(resultEither.left);
+	return yield* completeBlockedCraftJobFx({
+		job: target.liveJob,
+		reason: resultEither.left.reason,
 		scope,
-		target,
 	});
 });
 

@@ -1,5 +1,6 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readConfigCraftRecipes } from "~/config/validation/GameConfigValidationReaders";
+import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 
 export const readBlueprintItemIds = (config: GameConfig) =>
 	new Set(
@@ -24,10 +25,12 @@ export const readBlueprintItemIdsByCraftResultItemId = (
 
 	for (const [craftRecipeId, recipe] of readConfigCraftRecipes(config)) {
 		if (!blueprintItemIds.has(craftRecipeId)) continue;
-		result.set(recipe.resultItemId, [
-			...(result.get(recipe.resultItemId) ?? []),
-			craftRecipeId,
-		]);
+		for (const outputItemId of readCraftOutputItemIds(recipe)) {
+			result.set(outputItemId, [
+				...(result.get(outputItemId) ?? []),
+				craftRecipeId,
+			]);
+		}
 	}
 
 	return result;

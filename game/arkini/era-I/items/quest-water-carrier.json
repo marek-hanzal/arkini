@@ -18,7 +18,17 @@
 						"itemId": "item:stone"
 					}
 				],
-				"resultItemId": "item:vegetables"
+				"output": [
+					{
+						"itemId": "item:vegetables",
+						"type": "guaranteed"
+					},
+					{
+						"chance": 0.25,
+						"itemId": "item:egg",
+						"type": "chance"
+					}
+				]
 			},
 			"description": "A small board quest for settlement supplies, rewarding a modest early vegetable delivery from the next era.",
 			"maxStackSize": 1,

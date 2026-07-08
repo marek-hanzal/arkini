@@ -42,7 +42,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			lineOverrides: {
@@ -134,7 +140,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			lineOverrides: {
@@ -219,7 +231,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			lineOverrides: {
@@ -304,7 +322,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			producerOverrides: {
@@ -371,7 +395,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 		});

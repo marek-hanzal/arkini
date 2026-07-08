@@ -24,7 +24,12 @@
 						"itemId": "item:water"
 					}
 				],
-				"resultItemId": "producer:bio-waste-processor-t1"
+				"output": [
+					{
+						"itemId": "producer:bio-waste-processor-t1",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
 			"name": "Bio-Waste Processor I Blueprint",

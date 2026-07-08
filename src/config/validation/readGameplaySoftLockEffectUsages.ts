@@ -1,6 +1,7 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameConfigIssuePath } from "~/config/validation/GameConfigValidationCommon";
 import { formatItemLabel } from "~/config/validation/GameConfigValidationFormatting";
+import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 import {
 	readActivationOutputEffectEntries,
 	readConfigCraftRecipes,
@@ -43,15 +44,24 @@ export const readGameplaySoftLockEffectUsages = (config: GameConfig) => [
 			] satisfies GameConfigIssuePath,
 		})),
 	),
-	...readConfigCraftRecipes(config).map(([craftRecipeId, recipe]) => ({
-		enforceSoftLock: isGameplayProgressionProducer(config, recipe.resultItemId),
-		label: `craft recipe "${craftRecipeId}" -> ${formatItemLabel(config, recipe.resultItemId)}`,
-		lineEffects: recipe.effects ?? [],
-		path: [
-			"items",
-			craftRecipeId,
-			"craft",
-			"effects",
-		] satisfies GameConfigIssuePath,
-	})),
+	...readConfigCraftRecipes(config).map(([craftRecipeId, recipe]) => {
+		const outputItemIds = readCraftOutputItemIds(recipe);
+		const outputLabel = outputItemIds
+			.map((itemId) => formatItemLabel(config, itemId))
+			.join(", ");
+
+		return {
+			enforceSoftLock: outputItemIds.some((itemId) =>
+				isGameplayProgressionProducer(config, itemId),
+			),
+			label: `craft recipe "${craftRecipeId}" -> ${outputLabel}`,
+			lineEffects: recipe.effects ?? [],
+			path: [
+				"items",
+				craftRecipeId,
+				"craft",
+				"effects",
+			] satisfies GameConfigIssuePath,
+		};
+	}),
 ];

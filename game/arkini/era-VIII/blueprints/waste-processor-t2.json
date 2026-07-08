@@ -58,7 +58,12 @@
 						"quantity": 3
 					}
 				],
-				"resultItemId": "producer:waste-processor-t2"
+				"output": [
+					{
+						"itemId": "producer:waste-processor-t2",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that upgrades Waste Processor I into Waste Processor II for coal and charcoal disposal lines.",
 			"name": "Waste Processor II Blueprint",

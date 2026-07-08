@@ -29,7 +29,12 @@
 						"quantity": 6
 					}
 				],
-				"resultItemId": "item:tree"
+				"output": [
+					{
+						"itemId": "item:tree",
+						"type": "guaranteed"
+					}
+				]
 			}
 		}
 	}

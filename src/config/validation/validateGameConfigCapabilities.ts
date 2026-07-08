@@ -18,6 +18,7 @@ import {
 	validateGameLineEffects,
 } from "~/config/validation/GameConfigEffectValidation";
 import { validateActivationOutput } from "~/config/validation/validateGameConfigActivationOutput";
+import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 
 export const validateProducerCapability = ({
 	capability,
@@ -160,27 +161,33 @@ export const validateCraftCapability = ({
 	recipe: z.infer<typeof CraftRecipeSchema>;
 	value: GameConfig;
 }) => {
-	if (!hasItem(recipe.resultItemId)) {
+	validateActivationOutput(
+		ctx,
+		[
+			"items",
+			craftItemId,
+			"craft",
+			"output",
+		],
+		recipe.output,
+		{
+			grantIds,
+			hasItem,
+			itemIds,
+		},
+	);
+
+	for (const outputItemId of readCraftOutputItemIds(recipe)) {
+		if (value.items[outputItemId]?.storage !== "inventory") continue;
 		addIssue(
 			ctx,
 			[
 				"items",
 				craftItemId,
 				"craft",
-				"resultItemId",
+				"output",
 			],
-			`Missing item "${recipe.resultItemId}".`,
-		);
-	} else if (value.items[recipe.resultItemId]?.storage === "inventory") {
-		addIssue(
-			ctx,
-			[
-				"items",
-				craftItemId,
-				"craft",
-				"resultItemId",
-			],
-			`Craft recipe result "${recipe.resultItemId}" must be placeable on the board because craft completion replaces the board target.`,
+			`Craft recipe output "${outputItemId}" must be placeable on the board because craft completion places rewards on or around the craft target.`,
 		);
 	}
 

@@ -1,5 +1,6 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { addIssue } from "~/config/validation/GameConfigValidationCommon";
+import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 import type { z } from "zod";
 
 const questTag = "quest";
@@ -53,21 +54,23 @@ export const validateQuestItems = (ctx: z.RefinementCtx, config: GameConfig) => 
 			continue;
 		}
 
-		if (isBlueprintItem(config, item.craft.resultItemId)) {
+		const outputItemIds = readCraftOutputItemIds(item.craft);
+		for (const outputItemId of outputItemIds) {
+			if (!isBlueprintItem(config, outputItemId)) continue;
 			addIssue(
 				ctx,
 				[
 					"items",
 					itemId,
 					"craft",
-					"resultItemId",
+					"output",
 				],
-				`Quest "${itemId}" must not reward blueprint "${item.craft.resultItemId}".`,
+				`Quest "${itemId}" must not reward blueprint "${outputItemId}".`,
 			);
 		}
 
 		for (const [inputIndex, input] of item.craft.inputs.entries()) {
-			if (input.itemId !== item.craft.resultItemId) continue;
+			if (!outputItemIds.includes(input.itemId)) continue;
 
 			addIssue(
 				ctx,

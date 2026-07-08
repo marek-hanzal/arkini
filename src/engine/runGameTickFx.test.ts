@@ -564,7 +564,7 @@ describe("runGameTickFx", () => {
 		]);
 	});
 
-	it("completes craft jobs by replacing the target with the result item", () => {
+	it("completes craft jobs by removing the target and placing output on its cell", () => {
 		const config = createEngineCraftTableTestConfig();
 		const save = runInitialSave({
 			config,
@@ -585,12 +585,12 @@ describe("runGameTickFx", () => {
 		});
 
 		expect(result.save.craftJobs).toEqual({});
-		expect(result.save.board.items["item-instance:1"]).toMatchObject({
-			id: "item-instance:1",
-			itemId: "item:plank",
-			x: 0,
-			y: 0,
-		});
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(
+			Object.values(result.save.board.items).find(
+				(item) => item.itemId === "item:plank" && item.x === 0 && item.y === 0,
+			),
+		).toBeDefined();
 		expect(result.save.inventory.slots).toEqual([
 			null,
 			null,
@@ -604,11 +604,15 @@ describe("runGameTickFx", () => {
 				type: "craft.completed",
 			},
 			{
-				fromItemId: "item:craft-table",
+				itemId: "item:craft-table",
 				itemInstanceId: "item-instance:1",
 				reason: "craft-result",
-				toItemId: "item:plank",
-				type: "item.replaced",
+				type: "item.removed",
+			},
+			{
+				itemId: "item:plank",
+				reason: "craft-result",
+				type: "item.created",
 			},
 		]);
 	});

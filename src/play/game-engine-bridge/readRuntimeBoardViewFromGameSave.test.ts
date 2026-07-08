@@ -84,7 +84,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:craft-table": {
 					...baseConfig.craftCatalog["item:craft-table"],
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {
@@ -163,7 +169,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			lineOverrides: {
@@ -256,7 +268,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			lineOverrides: {
@@ -342,7 +360,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 				"item:blueprint-plank": {
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			lineOverrides: {
@@ -917,7 +941,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 							quantity: 1,
 						},
 					],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {

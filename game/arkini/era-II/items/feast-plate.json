@@ -32,7 +32,12 @@
 						"itemId": "item:vegetables"
 					}
 				],
-				"resultItemId": "item:feast"
+				"output": [
+					{
+						"itemId": "item:feast",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "An empty serving plate from the cookhouse. Fill it with Era II farm food on the board to assemble a proper feast.",
 			"maxStackSize": 1,

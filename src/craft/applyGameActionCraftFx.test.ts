@@ -473,7 +473,13 @@ describe("applyGameActionFx Craft", () => {
 							quantity: 1,
 						},
 					],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {
@@ -556,7 +562,13 @@ describe("applyGameActionFx Craft", () => {
 							quantity: 1,
 						},
 					],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {
@@ -659,7 +671,13 @@ describe("applyGameActionFx Craft", () => {
 							quantity: 1,
 						},
 					],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {
@@ -854,8 +872,13 @@ describe("applyGameActionFx Craft", () => {
 								itemId: "item:magnifying-glass",
 							},
 						],
-						resultItemId: "item:rock",
-						resultPlacement: "random-board",
+						output: [
+							{
+								type: "guaranteed",
+								quantity: 1,
+								itemId: "item:rock",
+							},
+						],
 					},
 					description: "Cracked rock",
 					maxStackSize: 1,
@@ -938,7 +961,7 @@ describe("applyGameActionFx Craft", () => {
 		expect(
 			findBoardItem(completed.save, {
 				itemId: "item:rock",
-				x: 2,
+				x: 0,
 				y: 0,
 			}),
 		).toBeDefined();
@@ -988,7 +1011,13 @@ describe("applyGameActionFx Craft", () => {
 					...baseConfig.craftCatalog["item:craft-table"],
 					durationMs: 0,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {
@@ -1019,11 +1048,14 @@ describe("applyGameActionFx Craft", () => {
 		});
 
 		expect(result.save.craftJobs).toEqual({});
-		expect(result.save.board.items["item-instance:1"]).toMatchObject({
-			itemId: "item:plank",
-			x: 0,
-			y: 0,
-		});
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:plank",
+				x: 0,
+				y: 0,
+			}),
+		).toBeDefined();
 		expect(result.nextWakeAtMs).toBeNull();
 		expect(result.events).toEqual([
 			{
@@ -1044,13 +1076,165 @@ describe("applyGameActionFx Craft", () => {
 			},
 			{
 				atMs: 100,
-				fromItemId: "item:craft-table",
+				itemId: "item:craft-table",
 				itemInstanceId: "item-instance:1",
 				reason: "craft-result",
-				toItemId: "item:plank",
-				type: "item.replaced",
+				type: "item.removed",
 			},
+			expect.objectContaining({
+				itemId: "item:plank",
+				reason: "craft-result",
+				type: "item.created",
+			}),
 		]);
+	});
+
+	it("places multiple craft outputs on and around the completed craft target", () => {
+		const baseConfig = createEngineCraftTableTestConfig();
+		const config = createEngineTestConfig({
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					...baseConfig.craftCatalog["item:craft-table"],
+					output: [
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+						{
+							itemId: "item:stone",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 2,
+					width: 2,
+				},
+			},
+			items: {
+				...baseConfig.items,
+				"item:stone": {
+					...baseConfig.items["item:plank"],
+					description: "Stone",
+					name: "Stone",
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:craft"] = {
+			id: "job:craft",
+			readyAtMs: 1000,
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:plank",
+				x: 0,
+				y: 0,
+			}),
+		).toBeDefined();
+		expect(
+			findBoardItem(result.save, {
+				itemId: "item:stone",
+				x: 1,
+				y: 0,
+			}),
+		).toBeDefined();
+	});
+
+	it("stacks craft output into existing board stacks before using the freed craft cell", () => {
+		const baseConfig = createEngineCraftTableTestConfig();
+		const config = createEngineTestConfig({
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					...baseConfig.craftCatalog["item:craft-table"],
+					output: [
+						{
+							itemId: "item:plank",
+							quantity: 1,
+							type: "guaranteed",
+						},
+					],
+				},
+			},
+			game: {
+				...baseConfig.game,
+				board: {
+					height: 1,
+					width: 3,
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+					{
+						itemId: "item:plank",
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		save.craftJobs["job:craft"] = {
+			id: "job:craft",
+			readyAtMs: 1000,
+			recipeId: "item:craft-table",
+			startAtMs: 0,
+			targetItemInstanceId: "item-instance:1",
+		};
+
+		const result = runTick({
+			config,
+			nowMs: 1000,
+			save,
+		});
+
+		expect(result.save.board.items["item-instance:1"]).toBeUndefined();
+		expect(result.save.board.items["item-instance:2"]).toMatchObject({
+			itemId: "item:plank",
+			quantity: 2,
+			x: 2,
+			y: 0,
+		});
 	});
 
 	it("rejects craft start while the same target has a running producer job", () => {
@@ -1061,7 +1245,13 @@ describe("applyGameActionFx Craft", () => {
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 			startingState: {

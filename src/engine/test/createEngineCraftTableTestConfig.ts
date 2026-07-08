@@ -35,7 +35,13 @@ export const createEngineCraftTableTestConfig = ({
 									quantity: 2,
 								},
 							],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 				description: "Craft table",
 				maxStackSize: 1,

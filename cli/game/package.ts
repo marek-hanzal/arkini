@@ -236,7 +236,12 @@ const normalizePackage = (value: unknown): unknown => {
 			const craft = {
 				...(item.craft as Record<string, unknown>),
 			};
-			craft.resultItemId ??= readCraftResultItemIdFromCraftTargetId(itemId);
+			craft.output ??= [
+				{
+					itemId: readCraftResultItemIdFromCraftTargetId(itemId),
+					type: "guaranteed",
+				},
+			];
 			craft.effects = normalizeLineEffects({
 				domainIndexes: effectSelectorDomainIndexes,
 				effects: craft.effects,

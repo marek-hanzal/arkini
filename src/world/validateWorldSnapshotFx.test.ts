@@ -168,7 +168,13 @@ describe("validateWorldSnapshotFx", () => {
 				"item:producer": {
 					durationMs: 1000,
 					inputs: [],
-					resultItemId: "item:plank",
+					output: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:plank",
+						},
+					],
 				},
 			},
 		});

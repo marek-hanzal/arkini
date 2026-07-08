@@ -460,7 +460,12 @@ describe("auditGameConfig", () => {
 						itemId: "item:fuel",
 					},
 				],
-				resultItemId: "item:tree",
+				output: [
+					{
+						itemId: "item:tree",
+						type: "guaranteed",
+					},
+				],
 			},
 			description: "Seed grown from forest",
 			maxStackSize: 10,
@@ -547,7 +552,12 @@ describe("auditGameConfig", () => {
 						itemId: "item:water",
 					},
 				],
-				resultItemId: "item:tree",
+				output: [
+					{
+						itemId: "item:tree",
+						type: "guaranteed",
+					},
+				],
 			},
 			description: "Seed grown from water",
 			maxStackSize: 10,

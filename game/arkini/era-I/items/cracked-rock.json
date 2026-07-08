@@ -22,8 +22,12 @@
 						"itemId": "item:magnifying-glass"
 					}
 				],
-				"resultItemId": "item:rock",
-				"resultPlacement": "random-board"
+				"output": [
+					{
+						"itemId": "item:rock",
+						"type": "guaranteed"
+					}
+				]
 			}
 		}
 	}

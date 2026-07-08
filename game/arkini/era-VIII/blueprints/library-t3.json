@@ -31,7 +31,12 @@
 						"itemId": "item:advanced-knowledge"
 					}
 				],
-				"resultItemId": "producer:library-t3"
+				"output": [
+					{
+						"itemId": "producer:library-t3",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that upgrades Library II into Library III.",
 			"name": "Library III Blueprint",

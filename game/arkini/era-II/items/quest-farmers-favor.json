@@ -23,7 +23,12 @@
 						"itemId": "item:egg"
 					}
 				],
-				"resultItemId": "item:cheese"
+				"output": [
+					{
+						"itemId": "item:cheese",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "A modest farm quest that converts basic food supplies into a small processed dairy reward from the next era.",
 			"maxStackSize": 1,

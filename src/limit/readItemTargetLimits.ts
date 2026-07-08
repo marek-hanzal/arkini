@@ -3,6 +3,7 @@ import { readBoardItemCount } from "~/board/readBoardItemCount";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
+import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
 import type { ItemId } from "~/config/GameIdSchema";
@@ -76,13 +77,18 @@ const readItemTargetItemIds = ({ config, itemId }: { config: GameConfig; itemId:
 		itemId,
 		itemIds,
 	});
-	appendTargetItemId({
-		itemId: readCraftRecipeDefinition({
-			config,
-			recipeId: itemId,
-		})?.resultItemId,
-		itemIds,
+	const recipe = readCraftRecipeDefinition({
+		config,
+		recipeId: itemId,
 	});
+	if (recipe) {
+		for (const outputItemId of readCraftOutputItemIds(recipe)) {
+			appendTargetItemId({
+				itemId: outputItemId,
+				itemIds,
+			});
+		}
+	}
 	return itemIds;
 };
 
@@ -172,7 +178,7 @@ const readPendingCraftJobQuantity = ({
 			config,
 			recipeId: job.recipeId,
 		});
-		if (recipe?.resultItemId === targetItemId) quantity += 1;
+		if (recipe && readCraftOutputItemIds(recipe).includes(targetItemId)) quantity += 1;
 	}
 
 	return quantity;
@@ -195,7 +201,7 @@ const readPendingCraftSourceItemQuantity = ({
 		const recipe = item.craft;
 		if (!recipe) continue;
 		if (sourceItemId === targetItemId) continue;
-		if (recipe.resultItemId !== targetItemId) continue;
+		if (!readCraftOutputItemIds(recipe).includes(targetItemId)) continue;
 		quantity += readItemBoardAndInventoryQuantity({
 			ignoredBoardItemInstanceIds,
 			itemId: sourceItemId,

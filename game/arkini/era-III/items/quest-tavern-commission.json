@@ -22,7 +22,12 @@
 						"itemId": "item:coin"
 					}
 				],
-				"resultItemId": "item:feast"
+				"output": [
+					{
+						"itemId": "item:feast",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
 			"maxStackSize": 1,

@@ -20,7 +20,12 @@
 						"itemId": "item:water"
 					}
 				],
-				"resultItemId": "producer:library-t1"
+				"output": [
+					{
+						"itemId": "producer:library-t1",
+						"type": "guaranteed"
+					}
+				]
 			},
 			"description": "Build plan that can be filled with early resources to construct Library I.",
 			"name": "Library I Blueprint",

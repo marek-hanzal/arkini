@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { handleResolvedBoardItemTapAction } from "~/board/handleResolvedBoardItemTapAction";
-import { readBoardItemActivationContext } from "~/board/readBoardItemActivationContext";
+import { readBoardItemActivationTarget } from "~/board/readBoardItemActivationContext";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
@@ -22,16 +22,17 @@ export const useBoardItemActivation = ({
 
 	return useCallback(
 		(boardItemId: string, expectedItemId: string) => {
-			const context = readBoardItemActivationContext({
+			const target = readBoardItemActivationTarget({
 				boardItemId,
 				expectedItemId,
+				runtimeStore,
+			});
+			if (!target) return;
+			handleResolvedBoardItemTapAction({
 				feedback,
 				onOpenSheet,
 				runtimeStore,
-			});
-			if (!context) return;
-			handleResolvedBoardItemTapAction({
-				context,
+				target,
 			});
 		},
 		[

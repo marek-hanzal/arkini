@@ -1,23 +1,17 @@
 import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
-import type { BoardItemActivationContext } from "~/board/BoardItemActivationTypes";
-import type { Feedback } from "~/play/feedback/Feedback";
+import type { BoardItemActivationTarget } from "~/board/BoardItemActivationTypes";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 import { readBoardView } from "~/play/runtime/readers/readBoardView";
-import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 
-export const readBoardItemActivationContext = ({
+export const readBoardItemActivationTarget = ({
 	boardItemId,
 	expectedItemId,
-	feedback,
-	onOpenSheet,
 	runtimeStore,
 }: {
 	boardItemId: string;
 	expectedItemId: string;
-	feedback: Feedback.Type;
-	onOpenSheet(sheet: ActiveSheetState): void;
 	runtimeStore: GameRuntimeStore;
-}): BoardItemActivationContext | undefined => {
+}): BoardItemActivationTarget | undefined => {
 	const snapshot = runtimeStore.getSnapshot();
 	const nowMs = Date.now();
 	const liveBoard = readBoardView(snapshot, nowMs);
@@ -29,11 +23,8 @@ export const readBoardItemActivationContext = ({
 	if (!liveBoardItem) return undefined;
 
 	return {
-		feedback,
 		liveBoard,
 		liveBoardItem,
 		nowMs,
-		onOpenSheet,
-		runtimeStore,
 	};
 };

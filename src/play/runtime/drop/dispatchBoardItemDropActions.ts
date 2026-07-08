@@ -1,24 +1,15 @@
 import type { GameAction } from "~/action/GameActionSchema";
 import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
+import type { BoardView } from "~/board/view/BoardViewSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { DropActions } from "~/play/drop/DropActions";
 import { createGameActionFromItemToBoardItemInteractionPlan } from "~/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
-import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
 import { readItemInteractionSourceRef } from "~/play/interaction/readItemInteractionSourceRef";
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import {
-	dispatchRuntimeDropAction,
-	readRuntimeDropActionContext,
-	type RuntimeDropActionContext,
-} from "~/play/runtime/drop/RuntimeDropActionContext";
-
-type ItemToBoardItemActionSource = {
-	readExpectedSourceItemId(context: RuntimeDropActionContext): string | undefined;
-	readSourceQuantity?(context: RuntimeDropActionContext): number | undefined;
-	readStackSourceRef?(context: RuntimeDropActionContext): GameActionItemRef | undefined;
-	sourceRef: GameActionItemRef;
-};
+import { dispatchRuntimeDropAction } from "~/play/runtime/drop/RuntimeDropActionContext";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
 
 const createFallbackMergeAction = ({
 	sourceRef,
@@ -32,55 +23,33 @@ const createFallbackMergeAction = ({
 	type: "item.merge" as const,
 });
 
-const createStackAction = ({
-	context,
-	source,
-	targetItemInstanceId,
-}: {
-	context: RuntimeDropActionContext;
-	source: ItemToBoardItemActionSource;
-	targetItemInstanceId: string;
-}): GameAction | undefined => {
-	const sourceRef = source.readStackSourceRef?.(context) ?? source.sourceRef;
+const readBoardDropState = ({ store }: { store: GameRuntimeStore }) => {
+	const snapshot = store.getSnapshot();
+	const nowMs = Date.now();
 	return {
-		sourceRef,
-		targetItemInstanceId,
-		type: "item.stack" as const,
+		board: readBoardView(snapshot, nowMs),
+		config: snapshot.runtime.config,
+		nowMs,
 	};
 };
 
-const readInteractionSourceRef = ({
-	context,
-	plan,
-	source,
-}: {
-	context: RuntimeDropActionContext;
-	plan: ItemToBoardItemInteractionPlan;
-	source: ItemToBoardItemActionSource;
-}) => {
-	const sourceRef =
-		plan.type === "stack"
-			? (source.readStackSourceRef?.(context) ?? source.sourceRef)
-			: source.sourceRef;
-	return readItemInteractionSourceRef({
-		plan,
-		sourceRef,
-	});
-};
-
 const dispatchBoardItemActionWhenExpected = ({
+	board,
 	boardItemId,
-	context,
 	expectedItemId,
+	nowMs,
 	readAction,
+	store,
 }: {
+	board: BoardView;
 	boardItemId: string;
-	context: RuntimeDropActionContext;
 	expectedItemId: string;
-	readAction(): Parameters<typeof dispatchRuntimeDropAction>[0]["action"];
+	nowMs: number;
+	readAction(): GameAction;
+	store: GameRuntimeStore;
 }) => {
 	const boardItem = readExpectedBoardViewItem({
-		board: context.board,
+		board,
 		expectedItemId,
 		itemInstanceId: boardItemId,
 	});
@@ -88,31 +57,39 @@ const dispatchBoardItemActionWhenExpected = ({
 
 	return dispatchRuntimeDropAction({
 		action: readAction(),
-		context,
+		nowMs,
+		store,
 	});
 };
 
-export const dispatchItemToBoardItemAction = ({
-	context,
+export const applyResolvedItemToBoardItem = ({
+	board,
+	config,
 	expectedSourceItemId,
 	expectedTargetItemId,
-	source,
+	nowMs,
+	sourceItemId,
+	sourceQuantity = 1,
+	sourceRef,
+	store,
 	targetBoardItemId,
 }: {
-	context: RuntimeDropActionContext;
+	board: BoardView;
+	config: GameConfig;
 	expectedSourceItemId: string;
 	expectedTargetItemId: string;
-	source: ItemToBoardItemActionSource;
+	nowMs: number;
+	sourceItemId: string | undefined;
+	sourceQuantity?: number;
+	sourceRef: GameActionItemRef;
+	store: GameRuntimeStore;
 	targetBoardItemId: string;
 }) => {
-	const { config } = context.snapshot.runtime;
-	const sourceItemId = source.readExpectedSourceItemId(context);
 	const target = readExpectedBoardViewItem({
-		board: context.board,
+		board,
 		expectedItemId: expectedTargetItemId,
 		itemInstanceId: targetBoardItemId,
 	});
-
 	if (!sourceItemId || sourceItemId !== expectedSourceItemId || !target) {
 		return Promise.resolve();
 	}
@@ -120,35 +97,28 @@ export const dispatchItemToBoardItemAction = ({
 	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
 		sourceItemId,
-		sourceQuantity: source.readSourceQuantity?.(context) ?? 1,
+		sourceQuantity,
 		targetItem: target,
 	});
-	const sourceRef = readInteractionSourceRef({
-		context,
+	const interactionSourceRef = readItemInteractionSourceRef({
 		plan,
-		source,
+		sourceRef,
 	});
-	const action =
-		plan.type === "stack"
-			? createStackAction({
-					context,
-					source,
-					targetItemInstanceId: target.id,
-				})
-			: createGameActionFromItemToBoardItemInteractionPlan({
-					plan,
-					sourceRef,
-					targetItemInstanceId: target.id,
-				});
+	const action = createGameActionFromItemToBoardItemInteractionPlan({
+		plan,
+		sourceRef: interactionSourceRef,
+		targetItemInstanceId: target.id,
+	});
 
 	return dispatchRuntimeDropAction({
 		action:
 			action ??
 			createFallbackMergeAction({
-				sourceRef,
+				sourceRef: interactionSourceRef,
 				targetItemInstanceId: target.id,
 			}),
-		context,
+		nowMs,
+		store,
 	});
 };
 
@@ -159,18 +129,20 @@ export const deleteExpectedBoardItem = ({
 	input: Parameters<DropActions["deleteBoardItem"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { board, nowMs } = readBoardDropState({
 		store,
 	});
 	return dispatchBoardItemActionWhenExpected({
+		board,
 		boardItemId: input.boardItemId,
-		context,
 		expectedItemId: input.expectedItemId,
+		nowMs,
 		readAction: () => ({
 			boardItemId: input.boardItemId,
 			expectedItemId: input.expectedItemId,
 			type: "debug.board_item.delete",
 		}),
+		store,
 	});
 };
 
@@ -181,30 +153,24 @@ export const applyExpectedBoardItemToBoardItem = ({
 	input: Parameters<DropActions["applyBoardItemToBoardItem"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { board, config, nowMs } = readBoardDropState({
 		store,
 	});
-	return dispatchItemToBoardItemAction({
-		context,
+	const sourceItem = board.byId[input.sourceBoardItemId];
+	return applyResolvedItemToBoardItem({
+		board,
+		config,
 		expectedSourceItemId: input.expectedSourceItemId,
 		expectedTargetItemId: input.expectedTargetItemId,
-		source: {
-			readExpectedSourceItemId: ({ board }) => board.byId[input.sourceBoardItemId]?.itemId,
-			readSourceQuantity: ({ board }) => board.byId[input.sourceBoardItemId]?.quantity ?? 1,
-			readStackSourceRef: ({ board }) => {
-				const sourceItem = board.byId[input.sourceBoardItemId];
-				if (!sourceItem) return undefined;
-				return {
-					kind: "board" as const,
-					itemInstanceId: input.sourceBoardItemId,
-					quantity: sourceItem.quantity ?? 1,
-				};
-			},
-			sourceRef: {
-				kind: "board",
-				itemInstanceId: input.sourceBoardItemId,
-			},
+		nowMs,
+		sourceItemId: sourceItem?.itemId,
+		sourceQuantity: sourceItem?.quantity ?? 1,
+		sourceRef: {
+			kind: "board",
+			itemInstanceId: input.sourceBoardItemId,
+			quantity: sourceItem?.quantity ?? 1,
 		},
+		store,
 		targetBoardItemId: input.targetBoardItemId,
 	});
 };
@@ -216,19 +182,21 @@ export const moveExpectedBoardItem = ({
 	input: Parameters<DropActions["moveBoardItem"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { board, nowMs } = readBoardDropState({
 		store,
 	});
 	return dispatchBoardItemActionWhenExpected({
+		board,
 		boardItemId: input.boardItemId,
-		context,
 		expectedItemId: input.expectedItemId,
+		nowMs,
 		readAction: () => ({
 			boardItemId: input.boardItemId,
 			type: "board.item.move",
 			x: input.x,
 			y: input.y,
 		}),
+		store,
 	});
 };
 
@@ -239,17 +207,19 @@ export const storeExpectedBoardItem = ({
 	input: Parameters<DropActions["storeBoardItem"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { board, nowMs } = readBoardDropState({
 		store,
 	});
 	return dispatchBoardItemActionWhenExpected({
+		board,
 		boardItemId: input.boardItemId,
-		context,
 		expectedItemId: input.expectedItemId,
+		nowMs,
 		readAction: () => ({
 			boardItemId: input.boardItemId,
 			type: "board.item.stash",
 		}),
+		store,
 	});
 };
 
@@ -260,16 +230,16 @@ export const swapExpectedBoardItems = ({
 	input: Parameters<DropActions["swapBoardItems"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { board, nowMs } = readBoardDropState({
 		store,
 	});
 	const source = readExpectedBoardViewItem({
-		board: context.board,
+		board,
 		expectedItemId: input.expectedSourceItemId,
 		itemInstanceId: input.sourceBoardItemId,
 	});
 	const target = readExpectedBoardViewItem({
-		board: context.board,
+		board,
 		expectedItemId: input.expectedTargetItemId,
 		itemInstanceId: input.targetBoardItemId,
 	});
@@ -283,6 +253,7 @@ export const swapExpectedBoardItems = ({
 			targetBoardItemId: input.targetBoardItemId,
 			type: "board.items.swap",
 		},
-		context,
+		nowMs,
+		store,
 	});
 };

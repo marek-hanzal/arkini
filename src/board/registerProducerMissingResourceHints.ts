@@ -1,23 +1,28 @@
-import type { BoardItemActivationContext } from "~/board/BoardItemActivationTypes";
+import type { BoardView } from "~/board/view/BoardViewSchema";
+import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { registerBoardTileBounceFeedback } from "~/play/game-engine-visual/registerBoardTileBounceFeedback";
 import { readProducerMissingResourceHintTileIds } from "~/producer/view/readProducerMissingResourceHintTileIds";
 
 export const registerProducerMissingResourceHints = ({
-	context,
+	board,
 	lineId,
+	nowMs,
+	producerItem,
 }: {
-	context: BoardItemActivationContext;
+	board: BoardView;
 	lineId?: string;
+	nowMs: number;
+	producerItem: BoardViewItem;
 }) => {
 	const hintTileIds = readProducerMissingResourceHintTileIds({
-		board: context.liveBoard,
+		board,
 		lineId,
-		producerItem: context.liveBoardItem,
+		producerItem,
 	});
 	if (hintTileIds.length === 0) return;
 
 	registerBoardTileBounceFeedback({
-		groupId: `producer-missing-resource-hint:${context.liveBoardItem.id}:${context.nowMs}`,
+		groupId: `producer-missing-resource-hint:${producerItem.id}:${nowMs}`,
 		tileIds: hintTileIds,
 	});
 };

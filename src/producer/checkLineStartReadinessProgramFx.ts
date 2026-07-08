@@ -14,13 +14,6 @@ export const checkLineStartReadinessProgramFx = Effect.fn("checkLineStartReadine
 		yield* assertLineStartRuntimeReadinessFx(scope, definition);
 		yield* assertLineStartInputsReadyFx(scope, definition);
 
-		return {
-			producerDefinition: definition.producerDefinition,
-			producerId: definition.producerId,
-			producerItem: definition.producerItem,
-			line: definition.line,
-			lineId: definition.lineId,
-			lineInputs: definition.lineInputs,
-		};
+		return definition;
 	},
 );

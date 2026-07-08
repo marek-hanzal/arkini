@@ -1,25 +1,37 @@
-import type { BoardItemActivationContext } from "~/board/BoardItemActivationTypes";
+import type { Feedback } from "~/play/feedback/Feedback";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 
 export const dispatchBoardItemActivationRuntimeAction = ({
 	action,
-	context,
+	feedback,
+	nowMs,
+	runtimeStore,
 }: {
 	action: Parameters<GameRuntimeStore["dispatch"]>[0]["action"];
-	context: BoardItemActivationContext;
+	feedback: Feedback.Type;
+	nowMs: number;
+	runtimeStore: GameRuntimeStore;
 }) => {
-	void context.runtimeStore
+	void runtimeStore
 		.dispatch({
 			action,
-			nowMs: context.nowMs,
+			nowMs,
 		})
-		.catch(context.feedback.showError);
+		.catch(feedback.showError);
 };
 
-export const tickRuntimeForReadyCraft = ({ context }: { context: BoardItemActivationContext }) => {
-	void context.runtimeStore
+export const tickRuntimeForReadyCraft = ({
+	feedback,
+	nowMs,
+	runtimeStore,
+}: {
+	feedback: Feedback.Type;
+	nowMs: number;
+	runtimeStore: GameRuntimeStore;
+}) => {
+	void runtimeStore
 		.tick({
-			nowMs: context.nowMs,
+			nowMs,
 		})
-		.catch(context.feedback.showError);
+		.catch(feedback.showError);
 };

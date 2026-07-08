@@ -22,6 +22,21 @@ import { readRuntimeLineEffectLabel } from "~/effects/readRuntimeLineEffectLabel
 type OutputSet = NonNullable<GameLineDefinition["output"]>[number];
 type OutputEntry = OutputSet["entries"][number];
 
+const readNearbyDurationSearchDistance = ({
+	bands,
+}: {
+	bands: Extract<
+		DropEffect,
+		{
+			kind: "nearby.duration.multiply";
+		}
+	>["bands"];
+}) => {
+	if (bands.some((band) => band.distance === "any")) return "any" as const;
+	if (bands.some((band) => band.distance === "near")) return "near" as const;
+	return "neighbour" as const;
+};
+
 const readOutputDurationEffects = ({
 	config,
 	dropEffectIdPrefix,
@@ -55,7 +70,9 @@ const readOutputDurationEffects = ({
 		if (effect.kind === "nearby.duration.multiply") {
 			const matches = readNearbyLineEffectMatches({
 				items: effect.items as RuntimeItemSelector,
-				nearbyDistance: effect.distance,
+				nearbyDistance: readNearbyDurationSearchDistance({
+					bands: effect.bands,
+				}),
 				save,
 				targetCell,
 			}).slice(0, effect.maxSources ?? Number.POSITIVE_INFINITY);

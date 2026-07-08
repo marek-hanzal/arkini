@@ -1,12 +1,21 @@
 import { readExpectedInventorySlotStack } from "~/inventory/view/readExpectedInventorySlotStack";
+import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
 import type { DropActions } from "~/play/drop/DropActions";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import {
-	dispatchRuntimeDropAction,
-	readRuntimeDropActionContext,
-} from "~/play/runtime/drop/RuntimeDropActionContext";
-import { dispatchItemToBoardItemAction } from "~/play/runtime/drop/dispatchBoardItemDropActions";
-import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
+import { dispatchRuntimeDropAction } from "~/play/runtime/drop/RuntimeDropActionContext";
+import { applyResolvedItemToBoardItem } from "~/play/runtime/drop/dispatchBoardItemDropActions";
+
+const readInventoryDropState = ({ store }: { store: GameRuntimeStore }) => {
+	const snapshot = store.getSnapshot();
+	const nowMs = Date.now();
+	return {
+		board: readBoardView(snapshot, nowMs),
+		config: snapshot.runtime.config,
+		inventory: readInventoryView(snapshot),
+		nowMs,
+	};
+};
 
 export const applyExpectedInventoryItemToBoardItem = ({
 	input,
@@ -15,27 +24,28 @@ export const applyExpectedInventoryItemToBoardItem = ({
 	input: Parameters<DropActions["applyInventoryItemToBoardItem"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { board, config, inventory, nowMs } = readInventoryDropState({
 		store,
 	});
-	return dispatchItemToBoardItemAction({
-		context,
+	const stack = readExpectedInventorySlotStack({
+		expectedItemId: input.expectedSourceItemId,
+		expectedStackId: input.expectedSourceStackId,
+		inventory,
+		slotIndex: input.sourceSlotIndex,
+	});
+	return applyResolvedItemToBoardItem({
+		board,
+		config,
 		expectedSourceItemId: input.expectedSourceItemId,
 		expectedTargetItemId: input.expectedTargetItemId,
-		source: {
-			readExpectedSourceItemId: ({ snapshot }) =>
-				readExpectedInventorySlotStack({
-					expectedItemId: input.expectedSourceItemId,
-					expectedStackId: input.expectedSourceStackId,
-					inventory: readInventoryView(snapshot),
-					slotIndex: input.sourceSlotIndex,
-				})?.itemId,
-			sourceRef: {
-				kind: "inventory",
-				quantity: 1,
-				slotIndex: input.sourceSlotIndex,
-			},
+		nowMs,
+		sourceItemId: stack?.itemId,
+		sourceRef: {
+			kind: "inventory",
+			quantity: 1,
+			slotIndex: input.sourceSlotIndex,
 		},
+		store,
 		targetBoardItemId: input.targetBoardItemId,
 	});
 };
@@ -47,13 +57,13 @@ export const placeExpectedInventoryItem = ({
 	input: Parameters<DropActions["placeInventoryItem"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { inventory, nowMs } = readInventoryDropState({
 		store,
 	});
 	const stack = readExpectedInventorySlotStack({
 		expectedItemId: input.expectedItemId,
 		expectedStackId: input.expectedStackId,
-		inventory: readInventoryView(context.snapshot),
+		inventory,
 		slotIndex: input.slotIndex,
 	});
 	if (!stack) return Promise.resolve();
@@ -67,7 +77,8 @@ export const placeExpectedInventoryItem = ({
 			x: input.x,
 			y: input.y,
 		},
-		context,
+		nowMs,
+		store,
 	});
 };
 
@@ -78,10 +89,9 @@ export const swapExpectedInventorySlots = ({
 	input: Parameters<DropActions["swapInventorySlots"]>[0];
 	store: GameRuntimeStore;
 }) => {
-	const context = readRuntimeDropActionContext({
+	const { inventory, nowMs } = readInventoryDropState({
 		store,
 	});
-	const inventory = readInventoryView(context.snapshot);
 	const source = readExpectedInventorySlotStack({
 		expectedItemId: input.expectedSourceItemId,
 		expectedStackId: input.expectedSourceStackId,
@@ -103,6 +113,7 @@ export const swapExpectedInventorySlots = ({
 			targetSlotIndex: input.targetSlotIndex,
 			type: "inventory.slots.swap",
 		},
-		context,
+		nowMs,
+		store,
 	});
 };

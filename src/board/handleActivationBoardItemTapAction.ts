@@ -1,62 +1,85 @@
 import { match } from "ts-pattern";
-import type { BoardItemActivationContext } from "~/board/BoardItemActivationTypes";
+import type {
+	BoardItemActivationRuntime,
+	BoardItemActivationTarget,
+} from "~/board/BoardItemActivationTypes";
 import { dispatchBoardItemActivationRuntimeAction } from "~/board/dispatchBoardItemActivationRuntimeAction";
 import { registerProducerMissingResourceHints } from "~/board/registerProducerMissingResourceHints";
 
-const activateStashFromBoardTap = ({ context }: { context: BoardItemActivationContext }) => {
+const activateStashFromBoardTap = ({
+	feedback,
+	runtimeStore,
+	target,
+}: BoardItemActivationRuntime & {
+	target: BoardItemActivationTarget;
+}) => {
 	dispatchBoardItemActivationRuntimeAction({
 		action: {
 			inputRefs: [],
-			stashItemInstanceId: context.liveBoardItem.id,
+			stashItemInstanceId: target.liveBoardItem.id,
 			type: "stash.open",
 		},
-		context,
+		feedback,
+		nowMs: target.nowMs,
+		runtimeStore,
 	});
 };
 
 const activateProducerLineFromBoardTap = ({
-	context,
+	feedback,
 	lineId,
-}: {
-	context: BoardItemActivationContext;
+	runtimeStore,
+	target,
+}: BoardItemActivationRuntime & {
 	lineId?: string;
+	target: BoardItemActivationTarget;
 }) => {
 	if (!lineId) return;
 	registerProducerMissingResourceHints({
-		context,
+		board: target.liveBoard,
 		lineId,
+		nowMs: target.nowMs,
+		producerItem: target.liveBoardItem,
 	});
 	dispatchBoardItemActivationRuntimeAction({
 		action: {
 			inputRefs: [],
-			itemInstanceId: context.liveBoardItem.id,
+			itemInstanceId: target.liveBoardItem.id,
 			lineId,
 			type: "line.start",
 		},
-		context,
+		feedback,
+		nowMs: target.nowMs,
+		runtimeStore,
 	});
 };
 
 export const handleActivationBoardItemTapAction = ({
-	context,
+	feedback,
 	lineId,
-}: {
-	context: BoardItemActivationContext;
+	runtimeStore,
+	target,
+}: BoardItemActivationRuntime & {
 	lineId?: string;
+	target: BoardItemActivationTarget;
 }) => {
-	const activation = context.liveBoardItem.activation;
+	const activation = target.liveBoardItem.activation;
 	if (!activation) return;
 
 	match(activation.kind)
 		.with("stash", () =>
 			activateStashFromBoardTap({
-				context,
+				feedback,
+				runtimeStore,
+				target,
 			}),
 		)
 		.with("producer", () =>
 			activateProducerLineFromBoardTap({
-				context,
+				feedback,
 				lineId,
+				runtimeStore,
+				target,
 			}),
 		)
 		.exhaustive();

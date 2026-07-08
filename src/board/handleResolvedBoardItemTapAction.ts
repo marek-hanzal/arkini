@@ -1,4 +1,8 @@
 import { match } from "ts-pattern";
+import type {
+	BoardItemActivationRuntime,
+	BoardItemActivationTarget,
+} from "~/board/BoardItemActivationTypes";
 import { handleActivationBoardItemTapAction } from "~/board/handleActivationBoardItemTapAction";
 import {
 	handleBoardMemoryTapAction,
@@ -6,17 +10,21 @@ import {
 	handleClaimCraftTapAction,
 	handleStartCraftTapAction,
 } from "~/board/handleBoardItemTapRuntimeAction";
-import type { BoardItemActivationContext } from "~/board/BoardItemActivationTypes";
 import { resolveBoardItemTapAction } from "~/board/control/resolveBoardItemTapAction";
+import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 
 export const handleResolvedBoardItemTapAction = ({
-	context,
-}: {
-	context: BoardItemActivationContext;
+	feedback,
+	onOpenSheet,
+	runtimeStore,
+	target,
+}: BoardItemActivationRuntime & {
+	onOpenSheet(sheet: ActiveSheetState): void;
+	target: BoardItemActivationTarget;
 }) => {
 	const action = resolveBoardItemTapAction({
-		boardItem: context.liveBoardItem,
-		nowMs: context.nowMs,
+		boardItem: target.liveBoardItem,
+		nowMs: target.nowMs,
 	});
 
 	match(action)
@@ -26,7 +34,9 @@ export const handleResolvedBoardItemTapAction = ({
 			},
 			() =>
 				handleClaimCraftTapAction({
-					context,
+					feedback,
+					nowMs: target.nowMs,
+					runtimeStore,
 				}),
 		)
 		.with(
@@ -36,15 +46,17 @@ export const handleResolvedBoardItemTapAction = ({
 			({ boardItemId, recipeId }) =>
 				handleStartCraftTapAction({
 					boardItemId,
-					context,
+					feedback,
+					nowMs: target.nowMs,
 					recipeId,
+					runtimeStore,
 				}),
 		)
 		.with(
 			{
 				type: "open-sheet",
 			},
-			({ sheet }) => context.onOpenSheet(sheet),
+			({ sheet }) => onOpenSheet(sheet),
 		)
 		.with(
 			{
@@ -53,7 +65,9 @@ export const handleResolvedBoardItemTapAction = ({
 			({ boardItemId }) =>
 				handleBoardMemoryTapAction({
 					boardItemId,
-					context,
+					feedback,
+					nowMs: target.nowMs,
+					runtimeStore,
 				}),
 		)
 		.with(
@@ -62,8 +76,10 @@ export const handleResolvedBoardItemTapAction = ({
 			},
 			({ mode }) =>
 				handleCheatSpeedTapAction({
-					context,
+					feedback,
 					mode,
+					nowMs: target.nowMs,
+					runtimeStore,
 				}),
 		)
 		.with(
@@ -72,8 +88,10 @@ export const handleResolvedBoardItemTapAction = ({
 			},
 			({ lineId }) =>
 				handleActivationBoardItemTapAction({
-					context,
+					feedback,
 					lineId,
+					runtimeStore,
+					target,
 				}),
 		)
 		.exhaustive();

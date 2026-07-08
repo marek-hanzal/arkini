@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import type { WorldCheckIssue } from "~/world/WorldCheckIssue";
 import type { WorldProducerJobFacts } from "~/world/WorldProducerJobFacts";
-import type { WorldSnapshotValidationScope } from "~/world/WorldSnapshotValidationScope";
+import type { WorldSnapshotFacts } from "~/world/WorldSnapshotFacts";
 
 const createProducerDeliveryBeforeReadyIssueFx = Effect.fn(
 	"readWorldSnapshotJobDeliveryIssuesFx.createProducerDeliveryBeforeReadyIssueFx",
@@ -27,9 +27,9 @@ const createProducerDeliveryBeforeReadyIssueFx = Effect.fn(
 
 const readProducerDeliveryBeforeReadyIssuesFx = Effect.fn(
 	"readWorldSnapshotJobDeliveryIssuesFx.readProducerDeliveryBeforeReadyIssuesFx",
-)(function* (scope: WorldSnapshotValidationScope) {
+)(function* ({ facts }: { facts: WorldSnapshotFacts }) {
 	const issues: WorldCheckIssue[] = [];
-	for (const producerJobFacts of scope.facts.producerJobs) {
+	for (const producerJobFacts of facts.producerJobs) {
 		issues.push(...(yield* createProducerDeliveryBeforeReadyIssueFx(producerJobFacts)));
 	}
 	return issues;
@@ -37,9 +37,9 @@ const readProducerDeliveryBeforeReadyIssuesFx = Effect.fn(
 
 const readCraftDeliveryBeforeReadyIssuesFx = Effect.fn(
 	"readWorldSnapshotJobDeliveryIssuesFx.readCraftDeliveryBeforeReadyIssuesFx",
-)(function* (scope: WorldSnapshotValidationScope) {
+)(function* ({ facts }: { facts: WorldSnapshotFacts }) {
 	const issues: WorldCheckIssue[] = [];
-	for (const { job } of scope.facts.craftJobs) {
+	for (const { job } of facts.craftJobs) {
 		if (!job.delivery || job.delivery.lastBlockedAtMs >= job.readyAtMs) continue;
 		issues.push({
 			code: "craft_delivery_before_ready",
@@ -61,9 +61,9 @@ const readCraftDeliveryBeforeReadyIssuesFx = Effect.fn(
 
 export const readWorldSnapshotJobDeliveryIssuesFx = Effect.fn(
 	"readWorldSnapshotJobDeliveryIssuesFx",
-)(function* (scope: WorldSnapshotValidationScope) {
+)(function* ({ facts }: { facts: WorldSnapshotFacts }) {
 	return [
-		...(yield* readProducerDeliveryBeforeReadyIssuesFx(scope)),
-		...(yield* readCraftDeliveryBeforeReadyIssuesFx(scope)),
+		...(yield* readProducerDeliveryBeforeReadyIssuesFx({ facts })),
+		...(yield* readCraftDeliveryBeforeReadyIssuesFx({ facts })),
 	];
 });

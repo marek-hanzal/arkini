@@ -16,8 +16,6 @@ export namespace readWorldProcessableJobFacts {
 	}
 }
 
-type ProcessableJobRouteScope = readWorldProcessableJobFacts.Props;
-
 const sortProcessableJobs = (left: WorldProcessableJobFacts, right: WorldProcessableJobFacts) =>
 	left.readyAtMs - right.readyAtMs ||
 	left.reason.localeCompare(right.reason) ||
@@ -54,7 +52,7 @@ const readDueProcessableJob = ({
 const readProcessableItemSpawnJobs = ({
 	nowMs,
 	save,
-}: ProcessableJobRouteScope): WorldProcessableJobFacts[] =>
+}: Pick<readWorldProcessableJobFacts.Props, "nowMs" | "save">): WorldProcessableJobFacts[] =>
 	Object.values(save.itemSpawnJobs).flatMap((job): WorldProcessableJobFacts[] => {
 		if (
 			isItemSpawnJobWaitingForDependencies({
@@ -74,17 +72,13 @@ const readProcessableItemSpawnJobs = ({
 			readyAtMs: job.readyAtMs,
 			reason: "item_spawn_ready",
 		});
-		return processableJob
-			? [
-					processableJob,
-				]
-			: [];
+		return processableJob ? [processableJob] : [];
 	});
 
 const readProcessableProducerJobs = ({
 	nowMs,
 	save,
-}: ProcessableJobRouteScope): WorldProcessableJobFacts[] =>
+}: Pick<readWorldProcessableJobFacts.Props, "nowMs" | "save">): WorldProcessableJobFacts[] =>
 	readWorldProducerJobFacts({
 		nowMs,
 		save,
@@ -100,17 +94,13 @@ const readProcessableProducerJobs = ({
 			readyAtMs: producerJobFacts.releaseAtMs,
 			reason: "producer_queue_ready",
 		});
-		return processableJob
-			? [
-					processableJob,
-				]
-			: [];
+		return processableJob ? [processableJob] : [];
 	});
 
 const readProcessableCraftJobs = ({
 	nowMs,
 	save,
-}: ProcessableJobRouteScope): WorldProcessableJobFacts[] =>
+}: Pick<readWorldProcessableJobFacts.Props, "nowMs" | "save">): WorldProcessableJobFacts[] =>
 	readWorldCraftJobFacts({
 		nowMs,
 		save,
@@ -124,18 +114,14 @@ const readProcessableCraftJobs = ({
 			readyAtMs: craftJobFacts.releaseAtMs,
 			reason: "craft_ready",
 		});
-		return processableJob
-			? [
-					processableJob,
-				]
-			: [];
+		return processableJob ? [processableJob] : [];
 	});
 
 const readProcessableActiveEffects = ({
 	config,
 	nowMs,
 	save,
-}: ProcessableJobRouteScope): WorldProcessableJobFacts[] =>
+}: readWorldProcessableJobFacts.Props): WorldProcessableJobFacts[] =>
 	readWorldActiveEffectFacts({
 		config,
 		nowMs,
@@ -157,22 +143,32 @@ const readProcessableActiveEffects = ({
 			readyAtMs: effectFacts.effect.endAtMs,
 			reason: "active_effect_end",
 		});
-		return processableJob
-			? [
-					processableJob,
-				]
-			: [];
+		return processableJob ? [processableJob] : [];
 	});
 
-const readProcessableJobRoutes = (
-	props: ProcessableJobRouteScope,
-): readonly WorldProcessableJobFacts[][] => [
-	readProcessableItemSpawnJobs(props),
-	readProcessableProducerJobs(props),
-	readProcessableCraftJobs(props),
-	readProcessableActiveEffects(props),
-];
-
-export const readWorldProcessableJobFacts = (
-	props: readWorldProcessableJobFacts.Props,
-): WorldProcessableJobFacts[] => readProcessableJobRoutes(props).flat().sort(sortProcessableJobs);
+export const readWorldProcessableJobFacts = ({
+	config,
+	nowMs,
+	save,
+}: readWorldProcessableJobFacts.Props): WorldProcessableJobFacts[] =>
+	[
+		readProcessableItemSpawnJobs({
+			nowMs,
+			save,
+		}),
+		readProcessableProducerJobs({
+			nowMs,
+			save,
+		}),
+		readProcessableCraftJobs({
+			nowMs,
+			save,
+		}),
+		readProcessableActiveEffects({
+			config,
+			nowMs,
+			save,
+		}),
+	]
+		.flat()
+		.sort(sortProcessableJobs);

@@ -1,16 +1,17 @@
 import { Effect } from "effect";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { WorldCheckIssue } from "~/world/WorldCheckIssue";
 import type { WorldReplacementSafetyFacts } from "~/world/WorldReplacementSafetyFacts";
-import type { WorldSnapshotValidationScope } from "~/world/WorldSnapshotValidationScope";
+import type { WorldSnapshotFacts } from "~/world/WorldSnapshotFacts";
 
 const createReplacementSafetyIssueFx = Effect.fn(
 	"readWorldSnapshotReplacementSafetyIssuesFx.createReplacementSafetyIssueFx",
 )(function* ({
 	replacementFacts,
-	scope,
+	save,
 }: {
 	replacementFacts: WorldReplacementSafetyFacts;
-	scope: WorldSnapshotValidationScope;
+	save: GameSave;
 }) {
 	if (
 		!replacementFacts.blockReasons.includes("craft_job") ||
@@ -19,10 +20,10 @@ const createReplacementSafetyIssueFx = Effect.fn(
 		return [];
 	}
 
-	const craftJobIds = Object.values(scope.save.craftJobs)
+	const craftJobIds = Object.values(save.craftJobs)
 		.filter((job) => job.targetItemInstanceId === replacementFacts.itemInstanceId)
 		.map((job) => job.id);
-	const producerJobIds = Object.values(scope.save.producerJobs)
+	const producerJobIds = Object.values(save.producerJobs)
 		.filter((job) => job.itemInstanceId === replacementFacts.itemInstanceId)
 		.map((job) => job.id);
 	return [
@@ -45,13 +46,19 @@ const createReplacementSafetyIssueFx = Effect.fn(
 
 export const readWorldSnapshotReplacementSafetyIssuesFx = Effect.fn(
 	"readWorldSnapshotReplacementSafetyIssuesFx",
-)(function* (scope: WorldSnapshotValidationScope) {
+)(function* ({
+	facts,
+	save,
+}: {
+	facts: WorldSnapshotFacts;
+	save: GameSave;
+}) {
 	const issues: WorldCheckIssue[] = [];
-	for (const replacementFacts of scope.facts.replacementSafety) {
+	for (const replacementFacts of facts.replacementSafety) {
 		issues.push(
 			...(yield* createReplacementSafetyIssueFx({
 				replacementFacts,
-				scope,
+				save,
 			})),
 		);
 	}

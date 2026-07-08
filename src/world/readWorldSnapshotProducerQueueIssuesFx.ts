@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import type { WorldCheckIssue } from "~/world/WorldCheckIssue";
 import type { WorldProducerJobFacts } from "~/world/WorldProducerJobFacts";
+import type { WorldSnapshotFacts } from "~/world/WorldSnapshotFacts";
 import { readProducerJobFactsByIdFx } from "~/world/readProducerJobFactsByIdFx";
-import type { WorldSnapshotValidationScope } from "~/world/WorldSnapshotValidationScope";
 
 const createProducerQueueDeliveryHeadIssueFx = Effect.fn(
 	"readWorldSnapshotProducerQueueIssuesFx.createProducerQueueDeliveryHeadIssueFx",
@@ -49,15 +49,17 @@ const createProducerDeliveryPausedIssueFx = Effect.fn(
 const createProducerQueueBarrierIssueFx = Effect.fn(
 	"readWorldSnapshotProducerQueueIssuesFx.createProducerQueueBarrierIssueFx",
 )(function* ({
+	facts,
 	producerJobFacts,
-	scope,
 }: {
+	facts: WorldSnapshotFacts;
 	producerJobFacts: WorldProducerJobFacts;
-	scope: WorldSnapshotValidationScope;
 }) {
 	const { job, previousJobId } = producerJobFacts;
 	if (!previousJobId) return [];
-	const producerJobFactsById = yield* readProducerJobFactsByIdFx(scope);
+	const producerJobFactsById = yield* readProducerJobFactsByIdFx({
+		facts,
+	});
 	const previousFacts = producerJobFactsById.get(previousJobId);
 	if (previousFacts?.releaseAtMs === undefined || job.startAtMs >= previousFacts.releaseAtMs) {
 		return [];
@@ -83,15 +85,15 @@ const createProducerQueueBarrierIssueFx = Effect.fn(
 
 export const readWorldSnapshotProducerQueueIssuesFx = Effect.fn(
 	"readWorldSnapshotProducerQueueIssuesFx",
-)(function* (scope: WorldSnapshotValidationScope) {
+)(function* ({ facts }: { facts: WorldSnapshotFacts }) {
 	const issues: WorldCheckIssue[] = [];
-	for (const producerJobFacts of scope.facts.producerJobs) {
+	for (const producerJobFacts of facts.producerJobs) {
 		issues.push(...(yield* createProducerQueueDeliveryHeadIssueFx(producerJobFacts)));
 		issues.push(...(yield* createProducerDeliveryPausedIssueFx(producerJobFacts)));
 		issues.push(
 			...(yield* createProducerQueueBarrierIssueFx({
+				facts,
 				producerJobFacts,
-				scope,
 			})),
 		);
 	}

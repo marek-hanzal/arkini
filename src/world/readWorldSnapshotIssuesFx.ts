@@ -1,25 +1,28 @@
 import { Effect } from "effect";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { allWorldSnapshotCheckIds } from "~/world/allWorldSnapshotCheckIds";
 import { readWorldSnapshotCheckIssuesFx } from "~/world/readWorldSnapshotCheckIssuesFx";
 import type { WorldCheckIssue } from "~/world/WorldCheckIssue";
-import type { WorldSnapshotValidationScope } from "~/world/WorldSnapshotValidationScope";
+import type { WorldSnapshotCheckId } from "~/world/WorldSnapshotCheckId";
+import type { WorldSnapshotFacts } from "~/world/WorldSnapshotFacts";
 
-const readSelectedCheckIdsFx = Effect.fn("readWorldSnapshotIssuesFx.readSelectedCheckIdsFx")(
-	function* ({ checks }: WorldSnapshotValidationScope) {
-		return checks ?? allWorldSnapshotCheckIds;
-	},
-);
-
-export const readWorldSnapshotIssuesFx = Effect.fn("readWorldSnapshotIssuesFx")(function* (
-	scope: WorldSnapshotValidationScope,
-) {
-	const checkIds = yield* readSelectedCheckIdsFx(scope);
+export const readWorldSnapshotIssuesFx = Effect.fn("readWorldSnapshotIssuesFx")(function* ({
+	checks,
+	facts,
+	save,
+}: {
+	checks?: readonly WorldSnapshotCheckId[];
+	facts: WorldSnapshotFacts;
+	save: GameSave;
+}) {
+	const checkIds = checks ?? allWorldSnapshotCheckIds;
 	const issues: WorldCheckIssue[] = [];
 	for (const checkId of checkIds) {
 		issues.push(
 			...(yield* readWorldSnapshotCheckIssuesFx({
 				checkId,
-				scope,
+				facts,
+				save,
 			})),
 		);
 	}

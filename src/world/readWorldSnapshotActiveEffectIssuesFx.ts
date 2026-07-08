@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import type { WorldActiveEffectFacts } from "~/world/WorldActiveEffectFacts";
 import type { WorldCheckIssue } from "~/world/WorldCheckIssue";
 import type { WorldProducerJobFacts } from "~/world/WorldProducerJobFacts";
+import type { WorldSnapshotFacts } from "~/world/WorldSnapshotFacts";
 import { readProducerJobFactsByIdFx } from "~/world/readProducerJobFactsByIdFx";
-import type { WorldSnapshotValidationScope } from "~/world/WorldSnapshotValidationScope";
 
 const createActiveEffectDeliveryJobIssueFx = Effect.fn(
 	"readWorldSnapshotActiveEffectIssuesFx.createActiveEffectDeliveryJobIssueFx",
@@ -66,13 +66,15 @@ const createActiveEffectProducerIssueFx = Effect.fn(
 	"readWorldSnapshotActiveEffectIssuesFx.createActiveEffectProducerIssueFx",
 )(function* ({
 	effectFacts,
-	scope,
+	facts,
 }: {
 	effectFacts: WorldActiveEffectFacts;
-	scope: WorldSnapshotValidationScope;
+	facts: WorldSnapshotFacts;
 }) {
 	if (!effectFacts.producerJobId) return [];
-	const producerJobFactsById = yield* readProducerJobFactsByIdFx(scope);
+	const producerJobFactsById = yield* readProducerJobFactsByIdFx({
+		facts,
+	});
 	const producerJobFacts = producerJobFactsById.get(effectFacts.producerJobId);
 	if (!producerJobFacts) return [];
 	const deliveryIssues = yield* createActiveEffectDeliveryJobIssueFx({
@@ -89,13 +91,13 @@ const createActiveEffectProducerIssueFx = Effect.fn(
 
 export const readWorldSnapshotActiveEffectIssuesFx = Effect.fn(
 	"readWorldSnapshotActiveEffectIssuesFx",
-)(function* (scope: WorldSnapshotValidationScope) {
+)(function* ({ facts }: { facts: WorldSnapshotFacts }) {
 	const issues: WorldCheckIssue[] = [];
-	for (const effectFacts of scope.facts.activeEffects) {
+	for (const effectFacts of facts.activeEffects) {
 		issues.push(
 			...(yield* createActiveEffectProducerIssueFx({
 				effectFacts,
-				scope,
+				facts,
 			})),
 		);
 	}

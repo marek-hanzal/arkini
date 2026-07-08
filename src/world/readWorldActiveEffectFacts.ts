@@ -15,11 +15,8 @@ export namespace readWorldActiveEffectFacts {
 	}
 }
 
-type ActiveEffectRouteScope = readWorldActiveEffectFacts.Props & {
-	producerFactsByJobId: ReadonlyMap<string, ReturnType<typeof readWorldProducerJobFacts>[number]>;
-};
-
 type ActiveEffect = GameSave["activeEffects"][string];
+type ProducerFactsByJobId = ReadonlyMap<string, ReturnType<typeof readWorldProducerJobFacts>[number]>;
 
 const sourceScopeIncludes = ({
 	location,
@@ -38,11 +35,7 @@ const readActiveEffectSourceLocation = ({
 }): WorldActiveEffectFacts["sourceLocation"] | undefined => {
 	if (save.board.items[effect.sourceItemInstanceId]) return "board";
 	return save.inventory.slots.some(
-		(slot) =>
-			slot !== null &&
-			"kind" in slot &&
-			slot.kind === "instance" &&
-			slot.id === effect.sourceItemInstanceId,
+		(slot) => slot !== null && "kind" in slot && slot.kind === "instance" && slot.id === effect.sourceItemInstanceId,
 	)
 		? "inventory"
 		: undefined;
@@ -120,13 +113,11 @@ const readProducerBoundEffectStatus = ({
 	producerFactsByJobId,
 }: {
 	effect: ActiveEffect;
-	producerFactsByJobId: ActiveEffectRouteScope["producerFactsByJobId"];
+	producerFactsByJobId: ProducerFactsByJobId;
 }):
 	| Extract<WorldActiveEffectFacts["status"], "blocked_by_paused_queue_head" | "producer_paused">
 	| undefined => {
-	const producerFacts = effect.producerJobId
-		? producerFactsByJobId.get(effect.producerJobId)
-		: undefined;
+	const producerFacts = effect.producerJobId ? producerFactsByJobId.get(effect.producerJobId) : undefined;
 	if (producerFacts?.status === "paused") return "producer_paused";
 	if (producerFacts?.status === "blocked_by_paused_queue_head") {
 		return "blocked_by_paused_queue_head";
@@ -140,8 +131,12 @@ const readActiveEffectFactsForEffect = ({
 	nowMs,
 	producerFactsByJobId,
 	save,
-}: ActiveEffectRouteScope & {
+}: {
+	config: GameConfig;
 	effect: ActiveEffect;
+	nowMs?: number;
+	producerFactsByJobId: ProducerFactsByJobId;
+	save: GameSave;
 }): WorldActiveEffectFacts => {
 	const sourceLocation = readActiveEffectSourceLocation({
 		effect,
@@ -193,34 +188,34 @@ const readActiveEffectFactsForEffect = ({
 	};
 };
 
-const createActiveEffectRouteScope = ({
-	config,
+const readProducerFactsByJobId = ({
 	nowMs,
 	save,
-}: readWorldActiveEffectFacts.Props): ActiveEffectRouteScope => ({
-	config,
-	nowMs,
-	producerFactsByJobId: new Map(
+}: Pick<readWorldActiveEffectFacts.Props, "nowMs" | "save">): ProducerFactsByJobId =>
+	new Map(
 		readWorldProducerJobFacts({
 			nowMs,
 			save,
-		}).map((facts) => [
-			facts.job.id,
-			facts,
-		]),
-	),
-	save,
-});
+		}).map((facts) => [facts.job.id, facts]),
+	);
 
-export const readWorldActiveEffectFacts = (
-	props: readWorldActiveEffectFacts.Props,
-): WorldActiveEffectFacts[] => {
-	const scope = createActiveEffectRouteScope(props);
-	return Object.values(props.save.activeEffects ?? {})
+export const readWorldActiveEffectFacts = ({
+	config,
+	nowMs,
+	save,
+}: readWorldActiveEffectFacts.Props): WorldActiveEffectFacts[] => {
+	const producerFactsByJobId = readProducerFactsByJobId({
+		nowMs,
+		save,
+	});
+	return Object.values(save.activeEffects ?? {})
 		.map((effect) =>
 			readActiveEffectFactsForEffect({
-				...scope,
+				config,
 				effect,
+				nowMs,
+				producerFactsByJobId,
+				save,
 			}),
 		)
 		.sort((left, right) => left.effect.id.localeCompare(right.effect.id));

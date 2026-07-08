@@ -15,17 +15,13 @@ export namespace resolveInputRefsFx {
 	}
 }
 
-type InputRefResolutionState = {
-	readonly save: GameSave;
-	readonly seen: Set<string>;
-};
-
 const assertUniqueInputRefFx = Effect.fn("resolveInputRefsFx.assertUniqueInputRefFx")(function* ({
 	key,
 	seen,
 }: {
 	key: string;
-} & Pick<InputRefResolutionState, "seen">) {
+	seen: Set<string>;
+}) {
 	if (!seen.has(key)) {
 		seen.add(key);
 		return;
@@ -46,8 +42,10 @@ const resolveBoardInputRefFx = Effect.fn("resolveInputRefsFx.resolveBoardInputRe
 	{
 		kind: "board";
 	}
-> &
-	InputRefResolutionState) {
+> & {
+	save: GameSave;
+	seen: Set<string>;
+}) {
 	const key = `board:${itemInstanceId}`;
 	yield* assertUniqueInputRefFx({
 		key,
@@ -106,8 +104,10 @@ const resolveInventoryInputRefFx = Effect.fn("resolveInputRefsFx.resolveInventor
 		{
 			kind: "inventory";
 		}
-	> &
-		InputRefResolutionState) {
+	> & {
+		save: GameSave;
+		seen: Set<string>;
+	}) {
 		const key = `inventory:${slotIndex}`;
 		yield* assertUniqueInputRefFx({
 			key,
@@ -139,52 +139,41 @@ const resolveInputRefFx = Effect.fn("resolveInputRefsFx.resolveInputRefFx")(func
 	seen,
 }: {
 	ref: GameActionItemRefSchema.Type;
-} & InputRefResolutionState) {
+	save: GameSave;
+	seen: Set<string>;
+}) {
 	return yield* match(ref)
-		.with(
-			{
-				kind: "board",
-			},
-			(boardRef) =>
-				resolveBoardInputRefFx({
-					...boardRef,
-					save,
-					seen,
-				}),
+		.with({ kind: "board" }, (boardRef) =>
+			resolveBoardInputRefFx({
+				...boardRef,
+				save,
+				seen,
+			}),
 		)
-		.with(
-			{
-				kind: "inventory",
-			},
-			(inventoryRef) =>
-				resolveInventoryInputRefFx({
-					...inventoryRef,
-					save,
-					seen,
-				}),
+		.with({ kind: "inventory" }, (inventoryRef) =>
+			resolveInventoryInputRefFx({
+				...inventoryRef,
+				save,
+				seen,
+			}),
 		)
 		.exhaustive();
 });
 
-const resolveInputRefsProgramFx = Effect.fn("resolveInputRefsFx.resolveInputRefsProgramFx")(
-	function* ({ inputRefs, save }: resolveInputRefsFx.Props) {
-		const seen = new Set<string>();
-		const resolved: GameActionResolvedInputRef[] = [];
-		for (const ref of inputRefs) {
-			resolved.push(
-				yield* resolveInputRefFx({
-					ref,
-					save,
-					seen,
-				}),
-			);
-		}
-		return resolved;
-	},
-);
-
-export const resolveInputRefsFx = Effect.fn("resolveInputRefsFx")(function* (
-	props: resolveInputRefsFx.Props,
-) {
-	return yield* resolveInputRefsProgramFx(props);
+export const resolveInputRefsFx = Effect.fn("resolveInputRefsFx")(function* ({
+	inputRefs,
+	save,
+}: resolveInputRefsFx.Props) {
+	const seen = new Set<string>();
+	const resolved: GameActionResolvedInputRef[] = [];
+	for (const ref of inputRefs) {
+		resolved.push(
+			yield* resolveInputRefFx({
+				ref,
+				save,
+				seen,
+			}),
+		);
+	}
+	return resolved;
 });

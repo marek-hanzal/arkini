@@ -27,11 +27,6 @@ type ActivationInputPlannerState = {
 	reservedInventorySlotQuantities: number[];
 };
 
-type ActivationInputPlannerScope = Omit<planActivationInputRefsFx.Props, "excludedBoardItemIds"> & {
-	excludedBoardItemIds: ReadonlySet<string>;
-	state: ActivationInputPlannerState;
-};
-
 const createActivationInputPlannerState = (): ActivationInputPlannerState => ({
 	inputRefs: [],
 	reservedBoardItemQuantities: {},
@@ -41,9 +36,7 @@ const createActivationInputPlannerState = (): ActivationInputPlannerState => ({
 const readSortedBoardInputCandidates = (items: readonly GameSave["board"]["items"][string][]) =>
 	[
 		...items,
-	].sort(
-		(left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
-	);
+	].sort((left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id));
 
 const readMissingActivationInputQuantity = ({
 	input,
@@ -59,35 +52,39 @@ const readMissingActivationInputQuantity = ({
 	});
 
 const appendBoardActivationInputRefsFx = Effect.fn("appendBoardActivationInputRefsFx")(function* ({
+	excludedBoardItemIds,
 	input,
 	missingQuantity,
-	scope,
+	save,
+	state,
 }: {
+	excludedBoardItemIds: ReadonlySet<string>;
 	input: ActivationInputDemand;
 	missingQuantity: number;
-	scope: ActivationInputPlannerScope;
+	save: GameSave;
+	state: ActivationInputPlannerState;
 }) {
 	let remainingQuantity = missingQuantity;
 
-	for (const boardItem of readSortedBoardInputCandidates(Object.values(scope.save.board.items))) {
+	for (const boardItem of readSortedBoardInputCandidates(Object.values(save.board.items))) {
 		if (remainingQuantity <= 0) break;
-		if (scope.excludedBoardItemIds.has(boardItem.id)) continue;
+		if (excludedBoardItemIds.has(boardItem.id)) continue;
 		if (boardItem.itemId !== input.itemId) continue;
-		const reservedQuantity = scope.state.reservedBoardItemQuantities[boardItem.id] ?? 0;
+		const reservedQuantity = state.reservedBoardItemQuantities[boardItem.id] ?? 0;
 		const availableQuantity = readGameSaveBoardItemQuantity(boardItem) - reservedQuantity;
 		const quantity = Math.min(remainingQuantity, availableQuantity);
 		if (quantity <= 0) continue;
 		if (
 			!isBoardItemConsumableAsInput({
 				itemInstanceId: boardItem.id,
-				save: scope.save,
+				save,
 			})
 		) {
 			continue;
 		}
 
-		scope.state.reservedBoardItemQuantities[boardItem.id] = reservedQuantity + quantity;
-		scope.state.inputRefs.push({
+		state.reservedBoardItemQuantities[boardItem.id] = reservedQuantity + quantity;
+		state.inputRefs.push({
 			itemInstanceId: boardItem.id,
 			kind: "board",
 			quantity,
@@ -102,25 +99,27 @@ const appendInventoryActivationInputRefsFx = Effect.fn("appendInventoryActivatio
 	function* ({
 		input,
 		missingQuantity,
-		scope,
+		save,
+		state,
 	}: {
 		input: ActivationInputDemand;
 		missingQuantity: number;
-		scope: ActivationInputPlannerScope;
+		save: GameSave;
+		state: ActivationInputPlannerState;
 	}) {
 		let remainingQuantity = missingQuantity;
 
-		for (const [slotIndex, slot] of scope.save.inventory.slots.entries()) {
+		for (const [slotIndex, slot] of save.inventory.slots.entries()) {
 			if (remainingQuantity <= 0) break;
 			if (!slot || slot.itemId !== input.itemId) continue;
 
-			const reservedQuantity = scope.state.reservedInventorySlotQuantities[slotIndex] ?? 0;
+			const reservedQuantity = state.reservedInventorySlotQuantities[slotIndex] ?? 0;
 			const availableQuantity = readGameSaveInventorySlotQuantity(slot) - reservedQuantity;
 			const quantity = Math.min(remainingQuantity, availableQuantity);
 			if (quantity <= 0) continue;
 
-			scope.state.reservedInventorySlotQuantities[slotIndex] = reservedQuantity + quantity;
-			scope.state.inputRefs.push({
+			state.reservedInventorySlotQuantities[slotIndex] = reservedQuantity + quantity;
+			state.inputRefs.push({
 				kind: "inventory",
 				quantity,
 				slotIndex,
@@ -133,27 +132,36 @@ const appendInventoryActivationInputRefsFx = Effect.fn("appendInventoryActivatio
 );
 
 const appendActivationInputRefsFx = Effect.fn("appendActivationInputRefsFx")(function* ({
+	excludedBoardItemIds,
 	input,
-	scope,
+	save,
+	state,
+	storedInputQuantities,
 }: {
+	excludedBoardItemIds: ReadonlySet<string>;
 	input: ActivationInputDemand;
-	scope: ActivationInputPlannerScope;
+	save: GameSave;
+	state: ActivationInputPlannerState;
+	storedInputQuantities: GameItemQuantityIndex;
 }) {
 	const missingQuantity = readMissingActivationInputQuantity({
 		input,
-		storedInputQuantities: scope.storedInputQuantities,
+		storedInputQuantities,
 	});
 	if (missingQuantity <= 0) return;
 
 	const afterBoardQuantity = yield* appendBoardActivationInputRefsFx({
+		excludedBoardItemIds,
 		input,
 		missingQuantity,
-		scope,
+		save,
+		state,
 	});
 	yield* appendInventoryActivationInputRefsFx({
 		input,
 		missingQuantity: afterBoardQuantity,
-		scope,
+		save,
+		state,
 	});
 });
 
@@ -163,20 +171,17 @@ export const planActivationInputRefsFx = Effect.fn("planActivationInputRefsFx")(
 	save,
 	storedInputQuantities,
 }: planActivationInputRefsFx.Props) {
-	const scope: ActivationInputPlannerScope = {
-		excludedBoardItemIds,
-		inputs,
-		save,
-		state: createActivationInputPlannerState(),
-		storedInputQuantities,
-	};
+	const state = createActivationInputPlannerState();
 
 	for (const input of inputs) {
 		yield* appendActivationInputRefsFx({
+			excludedBoardItemIds,
 			input,
-			scope,
+			save,
+			state,
+			storedInputQuantities,
 		});
 	}
 
-	return scope.state.inputRefs;
+	return state.inputRefs;
 });

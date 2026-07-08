@@ -1,10 +1,9 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { applyCraftCompletionResultFx } from "~/craft/applyCraftCompletionResultFx";
 import { completeBlockedCraftJobFx } from "~/craft/completeBlockedCraftJobFx";
 import { createMissingCraftJobResult } from "~/craft/CraftJobCompletionEvents";
-import type { CraftJobCompletionScope } from "~/craft/CraftJobCompletionTypes";
 import { readCraftCompletionTargetFx } from "~/craft/readCraftCompletionTargetFx";
-import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
 
 export namespace completeCraftJobFx {
@@ -16,26 +15,27 @@ export namespace completeCraftJobFx {
 	}
 }
 
-const readLiveCraftJobFx = Effect.fn("completeCraftJobFx.readLiveCraftJobFx")(function* (
-	scope: CraftJobCompletionScope,
-) {
-	return scope.save.craftJobs[scope.job.id];
-});
-
 const completeLiveCraftJobFx = Effect.fn("completeCraftJobFx.completeLiveCraftJobFx")(function* ({
+	config,
 	liveJob,
-	scope,
+	nowMs,
+	save,
 }: {
+	config: GameConfig;
 	liveJob: GameSaveCraftJob;
-	scope: CraftJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
 	const target = yield* readCraftCompletionTargetFx({
+		config,
 		liveJob,
-		scope,
+		save,
 	});
 	const resultEither = yield* Effect.either(
 		applyCraftCompletionResultFx({
-			scope,
+			config,
+			nowMs,
+			save,
 			target,
 		}),
 	);
@@ -44,28 +44,29 @@ const completeLiveCraftJobFx = Effect.fn("completeCraftJobFx.completeLiveCraftJo
 		return yield* Effect.fail(resultEither.left);
 	return yield* completeBlockedCraftJobFx({
 		job: target.liveJob,
+		nowMs,
 		reason: resultEither.left.reason,
-		scope,
+		save,
 	});
 });
 
-const completeCraftJobProgramFx = Effect.fn("completeCraftJobFx.completeCraftJobProgramFx")(
-	function* (scope: CraftJobCompletionScope) {
-		const liveJob = yield* readLiveCraftJobFx(scope);
-		if (!liveJob) {
-			return createMissingCraftJobResult({
-				save: scope.save,
-			});
-		}
-		return yield* completeLiveCraftJobFx({
-			liveJob,
-			scope,
+export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* ({
+	config,
+	job,
+	nowMs,
+	save,
+}: completeCraftJobFx.Props) {
+	const liveJob = save.craftJobs[job.id];
+	if (!liveJob) {
+		return createMissingCraftJobResult({
+			save,
 		});
-	},
-);
+	}
 
-export const completeCraftJobFx = Effect.fn("completeCraftJobFx")(function* (
-	props: completeCraftJobFx.Props,
-) {
-	return yield* completeCraftJobProgramFx(props);
+	return yield* completeLiveCraftJobFx({
+		config,
+		liveJob,
+		nowMs,
+		save,
+	});
 });

@@ -1,41 +1,50 @@
 import { Effect } from "effect";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
-import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { CraftCompletionTarget } from "~/craft/CraftJobCompletionTypes";
 import { createCraftSpawnCompletedResult } from "~/craft/CraftJobCompletionEvents";
-import type {
-	CraftCompletionTarget,
-	CraftJobCompletionScope,
-} from "~/craft/CraftJobCompletionTypes";
+import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
+import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import { readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
-import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 const readCraftDeliveryPlacementRequestsFx = Effect.fn(
 	"applyCraftCompletionResultFx.readCraftDeliveryPlacementRequestsFx",
-)(function* ({ scope, target }: { scope: CraftJobCompletionScope; target: CraftCompletionTarget }) {
+)(function* ({
+	config,
+	nowMs,
+	save,
+	target,
+}: {
+	config: GameConfig;
+	nowMs: number;
+	save: GameSave;
+	target: CraftCompletionTarget;
+}) {
 	const targetCell = yield* readBoardItemCellFx({
 		itemInstanceId: target.liveJob.targetItemInstanceId,
-		save: scope.save,
+		save,
 	});
 	const grantIds = readGameWorldGrantIds({
-		config: scope.config,
-		nowMs: scope.nowMs,
-		save: scope.save,
+		config,
+		nowMs,
+		save,
 	});
 	const effectiveOutput = readEffectiveOutputEntries({
-		config: scope.config,
+		config,
 		grantIds,
 		itemInstanceId: target.liveJob.targetItemInstanceId,
 		lineId: `craft:${target.liveJob.recipeId}`,
 		lineVisible: true,
 		output: target.recipe.output,
-		save: scope.save,
+		save,
 		targetCell,
 	});
 	const rolled = yield* rollEffectiveLootPlanItemsFx({
@@ -58,14 +67,18 @@ const readCraftDeliveryPlacementRequestsFx = Effect.fn(
 });
 
 export const applyCraftCompletionResultFx = Effect.fn("applyCraftCompletionResultFx")(function* ({
-	scope,
+	config,
+	nowMs,
+	save,
 	target,
 }: {
-	scope: CraftJobCompletionScope;
+	config: GameConfig;
+	nowMs: number;
+	save: GameSave;
 	target: CraftCompletionTarget;
 }) {
 	const nextSave = yield* cloneGameSaveFx({
-		save: scope.save,
+		save,
 	});
 	const nextTarget = nextSave.board.items[target.liveJob.targetItemInstanceId];
 	if (!nextTarget) {
@@ -78,10 +91,12 @@ export const applyCraftCompletionResultFx = Effect.fn("applyCraftCompletionResul
 
 	const targetCell = yield* readBoardItemCellFx({
 		itemInstanceId: target.liveJob.targetItemInstanceId,
-		save: scope.save,
+		save,
 	});
 	const placementRequests = yield* readCraftDeliveryPlacementRequestsFx({
-		scope,
+		config,
+		nowMs,
+		save,
 		target,
 	});
 
@@ -94,21 +109,21 @@ export const applyCraftCompletionResultFx = Effect.fn("applyCraftCompletionResul
 		runtimeState: "remove",
 		save: nextSave,
 	});
-	nextSave.updatedAtMs = scope.nowMs;
+	nextSave.updatedAtMs = nowMs;
 
 	const placed = yield* placeGameSaveItemsFx({
-		config: scope.config,
+		config,
 		freedBoardItemInstanceIds: new Set([
 			target.liveJob.targetItemInstanceId,
 		]),
 		items: placementRequests,
-		nowMs: scope.nowMs,
+		nowMs,
 		save: nextSave,
 		seedCell: targetCell,
 	});
 	const events: GameEvent[] = [
 		{
-			atMs: scope.nowMs,
+			atMs: nowMs,
 			itemId: target.liveTarget.itemId,
 			itemInstanceId: target.liveJob.targetItemInstanceId,
 			reason: "craft-result",
@@ -120,7 +135,7 @@ export const applyCraftCompletionResultFx = Effect.fn("applyCraftCompletionResul
 	return createCraftSpawnCompletedResult({
 		events,
 		job: target.liveJob,
-		nowMs: scope.nowMs,
+		nowMs,
 		save: placed.save,
 	});
 });

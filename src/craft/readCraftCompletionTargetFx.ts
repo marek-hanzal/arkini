@@ -5,21 +5,19 @@ import {
 } from "~/config/GameItemCapabilities";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
-import type { GameSaveBoardItem, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
-import type {
-	CraftCompletionTarget,
-	CraftJobCompletionScope,
-} from "~/craft/CraftJobCompletionTypes";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveBoardItem, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
+import type { CraftCompletionTarget } from "~/craft/CraftJobCompletionTypes";
 
 const readCraftCompletionRecipeFx = Effect.fn("readCraftCompletionRecipeFx")(function* ({
+	config,
 	liveJob,
-	scope,
 }: {
+	config: GameConfig;
 	liveJob: GameSaveCraftJob;
-	scope: CraftJobCompletionScope;
 }) {
 	const recipe = readCraftRecipeDefinition({
-		config: scope.config,
+		config,
 		recipeId: liveJob.recipeId,
 	});
 	if (recipe) return recipe;
@@ -31,12 +29,12 @@ const readCraftCompletionRecipeFx = Effect.fn("readCraftCompletionRecipeFx")(fun
 
 const readCraftCompletionBoardItemFx = Effect.fn("readCraftCompletionBoardItemFx")(function* ({
 	liveJob,
-	scope,
+	save,
 }: {
 	liveJob: GameSaveCraftJob;
-	scope: CraftJobCompletionScope;
+	save: GameSave;
 }) {
-	const liveTarget = scope.save.board.items[liveJob.targetItemInstanceId];
+	const liveTarget = save.board.items[liveJob.targetItemInstanceId];
 	if (liveTarget) return liveTarget;
 
 	return yield* Effect.fail(
@@ -65,14 +63,14 @@ const assertCraftCompletionTargetMatchesRecipeFx = Effect.fn(
 });
 
 const assertCraftOutputItemsExistFx = Effect.fn("assertCraftOutputItemsExistFx")(function* ({
+	config,
 	recipe,
-	scope,
 }: {
+	config: GameConfig;
 	recipe: GameCraftRecipeDefinition;
-	scope: CraftJobCompletionScope;
 }) {
 	for (const outputItemId of readCraftOutputItemIds(recipe)) {
-		if (scope.config.items[outputItemId]) continue;
+		if (config.items[outputItemId]) continue;
 
 		return yield* Effect.fail(
 			GameEngineError.configReferenceMissing(`Missing craft output item "${outputItemId}".`),
@@ -81,27 +79,29 @@ const assertCraftOutputItemsExistFx = Effect.fn("assertCraftOutputItemsExistFx")
 });
 
 export const readCraftCompletionTargetFx = Effect.fn("readCraftCompletionTargetFx")(function* ({
+	config,
 	liveJob,
-	scope,
+	save,
 }: {
+	config: GameConfig;
 	liveJob: GameSaveCraftJob;
-	scope: CraftJobCompletionScope;
+	save: GameSave;
 }) {
 	const recipe = yield* readCraftCompletionRecipeFx({
+		config,
 		liveJob,
-		scope,
 	});
 	const liveTarget = yield* readCraftCompletionBoardItemFx({
 		liveJob,
-		scope,
+		save,
 	});
 	yield* assertCraftCompletionTargetMatchesRecipeFx({
 		liveJob,
 		liveTarget,
 	});
 	yield* assertCraftOutputItemsExistFx({
+		config,
 		recipe,
-		scope,
 	});
 	return {
 		liveJob,

@@ -24,11 +24,6 @@ export namespace checkItemMergeReadinessFx {
 
 type MergeReadinessTarget = NonNullable<GameSave["board"]["items"][string]>;
 
-type ItemMergeReadinessScope = checkItemMergeReadinessFx.Props & {
-	readonly source: GameActionResolvedInputRef;
-	readonly target: MergeReadinessTarget;
-};
-
 const readMergeReadinessTargetFx = Effect.fn(
 	"checkItemMergeReadinessFx.readMergeReadinessTargetFx",
 )(function* ({ action, save }: checkItemMergeReadinessFx.Props) {
@@ -71,7 +66,15 @@ const readMergeReadinessSourceFx = Effect.fn(
 });
 
 const readExecutableMergeRuleFx = Effect.fn("checkItemMergeReadinessFx.readExecutableMergeRuleFx")(
-	function* ({ config, source, target }: ItemMergeReadinessScope) {
+	function* ({
+		config,
+		source,
+		target,
+	}: {
+		config: GameConfig;
+		source: GameActionResolvedInputRef;
+		target: MergeReadinessTarget;
+	}) {
 		const sourceDefinition = config.items[source.itemId];
 		const merge = resolveExecutableItemMergeRule({
 			config,
@@ -94,7 +97,8 @@ const assertMergeResultItemDefinitionExistsFx = Effect.fn(
 )(function* ({
 	config,
 	resultItemId,
-}: Pick<ItemMergeReadinessScope, "config"> & {
+}: {
+	config: GameConfig;
 	resultItemId: string;
 }) {
 	if (config.items[resultItemId]) return;
@@ -111,14 +115,15 @@ const assertMergeResultBoardCapacityFx = Effect.fn(
 	resultItemId,
 	save,
 	target,
-}: ItemMergeReadinessScope & {
+}: {
+	config: GameConfig;
 	resultItemId: string;
+	save: GameSave;
+	target: MergeReadinessTarget;
 }) {
 	const capacity = yield* readBoardItemMaxCountCapacityFx({
 		config,
-		ignoredBoardItemInstanceIds: new Set([
-			target.id,
-		]),
+		ignoredBoardItemInstanceIds: new Set([target.id]),
 		itemId: resultItemId,
 		save,
 	});
@@ -134,7 +139,7 @@ const assertMergeResultBoardCapacityFx = Effect.fn(
 
 const assertMergeTargetSingleQuantityFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeTargetSingleQuantityFx",
-)(function* ({ target }: ItemMergeReadinessScope) {
+)(function* ({ target }: { target: MergeReadinessTarget }) {
 	if (readGameSaveBoardItemQuantity(target) === 1) return;
 
 	return yield* Effect.fail(
@@ -147,7 +152,13 @@ const assertMergeTargetSingleQuantityFx = Effect.fn(
 
 const assertMergeTargetReplaceableFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeTargetReplaceableFx",
-)(function* ({ save, target }: ItemMergeReadinessScope) {
+)(function* ({
+	save,
+	target,
+}: {
+	save: GameSave;
+	target: MergeReadinessTarget;
+}) {
 	const targetStateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: target.id,
 		save,
@@ -166,35 +177,36 @@ const assertMergeTargetReplaceableFx = Effect.fn(
 
 const assertMergeResultReadinessFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeResultReadinessFx",
-)(function* ({ merge, scope }: { merge: GameMergeRuleDefinition; scope: ItemMergeReadinessScope }) {
+)(function* ({
+	config,
+	merge,
+	save,
+	target,
+}: {
+	config: GameConfig;
+	merge: GameMergeRuleDefinition;
+	save: GameSave;
+	target: MergeReadinessTarget;
+}) {
 	if (!("resultItemId" in merge)) return;
 
 	yield* assertMergeResultItemDefinitionExistsFx({
-		config: scope.config,
+		config,
 		resultItemId: merge.resultItemId,
 	});
 	yield* assertMergeResultBoardCapacityFx({
-		...scope,
+		config,
 		resultItemId: merge.resultItemId,
+		save,
+		target,
 	});
-	yield* assertMergeTargetSingleQuantityFx(scope);
-	yield* assertMergeTargetReplaceableFx(scope);
-});
-
-const checkItemMergeReadinessProgramFx = Effect.fn(
-	"checkItemMergeReadinessFx.checkItemMergeReadinessProgramFx",
-)(function* (scope: ItemMergeReadinessScope) {
-	const merge = yield* readExecutableMergeRuleFx(scope);
-	yield* assertMergeResultReadinessFx({
-		merge,
-		scope,
+	yield* assertMergeTargetSingleQuantityFx({
+		target,
 	});
-
-	return {
-		merge,
-		source: scope.source,
-		target: scope.target,
-	};
+	yield* assertMergeTargetReplaceableFx({
+		save,
+		target,
+	});
 });
 
 export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(function* (
@@ -202,13 +214,25 @@ export const checkItemMergeReadinessFx = Effect.fn("checkItemMergeReadinessFx")(
 ) {
 	const target = yield* readMergeReadinessTargetFx(props);
 	const source = yield* readMergeReadinessSourceFx({
-		...props,
+		action: props.action,
+		save: props.save,
 		target,
 	});
-
-	return yield* checkItemMergeReadinessProgramFx({
-		...props,
+	const merge = yield* readExecutableMergeRuleFx({
+		config: props.config,
 		source,
 		target,
 	});
+	yield* assertMergeResultReadinessFx({
+		config: props.config,
+		merge,
+		save: props.save,
+		target,
+	});
+
+	return {
+		merge,
+		source,
+		target,
+	};
 });

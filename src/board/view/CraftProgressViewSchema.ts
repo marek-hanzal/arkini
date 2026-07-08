@@ -2,6 +2,7 @@ import { z } from "zod";
 import { GameItemIdSchema } from "~/config/GameIdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
 import { ItemTargetLimitViewSchema } from "./ItemTargetLimitViewSchema";
+import { LineOutputViewSchema } from "./LineViewSchema";
 
 const CraftEffectRequirementViewSchema = z
 	.object({
@@ -47,6 +48,7 @@ export const CraftProgressViewSchema = z.object({
 	targetLimitBlocked: z.boolean().optional(),
 	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
 	acceptedInputItemIds: z.array(GameItemIdSchema),
+	outputs: z.array(LineOutputViewSchema).optional(),
 });
 
 type CraftProgressViewSchema = typeof CraftProgressViewSchema;

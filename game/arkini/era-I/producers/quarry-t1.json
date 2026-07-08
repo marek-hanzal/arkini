@@ -112,7 +112,7 @@
 										"type": "chance"
 									},
 									{
-										"chance": 0.03,
+										"chance": 0.1,
 										"itemId": "item:quest:road-repair",
 										"sort": 900,
 										"type": "chance"

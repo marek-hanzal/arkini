@@ -38,6 +38,7 @@ const readOutputProbabilityLabel = (output: DetailLineOutputView) => {
 
 const readOutputMetaLabel = (output: DetailLineOutputView) =>
 	joinTextParts([
+		output.rollSetLabel,
 		output.enabled === false ? "disabled" : undefined,
 		readQuantityLabel(output.quantity),
 		readOutputProbabilityLabel(output),

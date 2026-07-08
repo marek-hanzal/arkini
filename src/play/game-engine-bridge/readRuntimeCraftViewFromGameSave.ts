@@ -1,5 +1,9 @@
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
+import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
+import { readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
+import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import { readCraftRecipeDurationMs } from "~/craft/readCraftRecipeDurationMs";
 import {
 	readCraftOutputItemIds,
@@ -12,6 +16,7 @@ import type { GameSave, GameSaveBoardItem, GameSaveCraftJob } from "~/engine/mod
 import { readItemTargetLimits } from "~/limit/readItemTargetLimits";
 import { readTargetLimitBlocked } from "~/limit/readTargetLimitBlocked";
 import { readRuntimeActivationInputAvailableQuantityFromGameSave } from "~/play/game-engine-bridge/readRuntimeActivationInputAvailableQuantityFromGameSave";
+import { readRuntimeLineOutputViews } from "~/play/game-engine-bridge/readRuntimeLineOutputViews";
 import { readGameTimeProgress, readGameTimeRemainingMs } from "~/time/GameTime";
 
 export namespace readRuntimeCraftViewFromGameSave {
@@ -163,6 +168,45 @@ const readCraftVisibleProgress = ({
 	return facts.timeProgress;
 };
 
+const readCraftOutputViews = (scope: RuntimeCraftViewScope): CraftProgressView["outputs"] => {
+	const effectiveOutput = readEffectiveOutputEntries({
+		config: scope.config,
+		grantIds: readGameWorldGrantIds({
+			config: scope.config,
+			nowMs: scope.nowMs,
+			save: scope.save,
+		}),
+		itemInstanceId: scope.boardItem.id,
+		lineId: scope.boardItem.itemId,
+		lineVisible: true,
+		output: scope.recipe.output as NonNullable<GameLineDefinition["output"]>,
+		save: scope.save,
+		targetCell: readGameEffectSourceCell({
+			save: scope.save,
+			sourceItemInstanceId: scope.boardItem.id,
+		}),
+	});
+	const outputs = readRuntimeLineOutputViews({
+		effectiveLine: {
+			appliedEffects: effectiveOutput.appliedEffects,
+			blocked: false,
+			blockReasons: [],
+			durationMs: 0,
+			lootPlan: {
+				baseOutput: effectiveOutput.rollableOutput,
+				chanceItems: effectiveOutput.chanceItems,
+				outputSets: effectiveOutput.outputSets,
+				visibleOutput: effectiveOutput.visibleOutput,
+			},
+			requirements: [],
+			visible: true,
+		},
+		save: scope.save,
+	});
+
+	return outputs.length > 0 ? outputs : undefined;
+};
+
 const createRuntimeCraftView = (scope: RuntimeCraftViewScope): CraftProgressView => {
 	const phase = readCraftPhase(scope);
 	const acceptedInputItemIds = readAcceptedCraftInputItemIds({
@@ -189,6 +233,7 @@ const createRuntimeCraftView = (scope: RuntimeCraftViewScope): CraftProgressView
 		inputProgress: progressFacts.inputProgress,
 		inputs: readCraftInputViews(scope),
 		pausedAtMs: scope.runningJob?.pausedAtMs,
+		outputs: readCraftOutputViews(scope),
 		phase,
 		progress: readCraftVisibleProgress({
 			facts: progressFacts,

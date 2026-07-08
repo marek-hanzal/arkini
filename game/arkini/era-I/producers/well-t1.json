@@ -90,7 +90,7 @@
 										"type": "chance"
 									},
 									{
-										"chance": 0.04,
+										"chance": 0.1,
 										"itemId": "item:quest:water-carrier",
 										"sort": 900,
 										"type": "chance"

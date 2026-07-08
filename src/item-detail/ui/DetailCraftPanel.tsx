@@ -8,6 +8,7 @@ import { UiProgressButton } from "~/ui/UiProgressButton";
 import { cn } from "~/ui/cn";
 import type { DetailCraftControl } from "~/item-detail/control/DetailCraftControl";
 import { DetailCard } from "~/item-detail/ui/DetailCard";
+import { DetailLineOutputs } from "~/item-detail/ui/DetailLineOutputs";
 import { DetailTargetLimits } from "~/item-detail/ui/DetailTargetLimits";
 
 export namespace DetailCraftPanel {
@@ -88,6 +89,14 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 					id={craft.id}
 					items={items}
 					limits={targetLimits}
+				/>
+
+				<DetailLineOutputs
+					items={items}
+					line={{
+						lineId: craft.id,
+						outputs: craft.outputs,
+					}}
 				/>
 
 				{blockerRows.length ? (

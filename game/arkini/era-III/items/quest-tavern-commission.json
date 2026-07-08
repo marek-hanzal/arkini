@@ -24,9 +24,27 @@
 				],
 				"output": [
 					{
+						"weight": 3,
 						"entries": [
 							{
 								"itemId": "item:feast",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:cheese",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"weight": 1,
+						"entries": [
+							{
+								"itemId": "item:feast",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:stone-block",
 								"type": "guaranteed"
 							}
 						]

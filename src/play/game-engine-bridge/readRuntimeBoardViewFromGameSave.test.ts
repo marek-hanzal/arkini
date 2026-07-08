@@ -710,6 +710,71 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 		});
 	});
 
+	it("shows craft output roll sets in the runtime craft view", () => {
+		const baseConfig = createEngineTestConfig();
+		const config = createEngineTestConfig({
+			craftOverrides: {
+				...baseConfig.craftCatalog,
+				"item:craft-table": {
+					...baseConfig.craftCatalog["item:craft-table"],
+					output: [
+						{
+							weight: 3,
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+						},
+						{
+							weight: 1,
+							entries: [
+								{
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
+						},
+					],
+				},
+			},
+			startingState: {
+				board: [
+					{
+						itemId: "item:craft-table",
+						x: 0,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
+		});
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+
+		expect(
+			readRuntimeBoardViewFromGameSave({
+				config,
+				nowMs: 0,
+				save,
+			}).byId["item-instance:1"]?.craft?.outputs,
+		).toMatchObject([
+			{
+				itemId: "item:plank",
+				rollSetLabel: "Set 1 · 75%",
+			},
+			{
+				itemId: "item:twig",
+				rollSetLabel: "Set 2 · 25%",
+			},
+		]);
+	});
+
 	it("freezes paused craft progress in the runtime view", () => {
 		const baseConfig = createEngineTestConfig();
 		const config = createEngineTestConfig({

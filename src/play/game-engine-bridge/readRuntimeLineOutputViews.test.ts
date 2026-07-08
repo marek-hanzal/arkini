@@ -413,6 +413,87 @@ describe("readRuntimeLineOutputViews", () => {
 		]);
 	});
 
+	it("labels outputs by weighted roll set when multiple sets are visible", () => {
+		const config = createEngineTestConfig();
+		const save = runInitialSave({
+			config,
+			nowMs: 0,
+		});
+		const twigOutput = {
+			dropEffects: [],
+			enabled: true,
+			itemId: "item:twig",
+			quantity: 1,
+			type: "guaranteed" as const,
+			visible: true,
+		};
+		const plankOutput = {
+			dropEffects: [],
+			enabled: true,
+			itemId: "item:plank",
+			quantity: 1,
+			type: "guaranteed" as const,
+			visible: true,
+		};
+		const effectiveLine: EffectiveLine = {
+			appliedEffects: [],
+			blocked: false,
+			blockReasons: [],
+			durationMs: 1000,
+			lootPlan: {
+				baseOutput: [
+					twigOutput,
+					plankOutput,
+				],
+				visibleOutput: [
+					twigOutput,
+					plankOutput,
+				],
+				chanceItems: [],
+				outputSets: [
+					{
+						baseOutput: [
+							twigOutput,
+						],
+						chanceItems: [],
+						visibleOutput: [
+							twigOutput,
+						],
+						weight: 3,
+					},
+					{
+						baseOutput: [
+							plankOutput,
+						],
+						chanceItems: [],
+						visibleOutput: [
+							plankOutput,
+						],
+						weight: 1,
+					},
+				],
+			},
+			requirements: [],
+			visible: true,
+		};
+
+		expect(
+			readRuntimeLineOutputViews({
+				effectiveLine,
+				save,
+			}),
+		).toMatchObject([
+			{
+				itemId: "item:plank",
+				rollSetLabel: "Set 2 · 25%",
+			},
+			{
+				itemId: "item:twig",
+				rollSetLabel: "Set 1 · 75%",
+			},
+		]);
+	});
+
 	it("attaches active bonus lines only to matching output items", () => {
 		const config = createEngineTestConfig();
 		const save = runInitialSave({

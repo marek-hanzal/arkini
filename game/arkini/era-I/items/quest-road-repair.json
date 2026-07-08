@@ -21,9 +21,27 @@
 				],
 				"output": [
 					{
+						"weight": 3,
+						"entries": [
+							{
+								"itemId": "item:plank",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:coin",
+								"type": "guaranteed"
+							}
+						]
+					},
+					{
+						"weight": 2,
 						"entries": [
 							{
 								"itemId": "item:stone-block",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:coin",
 								"type": "guaranteed"
 							}
 						]

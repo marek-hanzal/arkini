@@ -25,18 +25,22 @@
 							{
 								"itemId": "item:vegetables",
 								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:coin",
+								"type": "guaranteed"
 							}
 						]
 					},
 					{
-						"weight": 1,
+						"weight": 2,
 						"entries": [
 							{
-								"itemId": "item:vegetables",
+								"itemId": "item:egg",
 								"type": "guaranteed"
 							},
 							{
-								"itemId": "item:egg",
+								"itemId": "item:coin",
 								"type": "guaranteed"
 							}
 						]

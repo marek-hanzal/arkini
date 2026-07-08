@@ -36,7 +36,7 @@ const EffectPolarityViewSchema = z.enum([
 	"mixed",
 ]);
 
-const LineOutputViewSchema = z.object({
+export const LineOutputViewSchema = z.object({
 	itemId: IdSchema,
 	bonusLines: z.array(z.string().min(1)).optional(),
 	ownedQuantity: z.number().int().nonnegative(),
@@ -52,6 +52,7 @@ const LineOutputViewSchema = z.object({
 	probability: z.number().min(0).optional(),
 	quantity: LineOutputQuantityViewSchema.optional(),
 	rollLabel: z.string().min(1).optional(),
+	rollSetLabel: z.string().min(1).optional(),
 	sort: z.number().optional(),
 });
 

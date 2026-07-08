@@ -58,6 +58,18 @@ describe("quest source config", () => {
 		}
 	});
 
+	it("defines multiple weighted reward sets for every quest", () => {
+		for (const file of questFiles) {
+			const item = Object.values<any>(readJson(file).items)[0];
+
+			expect(item.craft.output.length).toBeGreaterThan(1);
+			for (const outputSet of item.craft.output) {
+				expect(outputSet.weight).toBeGreaterThan(0);
+				expect(outputSet.entries.length).toBeGreaterThan(1);
+			}
+		}
+	});
+
 	it("keeps quest rewards away from blueprints and direct input echoes", () => {
 		for (const file of questFiles) {
 			const item = Object.values<any>(readJson(file).items)[0];
@@ -89,7 +101,7 @@ describe("quest source config", () => {
 					if (output.itemId && (questIds as readonly string[]).includes(output.itemId)) {
 						expect(output.type).toBe("chance");
 						expect(output.chance).toBeGreaterThan(0);
-						expect(output.chance).toBeLessThanOrEqual(0.05);
+						expect(output.chance).toBe(0.1);
 						spawnedQuestIds.add(output.itemId);
 					}
 				}

@@ -59,7 +59,7 @@
 										"type": "guaranteed"
 									},
 									{
-										"chance": 0.04,
+										"chance": 0.1,
 										"itemId": "item:quest:tavern-commission",
 										"sort": 900,
 										"type": "chance"
@@ -105,7 +105,7 @@
 										"type": "guaranteed"
 									},
 									{
-										"chance": 0.04,
+										"chance": 0.1,
 										"itemId": "item:quest:tavern-commission",
 										"sort": 900,
 										"type": "chance"

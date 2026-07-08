@@ -21,6 +21,7 @@ const item = (id: string, name: string, assetSrc: string) => ({
 });
 
 const items: ItemCatalogView = {
+	"item:coin": item("item:coin", "Coin", "coin.svg"),
 	"item:plank": item("item:plank", "Plank", "plank.svg"),
 	"item:townhall-t2": item("item:townhall-t2", "Town Hall II", "townhall.svg"),
 	"item:tree": item("item:tree", "Tree", "tree.svg"),
@@ -109,6 +110,35 @@ describe("DetailCraftPanel", () => {
 		expect(html).toContain("Needed before crafting");
 		expect(html).not.toContain("Missing requirements");
 		expect(html).not.toContain("Water");
+	});
+
+	it("renders craft outputs with weighted roll set labels", () => {
+		const html = renderCraft(
+			createCraft({
+				outputs: [
+					{
+						itemId: "item:plank",
+						kind: "guaranteed",
+						ownedQuantity: 0,
+						quantity: 1,
+						rollSetLabel: "Set 1 · 75%",
+					},
+					{
+						itemId: "item:coin",
+						kind: "guaranteed",
+						ownedQuantity: 0,
+						quantity: 1,
+						rollSetLabel: "Set 2 · 25%",
+					},
+				],
+			}),
+		);
+
+		expect(html).toContain("Outputs");
+		expect(html).toContain("Plank");
+		expect(html).toContain("Coin");
+		expect(html).toContain("Set 1 · 75% · 1× · guaranteed");
+		expect(html).toContain("Set 2 · 25% · 1× · guaranteed");
 	});
 
 	it("keeps fulfilled resources visible until the craft starts running", () => {

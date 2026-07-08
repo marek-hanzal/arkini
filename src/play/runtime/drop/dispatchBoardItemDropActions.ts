@@ -9,7 +9,7 @@ import { readItemInteractionSourceRef } from "~/play/interaction/readItemInterac
 import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 import { dispatchRuntimeDropAction } from "~/play/runtime/drop/RuntimeDropActionContext";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readRuntimeViews } from "~/play/runtime/readRuntimeViews";
 
 const createFallbackMergeAction = ({
 	sourceRef,
@@ -23,15 +23,8 @@ const createFallbackMergeAction = ({
 	type: "item.merge" as const,
 });
 
-const readBoardDropState = ({ store }: { store: GameRuntimeStore }) => {
-	const snapshot = store.getSnapshot();
-	const nowMs = Date.now();
-	return {
-		board: readBoardView(snapshot, nowMs),
-		config: snapshot.runtime.config,
-		nowMs,
-	};
-};
+const readBoardDropState = ({ store }: { store: GameRuntimeStore }) =>
+	readRuntimeViews(store.getSnapshot(), Date.now());
 
 const dispatchBoardItemActionWhenExpected = ({
 	board,

@@ -6,8 +6,7 @@ import type { DropActions } from "~/play/drop/DropActions";
 import { resolveDrop } from "~/play/drop/resolveDrop";
 import type { Feedback } from "~/play/feedback/Feedback";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
-import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
+import { readRuntimeViews } from "~/play/runtime/readRuntimeViews";
 import type { TileEngine } from "~/tile-engine/TileEngine.types";
 
 export namespace createRuntimeDropLifecycle {
@@ -29,14 +28,16 @@ export const createRuntimeDropLifecycle = <TTile, TSlot>({
 		audio.play("audio.tile.drag.start");
 	},
 	onDrop(context: TileEngine.DropContext<TTile, TSlot, DragSource, DropTarget>) {
-		const snapshot = runtimeStore.getSnapshot();
-		const nowMs = Date.now();
+		const { board, config, inventory } = readRuntimeViews(
+			runtimeStore.getSnapshot(),
+			Date.now(),
+		);
 
 		return resolveDrop({
 			context,
-			board: readBoardView(snapshot, nowMs),
-			config: snapshot.runtime.config,
-			inventory: readInventoryView(snapshot),
+			board,
+			config,
+			inventory,
 			feedback,
 			actions,
 		});

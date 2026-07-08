@@ -7,9 +7,8 @@ import type {
 } from "~/inventory/InventoryTileEngineModelTypes";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
-import { readBoardFirstEmptyCell } from "~/play/runtime/readers/readBoardFirstEmptyCell";
-import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
-import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
+import { readRuntimeBoardFirstEmptyCell, readRuntimeInventoryView } from "~/play/runtime/readRuntimeViews";
+import type { GameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
 import { useGameInventoryView } from "~/play/runtime/useGameRuntimeViews";
 
 type InventoryStack = NonNullable<
@@ -23,7 +22,7 @@ const placeInventoryAtPlacementSeed = ({
 	placementTarget,
 	stack,
 }: {
-	actions: ReturnType<typeof useGameRuntimeDropActions>;
+	actions: GameRuntimeDropActions;
 	feedback: Feedback.Type;
 	input: PlaceInventoryOnBoardInput;
 	placementTarget: InventoryPlacementTarget;
@@ -49,15 +48,15 @@ const placeInventoryFromTapAction = ({
 	snapshot,
 	stack,
 }: {
-	actions: ReturnType<typeof useGameRuntimeDropActions>;
+	actions: GameRuntimeDropActions;
 	feedback: Feedback.Type;
 	input: PlaceInventoryOnBoardInput;
 	snapshot: ReturnType<ReturnType<typeof useGameRuntimeStore>["getSnapshot"]>;
 	stack: InventoryStack;
 }) => {
 	const action = resolveInventorySlotTapAction({
-		firstEmptyCell: readBoardFirstEmptyCell(snapshot),
-		slot: readInventoryView(snapshot).bySlotIndex[String(input.slotIndex)]!,
+		firstEmptyCell: readRuntimeBoardFirstEmptyCell(snapshot),
+		slot: readRuntimeInventoryView(snapshot).bySlotIndex[String(input.slotIndex)]!,
 	});
 
 	match(action)
@@ -92,7 +91,7 @@ export const usePlaceInventoryOnBoard = ({
 	placementTarget,
 	runtimeStore,
 }: {
-	actions: ReturnType<typeof useGameRuntimeDropActions>;
+	actions: GameRuntimeDropActions;
 	feedback: Feedback.Type;
 	placementTarget?: InventoryPlacementTarget;
 	runtimeStore: ReturnType<typeof useGameRuntimeStore>;
@@ -100,7 +99,7 @@ export const usePlaceInventoryOnBoard = ({
 	useCallback(
 		(input: PlaceInventoryOnBoardInput) => {
 			const snapshot = runtimeStore.getSnapshot();
-			const liveInventory = readInventoryView(snapshot);
+			const liveInventory = readRuntimeInventoryView(snapshot);
 			const liveSlot = liveInventory.bySlotIndex[String(input.slotIndex)];
 			const stack = liveSlot?.stack;
 			if (

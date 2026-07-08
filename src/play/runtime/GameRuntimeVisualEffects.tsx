@@ -1,8 +1,7 @@
 import { type FC, useEffect } from "react";
 import { applyGameEngineVisualPlan } from "~/play/game-engine-visual/applyGameEngineVisualPlan";
 import { createGameEngineVisualPlan } from "~/play/game-engine-visual/createGameEngineVisualPlan";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
-import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
+import { readRuntimeBoardView, readRuntimeInventoryView } from "~/play/runtime/readRuntimeViews";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 
 export namespace GameRuntimeVisualEffects {
@@ -16,10 +15,10 @@ export const GameRuntimeVisualEffects: FC<GameRuntimeVisualEffects.Props> = ({ s
 		() =>
 			store.subscribeUpdate((update) => {
 				const plan = createGameEngineVisualPlan({
-					currentBoard: readBoardView(update.current),
-					currentInventory: readInventoryView(update.current),
+					currentBoard: readRuntimeBoardView(update.current),
+					currentInventory: readRuntimeInventoryView(update.current),
 					events: update.result.events,
-					previousBoard: readBoardView(update.previous),
+					previousBoard: readRuntimeBoardView(update.previous),
 				});
 
 				if (

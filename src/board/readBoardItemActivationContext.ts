@@ -1,7 +1,7 @@
 import { readExpectedBoardViewItem } from "~/board/view/readExpectedBoardViewItem";
 import type { BoardItemActivationTarget } from "~/board/BoardItemActivationTypes";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readRuntimeBoardView } from "~/play/runtime/readRuntimeViews";
 
 export const readBoardItemActivationTarget = ({
 	boardItemId,
@@ -14,7 +14,7 @@ export const readBoardItemActivationTarget = ({
 }): BoardItemActivationTarget | undefined => {
 	const snapshot = runtimeStore.getSnapshot();
 	const nowMs = Date.now();
-	const liveBoard = readBoardView(snapshot, nowMs);
+	const liveBoard = readRuntimeBoardView(snapshot, nowMs);
 	const liveBoardItem = readExpectedBoardViewItem({
 		board: liveBoard,
 		expectedItemId,

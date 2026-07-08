@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { RuntimeGameEngineAdapter } from "~/engine/runtime/RuntimeGameEngineAdapter";
 import { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readBoardView } from "~/play/runtime/readRuntimeViews";
 import {
 	readBoardTransientTiles,
 	upsertBoardTransientTiles,

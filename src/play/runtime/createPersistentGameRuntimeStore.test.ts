@@ -11,7 +11,7 @@ import type {
 } from "~/storage/GameSaveStorage";
 import { createPersistentGameRuntimeStoreFx } from "~/play/runtime/createPersistentGameRuntimeStoreFx";
 import { runGameRuntimeEffect } from "~/play/runtime/runGameRuntimeEffect";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
+import { readBoardView } from "~/play/runtime/readRuntimeViews";
 import { RandomServiceLive } from "~/random/RandomServiceLive";
 import { withRandomService } from "~/random/withRandomService";
 

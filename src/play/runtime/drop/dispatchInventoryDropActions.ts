@@ -1,21 +1,12 @@
 import { readExpectedInventorySlotStack } from "~/inventory/view/readExpectedInventorySlotStack";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
-import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
+import { readRuntimeViews } from "~/play/runtime/readRuntimeViews";
 import type { DropActions } from "~/play/drop/DropActions";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
 import { dispatchRuntimeDropAction } from "~/play/runtime/drop/RuntimeDropActionContext";
 import { applyResolvedItemToBoardItem } from "~/play/runtime/drop/dispatchBoardItemDropActions";
 
-const readInventoryDropState = ({ store }: { store: GameRuntimeStore }) => {
-	const snapshot = store.getSnapshot();
-	const nowMs = Date.now();
-	return {
-		board: readBoardView(snapshot, nowMs),
-		config: snapshot.runtime.config,
-		inventory: readInventoryView(snapshot),
-		nowMs,
-	};
-};
+const readInventoryDropState = ({ store }: { store: GameRuntimeStore }) =>
+	readRuntimeViews(store.getSnapshot(), Date.now());
 
 export const applyExpectedInventoryItemToBoardItem = ({
 	input,

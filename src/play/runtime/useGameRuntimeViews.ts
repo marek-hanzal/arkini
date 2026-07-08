@@ -9,11 +9,11 @@ import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/item/view/ViewItemSchema";
 import type { ItemId } from "~/config/GameIdSchema";
 import { useGameRuntimeSelector } from "~/play/runtime/GameRuntimeContext";
-import { readBoardItem } from "~/play/runtime/readers/readBoardItem";
-import { readBoardView } from "~/play/runtime/readers/readBoardView";
-import { readInventoryView } from "~/play/runtime/readers/readInventoryView";
-import { readItemCatalogView } from "~/play/runtime/readers/readItemCatalogView";
-import { readItemView } from "~/play/runtime/readers/readItemView";
+import { readBoardItem } from "~/play/runtime/readRuntimeViews";
+import { readBoardView } from "~/play/runtime/readRuntimeViews";
+import { readInventoryView } from "~/play/runtime/readRuntimeViews";
+import { readItemCatalogView } from "~/play/runtime/readRuntimeViews";
+import { readItemView } from "~/play/runtime/readRuntimeViews";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
 
 const sameBoardCell = (

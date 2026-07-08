@@ -1,0 +1,35 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:quest:water-carrier": {
+			"assetIds": [
+				"asset:item:quest"
+			],
+			"craft": {
+				"durationMs": 6000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:water",
+						"quantity": 4
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone"
+					}
+				],
+				"resultItemId": "item:vegetables"
+			},
+			"description": "A small board quest for settlement supplies, rewarding a modest early vegetable delivery from the next era.",
+			"maxStackSize": 1,
+			"name": "Water Carrier Quest",
+			"storage": "both",
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:I"
+			]
+		}
+	}
+}

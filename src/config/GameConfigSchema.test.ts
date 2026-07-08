@@ -1351,4 +1351,108 @@ describe("GameConfigSchema", () => {
 
 		expect(() => parseGameConfig(config)).toThrow(/Too small/);
 	});
+	it("allows quest craft targets with modest non-blueprint rewards", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:quest:test"] = {
+			assetIds: [
+				"asset:item",
+			],
+			craft: {
+				durationMs: 1000,
+				inputs: [
+					{
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+				resultItemId: "item:plank",
+			},
+			description: "Quest",
+			maxStackSize: 1,
+			name: "Quest",
+			storage: "both",
+			tags: [
+				"quest",
+				"craft-target",
+			],
+			tier: 0,
+		};
+
+		expect(() => parseGameConfig(config)).not.toThrow();
+	});
+
+	it("rejects quest rewards that hand out blueprints", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:blueprint-test"] = {
+			assetIds: [
+				"asset:item",
+			],
+			description: "Blueprint",
+			maxStackSize: 1,
+			name: "Blueprint",
+			tags: [
+				"blueprint",
+			],
+			tier: 0,
+		};
+		config.items["item:quest:test"] = {
+			assetIds: [
+				"asset:item",
+			],
+			craft: {
+				durationMs: 1000,
+				inputs: [
+					{
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+				resultItemId: "item:blueprint-test",
+			},
+			description: "Quest",
+			maxStackSize: 1,
+			name: "Quest",
+			storage: "both",
+			tags: [
+				"quest",
+				"craft-target",
+			],
+			tier: 0,
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/must not reward blueprint/);
+	});
+
+	it("rejects quests that take the same item they reward", () => {
+		const config: any = createValidConfigValue();
+		config.items["item:quest:test"] = {
+			assetIds: [
+				"asset:item",
+			],
+			craft: {
+				durationMs: 1000,
+				inputs: [
+					{
+						consume: true,
+						itemId: "item:twig",
+						quantity: 1,
+					},
+				],
+				resultItemId: "item:twig",
+			},
+			description: "Quest",
+			maxStackSize: 1,
+			name: "Quest",
+			storage: "both",
+			tags: [
+				"quest",
+				"craft-target",
+			],
+			tier: 0,
+		};
+
+		expect(() => parseGameConfig(config)).toThrow(/must not take the same item/);
+	});
 });

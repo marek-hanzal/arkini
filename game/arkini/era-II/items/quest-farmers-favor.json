@@ -1,0 +1,40 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:quest:farmers-favor": {
+			"assetIds": [
+				"asset:item:quest"
+			],
+			"craft": {
+				"durationMs": 8000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:grain",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:water",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:egg"
+					}
+				],
+				"resultItemId": "item:cheese"
+			},
+			"description": "A modest farm quest that converts basic food supplies into a small processed dairy reward from the next era.",
+			"maxStackSize": 1,
+			"name": "Farmers' Favor Quest",
+			"storage": "both",
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:II"
+			]
+		}
+	}
+}

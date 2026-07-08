@@ -86,6 +86,12 @@
 								],
 								"itemId": "item:water",
 								"type": "chance"
+							},
+							{
+								"chance": 0.04,
+								"itemId": "item:quest:water-carrier",
+								"sort": 900,
+								"type": "chance"
 							}
 						],
 						"tags": [

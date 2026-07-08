@@ -1,0 +1,36 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:quest:road-repair": {
+			"assetIds": [
+				"asset:item:quest"
+			],
+			"craft": {
+				"durationMs": 6000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:log",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:stone",
+						"quantity": 2
+					}
+				],
+				"resultItemId": "item:stone-block"
+			},
+			"description": "A small board quest asking for raw building materials and rewarding a processed block.",
+			"maxStackSize": 1,
+			"name": "Road Repair Quest",
+			"storage": "both",
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:I"
+			]
+		}
+	}
+}

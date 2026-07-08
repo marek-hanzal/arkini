@@ -55,6 +55,12 @@
 								"itemId": "item:beer",
 								"quantity": 4,
 								"type": "guaranteed"
+							},
+							{
+								"chance": 0.04,
+								"itemId": "item:quest:tavern-commission",
+								"sort": 900,
+								"type": "chance"
 							}
 						]
 					},
@@ -91,6 +97,12 @@
 								"itemId": "item:wine-glass",
 								"quantity": 4,
 								"type": "guaranteed"
+							},
+							{
+								"chance": 0.04,
+								"itemId": "item:quest:tavern-commission",
+								"sort": 900,
+								"type": "chance"
 							}
 						]
 					}

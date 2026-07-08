@@ -126,6 +126,12 @@
 								],
 								"itemId": "item:log",
 								"type": "chance"
+							},
+							{
+								"chance": 0.03,
+								"itemId": "item:quest:road-repair",
+								"sort": 900,
+								"type": "chance"
 							}
 						],
 						"tags": [

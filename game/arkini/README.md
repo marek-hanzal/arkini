@@ -270,6 +270,13 @@ Era X prestige construction materials
   Stained Glass and Marble Block are the current Era X prestige construction outputs.
 ```
 
+### Board quests
+
+Quests are authored as ordinary craft-target items tagged `quest`. They deliberately occupy a board tile but use `storage: "both"`, so the player may shove the nuisance into inventory instead of solving it immediately. Completing a quest feeds its craft inputs and replaces the quest tile with a modest reward item. Quest rewards must not be blueprints and must not echo the exact item they consumed, because "bring wood, receive wood" is not a quest, it is a tiny accounting prank.
+
+Current quest spawns are low-probability producer side outputs. Early quests may award one small next-era material, but the reward stays conservative because the real payment is mostly clearing the board tile.
+
+
 ### Initial balance placeholder
 
 Most first-pass production durations stay in the `5000` to `9000` ms range. Windmill flour takes `6000` ms, bakery bread and slaughterhouse sausage/raw-hide and tannery leather take `8000` ms, dairy cheese takes `7000` ms, cookhouse feast plates take `8000` ms, manual feast assembly craft takes `9000` ms, automatic cookhouse feasts take `60000` ms, and market trades are intentionally short conversions. Town Hall upgrade planning is intentionally heavier: Town Hall II/III/IV blueprints take `60000`/`90000`/`120000` ms and are Minor Haste targets, so era jumps feel like real milestones instead of another disposable click-snack. Timing balance is still placeholder territory; the point is getting the production language and data shape right before humans inevitably demand seventeen exceptions.

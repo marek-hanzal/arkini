@@ -22,6 +22,9 @@
 		},
 		"asset:item:board-memory:full": {
 			"resourceId": "item-board-memory-full"
+		},
+		"asset:item:quest": {
+			"resourceId": "item-quest"
 		}
 	},
 	"game": {

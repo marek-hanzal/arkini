@@ -1,0 +1,39 @@
+{
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"item:quest:tavern-commission": {
+			"assetIds": [
+				"asset:item:quest"
+			],
+			"craft": {
+				"durationMs": 10000,
+				"inputs": [
+					{
+						"consume": true,
+						"itemId": "item:beer",
+						"quantity": 2
+					},
+					{
+						"consume": true,
+						"itemId": "item:wine-glass"
+					},
+					{
+						"consume": true,
+						"itemId": "item:coin"
+					}
+				],
+				"resultItemId": "item:feast"
+			},
+			"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
+			"maxStackSize": 1,
+			"name": "Tavern Commission Quest",
+			"storage": "both",
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:III"
+			]
+		}
+	}
+}

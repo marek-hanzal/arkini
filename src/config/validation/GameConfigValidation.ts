@@ -10,6 +10,7 @@ import { validateConfigDefinitionReferences } from "~/config/validation/validate
 import { validateConfigEffects } from "~/config/validation/GameConfigEffectValidation";
 import { validateGameplaySoftLockRisks } from "~/config/validation/validateGameplaySoftLockRisks";
 import { validateStartingState } from "~/config/validation/validateGameConfigStartingState";
+import { validateQuestItems } from "~/config/validation/validateQuestItems";
 
 export const validateGameConfig = (config: GameConfig, ctx: z.RefinementCtx) => {
 	const context = createGameConfigValidationContext(config, ctx);
@@ -18,6 +19,7 @@ export const validateGameConfig = (config: GameConfig, ctx: z.RefinementCtx) => 
 	validateConfigEffects(ctx, config);
 	validateBlueprintDependencyCycles(ctx, config);
 	validateGameplaySoftLockRisks(ctx, config);
+	validateQuestItems(ctx, config);
 	validateStartingState(context);
 };
 

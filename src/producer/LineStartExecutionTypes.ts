@@ -42,10 +42,6 @@ export type ActivatedLineEffect = {
 	startAtMs: number;
 };
 
-export type LineStartExecutionScope = LineStartExecutionProps & {
-	checked: LineStartReadiness;
-};
-
 export type ProducerStoredInputsReadyProps = {
 	inputs: readonly GameActivationInput[];
 	save: GameSave;

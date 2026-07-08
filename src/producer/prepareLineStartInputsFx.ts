@@ -6,16 +6,27 @@ import { autoFillLineInputsFx } from "~/producer/autoFillLineInputsFx";
 import { consumeProducerStoredInputsFx } from "~/producer/consumeProducerStoredInputsFx";
 import type {
 	LineStartConsumedInputRefs,
-	LineStartExecutionScope,
+	LineStartExecutionProps,
 	LineStartPreparedInputs,
+	LineStartReadiness,
 } from "~/producer/LineStartExecutionTypes";
 import { readProducerStoredInputsReadyFx } from "~/producer/readProducerStoredInputsReadyFx";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 const consumeExplicitLineStartInputRefsFx = Effect.fn(
 	"startLineFx.consumeExplicitLineStartInputRefsFx",
-)(function* ({ action, checked, nowMs, save }: LineStartExecutionScope) {
-	if (action.inputRefs.length === 0) {
+)(function* ({
+	inputRefs,
+	lineInputs,
+	nowMs,
+	save,
+}: {
+	inputRefs: LineStartExecutionProps["action"]["inputRefs"];
+	lineInputs: LineStartReadiness["lineInputs"];
+	nowMs: number;
+	save: GameSave;
+}) {
+	if (inputRefs.length === 0) {
 		return {
 			events: [],
 			save,
@@ -23,8 +34,8 @@ const consumeExplicitLineStartInputRefsFx = Effect.fn(
 	}
 
 	return yield* consumeActivationInputsFx({
-		inputRefs: action.inputRefs,
-		inputs: checked.lineInputs,
+		inputRefs,
+		inputs: lineInputs,
 		nowMs,
 		reason: "line-input",
 		save,
@@ -33,54 +44,82 @@ const consumeExplicitLineStartInputRefsFx = Effect.fn(
 
 const autoFillAndConsumeStoredLineInputsFx = Effect.fn(
 	"startLineFx.autoFillAndConsumeStoredLineInputsFx",
-)(function* (
-	scope: LineStartExecutionScope,
-	{
+)(function* ({
 		events,
-		nextSave,
-	}: {
-		events: GameEvent[];
-		nextSave: GameSave;
-	},
-) {
-	const { action, checked, nowMs } = scope;
-	if (action.inputRefs.length > 0) return true;
-
-	yield* autoFillLineInputsFx({
-		events,
-		inputs: checked.lineInputs,
+		inputRefs,
+		itemInstanceId,
+		lineId,
+		lineInputs,
 		nextSave,
 		nowMs,
-		itemInstanceId: action.itemInstanceId,
-		lineId: checked.lineId,
-	});
-	const inputsReady = yield* readProducerStoredInputsReadyFx({
-		inputs: checked.lineInputs,
-		itemInstanceId: action.itemInstanceId,
-		lineId: checked.lineId,
-		save: nextSave,
-	});
-	if (!inputsReady) return false;
+	}: {
+		events: GameEvent[];
+		inputRefs: LineStartExecutionProps["action"]["inputRefs"];
+		itemInstanceId: string;
+		lineId: string;
+		lineInputs: LineStartReadiness["lineInputs"];
+		nextSave: GameSave;
+		nowMs: number;
+	}) {
+		if (inputRefs.length > 0) return true;
 
-	yield* consumeProducerStoredInputsFx({
-		inputs: checked.lineInputs,
-		nextSave,
-		itemInstanceId: action.itemInstanceId,
-		lineId: checked.lineId,
+		yield* autoFillLineInputsFx({
+			events,
+			inputs: lineInputs,
+			nextSave,
+			nowMs,
+			itemInstanceId,
+			lineId,
+		});
+		const inputsReady = yield* readProducerStoredInputsReadyFx({
+			inputs: lineInputs,
+			itemInstanceId,
+			lineId,
+			save: nextSave,
+		});
+		if (!inputsReady) return false;
+
+		yield* consumeProducerStoredInputsFx({
+			inputs: lineInputs,
+			nextSave,
+			itemInstanceId,
+			lineId,
+		});
+		return true;
 	});
-	return true;
-});
 
 export const prepareLineStartInputsFx = Effect.fn("startLineFx.prepareLineStartInputsFx")(
-	function* (scope: LineStartExecutionScope) {
-		const { nowMs } = scope;
-		const consumed = yield* consumeExplicitLineStartInputRefsFx(scope);
+	function* ({
+		action,
+		checked,
+		nowMs,
+		save,
+	}: {
+		action: {
+			inputRefs: LineStartExecutionProps["action"]["inputRefs"];
+			itemInstanceId: string;
+		};
+		checked: LineStartReadiness;
+		nowMs: number;
+		save: GameSave;
+	}) {
+		const consumed = yield* consumeExplicitLineStartInputRefsFx({
+			inputRefs: action.inputRefs,
+			lineInputs: checked.lineInputs,
+			nowMs,
+			save,
+		});
 		const nextSave = yield* cloneGameSaveFx({
 			save: consumed.save,
 		});
-		const ready = yield* autoFillAndConsumeStoredLineInputsFx(scope, {
+		const ready = yield* autoFillAndConsumeStoredLineInputsFx({
 			events: consumed.events,
+			inputRefs: action.inputRefs,
+			itemInstanceId: action.itemInstanceId,
+			lineId: checked.lineId,
+			lineInputs: checked.lineInputs,
 			nextSave,
+			nowMs,
 		});
 		if (!ready && consumed.events.length > 0) nextSave.updatedAtMs = nowMs;
 

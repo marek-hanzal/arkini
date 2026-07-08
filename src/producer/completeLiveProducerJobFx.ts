@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { completeProducerJobWithoutDeliveryItemsFx } from "~/producer/completeProducerJobWithoutDeliveryItemsFx";
 import { completeProducerJobWithDeliveryItemsFx } from "~/producer/completeProducerJobWithDeliveryItemsFx";
-import type { ProducerJobCompletionScope } from "~/producer/ProducerJobCompletionTypes";
 import {
 	assertProducerLinePlacementSupportedFx,
 	readLiveProducerLineFx,
@@ -11,34 +11,45 @@ import {
 import { rollProducerDeliveryItemsFx } from "~/producer/rollProducerDeliveryItemsFx";
 
 export const completeLiveProducerJobFx = Effect.fn("completeLiveProducerJobFx")(function* ({
+	config,
 	liveJob,
-	scope,
+	nowMs,
+	save,
 }: {
+	config: GameConfig;
 	liveJob: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
 	const line = yield* readLiveProducerLineFx({
+		config,
 		liveJob,
-		scope,
+		save,
 	});
 	yield* assertProducerLinePlacementSupportedFx(line);
 	const deliveryItems = yield* rollProducerDeliveryItemsFx({
+		config,
 		job: liveJob,
-		scope,
+		nowMs,
+		save,
 	});
 
 	return yield* match(deliveryItems.length === 0)
 		.with(true, () =>
 			completeProducerJobWithoutDeliveryItemsFx({
+				config,
 				liveJob,
-				scope,
+				nowMs,
+				save,
 			}),
 		)
 		.with(false, () =>
 			completeProducerJobWithDeliveryItemsFx({
+				config,
 				deliveryItems,
 				liveJob,
-				scope,
+				nowMs,
+				save,
 			}),
 		)
 		.exhaustive();

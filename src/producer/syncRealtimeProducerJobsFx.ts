@@ -6,10 +6,6 @@ import {
 	readRealtimeProducerJobIds,
 	readSortedProducerQueue,
 } from "~/producer/ProducerRealtimeQueueHelpers";
-import type {
-	ProducerRealtimeQueueScope,
-	ProducerRealtimeSyncScope,
-} from "~/producer/ProducerRealtimeSyncTypes";
 import { syncRealtimeProducerJobFx } from "~/producer/syncRealtimeProducerJobFx";
 import {
 	provideGameSaveDraftScopeFx,
@@ -27,13 +23,15 @@ export namespace syncRealtimeProducerJobsFx {
 }
 
 const syncProducerQueueFx = Effect.fn("syncRealtimeProducerJobsFx.syncProducerQueueFx")(function* ({
+	config,
+	nowMs,
 	queue,
-	queueScope,
-	scope,
+	realtimeProducerJobIds,
 }: {
+	config: GameConfig;
+	nowMs: number;
 	queue: readonly GameSaveProducerJob[];
-	queueScope: ProducerRealtimeQueueScope;
-	scope: ProducerRealtimeSyncScope;
+	realtimeProducerJobIds: ReadonlySet<string>;
 }) {
 	const sortedQueue = readSortedProducerQueue(queue);
 	let cursorAtMs = 0;
@@ -43,52 +41,37 @@ const syncProducerQueueFx = Effect.fn("syncRealtimeProducerJobsFx.syncProducerQu
 		if (!job) continue;
 
 		const step = yield* syncRealtimeProducerJobFx({
+			config,
 			cursorAtMs,
 			hasPreviousNonDeliveryQueueJob: readHasPreviousNonDeliveryQueueJob({
 				queue: sortedQueue,
 				queueIndex,
 			}),
 			job,
-			queueScope,
-			scope,
+			nowMs,
+			realtimeProducerJobIds,
 		});
 		cursorAtMs = step.cursorAtMs;
 		if (step.stopQueue) break;
 	}
 });
 
-const syncProducerQueueWithScopeFx = Effect.fn(
-	"syncRealtimeProducerJobsFx.syncProducerQueueWithScopeFx",
-)(function* ({
-	queue,
-	scope,
-}: {
-	queue: readonly GameSaveProducerJob[];
-	scope: ProducerRealtimeSyncScope;
-}) {
-	const sortedQueue = readSortedProducerQueue(queue);
-	return yield* syncProducerQueueFx({
-		queue: sortedQueue,
-		queueScope: {
-			realtimeProducerJobIds: readRealtimeProducerJobIds(sortedQueue),
-		},
-		scope,
-	});
-});
-
 const syncRealtimeProducerJobsProgramFx = Effect.fn(
 	"syncRealtimeProducerJobsFx.syncRealtimeProducerJobsProgramFx",
-)(function* (scope: ProducerRealtimeSyncScope) {
+)(function* ({ config, nowMs }: Omit<syncRealtimeProducerJobsFx.Props, "save">) {
 	const save = yield* readGameSaveDraftCurrentFx();
 	for (const [, queue] of groupWorldProducerJobs(save)) {
-		yield* syncProducerQueueWithScopeFx({
-			queue,
-			scope,
+		const sortedQueue = readSortedProducerQueue(queue);
+		yield* syncProducerQueueFx({
+			config,
+			nowMs,
+			queue: sortedQueue,
+			realtimeProducerJobIds: readRealtimeProducerJobIds(sortedQueue),
 		});
 	}
 
 	return yield* readUpdatedGameSaveDraftResultFx({
-		nowMs: scope.nowMs,
+		nowMs,
 	});
 });
 

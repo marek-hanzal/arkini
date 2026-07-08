@@ -1,8 +1,12 @@
 import { Effect } from "effect";
-import type { ProducerJobCompletionScope } from "~/producer/ProducerJobCompletionTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 
-export const readLiveProducerJobFx = Effect.fn("readLiveProducerJobFx")(function* (
-	scope: ProducerJobCompletionScope,
-) {
-	return scope.save.producerJobs[scope.job.id];
+export const readLiveProducerJobFx = Effect.fn("readLiveProducerJobFx")(function* ({
+	jobId,
+	save,
+}: {
+	jobId: string;
+	save: GameSave;
+}) {
+	return save.producerJobs[jobId];
 });

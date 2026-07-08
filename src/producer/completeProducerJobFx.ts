@@ -1,37 +1,35 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigTypes";
 import { createMissingProducerJobResult } from "~/producer/ProducerJobCompletionEvents";
 import { completeLiveProducerJobFx } from "~/producer/completeLiveProducerJobFx";
-import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { ProducerJobCompletionProps } from "~/producer/ProducerJobCompletionTypes";
 import { readLiveProducerJobFx } from "~/producer/readLiveProducerJobFx";
 
-export namespace completeProducerJobFx {
-	export interface Props {
-		config: GameConfig;
-		save: GameSave;
-		job: GameSaveProducerJob;
-		nowMs: number;
-	}
-}
-
-const completeProducerJobProgramFx = Effect.fn("completeProducerJobProgramFx")(function* (
-	scope: completeProducerJobFx.Props,
-) {
-	const liveJob = yield* readLiveProducerJobFx(scope);
+const completeProducerJobProgramFx = Effect.fn("completeProducerJobProgramFx")(function* ({
+	config,
+	job,
+	nowMs,
+	save,
+}: ProducerJobCompletionProps) {
+	const liveJob = yield* readLiveProducerJobFx({
+		jobId: job.id,
+		save,
+	});
 	if (!liveJob) {
 		return createMissingProducerJobResult({
-			save: scope.save,
+			save,
 		});
 	}
 
 	return yield* completeLiveProducerJobFx({
+		config,
 		liveJob,
-		scope,
+		nowMs,
+		save,
 	});
 });
 
 export const completeProducerJobFx = Effect.fn("completeProducerJobFx")(function* (
-	props: completeProducerJobFx.Props,
+	props: ProducerJobCompletionProps,
 ) {
 	return yield* completeProducerJobProgramFx(props);
 });

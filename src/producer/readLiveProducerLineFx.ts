@@ -1,22 +1,24 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { readProducerJobLine } from "~/producer/readProducerJobLine";
-import type { ProducerJobCompletionScope } from "~/producer/ProducerJobCompletionTypes";
 
 export const readLiveProducerLineFx = Effect.fn("readLiveProducerLineFx")(function* ({
+	config,
 	liveJob,
-	scope,
+	save,
 }: {
+	config: GameConfig;
 	liveJob: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	save: GameSave;
 }) {
 	const line = readProducerJobLine({
-		config: scope.config,
+		config,
 		job: liveJob,
-		save: scope.save,
+		save,
 	});
 	if (line) return line;
 

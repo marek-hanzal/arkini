@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import {
 	createProducerChargesDepletedRemovalEvent,
@@ -7,29 +8,31 @@ import {
 } from "~/producer/ProducerJobCompletionEvents";
 import type { ProducerChargeCompletionOutcome } from "~/producer/completeProducerJobChargesFx";
 import { spendProducerChargeCostAfterCompletedDeliveryFx } from "~/producer/completeProducerJobChargesFx";
-import type { ProducerJobCompletionScope } from "~/producer/ProducerJobCompletionTypes";
 import { replaceDepletedProducerSourceCellOutputFx } from "~/producer/replaceDepletedProducerSourceCellOutputFx";
 
 export const readProducerPlacementSuccessEffectsFx = Effect.fn(
 	"readProducerPlacementSuccessEffectsFx",
 )(function* ({
 	chargeOutcome,
+	config,
 	liveJob,
+	nowMs,
 	placementEvents,
 	placementSave,
-	scope,
+	save,
 }: {
 	chargeOutcome: ProducerChargeCompletionOutcome | undefined;
+	config: GameConfig;
 	liveJob: GameSaveProducerJob;
+	nowMs: number;
 	placementEvents: ProducerCompletionEvents;
 	placementSave: GameSave;
-	scope: ProducerJobCompletionScope;
+	save: GameSave;
 }) {
-	const { nowMs, save } = scope;
 	if (!chargeOutcome?.removeOnDepleted) {
 		return {
 			chargeEvents: yield* spendProducerChargeCostAfterCompletedDeliveryFx({
-				config: scope.config,
+				config,
 				job: liveJob,
 				nextSave: placementSave,
 				nowMs,

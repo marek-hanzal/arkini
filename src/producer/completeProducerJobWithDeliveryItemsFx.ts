@@ -1,37 +1,40 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { readProducerChargeCompletionOutcomeFx } from "~/producer/completeProducerJobChargesFx";
 import { completeProducerPlacementFailureFx } from "~/producer/completeProducerPlacementFailureFx";
 import { completeProducerPlacementSuccessFx } from "~/producer/completeProducerPlacementSuccessFx";
 import { placeProducerDeliveryItemsFx } from "~/producer/placeProducerDeliveryItemsFx";
-import type {
-	ProducerDeliveryItem,
-	ProducerJobCompletionScope,
-} from "~/producer/ProducerJobCompletionTypes";
+import type { ProducerDeliveryItem } from "~/producer/ProducerJobCompletionTypes";
 
 export const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 	"completeProducerJobWithDeliveryItemsFx",
 )(function* ({
+	config,
 	deliveryItems,
 	liveJob,
-	scope,
+	nowMs,
+	save,
 }: {
+	config: GameConfig;
 	deliveryItems: readonly ProducerDeliveryItem[];
 	liveJob: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
-	const { save } = scope;
 	const chargeOutcome = yield* readProducerChargeCompletionOutcomeFx({
-		config: scope.config,
+		config,
 		job: liveJob,
 		save,
 	});
 	const placementEither = yield* placeProducerDeliveryItemsFx({
 		chargeOutcome,
+		config,
 		deliveryItems,
 		liveJob,
-		scope,
+		nowMs,
+		save,
 	});
 
 	return yield* match(placementEither)
@@ -43,8 +46,10 @@ export const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 				if (left._tag !== "GamePlacementFailed") return Effect.fail(left);
 				return completeProducerPlacementFailureFx({
 					error: left,
+					config,
 					liveJob,
-					scope,
+					nowMs,
+					save,
 				});
 			},
 		)
@@ -55,9 +60,11 @@ export const completeProducerJobWithDeliveryItemsFx = Effect.fn(
 			({ right }) =>
 				completeProducerPlacementSuccessFx({
 					chargeOutcome,
+					config,
 					liveJob,
+					nowMs,
 					placementResult: right,
-					scope,
+					save,
 				}),
 		)
 		.exhaustive();

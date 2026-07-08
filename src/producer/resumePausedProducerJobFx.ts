@@ -1,14 +1,11 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { readGamePausableJobResumedTiming } from "~/job/GamePausableJobTiming";
 import {
 	continueProducerQueueAt,
 	stopProducerQueueAt,
 } from "~/producer/ProducerRealtimeQueueHelpers";
-import type {
-	ProducerRealtimeQueueScope,
-	ProducerRealtimeSyncScope,
-} from "~/producer/ProducerRealtimeSyncTypes";
 import { readProducerJobEffectiveTimingFx } from "~/producer/readProducerJobEffectiveTimingFx";
 import { readProducerStartGateReadyFx } from "~/producer/readProducerStartGateReadyFx";
 import { syncProducerJobActiveEffectFx } from "~/producer/syncProducerJobActiveEffectFx";
@@ -16,22 +13,23 @@ import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { ensureGameSaveDraftFx, readGameSaveDraftCurrentFx } from "~/save/GameSaveDraftScopeFx";
 
 export const resumePausedProducerJobFx = Effect.fn("resumePausedProducerJobFx")(function* ({
+	config,
 	cursorAtMs,
 	job,
-	queueScope,
-	scope,
+	nowMs,
+	realtimeProducerJobIds,
 }: {
+	config: GameConfig;
 	cursorAtMs: number;
 	job: GameSaveProducerJob;
-	queueScope: ProducerRealtimeQueueScope;
-	scope: ProducerRealtimeSyncScope;
+	nowMs: number;
+	realtimeProducerJobIds: ReadonlySet<string>;
 }) {
-	const { config, nowMs } = scope;
-	const { realtimeProducerJobIds } = queueScope;
 	const startGateReady = yield* readProducerStartGateReadyFx({
+		config,
 		job,
-		queueScope,
-		scope,
+		nowMs,
+		realtimeProducerJobIds,
 	});
 	if (!startGateReady) return stopProducerQueueAt(cursorAtMs);
 
@@ -68,9 +66,9 @@ export const resumePausedProducerJobFx = Effect.fn("resumePausedProducerJobFx")(
 		save: draft,
 	});
 	yield* syncProducerJobActiveEffectFx({
+		config,
 		job: resumedJob,
 		readyAtMs: resumedTiming.readyAtMs,
-		scope,
 		startAtMs: resumedTiming.startAtMs,
 	});
 	return continueProducerQueueAt(resumedTiming.readyAtMs);

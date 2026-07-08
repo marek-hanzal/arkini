@@ -1,17 +1,20 @@
 import { Effect } from "effect";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { readProducerJobEffectiveLineFx } from "~/producer/readProducerJobEffectiveLineFx";
-import type { ProducerJobCompletionScope } from "~/producer/ProducerJobCompletionTypes";
 
 export const rollProducerDeliveryItemsFx = Effect.fn("rollProducerDeliveryItemsFx")(function* ({
+	config,
 	job,
-	scope,
+	nowMs,
+	save,
 }: {
+	config: GameConfig;
 	job: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
-	const { config, nowMs, save } = scope;
 	const effectiveLine = yield* readProducerJobEffectiveLineFx({
 		config,
 		nowMs,

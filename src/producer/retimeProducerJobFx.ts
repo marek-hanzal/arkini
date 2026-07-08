@@ -1,28 +1,25 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { continueProducerQueueAt } from "~/producer/ProducerRealtimeQueueHelpers";
-import type {
-	ProducerRealtimeQueueScope,
-	ProducerRealtimeSyncScope,
-} from "~/producer/ProducerRealtimeSyncTypes";
 import { readProducerJobEffectiveTimingFx } from "~/producer/readProducerJobEffectiveTimingFx";
 import { syncProducerJobActiveEffectFx } from "~/producer/syncProducerJobActiveEffectFx";
 import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { ensureGameSaveDraftFx, readGameSaveDraftCurrentFx } from "~/save/GameSaveDraftScopeFx";
 
 export const retimeProducerJobFx = Effect.fn("retimeProducerJobFx")(function* ({
+	config,
 	job,
-	queueScope,
-	scope,
+	nowMs,
+	realtimeProducerJobIds,
 	startAtMs,
 }: {
+	config: GameConfig;
 	job: GameSaveProducerJob;
-	queueScope: ProducerRealtimeQueueScope;
-	scope: ProducerRealtimeSyncScope;
+	nowMs: number;
+	realtimeProducerJobIds: ReadonlySet<string>;
 	startAtMs: number;
 }) {
-	const { config, nowMs } = scope;
-	const { realtimeProducerJobIds } = queueScope;
 	const save = yield* readGameSaveDraftCurrentFx();
 	const evaluateAtMs = startAtMs <= nowMs ? nowMs : startAtMs;
 	const timing = yield* readProducerJobEffectiveTimingFx({
@@ -52,9 +49,9 @@ export const retimeProducerJobFx = Effect.fn("retimeProducerJobFx")(function* ({
 		save: draft,
 	});
 	yield* syncProducerJobActiveEffectFx({
+		config,
 		job: retimedJob,
 		readyAtMs: timing.readyAtMs,
-		scope,
 		startAtMs: timing.startAtMs,
 	});
 	return continueProducerQueueAt(timing.readyAtMs);

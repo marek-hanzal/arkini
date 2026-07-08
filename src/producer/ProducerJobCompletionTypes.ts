@@ -4,7 +4,7 @@ import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchem
 import type { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { Effect } from "effect";
 
-export type ProducerJobCompletionScope = {
+export type ProducerJobCompletionProps = {
 	config: GameConfig;
 	save: GameSave;
 	job: GameSaveProducerJob;

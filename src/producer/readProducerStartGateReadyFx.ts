@@ -1,23 +1,20 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
-import type {
-	ProducerRealtimeQueueScope,
-	ProducerRealtimeSyncScope,
-} from "~/producer/ProducerRealtimeSyncTypes";
 import { readProducerJobStartGateReadyFx } from "~/producer/readProducerJobStartGateReadyFx";
 import { readGameSaveDraftCurrentFx } from "~/save/GameSaveDraftScopeFx";
 
 export const readProducerStartGateReadyFx = Effect.fn("readProducerStartGateReadyFx")(function* ({
+	config,
 	job,
-	queueScope,
-	scope,
+	nowMs,
+	realtimeProducerJobIds,
 }: {
+	config: GameConfig;
 	job: GameSaveProducerJob;
-	queueScope: ProducerRealtimeQueueScope;
-	scope: ProducerRealtimeSyncScope;
+	nowMs: number;
+	realtimeProducerJobIds: ReadonlySet<string>;
 }) {
-	const { config, nowMs } = scope;
-	const { realtimeProducerJobIds } = queueScope;
 	const save = yield* readGameSaveDraftCurrentFx();
 	return yield* readProducerJobStartGateReadyFx({
 		config,

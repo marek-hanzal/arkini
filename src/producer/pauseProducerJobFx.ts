@@ -1,23 +1,24 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { readGamePausableJobRemainingMsAtPause } from "~/job/GamePausableJobTiming";
-import type { ProducerRealtimeSyncScope } from "~/producer/ProducerRealtimeSyncTypes";
 import { syncProducerJobActiveEffectFx } from "~/producer/syncProducerJobActiveEffectFx";
 import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 import { ensureGameSaveDraftFx } from "~/save/GameSaveDraftScopeFx";
 
 export const pauseProducerJobFx = Effect.fn("pauseProducerJobFx")(function* ({
+	config,
 	hasPreviousNonDeliveryQueueJob,
 	job,
-	scope,
+	nowMs,
 	startAtMs,
 }: {
+	config: GameConfig;
 	hasPreviousNonDeliveryQueueJob: boolean;
 	job: GameSaveProducerJob;
-	scope: ProducerRealtimeSyncScope;
+	nowMs: number;
 	startAtMs: number;
 }) {
-	const { nowMs } = scope;
 	const isRunningAtPause = startAtMs < nowMs && !hasPreviousNonDeliveryQueueJob;
 	const pausedStartAtMs = isRunningAtPause ? startAtMs : nowMs;
 	const remainingMs = isRunningAtPause
@@ -44,9 +45,9 @@ export const pauseProducerJobFx = Effect.fn("pauseProducerJobFx")(function* ({
 		save: draft,
 	});
 	yield* syncProducerJobActiveEffectFx({
+		config,
 		job: pausedJob,
 		readyAtMs,
-		scope,
 		startAtMs: pausedStartAtMs,
 	});
 });

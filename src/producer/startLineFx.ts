@@ -11,12 +11,13 @@ export namespace startLineFx {
 
 export const startLineFx = Effect.fn("startLineFx")(function* (props: startLineFx.Props) {
 	const checked = yield* checkLineStartReadinessFx(props);
-	const scope = {
-		...props,
-		checked,
-	};
 
-	const preparedInputs = yield* prepareLineStartInputsFx(scope);
+	const preparedInputs = yield* prepareLineStartInputsFx({
+		action: props.action,
+		checked,
+		nowMs: props.nowMs,
+		save: props.save,
+	});
 	if (!preparedInputs.ready) {
 		return yield* createGameEngineResultFx({
 			config: props.config,
@@ -26,15 +27,16 @@ export const startLineFx = Effect.fn("startLineFx")(function* (props: startLineF
 		});
 	}
 
-	const started = yield* startQueuedLineJobFx(scope, {
+	const started = yield* startQueuedLineJobFx({
+		action: props.action,
+		checked,
+		config: props.config,
 		nextSave: preparedInputs.nextSave,
+		nowMs: props.nowMs,
 	});
 	return yield* createGameEngineResultFx({
 		config: props.config,
-		events: [
-			...preparedInputs.events,
-			...started.events,
-		],
+		events: [...preparedInputs.events, ...started.events],
 		nowMs: props.nowMs,
 		save: started.nextSave,
 	});

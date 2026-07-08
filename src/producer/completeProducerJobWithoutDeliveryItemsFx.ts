@@ -1,22 +1,25 @@
 import { Effect } from "effect";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { createCompletedProducerJobResult } from "~/producer/ProducerJobCompletionEvents";
 import { spendProducerChargeCostAfterCompletedDeliveryFx } from "~/producer/completeProducerJobChargesFx";
 import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
 import { rescheduleQueueAfterCompletedProducerDeliveryFx } from "~/producer/rescheduleQueueAfterCompletedProducerDeliveryFx";
-import type { ProducerJobCompletionScope } from "~/producer/ProducerJobCompletionTypes";
 
 export const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 	"completeProducerJobWithoutDeliveryItemsFx",
 )(function* ({
+	config,
 	liveJob,
-	scope,
+	nowMs,
+	save,
 }: {
+	config: GameConfig;
 	liveJob: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
-	const { nowMs, save } = scope;
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
@@ -25,16 +28,16 @@ export const completeProducerJobWithoutDeliveryItemsFx = Effect.fn(
 		save: nextSave,
 	});
 	const chargeEvents = yield* spendProducerChargeCostAfterCompletedDeliveryFx({
-		config: scope.config,
+		config,
 		job: liveJob,
 		nextSave,
 		nowMs,
 	});
 	yield* rescheduleQueueAfterCompletedProducerDeliveryFx({
+		config,
 		liveJob,
 		nextSave,
 		resumeAtMs: nowMs,
-		scope,
 	});
 	nextSave.updatedAtMs = nowMs;
 

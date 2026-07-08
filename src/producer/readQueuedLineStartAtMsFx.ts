@@ -1,25 +1,24 @@
 import { Effect } from "effect";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import type { LineStartExecutionScope } from "~/producer/LineStartExecutionTypes";
 import { readWorldProducerJobFacts } from "~/world/readWorldProducerJobFacts";
 
 export const readQueuedLineStartAtMsFx = Effect.fn("startLineFx.readQueuedLineStartAtMsFx")(
-	function* (
-		scope: LineStartExecutionScope,
-		{
-			nextSave,
-		}: {
-			nextSave: GameSave;
-		},
-	) {
-		const { action, nowMs } = scope;
+	function* ({
+		itemInstanceId,
+		nextSave,
+		nowMs,
+	}: {
+		itemInstanceId: string;
+		nextSave: GameSave;
+		nowMs: number;
+	}) {
 		return Math.max(
 			nowMs,
 			...readWorldProducerJobFacts({
 				nowMs,
 				save: nextSave,
 			})
-				.filter((facts) => facts.itemInstanceId === action.itemInstanceId)
+				.filter((facts) => facts.itemInstanceId === itemInstanceId)
 				.map((facts) => facts.releaseAtMs)
 				.filter((wakeAtMs): wakeAtMs is number => wakeAtMs !== undefined),
 		);

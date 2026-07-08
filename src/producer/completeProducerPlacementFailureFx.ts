@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { isGamePlacementFailureRetryable } from "~/placement/isGamePlacementFailureRetryable";
 import { blockedProducerDeliveryRetryDelayMs } from "~/producer/producerDeliveryTiming";
 import {
@@ -12,22 +13,22 @@ import {
 import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
 import { rescheduleProducerQueueAfterBlockedDeliveryFx } from "~/producer/rescheduleProducerQueueAfterBlockedDeliveryFx";
 import { rescheduleQueueAfterCompletedProducerDeliveryFx } from "~/producer/rescheduleQueueAfterCompletedProducerDeliveryFx";
-import type {
-	ProducerJobCompletionScope,
-	ProducerPlacementFailure,
-} from "~/producer/ProducerJobCompletionTypes";
+import type { ProducerPlacementFailure } from "~/producer/ProducerJobCompletionTypes";
 import { writeProducerJobToSaveFx } from "~/producer/writeProducerJobToSaveFx";
 
 const completeFailedProducerDeliveryFx = Effect.fn("completeFailedProducerDeliveryFx")(function* ({
 	error,
+	config,
 	liveJob,
-	scope,
+	nowMs,
+	save,
 }: {
 	error: ProducerPlacementFailure;
+	config: GameConfig;
 	liveJob: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
-	const { nowMs, save } = scope;
 	const nextSave = yield* cloneGameSaveFx({
 		save,
 	});
@@ -36,10 +37,10 @@ const completeFailedProducerDeliveryFx = Effect.fn("completeFailedProducerDelive
 		save: nextSave,
 	});
 	yield* rescheduleQueueAfterCompletedProducerDeliveryFx({
+		config,
 		liveJob,
 		nextSave,
 		resumeAtMs: nowMs,
-		scope,
 	});
 	nextSave.updatedAtMs = nowMs;
 
@@ -63,14 +64,17 @@ const completeFailedProducerDeliveryFx = Effect.fn("completeFailedProducerDelive
 const completeBlockedProducerDeliveryFx = Effect.fn("completeBlockedProducerDeliveryFx")(
 	function* ({
 		error,
+		config,
 		liveJob,
-		scope,
+		nowMs,
+		save,
 	}: {
 		error: ProducerPlacementFailure;
+		config: GameConfig;
 		liveJob: GameSaveProducerJob;
-		scope: ProducerJobCompletionScope;
+		nowMs: number;
+		save: GameSave;
 	}) {
-		const { config, nowMs, save } = scope;
 		const nextSave = yield* cloneGameSaveFx({
 			save,
 		});
@@ -114,26 +118,34 @@ const completeBlockedProducerDeliveryFx = Effect.fn("completeBlockedProducerDeli
 export const completeProducerPlacementFailureFx = Effect.fn("completeProducerPlacementFailureFx")(
 	function* ({
 		error,
+		config,
 		liveJob,
-		scope,
+		nowMs,
+		save,
 	}: {
 		error: ProducerPlacementFailure;
+		config: GameConfig;
 		liveJob: GameSaveProducerJob;
-		scope: ProducerJobCompletionScope;
+		nowMs: number;
+		save: GameSave;
 	}) {
 		return yield* match(isGamePlacementFailureRetryable(error.reason))
 			.with(false, () =>
 				completeFailedProducerDeliveryFx({
 					error,
+					config,
 					liveJob,
-					scope,
+					nowMs,
+					save,
 				}),
 			)
 			.with(true, () =>
 				completeBlockedProducerDeliveryFx({
 					error,
+					config,
 					liveJob,
-					scope,
+					nowMs,
+					save,
 				}),
 			)
 			.exhaustive();

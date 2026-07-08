@@ -1,44 +1,47 @@
 import { Effect } from "effect";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import { createCompletedProducerJobResult } from "~/producer/ProducerJobCompletionEvents";
 import type { ProducerChargeCompletionOutcome } from "~/producer/completeProducerJobChargesFx";
 import { removeProducerJobFromSaveFx } from "~/producer/removeProducerJobFromSaveFx";
 import { rescheduleQueueAfterCompletedProducerDeliveryFx } from "~/producer/rescheduleQueueAfterCompletedProducerDeliveryFx";
 import { readProducerPlacementSuccessEffectsFx } from "~/producer/readProducerPlacementSuccessEffectsFx";
-import type {
-	ProducerJobCompletionScope,
-	ProducerPlacementSuccess,
-} from "~/producer/ProducerJobCompletionTypes";
+import type { ProducerPlacementSuccess } from "~/producer/ProducerJobCompletionTypes";
 
 export const completeProducerPlacementSuccessFx = Effect.fn("completeProducerPlacementSuccessFx")(
 	function* ({
 		chargeOutcome,
+		config,
 		liveJob,
+		nowMs,
 		placementResult,
-		scope,
+		save,
 	}: {
 		chargeOutcome: ProducerChargeCompletionOutcome | undefined;
+		config: GameConfig;
 		liveJob: GameSaveProducerJob;
+		nowMs: number;
 		placementResult: ProducerPlacementSuccess;
-		scope: ProducerJobCompletionScope;
+		save: GameSave;
 	}) {
-		const { nowMs } = scope;
 		yield* removeProducerJobFromSaveFx({
 			jobId: liveJob.id,
 			save: placementResult.save,
 		});
 		const { chargeEvents, placementEvents } = yield* readProducerPlacementSuccessEffectsFx({
 			chargeOutcome,
+			config,
 			liveJob,
+			nowMs,
 			placementEvents: placementResult.events,
 			placementSave: placementResult.save,
-			scope,
+			save,
 		});
 		yield* rescheduleQueueAfterCompletedProducerDeliveryFx({
+			config,
 			liveJob,
 			nextSave: placementResult.save,
 			resumeAtMs: nowMs,
-			scope,
 		});
 		placementResult.save.updatedAtMs = nowMs;
 

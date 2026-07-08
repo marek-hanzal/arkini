@@ -1,20 +1,18 @@
 import { Effect } from "effect";
 import { readGameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
-import type { ProducerRealtimeSyncScope } from "~/producer/ProducerRealtimeSyncTypes";
 import { readGameSaveDraftCurrentFx } from "~/save/GameSaveDraftScopeFx";
 
 export const readProducerJobSyncStartAtMsFx = Effect.fn("readProducerJobSyncStartAtMsFx")(
 	function* ({
 		cursorAtMs,
 		job,
-		scope,
+		nowMs,
 	}: {
 		cursorAtMs: number;
 		job: GameSaveProducerJob;
-		scope: ProducerRealtimeSyncScope;
+		nowMs: number;
 	}) {
-		const { nowMs } = scope;
 		const save = yield* readGameSaveDraftCurrentFx();
 		return readGameCheatSpeedMode({
 			save,

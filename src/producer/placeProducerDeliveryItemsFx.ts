@@ -1,13 +1,11 @@
 import { Effect } from "effect";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
-import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { ProducerChargeCompletionOutcome } from "~/producer/completeProducerJobChargesFx";
-import type {
-	ProducerDeliveryItem,
-	ProducerJobCompletionScope,
-} from "~/producer/ProducerJobCompletionTypes";
+import type { ProducerDeliveryItem } from "~/producer/ProducerJobCompletionTypes";
 
 const toPlacementRequests = ({
 	items,
@@ -27,16 +25,19 @@ const toPlacementRequests = ({
 
 export const placeProducerDeliveryItemsFx = Effect.fn("placeProducerDeliveryItemsFx")(function* ({
 	chargeOutcome,
+	config,
 	deliveryItems,
 	liveJob,
-	scope,
+	nowMs,
+	save,
 }: {
 	chargeOutcome: ProducerChargeCompletionOutcome | undefined;
+	config: GameConfig;
 	deliveryItems: readonly ProducerDeliveryItem[];
 	liveJob: GameSaveProducerJob;
-	scope: ProducerJobCompletionScope;
+	nowMs: number;
+	save: GameSave;
 }) {
-	const { config, nowMs, save } = scope;
 	const placementRequests = toPlacementRequests({
 		items: deliveryItems,
 		itemInstanceId: liveJob.itemInstanceId,
@@ -46,9 +47,7 @@ export const placeProducerDeliveryItemsFx = Effect.fn("placeProducerDeliveryItem
 		save,
 	});
 	const freedBoardItemInstanceIds = chargeOutcome?.removeOnDepleted
-		? new Set([
-				liveJob.itemInstanceId,
-			])
+		? new Set([liveJob.itemInstanceId])
 		: undefined;
 	return yield* Effect.either(
 		placeGameSaveItemsFx({

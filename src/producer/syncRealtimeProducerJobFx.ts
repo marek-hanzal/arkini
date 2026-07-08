@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSaveProducerJob } from "~/engine/model/GameSaveSchema";
-import type {
-	ProducerRealtimeQueueScope,
-	ProducerRealtimeSyncScope,
-} from "~/producer/ProducerRealtimeSyncTypes";
 import { readProducerJobSyncStartAtMsFx } from "~/producer/readProducerJobSyncStartAtMsFx";
 import { readProducerJobSyncState } from "~/producer/readProducerJobSyncState";
 import { resumePausedProducerJobFx } from "~/producer/resumePausedProducerJobFx";
@@ -12,17 +9,19 @@ import { syncProducerDeliveryCursorFx } from "~/producer/syncProducerDeliveryCur
 import { syncProducerTimingJobFx } from "~/producer/syncProducerTimingJobFx";
 
 export const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobFx")(function* ({
+	config,
 	cursorAtMs,
 	hasPreviousNonDeliveryQueueJob,
 	job,
-	queueScope,
-	scope,
+	nowMs,
+	realtimeProducerJobIds,
 }: {
+	config: GameConfig;
 	cursorAtMs: number;
 	hasPreviousNonDeliveryQueueJob: boolean;
 	job: GameSaveProducerJob;
-	queueScope: ProducerRealtimeQueueScope;
-	scope: ProducerRealtimeSyncScope;
+	nowMs: number;
+	realtimeProducerJobIds: ReadonlySet<string>;
 }) {
 	if (job.delivery) {
 		return yield* syncProducerDeliveryCursorFx({
@@ -34,7 +33,7 @@ export const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobFx")(
 	const startAtMs = yield* readProducerJobSyncStartAtMsFx({
 		cursorAtMs,
 		job,
-		scope,
+		nowMs,
 	});
 
 	return yield* match(
@@ -44,19 +43,21 @@ export const syncRealtimeProducerJobFx = Effect.fn("syncRealtimeProducerJobFx")(
 	)
 		.with("paused", () =>
 			resumePausedProducerJobFx({
+				config,
 				cursorAtMs,
 				job,
-				queueScope,
-				scope,
+				nowMs,
+				realtimeProducerJobIds,
 			}),
 		)
 		.with("sync_timing", () =>
 			syncProducerTimingJobFx({
+				config,
 				cursorAtMs,
 				hasPreviousNonDeliveryQueueJob,
 				job,
-				queueScope,
-				scope,
+				nowMs,
+				realtimeProducerJobIds,
 				startAtMs,
 			}),
 		)

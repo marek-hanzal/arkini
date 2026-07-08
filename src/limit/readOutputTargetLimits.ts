@@ -5,7 +5,7 @@ import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readItemTargetLimits } from "~/limit/readItemTargetLimits";
 import { mergeItemTargetLimits } from "~/limit/mergeItemTargetLimits";
 
-type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
+type ActivationOutputEntry = NonNullable<GameLineDefinition["output"]>[number]["entries"][number];
 
 export namespace readOutputTargetLimits {
 	export interface Props {
@@ -15,7 +15,7 @@ export namespace readOutputTargetLimits {
 		includePendingCraftSourceItems?: boolean;
 		includePendingProducerJobs?: boolean;
 		nowMs?: number;
-		output: ActivationOutput | undefined;
+		output: readonly ActivationOutputEntry[] | undefined;
 		save: GameSave;
 	}
 }

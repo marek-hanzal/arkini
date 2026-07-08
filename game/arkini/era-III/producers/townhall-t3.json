@@ -14,8 +14,12 @@
 						"name": "Blueprint: Windmill I",
 						"output": [
 							{
-								"itemId": "item:blueprint-windmill-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-windmill-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -25,8 +29,12 @@
 						"name": "Blueprint: Bakery I",
 						"output": [
 							{
-								"itemId": "item:blueprint-bakery-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-bakery-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -36,8 +44,12 @@
 						"name": "Blueprint: Slaughterhouse I",
 						"output": [
 							{
-								"itemId": "item:blueprint-slaughterhouse-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-slaughterhouse-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -47,8 +59,12 @@
 						"name": "Blueprint: Dairy I",
 						"output": [
 							{
-								"itemId": "item:blueprint-dairy-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-dairy-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -70,8 +86,12 @@
 						"name": "Survey: Hop Field",
 						"output": [
 							{
-								"itemId": "item:hop-field",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:hop-field",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -81,8 +101,12 @@
 						"name": "Blueprint: Brewery I",
 						"output": [
 							{
-								"itemId": "item:blueprint-brewery-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-brewery-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -92,8 +116,12 @@
 						"name": "Blueprint: Tavern I",
 						"output": [
 							{
-								"itemId": "item:blueprint-tavern-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-tavern-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -115,8 +143,12 @@
 						"name": "Survey: Vineyard",
 						"output": [
 							{
-								"itemId": "item:vineyard",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:vineyard",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -126,8 +158,12 @@
 						"name": "Blueprint: Winery I",
 						"output": [
 							{
-								"itemId": "item:blueprint-winery-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-winery-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -137,8 +173,12 @@
 						"name": "Blueprint: Market",
 						"output": [
 							{
-								"itemId": "item:blueprint-market-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-market-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -155,8 +195,12 @@
 						"name": "Blueprint: House II",
 						"output": [
 							{
-								"itemId": "item:blueprint-house-t2",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-house-t2",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -173,25 +217,29 @@
 						"name": "Blueprint: Town Hall IV",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+										"effects": [
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:blueprint-townhall-t4",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:blueprint-townhall-t4",
-								"type": "guaranteed"
+								]
 							}
 						],
 						"tags": [

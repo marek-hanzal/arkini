@@ -1,12 +1,10 @@
 import type { LineView } from "~/board/view/LineViewSchema";
 import { readGameSaveItemQuantityByScope } from "~/activation/readGameSaveItemQuantityByScope";
-import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveDropEffectOutcome, EffectiveLine } from "~/effects/EffectiveLine";
 import type { RuntimeLineActiveEffectBonusEntry } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
 
-type LineOutput = NonNullable<GameLineDefinition["output"]>;
-type LineOutputEntry = LineOutput[number];
+type LineOutputEntry = EffectiveLine["lootPlan"]["visibleOutput"][number];
 type LineOutputView = NonNullable<LineView["outputs"]>[number];
 type LineOutputQuantity = NonNullable<LineOutputView["quantity"]>;
 
@@ -27,8 +25,12 @@ const maxUnsortedOutputSort = Number.MAX_SAFE_INTEGER;
 const readOutputQuantity = (quantity: LineOutputQuantity | undefined): LineOutputQuantity =>
 	quantity ?? 1;
 
-const readOutputEntrySort = (output: LineOutputEntry, entrySort?: number) =>
-	entrySort ?? output.sort;
+const readOutputEntrySort = (
+	output: {
+		sort?: number;
+	},
+	entrySort?: number,
+) => entrySort ?? output.sort;
 
 const readOutputProbability = ({
 	enabled,

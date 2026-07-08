@@ -6,7 +6,7 @@ import { removeBoardItemRuntimeStateFx } from "~/board/removeBoardItemRuntimeSta
 import { consumeActivationInputsFx } from "~/activation/consumeActivationInputsFx";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
-import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
+import { rollLootOutputSetsFx } from "~/loot/rollLootOutputSetsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionItemMergeSchema } from "~/action/GameActionItemMergeSchema";
@@ -146,11 +146,9 @@ const rollMergeOutputPlacementRequestsFx = Effect.fn(
 	"mergeItemFx.rollMergeOutputPlacementRequestsFx",
 )(function* ({ checked }: MergeWorkingState) {
 	const rolledOutput = checked.merge.output
-		? yield* rollLootTableItemsFx({
-				lootTable: {
-					name: `Merge ${checked.source.itemId} + ${checked.target.itemId}`,
-					output: checked.merge.output,
-				},
+		? yield* rollLootOutputSetsFx({
+				name: `Merge ${checked.source.itemId} + ${checked.target.itemId}`,
+				outputSets: checked.merge.output,
 			})
 		: {
 				items: [],

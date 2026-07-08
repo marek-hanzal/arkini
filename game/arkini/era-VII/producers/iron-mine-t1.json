@@ -31,43 +31,47 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.1,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.1,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:iron-deposit"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:iron-deposit"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:iron-deposit",
-										"phase": "start",
-										"radius": 2
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:iron-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:iron-ore",
+										"quantity": 2,
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:iron-ore",
-								"quantity": 2,
-								"type": "guaranteed"
+								]
 							}
 						],
 						"visibility": "visible"

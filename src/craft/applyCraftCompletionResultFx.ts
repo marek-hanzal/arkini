@@ -39,8 +39,8 @@ const readCraftDeliveryPlacementRequestsFx = Effect.fn(
 		targetCell,
 	});
 	const rolled = yield* rollEffectiveLootPlanItemsFx({
-		config: scope.config,
 		lootPlan: {
+			outputSets: effectiveOutput.outputSets,
 			baseOutput: effectiveOutput.rollableOutput,
 			chanceItems: effectiveOutput.chanceItems,
 			visibleOutput: effectiveOutput.visibleOutput,

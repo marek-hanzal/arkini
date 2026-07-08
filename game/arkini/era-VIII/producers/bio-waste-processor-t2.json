@@ -45,14 +45,18 @@
 						"name": "Burn Bio Waste: Wood",
 						"output": [
 							{
-								"chance": 0.2,
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.04,
-								"itemId": "item:pollution",
-								"type": "chance"
+								"entries": [
+									{
+										"chance": 0.2,
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.04,
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
 							}
 						],
 						"placement": "board_then_inventory"
@@ -78,14 +82,18 @@
 						"name": "Burn Bio Waste: Charcoal",
 						"output": [
 							{
-								"chance": 0.25,
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.06,
-								"itemId": "item:pollution",
-								"type": "chance"
+								"entries": [
+									{
+										"chance": 0.25,
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
 							}
 						],
 						"placement": "board_then_inventory"
@@ -111,14 +119,18 @@
 						"name": "Burn Bio Waste: Coal",
 						"output": [
 							{
-								"chance": 0.4,
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.12,
-								"itemId": "item:pollution",
-								"type": "chance"
+								"entries": [
+									{
+										"chance": 0.4,
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.12,
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
 							}
 						],
 						"placement": "board_then_inventory"

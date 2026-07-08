@@ -139,34 +139,38 @@ export const readActivationOutputEffectEntries = ({
 	output: z.infer<typeof ActivationOutputSchema>;
 	path: GameConfigIssuePath;
 }) =>
-	output.flatMap((entry, outputIndex) => {
-		const outputPath = [
-			...path,
-			outputIndex,
-		];
-		if (entry.type === "weighted") {
-			return entry.entries.map((weightedEntry, weightedEntryIndex) => ({
-				enabled: weightedEntry.enabled,
-				effects: weightedEntry.effects ?? [],
-				itemId: weightedEntry.itemId,
-				path: [
-					...outputPath,
-					"entries",
-					weightedEntryIndex,
-				] satisfies GameConfigIssuePath,
-				sourceKey: `${outputIndex}:entry:${weightedEntryIndex}:${weightedEntry.itemId}`,
-				visibility: weightedEntry.visibility,
-			}));
-		}
+	output.flatMap((outputSet, outputSetIndex) =>
+		outputSet.entries.flatMap((entry, outputIndex) => {
+			const outputPath = [
+				...path,
+				outputSetIndex,
+				"entries",
+				outputIndex,
+			];
+			if (entry.type === "weighted") {
+				return entry.entries.map((weightedEntry, weightedEntryIndex) => ({
+					enabled: weightedEntry.enabled,
+					effects: weightedEntry.effects ?? [],
+					itemId: weightedEntry.itemId,
+					path: [
+						...outputPath,
+						"entries",
+						weightedEntryIndex,
+					] satisfies GameConfigIssuePath,
+					sourceKey: `${outputSetIndex}:${outputIndex}:entry:${weightedEntryIndex}:${weightedEntry.itemId}`,
+					visibility: weightedEntry.visibility,
+				}));
+			}
 
-		return [
-			{
-				enabled: entry.enabled,
-				effects: entry.effects ?? [],
-				itemId: entry.itemId,
-				path: outputPath satisfies GameConfigIssuePath,
-				sourceKey: `${outputIndex}:${entry.itemId}`,
-				visibility: entry.visibility,
-			},
-		];
-	});
+			return [
+				{
+					enabled: entry.enabled,
+					effects: entry.effects ?? [],
+					itemId: entry.itemId,
+					path: outputPath satisfies GameConfigIssuePath,
+					sourceKey: `${outputSetIndex}:${outputIndex}:${entry.itemId}`,
+					visibility: entry.visibility,
+				},
+			];
+		}),
+	);

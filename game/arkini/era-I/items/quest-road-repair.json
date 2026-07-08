@@ -21,8 +21,12 @@
 				],
 				"output": [
 					{
-						"itemId": "item:stone-block",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "item:stone-block",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

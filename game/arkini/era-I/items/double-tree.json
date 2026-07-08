@@ -11,12 +11,16 @@
 					"mode": "consume",
 					"output": [
 						{
-							"itemId": "item:log",
-							"quantity": {
-								"max": 2,
-								"min": 1
-							},
-							"type": "guaranteed"
+							"entries": [
+								{
+									"itemId": "item:log",
+									"quantity": {
+										"max": 2,
+										"min": 1
+									},
+									"type": "guaranteed"
+								}
+							]
 						}
 					]
 				}

@@ -207,12 +207,16 @@ describe("applyGameActionFx remove", () => {
 							mode: "consume",
 							output: [
 								{
-									itemId: "item:stone",
-									quantity: {
-										max: 4,
-										min: 1,
-									},
-									type: "guaranteed",
+									entries: [
+										{
+											itemId: "item:stone",
+											quantity: {
+												max: 4,
+												min: 1,
+											},
+											type: "guaranteed",
+										},
+									],
 								},
 							],
 						},

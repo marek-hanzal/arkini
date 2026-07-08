@@ -36,81 +36,85 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.3,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:quarry-t2"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:quarry-t2",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:stone-block",
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:quarry-t2"
+										"chance": 0.35,
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:quarry-t2",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:quarry-t2"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:quarry-t2",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:stone-block",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:stone-block",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.35,
-								"effects": [
-									{
-										"chance": 0.3,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:quarry-t2"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:quarry-t2",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:stone-block",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"
@@ -133,81 +137,85 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.05,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:quarry-t2"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:quarry-t2",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:marble-block",
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:quarry-t2"
+										"chance": 0.2,
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:quarry-t2",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:quarry-t2"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:quarry-t2",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:marble-block",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:marble-block",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.2,
-								"effects": [
-									{
-										"chance": 0.05,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:quarry-t2"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:quarry-t2",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:marble-block",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"
@@ -236,82 +244,86 @@
 						"name": "Marble Block (Inspired)",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.05,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:quarry-t2"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:quarry-t2",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:marble-block",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:quarry-t2"
+										"chance": 0.25,
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:quarry-t2",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:quarry-t2"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:quarry-t2",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:marble-block",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:marble-block",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.25,
-								"effects": [
-									{
-										"chance": 0.05,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:quarry-t2"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:quarry-t2",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:marble-block",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

@@ -10,9 +10,13 @@
 					"mode": "consume",
 					"output": [
 						{
-							"itemId": "item:log",
-							"quantity": 1,
-							"type": "guaranteed"
+							"entries": [
+								{
+									"itemId": "item:log",
+									"quantity": 1,
+									"type": "guaranteed"
+								}
+							]
 						}
 					]
 				}

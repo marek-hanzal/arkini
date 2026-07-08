@@ -17,6 +17,31 @@ const questFiles = [
 	"game/arkini/era-III/items/quest-tavern-commission.json",
 ] as const;
 
+type OutputEntry = {
+	chance?: number;
+	entries?: {
+		itemId: string;
+	}[];
+	itemId?: string;
+	type: string;
+};
+
+type OutputSet = {
+	entries: OutputEntry[];
+};
+
+const readOutputEntries = (output: OutputSet[] = []) =>
+	output.flatMap((outputSet) => outputSet.entries);
+
+const readOutputItemIds = (output: OutputSet[] = []) =>
+	readOutputEntries(output).flatMap((entry) =>
+		entry.type === "weighted"
+			? (entry.entries ?? []).map((weightedEntry) => weightedEntry.itemId)
+			: [
+					entry.itemId,
+				].filter((itemId): itemId is string => itemId !== undefined),
+	);
+
 describe("quest source config", () => {
 	it("defines quests as storable one-tile craft targets", () => {
 		for (const file of questFiles) {
@@ -37,20 +62,7 @@ describe("quest source config", () => {
 		for (const file of questFiles) {
 			const item = Object.values<any>(readJson(file).items)[0];
 			const inputItemIds = item.craft.inputs.map((input: { itemId: string }) => input.itemId);
-			const outputItemIds = item.craft.output.flatMap(
-				(output: {
-					type: string;
-					itemId?: string;
-					entries?: {
-						itemId: string;
-					}[];
-				}) =>
-					output.type === "weighted"
-						? (output.entries ?? []).map((entry) => entry.itemId)
-						: [
-								output.itemId,
-							],
-			);
+			const outputItemIds = readOutputItemIds(item.craft.output);
 
 			for (const outputItemId of outputItemIds) {
 				expect(outputItemId).not.toMatch(/^item:blueprint-/);
@@ -73,8 +85,8 @@ describe("quest source config", () => {
 		for (const file of producerFiles) {
 			const item = Object.values<any>(readJson(file).items)[0];
 			for (const line of item.producer.lines) {
-				for (const output of line.output ?? []) {
-					if (questIds.includes(output.itemId)) {
+				for (const output of readOutputEntries(line.output)) {
+					if (output.itemId && (questIds as readonly string[]).includes(output.itemId)) {
 						expect(output.type).toBe("chance");
 						expect(output.chance).toBeGreaterThan(0);
 						expect(output.chance).toBeLessThanOrEqual(0.05);

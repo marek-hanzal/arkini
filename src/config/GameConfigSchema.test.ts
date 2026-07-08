@@ -57,9 +57,13 @@ const createValidConfigValue = () => ({
 						name: "Test line",
 						output: [
 							{
-								itemId: "item:twig",
-								quantity: 1,
-								type: "guaranteed",
+								entries: [
+									{
+										itemId: "item:twig",
+										quantity: 1,
+										type: "guaranteed",
+									},
+								],
 							},
 						],
 						placement: "board_then_inventory",
@@ -106,9 +110,13 @@ const createValidConfigValue = () => ({
 				],
 				output: [
 					{
-						type: "guaranteed",
-						quantity: 1,
-						itemId: "item:plank",
+						entries: [
+							{
+								type: "guaranteed",
+								quantity: 1,
+								itemId: "item:plank",
+							},
+						],
 					},
 				],
 			},
@@ -256,8 +264,12 @@ const addReachabilityTargetProducer = (config: any, itemId = "producer:future") 
 					name: "Future",
 					output: [
 						{
-							itemId: "item:twig",
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:twig",
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory",
@@ -286,9 +298,13 @@ describe("GameConfigSchema", () => {
 			{
 				output: [
 					{
-						itemId: "item:plank",
-						quantity: 1,
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:plank",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 				targetMode: "keep",
@@ -308,9 +324,13 @@ describe("GameConfigSchema", () => {
 			{
 				output: [
 					{
-						itemId: "item:missing",
-						quantity: 1,
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:missing",
+								quantity: 1,
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 				targetMode: "keep",
@@ -549,7 +569,7 @@ describe("GameConfigSchema", () => {
 		addTestGrantSource(config, {
 			polarity: "buff",
 		});
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				chance: 0.5,
 				display: "whenActive",
@@ -585,7 +605,7 @@ describe("GameConfigSchema", () => {
 		addTestGrantSource(config, {
 			polarity: "buff",
 		});
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				display: "whenActive",
 				kind: "grant.duration.multiply",
@@ -604,7 +624,7 @@ describe("GameConfigSchema", () => {
 
 		expect(() => parseGameConfig(config)).toThrow(/no-op/);
 
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				display: "whenActive",
 				kind: "nearby.duration.multiply",
@@ -635,7 +655,7 @@ describe("GameConfigSchema", () => {
 		addTestGrantSource(config, {
 			polarity: "buff",
 		});
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				chance: 0,
 				display: "whenActive",
@@ -657,7 +677,7 @@ describe("GameConfigSchema", () => {
 
 	it("rejects drop-owned nearby requirements that target missing items", () => {
 		const config: any = createValidConfigValue();
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				display: "always",
 				items: {
@@ -782,9 +802,13 @@ describe("GameConfigSchema", () => {
 			],
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "producer:house-t1",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "producer:house-t1",
+						},
+					],
 				},
 			],
 		});
@@ -845,9 +869,13 @@ describe("GameConfigSchema", () => {
 			],
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "producer:a",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "producer:a",
+						},
+					],
 				},
 			],
 		});
@@ -862,9 +890,13 @@ describe("GameConfigSchema", () => {
 			],
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "producer:b",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "producer:b",
+						},
+					],
 				},
 			],
 		});
@@ -905,9 +937,13 @@ describe("GameConfigSchema", () => {
 			],
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "producer:a",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "producer:a",
+						},
+					],
 				},
 			],
 		});
@@ -920,8 +956,12 @@ describe("GameConfigSchema", () => {
 					name: "Blueprint A",
 					output: [
 						{
-							itemId: "item:blueprint-a",
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-a",
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory",
@@ -1009,8 +1049,12 @@ describe("GameConfigSchema", () => {
 				name: "Blueprint A",
 				output: [
 					{
-						itemId: "item:blueprint-a",
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:blueprint-a",
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 				placement: "board_then_inventory",
@@ -1021,8 +1065,12 @@ describe("GameConfigSchema", () => {
 				name: "Blueprint B",
 				output: [
 					{
-						itemId: "item:blueprint-b",
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:blueprint-b",
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 				placement: "board_then_inventory",
@@ -1039,9 +1087,13 @@ describe("GameConfigSchema", () => {
 			],
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "producer:a",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "producer:a",
+						},
+					],
 				},
 			],
 		});
@@ -1056,9 +1108,13 @@ describe("GameConfigSchema", () => {
 			],
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "producer:b",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "producer:b",
+						},
+					],
 				},
 			],
 		});
@@ -1071,8 +1127,12 @@ describe("GameConfigSchema", () => {
 					name: "Part A",
 					output: [
 						{
-							itemId: "item:a-part",
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:a-part",
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory",
@@ -1088,8 +1148,12 @@ describe("GameConfigSchema", () => {
 					name: "Part B",
 					output: [
 						{
-							itemId: "item:b-part",
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:b-part",
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory",
@@ -1105,7 +1169,7 @@ describe("GameConfigSchema", () => {
 		config.items["item:producer"].tags = [
 			"producer",
 		];
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				display: "whenMissing",
 				kind: "grant.require",
@@ -1134,7 +1198,7 @@ describe("GameConfigSchema", () => {
 		config.items["item:twig"].effects = [
 			createTestEffect(),
 		];
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				display: "whenMissing",
 				kind: "grant.require",
@@ -1231,8 +1295,12 @@ describe("GameConfigSchema", () => {
 			name: "Gated Future",
 			output: [
 				{
-					itemId: "producer:future",
-					type: "guaranteed",
+					entries: [
+						{
+							itemId: "producer:future",
+							type: "guaranteed",
+						},
+					],
 				},
 			],
 			placement: "board_then_inventory",
@@ -1249,7 +1317,7 @@ describe("GameConfigSchema", () => {
 			"producer",
 		];
 		config.items["item:twig"].storage = "inventory";
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				display: "always",
 				items: {
@@ -1279,9 +1347,13 @@ describe("GameConfigSchema", () => {
 			name: "Hidden Future",
 			output: [
 				{
-					itemId: "producer:future",
-					type: "guaranteed",
-					visibility: "hidden",
+					entries: [
+						{
+							itemId: "producer:future",
+							type: "guaranteed",
+							visibility: "hidden",
+						},
+					],
 				},
 			],
 			placement: "board_then_inventory",
@@ -1302,24 +1374,28 @@ describe("GameConfigSchema", () => {
 			name: "Hidden Future",
 			output: [
 				{
-					effects: [
+					entries: [
 						{
-							display: "whenActive",
-							kind: "grant.drop.show",
-							selector: {
-								allOf: [
-									{
-										ids: [
-											"grant:test",
+							effects: [
+								{
+									display: "whenActive",
+									kind: "grant.drop.show",
+									selector: {
+										allOf: [
+											{
+												ids: [
+													"grant:test",
+												],
+											},
 										],
 									},
-								],
-							},
+								},
+							],
+							itemId: "producer:future",
+							type: "guaranteed",
+							visibility: "hidden",
 						},
 					],
-					itemId: "producer:future",
-					type: "guaranteed",
-					visibility: "hidden",
 				},
 			],
 			placement: "board_then_inventory",
@@ -1337,9 +1413,13 @@ describe("GameConfigSchema", () => {
 			name: "Disabled Future",
 			output: [
 				{
-					enabled: false,
-					itemId: "producer:future",
-					type: "guaranteed",
+					entries: [
+						{
+							enabled: false,
+							itemId: "producer:future",
+							type: "guaranteed",
+						},
+					],
 				},
 			],
 			placement: "board_then_inventory",
@@ -1360,24 +1440,28 @@ describe("GameConfigSchema", () => {
 			name: "Disabled Future",
 			output: [
 				{
-					effects: [
+					entries: [
 						{
-							display: "whenActive",
-							kind: "grant.drop.enable",
-							selector: {
-								allOf: [
-									{
-										ids: [
-											"grant:test",
+							effects: [
+								{
+									display: "whenActive",
+									kind: "grant.drop.enable",
+									selector: {
+										allOf: [
+											{
+												ids: [
+													"grant:test",
+												],
+											},
 										],
 									},
-								],
-							},
+								},
+							],
+							enabled: false,
+							itemId: "producer:future",
+							type: "guaranteed",
 						},
 					],
-					enabled: false,
-					itemId: "producer:future",
-					type: "guaranteed",
 				},
 			],
 			placement: "board_then_inventory",

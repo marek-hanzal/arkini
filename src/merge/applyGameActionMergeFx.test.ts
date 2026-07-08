@@ -32,10 +32,14 @@ const createForestMergeTestConfig = () => {
 					{
 						output: [
 							{
-								type: "chance",
-								itemId: "item:seed",
-								quantity: 1,
-								chance: 0.35,
+								entries: [
+									{
+										type: "chance",
+										itemId: "item:seed",
+										quantity: 1,
+										chance: 0.35,
+									},
+								],
 							},
 						],
 						targetMode: "keep",

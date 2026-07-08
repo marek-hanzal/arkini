@@ -14,8 +14,12 @@
 						"name": "Blueprint: Paper Mill I",
 						"output": [
 							{
-								"itemId": "item:blueprint-paper-mill-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-paper-mill-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -25,8 +29,12 @@
 						"name": "Blueprint: School",
 						"output": [
 							{
-								"itemId": "item:blueprint-school",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-school",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -36,8 +44,12 @@
 						"name": "Blueprint: Library II",
 						"output": [
 							{
-								"itemId": "item:blueprint-library-t2",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-library-t2",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -47,8 +59,12 @@
 						"name": "Blueprint: Library III",
 						"output": [
 							{
-								"itemId": "item:blueprint-library-t3",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-library-t3",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -58,8 +74,12 @@
 						"name": "Blueprint: Library IV",
 						"output": [
 							{
-								"itemId": "item:blueprint-library-t4",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-library-t4",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -69,8 +89,12 @@
 						"name": "Blueprint: Civic Office I",
 						"output": [
 							{
-								"itemId": "item:blueprint-civic-office-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-civic-office-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -80,8 +104,12 @@
 						"name": "Blueprint: Market II",
 						"output": [
 							{
-								"itemId": "item:blueprint-market-t2",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-market-t2",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -91,8 +119,12 @@
 						"name": "Blueprint: Prospector Guild 1",
 						"output": [
 							{
-								"itemId": "item:blueprint-prospector-guild-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-prospector-guild-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -102,8 +134,12 @@
 						"name": "Blueprint: Tannery I",
 						"output": [
 							{
-								"itemId": "item:blueprint-tannery-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-tannery-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -113,8 +149,12 @@
 						"name": "Blueprint: Weaver Hut I",
 						"output": [
 							{
-								"itemId": "item:blueprint-weaver-hut-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-weaver-hut-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -124,8 +164,12 @@
 						"name": "Blueprint: Dye Workshop I",
 						"output": [
 							{
-								"itemId": "item:blueprint-dye-workshop-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-dye-workshop-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -135,8 +179,12 @@
 						"name": "Blueprint: Tailor Workshop I",
 						"output": [
 							{
-								"itemId": "item:blueprint-tailor-workshop-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-tailor-workshop-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -146,8 +194,12 @@
 						"name": "Blueprint: House III",
 						"output": [
 							{
-								"itemId": "item:blueprint-house-t3",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-house-t3",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

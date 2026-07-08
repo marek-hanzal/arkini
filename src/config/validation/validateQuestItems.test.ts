@@ -16,8 +16,12 @@ const createQuestItem = (outputItemId: string) => ({
 		],
 		output: [
 			{
-				itemId: outputItemId,
-				type: "guaranteed" as const,
+				entries: [
+					{
+						itemId: outputItemId,
+						type: "guaranteed" as const,
+					},
+				],
 			},
 		],
 	},

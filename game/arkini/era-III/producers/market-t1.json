@@ -36,9 +36,13 @@
 						"name": "Coins from Bread",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 3,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 3,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -55,9 +59,13 @@
 						"name": "Coins from Sausage",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 2,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -74,9 +82,13 @@
 						"name": "Coins from Cheese",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 2,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -94,9 +106,13 @@
 						"name": "Coins from Beer",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 3,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 3,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -114,9 +130,13 @@
 						"name": "Coins from Wine Glass",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 4,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 4,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -133,9 +153,13 @@
 						"name": "Coins from Feast",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 5,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 5,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

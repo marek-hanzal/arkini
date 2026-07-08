@@ -33,8 +33,12 @@
 				],
 				"output": [
 					{
-						"itemId": "producer:library-t3",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "producer:library-t3",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

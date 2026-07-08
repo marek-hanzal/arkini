@@ -238,8 +238,12 @@ const normalizePackage = (value: unknown): unknown => {
 			};
 			craft.output ??= [
 				{
-					itemId: readCraftResultItemIdFromCraftTargetId(itemId),
-					type: "guaranteed",
+					entries: [
+						{
+							itemId: readCraftResultItemIdFromCraftTargetId(itemId),
+							type: "guaranteed",
+						},
+					],
 				},
 			];
 			craft.effects = normalizeLineEffects({
@@ -507,28 +511,24 @@ const normalizeNearbyLootSources = ({
 	return effect;
 };
 
-const normalizeActivationOutputEffects = ({
+const normalizeActivationOutputEntryEffects = ({
 	domainIndexes,
-	output,
+	entry,
 	path,
 }: {
 	domainIndexes: {
 		items: DomainIndex;
 	};
-	output: unknown;
+	entry: unknown;
 	path: string;
 }) => {
-	if (!Array.isArray(output)) return output;
-
-	return output.map((outputEntry, outputIndex) => {
-		if (!outputEntry || typeof outputEntry !== "object" || Array.isArray(outputEntry)) {
-			return outputEntry;
-		}
-		const entry = {
-			...(outputEntry as Record<string, unknown>),
-		};
-		if (entry.type === "weighted" && Array.isArray(entry.entries)) {
-			entry.entries = entry.entries.map((weightedEntry, weightedEntryIndex) => {
+	if (!entry || typeof entry !== "object" || Array.isArray(entry)) return entry;
+	const normalizedEntry = {
+		...(entry as Record<string, unknown>),
+	};
+	if (normalizedEntry.type === "weighted" && Array.isArray(normalizedEntry.entries)) {
+		normalizedEntry.entries = normalizedEntry.entries.map(
+			(weightedEntry, weightedEntryIndex) => {
 				if (
 					!weightedEntry ||
 					typeof weightedEntry !== "object" ||
@@ -542,18 +542,50 @@ const normalizeActivationOutputEffects = ({
 				normalizedWeightedEntry.effects = normalizeDropEffects({
 					domainIndexes,
 					effects: normalizedWeightedEntry.effects,
-					path: `${path}.${outputIndex}.entries.${weightedEntryIndex}.effects`,
+					path: `${path}.entries.${weightedEntryIndex}.effects`,
 				});
 				return normalizedWeightedEntry;
-			});
-			return entry;
+			},
+		);
+		return normalizedEntry;
+	}
+	normalizedEntry.effects = normalizeDropEffects({
+		domainIndexes,
+		effects: normalizedEntry.effects,
+		path: `${path}.effects`,
+	});
+	return normalizedEntry;
+};
+
+const normalizeActivationOutputEffects = ({
+	domainIndexes,
+	output,
+	path,
+}: {
+	domainIndexes: {
+		items: DomainIndex;
+	};
+	output: unknown;
+	path: string;
+}) => {
+	if (!Array.isArray(output)) return output;
+
+	return output.map((outputSet, outputSetIndex) => {
+		if (!outputSet || typeof outputSet !== "object" || Array.isArray(outputSet)) {
+			return outputSet;
 		}
-		entry.effects = normalizeDropEffects({
-			domainIndexes,
-			effects: entry.effects,
-			path: `${path}.${outputIndex}.effects`,
-		});
-		return entry;
+		const normalizedSet = {
+			...(outputSet as Record<string, unknown>),
+		};
+		if (!Array.isArray(normalizedSet.entries)) return normalizedSet;
+		normalizedSet.entries = normalizedSet.entries.map((entry, entryIndex) =>
+			normalizeActivationOutputEntryEffects({
+				domainIndexes,
+				entry,
+				path: `${path}.${outputSetIndex}.entries.${entryIndex}`,
+			}),
+		);
+		return normalizedSet;
 	});
 };
 
@@ -811,17 +843,23 @@ const readLineNameFromPrimaryOutput = (
 	items: Readonly<Record<string, unknown>>,
 ) => {
 	const output = Array.isArray(line.output) ? line.output : [];
-	const primaryOutput = output.find(
-		(
-			entry,
-		): entry is {
-			itemId: string;
-		} =>
-			!!entry &&
-			typeof entry === "object" &&
-			!Array.isArray(entry) &&
-			typeof (entry as Record<string, unknown>).itemId === "string",
-	);
+	const primaryOutput = output
+		.flatMap((outputSet) =>
+			outputSet && typeof outputSet === "object" && !Array.isArray(outputSet)
+				? ((outputSet as Record<string, unknown>).entries ?? [])
+				: [],
+		)
+		.find(
+			(
+				entry,
+			): entry is {
+				itemId: string;
+			} =>
+				!!entry &&
+				typeof entry === "object" &&
+				!Array.isArray(entry) &&
+				typeof (entry as Record<string, unknown>).itemId === "string",
+		);
 
 	if (!primaryOutput) {
 		return undefined;

@@ -83,6 +83,7 @@ export const readEffectiveLine = ({
 		].sort(),
 		startRequirementsReady: lineRequirements.startRequirementsReady,
 		lootPlan: {
+			outputSets: effectiveOutput.outputSets,
 			baseOutput: effectiveOutput.rollableOutput,
 			chanceItems: effectiveOutput.chanceItems,
 			visibleOutput: effectiveOutput.visibleOutput,

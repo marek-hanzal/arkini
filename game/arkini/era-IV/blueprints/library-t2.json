@@ -27,8 +27,12 @@
 				],
 				"output": [
 					{
-						"itemId": "producer:library-t2",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "producer:library-t2",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

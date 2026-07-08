@@ -26,8 +26,12 @@
 						"name": "Blueprint: Sawmill I",
 						"output": [
 							{
-								"itemId": "item:blueprint-sawmill-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-sawmill-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -49,8 +53,12 @@
 						"name": "Blueprint: Stonemason I",
 						"output": [
 							{
-								"itemId": "item:blueprint-stonemason-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-stonemason-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -72,8 +80,12 @@
 						"name": "Blueprint: Wayside Shrine",
 						"output": [
 							{
-								"itemId": "item:blueprint-shrine-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-shrine-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -95,8 +107,12 @@
 						"name": "Blueprint: Well I",
 						"output": [
 							{
-								"itemId": "item:blueprint-well-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-well-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -118,8 +134,12 @@
 						"name": "Blueprint: Library I",
 						"output": [
 							{
-								"itemId": "item:blueprint-library-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-library-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -141,25 +161,29 @@
 						"name": "Blueprint: Town Hall II",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+										"effects": [
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:blueprint-townhall-t2",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:blueprint-townhall-t2",
-								"type": "guaranteed"
+								]
 							}
 						],
 						"tags": [

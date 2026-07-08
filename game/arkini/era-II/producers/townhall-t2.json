@@ -21,8 +21,12 @@
 						"name": "Survey: Wheat Field",
 						"output": [
 							{
-								"itemId": "item:wheat-field",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:wheat-field",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -32,8 +36,12 @@
 						"name": "Blueprint: Farm I",
 						"output": [
 							{
-								"itemId": "item:blueprint-farm-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-farm-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -43,8 +51,12 @@
 						"name": "Blueprint: Pig Farm I",
 						"output": [
 							{
-								"itemId": "item:blueprint-pig-farm-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-pig-farm-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -54,8 +66,12 @@
 						"name": "Blueprint: Cattle Farm I",
 						"output": [
 							{
-								"itemId": "item:blueprint-cattle-farm-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-cattle-farm-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -65,8 +81,12 @@
 						"name": "Blueprint: Chicken Coop I",
 						"output": [
 							{
-								"itemId": "item:blueprint-chicken-coop-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-chicken-coop-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -76,8 +96,12 @@
 						"name": "Blueprint: Sheep Pasture I",
 						"output": [
 							{
-								"itemId": "item:blueprint-sheep-pasture-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-sheep-pasture-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -87,8 +111,12 @@
 						"name": "Blueprint: Vegetable Garden I",
 						"output": [
 							{
-								"itemId": "item:blueprint-vegetable-garden-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-vegetable-garden-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -98,8 +126,12 @@
 						"name": "Blueprint: Cookhouse I",
 						"output": [
 							{
-								"itemId": "item:blueprint-cookhouse-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-cookhouse-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -109,8 +141,12 @@
 						"name": "Blueprint: Waste Processor I",
 						"output": [
 							{
-								"itemId": "item:blueprint-waste-processor-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-waste-processor-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -120,8 +156,12 @@
 						"name": "Blueprint: Bio-Waste Processor I",
 						"output": [
 							{
-								"itemId": "item:blueprint-bio-waste-processor-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-bio-waste-processor-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -138,8 +178,12 @@
 						"name": "Blueprint: House I",
 						"output": [
 							{
-								"itemId": "item:blueprint-house-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-house-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -149,25 +193,29 @@
 						"name": "Blueprint: Town Hall III",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+										"effects": [
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:blueprint-townhall-t3",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:blueprint-townhall-t3",
-								"type": "guaranteed"
+								]
 							}
 						],
 						"tags": [

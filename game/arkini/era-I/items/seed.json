@@ -31,8 +31,12 @@
 				],
 				"output": [
 					{
-						"itemId": "item:tree",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "item:tree",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			}

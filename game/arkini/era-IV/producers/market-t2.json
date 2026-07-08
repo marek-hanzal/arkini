@@ -22,9 +22,13 @@
 						"name": "Coins from Paper",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 2,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -41,9 +45,13 @@
 						"name": "Better Coins from Feast",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 7,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 7,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -60,9 +68,13 @@
 						"name": "Coins from Common Clothing",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 5,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 5,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -79,9 +91,13 @@
 						"name": "Coins from Luxury Clothing",
 						"output": [
 							{
-								"itemId": "item:coin",
-								"quantity": 8,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coin",
+										"quantity": 8,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

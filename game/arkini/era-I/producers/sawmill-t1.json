@@ -34,97 +34,101 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.3,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:lumberjack-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:lumberjack-t1",
+												"phase": "start",
+												"radius": 2
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
+													]
+												}
+											}
+										],
+										"itemId": "item:plank",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:lumberjack-t1"
+										"chance": 0.25,
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:lumberjack-t1",
-										"phase": "start",
-										"radius": 2
-									},
-									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:lumberjack-t1"
+															]
+														}
 													]
-												}
-											]
-										}
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:lumberjack-t1",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:plank",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:plank",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.25,
-								"effects": [
-									{
-										"chance": 0.3,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:lumberjack-t1"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:lumberjack-t1",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:plank",
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [

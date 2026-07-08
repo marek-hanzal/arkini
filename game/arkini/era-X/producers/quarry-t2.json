@@ -28,82 +28,86 @@
 						"id": "line:quarry-t2:stone",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:stone",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:marble-deposit"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:marble-deposit",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:stone",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.35,
-								"effects": [
-									{
 										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:marble-deposit"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:marble-deposit",
-										"phase": "start",
-										"radius": 2
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:stone",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:stone",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"
@@ -113,81 +117,85 @@
 						"id": "line:quarry-t2:marble",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.05,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:marble",
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:marble-deposit"
+										"chance": 0.25,
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:marble-deposit",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:marble",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:marble",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.25,
-								"effects": [
-									{
-										"chance": 0.05,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:marble-deposit"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:marble-deposit",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:marble",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

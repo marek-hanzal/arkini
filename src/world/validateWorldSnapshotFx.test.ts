@@ -170,9 +170,13 @@ describe("validateWorldSnapshotFx", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},

@@ -1187,11 +1187,14 @@ Expected fields:
 
 Expected fields or defaults:
 
-- `type`: `guaranteed`, `chance`, or `weighted`
-- `itemId`
-- `quantity`, omitted when it is `1`
-- `chance`, for chance entries
-- `entries` and `rolls`, for weighted entries; `rolls` is omitted when it is `1`
+- `output` is an ordered list of alternative roll sets
+- each set has optional `weight` and required `entries`
+- exactly one set is selected by relative ordered weight roll before entry-level drops roll
+- entry `type`: `guaranteed`, `chance`, or `weighted`
+- entry `itemId`
+- entry `quantity`, omitted when it is `1`
+- entry `chance`, for chance entries
+- entry `entries` and `rolls`, for weighted entries; `rolls` is omitted when it is `1`
 - non-empty output validation unless the owning product intentionally omits output as a sink
 
 ### 18.9 Blueprint definition

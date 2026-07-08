@@ -19,31 +19,35 @@ describe("realtime line effects", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									bands: [
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
 										{
-											maxDistance: 1,
-											minDistance: 0,
-											multiplier: 0.5,
-										},
-									],
-									display: "whenActive",
-									items: {
-										anyOf: [
-											{
-												ids: [
-													"item:axe",
+											bands: [
+												{
+													maxDistance: 1,
+													minDistance: 0,
+													multiplier: 0.5,
+												},
+											],
+											display: "whenActive",
+											items: {
+												anyOf: [
+													{
+														ids: [
+															"item:axe",
+														],
+													},
 												],
 											},
-										],
-									},
-									kind: "nearby.duration.multiply",
-									label: "Nearby Axe Haste",
-									radius: 1,
+											kind: "nearby.duration.multiply",
+											label: "Nearby Axe Haste",
+											radius: 1,
+										},
+									],
 								},
 							],
 						},

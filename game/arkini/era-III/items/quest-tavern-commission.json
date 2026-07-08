@@ -24,8 +24,12 @@
 				],
 				"output": [
 					{
-						"itemId": "item:feast",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "item:feast",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

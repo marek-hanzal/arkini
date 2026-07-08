@@ -20,7 +20,6 @@ export const rollProducerDeliveryItemsFx = Effect.fn("rollProducerDeliveryItemsF
 		save,
 	});
 	return (yield* rollEffectiveLootPlanItemsFx({
-		config,
 		lootPlan: effectiveLine.lootPlan,
 	})).items;
 });

@@ -25,7 +25,7 @@ const anyOfItem = (itemId: string) => ({
 
 type TestConfig = ReturnType<typeof createEngineTestConfig>;
 type TestLine = TestConfig["lineCatalog"][string];
-type TestOutputEntry = NonNullable<TestLine["output"]>[number];
+type TestOutputEntry = NonNullable<TestLine["output"]>[number]["entries"][number];
 type TestOutputEffect = NonNullable<
 	Exclude<
 		TestOutputEntry,
@@ -40,13 +40,18 @@ const appendFirstOutputEffects = (
 	effects: readonly TestOutputEffect[],
 ): TestLine => {
 	if (!line) throw new Error("Missing test line.");
-	const [firstOutput, ...remainingOutput] = line.output ?? [
+	const [firstOutputSet] = line.output ?? [
 		{
-			itemId: "item:twig",
-			quantity: 1,
-			type: "guaranteed" as const,
+			entries: [
+				{
+					itemId: "item:twig",
+					quantity: 1,
+					type: "guaranteed" as const,
+				},
+			],
 		},
 	];
+	const [firstOutput, ...remainingOutput] = firstOutputSet.entries;
 	if (firstOutput.type === "weighted") {
 		throw new Error("Test helper only supports non-weighted first outputs.");
 	}
@@ -55,13 +60,17 @@ const appendFirstOutputEffects = (
 		...line,
 		output: [
 			{
-				...firstOutput,
-				effects: [
-					...(firstOutput.effects ?? []),
-					...effects,
+				entries: [
+					{
+						...firstOutput,
+						effects: [
+							...(firstOutput.effects ?? []),
+							...effects,
+						],
+					},
+					...remainingOutput,
 				],
 			},
-			...remainingOutput,
 		],
 	};
 };
@@ -449,24 +458,28 @@ describe("readRuntimeLineViewsFromGameSave", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "whenActive",
-									kind: "grant.duration.multiply",
-									label: "Inventory Haste",
-									multiplier: 0.5,
-									selector: allOfGrant("grant:test:haste"),
-								},
-								{
-									chance: 0.25,
-									display: "whenActive",
-									kind: "grant.loot.extraOutputChance.add",
-									label: "Extra Twig",
-									quantity: 1,
-									selector: allOfGrant("grant:test:haste"),
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "whenActive",
+											kind: "grant.duration.multiply",
+											label: "Inventory Haste",
+											multiplier: 0.5,
+											selector: allOfGrant("grant:test:haste"),
+										},
+										{
+											chance: 0.25,
+											display: "whenActive",
+											kind: "grant.loot.extraOutputChance.add",
+											label: "Extra Twig",
+											quantity: 1,
+											selector: allOfGrant("grant:test:haste"),
+										},
+									],
 								},
 							],
 						},

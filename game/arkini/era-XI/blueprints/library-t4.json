@@ -31,8 +31,12 @@
 				],
 				"output": [
 					{
-						"itemId": "producer:library-t4",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "producer:library-t4",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

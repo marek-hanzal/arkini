@@ -27,93 +27,97 @@
 						"id": "line:quarry-t1:stone",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
+													]
+												}
+											}
+										],
+										"itemId": "item:stone",
+										"type": "guaranteed"
 									},
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+										"chance": 0.4,
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									}
-								],
-								"itemId": "item:stone",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.4,
-								"effects": [
+											}
+										],
+										"itemId": "item:stone",
+										"type": "chance"
+									},
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"chance": 0.15,
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									}
-								],
-								"itemId": "item:stone",
-								"type": "chance"
-							},
-							{
-								"chance": 0.15,
-								"effects": [
+											}
+										],
+										"itemId": "item:stone",
+										"type": "chance"
+									},
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
+										"chance": 0.03,
+										"itemId": "item:quest:road-repair",
+										"sort": 900,
+										"type": "chance"
 									}
-								],
-								"itemId": "item:stone",
-								"type": "chance"
-							},
-							{
-								"chance": 0.03,
-								"itemId": "item:quest:road-repair",
-								"sort": 900,
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [

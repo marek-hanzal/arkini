@@ -475,9 +475,13 @@ describe("applyGameActionFx Craft", () => {
 					],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -564,9 +568,13 @@ describe("applyGameActionFx Craft", () => {
 					],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -673,9 +681,13 @@ describe("applyGameActionFx Craft", () => {
 					],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -874,9 +886,13 @@ describe("applyGameActionFx Craft", () => {
 						],
 						output: [
 							{
-								type: "guaranteed",
-								quantity: 1,
-								itemId: "item:rock",
+								entries: [
+									{
+										type: "guaranteed",
+										quantity: 1,
+										itemId: "item:rock",
+									},
+								],
 							},
 						],
 					},
@@ -1013,9 +1029,13 @@ describe("applyGameActionFx Craft", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -1098,14 +1118,18 @@ describe("applyGameActionFx Craft", () => {
 					...baseConfig.craftCatalog["item:craft-table"],
 					output: [
 						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
-						},
-						{
-							itemId: "item:stone",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+								{
+									itemId: "item:stone",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -1180,9 +1204,13 @@ describe("applyGameActionFx Craft", () => {
 					...baseConfig.craftCatalog["item:craft-table"],
 					output: [
 						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -1247,9 +1275,13 @@ describe("applyGameActionFx Craft", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},

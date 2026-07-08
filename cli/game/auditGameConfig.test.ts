@@ -58,9 +58,13 @@ const createConfigValue = () => ({
 						name: "Test line",
 						output: [
 							{
-								itemId: "item:pollution",
-								quantity: 1,
-								type: "guaranteed",
+								entries: [
+									{
+										itemId: "item:pollution",
+										quantity: 1,
+										type: "guaranteed",
+									},
+								],
 							},
 						],
 						placement: "board_then_inventory",
@@ -181,9 +185,13 @@ describe("auditGameConfig", () => {
 		];
 		readTestLine(config, "line:test").output = [
 			{
-				itemId: "item:pollution",
-				quantity: 1,
-				type: "guaranteed",
+				entries: [
+					{
+						itemId: "item:pollution",
+						quantity: 1,
+						type: "guaranteed",
+					},
+				],
 			},
 		];
 
@@ -199,7 +207,7 @@ describe("auditGameConfig", () => {
 
 	it("does not call produced items terminal when output-owned effects reference them", () => {
 		const config: any = createConfigValue();
-		readTestLine(config, "line:test").output[0].effects = [
+		readTestLine(config, "line:test").output[0].entries[0].effects = [
 			{
 				bands: [
 					{
@@ -345,9 +353,13 @@ describe("auditGameConfig", () => {
 		];
 		readTestLine(config, "line:test").output = [
 			{
-				chance: 0.5,
-				itemId: "item:pollution",
-				type: "chance",
+				entries: [
+					{
+						chance: 0.5,
+						itemId: "item:pollution",
+						type: "chance",
+					},
+				],
 			},
 		];
 
@@ -371,13 +383,17 @@ describe("auditGameConfig", () => {
 		];
 		readTestLine(config, "line:test").output = [
 			{
-				itemId: "item:pollution",
-				type: "guaranteed",
-			},
-			{
-				chance: 0.5,
-				itemId: "item:pollution",
-				type: "chance",
+				entries: [
+					{
+						itemId: "item:pollution",
+						type: "guaranteed",
+					},
+					{
+						chance: 0.5,
+						itemId: "item:pollution",
+						type: "chance",
+					},
+				],
 			},
 		];
 
@@ -409,8 +425,12 @@ describe("auditGameConfig", () => {
 						name: "Grow deposit",
 						output: [
 							{
-								itemId: "item:deposit",
-								type: "guaranteed",
+								entries: [
+									{
+										itemId: "item:deposit",
+										type: "guaranteed",
+									},
+								],
 							},
 						],
 					},
@@ -462,8 +482,12 @@ describe("auditGameConfig", () => {
 				],
 				output: [
 					{
-						itemId: "item:tree",
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:tree",
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 			},
@@ -477,8 +501,12 @@ describe("auditGameConfig", () => {
 			{
 				output: [
 					{
-						itemId: "item:seed",
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:seed",
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 				targetMode: "keep",
@@ -554,8 +582,12 @@ describe("auditGameConfig", () => {
 				],
 				output: [
 					{
-						itemId: "item:tree",
-						type: "guaranteed",
+						entries: [
+							{
+								itemId: "item:tree",
+								type: "guaranteed",
+							},
+						],
 					},
 				],
 			},
@@ -600,8 +632,12 @@ describe("auditGameConfig", () => {
 						name: "Water",
 						output: [
 							{
-								itemId: "item:water",
-								type: "guaranteed",
+								entries: [
+									{
+										itemId: "item:water",
+										type: "guaranteed",
+									},
+								],
 							},
 						],
 					},
@@ -650,9 +686,13 @@ describe("auditGameConfig", () => {
 		];
 		readTestLine(config, "line:test").output = [
 			{
-				chance: 0.5,
-				itemId: "item:pollution",
-				type: "chance",
+				entries: [
+					{
+						chance: 0.5,
+						itemId: "item:pollution",
+						type: "chance",
+					},
+				],
 			},
 		];
 

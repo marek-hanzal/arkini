@@ -86,9 +86,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -171,9 +175,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -183,9 +191,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -270,9 +282,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -282,9 +298,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -362,9 +382,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -374,9 +398,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -943,9 +971,13 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -1247,34 +1279,38 @@ describe("readRuntimeBoardViewFromGameSave", () => {
 					...baseConfig.lineCatalog["line:stash"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: {
-								min: 1,
-								max: 3,
-							},
-							type: "guaranteed",
-						},
-						{
-							chance: 0.25,
-							itemId: "item:plank",
-							quantity: 1,
-							type: "chance",
-						},
-						{
 							entries: [
 								{
-									itemId: "item:axe",
-									quantity: 1,
-									weight: 1,
+									itemId: "item:twig",
+									quantity: {
+										min: 1,
+										max: 3,
+									},
+									type: "guaranteed",
 								},
 								{
-									itemId: "item:key",
-									quantity: 2,
-									weight: 3,
+									chance: 0.25,
+									itemId: "item:plank",
+									quantity: 1,
+									type: "chance",
+								},
+								{
+									entries: [
+										{
+											itemId: "item:axe",
+											quantity: 1,
+											weight: 1,
+										},
+										{
+											itemId: "item:key",
+											quantity: 2,
+											weight: 3,
+										},
+									],
+									rolls: 2,
+									type: "weighted",
 								},
 							],
-							rolls: 2,
-							type: "weighted",
 						},
 					],
 				},

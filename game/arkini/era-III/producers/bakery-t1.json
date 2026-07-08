@@ -40,27 +40,31 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:bread",
+										"quantity": 3,
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:bread",
-								"quantity": 3,
-								"type": "guaranteed"
+								]
 							}
 						]
 					},
@@ -88,27 +92,31 @@
 						"name": "Bread (Inspired)",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:bread",
+										"quantity": 5,
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:bread",
-								"quantity": 5,
-								"type": "guaranteed"
+								]
 							}
 						]
 					}

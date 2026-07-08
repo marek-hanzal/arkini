@@ -1,6 +1,7 @@
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 
-type LineOutputEntry = NonNullable<GameLineDefinition["output"]>[number];
+type LineOutputSet = NonNullable<GameLineDefinition["output"]>[number];
+type LineOutputEntry = LineOutputSet["entries"][number];
 type NonWeightedLineOutput = Exclude<
 	LineOutputEntry,
 	{

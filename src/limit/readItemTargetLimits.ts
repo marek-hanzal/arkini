@@ -12,7 +12,7 @@ import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInv
 import { readProducerJobLine } from "~/producer/readProducerJobLine";
 
 type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
-type ActivationOutputEntry = ActivationOutput[number];
+type ActivationOutputEntry = ActivationOutput[number]["entries"][number];
 
 export namespace readItemTargetLimits {
 	export interface Props {

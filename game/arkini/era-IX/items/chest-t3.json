@@ -21,27 +21,31 @@
 					"name": "Open Chest T3",
 					"output": [
 						{
-							"itemId": "item:coin",
-							"quantity": {
-								"max": 10,
-								"min": 7
-							},
-							"type": "guaranteed"
-						},
-						{
-							"chance": 0.35,
-							"itemId": "item:emerald",
-							"type": "chance"
-						},
-						{
-							"chance": 0.65,
-							"itemId": "item:sapphire",
-							"type": "chance"
-						},
-						{
-							"chance": 0.25,
-							"itemId": "item:topaz",
-							"type": "chance"
+							"entries": [
+								{
+									"itemId": "item:coin",
+									"quantity": {
+										"max": 10,
+										"min": 7
+									},
+									"type": "guaranteed"
+								},
+								{
+									"chance": 0.35,
+									"itemId": "item:emerald",
+									"type": "chance"
+								},
+								{
+									"chance": 0.65,
+									"itemId": "item:sapphire",
+									"type": "chance"
+								},
+								{
+									"chance": 0.25,
+									"itemId": "item:topaz",
+									"type": "chance"
+								}
+							]
 						}
 					],
 					"placement": "board_then_inventory"

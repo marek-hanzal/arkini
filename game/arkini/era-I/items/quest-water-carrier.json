@@ -20,13 +20,26 @@
 				],
 				"output": [
 					{
-						"itemId": "item:vegetables",
-						"type": "guaranteed"
+						"weight": 3,
+						"entries": [
+							{
+								"itemId": "item:vegetables",
+								"type": "guaranteed"
+							}
+						]
 					},
 					{
-						"chance": 0.25,
-						"itemId": "item:egg",
-						"type": "chance"
+						"weight": 1,
+						"entries": [
+							{
+								"itemId": "item:vegetables",
+								"type": "guaranteed"
+							},
+							{
+								"itemId": "item:egg",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

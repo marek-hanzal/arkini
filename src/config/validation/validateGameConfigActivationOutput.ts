@@ -12,60 +12,64 @@ export const validateActivationOutput = (
 	output: z.infer<typeof ActivationOutputSchema>,
 	entities: GameEffectValidationEntities,
 ) => {
-	for (const [index, entry] of output.entries()) {
-		if (entry.type === "weighted") {
-			for (const [entryIndex, weightedEntry] of entry.entries.entries()) {
-				if (!entities.hasItem(weightedEntry.itemId)) {
-					addIssue(
+	for (const [outputSetIndex, outputSet] of output.entries()) {
+		for (const [index, entry] of outputSet.entries.entries()) {
+			const entryPath = [
+				...path,
+				outputSetIndex,
+				"entries",
+				index,
+			] satisfies GameConfigIssuePath;
+			if (entry.type === "weighted") {
+				for (const [entryIndex, weightedEntry] of entry.entries.entries()) {
+					if (!entities.hasItem(weightedEntry.itemId)) {
+						addIssue(
+							ctx,
+							[
+								...entryPath,
+								"entries",
+								entryIndex,
+								"itemId",
+							],
+							`Missing item "${weightedEntry.itemId}".`,
+						);
+					}
+					validateGameDropEffects(
 						ctx,
 						[
-							...path,
-							index,
+							...entryPath,
 							"entries",
 							entryIndex,
-							"itemId",
+							"effects",
 						],
-						`Missing item "${weightedEntry.itemId}".`,
+						weightedEntry.effects ?? [],
+						entities,
 					);
 				}
-				validateGameDropEffects(
+
+				continue;
+			}
+
+			if (!entities.hasItem(entry.itemId)) {
+				addIssue(
 					ctx,
 					[
-						...path,
-						index,
-						"entries",
-						entryIndex,
-						"effects",
+						...entryPath,
+						"itemId",
 					],
-					weightedEntry.effects ?? [],
-					entities,
+					`Missing item "${entry.itemId}".`,
 				);
 			}
 
-			continue;
-		}
-
-		if (!entities.hasItem(entry.itemId)) {
-			addIssue(
+			validateGameDropEffects(
 				ctx,
 				[
-					...path,
-					index,
-					"itemId",
+					...entryPath,
+					"effects",
 				],
-				`Missing item "${entry.itemId}".`,
+				entry.effects ?? [],
+				entities,
 			);
 		}
-
-		validateGameDropEffects(
-			ctx,
-			[
-				...path,
-				index,
-				"effects",
-			],
-			entry.effects ?? [],
-			entities,
-		);
 	}
 };

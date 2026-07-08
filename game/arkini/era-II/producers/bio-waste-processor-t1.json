@@ -45,14 +45,18 @@
 						"name": "Burn Bio Waste: Wood",
 						"output": [
 							{
-								"chance": 0.2,
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.04,
-								"itemId": "item:pollution",
-								"type": "chance"
+								"entries": [
+									{
+										"chance": 0.2,
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.04,
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
 							}
 						],
 						"placement": "board_then_inventory"

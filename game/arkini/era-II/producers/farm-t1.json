@@ -35,135 +35,139 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:wheat-field"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:wheat-field"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:wheat-field",
+												"phase": "start",
+												"radius": 2
+											},
+											{
+												"bands": [
+													{
+														"maxDistance": 0,
+														"minDistance": 0,
+														"multiplier": 2.5
+													},
+													{
+														"maxDistance": 1,
+														"minDistance": 1,
+														"multiplier": 2
+													},
+													{
+														"maxDistance": 2,
+														"minDistance": 2,
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production",
+												"radius": 2
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:wheat-field",
-										"phase": "start",
-										"radius": 2
-									},
-									{
-										"bands": [
-											{
-												"maxDistance": 0,
-												"minDistance": 0,
-												"multiplier": 2.5
-											},
-											{
-												"maxDistance": 1,
-												"minDistance": 1,
-												"multiplier": 2
-											},
-											{
-												"maxDistance": 2,
-												"minDistance": 2,
-												"multiplier": 1.5
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:pollution"
-													]
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Pollution slows nearby sensitive production",
-										"radius": 2
+										"itemId": "item:grain",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+										"chance": 0.4,
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									}
-								],
-								"itemId": "item:grain",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.4,
-								"effects": [
-									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:wheat-field"
+															]
+														}
 													]
-												}
-											]
-										}
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:wheat-field",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:grain",
+										"type": "chance"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:wheat-field"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:wheat-field",
-										"phase": "start",
-										"radius": 2
+										"chance": 0.03,
+										"itemId": "item:quest:farmers-favor",
+										"sort": 900,
+										"type": "chance"
 									}
-								],
-								"itemId": "item:grain",
-								"type": "chance"
-							},
-							{
-								"chance": 0.03,
-								"itemId": "item:quest:farmers-favor",
-								"sort": 900,
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [
@@ -192,114 +196,118 @@
 						"name": "Grain (Inspired)",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:wheat-field"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:wheat-field"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:wheat-field",
-										"phase": "start",
-										"radius": 2
-									},
-									{
-										"bands": [
-											{
-												"maxDistance": 0,
-												"minDistance": 0,
-												"multiplier": 2.5
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:wheat-field",
+												"phase": "start",
+												"radius": 2
 											},
 											{
-												"maxDistance": 1,
-												"minDistance": 1,
-												"multiplier": 2
-											},
-											{
-												"maxDistance": 2,
-												"minDistance": 2,
-												"multiplier": 1.5
+												"bands": [
+													{
+														"maxDistance": 0,
+														"minDistance": 0,
+														"multiplier": 2.5
+													},
+													{
+														"maxDistance": 1,
+														"minDistance": 1,
+														"multiplier": 2
+													},
+													{
+														"maxDistance": 2,
+														"minDistance": 2,
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production",
+												"radius": 2
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:pollution"
-													]
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Pollution slows nearby sensitive production",
-										"radius": 2
-									}
-								],
-								"itemId": "item:grain",
-								"quantity": 4,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.25,
-								"effects": [
-									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
+										"itemId": "item:grain",
+										"quantity": 4,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:wheat-field"
+										"chance": 0.25,
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:wheat-field",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:wheat-field"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:wheat-field",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:grain",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:grain",
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [

@@ -19,7 +19,7 @@ export const runTick = (props: runGameTickFx.Props) =>
 
 export type TestConfig = ReturnType<typeof createEngineTestConfig>;
 export type TestLine = TestConfig["lineCatalog"][string];
-export type TestOutputEntry = NonNullable<TestLine["output"]>[number];
+export type TestOutputEntry = NonNullable<TestLine["output"]>[number]["entries"][number];
 export type TestOutputEffect = NonNullable<
 	Exclude<
 		TestOutputEntry,
@@ -34,13 +34,18 @@ export const appendFirstOutputEffects = (
 	effects: readonly TestOutputEffect[],
 ): TestLine => {
 	if (!line) throw new Error("Missing test line.");
-	const [firstOutput, ...remainingOutput] = line.output ?? [
+	const [firstOutputSet] = line.output ?? [
 		{
-			itemId: "item:plank",
-			quantity: 1,
-			type: "guaranteed" as const,
+			entries: [
+				{
+					itemId: "item:plank",
+					quantity: 1,
+					type: "guaranteed" as const,
+				},
+			],
 		},
 	];
+	const [firstOutput, ...remainingOutput] = firstOutputSet.entries;
 	if (firstOutput.type === "weighted") {
 		throw new Error("Test helper only supports non-weighted first outputs.");
 	}
@@ -49,13 +54,17 @@ export const appendFirstOutputEffects = (
 		...line,
 		output: [
 			{
-				...firstOutput,
-				effects: [
-					...(firstOutput.effects ?? []),
-					...effects,
+				entries: [
+					{
+						...firstOutput,
+						effects: [
+							...(firstOutput.effects ?? []),
+							...effects,
+						],
+					},
+					...remainingOutput,
 				],
 			},
-			...remainingOutput,
 		],
 	};
 };

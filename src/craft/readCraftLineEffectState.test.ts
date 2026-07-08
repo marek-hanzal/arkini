@@ -34,9 +34,13 @@ describe("readCraftLineEffectState", () => {
 					],
 					output: [
 						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},

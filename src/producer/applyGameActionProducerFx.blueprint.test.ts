@@ -44,9 +44,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -56,9 +60,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -142,9 +150,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -154,9 +166,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -233,9 +249,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -245,9 +265,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -324,9 +348,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},
@@ -342,9 +370,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					durationMs: 1000,
 					output: [
 						{
-							itemId: "item:blueprint-plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:blueprint-plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},
@@ -397,9 +429,13 @@ describe("applyGameActionFx Producer blueprint", () => {
 					inputs: [],
 					output: [
 						{
-							type: "guaranteed",
-							quantity: 1,
-							itemId: "item:plank",
+							entries: [
+								{
+									type: "guaranteed",
+									quantity: 1,
+									itemId: "item:plank",
+								},
+							],
 						},
 					],
 				},

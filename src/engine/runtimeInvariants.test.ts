@@ -136,9 +136,13 @@ describe("runtime invariants", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},

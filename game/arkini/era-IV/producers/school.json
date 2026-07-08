@@ -26,9 +26,13 @@
 						],
 						"output": [
 							{
-								"itemId": "item:basic-knowledge",
-								"quantity": 2,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:basic-knowledge",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -56,9 +60,13 @@
 						"name": "Basic Knowledge (Inspired)",
 						"output": [
 							{
-								"itemId": "item:basic-knowledge",
-								"quantity": 4,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:basic-knowledge",
+										"quantity": 4,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

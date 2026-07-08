@@ -26,8 +26,12 @@
 				],
 				"output": [
 					{
-						"itemId": "producer:bio-waste-processor-t1",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "producer:bio-waste-processor-t1",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

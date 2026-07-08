@@ -39,89 +39,93 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.2,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:nails",
+										"quantity": 6,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:nails",
-								"quantity": 6,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.35,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.06,
-								"effects": [
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"
@@ -148,72 +152,76 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:axe",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.4,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:axe",
+										"type": "guaranteed"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.4,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.08,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.08,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"
@@ -240,72 +248,76 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:pickaxe",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.4,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pickaxe",
+										"type": "guaranteed"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.4,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.08,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.08,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"
@@ -333,72 +345,76 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:sword",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.45,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:sword",
+										"type": "guaranteed"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.45,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.1,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.1,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

@@ -34,9 +34,13 @@
 						],
 						"output": [
 							{
-								"itemId": "item:basic-knowledge",
-								"quantity": 4,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:basic-knowledge",
+										"quantity": 4,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -57,9 +61,13 @@
 						],
 						"output": [
 							{
-								"itemId": "item:advanced-knowledge",
-								"quantity": 3,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:advanced-knowledge",
+										"quantity": 3,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -93,8 +101,12 @@
 						],
 						"output": [
 							{
-								"itemId": "item:master-knowledge",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:master-knowledge",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -134,9 +146,13 @@
 						"name": "Master Knowledge (Inspired)",
 						"output": [
 							{
-								"itemId": "item:master-knowledge",
-								"quantity": 2,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:master-knowledge",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -153,8 +169,12 @@
 						"name": "Blueprint: Heroes Guild I",
 						"output": [
 							{
-								"itemId": "item:blueprint-heroes-guild-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-heroes-guild-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -171,8 +191,12 @@
 						"name": "Blueprint: Glazier Workshop I",
 						"output": [
 							{
-								"itemId": "item:blueprint-glazier-workshop-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-glazier-workshop-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -189,8 +213,12 @@
 						"name": "Blueprint: Quarry 2",
 						"output": [
 							{
-								"itemId": "item:blueprint-quarry-t2",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-quarry-t2",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -207,8 +235,12 @@
 						"name": "Blueprint: Stonemason 2",
 						"output": [
 							{
-								"itemId": "item:blueprint-stonemason-t2",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-stonemason-t2",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -225,8 +257,12 @@
 						"name": "Blueprint: House IV",
 						"output": [
 							{
-								"itemId": "item:blueprint-house-t4",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-house-t4",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -243,40 +279,44 @@
 						"name": "Blueprint: House of Engineers",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "whenActive",
-										"kind": "grant.drop.hide",
-										"label": "Faith path locks Engineers and Mages keystone plans",
-										"reason": "Faith path is already chosen.",
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:path:faith"
+										"effects": [
+											{
+												"display": "whenActive",
+												"kind": "grant.drop.hide",
+												"label": "Faith path locks Engineers and Mages keystone plans",
+												"reason": "Faith path is already chosen.",
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:path:faith"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "whenActive",
-										"kind": "grant.drop.hide",
-										"label": "Mages path locks Engineers and Faith keystone plans",
-										"reason": "Mages path is already chosen.",
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:path:mages"
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.drop.hide",
+												"label": "Mages path locks Engineers and Faith keystone plans",
+												"reason": "Mages path is already chosen.",
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:path:mages"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:blueprint-house-of-engineers",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:blueprint-house-of-engineers",
-								"type": "guaranteed"
+								]
 							}
 						]
 					},
@@ -299,40 +339,44 @@
 						"name": "Blueprint: Cathedral",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "whenActive",
-										"kind": "grant.drop.hide",
-										"label": "Engineers path locks Faith and Mages keystone plans",
-										"reason": "Engineers path is already chosen.",
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:path:engineers"
+										"effects": [
+											{
+												"display": "whenActive",
+												"kind": "grant.drop.hide",
+												"label": "Engineers path locks Faith and Mages keystone plans",
+												"reason": "Engineers path is already chosen.",
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:path:engineers"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "whenActive",
-										"kind": "grant.drop.hide",
-										"label": "Mages path locks Engineers and Faith keystone plans",
-										"reason": "Mages path is already chosen.",
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:path:mages"
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.drop.hide",
+												"label": "Mages path locks Engineers and Faith keystone plans",
+												"reason": "Mages path is already chosen.",
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:path:mages"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:blueprint-cathedral",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:blueprint-cathedral",
-								"type": "guaranteed"
+								]
 							}
 						]
 					},
@@ -349,40 +393,44 @@
 						"name": "Blueprint: Mage Lodge",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"display": "whenActive",
-										"kind": "grant.drop.hide",
-										"label": "Engineers path locks Faith and Mages keystone plans",
-										"reason": "Engineers path is already chosen.",
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:path:engineers"
+										"effects": [
+											{
+												"display": "whenActive",
+												"kind": "grant.drop.hide",
+												"label": "Engineers path locks Faith and Mages keystone plans",
+												"reason": "Engineers path is already chosen.",
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:path:engineers"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "whenActive",
-										"kind": "grant.drop.hide",
-										"label": "Faith path locks Engineers and Mages keystone plans",
-										"reason": "Faith path is already chosen.",
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:path:faith"
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.drop.hide",
+												"label": "Faith path locks Engineers and Mages keystone plans",
+												"reason": "Faith path is already chosen.",
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:path:faith"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:blueprint-mage-lodge",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:blueprint-mage-lodge",
-								"type": "guaranteed"
+								]
 							}
 						]
 					}

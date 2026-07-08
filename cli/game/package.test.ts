@@ -67,8 +67,12 @@ describe("game package normalization", () => {
 								id: "line:test",
 								output: [
 									{
-										itemId: "item:plank",
-										type: "guaranteed",
+										entries: [
+											{
+												itemId: "item:plank",
+												type: "guaranteed",
+											},
+										],
 									},
 								],
 							},

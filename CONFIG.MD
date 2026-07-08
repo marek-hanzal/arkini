@@ -154,35 +154,42 @@ A producer item owns its `producer` capability. The line below spends nearby woo
 
             "output": [
               {
-                // chance: 0 is valid when output-owned effects provide chance.
-                "type": "chance",
-                "chance": 0,
-                "itemId": "item:log",
-
-                // These effects belong to this concrete log drop only.
-                "effects": [
+                // Output is a non-recursive list of alternative roll sets.
+                // A single set behaves like the old flat output, because it is the
+                // only candidate and is therefore always selected.
+                "entries": [
                   {
-                    "kind": "nearby.loot.outputChance.add",
-                    "display": "always",
-                    "label": "Nearby wood source drop chance",
-                    "radius": 2,
-                    "quantity": 1,
-                    "sources": [
+                    // chance: 0 is valid when output-owned effects provide chance.
+                    "type": "chance",
+                    "chance": 0,
+                    "itemId": "item:log",
+
+                    // These effects belong to this concrete log drop only.
+                    "effects": [
                       {
-                        "label": "Single Tree",
-                        "items": { "anyOf": [{ "id": "item:tree" }] },
-                        "chance": 0.5
+                        "kind": "nearby.loot.outputChance.add",
+                        "display": "always",
+                        "label": "Nearby wood source drop chance",
+                        "radius": 2,
+                        "quantity": 1,
+                        "sources": [
+                          {
+                            "label": "Single Tree",
+                            "items": { "anyOf": [{ "id": "item:tree" }] },
+                            "chance": 0.5
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "grant.duration.multiply",
+                        "display": "whenActive",
+                        "label": "Minor Haste",
+                        "selector": {
+                          "allOf": [{ "ids": ["grant:active:shrine-minor-haste"] }]
+                        },
+                        "multiplier": 0.75
                       }
                     ]
-                  },
-                  {
-                    "kind": "grant.duration.multiply",
-                    "display": "whenActive",
-                    "label": "Minor Haste",
-                    "selector": {
-                      "allOf": [{ "ids": ["grant:active:shrine-minor-haste"] }]
-                    },
-                    "multiplier": 0.75
                   }
                 ]
               }
@@ -439,19 +446,31 @@ Line input `quantity` defaults to `1`. Missing input `mode` means `exact`: the l
 }
 ```
 
-Output entries support:
+Output is a non-recursive list of alternative roll sets. Runtime selects exactly one set by walking sets in order and rolling each set against its remaining relative `weight`; the first set that wins is used, and the last remaining set naturally wins if all previous sets missed. After a set is selected, its `entries` roll with the same guaranteed/chance/weighted rules as producer output has always used. One set without `weight` is therefore the boring default path, which is exactly what boring defaults are for.
 
 ```json
-{ "type": "guaranteed", "itemId": "item:twig", "quantity": 2 }
-{ "type": "chance", "itemId": "item:pollution", "chance": 0.2 }
-{
-  "type": "weighted",
-  "rolls": 1,
-  "entries": [
-    { "itemId": "item:twig", "weight": 3 },
-    { "itemId": "item:log", "weight": 1 }
-  ]
-}
+[
+  {
+    "entries": [
+      { "type": "guaranteed", "itemId": "item:twig", "quantity": 2 },
+      { "type": "chance", "itemId": "item:pollution", "chance": 0.2 },
+      {
+        "type": "weighted",
+        "rolls": 1,
+        "entries": [
+          { "itemId": "item:twig", "weight": 3 },
+          { "itemId": "item:log", "weight": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "weight": 1,
+    "entries": [
+      { "type": "guaranteed", "itemId": "item:rare-something" }
+    ]
+  }
+]
 ```
 
 Quantity may be a number or `{ "min": number, "max": number }`. Output entries may also define optional `sort` for display ordering when a line has several possible outputs such as trash, pollution, or weighted alternatives. Lower values appear first; omitted values fall back to deterministic item-id ordering. Each concrete drop, including a weighted entry, may also define `visibility`, `enabled`, and ordered drop-owned `effects`. Runtime evaluates those effects from top to bottom on that one drop, so the affected output owns its own reactivity instead of being poked from a bonus table like a JSON voodoo doll.

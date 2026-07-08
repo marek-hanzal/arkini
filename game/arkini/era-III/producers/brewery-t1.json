@@ -34,114 +34,118 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:hop-field"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:hop-field"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:hop-field",
-										"phase": "start",
-										"radius": 2
-									},
-									{
-										"bands": [
-											{
-												"maxDistance": 0,
-												"minDistance": 0,
-												"multiplier": 2.5
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:hop-field",
+												"phase": "start",
+												"radius": 2
 											},
 											{
-												"maxDistance": 1,
-												"minDistance": 1,
-												"multiplier": 2
-											},
-											{
-												"maxDistance": 2,
-												"minDistance": 2,
-												"multiplier": 1.5
+												"bands": [
+													{
+														"maxDistance": 0,
+														"minDistance": 0,
+														"multiplier": 2.5
+													},
+													{
+														"maxDistance": 1,
+														"minDistance": 1,
+														"multiplier": 2
+													},
+													{
+														"maxDistance": 2,
+														"minDistance": 2,
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production",
+												"radius": 2
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:pollution"
-													]
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Pollution slows nearby sensitive production",
-										"radius": 2
-									}
-								],
-								"itemId": "item:hops",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.25,
-								"effects": [
-									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
+										"itemId": "item:hops",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:hop-field"
+										"chance": 0.25,
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:hop-field",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:hop-field"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:hop-field",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:hops",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:hops",
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [
@@ -173,74 +177,78 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:hop-field"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:hop-field"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:hop-field",
-										"phase": "start",
-										"radius": 2
-									},
-									{
-										"bands": [
-											{
-												"maxDistance": 0,
-												"minDistance": 0,
-												"multiplier": 2.5
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:hop-field",
+												"phase": "start",
+												"radius": 2
 											},
 											{
-												"maxDistance": 1,
-												"minDistance": 1,
-												"multiplier": 2
-											},
-											{
-												"maxDistance": 2,
-												"minDistance": 2,
-												"multiplier": 1.5
+												"bands": [
+													{
+														"maxDistance": 0,
+														"minDistance": 0,
+														"multiplier": 2.5
+													},
+													{
+														"maxDistance": 1,
+														"minDistance": 1,
+														"multiplier": 2
+													},
+													{
+														"maxDistance": 2,
+														"minDistance": 2,
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production",
+												"radius": 2
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:pollution"
-													]
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Pollution slows nearby sensitive production",
-										"radius": 2
+										"itemId": "item:beer-barrel",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:beer-barrel",
-								"type": "guaranteed"
+								]
 							}
 						],
 						"tags": [
@@ -267,74 +275,78 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:hop-field"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:hop-field"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:hop-field",
-										"phase": "start",
-										"radius": 2
-									},
-									{
-										"bands": [
-											{
-												"maxDistance": 0,
-												"minDistance": 0,
-												"multiplier": 2.5
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:hop-field",
+												"phase": "start",
+												"radius": 2
 											},
 											{
-												"maxDistance": 1,
-												"minDistance": 1,
-												"multiplier": 2
-											},
-											{
-												"maxDistance": 2,
-												"minDistance": 2,
-												"multiplier": 1.5
+												"bands": [
+													{
+														"maxDistance": 0,
+														"minDistance": 0,
+														"multiplier": 2.5
+													},
+													{
+														"maxDistance": 1,
+														"minDistance": 1,
+														"multiplier": 2
+													},
+													{
+														"maxDistance": 2,
+														"minDistance": 2,
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production",
+												"radius": 2
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:pollution"
-													]
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Pollution slows nearby sensitive production",
-										"radius": 2
+										"itemId": "item:beer-barrel",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:beer-barrel",
-								"type": "guaranteed"
+								]
 							}
 						],
 						"tags": [

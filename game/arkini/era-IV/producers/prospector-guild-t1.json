@@ -32,8 +32,12 @@
 						"name": "Prospect: Clay Deposit",
 						"output": [
 							{
-								"itemId": "item:clay-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:clay-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -60,8 +64,12 @@
 						"name": "Prospect: Sand Deposit",
 						"output": [
 							{
-								"itemId": "item:sand-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:sand-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

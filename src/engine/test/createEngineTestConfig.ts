@@ -153,9 +153,13 @@ const createBaseEmbeddedConfig = () => ({
 						name: "Test line",
 						output: [
 							{
-								itemId: "item:twig",
-								quantity: 2,
-								type: "guaranteed" as const,
+								entries: [
+									{
+										itemId: "item:twig",
+										quantity: 2,
+										type: "guaranteed" as const,
+									},
+								],
 							},
 						],
 						placement: "board_then_inventory" as const,
@@ -220,9 +224,13 @@ const createBaseEmbeddedConfig = () => ({
 				],
 				output: [
 					{
-						type: "guaranteed",
-						quantity: 1,
-						itemId: "item:plank",
+						entries: [
+							{
+								type: "guaranteed",
+								quantity: 1,
+								itemId: "item:plank",
+							},
+						],
 					},
 				],
 			},
@@ -266,9 +274,13 @@ const createBaseEmbeddedConfig = () => ({
 					name: "Open stash",
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed" as const,
+							entries: [
+								{
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed" as const,
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory" as const,

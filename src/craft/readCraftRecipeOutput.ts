@@ -1,20 +1,33 @@
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 
-type CraftOutputEntry = GameCraftRecipeDefinition["output"][number];
+type CraftOutputSet = GameCraftRecipeDefinition["output"][number];
+type CraftOutputEntry = CraftOutputSet["entries"][number];
+
+const readCraftOutputEntryItemIds = (entry: CraftOutputEntry): string[] =>
+	entry.type === "weighted"
+		? entry.entries.map((weightedEntry) => weightedEntry.itemId)
+		: [
+				entry.itemId,
+			];
 
 export const readCraftOutputItemIds = (recipe: GameCraftRecipeDefinition): string[] =>
-	recipe.output.flatMap((entry) =>
-		entry.type === "weighted"
-			? entry.entries.map((weightedEntry) => weightedEntry.itemId)
-			: [
-					entry.itemId,
-				],
-	);
+	recipe.output.flatMap((outputSet) => outputSet.entries.flatMap(readCraftOutputEntryItemIds));
 
 export const readCraftPrimaryOutputItemId = (recipe: GameCraftRecipeDefinition): string => {
 	const [primaryItemId] = readCraftOutputItemIds(recipe);
 	return primaryItemId;
 };
+
+const craftOutputEntryContainsItemId = ({
+	entry,
+	itemId,
+}: {
+	entry: CraftOutputEntry;
+	itemId: string;
+}) =>
+	entry.type === "weighted"
+		? entry.entries.some((weightedEntry) => weightedEntry.itemId === itemId)
+		: entry.itemId === itemId;
 
 export const readCraftOutputEntriesForItemId = ({
 	itemId,
@@ -23,8 +36,11 @@ export const readCraftOutputEntriesForItemId = ({
 	itemId: string;
 	recipe: GameCraftRecipeDefinition;
 }): CraftOutputEntry[] =>
-	recipe.output.filter((entry) =>
-		entry.type === "weighted"
-			? entry.entries.some((weightedEntry) => weightedEntry.itemId === itemId)
-			: entry.itemId === itemId,
+	recipe.output.flatMap((outputSet) =>
+		outputSet.entries.filter((entry) =>
+			craftOutputEntryContainsItemId({
+				entry,
+				itemId,
+			}),
+		),
 	);

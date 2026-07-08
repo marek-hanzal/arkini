@@ -41,59 +41,63 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.3,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									},
-									{
-										"bands": [
-											{
-												"maxDistance": 0,
-												"minDistance": 0,
-												"multiplier": 2.5
 											},
 											{
-												"maxDistance": 1,
-												"minDistance": 1,
-												"multiplier": 2
-											},
-											{
-												"maxDistance": 2,
-												"minDistance": 2,
-												"multiplier": 1.5
+												"bands": [
+													{
+														"maxDistance": 0,
+														"minDistance": 0,
+														"multiplier": 2.5
+													},
+													{
+														"maxDistance": 1,
+														"minDistance": 1,
+														"multiplier": 2
+													},
+													{
+														"maxDistance": 2,
+														"minDistance": 2,
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production",
+												"radius": 2
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:pollution"
-													]
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Pollution slows nearby sensitive production",
-										"radius": 2
+										"itemId": "item:milk",
+										"quantity": 2,
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:milk",
-								"quantity": 2,
-								"type": "guaranteed"
+								]
 							}
 						],
 						"tags": [

@@ -51,8 +51,12 @@
 						"name": "Chest I Expedition",
 						"output": [
 							{
-								"itemId": "item:chest-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:chest-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -84,8 +88,12 @@
 						"name": "Chest II Expedition",
 						"output": [
 							{
-								"itemId": "item:chest-t2",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:chest-t2",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -122,8 +130,12 @@
 						"name": "Chest III Expedition",
 						"output": [
 							{
-								"itemId": "item:chest-t3",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:chest-t3",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -165,8 +177,12 @@
 						"name": "Chest IV Expedition",
 						"output": [
 							{
-								"itemId": "item:chest-t4",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:chest-t4",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -224,8 +240,12 @@
 						"name": "Grand Expedition",
 						"output": [
 							{
-								"itemId": "item:treasure-chest",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:treasure-chest",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -288,18 +308,22 @@
 						"name": "Grand Expedition (Inspired)",
 						"output": [
 							{
-								"itemId": "item:treasure-chest",
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.3,
-								"itemId": "item:aquamarine",
-								"type": "chance"
-							},
-							{
-								"chance": 0.3,
-								"itemId": "item:topaz",
-								"type": "chance"
+								"entries": [
+									{
+										"itemId": "item:treasure-chest",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.3,
+										"itemId": "item:aquamarine",
+										"type": "chance"
+									},
+									{
+										"chance": 0.3,
+										"itemId": "item:topaz",
+										"type": "chance"
+									}
+								]
 							}
 						]
 					}

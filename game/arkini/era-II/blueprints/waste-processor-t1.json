@@ -22,8 +22,12 @@
 				],
 				"output": [
 					{
-						"itemId": "producer:waste-processor-t1",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "producer:waste-processor-t1",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

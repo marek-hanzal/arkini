@@ -40,4 +40,63 @@ describe("rollEffectiveLootPlanItemsFx", () => {
 			},
 		]);
 	});
+	it("chooses exactly one weighted output set before rolling its entries", () => {
+		let chanceIndex = 0;
+		const result = Effect.runSync(
+			rollEffectiveLootPlanItemsFx({
+				lootPlan: {
+					baseOutput: [],
+					visibleOutput: [],
+					chanceItems: [],
+					outputSets: [
+						{
+							weight: 3,
+							baseOutput: [
+								{
+									dropEffects: [],
+									enabled: true,
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
+									visible: true,
+								},
+							],
+							chanceItems: [],
+							visibleOutput: [],
+						},
+						{
+							weight: 1,
+							baseOutput: [
+								{
+									dropEffects: [],
+									enabled: true,
+									itemId: "item:stone",
+									quantity: 1,
+									type: "guaranteed",
+									visible: true,
+								},
+							],
+							chanceItems: [],
+							visibleOutput: [],
+						},
+					],
+				},
+			}).pipe(
+				withRandomService({
+					...TestRandomService,
+					chance() {
+						chanceIndex += 1;
+						return chanceIndex === 2;
+					},
+				}),
+			),
+		);
+
+		expect(result.items).toEqual([
+			{
+				itemId: "item:stone",
+				quantity: 1,
+			},
+		]);
+	});
 });

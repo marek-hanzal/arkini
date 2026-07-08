@@ -34,33 +34,37 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:beer",
+										"quantity": 4,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.04,
+										"itemId": "item:quest:tavern-commission",
+										"sort": 900,
+										"type": "chance"
 									}
-								],
-								"itemId": "item:beer",
-								"quantity": 4,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.04,
-								"itemId": "item:quest:tavern-commission",
-								"sort": 900,
-								"type": "chance"
+								]
 							}
 						]
 					},
@@ -76,33 +80,37 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.2,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:wine-glass",
+										"quantity": 4,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.04,
+										"itemId": "item:quest:tavern-commission",
+										"sort": 900,
+										"type": "chance"
 									}
-								],
-								"itemId": "item:wine-glass",
-								"quantity": 4,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.04,
-								"itemId": "item:quest:tavern-commission",
-								"sort": 900,
-								"type": "chance"
+								]
 							}
 						]
 					}

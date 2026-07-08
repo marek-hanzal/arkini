@@ -2,7 +2,8 @@ import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 
 type LineDefinition = GameLineDefinition;
 type LineOutput = NonNullable<LineDefinition["output"]>;
-type LineOutputEntry = LineOutput[number];
+type LineOutputSet = LineOutput[number];
+type LineOutputEntry = LineOutputSet["entries"][number];
 type WeightedLineOutput = Extract<
 	LineOutputEntry,
 	{
@@ -85,6 +86,13 @@ export type EffectiveLineOutputEntry =
 	| EffectiveNonWeightedLineOutputEntry
 	| EffectiveWeightedLineOutputEntry;
 
+export interface EffectiveLineOutputSet {
+	weight: number;
+	baseOutput: EffectiveLineOutputEntry[];
+	chanceItems: EffectiveChanceItemEntry[];
+	visibleOutput: EffectiveLineOutputEntry[];
+}
+
 export interface EffectiveLine {
 	appliedEffects: AppliedGameEffectOperation[];
 	blocked: boolean;
@@ -94,6 +102,7 @@ export interface EffectiveLine {
 	grantIds?: string[];
 	startRequirementsReady?: boolean;
 	lootPlan: {
+		outputSets?: EffectiveLineOutputSet[];
 		baseOutput: EffectiveLineOutputEntry[];
 		chanceItems: EffectiveChanceItemEntry[];
 		visibleOutput: EffectiveLineOutputEntry[];

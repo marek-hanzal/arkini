@@ -44,8 +44,12 @@
 						],
 						"output": [
 							{
-								"itemId": "item:building-permit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:building-permit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -77,9 +81,13 @@
 						"name": "Building Permit (Inspired)",
 						"output": [
 							{
-								"itemId": "item:building-permit",
-								"quantity": 2,
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:building-permit",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -103,8 +111,12 @@
 						"name": "Blueprint: Academy",
 						"output": [
 							{
-								"itemId": "item:blueprint-academy",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:blueprint-academy",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -141,8 +153,12 @@
 						],
 						"output": [
 							{
-								"itemId": "item:guild-charter",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:guild-charter",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

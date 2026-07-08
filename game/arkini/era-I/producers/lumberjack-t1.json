@@ -27,111 +27,115 @@
 						"id": "line:lumberjack-t1:log",
 						"output": [
 							{
-								"chance": 0,
-								"effects": [
+								"entries": [
 									{
-										"display": "always",
-										"kind": "nearby.loot.outputChance.add",
-										"label": "Nearby wood source drop chance",
-										"quantity": 1,
-										"radius": 2,
-										"sources": [
+										"chance": 0,
+										"effects": [
 											{
-												"chance": 0.5,
-												"items": {
-													"anyOf": [
-														{
-															"id": "item:tree"
-														}
-													]
-												},
-												"label": "Single Tree"
+												"display": "always",
+												"kind": "nearby.loot.outputChance.add",
+												"label": "Nearby wood source drop chance",
+												"quantity": 1,
+												"radius": 2,
+												"sources": [
+													{
+														"chance": 0.5,
+														"items": {
+															"anyOf": [
+																{
+																	"id": "item:tree"
+																}
+															]
+														},
+														"label": "Single Tree"
+													},
+													{
+														"chance": 0.65,
+														"items": {
+															"anyOf": [
+																{
+																	"id": "item:double-tree"
+																}
+															]
+														},
+														"label": "Double Tree"
+													},
+													{
+														"chance": 0.85,
+														"items": {
+															"anyOf": [
+																{
+																	"id": "item:micro-forest"
+																}
+															]
+														},
+														"label": "Micro-Forest"
+													}
+												]
 											},
 											{
-												"chance": 0.65,
-												"items": {
-													"anyOf": [
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
 														{
-															"id": "item:double-tree"
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
 														}
-													]
-												},
-												"label": "Double Tree"
-											},
-											{
-												"chance": 0.85,
-												"items": {
-													"anyOf": [
-														{
-															"id": "item:micro-forest"
-														}
-													]
-												},
-												"label": "Micro-Forest"
-											}
-										]
-									},
-									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
 													]
 												}
-											]
-										}
-									},
-									{
-										"bands": [
+											},
 											{
-												"maxDistance": 2,
-												"minDistance": 0,
-												"multiplier": 0.9
+												"bands": [
+													{
+														"maxDistance": 2,
+														"minDistance": 0,
+														"multiplier": 0.9
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"tag": "wood-source"
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Nearby wood source enables production",
+												"maxSources": 5,
+												"radius": 2
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
+													]
+												}
 											}
 										],
-										"display": "whenActive",
-										"items": {
-											"anyOf": [
-												{
-													"tag": "wood-source"
-												}
-											]
-										},
-										"kind": "nearby.duration.multiply",
-										"label": "Nearby wood source enables production",
-										"maxSources": 5,
-										"radius": 2
+										"itemId": "item:log",
+										"type": "chance"
 									},
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
-													]
-												}
-											]
-										}
+										"chance": 0.03,
+										"itemId": "item:quest:road-repair",
+										"sort": 900,
+										"type": "chance"
 									}
-								],
-								"itemId": "item:log",
-								"type": "chance"
-							},
-							{
-								"chance": 0.03,
-								"itemId": "item:quest:road-repair",
-								"sort": 900,
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [

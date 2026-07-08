@@ -27,71 +27,75 @@
 						"id": "line:well-t1:water",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "whenActive",
+												"kind": "grant.duration.multiply",
+												"label": "Minor Haste",
+												"multiplier": 0.75,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-minor-haste"
+															]
+														}
+													]
+												}
+											}
+										],
+										"itemId": "item:water",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "whenActive",
-										"kind": "grant.duration.multiply",
-										"label": "Minor Haste",
-										"multiplier": 0.75,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-minor-haste"
+										"chance": 0.5,
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
-									}
-								],
-								"itemId": "item:water",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.5,
-								"effects": [
+											}
+										],
+										"itemId": "item:water",
+										"type": "chance"
+									},
 									{
-										"chance": 0.35,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
+										"chance": 0.04,
+										"itemId": "item:quest:water-carrier",
+										"sort": 900,
+										"type": "chance"
 									}
-								],
-								"itemId": "item:water",
-								"type": "chance"
-							},
-							{
-								"chance": 0.04,
-								"itemId": "item:quest:water-carrier",
-								"sort": 900,
-								"type": "chance"
+								]
 							}
 						],
 						"tags": [

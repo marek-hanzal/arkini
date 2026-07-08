@@ -32,8 +32,12 @@
 						"name": "Prospect: Clay Deposit",
 						"output": [
 							{
-								"itemId": "item:clay-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:clay-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -60,8 +64,12 @@
 						"name": "Prospect: Sand Deposit",
 						"output": [
 							{
-								"itemId": "item:sand-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:sand-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -94,8 +102,12 @@
 						"name": "Prospect: Coal Deposit",
 						"output": [
 							{
-								"itemId": "item:coal-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:coal-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -128,8 +140,12 @@
 						"name": "Prospect: Iron Deposit",
 						"output": [
 							{
-								"itemId": "item:iron-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:iron-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -162,8 +178,12 @@
 						"name": "Prospect: Gold Deposit",
 						"output": [
 							{
-								"itemId": "item:gold-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:gold-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -195,8 +215,12 @@
 						"name": "Prospect: Marble Deposit",
 						"output": [
 							{
-								"itemId": "item:marble-deposit",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:marble-deposit",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

@@ -56,8 +56,12 @@ describe("feast plate source config", () => {
 			name: "Feast Plate",
 			output: [
 				{
-					itemId: "item:feast-plate",
-					type: "guaranteed",
+					entries: [
+						{
+							itemId: "item:feast-plate",
+							type: "guaranteed",
+						},
+					],
 				},
 			],
 		});
@@ -66,8 +70,12 @@ describe("feast plate source config", () => {
 			name: "Auto-Cooked Feast",
 			output: [
 				{
-					itemId: "item:feast",
-					type: "guaranteed",
+					entries: [
+						{
+							itemId: "item:feast",
+							type: "guaranteed",
+						},
+					],
 				},
 			],
 		});
@@ -89,8 +97,12 @@ describe("feast plate source config", () => {
 			durationMs: 9000,
 			output: [
 				{
-					type: "guaranteed",
-					itemId: "item:feast",
+					entries: [
+						{
+							type: "guaranteed",
+							itemId: "item:feast",
+						},
+					],
 				},
 			],
 			inputs: [

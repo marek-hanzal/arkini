@@ -21,27 +21,31 @@
 					"name": "Open Chest T4",
 					"output": [
 						{
-							"itemId": "item:coin",
-							"quantity": {
-								"max": 15,
-								"min": 10
-							},
-							"type": "guaranteed"
-						},
-						{
-							"chance": 0.35,
-							"itemId": "item:sapphire",
-							"type": "chance"
-						},
-						{
-							"chance": 0.55,
-							"itemId": "item:topaz",
-							"type": "chance"
-						},
-						{
-							"chance": 0.35,
-							"itemId": "item:aquamarine",
-							"type": "chance"
+							"entries": [
+								{
+									"itemId": "item:coin",
+									"quantity": {
+										"max": 15,
+										"min": 10
+									},
+									"type": "guaranteed"
+								},
+								{
+									"chance": 0.35,
+									"itemId": "item:sapphire",
+									"type": "chance"
+								},
+								{
+									"chance": 0.55,
+									"itemId": "item:topaz",
+									"type": "chance"
+								},
+								{
+									"chance": 0.35,
+									"itemId": "item:aquamarine",
+									"type": "chance"
+								}
+							]
 						}
 					],
 					"placement": "board_then_inventory"

@@ -26,8 +26,12 @@
 						],
 						"output": [
 							{
-								"itemId": "item:morale-t1",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:morale-t1",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					}

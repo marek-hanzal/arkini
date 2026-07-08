@@ -228,9 +228,13 @@ describe("applyGameActionFx Producer grants", () => {
 							name: "Backup",
 							output: [
 								{
-									itemId: "item:plank",
-									quantity: 1,
-									type: "guaranteed",
+									entries: [
+										{
+											itemId: "item:plank",
+											quantity: 1,
+											type: "guaranteed",
+										},
+									],
 								},
 							],
 							placement: "board_then_inventory",
@@ -250,9 +254,13 @@ describe("applyGameActionFx Producer grants", () => {
 					name: "Backup",
 					output: [
 						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory",
@@ -395,9 +403,13 @@ describe("applyGameActionFx Producer grants", () => {
 							name: "Backup",
 							output: [
 								{
-									itemId: "item:plank",
-									quantity: 1,
-									type: "guaranteed",
+									entries: [
+										{
+											itemId: "item:plank",
+											quantity: 1,
+											type: "guaranteed",
+										},
+									],
 								},
 							],
 							placement: "board_then_inventory",
@@ -417,9 +429,13 @@ describe("applyGameActionFx Producer grants", () => {
 					name: "Backup",
 					output: [
 						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 					placement: "board_then_inventory",
@@ -510,27 +526,31 @@ describe("applyGameActionFx Producer grants", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							effects: [
+							entries: [
 								{
-									display: "always",
-									items: {
-										anyOf: [
-											{
-												ids: [
-													"item:axe",
+									effects: [
+										{
+											display: "always",
+											items: {
+												anyOf: [
+													{
+														ids: [
+															"item:axe",
+														],
+													},
 												],
 											},
-										],
-									},
-									kind: "nearby.require",
-									label: "Nearby Axe Unlocks Drop",
-									phase: "start",
-									radius: 1,
+											kind: "nearby.require",
+											label: "Nearby Axe Unlocks Drop",
+											phase: "start",
+											radius: 1,
+										},
+									],
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
 								},
 							],
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
 						},
 					],
 				},

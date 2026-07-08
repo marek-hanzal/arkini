@@ -28,8 +28,12 @@
 						"name": "Feast Plate",
 						"output": [
 							{
-								"itemId": "item:feast-plate",
-								"type": "guaranteed"
+								"entries": [
+									{
+										"itemId": "item:feast-plate",
+										"type": "guaranteed"
+									}
+								]
 							}
 						]
 					},
@@ -66,26 +70,30 @@
 						"name": "Auto-Cooked Feast",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.2,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:feast",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:feast",
-								"type": "guaranteed"
+								]
 							}
 						]
 					}

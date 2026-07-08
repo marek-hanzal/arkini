@@ -148,9 +148,13 @@ describe("RuntimeGameEngineAdapter", () => {
 						...base.lineCatalog["line:test"],
 						output: [
 							{
-								itemId: "item:twig",
-								quantity: 1,
-								type: "guaranteed",
+								entries: [
+									{
+										itemId: "item:twig",
+										quantity: 1,
+										type: "guaranteed",
+									},
+								],
 							},
 						],
 					},
@@ -233,9 +237,13 @@ describe("RuntimeGameEngineAdapter", () => {
 						...base.lineCatalog["line:test"],
 						output: [
 							{
-								itemId: "item:twig",
-								quantity: 1,
-								type: "guaranteed",
+								entries: [
+									{
+										itemId: "item:twig",
+										quantity: 1,
+										type: "guaranteed",
+									},
+								],
 							},
 						],
 					},

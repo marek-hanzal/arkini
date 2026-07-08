@@ -35,128 +35,132 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.12,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.12,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:charcoal",
+										"quantity": 3,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.3,
+										"effects": [
+											{
+												"chance": 0.12,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:charcoal",
-								"quantity": 3,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.3,
-								"effects": [
-									{
-										"chance": 0.12,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										}
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:charcoal",
+										"type": "chance"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:charcoal",
-								"type": "chance"
-							},
-							{
-								"chance": 0.35,
-								"effects": [
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.08,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.08,
-								"effects": [
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

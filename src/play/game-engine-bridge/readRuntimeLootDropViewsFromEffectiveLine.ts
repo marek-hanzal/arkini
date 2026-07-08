@@ -2,7 +2,8 @@ import type { ActivationDropView } from "~/board/view/ActivationDropViewSchema";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { EffectiveDropEffectOutcome, EffectiveLine } from "~/effects/EffectiveLine";
 
-type LootOutput = NonNullable<GameLineDefinition["output"]>[number];
+type LootOutputSet = NonNullable<GameLineDefinition["output"]>[number];
+type LootOutput = LootOutputSet["entries"][number];
 type LootQuantity = NonNullable<
 	Extract<
 		LootOutput,

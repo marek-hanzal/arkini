@@ -6,6 +6,7 @@ import type {
 	AppliedGameEffectOperation,
 	EffectiveChanceItemEntry,
 	EffectiveLineOutputEntry,
+	EffectiveLineOutputSet,
 	EffectiveWeightedLineOutputSubEntry,
 } from "~/effects/EffectiveLine";
 import { createAppliedGameEffectOperation } from "~/effects/createAppliedGameEffectOperation";
@@ -17,6 +18,9 @@ import {
 	readNearbyLineEffectMatches,
 } from "~/effects/readNearbyLineEffectMatches";
 import { readRuntimeLineEffectLabel } from "~/effects/readRuntimeLineEffectLabel";
+
+type OutputSet = NonNullable<GameLineDefinition["output"]>[number];
+type OutputEntry = OutputSet["entries"][number];
 
 const readOutputDurationEffects = ({
 	config,
@@ -104,6 +108,13 @@ const readOutputDurationEffects = ({
 	};
 };
 
+const readOutputEntryItemIds = (entry: OutputEntry): readonly string[] =>
+	entry.type === "weighted"
+		? entry.entries.map((weightedEntry) => weightedEntry.itemId)
+		: [
+				entry.itemId,
+			];
+
 export const readEffectiveOutputEntries = ({
 	config,
 	grantIds,
@@ -124,11 +135,8 @@ export const readEffectiveOutputEntries = ({
 	targetCell?: BoardCell;
 }) => {
 	const appliedEffects: AppliedGameEffectOperation[] = [];
-	const rollableOutput: EffectiveLineOutputEntry[] = [];
-	const visibleOutput: EffectiveLineOutputEntry[] = [];
-	const chanceItems: EffectiveChanceItemEntry[] = [];
+	const outputSets: EffectiveLineOutputSet[] = [];
 	let durationMultiplier = 1;
-	const rollableDropIds = new Set<string>();
 	const applyDurationEffects = ({
 		dropEffectIdPrefix,
 		dropEffects,
@@ -152,105 +160,129 @@ export const readEffectiveOutputEntries = ({
 		appliedEffects.push(...duration.appliedEffects);
 	};
 
-	for (const [outputIndex, entry] of output.entries()) {
-		if (entry.type === "weighted") {
-			const visibleEntries: EffectiveWeightedLineOutputSubEntry[] = [];
-			const rollableEntries: EffectiveWeightedLineOutputSubEntry[] = [];
+	for (const [outputSetIndex, outputSet] of output.entries()) {
+		const rollableOutput: EffectiveLineOutputEntry[] = [];
+		const visibleOutput: EffectiveLineOutputEntry[] = [];
+		const chanceItems: EffectiveChanceItemEntry[] = [];
+		const rollableDropIds = new Set<string>();
 
-			for (const [weightedEntryIndex, weightedEntry] of entry.entries.entries()) {
-				const sourceDropId = `${lineId}:output:${outputIndex}:entry:${weightedEntryIndex}`;
-				const evaluation = readEffectiveDrop({
-					config,
-					defaultVisible: lineVisible,
-					dropEffectIdPrefix: sourceDropId,
-					dropEffects: weightedEntry.effects,
-					enabled: weightedEntry.enabled,
-					grantIds,
-					itemId: weightedEntry.itemId,
-					save,
-					targetCell,
-					visibility: weightedEntry.visibility,
-				});
-				chanceItems.push(...evaluation.chanceItems);
-				const effectiveEntry = {
-					...weightedEntry,
-					dropEffects: evaluation.dropEffects,
-					enabled: evaluation.enabled,
-					visible: evaluation.visible,
-				};
-				if (evaluation.visible) visibleEntries.push(effectiveEntry);
-				if (evaluation.visible && evaluation.enabled) {
-					rollableEntries.push(effectiveEntry);
-					rollableDropIds.add(sourceDropId);
-					applyDurationEffects({
+		for (const [outputIndex, entry] of outputSet.entries.entries()) {
+			if (entry.type === "weighted") {
+				const visibleEntries: EffectiveWeightedLineOutputSubEntry[] = [];
+				const rollableEntries: EffectiveWeightedLineOutputSubEntry[] = [];
+
+				for (const [weightedEntryIndex, weightedEntry] of entry.entries.entries()) {
+					const sourceDropId = `${lineId}:output:${outputSetIndex}:entries:${outputIndex}:entry:${weightedEntryIndex}`;
+					const evaluation = readEffectiveDrop({
+						config,
+						defaultVisible: lineVisible,
 						dropEffectIdPrefix: sourceDropId,
 						dropEffects: weightedEntry.effects,
-						outputItemId: weightedEntry.itemId,
+						enabled: weightedEntry.enabled,
+						grantIds,
+						itemId: weightedEntry.itemId,
+						save,
+						targetCell,
+						visibility: weightedEntry.visibility,
+					});
+					chanceItems.push(...evaluation.chanceItems);
+					const effectiveEntry = {
+						...weightedEntry,
+						dropEffects: evaluation.dropEffects,
+						enabled: evaluation.enabled,
+						visible: evaluation.visible,
+					};
+					if (evaluation.visible) visibleEntries.push(effectiveEntry);
+					if (evaluation.visible && evaluation.enabled) {
+						rollableEntries.push(effectiveEntry);
+						rollableDropIds.add(sourceDropId);
+						applyDurationEffects({
+							dropEffectIdPrefix: sourceDropId,
+							dropEffects: weightedEntry.effects,
+							outputItemId: weightedEntry.itemId,
+						});
+					}
+				}
+
+				if (visibleEntries.length > 0) {
+					visibleOutput.push({
+						...entry,
+						dropEffects: [],
+						enabled: rollableEntries.length > 0,
+						entries: visibleEntries,
+						visible: true,
+					});
+				}
+				if (rollableEntries.length > 0) {
+					rollableOutput.push({
+						...entry,
+						dropEffects: [],
+						enabled: true,
+						entries: rollableEntries,
+						visible: true,
+					});
+				}
+				continue;
+			}
+
+			const sourceDropId = `${lineId}:output:${outputSetIndex}:entries:${outputIndex}`;
+			const evaluation = readEffectiveDrop({
+				config,
+				defaultVisible: lineVisible,
+				dropEffectIdPrefix: sourceDropId,
+				dropEffects: entry.effects,
+				enabled: entry.enabled,
+				grantIds,
+				itemId: entry.itemId,
+				save,
+				targetCell,
+				visibility: entry.visibility,
+			});
+			chanceItems.push(...evaluation.chanceItems);
+			const effectiveEntry = {
+				...entry,
+				dropEffects: evaluation.dropEffects,
+				enabled: evaluation.enabled,
+				visible: evaluation.visible,
+			};
+
+			if (evaluation.visible) visibleOutput.push(effectiveEntry);
+			if (evaluation.visible && evaluation.enabled) {
+				rollableOutput.push(effectiveEntry);
+				rollableDropIds.add(sourceDropId);
+				for (const outputItemId of readOutputEntryItemIds(entry)) {
+					applyDurationEffects({
+						dropEffectIdPrefix: sourceDropId,
+						dropEffects: entry.effects,
+						outputItemId,
 					});
 				}
 			}
-
-			if (visibleEntries.length > 0) {
-				visibleOutput.push({
-					...entry,
-					dropEffects: [],
-					enabled: rollableEntries.length > 0,
-					entries: visibleEntries,
-					visible: true,
-				});
-			}
-			if (rollableEntries.length > 0) {
-				rollableOutput.push({
-					...entry,
-					dropEffects: [],
-					enabled: true,
-					entries: rollableEntries,
-					visible: true,
-				});
-			}
-			continue;
 		}
 
-		const sourceDropId = `${lineId}:output:${outputIndex}`;
-		const evaluation = readEffectiveDrop({
-			config,
-			defaultVisible: lineVisible,
-			dropEffectIdPrefix: sourceDropId,
-			dropEffects: entry.effects,
-			enabled: entry.enabled,
-			grantIds,
-			itemId: entry.itemId,
-			save,
-			targetCell,
-			visibility: entry.visibility,
-		});
-		chanceItems.push(...evaluation.chanceItems);
-		const effectiveEntry = {
-			...entry,
-			dropEffects: evaluation.dropEffects,
-			enabled: evaluation.enabled,
-			visible: evaluation.visible,
-		};
-
-		if (evaluation.visible) visibleOutput.push(effectiveEntry);
-		if (evaluation.visible && evaluation.enabled) {
-			rollableOutput.push(effectiveEntry);
-			rollableDropIds.add(sourceDropId);
-			applyDurationEffects({
-				dropEffectIdPrefix: sourceDropId,
-				dropEffects: entry.effects,
-				outputItemId: entry.itemId,
+		const filteredChanceItems = chanceItems.filter((chanceItem) =>
+			rollableDropIds.has(chanceItem.sourceDropId),
+		);
+		if (
+			visibleOutput.length > 0 ||
+			rollableOutput.length > 0 ||
+			filteredChanceItems.length > 0
+		) {
+			outputSets.push({
+				baseOutput: rollableOutput,
+				chanceItems: filteredChanceItems,
+				visibleOutput,
+				weight: outputSet.weight ?? 1,
 			});
 		}
 	}
 
 	return {
 		appliedEffects,
-		chanceItems: chanceItems.filter((chanceItem) =>
-			rollableDropIds.has(chanceItem.sourceDropId),
-		),
+		chanceItems: outputSets.flatMap((outputSet) => outputSet.chanceItems),
 		durationMultiplier,
-		rollableOutput,
-		visibleOutput,
+		outputSets,
+		rollableOutput: outputSets.flatMap((outputSet) => outputSet.baseOutput),
+		visibleOutput: outputSets.flatMap((outputSet) => outputSet.visibleOutput),
 	};
 };

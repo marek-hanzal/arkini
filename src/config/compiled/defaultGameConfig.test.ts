@@ -176,9 +176,13 @@ describe("defaultGameConfig", () => {
 			durationMs: 120000,
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "item:rock",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:rock",
+						},
+					],
 				},
 			],
 			inputs: [
@@ -216,9 +220,13 @@ describe("defaultGameConfig", () => {
 			durationMs: 30000,
 			output: [
 				{
-					type: "guaranteed",
-					quantity: 1,
-					itemId: "item:tree",
+					entries: [
+						{
+							type: "guaranteed",
+							quantity: 1,
+							itemId: "item:tree",
+						},
+					],
 				},
 			],
 			inputs: [

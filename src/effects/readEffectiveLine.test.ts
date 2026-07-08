@@ -67,16 +67,20 @@ describe("readEffectiveLine", () => {
 					...createEngineTestConfig().lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "grant.require",
-									label: "Town Hall Grant",
-									phase: "start",
-									selector: allOfGrant("grant:test:townhall"),
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "always",
+											kind: "grant.require",
+											label: "Town Hall Grant",
+											phase: "start",
+											selector: allOfGrant("grant:test:townhall"),
+										},
+									],
 								},
 							],
 						},
@@ -139,15 +143,19 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "never",
-									kind: "grant.require",
-									phase: "visibility",
-									selector: allOfGrant(grantId),
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "never",
+											kind: "grant.require",
+											phase: "visibility",
+											selector: allOfGrant(grantId),
+										},
+									],
 								},
 							],
 						},
@@ -219,23 +227,27 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "grant.require",
-									label: "Choose Twig Path",
-									phase: "visibility",
-									selector: allOfGrant(grantId),
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "always",
+											kind: "grant.require",
+											label: "Choose Twig Path",
+											phase: "visibility",
+											selector: allOfGrant(grantId),
+										},
+									],
+								},
+								{
+									itemId: "item:plank",
+									quantity: 1,
+									type: "guaranteed",
 								},
 							],
-						},
-						{
-							itemId: "item:plank",
-							quantity: 1,
-							type: "guaranteed",
 						},
 					],
 				},
@@ -317,16 +329,20 @@ describe("readEffectiveLine", () => {
 					...createEngineTestConfig().lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "grant.require",
-									label: "Unlock Twig Drop",
-									phase: "start",
-									selector: allOfGrant("grant:test:unlock"),
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "always",
+											kind: "grant.require",
+											label: "Unlock Twig Drop",
+											phase: "start",
+											selector: allOfGrant("grant:test:unlock"),
+										},
+									],
 								},
 							],
 						},
@@ -377,35 +393,39 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									items: anyOfItem("item:twig"),
-									kind: "nearby.require",
-									label: "Nearby Twig",
-									phase: "start",
-									radius: 1,
-								},
-								{
-									bands: [
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
 										{
-											maxDistance: 1,
-											minDistance: 0,
-											multiplier: 2,
+											display: "always",
+											items: anyOfItem("item:twig"),
+											kind: "nearby.require",
+											label: "Nearby Twig",
+											phase: "start",
+											radius: 1,
 										},
 										{
-											minDistance: 2,
-											multiplier: 3,
+											bands: [
+												{
+													maxDistance: 1,
+													minDistance: 0,
+													multiplier: 2,
+												},
+												{
+													minDistance: 2,
+													multiplier: 3,
+												},
+											],
+											display: "whenActive",
+											items: anyOfItem("item:axe"),
+											kind: "nearby.duration.multiply",
+											label: "Nearby Axe Slowdown",
+											radius: 2,
 										},
 									],
-									display: "whenActive",
-									items: anyOfItem("item:axe"),
-									kind: "nearby.duration.multiply",
-									label: "Nearby Axe Slowdown",
-									radius: 2,
 								},
 							],
 						},
@@ -483,24 +503,28 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "whenActive",
-									kind: "grant.duration.multiply",
-									label: "Inventory Haste",
-									multiplier: 0.5,
-									selector: allOfGrant(grantId),
-								},
-								{
-									chance: 0.25,
-									display: "whenActive",
-									kind: "grant.loot.extraOutputChance.add",
-									label: "Extra Twig",
-									quantity: 1,
-									selector: allOfGrant(grantId),
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "whenActive",
+											kind: "grant.duration.multiply",
+											label: "Inventory Haste",
+											multiplier: 0.5,
+											selector: allOfGrant(grantId),
+										},
+										{
+											chance: 0.25,
+											display: "whenActive",
+											kind: "grant.loot.extraOutputChance.add",
+											label: "Extra Twig",
+											quantity: 1,
+											selector: allOfGrant(grantId),
+										},
+									],
 								},
 							],
 						},
@@ -565,19 +589,23 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							effects: [
+							entries: [
 								{
-									chance: 0.25,
-									display: "never",
-									kind: "grant.loot.extraOutputChance.add",
-									label: "Hidden Bonus Label",
+									effects: [
+										{
+											chance: 0.25,
+											display: "never",
+											kind: "grant.loot.extraOutputChance.add",
+											label: "Hidden Bonus Label",
+											quantity: 1,
+											selector: allOfGrant(grantId),
+										},
+									],
+									itemId: "item:twig",
 									quantity: 1,
-									selector: allOfGrant(grantId),
+									type: "guaranteed",
 								},
 							],
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
 						},
 					],
 				},
@@ -626,24 +654,28 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									bands: [
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
 										{
-											maxDistance: 3,
-											minDistance: 0,
-											multiplier: 0.5,
+											bands: [
+												{
+													maxDistance: 3,
+													minDistance: 0,
+													multiplier: 0.5,
+												},
+											],
+											display: "whenActive",
+											items: anyOfItem("item:axe"),
+											kind: "nearby.duration.multiply",
+											label: "Nearby Axe Haste",
+											maxSources: 2,
+											radius: 3,
 										},
 									],
-									display: "whenActive",
-									items: anyOfItem("item:axe"),
-									kind: "nearby.duration.multiply",
-									label: "Nearby Axe Haste",
-									maxSources: 2,
-									radius: 3,
 								},
 							],
 						},
@@ -743,31 +775,35 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									chance: 0.5,
-									display: "whenActive",
-									kind: "grant.loot.extraOutputChance.add",
-									label: "Disabled source bonus",
+									itemId: "item:twig",
 									quantity: 1,
-									selector: allOfGrant(bonusGrantId),
+									type: "guaranteed",
+									effects: [
+										{
+											chance: 0.5,
+											display: "whenActive",
+											kind: "grant.loot.extraOutputChance.add",
+											label: "Disabled source bonus",
+											quantity: 1,
+											selector: allOfGrant(bonusGrantId),
+										},
+										{
+											display: "always",
+											kind: "grant.require",
+											label: "Missing unlock",
+											phase: "start",
+											selector: allOfGrant(missingGrantId),
+										},
+									],
 								},
 								{
-									display: "always",
-									kind: "grant.require",
-									label: "Missing unlock",
-									phase: "start",
-									selector: allOfGrant(missingGrantId),
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
 								},
 							],
-						},
-						{
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
 						},
 					],
 				},
@@ -823,22 +859,26 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "grant.drop.disable",
-									label: "Disable Twig",
-									selector: allOfGrant(grantId),
-								},
-								{
-									display: "always",
-									kind: "grant.require",
-									label: "Ready Requirement",
-									phase: "start",
-									selector: allOfGrant(grantId),
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "always",
+											kind: "grant.drop.disable",
+											label: "Disable Twig",
+											selector: allOfGrant(grantId),
+										},
+										{
+											display: "always",
+											kind: "grant.require",
+											label: "Ready Requirement",
+											phase: "start",
+											selector: allOfGrant(grantId),
+										},
+									],
 								},
 							],
 						},
@@ -899,31 +939,35 @@ describe("readEffectiveLine", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							chance: 0,
-							quantity: 1,
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "nearby.loot.outputChance.add",
-									label: "Nearby wood sources",
+									chance: 0,
 									quantity: 1,
-									radius: 2,
-									sources: [
+									effects: [
 										{
-											chance: 0.5,
-											items: anyOfItem("item:twig"),
-											label: "Single tree",
-										},
-										{
-											chance: 0.65,
-											items: anyOfItem("item:plank"),
-											label: "Double tree",
+											display: "always",
+											kind: "nearby.loot.outputChance.add",
+											label: "Nearby wood sources",
+											quantity: 1,
+											radius: 2,
+											sources: [
+												{
+													chance: 0.5,
+													items: anyOfItem("item:twig"),
+													label: "Single tree",
+												},
+												{
+													chance: 0.65,
+													items: anyOfItem("item:plank"),
+													label: "Double tree",
+												},
+											],
 										},
 									],
+									itemId: "item:twig",
+									type: "chance",
 								},
 							],
-							itemId: "item:twig",
-							type: "chance",
 						},
 					],
 				},

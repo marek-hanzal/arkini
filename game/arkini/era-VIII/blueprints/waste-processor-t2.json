@@ -60,8 +60,12 @@
 				],
 				"output": [
 					{
-						"itemId": "producer:waste-processor-t2",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "producer:waste-processor-t2",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			},

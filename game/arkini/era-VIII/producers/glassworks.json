@@ -41,137 +41,141 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.2,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:sand-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:sand-pit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:glass",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
+										"chance": 0.65,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:sand-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:sand-pit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:sand-pit"
+										"chance": 0.15,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
 													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:sand-pit",
-										"phase": "start",
-										"radius": 2
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"radius": 3
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:sand-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:sand-pit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:glass",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.65,
-								"effects": [
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:sand-pit"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:sand-pit",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
-							},
-							{
-								"chance": 0.15,
-								"effects": [
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:purifier-t1"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:purifier-t1",
-										"phase": "start",
-										"radius": 3
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"producer:sand-pit"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby producer:sand-pit",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:pollution",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

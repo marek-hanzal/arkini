@@ -8,7 +8,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
-import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
+import { rollLootOutputSetsFx } from "~/loot/rollLootOutputSetsFx";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import type { GameSaveItemPlacementRequest } from "~/placement/GameSaveItemPlacementRequest";
 import { checkTileRemoveReadinessFx } from "~/remove/checkTileRemoveReadinessFx";
@@ -139,11 +139,9 @@ const rollTileRemoveOutputPlacementRequestsFx = Effect.fn(
 	"removeTileFx.rollTileRemoveOutputPlacementRequestsFx",
 )(function* ({ checked }: TileRemoveWorkingState) {
 	const rolledOutput = checked.removal.output
-		? yield* rollLootTableItemsFx({
-				lootTable: {
-					name: `Tile removal ${checked.target.itemId}`,
-					output: checked.removal.output,
-				},
+		? yield* rollLootOutputSetsFx({
+				name: `Tile removal ${checked.target.itemId}`,
+				outputSets: checked.removal.output,
 			})
 		: {
 				items: [],

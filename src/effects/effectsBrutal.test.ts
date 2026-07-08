@@ -26,23 +26,27 @@ describe("output-owned producer effect runtime guards", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "grant.require",
-									phase: "start",
-									selector: {
-										allOf: [
-											{
-												ids: [
-													"grant:test:missing",
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "always",
+											kind: "grant.require",
+											phase: "start",
+											selector: {
+												allOf: [
+													{
+														ids: [
+															"grant:test:missing",
+														],
+													},
 												],
 											},
-										],
-									},
+										},
+									],
 								},
 							],
 						},

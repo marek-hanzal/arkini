@@ -21,22 +21,26 @@
 					"name": "Open Chest T1",
 					"output": [
 						{
-							"itemId": "item:coin",
-							"quantity": {
-								"max": 4,
-								"min": 2
-							},
-							"type": "guaranteed"
-						},
-						{
-							"chance": 0.65,
-							"itemId": "item:ruby",
-							"type": "chance"
-						},
-						{
-							"chance": 0.12,
-							"itemId": "item:emerald",
-							"type": "chance"
+							"entries": [
+								{
+									"itemId": "item:coin",
+									"quantity": {
+										"max": 4,
+										"min": 2
+									},
+									"type": "guaranteed"
+								},
+								{
+									"chance": 0.65,
+									"itemId": "item:ruby",
+									"type": "chance"
+								},
+								{
+									"chance": 0.12,
+									"itemId": "item:emerald",
+									"type": "chance"
+								}
+							]
 						}
 					],
 					"placement": "board_then_inventory"

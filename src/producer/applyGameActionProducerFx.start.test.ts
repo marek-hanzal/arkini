@@ -146,24 +146,28 @@ describe("applyGameActionFx Producer start", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
-							effects: [
+							entries: [
 								{
-									display: "always",
-									kind: "grant.require",
-									label: "Unlock Twig Drop",
-									phase: "start",
-									selector: {
-										allOf: [
-											{
-												ids: [
-													"grant:test:unlock",
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
+									effects: [
+										{
+											display: "always",
+											kind: "grant.require",
+											label: "Unlock Twig Drop",
+											phase: "start",
+											selector: {
+												allOf: [
+													{
+														ids: [
+															"grant:test:unlock",
+														],
+													},
 												],
 											},
-										],
-									},
+										},
+									],
 								},
 							],
 						},
@@ -206,9 +210,13 @@ describe("applyGameActionFx Producer start", () => {
 					durationMs: 0,
 					output: [
 						{
-							itemId: "item:twig",
-							quantity: 1,
-							type: "guaranteed",
+							entries: [
+								{
+									itemId: "item:twig",
+									quantity: 1,
+									type: "guaranteed",
+								},
+							],
 						},
 					],
 				},

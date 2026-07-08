@@ -24,8 +24,12 @@
 				],
 				"output": [
 					{
-						"itemId": "item:rock",
-						"type": "guaranteed"
+						"entries": [
+							{
+								"itemId": "item:rock",
+								"type": "guaranteed"
+							}
+						]
 					}
 				]
 			}

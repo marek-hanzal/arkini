@@ -34,82 +34,86 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:clay-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:clay-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:clay",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:clay-deposit"
+										"chance": 0.3,
+										"effects": [
+											{
+												"chance": 0.25,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:clay-deposit",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:clay-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:clay-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:clay",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:clay",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.3,
-								"effects": [
-									{
-										"chance": 0.25,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:clay-deposit"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:clay-deposit",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:clay",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

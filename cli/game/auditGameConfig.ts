@@ -73,9 +73,10 @@ type LimitedDepositIndex = {
 };
 
 type ActivationOutput = NonNullable<GameLineDefinition["output"]>;
+type ActivationOutputEntry = ActivationOutput[number]["entries"][number];
 type GameDropEffect = NonNullable<
 	Extract<
-		ActivationOutput[number],
+		ActivationOutputEntry,
 		{
 			type: "guaranteed" | "chance";
 		}
@@ -404,12 +405,15 @@ const collectEffectUsage = (config: GameConfig, usage: UsageIndex) => {
 	}
 };
 
+const flatMapActivationOutputEntries = (output: ActivationOutput) =>
+	output.flatMap((outputSet) => outputSet.entries);
+
 const collectActivationOutputEffectUsage = (
 	output: ActivationOutput,
 	config: GameConfig,
 	usage: UsageIndex,
 ) => {
-	for (const entry of output) {
+	for (const entry of flatMapActivationOutputEntries(output)) {
 		if (entry.type === "weighted") {
 			for (const weightedEntry of entry.entries) {
 				collectLineEffectUsage(weightedEntry.effects ?? [], config, usage);
@@ -446,7 +450,7 @@ const collectLootOutputEffectUsage = (
 	config: GameConfig,
 	usage: UsageIndex,
 ) => {
-	for (const entry of output) {
+	for (const entry of flatMapActivationOutputEntries(output)) {
 		if (entry.type === "weighted") {
 			for (const weightedEntry of entry.entries) {
 				collectDropEffectUsage(weightedEntry.effects ?? [], config, usage);
@@ -487,7 +491,7 @@ const collectDropEffectUsage = (
 };
 
 const collectLootOutputUsage = (output: ActivationOutput, itemFlow: ItemFlowIndex) => {
-	for (const entry of output) {
+	for (const entry of flatMapActivationOutputEntries(output)) {
 		if (entry.type === "weighted") {
 			for (const weightedEntry of entry.entries) {
 				itemFlow.producedItemIds.add(weightedEntry.itemId);
@@ -516,7 +520,7 @@ const collectProductionRule = (
 const readLootOutputItemIds = (output: ActivationOutput): Set<string> => {
 	const itemIds = new Set<string>();
 
-	for (const entry of output) {
+	for (const entry of flatMapActivationOutputEntries(output)) {
 		if (entry.type === "weighted") {
 			for (const weightedEntry of entry.entries) itemIds.add(weightedEntry.itemId);
 			continue;
@@ -696,7 +700,9 @@ const readGameConfigAuditSummary = (
 };
 
 const hasGuaranteedOutput = (output: ActivationOutput): boolean =>
-	output.some((entry) => entry.type === "guaranteed" && entry.enabled !== false);
+	flatMapActivationOutputEntries(output).some(
+		(entry) => entry.type === "guaranteed" && entry.enabled !== false,
+	);
 
 const formatCapacitySpendLineId = (line: CapacitySpendLine): string =>
 	`${line.ownerItemId}.${line.lineId}`;

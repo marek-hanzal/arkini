@@ -43,24 +43,28 @@ describe("readItemTargetLimits", () => {
 					...baseConfig.lineCatalog["line:test"],
 					output: [
 						{
-							effects: [
+							entries: [
 								{
-									display: "always" as const,
-									kind: "grant.drop.disable" as const,
-									selector: {
-										allOf: [
-											{
-												ids: [
-													grantId,
+									effects: [
+										{
+											display: "always" as const,
+											kind: "grant.drop.disable" as const,
+											selector: {
+												allOf: [
+													{
+														ids: [
+															grantId,
+														],
+													},
 												],
 											},
-										],
-									},
+										},
+									],
+									itemId: "item:twig",
+									quantity: 2,
+									type: "guaranteed" as const,
 								},
 							],
-							itemId: "item:twig",
-							quantity: 2,
-							type: "guaranteed" as const,
 						},
 					],
 				},

@@ -62,26 +62,30 @@
 						],
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.12,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.12,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:construction-bundle",
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:construction-bundle",
-								"type": "guaranteed"
+								]
 							}
 						]
 					},
@@ -131,27 +135,31 @@
 						"name": "Construction Bundle (Inspired)",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.12,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.12,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											}
+										],
+										"itemId": "item:construction-bundle",
+										"quantity": 2,
+										"type": "guaranteed"
 									}
-								],
-								"itemId": "item:construction-bundle",
-								"quantity": 2,
-								"type": "guaranteed"
+								]
 							}
 						]
 					}

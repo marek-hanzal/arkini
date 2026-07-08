@@ -1,7 +1,5 @@
 import { Effect } from "effect";
-import type { GameConfig } from "~/config/GameConfigTypes";
-import type { GameLineDefinition } from "~/config/GameItemCapabilities";
-import type { EffectiveLine } from "~/effects/EffectiveLine";
+import type { EffectiveLine, EffectiveLineOutputSet } from "~/effects/EffectiveLine";
 import { rollGameQuantityFx } from "~/loot/rollGameQuantityFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import type { LootTableRollResult } from "~/loot/LootTableRollResult";
@@ -9,15 +7,17 @@ import { RandomServiceFx } from "~/random/context/RandomServiceFx";
 
 export namespace rollEffectiveLootPlanItemsFx {
 	export interface Props {
-		config: GameConfig;
+		config?: unknown;
 		lootPlan: EffectiveLine["lootPlan"];
 	}
 }
 
+type LootOutputEntries = EffectiveLineOutputSet["baseOutput"];
+
 const rollLootOutputFx = Effect.fn("rollLootOutputFx")(function* ({
 	output,
 }: {
-	output: NonNullable<GameLineDefinition["output"]>;
+	output: LootOutputEntries;
 }) {
 	return yield* rollLootTableItemsFx({
 		lootTable: {
@@ -41,19 +41,52 @@ const readChanceRollCountFx = Effect.fn("readChanceRollCountFx")(function* ({
 	return guaranteedRolls + (random.chance(remainder) ? 1 : 0);
 });
 
+const chooseOutputSetFx = Effect.fn("chooseOutputSetFx")(function* ({
+	outputSets,
+}: {
+	outputSets: readonly EffectiveLineOutputSet[];
+}) {
+	if (outputSets.length === 0) return undefined;
+
+	const random = yield* RandomServiceFx;
+	let remainingWeight = outputSets.reduce((total, outputSet) => total + outputSet.weight, 0);
+
+	for (const outputSet of outputSets) {
+		const chance = outputSet.weight / remainingWeight;
+		if (random.chance(chance)) return outputSet;
+		remainingWeight -= outputSet.weight;
+	}
+
+	return outputSets[outputSets.length - 1];
+});
+
 export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItemsFx")(function* ({
 	lootPlan,
 }: rollEffectiveLootPlanItemsFx.Props) {
 	const items: LootTableRollResult["items"] = [];
+	const outputSet = yield* chooseOutputSetFx({
+		outputSets: lootPlan.outputSets ?? [
+			{
+				baseOutput: lootPlan.baseOutput,
+				chanceItems: lootPlan.chanceItems,
+				visibleOutput: lootPlan.visibleOutput,
+				weight: 1,
+			},
+		],
+	});
+	if (!outputSet)
+		return {
+			items,
+		} satisfies LootTableRollResult;
 
-	if (lootPlan.baseOutput.length > 0) {
+	if (outputSet.baseOutput.length > 0) {
 		const rolled = yield* rollLootOutputFx({
-			output: lootPlan.baseOutput,
+			output: outputSet.baseOutput,
 		});
 		items.push(...rolled.items);
 	}
 
-	for (const chanceItem of lootPlan.chanceItems) {
+	for (const chanceItem of outputSet.chanceItems) {
 		const rollCount = yield* readChanceRollCountFx({
 			chance: chanceItem.chance,
 		});

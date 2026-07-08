@@ -27,82 +27,86 @@
 						"id": "line:sand-pit:sand",
 						"output": [
 							{
-								"effects": [
+								"entries": [
 									{
-										"chance": 0.2,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:sand-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:sand-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:sand",
+										"quantity": 2,
+										"type": "guaranteed"
 									},
 									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:sand-deposit"
+										"chance": 0.35,
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
 													]
 												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:sand-deposit",
-										"phase": "start",
-										"radius": 2
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:sand-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:sand-deposit",
+												"phase": "start",
+												"radius": 2
+											}
+										],
+										"itemId": "item:sand",
+										"type": "chance"
 									}
-								],
-								"itemId": "item:sand",
-								"quantity": 2,
-								"type": "guaranteed"
-							},
-							{
-								"chance": 0.35,
-								"effects": [
-									{
-										"chance": 0.2,
-										"display": "whenActive",
-										"kind": "grant.loot.extraOutputChance.add",
-										"label": "Bountiful Offering",
-										"quantity": 1,
-										"selector": {
-											"allOf": [
-												{
-													"ids": [
-														"grant:active:shrine-bountiful-offering"
-													]
-												}
-											]
-										}
-									},
-									{
-										"display": "always",
-										"items": {
-											"anyOf": [
-												{
-													"ids": [
-														"item:sand-deposit"
-													]
-												}
-											]
-										},
-										"kind": "nearby.require",
-										"label": "Nearby item:sand-deposit",
-										"phase": "start",
-										"radius": 2
-									}
-								],
-								"itemId": "item:sand",
-								"type": "chance"
+								]
 							}
 						],
 						"visibility": "visible"

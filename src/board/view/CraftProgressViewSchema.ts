@@ -11,6 +11,7 @@ const CraftEffectRequirementViewSchema = z
 				"grant.require",
 			])
 			.optional(),
+		itemId: GameItemIdSchema.optional(),
 		label: z.string().min(1),
 		ready: z.boolean(),
 	})

@@ -141,6 +141,7 @@ const readCraftEffectRequirements = (scope: RuntimeCraftViewScope) => {
 		effectBlockReasons: effectState.blockReasons.length ? effectState.blockReasons : undefined,
 		effectRequirements: effectState.requirements.length
 			? effectState.requirements.map((requirement) => ({
+					itemId: requirement.itemId,
 					kind: requirement.kind,
 					label: requirement.label,
 					ready: requirement.ready,

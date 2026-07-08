@@ -22,6 +22,7 @@ const item = (id: string, name: string, assetSrc: string) => ({
 
 const items: ItemCatalogView = {
 	"item:plank": item("item:plank", "Plank", "plank.svg"),
+	"item:townhall-t2": item("item:townhall-t2", "Town Hall II", "townhall.svg"),
 	"item:tree": item("item:tree", "Tree", "tree.svg"),
 	"item:water": item("item:water", "Water", "water.svg"),
 };
@@ -88,13 +89,14 @@ describe("DetailCraftPanel", () => {
 		expect(html).toContain("Nearby Tree blocks crafting");
 	});
 
-	it("renders missing effect start requirements", () => {
+	it("renders missing effect start requirements as blocker rows and hides inputs", () => {
 		const html = renderCraft(
 			createCraft({
 				effectRequirements: [
 					{
+						itemId: "item:townhall-t2",
 						kind: "grant.require",
-						label: "Owns Town Hall II",
+						label: "Town Hall II",
 						ready: false,
 					},
 				],
@@ -102,8 +104,11 @@ describe("DetailCraftPanel", () => {
 			}),
 		);
 
-		expect(html).toContain("Missing requirements");
-		expect(html).toContain("Missing Owns Town Hall II");
+		expect(html).toContain("Craft blockers");
+		expect(html).toContain("Town Hall II");
+		expect(html).toContain("Needed before crafting");
+		expect(html).not.toContain("Missing requirements");
+		expect(html).not.toContain("Water");
 	});
 
 	it("keeps fulfilled resources visible until the craft starts running", () => {

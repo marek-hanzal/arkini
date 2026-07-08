@@ -34,14 +34,31 @@ const readCraftInputRowClassName = ({
 				: "border-transparent bg-ak-surface/80",
 	);
 
+type CraftBlockerRow = {
+	itemId?: string;
+	label: string;
+	reason: string;
+};
+
+const readCraftBlockerRows = (craft: CraftProgressView): CraftBlockerRow[] => [
+	...(craft.effectBlockReasons ?? []).map((reason) => ({
+		label: reason,
+		reason: "Blocks craft",
+	})),
+	...(craft.effectRequirements ?? [])
+		.filter((requirement) => !requirement.ready && requirement.kind !== "grant.blockStart")
+		.map((requirement) => ({
+			itemId: requirement.itemId,
+			label: requirement.label,
+			reason: "Needed before crafting",
+		})),
+];
+
 export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, items }) => {
 	const resultItem = items[craft.resultItemId];
 	const targetLimits = craft.targetLimits ?? [];
-	const effectBlockReasons = craft.effectBlockReasons ?? [];
-	const missingEffectRequirements = (craft.effectRequirements ?? [])
-		.filter((requirement) => !requirement.ready && requirement.kind !== "grant.blockStart")
-		.map((requirement) => `Missing ${requirement.label}`);
-	const showInputs = craft.phase === "collecting_inputs";
+	const blockerRows = readCraftBlockerRows(craft);
+	const showInputs = craft.phase === "collecting_inputs" && blockerRows.length === 0;
 
 	return (
 		<DetailCard
@@ -73,27 +90,35 @@ export const DetailCraftPanel: FC<DetailCraftPanel.Props> = ({ control, craft, i
 					limits={targetLimits}
 				/>
 
-				{effectBlockReasons.length ? (
-					<div className="rounded-sm bg-rose-100/90 px-2.5 py-2 text-xs text-rose-900">
-						<p className="font-black text-rose-800">Blocked by effects</p>
-						<ul className="mt-1 grid gap-1 leading-5 text-rose-700/80">
-							{effectBlockReasons.map((reason) => (
-								<li key={`${craft.id}:effect-block:${reason}`}>{reason}</li>
-							))}
-						</ul>
-					</div>
-				) : null}
-
-				{missingEffectRequirements.length ? (
-					<div className="rounded-sm bg-rose-100/90 px-2.5 py-2 text-xs text-rose-900">
-						<p className="font-black text-rose-800">Missing requirements</p>
-						<ul className="mt-1 grid gap-1 leading-5 text-rose-700/80">
-							{missingEffectRequirements.map((requirement) => (
-								<li key={`${craft.id}:effect-requirement:${requirement}`}>
-									{requirement}
-								</li>
-							))}
-						</ul>
+				{blockerRows.length ? (
+					<div className="grid gap-2">
+						<p className="text-xs font-black uppercase tracking-[0.2em] text-rose-600/85">
+							Craft blockers
+						</p>
+						{blockerRows.map((blocker, blockerIndex) => {
+							const blockerItem = blocker.itemId ? items[blocker.itemId] : undefined;
+							return (
+								<div
+									key={`${craft.id}:craft-blocker:${blockerIndex}:${blocker.itemId ?? blocker.label}`}
+									className="flex min-w-0 items-center gap-2 rounded-sm border border-rose-300/65 bg-rose-100/70 px-2.5 py-2 text-sm shadow-[inset_0_0_0_1px_rgba(251,113,133,0.06)]"
+								>
+									{blocker.itemId ? (
+										<ItemInlineAsset
+											item={blockerItem}
+											className="h-9 w-9"
+										/>
+									) : null}
+									<div className="min-w-0 flex-1">
+										<p className="break-words font-black text-rose-900">
+											{blockerItem?.name ?? blocker.label}
+										</p>
+										<p className="mt-0.5 text-xs leading-5 text-rose-700/85">
+											{blocker.reason}
+										</p>
+									</div>
+								</div>
+							);
+						})}
 					</div>
 				) : null}
 

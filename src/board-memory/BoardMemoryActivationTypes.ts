@@ -10,9 +10,9 @@ export interface BoardMemoryActivationProps {
 	save: GameSave;
 }
 
-export type BoardMemoryLayoutItem = GameSave["boardMemoryLayouts"][string]["items"][number];
-
-export type BoardMemoryActivationScope = BoardMemoryActivationProps & {
+export interface BoardMemoryActivationState {
 	events: GameEvent[];
 	nextSave: GameSave;
-};
+}
+
+export type BoardMemoryLayoutItem = GameSave["boardMemoryLayouts"][string]["items"][number];

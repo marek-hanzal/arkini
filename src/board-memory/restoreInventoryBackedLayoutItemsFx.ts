@@ -1,27 +1,33 @@
 import { Effect } from "effect";
-import type {
-	BoardMemoryActivationScope,
-	BoardMemoryLayoutItem,
-} from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
 import { canRestoreInventoryBackedLayoutItemFx } from "~/board-memory/canRestoreInventoryBackedLayoutItemFx";
 import { consumeInventoryItemForMemoryRestoreFx } from "~/board-memory/consumeInventoryItemForMemoryRestoreFx";
 import { readBoardMemoryLayoutItemQuantity } from "~/board-memory/readBoardMemoryLayoutItemQuantity";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { createGameItemInstanceIdFx } from "~/save/createGameItemInstanceIdFx";
 
 const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayoutItemFx")(
 	function* ({
+		boardMemoryItemInstanceId,
+		config,
+		events,
 		memoryItem,
-		scope,
+		nextSave,
 	}: {
+		boardMemoryItemInstanceId: string;
+		config: GameConfig;
+		events: GameEvent[];
 		memoryItem: BoardMemoryLayoutItem;
-		scope: BoardMemoryActivationScope;
+		nextSave: GameSave;
 	}) {
-		const { action, events, nextSave } = scope;
 		if (
 			!(yield* canRestoreInventoryBackedLayoutItemFx({
+				config,
 				memoryItem,
-				scope,
+				nextSave,
 			}))
 		) {
 			return false;
@@ -29,7 +35,7 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayo
 
 		const consumed = yield* consumeInventoryItemForMemoryRestoreFx({
 			memoryItem,
-			scope,
+			nextSave,
 		});
 		if (!consumed) return false;
 
@@ -45,7 +51,7 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayo
 			itemId: memoryItem.itemId,
 			itemInstanceId,
 			quantity: readBoardMemoryLayoutItemQuantity(memoryItem),
-			originItemInstanceId: action.boardItemId,
+			originItemInstanceId: boardMemoryItemInstanceId,
 			reason: "memory-restore",
 			save: nextSave,
 		});
@@ -55,21 +61,30 @@ const restoreInventoryBackedLayoutItemFx = Effect.fn("restoreInventoryBackedLayo
 
 export const restoreInventoryBackedLayoutItemsFx = Effect.fn("restoreInventoryBackedLayoutItemsFx")(
 	function* ({
+		boardMemoryItemInstanceId,
+		config,
+		events,
+		nextSave,
 		restoredIndexes,
 		savedItems,
-		scope,
 	}: {
+		boardMemoryItemInstanceId: string;
+		config: GameConfig;
+		events: GameEvent[];
+		nextSave: GameSave;
 		restoredIndexes: Set<number>;
 		savedItems: readonly BoardMemoryLayoutItem[];
-		scope: BoardMemoryActivationScope;
 	}) {
 		let restoredCount = restoredIndexes.size;
 		for (const [memoryItemIndex, memoryItem] of savedItems.entries()) {
 			if (restoredIndexes.has(memoryItemIndex)) continue;
 			if (
 				yield* restoreInventoryBackedLayoutItemFx({
+					boardMemoryItemInstanceId,
+					config,
+					events,
 					memoryItem,
-					scope,
+					nextSave,
 				})
 			) {
 				restoredCount += 1;

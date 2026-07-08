@@ -2,22 +2,21 @@ import { Effect } from "effect";
 import { readBoardItemRuntimeStateStatus } from "~/board/readBoardItemRuntimeStateStatus";
 import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuantity";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
-import type {
-	BoardMemoryActivationScope,
-	BoardMemoryLayoutItem,
-} from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
 import { readSortedBoardMemoryBoardItems } from "~/board-memory/readSortedBoardMemoryBoardItems";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
-import type { GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
+import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
 
 const readBoardMemorySnapshotItemFx = Effect.fn("readBoardMemorySnapshotItemFx")(function* ({
+	config,
 	item,
-	scope,
+	nextSave,
 }: {
+	config: GameConfig;
 	item: GameSaveBoardItem;
-	scope: BoardMemoryActivationScope;
+	nextSave: GameSave;
 }) {
-	const { config, nextSave } = scope;
 	const stateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: item.id,
 		save: nextSave,
@@ -27,7 +26,6 @@ const readBoardMemorySnapshotItemFx = Effect.fn("readBoardMemorySnapshotItemFx")
 		itemId: item.itemId,
 		location: "inventory",
 	});
-
 	const quantity = readGameSaveBoardItemQuantity(item);
 
 	return {
@@ -48,19 +46,21 @@ const readBoardMemorySnapshotItemFx = Effect.fn("readBoardMemorySnapshotItemFx")
 });
 
 export const readBoardMemorySnapshotFx = Effect.fn("readBoardMemorySnapshotFx")(function* ({
-	scope,
+	config,
+	nextSave,
 }: {
-	scope: BoardMemoryActivationScope;
+	config: GameConfig;
+	nextSave: GameSave;
 }) {
-	const { nextSave } = scope;
 	const items: BoardMemoryLayoutItem[] = [];
 	for (const item of readSortedBoardMemoryBoardItems({
 		save: nextSave,
 	})) {
 		items.push(
 			yield* readBoardMemorySnapshotItemFx({
+				config,
 				item,
-				scope,
+				nextSave,
 			}),
 		);
 	}

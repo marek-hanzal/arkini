@@ -1,27 +1,31 @@
 import { Effect } from "effect";
 import { createBoardItemConsumedEventFx } from "~/board/createBoardItemConsumedEventFx";
-import type {
-	BoardMemoryActivationScope,
-	BoardMemoryLayoutItem,
-} from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
 import { readMemoryRestoreSourceBoardItemFx } from "~/board-memory/readMemoryRestoreSourceBoardItemFx";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { pushBoardItemCreatedEventFx } from "~/placement/pushBoardItemCreatedEventFx";
 
 export const restoreBoardOnlyLayoutItemsFx = Effect.fn("restoreBoardOnlyLayoutItemsFx")(function* ({
+	config,
+	events,
+	nextSave,
 	savedItems,
-	scope,
 }: {
+	config: GameConfig;
+	events: GameEvent[];
+	nextSave: GameSave;
 	savedItems: readonly BoardMemoryLayoutItem[];
-	scope: BoardMemoryActivationScope;
 }) {
-	const { events } = scope;
 	const restoredIndexes = new Set<number>();
 	const usedItemInstanceIds = new Set<string>();
 
 	for (const [index, memoryItem] of savedItems.entries()) {
 		const source = yield* readMemoryRestoreSourceBoardItemFx({
+			config,
 			memoryItem,
-			scope,
+			nextSave,
 			usedItemInstanceIds,
 		});
 		if (!source) continue;

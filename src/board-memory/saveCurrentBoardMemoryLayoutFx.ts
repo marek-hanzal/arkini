@@ -1,14 +1,28 @@
 import { Effect } from "effect";
-import type { BoardMemoryActivationScope } from "~/board-memory/BoardMemoryActivationTypes";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { readBoardMemoryEngineResultFx } from "~/board-memory/readBoardMemoryEngineResultFx";
 import { readBoardMemorySnapshotFx } from "~/board-memory/readBoardMemorySnapshotFx";
 import { writeBoardMemoryLayoutToSaveFx } from "~/board-memory/writeBoardMemoryLayoutToSaveFx";
 
 export const saveCurrentBoardMemoryLayoutFx = Effect.fn("saveCurrentBoardMemoryLayoutFx")(
-	function* ({ boardItemId, scope }: { boardItemId: string; scope: BoardMemoryActivationScope }) {
-		const { events, nextSave, nowMs } = scope;
+	function* ({
+		boardItemId,
+		config,
+		events,
+		nextSave,
+		nowMs,
+	}: {
+		boardItemId: string;
+		config: GameConfig;
+		events: GameEvent[];
+		nextSave: GameSave;
+		nowMs: number;
+	}) {
 		const items = yield* readBoardMemorySnapshotFx({
-			scope,
+			config,
+			nextSave,
 		});
 		yield* writeBoardMemoryLayoutToSaveFx({
 			boardItemId,
@@ -27,7 +41,10 @@ export const saveCurrentBoardMemoryLayoutFx = Effect.fn("saveCurrentBoardMemoryL
 		});
 
 		return yield* readBoardMemoryEngineResultFx({
-			scope,
+			config,
+			events,
+			nextSave,
+			nowMs,
 		});
 	},
 );

@@ -1,23 +1,23 @@
 import { Effect } from "effect";
 import { boardItemMatchesBoardMemoryCell } from "~/board-memory/boardItemMatchesBoardMemoryCell";
 import { boardItemMatchesBoardMemoryIdentity } from "~/board-memory/boardItemMatchesBoardMemoryIdentity";
-import type {
-	BoardMemoryActivationScope,
-	BoardMemoryLayoutItem,
-} from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 export const readMemoryRestoreSourceBoardItemFx = Effect.fn("readMemoryRestoreSourceBoardItemFx")(
 	function* ({
+		config,
 		memoryItem,
-		scope,
+		nextSave,
 		usedItemInstanceIds,
 	}: {
+		config: GameConfig;
 		memoryItem: BoardMemoryLayoutItem;
-		scope: BoardMemoryActivationScope;
+		nextSave: GameSave;
 		usedItemInstanceIds: ReadonlySet<string>;
 	}) {
-		const { config, nextSave } = scope;
 		if (
 			isItemStorageAllowed({
 				config,

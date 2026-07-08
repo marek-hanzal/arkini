@@ -7,7 +7,6 @@ import type {
 import { readGameDebugExplanationOutcome } from "~/debug/explain/readGameDebugExplanationOutcome";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
-import type { BoardMemoryActivationScope } from "~/board-memory/BoardMemoryActivationTypes";
 import { readBoardMemoryRestorePlanFx } from "~/board-memory/readBoardMemoryRestorePlanFx";
 import { restoreBoardMemoryLayoutItemsFx } from "~/board-memory/restoreBoardMemoryLayoutItemsFx";
 import { storeCurrentBoardItemsInInventoryFx } from "~/board-memory/storeCurrentBoardItemsInInventoryFx";
@@ -22,22 +21,14 @@ export namespace explainBoardMemoryRestoreFx {
 	}
 }
 
-const createDryRunScopeFx = Effect.fn("explainBoardMemoryRestoreFx.createDryRunScopeFx")(
-	function* ({ config, nowMs, save }: Omit<explainBoardMemoryRestoreFx.Props, "boardItemId">) {
-		const nextSave = yield* cloneGameSaveFx({
-			save,
-		});
+const createDryRunStateFx = Effect.fn("explainBoardMemoryRestoreFx.createDryRunStateFx")(
+	function* ({ save }: Pick<explainBoardMemoryRestoreFx.Props, "save">) {
 		return {
-			action: {
-				boardItemId: "debug:memory-explain",
-				type: "board.memory.activate" as const,
-			},
-			config,
 			events: [] as GameEvent[],
-			nextSave,
-			nowMs,
-			save,
-		} satisfies BoardMemoryActivationScope;
+			nextSave: yield* cloneGameSaveFx({
+				save,
+			}),
+		};
 	},
 );
 
@@ -49,7 +40,6 @@ const setDetails = (ids: ReadonlySet<string>) => ({
 export const explainBoardMemoryRestoreFx = Effect.fn("explainBoardMemoryRestoreFx")(function* ({
 	boardItemId,
 	config,
-	nowMs,
 	save,
 }: explainBoardMemoryRestoreFx.Props) {
 	const savedItems = save.boardMemoryLayouts[boardItemId]?.items;
@@ -79,14 +69,13 @@ export const explainBoardMemoryRestoreFx = Effect.fn("explainBoardMemoryRestoreF
 		} satisfies GameDebugExplanation<"board-memory-restore">;
 	}
 
-	const scope = yield* createDryRunScopeFx({
-		config,
-		nowMs,
+	const state = yield* createDryRunStateFx({
 		save,
 	});
 	const plan = yield* readBoardMemoryRestorePlanFx({
+		config,
+		nextSave: state.nextSave,
 		savedItems,
-		scope,
 	});
 
 	steps.push({
@@ -119,8 +108,10 @@ export const explainBoardMemoryRestoreFx = Effect.fn("explainBoardMemoryRestoreF
 	});
 
 	const storeResult = yield* storeCurrentBoardItemsInInventoryFx({
+		config,
+		events: state.events,
+		nextSave: state.nextSave,
 		preservedBoardItemInstanceIds: plan.fulfillmentPlan.preservedBoardItemInstanceIds,
-		scope,
 	});
 	if (storeResult.failedItemInstanceIds.size > 0) {
 		steps.push({
@@ -138,9 +129,12 @@ export const explainBoardMemoryRestoreFx = Effect.fn("explainBoardMemoryRestoreF
 	}
 
 	const restoredCount = yield* restoreBoardMemoryLayoutItemsFx({
+		boardMemoryItemInstanceId: boardItemId,
+		config,
+		events: state.events,
+		nextSave: state.nextSave,
 		restoredIndexes: new Set(plan.fulfillmentPlan.restoredIndexes),
 		savedItems,
-		scope,
 	});
 	const skippedCount = savedItems.length - restoredCount;
 

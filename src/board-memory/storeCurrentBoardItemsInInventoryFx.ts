@@ -1,8 +1,9 @@
 import { Effect } from "effect";
-import type { BoardMemoryActivationScope } from "~/board-memory/BoardMemoryActivationTypes";
 import { readBoardMemoryBoardItemStorePlan } from "~/board-memory/readBoardMemoryBoardItemStorePlan";
 import { readSortedBoardMemoryBoardItems } from "~/board-memory/readSortedBoardMemoryBoardItems";
-import type { GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { placeBoardItemInInventoryFx } from "~/placement/placeBoardItemInInventoryFx";
 
 export namespace StoreCurrentBoardItemsInInventoryResult {
@@ -13,13 +14,16 @@ export namespace StoreCurrentBoardItemsInInventoryResult {
 }
 
 const storeBoardItemInInventoryFx = Effect.fn("storeBoardItemInInventoryFx")(function* ({
+	config,
+	events,
 	item,
-	scope,
+	nextSave,
 }: {
+	config: GameConfig;
+	events: GameEvent[];
 	item: GameSaveBoardItem;
-	scope: BoardMemoryActivationScope;
+	nextSave: GameSave;
 }) {
-	const { config, events, nextSave } = scope;
 	const storePlan = readBoardMemoryBoardItemStorePlan({
 		config,
 		item,
@@ -43,34 +47,33 @@ const storeBoardItemInInventoryFx = Effect.fn("storeBoardItemInInventoryFx")(fun
 
 export const storeCurrentBoardItemsInInventoryFx = Effect.fn("storeCurrentBoardItemsInInventoryFx")(
 	function* ({
+		config,
+		events,
+		nextSave,
 		preservedBoardItemInstanceIds = new Set(),
-		scope,
 	}: {
+		config: GameConfig;
+		events: GameEvent[];
+		nextSave: GameSave;
 		preservedBoardItemInstanceIds?: ReadonlySet<string>;
-		scope: BoardMemoryActivationScope;
 	}) {
-		const { nextSave } = scope;
 		const result: StoreCurrentBoardItemsInInventoryResult.Type = {
 			failedItemInstanceIds: new Set(),
 			storedItemInstanceIds: new Set(),
 		};
-
 		for (const item of readSortedBoardMemoryBoardItems({
 			save: nextSave,
 		})) {
 			if (preservedBoardItemInstanceIds.has(item.id)) continue;
-			const storeResult = yield* storeBoardItemInInventoryFx({
+			const status = yield* storeBoardItemInInventoryFx({
+				config,
+				events,
 				item,
-				scope,
+				nextSave,
 			});
-			if (storeResult === "stored") {
-				result.storedItemInstanceIds.add(item.id);
-			}
-			if (storeResult === "failed") {
-				result.failedItemInstanceIds.add(item.id);
-			}
+			if (status === "ignored") continue;
+			(status === "stored" ? result.storedItemInstanceIds : result.failedItemInstanceIds).add(item.id);
 		}
-
 		return result;
 	},
 );

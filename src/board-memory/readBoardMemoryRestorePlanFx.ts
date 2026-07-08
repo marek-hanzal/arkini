@@ -1,36 +1,33 @@
 import { Effect } from "effect";
-import type {
-	BoardMemoryActivationScope,
-	BoardMemoryLayoutItem,
-} from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
 import type { BoardMemoryRestorePlan } from "~/board-memory/BoardMemoryRestorePlan";
 import { readBoardMemoryFulfillmentPlan } from "~/board-memory/readBoardMemoryFulfillmentPlan";
 import { storeCurrentBoardItemsInInventoryFx } from "~/board-memory/storeCurrentBoardItemsInInventoryFx";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { cloneGameSaveFx } from "~/save/cloneGameSaveFx";
 
 export const readBoardMemoryRestorePlanFx = Effect.fn("readBoardMemoryRestorePlanFx")(function* ({
+	config,
+	nextSave,
 	savedItems,
-	scope,
 }: {
+	config: GameConfig;
+	nextSave: GameSave;
 	savedItems: readonly BoardMemoryLayoutItem[];
-	scope: BoardMemoryActivationScope;
 }) {
-	const { config, nextSave } = scope;
 	const fulfillmentPlan = readBoardMemoryFulfillmentPlan({
 		config,
 		save: nextSave,
 		savedItems,
 	});
-	const dryRunScope: BoardMemoryActivationScope = {
-		...scope,
+	const cleanupResult = yield* storeCurrentBoardItemsInInventoryFx({
+		config,
 		events: [],
 		nextSave: yield* cloneGameSaveFx({
 			save: nextSave,
 		}),
-	};
-	const cleanupResult = yield* storeCurrentBoardItemsInInventoryFx({
 		preservedBoardItemInstanceIds: fulfillmentPlan.preservedBoardItemInstanceIds,
-		scope: dryRunScope,
 	});
 
 	return {

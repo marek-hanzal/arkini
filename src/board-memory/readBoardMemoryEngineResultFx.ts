@@ -1,14 +1,21 @@
 import { Effect } from "effect";
-import type { BoardMemoryActivationScope } from "~/board-memory/BoardMemoryActivationTypes";
+import type { GameConfig } from "~/config/GameConfigTypes";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEngineResult } from "~/engine/model/GameEngineResult";
+import type { GameEvent } from "~/event/GameEventSchema";
 import { readNextWakeAtMsFx } from "~/job/readNextWakeAtMsFx";
 
 export const readBoardMemoryEngineResultFx = Effect.fn("readBoardMemoryEngineResultFx")(function* ({
-	scope,
+	config,
+	events,
+	nextSave,
+	nowMs,
 }: {
-	scope: BoardMemoryActivationScope;
+	config: GameConfig;
+	events: GameEvent[];
+	nextSave: GameSave;
+	nowMs: number;
 }) {
-	const { config, events, nextSave, nowMs } = scope;
 	return {
 		events,
 		nextWakeAtMs: yield* readNextWakeAtMsFx({

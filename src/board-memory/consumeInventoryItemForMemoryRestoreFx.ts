@@ -1,8 +1,5 @@
 import { Effect } from "effect";
-import type {
-	BoardMemoryActivationScope,
-	BoardMemoryLayoutItem,
-} from "~/board-memory/BoardMemoryActivationTypes";
+import type { BoardMemoryLayoutItem } from "~/board-memory/BoardMemoryActivationTypes";
 import type { InventoryConsumedForMemoryRestore } from "~/board-memory/BoardMemoryRestoreTypes";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { readBoardMemoryLayoutItemQuantity } from "~/board-memory/readBoardMemoryLayoutItemQuantity";
@@ -11,25 +8,22 @@ import {
 	isGameSaveInventoryInstance,
 	isGameSaveInventoryStack,
 } from "~/inventory/model/GameSaveInventorySlot";
+import type { GameSave } from "~/engine/model/GameSaveSchema";
 
 const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 	"consumePreferredInventoryInstanceForMemoryRestoreFx",
 )(function* ({
 	itemId,
+	nextSave,
 	preferredItemInstanceId,
-	scope,
 }: {
 	itemId: string;
+	nextSave: GameSave;
 	preferredItemInstanceId?: string;
-	scope: BoardMemoryActivationScope;
 }) {
 	if (!preferredItemInstanceId) return undefined;
-	const { nextSave } = scope;
 	const slotIndex = nextSave.inventory.slots.findIndex(
-		(slot) =>
-			isGameSaveInventoryInstance(slot) &&
-			slot.itemId === itemId &&
-			slot.id === preferredItemInstanceId,
+		(slot) => isGameSaveInventoryInstance(slot) && slot.itemId === itemId && slot.id === preferredItemInstanceId,
 	);
 	if (slotIndex < 0) return undefined;
 
@@ -43,9 +37,7 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 	if (!isGameSaveInventoryInstance(consumed.slot)) return undefined;
 
 	return {
-		consumedEvents: [
-			consumed.consumedEvent,
-		],
+		consumedEvents: [consumed.consumedEvent],
 		createdAtMs: consumed.slot.createdAtMs,
 		itemInstanceId: consumed.slot.id,
 	} satisfies InventoryConsumedForMemoryRestore;
@@ -53,12 +45,12 @@ const consumePreferredInventoryInstanceForMemoryRestoreFx = Effect.fn(
 
 const readInventoryStackQuantity = ({
 	itemId,
-	scope,
+	nextSave,
 }: {
 	itemId: string;
-	scope: BoardMemoryActivationScope;
+	nextSave: GameSave;
 }) =>
-	scope.nextSave.inventory.slots.reduce((total, slot) => {
+	nextSave.inventory.slots.reduce((total, slot) => {
 		if (!isGameSaveInventoryStack(slot) || slot.itemId !== itemId) return total;
 		return total + slot.quantity;
 	}, 0);
@@ -67,37 +59,30 @@ const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 	"consumeInventoryStackForMemoryRestoreFx",
 )(function* ({
 	itemId,
+	nextSave,
 	quantity,
-	scope,
 }: {
 	itemId: string;
+	nextSave: GameSave;
 	quantity: number;
-	scope: BoardMemoryActivationScope;
 }) {
-	const { nextSave } = scope;
 	if (
 		readInventoryStackQuantity({
 			itemId,
-			scope,
+			nextSave,
 		}) < quantity
 	) {
 		return undefined;
 	}
 
-	const consumedEvents: Extract<
-		GameEvent,
-		{
-			type: "item.consumed";
-		}
-	>[] = [];
+	const consumedEvents: Extract<GameEvent, { type: "item.consumed" }>[] = [];
 	let createdAtMs: number | undefined;
 	let remainingQuantity = quantity;
 
 	for (let slotIndex = 0; slotIndex < nextSave.inventory.slots.length; slotIndex += 1) {
 		if (remainingQuantity <= 0) break;
 		const slot = nextSave.inventory.slots[slotIndex];
-		if (!isGameSaveInventoryStack(slot) || slot.itemId !== itemId || slot.quantity <= 0)
-			continue;
+		if (!isGameSaveInventoryStack(slot) || slot.itemId !== itemId || slot.quantity <= 0) continue;
 
 		const consumedQuantity = Math.min(slot.quantity, remainingQuantity);
 		const consumed = yield* consumeInventorySlotQuantityFx({
@@ -122,24 +107,24 @@ const consumeInventoryStackForMemoryRestoreFx = Effect.fn(
 export const consumeInventoryItemForMemoryRestoreFx = Effect.fn(
 	"consumeInventoryItemForMemoryRestoreFx",
 )(function* ({
-	memoryItem,
-	scope,
-}: {
-	memoryItem: BoardMemoryLayoutItem;
-	scope: BoardMemoryActivationScope;
-}) {
-	return (
-		(yield* consumePreferredInventoryInstanceForMemoryRestoreFx({
-			itemId: memoryItem.itemId,
-			preferredItemInstanceId: memoryItem.itemInstanceId,
-			scope,
-		})) ??
-		(memoryItem.itemInstanceId
-			? undefined
-			: yield* consumeInventoryStackForMemoryRestoreFx({
-					itemId: memoryItem.itemId,
-					quantity: readBoardMemoryLayoutItemQuantity(memoryItem),
-					scope,
-				}))
-	);
-});
+		memoryItem,
+		nextSave,
+	}: {
+		memoryItem: BoardMemoryLayoutItem;
+		nextSave: GameSave;
+	}) {
+		return (
+			(yield* consumePreferredInventoryInstanceForMemoryRestoreFx({
+				itemId: memoryItem.itemId,
+				nextSave,
+				preferredItemInstanceId: memoryItem.itemInstanceId,
+			})) ??
+			(memoryItem.itemInstanceId
+				? undefined
+				: yield* consumeInventoryStackForMemoryRestoreFx({
+						itemId: memoryItem.itemId,
+						nextSave,
+						quantity: readBoardMemoryLayoutItemQuantity(memoryItem),
+					}))
+		);
+	});

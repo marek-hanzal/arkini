@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import { boardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
-import type { BoardMemoryActivationProps } from "~/board-memory/BoardMemoryActivationTypes";
-import type { BoardMemoryActivationScope } from "~/board-memory/BoardMemoryActivationTypes";
+import type {
+	BoardMemoryActivationProps,
+	BoardMemoryActivationState,
+} from "~/board-memory/BoardMemoryActivationTypes";
 import { restoreSavedBoardMemoryLayoutFx } from "~/board-memory/restoreSavedBoardMemoryLayoutFx";
 import { saveCurrentBoardMemoryLayoutFx } from "~/board-memory/saveCurrentBoardMemoryLayoutFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
@@ -13,8 +15,10 @@ export namespace applyBoardMemoryActivateFx {
 }
 
 const readBoardMemoryActorFx = Effect.fn("applyBoardMemoryActivateFx.readBoardMemoryActorFx")(
-	function* ({ scope }: { scope: BoardMemoryActivationScope }) {
-		const { action, nextSave } = scope;
+	function* ({
+		action,
+		nextSave,
+	}: Pick<BoardMemoryActivationProps, "action"> & Pick<BoardMemoryActivationState, "nextSave">) {
 		const memoryItem = nextSave.board.items[action.boardItemId];
 		if (memoryItem?.itemId === boardMemoryItemId) return memoryItem;
 
@@ -26,10 +30,16 @@ const readBoardMemoryActorFx = Effect.fn("applyBoardMemoryActivateFx.readBoardMe
 
 const applyBoardMemoryActivateProgramFx = Effect.fn(
 	"applyBoardMemoryActivateFx.applyBoardMemoryActivateProgramFx",
-)(function* ({ scope }: { scope: BoardMemoryActivationScope }) {
-	const { action, nextSave } = scope;
+)(function* ({
+	action,
+	config,
+	events,
+	nextSave,
+	nowMs,
+}: Pick<BoardMemoryActivationProps, "action" | "config" | "nowMs"> & BoardMemoryActivationState) {
 	yield* readBoardMemoryActorFx({
-		scope,
+		action,
+		nextSave,
 	});
 	const savedLayout = nextSave.boardMemoryLayouts[action.boardItemId];
 	const activationRoute = savedLayout
@@ -42,26 +52,24 @@ const applyBoardMemoryActivateProgramFx = Effect.fn(
 			} as const);
 
 	return yield* match(activationRoute)
-		.with(
-			{
-				kind: "save",
-			},
-			() =>
-				saveCurrentBoardMemoryLayoutFx({
-					boardItemId: action.boardItemId,
-					scope,
-				}),
+		.with({ kind: "save" }, () =>
+			saveCurrentBoardMemoryLayoutFx({
+				boardItemId: action.boardItemId,
+				config,
+				events,
+				nextSave,
+				nowMs,
+			}),
 		)
-		.with(
-			{
-				kind: "restore",
-			},
-			({ savedItems }) =>
-				restoreSavedBoardMemoryLayoutFx({
-					boardItemId: action.boardItemId,
-					savedItems,
-					scope,
-				}),
+		.with({ kind: "restore" }, ({ savedItems }) =>
+			restoreSavedBoardMemoryLayoutFx({
+				boardItemId: action.boardItemId,
+				config,
+				events,
+				nextSave,
+				nowMs,
+				savedItems,
+			}),
 		)
 		.exhaustive();
 });
@@ -74,10 +82,10 @@ export const applyBoardMemoryActivateFx = Effect.fn("applyBoardMemoryActivateFx"
 	});
 
 	return yield* applyBoardMemoryActivateProgramFx({
-		scope: {
-			...props,
-			events: [],
-			nextSave,
-		},
+		action: props.action,
+		config: props.config,
+		events: [],
+		nextSave,
+		nowMs: props.nowMs,
 	});
 });

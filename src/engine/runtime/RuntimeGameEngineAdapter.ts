@@ -1,6 +1,8 @@
+import { readActionReadinessFx } from "~/engine/readActionReadinessFx";
+import { runGameEngineEffect } from "~/engine/runtime/runGameEngineEffect";
+import { catchUpDueRuntimeGameTicks } from "~/engine/runtime/catchUpDueRuntimeGameTicks";
 import { dispatchRuntimeGameAction } from "~/engine/runtime/dispatchRuntimeGameAction";
 import { readInitialRuntimeGameEngineAdapterOptions } from "~/engine/runtime/readInitialRuntimeGameEngineAdapterOptions";
-import { readRuntimeActionReadiness } from "~/engine/runtime/readRuntimeActionReadiness";
 import { replaceRuntimeGameSave } from "~/engine/runtime/replaceRuntimeGameSave";
 import { tickRuntimeGameEngine } from "~/engine/runtime/tickRuntimeGameEngine";
 import { validateRuntimeWorldSnapshot } from "~/engine/runtime/validateRuntimeWorldSnapshot";
@@ -95,8 +97,26 @@ export class RuntimeGameEngineAdapter {
 		};
 	}
 
-	async readiness(props: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
-		return this.enqueueMutation(() => readRuntimeActionReadiness(this.createScope(), props));
+	async readiness({ action, nowMs = Date.now() }: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
+		return this.enqueueMutation(async () => {
+			const scope = this.createScope();
+
+			await catchUpDueRuntimeGameTicks(scope, {
+				nowMs,
+			});
+
+			return runGameEngineEffect(
+				readActionReadinessFx({
+					action,
+					config: scope.config,
+					nowMs,
+					save: scope.readSave(),
+				}),
+				{
+					random: scope.random,
+				},
+			);
+		});
 	}
 
 	async dispatch(props: RuntimeGameEngineAdapter.DispatchProps): Promise<GameEngineResult> {

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useGameAudio } from "~/audio/GameAudioProvider";
 import { readBoardCellDropTarget } from "~/board/readBoardCellDropTarget";
-import { readBoardDropFeedbackForRuntimeSnapshot } from "~/board/readBoardDropFeedbackForRuntimeSnapshot";
 import { readBoardTileDragActor } from "~/board/readBoardTileDragActor";
+import { resolveBoardDropFeedback } from "~/board/drop/resolveBoardDropFeedback";
 import { useBoardItemActivation } from "~/board/useBoardItemActivation";
 import type { BoardTileEngineDragConfig } from "~/board/BoardTileEngineModelTypes";
 import type { BoardCellView } from "~/board/boardCells";
@@ -10,7 +10,8 @@ import type { BoardSurface } from "~/board/BoardSurface.types";
 import { createRuntimeDropLifecycle } from "~/play/drag/createRuntimeDropLifecycle";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
-import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
+import { readRuntimeViews } from "~/play/runtime/readRuntimeViews";
+import type { GameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
 import { useGameBoardView } from "~/play/runtime/useGameRuntimeViews";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 
@@ -24,7 +25,7 @@ export const useBoardDragConfig = ({
 	openBoardItemSheet,
 	runtimeStore,
 }: {
-	actions: ReturnType<typeof useGameRuntimeDropActions>;
+	actions: GameRuntimeDropActions;
 	activateBoardItem: useBoardItemActivation.Result;
 	audio: ReturnType<typeof useGameAudio>;
 	board: ReturnType<typeof useGameBoardView>;
@@ -51,11 +52,19 @@ export const useBoardDragConfig = ({
 					slot,
 					targetTile,
 				}),
-			dropFeedback: (context) =>
-				readBoardDropFeedbackForRuntimeSnapshot({
+			dropFeedback: (context) => {
+				const { board: liveBoard, config, inventory } = readRuntimeViews(
+					runtimeStore.getSnapshot(),
+					Date.now(),
+				);
+
+				return resolveBoardDropFeedback({
+					board: liveBoard,
+					config,
 					context,
-					runtimeStore,
-				}),
+					inventory,
+				});
+			},
 			...createRuntimeDropLifecycle<BoardSurface.TileData, BoardCellView>({
 				actions,
 				audio,

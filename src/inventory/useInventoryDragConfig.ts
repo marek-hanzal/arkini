@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useGameAudio } from "~/audio/GameAudioProvider";
-import { readInventoryDropFeedbackFromRuntimeSnapshot } from "~/inventory/readInventoryDropFeedbackFromRuntimeSnapshot";
 import { readInventorySlotDropTarget } from "~/inventory/readInventorySlotDropTarget";
 import { readInventoryTileDragActor } from "~/inventory/readInventoryTileDragActor";
+import { resolveInventoryDropFeedback } from "~/inventory/drop/resolveInventoryDropFeedback";
 import type {
 	InventoryTileEngineDragConfig,
 	PlaceInventoryOnBoardInput,
@@ -11,7 +11,8 @@ import type { InventorySurface } from "~/inventory/InventorySurface.types";
 import { createRuntimeDropLifecycle } from "~/play/drag/createRuntimeDropLifecycle";
 import type { Feedback } from "~/play/feedback/Feedback";
 import { useGameRuntimeStore } from "~/play/runtime/GameRuntimeContext";
-import { useGameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
+import { readRuntimeInventoryView } from "~/play/runtime/readRuntimeViews";
+import type { GameRuntimeDropActions } from "~/play/runtime/useGameRuntimeDropActions";
 import { useGameInventoryView } from "~/play/runtime/useGameRuntimeViews";
 
 export const useInventoryDragConfig = ({
@@ -22,7 +23,7 @@ export const useInventoryDragConfig = ({
 	placeInventoryOnBoard,
 	runtimeStore,
 }: {
-	actions: ReturnType<typeof useGameRuntimeDropActions>;
+	actions: GameRuntimeDropActions;
 	audio: ReturnType<typeof useGameAudio>;
 	feedback: Feedback.Type;
 	inventory: ReturnType<typeof useGameInventoryView>;
@@ -42,9 +43,9 @@ export const useInventoryDragConfig = ({
 					slot,
 				}),
 			dropFeedback: (context) =>
-				readInventoryDropFeedbackFromRuntimeSnapshot({
+				resolveInventoryDropFeedback({
 					context,
-					runtimeStore,
+					inventory: readRuntimeInventoryView(runtimeStore.getSnapshot()),
 				}),
 			...createRuntimeDropLifecycle<InventorySurface.TileData, InventorySurface.SlotData>({
 				actions,

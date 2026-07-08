@@ -25,74 +25,64 @@ type CraftInputStoreReadiness = Effect.Effect.Success<
 	ReturnType<typeof checkCraftInputStoreReadinessFx>
 >;
 
-type CraftInputStoreWorkingState = {
-	checked: CraftInputStoreReadiness;
-	events: GameEvent[];
-	nextSave: GameSave;
-};
-
-const readCraftInputStoreReadinessFx = Effect.fn(
-	"storeCraftInputFx.readCraftInputStoreReadinessFx",
-)(function* ({ action, config, nowMs, save }: storeCraftInputFx.Props) {
-	return yield* checkCraftInputStoreReadinessFx({
+const buildStoredCraftInputStateFx = Effect.fn("storeCraftInputFx.buildStoredCraftInputStateFx")(
+	function* ({
 		action,
-		config,
 		nowMs,
 		save,
-	});
-});
+		checked,
+	}: {
+		action: GameActionCraftInputStoreSchema.Type;
+		nowMs: number;
+		save: GameSave;
+		checked: CraftInputStoreReadiness;
+	}) {
+		const nextSave = yield* cloneGameSaveFx({
+			save,
+		});
+		const events: GameEvent[] = [];
 
-const createStoredCraftInputWorkingStateFx = Effect.fn(
-	"storeCraftInputFx.createStoredCraftInputWorkingStateFx",
-)(function* ({
-	checked,
-	props,
-}: {
-	checked: CraftInputStoreReadiness;
-	props: storeCraftInputFx.Props;
-}) {
-	const nextSave = yield* cloneGameSaveFx({
-		save: props.save,
-	});
-	const events: GameEvent[] = [];
-
-	if (checked.inputSlot.consume) {
-		yield* consumeResolvedInputRefFx({
+		if (checked.inputSlot.consume) {
+			yield* consumeResolvedInputRefFx({
+				events,
+				nextSave,
+				reason: "craft-input-store",
+				ref: checked.resolvedRef,
+			});
+		}
+		yield* storeCraftResolvedInputFx({
 			events,
 			nextSave,
-			reason: "craft-input-store",
+			nowMs,
+			recipeId: checked.target.recipeId,
+			targetItemInstanceId: action.targetItemInstanceId,
 			ref: checked.resolvedRef,
 		});
-	}
-	yield* storeCraftResolvedInputFx({
-		events,
-		nextSave,
-		nowMs: props.nowMs,
-		recipeId: checked.target.recipeId,
-		targetItemInstanceId: props.action.targetItemInstanceId,
-		ref: checked.resolvedRef,
-	});
-	nextSave.updatedAtMs = props.nowMs;
+		nextSave.updatedAtMs = nowMs;
 
-	return {
-		checked,
-		events,
-		nextSave,
-	} satisfies CraftInputStoreWorkingState;
-});
+		return {
+			events,
+			nextSave,
+		};
+	},
+);
 
 const buildStoredCraftInputResultFx = Effect.fn("storeCraftInputFx.buildStoredCraftInputResultFx")(
 	function* ({
+		config,
 		events,
 		nextSave,
-		props,
-	}: Pick<CraftInputStoreWorkingState, "events" | "nextSave"> & {
-		props: storeCraftInputFx.Props;
+		nowMs,
+	}: {
+		config: GameConfig;
+		events: GameEvent[];
+		nextSave: GameSave;
+		nowMs: number;
 	}) {
 		return yield* createGameEngineResultFx({
-			config: props.config,
+			config,
 			events,
-			nowMs: props.nowMs,
+			nowMs,
 			save: nextSave,
 		});
 	},
@@ -100,16 +90,18 @@ const buildStoredCraftInputResultFx = Effect.fn("storeCraftInputFx.buildStoredCr
 
 const readStoredCraftInputReadyFx = Effect.fn("storeCraftInputFx.readStoredCraftInputReadyFx")(
 	function* ({
-		state,
-		props,
+		targetItemInstanceId,
+		inputs,
+		nextSave,
 	}: {
-		state: CraftInputStoreWorkingState;
-		props: storeCraftInputFx.Props;
+		targetItemInstanceId: string;
+		inputs: CraftInputStoreReadiness["target"]["recipe"]["inputs"];
+		nextSave: GameSave;
 	}) {
 		return yield* readCraftStoredInputsReadyFx({
-			inputs: state.checked.target.recipe.inputs,
-			save: state.nextSave,
-			targetItemInstanceId: props.action.targetItemInstanceId,
+			inputs,
+			save: nextSave,
+			targetItemInstanceId,
 		});
 	},
 );
@@ -117,66 +109,86 @@ const readStoredCraftInputReadyFx = Effect.fn("storeCraftInputFx.readStoredCraft
 const tryStartReadyStoredCraftInputFx = Effect.fn(
 	"storeCraftInputFx.tryStartReadyStoredCraftInputFx",
 )(function* ({
-	state,
-	props,
-}: {
-	state: CraftInputStoreWorkingState;
-	props: storeCraftInputFx.Props;
-}) {
-	const storedResult = yield* buildStoredCraftInputResultFx({
-		...state,
-		props,
-	});
-	const storedInputsReady = yield* readStoredCraftInputReadyFx({
-		props,
-		state,
-	});
-	if (!storedInputsReady) return storedResult;
-
-	const startEither = yield* Effect.either(
-		startCraftFx({
-			action: {
-				recipeId: state.checked.target.recipeId,
-				targetItemInstanceId: props.action.targetItemInstanceId,
-				type: "craft.start",
-			},
-			config: props.config,
-			nowMs: props.nowMs,
-			save: state.nextSave,
-		}),
-	);
-	if (startEither._tag === "Right") {
-		return {
-			events: [
-				...state.events,
-				...startEither.right.events,
-			],
-			nextWakeAtMs: startEither.right.nextWakeAtMs,
-			save: startEither.right.save,
-		} satisfies GameEngineResult;
-	}
-
-	const error = startEither.left;
-	if (error._tag === "GameActionRejected") return storedResult;
-	return yield* Effect.fail(error);
-});
-
-const storeCraftInputProgramFx = Effect.fn("storeCraftInputFx.storeCraftInputProgramFx")(function* (
-	props: storeCraftInputFx.Props,
-) {
-	const checked = yield* readCraftInputStoreReadinessFx(props);
-	const state = yield* createStoredCraftInputWorkingStateFx({
+		action,
+		config,
+		nowMs,
 		checked,
-		props,
+		events,
+		nextSave,
+	}: {
+		action: GameActionCraftInputStoreSchema.Type;
+		config: GameConfig;
+		nowMs: number;
+		checked: CraftInputStoreReadiness;
+		events: GameEvent[];
+		nextSave: GameSave;
+	}) {
+		const storedResult = yield* buildStoredCraftInputResultFx({
+			config,
+			events,
+			nextSave,
+			nowMs,
+		});
+		const storedInputsReady = yield* readStoredCraftInputReadyFx({
+			inputs: checked.target.recipe.inputs,
+			nextSave,
+			targetItemInstanceId: action.targetItemInstanceId,
+		});
+		if (!storedInputsReady) return storedResult;
+
+		const startEither = yield* Effect.either(
+			startCraftFx({
+				action: {
+					recipeId: checked.target.recipeId,
+					targetItemInstanceId: action.targetItemInstanceId,
+					type: "craft.start",
+				},
+				config,
+				nowMs,
+				save: nextSave,
+			}),
+		);
+		if (startEither._tag === "Right") {
+			return {
+				events: [
+					...events,
+					...startEither.right.events,
+				],
+				nextWakeAtMs: startEither.right.nextWakeAtMs,
+				save: startEither.right.save,
+			} satisfies GameEngineResult;
+		}
+
+		const error = startEither.left;
+		if (error._tag === "GameActionRejected") return storedResult;
+		return yield* Effect.fail(error);
+	},
+);
+
+export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* ({
+	action,
+	config,
+	nowMs,
+	save,
+}: storeCraftInputFx.Props) {
+	const checked = yield* checkCraftInputStoreReadinessFx({
+		action,
+		config,
+		nowMs,
+		save,
+	});
+	const { events, nextSave } = yield* buildStoredCraftInputStateFx({
+		action,
+		checked,
+		nowMs,
+		save,
 	});
 	return yield* tryStartReadyStoredCraftInputFx({
-		props,
-		state,
+		action,
+		checked,
+		config,
+		events,
+		nextSave,
+		nowMs,
 	});
-});
-
-export const storeCraftInputFx = Effect.fn("storeCraftInputFx")(function* (
-	props: storeCraftInputFx.Props,
-) {
-	return yield* storeCraftInputProgramFx(props);
 });

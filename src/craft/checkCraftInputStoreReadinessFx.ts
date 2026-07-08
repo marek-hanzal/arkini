@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { assertResolvedInputRefIsNotBoardItemFx } from "~/activation/assertResolvedInputRefIsNotBoardItemFx";
-import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import { readStoredActivationInputQuantityCandidateFx } from "~/activation/readStoredActivationInputQuantityCandidateFx";
+import { resolveSingleInputRefFx } from "~/activation/resolveSingleInputRefFx";
 import type { GameActionResolvedInputRef } from "~/action/GameActionResolvedInputRef";
 import type { GameActionCraftInputStoreSchema } from "~/action/GameActionCraftInputStoreSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
@@ -34,11 +34,6 @@ type CraftInputStoreQuantityCandidate = {
 	nextQuantity: number;
 	previousQuantity: number;
 	resolvedRef: GameActionResolvedInputRef;
-};
-
-type CraftInputStoreReadinessScope = checkCraftInputStoreReadinessFx.Props & {
-	readonly resolvedRef: GameActionResolvedInputRef;
-	readonly target: CraftInputStoreTarget;
 };
 
 const readCraftInputStoreTargetFx = Effect.fn(
@@ -74,79 +69,93 @@ const readCraftInputStoreResolvedRefFx = Effect.fn(
 
 const readCraftInputStoreSlotFx = Effect.fn(
 	"checkCraftInputStoreReadinessFx.readCraftInputStoreSlotFx",
-)(function* ({ resolvedRef, target }: CraftInputStoreReadinessScope) {
-	const inputSlot = target.recipe.inputs.find((input) => input.itemId === resolvedRef.itemId);
-	if (inputSlot) return inputSlot;
+)(function* ({
+		resolvedRef,
+		target,
+	}: {
+		resolvedRef: GameActionResolvedInputRef;
+		target: CraftInputStoreTarget;
+	}) {
+		const inputSlot = target.recipe.inputs.find((input) => input.itemId === resolvedRef.itemId);
+		if (inputSlot) return inputSlot;
 
-	return yield* Effect.fail(
-		GameEngineError.actionRejected(
-			"input_mismatch",
-			`Craft input "${resolvedRef.itemId}" is not accepted by recipe "${target.recipeId}".`,
-		),
-	);
-});
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"input_mismatch",
+				`Craft input "${resolvedRef.itemId}" is not accepted by recipe "${target.recipeId}".`,
+			),
+		);
+	},
+);
 
 const readCraftInputStoreQuantityCandidateFx = Effect.fn(
 	"checkCraftInputStoreReadinessFx.readCraftInputStoreQuantityCandidateFx",
 )(function* ({
-	inputSlot,
-	scope,
-}: {
-	inputSlot: CraftInputSlot;
-	scope: CraftInputStoreReadinessScope;
-}) {
-	const storedInputs = yield* readCraftInputQuantitiesFx({
-		save: scope.save,
-		targetItemInstanceId: scope.action.targetItemInstanceId,
-	});
-	const previousQuantity = readGameItemQuantity({
-		itemId: scope.resolvedRef.itemId,
-		quantities: storedInputs,
-	});
-	const quantityCandidate = yield* readStoredActivationInputQuantityCandidateFx({
-		capacity: inputSlot.quantity,
-		previousQuantity,
-		resolvedRef: scope.resolvedRef,
-	});
-	if (quantityCandidate) {
-		return {
-			inputSlot,
-			...quantityCandidate,
-		} satisfies CraftInputStoreQuantityCandidate;
-	}
-
-	return yield* Effect.fail(
-		GameEngineError.actionRejected(
-			"input_mismatch",
-			`Craft input "${scope.resolvedRef.itemId}" capacity exceeded (${previousQuantity + scope.resolvedRef.quantity}/${inputSlot.quantity}).`,
-		),
-	);
-});
-
-const checkCraftInputStoreReadinessProgramFx = Effect.fn(
-	"checkCraftInputStoreReadinessFx.checkCraftInputStoreReadinessProgramFx",
-)(function* (scope: CraftInputStoreReadinessScope) {
-	const inputSlot = yield* readCraftInputStoreSlotFx(scope);
-	const quantityCandidate = yield* readCraftInputStoreQuantityCandidateFx({
+		action,
+		save,
+		resolvedRef,
 		inputSlot,
-		scope,
-	});
+	}: {
+		action: GameActionCraftInputStoreSchema.Type;
+		save: GameSave;
+		resolvedRef: GameActionResolvedInputRef;
+		inputSlot: CraftInputSlot;
+	}) {
+		const storedInputs = yield* readCraftInputQuantitiesFx({
+			save,
+			targetItemInstanceId: action.targetItemInstanceId,
+		});
+		const previousQuantity = readGameItemQuantity({
+			itemId: resolvedRef.itemId,
+			quantities: storedInputs,
+		});
+		const quantityCandidate = yield* readStoredActivationInputQuantityCandidateFx({
+			capacity: inputSlot.quantity,
+			previousQuantity,
+			resolvedRef,
+		});
+		if (quantityCandidate) {
+			return {
+				inputSlot,
+				...quantityCandidate,
+			} satisfies CraftInputStoreQuantityCandidate;
+		}
 
-	return {
-		...quantityCandidate,
-		target: scope.target,
-	};
-});
+		return yield* Effect.fail(
+			GameEngineError.actionRejected(
+				"input_mismatch",
+				`Craft input "${resolvedRef.itemId}" capacity exceeded (${previousQuantity + resolvedRef.quantity}/${inputSlot.quantity}).`,
+			),
+		);
+	},
+);
 
 export const checkCraftInputStoreReadinessFx = Effect.fn("checkCraftInputStoreReadinessFx")(
-	function* (props: checkCraftInputStoreReadinessFx.Props) {
-		const target = yield* readCraftInputStoreTargetFx(props);
-		const resolvedRef = yield* readCraftInputStoreResolvedRefFx(props);
-
-		return yield* checkCraftInputStoreReadinessProgramFx({
-			...props,
+	function* ({ action, config, nowMs, save }: checkCraftInputStoreReadinessFx.Props) {
+		const target = yield* readCraftInputStoreTargetFx({
+			action,
+			config,
+			nowMs,
+			save,
+		});
+		const resolvedRef = yield* readCraftInputStoreResolvedRefFx({
+			action,
+			save,
+		});
+		const inputSlot = yield* readCraftInputStoreSlotFx({
 			resolvedRef,
 			target,
 		});
+		const quantityCandidate = yield* readCraftInputStoreQuantityCandidateFx({
+			action,
+			save,
+			resolvedRef,
+			inputSlot,
+		});
+
+		return {
+			...quantityCandidate,
+			target,
+		};
 	},
 );

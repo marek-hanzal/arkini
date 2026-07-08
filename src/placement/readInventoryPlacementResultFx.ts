@@ -1,23 +1,25 @@
 import { Effect } from "effect";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { GameEvent } from "~/event/GameEventSchema";
 import { createGameEngineResultFx } from "~/job/createGameEngineResultFx";
-import type { PlaceInventoryItemOnBoardProps } from "~/placement/InventoryItemOnBoardPlacementTypes";
 
 export const readInventoryPlacementResultFx = Effect.fn("readInventoryPlacementResultFx")(
 	function* ({
+		config,
 		events,
-		props,
+		nowMs,
 		save,
 	}: {
+		config: GameConfig;
 		events: GameEvent[];
-		props: PlaceInventoryItemOnBoardProps;
+		nowMs: number;
 		save: GameSave;
 	}) {
 		return yield* createGameEngineResultFx({
-			config: props.config,
+			config,
 			events,
-			nowMs: props.nowMs,
+			nowMs,
 			save,
 		});
 	},

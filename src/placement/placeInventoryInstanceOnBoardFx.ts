@@ -1,41 +1,44 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { BoardCell } from "~/board/BoardCellPosition";
+import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSaveInventoryInstance } from "~/engine/model/GameSaveSchema";
-import {
-	type InventoryPlacementState,
-	type PlaceInventoryItemOnBoardProps,
-} from "~/placement/InventoryItemOnBoardPlacementTypes";
+import type { InventoryPlacementState } from "~/placement/InventoryItemOnBoardPlacementTypes";
 import { placeBoardItemInstanceFx } from "~/placement/placeBoardItemInstanceFx";
 import { planItemBoardPlacementCellsFx } from "~/placement/planItemBoardPlacementCellsFx";
 import { readInventoryPlacementResultFx } from "~/placement/readInventoryPlacementResultFx";
 
 const readInventoryInstanceTargetCellFx = Effect.fn("readInventoryInstanceTargetCellFx")(
 	function* ({
-		props,
+		action,
+		config,
+		nowMs,
 		state,
 	}: {
-		props: PlaceInventoryItemOnBoardProps;
+		action: GameActionInventoryItemPlaceSchema.Type;
+		config: GameConfig;
+		nowMs: number;
 		state: InventoryPlacementState;
 	}) {
 		return yield* match(state.placementMode)
 			.with("exact", () =>
 				Effect.succeed({
-					x: props.action.x,
-					y: props.action.y,
+					x: action.x,
+					y: action.y,
 				} satisfies BoardCell),
 			)
 			.with("nearest_by_manhattan", () =>
 				Effect.gen(function* () {
 					const [nearestAllowedCell] = yield* planItemBoardPlacementCellsFx({
-						config: props.config,
+						config,
 						itemId: state.itemId,
-						nowMs: props.nowMs,
+						nowMs,
 						save: state.nextSave,
 						seedCell: {
-							x: props.action.x,
-							y: props.action.y,
+							x: action.x,
+							y: action.y,
 						},
 					});
 					if (nearestAllowedCell) return nearestAllowedCell;
@@ -54,10 +57,14 @@ const readInventoryInstanceTargetCellFx = Effect.fn("readInventoryInstanceTarget
 
 export const placeInventoryInstanceOnBoardFx = Effect.fn("placeInventoryInstanceOnBoardFx")(
 	function* ({
-		props,
+		action,
+		config,
+		nowMs,
 		state,
 	}: {
-		props: PlaceInventoryItemOnBoardProps;
+		action: GameActionInventoryItemPlaceSchema.Type;
+		config: GameConfig;
+		nowMs: number;
 		state: InventoryPlacementState & {
 			liveSlot: GameSaveInventoryInstance;
 		};
@@ -72,12 +79,12 @@ export const placeInventoryInstanceOnBoardFx = Effect.fn("placeInventoryInstance
 		}
 
 		const targetCell = yield* readInventoryInstanceTargetCellFx({
-			props,
+			action,
+			config,
+			nowMs,
 			state,
 		});
-		const events = [
-			state.consumedEvent,
-		];
+		const events = [state.consumedEvent];
 		yield* placeBoardItemInstanceFx({
 			cell: targetCell,
 			createdAtMs: state.placedCreatedAtMs,
@@ -87,11 +94,12 @@ export const placeInventoryInstanceOnBoardFx = Effect.fn("placeInventoryInstance
 			reason: "inventory-placement",
 			save: state.nextSave,
 		});
-		state.nextSave.updatedAtMs = props.nowMs;
+		state.nextSave.updatedAtMs = nowMs;
 
 		return yield* readInventoryPlacementResultFx({
+			config,
 			events,
-			props,
+			nowMs,
 			save: state.nextSave,
 		});
 	},

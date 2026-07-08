@@ -1,24 +1,26 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
+import type { GameActionInventoryItemPlaceSchema } from "~/action/GameActionInventoryItemPlaceSchema";
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { GameEngineError } from "~/engine/model/GameEngineError";
-import {
-	type InventoryPlacementStackState,
-	type PlaceInventoryItemOnBoardProps,
-} from "~/placement/InventoryItemOnBoardPlacementTypes";
+import type { InventoryPlacementStackState } from "~/placement/InventoryItemOnBoardPlacementTypes";
 import { placeGameSaveItemsFx } from "~/placement/placeGameSaveItemsFx";
 import { readInventoryPlacementResultFx } from "~/placement/readInventoryPlacementResultFx";
 
 const placeInventoryStackByNearestPlacementFx = Effect.fn(
 	"placeInventoryStackByNearestPlacementFx",
 )(function* ({
-	props,
+	action,
+	config,
+	nowMs,
 	state,
 }: {
-	props: PlaceInventoryItemOnBoardProps;
+	action: GameActionInventoryItemPlaceSchema.Type;
+	config: GameConfig;
+	nowMs: number;
 	state: InventoryPlacementStackState;
 }) {
 	const placed = yield* placeGameSaveItemsFx({
-		config: props.config,
+		config,
 		items: [
 			{
 				createdAtMs: state.placedCreatedAtMs,
@@ -27,11 +29,11 @@ const placeInventoryStackByNearestPlacementFx = Effect.fn(
 				reason: "inventory-placement",
 			},
 		],
-		nowMs: props.nowMs,
+		nowMs,
 		save: state.nextSave,
 		seedCell: {
-			x: props.action.x,
-			y: props.action.y,
+			x: action.x,
+			y: action.y,
 		},
 	}).pipe(
 		Effect.catchTag("GamePlacementFailed", (error) =>
@@ -42,47 +44,31 @@ const placeInventoryStackByNearestPlacementFx = Effect.fn(
 	);
 
 	return yield* readInventoryPlacementResultFx({
+		config,
 		events: [
 			state.consumedEvent,
 			...placed.events,
 		],
-		props,
+		nowMs,
 		save: placed.save,
 	});
 });
 
-const placeInventoryStackExactlyFx = Effect.fn("placeInventoryStackExactlyFx")(function* ({
-	props,
+export const placeInventoryStackOnBoardFx = Effect.fn("placeInventoryStackOnBoardFx")(function* ({
+	action,
+	config,
+	nowMs,
 	state,
 }: {
-	props: PlaceInventoryItemOnBoardProps;
+	action: GameActionInventoryItemPlaceSchema.Type;
+	config: GameConfig;
+	nowMs: number;
 	state: InventoryPlacementStackState;
 }) {
 	return yield* placeInventoryStackByNearestPlacementFx({
-		props,
+		action,
+		config,
+		nowMs,
 		state,
 	});
-});
-
-export const placeInventoryStackOnBoardFx = Effect.fn("placeInventoryStackOnBoardFx")(function* ({
-	props,
-	state,
-}: {
-	props: PlaceInventoryItemOnBoardProps;
-	state: InventoryPlacementStackState;
-}) {
-	return yield* match(state.placementMode)
-		.with("nearest_by_manhattan", () =>
-			placeInventoryStackByNearestPlacementFx({
-				props,
-				state,
-			}),
-		)
-		.with("exact", () =>
-			placeInventoryStackExactlyFx({
-				props,
-				state,
-			}),
-		)
-		.exhaustive();
 });

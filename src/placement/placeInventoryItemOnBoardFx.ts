@@ -13,10 +13,18 @@ export namespace placeInventoryItemOnBoardFx {
 	export interface Props extends PlaceInventoryItemOnBoardProps {}
 }
 
-export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardFx")(function* (
-	props: placeInventoryItemOnBoardFx.Props,
-) {
-	const state = yield* readInventoryPlacementStateFx(props);
+export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardFx")(function* ({
+	action,
+	config,
+	nowMs,
+	save,
+}: placeInventoryItemOnBoardFx.Props) {
+	const state = yield* readInventoryPlacementStateFx({
+		action,
+		config,
+		nowMs,
+		save,
+	});
 	return yield* match(state)
 		.with(
 			{
@@ -24,11 +32,10 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 			},
 			(instanceState) =>
 				placeInventoryInstanceOnBoardFx({
-					props,
-					state: {
-						...instanceState,
-						liveSlot: instanceState.liveSlot,
-					},
+					action,
+					config,
+					nowMs,
+					state: instanceState,
 				}),
 		)
 		.with(
@@ -37,11 +44,10 @@ export const placeInventoryItemOnBoardFx = Effect.fn("placeInventoryItemOnBoardF
 			},
 			(stackState) =>
 				placeInventoryStackOnBoardFx({
-					props,
-					state: {
-						...stackState,
-						liveSlot: stackState.liveSlot,
-					},
+					action,
+					config,
+					nowMs,
+					state: stackState,
 				}),
 		)
 		.exhaustive();

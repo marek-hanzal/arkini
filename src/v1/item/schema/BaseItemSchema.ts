@@ -6,6 +6,7 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/v1/common/schema/TitleSchema";
 import { MergeSchema } from "~/v1/merge/schema/MergeSchema";
+import { AssetSchema } from "./AssetSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -29,6 +30,10 @@ export const BaseItemSchema = z
 		description: DescriptionSchema.describe(
 			"The human-readable explanation of this item's purpose.",
 		),
+		/**
+		 * Visual asset definition used to render this item.
+		 */
+		asset: AssetSchema.describe("The visual asset definition used to render this item."),
 		/**
 		 * Part of game state in which this item may be stored.
 		 */

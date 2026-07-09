@@ -9,6 +9,11 @@ describe("BaseItemSchema", () => {
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
+			asset: {
+				source: [
+					"asset:tree",
+				],
+			},
 			scope: "board",
 		};
 
@@ -32,6 +37,11 @@ describe("BaseItemSchema", () => {
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
+			asset: {
+				source: [
+					"asset:tree",
+				],
+			},
 			scope: "board",
 			type: "simple",
 			maxStackSize: 1,

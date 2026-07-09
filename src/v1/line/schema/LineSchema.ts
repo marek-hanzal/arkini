@@ -1,7 +1,10 @@
 import { z } from "zod";
-import { InputSchema } from "../input/InputSchema";
-import { OutputSchema } from "../output/OutputSchema";
-import { TimeSchema } from "../util/TimeSchema";
+import { InputSchema } from "../../input/schema/InputSchema";
+import { OutputSchema } from "../../output/schema/OutputSchema";
+import { DescriptionSchema } from "../../util/schema/DescriptionSchema";
+import { IdSchema } from "../../util/schema/IdSchema";
+import { TimeSchema } from "../../util/schema/TimeSchema";
+import { TitleSchema } from "../../util/schema/TitleSchema";
 import { RuleSchema } from "./rule/RuleSchema";
 
 /**
@@ -12,6 +15,20 @@ import { RuleSchema } from "./rule/RuleSchema";
  */
 export const LineSchema = z
 	.object({
+		/**
+		 * Stable ID of this product line within its owning item.
+		 */
+		id: IdSchema.describe("The stable ID of this product line within its owning item."),
+		/**
+		 * Human-readable title of this product line.
+		 */
+		title: TitleSchema.describe("The human-readable title of this product line."),
+		/**
+		 * Human-readable explanation of this product line's purpose.
+		 */
+		description: DescriptionSchema.describe(
+			"The human-readable explanation of this product line's purpose.",
+		),
 		/**
 		 * Whether this product line is visible before its rules are evaluated.
 		 *

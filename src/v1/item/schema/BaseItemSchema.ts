@@ -7,6 +7,8 @@ import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema"
 import { TitleSchema } from "~/v1/common/schema/TitleSchema";
 import { MergeSchema } from "~/v1/merge/schema/MergeSchema";
 import { AssetSchema } from "./AssetSchema";
+import { CategorySchema } from "./CategorySchema";
+import { TagSchema } from "./TagSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -34,6 +36,18 @@ export const BaseItemSchema = z
 		 * Visual asset definition used to render this item.
 		 */
 		asset: AssetSchema.describe("The visual asset definition used to render this item."),
+		/**
+		 * Semantic labels used to classify this item for content and future rules.
+		 */
+		tags: z
+			.array(TagSchema)
+			.describe(
+				"The semantic labels used to classify this item for content and future rules.",
+			),
+		/**
+		 * UI-facing group shared with similar items.
+		 */
+		category: CategorySchema.describe("The UI-facing group shared with similar items."),
 		/**
 		 * Part of game state in which this item may be stored.
 		 */

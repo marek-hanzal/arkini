@@ -14,6 +14,13 @@ describe("BaseItemSchema", () => {
 					"asset:tree",
 				],
 			},
+			tags: [
+				"nature",
+			],
+			category: {
+				id: "resource",
+				title: "Resources",
+			},
 			scope: "board",
 		};
 
@@ -30,6 +37,18 @@ describe("BaseItemSchema", () => {
 				title: "",
 			}).success,
 		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				tags: undefined,
+			}).success,
+		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				category: undefined,
+			}).success,
+		).toBe(false);
 	});
 
 	it("requires a positive stack limit only for simple items", () => {
@@ -41,6 +60,11 @@ describe("BaseItemSchema", () => {
 				source: [
 					"asset:tree",
 				],
+			},
+			tags: [],
+			category: {
+				id: "resource",
+				title: "Resources",
 			},
 			scope: "board",
 			type: "simple",

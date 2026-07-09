@@ -14,9 +14,16 @@ export const RollGuaranteedSchema = z
 			"guaranteed",
 		]),
 		/**
-		 * Items emitted when this roll succeeds.
+		 * One or more items emitted when this roll succeeds.
 		 */
-		drop: z.array(DropSchema).describe("The items emitted when this roll succeeds."),
+		drop: z
+			.tuple(
+				[
+					DropSchema,
+				],
+				DropSchema,
+			)
+			.describe("One or more items emitted when this roll succeeds."),
 	})
 	.strict()
 	.describe("A roll that guarantees its output when its rules allow it.");

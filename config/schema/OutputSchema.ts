@@ -7,8 +7,6 @@ import { TitleSchema } from "./util/TitleSchema";
 
 /**
  * A named result produced by a gameplay source such as a production line or stash.
- *
- * Its roll list is empty until concrete roll schemas are added to `RollSchema`.
  */
 export const OutputSchema = z
 	.object({
@@ -16,12 +14,19 @@ export const OutputSchema = z
 		title: TitleSchema,
 		description: DescriptionSchema,
 		/**
-		 * Individual rolls and their rules that this output may provide.
+		 * One or more individual rolls and their rules that this output may provide.
 		 *
 		 * For example, it can grant guaranteed wood when a tree is nearby or reduce
 		 * a farm's efficiency when pollution is nearby.
 		 */
-		roll: z.array(RollSchema),
+		roll: z
+			.tuple(
+				[
+					RollSchema,
+				],
+				RollSchema,
+			)
+			.describe("One or more individual rolls provided by this output."),
 	})
 	.strict()
 	.describe("A configured output produced by a gameplay source.");

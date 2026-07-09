@@ -21,9 +21,16 @@ export const RollChanceSchema = z
 			"The probability that this roll provides its output, from 0 to 1 inclusive.",
 		),
 		/**
-		 * Items emitted when this roll succeeds.
+		 * One or more items emitted when this roll succeeds.
 		 */
-		drop: z.array(DropSchema).describe("The items emitted when this roll succeeds."),
+		drop: z
+			.tuple(
+				[
+					DropSchema,
+				],
+				DropSchema,
+			)
+			.describe("One or more items emitted when this roll succeeds."),
 	})
 	.strict()
 	.describe("A roll that provides its output according to a probability.");

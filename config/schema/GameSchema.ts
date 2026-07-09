@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { VersionEnumSchema } from "./VersionEnumSchema";
 import { ItemSchema } from "./ItemSchema";
+import { IdSchema } from "./util/IdSchema";
+import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
  * The root schema for a game's configuration.
@@ -11,7 +12,12 @@ import { ItemSchema } from "./ItemSchema";
 export const GameSchema = z
 	.object({
 		version: VersionEnumSchema,
-		items: z.array(ItemSchema),
+		/**
+		 * Canonical game items keyed by their unique identifier.
+		 */
+		items: z
+			.record(IdSchema, ItemSchema)
+			.describe("Canonical game items keyed by a non-empty identifier."),
 	})
 	.strict()
 	.describe("The root configuration for a game.");

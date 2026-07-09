@@ -14,9 +14,9 @@ export const RuleRequireSchema = z
 		/**
 		 * Identifies this rule as a requirement for emitting the selected drop.
 		 */
-		type: RuleEnumSchema.extract(["require"]).describe(
-			"Identifies this rule as a requirement for emitting the selected drop.",
-		),
+		type: RuleEnumSchema.extract([
+			"require",
+		]).describe("Identifies this rule as a requirement for emitting the selected drop."),
 	})
 	.strict()
 	.describe("A rule that requires a condition before a selected drop can be emitted.");

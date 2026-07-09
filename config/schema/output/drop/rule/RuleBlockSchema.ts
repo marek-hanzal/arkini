@@ -14,9 +14,9 @@ export const RuleBlockSchema = z
 		/**
 		 * Identifies this rule as a block on emitting the selected drop.
 		 */
-		type: RuleEnumSchema.extract(["block"]).describe(
-			"Identifies this rule as a block on emitting the selected drop.",
-		),
+		type: RuleEnumSchema.extract([
+			"block",
+		]).describe("Identifies this rule as a block on emitting the selected drop."),
 	})
 	.strict()
 	.describe("A rule that prevents a selected drop from being emitted.");

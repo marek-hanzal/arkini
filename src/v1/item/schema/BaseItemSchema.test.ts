@@ -4,9 +4,11 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { SimpleItemSchema } from "./SimpleItemSchema";
 
 describe("BaseItemSchema", () => {
-	it("requires storage scope and permits an optional positive total limit", () => {
+	it("requires presentation, storage scope, and permits an optional positive total limit", () => {
 		const item = {
 			id: "tree",
+			title: "Tree",
+			description: "A living tree.",
 			scope: "board",
 		};
 
@@ -17,11 +19,19 @@ describe("BaseItemSchema", () => {
 				maxCount: 0,
 			}).success,
 		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				title: "",
+			}).success,
+		).toBe(false);
 	});
 
 	it("requires a positive stack limit only for simple items", () => {
 		const item = {
 			id: "tree",
+			title: "Tree",
+			description: "A living tree.",
 			scope: "board",
 			type: "simple",
 			maxStackSize: 1,

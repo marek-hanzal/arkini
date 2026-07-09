@@ -3,7 +3,6 @@ import { InputSchema } from "../../input/schema/InputSchema";
 import { OutputSchema } from "../../output/schema/OutputSchema";
 import { DescriptionSchema } from "../../util/schema/DescriptionSchema";
 import { IdSchema } from "../../util/schema/IdSchema";
-import { PositiveIntegerSchema } from "../../util/schema/PositiveIntegerSchema";
 import { TimeSchema } from "../../util/schema/TimeSchema";
 import { TitleSchema } from "../../util/schema/TitleSchema";
 import { RuleSchema } from "./rule/RuleSchema";
@@ -58,15 +57,6 @@ export const LineSchema = z
 				InputSchema,
 			)
 			.describe("One or more items accepted by this product line."),
-		/**
-		 * Total capacity for input items stored by this product line.
-		 *
-		 * When present, the limit applies to the combined quantity of every input
-		 * item held by the line before it consumes them to produce its output.
-		 */
-		capacity: PositiveIntegerSchema.describe(
-			"The total capacity for input items stored by this product line.",
-		),
 		/**
 		 * Optional result produced when this product line completes.
 		 *

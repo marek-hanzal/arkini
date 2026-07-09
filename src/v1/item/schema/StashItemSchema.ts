@@ -1,20 +1,39 @@
 import { z } from "zod";
-
+import { LineSchema } from "../../line/schema/LineSchema";
+import { OutputSchema } from "../../output/schema/OutputSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An item that will provide stash gameplay behavior.
+ * A single-use item that consumes its one product line when opened.
+ *
+ * A stash without `output` disappears after its line completes. A stash with
+ * `output` evaluates that output before it disappears.
  */
 export const StashItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
+		/**
+		 * Identifies this item as a single-use stash.
+		 */
 		type: ItemEnumSchema.extract([
 			"stash",
 		]),
+		/**
+		 * The one product line consumed when this stash is opened.
+		 */
+		line: LineSchema.describe("The one product line consumed when this stash is opened."),
+		/**
+		 * Optional output evaluated after this stash's line completes.
+		 *
+		 * When omitted, the stash simply disappears after its line completes.
+		 */
+		output: OutputSchema.optional().describe(
+			"The optional output evaluated after this stash's line completes.",
+		),
 	})
 	.strict()
-	.describe("An item that provides stash gameplay behavior.");
+	.describe("A single-use stash that consumes one product line when opened.");
 
 export type StashItemSchema = typeof StashItemSchema;
 

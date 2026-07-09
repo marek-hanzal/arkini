@@ -16,9 +16,9 @@ describe("LineSchema", () => {
 						type: "value",
 						value: 1,
 					},
+					capacity: 3,
 				},
 			],
-			capacity: 3,
 			output: {
 				set: [
 					{
@@ -47,7 +47,12 @@ describe("LineSchema", () => {
 		expect(
 			LineSchema.safeParse({
 				...line,
-				capacity: undefined,
+				input: [
+					{
+						...line.input[0],
+						capacity: undefined,
+					},
+				],
 			}).success,
 		).toBe(false);
 		expect(
@@ -59,7 +64,12 @@ describe("LineSchema", () => {
 		expect(
 			LineSchema.safeParse({
 				...line,
-				capacity: 0,
+				input: [
+					{
+						...line.input[0],
+						capacity: 0,
+					},
+				],
 			}).success,
 		).toBe(false);
 		expect(

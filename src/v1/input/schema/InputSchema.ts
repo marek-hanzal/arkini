@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { QuantitySchema } from "../quantity/QuantitySchema";
-import { IdSchema } from "../util/IdSchema";
+import { QuantitySchema } from "../../quantity/schema/QuantitySchema";
+import { IdSchema } from "../../util/schema/IdSchema";
+import { PositiveIntegerSchema } from "../../util/schema/PositiveIntegerSchema";
 
 /**
  * A canonical game item and the amount accepted by a gameplay input.
@@ -24,9 +25,15 @@ export const InputSchema = z
 		quantity: QuantitySchema.describe(
 			"The exact or bounded amount accepted by this input, replacing legacy upTo mode.",
 		),
+		/**
+		 * Maximum quantity of this item that the line may store as this input.
+		 */
+		capacity: PositiveIntegerSchema.describe(
+			"The maximum quantity of this item that the line may store as this input.",
+		),
 	})
 	.strict()
-	.describe("A canonical game item and the amount accepted by a gameplay input.");
+	.describe("A canonical game item, accepted amount, and storage capacity for a gameplay input.");
 
 export type InputSchema = typeof InputSchema;
 

@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-import { ScopeEnumSchema } from "../scope/ScopeEnumSchema";
-import { IdSchema } from "../util/IdSchema";
-import { PositiveIntegerSchema } from "../util/PositiveIntegerSchema";
+import { ScopeEnumSchema } from "../../scope/schema/ScopeEnumSchema";
+import { DescriptionSchema } from "../../util/schema/DescriptionSchema";
+import { IdSchema } from "../../util/schema/IdSchema";
+import { PositiveIntegerSchema } from "../../util/schema/PositiveIntegerSchema";
+import { TitleSchema } from "../../util/schema/TitleSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -16,6 +18,16 @@ export const BaseItemSchema = z
 		 * Stable ID of this canonical game item.
 		 */
 		id: IdSchema.describe("The stable ID of this canonical game item."),
+		/**
+		 * Human-readable title of this item.
+		 */
+		title: TitleSchema.describe("The human-readable title of this item."),
+		/**
+		 * Human-readable explanation of this item's purpose.
+		 */
+		description: DescriptionSchema.describe(
+			"The human-readable explanation of this item's purpose.",
+		),
 		/**
 		 * Part of game state in which this item may be stored.
 		 */

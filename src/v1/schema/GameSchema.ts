@@ -15,9 +15,11 @@ export const GameSchema = z
 		/**
 		 * Optional JSON Schema reference used by configuration authoring tools.
 		 */
-		$schema: z.string().min(1).optional().describe(
-			"The optional JSON Schema reference used by configuration authoring tools.",
-		),
+		$schema: z
+			.string()
+			.min(1)
+			.optional()
+			.describe("The optional JSON Schema reference used by configuration authoring tools."),
 		/**
 		 * Core metadata and player-available layouts for this game.
 		 */

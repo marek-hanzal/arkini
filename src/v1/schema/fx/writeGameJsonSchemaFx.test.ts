@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { writeGameJsonSchemaFx } from "./writeGameJsonSchemaFx";
 
 describe("writeGameJsonSchemaFx", () => {
-	it("writes the JSON Schema for the root game configuration contract", async () => {
+	it("writes the JSON Schema for split game-source fragments", async () => {
 		const jsonSchema = await Effect.runPromise(
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;

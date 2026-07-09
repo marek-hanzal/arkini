@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { z } from "zod";
-import { GameSchema } from "~/v1/schema/GameSchema";
+import { GameSourceSchema } from "~/v1/schema/GameSourceSchema";
 
 export namespace writeGameJsonSchemaFx {
 	export interface Props {
@@ -18,7 +18,7 @@ export namespace writeGameJsonSchemaFx {
 export const writeGameJsonSchemaFx = ({ output }: writeGameJsonSchemaFx.Props) =>
 	Effect.gen(function* () {
 		const fileSystem = yield* FileSystem.FileSystem;
-		const jsonSchema = z.toJSONSchema(GameSchema, {
+		const jsonSchema = z.toJSONSchema(GameSourceSchema, {
 			reused: "inline",
 			target: "draft-2020-12",
 		});

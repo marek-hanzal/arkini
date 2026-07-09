@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 
 export const ActivationInputViewSchema = z.object({
-	itemId: GameItemIdSchema,
+	itemId: IdSchema,
 	quantity: z.number().int().nonnegative(),
 	capacity: z.number().int().nonnegative(),
 	consume: z.boolean(),

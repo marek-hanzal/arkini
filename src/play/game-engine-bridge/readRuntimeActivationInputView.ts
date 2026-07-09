@@ -1,5 +1,5 @@
 import type { ActivationInputView } from "~/board/view/ActivationInputViewSchema";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import { readActivationInputMode } from "~/activation/readActivationInputMode";
 
 export namespace readRuntimeActivationInputView {

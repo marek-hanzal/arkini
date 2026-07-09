@@ -7,7 +7,7 @@ import { sameBoardViewItem } from "~/play/runtime/sameBoardViewItem";
 import type { BoardCellSchema } from "~/board/schema/BoardCellSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import type { ViewItem } from "~/item/view/ViewItemSchema";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import { useGameRuntimeSelector } from "~/play/runtime/GameRuntimeContext";
 import { readBoardItem } from "~/play/runtime/readRuntimeViews";
 import { readBoardView } from "~/play/runtime/readRuntimeViews";

@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 
 export const InventorySlotSchema = z.object({
 	slotIndex: z.number().int().nonnegative(),
 	stack: z
 		.object({
 			id: z.string().min(1),
-			itemId: GameItemIdSchema,
+			itemId: IdSchema,
 			quantity: z.number().int().positive(),
 		})
 		.optional(),

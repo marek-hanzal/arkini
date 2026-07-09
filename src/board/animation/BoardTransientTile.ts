@@ -1,4 +1,4 @@
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 
 export interface BoardTransientTile {
 	id: string;

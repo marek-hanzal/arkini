@@ -7,7 +7,7 @@ import {
 import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { readCheatSpeedToggleModeFromItemId } from "~/cheat/GameCheatSpeedItem";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import { GameItemIdSchema, type ItemId } from "~/config/GameIdSchema";
+import { IdSchema, type ItemId } from "~/config/IdSchema";
 
 export const ItemSpecialInteractionKindSchema = z.enum([
 	"none",
@@ -24,11 +24,11 @@ export const ItemInteractionProfileSchema = z
 	.object({
 		stackKey: z.string().nullable(),
 		hasExplicitMergeRules: z.boolean(),
-		mergeTargetIds: z.array(GameItemIdSchema),
+		mergeTargetIds: z.array(IdSchema),
 		acceptsCraftInput: z.boolean(),
 		acceptsProducerInput: z.boolean(),
 		acceptsStashInput: z.boolean(),
-		removableByItemIds: z.array(GameItemIdSchema),
+		removableByItemIds: z.array(IdSchema),
 		specialInteractionKind: ItemSpecialInteractionKindSchema,
 	})
 	.strict();

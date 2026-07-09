@@ -15,7 +15,7 @@ Client-only offline merge-game prototype. Plain Vite + React SPA, static-host fr
 
 Arkini is mobile-first. The board is the main surface, the bottom navigation opens sheets for inventory, player valuables, and testing utilities. Desktop can work, but it does not drive the interaction model, because pretending mouse users are the center of a tap game would be peak human comedy.
 
-The game has one gameplay source of truth: source JSON fragments compiled into the Arkini binary pack and parsed by `src/config/GameConfigSchema.ts` after decode. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `GameIdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
+The game has one gameplay source of truth: source JSON fragments compiled into the Arkini binary pack and parsed by `src/config/GameConfigSchema.ts` after decode. Source fragments live under `game/arkini`; the browser/runtime consumes the compiled canonical config. Runtime ID value schemas are generic strings in `IdSchema`; cross-reference truth belongs to `GameConfigSchema` / `GameSaveConfigSchema`, not stale TS enum mirrors.
 
 Item definitions drive behavior. An item may define:
 

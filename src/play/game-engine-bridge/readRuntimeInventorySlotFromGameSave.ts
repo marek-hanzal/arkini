@@ -1,5 +1,5 @@
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import {
 	isGameSaveInventoryInstance,
 	readGameSaveInventorySlotQuantity,

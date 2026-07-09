@@ -1,6 +1,6 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readGameConfigAssetSrc } from "~/config/readGameConfigAssetSrc";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import { isPlayerVisibleGeneratedEffect } from "~/play/game-engine-bridge/isPlayerVisibleGeneratedEffect";
 import type { ViewItem, ViewItemAsset } from "~/item/view/ViewItemSchema";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";

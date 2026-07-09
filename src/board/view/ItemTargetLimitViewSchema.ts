@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 
 export const ItemTargetLimitViewSchema = z.object({
-	itemId: GameItemIdSchema,
+	itemId: IdSchema,
 	maxCount: z.number().int().positive(),
 	ownedQuantity: z.number().int().nonnegative(),
 	remainingQuantity: z.number().int().nonnegative(),
 	requiredQuantity: z.number().int().positive(),
-	sourceItemId: GameItemIdSchema.optional(),
+	sourceItemId: IdSchema.optional(),
 });
 
 type ItemTargetLimitViewSchema = typeof ItemTargetLimitViewSchema;

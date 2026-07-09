@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 
 const PositiveIntegerSchema = z.number().int().positive();
 
@@ -10,7 +10,7 @@ const GameActionDebugItemSpawnLocationSchema = z.enum([
 
 export const GameActionDebugItemSpawnSchema = z
 	.object({
-		itemId: GameItemIdSchema,
+		itemId: IdSchema,
 		location: GameActionDebugItemSpawnLocationSchema,
 		quantity: PositiveIntegerSchema.optional(),
 		type: z.literal("debug.item.spawn"),

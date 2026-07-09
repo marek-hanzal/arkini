@@ -6,7 +6,7 @@ import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import { readGameSaveInventorySlotQuantity } from "~/inventory/model/GameSaveInventorySlot";
 import { readProducerJobLine } from "~/producer/readProducerJobLine";

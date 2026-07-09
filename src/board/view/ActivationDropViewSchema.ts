@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 import { ActivationEffectViewSchema } from "~/board/view/ActivationEffectViewSchema";
 
 export const ActivationDropViewSchema = z.object({
-	itemId: GameItemIdSchema,
+	itemId: IdSchema,
 	quantityLabel: z.string(),
 	chanceLabel: z.string(),
 	enabled: z.boolean().optional(),

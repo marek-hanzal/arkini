@@ -5,7 +5,7 @@ import { isBoardViewItemRuntimeBusy } from "~/board/view/isBoardViewItemRuntimeB
 import { isBoardViewItemRuntimeStatePreserved } from "~/board/view/isBoardViewItemRuntimeStatePreserved";
 import { readBoardViewItemQuantity } from "~/board/view/readBoardViewItemQuantity";
 import type { GameConfig } from "~/config/GameConfigTypes";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
 import { readAcceptedTransferQuantity } from "~/quantity/readAcceptedTransferQuantity";

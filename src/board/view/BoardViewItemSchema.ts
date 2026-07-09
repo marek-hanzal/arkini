@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 import { ActivationViewSchema } from "./ActivationViewSchema";
 import { BoardItemStateSchema } from "./BoardItemStateSchema";
 import { CraftProgressViewSchema } from "./CraftProgressViewSchema";
 
 export const BoardViewItemSchema = z.object({
 	id: z.string().min(1),
-	itemId: GameItemIdSchema,
+	itemId: IdSchema,
 	quantity: z.number().int().positive().optional(),
 	x: z.number().int().nonnegative(),
 	y: z.number().int().nonnegative(),

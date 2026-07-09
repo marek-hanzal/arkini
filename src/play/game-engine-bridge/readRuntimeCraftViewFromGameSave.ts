@@ -9,7 +9,7 @@ import {
 } from "~/craft/readCraftRecipeOutput";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { readCraftRecipeDefinition } from "~/config/GameItemCapabilities";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import type { GameSave, GameSaveBoardItem, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
 import { readItemTargetLimits } from "~/limit/readItemTargetLimits";
 import { readTargetLimitBlocked } from "~/limit/readTargetLimitBlocked";

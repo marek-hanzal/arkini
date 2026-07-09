@@ -1,4 +1,4 @@
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import type { GameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 
 export const cheatSpeedEnableItemId = "item:cheat:speed-enable" satisfies ItemId;

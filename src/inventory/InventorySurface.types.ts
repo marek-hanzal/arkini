@@ -1,4 +1,4 @@
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import type { Feedback } from "~/play/feedback/Feedback";
 
 export namespace InventorySurface {

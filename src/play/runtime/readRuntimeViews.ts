@@ -3,7 +3,7 @@ import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { BoardView } from "~/board/view/BoardViewSchema";
 import { cellKey } from "~/board/cellKey";
 import { findFirstEmptyCell } from "~/board/findFirstEmptyCell";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
 import type { ItemCatalogView } from "~/item/view/ItemCatalogViewSchema";

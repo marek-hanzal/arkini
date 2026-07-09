@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 import { CraftProgressPhaseSchema } from "./CraftProgressPhaseSchema";
 import { ItemTargetLimitViewSchema } from "./ItemTargetLimitViewSchema";
 import { LineOutputViewSchema } from "./LineViewSchema";
@@ -12,7 +12,7 @@ const CraftEffectRequirementViewSchema = z
 				"grant.require",
 			])
 			.optional(),
-		itemId: GameItemIdSchema.optional(),
+		itemId: IdSchema.optional(),
 		label: z.string().min(1),
 		ready: z.boolean(),
 	})
@@ -20,11 +20,11 @@ const CraftEffectRequirementViewSchema = z
 
 export const CraftProgressViewSchema = z.object({
 	id: z.string().min(1),
-	resultItemId: GameItemIdSchema,
+	resultItemId: IdSchema,
 	durationMs: z.number().int().nonnegative(),
 	inputs: z.array(
 		z.object({
-			itemId: GameItemIdSchema,
+			itemId: IdSchema,
 			quantity: z.number().int().nonnegative(),
 			available: z.number().int().nonnegative().optional(),
 		}),
@@ -47,7 +47,7 @@ export const CraftProgressViewSchema = z.object({
 	deliveryBlocked: z.boolean().optional(),
 	targetLimitBlocked: z.boolean().optional(),
 	targetLimits: z.array(ItemTargetLimitViewSchema).optional(),
-	acceptedInputItemIds: z.array(GameItemIdSchema),
+	acceptedInputItemIds: z.array(IdSchema),
 	outputs: z.array(LineOutputViewSchema).optional(),
 });
 

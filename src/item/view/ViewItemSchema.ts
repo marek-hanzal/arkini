@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GameItemIdSchema } from "~/config/GameIdSchema";
+import { IdSchema } from "~/config/IdSchema";
 
 const ViewEffectPolaritySchema = z.enum([
 	"buff",
@@ -37,7 +37,7 @@ const ViewItemAssetSchema = z.object({
 });
 
 const ViewItemSchema = z.object({
-	id: GameItemIdSchema,
+	id: IdSchema,
 	name: z.string(),
 	description: z.string(),
 	label: z.string().optional(),

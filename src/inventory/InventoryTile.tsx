@@ -2,7 +2,7 @@ import { memo } from "react";
 import { GameItemView } from "~/item/ui/GameItemView";
 import { useGameRuntimeSelector } from "~/play/runtime/GameRuntimeContext";
 import { useGameItemView } from "~/play/runtime/useGameRuntimeViews";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 
 export namespace InventoryTile {
 	export interface Props {

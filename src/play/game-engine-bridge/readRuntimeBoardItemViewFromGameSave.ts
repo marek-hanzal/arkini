@@ -2,7 +2,7 @@ import { readGameSaveBoardItemQuantity } from "~/board/readGameSaveBoardItemQuan
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import { readRuntimeActivationViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeActivationViewFromGameSave";
 import { readRuntimeCraftViewFromGameSave } from "~/play/game-engine-bridge/readRuntimeCraftViewFromGameSave";
 import { readItemCapacityState } from "~/capacity/readItemCapacityState";

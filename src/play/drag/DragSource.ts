@@ -1,6 +1,6 @@
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import type { InventorySlot } from "~/inventory/view/InventorySlotSchema";
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 
 export type DragSource =
 	| {

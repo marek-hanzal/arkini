@@ -1,4 +1,4 @@
-import type { ItemId } from "~/config/GameIdSchema";
+import type { ItemId } from "~/config/IdSchema";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
 
 const utilitySheetsByItemId = {

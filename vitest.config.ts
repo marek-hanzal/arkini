@@ -14,6 +14,7 @@ export default defineConfig({
 		isolate: false,
 		include: [
 			"cli/**/*.test.ts",
+			"config/**/*.test.ts",
 			"src/**/*.test.ts",
 			"src/**/*.test.tsx",
 		],

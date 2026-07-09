@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PositiveNumberSchema } from "../../../util/schema/PositiveNumberSchema";
+import { PositiveNumberSchema } from "../../../common/schema/PositiveNumberSchema";
 import { BaseRuleSchema } from "./BaseRuleSchema";
 import { RuleEnumSchema } from "./RuleEnumSchema";
 

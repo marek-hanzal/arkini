@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "../util/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
 import { RollSchema } from "./RollSchema";
 
 /**

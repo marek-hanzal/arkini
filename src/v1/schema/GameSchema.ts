@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { ItemSchema } from "./item/ItemSchema";
-import { MetaSchema } from "./meta/MetaSchema";
-import { IdSchema } from "./util/IdSchema";
+import { ItemSchema } from "../item/schema/ItemSchema";
+import { MetaSchema } from "../meta/schema/MetaSchema";
+import { IdSchema } from "../common/schema/IdSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**

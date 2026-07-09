@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { InputSchema } from "../../input/schema/InputSchema";
 import { OutputSchema } from "../../output/schema/OutputSchema";
-import { DescriptionSchema } from "../../util/schema/DescriptionSchema";
-import { IdSchema } from "../../util/schema/IdSchema";
-import { TimeSchema } from "../../util/schema/TimeSchema";
-import { TitleSchema } from "../../util/schema/TitleSchema";
+import { DescriptionSchema } from "../../common/schema/DescriptionSchema";
+import { IdSchema } from "../../common/schema/IdSchema";
+import { TimeSchema } from "../../common/schema/TimeSchema";
+import { TitleSchema } from "../../common/schema/TitleSchema";
 import { RuleSchema } from "./rule/RuleSchema";
 
 /**

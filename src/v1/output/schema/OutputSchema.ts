@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RollSetSchema } from "../roll/RollSetSchema";
+import { RollSetSchema } from "../../roll/schema/RollSetSchema";
 
 /**
  * A named result produced by a gameplay source such as a production line or stash.

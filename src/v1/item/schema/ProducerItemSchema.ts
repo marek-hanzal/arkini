@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { LineSchema } from "../../line/schema/LineSchema";
-import { PositiveIntegerSchema } from "../../util/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 

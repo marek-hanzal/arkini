@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { ScopeEnumSchema } from "../../scope/schema/ScopeEnumSchema";
-import { DescriptionSchema } from "../../util/schema/DescriptionSchema";
-import { IdSchema } from "../../util/schema/IdSchema";
-import { PositiveIntegerSchema } from "../../util/schema/PositiveIntegerSchema";
-import { TitleSchema } from "../../util/schema/TitleSchema";
+import { DescriptionSchema } from "../../common/schema/DescriptionSchema";
+import { IdSchema } from "../../common/schema/IdSchema";
+import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
+import { TitleSchema } from "../../common/schema/TitleSchema";
 
 /**
  * Fields shared by every item configuration.

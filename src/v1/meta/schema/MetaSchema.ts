@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { GridSizeSchema } from "../grid/GridSizeSchema";
-import { IdSchema } from "../util/IdSchema";
-import { TitleSchema } from "../util/TitleSchema";
+import { GridSizeSchema } from "../../grid/schema/GridSizeSchema";
+import { IdSchema } from "../../common/schema/IdSchema";
+import { TitleSchema } from "../../common/schema/TitleSchema";
 
 /**
  * Core metadata that defines the game and the layouts available to the player.

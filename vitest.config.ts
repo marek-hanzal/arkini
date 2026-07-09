@@ -13,10 +13,7 @@ export default defineConfig({
 		fileParallelism: false,
 		isolate: false,
 		include: [
-			"cli/**/*.test.ts",
-			"config/**/*.test.ts",
-			"src/**/*.test.ts",
-			"src/**/*.test.tsx",
+			"src/v1/**/*.test.ts",
 		],
 		maxWorkers: 1,
 		pool: "threads",

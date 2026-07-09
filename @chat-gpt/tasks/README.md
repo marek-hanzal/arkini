@@ -1,10 +1,13 @@
 # Arkini GPT tasks
 
-No active GPT task queue is open.
+Active queue opened on 2026-07-09 for effect/proximity/distance simplification.
 
-This folder should stay empty except for this README until a new work block starts in a new thread.
+Read in order:
 
-When work resumes:
-- create only the current active tasks here
-- keep completed notes in `../archive/tasks/`
-- keep deferred ideas in `../backlog/`
+1. `2026-07-09-001-effects-proximity-current-state.md`
+2. `2026-07-09-002-distance-model-unification.md`
+3. `2026-07-09-003-effect-runtime-pipeline-simplification.md`
+4. `2026-07-09-004-effect-authoring-simplification.md`
+5. `2026-07-09-005-validation-ui-parity-pass.md`
+
+Scope guardrail: this queue starts with analysis and task planning only. Do not change runtime behavior until the tuning direction is agreed.

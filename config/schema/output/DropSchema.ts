@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { QuantitySchema } from "../quantity/QuantitySchema";
 import { IdSchema } from "../util/IdSchema";
+import { RuleSchema } from "./drop/rule/RuleSchema";
 
 /**
  * A quantity of a canonical game item emitted by a successful roll.
@@ -19,9 +20,18 @@ export const DropSchema = z
 		 * Number of this item emitted by the drop.
 		 */
 		quantity: QuantitySchema.describe("The quantity emitted by this drop."),
+		/**
+		 * Rules evaluated after this drop is selected by a successful roll.
+		 *
+		 * A failed `require` or an applicable `block` prevents this drop from
+		 * being emitted; it does not reroll or replace the selected drop.
+		 */
+		rules: z
+			.array(RuleSchema)
+			.describe("Rules evaluated after this drop is selected by a successful roll."),
 	})
 	.strict()
-	.describe("A canonical game item and the quantity emitted by a successful roll.");
+	.describe("A canonical game item, quantity, and rules for a successful roll's drop.");
 
 export type DropSchema = typeof DropSchema;
 

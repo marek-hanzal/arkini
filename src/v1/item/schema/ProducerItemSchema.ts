@@ -1,8 +1,8 @@
 import { z } from "zod";
-
+import { LineSchema } from "../../line/schema/LineSchema";
+import { PositiveIntegerSchema } from "../../util/schema/PositiveIntegerSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
-import { LineSchema } from "../line/LineSchema";
 
 /**
  * An item that provides one or more selectable product lines.
@@ -10,6 +10,15 @@ import { LineSchema } from "../line/LineSchema";
 export const ProducerItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
+		/**
+		 * Maximum number of this producer's product lines that may run in parallel.
+		 */
+		maxQueueSize: PositiveIntegerSchema.default(1).describe(
+			"The maximum number of this producer's product lines that may run in parallel; defaults to one.",
+		),
+		/**
+		 * Identifies this item as a producer with one or more product lines.
+		 */
 		type: ItemEnumSchema.extract([
 			"producer",
 		]),

@@ -43,10 +43,8 @@ const readRunningCraftJobForBoardItem = ({
 		(job) => job.recipeId === boardItem.itemId && job.targetItemInstanceId === boardItem.id,
 	);
 
-const readDeliveredCraftInputs = ({
-	boardItem,
-	save,
-}: readRuntimeCraftViewFromGameSave.Props) => save.craftInputs[boardItem.id]?.items ?? {};
+const readDeliveredCraftInputs = ({ boardItem, save }: readRuntimeCraftViewFromGameSave.Props) =>
+	save.craftInputs[boardItem.id]?.items ?? {};
 
 const readCraftInputProgress = ({
 	delivered,
@@ -67,7 +65,13 @@ const readCraftInputProgress = ({
 		: deliveredInputQuantity / totalInputQuantity;
 };
 
-const readCraftPhase = ({ nowMs, runningJob }: { nowMs: number; runningJob: GameSaveCraftJob | undefined }) => {
+const readCraftPhase = ({
+	nowMs,
+	runningJob,
+}: {
+	nowMs: number;
+	runningJob: GameSaveCraftJob | undefined;
+}) => {
 	if (runningJob?.delivery) return "delivery_blocked" satisfies CraftProgressPhase;
 	if (runningJob?.pausedAtMs !== undefined) return "paused" satisfies CraftProgressPhase;
 	if (runningJob?.readyAtMs !== undefined && runningJob.readyAtMs <= nowMs) {
@@ -77,7 +81,13 @@ const readCraftPhase = ({ nowMs, runningJob }: { nowMs: number; runningJob: Game
 	return "collecting_inputs" satisfies CraftProgressPhase;
 };
 
-const readCraftTimeProgress = ({ nowMs, runningJob }: { nowMs: number; runningJob: GameSaveCraftJob | undefined }) => {
+const readCraftTimeProgress = ({
+	nowMs,
+	runningJob,
+}: {
+	nowMs: number;
+	runningJob: GameSaveCraftJob | undefined;
+}) => {
 	if (runningJob?.startAtMs === undefined || runningJob.readyAtMs === undefined) return 0;
 	return readGameTimeProgress({
 		nowMs: runningJob.pausedAtMs ?? nowMs,
@@ -97,7 +107,11 @@ const readAcceptedCraftInputItemIds = ({
 }): ItemId[] => {
 	if (phase !== "collecting_inputs") return [];
 	return recipe.inputs.flatMap((input) =>
-		(delivered[input.itemId] ?? 0) < input.quantity ? [input.itemId as ItemId] : [],
+		(delivered[input.itemId] ?? 0) < input.quantity
+			? [
+					input.itemId as ItemId,
+				]
+			: [],
 	);
 };
 
@@ -124,11 +138,15 @@ const readCraftTargetLimitViews = ({
 	nowMs,
 	recipe,
 	save,
-}: readRuntimeCraftViewFromGameSave.Props & { recipe: RuntimeCraftRecipe }) =>
+}: readRuntimeCraftViewFromGameSave.Props & {
+	recipe: RuntimeCraftRecipe;
+}) =>
 	readCraftOutputItemIds(recipe).flatMap((itemId) =>
 		readItemTargetLimits({
 			config,
-			ignoredBoardItemInstanceIds: new Set([boardItem.id]),
+			ignoredBoardItemInstanceIds: new Set([
+				boardItem.id,
+			]),
 			includePendingCraftJobs: true,
 			includePendingProducerJobs: true,
 			itemId,
@@ -163,7 +181,7 @@ const readCraftEffectRequirementState = ({
 					kind: requirement.kind,
 					label: requirement.label,
 					ready: requirement.ready,
-			  }))
+				}))
 			: undefined,
 		startRequirementsReady: effectState.startRequirementsReady,
 	};
@@ -221,13 +239,19 @@ export const readRuntimeCraftViewFromGameSave = ({
 		nowMs,
 		save,
 	});
-	const phase = readCraftPhase({ nowMs, runningJob });
+	const phase = readCraftPhase({
+		nowMs,
+		runningJob,
+	});
 	const inputProgress = readCraftInputProgress({
 		delivered,
 		recipe,
 		runningJob,
 	});
-	const timeProgress = readCraftTimeProgress({ nowMs, runningJob });
+	const timeProgress = readCraftTimeProgress({
+		nowMs,
+		runningJob,
+	});
 	const acceptedInputItemIds = readAcceptedCraftInputItemIds({
 		delivered,
 		phase,
@@ -276,14 +300,19 @@ export const readRuntimeCraftViewFromGameSave = ({
 		}),
 		pausedAtMs: runningJob?.pausedAtMs,
 		phase,
-		progress: phase === "collecting_inputs" ? inputProgress : phase === "delivery_blocked" ? 0 : timeProgress,
+		progress:
+			phase === "collecting_inputs"
+				? inputProgress
+				: phase === "delivery_blocked"
+					? 0
+					: timeProgress,
 		readyAtMs: runningJob?.readyAtMs,
 		remainingMs:
 			runningJob?.readyAtMs !== undefined
 				? readGameTimeRemainingMs({
 						nowMs: clockNowMs,
 						readyAtMs: runningJob.readyAtMs,
-				  })
+					})
 				: undefined,
 		resultItemId: readCraftPrimaryOutputItemId(recipe) as ItemId,
 		startAtMs: runningJob?.startAtMs,

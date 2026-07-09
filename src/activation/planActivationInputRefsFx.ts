@@ -36,7 +36,9 @@ const createActivationInputPlannerState = (): ActivationInputPlannerState => ({
 const readSortedBoardInputCandidates = (items: readonly GameSave["board"]["items"][string][]) =>
 	[
 		...items,
-	].sort((left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id));
+	].sort(
+		(left, right) => left.y - right.y || left.x - right.x || left.id.localeCompare(right.id),
+	);
 
 const readMissingActivationInputQuantity = ({
 	input,

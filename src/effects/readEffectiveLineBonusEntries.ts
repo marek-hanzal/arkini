@@ -17,7 +17,6 @@ export interface EffectiveLineBonusEntry {
 	label: string;
 }
 
-
 export namespace readEffectBenefitLines {
 	export interface Props {
 		config: GameConfig;
@@ -25,10 +24,7 @@ export namespace readEffectBenefitLines {
 	}
 }
 
-export const readEffectBenefitLines = ({
-	config,
-	effectId,
-}: readEffectBenefitLines.Props) => {
+export const readEffectBenefitLines = ({ config, effectId }: readEffectBenefitLines.Props) => {
 	const effect = readGameConfigEffect({
 		config,
 		effectId,
@@ -112,12 +108,16 @@ const groupDurationEffectInstances = (
 
 		groups.set(groupKey, {
 			durationMultiplier: effect.durationMultiplier,
-			sourceKeys: new Set([sourceKey]),
+			sourceKeys: new Set([
+				sourceKey,
+			]),
 			targetItemId: effect.targetItemId,
 		});
 	}
 
-	return [...groups.values()].map(({ sourceKeys: _sourceKeys, ...group }) => group);
+	return [
+		...groups.values(),
+	].map(({ sourceKeys: _sourceKeys, ...group }) => group);
 };
 
 const readChanceAtLeastOne = (chances: readonly number[]) =>
@@ -162,13 +162,19 @@ const readAggregatedChanceItemEntries = ({
 		}
 
 		groups.set(groupKey, {
-			chances: [chanceItem.chance],
+			chances: [
+				chanceItem.chance,
+			],
 			itemId: chanceItem.itemId,
-			quantityRanges: [quantityRange],
+			quantityRanges: [
+				quantityRange,
+			],
 		});
 	}
 
-	return [...groups.values()].map((group) => {
+	return [
+		...groups.values(),
+	].map((group) => {
 		const rollCount = group.chances.length;
 		const firstSuccessMin = Math.min(...group.quantityRanges.map((quantity) => quantity.min));
 		const maxQuantity = group.quantityRanges.reduce(
@@ -294,7 +300,6 @@ export const readEffectiveLineBonusEntries = ({
 	];
 };
 
-
 export interface EffectiveLineBonusSummary {
 	byItemId: ReadonlyMap<string, readonly string[]>;
 	lines: readonly string[];
@@ -333,9 +338,8 @@ export const readEffectiveLineBonusSummary = (
 	};
 };
 
-export const readEffectiveLineBonusLines = (
-	props: readEffectiveLineBonusEntries.Props,
-) => readEffectiveLineBonusEntries(props).map((entry) => entry.label);
+export const readEffectiveLineBonusLines = (props: readEffectiveLineBonusEntries.Props) =>
+	readEffectiveLineBonusEntries(props).map((entry) => entry.label);
 
 export const readRuntimeEffectBenefitLines = readEffectBenefitLines;
 export const readRuntimeLineActiveEffectBonusEntries = readEffectiveLineBonusEntries;

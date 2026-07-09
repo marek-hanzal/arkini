@@ -31,7 +31,6 @@ export namespace readRuntimeLineViewFromDefinition {
 	}
 }
 
-
 const readRuntimeLineJobs = ({
 	lineId,
 	queueState,
@@ -123,7 +122,11 @@ export const readRuntimeLineViewFromDefinition = ({
 			config,
 			line,
 		}),
-		effectBonusLines: effectBonusSummary.lines.length ? [...effectBonusSummary.lines] : undefined,
+		effectBonusLines: effectBonusSummary.lines.length
+			? [
+					...effectBonusSummary.lines,
+				]
+			: undefined,
 		effectRequirements: effectRequirements.length ? effectRequirements : undefined,
 		startRequirementsReady: readRuntimeLineStartRequirementsReady(effectiveLine),
 		inProgress: lineJobs.length > 0,

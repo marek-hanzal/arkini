@@ -36,7 +36,10 @@ export const startLineFx = Effect.fn("startLineFx")(function* (props: startLineF
 	});
 	return yield* createGameEngineResultFx({
 		config: props.config,
-		events: [...preparedInputs.events, ...started.events],
+		events: [
+			...preparedInputs.events,
+			...started.events,
+		],
 		nowMs: props.nowMs,
 		save: started.nextSave,
 	});

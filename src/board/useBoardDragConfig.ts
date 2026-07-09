@@ -53,10 +53,11 @@ export const useBoardDragConfig = ({
 					targetTile,
 				}),
 			dropFeedback: (context) => {
-				const { board: liveBoard, config, inventory } = readRuntimeViews(
-					runtimeStore.getSnapshot(),
-					Date.now(),
-				);
+				const {
+					board: liveBoard,
+					config,
+					inventory,
+				} = readRuntimeViews(runtimeStore.getSnapshot(), Date.now());
 
 				return resolveBoardDropFeedback({
 					board: liveBoard,

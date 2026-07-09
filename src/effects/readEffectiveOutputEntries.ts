@@ -133,7 +133,6 @@ const readOutputEntryItemIds = (entry: OutputEntry): readonly string[] =>
 				entry.itemId,
 			];
 
-
 export interface EffectiveOutputEntriesResult {
 	appliedEffects: AppliedGameEffectOperation[];
 	chanceItems: EffectiveChanceItemEntry[];
@@ -158,7 +157,9 @@ export const readEffectiveLootPlan = ({
 	visibleOutput,
 });
 
-export const readEffectiveLootPlanOutputSets = (lootPlan: EffectiveLootPlan): EffectiveLineOutputSet[] =>
+export const readEffectiveLootPlanOutputSets = (
+	lootPlan: EffectiveLootPlan,
+): EffectiveLineOutputSet[] =>
 	lootPlan.outputSets ?? [
 		{
 			baseOutput: lootPlan.baseOutput,

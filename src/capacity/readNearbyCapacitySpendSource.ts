@@ -68,7 +68,13 @@ export const readNearbyCapacitySpendSource = ({
 			if (!cell) return [];
 
 			const distance = readChebyshevDistance(cell, targetCell);
-			if (!doesNearbyDistanceMatch({ distance, nearbyDistance: effect.distance })) return [];
+			if (
+				!doesNearbyDistanceMatch({
+					distance,
+					nearbyDistance: effect.distance,
+				})
+			)
+				return [];
 
 			return [
 				{

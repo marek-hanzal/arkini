@@ -84,7 +84,9 @@ export const placeInventoryInstanceOnBoardFx = Effect.fn("placeInventoryInstance
 			nowMs,
 			state,
 		});
-		const events = [state.consumedEvent];
+		const events = [
+			state.consumedEvent,
+		];
 		yield* placeBoardItemInstanceFx({
 			cell: targetCell,
 			createdAtMs: state.placedCreatedAtMs,

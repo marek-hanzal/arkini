@@ -84,7 +84,7 @@ const resolveSpecialBoardItemTapAction = ({
 				? {
 						sheet: utilitySheet,
 						type: "open-sheet",
-				  }
+					}
 				: undefined;
 		}
 		case "none":
@@ -133,14 +133,17 @@ const resolveStashBoardItemTapAction = ({
 				activation: "exhaust",
 				boardItemId: boardItem.id,
 				type: "activate",
-		  }
+			}
 		: createOpenBoardItemSheetAction({
 				boardItemId: boardItem.id,
-		  });
+			});
 
 const readRunnableDefaultProducerLine = ({ boardItem }: { boardItem: BoardViewItem }) => {
 	const lines = boardItem.activation?.lines ?? [];
-	const preferredKinds: Array<"effect" | "product"> = ["effect", "product"];
+	const preferredKinds: Array<"effect" | "product"> = [
+		"effect",
+		"product",
+	];
 	for (const kind of preferredKinds) {
 		const line = lines.find((entry) => entry.isDefault && entry.kind === kind);
 		if (
@@ -167,10 +170,10 @@ const resolveProducerBoardItemTapAction = ({
 				boardItemId: boardItem.id,
 				lineId: runnableDefaultLine.lineId,
 				type: "activate",
-		  }
+			}
 		: createOpenBoardItemSheetAction({
 				boardItemId: boardItem.id,
-		  });
+			});
 };
 
 const resolveLiveBoardItemTapAction = ({

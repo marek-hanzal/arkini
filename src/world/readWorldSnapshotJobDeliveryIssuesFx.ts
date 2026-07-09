@@ -63,7 +63,11 @@ export const readWorldSnapshotJobDeliveryIssuesFx = Effect.fn(
 	"readWorldSnapshotJobDeliveryIssuesFx",
 )(function* ({ facts }: { facts: WorldSnapshotFacts }) {
 	return [
-		...(yield* readProducerDeliveryBeforeReadyIssuesFx({ facts })),
-		...(yield* readCraftDeliveryBeforeReadyIssuesFx({ facts })),
+		...(yield* readProducerDeliveryBeforeReadyIssuesFx({
+			facts,
+		})),
+		...(yield* readCraftDeliveryBeforeReadyIssuesFx({
+			facts,
+		})),
 	];
 });

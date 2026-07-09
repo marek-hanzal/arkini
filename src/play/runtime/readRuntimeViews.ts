@@ -15,10 +15,7 @@ import { readRuntimeInventoryViewFromGameSave } from "~/play/game-engine-bridge/
 import { readRuntimeItemCatalogViewFromGameConfig } from "~/play/game-engine-bridge/readRuntimeItemCatalogViewFromGameConfig";
 import type { GameRuntimeState } from "~/play/runtime/GameRuntimeStore";
 
-export const readRuntimeBoardView = (
-	state: GameRuntimeState,
-	nowMs = state.nowMs,
-): BoardView =>
+export const readRuntimeBoardView = (state: GameRuntimeState, nowMs = state.nowMs): BoardView =>
 	readRuntimeBoardViewFromGameSave({
 		config: state.runtime.config,
 		nowMs,
@@ -69,9 +66,7 @@ export const readRuntimeItemView = ({
 	itemId: ItemId | string | undefined;
 	state: GameRuntimeState;
 }): ViewItem | undefined =>
-	itemId
-		? readRuntimeItemCatalogView(state)[itemId as ItemId]
-		: undefined;
+	itemId ? readRuntimeItemCatalogView(state)[itemId as ItemId] : undefined;
 
 export const readRuntimeBoardFirstEmptyCell = (
 	state: GameRuntimeState,
@@ -102,7 +97,6 @@ export const readRuntimeViews = (
 	inventory: readRuntimeInventoryView(state),
 	nowMs,
 });
-
 
 export {
 	readRuntimeBoardFirstEmptyCell as readBoardFirstEmptyCell,

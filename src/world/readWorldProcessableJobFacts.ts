@@ -72,7 +72,11 @@ const readProcessableItemSpawnJobs = ({
 			readyAtMs: job.readyAtMs,
 			reason: "item_spawn_ready",
 		});
-		return processableJob ? [processableJob] : [];
+		return processableJob
+			? [
+					processableJob,
+				]
+			: [];
 	});
 
 const readProcessableProducerJobs = ({
@@ -94,7 +98,11 @@ const readProcessableProducerJobs = ({
 			readyAtMs: producerJobFacts.releaseAtMs,
 			reason: "producer_queue_ready",
 		});
-		return processableJob ? [processableJob] : [];
+		return processableJob
+			? [
+					processableJob,
+				]
+			: [];
 	});
 
 const readProcessableCraftJobs = ({
@@ -114,7 +122,11 @@ const readProcessableCraftJobs = ({
 			readyAtMs: craftJobFacts.releaseAtMs,
 			reason: "craft_ready",
 		});
-		return processableJob ? [processableJob] : [];
+		return processableJob
+			? [
+					processableJob,
+				]
+			: [];
 	});
 
 const readProcessableActiveEffects = ({
@@ -143,7 +155,11 @@ const readProcessableActiveEffects = ({
 			readyAtMs: effectFacts.effect.endAtMs,
 			reason: "active_effect_end",
 		});
-		return processableJob ? [processableJob] : [];
+		return processableJob
+			? [
+					processableJob,
+				]
+			: [];
 	});
 
 export const readWorldProcessableJobFacts = ({

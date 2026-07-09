@@ -94,13 +94,7 @@ const readExecutableMergeRuleFx = Effect.fn("checkItemMergeReadinessFx.readExecu
 
 const assertMergeResultItemDefinitionExistsFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeResultItemDefinitionExistsFx",
-)(function* ({
-	config,
-	resultItemId,
-}: {
-	config: GameConfig;
-	resultItemId: string;
-}) {
+)(function* ({ config, resultItemId }: { config: GameConfig; resultItemId: string }) {
 	if (config.items[resultItemId]) return;
 
 	return yield* Effect.fail(
@@ -123,7 +117,9 @@ const assertMergeResultBoardCapacityFx = Effect.fn(
 }) {
 	const capacity = yield* readBoardItemMaxCountCapacityFx({
 		config,
-		ignoredBoardItemInstanceIds: new Set([target.id]),
+		ignoredBoardItemInstanceIds: new Set([
+			target.id,
+		]),
 		itemId: resultItemId,
 		save,
 	});
@@ -152,13 +148,7 @@ const assertMergeTargetSingleQuantityFx = Effect.fn(
 
 const assertMergeTargetReplaceableFx = Effect.fn(
 	"checkItemMergeReadinessFx.assertMergeTargetReplaceableFx",
-)(function* ({
-	save,
-	target,
-}: {
-	save: GameSave;
-	target: MergeReadinessTarget;
-}) {
+)(function* ({ save, target }: { save: GameSave; target: MergeReadinessTarget }) {
 	const targetStateStatus = readBoardItemRuntimeStateStatus({
 		itemInstanceId: target.id,
 		save,

@@ -143,19 +143,27 @@ const resolveInputRefFx = Effect.fn("resolveInputRefsFx.resolveInputRefFx")(func
 	seen: Set<string>;
 }) {
 	return yield* match(ref)
-		.with({ kind: "board" }, (boardRef) =>
-			resolveBoardInputRefFx({
-				...boardRef,
-				save,
-				seen,
-			}),
+		.with(
+			{
+				kind: "board",
+			},
+			(boardRef) =>
+				resolveBoardInputRefFx({
+					...boardRef,
+					save,
+					seen,
+				}),
 		)
-		.with({ kind: "inventory" }, (inventoryRef) =>
-			resolveInventoryInputRefFx({
-				...inventoryRef,
-				save,
-				seen,
-			}),
+		.with(
+			{
+				kind: "inventory",
+			},
+			(inventoryRef) =>
+				resolveInventoryInputRefFx({
+					...inventoryRef,
+					save,
+					seen,
+				}),
 		)
 		.exhaustive();
 });

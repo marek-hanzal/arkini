@@ -80,48 +80,88 @@ export const resolveBoardCellDropAction = ({
 	});
 
 	return match(plan)
-		.with({ type: "reject" }, () => createBoardCellRejectDropAction(targetCellKey))
-		.with({ type: "swap" }, () => ({
-			animation: "parallel-swap" as const,
-			input,
-			type: "swap-board-items" as const,
-		}))
-		.with({ type: "merge" }, () => ({
-			animation: "parallel-merge" as const,
-			feedback: {
-				cellKey: targetCellKey,
-				kind: "merge-cell" as const,
+		.with(
+			{
+				type: "reject",
 			},
-			input,
-			type: "merge-board-items" as const,
-		}))
-		.with({ type: "stack" }, () => ({
-			input,
-			type: "apply-board-item-to-board-item" as const,
-		}))
-		.with({ type: "producer-input" }, ({ consumedQuantity }) => ({
-			animation:
-				input.sourceQuantity > consumedQuantity ? "boomerang" as const : "remove" as const,
-			input: {
-				...input,
-				consumedQuantity,
+			() => createBoardCellRejectDropAction(targetCellKey),
+		)
+		.with(
+			{
+				type: "swap",
 			},
-			type: "apply-board-item-to-board-item" as const,
-		}))
-		.with({ type: "craft-input" }, { type: "stash-input" }, { type: "tile-remove" }, ({ consumedQuantity, consumesSource, feedbackVariant }) => ({
-			animation: consumesSource
-				? input.sourceQuantity > consumedQuantity ? "boomerang" as const : "remove" as const
-				: undefined,
-			feedback: {
-				cellKey: targetCellKey,
-				kind: "cell-feedback" as const,
-				variant: feedbackVariant,
+			() => ({
+				animation: "parallel-swap" as const,
+				input,
+				type: "swap-board-items" as const,
+			}),
+		)
+		.with(
+			{
+				type: "merge",
 			},
-			input: {
-				...input,
-				consumedQuantity,
+			() => ({
+				animation: "parallel-merge" as const,
+				feedback: {
+					cellKey: targetCellKey,
+					kind: "merge-cell" as const,
+				},
+				input,
+				type: "merge-board-items" as const,
+			}),
+		)
+		.with(
+			{
+				type: "stack",
 			},
-			type: "apply-board-item-to-board-item" as const,
-		}))
+			() => ({
+				input,
+				type: "apply-board-item-to-board-item" as const,
+			}),
+		)
+		.with(
+			{
+				type: "producer-input",
+			},
+			({ consumedQuantity }) => ({
+				animation:
+					input.sourceQuantity > consumedQuantity
+						? ("boomerang" as const)
+						: ("remove" as const),
+				input: {
+					...input,
+					consumedQuantity,
+				},
+				type: "apply-board-item-to-board-item" as const,
+			}),
+		)
+		.with(
+			{
+				type: "craft-input",
+			},
+			{
+				type: "stash-input",
+			},
+			{
+				type: "tile-remove",
+			},
+			({ consumedQuantity, consumesSource, feedbackVariant }) => ({
+				animation: consumesSource
+					? input.sourceQuantity > consumedQuantity
+						? ("boomerang" as const)
+						: ("remove" as const)
+					: undefined,
+				feedback: {
+					cellKey: targetCellKey,
+					kind: "cell-feedback" as const,
+					variant: feedbackVariant,
+				},
+				input: {
+					...input,
+					consumedQuantity,
+				},
+				type: "apply-board-item-to-board-item" as const,
+			}),
+		)
 		.exhaustive();
 };

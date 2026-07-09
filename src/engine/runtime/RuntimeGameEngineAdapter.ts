@@ -97,7 +97,10 @@ export class RuntimeGameEngineAdapter {
 		};
 	}
 
-	async readiness({ action, nowMs = Date.now() }: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
+	async readiness({
+		action,
+		nowMs = Date.now(),
+	}: RuntimeGameEngineAdapter.ReadinessProps): Promise<GameActionReadiness> {
 		return this.enqueueMutation(async () => {
 			const scope = this.createScope();
 

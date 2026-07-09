@@ -4,7 +4,10 @@ import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 import { readEffectiveLineRequirements } from "~/effects/readEffectiveLineRequirements";
-import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import {
+	readEffectiveLootPlan,
+	readEffectiveOutputEntries,
+} from "~/effects/readEffectiveOutputEntries";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 

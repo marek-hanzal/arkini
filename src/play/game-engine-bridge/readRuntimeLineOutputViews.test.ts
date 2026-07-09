@@ -91,9 +91,9 @@ describe("readRuntimeLineOutputViews", () => {
 		expect(
 			readRuntimeLineOutputViews({
 				effectBonusSummary: readEffectiveLineBonusSummary({
-				baseDurationMs: 1000,
-				effectiveLine,
-			}),
+					baseDurationMs: 1000,
+					effectiveLine,
+				}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -162,9 +162,9 @@ describe("readRuntimeLineOutputViews", () => {
 		expect(
 			readRuntimeLineOutputViews({
 				effectBonusSummary: readEffectiveLineBonusSummary({
-				baseDurationMs: 1000,
-				effectiveLine,
-			}),
+					baseDurationMs: 1000,
+					effectiveLine,
+				}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -240,9 +240,9 @@ describe("readRuntimeLineOutputViews", () => {
 		expect(
 			readRuntimeLineOutputViews({
 				effectBonusSummary: readEffectiveLineBonusSummary({
-				baseDurationMs: 1000,
-				effectiveLine,
-			}),
+					baseDurationMs: 1000,
+					effectiveLine,
+				}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -317,9 +317,9 @@ describe("readRuntimeLineOutputViews", () => {
 		expect(
 			readRuntimeLineOutputViews({
 				effectBonusSummary: readEffectiveLineBonusSummary({
-				baseDurationMs: 1000,
-				effectiveLine,
-			}),
+					baseDurationMs: 1000,
+					effectiveLine,
+				}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -412,9 +412,9 @@ describe("readRuntimeLineOutputViews", () => {
 		expect(
 			readRuntimeLineOutputViews({
 				effectBonusSummary: readEffectiveLineBonusSummary({
-				baseDurationMs: 1000,
-				effectiveLine,
-			}),
+					baseDurationMs: 1000,
+					effectiveLine,
+				}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -501,9 +501,9 @@ describe("readRuntimeLineOutputViews", () => {
 		expect(
 			readRuntimeLineOutputViews({
 				effectBonusSummary: readEffectiveLineBonusSummary({
-				baseDurationMs: 1000,
-				effectiveLine,
-			}),
+					baseDurationMs: 1000,
+					effectiveLine,
+				}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -558,8 +558,17 @@ describe("readRuntimeLineOutputViews", () => {
 
 		const outputs = readRuntimeLineOutputViews({
 			effectBonusSummary: {
-				byItemId: new Map([["item:twig", ["Speed: 10% faster"]]]),
-				lines: ["Speed: 10% faster"],
+				byItemId: new Map([
+					[
+						"item:twig",
+						[
+							"Speed: 10% faster",
+						],
+					],
+				]),
+				lines: [
+					"Speed: 10% faster",
+				],
 				universalLines: [],
 			},
 			lootPlan: effectiveLine.lootPlan,

@@ -58,7 +58,9 @@ const consumeMergeSourceFx = Effect.fn("mergeItemFx.consumeMergeSourceFx")(funct
 	save: GameSave;
 }) {
 	return yield* consumeActivationInputsFx({
-		inputRefs: [action.sourceRef],
+		inputRefs: [
+			action.sourceRef,
+		],
 		inputs: [
 			{
 				consume: true,
@@ -91,7 +93,9 @@ const createMergeWorkingStateFx = Effect.fn("mergeItemFx.createMergeWorkingState
 	});
 	return {
 		checked,
-		mergeEvents: [...consumed.events],
+		mergeEvents: [
+			...consumed.events,
+		],
 		nextSave: yield* cloneGameSaveFx({
 			save: consumed.save,
 		}),
@@ -122,7 +126,12 @@ const applyMergeResultReplacementFx = Effect.fn("mergeItemFx.applyMergeResultRep
 	}) {
 		const { checked, mergeEvents, nextSave } = state;
 		const resultItemId = match(checked.merge)
-			.with({ resultItemId: P.string }, (merge) => merge.resultItemId)
+			.with(
+				{
+					resultItemId: P.string,
+				},
+				(merge) => merge.resultItemId,
+			)
 			.otherwise(() => undefined);
 		if (!resultItemId) return state;
 
@@ -172,7 +181,9 @@ const rollMergeOutputPlacementRequestsFx = Effect.fn(
 
 const readMergeSourceFreedBoardItemInstanceIds = ({ checked }: { checked: MergeReadiness }) =>
 	checked.source.kind === "board"
-		? new Set([checked.source.itemInstanceId])
+		? new Set([
+				checked.source.itemInstanceId,
+			])
 		: undefined;
 
 const placeMergeOutputsFx = Effect.fn("mergeItemFx.placeMergeOutputsFx")(function* ({
@@ -225,7 +236,10 @@ const buildMergeResultFx = Effect.fn("mergeItemFx.buildMergeResultFx")(function*
 
 	return yield* createGameEngineResultFx({
 		config,
-		events: [...state.mergeEvents, ...placed.events],
+		events: [
+			...state.mergeEvents,
+			...placed.events,
+		],
 		nowMs,
 		save: placed.save,
 	});

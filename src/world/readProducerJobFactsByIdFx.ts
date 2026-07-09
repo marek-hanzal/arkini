@@ -8,6 +8,9 @@ export const readProducerJobFactsByIdFx = Effect.fn("readProducerJobFactsByIdFx"
 	facts: WorldSnapshotFacts;
 }) {
 	return new Map<string, WorldProducerJobFacts>(
-		facts.producerJobs.map((producerJobFacts) => [producerJobFacts.job.id, producerJobFacts]),
+		facts.producerJobs.map((producerJobFacts) => [
+			producerJobFacts.job.id,
+			producerJobFacts,
+		]),
 	);
 });

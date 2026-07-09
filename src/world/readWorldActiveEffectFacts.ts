@@ -16,7 +16,10 @@ export namespace readWorldActiveEffectFacts {
 }
 
 type ActiveEffect = GameSave["activeEffects"][string];
-type ProducerFactsByJobId = ReadonlyMap<string, ReturnType<typeof readWorldProducerJobFacts>[number]>;
+type ProducerFactsByJobId = ReadonlyMap<
+	string,
+	ReturnType<typeof readWorldProducerJobFacts>[number]
+>;
 
 const sourceScopeIncludes = ({
 	location,
@@ -35,7 +38,11 @@ const readActiveEffectSourceLocation = ({
 }): WorldActiveEffectFacts["sourceLocation"] | undefined => {
 	if (save.board.items[effect.sourceItemInstanceId]) return "board";
 	return save.inventory.slots.some(
-		(slot) => slot !== null && "kind" in slot && slot.kind === "instance" && slot.id === effect.sourceItemInstanceId,
+		(slot) =>
+			slot !== null &&
+			"kind" in slot &&
+			slot.kind === "instance" &&
+			slot.id === effect.sourceItemInstanceId,
 	)
 		? "inventory"
 		: undefined;
@@ -117,7 +124,9 @@ const readProducerBoundEffectStatus = ({
 }):
 	| Extract<WorldActiveEffectFacts["status"], "blocked_by_paused_queue_head" | "producer_paused">
 	| undefined => {
-	const producerFacts = effect.producerJobId ? producerFactsByJobId.get(effect.producerJobId) : undefined;
+	const producerFacts = effect.producerJobId
+		? producerFactsByJobId.get(effect.producerJobId)
+		: undefined;
 	if (producerFacts?.status === "paused") return "producer_paused";
 	if (producerFacts?.status === "blocked_by_paused_queue_head") {
 		return "blocked_by_paused_queue_head";
@@ -196,7 +205,10 @@ const readProducerFactsByJobId = ({
 		readWorldProducerJobFacts({
 			nowMs,
 			save,
-		}).map((facts) => [facts.job.id, facts]),
+		}).map((facts) => [
+			facts.job.id,
+			facts,
+		]),
 	);
 
 export const readWorldActiveEffectFacts = ({

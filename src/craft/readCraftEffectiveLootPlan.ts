@@ -1,7 +1,10 @@
 import type { BoardCell } from "~/board/BoardCellPosition";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
-import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import {
+	readEffectiveLootPlan,
+	readEffectiveOutputEntries,
+} from "~/effects/readEffectiveOutputEntries";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import type { GameSave } from "~/engine/model/GameSaveSchema";

@@ -22,7 +22,12 @@ export namespace readCraftLineStartGateState {
 
 type ResolvedDomainSelector = z.infer<typeof ResolvedDomainSelectorSchema>;
 type CraftRecipeEffect = NonNullable<NonNullable<GameCraftRecipeDefinition["effects"]>[number]>;
-type CraftLineEffect = Extract<CraftRecipeEffect, { kind: "grant.require" | "grant.blockStart" }>;
+type CraftLineEffect = Extract<
+	CraftRecipeEffect,
+	{
+		kind: "grant.require" | "grant.blockStart";
+	}
+>;
 
 type CraftEffectRequirement = {
 	display: "always" | "whenActive" | "whenMissing" | "never";
@@ -214,7 +219,8 @@ const evaluateCraftLineEffects = ({
 	recipe: GameCraftRecipeDefinition;
 }): EvaluatedCraftLineEffect[] =>
 	(recipe.effects ?? []).flatMap((lineEffect) => {
-		if (lineEffect.kind !== "grant.require" && lineEffect.kind !== "grant.blockStart") return [];
+		if (lineEffect.kind !== "grant.require" && lineEffect.kind !== "grant.blockStart")
+			return [];
 		return [
 			{
 				lineEffect,
@@ -300,7 +306,9 @@ export const readCraftLineEffectState = ({
 	nowMs,
 	recipe,
 	save,
-}: readCraftLineEffectState.Props): CraftLineStartGateState & { requirements: CraftEffectRequirement[] } => {
+}: readCraftLineEffectState.Props): CraftLineStartGateState & {
+	requirements: CraftEffectRequirement[];
+} => {
 	const analysis = readCraftLineEffectAnalysis({
 		config,
 		grantIds: providedGrantIds,
@@ -308,7 +316,8 @@ export const readCraftLineEffectState = ({
 		recipe,
 		save,
 	});
-	const { blocked, blockReasons, effects, grantIds, startGateReady, startRequirementsReady } = analysis;
+	const { blocked, blockReasons, effects, grantIds, startGateReady, startRequirementsReady } =
+		analysis;
 	const requirements: CraftEffectRequirement[] = [];
 
 	for (const { lineEffect, selectorMatched } of effects) {
@@ -335,7 +344,8 @@ export const readCraftLineEffectState = ({
 					label: requirementLabel.label,
 					ready,
 				};
-				if (shouldDisplayCraftEffectRequirement(requirement)) requirements.push(requirement);
+				if (shouldDisplayCraftEffectRequirement(requirement))
+					requirements.push(requirement);
 			}
 			continue;
 		}

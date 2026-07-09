@@ -37,7 +37,13 @@ export const readNearbyLineEffectMatches = ({
 				return [];
 			}
 			const distance = readChebyshevDistance(cell, targetCell);
-			if (!doesNearbyDistanceMatch({ distance, nearbyDistance })) return [];
+			if (
+				!doesNearbyDistanceMatch({
+					distance,
+					nearbyDistance,
+				})
+			)
+				return [];
 			return [
 				{
 					distance,

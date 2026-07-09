@@ -54,7 +54,9 @@ export const readLineRunState = ({ line }: readLineRunState.Props): readLineRunS
 			outputsDisabled,
 			queueBlocked,
 		}),
-		progressLabel: readLineRunProgressLabel({ line }),
+		progressLabel: readLineRunProgressLabel({
+			line,
+		}),
 		showProgress: line.inProgress && !line.deliveryBlocked,
 		statusMetaLabel: readLineRunStatusMetaLabel({
 			canRunAction,

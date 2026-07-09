@@ -47,7 +47,9 @@ export const placeProducerDeliveryItemsFx = Effect.fn("placeProducerDeliveryItem
 		save,
 	});
 	const freedBoardItemInstanceIds = chargeOutcome?.removeOnDepleted
-		? new Set([liveJob.itemInstanceId])
+		? new Set([
+				liveJob.itemInstanceId,
+			])
 		: undefined;
 	return yield* Effect.either(
 		placeGameSaveItemsFx({

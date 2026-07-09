@@ -46,13 +46,7 @@ const createReplacementSafetyIssueFx = Effect.fn(
 
 export const readWorldSnapshotReplacementSafetyIssuesFx = Effect.fn(
 	"readWorldSnapshotReplacementSafetyIssuesFx",
-)(function* ({
-	facts,
-	save,
-}: {
-	facts: WorldSnapshotFacts;
-	save: GameSave;
-}) {
+)(function* ({ facts, save }: { facts: WorldSnapshotFacts; save: GameSave }) {
 	const issues: WorldCheckIssue[] = [];
 	for (const replacementFacts of facts.replacementSafety) {
 		issues.push(

@@ -9,21 +9,35 @@ import {
 const defaultGameConfig = {
 	items: {
 		"item:test:minor-haste": {
-			effects: [{
-				id: "effect:shrine-minor-haste",
-				grants: [{ id: "grant:test:minor-haste", name: "Minor Haste active" }],
-				name: "Minor Haste",
-				polarity: "buff",
-			}],
+			effects: [
+				{
+					id: "effect:shrine-minor-haste",
+					grants: [
+						{
+							id: "grant:test:minor-haste",
+							name: "Minor Haste active",
+						},
+					],
+					name: "Minor Haste",
+					polarity: "buff",
+				},
+			],
 			name: "Minor Haste Source",
 		},
 		"item:test:bountiful-offering": {
-			effects: [{
-				id: "effect:shrine-bountiful-offering",
-				grants: [{ id: "grant:test:bountiful-offering", name: "Bountiful Offering active" }],
-				name: "Bountiful Offering",
-				polarity: "buff",
-			}],
+			effects: [
+				{
+					id: "effect:shrine-bountiful-offering",
+					grants: [
+						{
+							id: "grant:test:bountiful-offering",
+							name: "Bountiful Offering active",
+						},
+					],
+					name: "Bountiful Offering",
+					polarity: "buff",
+				},
+			],
 			name: "Bountiful Offering Source",
 		},
 	},

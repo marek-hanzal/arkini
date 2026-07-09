@@ -52,24 +52,32 @@ const applyBoardMemoryActivateProgramFx = Effect.fn(
 			} as const);
 
 	return yield* match(activationRoute)
-		.with({ kind: "save" }, () =>
-			saveCurrentBoardMemoryLayoutFx({
-				boardItemId: action.boardItemId,
-				config,
-				events,
-				nextSave,
-				nowMs,
-			}),
+		.with(
+			{
+				kind: "save",
+			},
+			() =>
+				saveCurrentBoardMemoryLayoutFx({
+					boardItemId: action.boardItemId,
+					config,
+					events,
+					nextSave,
+					nowMs,
+				}),
 		)
-		.with({ kind: "restore" }, ({ savedItems }) =>
-			restoreSavedBoardMemoryLayoutFx({
-				boardItemId: action.boardItemId,
-				config,
-				events,
-				nextSave,
-				nowMs,
-				savedItems,
-			}),
+		.with(
+			{
+				kind: "restore",
+			},
+			({ savedItems }) =>
+				restoreSavedBoardMemoryLayoutFx({
+					boardItemId: action.boardItemId,
+					config,
+					events,
+					nextSave,
+					nowMs,
+					savedItems,
+				}),
 		)
 		.exhaustive();
 });

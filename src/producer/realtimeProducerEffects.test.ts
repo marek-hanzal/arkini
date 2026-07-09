@@ -31,7 +31,7 @@ describe("realtime line effects", () => {
 													distance: "neighbour",
 													multiplier: 0.5,
 												},
-												],
+											],
 											display: "whenActive",
 											items: {
 												anyOf: [

@@ -45,48 +45,48 @@ const consumeExplicitLineStartInputRefsFx = Effect.fn(
 const autoFillAndConsumeStoredLineInputsFx = Effect.fn(
 	"startLineFx.autoFillAndConsumeStoredLineInputsFx",
 )(function* ({
+	events,
+	inputRefs,
+	itemInstanceId,
+	lineId,
+	lineInputs,
+	nextSave,
+	nowMs,
+}: {
+	events: GameEvent[];
+	inputRefs: LineStartExecutionProps["action"]["inputRefs"];
+	itemInstanceId: string;
+	lineId: string;
+	lineInputs: LineStartReadiness["lineInputs"];
+	nextSave: GameSave;
+	nowMs: number;
+}) {
+	if (inputRefs.length > 0) return true;
+
+	yield* autoFillLineInputsFx({
 		events,
-		inputRefs,
-		itemInstanceId,
-		lineId,
-		lineInputs,
+		inputs: lineInputs,
 		nextSave,
 		nowMs,
-	}: {
-		events: GameEvent[];
-		inputRefs: LineStartExecutionProps["action"]["inputRefs"];
-		itemInstanceId: string;
-		lineId: string;
-		lineInputs: LineStartReadiness["lineInputs"];
-		nextSave: GameSave;
-		nowMs: number;
-	}) {
-		if (inputRefs.length > 0) return true;
-
-		yield* autoFillLineInputsFx({
-			events,
-			inputs: lineInputs,
-			nextSave,
-			nowMs,
-			itemInstanceId,
-			lineId,
-		});
-		const inputsReady = yield* readProducerStoredInputsReadyFx({
-			inputs: lineInputs,
-			itemInstanceId,
-			lineId,
-			save: nextSave,
-		});
-		if (!inputsReady) return false;
-
-		yield* consumeProducerStoredInputsFx({
-			inputs: lineInputs,
-			nextSave,
-			itemInstanceId,
-			lineId,
-		});
-		return true;
+		itemInstanceId,
+		lineId,
 	});
+	const inputsReady = yield* readProducerStoredInputsReadyFx({
+		inputs: lineInputs,
+		itemInstanceId,
+		lineId,
+		save: nextSave,
+	});
+	if (!inputsReady) return false;
+
+	yield* consumeProducerStoredInputsFx({
+		inputs: lineInputs,
+		nextSave,
+		itemInstanceId,
+		lineId,
+	});
+	return true;
+});
 
 export const prepareLineStartInputsFx = Effect.fn("startLineFx.prepareLineStartInputsFx")(
 	function* ({

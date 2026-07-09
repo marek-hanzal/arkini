@@ -72,7 +72,9 @@ export const storeCurrentBoardItemsInInventoryFx = Effect.fn("storeCurrentBoardI
 				nextSave,
 			});
 			if (status === "ignored") continue;
-			(status === "stored" ? result.storedItemInstanceIds : result.failedItemInstanceIds).add(item.id);
+			(status === "stored" ? result.storedItemInstanceIds : result.failedItemInstanceIds).add(
+				item.id,
+			);
 		}
 		return result;
 	},

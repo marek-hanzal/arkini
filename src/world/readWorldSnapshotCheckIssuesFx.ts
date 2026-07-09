@@ -19,10 +19,27 @@ export const readWorldSnapshotCheckIssuesFx = Effect.fn("readWorldSnapshotCheckI
 		save: GameSave;
 	}) {
 		return yield* match(checkId)
-			.with("job-delivery", () => readWorldSnapshotJobDeliveryIssuesFx({ facts }))
-			.with("producer-queues", () => readWorldSnapshotProducerQueueIssuesFx({ facts }))
-			.with("active-effects", () => readWorldSnapshotActiveEffectIssuesFx({ facts }))
-			.with("replacement-safety", () => readWorldSnapshotReplacementSafetyIssuesFx({ facts, save }))
+			.with("job-delivery", () =>
+				readWorldSnapshotJobDeliveryIssuesFx({
+					facts,
+				}),
+			)
+			.with("producer-queues", () =>
+				readWorldSnapshotProducerQueueIssuesFx({
+					facts,
+				}),
+			)
+			.with("active-effects", () =>
+				readWorldSnapshotActiveEffectIssuesFx({
+					facts,
+				}),
+			)
+			.with("replacement-safety", () =>
+				readWorldSnapshotReplacementSafetyIssuesFx({
+					facts,
+					save,
+				}),
+			)
 			.exhaustive();
 	},
 );

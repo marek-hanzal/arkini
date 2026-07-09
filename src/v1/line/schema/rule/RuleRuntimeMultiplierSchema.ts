@@ -27,7 +27,10 @@ export const RuleRuntimeMultiplierSchema = z
 		),
 	})
 	.strict()
-	.describe("A rule that multiplies a product line's runtime when its conditions pass.");
+	.meta({
+		id: "RuleRuntimeMultiplierSchema",
+		description: "A rule that multiplies a product line's runtime when its conditions pass.",
+	});
 
 export type RuleRuntimeMultiplierSchema = typeof RuleRuntimeMultiplierSchema;
 

@@ -19,7 +19,10 @@ export const QuantityValueSchema = z
 		value: PositiveIntegerSchema.describe("The fixed positive quantity emitted by the drop."),
 	})
 	.strict()
-	.describe("A fixed positive quantity emitted by an item drop.");
+	.meta({
+		id: "QuantityValueSchema",
+		description: "A fixed positive quantity emitted by an item drop.",
+	});
 
 export type QuantityValueSchema = typeof QuantityValueSchema;
 

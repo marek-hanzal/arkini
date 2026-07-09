@@ -24,7 +24,10 @@ export const SelectorTagSchema = z
 		),
 	})
 	.strict()
-	.describe("A selector that chooses every canonical game item with one semantic tag.");
+	.meta({
+		id: "SelectorTagSchema",
+		description: "A selector that chooses every canonical game item with one semantic tag.",
+	});
 
 export type SelectorTagSchema = typeof SelectorTagSchema;
 

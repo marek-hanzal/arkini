@@ -22,7 +22,10 @@ export const CraftItemSchema = z
 		line: LineSchema.describe("The one product line owned by this craft."),
 	})
 	.strict()
-	.describe("An item that provides a single craft product line.");
+	.meta({
+		id: "CraftItemSchema",
+		description: "An item that provides a single craft product line.",
+	});
 
 export type CraftItemSchema = typeof CraftItemSchema;
 

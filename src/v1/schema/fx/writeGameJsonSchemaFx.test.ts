@@ -27,7 +27,10 @@ describe("writeGameJsonSchemaFx", () => {
 			type: "object",
 			properties: {
 				items: {
-					$ref: expect.stringMatching(/^#\/\$defs\//),
+					type: "object",
+					additionalProperties: {
+						$ref: "#/$defs/ItemSchema",
+					},
 				},
 				meta: {
 					$ref: expect.stringMatching(/^#\/\$defs\//),
@@ -37,6 +40,10 @@ describe("writeGameJsonSchemaFx", () => {
 				},
 			},
 		});
+		expect(Object.keys(schema.$defs ?? {})).not.toContain(
+			expect.stringMatching(/^__schema\d+$/),
+		);
+		expect(schema.$defs).toHaveProperty("ItemSchema");
 		expect(jsonSchema.length).toBeLessThan(1_000_000);
 	});
 });

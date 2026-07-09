@@ -14,7 +14,10 @@ export const QuantityEnumSchema = z
 		 */
 		"range",
 	])
-	.describe("The way a drop quantity is determined.");
+	.meta({
+		id: "QuantityEnumSchema",
+		description: "The way a drop quantity is determined.",
+	});
 
 export type QuantityEnumSchema = typeof QuantityEnumSchema;
 

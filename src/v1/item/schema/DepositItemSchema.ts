@@ -33,7 +33,10 @@ export const DepositItemSchema = z
 		),
 	})
 	.strict()
-	.describe("A finite resource deposit that disappears when its capacity is depleted.");
+	.meta({
+		id: "DepositItemSchema",
+		description: "A finite resource deposit that disappears when its capacity is depleted.",
+	});
 
 export type DepositItemSchema = typeof DepositItemSchema;
 

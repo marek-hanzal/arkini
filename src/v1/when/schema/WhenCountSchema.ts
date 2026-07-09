@@ -37,7 +37,10 @@ export const WhenCountSchema = z
 		),
 	})
 	.strict()
-	.describe("A condition that checks the count of selected items in a game-state scope.");
+	.meta({
+		id: "WhenCountSchema",
+		description: "A condition that checks the count of selected items in a game-state scope.",
+	});
 
 export type WhenCountSchema = typeof WhenCountSchema;
 

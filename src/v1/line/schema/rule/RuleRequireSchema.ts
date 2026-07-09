@@ -20,7 +20,10 @@ export const RuleRequireSchema = z
 		]).describe("Identifies this rule as a requirement for starting the product line."),
 	})
 	.strict()
-	.describe("A rule that requires a condition before a product line can start.");
+	.meta({
+		id: "LineRuleRequireSchema",
+		description: "A rule that requires a condition before a product line can start.",
+	});
 
 export type RuleRequireSchema = typeof RuleRequireSchema;
 

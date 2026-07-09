@@ -19,7 +19,7 @@ export const writeGameJsonSchemaFx = ({ output }: writeGameJsonSchemaFx.Props) =
 	Effect.gen(function* () {
 		const fileSystem = yield* FileSystem.FileSystem;
 		const jsonSchema = z.toJSONSchema(GameSchema, {
-			reused: "ref",
+			reused: "inline",
 			target: "draft-2020-12",
 		});
 

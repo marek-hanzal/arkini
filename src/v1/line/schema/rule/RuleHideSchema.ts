@@ -20,7 +20,10 @@ export const RuleHideSchema = z
 		]).describe("Identifies this rule as a request to hide the product line."),
 	})
 	.strict()
-	.describe("A rule that hides a product line when its condition is satisfied.");
+	.meta({
+		id: "LineRuleHideSchema",
+		description: "A rule that hides a product line when its condition is satisfied.",
+	});
 
 export type RuleHideSchema = typeof RuleHideSchema;
 

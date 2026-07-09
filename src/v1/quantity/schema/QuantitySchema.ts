@@ -13,7 +13,10 @@ export const QuantitySchema = z
 		QuantityValueSchema,
 		QuantityRangeSchema,
 	])
-	.describe("A fixed or inclusive range quantity selected by its type.");
+	.meta({
+		id: "QuantitySchema",
+		description: "A fixed or inclusive range quantity selected by its type.",
+	});
 
 export type QuantitySchema = typeof QuantitySchema;
 

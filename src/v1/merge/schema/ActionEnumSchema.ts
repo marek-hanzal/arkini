@@ -14,7 +14,10 @@ export const ActionEnumSchema = z
 		 */
 		"consume",
 	])
-	.describe("The action applied to a merge source after it changes its target.");
+	.meta({
+		id: "ActionEnumSchema",
+		description: "The action applied to a merge source after it changes its target.",
+	});
 
 export type ActionEnumSchema = typeof ActionEnumSchema;
 

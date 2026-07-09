@@ -17,7 +17,10 @@ export const RuleShowSchema = z
 		]).describe("Identifies this rule as a request to show the product line."),
 	})
 	.strict()
-	.describe("A rule that conditionally makes a product line visible.");
+	.meta({
+		id: "LineRuleShowSchema",
+		description: "A rule that conditionally makes a product line visible.",
+	});
 
 export type RuleShowSchema = typeof RuleShowSchema;
 

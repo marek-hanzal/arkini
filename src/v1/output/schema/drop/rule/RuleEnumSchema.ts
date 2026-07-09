@@ -14,7 +14,10 @@ export const RuleEnumSchema = z
 		 */
 		"block",
 	])
-	.describe("The kind of rule evaluated for a selected drop.");
+	.meta({
+		id: "DropRuleEnumSchema",
+		description: "The kind of rule evaluated for a selected drop.",
+	});
 
 export type RuleEnumSchema = typeof RuleEnumSchema;
 

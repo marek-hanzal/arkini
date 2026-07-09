@@ -15,7 +15,10 @@ export const SelectorSchema = z
 		SelectorItemSchema,
 		SelectorTagSchema,
 	])
-	.describe("A selector that resolves to one or more canonical game items.");
+	.meta({
+		id: "SelectorSchema",
+		description: "A selector that resolves to one or more canonical game items.",
+	});
 
 export type SelectorSchema = typeof SelectorSchema;
 

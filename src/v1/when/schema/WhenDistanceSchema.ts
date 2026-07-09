@@ -40,9 +40,11 @@ export const WhenDistanceSchema = z
 		),
 	})
 	.strict()
-	.describe(
-		"A condition that checks selected item count at a board distance from a rule source.",
-	);
+	.meta({
+		id: "WhenDistanceSchema",
+		description:
+			"A condition that checks selected item count at a board distance from a rule source.",
+	});
 
 export type WhenDistanceSchema = typeof WhenDistanceSchema;
 

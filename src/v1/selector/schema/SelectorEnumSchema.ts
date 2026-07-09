@@ -14,7 +14,10 @@ export const SelectorEnumSchema = z
 		 */
 		"tag",
 	])
-	.describe("The strategy used to select game items.");
+	.meta({
+		id: "SelectorEnumSchema",
+		description: "The strategy used to select game items.",
+	});
 
 export type SelectorEnumSchema = typeof SelectorEnumSchema;
 

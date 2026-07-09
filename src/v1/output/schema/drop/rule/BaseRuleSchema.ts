@@ -22,7 +22,10 @@ export const BaseRuleSchema = z
 			.describe("Conditions that must all pass for this selected-drop rule to apply."),
 	})
 	.strict()
-	.describe("The common fields shared by every selected-drop rule.");
+	.meta({
+		id: "BaseDropRuleSchema",
+		description: "The common fields shared by every selected-drop rule.",
+	});
 
 export type BaseRuleSchema = typeof BaseRuleSchema;
 

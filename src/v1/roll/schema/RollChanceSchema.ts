@@ -33,7 +33,10 @@ export const RollChanceSchema = z
 			.describe("One or more items emitted when this roll succeeds."),
 	})
 	.strict()
-	.describe("A roll that provides its output according to a probability.");
+	.meta({
+		id: "RollChanceSchema",
+		description: "A roll that provides its output according to a probability.",
+	});
 
 export type RollChanceSchema = typeof RollChanceSchema;
 

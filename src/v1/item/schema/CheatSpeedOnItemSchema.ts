@@ -14,7 +14,10 @@ export const CheatSpeedOnItemSchema = z
 		]),
 	})
 	.strict()
-	.describe("An item that enables the speed cheat.");
+	.meta({
+		id: "CheatSpeedOnItemSchema",
+		description: "An item that enables the speed cheat.",
+	});
 
 export type CheatSpeedOnItemSchema = typeof CheatSpeedOnItemSchema;
 

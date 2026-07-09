@@ -6,7 +6,10 @@ import { z } from "zod";
  * Its domain and cross-reference validity are enforced by the configuration
  * schemas that consume it, not by this scalar schema.
  */
-export const IdSchema = z.string().min(1).describe("A non-empty configuration identifier.");
+export const IdSchema = z.string().min(1).meta({
+	id: "IdSchema",
+	description: "A non-empty configuration identifier.",
+});
 
 export type IdSchema = typeof IdSchema;
 

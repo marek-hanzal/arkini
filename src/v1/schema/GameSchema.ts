@@ -28,7 +28,10 @@ export const GameSchema = z
 			.describe("Canonical game items keyed by a non-empty identifier."),
 	})
 	.strict()
-	.describe("The root configuration for a game.");
+	.meta({
+		id: "GameSchema",
+		description: "The root configuration for a game.",
+	});
 
 export type GameSchema = typeof GameSchema;
 

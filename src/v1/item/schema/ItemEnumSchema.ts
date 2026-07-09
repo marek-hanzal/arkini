@@ -30,7 +30,10 @@ export const ItemEnumSchema = z
 		"nuke",
 		"cheat:inventory",
 	])
-	.describe("The kind of gameplay item described by an item configuration.");
+	.meta({
+		id: "ItemEnumSchema",
+		description: "The kind of gameplay item described by an item configuration.",
+	});
 
 export type ItemEnumSchema = typeof ItemEnumSchema;
 

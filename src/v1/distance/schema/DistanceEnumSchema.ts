@@ -18,7 +18,10 @@ export const DistanceEnumSchema = z
 		 */
 		"far",
 	])
-	.describe("The Chebyshev board distance used by a distance-based gameplay rule.");
+	.meta({
+		id: "DistanceEnumSchema",
+		description: "The Chebyshev board distance used by a distance-based gameplay rule.",
+	});
 
 export type DistanceEnumSchema = typeof DistanceEnumSchema;
 

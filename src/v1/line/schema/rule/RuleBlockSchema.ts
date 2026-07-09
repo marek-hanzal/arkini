@@ -20,7 +20,10 @@ export const RuleBlockSchema = z
 		]).describe("Identifies this rule as a request to block the product line from starting."),
 	})
 	.strict()
-	.describe("A rule that prevents a visible product line from starting.");
+	.meta({
+		id: "LineRuleBlockSchema",
+		description: "A rule that prevents a visible product line from starting.",
+	});
 
 export type RuleBlockSchema = typeof RuleBlockSchema;
 

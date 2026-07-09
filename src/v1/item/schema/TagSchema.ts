@@ -8,9 +8,10 @@ import { NonEmptyStringSchema } from "~/v1/common/schema/NonEmptyStringSchema";
  * Tags are deliberately open-ended. They support content grouping and later
  * rule selectors without coupling the schema to a centrally maintained enum.
  */
-export const TagSchema = NonEmptyStringSchema.describe(
-	"A non-empty semantic label used to classify a game item.",
-);
+export const TagSchema = NonEmptyStringSchema.meta({
+	id: "TagSchema",
+	description: "A non-empty semantic label used to classify a game item.",
+});
 
 export type TagSchema = typeof TagSchema;
 

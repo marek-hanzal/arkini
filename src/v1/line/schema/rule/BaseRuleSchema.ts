@@ -23,7 +23,10 @@ export const BaseRuleSchema = z
 			.describe("Conditions that must all pass for this product-line rule to apply."),
 	})
 	.strict()
-	.describe("The common fields shared by every product-line rule.");
+	.meta({
+		id: "BaseLineRuleSchema",
+		description: "The common fields shared by every product-line rule.",
+	});
 
 export type BaseRuleSchema = typeof BaseRuleSchema;
 

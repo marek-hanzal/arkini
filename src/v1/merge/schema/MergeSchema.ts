@@ -38,7 +38,10 @@ export const MergeSchema = z
 		),
 	})
 	.strict()
-	.describe("A directional item merge that transforms or removes the receiving item.");
+	.meta({
+		id: "MergeSchema",
+		description: "A directional item merge that transforms or removes the receiving item.",
+	});
 
 export type MergeSchema = typeof MergeSchema;
 

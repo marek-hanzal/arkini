@@ -37,7 +37,10 @@ export const RollWeightSchema = z
 			.describe("At least two weighted drop candidates selected by this roll."),
 	})
 	.strict()
-	.describe("A roll that selects its output according to relative item weights.");
+	.meta({
+		id: "RollWeightSchema",
+		description: "A roll that selects its output according to relative item weights.",
+	});
 
 export type RollWeightSchema = typeof RollWeightSchema;
 

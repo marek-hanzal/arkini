@@ -31,7 +31,10 @@ export const DropSchema = z
 			.describe("Rules evaluated after this drop is selected by a successful roll."),
 	})
 	.strict()
-	.describe("A canonical game item, quantity, and rules for a successful roll's drop.");
+	.meta({
+		id: "DropSchema",
+		description: "A canonical game item, quantity, and rules for a successful roll's drop.",
+	});
 
 export type DropSchema = typeof DropSchema;
 

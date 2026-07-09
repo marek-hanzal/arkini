@@ -26,7 +26,10 @@ export const RollGuaranteedSchema = z
 			.describe("One or more items emitted when this roll succeeds."),
 	})
 	.strict()
-	.describe("A roll that guarantees its output when its rules allow it.");
+	.meta({
+		id: "RollGuaranteedSchema",
+		description: "A roll that guarantees its output when its rules allow it.",
+	});
 
 export type RollGuaranteedSchema = typeof RollGuaranteedSchema;
 

@@ -19,7 +19,10 @@ export const RuleBlockSchema = z
 		]).describe("Identifies this rule as a block on emitting the selected drop."),
 	})
 	.strict()
-	.describe("A rule that prevents a selected drop from being emitted.");
+	.meta({
+		id: "DropRuleBlockSchema",
+		description: "A rule that prevents a selected drop from being emitted.",
+	});
 
 export type RuleBlockSchema = typeof RuleBlockSchema;
 

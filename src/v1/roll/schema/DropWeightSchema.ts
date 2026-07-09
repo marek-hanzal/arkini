@@ -30,7 +30,10 @@ export const DropWeightSchema = z
 			.describe("One or more items emitted when this weighted drop is selected."),
 	})
 	.strict()
-	.describe("Items and their relative weight in a weight-based output roll.");
+	.meta({
+		id: "DropWeightSchema",
+		description: "Items and their relative weight in a weight-based output roll.",
+	});
 
 export type DropWeightSchema = typeof DropWeightSchema;
 

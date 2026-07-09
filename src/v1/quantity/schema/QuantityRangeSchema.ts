@@ -26,7 +26,10 @@ export const QuantityRangeSchema = z
 	.refine((value) => value.max >= value.min, {
 		message: "max must be greater than or equal to min",
 	})
-	.describe("An inclusive range of positive item quantities.");
+	.meta({
+		id: "QuantityRangeSchema",
+		description: "An inclusive range of positive item quantities.",
+	});
 
 export type QuantityRangeSchema = typeof QuantityRangeSchema;
 

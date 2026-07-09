@@ -22,7 +22,10 @@ export const OutputSchema = z
 			.describe("One or more alternative roll sets provided by this output."),
 	})
 	.strict()
-	.describe("A configured output produced by a gameplay source.");
+	.meta({
+		id: "OutputSchema",
+		description: "A configured output produced by a gameplay source.",
+	});
 
 export type OutputSchema = typeof OutputSchema;
 

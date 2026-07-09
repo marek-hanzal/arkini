@@ -24,7 +24,10 @@ export const SelectorItemSchema = z
 		),
 	})
 	.strict()
-	.describe("A selector that chooses one canonical game item by its stable ID.");
+	.meta({
+		id: "SelectorItemSchema",
+		description: "A selector that chooses one canonical game item by its stable ID.",
+	});
 
 export type SelectorItemSchema = typeof SelectorItemSchema;
 

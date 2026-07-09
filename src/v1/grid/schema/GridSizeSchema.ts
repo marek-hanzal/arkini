@@ -23,7 +23,10 @@ export const GridSizeSchema = z
 		),
 	})
 	.strict()
-	.describe("The explicit width and height of a two-dimensional game grid.");
+	.meta({
+		id: "GridSizeSchema",
+		description: "The explicit width and height of a two-dimensional game grid.",
+	});
 
 export type GridSizeSchema = typeof GridSizeSchema;
 

@@ -28,7 +28,10 @@ export const ItemSchema = z
 		NukeItemSchema,
 		CheatInventoryItemSchema,
 	])
-	.describe("A game item selected by its type discriminator.");
+	.meta({
+		id: "ItemSchema",
+		description: "A game item selected by its type discriminator.",
+	});
 
 export type ItemSchema = typeof ItemSchema;
 

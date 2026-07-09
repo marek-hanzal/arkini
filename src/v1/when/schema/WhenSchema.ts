@@ -14,7 +14,10 @@ export const WhenSchema = z
 		WhenCountSchema,
 		WhenDistanceSchema,
 	])
-	.describe("A standalone condition that produces a boolean result from game-state facts.");
+	.meta({
+		id: "WhenSchema",
+		description: "A standalone condition that produces a boolean result from game-state facts.",
+	});
 
 export type WhenSchema = typeof WhenSchema;
 

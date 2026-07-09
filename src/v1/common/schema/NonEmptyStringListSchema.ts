@@ -2,12 +2,17 @@ import { z } from "zod";
 
 import { NonEmptyStringSchema } from "./NonEmptyStringSchema";
 
-export const NonEmptyStringListSchema = z.tuple(
-	[
+export const NonEmptyStringListSchema = z
+	.tuple(
+		[
+			NonEmptyStringSchema,
+		],
 		NonEmptyStringSchema,
-	],
-	NonEmptyStringSchema,
-);
+	)
+	.meta({
+		id: "NonEmptyStringListSchema",
+		description: "A non-empty ordered list of non-empty strings.",
+	});
 
 export type NonEmptyStringListSchema = typeof NonEmptyStringListSchema;
 

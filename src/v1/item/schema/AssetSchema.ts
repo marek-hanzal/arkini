@@ -31,7 +31,10 @@ export const AssetSchema = z
 		),
 	})
 	.strict()
-	.describe("The visual asset definition for a game item.");
+	.meta({
+		id: "AssetSchema",
+		description: "The visual asset definition for a game item.",
+	});
 
 export type AssetSchema = typeof AssetSchema;
 

@@ -24,7 +24,10 @@ export const SimpleItemSchema = z
 		]),
 	})
 	.strict()
-	.describe("A stackable item without specialized gameplay behavior.");
+	.meta({
+		id: "SimpleItemSchema",
+		description: "A stackable item without specialized gameplay behavior.",
+	});
 
 export type SimpleItemSchema = typeof SimpleItemSchema;
 

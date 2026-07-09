@@ -7,7 +7,10 @@ export const VersionEnumSchema = z
 	.enum([
 		"1.0",
 	])
-	.describe("The supported game configuration format version.");
+	.meta({
+		id: "VersionEnumSchema",
+		description: "The supported game configuration format version.",
+	});
 
 export type VersionEnumSchema = typeof VersionEnumSchema;
 

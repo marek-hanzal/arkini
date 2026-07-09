@@ -22,7 +22,10 @@ export const CategorySchema = z
 		title: TitleSchema.describe("The human-readable name displayed for this item category."),
 	})
 	.strict()
-	.describe("A UI-facing category used to group related game items.");
+	.meta({
+		id: "CategorySchema",
+		description: "A UI-facing category used to group related game items.",
+	});
 
 export type CategorySchema = typeof CategorySchema;
 

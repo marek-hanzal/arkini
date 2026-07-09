@@ -14,7 +14,10 @@ export const NukeItemSchema = z
 		]),
 	})
 	.strict()
-	.describe("An item that triggers the nuke gameplay effect.");
+	.meta({
+		id: "NukeItemSchema",
+		description: "An item that triggers the nuke gameplay effect.",
+	});
 
 export type NukeItemSchema = typeof NukeItemSchema;
 

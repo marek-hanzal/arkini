@@ -77,7 +77,10 @@ export const LineSchema = z
 			.describe("Rules that can change this product line's visibility or behavior."),
 	})
 	.strict()
-	.describe("A single product line with its accepted inputs and produced output.");
+	.meta({
+		id: "LineSchema",
+		description: "A single product line with its accepted inputs and produced output.",
+	});
 
 export type LineSchema = typeof LineSchema;
 

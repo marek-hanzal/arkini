@@ -29,7 +29,10 @@ export const MetaSchema = z
 		),
 	})
 	.strict()
-	.describe("Core metadata and player-available layouts for a game.");
+	.meta({
+		id: "MetaSchema",
+		description: "Core metadata and player-available layouts for a game.",
+	});
 
 export type MetaSchema = typeof MetaSchema;
 

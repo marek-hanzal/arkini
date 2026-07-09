@@ -26,7 +26,10 @@ export const RuleEnumSchema = z
 		 */
 		"runtime:multiplier",
 	])
-	.describe("The kind of rule evaluated for a product line.");
+	.meta({
+		id: "LineRuleEnumSchema",
+		description: "The kind of rule evaluated for a product line.",
+	});
 
 export type RuleEnumSchema = typeof RuleEnumSchema;
 

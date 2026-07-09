@@ -14,7 +14,10 @@ export const RuleSchema = z
 		RuleRequireSchema,
 		RuleBlockSchema,
 	])
-	.describe("A rule evaluated for a drop selected by a successful roll.");
+	.meta({
+		id: "DropRuleSchema",
+		description: "A rule evaluated for a drop selected by a successful roll.",
+	});
 
 export type RuleSchema = typeof RuleSchema;
 

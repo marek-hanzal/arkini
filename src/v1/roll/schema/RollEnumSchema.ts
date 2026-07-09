@@ -18,7 +18,10 @@ export const RollEnumSchema = z
 		 */
 		"weight",
 	])
-	.describe("The rule used to determine an output roll.");
+	.meta({
+		id: "RollEnumSchema",
+		description: "The rule used to determine an output roll.",
+	});
 
 export type RollEnumSchema = typeof RollEnumSchema;
 

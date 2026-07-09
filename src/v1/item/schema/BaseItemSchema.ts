@@ -66,7 +66,10 @@ export const BaseItemSchema = z
 		),
 	})
 	.strict()
-	.describe("The common fields shared by every game item.");
+	.meta({
+		id: "BaseItemSchema",
+		description: "The common fields shared by every game item.",
+	});
 
 export type BaseItemSchema = typeof BaseItemSchema;
 

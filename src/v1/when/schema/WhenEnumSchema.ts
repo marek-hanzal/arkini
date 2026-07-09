@@ -14,7 +14,10 @@ export const WhenEnumSchema = z
 		 */
 		"distance",
 	])
-	.describe("The kind of condition evaluated by a rule.");
+	.meta({
+		id: "WhenEnumSchema",
+		description: "The kind of condition evaluated by a rule.",
+	});
 
 export type WhenEnumSchema = typeof WhenEnumSchema;
 

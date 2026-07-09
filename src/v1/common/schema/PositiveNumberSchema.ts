@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-export const PositiveNumberSchema = z.number().positive();
+export const PositiveNumberSchema = z.number().positive().meta({
+	id: "PositiveNumberSchema",
+	description: "A number greater than zero.",
+});
 
 export type PositiveNumberSchema = typeof PositiveNumberSchema;
 

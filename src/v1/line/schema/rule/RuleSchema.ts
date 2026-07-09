@@ -20,7 +20,10 @@ export const RuleSchema = z
 		RuleRequireSchema,
 		RuleRuntimeMultiplierSchema,
 	])
-	.describe("A rule evaluated for a product line.");
+	.meta({
+		id: "LineRuleSchema",
+		description: "A rule evaluated for a product line.",
+	});
 
 export type RuleSchema = typeof RuleSchema;
 

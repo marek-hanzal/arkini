@@ -14,7 +14,10 @@ export const CheatInventoryItemSchema = z
 		]),
 	})
 	.strict()
-	.describe("An item that triggers the inventory cheat.");
+	.meta({
+		id: "CheatInventoryItemSchema",
+		description: "An item that triggers the inventory cheat.",
+	});
 
 export type CheatInventoryItemSchema = typeof CheatInventoryItemSchema;
 

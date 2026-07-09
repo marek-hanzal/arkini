@@ -33,7 +33,10 @@ export const StashItemSchema = z
 		),
 	})
 	.strict()
-	.describe("A single-use stash that consumes one product line when opened.");
+	.meta({
+		id: "StashItemSchema",
+		description: "A single-use stash that consumes one product line when opened.",
+	});
 
 export type StashItemSchema = typeof StashItemSchema;
 

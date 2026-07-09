@@ -33,7 +33,11 @@ export const InputSchema = z
 		),
 	})
 	.strict()
-	.describe("A canonical game item, accepted amount, and storage capacity for a gameplay input.");
+	.meta({
+		id: "InputSchema",
+		description:
+			"A canonical game item, accepted amount, and storage capacity for a gameplay input.",
+	});
 
 export type InputSchema = typeof InputSchema;
 

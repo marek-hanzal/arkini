@@ -32,7 +32,10 @@ export const RollSetSchema = z
 			.describe("One or more rolls evaluated after this set is selected."),
 	})
 	.strict()
-	.describe("An alternative non-empty collection of output rolls.");
+	.meta({
+		id: "RollSetSchema",
+		description: "An alternative non-empty collection of output rolls.",
+	});
 
 export type RollSetSchema = typeof RollSetSchema;
 

@@ -35,7 +35,10 @@ export const ProducerItemSchema = z
 			.describe("One or more product lines provided by this producer."),
 	})
 	.strict()
-	.describe("An item that provides one or more selectable product lines.");
+	.meta({
+		id: "ProducerItemSchema",
+		description: "An item that provides one or more selectable product lines.",
+	});
 
 export type ProducerItemSchema = typeof ProducerItemSchema;
 

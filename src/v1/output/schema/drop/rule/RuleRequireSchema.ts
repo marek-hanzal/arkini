@@ -19,7 +19,10 @@ export const RuleRequireSchema = z
 		]).describe("Identifies this rule as a requirement for emitting the selected drop."),
 	})
 	.strict()
-	.describe("A rule that requires a condition before a selected drop can be emitted.");
+	.meta({
+		id: "DropRuleRequireSchema",
+		description: "A rule that requires a condition before a selected drop can be emitted.",
+	});
 
 export type RuleRequireSchema = typeof RuleRequireSchema;
 

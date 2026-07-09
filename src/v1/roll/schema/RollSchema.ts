@@ -13,7 +13,10 @@ export const RollSchema = z
 		RollChanceSchema,
 		RollWeightSchema,
 	])
-	.describe("A typed roll that an output may produce.");
+	.meta({
+		id: "RollSchema",
+		description: "A typed roll that an output may produce.",
+	});
 
 export type RollSchema = typeof RollSchema;
 

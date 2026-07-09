@@ -18,7 +18,10 @@ export const ScopeEnumSchema = z
 		 */
 		"any",
 	])
-	.describe("The part of game state targeted by a configuration feature.");
+	.meta({
+		id: "ScopeEnumSchema",
+		description: "The part of game state targeted by a configuration feature.",
+	});
 
 export type ScopeEnumSchema = typeof ScopeEnumSchema;
 

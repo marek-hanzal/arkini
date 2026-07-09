@@ -5,9 +5,25 @@ import { z } from "zod";
  */
 export const ItemEnumSchema = z
 	.enum([
+		/**
+		 * A finite resource item that disappears after its capacity is used.
+		 */
+		"deposit",
+		/**
+		 * An item with no specialized gameplay behavior.
+		 */
 		"simple",
+		/**
+		 * An item that owns one or more product lines.
+		 */
 		"producer",
+		/**
+		 * An item that owns one craft product line.
+		 */
 		"craft",
+		/**
+		 * A single-use item that owns one stash product line.
+		 */
 		"stash",
 		"cheat:speed:on",
 		"cheat:speed:off",

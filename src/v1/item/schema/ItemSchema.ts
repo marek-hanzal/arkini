@@ -4,6 +4,7 @@ import { CheatInventoryItemSchema } from "./CheatInventoryItemSchema";
 import { CheatSpeedOffItemSchema } from "./CheatSpeedOffItemSchema";
 import { CheatSpeedOnItemSchema } from "./CheatSpeedOnItemSchema";
 import { CraftItemSchema } from "./CraftItemSchema";
+import { DepositItemSchema } from "./DepositItemSchema";
 import { NukeItemSchema } from "./NukeItemSchema";
 import { ProducerItemSchema } from "./ProducerItemSchema";
 import { SimpleItemSchema } from "./SimpleItemSchema";
@@ -17,6 +18,7 @@ import { StashItemSchema } from "./StashItemSchema";
  */
 export const ItemSchema = z
 	.discriminatedUnion("type", [
+		DepositItemSchema,
 		SimpleItemSchema,
 		ProducerItemSchema,
 		CraftItemSchema,

@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { EffectiveLine, EffectiveLineOutputSet } from "~/effects/EffectiveLine";
+import { readEffectiveLootPlanOutputSets } from "~/effects/readEffectiveOutputEntries";
 import { rollGameQuantityFx } from "~/loot/rollGameQuantityFx";
 import { rollLootTableItemsFx } from "~/loot/rollLootTableItemsFx";
 import type { LootTableRollResult } from "~/loot/LootTableRollResult";
@@ -65,14 +66,7 @@ export const rollEffectiveLootPlanItemsFx = Effect.fn("rollEffectiveLootPlanItem
 }: rollEffectiveLootPlanItemsFx.Props) {
 	const items: LootTableRollResult["items"] = [];
 	const outputSet = yield* chooseOutputSetFx({
-		outputSets: lootPlan.outputSets ?? [
-			{
-				baseOutput: lootPlan.baseOutput,
-				chanceItems: lootPlan.chanceItems,
-				visibleOutput: lootPlan.visibleOutput,
-				weight: 1,
-			},
-		],
+		outputSets: readEffectiveLootPlanOutputSets(lootPlan),
 	});
 	if (!outputSet)
 		return {

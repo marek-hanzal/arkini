@@ -3,8 +3,10 @@ import { readGameSaveItemQuantityByScope } from "~/activation/readGameSaveItemQu
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveDropEffectOutcome, EffectiveLine } from "~/effects/EffectiveLine";
 import type { EffectiveLineBonusSummary } from "~/effects/readEffectiveLineBonusEntries";
+import { readEffectiveLootPlanOutputSets } from "~/effects/readEffectiveOutputEntries";
 
 type EffectiveLootPlan = EffectiveLine["lootPlan"];
+type EffectiveLineOutputSet = ReturnType<typeof readEffectiveLootPlanOutputSets>[number];
 type LineOutputEntry = EffectiveLootPlan["visibleOutput"][number];
 type LineOutputView = NonNullable<LineView["outputs"]>[number];
 type LineOutputQuantity = NonNullable<LineOutputView["quantity"]>;
@@ -235,7 +237,7 @@ const pushOutputSetViews = ({
 	sourceIndexOffset,
 }: {
 	effectBonusSummary?: EffectiveLineBonusSummary;
-	outputSet: NonNullable<EffectiveLootPlan["outputSets"]>[number];
+	outputSet: EffectiveLineOutputSet;
 	outputSetIndex: number;
 	rollSetLabel?: string;
 	save: GameSave;
@@ -290,14 +292,7 @@ export const readRuntimeLineOutputViews = ({
 }: readRuntimeLineOutputViews.Props): LineOutputView[] => {
 	let sourceIndexOffset = 0;
 	const outputs: IndexedLineOutputView[] = [];
-	const outputSets = lootPlan.outputSets ?? [
-		{
-			baseOutput: lootPlan.baseOutput,
-			chanceItems: lootPlan.chanceItems,
-			visibleOutput: lootPlan.visibleOutput,
-			weight: 1,
-		},
-	];
+	const outputSets = readEffectiveLootPlanOutputSets(lootPlan);
 	const totalWeight = outputSets.reduce((total, outputSet) => total + outputSet.weight, 0);
 
 	for (const [outputSetIndex, outputSet] of outputSets.entries()) {

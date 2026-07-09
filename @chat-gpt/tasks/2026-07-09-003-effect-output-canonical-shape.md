@@ -42,3 +42,5 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 - Bonus line grouping (`lines`, `universalLines`, `byItemId`) now lives in `effects/readEffectiveLineBonusEntries.ts` as shared domain-facing summary logic.
 - `readRuntimeLineViewFromDefinition` now reads the summary once and reuses it for both line-level bonus lines and output-level bonus lines.
 - Remaining task inside this thread: keep shrinking `readRuntimeLineOutputViews.ts` by pushing more canonical output facts below the bridge boundary where it clearly pays off.
+
+- introduced shared `readEffectiveLootPlanOutputSets(...)` fallback so bridge/runtime rolling stop rebuilding default output-set arrays locally

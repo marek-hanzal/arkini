@@ -158,6 +158,16 @@ export const readEffectiveLootPlan = ({
 	visibleOutput,
 });
 
+export const readEffectiveLootPlanOutputSets = (lootPlan: EffectiveLootPlan): EffectiveLineOutputSet[] =>
+	lootPlan.outputSets ?? [
+		{
+			baseOutput: lootPlan.baseOutput,
+			chanceItems: lootPlan.chanceItems,
+			visibleOutput: lootPlan.visibleOutput,
+			weight: 1,
+		},
+	];
+
 export const readEffectiveOutputEntries = ({
 	config,
 	grantIds,

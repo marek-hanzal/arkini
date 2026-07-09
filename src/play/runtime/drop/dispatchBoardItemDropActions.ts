@@ -5,8 +5,7 @@ import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { DropActions } from "~/play/drop/DropActions";
 import {
-	createGameActionFromItemToBoardItemInteractionPlan,
-	readItemInteractionSourceRef,
+	readItemToBoardItemInteractionCommit,
 	resolveItemToBoardItemInteractionPlan,
 } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { GameRuntimeStore } from "~/play/runtime/GameRuntimeStore";
@@ -95,21 +94,17 @@ export const applyResolvedItemToBoardItem = ({
 		sourceQuantity,
 		targetItem: target,
 	});
-	const interactionSourceRef = readItemInteractionSourceRef({
+	const commit = readItemToBoardItemInteractionCommit({
 		plan,
 		sourceRef,
-	});
-	const action = createGameActionFromItemToBoardItemInteractionPlan({
-		plan,
-		sourceRef: interactionSourceRef,
 		targetItemInstanceId: target.id,
 	});
 
 	return dispatchRuntimeDropAction({
 		action:
-			action ??
+			commit.action ??
 			createFallbackMergeAction({
-				sourceRef: interactionSourceRef,
+				sourceRef: commit.sourceRef,
 				targetItemInstanceId: target.id,
 			}),
 		nowMs,

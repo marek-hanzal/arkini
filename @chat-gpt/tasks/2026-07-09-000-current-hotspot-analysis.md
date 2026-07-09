@@ -68,3 +68,5 @@ Desired direction:
 - schemas
 - tests-only builders
 - audio synth
+
+- Update after interaction pass: `resolveItemToBoardItemInteractionPlan.ts` now owns one exported commit helper instead of two extra translator exports, and the main resolver is organized by ordered interaction families (merge -> stack -> input families -> swap) rather than by a single mega facts object. Re-measure before doing another pass here.

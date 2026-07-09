@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { PositiveIntegerSchema } from "../util/PositiveIntegerSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -9,12 +10,21 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const SimpleItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
+		/**
+		 * Maximum number of this item that one inventory stack can hold.
+		 */
+		maxStackSize: PositiveIntegerSchema.describe(
+			"The maximum number of this simple item that one inventory stack can hold.",
+		),
+		/**
+		 * Identifies this item as a simple stackable item.
+		 */
 		type: ItemEnumSchema.extract([
 			"simple",
 		]),
 	})
 	.strict()
-	.describe("An item without specialized gameplay behavior.");
+	.describe("A stackable item without specialized gameplay behavior.");
 
 export type SimpleItemSchema = typeof SimpleItemSchema;
 

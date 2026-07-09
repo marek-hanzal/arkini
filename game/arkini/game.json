@@ -1,0 +1,16 @@
+{
+	"$schema": "../schema.json",
+	"meta": {
+		"id": "arkini",
+		"title": "Arkini",
+		"board": {
+			"width": 7,
+			"height": 11
+		},
+		"inventory": {
+			"width": 7,
+			"height": 7
+		}
+	},
+	"version": "1.0"
+}

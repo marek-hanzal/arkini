@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:stone": {
+			"id": "item:stone",
+			"type": "simple",
+			"title": "Stone",
+			"description": "Basic stone material produced by quarries.",
+			"asset": {
+				"source": [
+					"asset:item:stone"
+				]
+			},
+			"tags": [
+				"material",
+				"stone",
+				"era:I",
+				"tier-1-resource"
+			],
+			"category": {
+				"id": "material",
+				"title": "Materials"
+			},
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

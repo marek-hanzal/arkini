@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:log": {
+			"id": "item:log",
+			"type": "simple",
+			"title": "Log",
+			"description": "Basic wood material produced by lumberjacks.",
+			"asset": {
+				"source": [
+					"asset:item:log"
+				]
+			},
+			"tags": [
+				"material",
+				"wood",
+				"era:I",
+				"tier-1-resource"
+			],
+			"category": {
+				"id": "material",
+				"title": "Materials"
+			},
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

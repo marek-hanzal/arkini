@@ -52,3 +52,5 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 
 - introduced shared `src/craft/readCraftEffectiveLootPlan.ts`, so craft runtime view and craft completion no longer rebuild the same grant/output/loot-plan path independently
 - `applyCraftCompletionResultFx.ts` now reuses the already-read `targetCell` instead of reading the board cell twice for the same craft completion
+
+- simplified `readRuntimeCraftViewFromGameSave.ts` so craft runtime view now computes its local state directly instead of routing through a `RuntimeCraftViewScope` bag and nested scope-driven helpers; delivered inputs, running job, grant ids, phase, and progress are now resolved once in the top-level flow

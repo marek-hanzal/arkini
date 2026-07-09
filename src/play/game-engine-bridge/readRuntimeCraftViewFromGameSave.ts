@@ -30,52 +30,54 @@ type CraftProgressPhase = CraftProgressView["phase"];
 
 type RuntimeCraftRecipe = NonNullable<ReturnType<typeof readCraftRecipeDefinition>>;
 
-type RuntimeCraftViewScope = readRuntimeCraftViewFromGameSave.Props & {
-	grantIds: ReadonlySet<string>;
-	recipe: RuntimeCraftRecipe;
-	runningJob: GameSaveCraftJob | undefined;
-};
-
-type RuntimeCraftProgressFacts = {
-	inputProgress: number;
-	timeProgress: number;
-};
+type CraftViewEffectRequirementState = Pick<
+	CraftProgressView,
+	"effectBlocked" | "effectBlockReasons" | "effectRequirements" | "startRequirementsReady"
+>;
 
 const readRunningCraftJobForBoardItem = ({
 	boardItem,
 	save,
-}: RuntimeCraftViewScope): GameSaveCraftJob | undefined =>
+}: readRuntimeCraftViewFromGameSave.Props): GameSaveCraftJob | undefined =>
 	Object.values(save.craftJobs).find(
 		(job) => job.recipeId === boardItem.itemId && job.targetItemInstanceId === boardItem.id,
 	);
 
-const readDeliveredCraftInputs = ({ boardItem, save }: RuntimeCraftViewScope) =>
-	save.craftInputs[boardItem.id]?.items ?? {};
+const readDeliveredCraftInputs = ({
+	boardItem,
+	save,
+}: readRuntimeCraftViewFromGameSave.Props) => save.craftInputs[boardItem.id]?.items ?? {};
 
-const readCraftInputProgress = (scope: RuntimeCraftViewScope): number => {
-	const delivered = readDeliveredCraftInputs(scope);
-	const totalInputQuantity = scope.recipe.inputs.reduce(
-		(total, input) => total + input.quantity,
-		0,
-	);
-	const deliveredInputQuantity = scope.recipe.inputs.reduce(
+const readCraftInputProgress = ({
+	delivered,
+	recipe,
+	runningJob,
+}: {
+	delivered: Record<string, number>;
+	recipe: RuntimeCraftRecipe;
+	runningJob: GameSaveCraftJob | undefined;
+}): number => {
+	const totalInputQuantity = recipe.inputs.reduce((total, input) => total + input.quantity, 0);
+	const deliveredInputQuantity = recipe.inputs.reduce(
 		(total, input) => total + Math.min(input.quantity, delivered[input.itemId] ?? 0),
 		0,
 	);
-	return scope.runningJob !== undefined || totalInputQuantity === 0
+	return runningJob !== undefined || totalInputQuantity === 0
 		? 1
 		: deliveredInputQuantity / totalInputQuantity;
 };
 
-const readCraftPhase = ({ nowMs, runningJob }: RuntimeCraftViewScope): CraftProgressPhase => {
-	if (runningJob?.delivery) return "delivery_blocked";
-	if (runningJob?.pausedAtMs !== undefined) return "paused";
-	if (runningJob?.readyAtMs !== undefined && runningJob.readyAtMs <= nowMs) return "ready";
-	if (runningJob?.readyAtMs !== undefined) return "waiting";
-	return "collecting_inputs";
+const readCraftPhase = ({ nowMs, runningJob }: { nowMs: number; runningJob: GameSaveCraftJob | undefined }) => {
+	if (runningJob?.delivery) return "delivery_blocked" satisfies CraftProgressPhase;
+	if (runningJob?.pausedAtMs !== undefined) return "paused" satisfies CraftProgressPhase;
+	if (runningJob?.readyAtMs !== undefined && runningJob.readyAtMs <= nowMs) {
+		return "ready" satisfies CraftProgressPhase;
+	}
+	if (runningJob?.readyAtMs !== undefined) return "waiting" satisfies CraftProgressPhase;
+	return "collecting_inputs" satisfies CraftProgressPhase;
 };
 
-const readCraftTimeProgress = ({ nowMs, runningJob }: RuntimeCraftViewScope): number => {
+const readCraftTimeProgress = ({ nowMs, runningJob }: { nowMs: number; runningJob: GameSaveCraftJob | undefined }) => {
 	if (runningJob?.startAtMs === undefined || runningJob.readyAtMs === undefined) return 0;
 	return readGameTimeProgress({
 		nowMs: runningJob.pausedAtMs ?? nowMs,
@@ -84,62 +86,73 @@ const readCraftTimeProgress = ({ nowMs, runningJob }: RuntimeCraftViewScope): nu
 	});
 };
 
-const readCraftProgressFacts = (scope: RuntimeCraftViewScope): RuntimeCraftProgressFacts => ({
-	inputProgress: readCraftInputProgress(scope),
-	timeProgress: readCraftTimeProgress(scope),
-});
-
 const readAcceptedCraftInputItemIds = ({
+	delivered,
 	phase,
-	scope,
+	recipe,
 }: {
+	delivered: Record<string, number>;
 	phase: CraftProgressPhase;
-	scope: RuntimeCraftViewScope;
+	recipe: RuntimeCraftRecipe;
 }): ItemId[] => {
 	if (phase !== "collecting_inputs") return [];
-	const delivered = readDeliveredCraftInputs(scope);
-	return scope.recipe.inputs.flatMap((input) =>
-		(delivered[input.itemId] ?? 0) < input.quantity
-			? [
-					input.itemId as ItemId,
-				]
-			: [],
+	return recipe.inputs.flatMap((input) =>
+		(delivered[input.itemId] ?? 0) < input.quantity ? [input.itemId as ItemId] : [],
 	);
 };
 
-const readCraftInputViews = (scope: RuntimeCraftViewScope): CraftProgressView["inputs"] =>
-	scope.recipe.inputs.map((input) => ({
+const readCraftInputViews = ({
+	boardItem,
+	recipe,
+	save,
+}: Pick<readRuntimeCraftViewFromGameSave.Props, "boardItem" | "save"> & {
+	recipe: RuntimeCraftRecipe;
+}): CraftProgressView["inputs"] =>
+	recipe.inputs.map((input) => ({
 		available: readRuntimeActivationInputAvailableQuantityFromGameSave({
 			itemId: input.itemId,
-			save: scope.save,
-			targetItemInstanceId: scope.boardItem.id,
+			save,
+			targetItemInstanceId: boardItem.id,
 		}),
 		itemId: input.itemId as ItemId,
 		quantity: input.quantity,
 	}));
 
-const readCraftTargetLimitViews = (scope: RuntimeCraftViewScope) =>
-	readCraftOutputItemIds(scope.recipe).flatMap((itemId) =>
+const readCraftTargetLimitViews = ({
+	boardItem,
+	config,
+	nowMs,
+	recipe,
+	save,
+}: readRuntimeCraftViewFromGameSave.Props & { recipe: RuntimeCraftRecipe }) =>
+	readCraftOutputItemIds(recipe).flatMap((itemId) =>
 		readItemTargetLimits({
-			config: scope.config,
-			ignoredBoardItemInstanceIds: new Set([
-				scope.boardItem.id,
-			]),
+			config,
+			ignoredBoardItemInstanceIds: new Set([boardItem.id]),
 			includePendingCraftJobs: true,
 			includePendingProducerJobs: true,
 			itemId,
-			nowMs: scope.nowMs,
-			save: scope.save,
+			nowMs,
+			save,
 		}),
 	);
 
-const readCraftEffectRequirements = (scope: RuntimeCraftViewScope) => {
+const readCraftEffectRequirementState = ({
+	config,
+	grantIds,
+	nowMs,
+	recipe,
+	save,
+}: Pick<readRuntimeCraftViewFromGameSave.Props, "config" | "nowMs" | "save"> & {
+	grantIds: ReadonlySet<string>;
+	recipe: RuntimeCraftRecipe;
+}): CraftViewEffectRequirementState => {
 	const effectState = readCraftLineEffectState({
-		config: scope.config,
-		grantIds: scope.grantIds,
-		nowMs: scope.nowMs,
-		recipe: scope.recipe,
-		save: scope.save,
+		config,
+		grantIds,
+		nowMs,
+		recipe,
+		save,
 	});
 	return {
 		effectBlocked: effectState.blocked,
@@ -150,86 +163,34 @@ const readCraftEffectRequirements = (scope: RuntimeCraftViewScope) => {
 					kind: requirement.kind,
 					label: requirement.label,
 					ready: requirement.ready,
-				}))
+			  }))
 			: undefined,
 		startRequirementsReady: effectState.startRequirementsReady,
 	};
 };
 
-const readCraftVisibleProgress = ({
-	facts,
-	phase,
-}: {
-	facts: RuntimeCraftProgressFacts;
-	phase: CraftProgressPhase;
-}) => {
-	if (phase === "collecting_inputs") return facts.inputProgress;
-	if (phase === "delivery_blocked") return 0;
-	return facts.timeProgress;
-};
-
-const readCraftOutputViews = (scope: RuntimeCraftViewScope): CraftProgressView["outputs"] => {
+const readCraftOutputViews = ({
+	boardItem,
+	config,
+	grantIds,
+	recipe,
+	save,
+}: Pick<readRuntimeCraftViewFromGameSave.Props, "boardItem" | "config" | "save"> & {
+	grantIds: ReadonlySet<string>;
+	recipe: RuntimeCraftRecipe;
+}): CraftProgressView["outputs"] => {
 	const outputs = readRuntimeLineOutputViews({
 		lootPlan: readCraftEffectiveLootPlan({
-			config: scope.config,
-			grantIds: scope.grantIds,
-			itemInstanceId: scope.boardItem.id,
-			lineId: scope.boardItem.itemId,
-			recipe: scope.recipe,
-			save: scope.save,
+			config,
+			grantIds,
+			itemInstanceId: boardItem.id,
+			lineId: boardItem.itemId,
+			recipe,
+			save,
 		}),
-		save: scope.save,
+		save,
 	});
-
 	return outputs.length > 0 ? outputs : undefined;
-};
-
-const createRuntimeCraftView = (scope: RuntimeCraftViewScope): CraftProgressView => {
-	const phase = readCraftPhase(scope);
-	const acceptedInputItemIds = readAcceptedCraftInputItemIds({
-		phase,
-		scope,
-	});
-	const durationMs = readCraftRecipeDurationMs({
-		recipe: scope.recipe,
-		save: scope.save,
-	});
-	const progressFacts = readCraftProgressFacts(scope);
-	const targetLimits = readCraftTargetLimitViews(scope);
-	const clockNowMs = scope.runningJob?.pausedAtMs ?? scope.nowMs;
-
-	return {
-		...readCraftEffectRequirements(scope),
-		acceptedInputItemIds,
-		canAcceptInputs: acceptedInputItemIds.length > 0,
-		complete: phase === "ready",
-		delivered: readDeliveredCraftInputs(scope),
-		deliveryBlocked: scope.runningJob?.delivery !== undefined,
-		durationMs,
-		id: scope.boardItem.itemId,
-		inputProgress: progressFacts.inputProgress,
-		inputs: readCraftInputViews(scope),
-		pausedAtMs: scope.runningJob?.pausedAtMs,
-		outputs: readCraftOutputViews(scope),
-		phase,
-		progress: readCraftVisibleProgress({
-			facts: progressFacts,
-			phase,
-		}),
-		readyAtMs: scope.runningJob?.readyAtMs,
-		remainingMs:
-			scope.runningJob?.readyAtMs !== undefined
-				? readGameTimeRemainingMs({
-						nowMs: clockNowMs,
-						readyAtMs: scope.runningJob.readyAtMs,
-					})
-				: undefined,
-		resultItemId: readCraftPrimaryOutputItemId(scope.recipe) as ItemId,
-		startAtMs: scope.runningJob?.startAtMs,
-		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
-		targetLimits: targetLimits.length ? targetLimits : undefined,
-		timeProgress: progressFacts.timeProgress,
-	};
 };
 
 export const readRuntimeCraftViewFromGameSave = ({
@@ -248,19 +209,86 @@ export const readRuntimeCraftViewFromGameSave = ({
 		nowMs,
 		save,
 	});
-
-	const scopeWithoutJob = {
+	const runningJob = readRunningCraftJobForBoardItem({
 		boardItem,
 		config,
-		grantIds,
+		nowMs,
+		save,
+	});
+	const delivered = readDeliveredCraftInputs({
+		boardItem,
+		config,
+		nowMs,
+		save,
+	});
+	const phase = readCraftPhase({ nowMs, runningJob });
+	const inputProgress = readCraftInputProgress({
+		delivered,
+		recipe,
+		runningJob,
+	});
+	const timeProgress = readCraftTimeProgress({ nowMs, runningJob });
+	const acceptedInputItemIds = readAcceptedCraftInputItemIds({
+		delivered,
+		phase,
+		recipe,
+	});
+	const targetLimits = readCraftTargetLimitViews({
+		boardItem,
+		config,
 		nowMs,
 		recipe,
-		runningJob: undefined,
 		save,
-	} satisfies RuntimeCraftViewScope;
-
-	return createRuntimeCraftView({
-		...scopeWithoutJob,
-		runningJob: readRunningCraftJobForBoardItem(scopeWithoutJob),
 	});
+	const clockNowMs = runningJob?.pausedAtMs ?? nowMs;
+	const durationMs = readCraftRecipeDurationMs({
+		recipe,
+		save,
+	});
+
+	return {
+		...readCraftEffectRequirementState({
+			config,
+			grantIds,
+			nowMs,
+			recipe,
+			save,
+		}),
+		acceptedInputItemIds,
+		canAcceptInputs: acceptedInputItemIds.length > 0,
+		complete: phase === "ready",
+		delivered,
+		deliveryBlocked: runningJob?.delivery !== undefined,
+		durationMs,
+		id: boardItem.itemId,
+		inputProgress,
+		inputs: readCraftInputViews({
+			boardItem,
+			recipe,
+			save,
+		}),
+		outputs: readCraftOutputViews({
+			boardItem,
+			config,
+			grantIds,
+			recipe,
+			save,
+		}),
+		pausedAtMs: runningJob?.pausedAtMs,
+		phase,
+		progress: phase === "collecting_inputs" ? inputProgress : phase === "delivery_blocked" ? 0 : timeProgress,
+		readyAtMs: runningJob?.readyAtMs,
+		remainingMs:
+			runningJob?.readyAtMs !== undefined
+				? readGameTimeRemainingMs({
+						nowMs: clockNowMs,
+						readyAtMs: runningJob.readyAtMs,
+				  })
+				: undefined,
+		resultItemId: readCraftPrimaryOutputItemId(recipe) as ItemId,
+		startAtMs: runningJob?.startAtMs,
+		targetLimitBlocked: readTargetLimitBlocked(targetLimits),
+		targetLimits: targetLimits.length ? targetLimits : undefined,
+		timeProgress,
+	};
 };

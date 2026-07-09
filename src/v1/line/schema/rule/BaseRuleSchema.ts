@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { WhenSchema } from "../../when/WhenSchema";
+import { WhenSchema } from "../../../when/schema/WhenSchema";
 
 /**
  * Fields shared by every rule evaluated for a product line.

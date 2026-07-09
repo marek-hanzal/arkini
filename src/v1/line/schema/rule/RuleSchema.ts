@@ -3,6 +3,7 @@ import { z } from "zod";
 import { RuleBlockSchema } from "./RuleBlockSchema";
 import { RuleHideSchema } from "./RuleHideSchema";
 import { RuleRequireSchema } from "./RuleRequireSchema";
+import { RuleRuntimeMultiplierSchema } from "./RuleRuntimeMultiplierSchema";
 import { RuleShowSchema } from "./RuleShowSchema";
 
 /**
@@ -17,6 +18,7 @@ export const RuleSchema = z
 		RuleHideSchema,
 		RuleBlockSchema,
 		RuleRequireSchema,
+		RuleRuntimeMultiplierSchema,
 	])
 	.describe("A rule evaluated for a product line.");
 

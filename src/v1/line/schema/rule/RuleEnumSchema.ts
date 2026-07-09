@@ -21,6 +21,10 @@ export const RuleEnumSchema = z
 		 * Requires the rule's condition to be satisfied before a visible line can start.
 		 */
 		"require",
+		/**
+		 * Multiplies a line's runtime when the rule's condition is satisfied.
+		 */
+		"runtime:multiplier",
 	])
 	.describe("The kind of rule evaluated for a product line.");
 

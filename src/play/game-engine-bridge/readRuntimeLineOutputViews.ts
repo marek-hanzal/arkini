@@ -2,12 +2,13 @@ import type { LineView } from "~/board/view/LineViewSchema";
 import { readGameSaveItemQuantityByScope } from "~/activation/readGameSaveItemQuantityByScope";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveDropEffectOutcome, EffectiveLine } from "~/effects/EffectiveLine";
-import type { EffectiveLineBonusEntry } from "~/effects/readEffectiveLineBonusEntries";
+import type { EffectiveLineBonusSummary } from "~/effects/readEffectiveLineBonusEntries";
 
 type EffectiveLootPlan = EffectiveLine["lootPlan"];
 type LineOutputEntry = EffectiveLootPlan["visibleOutput"][number];
 type LineOutputView = NonNullable<LineView["outputs"]>[number];
 type LineOutputQuantity = NonNullable<LineOutputView["quantity"]>;
+type WeightedOutputEntry = Extract<LineOutputEntry, { type: "weighted" }>;
 
 type IndexedLineOutputView = LineOutputView & {
 	readonly sourceIndex: number;
@@ -15,7 +16,7 @@ type IndexedLineOutputView = LineOutputView & {
 
 export namespace readRuntimeLineOutputViews {
 	export interface Props {
-		effectBonusEntries?: readonly EffectiveLineBonusEntry[];
+		effectBonusSummary?: EffectiveLineBonusSummary;
 		lootPlan: EffectiveLootPlan;
 		save: GameSave;
 	}
@@ -38,12 +39,7 @@ const readOutputProbability = ({
 	entry,
 }: {
 	enabled?: boolean;
-	entry: Extract<
-		LineOutputEntry,
-		{
-			type: "chance" | "guaranteed";
-		}
-	>;
+	entry: Extract<LineOutputEntry, { type: "chance" | "guaranteed" }>;
 }) => {
 	if (enabled === false) return 0;
 	if (entry.type === "chance") return entry.chance;
@@ -68,6 +64,21 @@ const readDropEffects = (effects: readonly EffectiveDropEffectOutcome[] | undefi
 				result: effect.result,
 			}))
 		: undefined;
+
+const readOutputBonusLines = ({
+	effectBonusSummary,
+	itemId,
+}: {
+	effectBonusSummary?: EffectiveLineBonusSummary;
+	itemId: string;
+}) => {
+	if (!effectBonusSummary) return undefined;
+	const lines = [
+		...effectBonusSummary.universalLines,
+		...(effectBonusSummary.byItemId.get(itemId) ?? []),
+	];
+	return lines.length > 0 ? lines : undefined;
+};
 
 const createOutputView = ({
 	bonusLines,
@@ -118,69 +129,14 @@ const readRollSetLabel = ({
 	totalWeight: number;
 }) => `Set ${outputSetIndex + 1} · ${formatRollSetPercent(outputSetWeight / totalWeight)}`;
 
-const pushUniqueBonusLine = (lines: string[], line: string) => {
-	if (lines.includes(line)) return;
-	lines.push(line);
-};
-
-const readBonusLinesByItemId = (
-	entries: readonly EffectiveLineBonusEntry[],
-): ReadonlyMap<string, readonly string[]> => {
-	const byItemId = new Map<string, string[]>();
-
-	for (const entry of entries) {
-		if (!entry.itemId) continue;
-		const lines = byItemId.get(entry.itemId) ?? [];
-		pushUniqueBonusLine(lines, entry.label);
-		byItemId.set(entry.itemId, lines);
-	}
-
-	return byItemId;
-};
-
-const readUniversalBonusLines = (
-	entries: readonly EffectiveLineBonusEntry[],
-): readonly string[] => {
-	const lines: string[] = [];
-	for (const entry of entries) {
-		if (entry.itemId) continue;
-		pushUniqueBonusLine(lines, entry.label);
-	}
-	return lines;
-};
-
-const readOutputBonusLines = ({
-	bonusLinesByItemId,
-	itemId,
-	universalBonusLines,
-}: {
-	bonusLinesByItemId: ReadonlyMap<string, readonly string[]>;
-	itemId: string;
-	universalBonusLines: readonly string[];
-}) => {
-	const lines = [...universalBonusLines, ...(bonusLinesByItemId.get(itemId) ?? [])];
-	return lines.length > 0 ? lines : undefined;
-};
-
-const readWeightedOutputTotalWeight = (
-	entries: Extract<
-		EffectiveLine["lootPlan"]["visibleOutput"][number],
-		{
-			type: "weighted";
-		}
-	>["entries"],
-) => entries.filter((entry) => entry.enabled).reduce((total, entry) => total + entry.weight, 0);
+const readWeightedOutputTotalWeight = (entries: WeightedOutputEntry["entries"]) =>
+	entries.filter((entry) => entry.enabled).reduce((total, entry) => total + entry.weight, 0);
 
 const readWeightedOutputProbability = ({
 	entry,
 	totalWeight,
 }: {
-	entry: Extract<
-		EffectiveLine["lootPlan"]["visibleOutput"][number],
-		{
-			type: "weighted";
-		}
-	>["entries"][number];
+	entry: WeightedOutputEntry["entries"][number];
 	totalWeight: number;
 }) => {
 	if (entry.enabled === false || totalWeight <= 0) return 0;
@@ -188,19 +144,17 @@ const readWeightedOutputProbability = ({
 };
 
 const collectOutputViews = ({
-	bonusLinesByItemId,
+	effectBonusSummary,
 	output,
 	rollSetLabel,
 	save,
 	sourceIndexOffset,
-	universalBonusLines,
 }: {
-	bonusLinesByItemId: ReadonlyMap<string, readonly string[]>;
+	effectBonusSummary?: EffectiveLineBonusSummary;
 	output: EffectiveLootPlan["visibleOutput"];
 	rollSetLabel?: string;
 	save: GameSave;
 	sourceIndexOffset: number;
-	universalBonusLines: readonly string[];
 }): IndexedLineOutputView[] =>
 	output.flatMap((entry, outputIndex): IndexedLineOutputView[] => {
 		const sourceIndex = sourceIndexOffset + outputIndex;
@@ -210,9 +164,8 @@ const collectOutputViews = ({
 			return entry.entries.map((weightedEntry, weightedEntryIndex) =>
 				createOutputView({
 					bonusLines: readOutputBonusLines({
-						bonusLinesByItemId,
+						effectBonusSummary,
 						itemId: weightedEntry.itemId,
-						universalBonusLines,
 					}),
 					enabled: weightedEntry.enabled,
 					effects: readDropEffects(weightedEntry.dropEffects),
@@ -238,9 +191,8 @@ const collectOutputViews = ({
 		return [
 			createOutputView({
 				bonusLines: readOutputBonusLines({
-					bonusLinesByItemId,
+					effectBonusSummary,
 					itemId: entry.itemId,
-					universalBonusLines,
 				}),
 				enabled: entry.enabled,
 				effects: readDropEffects(entry.dropEffects),
@@ -275,32 +227,29 @@ const isZeroChanceEffectCarrier = (output: LineOutputView) =>
 	(output.effects ?? []).some((effect) => effect.impact === "chance");
 
 const pushOutputSetViews = ({
-	bonusLinesByItemId,
+	effectBonusSummary,
 	outputSet,
 	outputSetIndex,
 	rollSetLabel,
 	save,
 	sourceIndexOffset,
-	universalBonusLines,
 }: {
-	bonusLinesByItemId: ReadonlyMap<string, readonly string[]>;
+	effectBonusSummary?: EffectiveLineBonusSummary;
 	outputSet: NonNullable<EffectiveLootPlan["outputSets"]>[number];
 	outputSetIndex: number;
 	rollSetLabel?: string;
 	save: GameSave;
 	sourceIndexOffset: number;
-	universalBonusLines: readonly string[];
 }) => {
 	const outputs: IndexedLineOutputView[] = [];
 
 	outputs.push(
 		...collectOutputViews({
-			bonusLinesByItemId,
+			effectBonusSummary,
 			output: outputSet.visibleOutput,
 			rollSetLabel,
 			save,
 			sourceIndexOffset,
-			universalBonusLines,
 		}),
 	);
 
@@ -309,9 +258,8 @@ const pushOutputSetViews = ({
 		outputs.push(
 			createOutputView({
 				bonusLines: readOutputBonusLines({
-					bonusLinesByItemId,
+					effectBonusSummary,
 					itemId: chanceItem.itemId,
-					universalBonusLines,
 				}),
 				enabled: true,
 				effects: readDropEffects(chanceItem.dropEffects),
@@ -336,14 +284,12 @@ const pushOutputSetViews = ({
 };
 
 export const readRuntimeLineOutputViews = ({
-	effectBonusEntries = [],
+	effectBonusSummary,
 	lootPlan,
 	save,
 }: readRuntimeLineOutputViews.Props): LineOutputView[] => {
 	let sourceIndexOffset = 0;
 	const outputs: IndexedLineOutputView[] = [];
-	const bonusLinesByItemId = readBonusLinesByItemId(effectBonusEntries);
-	const universalBonusLines = readUniversalBonusLines(effectBonusEntries);
 	const outputSets = lootPlan.outputSets ?? [
 		{
 			baseOutput: lootPlan.baseOutput,
@@ -357,7 +303,7 @@ export const readRuntimeLineOutputViews = ({
 	for (const [outputSetIndex, outputSet] of outputSets.entries()) {
 		outputs.push(
 			...pushOutputSetViews({
-				bonusLinesByItemId,
+				effectBonusSummary,
 				outputSet,
 				outputSetIndex,
 				rollSetLabel:
@@ -366,11 +312,10 @@ export const readRuntimeLineOutputViews = ({
 								outputSetIndex,
 								outputSetWeight: outputSet.weight,
 								totalWeight,
-							})
+						  })
 						: undefined,
 				save,
 				sourceIndexOffset,
-				universalBonusLines,
 			}),
 		);
 		sourceIndexOffset += outputSet.visibleOutput.length * 1000 + outputSet.chanceItems.length + 1000;

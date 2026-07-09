@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEngineTestConfig } from "~/engine/test/createEngineTestConfig";
 import { runInitialSave } from "~/engine/applyGameActionFx.testSupport";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
-import { readEffectiveLineBonusEntries } from "~/effects/readEffectiveLineBonusEntries";
+import { readEffectiveLineBonusSummary } from "~/effects/readEffectiveLineBonusEntries";
 import { readRuntimeLineOutputViews } from "~/play/game-engine-bridge/readRuntimeLineOutputViews";
 
 describe("readRuntimeLineOutputViews", () => {
@@ -90,10 +90,10 @@ describe("readRuntimeLineOutputViews", () => {
 
 		expect(
 			readRuntimeLineOutputViews({
-				effectBonusEntries: readEffectiveLineBonusEntries({
-					baseDurationMs: 1000,
-					effectiveLine,
-				}),
+				effectBonusSummary: readEffectiveLineBonusSummary({
+				baseDurationMs: 1000,
+				effectiveLine,
+			}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -161,10 +161,10 @@ describe("readRuntimeLineOutputViews", () => {
 
 		expect(
 			readRuntimeLineOutputViews({
-				effectBonusEntries: readEffectiveLineBonusEntries({
-					baseDurationMs: 1000,
-					effectiveLine,
-				}),
+				effectBonusSummary: readEffectiveLineBonusSummary({
+				baseDurationMs: 1000,
+				effectiveLine,
+			}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -239,10 +239,10 @@ describe("readRuntimeLineOutputViews", () => {
 
 		expect(
 			readRuntimeLineOutputViews({
-				effectBonusEntries: readEffectiveLineBonusEntries({
-					baseDurationMs: 1000,
-					effectiveLine,
-				}),
+				effectBonusSummary: readEffectiveLineBonusSummary({
+				baseDurationMs: 1000,
+				effectiveLine,
+			}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -316,10 +316,10 @@ describe("readRuntimeLineOutputViews", () => {
 
 		expect(
 			readRuntimeLineOutputViews({
-				effectBonusEntries: readEffectiveLineBonusEntries({
-					baseDurationMs: 1000,
-					effectiveLine,
-				}),
+				effectBonusSummary: readEffectiveLineBonusSummary({
+				baseDurationMs: 1000,
+				effectiveLine,
+			}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -411,10 +411,10 @@ describe("readRuntimeLineOutputViews", () => {
 
 		expect(
 			readRuntimeLineOutputViews({
-				effectBonusEntries: readEffectiveLineBonusEntries({
-					baseDurationMs: 1000,
-					effectiveLine,
-				}),
+				effectBonusSummary: readEffectiveLineBonusSummary({
+				baseDurationMs: 1000,
+				effectiveLine,
+			}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -500,10 +500,10 @@ describe("readRuntimeLineOutputViews", () => {
 
 		expect(
 			readRuntimeLineOutputViews({
-				effectBonusEntries: readEffectiveLineBonusEntries({
-					baseDurationMs: 1000,
-					effectiveLine,
-				}),
+				effectBonusSummary: readEffectiveLineBonusSummary({
+				baseDurationMs: 1000,
+				effectiveLine,
+			}),
 				lootPlan: effectiveLine.lootPlan,
 				save,
 			}),
@@ -557,12 +557,11 @@ describe("readRuntimeLineOutputViews", () => {
 		};
 
 		const outputs = readRuntimeLineOutputViews({
-			effectBonusEntries: [
-				{
-					itemId: "item:twig",
-					label: "Speed: 10% faster",
-				},
-			],
+			effectBonusSummary: {
+				byItemId: new Map([["item:twig", ["Speed: 10% faster"]]]),
+				lines: ["Speed: 10% faster"],
+				universalLines: [],
+			},
 			lootPlan: effectiveLine.lootPlan,
 			save,
 		});

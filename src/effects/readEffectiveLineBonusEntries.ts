@@ -294,6 +294,45 @@ export const readEffectiveLineBonusEntries = ({
 	];
 };
 
+
+export interface EffectiveLineBonusSummary {
+	byItemId: ReadonlyMap<string, readonly string[]>;
+	lines: readonly string[];
+	universalLines: readonly string[];
+}
+
+const pushUniqueBonusLine = (lines: string[], line: string) => {
+	if (lines.includes(line)) return;
+	lines.push(line);
+};
+
+export const readEffectiveLineBonusSummary = (
+	props: readEffectiveLineBonusEntries.Props,
+): EffectiveLineBonusSummary => {
+	const entries = readEffectiveLineBonusEntries(props);
+	const byItemId = new Map<string, string[]>();
+	const lines: string[] = [];
+	const universalLines: string[] = [];
+
+	for (const entry of entries) {
+		pushUniqueBonusLine(lines, entry.label);
+		if (entry.itemId) {
+			const itemLines = byItemId.get(entry.itemId) ?? [];
+			pushUniqueBonusLine(itemLines, entry.label);
+			byItemId.set(entry.itemId, itemLines);
+			continue;
+		}
+
+		pushUniqueBonusLine(universalLines, entry.label);
+	}
+
+	return {
+		byItemId,
+		lines,
+		universalLines,
+	};
+};
+
 export const readEffectiveLineBonusLines = (
 	props: readEffectiveLineBonusEntries.Props,
 ) => readEffectiveLineBonusEntries(props).map((entry) => entry.label);

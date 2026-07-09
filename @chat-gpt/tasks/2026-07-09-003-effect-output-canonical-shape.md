@@ -30,3 +30,15 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 - line view and line output readers now consume the shared effects-level bonus shape directly
 - reduced craft output flow so it passes shared `grantIds` once and feeds `readRuntimeLineOutputViews` directly from `lootPlan`, removing the fake craft-only `EffectiveLine` wrapper
 - next step: introduce a shared `EffectiveLootPlan` path so craft/runtime/completion stop rebuilding the same loot-plan object manually
+
+
+## Progress update after `38236f55` and `7bd60c8d`
+- Craft no longer builds a fake `EffectiveLine` just to render output views.
+- `grantIds` and `EffectiveLootPlan` are now shared more directly across craft completion, craft runtime view, and effective line reading.
+- Output rendering still kept a local bridge-only grouping step for bonus lines.
+
+## Progress update after current pass
+- `readRuntimeLineOutputViews` now takes `effectBonusSummary` instead of raw bonus entries.
+- Bonus line grouping (`lines`, `universalLines`, `byItemId`) now lives in `effects/readEffectiveLineBonusEntries.ts` as shared domain-facing summary logic.
+- `readRuntimeLineViewFromDefinition` now reads the summary once and reuses it for both line-level bonus lines and output-level bonus lines.
+- Remaining task inside this thread: keep shrinking `readRuntimeLineOutputViews.ts` by pushing more canonical output facts below the bridge boundary where it clearly pays off.

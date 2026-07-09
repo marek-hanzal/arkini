@@ -6,7 +6,7 @@ import { readEffectiveLine } from "~/effects/readEffectiveLine";
 import { readEffectLineLocked } from "~/producer/readEffectLineLocked";
 import { readLineDurationMs } from "~/producer/readLineDurationMs";
 import { readLineKind } from "~/producer/readLineKind";
-import { readEffectiveLineBonusEntries } from "~/effects/readEffectiveLineBonusEntries";
+import { readEffectiveLineBonusSummary } from "~/effects/readEffectiveLineBonusEntries";
 import { readRuntimeLineEffectBenefitViewLines } from "~/play/game-engine-bridge/readRuntimeLineEffectBenefitViewLines";
 import { readRuntimeLineEffectRequirementViews } from "~/play/game-engine-bridge/readRuntimeLineEffectRequirementViews";
 import { readRuntimeLineInputViewState } from "~/play/game-engine-bridge/readRuntimeLineInputViewState";
@@ -76,11 +76,10 @@ export const readRuntimeLineViewFromDefinition = ({
 		return undefined;
 	}
 
-	const effectBonusEntries = readEffectiveLineBonusEntries({
+	const effectBonusSummary = readEffectiveLineBonusSummary({
 		baseDurationMs,
 		effectiveLine,
 	});
-	const effectBonusLines = effectBonusEntries.map((entry) => entry.label);
 	const effectRequirements = readRuntimeLineEffectRequirementViews(effectiveLine);
 
 	return {
@@ -105,7 +104,7 @@ export const readRuntimeLineViewFromDefinition = ({
 			config,
 			line,
 		}),
-		effectBonusLines: effectBonusLines.length ? effectBonusLines : undefined,
+		effectBonusLines: effectBonusSummary.lines.length ? [...effectBonusSummary.lines] : undefined,
 		effectRequirements: effectRequirements.length ? effectRequirements : undefined,
 		startRequirementsReady: readRuntimeLineStartRequirementsReady(effectiveLine),
 		inProgress: lineJobs.length > 0,
@@ -123,7 +122,7 @@ export const readRuntimeLineViewFromDefinition = ({
 		}),
 		name: line.name,
 		outputs: readRuntimeLineOutputViews({
-			effectBonusEntries,
+			effectBonusSummary,
 			lootPlan: effectiveLine.lootPlan,
 			save,
 		}),

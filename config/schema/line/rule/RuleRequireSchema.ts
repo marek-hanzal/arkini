@@ -15,9 +15,9 @@ export const RuleRequireSchema = z
 		/**
 		 * Identifies this rule as a requirement for starting the line.
 		 */
-		type: RuleEnumSchema.extract(["require"]).describe(
-			"Identifies this rule as a requirement for starting the product line.",
-		),
+		type: RuleEnumSchema.extract([
+			"require",
+		]).describe("Identifies this rule as a requirement for starting the product line."),
 	})
 	.strict()
 	.describe("A rule that requires a condition before a product line can start.");

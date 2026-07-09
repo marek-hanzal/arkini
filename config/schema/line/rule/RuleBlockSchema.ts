@@ -15,9 +15,9 @@ export const RuleBlockSchema = z
 		/**
 		 * Identifies this rule as a request to block the line from starting.
 		 */
-		type: RuleEnumSchema.extract(["block"]).describe(
-			"Identifies this rule as a request to block the product line from starting.",
-		),
+		type: RuleEnumSchema.extract([
+			"block",
+		]).describe("Identifies this rule as a request to block the product line from starting."),
 	})
 	.strict()
 	.describe("A rule that prevents a visible product line from starting.");

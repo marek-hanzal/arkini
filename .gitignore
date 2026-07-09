@@ -10,6 +10,7 @@ bun.lock
 bun.lockb
 dist
 game/arkini.game.arkpack
+game/schema.json
 node_modules
 npm-debug.log*
 package-lock.json

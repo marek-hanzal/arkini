@@ -9,6 +9,7 @@
 		"ignoreUnknown": true,
 		"includes": [
 			"**/*",
+			"!game/schema.json",
 			"!**/dist",
 			"!**/.output",
 			"!**/.nitro",

@@ -1,0 +1,35 @@
+import { z } from "zod";
+
+import { BaseRollSchema } from "./BaseRollSchema";
+import { DropSchema } from "./DropSchema";
+import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
+import { ChanceSchema } from "./util/ChanceSchema";
+
+/**
+ * An output roll that will provide its output according to a probability.
+ */
+export const RollChanceSchema = z
+	.object({
+		...BaseRollSchema.shape,
+		type: RollTypeEnumSchema.extract([
+			"chance",
+		]),
+		/**
+		 * Probability that this roll provides its output, from 0 to 1 inclusive.
+		 */
+		chance: ChanceSchema.describe(
+			"The probability that this roll provides its output, from 0 to 1 inclusive.",
+		),
+		/**
+		 * Items emitted when this roll succeeds.
+		 */
+		drop: z.array(DropSchema).describe("The items emitted when this roll succeeds."),
+	})
+	.strict()
+	.describe("A roll that provides its output according to a probability.");
+
+export type RollChanceSchema = typeof RollChanceSchema;
+
+export namespace RollChanceSchema {
+	export type Type = z.infer<RollChanceSchema>;
+}

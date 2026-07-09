@@ -6,7 +6,8 @@ import {
 	type GameCraftRecipeDefinition,
 } from "~/config/GameItemCapabilities";
 import { readCraftJobEffectiveTimingFx } from "~/craft/readCraftJobEffectiveTimingFx";
-import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
+import { readCraftLineStartGateState } from "~/craft/readCraftLineEffectState";
+import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import { writeCraftJobToSaveFx } from "~/craft/writeCraftJobToSaveFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveCraftJob } from "~/engine/model/GameSaveSchema";
@@ -60,16 +61,19 @@ const readCraftJobRecipeFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobReci
 const readCraftStartGateReadyFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftStartGateReadyFx")(
 	function* ({
 		config,
+		grantIds,
 		nowMs,
 		recipe,
 	}: {
 		config: GameConfig;
+		grantIds: ReadonlySet<string>;
 		nowMs: number;
 		recipe: GameCraftRecipeDefinition;
 	}) {
 		const save = yield* readGameSaveDraftCurrentFx();
-		return readCraftLineEffectState({
+		return readCraftLineStartGateState({
 			config,
+			grantIds,
 			nowMs,
 			recipe,
 			save,
@@ -83,14 +87,17 @@ const readCraftJobSyncStateFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobS
 		nowMs,
 		recipe,
 		config,
+		grantIds,
 	}: {
 		job: GameSaveCraftJob;
 		nowMs: number;
 		recipe: GameCraftRecipeDefinition;
 		config: GameConfig;
+		grantIds: ReadonlySet<string>;
 	}) {
 		const startGateReady = yield* readCraftStartGateReadyFx({
 			config,
+			grantIds,
 			nowMs,
 			recipe,
 		});
@@ -206,10 +213,12 @@ const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCr
 	function* ({
 		job,
 		config,
+		grantIds,
 		nowMs,
 	}: {
 		job: GameSaveCraftJob;
 		config: GameConfig;
+		grantIds: ReadonlySet<string>;
 		nowMs: number;
 	}) {
 		if (job.delivery) return;
@@ -225,6 +234,7 @@ const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCr
 		const syncState = yield* readCraftJobSyncStateFx({
 			job,
 			config,
+			grantIds,
 			nowMs,
 			recipe,
 		});
@@ -259,12 +269,18 @@ export const syncRealtimeCraftJobsFx = Effect.fn("syncRealtimeCraftJobsFx")(func
 	nowMs,
 	save,
 }: syncRealtimeCraftJobsFx.Props) {
+	const grantIds = readGameWorldGrantIds({
+		config,
+		nowMs,
+		save,
+	});
 	const effect = Effect.gen(function* () {
 		const jobs = yield* readSortedCraftJobsFx();
 		for (const job of jobs) {
 			yield* syncRealtimeCraftJobFx({
 				job,
 				config,
+				grantIds,
 				nowMs,
 			});
 		}

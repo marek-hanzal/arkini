@@ -79,6 +79,13 @@ export const applyCraftCompletionResultFx = Effect.fn("applyCraftCompletionResul
 		itemInstanceId: target.liveJob.targetItemInstanceId,
 		save,
 	});
+	if (!targetCell) {
+		return yield* Effect.fail(
+			GameEngineError.saveInvalid(
+				`Craft job "${target.liveJob.id}" target "${target.liveJob.targetItemInstanceId}" is missing a board cell during completion.`,
+			),
+		);
+	}
 	const placementRequests = yield* readCraftDeliveryPlacementRequestsFx({
 		config,
 		nowMs,

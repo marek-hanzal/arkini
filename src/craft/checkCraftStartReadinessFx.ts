@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { checkCraftTargetIdleFx } from "~/craft/checkCraftTargetIdleFx";
 import { readCraftBoardItemFx } from "~/craft/readCraftBoardItemFx";
-import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
+import { readCraftLineStartGateState } from "~/craft/readCraftLineEffectState";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameActionCraftStartSchema } from "~/action/GameActionCraftStartSchema";
@@ -34,7 +34,7 @@ export const checkCraftStartReadinessFx = Effect.fn("checkCraftStartReadinessFx"
 		targetItemInstanceId: action.targetItemInstanceId,
 	});
 
-	const effectState = readCraftLineEffectState({
+	const effectState = readCraftLineStartGateState({
 		config,
 		nowMs,
 		recipe: target.recipe,

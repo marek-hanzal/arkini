@@ -3,7 +3,7 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameCraftRecipeDefinition } from "~/config/GameItemCapabilities";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave, GameSaveBoardItem } from "~/engine/model/GameSaveSchema";
-import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
+import { readCraftLineStartGateState } from "~/craft/readCraftLineEffectState";
 import { readItemTargetLimits } from "~/limit/readItemTargetLimits";
 import { readCraftOutputItemIds } from "~/craft/readCraftRecipeOutput";
 import { readTargetLimitBlocked } from "~/limit/readTargetLimitBlocked";
@@ -28,7 +28,7 @@ export const checkCraftStartRuntimeConstraintsFx = Effect.fn("checkCraftStartRun
 		targetItem,
 		targetItemInstanceId,
 	}: checkCraftStartRuntimeConstraintsFx.Props) {
-		const effectState = readCraftLineEffectState({
+		const effectState = readCraftLineStartGateState({
 			config,
 			nowMs,
 			recipe,

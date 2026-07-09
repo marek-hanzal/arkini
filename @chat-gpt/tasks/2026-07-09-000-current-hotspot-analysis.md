@@ -79,3 +79,5 @@ Desired direction:
 - Follow-up after `readCraftEffectiveLootPlan`: craft runtime view and craft completion now share one canonical loot-plan reader, so the remaining craft hotspot is less about duplicate output assembly and more about effect-state / runtime-view orchestration.
 
 - craft runtime view hotspot was partially reduced by collapsing `RuntimeCraftViewScope` and moving the craft view builder toward a direct top-level flow with smaller local helpers; reevaluate craft cluster before opening a new broad refactor front
+
+- Follow-up after craft gate split: craft runtime/start/sync paths now avoid building full effect requirement labels when they only need start-gate readiness, so the remaining craft hotspot is increasingly concentrated in display/state projection rather than duplicated gate evaluation.

@@ -54,3 +54,6 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 - `applyCraftCompletionResultFx.ts` now reuses the already-read `targetCell` instead of reading the board cell twice for the same craft completion
 
 - simplified `readRuntimeCraftViewFromGameSave.ts` so craft runtime view now computes its local state directly instead of routing through a `RuntimeCraftViewScope` bag and nested scope-driven helpers; delivered inputs, running job, grant ids, phase, and progress are now resolved once in the top-level flow
+
+- introduced `readCraftLineStartGateState(...)` as a lightweight craft gate reader, so craft start/readiness/realtime sync paths no longer build full requirement labels and requirement arrays when they only need `startGateReady` / blockers
+- `syncRealtimeCraftJobsFx.ts`, `checkCraftStartReadinessFx.ts`, and `checkCraftStartRuntimeConstraintsFx.ts` now reuse the lighter craft gate path instead of the full view-facing effect state

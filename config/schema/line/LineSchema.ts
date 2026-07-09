@@ -1,8 +1,8 @@
 import { z } from "zod";
-
 import { InputSchema } from "../input/InputSchema";
 import { OutputSchema } from "../output/OutputSchema";
 import { TimeSchema } from "../util/TimeSchema";
+import { RuleSchema } from "./rule/RuleSchema";
 
 /**
  * A single product line with its accepted inputs and produced output.
@@ -12,6 +12,15 @@ import { TimeSchema } from "../util/TimeSchema";
  */
 export const LineSchema = z
 	.object({
+		/**
+		 * Whether this product line is visible before its rules are evaluated.
+		 *
+		 * A line hidden by default can be revealed by an applicable `show` rule.
+		 */
+		show: z
+			.boolean()
+			.default(true)
+			.describe("Whether this product line is visible before its rules are evaluated."),
 		/**
 		 * Runtime of this product line in milliseconds.
 		 *
@@ -35,6 +44,15 @@ export const LineSchema = z
 		 * Result produced when this product line completes.
 		 */
 		output: OutputSchema.describe("The result produced when this product line completes."),
+		/**
+		 * Rules that can change this product line's visibility or behavior.
+		 *
+		 * Rules are evaluated after the line's `show` default. An applicable `show`
+		 * rule can reveal a line whose default visibility is `false`.
+		 */
+		rules: z
+			.array(RuleSchema)
+			.describe("Rules that can change this product line's visibility or behavior."),
 	})
 	.strict()
 	.describe("A single product line with its accepted inputs and produced output.");

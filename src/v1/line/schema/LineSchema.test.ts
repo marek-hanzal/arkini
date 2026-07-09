@@ -22,7 +22,7 @@ describe("LineSchema", () => {
 				id: "output:wood",
 				title: "Wood",
 				description: "Freshly gathered wood.",
-				roll: [
+				set: [
 					{
 						roll: [
 							{

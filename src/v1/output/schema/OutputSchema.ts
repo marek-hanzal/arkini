@@ -12,7 +12,7 @@ export const OutputSchema = z
 		 * For example, it can grant guaranteed wood when a tree is nearby or reduce
 		 * a farm's efficiency when pollution is nearby.
 		 */
-		roll: z
+		set: z
 			.tuple(
 				[
 					RollSetSchema,

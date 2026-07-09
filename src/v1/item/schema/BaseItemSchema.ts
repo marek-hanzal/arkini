@@ -5,6 +5,7 @@ import { DescriptionSchema } from "~/v1/common/schema/DescriptionSchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/v1/common/schema/TitleSchema";
+import { MergeSchema } from "~/v1/merge/schema/MergeSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -37,6 +38,12 @@ export const BaseItemSchema = z
 		 */
 		maxCount: PositiveIntegerSchema.optional().describe(
 			"The optional maximum number of this item allowed across the game state.",
+		),
+		/**
+		 * Optional directional merge initiated when this item is dropped onto another item.
+		 */
+		merge: MergeSchema.optional().describe(
+			"The optional directional merge initiated when this item is dropped onto another item.",
 		),
 	})
 	.strict()

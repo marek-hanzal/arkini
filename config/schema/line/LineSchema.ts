@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { InputSchema } from "../input/InputSchema";
 import { OutputSchema } from "../output/OutputSchema";
+import { TimeSchema } from "../util/TimeSchema";
 
 /**
  * A single product line with its accepted inputs and produced output.
@@ -11,6 +12,14 @@ import { OutputSchema } from "../output/OutputSchema";
  */
 export const LineSchema = z
 	.object({
+		/**
+		 * Runtime of this product line in milliseconds.
+		 *
+		 * Zero means that the line completes immediately.
+		 */
+		runtimeMs: TimeSchema.describe(
+			"The runtime of this product line in milliseconds; zero completes immediately.",
+		),
 		/**
 		 * One or more items accepted by this product line.
 		 */

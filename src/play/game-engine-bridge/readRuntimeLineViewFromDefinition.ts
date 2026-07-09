@@ -124,7 +124,7 @@ export const readRuntimeLineViewFromDefinition = ({
 		name: line.name,
 		outputs: readRuntimeLineOutputViews({
 			effectBonusEntries,
-			effectiveLine,
+			lootPlan: effectiveLine.lootPlan,
 			save,
 		}),
 		lineId,

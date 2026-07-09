@@ -9,6 +9,7 @@ import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 export namespace readCraftLineEffectState {
 	export interface Props {
 		config: GameConfig;
+		grantIds?: ReadonlySet<string>;
 		nowMs?: number;
 		recipe: GameCraftRecipeDefinition;
 		save: GameSave;
@@ -171,15 +172,18 @@ const readMissingGrantRequirementLabels = ({
 
 export const readCraftLineEffectState = ({
 	config,
+	grantIds: providedGrantIds,
 	nowMs,
 	recipe,
 	save,
 }: readCraftLineEffectState.Props) => {
-	const grantIds = readGameWorldGrantIds({
-		config,
-		nowMs,
-		save,
-	});
+	const grantIds =
+		providedGrantIds ??
+		readGameWorldGrantIds({
+			config,
+			nowMs,
+			save,
+		});
 	let startRequirementsReady = true;
 	let blocked = false;
 	const blockReasons: string[] = [];

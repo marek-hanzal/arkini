@@ -29,3 +29,4 @@ Introduce or converge on one canonical post-effect output/bonus shape that downs
 - removed `readRuntimeEffectOperationSummary.ts` bridge helper layer
 - line view and line output readers now consume the shared effects-level bonus shape directly
 - remaining work: inspect craft effect state vs line/output effect summary for any further shared selector opportunities
+- reduced craft output flow so it passes shared `grantIds` once and feeds `readRuntimeLineOutputViews` directly from `lootPlan`, removing the fake craft-only `EffectiveLine` wrapper

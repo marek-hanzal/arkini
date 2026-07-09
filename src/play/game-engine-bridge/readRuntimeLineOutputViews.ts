@@ -4,7 +4,8 @@ import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveDropEffectOutcome, EffectiveLine } from "~/effects/EffectiveLine";
 import type { EffectiveLineBonusEntry } from "~/effects/readEffectiveLineBonusEntries";
 
-type LineOutputEntry = EffectiveLine["lootPlan"]["visibleOutput"][number];
+type EffectiveLootPlan = EffectiveLine["lootPlan"];
+type LineOutputEntry = EffectiveLootPlan["visibleOutput"][number];
 type LineOutputView = NonNullable<LineView["outputs"]>[number];
 type LineOutputQuantity = NonNullable<LineOutputView["quantity"]>;
 
@@ -15,7 +16,7 @@ type IndexedLineOutputView = LineOutputView & {
 export namespace readRuntimeLineOutputViews {
 	export interface Props {
 		effectBonusEntries?: readonly EffectiveLineBonusEntry[];
-		effectiveLine: EffectiveLine;
+		lootPlan: EffectiveLootPlan;
 		save: GameSave;
 	}
 }
@@ -195,7 +196,7 @@ const collectOutputViews = ({
 	universalBonusLines,
 }: {
 	bonusLinesByItemId: ReadonlyMap<string, readonly string[]>;
-	output: EffectiveLine["lootPlan"]["visibleOutput"];
+	output: EffectiveLootPlan["visibleOutput"];
 	rollSetLabel?: string;
 	save: GameSave;
 	sourceIndexOffset: number;
@@ -283,7 +284,7 @@ const pushOutputSetViews = ({
 	universalBonusLines,
 }: {
 	bonusLinesByItemId: ReadonlyMap<string, readonly string[]>;
-	outputSet: NonNullable<EffectiveLine["lootPlan"]["outputSets"]>[number];
+	outputSet: NonNullable<EffectiveLootPlan["outputSets"]>[number];
 	outputSetIndex: number;
 	rollSetLabel?: string;
 	save: GameSave;
@@ -336,18 +337,18 @@ const pushOutputSetViews = ({
 
 export const readRuntimeLineOutputViews = ({
 	effectBonusEntries = [],
-	effectiveLine,
+	lootPlan,
 	save,
 }: readRuntimeLineOutputViews.Props): LineOutputView[] => {
 	let sourceIndexOffset = 0;
 	const outputs: IndexedLineOutputView[] = [];
 	const bonusLinesByItemId = readBonusLinesByItemId(effectBonusEntries);
 	const universalBonusLines = readUniversalBonusLines(effectBonusEntries);
-	const outputSets = effectiveLine.lootPlan.outputSets ?? [
+	const outputSets = lootPlan.outputSets ?? [
 		{
-			baseOutput: effectiveLine.lootPlan.baseOutput,
-			chanceItems: effectiveLine.lootPlan.chanceItems,
-			visibleOutput: effectiveLine.lootPlan.visibleOutput,
+			baseOutput: lootPlan.baseOutput,
+			chanceItems: lootPlan.chanceItems,
+			visibleOutput: lootPlan.visibleOutput,
 			weight: 1,
 		},
 	];

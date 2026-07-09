@@ -33,6 +33,7 @@ type CraftProgressPhase = CraftProgressView["phase"];
 type RuntimeCraftRecipe = NonNullable<ReturnType<typeof readCraftRecipeDefinition>>;
 
 type RuntimeCraftViewScope = readRuntimeCraftViewFromGameSave.Props & {
+	grantIds: ReadonlySet<string>;
 	recipe: RuntimeCraftRecipe;
 	runningJob: GameSaveCraftJob | undefined;
 };
@@ -137,6 +138,7 @@ const readCraftTargetLimitViews = (scope: RuntimeCraftViewScope) =>
 const readCraftEffectRequirements = (scope: RuntimeCraftViewScope) => {
 	const effectState = readCraftLineEffectState({
 		config: scope.config,
+		grantIds: scope.grantIds,
 		nowMs: scope.nowMs,
 		recipe: scope.recipe,
 		save: scope.save,
@@ -171,11 +173,7 @@ const readCraftVisibleProgress = ({
 const readCraftOutputViews = (scope: RuntimeCraftViewScope): CraftProgressView["outputs"] => {
 	const effectiveOutput = readEffectiveOutputEntries({
 		config: scope.config,
-		grantIds: readGameWorldGrantIds({
-			config: scope.config,
-			nowMs: scope.nowMs,
-			save: scope.save,
-		}),
+		grantIds: scope.grantIds,
 		itemInstanceId: scope.boardItem.id,
 		lineId: scope.boardItem.itemId,
 		lineVisible: true,
@@ -187,19 +185,11 @@ const readCraftOutputViews = (scope: RuntimeCraftViewScope): CraftProgressView["
 		}),
 	});
 	const outputs = readRuntimeLineOutputViews({
-		effectiveLine: {
-			appliedEffects: effectiveOutput.appliedEffects,
-			blocked: false,
-			blockReasons: [],
-			durationMs: 0,
-			lootPlan: {
-				baseOutput: effectiveOutput.rollableOutput,
-				chanceItems: effectiveOutput.chanceItems,
-				outputSets: effectiveOutput.outputSets,
-				visibleOutput: effectiveOutput.visibleOutput,
-			},
-			requirements: [],
-			visible: true,
+		lootPlan: {
+			baseOutput: effectiveOutput.rollableOutput,
+			chanceItems: effectiveOutput.chanceItems,
+			outputSets: effectiveOutput.outputSets,
+			visibleOutput: effectiveOutput.visibleOutput,
 		},
 		save: scope.save,
 	});
@@ -266,10 +256,16 @@ export const readRuntimeCraftViewFromGameSave = ({
 		recipeId: boardItem.itemId,
 	});
 	if (!recipe) return undefined;
+	const grantIds = readGameWorldGrantIds({
+		config,
+		nowMs,
+		save,
+	});
 
 	const scopeWithoutJob = {
 		boardItem,
 		config,
+		grantIds,
 		nowMs,
 		recipe,
 		runningJob: undefined,

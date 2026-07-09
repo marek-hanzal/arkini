@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { RollSchema } from "../roll/RollSchema";
+import { RollSetSchema } from "../roll/RollSetSchema";
 import { DescriptionSchema } from "../util/DescriptionSchema";
 import { IdSchema } from "../util/IdSchema";
 import { TitleSchema } from "../util/TitleSchema";
@@ -14,7 +14,7 @@ export const OutputSchema = z
 		title: TitleSchema,
 		description: DescriptionSchema,
 		/**
-		 * One or more individual rolls and their rules that this output may provide.
+		 * One or more alternative roll sets that this output may provide.
 		 *
 		 * For example, it can grant guaranteed wood when a tree is nearby or reduce
 		 * a farm's efficiency when pollution is nearby.
@@ -22,11 +22,11 @@ export const OutputSchema = z
 		roll: z
 			.tuple(
 				[
-					RollSchema,
+					RollSetSchema,
 				],
-				RollSchema,
+				RollSetSchema,
 			)
-			.describe("One or more individual rolls provided by this output."),
+			.describe("One or more alternative roll sets provided by this output."),
 	})
 	.strict()
 	.describe("A configured output produced by a gameplay source.");

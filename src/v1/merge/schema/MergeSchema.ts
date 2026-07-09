@@ -7,17 +7,22 @@ import { ActionEnumSchema } from "./ActionEnumSchema";
 /**
  * A directional interaction initiated by dropping its owning item onto another item.
  *
- * The receiving item becomes `result`; `action` then determines whether the
- * source returns to its original position or is consumed. The receiving item
- * does not define a reverse merge implicitly.
+ * When `result` is defined, the receiving item becomes that result. When it is
+ * omitted, the receiving item is removed instead. Keeping `result` optional
+ * represents both outcomes through one directional interaction contract rather
+ * than duplicating a near-identical remove schema. `action` then determines
+ * whether the source returns to its original position or is consumed. The
+ * receiving item does not define a reverse merge implicitly.
  */
 export const MergeSchema = z
 	.object({
 		/**
-		 * ID of the item that replaces the receiving item after this merge.
+		 * Optional ID of the item that replaces the receiving item after this merge.
+		 *
+		 * When omitted, this merge removes the receiving item instead of replacing it.
 		 */
-		result: IdSchema.describe(
-			"The ID of the item that replaces the receiving item after this merge.",
+		result: IdSchema.optional().describe(
+			"The optional ID that replaces the receiving item; omit it to remove that item.",
 		),
 		/**
 		 * Action applied to the source item after it changes the receiving item.
@@ -33,7 +38,7 @@ export const MergeSchema = z
 		),
 	})
 	.strict()
-	.describe("A directional item merge that replaces the receiving item with a result.");
+	.describe("A directional item merge that transforms or removes the receiving item.");
 
 export type MergeSchema = typeof MergeSchema;
 

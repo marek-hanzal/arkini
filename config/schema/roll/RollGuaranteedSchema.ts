@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseRollSchema } from "./BaseRollSchema";
-import { DropSchema } from "./DropSchema";
+import { DropSchema } from "../output/DropSchema";
 import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
 
 /**

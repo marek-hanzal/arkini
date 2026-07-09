@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { IdSchema } from "./util/IdSchema";
+import { IdSchema } from "../util/IdSchema";
 
 /**
  * Fields shared by every item configuration.

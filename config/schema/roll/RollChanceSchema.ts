@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 import { BaseRollSchema } from "./BaseRollSchema";
-import { DropSchema } from "./DropSchema";
+import { DropSchema } from "../output/DropSchema";
 import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
-import { ChanceSchema } from "./util/ChanceSchema";
+import { ChanceSchema } from "../util/ChanceSchema";
 
 /**
  * An output roll that will provide its output according to a probability.

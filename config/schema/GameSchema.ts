@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ItemSchema } from "./ItemSchema";
+import { ItemSchema } from "./item/ItemSchema";
 import { IdSchema } from "./util/IdSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 

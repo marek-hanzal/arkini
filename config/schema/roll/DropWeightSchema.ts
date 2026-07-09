@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { DropSchema } from "./DropSchema";
-import { PositiveIntegerSchema } from "./util/PositiveIntegerSchema";
+import { DropSchema } from "../output/DropSchema";
+import { PositiveIntegerSchema } from "../util/PositiveIntegerSchema";
 
 /**
  * Items that may be selected by a weight-based output roll.

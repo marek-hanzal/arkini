@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { IdSchema } from "./util/IdSchema";
-import { QuantitySchema } from "./QuantitySchema";
+import { QuantitySchema } from "../quantity/QuantitySchema";
+import { IdSchema } from "../util/IdSchema";
 
 /**
  * A quantity of a canonical game item emitted by a successful roll.

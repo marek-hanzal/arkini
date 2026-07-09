@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseRollSchema } from "./BaseRollSchema";
-import { QuantitySchema } from "./QuantitySchema";
+import { QuantitySchema } from "../quantity/QuantitySchema";
 import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
 import { DropWeightSchema } from "./DropWeightSchema";
 

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { RollSchema } from "./RollSchema";
-import { DescriptionSchema } from "./util/DescriptionSchema";
-import { IdSchema } from "./util/IdSchema";
-import { TitleSchema } from "./util/TitleSchema";
+import { RollSchema } from "../roll/RollSchema";
+import { DescriptionSchema } from "../util/DescriptionSchema";
+import { IdSchema } from "../util/IdSchema";
+import { TitleSchema } from "../util/TitleSchema";
 
 /**
  * A named result produced by a gameplay source such as a production line or stash.

@@ -1,11 +1,27 @@
+import { FileSystem, Path } from "@effect/platform";
+import { NodeContext } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { generateGameJsonSchemaFx } from "./writeGameJsonSchemaFx";
+import { writeGameJsonSchemaFx } from "./writeGameJsonSchemaFx";
 
-describe("generateGameJsonSchemaFx", () => {
-	it("generates a JSON Schema for the root game configuration contract", () => {
-		const schema = Effect.runSync(generateGameJsonSchemaFx);
+describe("writeGameJsonSchemaFx", () => {
+	it("writes the JSON Schema for the root game configuration contract", async () => {
+		const jsonSchema = await Effect.runPromise(
+			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
+				const path = yield* Path.Path;
+				const directory = yield* fileSystem.makeTempDirectoryScoped();
+				const output = path.join(directory, "schema.json");
+
+				yield* writeGameJsonSchemaFx({
+					output,
+				});
+
+				return yield* fileSystem.readFileString(output);
+			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+		);
+		const schema = JSON.parse(jsonSchema);
 
 		expect(schema).toMatchObject({
 			type: "object",
@@ -21,6 +37,6 @@ describe("generateGameJsonSchemaFx", () => {
 				},
 			},
 		});
-		expect(JSON.stringify(schema).length).toBeLessThan(1_000_000);
+		expect(jsonSchema.length).toBeLessThan(1_000_000);
 	});
 });

@@ -8,7 +8,9 @@ import { SchemaCommand } from "~/v1/schema/cli/SchemaCommand";
 export const ArkiniCommand = Command.make("arkini")
 	.pipe(
 		Command.withSubcommands([
-			SchemaCommand,
+			SchemaCommand({
+				output: "game/schema.json",
+			}),
 		]),
 	)
 	.pipe(Command.withDescription("Arkini development commands."));

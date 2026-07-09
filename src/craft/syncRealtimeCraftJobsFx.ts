@@ -58,76 +58,34 @@ const readCraftJobRecipeFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobReci
 	);
 });
 
-const readCraftStartGateReadyFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftStartGateReadyFx")(
-	function* ({
-		config,
-		grantIds,
-		nowMs,
-		recipe,
-	}: {
-		config: GameConfig;
-		grantIds: ReadonlySet<string>;
-		nowMs: number;
-		recipe: GameCraftRecipeDefinition;
-	}) {
-		const save = yield* readGameSaveDraftCurrentFx();
-		return readCraftLineStartGateState({
-			config,
-			grantIds,
-			nowMs,
-			recipe,
-			save,
-		}).startGateReady;
-	},
-);
+const readCraftJobSyncState = ({
+	job,
+	nowMs,
+	startGateReady,
+}: {
+	job: GameSaveCraftJob;
+	nowMs: number;
+	startGateReady: boolean;
+}) => {
+	if (isGamePausableJobPaused(job)) {
+		return startGateReady ? "resumable" : "still_paused";
+	}
 
-const readCraftJobSyncStateFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftJobSyncStateFx")(
-	function* ({
-		job,
-		nowMs,
-		recipe,
-		config,
-		grantIds,
-	}: {
-		job: GameSaveCraftJob;
-		nowMs: number;
-		recipe: GameCraftRecipeDefinition;
-		config: GameConfig;
-		grantIds: ReadonlySet<string>;
-	}) {
-		const startGateReady = yield* readCraftStartGateReadyFx({
-			config,
-			grantIds,
-			nowMs,
-			recipe,
-		});
-
-		if (isGamePausableJobPaused(job)) {
-			return startGateReady ? "resumable" : "still_paused";
-		}
-
-		return !startGateReady && job.startAtMs <= nowMs ? "blocked" : "ready";
-	},
-);
-
-const readCraftTargetExistsFx = Effect.fn("syncRealtimeCraftJobsFx.readCraftTargetExistsFx")(
-	function* ({ job }: { job: GameSaveCraftJob }) {
-		const save = yield* readGameSaveDraftCurrentFx();
-		return Boolean(save.board.items[job.targetItemInstanceId]);
-	},
-);
+	return !startGateReady && job.startAtMs <= nowMs ? "blocked" : "ready";
+};
 
 const resumePausedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.resumePausedCraftJobFx")(
 	function* ({
 		job,
 		nowMs,
 		recipe,
+		save,
 	}: {
 		job: GameSaveCraftJob;
 		nowMs: number;
 		recipe: GameCraftRecipeDefinition;
+		save: GameSave;
 	}) {
-		const save = yield* readGameSaveDraftCurrentFx();
 		const remainingMs = job.remainingMs ?? 0;
 		const effectiveTiming = yield* readCraftJobEffectiveTimingFx({
 			recipe,
@@ -183,8 +141,15 @@ const pauseBlockedCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.pauseBlockedCr
 );
 
 const retimeReadyCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.retimeReadyCraftJobFx")(
-	function* ({ job, recipe }: { job: GameSaveCraftJob; recipe: GameCraftRecipeDefinition }) {
-		const save = yield* readGameSaveDraftCurrentFx();
+	function* ({
+		job,
+		recipe,
+		save,
+	}: {
+		job: GameSaveCraftJob;
+		recipe: GameCraftRecipeDefinition;
+		save: GameSave;
+	}) {
 		const timing = yield* readCraftJobEffectiveTimingFx({
 			recipe,
 			save,
@@ -227,16 +192,22 @@ const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCr
 			config,
 			job,
 		});
-		if (!(yield* readCraftTargetExistsFx({ job }))) {
+		const save = yield* readGameSaveDraftCurrentFx();
+		if (!save.board.items[job.targetItemInstanceId]) {
 			return;
 		}
 
-		const syncState = yield* readCraftJobSyncStateFx({
-			job,
+		const startGateReady = readCraftLineStartGateState({
 			config,
 			grantIds,
 			nowMs,
 			recipe,
+			save,
+		}).startGateReady;
+		const syncState = readCraftJobSyncState({
+			job,
+			nowMs,
+			startGateReady,
 		});
 
 		return yield* match(syncState)
@@ -245,6 +216,7 @@ const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCr
 					job,
 					nowMs,
 					recipe,
+					save,
 				}),
 			)
 			.with("blocked", () =>
@@ -257,6 +229,7 @@ const syncRealtimeCraftJobFx = Effect.fn("syncRealtimeCraftJobsFx.syncRealtimeCr
 				retimeReadyCraftJobFx({
 					job,
 					recipe,
+					save,
 				}),
 			)
 			.with("still_paused", () => Effect.void)

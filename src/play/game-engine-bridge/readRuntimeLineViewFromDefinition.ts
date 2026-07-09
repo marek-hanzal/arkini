@@ -11,9 +11,7 @@ import { readRuntimeLineEffectBenefitViewLines } from "~/play/game-engine-bridge
 import { readRuntimeLineEffectRequirementViews } from "~/play/game-engine-bridge/readRuntimeLineEffectRequirementViews";
 import { readRuntimeLineInputViewState } from "~/play/game-engine-bridge/readRuntimeLineInputViewState";
 import { readRuntimeLineIsSelectedDefault } from "~/play/game-engine-bridge/readRuntimeLineIsSelectedDefault";
-import { readRuntimeLineJobs } from "~/play/game-engine-bridge/readRuntimeLineJobs";
 import { readRuntimeLineOutputViews } from "~/play/game-engine-bridge/readRuntimeLineOutputViews";
-import { readRuntimeLineStartRequirementsReady } from "~/play/game-engine-bridge/readRuntimeLineStartRequirementsReady";
 import { readRuntimeLineTargetLimitViewState } from "~/play/game-engine-bridge/readRuntimeLineTargetLimitViewState";
 import { readRuntimeLineTimingViewState } from "~/play/game-engine-bridge/readRuntimeLineTimingViewState";
 import type { RuntimeLineDefaultSelection } from "~/play/game-engine-bridge/readRuntimeLineDefaultSelection";
@@ -32,6 +30,27 @@ export namespace readRuntimeLineViewFromDefinition {
 		targetItemInstanceId: string;
 	}
 }
+
+
+const readRuntimeLineJobs = ({
+	lineId,
+	queueState,
+}: Pick<readRuntimeLineViewFromDefinition.Props, "lineId" | "queueState">) =>
+	queueState.jobs
+		.filter((job) => job.lineId === lineId)
+		.sort((left, right) => left.startAtMs - right.startAtMs || left.id.localeCompare(right.id));
+
+const readRuntimeLineStartRequirementsReady = (
+	effectiveLine: ReturnType<typeof readEffectiveLine>,
+) => {
+	const hasStartRequirements = effectiveLine.requirements.some(
+		(requirement) => requirement.phase === "start",
+	);
+
+	if (effectiveLine.startRequirementsReady === false) return false;
+	if (hasStartRequirements) return true;
+	return undefined;
+};
 
 export const readRuntimeLineViewFromDefinition = ({
 	config,

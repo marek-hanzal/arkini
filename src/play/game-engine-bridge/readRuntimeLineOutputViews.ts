@@ -12,10 +12,6 @@ type EffectiveLootPlan = EffectiveLine["lootPlan"];
 type LineOutputView = NonNullable<LineView["outputs"]>[number];
 type LineOutputQuantity = NonNullable<LineOutputView["quantity"]>;
 
-type IndexedLineOutputView = LineOutputView & {
-  readonly sourceIndex: number;
-};
-
 export namespace readRuntimeLineOutputViews {
   export interface Props {
     effectBonusSummary?: EffectiveLineBonusSummary;
@@ -23,8 +19,6 @@ export namespace readRuntimeLineOutputViews {
     save: GameSave;
   }
 }
-
-const maxUnsortedOutputSort = Number.MAX_SAFE_INTEGER;
 
 const readOutputQuantity = (
   quantity: LineOutputQuantity | undefined,
@@ -72,34 +66,6 @@ const readOutputBonusLines = ({
   return lines.length > 0 ? lines : undefined;
 };
 
-const createOutputView = ({
-  bonusLines,
-  enabled,
-  effects,
-  itemId,
-  kind,
-  ownedQuantity,
-  probability,
-  quantity,
-  rollLabel,
-  rollSetLabel,
-  sort,
-  sourceIndex,
-}: IndexedLineOutputView): IndexedLineOutputView => ({
-  bonusLines,
-  enabled,
-  effects,
-  itemId,
-  kind,
-  ownedQuantity,
-  probability,
-  quantity,
-  rollLabel,
-  rollSetLabel,
-  sort,
-  sourceIndex,
-});
-
 const readRollLabel = (rolls: LineOutputQuantity) => {
   if (typeof rolls !== "number")
     return `weighted · ${rolls.min}-${rolls.max} rolls`;
@@ -122,23 +88,13 @@ const readRollSetLabel = ({
 >) =>
   `Set ${outputSetIndex + 1} · ${formatRollSetPercent(outputSetWeight / totalOutputSetWeight)}`;
 
-const compareOutputViews = (
-  left: IndexedLineOutputView,
-  right: IndexedLineOutputView,
-) =>
-  (left.sort ?? maxUnsortedOutputSort) -
-    (right.sort ?? maxUnsortedOutputSort) ||
-  left.itemId.localeCompare(right.itemId) ||
-  (left.kind ?? "").localeCompare(right.kind ?? "") ||
-  left.sourceIndex - right.sourceIndex;
+const isZeroChanceEffectCarrier = (entry: EffectiveLootPlanViewEntry) =>
+  entry.kind === "chance" &&
+  entry.enabled !== false &&
+  entry.probability === 0 &&
+  (entry.effects ?? []).some((effect) => effect.impact === "chance");
 
-const isZeroChanceEffectCarrier = (output: LineOutputView) =>
-  output.kind === "chance" &&
-  output.enabled !== false &&
-  output.probability === 0 &&
-  (output.effects ?? []).some((effect) => effect.impact === "chance");
-
-const createIndexedOutputView = ({
+const createOutputView = ({
   effectBonusSummary,
   entry,
   hasMultipleOutputSets,
@@ -148,34 +104,31 @@ const createIndexedOutputView = ({
   entry: EffectiveLootPlanViewEntry;
   hasMultipleOutputSets: boolean;
   save: GameSave;
-}): IndexedLineOutputView =>
-  createOutputView({
-    bonusLines: readOutputBonusLines({
-      effectBonusSummary,
-      itemId: entry.itemId,
-    }),
-    enabled: entry.enabled,
-    effects: readDropEffects(entry.effects),
+}): LineOutputView => ({
+  bonusLines: readOutputBonusLines({
+    effectBonusSummary,
     itemId: entry.itemId,
-    kind: entry.kind,
-    ownedQuantity: readOwnedQuantity({
-      itemId: entry.itemId,
-      save,
-    }),
-    probability: entry.probability,
-    quantity: readOutputQuantity(entry.quantity),
-    rollLabel:
-      entry.kind === "weighted" ? readRollLabel(entry.rolls ?? 1) : undefined,
-    rollSetLabel: hasMultipleOutputSets
-      ? readRollSetLabel({
-          outputSetIndex: entry.outputSetIndex,
-          outputSetWeight: entry.outputSetWeight,
-          totalOutputSetWeight: entry.totalOutputSetWeight,
-        })
-      : undefined,
-    sort: entry.sort,
-    sourceIndex: entry.sourceIndex,
-  });
+  }),
+  enabled: entry.enabled,
+  effects: readDropEffects(entry.effects),
+  itemId: entry.itemId,
+  kind: entry.kind,
+  ownedQuantity: readOwnedQuantity({
+    itemId: entry.itemId,
+    save,
+  }),
+  probability: entry.probability,
+  quantity: readOutputQuantity(entry.quantity),
+  rollLabel: entry.kind === "weighted" ? readRollLabel(entry.rolls ?? 1) : undefined,
+  rollSetLabel: hasMultipleOutputSets
+    ? readRollSetLabel({
+        outputSetIndex: entry.outputSetIndex,
+        outputSetWeight: entry.outputSetWeight,
+        totalOutputSetWeight: entry.totalOutputSetWeight,
+      })
+    : undefined,
+  sort: entry.sort,
+});
 
 export const readRuntimeLineOutputViews = ({
   effectBonusSummary,
@@ -187,15 +140,13 @@ export const readRuntimeLineOutputViews = ({
     new Set(viewEntries.map((entry) => entry.outputSetIndex)).size > 1;
 
   return viewEntries
+    .filter((entry) => !isZeroChanceEffectCarrier(entry))
     .map((entry) =>
-      createIndexedOutputView({
+      createOutputView({
         effectBonusSummary,
         entry,
         hasMultipleOutputSets,
         save,
       }),
-    )
-    .sort(compareOutputViews)
-    .map(({ sourceIndex: _sourceIndex, ...output }) => output)
-    .filter((output) => !isZeroChanceEffectCarrier(output));
+    );
 };

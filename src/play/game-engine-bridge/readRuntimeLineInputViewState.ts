@@ -20,44 +20,46 @@ export namespace readRuntimeLineInputViewState {
 	}
 }
 
+type RuntimeLineInputFacts = ReturnType<typeof readRuntimeActivationInputView> & {
+	requiredQuantity: number;
+};
+
 export const readRuntimeLineInputViewState = ({
 	line,
 	lineId,
 	save,
 	targetItemInstanceId,
 }: readRuntimeLineInputViewState.Props): RuntimeLineInputViewState => {
-	const inputs = (line.inputs ?? []).map((input) =>
-		readRuntimeActivationInputView({
-			available: readRuntimeActivationInputAvailableQuantityFromGameSave({
-				itemId: input.itemId,
-				save,
-				targetItemInstanceId,
-			}),
+	const inputs: RuntimeLineInputFacts[] = (line.inputs ?? []).map((input) => {
+		const available = readRuntimeActivationInputAvailableQuantityFromGameSave({
+			itemId: input.itemId,
+			save,
+			targetItemInstanceId,
+		});
+		const stored = readRuntimeStoredLineInputQuantityFromGameSave({
+			itemId: input.itemId,
+			lineId,
+			save,
+			targetItemInstanceId,
+		});
+		const inputView = readRuntimeActivationInputView({
+			available,
 			input,
-			stored: readRuntimeStoredLineInputQuantityFromGameSave({
-				itemId: input.itemId,
-				lineId,
-				save,
-				targetItemInstanceId,
-			}),
-		}),
-	);
+			stored,
+		});
+
+		return {
+			...inputView,
+			requiredQuantity: readActivationInputRequiredQuantity(inputView),
+		};
+	});
 
 	return {
 		inputItemIds: inputs.map((input) => input.itemId),
 		inputs,
-		inputsReady: inputs.every(
-			(input) => input.stored >= readActivationInputRequiredQuantity(input),
-		),
+		inputsReady: inputs.every((input) => input.stored >= input.requiredQuantity),
 		inputsAvailable: inputs.every(
-			(input) =>
-				input.stored +
-					readRuntimeActivationInputAvailableQuantityFromGameSave({
-						itemId: input.itemId,
-						save,
-						targetItemInstanceId,
-					}) >=
-				readActivationInputRequiredQuantity(input),
+			(input) => input.stored + (input.available ?? 0) >= input.requiredQuantity,
 		),
 	};
 };

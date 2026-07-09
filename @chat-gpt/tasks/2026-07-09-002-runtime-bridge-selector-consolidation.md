@@ -32,3 +32,8 @@ Make bridge projection thinner by consuming more canonical effect/output data di
 - moved bonus summary generation from bridge into `effects/readEffectiveLineBonusEntries.ts`
 - removed `readRuntimeEffectOperationSummary.ts`
 - next step: reduce bridge-local loot/output reconstruction around `readRuntimeLineOutputViews.ts`
+
+- `readRuntimeLootDropViewsFromEffectiveLine.ts` now consumes canonical `readEffectiveLootPlanViewEntries(...)` instead of rebuilding visible/chance/weighted traversal inside the bridge.
+- `readRuntimeLineOutputViews.ts` no longer re-sorts output entries after canonical view-entry ordering and no longer carries `sourceIndex` through an extra bridge-local wrapper type.
+- removed single-use bridge wrappers `readRuntimeLineJobs.ts` and `readRuntimeLineStartRequirementsReady.ts` by inlining them into `readRuntimeLineViewFromDefinition.ts`.
+- `readRuntimeLineInputViewState.ts` now computes per-input available/stored/required facts once instead of re-reading available quantities during readiness checks.

@@ -6,7 +6,7 @@ import type { BoardView } from "~/board/view/BoardViewSchema";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import { isItemStorageAllowed } from "~/config/isItemStorageAllowed";
 import type { InventoryView } from "~/inventory/view/InventoryViewSchema";
-import { resolveDropIntent } from "~/play/interaction/resolveDropIntent";
+import { resolveItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 import type { DragSource } from "~/play/drag/DragSource";
 import type { DropTarget } from "~/play/drag/DropTarget";
 import type { TileEngine } from "~/tile-engine/TileEngine.types";
@@ -116,17 +116,17 @@ export const resolveBoardDropFeedback = ({
 				};
 	}
 
-	const intent = resolveDropIntent({
+	const plan = resolveItemToBoardItemInteractionPlan({
 		config,
 		sourceItemId,
 		targetItem,
 	});
 
 	if (
-		intent.type === "craft-input" ||
-		intent.type === "producer-input" ||
-		intent.type === "stash-input" ||
-		intent.type === "tile-remove"
+		plan.type === "craft-input" ||
+		plan.type === "producer-input" ||
+		plan.type === "stash-input" ||
+		plan.type === "tile-remove"
 	) {
 		return {
 			effect: "merge",
@@ -134,13 +134,13 @@ export const resolveBoardDropFeedback = ({
 		};
 	}
 
-	if (intent.type === "merge") {
+	if (plan.type === "merge" || plan.type === "stack") {
 		return {
 			effect: "merge",
 		};
 	}
 
-	if (intent.type === "swap") {
+	if (plan.type === "swap") {
 		return {
 			effect: "blocked",
 		};

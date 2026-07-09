@@ -1,4 +1,6 @@
 import { match, P } from "ts-pattern";
+import type { GameAction } from "~/action/GameActionSchema";
+import type { GameActionItemRef } from "~/action/GameActionItemRefSchema";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { isBoardViewItemRuntimeBusy } from "~/board/view/isBoardViewItemRuntimeBusy";
 import { isBoardViewItemRuntimeStatePreserved } from "~/board/view/isBoardViewItemRuntimeStatePreserved";
@@ -39,6 +41,17 @@ const readTargetCanBeReplacedByMerge = ({ targetItem }: { targetItem: BoardViewI
 const readSourceQuantity = ({
 	sourceQuantity,
 }: Pick<resolveItemToBoardItemInteractionPlan.Props, "sourceQuantity">) => sourceQuantity ?? 1;
+
+const withSourceQuantity = ({
+	quantity,
+	sourceRef,
+}: {
+	quantity: number;
+	sourceRef: GameActionItemRef;
+}): GameActionItemRef => ({
+	...sourceRef,
+	quantity,
+});
 
 const readMergeInteractionFacts = ({
 	config,
@@ -224,17 +237,17 @@ export const resolveItemToBoardItemInteractionPlan = (
 	match(readItemToBoardItemInteractionFacts(props))
 		.with(
 			{
+				canMerge: true,
+			},
+			createMergeInteractionPlan,
+		)
+		.with(
+			{
 				canStack: true,
 			},
 			() => ({
 				type: "stack" as const,
 			}),
-		)
-		.with(
-			{
-				canMerge: true,
-			},
-			createMergeInteractionPlan,
 		)
 		.with(
 			{
@@ -284,3 +297,103 @@ export const resolveItemToBoardItemInteractionPlan = (
 		.otherwise(() => ({
 			type: "swap" as const,
 		}));
+
+export const readItemInteractionSourceRef = ({
+	plan,
+	sourceRef,
+}: {
+	plan: ItemToBoardItemInteractionPlan;
+	sourceRef: GameActionItemRef;
+}): GameActionItemRef => {
+	if (!("consumedQuantity" in plan) || !plan.consumesSource) return sourceRef;
+
+	return withSourceQuantity({
+		quantity: plan.consumedQuantity,
+		sourceRef,
+	});
+};
+
+export const createGameActionFromItemToBoardItemInteractionPlan = ({
+	plan,
+	sourceRef,
+	targetItemInstanceId,
+}: {
+	plan: ItemToBoardItemInteractionPlan;
+	sourceRef: GameActionItemRef;
+	targetItemInstanceId: string;
+}): GameAction | undefined =>
+	match(plan)
+		.with(
+			{
+				type: "merge",
+			},
+			() => ({
+				sourceRef,
+				targetItemInstanceId,
+				type: "item.merge" as const,
+			}),
+		)
+		.with(
+			{
+				type: "stack",
+			},
+			() => ({
+				sourceRef,
+				targetItemInstanceId,
+				type: "item.stack" as const,
+			}),
+		)
+		.with(
+			{
+				type: "craft-input",
+			},
+			() => ({
+				inputRef: sourceRef,
+				targetItemInstanceId,
+				type: "craft.input.store" as const,
+			}),
+		)
+		.with(
+			{
+				type: "producer-input",
+			},
+			({ lineId }) => ({
+				inputRef: sourceRef,
+				itemInstanceId: targetItemInstanceId,
+				lineId,
+				type: "producer.input.store" as const,
+			}),
+		)
+		.with(
+			{
+				type: "stash-input",
+			},
+			() => ({
+				inputRefs: [sourceRef],
+				stashItemInstanceId: targetItemInstanceId,
+				type: "stash.open" as const,
+			}),
+		)
+		.with(
+			{
+				type: "tile-remove",
+			},
+			() => ({
+				targetItemInstanceId,
+				toolRef: sourceRef,
+				type: "tile.remove" as const,
+			}),
+		)
+		.with(
+			{
+				type: "reject",
+			},
+			() => undefined,
+		)
+		.with(
+			{
+				type: "swap",
+			},
+			() => undefined,
+		)
+		.exhaustive();

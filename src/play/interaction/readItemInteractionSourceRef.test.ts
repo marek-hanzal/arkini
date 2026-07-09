@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readItemInteractionSourceRef } from "~/play/interaction/readItemInteractionSourceRef";
+import { readItemInteractionSourceRef } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 describe("readItemInteractionSourceRef", () => {
 	it("pins consumed source interactions to the planned consumed quantity", () => {

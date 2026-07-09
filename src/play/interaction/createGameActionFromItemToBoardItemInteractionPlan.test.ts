@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createGameActionFromItemToBoardItemInteractionPlan } from "~/play/interaction/createGameActionFromItemToBoardItemInteractionPlan";
+import { createGameActionFromItemToBoardItemInteractionPlan } from "~/play/interaction/resolveItemToBoardItemInteractionPlan";
 
 const sourceRef = {
 	kind: "board" as const,

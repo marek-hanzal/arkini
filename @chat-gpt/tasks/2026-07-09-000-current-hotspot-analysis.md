@@ -75,3 +75,5 @@ Desired direction:
 - `resolveItemToBoardItemInteractionPlan.ts` now uses a readable compiled `ItemInteractionProfile` instead of repeatedly spelunking config state inline.
 - The hotspot still exists, but the remaining cost is now mostly true precedence logic, not repeated static capability checks.
 - `resolveBoardItemTapAction.ts` also shares the new `specialInteractionKind` classification, which reduces one more cluster of open-coded special item checks.
+
+- Follow-up after `readCraftEffectiveLootPlan`: craft runtime view and craft completion now share one canonical loot-plan reader, so the remaining craft hotspot is less about duplicate output assembly and more about effect-state / runtime-view orchestration.

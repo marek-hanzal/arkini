@@ -1,12 +1,12 @@
 import { Effect } from "effect";
+import type { BoardCell } from "~/board/BoardCellPosition";
 import { readBoardItemCellFx } from "~/board/readBoardItemCellFx";
 import { removeBoardItemFromSaveFx } from "~/board/removeBoardItemFromSaveFx";
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { CraftCompletionTarget } from "~/craft/CraftJobCompletionTypes";
 import { createCraftSpawnCompletedResult } from "~/craft/CraftJobCompletionEvents";
 import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
-import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
-import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import { readCraftEffectiveLootPlan } from "~/craft/readCraftEffectiveLootPlan";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -22,33 +22,24 @@ const readCraftDeliveryPlacementRequestsFx = Effect.fn(
 	nowMs,
 	save,
 	target,
+	targetCell,
 }: {
 	config: GameConfig;
 	nowMs: number;
 	save: GameSave;
 	target: CraftCompletionTarget;
+	targetCell: BoardCell;
 }) {
-	const targetCell = yield* readBoardItemCellFx({
-		itemInstanceId: target.liveJob.targetItemInstanceId,
-		save,
-	});
-	const grantIds = readGameWorldGrantIds({
-		config,
-		nowMs,
-		save,
-	});
-	const effectiveOutput = readEffectiveOutputEntries({
-		config,
-		grantIds,
-		itemInstanceId: target.liveJob.targetItemInstanceId,
-		lineId: `craft:${target.liveJob.recipeId}`,
-		lineVisible: true,
-		output: target.recipe.output,
-		save,
-		targetCell,
-	});
 	const rolled = yield* rollEffectiveLootPlanItemsFx({
-		lootPlan: readEffectiveLootPlan(effectiveOutput),
+		lootPlan: readCraftEffectiveLootPlan({
+			config,
+			itemInstanceId: target.liveJob.targetItemInstanceId,
+			lineId: `craft:${target.liveJob.recipeId}`,
+			nowMs,
+			recipe: target.recipe,
+			save,
+			targetCell,
+		}),
 	});
 
 	return rolled.items.map(
@@ -93,6 +84,7 @@ export const applyCraftCompletionResultFx = Effect.fn("applyCraftCompletionResul
 		nowMs,
 		save,
 		target,
+		targetCell,
 	});
 
 	yield* removeCraftJobFromSaveFx({

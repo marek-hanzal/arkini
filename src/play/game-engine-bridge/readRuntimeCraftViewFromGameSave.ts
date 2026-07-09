@@ -1,9 +1,7 @@
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
-import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
-import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
-import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
+import { readCraftEffectiveLootPlan } from "~/craft/readCraftEffectiveLootPlan";
 import { readCraftRecipeDurationMs } from "~/craft/readCraftRecipeDurationMs";
 import {
 	readCraftOutputItemIds,
@@ -171,21 +169,15 @@ const readCraftVisibleProgress = ({
 };
 
 const readCraftOutputViews = (scope: RuntimeCraftViewScope): CraftProgressView["outputs"] => {
-	const effectiveOutput = readEffectiveOutputEntries({
-		config: scope.config,
-		grantIds: scope.grantIds,
-		itemInstanceId: scope.boardItem.id,
-		lineId: scope.boardItem.itemId,
-		lineVisible: true,
-		output: scope.recipe.output as NonNullable<GameLineDefinition["output"]>,
-		save: scope.save,
-		targetCell: readGameEffectSourceCell({
-			save: scope.save,
-			sourceItemInstanceId: scope.boardItem.id,
-		}),
-	});
 	const outputs = readRuntimeLineOutputViews({
-		lootPlan: readEffectiveLootPlan(effectiveOutput),
+		lootPlan: readCraftEffectiveLootPlan({
+			config: scope.config,
+			grantIds: scope.grantIds,
+			itemInstanceId: scope.boardItem.id,
+			lineId: scope.boardItem.itemId,
+			recipe: scope.recipe,
+			save: scope.save,
+		}),
 		save: scope.save,
 	});
 

@@ -49,3 +49,6 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 - introduced shared `readEffectiveLootPlanViewEntries(...)` in `effects`, so weighted/chance flattening, output-set traversal, per-entry probability calculation, and stable source ordering are no longer implemented inside `readRuntimeLineOutputViews.ts`
 - `readRuntimeLineOutputViews.ts` now acts more like a thin projection layer over canonical effect/output view entries
 - remaining work for this task: decide whether any remaining craft-specific effect state (`readCraftLineEffectState.ts`) should consume more of the shared post-effect shape directly, or whether the ROI is now better on task 002 / task 004
+
+- introduced shared `src/craft/readCraftEffectiveLootPlan.ts`, so craft runtime view and craft completion no longer rebuild the same grant/output/loot-plan path independently
+- `applyCraftCompletionResultFx.ts` now reuses the already-read `targetCell` instead of reading the board cell twice for the same craft completion

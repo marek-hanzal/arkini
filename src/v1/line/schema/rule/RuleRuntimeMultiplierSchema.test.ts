@@ -9,7 +9,10 @@ describe("RuleRuntimeMultiplierSchema", () => {
 			when: [
 				{
 					type: "distance",
-					itemId: "pollution",
+					selector: {
+						type: "item",
+						itemId: "pollution",
+					},
 					distance: "close",
 					count: 1,
 				},

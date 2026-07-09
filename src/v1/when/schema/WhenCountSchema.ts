@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
-import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
+import { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
 /**
- * A condition that checks the count of one item in a game-state scope.
+ * A condition that checks the count of selected items in a game-state scope.
  *
  * The condition is satisfied when the matching item count is greater than or
  * equal to `count`.
@@ -20,9 +20,11 @@ export const WhenCountSchema = z
 			"count",
 		]).describe("Identifies this condition as a game-state item-count check."),
 		/**
-		 * ID of the item whose count is checked.
+		 * Strategy used to select the items whose count is checked.
 		 */
-		itemId: IdSchema.describe("The ID of the item whose count is checked."),
+		selector: SelectorSchema.describe(
+			"The strategy used to select the items whose count is checked.",
+		),
 		/**
 		 * Part of the game state searched for matching items.
 		 */
@@ -35,7 +37,7 @@ export const WhenCountSchema = z
 		),
 	})
 	.strict()
-	.describe("A condition that checks the count of one item in a game-state scope.");
+	.describe("A condition that checks the count of selected items in a game-state scope.");
 
 export type WhenCountSchema = typeof WhenCountSchema;
 

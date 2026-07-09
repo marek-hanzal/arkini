@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 import { DistanceEnumSchema } from "~/v1/distance/schema/DistanceEnumSchema";
-import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
+import { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
 /**
- * A condition that checks the count of one item at a board distance from a rule source.
+ * A condition that checks the count of selected items at a board distance from a rule source.
  *
  * The condition is satisfied when the matching item count is greater than or
  * equal to `count`. Evaluation excludes the rule source and requires that the
@@ -21,9 +21,11 @@ export const WhenDistanceSchema = z
 			"distance",
 		]).describe("Identifies this condition as a board-distance item-count check."),
 		/**
-		 * ID of the board item counted at the configured distance.
+		 * Strategy used to select the board items counted at the configured distance.
 		 */
-		itemId: IdSchema.describe("The ID of the board item counted at the configured distance."),
+		selector: SelectorSchema.describe(
+			"The strategy used to select the board items counted at the configured distance.",
+		),
 		/**
 		 * Board distance from the rule source at which matching items are counted.
 		 */
@@ -38,7 +40,9 @@ export const WhenDistanceSchema = z
 		),
 	})
 	.strict()
-	.describe("A condition that checks item count at a board distance from a rule source.");
+	.describe(
+		"A condition that checks selected item count at a board distance from a rule source.",
+	);
 
 export type WhenDistanceSchema = typeof WhenDistanceSchema;
 

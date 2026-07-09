@@ -19,9 +19,6 @@ describe("LineSchema", () => {
 				},
 			],
 			output: {
-				id: "output:wood",
-				title: "Wood",
-				description: "Freshly gathered wood.",
 				set: [
 					{
 						roll: [
@@ -46,6 +43,12 @@ describe("LineSchema", () => {
 		};
 
 		expect(LineSchema.safeParse(line).success).toBe(true);
+		expect(
+			LineSchema.safeParse({
+				...line,
+				output: undefined,
+			}).success,
+		).toBe(true);
 		expect(
 			LineSchema.safeParse({
 				...line,

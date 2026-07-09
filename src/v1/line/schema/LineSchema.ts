@@ -58,9 +58,14 @@ export const LineSchema = z
 			)
 			.describe("One or more items accepted by this product line."),
 		/**
-		 * Result produced when this product line completes.
+		 * Optional result produced when this product line completes.
+		 *
+		 * A line may consume its input without producing an output, for example
+		 * when a purifier removes pollution.
 		 */
-		output: OutputSchema.describe("The result produced when this product line completes."),
+		output: OutputSchema.optional().describe(
+			"The optional result produced when this product line completes.",
+		),
 		/**
 		 * Rules that can change this product line's visibility or behavior.
 		 *

@@ -21,13 +21,13 @@ Primary file:
 - `src/play/game-engine-bridge/readRuntimeLineOutputViews.ts`
 
 Why it matters:
-- still large and bridge-heavy
-- still mixes output-set traversal, bonus line projection, owned quantity reads, weighted probability math, and effect carrier filtering
-- good candidate for LOC reduction without changing gameplay rules
+- still one of the larger bridge modules
+- weighted/chance flattening and output-set traversal were already pushed down into `effects/readEffectiveLootPlanViewEntries.ts`
+- remaining bridge work is now mostly owned quantity, bonus line attachment, labels, and effect-carrier filtering
 
 Desired direction:
-- push more canonical shape into `effects`
-- make bridge output rendering thinner and less responsible for reconstructing effect/output truth
+- keep bridge output rendering thin
+- only continue here if another clearly shared canonical fact can move below the bridge boundary
 
 ### 2. Craft vs line/output effect flow
 Primary files:

@@ -44,3 +44,8 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 - Remaining task inside this thread: keep shrinking `readRuntimeLineOutputViews.ts` by pushing more canonical output facts below the bridge boundary where it clearly pays off.
 
 - introduced shared `readEffectiveLootPlanOutputSets(...)` fallback so bridge/runtime rolling stop rebuilding default output-set arrays locally
+
+## Progress update after `e55c1f80` and current pass
+- introduced shared `readEffectiveLootPlanViewEntries(...)` in `effects`, so weighted/chance flattening, output-set traversal, per-entry probability calculation, and stable source ordering are no longer implemented inside `readRuntimeLineOutputViews.ts`
+- `readRuntimeLineOutputViews.ts` now acts more like a thin projection layer over canonical effect/output view entries
+- remaining work for this task: decide whether any remaining craft-specific effect state (`readCraftLineEffectState.ts`) should consume more of the shared post-effect shape directly, or whether the ROI is now better on task 002 / task 004

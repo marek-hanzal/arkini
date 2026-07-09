@@ -9,7 +9,7 @@ import { PositiveIntegerSchema } from "./util/PositiveIntegerSchema";
  * The relative weight determines this drop's likelihood among the other
  * configured weighted drops.
  */
-export const WeightDropSchema = z
+export const DropWeightSchema = z
 	.object({
 		/**
 		 * Relative likelihood of selecting this drop among the weighted drops.
@@ -27,8 +27,8 @@ export const WeightDropSchema = z
 	.strict()
 	.describe("Items and their relative weight in a weight-based output roll.");
 
-export type WeightDropSchema = typeof WeightDropSchema;
+export type DropWeightSchema = typeof DropWeightSchema;
 
-export namespace WeightDropSchema {
-	export type Type = z.infer<WeightDropSchema>;
+export namespace DropWeightSchema {
+	export type Type = z.infer<DropWeightSchema>;
 }

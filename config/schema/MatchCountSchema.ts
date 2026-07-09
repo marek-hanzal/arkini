@@ -1,22 +1,6 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "./EffectScalarSchemas";
-
-export const RuleScopeSchema = z
-	.enum([
-		"board",
-		"owned",
-		"inventory",
-	])
-	.describe("Where the rule searches for matching items.");
-
-export const RuleDistanceSchema = z
-	.enum([
-		"neighbour",
-		"near",
-		"far",
-	])
-	.describe("Board distance bucket used when matching board items.");
+import { PositiveIntegerSchema } from "./PositiveIntegerSchema";
 
 /**
  * Required number of matches for the rule to pass.
@@ -38,3 +22,9 @@ export const MatchCountSchema = z
 		message: "count.max must be greater than or equal to count.min",
 	})
 	.describe("How many matching targets are required for the rule to pass.");
+
+export type MatchCountSchema = typeof MatchCountSchema;
+
+export namespace MatchCountSchema {
+	export type Type = z.infer<MatchCountSchema>;
+}

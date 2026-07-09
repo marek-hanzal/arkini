@@ -1,18 +1,11 @@
 import { z } from "zod";
-
 import { RollSetSchema } from "../roll/RollSetSchema";
-import { DescriptionSchema } from "../util/DescriptionSchema";
-import { IdSchema } from "../util/IdSchema";
-import { TitleSchema } from "../util/TitleSchema";
 
 /**
  * A named result produced by a gameplay source such as a production line or stash.
  */
 export const OutputSchema = z
 	.object({
-		id: IdSchema,
-		title: TitleSchema,
-		description: DescriptionSchema,
 		/**
 		 * One or more alternative roll sets that this output may provide.
 		 *

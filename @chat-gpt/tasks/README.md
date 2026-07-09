@@ -1,12 +1,10 @@
 # Arkini GPT tasks
 
-Active work block: flow-chain reduction, bridge consolidation, and canonical effect/output shape.
+No active GPT task queue is open.
 
-Current task order:
-1. `2026-07-09-000-current-hotspot-analysis.md`
-2. `2026-07-09-002-runtime-bridge-selector-consolidation.md`
-3. `2026-07-09-003-effect-output-canonical-shape.md`
-4. `2026-07-09-004-interaction-decision-hub.md`
-5. `2026-07-09-005-board-tap-runtime-surface.md`
+This folder should stay empty except for this README until a new work block starts in a new thread.
 
-Keep only active tasks in this folder. Move completed notes to `../archive/tasks/` and deferred ideas to `../backlog/`.
+When work resumes:
+- create only the current active tasks here
+- keep completed notes in `../archive/tasks/`
+- keep deferred ideas in `../backlog/`

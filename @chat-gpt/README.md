@@ -4,7 +4,7 @@ Read this first, then `tasks/`. Open `backlog/` only when planning. Open `archiv
 
 ## Layout
 
-- `tasks/` - active/current work block. If it only contains `README.md`, no active GPT task queue is open.
+- `tasks/` - active/current work block. If it only contains `README.md`, no active GPT task queue is open. Current status: queue closed and cleaned at the end of the 2026-07-09 flow-reduction block.
 - `backlog/` - planned/deferred tasks worth solving later.
 - `archive/` - completed/obsolete notes and rationale.
 

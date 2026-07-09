@@ -14,9 +14,17 @@ export const RollWeightSchema = z
 			"weight",
 		]),
 		/**
-		 * The items and relative weight selected by this roll.
+		 * At least two weighted drop candidates from which this roll selects.
 		 */
-		drop: WeightDropSchema.describe("The weighted items selected by this roll."),
+		drop: z
+			.tuple(
+				[
+					WeightDropSchema,
+					WeightDropSchema,
+				],
+				WeightDropSchema,
+			)
+			.describe("At least two weighted drop candidates selected by this roll."),
 	})
 	.strict()
 	.describe("A roll that selects its output according to relative item weights.");

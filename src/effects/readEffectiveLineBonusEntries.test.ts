@@ -1,3 +1,4 @@
+import type { GameConfig } from "~/config/GameConfigTypes";
 import { describe, expect, it } from "vitest";
 import {
 	readEffectBenefitLines,
@@ -12,6 +13,7 @@ const defaultGameConfig = {
 				id: "effect:shrine-minor-haste",
 				grants: [{ id: "grant:test:minor-haste", name: "Minor Haste active" }],
 				name: "Minor Haste",
+				polarity: "buff",
 			}],
 			name: "Minor Haste Source",
 		},
@@ -20,11 +22,12 @@ const defaultGameConfig = {
 				id: "effect:shrine-bountiful-offering",
 				grants: [{ id: "grant:test:bountiful-offering", name: "Bountiful Offering active" }],
 				name: "Bountiful Offering",
+				polarity: "buff",
 			}],
 			name: "Bountiful Offering Source",
 		},
 	},
-} as const;
+} as const as unknown as GameConfig;
 
 describe("readEffectiveLineBonusEntries", () => {
 	it("describes shrine speed boosts in player-readable copy", () => {

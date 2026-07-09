@@ -4,7 +4,7 @@ import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 import { readEffectiveLineRequirements } from "~/effects/readEffectiveLineRequirements";
-import { readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 
@@ -82,12 +82,7 @@ export const readEffectiveLine = ({
 			...grantIds,
 		].sort(),
 		startRequirementsReady: lineRequirements.startRequirementsReady,
-		lootPlan: {
-			outputSets: effectiveOutput.outputSets,
-			baseOutput: effectiveOutput.rollableOutput,
-			chanceItems: effectiveOutput.chanceItems,
-			visibleOutput: effectiveOutput.visibleOutput,
-		},
+		lootPlan: readEffectiveLootPlan(effectiveOutput),
 		requirements: lineRequirements.requirements,
 		visible,
 	};

@@ -93,6 +93,13 @@ export interface EffectiveLineOutputSet {
 	visibleOutput: EffectiveLineOutputEntry[];
 }
 
+export interface EffectiveLootPlan {
+	outputSets?: EffectiveLineOutputSet[];
+	baseOutput: EffectiveLineOutputEntry[];
+	chanceItems: EffectiveChanceItemEntry[];
+	visibleOutput: EffectiveLineOutputEntry[];
+}
+
 export interface EffectiveLine {
 	appliedEffects: AppliedGameEffectOperation[];
 	blocked: boolean;

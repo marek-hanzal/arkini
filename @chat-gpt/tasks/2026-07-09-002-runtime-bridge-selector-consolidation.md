@@ -1,29 +1,34 @@
 # 2026-07-09-002 Runtime bridge selector consolidation
 
 ## Problem
-`src/play/game-engine-bridge/*` still contains many fragmented projection helpers. Several selectors rebuild overlapping runtime facts and then wrap them again into UI-friendly shapes.
+`src/play/game-engine-bridge/*` still contains a few large projection builders that mix domain-derived facts with UI shaping.
+The worst remaining hotspot is `readRuntimeLineOutputViews.ts`.
 
 ## Current hotspots
-- `src/play/game-engine-bridge/readRuntimeLineViewsFromGameSave.ts`
+- `src/play/game-engine-bridge/readRuntimeLineOutputViews.ts`
 - `src/play/game-engine-bridge/readRuntimeLineViewFromDefinition.ts`
 - `src/play/game-engine-bridge/readRuntimeCraftViewFromGameSave.ts`
-- `src/play/game-engine-bridge/readRuntimeLineOutputViews.ts`
-- `src/play/game-engine-bridge/readRuntimeLineOutputViewHelpers.ts`
 
 ## Goal
-Consolidate fragmented runtime projection into fewer selectors/builders with clearer boundaries.
+Make bridge projection thinner by consuming more canonical effect/output data directly and by deleting bridge-only reconstruction logic when possible.
 
 ## Target shape
-- fewer thin helper files
-- less repeated `save/config/nowMs/effectiveLine` plumbing
-- bridge behaves more like selector composition, less like a scattered helper catalog
+- bridge reads like selector composition
+- less repeated `lootPlan -> output views` plumbing
+- fewer bridge-local helpers for things that belong to `effects`
 
 ## Guardrails
 - preserve current view outputs
-- avoid large folder reorg in this task
-- prefer deleting helper files over introducing new wrapper files
+- avoid folder reorg in this task
+- prefer deleting bridge-specific helpers over adding new bridge wrapper layers
 
 ## Done when
-- one or more bridge helper files disappear
-- line/craft/output projection uses fewer cross-file hops
-- runtime projection reads more like a selector pipeline than a helper tree
+- `readRuntimeLineOutputViews.ts` is materially smaller or simpler
+- at least one bridge-local reconstruction step disappears
+- craft + line view consume shared output/effect shape more directly
+
+## Progress
+- removed thin runtime reader catalog and several bridge wrappers earlier in this pass series
+- moved bonus summary generation from bridge into `effects/readEffectiveLineBonusEntries.ts`
+- removed `readRuntimeEffectOperationSummary.ts`
+- next step: reduce bridge-local loot/output reconstruction around `readRuntimeLineOutputViews.ts`

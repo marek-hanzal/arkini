@@ -1,7 +1,7 @@
 import type { CraftProgressView } from "~/board/view/CraftProgressViewSchema";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
 import { readCraftLineEffectState } from "~/craft/readCraftLineEffectState";
-import { readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
 import { readGameEffectSourceCell } from "~/effects/readGameEffectSourceCell";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
 import { readCraftRecipeDurationMs } from "~/craft/readCraftRecipeDurationMs";
@@ -185,12 +185,7 @@ const readCraftOutputViews = (scope: RuntimeCraftViewScope): CraftProgressView["
 		}),
 	});
 	const outputs = readRuntimeLineOutputViews({
-		lootPlan: {
-			baseOutput: effectiveOutput.rollableOutput,
-			chanceItems: effectiveOutput.chanceItems,
-			outputSets: effectiveOutput.outputSets,
-			visibleOutput: effectiveOutput.visibleOutput,
-		},
+		lootPlan: readEffectiveLootPlan(effectiveOutput),
 		save: scope.save,
 	});
 

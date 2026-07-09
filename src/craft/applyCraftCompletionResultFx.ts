@@ -6,7 +6,7 @@ import type { CraftCompletionTarget } from "~/craft/CraftJobCompletionTypes";
 import { createCraftSpawnCompletedResult } from "~/craft/CraftJobCompletionEvents";
 import { removeCraftJobFromSaveFx } from "~/craft/removeCraftJobFromSaveFx";
 import { readGameWorldGrantIds } from "~/effects/readGameWorldGrantIds";
-import { readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
+import { readEffectiveLootPlan, readEffectiveOutputEntries } from "~/effects/readEffectiveOutputEntries";
 import { rollEffectiveLootPlanItemsFx } from "~/effects/rollEffectiveLootPlanItemsFx";
 import { GameEngineError } from "~/engine/model/GameEngineError";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
@@ -48,12 +48,7 @@ const readCraftDeliveryPlacementRequestsFx = Effect.fn(
 		targetCell,
 	});
 	const rolled = yield* rollEffectiveLootPlanItemsFx({
-		lootPlan: {
-			outputSets: effectiveOutput.outputSets,
-			baseOutput: effectiveOutput.rollableOutput,
-			chanceItems: effectiveOutput.chanceItems,
-			visibleOutput: effectiveOutput.visibleOutput,
-		},
+		lootPlan: readEffectiveLootPlan(effectiveOutput),
 	});
 
 	return rolled.items.map(

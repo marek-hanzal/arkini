@@ -7,6 +7,7 @@ import type {
 	EffectiveChanceItemEntry,
 	EffectiveLineOutputEntry,
 	EffectiveLineOutputSet,
+	EffectiveLootPlan,
 	EffectiveWeightedLineOutputSubEntry,
 } from "~/effects/EffectiveLine";
 import { createAppliedGameEffectOperation } from "~/effects/createAppliedGameEffectOperation";
@@ -132,6 +133,31 @@ const readOutputEntryItemIds = (entry: OutputEntry): readonly string[] =>
 				entry.itemId,
 			];
 
+
+export interface EffectiveOutputEntriesResult {
+	appliedEffects: AppliedGameEffectOperation[];
+	chanceItems: EffectiveChanceItemEntry[];
+	durationMultiplier: number;
+	outputSets: EffectiveLineOutputSet[];
+	rollableOutput: EffectiveLineOutputEntry[];
+	visibleOutput: EffectiveLineOutputEntry[];
+}
+
+export const readEffectiveLootPlan = ({
+	chanceItems,
+	outputSets,
+	rollableOutput,
+	visibleOutput,
+}: Pick<
+	EffectiveOutputEntriesResult,
+	"chanceItems" | "outputSets" | "rollableOutput" | "visibleOutput"
+>): EffectiveLootPlan => ({
+	outputSets,
+	baseOutput: rollableOutput,
+	chanceItems,
+	visibleOutput,
+});
+
 export const readEffectiveOutputEntries = ({
 	config,
 	grantIds,
@@ -150,7 +176,7 @@ export const readEffectiveOutputEntries = ({
 	lineVisible: boolean;
 	save: GameSave;
 	targetCell?: BoardCell;
-}) => {
+}): EffectiveOutputEntriesResult => {
 	const appliedEffects: AppliedGameEffectOperation[] = [];
 	const outputSets: EffectiveLineOutputSet[] = [];
 	let durationMultiplier = 1;

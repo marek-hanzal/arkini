@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
-import { LineSchema } from "../../line/schema/LineSchema";
+import { LineSchema } from "~/v1/line/schema/LineSchema";
 
 /**
  * An item that provides a single craft product line.

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { LineSchema } from "../../line/schema/LineSchema";
-import { OutputSchema } from "../../output/schema/OutputSchema";
+import { LineSchema } from "~/v1/line/schema/LineSchema";
+import { OutputSchema } from "~/v1/output/schema/OutputSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 

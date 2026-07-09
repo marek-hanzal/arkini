@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { QuantitySchema } from "../../quantity/schema/QuantitySchema";
-import { IdSchema } from "../../common/schema/IdSchema";
-import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
+import { QuantitySchema } from "~/v1/quantity/schema/QuantitySchema";
+import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
 /**
  * A canonical game item and the amount accepted by a gameplay input.

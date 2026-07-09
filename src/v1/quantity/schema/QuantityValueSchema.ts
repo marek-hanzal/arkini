@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseQuantitySchema } from "./BaseQuantitySchema";
 import { QuantityEnumSchema } from "./QuantityEnumSchema";
-import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
 /**
  * A fixed positive quantity emitted by an item drop.

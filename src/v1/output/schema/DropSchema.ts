@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { QuantitySchema } from "../../quantity/schema/QuantitySchema";
-import { IdSchema } from "../../common/schema/IdSchema";
+import { QuantitySchema } from "~/v1/quantity/schema/QuantitySchema";
+import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { RuleSchema } from "./drop/rule/RuleSchema";
 
 /**

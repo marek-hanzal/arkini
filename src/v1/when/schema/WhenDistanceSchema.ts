@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { DistanceEnumSchema } from "../../distance/schema/DistanceEnumSchema";
-import { IdSchema } from "../../common/schema/IdSchema";
-import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
+import { DistanceEnumSchema } from "~/v1/distance/schema/DistanceEnumSchema";
+import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
 /**

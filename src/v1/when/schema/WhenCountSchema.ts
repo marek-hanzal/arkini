@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { ScopeEnumSchema } from "../../scope/schema/ScopeEnumSchema";
-import { IdSchema } from "../../common/schema/IdSchema";
-import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
+import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
 /**

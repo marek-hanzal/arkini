@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseQuantitySchema } from "./BaseQuantitySchema";
 import { QuantityEnumSchema } from "./QuantityEnumSchema";
-import { PositiveIntegerSchema } from "../../common/schema/PositiveIntegerSchema";
+import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
 /**
  * An inclusive range from which a positive item quantity is selected.

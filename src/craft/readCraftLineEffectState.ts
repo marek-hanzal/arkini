@@ -21,6 +21,8 @@ export namespace readCraftLineStartGateState {
 }
 
 type ResolvedDomainSelector = z.infer<typeof ResolvedDomainSelectorSchema>;
+type CraftRecipeEffect = NonNullable<NonNullable<GameCraftRecipeDefinition["effects"]>[number]>;
+type CraftLineEffect = Extract<CraftRecipeEffect, { kind: "grant.require" | "grant.blockStart" }>;
 
 type CraftEffectRequirement = {
 	display: "always" | "whenActive" | "whenMissing" | "never";
@@ -41,6 +43,15 @@ type CraftLineStartGateState = {
 	grantIds: ReadonlySet<string>;
 	startGateReady: boolean;
 	startRequirementsReady: boolean;
+};
+
+type EvaluatedCraftLineEffect = {
+	lineEffect: CraftLineEffect;
+	selectorMatched: boolean;
+};
+
+type CraftLineEffectAnalysis = CraftLineStartGateState & {
+	effects: EvaluatedCraftLineEffect[];
 };
 
 const readCraftGrantIds = ({
@@ -195,6 +206,69 @@ const readMissingGrantRequirementLabels = ({
 	return labels;
 };
 
+const evaluateCraftLineEffects = ({
+	grantIds,
+	recipe,
+}: {
+	grantIds: ReadonlySet<string>;
+	recipe: GameCraftRecipeDefinition;
+}): EvaluatedCraftLineEffect[] =>
+	(recipe.effects ?? []).flatMap((lineEffect) => {
+		if (lineEffect.kind !== "grant.require" && lineEffect.kind !== "grant.blockStart") return [];
+		return [
+			{
+				lineEffect,
+				selectorMatched: doesGameGrantSelectorMatchIds({
+					grantIds,
+					selector: lineEffect.selector,
+				}),
+			},
+		];
+	});
+
+const readCraftLineEffectAnalysis = ({
+	config,
+	grantIds: providedGrantIds,
+	nowMs,
+	recipe,
+	save,
+}: readCraftLineEffectState.Props): CraftLineEffectAnalysis => {
+	const grantIds = readCraftGrantIds({
+		config,
+		grantIds: providedGrantIds,
+		nowMs,
+		save,
+	});
+	const effects = evaluateCraftLineEffects({
+		grantIds,
+		recipe,
+	});
+	let startRequirementsReady = true;
+	let blocked = false;
+	const blockReasons: string[] = [];
+
+	for (const { lineEffect, selectorMatched } of effects) {
+		if (lineEffect.kind === "grant.require") {
+			if (lineEffect.phase === "start" && !selectorMatched) startRequirementsReady = false;
+			continue;
+		}
+
+		if (lineEffect.kind === "grant.blockStart" && selectorMatched) {
+			blocked = true;
+			blockReasons.push(lineEffect.reason ?? lineEffect.label ?? "Craft recipe is blocked.");
+		}
+	}
+
+	return {
+		blocked,
+		blockReasons,
+		effects,
+		grantIds,
+		startRequirementsReady,
+		startGateReady: startRequirementsReady && !blocked,
+	};
+};
+
 export const readCraftLineStartGateState = ({
 	config,
 	grantIds: providedGrantIds,
@@ -202,52 +276,21 @@ export const readCraftLineStartGateState = ({
 	recipe,
 	save,
 }: readCraftLineStartGateState.Props): CraftLineStartGateState => {
-	const grantIds = readCraftGrantIds({
-		config,
-		grantIds: providedGrantIds,
-		nowMs,
-		save,
-	});
-	let startRequirementsReady = true;
-	let blocked = false;
-	const blockReasons: string[] = [];
-
-	for (const lineEffect of recipe.effects ?? []) {
-		if (lineEffect.kind === "grant.require") {
-			if (
-				lineEffect.phase === "start" &&
-				!doesGameGrantSelectorMatchIds({
-					grantIds,
-					selector: lineEffect.selector,
-				})
-			) {
-				startRequirementsReady = false;
-			}
-			continue;
-		}
-
-		if (
-			lineEffect.kind === "grant.blockStart" &&
-			doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: lineEffect.selector,
-			})
-		) {
-			blocked = true;
-			blockReasons.push(
-				lineEffect.reason ?? lineEffect.label ?? "Craft recipe is blocked.",
-			);
-		}
-
-		if (blocked && !startRequirementsReady) break;
-	}
+	const { blocked, blockReasons, grantIds, startGateReady, startRequirementsReady } =
+		readCraftLineEffectAnalysis({
+			config,
+			grantIds: providedGrantIds,
+			nowMs,
+			recipe,
+			save,
+		});
 
 	return {
 		blocked,
 		blockReasons,
 		grantIds,
+		startGateReady,
 		startRequirementsReady,
-		startGateReady: startRequirementsReady && !blocked,
 	};
 };
 
@@ -258,22 +301,19 @@ export const readCraftLineEffectState = ({
 	recipe,
 	save,
 }: readCraftLineEffectState.Props): CraftLineStartGateState & { requirements: CraftEffectRequirement[] } => {
-	const startGateState = readCraftLineStartGateState({
+	const analysis = readCraftLineEffectAnalysis({
 		config,
 		grantIds: providedGrantIds,
 		nowMs,
 		recipe,
 		save,
 	});
-	const { grantIds } = startGateState;
+	const { blocked, blockReasons, effects, grantIds, startGateReady, startRequirementsReady } = analysis;
 	const requirements: CraftEffectRequirement[] = [];
 
-	for (const lineEffect of recipe.effects ?? []) {
+	for (const { lineEffect, selectorMatched } of effects) {
 		if (lineEffect.kind === "grant.require") {
-			const ready = doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: lineEffect.selector,
-			});
+			const ready = selectorMatched;
 			const requirementLabels =
 				lineEffect.label || lineEffect.reason || ready
 					? [
@@ -295,9 +335,7 @@ export const readCraftLineEffectState = ({
 					label: requirementLabel.label,
 					ready,
 				};
-				if (shouldDisplayCraftEffectRequirement(requirement)) {
-					requirements.push(requirement);
-				}
+				if (shouldDisplayCraftEffectRequirement(requirement)) requirements.push(requirement);
 			}
 			continue;
 		}
@@ -307,18 +345,17 @@ export const readCraftLineEffectState = ({
 			display: lineEffect.display,
 			kind: lineEffect.kind,
 			label: lineEffect.reason ?? lineEffect.label ?? "Craft recipe is blocked.",
-			ready: !doesGameGrantSelectorMatchIds({
-				grantIds,
-				selector: lineEffect.selector,
-			}),
+			ready: !selectorMatched,
 		};
-		if (shouldDisplayCraftEffectRequirement(requirement)) {
-			requirements.push(requirement);
-		}
+		if (shouldDisplayCraftEffectRequirement(requirement)) requirements.push(requirement);
 	}
 
 	return {
-		...startGateState,
+		blocked,
+		blockReasons,
+		grantIds,
 		requirements,
+		startGateReady,
+		startRequirementsReady,
 	};
 };

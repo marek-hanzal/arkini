@@ -81,3 +81,5 @@ Desired direction:
 - craft runtime view hotspot was partially reduced by collapsing `RuntimeCraftViewScope` and moving the craft view builder toward a direct top-level flow with smaller local helpers; reevaluate craft cluster before opening a new broad refactor front
 
 - Follow-up after craft gate split: craft runtime/start/sync paths now avoid building full effect requirement labels when they only need start-gate readiness, so the remaining craft hotspot is increasingly concentrated in display/state projection rather than duplicated gate evaluation.
+
+- 2026-07-09 craft remeasure after `7fb8c0b0`: craft total ~2819 LOC across 38 impl files. Top craft hotspots: `readCraftLineEffectState.ts` 324, `syncRealtimeCraftJobsFx.ts` 296, `readRuntimeCraftViewFromGameSave.ts` 274. Follow-up pass moved craft effect evaluation to a single internal analysis path reused by gate and full effect state readers.

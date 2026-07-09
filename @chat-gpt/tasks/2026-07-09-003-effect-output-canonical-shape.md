@@ -57,3 +57,5 @@ Converge on one canonical post-effect output/bonus shape that downstream readers
 
 - introduced `readCraftLineStartGateState(...)` as a lightweight craft gate reader, so craft start/readiness/realtime sync paths no longer build full requirement labels and requirement arrays when they only need `startGateReady` / blockers
 - `syncRealtimeCraftJobsFx.ts`, `checkCraftStartReadinessFx.ts`, and `checkCraftStartRuntimeConstraintsFx.ts` now reuse the lighter craft gate path instead of the full view-facing effect state
+
+- 2026-07-09 update: craft cluster remeasured after `7fb8c0b0`. Remaining craft hotspots were `readCraftLineEffectState.ts` (324 LOC), `syncRealtimeCraftJobsFx.ts` (296 LOC), and `readRuntimeCraftViewFromGameSave.ts` (274 LOC). Next ROI pass unified craft line effect analysis so selector matching and gate state are computed once and reused by both `readCraftLineStartGateState` and `readCraftLineEffectState`.

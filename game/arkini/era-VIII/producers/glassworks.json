@@ -1,197 +1,197 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:glassworks": {
-      "description": "Furnace workshop that turns sand and charcoal into glass.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:glassworks",
-              "name": "Owns Glassworks"
-            }
-          ],
-          "id": "effect:grant-owned:producer-glassworks",
-          "name": "Owned Glassworks grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Glassworks",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 30000,
-            "id": "line:glassworks:glass",
-            "inputs": [
-              {
-                "capacity": 8,
-                "consume": true,
-                "itemId": "item:sand",
-                "quantity": 3
-              },
-              {
-                "capacity": 8,
-                "consume": true,
-                "itemId": "item:charcoal",
-                "quantity": 2
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.2,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:sand-pit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:sand-pit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:glass",
-                    "quantity": 2,
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.65,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:sand-pit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:sand-pit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.15,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:sand-pit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:sand-pit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "building",
-        "producer",
-        "construction",
-        "glass",
-        "era:VIII",
-        "industry",
-        "unique"
-      ],
-      "tier": 4
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:glassworks": {
+			"description": "Furnace workshop that turns sand and charcoal into glass.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:glassworks",
+							"name": "Owns Glassworks"
+						}
+					],
+					"id": "effect:grant-owned:producer-glassworks",
+					"name": "Owned Glassworks grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Glassworks",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 30000,
+						"id": "line:glassworks:glass",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:sand",
+								"quantity": 3
+							},
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:charcoal",
+								"quantity": 2
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:sand-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:sand-pit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:glass",
+										"quantity": 2,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.65,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:sand-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:sand-pit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.15,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:sand-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:sand-pit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"glass",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"tier": 4
+		}
+	}
 }

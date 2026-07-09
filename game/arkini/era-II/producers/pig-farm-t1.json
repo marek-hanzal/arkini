@@ -1,133 +1,133 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:pig-farm-t1": {
-      "description": "Consumes grain and water to produce piglets.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:pig-farm-t1",
-              "name": "Owns Pig Farm I"
-            }
-          ],
-          "id": "effect:grant-owned:producer-pig-farm-t1",
-          "name": "Owned Pig Farm I grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Pig Farm I",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 32000,
-            "id": "line:pig-farm-t1:piglet",
-            "inputs": [
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:grain",
-                "quantity": 2
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:water"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.3,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "bands": [
-                          {
-                            "distance": "neighbour",
-                            "multiplier": 2
-                          },
-                          {
-                            "distance": "near",
-                            "multiplier": 1.5
-                          }
-                        ],
-                        "display": "whenActive",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:pollution"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.duration.multiply",
-                        "label": "Pollution slows nearby sensitive production"
-                      }
-                    ],
-                    "itemId": "item:piglet",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "chance": 0.3,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    ],
-                    "itemId": "item:piglet",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "tags": [
-              "pollution-sensitive",
-              "pollution-sensitive:near"
-            ]
-          }
-        ]
-      },
-      "tags": [
-        "producer",
-        "food",
-        "pig",
-        "era:II",
-        "unique"
-      ],
-      "tier": 1
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:pig-farm-t1": {
+			"description": "Consumes grain and water to produce piglets.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:pig-farm-t1",
+							"name": "Owns Pig Farm I"
+						}
+					],
+					"id": "effect:grant-owned:producer-pig-farm-t1",
+					"name": "Owned Pig Farm I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Pig Farm I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 32000,
+						"id": "line:pig-farm-t1:piglet",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:grain",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"bands": [
+													{
+														"distance": "neighbour",
+														"multiplier": 2
+													},
+													{
+														"distance": "near",
+														"multiplier": 1.5
+													}
+												],
+												"display": "whenActive",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:pollution"
+															]
+														}
+													]
+												},
+												"kind": "nearby.duration.multiply",
+												"label": "Pollution slows nearby sensitive production"
+											}
+										],
+										"itemId": "item:piglet",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"chance": 0.3,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											}
+										],
+										"itemId": "item:piglet",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"tags": [
+							"pollution-sensitive",
+							"pollution-sensitive:near"
+						]
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"pig",
+				"era:II",
+				"unique"
+			],
+			"tier": 1
+		}
+	}
 }

@@ -1,436 +1,436 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:blacksmith-t1": {
-      "description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:blacksmith-t1",
-              "name": "Owns Blacksmith I"
-            }
-          ],
-          "id": "effect:grant-owned:producer-blacksmith-t1",
-          "name": "Owned Blacksmith I grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Blacksmith I",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 16000,
-            "id": "line:blacksmith-t1:nails",
-            "inputs": [
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:iron-ingot"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.2,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:nails",
-                    "quantity": 6,
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.06,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 20000,
-            "id": "line:blacksmith-t1:axe",
-            "inputs": [
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:iron-ingot"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:plank"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:axe",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.4,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.08,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 20000,
-            "id": "line:blacksmith-t1:pickaxe",
-            "inputs": [
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:iron-ingot"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:plank"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pickaxe",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.4,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.08,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 26000,
-            "id": "line:blacksmith-t1:sword",
-            "inputs": [
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:iron-ingot",
-                "quantity": 2
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:leather"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:sword",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.45,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.1,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "producer",
-        "blacksmith",
-        "equipment",
-        "weapon",
-        "guild",
-        "era:IX",
-        "unique"
-      ],
-      "tier": 9
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:blacksmith-t1": {
+			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:blacksmith-t1",
+							"name": "Owns Blacksmith I"
+						}
+					],
+					"id": "effect:grant-owned:producer-blacksmith-t1",
+					"name": "Owned Blacksmith I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Blacksmith I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 16000,
+						"id": "line:blacksmith-t1:nails",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:iron-ingot"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:nails",
+										"quantity": 6,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 20000,
+						"id": "line:blacksmith-t1:axe",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:iron-ingot"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:plank"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:axe",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.4,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.08,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 20000,
+						"id": "line:blacksmith-t1:pickaxe",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:iron-ingot"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:plank"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pickaxe",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.4,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.08,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 26000,
+						"id": "line:blacksmith-t1:sword",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:iron-ingot",
+								"quantity": 2
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:leather"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:sword",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.45,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.1,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"blacksmith",
+				"equipment",
+				"weapon",
+				"guild",
+				"era:IX",
+				"unique"
+			],
+			"tier": 9
+		}
+	}
 }

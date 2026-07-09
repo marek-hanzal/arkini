@@ -1,92 +1,92 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:gold-mine-t1": {
-      "description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Gold Mine I",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 72000,
-            "id": "line:gold-mine-t1:gold-ore",
-            "inputs": [
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:bread"
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:wine-glass",
-                "quantity": 2
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:luxury-clothing"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.1,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:gold-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:gold-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:gold-ore",
-                    "quantity": 2,
-                    "type": "guaranteed"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "producer",
-        "industry",
-        "mine",
-        "gold",
-        "era:VII",
-        "unique"
-      ],
-      "tier": 7
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:gold-mine-t1": {
+			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Gold Mine I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 72000,
+						"id": "line:gold-mine-t1:gold-ore",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:bread"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:wine-glass",
+								"quantity": 2
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:luxury-clothing"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.1,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:gold-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:gold-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:gold-ore",
+										"quantity": 2,
+										"type": "guaranteed"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"gold",
+				"era:VII",
+				"unique"
+			],
+			"tier": 7
+		}
+	}
 }

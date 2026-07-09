@@ -1,201 +1,201 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:roof-tile-factory": {
-      "description": "Workshop that fires clay into sturdy roof tiles.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:roof-tile-factory",
-              "name": "Owns Roof Tile Factory"
-            }
-          ],
-          "id": "effect:grant-owned:producer-roof-tile-factory",
-          "name": "Owned Roof Tile Factory grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Roof Tile Factory",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 22000,
-            "id": "line:roof-tile-factory:roof-tiles",
-            "inputs": [
-              {
-                "capacity": 8,
-                "consume": true,
-                "itemId": "item:clay",
-                "quantity": 2
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:water"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.2,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:clay-pit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:clay-pit",
-                        "phase": "start",
-                        "distance": "near"
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:roof-tiles",
-                    "quantity": 4,
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.55,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:clay-pit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:clay-pit",
-                        "phase": "start",
-                        "distance": "near"
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.12,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:clay-pit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:clay-pit",
-                        "phase": "start",
-                        "distance": "near"
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "building",
-        "producer",
-        "construction",
-        "roof",
-        "era:VIII",
-        "industry",
-        "unique"
-      ],
-      "tier": 4
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:roof-tile-factory": {
+			"description": "Workshop that fires clay into sturdy roof tiles.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:roof-tile-factory",
+							"name": "Owns Roof Tile Factory"
+						}
+					],
+					"id": "effect:grant-owned:producer-roof-tile-factory",
+					"name": "Owned Roof Tile Factory grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Roof Tile Factory",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 22000,
+						"id": "line:roof-tile-factory:roof-tiles",
+						"inputs": [
+							{
+								"capacity": 8,
+								"consume": true,
+								"itemId": "item:clay",
+								"quantity": 2
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:water"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:clay-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:clay-pit",
+												"phase": "start",
+												"distance": "near"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:roof-tiles",
+										"quantity": 4,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.55,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:clay-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:clay-pit",
+												"phase": "start",
+												"distance": "near"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.12,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:clay-pit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:clay-pit",
+												"phase": "start",
+												"distance": "near"
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"roof",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"tier": 4
+		}
+	}
 }

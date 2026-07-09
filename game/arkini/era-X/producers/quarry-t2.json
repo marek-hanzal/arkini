@@ -1,219 +1,219 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:quarry-t2": {
-      "description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:quarry-t2",
-              "name": "Owns Quarry"
-            }
-          ],
-          "id": "effect:grant-owned:producer-quarry-t2",
-          "name": "Owned Quarry grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "label": "2",
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Quarry",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 10000,
-            "id": "line:quarry-t2:stone",
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.35,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:marble-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:marble-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:stone",
-                    "quantity": 2,
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "chance": 0.35,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:marble-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:marble-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:stone",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 22000,
-            "id": "line:quarry-t2:marble",
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.05,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:marble-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:marble-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:marble",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.25,
-                    "effects": [
-                      {
-                        "chance": 0.05,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:marble-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:marble-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:marble",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "producer",
-        "building",
-        "stone",
-        "marble",
-        "quarry",
-        "luxury",
-        "prestige",
-        "era:X",
-        "unique"
-      ],
-      "tier": 10
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:quarry-t2": {
+			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:quarry-t2",
+							"name": "Owns Quarry"
+						}
+					],
+					"id": "effect:grant-owned:producer-quarry-t2",
+					"name": "Owned Quarry grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"label": "2",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Quarry",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 10000,
+						"id": "line:quarry-t2:stone",
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:stone",
+										"quantity": 2,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"chance": 0.35,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:stone",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 22000,
+						"id": "line:quarry-t2:marble",
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:marble",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.25,
+										"effects": [
+											{
+												"chance": 0.05,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:marble-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:marble-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:marble",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"quarry",
+				"luxury",
+				"prestige",
+				"era:X",
+				"unique"
+			],
+			"tier": 10
+		}
+	}
 }

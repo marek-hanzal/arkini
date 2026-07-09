@@ -1,536 +1,536 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:goldsmith-t1": {
-      "description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:goldsmith-t1",
-              "name": "Owns Goldsmith I"
-            }
-          ],
-          "id": "effect:grant-owned:producer-goldsmith-t1",
-          "name": "Owned Goldsmith I grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Goldsmith I",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 25000,
-            "id": "line:goldsmith-t1:coin-stack",
-            "inputs": [
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:gold-ingot",
-                "quantity": 2
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:coin-stack",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.06,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 30000,
-            "id": "line:goldsmith-t1:key-t1",
-            "inputs": [
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:gold-ingot"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:iron-ingot"
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:advanced-knowledge"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:key-t1",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.06,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 34000,
-            "id": "line:goldsmith-t1:key-t2",
-            "inputs": [
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:key-t1"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:gold-ingot"
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:ruby"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:key-t2",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.06,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 38000,
-            "id": "line:goldsmith-t1:key-t3",
-            "inputs": [
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:key-t2"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:gold-ingot"
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:emerald"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:key-t3",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.06,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          },
-          {
-            "durationMs": 45000,
-            "id": "line:goldsmith-t1:key-t4",
-            "inputs": [
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:key-t3"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:gold-ingot"
-              },
-              {
-                "capacity": 4,
-                "consume": true,
-                "itemId": "item:sapphire"
-              },
-              {
-                "capacity": 6,
-                "consume": true,
-                "itemId": "item:charcoal"
-              }
-            ],
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:key-t4",
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  },
-                  {
-                    "chance": 0.06,
-                    "effects": [
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "producer:purifier-t1"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby producer:purifier-t1",
-                        "phase": "start",
-                        "distance": "any"
-                      }
-                    ],
-                    "itemId": "item:pollution",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "producer",
-        "economy",
-        "goldsmith",
-        "coin",
-        "key",
-        "guild",
-        "era:IX",
-        "unique"
-      ],
-      "tier": 9
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:goldsmith-t1": {
+			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:goldsmith-t1",
+							"name": "Owns Goldsmith I"
+						}
+					],
+					"id": "effect:grant-owned:producer-goldsmith-t1",
+					"name": "Owned Goldsmith I grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Goldsmith I",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 25000,
+						"id": "line:goldsmith-t1:coin-stack",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:gold-ingot",
+								"quantity": 2
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:coin-stack",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 30000,
+						"id": "line:goldsmith-t1:key-t1",
+						"inputs": [
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:gold-ingot"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:iron-ingot"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:advanced-knowledge"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:key-t1",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 34000,
+						"id": "line:goldsmith-t1:key-t2",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t1"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:gold-ingot"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:ruby"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:key-t2",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 38000,
+						"id": "line:goldsmith-t1:key-t3",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t2"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:gold-ingot"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:emerald"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:key-t3",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					},
+					{
+						"durationMs": 45000,
+						"id": "line:goldsmith-t1:key-t4",
+						"inputs": [
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:key-t3"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:gold-ingot"
+							},
+							{
+								"capacity": 4,
+								"consume": true,
+								"itemId": "item:sapphire"
+							},
+							{
+								"capacity": 6,
+								"consume": true,
+								"itemId": "item:charcoal"
+							}
+						],
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:key-t4",
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									},
+									{
+										"chance": 0.06,
+										"effects": [
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"producer:purifier-t1"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby producer:purifier-t1",
+												"phase": "start",
+												"distance": "any"
+											}
+										],
+										"itemId": "item:pollution",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"producer",
+				"economy",
+				"goldsmith",
+				"coin",
+				"key",
+				"guild",
+				"era:IX",
+				"unique"
+			],
+			"tier": 9
+		}
+	}
 }

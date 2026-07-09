@@ -1,129 +1,129 @@
 {
-  "$schema": "../../../arkini.schema.json",
-  "items": {
-    "producer:sand-pit": {
-      "description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
-      "effects": [
-        {
-          "grants": [
-            {
-              "id": "grant:owned:producer:sand-pit",
-              "name": "Owns Sand Pit"
-            }
-          ],
-          "id": "effect:grant-owned:producer-sand-pit",
-          "name": "Owned Sand Pit grant",
-          "polarity": "neutral",
-          "sourceScope": "both"
-        }
-      ],
-      "maxCount": 1,
-      "maxStackSize": 1,
-      "name": "Sand Pit",
-      "producer": {
-        "lines": [
-          {
-            "durationMs": 9000,
-            "id": "line:sand-pit:sand",
-            "output": [
-              {
-                "entries": [
-                  {
-                    "effects": [
-                      {
-                        "chance": 0.2,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:sand-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:sand-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:sand",
-                    "quantity": 2,
-                    "type": "guaranteed"
-                  },
-                  {
-                    "chance": 0.35,
-                    "effects": [
-                      {
-                        "chance": 0.2,
-                        "display": "whenActive",
-                        "kind": "grant.loot.extraOutputChance.add",
-                        "label": "Bountiful Offering",
-                        "quantity": 1,
-                        "selector": {
-                          "allOf": [
-                            {
-                              "ids": [
-                                "grant:active:shrine-bountiful-offering"
-                              ]
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "display": "always",
-                        "items": {
-                          "anyOf": [
-                            {
-                              "ids": [
-                                "item:sand-deposit"
-                              ]
-                            }
-                          ]
-                        },
-                        "kind": "nearby.require",
-                        "label": "Nearby item:sand-deposit",
-                        "phase": "start",
-                        "distance": "near"
-                      }
-                    ],
-                    "itemId": "item:sand",
-                    "type": "chance"
-                  }
-                ]
-              }
-            ],
-            "visibility": "visible"
-          }
-        ]
-      },
-      "tags": [
-        "building",
-        "producer",
-        "construction",
-        "sand",
-        "glass",
-        "era:VIII",
-        "industry",
-        "unique"
-      ],
-      "tier": 4
-    }
-  }
+	"$schema": "../../../arkini.schema.json",
+	"items": {
+		"producer:sand-pit": {
+			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
+			"effects": [
+				{
+					"grants": [
+						{
+							"id": "grant:owned:producer:sand-pit",
+							"name": "Owns Sand Pit"
+						}
+					],
+					"id": "effect:grant-owned:producer-sand-pit",
+					"name": "Owned Sand Pit grant",
+					"polarity": "neutral",
+					"sourceScope": "both"
+				}
+			],
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"name": "Sand Pit",
+			"producer": {
+				"lines": [
+					{
+						"durationMs": 9000,
+						"id": "line:sand-pit:sand",
+						"output": [
+							{
+								"entries": [
+									{
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:sand-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:sand-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:sand",
+										"quantity": 2,
+										"type": "guaranteed"
+									},
+									{
+										"chance": 0.35,
+										"effects": [
+											{
+												"chance": 0.2,
+												"display": "whenActive",
+												"kind": "grant.loot.extraOutputChance.add",
+												"label": "Bountiful Offering",
+												"quantity": 1,
+												"selector": {
+													"allOf": [
+														{
+															"ids": [
+																"grant:active:shrine-bountiful-offering"
+															]
+														}
+													]
+												}
+											},
+											{
+												"display": "always",
+												"items": {
+													"anyOf": [
+														{
+															"ids": [
+																"item:sand-deposit"
+															]
+														}
+													]
+												},
+												"kind": "nearby.require",
+												"label": "Nearby item:sand-deposit",
+												"phase": "start",
+												"distance": "near"
+											}
+										],
+										"itemId": "item:sand",
+										"type": "chance"
+									}
+								]
+							}
+						],
+						"visibility": "visible"
+					}
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"sand",
+				"glass",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"tier": 4
+		}
+	}
 }

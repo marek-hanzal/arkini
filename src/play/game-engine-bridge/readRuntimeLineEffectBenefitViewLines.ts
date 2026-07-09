@@ -1,6 +1,6 @@
 import type { GameConfig } from "~/config/GameConfigTypes";
 import type { GameLineDefinition } from "~/config/GameItemCapabilities";
-import { readRuntimeEffectBenefitLines } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
+import { readRuntimeEffectBenefitLines } from "~/effects/readEffectiveLineBonusEntries";
 
 export namespace readRuntimeLineEffectBenefitViewLines {
 	export interface Props {

@@ -23,3 +23,9 @@ Introduce or converge on one canonical post-effect output/bonus shape that downs
 - downstream code consumes one shared post-effect shape more directly
 - duplicated effect-summary assembly shrinks
 - at least one helper or translation layer disappears
+
+## Progress
+- moved line bonus entry and benefit summary generation from `play/game-engine-bridge` into `effects/readEffectiveLineBonusEntries.ts`
+- removed `readRuntimeEffectOperationSummary.ts` bridge helper layer
+- line view and line output readers now consume the shared effects-level bonus shape directly
+- remaining work: inspect craft effect state vs line/output effect summary for any further shared selector opportunities

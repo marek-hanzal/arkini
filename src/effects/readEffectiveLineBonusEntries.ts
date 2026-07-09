@@ -2,34 +2,6 @@ import type { GameConfig } from "~/config/GameConfigTypes";
 import { readGameConfigEffect } from "~/config/readGameConfigEffects";
 import type { EffectiveLine } from "~/effects/EffectiveLine";
 
-export namespace readRuntimeEffectBenefitLines {
-	export interface Props {
-		config: GameConfig;
-		effectId: string;
-	}
-}
-
-export namespace readRuntimeLineActiveEffectBonusEntries {
-	export interface Props {
-		baseDurationMs: number;
-		effectiveLine: EffectiveLine;
-	}
-}
-
-const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
-
-export const readRuntimeEffectBenefitLines = ({
-	config,
-	effectId,
-}: readRuntimeEffectBenefitLines.Props) => {
-	const effect = readGameConfigEffect({
-		config,
-		effectId,
-	});
-	if (!effect) return [];
-	return effect.grants.map((grant) => grant.name);
-};
-
 type EffectInstanceGroup = {
 	durationMultiplier?: number;
 	targetItemId?: string;
@@ -40,10 +12,39 @@ type QuantityRange = {
 	min: number;
 };
 
-export interface RuntimeLineActiveEffectBonusEntry {
+export interface EffectiveLineBonusEntry {
 	itemId?: string;
 	label: string;
 }
+
+
+export namespace readEffectBenefitLines {
+	export interface Props {
+		config: GameConfig;
+		effectId: string;
+	}
+}
+
+export const readEffectBenefitLines = ({
+	config,
+	effectId,
+}: readEffectBenefitLines.Props) => {
+	const effect = readGameConfigEffect({
+		config,
+		effectId,
+	});
+	if (!effect) return [];
+	return effect.grants.map((grant) => grant.name);
+};
+
+export namespace readEffectiveLineBonusEntries {
+	export interface Props {
+		baseDurationMs: number;
+		effectiveLine: EffectiveLine;
+	}
+}
+
+const formatPercent = (value: number) => `${Math.round(value * 100)}%`;
 
 const readQuantityRange = (
 	quantity:
@@ -111,16 +112,12 @@ const groupDurationEffectInstances = (
 
 		groups.set(groupKey, {
 			durationMultiplier: effect.durationMultiplier,
-			sourceKeys: new Set([
-				sourceKey,
-			]),
+			sourceKeys: new Set([sourceKey]),
 			targetItemId: effect.targetItemId,
 		});
 	}
 
-	return [
-		...groups.values(),
-	].map(({ sourceKeys: _sourceKeys, ...group }) => group);
+	return [...groups.values()].map(({ sourceKeys: _sourceKeys, ...group }) => group);
 };
 
 const readChanceAtLeastOne = (chances: readonly number[]) =>
@@ -135,7 +132,7 @@ const readAggregatedChanceItemEntries = ({
 	effectiveLine,
 }: {
 	effectiveLine: EffectiveLine;
-}): RuntimeLineActiveEffectBonusEntry[] => {
+}): EffectiveLineBonusEntry[] => {
 	const groups = new Map<
 		string,
 		{
@@ -165,19 +162,13 @@ const readAggregatedChanceItemEntries = ({
 		}
 
 		groups.set(groupKey, {
-			chances: [
-				chanceItem.chance,
-			],
+			chances: [chanceItem.chance],
 			itemId: chanceItem.itemId,
-			quantityRanges: [
-				quantityRange,
-			],
+			quantityRanges: [quantityRange],
 		});
 	}
 
-	return [
-		...groups.values(),
-	].map((group) => {
+	return [...groups.values()].map((group) => {
 		const rollCount = group.chances.length;
 		const firstSuccessMin = Math.min(...group.quantityRanges.map((quantity) => quantity.min));
 		const maxQuantity = group.quantityRanges.reduce(
@@ -268,7 +259,7 @@ const readDurationEffectBonusEntries = ({
 }: {
 	effectiveLine: EffectiveLine;
 	fallbackDurationRatio: number;
-}): RuntimeLineActiveEffectBonusEntry[] =>
+}): EffectiveLineBonusEntry[] =>
 	groupDurationEffectInstances(effectiveLine.appliedEffects).flatMap((group) => {
 		const durationRatio = group.durationMultiplier ?? fallbackDurationRatio;
 		if (durationRatio === 1) return [];
@@ -284,10 +275,10 @@ const readDurationEffectBonusEntries = ({
 		];
 	});
 
-export const readRuntimeLineActiveEffectBonusEntries = ({
+export const readEffectiveLineBonusEntries = ({
 	baseDurationMs,
 	effectiveLine,
-}: readRuntimeLineActiveEffectBonusEntries.Props): RuntimeLineActiveEffectBonusEntry[] => {
+}: readEffectiveLineBonusEntries.Props): EffectiveLineBonusEntry[] => {
 	const durationRatio =
 		effectiveLine.effectDurationMultiplier ??
 		(baseDurationMs > 0 ? effectiveLine.durationMs / baseDurationMs : 1);
@@ -303,6 +294,10 @@ export const readRuntimeLineActiveEffectBonusEntries = ({
 	];
 };
 
-export const readRuntimeLineActiveEffectBonusLines = (
-	props: readRuntimeLineActiveEffectBonusEntries.Props,
-) => readRuntimeLineActiveEffectBonusEntries(props).map((entry) => entry.label);
+export const readEffectiveLineBonusLines = (
+	props: readEffectiveLineBonusEntries.Props,
+) => readEffectiveLineBonusEntries(props).map((entry) => entry.label);
+
+export const readRuntimeEffectBenefitLines = readEffectBenefitLines;
+export const readRuntimeLineActiveEffectBonusEntries = readEffectiveLineBonusEntries;
+export const readRuntimeLineActiveEffectBonusLines = readEffectiveLineBonusLines;

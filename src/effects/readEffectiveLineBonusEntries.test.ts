@@ -1,17 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { loadGameConfigPackFromFile } from "~/config/pack/loadGameConfigPackFromFile";
 import {
-	readRuntimeEffectBenefitLines,
-	readRuntimeLineActiveEffectBonusEntries,
-	readRuntimeLineActiveEffectBonusLines,
-} from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
+	readEffectBenefitLines,
+	readEffectiveLineBonusEntries,
+	readEffectiveLineBonusLines,
+} from "~/effects/readEffectiveLineBonusEntries";
 
-const defaultGameConfig = await loadGameConfigPackFromFile("game/arkini.game.arkpack");
+const defaultGameConfig = {
+	items: {
+		"item:test:minor-haste": {
+			effects: [{
+				id: "effect:shrine-minor-haste",
+				grants: [{ id: "grant:test:minor-haste", name: "Minor Haste active" }],
+				name: "Minor Haste",
+			}],
+			name: "Minor Haste Source",
+		},
+		"item:test:bountiful-offering": {
+			effects: [{
+				id: "effect:shrine-bountiful-offering",
+				grants: [{ id: "grant:test:bountiful-offering", name: "Bountiful Offering active" }],
+				name: "Bountiful Offering",
+			}],
+			name: "Bountiful Offering Source",
+		},
+	},
+} as const;
 
-describe("readRuntimeEffectBenefitLines", () => {
+describe("readEffectiveLineBonusEntries", () => {
 	it("describes shrine speed boosts in player-readable copy", () => {
 		expect(
-			readRuntimeEffectBenefitLines({
+			readEffectBenefitLines({
 				config: defaultGameConfig,
 				effectId: "effect:shrine-minor-haste",
 			}),
@@ -22,7 +40,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("describes shrine quantity grants in player-readable copy", () => {
 		expect(
-			readRuntimeEffectBenefitLines({
+			readEffectBenefitLines({
 				config: defaultGameConfig,
 				effectId: "effect:shrine-bountiful-offering",
 			}),
@@ -33,7 +51,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("describes active line bonuses from effective runtime state", () => {
 		expect(
-			readRuntimeLineActiveEffectBonusLines({
+			readEffectiveLineBonusLines({
 				baseDurationMs: 1000,
 				effectiveLine: {
 					appliedEffects: [
@@ -87,7 +105,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("uses effect multiplier, not cheat-clamped runtime duration, for duration bonus copy", () => {
 		expect(
-			readRuntimeLineActiveEffectBonusLines({
+			readEffectiveLineBonusLines({
 				baseDurationMs: 60000,
 				effectiveLine: {
 					appliedEffects: [
@@ -119,7 +137,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("aggregates stacked active line bonuses into resulting numbers", () => {
 		expect(
-			readRuntimeLineActiveEffectBonusLines({
+			readEffectiveLineBonusLines({
 				baseDurationMs: 1000,
 				effectiveLine: {
 					appliedEffects: [
@@ -201,7 +219,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("describes uncapped chance bonuses as guaranteed plus remainder rolls", () => {
 		expect(
-			readRuntimeLineActiveEffectBonusLines({
+			readEffectiveLineBonusLines({
 				baseDurationMs: 1000,
 				effectiveLine: {
 					appliedEffects: [],
@@ -246,7 +264,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("respects hidden display rules when summarizing chance bonuses", () => {
 		expect(
-			readRuntimeLineActiveEffectBonusLines({
+			readEffectiveLineBonusLines({
 				baseDurationMs: 1000,
 				effectiveLine: {
 					appliedEffects: [],
@@ -276,7 +294,7 @@ describe("readRuntimeEffectBenefitLines", () => {
 
 	it("keeps active bonus summaries attached to their affected output item", () => {
 		expect(
-			readRuntimeLineActiveEffectBonusEntries({
+			readEffectiveLineBonusEntries({
 				baseDurationMs: 1000,
 				effectiveLine: {
 					appliedEffects: [

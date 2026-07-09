@@ -2,7 +2,7 @@ import type { LineView } from "~/board/view/LineViewSchema";
 import { readGameSaveItemQuantityByScope } from "~/activation/readGameSaveItemQuantityByScope";
 import type { GameSave } from "~/engine/model/GameSaveSchema";
 import type { EffectiveDropEffectOutcome, EffectiveLine } from "~/effects/EffectiveLine";
-import type { RuntimeLineActiveEffectBonusEntry } from "~/play/game-engine-bridge/readRuntimeEffectOperationSummary";
+import type { EffectiveLineBonusEntry } from "~/effects/readEffectiveLineBonusEntries";
 
 type LineOutputEntry = EffectiveLine["lootPlan"]["visibleOutput"][number];
 type LineOutputView = NonNullable<LineView["outputs"]>[number];
@@ -14,7 +14,7 @@ type IndexedLineOutputView = LineOutputView & {
 
 export namespace readRuntimeLineOutputViews {
 	export interface Props {
-		effectBonusEntries?: readonly RuntimeLineActiveEffectBonusEntry[];
+		effectBonusEntries?: readonly EffectiveLineBonusEntry[];
 		effectiveLine: EffectiveLine;
 		save: GameSave;
 	}
@@ -123,7 +123,7 @@ const pushUniqueBonusLine = (lines: string[], line: string) => {
 };
 
 const readBonusLinesByItemId = (
-	entries: readonly RuntimeLineActiveEffectBonusEntry[],
+	entries: readonly EffectiveLineBonusEntry[],
 ): ReadonlyMap<string, readonly string[]> => {
 	const byItemId = new Map<string, string[]>();
 
@@ -138,7 +138,7 @@ const readBonusLinesByItemId = (
 };
 
 const readUniversalBonusLines = (
-	entries: readonly RuntimeLineActiveEffectBonusEntry[],
+	entries: readonly EffectiveLineBonusEntry[],
 ): readonly string[] => {
 	const lines: string[] = [];
 	for (const entry of entries) {

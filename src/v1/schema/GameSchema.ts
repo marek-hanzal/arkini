@@ -13,6 +13,12 @@ import { VersionEnumSchema } from "./VersionEnumSchema";
 export const GameSchema = z
 	.object({
 		/**
+		 * Optional JSON Schema reference used by configuration authoring tools.
+		 */
+		$schema: z.string().min(1).optional().describe(
+			"The optional JSON Schema reference used by configuration authoring tools.",
+		),
+		/**
 		 * Core metadata and player-available layouts for this game.
 		 */
 		meta: MetaSchema.describe("Core metadata and player-available layouts for this game."),

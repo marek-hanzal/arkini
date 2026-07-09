@@ -84,3 +84,7 @@ Desired direction:
 
 - 2026-07-09 craft remeasure after `7fb8c0b0`: craft total ~2819 LOC across 38 impl files. Top craft hotspots: `readCraftLineEffectState.ts` 324, `syncRealtimeCraftJobsFx.ts` 296, `readRuntimeCraftViewFromGameSave.ts` 274. Follow-up pass moved craft effect evaluation to a single internal analysis path reused by gate and full effect state readers.
 - 2026-07-09: Simplified `syncRealtimeCraftJobsFx` to read current draft save once per job, derive `startGateReady` from the same snapshot, and pass that save into retime/resume timing instead of re-reading via separate helpers. Verified with typecheck and targeted craft/runtime tests.
+
+- 2026-07-09 broader remeasure at `7488dfa7`: craft cluster was intentionally cooled down after several passes; next broader ROI should move to board/drop interaction surfaces or remaining interaction hub cleanup rather than tunneling deeper into craft.
+
+- 2026-07-09 broader pass after `7488dfa7`: switched focus away from craft-only cleanup and added a board tap/runtime surface task. Simplified `resolveBoardItemTapAction.ts` and `handleResolvedBoardItemTapAction.ts` to straightforward ordered control flow without matcher ceremony; board tap remains a surface worth watching, but no longer needs a dedicated hotspot push right now.

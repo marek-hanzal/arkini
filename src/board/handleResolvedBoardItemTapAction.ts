@@ -1,4 +1,3 @@
-import { match } from "ts-pattern";
 import type {
 	BoardItemActivationRuntime,
 	BoardItemActivationTarget,
@@ -27,72 +26,43 @@ export const handleResolvedBoardItemTapAction = ({
 		nowMs: target.nowMs,
 	});
 
-	match(action)
-		.with(
-			{
-				type: "claim-craft",
-			},
-			() =>
-				handleClaimCraftTapAction({
-					feedback,
-					nowMs: target.nowMs,
-					runtimeStore,
-				}),
-		)
-		.with(
-			{
-				type: "start-craft",
-			},
-			({ boardItemId, recipeId }) =>
-				handleStartCraftTapAction({
-					boardItemId,
-					feedback,
-					nowMs: target.nowMs,
-					recipeId,
-					runtimeStore,
-				}),
-		)
-		.with(
-			{
-				type: "open-sheet",
-			},
-			({ sheet }) => onOpenSheet(sheet),
-		)
-		.with(
-			{
-				type: "activate-board-memory",
-			},
-			({ boardItemId }) =>
-				handleBoardMemoryTapAction({
-					boardItemId,
-					feedback,
-					nowMs: target.nowMs,
-					runtimeStore,
-				}),
-		)
-		.with(
-			{
-				type: "set-cheat-speed-mode",
-			},
-			({ mode }) =>
-				handleCheatSpeedTapAction({
-					feedback,
-					mode,
-					nowMs: target.nowMs,
-					runtimeStore,
-				}),
-		)
-		.with(
-			{
-				type: "activate",
-			},
-			({ lineId }) =>
-				handleActivationBoardItemTapAction({
-					feedback,
-					lineId,
-					runtimeStore,
-					target,
-				}),
-		)
-		.exhaustive();
+	switch (action.type) {
+		case "claim-craft":
+			return handleClaimCraftTapAction({
+				feedback,
+				nowMs: target.nowMs,
+				runtimeStore,
+			});
+		case "start-craft":
+			return handleStartCraftTapAction({
+				boardItemId: action.boardItemId,
+				feedback,
+				nowMs: target.nowMs,
+				recipeId: action.recipeId,
+				runtimeStore,
+			});
+		case "open-sheet":
+			return onOpenSheet(action.sheet);
+		case "activate-board-memory":
+			return handleBoardMemoryTapAction({
+				boardItemId: action.boardItemId,
+				feedback,
+				nowMs: target.nowMs,
+				runtimeStore,
+			});
+		case "set-cheat-speed-mode":
+			return handleCheatSpeedTapAction({
+				feedback,
+				mode: action.mode,
+				nowMs: target.nowMs,
+				runtimeStore,
+			});
+		case "activate":
+			return handleActivationBoardItemTapAction({
+				feedback,
+				lineId: action.lineId,
+				runtimeStore,
+				target,
+			});
+	}
 };

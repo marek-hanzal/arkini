@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
+import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
  * An item that disables the speed cheat.
@@ -9,7 +9,7 @@ import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
 export const CheatSpeedOffItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemTypeEnumSchema.extract([
+		type: ItemEnumSchema.extract([
 			"cheat:speed:off",
 		]),
 	})

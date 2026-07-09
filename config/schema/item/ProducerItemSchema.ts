@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
+import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
  * An item that will produce gameplay outputs.
@@ -9,7 +9,7 @@ import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
 export const ProducerItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemTypeEnumSchema.extract([
+		type: ItemEnumSchema.extract([
 			"producer",
 		]),
 	})

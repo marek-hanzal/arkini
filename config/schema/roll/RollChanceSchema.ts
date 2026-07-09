@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseRollSchema } from "./BaseRollSchema";
 import { DropSchema } from "../output/DropSchema";
-import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
+import { RollEnumSchema } from "./RollEnumSchema";
 import { ChanceSchema } from "../util/ChanceSchema";
 
 /**
@@ -11,7 +11,7 @@ import { ChanceSchema } from "../util/ChanceSchema";
 export const RollChanceSchema = z
 	.object({
 		...BaseRollSchema.shape,
-		type: RollTypeEnumSchema.extract([
+		type: RollEnumSchema.extract([
 			"chance",
 		]),
 		/**

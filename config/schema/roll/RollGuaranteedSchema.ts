@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseRollSchema } from "./BaseRollSchema";
 import { DropSchema } from "../output/DropSchema";
-import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
+import { RollEnumSchema } from "./RollEnumSchema";
 
 /**
  * An output roll that provides its output whenever its rules allow it.
@@ -10,7 +10,7 @@ import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
 export const RollGuaranteedSchema = z
 	.object({
 		...BaseRollSchema.shape,
-		type: RollTypeEnumSchema.extract([
+		type: RollEnumSchema.extract([
 			"guaranteed",
 		]),
 		/**

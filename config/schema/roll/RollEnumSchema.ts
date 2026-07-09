@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Discriminates the rule used to determine whether an output roll is provided.
  */
-export const RollTypeEnumSchema = z
+export const RollEnumSchema = z
 	.enum([
 		/**
 		 * The output is always provided when the roll's own rules allow it.
@@ -20,8 +20,8 @@ export const RollTypeEnumSchema = z
 	])
 	.describe("The rule used to determine an output roll.");
 
-export type RollTypeEnumSchema = typeof RollTypeEnumSchema;
+export type RollEnumSchema = typeof RollEnumSchema;
 
-export namespace RollTypeEnumSchema {
-	export type Type = z.infer<RollTypeEnumSchema>;
+export namespace RollEnumSchema {
+	export type Type = z.infer<RollEnumSchema>;
 }

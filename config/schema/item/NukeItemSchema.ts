@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
+import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
  * An item that will trigger the nuke gameplay effect.
@@ -9,7 +9,7 @@ import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
 export const NukeItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemTypeEnumSchema.extract([
+		type: ItemEnumSchema.extract([
 			"nuke",
 		]),
 	})

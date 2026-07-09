@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseRollSchema } from "./BaseRollSchema";
 import { QuantitySchema } from "../quantity/QuantitySchema";
-import { RollTypeEnumSchema } from "./RollTypeEnumSchema";
+import { RollEnumSchema } from "./RollEnumSchema";
 import { DropWeightSchema } from "./DropWeightSchema";
 
 /**
@@ -11,7 +11,7 @@ import { DropWeightSchema } from "./DropWeightSchema";
 export const RollWeightSchema = z
 	.object({
 		...BaseRollSchema.shape,
-		type: RollTypeEnumSchema.extract([
+		type: RollEnumSchema.extract([
 			"weight",
 		]),
 		/**

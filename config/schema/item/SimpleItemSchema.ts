@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseItemSchema } from "./BaseItemSchema";
-import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
+import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
  * An item with no specialized gameplay behavior.
@@ -9,7 +9,7 @@ import { ItemTypeEnumSchema } from "./ItemTypeEnumSchema";
 export const SimpleItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemTypeEnumSchema.extract([
+		type: ItemEnumSchema.extract([
 			"simple",
 		]),
 	})

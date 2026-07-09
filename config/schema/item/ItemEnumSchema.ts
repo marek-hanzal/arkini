@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Discriminates the specialized configuration schema used by an item.
  */
-export const ItemTypeEnumSchema = z
+export const ItemEnumSchema = z
 	.enum([
 		"simple",
 		"producer",
@@ -16,8 +16,8 @@ export const ItemTypeEnumSchema = z
 	])
 	.describe("The kind of gameplay item described by an item configuration.");
 
-export type ItemTypeEnumSchema = typeof ItemTypeEnumSchema;
+export type ItemEnumSchema = typeof ItemEnumSchema;
 
-export namespace ItemTypeEnumSchema {
-	export type Type = z.infer<ItemTypeEnumSchema>;
+export namespace ItemEnumSchema {
+	export type Type = z.infer<ItemEnumSchema>;
 }

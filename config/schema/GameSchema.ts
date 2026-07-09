@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ItemSchema } from "./item/ItemSchema";
+import { MetaSchema } from "./meta/MetaSchema";
 import { IdSchema } from "./util/IdSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 
@@ -11,6 +12,13 @@ import { VersionEnumSchema } from "./VersionEnumSchema";
  */
 export const GameSchema = z
 	.object({
+		/**
+		 * Core metadata and player-available layouts for this game.
+		 */
+		meta: MetaSchema.describe("Core metadata and player-available layouts for this game."),
+		/**
+		 * Version of this game configuration's schema contract.
+		 */
 		version: VersionEnumSchema,
 		/**
 		 * Canonical game items keyed by their unique identifier.

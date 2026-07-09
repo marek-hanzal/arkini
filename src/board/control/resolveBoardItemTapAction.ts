@@ -2,8 +2,8 @@ import { match, P } from "ts-pattern";
 import type { BoardViewItem } from "~/board/view/BoardViewItemSchema";
 import { readLiveBoardItemView } from "~/board/view/readLiveBoardItemView";
 import { readBoardUtilityItemSheet } from "~/board/BoardUtilityItem";
-import { isBoardMemoryItemId } from "~/board-memory/GameBoardMemoryItem";
 import { readCheatSpeedToggleModeFromItemId } from "~/cheat/GameCheatSpeedItem";
+import { readItemSpecialInteractionKind } from "~/item/ItemInteractionProfile";
 import type { GameCheatSpeedMode } from "~/cheat/GameCheatSpeedMode";
 import { readCraftRunState } from "~/craft/view/readCraftRunState";
 import type { ActiveSheetState } from "~/play/sheet/ActiveSheetState";
@@ -63,28 +63,34 @@ const resolveSpecialBoardItemTapAction = ({
 }: Pick<resolveBoardItemTapAction.Props, "boardItem">):
 	| resolveBoardItemTapAction.Result
 	| undefined => {
-	const cheatSpeedMode = readCheatSpeedToggleModeFromItemId(boardItem.itemId);
-	if (cheatSpeedMode) {
-		return {
-			mode: cheatSpeedMode,
-			type: "set-cheat-speed-mode",
-		};
+	switch (readItemSpecialInteractionKind(boardItem.itemId)) {
+		case "clock": {
+			const cheatSpeedMode = readCheatSpeedToggleModeFromItemId(boardItem.itemId);
+			if (!cheatSpeedMode) return undefined;
+			return {
+				mode: cheatSpeedMode,
+				type: "set-cheat-speed-mode",
+			};
+		}
+		case "memory":
+			return {
+				boardItemId: boardItem.id,
+				type: "activate-board-memory",
+			};
+		case "cheat-inventory":
+		case "inventory":
+		case "nuke-save": {
+			const utilitySheet = readBoardUtilityItemSheet(boardItem.itemId);
+			return utilitySheet
+				? {
+						sheet: utilitySheet,
+						type: "open-sheet",
+					}
+				: undefined;
+		}
+		case "none":
+			return undefined;
 	}
-
-	if (isBoardMemoryItemId(boardItem.itemId)) {
-		return {
-			boardItemId: boardItem.id,
-			type: "activate-board-memory",
-		};
-	}
-
-	const utilitySheet = readBoardUtilityItemSheet(boardItem.itemId);
-	return utilitySheet
-		? {
-				sheet: utilitySheet,
-				type: "open-sheet",
-			}
-		: undefined;
 };
 
 const resolveCraftBoardItemTapAction = ({

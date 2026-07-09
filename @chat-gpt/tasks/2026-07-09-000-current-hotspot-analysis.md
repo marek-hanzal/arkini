@@ -70,3 +70,8 @@ Desired direction:
 - audio synth
 
 - Update after interaction pass: `resolveItemToBoardItemInteractionPlan.ts` now owns one exported commit helper instead of two extra translator exports, and the main resolver is organized by ordered interaction families (merge -> stack -> input families -> swap) rather than by a single mega facts object. Re-measure before doing another pass here.
+
+## 2026-07-09 follow-up
+- `resolveItemToBoardItemInteractionPlan.ts` now uses a readable compiled `ItemInteractionProfile` instead of repeatedly spelunking config state inline.
+- The hotspot still exists, but the remaining cost is now mostly true precedence logic, not repeated static capability checks.
+- `resolveBoardItemTapAction.ts` also shares the new `specialInteractionKind` classification, which reduces one more cluster of open-coded special item checks.

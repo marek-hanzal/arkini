@@ -9,6 +9,7 @@ import type { ItemId } from "~/config/GameIdSchema";
 import { resolveExecutableItemMergeRule } from "~/merge/resolveExecutableItemMergeRule";
 import type { ItemToBoardItemInteractionPlan } from "~/play/interaction/ItemToBoardItemInteractionPlan";
 import { readAcceptedTransferQuantity } from "~/quantity/readAcceptedTransferQuantity";
+import { readItemInteractionProfile } from "~/item/ItemInteractionProfile";
 
 export namespace resolveItemToBoardItemInteractionPlan {
 	export interface Props {
@@ -54,6 +55,17 @@ const readMergeInteractionPlan = ({
 	sourceItemId,
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan | undefined => {
+	const sourceProfile = readItemInteractionProfile({
+		config,
+		itemId: sourceItemId,
+	});
+	if (
+		!sourceProfile.hasExplicitMergeRules ||
+		!sourceProfile.mergeTargetIds.includes(targetItem.itemId)
+	) {
+		return undefined;
+	}
+
 	const mergeRule = resolveExecutableItemMergeRule({
 		config,
 		sourceItemId,
@@ -65,7 +77,12 @@ const readMergeInteractionPlan = ({
 		mergeRule.merge && "resultItemId" in mergeRule.merge
 			? mergeRule.merge.resultItemId
 			: undefined;
-	if (mergeResultItemId && !readTargetCanBeReplacedByMerge({ targetItem })) {
+	if (
+		mergeResultItemId &&
+		!readTargetCanBeReplacedByMerge({
+			targetItem,
+		})
+	) {
 		return undefined;
 	}
 
@@ -84,7 +101,16 @@ const readStackInteractionPlan = ({
 	sourceItemId,
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan | undefined => {
-	if (sourceItemId !== targetItem.itemId) return undefined;
+	const sourceProfile = readItemInteractionProfile({
+		config,
+		itemId: sourceItemId,
+	});
+	const targetProfile = readItemInteractionProfile({
+		config,
+		itemId: targetItem.itemId,
+	});
+	if (!sourceProfile.stackKey || sourceProfile.stackKey !== targetProfile.stackKey)
+		return undefined;
 	if (
 		isBoardViewItemRuntimeBusy(targetItem) ||
 		isBoardViewItemRuntimeStatePreserved(targetItem)
@@ -92,8 +118,10 @@ const readStackInteractionPlan = ({
 		return undefined;
 	}
 
-	const maxStackSize = config.items[targetItem.itemId]?.maxStackSize ?? 1;
-	if (maxStackSize <= 1 || readBoardViewItemQuantity(targetItem) >= maxStackSize) {
+	const maxStackSize = targetProfile.stackKey
+		? (config.items[targetItem.itemId]?.maxStackSize ?? 1)
+		: 1;
+	if (readBoardViewItemQuantity(targetItem) >= maxStackSize) {
 		return undefined;
 	}
 
@@ -103,11 +131,17 @@ const readStackInteractionPlan = ({
 };
 
 const readCraftInputInteractionPlan = ({
+	config,
 	sourceItemId,
 	sourceQuantity,
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan | undefined => {
+	const targetProfile = readItemInteractionProfile({
+		config,
+		itemId: targetItem.itemId,
+	});
 	if (
+		(!targetProfile.acceptsCraftInput && !targetItem.craft) ||
 		!targetItem.craft?.canAcceptInputs ||
 		!targetItem.craft.acceptedInputItemIds.includes(sourceItemId as ItemId)
 	) {
@@ -135,10 +169,18 @@ const readCraftInputInteractionPlan = ({
 };
 
 const readStashInputInteractionPlan = ({
+	config,
 	sourceItemId,
 	sourceQuantity,
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan | undefined => {
+	const targetProfile = readItemInteractionProfile({
+		config,
+		itemId: targetItem.itemId,
+	});
+	if (!targetProfile.acceptsStashInput && targetItem.activation?.kind !== "stash")
+		return undefined;
+
 	const input =
 		targetItem.activation?.kind === "stash"
 			? targetItem.activation.inputs.find(
@@ -168,6 +210,12 @@ const readTileRemoveInteractionPlan = ({
 	sourceItemId,
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan | undefined => {
+	const targetProfile = readItemInteractionProfile({
+		config,
+		itemId: targetItem.itemId,
+	});
+	if (!targetProfile.removableByItemIds.includes(sourceItemId as ItemId)) return undefined;
+
 	const removal = config.items[targetItem.itemId]?.removeBy?.find(
 		(entry) => entry.itemId === sourceItemId,
 	);
@@ -182,10 +230,18 @@ const readTileRemoveInteractionPlan = ({
 };
 
 const readProducerInputInteractionPlan = ({
+	config,
 	sourceItemId,
 	sourceQuantity,
 	targetItem,
 }: resolveItemToBoardItemInteractionPlan.Props): ItemToBoardItemInteractionPlan | undefined => {
+	const targetProfile = readItemInteractionProfile({
+		config,
+		itemId: targetItem.itemId,
+	});
+	if (!targetProfile.acceptsProducerInput && targetItem.activation?.kind !== "producer")
+		return undefined;
+
 	const candidate = (targetItem.activation?.lines ?? [])
 		.map((line, index) => ({
 			index,
@@ -291,7 +347,9 @@ const readItemInteractionAction = ({
 			};
 		case "stash-input":
 			return {
-				inputRefs: [sourceRef],
+				inputRefs: [
+					sourceRef,
+				],
 				stashItemInstanceId: targetItemInstanceId,
 				type: "stash.open",
 			};

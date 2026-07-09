@@ -73,12 +73,18 @@ describe("readItemToBoardItemInteractionCommit", () => {
 			}),
 		).toEqual({
 			action: {
-				inputRef: sourceRef,
+				inputRef: {
+					...sourceRef,
+					quantity: 1,
+				},
 				itemInstanceId: "target",
 				lineId: "line:test",
 				type: "producer.input.store",
 			},
-			sourceRef,
+			sourceRef: {
+				...sourceRef,
+				quantity: 1,
+			},
 		});
 
 		expect(
@@ -95,12 +101,18 @@ describe("readItemToBoardItemInteractionCommit", () => {
 		).toEqual({
 			action: {
 				inputRefs: [
-					sourceRef,
+					{
+						...sourceRef,
+						quantity: 1,
+					},
 				],
 				stashItemInstanceId: "target",
 				type: "stash.open",
 			},
-			sourceRef,
+			sourceRef: {
+				...sourceRef,
+				quantity: 1,
+			},
 		});
 
 		expect(
@@ -117,10 +129,16 @@ describe("readItemToBoardItemInteractionCommit", () => {
 		).toEqual({
 			action: {
 				targetItemInstanceId: "target",
-				toolRef: sourceRef,
+				toolRef: {
+					...sourceRef,
+					quantity: 1,
+				},
 				type: "tile.remove",
 			},
-			sourceRef,
+			sourceRef: {
+				...sourceRef,
+				quantity: 1,
+			},
 		});
 	});
 

@@ -1,0 +1,23 @@
+import { Effect } from "effect";
+
+import type { BaseItemSchema } from "~/v1/item/schema/BaseItemSchema";
+import type { SelectorItemSchema } from "~/v1/selector/schema/SelectorItemSchema";
+
+export namespace selectorItemFx {
+	export interface Props {
+		selector: SelectorItemSchema.Type;
+		item: BaseItemSchema.Type;
+	}
+
+	export type Result = boolean;
+}
+
+/** Tests whether a canonical item has the ID selected by an item selector. */
+export const selectorItemFx = Effect.fn("selectorItemFx")(function* ({
+	selector,
+	item,
+}: selectorItemFx.Props) {
+	const result = selector.itemId === item.id;
+
+	return result satisfies selectorItemFx.Result;
+});

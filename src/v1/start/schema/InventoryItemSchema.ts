@@ -21,7 +21,7 @@ export const InventoryItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "InventoryItemSchema",
+		id: "start.InventoryItemSchema",
 		description: "A positive quantity of one canonical item in the initial inventory.",
 	});
 

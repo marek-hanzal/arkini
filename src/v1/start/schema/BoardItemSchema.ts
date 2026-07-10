@@ -27,7 +27,7 @@ export const BoardItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "BoardItemSchema",
+		id: "start.BoardItemSchema",
 		description: "One canonical item placed at an explicit initial board coordinate.",
 	});
 

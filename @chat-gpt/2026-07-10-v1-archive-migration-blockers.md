@@ -13,24 +13,28 @@ Branch: `migration/v1-archive`
 
 All 190 source fragments pass `GameSourceSchema`; the merged 189-item configuration passes `GameSchema`.
 
-## Hard model gaps
+## Migration decisions and remaining model work
 
-### Game state cannot be authored
+### Deferred: authored initial game state
 
-`GameSchema`/`MetaSchema` have no equivalent of archive `startingState`, so the initial board and inventory cannot be migrated.
+`GameSchema`/`MetaSchema` have no equivalent of archive `startingState`. Initial board and inventory authoring is intentionally deferred until the game implementation needs it; it does not block the current definition-schema pass.
 
-### Missing special item types
+### Reserved special item types
 
-- `item:inventory`
-- `item:board-memory`
+- `inventory`
+- `memory`
 
-The four other root special items are representable and were migrated.
+Both discriminators now exist in `ItemEnumSchema`. Their concrete item schemas and runtime behavior remain deferred. The canonical type is `memory`, not `board-memory`.
 
-### Autonomous product lines are forbidden
+### Resolved model: explicit simple input
 
-`LineSchema.input` is a non-empty tuple. This blocks legitimate zero-material production lines:
+`LineSchema.input` remains a non-empty tuple. Legitimate zero-material production lines use the explicit `{ "type": "simple" }` input, which carries no material consumption, reservation, quantity, capacity, or deposit operation.
+
+Affected producers include:
 
 - `producer:cookhouse-t1`
+- `producer:lumberjack-t1`
+- `producer:quarry-t1`
 - `producer:quarry-t2`
 - `producer:sand-pit`
 - `producer:townhall-t2`
@@ -38,11 +42,11 @@ The four other root special items are representable and were migrated.
 - `producer:townhall-t4`
 - `producer:well-t1`
 
-A line must be allowed to have `input: []`; otherwise the model cannot represent producers driven only by runtime, proximity or an output/effect.
+### Deferred redesign: effects as temporary items
 
-### Persistent and timed grants do not exist
+Do not add a detached persistent-grant state subsystem. The intended redesign is for a shrine or another source to create a real item with a temporary effect duration. The item occupies board space, participates in existing item mechanics, and disappears when its duration expires. Schema support for item lifetime/expiry will be designed with that gameplay pass.
 
-Queries can inspect items only. They cannot inspect persistent gameplay state such as:
+Historical grant identities that need remapping include:
 
 - `grant:active:shrine-minor-haste`
 - `grant:active:shrine-bountiful-offering`
@@ -50,21 +54,23 @@ Queries can inspect items only. They cannot inspect persistent gameplay state su
 - `grant:path:faith`
 - `grant:path:mages`
 
-This blocks the shrine itself, three mutually exclusive path blueprints and path-dependent University drops.
+This work remains deferred together with the shrine, path blueprints and path-dependent University behavior.
 
-### Dynamic output chance cannot be expressed
+### Obsolete: legacy dynamic output-effect subsystem
 
-There is no rule that modifies a roll's chance or adds an extra output chance based on a condition. This blocks the shrine's bountiful bonus on 39 producers and the Lumberjack's per-nearby-source output chance.
+The archived dynamic output-effect subsystem will not be migrated. The current rule system remains the canonical model. Legacy effects will be deleted from migrated definitions first; any genuinely missing behavior will be reconsidered later as a dedicated rule-system quest.
 
-### Conditional runtime bands are not safely expressible
+### Deferred simplification: conditional runtime bands
 
-The archive uses mutually exclusive distance bands such as `close => 2x`, `near => 1.5x`. Current board queries are cumulative radii, so two independent multiplier rules would stack for a close item and change the behavior.
+The archived mutually exclusive distance-band behavior is intentionally not preserved during the first migration. It was overcomplicated and will be redesigned later using the current rule system.
 
 Affected producer families include farms, animal producers, Brewery and Winery.
 
-### `board_then_inventory` placement is missing
+### Resolved runtime policy: implicit inventory fallback
 
-`PlacementEnumSchema` has only `drop`, `random` and `replace`. It cannot preserve explicit board-first, inventory-fallback delivery used by:
+`board_then_inventory` is not an authored placement strategy. Every placement type only selects how runtime attempts board placement. Independently of that type, runtime checks available board space and uses the emitted item's scope to decide whether anything that does not fit may fall back to inventory. Archived `board_then_inventory` fields are omitted during migration.
+
+This unblocks placement mapping for:
 
 - `item:chest-t1` through `item:chest-t4`
 - `producer:waste-processor-t1`
@@ -81,4 +87,4 @@ The remaining 58 legacy definitions are the actual migration backlog:
 - 3 path blueprints
 - 2 special items
 
-Because those canonical entities cannot yet be represented, the migrated WIP config currently contains 53 dangling item references to blocked producers and chests. This is intentional for the schema-design branch and must be resolved before the configuration is treated as runtime-complete.
+The migrated WIP config still contains dangling item references to producers and chests that remain in the archive. This is intentional during the schema-design pass and must reach zero before the configuration is treated as definition-complete.

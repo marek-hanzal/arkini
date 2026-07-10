@@ -47,7 +47,7 @@ export const LineSchema = z
 			"The runtime of this product line in milliseconds; zero completes immediately.",
 		),
 		/**
-		 * One or more material or deposit requirements for this product line.
+		 * One or more input requirements for this product line.
 		 */
 		input: z
 			.tuple(
@@ -56,7 +56,7 @@ export const LineSchema = z
 				],
 				InputSchema,
 			)
-			.describe("One or more material or deposit requirements for this product line."),
+			.describe("One or more input requirements for this product line."),
 		/**
 		 * Optional result produced when this product line completes.
 		 *

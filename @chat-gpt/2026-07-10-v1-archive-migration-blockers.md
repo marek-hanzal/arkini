@@ -5,6 +5,7 @@ Branch: `migration/v1-archive`
 ## Migrated
 
 - 189 canonical items now exist in `game/arkini`.
+- Their 189 legacy definitions were removed from `game/archive`; the archive now contains only unresolved migration backlog.
 - 131 authoring fragments were added on top of the 58 fragments already migrated.
 - Migrated content includes simple items, deposits, 74 craft items, 15 producers and four supported special items.
 - `game/arkini/game.json` gained the `building`, `treasure` and `utility` categories.
@@ -71,7 +72,9 @@ Affected producer families include farms, animal producers, Brewery and Winery.
 - `producer:bio-waste-processor-t1`
 - `producer:bio-waste-processor-t2`
 
-### Blocked archive entities
+### Remaining archive entities
+
+The remaining 58 legacy definitions are the actual migration backlog:
 
 - 49 producers
 - 4 stash items

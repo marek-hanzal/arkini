@@ -26,6 +26,10 @@ export const ItemEnumSchema = z
 		 */
 		"stash",
 		/**
+		 * A board-only item that expires after a configured duration.
+		 */
+		"temporary",
+		/**
 		 * A board item that opens the shared inventory.
 		 */
 		"inventory",

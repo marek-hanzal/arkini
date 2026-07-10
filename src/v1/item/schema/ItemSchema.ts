@@ -9,6 +9,7 @@ import { NukeItemSchema } from "./NukeItemSchema";
 import { ProducerItemSchema } from "./ProducerItemSchema";
 import { SimpleItemSchema } from "./SimpleItemSchema";
 import { StashItemSchema } from "./StashItemSchema";
+import { TemporaryItemSchema } from "./TemporaryItemSchema";
 
 /**
  * An item configuration, resolved by its `type` discriminator.
@@ -23,6 +24,7 @@ export const ItemSchema = z
 		ProducerItemSchema,
 		CraftItemSchema,
 		StashItemSchema,
+		TemporaryItemSchema,
 		CheatSpeedOnItemSchema,
 		CheatSpeedOffItemSchema,
 		NukeItemSchema,

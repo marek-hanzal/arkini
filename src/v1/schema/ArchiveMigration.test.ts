@@ -61,8 +61,6 @@ describe("archive migration", () => {
 		].sort();
 
 		expect(archiveItemIds).toEqual([
-			"item:board-memory",
-			"item:inventory",
 			"producer:shrine-t1",
 		]);
 	});

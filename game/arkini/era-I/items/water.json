@@ -31,6 +31,7 @@
 						"itemId": "item:tree"
 					},
 					"action": "consume",
+					"effect": "replace",
 					"result": "item:double-tree"
 				},
 				{
@@ -39,6 +40,7 @@
 						"itemId": "item:double-tree"
 					},
 					"action": "consume",
+					"effect": "replace",
 					"result": "item:micro-forest"
 				},
 				{
@@ -46,7 +48,8 @@
 						"type": "item",
 						"itemId": "item:micro-forest"
 					},
-					"action": "keep",
+					"action": "consume",
+					"effect": "keep",
 					"output": {
 						"set": [
 							{

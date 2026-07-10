@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { ActionEnumSchema } from "./ActionEnumSchema";
 import { BaseMergeSchema } from "./BaseMergeSchema";
+import { EffectEnumSchema } from "./EffectEnumSchema";
 
 /**
  * A merge that keeps its matched receiving item unchanged.
@@ -15,7 +15,7 @@ export const MergeKeepSchema = z
 		/**
 		 * Identifies this merge as one that leaves its selected target unchanged.
 		 */
-		action: ActionEnumSchema.extract([
+		effect: EffectEnumSchema.extract([
 			"keep",
 		]).describe("Identifies this merge as one that keeps its selected target unchanged."),
 	})

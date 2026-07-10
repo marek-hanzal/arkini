@@ -65,6 +65,7 @@ describe("BaseItemSchema", () => {
 							itemId: "tree",
 						},
 						action: "consume",
+						effect: "replace",
 						result: "tree",
 					},
 				],

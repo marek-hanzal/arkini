@@ -1,21 +1,21 @@
 import { z } from "zod";
 
-import { MergeConsumeSchema } from "./MergeConsumeSchema";
 import { MergeKeepSchema } from "./MergeKeepSchema";
-import { MergeUseSchema } from "./MergeUseSchema";
+import { MergeRemoveSchema } from "./MergeRemoveSchema";
+import { MergeReplaceSchema } from "./MergeReplaceSchema";
 
 /**
  * A target-specific directional interaction initiated by dropping its owning
  * item onto another item.
  *
- * Each action has its own schema, so source handling and whether a result is
- * allowed or required are explicit and safe to exhaustively match at runtime.
+ * Source handling and target effects are separate: `action` describes the
+ * source item, while this union's `effect` describes the matched target.
  */
 export const MergeSchema = z
-	.discriminatedUnion("action", [
+	.discriminatedUnion("effect", [
 		MergeKeepSchema,
-		MergeUseSchema,
-		MergeConsumeSchema,
+		MergeRemoveSchema,
+		MergeReplaceSchema,
 	])
 	.meta({
 		id: "MergeSchema",

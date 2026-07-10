@@ -1,14 +1,10 @@
 import { z } from "zod";
 
 /**
- * Discriminates the explicit merge interaction variants.
+ * Discriminates what happens to a source item after it initiates a merge.
  */
 export const ActionEnumSchema = z
 	.enum([
-		/**
-		 * Keeps the matched receiving item unchanged while resolving this merge.
-		 */
-		"keep",
 		/**
 		 * Uses the source item, then returns it to its original position.
 		 */
@@ -20,7 +16,7 @@ export const ActionEnumSchema = z
 	])
 	.meta({
 		id: "ActionEnumSchema",
-		description: "The action that defines a merge interaction variant.",
+		description: "The action applied to a source item after it initiates a merge.",
 	});
 
 export type ActionEnumSchema = typeof ActionEnumSchema;

@@ -2,7 +2,7 @@
 
 > `game/archive` now contains only configuration definitions that have **not** been migrated to `game/arkini`. Migrated JSON definitions are deleted immediately; all shared PNG assets now belong to `game/arkini/assets`. The prose below is historical gameplay context, not a list of entities still waiting for migration. See `@chat-gpt/2026-07-10-v1-archive-migration-blockers.md` for the active blockers.
 
-Current JSON backlog: `producer:shrine-t1` and the deferred initial board/inventory state. Everything else described below is historical context only.
+Current JSON backlog: only the deferred initial board/inventory state. Every canonical item definition has been migrated. Everything else described below is historical context only.
 
 This folder is the remaining v0 migration backlog. Its JSON definitions stay here only until the v1 model can represent them without changing gameplay semantics.
 

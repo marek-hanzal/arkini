@@ -60,9 +60,7 @@ describe("archive migration", () => {
 			),
 		].sort();
 
-		expect(archiveItemIds).toEqual([
-			"producer:shrine-t1",
-		]);
+		expect(archiveItemIds).toEqual([]);
 	});
 
 	it("preserves lumberjack output chances for every wood-source tier", () => {

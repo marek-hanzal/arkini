@@ -1,0 +1,151 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:shrine-t1": {
+			"id": "producer:shrine-t1",
+			"type": "producer",
+			"title": "Wayside Shrine",
+			"description": "Turns simple offerings into temporary production blessings.",
+			"asset": {
+				"source": [
+					"asset:producer:shrine-t1"
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"shrine",
+				"effect-source",
+				"unique",
+				"era:I"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 2,
+			"lines": [
+				{
+					"id": "line:shrine-t1:minor-haste",
+					"title": "Minor Haste",
+					"description": "Consumes a simple offering to produce a temporary Minor Haste blessing.",
+					"runtimeMs": 60000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:effect:minor-haste",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": []
+				},
+				{
+					"id": "line:shrine-t1:bountiful-offering",
+					"title": "Bountiful Offering",
+					"description": "Consumes a larger offering to produce a temporary Bountiful Offering blessing.",
+					"runtimeMs": 60000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:effect:bountiful-offering",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					"rules": []
+				}
+			]
+		}
+	}
+}

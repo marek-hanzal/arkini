@@ -1,0 +1,65 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:cracked-rock": {
+			"id": "item:cracked-rock",
+			"type": "craft",
+			"title": "Cracked Rock",
+			"description": "A mined-out rocky crack. Use a Magnifying Glass to survey it for a fresh stone deposit somewhere on the board.",
+			"asset": {
+				"source": [
+					"asset:item:cracked-rock"
+				]
+			},
+			"tags": [
+				"source",
+				"stone",
+				"depleted",
+				"craft-target",
+				"era:I",
+				"stone-deposit"
+			],
+			"categoryId": "source",
+			"scope": "board",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:cracked-rock:survey",
+				"title": "Survey Rock",
+				"description": "Reserves a magnifying glass to survey this crack for a fresh stone deposit.",
+				"runtimeMs": 120000,
+				"input": [
+					{
+						"itemId": "item:magnifying-glass",
+						"mode": "reserve",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:rock",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

@@ -1,0 +1,76 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:water": {
+			"id": "item:water",
+			"type": "simple",
+			"title": "Water",
+			"description": "Basic water resource produced by wells and consumed by farms.",
+			"asset": {
+				"source": [
+					"asset:item:water"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"water",
+				"era:I",
+				"tier-1-resource"
+			],
+			"category": {
+				"id": "material",
+				"title": "Materials"
+			},
+			"scope": "any",
+			"maxStackSize": 50,
+			"merge": [
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:tree"
+					},
+					"action": "consume",
+					"result": "item:double-tree"
+				},
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:double-tree"
+					},
+					"action": "consume",
+					"result": "item:micro-forest"
+				},
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:micro-forest"
+					},
+					"action": "keep",
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:seed",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

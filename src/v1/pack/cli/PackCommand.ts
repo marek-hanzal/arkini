@@ -1,7 +1,7 @@
 import { Args, Command } from "@effect/cli";
 import { Console, Effect } from "effect";
 
-import { packGameDirectoryFx } from "~/v1/pack/fx/packGameDirectoryFx";
+import { packDirectoryFx } from "~/v1/pack/fx/packDirectoryFx";
 
 export namespace PackCommand {
 	export interface Props {
@@ -22,14 +22,14 @@ export const PackCommand = ({ input }: PackCommand.Props) =>
 		},
 		({ input }) =>
 			Effect.gen(function* () {
-				const result = yield* packGameDirectoryFx({
+				const result = yield* packDirectoryFx({
 					input,
 				});
 
 				yield* Console.log(
-					`Packed ${result.jsonSourceCount} JSON sources and ${result.pngAssetCount} PNG assets.`,
+					`Packed ${result.json} JSON sources and ${result.png} PNG assets.`,
 				);
-				yield* Console.log(`Wrote ${result.output} (${result.byteLength} bytes).`);
+				yield* Console.log(`Wrote ${result.output} (${result.bytes} bytes).`);
 			}),
 	).pipe(
 		Command.withDescription(

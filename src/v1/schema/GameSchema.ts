@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
+import { CategorySchema } from "~/v1/item/schema/CategorySchema";
 import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
@@ -24,6 +25,12 @@ export const GameSchema = z
 		 * Core metadata and player-available layouts for this game.
 		 */
 		meta: MetaSchema.describe("Core metadata and player-available layouts for this game."),
+		/**
+		 * Canonical UI-facing categories keyed by their stable identifier.
+		 */
+		categories: z
+			.record(IdSchema, CategorySchema)
+			.describe("Canonical UI-facing categories keyed by a non-empty identifier."),
 		/**
 		 * Version of this game configuration's schema contract.
 		 */

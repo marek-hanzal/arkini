@@ -12,5 +12,15 @@
 			"height": 7
 		}
 	},
+	"categories": {
+		"material": {
+			"id": "material",
+			"title": "Materials"
+		},
+		"waste": {
+			"id": "waste",
+			"title": "Waste"
+		}
+	},
 	"version": "1.0"
 }

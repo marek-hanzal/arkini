@@ -17,10 +17,7 @@ describe("BaseItemSchema", () => {
 			tags: [
 				"nature",
 			],
-			category: {
-				id: "resource",
-				title: "Resources",
-			},
+			categoryId: "resource",
 			scope: "board",
 		};
 
@@ -46,7 +43,7 @@ describe("BaseItemSchema", () => {
 		expect(
 			BaseItemSchema.safeParse({
 				...item,
-				category: undefined,
+				categoryId: undefined,
 			}).success,
 		).toBe(false);
 		expect(
@@ -84,10 +81,7 @@ describe("BaseItemSchema", () => {
 				],
 			},
 			tags: [],
-			category: {
-				id: "resource",
-				title: "Resources",
-			},
+			categoryId: "resource",
 			scope: "board",
 			type: "simple",
 			maxStackSize: 1,

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
+import { CategorySchema } from "~/v1/item/schema/CategorySchema";
 import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 
@@ -29,6 +30,15 @@ export const GameSourceSchema = z
 		meta: MetaSchema.optional().describe(
 			"The optional game metadata contributed by this source fragment.",
 		),
+		/**
+		 * Optional canonical UI-facing categories contributed by this source fragment.
+		 */
+		categories: z
+			.record(IdSchema, CategorySchema)
+			.optional()
+			.describe(
+				"The optional canonical UI-facing categories contributed by this source fragment.",
+			),
 		/**
 		 * Optional version contributed by this source fragment.
 		 */

@@ -4,18 +4,18 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { TitleSchema } from "~/v1/common/schema/TitleSchema";
 
 /**
- * UI-facing category shared by items that should be presented together.
+ * Canonical UI-facing category shared by items that should be presented together.
  *
- * Categories are embedded in items rather than maintained in a global catalog.
- * This keeps content grouping close to the items it affects while giving the UI
- * both a stable grouping key and a display title.
+ * Game configuration indexes categories by this schema's ID, while items retain
+ * only a `categoryId` reference. Keeping the ID here makes the category itself
+ * the canonical source of truth rather than trusting its record key alone.
  */
 export const CategorySchema = z
 	.object({
 		/**
-		 * Stable key used by the UI to group related items.
+		 * Stable canonical key used by the UI to group related items.
 		 */
-		id: IdSchema.describe("The stable key used by the UI to group related items."),
+		id: IdSchema.describe("The stable canonical key used by the UI to group related items."),
 		/**
 		 * Human-readable name displayed for this item category.
 		 */
@@ -24,7 +24,7 @@ export const CategorySchema = z
 	.strict()
 	.meta({
 		id: "CategorySchema",
-		description: "A UI-facing category used to group related game items.",
+		description: "A canonical UI-facing category used to group related game items.",
 	});
 
 export type CategorySchema = typeof CategorySchema;

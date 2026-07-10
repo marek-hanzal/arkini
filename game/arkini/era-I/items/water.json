@@ -18,12 +18,9 @@
 				"era:I",
 				"tier-1-resource"
 			],
-			"category": {
-				"id": "material",
-				"title": "Materials"
-			},
+			"categoryId": "material",
 			"scope": "any",
-			"maxStackSize": 50,
+			"maxStackSize": 8,
 			"merge": [
 				{
 					"target": {

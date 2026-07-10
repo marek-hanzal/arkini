@@ -31,35 +31,55 @@
 				"runtimeMs": 9000,
 				"input": [
 					{
-						"itemId": "item:grain",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grain"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1
 						}
 					},
 					{
-						"itemId": "item:piglet",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:piglet"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1
 						}
 					},
 					{
-						"itemId": "item:milk",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:milk"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1
 						}
 					},
 					{
-						"itemId": "item:egg",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:egg"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1
 						}
 					},
 					{
-						"itemId": "item:vegetables",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:vegetables"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1

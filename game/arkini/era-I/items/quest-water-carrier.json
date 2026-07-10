@@ -27,14 +27,22 @@
 				"runtimeMs": 6000,
 				"input": [
 					{
-						"itemId": "item:water",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 4
 						}
 					},
 					{
-						"itemId": "item:stone",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1

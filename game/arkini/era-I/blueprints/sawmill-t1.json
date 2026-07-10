@@ -28,14 +28,22 @@
 				"runtimeMs": 12000,
 				"input": [
 					{
-						"itemId": "item:log",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:log"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 2
 						}
 					},
 					{
-						"itemId": "item:stone",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1

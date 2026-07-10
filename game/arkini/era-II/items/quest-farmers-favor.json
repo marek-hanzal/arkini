@@ -27,21 +27,33 @@
 				"runtimeMs": 8000,
 				"input": [
 					{
-						"itemId": "item:grain",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grain"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 2
 						}
 					},
 					{
-						"itemId": "item:water",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 2
 						}
 					},
 					{
-						"itemId": "item:egg",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:egg"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1

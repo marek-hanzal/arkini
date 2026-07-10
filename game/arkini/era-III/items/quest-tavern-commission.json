@@ -27,21 +27,33 @@
 				"runtimeMs": 10000,
 				"input": [
 					{
-						"itemId": "item:beer",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:beer"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 2
 						}
 					},
 					{
-						"itemId": "item:wine-glass",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:wine-glass"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1
 						}
 					},
 					{
-						"itemId": "item:coin",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1

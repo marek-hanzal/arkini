@@ -29,7 +29,11 @@
 				"runtimeMs": 120000,
 				"input": [
 					{
-						"itemId": "item:magnifying-glass",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:magnifying-glass"
+						},
 						"mode": "reserve",
 						"quantity": {
 							"type": "value",

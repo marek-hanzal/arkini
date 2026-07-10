@@ -28,14 +28,22 @@
 				"runtimeMs": 8000,
 				"input": [
 					{
-						"itemId": "item:log",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:log"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1
 						}
 					},
 					{
-						"itemId": "item:water",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 1

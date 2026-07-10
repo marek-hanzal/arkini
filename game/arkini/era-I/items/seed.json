@@ -32,7 +32,11 @@
 				"runtimeMs": 30000,
 				"input": [
 					{
-						"itemId": "item:water",
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
 						"quantity": {
 							"type": "value",
 							"value": 6

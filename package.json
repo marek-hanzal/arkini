@@ -10,6 +10,7 @@
 		"check": "npm run format:check && npm run typecheck && npm run test",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
+		"game:pack": "tsx cli/arkini.ts pack",
 		"game:schema": "tsx cli/arkini.ts schema"
 	},
 	"dependencies": {

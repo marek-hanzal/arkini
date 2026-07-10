@@ -3,6 +3,16 @@ import { describe, expect, it } from "vitest";
 import { InputSchema } from "./InputSchema";
 
 describe("InputSchema", () => {
+	it("parses a simple input without a consumption operation", () => {
+		expect(
+			InputSchema.parse({
+				type: "simple",
+			}),
+		).toEqual({
+			type: "simple",
+		});
+	});
+
 	it("parses material requirements with their standard defaults", () => {
 		const input = InputSchema.parse({
 			type: "materials",

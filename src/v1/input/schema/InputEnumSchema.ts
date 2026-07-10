@@ -6,6 +6,10 @@ import { z } from "zod";
 export const InputEnumSchema = z
 	.enum([
 		/**
+		 * An explicit input marker with no material consumption or deposit spending.
+		 */
+		"simple",
+		/**
 		 * Requires a directly delivered material item that is consumed or reserved.
 		 */
 		"materials",

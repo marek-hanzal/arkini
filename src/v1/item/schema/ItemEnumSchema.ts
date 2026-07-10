@@ -25,6 +25,14 @@ export const ItemEnumSchema = z
 		 * A single-use item that owns one stash product line.
 		 */
 		"stash",
+		/**
+		 * A board item that opens the shared inventory.
+		 */
+		"inventory",
+		/**
+		 * An item that stores and restores a board layout.
+		 */
+		"memory",
 		"cheat:speed:on",
 		"cheat:speed:off",
 		"nuke",

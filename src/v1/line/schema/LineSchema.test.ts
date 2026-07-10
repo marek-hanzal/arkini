@@ -54,6 +54,29 @@ describe("LineSchema", () => {
 			],
 		});
 		expect(lineWithDefaultCapacity.input[0].capacity).toBe(0);
+		expect(lineWithDefaultCapacity.input[0].mode).toBe("consume");
+		expect(
+			LineSchema.safeParse({
+				...line,
+				input: [
+					{
+						...line.input[0],
+						mode: "reserve",
+					},
+				],
+			}).success,
+		).toBe(true);
+		expect(
+			LineSchema.safeParse({
+				...line,
+				input: [
+					{
+						...line.input[0],
+						mode: "borrow",
+					},
+				],
+			}).success,
+		).toBe(false);
 		expect(
 			LineSchema.safeParse({
 				...line,

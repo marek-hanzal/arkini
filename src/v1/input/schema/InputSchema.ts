@@ -3,6 +3,7 @@ import { z } from "zod";
 import { QuantitySchema } from "~/v1/quantity/schema/QuantitySchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
+import { InputModeEnumSchema } from "./InputModeEnumSchema";
 
 /**
  * A canonical game item and the amount accepted by a gameplay input.
@@ -17,6 +18,15 @@ export const InputSchema = z
 		 * ID of the canonical game item accepted by this input.
 		 */
 		itemId: IdSchema.describe("The ID of the canonical game item accepted by this input."),
+		/**
+		 * Whether this input is consumed or temporarily reserved by the line.
+		 *
+		 * A reserved input returns to its prior game-state location when the work
+		 * completes or is cancelled. Consumption is the standard input behavior.
+		 */
+		mode: InputModeEnumSchema.default("consume").describe(
+			"Whether this input is consumed or reserved; defaults to consume.",
+		),
 		/**
 		 * Exact or bounded amount accepted by this input.
 		 *

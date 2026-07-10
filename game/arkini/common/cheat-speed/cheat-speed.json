@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:cheat-speed": {
+			"id": "item:cheat-speed",
+			"type": "cheat:speed",
+			"title": "Onion Watch",
+			"description": "Cheat timepiece that toggles the engine between normal timing and one-second instant actions.",
+			"asset": {
+				"source": [
+					"asset:item:cheat-speed:on",
+					"asset:item:cheat-speed:off"
+				]
+			},
+			"tags": [
+				"special:cheat-speed",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			],
+			"categoryId": "utility",
+			"scope": "any",
+			"maxStackSize": 10
+		}
+	}
+}

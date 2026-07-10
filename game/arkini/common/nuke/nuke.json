@@ -1,18 +1,18 @@
 {
 	"$schema": "../../../schema.json",
 	"items": {
-		"item:nuke-save": {
-			"id": "item:nuke-save",
+		"item:nuke": {
+			"id": "item:nuke",
 			"type": "nuke",
-			"title": "Save Nuke",
-			"description": "A dangerous reset charge that opens the save nuke confirmation.",
+			"title": "Nuke",
+			"description": "A dangerous reset charge that opens the nuke confirmation.",
 			"asset": {
 				"source": [
-					"asset:item:nuke-save"
+					"asset:item:nuke"
 				]
 			},
 			"tags": [
-				"special:nuke-save",
+				"special:nuke",
 				"utility",
 				"ui"
 			],

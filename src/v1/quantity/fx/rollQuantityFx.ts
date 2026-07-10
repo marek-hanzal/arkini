@@ -20,19 +20,21 @@ export const rollQuantityFx = Effect.fn("rollQuantityFx")(function* ({
 			{
 				type: "value",
 			},
-			(quantity) =>
-				rollQuantityValueFx({
+			(quantity) => {
+				return rollQuantityValueFx({
 					quantity,
-				}),
+				});
+			},
 		)
 		.with(
 			{
 				type: "range",
 			},
-			(quantity) =>
-				rollQuantityRangeFx({
+			(quantity) => {
+				return rollQuantityRangeFx({
 					quantity,
-				}),
+				});
+			},
 		)
 		.exhaustive();
 });

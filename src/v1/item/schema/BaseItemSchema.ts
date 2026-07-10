@@ -59,11 +59,19 @@ export const BaseItemSchema = z
 			"The optional maximum number of this item allowed across the game state.",
 		),
 		/**
-		 * Optional directional merge initiated when this item is dropped onto another item.
+		 * Optional target-specific merges initiated when this item is dropped onto another item.
 		 */
-		merge: MergeSchema.optional().describe(
-			"The optional directional merge initiated when this item is dropped onto another item.",
-		),
+		merge: z
+			.tuple(
+				[
+					MergeSchema,
+				],
+				MergeSchema,
+			)
+			.optional()
+			.describe(
+				"The optional non-empty target-specific merges initiated when this item is dropped onto another item.",
+			),
 	})
 	.strict()
 	.meta({

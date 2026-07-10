@@ -49,6 +49,26 @@ describe("BaseItemSchema", () => {
 				category: undefined,
 			}).success,
 		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				merge: [],
+			}).success,
+		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				merge: [
+					{
+						target: {
+							type: "item",
+							itemId: "tree",
+						},
+						action: "consume",
+					},
+				],
+			}).success,
+		).toBe(true);
 	});
 
 	it("requires a positive stack limit only for simple items", () => {

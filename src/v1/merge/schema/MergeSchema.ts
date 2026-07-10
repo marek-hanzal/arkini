@@ -2,20 +2,28 @@ import { z } from "zod";
 
 import { OutputSchema } from "~/v1/output/schema/OutputSchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
 import { ActionEnumSchema } from "./ActionEnumSchema";
 
 /**
- * A directional interaction initiated by dropping its owning item onto another item.
+ * A target-specific directional interaction initiated by dropping its owning item
+ * onto another item.
  *
- * When `result` is defined, the receiving item becomes that result. When it is
- * omitted, the receiving item is removed instead. Keeping `result` optional
- * represents both outcomes through one directional interaction contract rather
- * than duplicating a near-identical remove schema. `action` then determines
- * whether the source returns to its original position or is consumed. The
- * receiving item does not define a reverse merge implicitly.
+ * `target` matches the receiving item. When `result` is defined, that receiving
+ * item becomes the result; when it is omitted, the receiving item is removed.
+ * Keeping `result` optional represents both outcomes through one directional
+ * interaction contract rather than duplicating a near-identical remove schema.
+ * `action` then determines whether the source returns to its original position
+ * or is consumed. The receiving item does not define a reverse merge implicitly.
  */
 export const MergeSchema = z
 	.object({
+		/**
+		 * Selector that must match the receiving item for this merge to apply.
+		 */
+		target: SelectorSchema.describe(
+			"The selector that must match the receiving item for this merge to apply.",
+		),
 		/**
 		 * Optional ID of the item that replaces the receiving item after this merge.
 		 *
@@ -40,7 +48,8 @@ export const MergeSchema = z
 	.strict()
 	.meta({
 		id: "MergeSchema",
-		description: "A directional item merge that transforms or removes the receiving item.",
+		description:
+			"A target-specific directional item merge that transforms or removes the receiving item.",
 	});
 
 export type MergeSchema = typeof MergeSchema;

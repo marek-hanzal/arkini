@@ -11,6 +11,7 @@ describe("LineSchema", () => {
 			runtimeMs: 1_000,
 			input: [
 				{
+					type: "materials",
 					itemId: "tree",
 					quantity: {
 						type: "value",
@@ -53,8 +54,12 @@ describe("LineSchema", () => {
 				},
 			],
 		});
-		expect(lineWithDefaultCapacity.input[0].capacity).toBe(0);
-		expect(lineWithDefaultCapacity.input[0].mode).toBe("consume");
+		const [materialInput] = lineWithDefaultCapacity.input;
+		if (materialInput?.type !== "materials") {
+			throw new Error("Expected a material input.");
+		}
+		expect(materialInput.capacity).toBe(0);
+		expect(materialInput.mode).toBe("consume");
 		expect(
 			LineSchema.safeParse({
 				...line,

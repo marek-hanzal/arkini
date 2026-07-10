@@ -35,6 +35,9 @@ describe("writeGameJsonSchemaFx", () => {
 				meta: {
 					$ref: expect.stringMatching(/^#\/\$defs\//),
 				},
+				start: {
+					$ref: expect.stringMatching(/^#\/\$defs\//),
+				},
 				version: {
 					$ref: expect.stringMatching(/^#\/\$defs\//),
 				},

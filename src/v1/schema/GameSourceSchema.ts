@@ -11,8 +11,7 @@ import { VersionEnumSchema } from "./VersionEnumSchema";
  *
  * Game source data is intentionally split across files such as `game.json` and
  * `era-I/items/*.json`. Each fragment is valid independently; the source
- * compiler merges all fragments and validates the completed result with
- * `GameSchema`.
+ * packer merges all fragments, while the validator owns completed-game checks.
  */
 export const GameSourceSchema = z
 	.object({

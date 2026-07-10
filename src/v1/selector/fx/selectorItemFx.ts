@@ -8,8 +8,6 @@ export namespace selectorItemFx {
 		selector: SelectorItemSchema.Type;
 		item: BaseItemSchema.Type;
 	}
-
-	export type Result = boolean;
 }
 
 /** Tests whether a canonical item has the ID selected by an item selector. */
@@ -19,5 +17,5 @@ export const selectorItemFx = Effect.fn("selectorItemFx")(function* ({
 }: selectorItemFx.Props) {
 	const result = selector.itemId === item.id;
 
-	return result satisfies selectorItemFx.Result;
+	return result;
 });

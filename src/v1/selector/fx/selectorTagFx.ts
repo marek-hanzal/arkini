@@ -8,8 +8,6 @@ export namespace selectorTagFx {
 		selector: SelectorTagSchema.Type;
 		item: BaseItemSchema.Type;
 	}
-
-	export type Result = boolean;
 }
 
 /** Tests whether a canonical item has the tag selected by a tag selector. */
@@ -19,5 +17,5 @@ export const selectorTagFx = Effect.fn("selectorTagFx")(function* ({
 }: selectorTagFx.Props) {
 	const result = item.tags.includes(selector.tag);
 
-	return result satisfies selectorTagFx.Result;
+	return result;
 });

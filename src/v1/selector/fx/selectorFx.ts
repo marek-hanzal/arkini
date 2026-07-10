@@ -11,8 +11,6 @@ export namespace selectorFx {
 		selector: SelectorSchema.Type;
 		item: BaseItemSchema.Type;
 	}
-
-	export type Result = boolean;
 }
 
 /** Dispatches an item selector to its specialized matching strategy. */
@@ -42,5 +40,5 @@ export const selectorFx = Effect.fn("selectorFx")(function* ({ selector, item }:
 		)
 		.exhaustive();
 
-	return result satisfies selectorFx.Result;
+	return result;
 });

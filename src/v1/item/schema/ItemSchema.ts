@@ -1,10 +1,11 @@
 import { z } from "zod";
 
 import { CheatInventoryItemSchema } from "./CheatInventoryItemSchema";
-import { CheatSpeedOffItemSchema } from "./CheatSpeedOffItemSchema";
-import { CheatSpeedOnItemSchema } from "./CheatSpeedOnItemSchema";
+import { CheatSpeedItemSchema } from "./CheatSpeedItemSchema";
 import { CraftItemSchema } from "./CraftItemSchema";
 import { DepositItemSchema } from "./DepositItemSchema";
+import { InventoryItemSchema } from "./InventoryItemSchema";
+import { MemoryItemSchema } from "./MemoryItemSchema";
 import { NukeItemSchema } from "./NukeItemSchema";
 import { ProducerItemSchema } from "./ProducerItemSchema";
 import { SimpleItemSchema } from "./SimpleItemSchema";
@@ -25,8 +26,9 @@ export const ItemSchema = z
 		CraftItemSchema,
 		StashItemSchema,
 		TemporaryItemSchema,
-		CheatSpeedOnItemSchema,
-		CheatSpeedOffItemSchema,
+		InventoryItemSchema,
+		MemoryItemSchema,
+		CheatSpeedItemSchema,
 		NukeItemSchema,
 		CheatInventoryItemSchema,
 	])

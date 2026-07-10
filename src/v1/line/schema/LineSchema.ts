@@ -39,6 +39,15 @@ export const LineSchema = z
 			.default(true)
 			.describe("Whether this product line is visible before its rules are evaluated."),
 		/**
+		 * Whether this product line is enabled before its rules are evaluated.
+		 *
+		 * A line disabled by default can be enabled by an applicable `enable` rule.
+		 */
+		enable: z
+			.boolean()
+			.default(true)
+			.describe("Whether this product line is enabled before its rules are evaluated."),
+		/**
 		 * Runtime of this product line in milliseconds.
 		 *
 		 * Zero means that the line completes immediately.
@@ -67,7 +76,7 @@ export const LineSchema = z
 			"The optional result produced when this product line completes.",
 		),
 		/**
-		 * Rules that can change this product line's visibility or behavior.
+		 * Rules that can change this product line's visibility, availability, or behavior.
 		 *
 		 * Rules are evaluated after the line's `show` default. An applicable `show`
 		 * rule can reveal a line whose default visibility is `false`.

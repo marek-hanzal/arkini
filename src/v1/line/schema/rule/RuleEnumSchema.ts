@@ -14,9 +14,13 @@ export const RuleEnumSchema = z
 		 */
 		"hide",
 		/**
-		 * Prevents a visible line from starting when the rule's condition is satisfied.
+		 * Enables a line when the rule's condition is satisfied.
 		 */
-		"block",
+		"enable",
+		/**
+		 * Disables a line when the rule's condition is satisfied.
+		 */
+		"disable",
 		/**
 		 * Requires the rule's condition to be satisfied before a visible line can start.
 		 */

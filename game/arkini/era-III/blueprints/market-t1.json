@@ -1,0 +1,103 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-market-t1": {
+			"id": "item:blueprint-market-t1",
+			"type": "craft",
+			"title": "Market Blueprint",
+			"description": "Build plan that can be filled with resources to construct the Market.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-market-t1"
+				],
+				"composite": "asset:producer:market-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"market",
+				"trade",
+				"era:III"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:market-t1:construct",
+				"title": "Construct Market",
+				"description": "Consumes construction resources to build Market.",
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bread"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:sausage"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:market-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

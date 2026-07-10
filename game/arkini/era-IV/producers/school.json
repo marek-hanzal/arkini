@@ -1,0 +1,151 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:school": {
+			"id": "producer:school",
+			"type": "producer",
+			"title": "School",
+			"description": "Education building that turns civic support into Basic Knowledge.",
+			"asset": {
+				"source": [
+					"asset:producer:school"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"education",
+				"knowledge",
+				"unique",
+				"era:IV"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:school:basic-knowledge",
+					"title": "Basic Knowledge",
+					"description": "Runs basic knowledge for School.",
+					"runtimeMs": 22000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 2
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 7
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:basic-knowledge",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:school:basic-knowledge-morale-t2",
+					"title": "Basic Knowledge (Inspired)",
+					"description": "Runs basic knowledge (inspired) for School.",
+					"runtimeMs": 18000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 2
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 7
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t2"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:basic-knowledge",
+												"quantity": {
+													"type": "value",
+													"value": 4
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

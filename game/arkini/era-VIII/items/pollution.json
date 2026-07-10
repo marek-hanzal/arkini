@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:pollution": {
+			"id": "item:pollution",
+			"type": "simple",
+			"title": "Pollution",
+			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
+			"asset": {
+				"source": [
+					"asset:item:pollution"
+				]
+			},
+			"tags": [
+				"danger",
+				"industry",
+				"pollution",
+				"era:VIII"
+			],
+			"categoryId": "waste",
+			"scope": "board",
+			"maxStackSize": 1
+		}
+	}
+}

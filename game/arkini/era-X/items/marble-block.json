@@ -1,0 +1,30 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:marble-block": {
+			"id": "item:marble-block",
+			"type": "simple",
+			"title": "Marble Block",
+			"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
+			"asset": {
+				"source": [
+					"asset:item:marble-block"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"master",
+				"era:X",
+				"tier-10-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 30
+		}
+	}
+}

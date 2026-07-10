@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:construction-bundle": {
+			"id": "item:construction-bundle",
+			"type": "simple",
+			"title": "Construction Bundle",
+			"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
+			"asset": {
+				"source": [
+					"asset:item:construction-bundle"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"master",
+				"era:VIII",
+				"tier-6-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

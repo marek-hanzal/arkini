@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:sand-deposit": {
+			"id": "item:sand-deposit",
+			"type": "simple",
+			"title": "Sand Deposit",
+			"description": "Movable sand source used by nearby sand pits.",
+			"asset": {
+				"source": [
+					"asset:item:sand-deposit"
+				]
+			},
+			"tags": [
+				"source",
+				"construction",
+				"sand",
+				"glass",
+				"era:VI"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

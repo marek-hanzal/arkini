@@ -1,0 +1,30 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:house-of-engineers": {
+			"id": "producer:house-of-engineers",
+			"type": "simple",
+			"title": "House of Engineers",
+			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
+			"asset": {
+				"source": [
+					"asset:producer:house-of-engineers"
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"path",
+				"keystone",
+				"engineers",
+				"engineering",
+				"unique",
+				"era:XI"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1
+		}
+	}
+}

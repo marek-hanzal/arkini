@@ -1,0 +1,109 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-prospector-guild-t2": {
+			"id": "item:blueprint-prospector-guild-t2",
+			"type": "craft",
+			"title": "Prospector Guild Blueprint",
+			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-prospector-guild-t2"
+				],
+				"composite": "asset:producer:prospector-guild-t2"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"prospecting",
+				"guild",
+				"industry",
+				"era:VII"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:prospector-guild-t2:construct",
+				"title": "Construct Prospector Guild",
+				"description": "Consumes construction resources to build Prospector Guild.",
+				"runtimeMs": 45000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:prospector-guild-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:prospector-guild-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

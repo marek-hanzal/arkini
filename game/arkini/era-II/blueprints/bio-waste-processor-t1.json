@@ -1,0 +1,104 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-bio-waste-processor-t1": {
+			"id": "item:blueprint-bio-waste-processor-t1",
+			"type": "craft",
+			"title": "Bio-Waste Processor I Blueprint",
+			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-bio-waste-processor-t1"
+				],
+				"composite": "asset:producer:bio-waste-processor-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"cleanup",
+				"bio-waste",
+				"farm",
+				"era:II"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:bio-waste-processor-t1:construct",
+				"title": "Construct Bio-Waste Processor I",
+				"description": "Consumes construction resources to build Bio-Waste Processor I.",
+				"runtimeMs": 34000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grain"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:bio-waste-processor-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

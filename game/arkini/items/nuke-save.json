@@ -1,0 +1,25 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:nuke-save": {
+			"id": "item:nuke-save",
+			"type": "nuke",
+			"title": "Save Nuke",
+			"description": "A dangerous reset charge that opens the save nuke confirmation.",
+			"asset": {
+				"source": [
+					"asset:item:nuke-save"
+				]
+			},
+			"tags": [
+				"special:nuke-save",
+				"utility",
+				"ui"
+			],
+			"categoryId": "utility",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1
+		}
+	}
+}

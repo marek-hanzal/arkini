@@ -1,10 +1,12 @@
-# Arkini authored game package
+# Arkini archived migration backlog
 
-This folder is the source package for the current Arkini game configuration. JSON files here are authored source data; compiled root outputs are generated from this package.
+> `game/archive` now contains only configuration definitions that have **not** been migrated to `game/arkini`. Migrated JSON definitions are deleted immediately; shared PNG assets remain here intentionally until asset ownership is migrated separately. The prose below is historical gameplay context, not a list of entities still waiting for migration. See `@chat-gpt/2026-07-10-v1-archive-migration-blockers.md` for the active blockers.
 
-## Current gameplay draft
+This folder is the remaining v0 migration backlog. Its JSON definitions stay here only until the v1 model can represent them without changing gameplay semantics.
 
-This is a working design note for the current package, kept next to the data it describes. It is not the global gameplay contract. When the package changes, update this note with the current content direction instead of letting the source JSON turn into folklore with braces.
+## Historical gameplay draft
+
+This design note describes the original package and remains as migration context. The authoritative list of pending entities is the JSON still present in this directory, not every entity mentioned below.
 
 ### Core loop direction
 

@@ -1,0 +1,79 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-chicken-coop-t1": {
+			"id": "item:blueprint-chicken-coop-t1",
+			"type": "craft",
+			"title": "Chicken Coop I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-chicken-coop-t1"
+				],
+				"composite": "asset:producer:chicken-coop-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:chicken-coop-t1:construct",
+				"title": "Construct Chicken Coop I",
+				"description": "Consumes construction resources to build Chicken Coop I.",
+				"runtimeMs": 18000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:grain"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:chicken-coop-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

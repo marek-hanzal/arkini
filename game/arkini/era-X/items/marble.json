@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:marble": {
+			"id": "item:marble",
+			"type": "simple",
+			"title": "Marble",
+			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
+			"asset": {
+				"source": [
+					"asset:item:marble"
+				]
+			},
+			"tags": [
+				"material",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X",
+				"tier-10-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 40
+		}
+	}
+}

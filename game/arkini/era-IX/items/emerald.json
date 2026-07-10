@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:emerald": {
+			"id": "item:emerald",
+			"type": "simple",
+			"title": "Emerald",
+			"description": "A polished green gemstone prepared for later treasure recipes.",
+			"asset": {
+				"source": [
+					"asset:item:emerald"
+				]
+			},
+			"tags": [
+				"treasure",
+				"gem",
+				"emerald",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

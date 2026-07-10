@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:clay-deposit": {
+			"id": "item:clay-deposit",
+			"type": "simple",
+			"title": "Clay Deposit",
+			"description": "Movable clay source used by nearby clay pits.",
+			"asset": {
+				"source": [
+					"asset:item:clay-deposit"
+				]
+			},
+			"tags": [
+				"source",
+				"construction",
+				"clay",
+				"deposit",
+				"era:VI"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

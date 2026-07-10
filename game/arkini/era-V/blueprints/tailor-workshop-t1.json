@@ -1,0 +1,140 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-tailor-workshop-t1": {
+			"id": "item:blueprint-tailor-workshop-t1",
+			"type": "craft",
+			"title": "Tailor Workshop I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-tailor-workshop-t1"
+				],
+				"composite": "asset:producer:tailor-workshop-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"clothing",
+				"textile",
+				"era:V"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:tailor-workshop-t1:construct",
+				"title": "Construct Tailor Workshop I",
+				"description": "Consumes construction resources to build Tailor Workshop I.",
+				"runtimeMs": 42000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:common-cloth"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:leather"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:tannery-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:weaver-hut-t1"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:tailor-workshop-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

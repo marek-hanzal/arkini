@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:advanced-knowledge": {
+			"id": "item:advanced-knowledge",
+			"type": "simple",
+			"title": "Advanced Knowledge",
+			"description": "Advanced civic and technical knowledge produced by academies and used to unlock prospecting, mining, and later industrial plans.",
+			"asset": {
+				"source": [
+					"asset:item:advanced-knowledge"
+				]
+			},
+			"tags": [
+				"knowledge",
+				"education",
+				"research",
+				"era:VII"
+			],
+			"categoryId": "knowledge",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

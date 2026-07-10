@@ -1,0 +1,143 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-stonemason-t2": {
+			"id": "item:blueprint-stonemason-t2",
+			"type": "craft",
+			"title": "Stonemason Blueprint",
+			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-stonemason-t2"
+				],
+				"composite": "asset:producer:stonemason-t2"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:stonemason-t2:construct",
+				"title": "Construct Stonemason",
+				"description": "Consumes construction resources to build Stonemason.",
+				"runtimeMs": 75000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:stonemason-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:guild-charter"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stained-glass"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:quarry-t2"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:university"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:stonemason-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

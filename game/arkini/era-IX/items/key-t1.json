@@ -1,0 +1,24 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:key-t1": {
+			"id": "item:key-t1",
+			"type": "simple",
+			"title": "Key I",
+			"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
+			"asset": {
+				"source": [
+					"asset:item:key-t1"
+				]
+			},
+			"tags": [
+				"key",
+				"goldsmith",
+				"era:IX"
+			],
+			"categoryId": "equipment",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

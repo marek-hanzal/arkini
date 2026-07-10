@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:roof-tiles": {
+			"id": "item:roof-tiles",
+			"type": "simple",
+			"title": "Roof Tiles",
+			"description": "Curved fired roof tiles prepared for higher-tier building construction.",
+			"asset": {
+				"source": [
+					"asset:item:roof-tiles"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"clay",
+				"roof",
+				"era:VIII",
+				"industry",
+				"tier-4-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

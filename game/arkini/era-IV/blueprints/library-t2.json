@@ -1,0 +1,103 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-library-t2": {
+			"id": "item:blueprint-library-t2",
+			"type": "craft",
+			"title": "Library II Blueprint",
+			"description": "Build plan that upgrades Library I into Library II.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-library-t2"
+				],
+				"composite": "asset:producer:library-t2"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:IV"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:library-t2:construct",
+				"title": "Construct Library II",
+				"description": "Consumes construction resources to build Library II.",
+				"runtimeMs": 38000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:library-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:paper"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:library-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

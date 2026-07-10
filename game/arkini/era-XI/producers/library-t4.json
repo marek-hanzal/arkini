@@ -1,0 +1,29 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:library-t4": {
+			"id": "producer:library-t4",
+			"type": "simple",
+			"title": "Library IV",
+			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
+			"asset": {
+				"source": [
+					"asset:producer:library-t4"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:XI"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1
+		}
+	}
+}

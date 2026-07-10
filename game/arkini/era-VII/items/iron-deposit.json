@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:iron-deposit": {
+			"id": "item:iron-deposit",
+			"type": "simple",
+			"title": "Iron Deposit",
+			"description": "Movable iron source used by nearby iron mines.",
+			"asset": {
+				"source": [
+					"asset:item:iron-deposit"
+				]
+			},
+			"tags": [
+				"source",
+				"industry",
+				"mine",
+				"iron",
+				"era:VII"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

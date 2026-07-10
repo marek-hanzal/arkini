@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:iron-ore": {
+			"id": "item:iron-ore",
+			"type": "simple",
+			"title": "Iron Ore Cart",
+			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
+			"asset": {
+				"source": [
+					"asset:item:iron-ore"
+				]
+			},
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"iron",
+				"era:VII",
+				"tier-7-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

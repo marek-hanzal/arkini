@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:wheat-field": {
+			"id": "item:wheat-field",
+			"type": "simple",
+			"title": "Wheat Field",
+			"description": "Movable grain source used by nearby farms.",
+			"asset": {
+				"source": [
+					"asset:item:wheat-field"
+				]
+			},
+			"tags": [
+				"source",
+				"food",
+				"grain",
+				"era:II"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

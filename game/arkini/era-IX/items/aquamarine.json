@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:aquamarine": {
+			"id": "item:aquamarine",
+			"type": "simple",
+			"title": "Aquamarine",
+			"description": "A polished cyan gemstone reserved for late-game treasure economy.",
+			"asset": {
+				"source": [
+					"asset:item:aquamarine"
+				]
+			},
+			"tags": [
+				"treasure",
+				"gem",
+				"aquamarine",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

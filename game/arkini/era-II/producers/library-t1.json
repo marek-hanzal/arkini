@@ -1,0 +1,29 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:library-t1": {
+			"id": "producer:library-t1",
+			"type": "simple",
+			"title": "Library I",
+			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
+			"asset": {
+				"source": [
+					"asset:producer:library-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:II"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1
+		}
+	}
+}

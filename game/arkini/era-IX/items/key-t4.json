@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:key-t4": {
+			"id": "item:key-t4",
+			"type": "simple",
+			"title": "Key IV",
+			"description": "Masterwork gem-set goldsmith key used to open Chest IV.",
+			"asset": {
+				"source": [
+					"asset:item:key-t4"
+				]
+			},
+			"tags": [
+				"key",
+				"goldsmith",
+				"gem",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

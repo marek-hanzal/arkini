@@ -1,0 +1,106 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:house-t2": {
+			"id": "producer:house-t2",
+			"type": "producer",
+			"title": "House",
+			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
+			"asset": {
+				"source": [
+					"asset:producer:house-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:III",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:house-t2:morale-t2",
+					"title": "Morale T2",
+					"description": "Runs morale t2 for House.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bread"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 7
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:morale-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											},
+											{
+												"itemId": "item:morale-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

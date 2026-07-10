@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:coal": {
+			"id": "item:coal",
+			"type": "simple",
+			"title": "Coal Cart",
+			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
+			"asset": {
+				"source": [
+					"asset:item:coal"
+				]
+			},
+			"tags": [
+				"material",
+				"industry",
+				"fuel",
+				"coal",
+				"era:VII",
+				"tier-7-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

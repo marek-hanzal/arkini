@@ -1,0 +1,90 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-slaughterhouse-t1": {
+			"id": "item:blueprint-slaughterhouse-t1",
+			"type": "craft",
+			"title": "Slaughterhouse I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-slaughterhouse-t1"
+				],
+				"composite": "asset:producer:slaughterhouse-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:slaughterhouse-t1:construct",
+				"title": "Construct Slaughterhouse I",
+				"description": "Consumes construction resources to build Slaughterhouse I.",
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:piglet"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:slaughterhouse-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:magnifying-glass": {
+			"id": "item:magnifying-glass",
+			"type": "simple",
+			"title": "Magnifying Glass",
+			"description": "Reusable survey tool used to search exhausted cracks and later other depleted deposits for fresh sources.",
+			"asset": {
+				"source": [
+					"asset:item:magnifying-glass"
+				]
+			},
+			"tags": [
+				"equipment",
+				"tool",
+				"search",
+				"survey",
+				"deposit-search",
+				"era:I"
+			],
+			"categoryId": "equipment",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

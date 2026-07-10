@@ -1,0 +1,67 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:seed": {
+			"id": "item:seed",
+			"type": "craft",
+			"title": "Seed",
+			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Feed it water on the board until it grows into a sapling stage, then let it finish into a tree.",
+			"asset": {
+				"source": [
+					"asset:item:seed",
+					"asset:item:sapling"
+				]
+			},
+			"tags": [
+				"material",
+				"wood",
+				"forest",
+				"seed",
+				"craft-target",
+				"growth",
+				"era:I",
+				"tier-1-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 10,
+			"line": {
+				"id": "line:seed:grow",
+				"title": "Grow Tree",
+				"description": "Consumes water to grow this seed into a tree.",
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"itemId": "item:water",
+						"quantity": {
+							"type": "value",
+							"value": 6
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:tree",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

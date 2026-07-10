@@ -1,0 +1,60 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:pickaxe": {
+			"id": "item:pickaxe",
+			"type": "simple",
+			"title": "Pickaxe",
+			"description": "Single-use mining tool. Drag onto a stone deposit to harvest a random pile of stones.",
+			"asset": {
+				"source": [
+					"asset:item:pickaxe"
+				]
+			},
+			"tags": [
+				"equipment",
+				"tool",
+				"mining",
+				"stone",
+				"blacksmith",
+				"single-use",
+				"era:IX"
+			],
+			"categoryId": "equipment",
+			"scope": "any",
+			"maxStackSize": 20,
+			"merge": [
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:rock"
+					},
+					"action": "consume",
+					"effect": "remove",
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:stone",
+												"quantity": {
+													"type": "range",
+													"min": 1,
+													"max": 4
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

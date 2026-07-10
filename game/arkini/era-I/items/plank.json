@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:plank": {
+			"id": "item:plank",
+			"type": "simple",
+			"title": "Plank",
+			"description": "Processed wood material produced by sawmills.",
+			"asset": {
+				"source": [
+					"asset:item:plank"
+				]
+			},
+			"tags": [
+				"material",
+				"wood",
+				"era:I",
+				"tier-2-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:stone-block": {
+			"id": "item:stone-block",
+			"type": "simple",
+			"title": "Stone Block",
+			"description": "Processed stone material produced by stonemasons.",
+			"asset": {
+				"source": [
+					"asset:item:stone-block"
+				]
+			},
+			"tags": [
+				"material",
+				"stone",
+				"era:I",
+				"tier-2-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

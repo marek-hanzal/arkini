@@ -44,13 +44,23 @@ describe("LineSchema", () => {
 		};
 
 		expect(LineSchema.safeParse(line).success).toBe(true);
+		const lineWithDefaultCapacity = LineSchema.parse({
+			...line,
+			input: [
+				{
+					...line.input[0],
+					capacity: undefined,
+				},
+			],
+		});
+		expect(lineWithDefaultCapacity.input[0].capacity).toBe(0);
 		expect(
 			LineSchema.safeParse({
 				...line,
 				input: [
 					{
 						...line.input[0],
-						capacity: undefined,
+						capacity: -1,
 					},
 				],
 			}).success,
@@ -71,7 +81,7 @@ describe("LineSchema", () => {
 					},
 				],
 			}).success,
-		).toBe(false);
+		).toBe(true);
 		expect(
 			LineSchema.safeParse({
 				...line,

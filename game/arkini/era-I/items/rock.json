@@ -1,0 +1,47 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:rock": {
+			"id": "item:rock",
+			"type": "deposit",
+			"title": "Stone Deposit",
+			"description": "Movable stone deposit used by nearby quarries or mined manually with a single-use pickaxe.",
+			"asset": {
+				"source": [
+					"asset:item:rock"
+				]
+			},
+			"tags": [
+				"source",
+				"stone",
+				"era:I",
+				"stone-deposit"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1,
+			"count": 64,
+			"output": {
+				"set": [
+					{
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:cracked-rock",
+										"quantity": {
+											"type": "value",
+											"value": 1
+										},
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

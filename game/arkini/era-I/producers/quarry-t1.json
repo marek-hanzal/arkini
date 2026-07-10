@@ -1,0 +1,116 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:quarry-t1": {
+			"id": "producer:quarry-t1",
+			"type": "producer",
+			"title": "Quarry I",
+			"description": "Produces stone when placed near a rock.",
+			"asset": {
+				"source": [
+					"asset:producer:quarry-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"stone",
+				"era:I",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:quarry-t1:stone",
+					"title": "Stone",
+					"description": "Runs stone for Quarry I.",
+					"runtimeMs": 8000,
+					"input": [
+						{
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "near",
+								"selector": {
+									"type": "item",
+									"itemId": "item:rock"
+								}
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							}
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:stone",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.4,
+										"drop": [
+											{
+												"itemId": "item:stone",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.15,
+										"drop": [
+											{
+												"itemId": "item:stone",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:road-repair",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

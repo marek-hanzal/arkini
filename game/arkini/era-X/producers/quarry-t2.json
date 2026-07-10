@@ -1,0 +1,162 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:quarry-t2": {
+			"id": "producer:quarry-t2",
+			"type": "producer",
+			"title": "Quarry",
+			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
+			"asset": {
+				"source": [
+					"asset:producer:quarry-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"quarry",
+				"luxury",
+				"prestige",
+				"era:X",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:quarry-t2:stone",
+					"title": "Stone",
+					"description": "Runs stone for Quarry.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "item:marble-deposit"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:stone",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:stone",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:quarry-t2:marble",
+					"title": "Marble",
+					"description": "Runs marble for Quarry.",
+					"runtimeMs": 22000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "item:marble-deposit"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:marble",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.25,
+										"drop": [
+											{
+												"itemId": "item:marble",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

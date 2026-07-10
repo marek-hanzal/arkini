@@ -1,0 +1,459 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:townhall-t4": {
+			"id": "producer:townhall-t4",
+			"type": "producer",
+			"title": "Town Hall IV",
+			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
+			"asset": {
+				"source": [
+					"asset:producer:townhall-t4"
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:townhall-t4:blueprint-paper-mill-t1",
+					"title": "Blueprint: Paper Mill I",
+					"description": "Runs blueprint: paper mill i for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-paper-mill-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-school",
+					"title": "Blueprint: School",
+					"description": "Runs blueprint: school for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-school",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-library-t2",
+					"title": "Blueprint: Library II",
+					"description": "Runs blueprint: library ii for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-library-t3",
+					"title": "Blueprint: Library III",
+					"description": "Runs blueprint: library iii for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-library-t4",
+					"title": "Blueprint: Library IV",
+					"description": "Runs blueprint: library iv for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t4",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-civic-office-t1",
+					"title": "Blueprint: Civic Office I",
+					"description": "Runs blueprint: civic office i for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-civic-office-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-market-t2",
+					"title": "Blueprint: Market II",
+					"description": "Runs blueprint: market ii for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-market-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-prospector-guild-t1",
+					"title": "Blueprint: Prospector Guild 1",
+					"description": "Runs blueprint: prospector guild 1 for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-prospector-guild-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-tannery-t1",
+					"title": "Blueprint: Tannery I",
+					"description": "Runs blueprint: tannery i for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-tannery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-weaver-hut-t1",
+					"title": "Blueprint: Weaver Hut I",
+					"description": "Runs blueprint: weaver hut i for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-weaver-hut-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-dye-workshop-t1",
+					"title": "Blueprint: Dye Workshop I",
+					"description": "Runs blueprint: dye workshop i for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-dye-workshop-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-tailor-workshop-t1",
+					"title": "Blueprint: Tailor Workshop I",
+					"description": "Runs blueprint: tailor workshop i for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-tailor-workshop-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t4:blueprint-house-t3",
+					"title": "Blueprint: House III",
+					"description": "Runs blueprint: house iii for Town Hall IV.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-house-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,114 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:iron-mine-t1": {
+			"id": "producer:iron-mine-t1",
+			"type": "producer",
+			"title": "Iron Mine I",
+			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
+			"asset": {
+				"source": [
+					"asset:producer:iron-mine-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"iron",
+				"era:VII",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:iron-mine-t1:iron-ore",
+					"title": "Iron Ore",
+					"description": "Runs iron ore for Iron Mine I.",
+					"runtimeMs": 62000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sausage"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:beer"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:common-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "item:iron-deposit"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:iron-ore",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

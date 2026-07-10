@@ -1,0 +1,261 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:waste-processor-t2": {
+			"id": "producer:waste-processor-t2",
+			"type": "producer",
+			"title": "Waste Processor II",
+			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
+			"asset": {
+				"source": [
+					"asset:producer:waste-processor-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"industry",
+				"era:VIII",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:waste-processor-t2:recycle-trash",
+					"title": "Recycle Trash",
+					"description": "Runs recycle trash for Waste Processor II.",
+					"runtimeMs": 75000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:trash"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						}
+					],
+					"rules": []
+				},
+				{
+					"id": "line:waste-processor-t2:burn-trash-log",
+					"title": "Burn Trash: Wood",
+					"description": "Runs burn trash: wood for Waste Processor II.",
+					"runtimeMs": 40000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:trash"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.25,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.05,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:waste-processor-t2:burn-trash-charcoal",
+					"title": "Burn Trash: Charcoal",
+					"description": "Runs burn trash: charcoal for Waste Processor II.",
+					"runtimeMs": 30000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:trash"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.3,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.08,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:waste-processor-t2:burn-trash-coal",
+					"title": "Burn Trash: Coal",
+					"description": "Runs burn trash: coal for Waste Processor II.",
+					"runtimeMs": 25000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:trash"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coal"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.45,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.15,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

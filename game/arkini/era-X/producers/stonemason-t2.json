@@ -1,0 +1,289 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:stonemason-t2": {
+			"id": "producer:stonemason-t2",
+			"type": "producer",
+			"title": "Stonemason",
+			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
+			"asset": {
+				"source": [
+					"asset:producer:stonemason-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"stone",
+				"marble",
+				"masonry",
+				"luxury",
+				"prestige",
+				"era:X",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:stonemason-t2:stone-block",
+					"title": "Stone Block",
+					"description": "Runs stone block for Stonemason.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:quarry-t2"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:stone-block",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:stone-block",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:stonemason-t2:marble-block",
+					"title": "Marble Block",
+					"description": "Runs marble block for Stonemason.",
+					"runtimeMs": 28000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:marble"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:quarry-t2"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:marble-block",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.2,
+										"drop": [
+											{
+												"itemId": "item:marble-block",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:stonemason-t2:marble-block-morale-t4",
+					"title": "Marble Block (Inspired)",
+					"description": "Runs marble block (inspired) for Stonemason.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:marble"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t4"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:quarry-t2"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:marble-block",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.25,
+										"drop": [
+											{
+												"itemId": "item:marble-block",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

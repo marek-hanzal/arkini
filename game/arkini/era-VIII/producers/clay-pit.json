@@ -1,0 +1,105 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:clay-pit": {
+			"id": "producer:clay-pit",
+			"type": "producer",
+			"title": "Clay Pit",
+			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
+			"asset": {
+				"source": [
+					"asset:producer:clay-pit"
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"clay",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:clay-pit:clay",
+					"title": "Clay",
+					"description": "Runs clay for Clay Pit.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "item:clay-deposit"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:clay",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.3,
+										"drop": [
+											{
+												"itemId": "item:clay",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

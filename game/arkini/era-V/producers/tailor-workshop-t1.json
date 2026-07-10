@@ -1,0 +1,229 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:tailor-workshop-t1": {
+			"id": "producer:tailor-workshop-t1",
+			"type": "producer",
+			"title": "Tailor Workshop I",
+			"description": "Clothing producer that sews common and luxury clothing.",
+			"asset": {
+				"source": [
+					"asset:producer:tailor-workshop-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"clothing",
+				"textile",
+				"era:V",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:tailor-workshop-t1:common-clothing",
+					"title": "Common Clothing",
+					"description": "Runs common clothing for Tailor Workshop I.",
+					"runtimeMs": 26000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:common-cloth"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:common-clothing",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:tailor-workshop-t1:luxury-clothing",
+					"title": "Luxury Clothing",
+					"description": "Runs luxury clothing for Tailor Workshop I.",
+					"runtimeMs": 35000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-cloth"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 8
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:luxury-clothing",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:tailor-workshop-t1:luxury-clothing-morale-t3",
+					"title": "Luxury Clothing (Inspired)",
+					"description": "Runs luxury clothing (inspired) for Tailor Workshop I.",
+					"runtimeMs": 30000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-cloth"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 8
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t3"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:luxury-clothing",
+												"quantity": {
+													"type": "value",
+													"value": 3
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

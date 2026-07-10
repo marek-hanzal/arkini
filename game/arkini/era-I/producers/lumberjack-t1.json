@@ -1,0 +1,209 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:lumberjack-t1": {
+			"id": "producer:lumberjack-t1",
+			"type": "producer",
+			"title": "Lumberjack I",
+			"description": "Produces logs when placed near a tree.",
+			"asset": {
+				"source": [
+					"asset:producer:lumberjack-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"wood",
+				"era:I",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:lumberjack-t1:log",
+					"title": "Log from Tree",
+					"description": "Produces logs from a nearby log from tree.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "near",
+								"selector": {
+									"type": "item",
+									"itemId": "item:tree"
+								}
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							}
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.5,
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:road-repair",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:lumberjack-t1:log-double-tree",
+					"title": "Log from Double Tree",
+					"description": "Produces logs from a nearby log from double tree.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "near",
+								"selector": {
+									"type": "item",
+									"itemId": "item:double-tree"
+								}
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							}
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.65,
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:road-repair",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:lumberjack-t1:log-micro-forest",
+					"title": "Log from Micro-Forest",
+					"description": "Produces logs from a nearby log from micro-forest.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "near",
+								"selector": {
+									"type": "item",
+									"itemId": "item:micro-forest"
+								}
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							}
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.85,
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:road-repair",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

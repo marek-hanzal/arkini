@@ -1,0 +1,133 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:charcoal-burner-t1": {
+			"id": "producer:charcoal-burner-t1",
+			"type": "producer",
+			"title": "Charcoal Burner I",
+			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
+			"asset": {
+				"source": [
+					"asset:producer:charcoal-burner-t1"
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"fuel",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:charcoal-burner-t1:charcoal",
+					"title": "Charcoal",
+					"description": "Runs charcoal for Charcoal Burner I.",
+					"runtimeMs": 20000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 8
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "far",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:charcoal",
+												"quantity": {
+													"type": "value",
+													"value": 3
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.3,
+										"drop": [
+											{
+												"itemId": "item:charcoal",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.08,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

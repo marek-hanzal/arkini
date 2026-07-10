@@ -1,0 +1,159 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:roof-tile-factory": {
+			"id": "producer:roof-tile-factory",
+			"type": "producer",
+			"title": "Roof Tile Factory",
+			"description": "Workshop that fires clay into sturdy roof tiles.",
+			"asset": {
+				"source": [
+					"asset:producer:roof-tile-factory"
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"roof",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:roof-tile-factory:roof-tiles",
+					"title": "Roof Tiles",
+					"description": "Runs roof tiles for Roof Tile Factory.",
+					"runtimeMs": 22000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:clay"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 8
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:clay-pit"
+										}
+									}
+								}
+							]
+						},
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "far",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:roof-tiles",
+												"quantity": {
+													"type": "value",
+													"value": 4
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.55,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.12,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

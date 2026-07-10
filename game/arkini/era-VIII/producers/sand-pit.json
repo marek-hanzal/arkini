@@ -1,0 +1,97 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:sand-pit": {
+			"id": "producer:sand-pit",
+			"type": "producer",
+			"title": "Sand Pit",
+			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
+			"asset": {
+				"source": [
+					"asset:producer:sand-pit"
+				]
+			},
+			"tags": [
+				"building",
+				"producer",
+				"construction",
+				"sand",
+				"glass",
+				"era:VIII",
+				"industry",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:sand-pit:sand",
+					"title": "Sand",
+					"description": "Runs sand for Sand Pit.",
+					"runtimeMs": 9000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "item:sand-deposit"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:sand",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.35,
+										"drop": [
+											{
+												"itemId": "item:sand",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

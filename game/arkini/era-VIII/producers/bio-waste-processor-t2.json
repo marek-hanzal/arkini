@@ -1,0 +1,262 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:bio-waste-processor-t2": {
+			"id": "producer:bio-waste-processor-t2",
+			"type": "producer",
+			"title": "Bio-Waste Processor II",
+			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
+			"asset": {
+				"source": [
+					"asset:producer:bio-waste-processor-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"bio-waste",
+				"farm",
+				"industry",
+				"era:VIII",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:bio-waste-processor-t2:compost-bio-waste",
+					"title": "Compost Bio Waste",
+					"description": "Runs compost bio waste for Bio-Waste Processor II.",
+					"runtimeMs": 70000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bio-waste"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						}
+					],
+					"rules": []
+				},
+				{
+					"id": "line:bio-waste-processor-t2:burn-bio-waste-log",
+					"title": "Burn Bio Waste: Wood",
+					"description": "Runs burn bio waste: wood for Bio-Waste Processor II.",
+					"runtimeMs": 40000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bio-waste"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.2,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.04,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:bio-waste-processor-t2:burn-bio-waste-charcoal",
+					"title": "Burn Bio Waste: Charcoal",
+					"description": "Runs burn bio waste: charcoal for Bio-Waste Processor II.",
+					"runtimeMs": 30000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bio-waste"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.25,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.06,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:bio-waste-processor-t2:burn-bio-waste-coal",
+					"title": "Burn Bio Waste: Coal",
+					"description": "Runs burn bio waste: coal for Bio-Waste Processor II.",
+					"runtimeMs": 25000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bio-waste"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coal"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.4,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.12,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

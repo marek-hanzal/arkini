@@ -1,0 +1,486 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:townhall-t3": {
+			"id": "producer:townhall-t3",
+			"type": "producer",
+			"title": "Town Hall III",
+			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, brewing, wine, market, and Era IV plans.",
+			"asset": {
+				"source": [
+					"asset:producer:townhall-t3"
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:III"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:townhall-t3:blueprint-windmill-t1",
+					"title": "Blueprint: Windmill I",
+					"description": "Runs blueprint: windmill i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-windmill-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-bakery-t1",
+					"title": "Blueprint: Bakery I",
+					"description": "Runs blueprint: bakery i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-bakery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-slaughterhouse-t1",
+					"title": "Blueprint: Slaughterhouse I",
+					"description": "Runs blueprint: slaughterhouse i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-slaughterhouse-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-dairy-t1",
+					"title": "Blueprint: Dairy I",
+					"description": "Runs blueprint: dairy i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-dairy-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:hop-field",
+					"title": "Survey: Hop Field",
+					"description": "Runs survey: hop field for Town Hall III.",
+					"runtimeMs": 13000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:grain"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:hop-field",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-brewery-t1",
+					"title": "Blueprint: Brewery I",
+					"description": "Runs blueprint: brewery i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-brewery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-tavern-t1",
+					"title": "Blueprint: Tavern I",
+					"description": "Runs blueprint: tavern i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-tavern-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:vineyard",
+					"title": "Survey: Vineyard",
+					"description": "Runs survey: vineyard for Town Hall III.",
+					"runtimeMs": 15000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:grain"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:vineyard",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-winery-t1",
+					"title": "Blueprint: Winery I",
+					"description": "Runs blueprint: winery i for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-winery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-market-t1",
+					"title": "Blueprint: Market",
+					"description": "Runs blueprint: market for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-market-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-house-t2",
+					"title": "Blueprint: House II",
+					"description": "Runs blueprint: house ii for Town Hall III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:beer"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-house-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t3:blueprint-townhall-t4",
+					"title": "Blueprint: Town Hall IV",
+					"description": "Runs blueprint: town hall iv for Town Hall III.",
+					"runtimeMs": 120000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-townhall-t4",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

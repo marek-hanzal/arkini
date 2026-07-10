@@ -1,0 +1,114 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:coal-mine-t1": {
+			"id": "producer:coal-mine-t1",
+			"type": "producer",
+			"title": "Coal Mine I",
+			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
+			"asset": {
+				"source": [
+					"asset:producer:coal-mine-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"industry",
+				"mine",
+				"coal",
+				"era:VII",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:coal-mine-t1:coal",
+					"title": "Coal",
+					"description": "Runs coal for Coal Mine I.",
+					"runtimeMs": 50000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:bread"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:common-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "near",
+										"selector": {
+											"type": "item",
+											"itemId": "item:coal-deposit"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:coal",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

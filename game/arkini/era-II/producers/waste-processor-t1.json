@@ -1,0 +1,122 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:waste-processor-t1": {
+			"id": "producer:waste-processor-t1",
+			"type": "producer",
+			"title": "Waste Processor I",
+			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
+			"asset": {
+				"source": [
+					"asset:producer:waste-processor-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cleanup",
+				"waste",
+				"trash",
+				"era:II",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:waste-processor-t1:recycle-trash",
+					"title": "Recycle Trash",
+					"description": "Runs recycle trash for Waste Processor I.",
+					"runtimeMs": 90000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:trash"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						}
+					],
+					"rules": []
+				},
+				{
+					"id": "line:waste-processor-t1:burn-trash-log",
+					"title": "Burn Trash: Wood",
+					"description": "Runs burn trash: wood for Waste Processor I.",
+					"runtimeMs": 45000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:trash"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "chance",
+										"chance": 0.25,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.05,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

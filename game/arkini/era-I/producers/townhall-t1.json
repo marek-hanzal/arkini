@@ -1,0 +1,354 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:townhall-t1": {
+			"id": "producer:townhall-t1",
+			"type": "producer",
+			"title": "Town Hall I",
+			"description": "Starter civic hub that issues basic settlement blueprints.",
+			"asset": {
+				"source": [
+					"asset:producer:townhall-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:I"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:townhall-t1:blueprint-sawmill-t1",
+					"title": "Blueprint: Sawmill I",
+					"description": "Runs blueprint: sawmill i for Town Hall I.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-sawmill-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t1:blueprint-stonemason-t1",
+					"title": "Blueprint: Stonemason I",
+					"description": "Runs blueprint: stonemason i for Town Hall I.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-stonemason-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t1:blueprint-shrine-t1",
+					"title": "Blueprint: Wayside Shrine",
+					"description": "Runs blueprint: wayside shrine for Town Hall I.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-shrine-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t1:blueprint-well-t1",
+					"title": "Blueprint: Well I",
+					"description": "Runs blueprint: well i for Town Hall I.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-well-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t1:blueprint-library-t1",
+					"title": "Blueprint: Library I",
+					"description": "Runs blueprint: library i for Town Hall I.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t1:blueprint-townhall-t2",
+					"title": "Blueprint: Town Hall II",
+					"description": "Runs blueprint: town hall ii for Town Hall I.",
+					"runtimeMs": 60000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-townhall-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

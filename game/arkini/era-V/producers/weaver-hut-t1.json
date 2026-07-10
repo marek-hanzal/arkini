@@ -1,0 +1,73 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:weaver-hut-t1": {
+			"id": "producer:weaver-hut-t1",
+			"type": "producer",
+			"title": "Weaver Hut I",
+			"description": "Textile producer that weaves wool into common cloth.",
+			"asset": {
+				"source": [
+					"asset:producer:weaver-hut-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"cloth",
+				"textile",
+				"era:V",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:weaver-hut-t1:common-cloth",
+					"title": "Common Cloth",
+					"description": "Runs common cloth for Weaver Hut I.",
+					"runtimeMs": 18000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:wool"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:common-cloth",
+												"quantity": {
+													"type": "value",
+													"value": 3
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

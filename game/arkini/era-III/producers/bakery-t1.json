@@ -1,0 +1,150 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:bakery-t1": {
+			"id": "producer:bakery-t1",
+			"type": "producer",
+			"title": "Bakery I",
+			"description": "Consumes flour and water to bake bread.",
+			"asset": {
+				"source": [
+					"asset:producer:bakery-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"bread",
+				"era:III",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:bakery-t1:bread",
+					"title": "Bread",
+					"description": "Runs bread for Bakery I.",
+					"runtimeMs": 15000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:flour"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:bread",
+												"quantity": {
+													"type": "value",
+													"value": 3
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:bakery-t1:bread-morale-t1",
+					"title": "Bread (Inspired)",
+					"description": "Runs bread (inspired) for Bakery I.",
+					"runtimeMs": 13000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:flour"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t1"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:bread",
+												"quantity": {
+													"type": "value",
+													"value": 5
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

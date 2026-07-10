@@ -1,0 +1,444 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:townhall-t2": {
+			"id": "producer:townhall-t2",
+			"type": "producer",
+			"title": "Town Hall II",
+			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
+			"asset": {
+				"source": [
+					"asset:producer:townhall-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"townhall",
+				"civic",
+				"unique",
+				"era:II"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:townhall-t2:wheat-field",
+					"title": "Survey: Wheat Field",
+					"description": "Runs survey: wheat field for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:water"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:wheat-field",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-farm-t1",
+					"title": "Blueprint: Farm I",
+					"description": "Runs blueprint: farm i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-farm-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-pig-farm-t1",
+					"title": "Blueprint: Pig Farm I",
+					"description": "Runs blueprint: pig farm i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-pig-farm-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-cattle-farm-t1",
+					"title": "Blueprint: Cattle Farm I",
+					"description": "Runs blueprint: cattle farm i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-cattle-farm-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-chicken-coop-t1",
+					"title": "Blueprint: Chicken Coop I",
+					"description": "Runs blueprint: chicken coop i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-chicken-coop-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-sheep-pasture-t1",
+					"title": "Blueprint: Sheep Pasture I",
+					"description": "Runs blueprint: sheep pasture i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-sheep-pasture-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-vegetable-garden-t1",
+					"title": "Blueprint: Vegetable Garden I",
+					"description": "Runs blueprint: vegetable garden i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-vegetable-garden-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-cookhouse-t1",
+					"title": "Blueprint: Cookhouse I",
+					"description": "Runs blueprint: cookhouse i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-cookhouse-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-waste-processor-t1",
+					"title": "Blueprint: Waste Processor I",
+					"description": "Runs blueprint: waste processor i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-waste-processor-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-bio-waste-processor-t1",
+					"title": "Blueprint: Bio-Waste Processor I",
+					"description": "Runs blueprint: bio-waste processor i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-bio-waste-processor-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-house-t1",
+					"title": "Blueprint: House I",
+					"description": "Runs blueprint: house i for Town Hall II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-house-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:townhall-t2:blueprint-townhall-t3",
+					"title": "Blueprint: Town Hall III",
+					"description": "Runs blueprint: town hall iii for Town Hall II.",
+					"runtimeMs": 90000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-townhall-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

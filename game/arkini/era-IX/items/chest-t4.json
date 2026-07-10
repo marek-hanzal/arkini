@@ -1,0 +1,111 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:chest-t4": {
+			"id": "item:chest-t4",
+			"type": "stash",
+			"title": "Chest IV",
+			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
+			"asset": {
+				"source": [
+					"asset:item:chest-t4"
+				]
+			},
+			"tags": [
+				"chest",
+				"locked",
+				"stash",
+				"guild",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:chest-t4:open",
+				"title": "Open Chest T4",
+				"description": "Runs open chest t4 for Chest IV.",
+				"runtimeMs": 24000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:key-t4"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						},
+						"capacity": 1
+					}
+				],
+				"rules": []
+			},
+			"output": {
+				"set": [
+					{
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:coin",
+										"quantity": {
+											"type": "range",
+											"min": 10,
+											"max": 15
+										},
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.35,
+								"drop": [
+									{
+										"itemId": "item:sapphire",
+										"quantity": {
+											"type": "value",
+											"value": 1
+										},
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.55,
+								"drop": [
+									{
+										"itemId": "item:topaz",
+										"quantity": {
+											"type": "value",
+											"value": 1
+										},
+										"rules": []
+									}
+								]
+							},
+							{
+								"type": "chance",
+								"chance": 0.35,
+								"drop": [
+									{
+										"itemId": "item:aquamarine",
+										"quantity": {
+											"type": "value",
+											"value": 1
+										},
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

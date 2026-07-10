@@ -1,42 +1,12 @@
 {
 	"$schema": "../arkini.schema.json",
 	"assets": {
-		"asset:item:cheat:speed-disable": {
-			"resourceId": "item-cheat-speed-disable"
-		},
-		"asset:item:cheat:speed-enable": {
-			"resourceId": "item-cheat-speed-enable"
-		},
-		"asset:producer:prospector-guild-t2": {
-			"resourceId": "producer-prospector-guild-t1"
-		},
-		"asset:producer:shrine-t1": {
-			"resourceId": "producer-shrine-t1"
-		},
-		"asset:game:hero": {
-			"label": "Splash hero",
-			"resourceId": "hero"
-		},
 		"asset:item:board-memory:empty": {
 			"resourceId": "item-board-memory-empty"
 		},
 		"asset:item:board-memory:full": {
 			"resourceId": "item-board-memory-full"
-		},
-		"asset:item:quest": {
-			"resourceId": "item-quest"
 		}
-	},
-	"game": {
-		"board": {
-			"height": 11,
-			"width": 7
-		},
-		"id": "arkini",
-		"inventory": {
-			"slots": 49
-		},
-		"title": "Arkini"
 	},
 	"items": {
 		"item:inventory": {
@@ -145,6 +115,5 @@
 				"quantity": 1
 			}
 		]
-	},
-	"version": 1
+	}
 }

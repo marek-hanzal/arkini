@@ -1,0 +1,153 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:cookhouse-t1": {
+			"id": "producer:cookhouse-t1",
+			"type": "producer",
+			"title": "Cookhouse I",
+			"description": "Prepares empty feast plates for manual assembly or slowly cooks complete feasts from Era II farm food.",
+			"asset": {
+				"source": [
+					"asset:producer:cookhouse-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"cooking",
+				"era:II",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:cookhouse-t1:feast-plate",
+					"title": "Feast Plate",
+					"description": "Runs feast plate for Cookhouse I.",
+					"runtimeMs": 8000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:feast-plate",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:cookhouse-t1:feast",
+					"title": "Auto-Cooked Feast",
+					"description": "Runs auto-cooked feast for Cookhouse I.",
+					"runtimeMs": 60000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:grain"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:piglet"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:milk"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:egg"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:vegetables"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:feast",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

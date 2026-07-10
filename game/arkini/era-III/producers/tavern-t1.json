@@ -1,0 +1,142 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:tavern-t1": {
+			"id": "producer:tavern-t1",
+			"type": "producer",
+			"title": "Tavern I",
+			"description": "Serves finished drink items; cooking and feast prep belong to Cookhouse I.",
+			"asset": {
+				"source": [
+					"asset:producer:tavern-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"beer",
+				"era:III",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:tavern-t1:beer",
+					"title": "Beer",
+					"description": "Runs beer for Tavern I.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:beer-barrel"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:beer",
+												"quantity": {
+													"type": "value",
+													"value": 4
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:tavern-commission",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:tavern-t1:wine-glass",
+					"title": "Wine Glass",
+					"description": "Runs wine glass for Tavern I.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:wine-barrel"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:wine-glass",
+												"quantity": {
+													"type": "value",
+													"value": 4
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:quest:tavern-commission",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

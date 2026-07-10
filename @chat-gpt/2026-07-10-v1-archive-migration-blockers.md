@@ -1,8 +1,8 @@
-# v1 archive migration blockers
+# v1 archive migration remainder
 
 Branch: `migration/v1-archive`
 
-## Migrated
+## Migrated baseline
 
 - 189 canonical items now exist in `game/arkini`.
 - Their 189 legacy definitions were removed from `game/archive`; the archive now contains only unresolved migration backlog.
@@ -11,7 +11,19 @@ Branch: `migration/v1-archive`
 - `game/arkini/game.json` gained the `building`, `treasure` and `utility` categories.
 - Schema tests now discover every `game/arkini/**/*.json` fragment recursively instead of maintaining a manual import list.
 
-All 190 source fragments pass `GameSourceSchema`; the merged 189-item configuration passes `GameSchema`.
+## 2026-07-10 migration pass
+
+- Migrated another 55 canonical entities: 48 producers, four stash items and three path blueprints.
+- `game/arkini` now contains 244 canonical items.
+- Legacy `board_then_inventory` authoring was omitted; runtime board placement falls back according to the emitted item's scope independently of placement type.
+- Zero-material lines use the explicit `{ "type": "simple" }` input.
+- Legacy nearby requirements became current item-query `require` rules.
+- Legacy nearby capacity spending became deposit inputs.
+- University and path exclusivity now query owned keystone items directly instead of indirect path grants.
+- Legacy dynamic output/grant modifiers and distance bands were intentionally removed.
+- Lumberjack's dynamic per-source log chance became three explicit source lines: Tree `0.5`, Double Tree `0.65`, and Micro-Forest `0.85`. Counting and stacking multiple nearby sources remains deferred with the future rule pass.
+
+All 245 source fragments pass `GameSourceSchema`; the merged 244-item configuration passes `GameSchema`.
 
 ## Migration decisions and remaining model work
 
@@ -26,65 +38,30 @@ All 190 source fragments pass `GameSourceSchema`; the merged 189-item configurat
 
 Both discriminators now exist in `ItemEnumSchema`. Their concrete item schemas and runtime behavior remain deferred. The canonical type is `memory`, not `board-memory`.
 
-### Resolved model: explicit simple input
-
-`LineSchema.input` remains a non-empty tuple. Legitimate zero-material production lines use the explicit `{ "type": "simple" }` input, which carries no material consumption, reservation, quantity, capacity, or deposit operation.
-
-Affected producers include:
-
-- `producer:cookhouse-t1`
-- `producer:lumberjack-t1`
-- `producer:quarry-t1`
-- `producer:quarry-t2`
-- `producer:sand-pit`
-- `producer:townhall-t2`
-- `producer:townhall-t3`
-- `producer:townhall-t4`
-- `producer:well-t1`
-
 ### Deferred redesign: effects as temporary items
 
 Do not add a detached persistent-grant state subsystem. The intended redesign is for a shrine or another source to create a real item with a temporary effect duration. The item occupies board space, participates in existing item mechanics, and disappears when its duration expires. Schema support for item lifetime/expiry will be designed with that gameplay pass.
 
-Historical grant identities that need remapping include:
+Historical active grant identities that need remapping include:
 
 - `grant:active:shrine-minor-haste`
 - `grant:active:shrine-bountiful-offering`
-- `grant:path:engineers`
-- `grant:path:faith`
-- `grant:path:mages`
+This work remains deferred together with the shrine. Path ownership no longer needs grants because current rules query keystone items directly.
 
-This work remains deferred together with the shrine, path blueprints and path-dependent University behavior.
+### Removed: legacy dynamic output-effect subsystem
 
-### Obsolete: legacy dynamic output-effect subsystem
+The archived dynamic output-effect subsystem was not migrated. The current rule system remains the canonical model. Any genuinely missing behavior will be reconsidered later as a dedicated rule-system quest.
 
-The archived dynamic output-effect subsystem will not be migrated. The current rule system remains the canonical model. Legacy effects will be deleted from migrated definitions first; any genuinely missing behavior will be reconsidered later as a dedicated rule-system quest.
+### Removed pending redesign: conditional runtime bands
 
-### Deferred simplification: conditional runtime bands
-
-The archived mutually exclusive distance-band behavior is intentionally not preserved during the first migration. It was overcomplicated and will be redesigned later using the current rule system.
-
-Affected producer families include farms, animal producers, Brewery and Winery.
-
-### Resolved runtime policy: implicit inventory fallback
-
-`board_then_inventory` is not an authored placement strategy. Every placement type only selects how runtime attempts board placement. Independently of that type, runtime checks available board space and uses the emitted item's scope to decide whether anything that does not fit may fall back to inventory. Archived `board_then_inventory` fields are omitted during migration.
-
-This unblocks placement mapping for:
-
-- `item:chest-t1` through `item:chest-t4`
-- `producer:waste-processor-t1`
-- `producer:waste-processor-t2`
-- `producer:bio-waste-processor-t1`
-- `producer:bio-waste-processor-t2`
+The archived mutually exclusive distance-band behavior was intentionally not preserved. It will be redesigned later using the current rule system.
 
 ### Remaining archive entities
 
-The remaining 58 legacy definitions are the actual migration backlog:
+The remaining three legacy definitions are the actual migration backlog:
 
-- 49 producers
-- 4 stash items
-- 3 path blueprints
-- 2 special items
+- `producer:shrine-t1`
+- `item:inventory`
+- `item:board-memory`, whose future v1 type is `memory`
 
-The migrated WIP config still contains dangling item references to producers and chests that remain in the archive. This is intentional during the schema-design pass and must reach zero before the configuration is treated as definition-complete.
+The only remaining canonical dangling reference is `producer:shrine-t1` from its already migrated blueprint. It stays intentional until temporary effect items and expiry are designed.

@@ -1,0 +1,72 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:dairy-t1": {
+			"id": "producer:dairy-t1",
+			"type": "producer",
+			"title": "Dairy I",
+			"description": "Processes milk into cheese.",
+			"asset": {
+				"source": [
+					"asset:producer:dairy-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"food",
+				"dairy",
+				"era:III",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:dairy-t1:cheese",
+					"title": "Cheese",
+					"description": "Runs cheese for Dairy I.",
+					"runtimeMs": 18000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:milk"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 3
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:cheese",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

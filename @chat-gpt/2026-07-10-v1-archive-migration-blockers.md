@@ -14,7 +14,7 @@ Branch: `migration/v1-archive`
 ## 2026-07-10 migration pass
 
 - Migrated another 55 canonical entities: 48 producers, four stash items and three path blueprints.
-- `game/arkini` now contains 244 canonical items.
+- `game/arkini` now contains 248 canonical items, including the two prepared temporary Shrine effect items, Inventory and Board Memory.
 - Legacy `board_then_inventory` authoring was omitted; runtime board placement falls back according to the emitted item's scope independently of placement type.
 - Zero-material lines use the explicit `{ "type": "simple" }` input.
 - Legacy nearby requirements became current item-query `require` rules.
@@ -23,7 +23,7 @@ Branch: `migration/v1-archive`
 - Legacy dynamic output/grant modifiers and distance bands were intentionally removed.
 - Lumberjack's dynamic per-source log chance became three explicit source lines: Tree `0.5`, Double Tree `0.65`, and Micro-Forest `0.85`. Counting and stacking multiple nearby sources remains deferred with the future rule pass.
 
-All 245 source fragments pass `GameSourceSchema`; the merged 244-item configuration passes `GameSchema`.
+All 249 source fragments pass `GameSourceSchema`; the merged 248-item configuration passes `GameSchema`.
 
 ## Migration decisions and remaining model work
 
@@ -31,12 +31,12 @@ All 245 source fragments pass `GameSourceSchema`; the merged 244-item configurat
 
 `GameSchema`/`MetaSchema` have no equivalent of archive `startingState`. Initial board and inventory authoring is intentionally deferred until the game implementation needs it; it does not block the current definition-schema pass.
 
-### Reserved special item types
+### Migrated special item types
 
 - `inventory`
 - `memory`
 
-Both discriminators now exist in `ItemEnumSchema`. Their concrete item schemas and runtime behavior remain deferred. The canonical type is `memory`, not `board-memory`.
+Both discriminators now have concrete item schemas and canonical definitions. Inventory is a singleton board item. Memory is an individual board-or-inventory item with ordered empty/full assets. Their runtime behavior remains deferred. The canonical type is `memory`, not `board-memory`.
 
 ### Deferred redesign: effects as temporary items
 
@@ -48,6 +48,8 @@ Historical active grant identities that need remapping include:
 - `grant:active:shrine-bountiful-offering`
 This work remains deferred together with the shrine. Path ownership no longer needs grants because current rules query keystone items directly.
 
+The canonical temporary effect items now exist as `item:effect:minor-haste` and `item:effect:bountiful-offering`. Migrating the Shrine producer itself remains deferred until its lines are remapped to emit them.
+
 ### Removed: legacy dynamic output-effect subsystem
 
 The archived dynamic output-effect subsystem was not migrated. The current rule system remains the canonical model. Any genuinely missing behavior will be reconsidered later as a dedicated rule-system quest.
@@ -58,10 +60,8 @@ The archived mutually exclusive distance-band behavior was intentionally not pre
 
 ### Remaining archive entities
 
-The remaining three legacy definitions are the actual migration backlog:
+The remaining legacy definition is the actual entity migration backlog:
 
 - `producer:shrine-t1`
-- `item:inventory`
-- `item:board-memory`, whose future v1 type is `memory`
 
 The only remaining canonical dangling reference is `producer:shrine-t1` from its already migrated blueprint. It stays intentional until temporary effect items and expiry are designed.

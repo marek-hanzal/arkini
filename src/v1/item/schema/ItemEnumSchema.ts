@@ -37,8 +37,10 @@ export const ItemEnumSchema = z
 		 * An item that stores and restores a board layout.
 		 */
 		"memory",
-		"cheat:speed:on",
-		"cheat:speed:off",
+		/**
+		 * A stateful item that toggles the speed cheat.
+		 */
+		"cheat:speed",
 		"nuke",
 		"cheat:inventory",
 	])

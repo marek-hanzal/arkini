@@ -10,7 +10,7 @@ import { VersionEnumSchema } from "./VersionEnumSchema";
  * One authoring fragment that contributes data to a complete game configuration.
  *
  * Game source data is intentionally split across files such as `game.json` and
- * `era-I/items/*.json`. Each fragment is valid independently; the source
+ * `era-I/simple/*.json`. Each fragment is valid independently; the source
  * packer merges all fragments, while the validator owns completed-game checks.
  */
 export const GameSourceSchema = z

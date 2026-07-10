@@ -1,0 +1,104 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:quest:water-carrier": {
+			"id": "item:quest:water-carrier",
+			"type": "craft",
+			"title": "Water Carrier Quest",
+			"description": "A small board quest for settlement supplies, rewarding a modest early vegetable delivery from the next era.",
+			"asset": {
+				"source": [
+					"asset:item:quest"
+				]
+			},
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:I"
+			],
+			"categoryId": "quest",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:quest:water-carrier:complete",
+				"title": "Supply Water",
+				"description": "Consumes settlement supplies to complete this water carrier request.",
+				"runtimeMs": 6000,
+				"input": [
+					{
+						"itemId": "item:water",
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					},
+					{
+						"itemId": "item:stone",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 3,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:vegetables",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 2,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:egg",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

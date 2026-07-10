@@ -1,0 +1,104 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:quest:road-repair": {
+			"id": "item:quest:road-repair",
+			"type": "craft",
+			"title": "Road Repair Quest",
+			"description": "A small board quest asking for raw building materials and rewarding a processed block.",
+			"asset": {
+				"source": [
+					"asset:item:quest"
+				]
+			},
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:I"
+			],
+			"categoryId": "quest",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:quest:road-repair:complete",
+				"title": "Repair Road",
+				"description": "Consumes raw building materials to complete this road repair request.",
+				"runtimeMs": 6000,
+				"input": [
+					{
+						"itemId": "item:log",
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"itemId": "item:stone",
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 3,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:plank",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 2,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:stone-block",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

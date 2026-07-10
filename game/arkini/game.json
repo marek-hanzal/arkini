@@ -28,6 +28,10 @@
 		"equipment": {
 			"id": "equipment",
 			"title": "Equipment"
+		},
+		"quest": {
+			"id": "quest",
+			"title": "Quests"
 		}
 	},
 	"version": "1.0"

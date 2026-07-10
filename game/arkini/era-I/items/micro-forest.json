@@ -1,0 +1,50 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:micro-forest": {
+			"id": "item:micro-forest",
+			"type": "deposit",
+			"title": "Micro-Forest",
+			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it. Harvesting it with a single-use axe removes the source and drops logs.",
+			"asset": {
+				"source": [
+					"asset:item:micro-forest"
+				]
+			},
+			"tags": [
+				"source",
+				"wood",
+				"wood-source",
+				"tree",
+				"tree:t3",
+				"forest",
+				"era:I"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1,
+			"count": 72,
+			"output": {
+				"set": [
+					{
+						"roll": [
+							{
+								"type": "guaranteed",
+								"drop": [
+									{
+										"itemId": "item:seed",
+										"quantity": {
+											"type": "value",
+											"value": 1
+										},
+										"rules": []
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

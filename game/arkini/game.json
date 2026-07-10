@@ -20,6 +20,14 @@
 		"waste": {
 			"id": "waste",
 			"title": "Waste"
+		},
+		"source": {
+			"id": "source",
+			"title": "Sources"
+		},
+		"equipment": {
+			"id": "equipment",
+			"title": "Equipment"
 		}
 	},
 	"version": "1.0"

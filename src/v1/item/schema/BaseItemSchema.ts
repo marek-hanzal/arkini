@@ -6,8 +6,8 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/v1/common/schema/TitleSchema";
 import { MergeSchema } from "~/v1/merge/schema/MergeSchema";
+import { TagSchema } from "~/v1/tag/schema/TagSchema";
 import { AssetSchema } from "./AssetSchema";
-import { TagSchema } from "./TagSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -58,6 +58,15 @@ export const BaseItemSchema = z
 		 */
 		maxCount: PositiveIntegerSchema.optional().describe(
 			"The optional maximum number of this item allowed across the game state.",
+		),
+		/**
+		 * Maximum number of this item that one stack can hold.
+		 *
+		 * Runtime keeps an item with mutable state, such as craft progress, in an
+		 * individual stack even when this configured limit is greater than one.
+		 */
+		maxStackSize: PositiveIntegerSchema.describe(
+			"The maximum number of this item that one stack can hold before it has mutable state.",
 		),
 		/**
 		 * Optional target-specific merges initiated when this item is dropped onto another item.

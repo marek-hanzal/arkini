@@ -19,6 +19,7 @@ describe("BaseItemSchema", () => {
 			],
 			categoryId: "resource",
 			scope: "board",
+			maxStackSize: 1,
 		};
 
 		expect(BaseItemSchema.safeParse(item).success).toBe(true);
@@ -26,6 +27,12 @@ describe("BaseItemSchema", () => {
 			BaseItemSchema.safeParse({
 				...item,
 				maxCount: 0,
+			}).success,
+		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				maxStackSize: 0,
 			}).success,
 		).toBe(false);
 		expect(
@@ -70,7 +77,7 @@ describe("BaseItemSchema", () => {
 		).toBe(true);
 	});
 
-	it("requires a positive stack limit only for simple items", () => {
+	it("inherits the base stack limit for simple items", () => {
 		const item = {
 			id: "tree",
 			title: "Tree",

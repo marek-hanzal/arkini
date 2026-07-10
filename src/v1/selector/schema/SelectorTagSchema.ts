@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { TagSchema } from "~/v1/item/schema/TagSchema";
+import { TagSchema } from "~/v1/tag/schema/TagSchema";
 import { BaseSelectorSchema } from "./BaseSelectorSchema";
 import { SelectorEnumSchema } from "./SelectorEnumSchema";
 

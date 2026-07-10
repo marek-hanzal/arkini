@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
-import { CategorySchema } from "~/v1/item/schema/CategorySchema";
+import { CategorySchema } from "~/v1/category/schema/CategorySchema";
 import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 

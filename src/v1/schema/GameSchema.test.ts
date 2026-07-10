@@ -38,7 +38,7 @@ describe("GameSchema", () => {
 	it("rejects invalid initial item references and board placements", () => {
 		const game = readGame().value;
 
-		for (const startingState of [
+		for (const start of [
 			{
 				board: [
 					{
@@ -87,7 +87,7 @@ describe("GameSchema", () => {
 			expect(
 				GameSchema.safeParse({
 					...game,
-					startingState,
+					start,
 				}).success,
 			).toBe(false);
 		}

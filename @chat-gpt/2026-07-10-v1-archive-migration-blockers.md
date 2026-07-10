@@ -27,9 +27,9 @@ All 249 source fragments pass `GameSourceSchema`; the merged 248-item configurat
 
 ## Migration decisions and remaining model work
 
-### Deferred: authored initial game state
+### Migrated: authored initial game state
 
-`GameSchema`/`MetaSchema` have no equivalent of archive `startingState`. Initial board and inventory authoring is intentionally deferred until the game implementation needs it; it does not block the current definition-schema pass.
+`GameSchema` now owns an explicit `startingState` with board placements and inventory quantities. Completed-game validation requires referenced items to exist, keeps board coordinates inside the configured dimensions, and rejects duplicate initial board cells.
 
 ### Migrated special item types
 
@@ -57,6 +57,6 @@ The archived dynamic output-effect subsystem was not migrated. The current rule 
 
 The archived mutually exclusive distance-band behavior was intentionally not preserved. It will be redesigned later using the current rule system.
 
-### Remaining archive work
+### Archive status
 
-No canonical item definitions remain in the archive. Only the deferred initial board/inventory state still needs a future v1 authoring model.
+No JSON configuration remains in the archive. It now preserves historical design prose only.

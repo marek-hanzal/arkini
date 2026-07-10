@@ -1,46 +1,5 @@
 {
 	"$schema": "../arkini.schema.json",
-	"assets": {
-		"asset:item:board-memory:empty": {
-			"resourceId": "item-board-memory-empty"
-		},
-		"asset:item:board-memory:full": {
-			"resourceId": "item-board-memory-full"
-		}
-	},
-	"items": {
-		"item:inventory": {
-			"description": "A trusty backpack that opens the shared inventory from the board.",
-			"label": "Inventory",
-			"maxCount": 1,
-			"maxStackSize": 1,
-			"name": "Backpack",
-			"storage": "board",
-			"tags": [
-				"special:inventory",
-				"utility",
-				"ui"
-			]
-		},
-		"item:board-memory": {
-			"assetIds": [
-				"asset:item:board-memory:empty",
-				"asset:item:board-memory:full"
-			],
-			"description": "A layout memory device. Tap empty memory to save the current board layout, tap filled memory to restore it. Long press to clear the stored layout.",
-			"label": "Memory",
-			"maxStackSize": 1,
-			"name": "Board Memory",
-			"storage": "both",
-			"tags": [
-				"special:board-memory",
-				"memory",
-				"layout",
-				"utility",
-				"ui"
-			]
-		}
-	},
 	"startingState": {
 		"board": [
 			{

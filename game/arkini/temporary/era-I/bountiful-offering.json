@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:effect:bountiful-offering": {
+			"id": "item:effect:bountiful-offering",
+			"type": "temporary",
+			"title": "Bountiful Offering",
+			"description": "A temporary shrine blessing that later rules can use to improve production rewards while it occupies the board.",
+			"asset": {
+				"source": [
+					"asset:producer:shrine-t1"
+				]
+			},
+			"tags": [
+				"effect",
+				"buff",
+				"shrine",
+				"bountiful",
+				"era:I"
+			],
+			"categoryId": "utility",
+			"durationMs": 180000
+		}
+	}
+}

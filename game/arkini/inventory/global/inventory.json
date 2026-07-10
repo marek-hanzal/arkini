@@ -1,0 +1,22 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:inventory": {
+			"id": "item:inventory",
+			"type": "inventory",
+			"title": "Backpack",
+			"description": "A trusty backpack that opens the shared inventory from the board.",
+			"asset": {
+				"source": [
+					"asset:item:inventory"
+				]
+			},
+			"tags": [
+				"special:inventory",
+				"utility",
+				"ui"
+			],
+			"categoryId": "utility"
+		}
+	}
+}

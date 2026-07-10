@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:effect:minor-haste": {
+			"id": "item:effect:minor-haste",
+			"type": "temporary",
+			"title": "Minor Haste",
+			"description": "A temporary shrine blessing that later rules can use to accelerate production while it occupies the board.",
+			"asset": {
+				"source": [
+					"asset:producer:shrine-t1"
+				]
+			},
+			"tags": [
+				"effect",
+				"buff",
+				"shrine",
+				"haste",
+				"era:I"
+			],
+			"categoryId": "utility",
+			"durationMs": 300000
+		}
+	}
+}

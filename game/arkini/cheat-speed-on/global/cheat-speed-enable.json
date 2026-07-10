@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:cheat:speed-enable": {
+			"id": "item:cheat:speed-enable",
+			"type": "cheat:speed:on",
+			"title": "Open Onion Watch",
+			"description": "Cheat timepiece that switches the engine into 1s instant timing mode without confirmation.",
+			"asset": {
+				"source": [
+					"asset:item:cheat:speed-enable"
+				]
+			},
+			"tags": [
+				"special:cheat",
+				"cheat",
+				"speed",
+				"time",
+				"utility",
+				"ui"
+			],
+			"categoryId": "utility",
+			"scope": "any",
+			"maxStackSize": 10
+		}
+	}
+}

@@ -1,0 +1,92 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-library-t1": {
+			"id": "item:blueprint-library-t1",
+			"type": "craft",
+			"title": "Library I Blueprint",
+			"description": "Build plan that can be filled with early resources to construct Library I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-library-t1"
+				],
+				"composite": "asset:producer:library-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:II"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:library-t1:construct",
+				"title": "Construct Library I",
+				"description": "Consumes construction resources to build Library I.",
+				"runtimeMs": 14000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:log"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:library-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

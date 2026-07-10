@@ -1,0 +1,25 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:cheat": {
+			"id": "item:cheat",
+			"type": "cheat:inventory",
+			"title": "Cheat Kit",
+			"description": "A shameless little toolkit that opens the cheat inventory for testing.",
+			"asset": {
+				"source": [
+					"asset:item:cheat"
+				]
+			},
+			"tags": [
+				"special:cheat",
+				"utility",
+				"ui"
+			],
+			"categoryId": "utility",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1
+		}
+	}
+}

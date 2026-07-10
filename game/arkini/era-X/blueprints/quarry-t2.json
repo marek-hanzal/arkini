@@ -1,0 +1,142 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-quarry-t2": {
+			"id": "item:blueprint-quarry-t2",
+			"type": "craft",
+			"title": "Quarry Blueprint",
+			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-quarry-t2"
+				],
+				"composite": "asset:producer:quarry-t2"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"stone",
+				"marble",
+				"luxury",
+				"prestige",
+				"era:X"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:quarry-t2:construct",
+				"title": "Construct Quarry",
+				"description": "Consumes construction resources to build Quarry.",
+				"runtimeMs": 72000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:quarry-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:guild-charter"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:iron-ingot"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:marble-deposit"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:university"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:quarry-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

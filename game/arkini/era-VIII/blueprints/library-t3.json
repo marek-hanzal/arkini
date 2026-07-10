@@ -1,0 +1,125 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-library-t3": {
+			"id": "item:blueprint-library-t3",
+			"type": "craft",
+			"title": "Library III Blueprint",
+			"description": "Build plan that upgrades Library II into Library III.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-library-t3"
+				],
+				"composite": "asset:producer:library-t3"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:VIII"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:library-t3:construct",
+				"title": "Construct Library III",
+				"description": "Consumes construction resources to build Library III.",
+				"runtimeMs": 48000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:library-t2"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bricks"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:glass"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:advanced-knowledge"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:library-t3",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

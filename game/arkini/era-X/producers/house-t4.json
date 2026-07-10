@@ -1,0 +1,134 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:house-t4": {
+			"id": "producer:house-t4",
+			"type": "producer",
+			"title": "House",
+			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
+			"asset": {
+				"source": [
+					"asset:producer:house-t4"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"house",
+				"housing",
+				"morale",
+				"era:X",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:house-t4:morale-t4",
+					"title": "Morale T4",
+					"description": "Runs morale t4 for House.",
+					"runtimeMs": 40000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:wine-glass"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin-stack"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 5
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:morale-t4",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											},
+											{
+												"itemId": "item:morale-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											},
+											{
+												"itemId": "item:morale-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											},
+											{
+												"itemId": "item:morale-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

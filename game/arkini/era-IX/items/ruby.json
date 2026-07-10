@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:ruby": {
+			"id": "item:ruby",
+			"type": "simple",
+			"title": "Ruby",
+			"description": "A polished red gemstone recovered from low-tier hero loot.",
+			"asset": {
+				"source": [
+					"asset:item:ruby"
+				]
+			},
+			"tags": [
+				"treasure",
+				"gem",
+				"ruby",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

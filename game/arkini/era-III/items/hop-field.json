@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:hop-field": {
+			"id": "item:hop-field",
+			"type": "simple",
+			"title": "Hop Field",
+			"description": "Movable hop source used by nearby breweries.",
+			"asset": {
+				"source": [
+					"asset:item:hop-field"
+				]
+			},
+			"tags": [
+				"source",
+				"food",
+				"beer",
+				"hops",
+				"era:III"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

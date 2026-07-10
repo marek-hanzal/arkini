@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:sand": {
+			"id": "item:sand",
+			"type": "simple",
+			"title": "Sand",
+			"description": "Fine sand prepared as the base material for glassmaking.",
+			"asset": {
+				"source": [
+					"asset:item:sand"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"glass",
+				"era:VIII",
+				"industry",
+				"tier-4-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

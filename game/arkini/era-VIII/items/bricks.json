@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:bricks": {
+			"id": "item:bricks",
+			"type": "simple",
+			"title": "Bricks",
+			"description": "Fired clay building material prepared for sturdier construction.",
+			"asset": {
+				"source": [
+					"asset:item:bricks"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"clay",
+				"era:VIII",
+				"industry",
+				"tier-3-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

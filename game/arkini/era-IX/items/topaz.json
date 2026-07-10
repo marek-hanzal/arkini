@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:topaz": {
+			"id": "item:topaz",
+			"type": "simple",
+			"title": "Topaz",
+			"description": "A polished amber gemstone from high-tier treasure chests.",
+			"asset": {
+				"source": [
+					"asset:item:topaz"
+				]
+			},
+			"tags": [
+				"treasure",
+				"gem",
+				"topaz",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

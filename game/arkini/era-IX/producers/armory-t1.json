@@ -1,0 +1,221 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:armory-t1": {
+			"id": "producer:armory-t1",
+			"type": "producer",
+			"title": "Armory I",
+			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
+			"asset": {
+				"source": [
+					"asset:producer:armory-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"armory",
+				"equipment",
+				"armor",
+				"guild",
+				"era:IX",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:armory-t1:leather-armor",
+					"title": "Leather Armor",
+					"description": "Runs leather armor for Armory I.",
+					"runtimeMs": 30000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:common-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:nails"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 7
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:leather-armor",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:armory-t1:iron-armor",
+					"title": "Iron Armor",
+					"description": "Runs iron armor for Armory I.",
+					"runtimeMs": 42000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-ingot"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:nails"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 6
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:charcoal"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 5
+						}
+					],
+					"rules": [
+						{
+							"type": "require",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "far",
+										"selector": {
+											"type": "item",
+											"itemId": "producer:purifier-t1"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:iron-armor",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.45,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:pollution",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

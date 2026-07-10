@@ -1,0 +1,171 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-heroes-guild-t1": {
+			"id": "item:blueprint-heroes-guild-t1",
+			"type": "craft",
+			"title": "Heroes Guild I Blueprint",
+			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-heroes-guild-t1"
+				],
+				"composite": "asset:producer:heroes-guild-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"hero",
+				"guild",
+				"era:IX"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:heroes-guild-t1:construct",
+				"title": "Construct Heroes Guild I",
+				"description": "Consumes construction resources to build Heroes Guild I.",
+				"runtimeMs": 95000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:construction-bundle"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:guild-charter"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bricks"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:roof-tiles"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:luxury-clothing"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:armory-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:goldsmith-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:library-t4"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:university"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:heroes-guild-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

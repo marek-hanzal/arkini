@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:sword": {
+			"id": "item:sword",
+			"type": "simple",
+			"title": "Sword",
+			"description": "Expedition weapon forged from iron ingots, leather grip work, and charcoal heat.",
+			"asset": {
+				"source": [
+					"asset:item:sword"
+				]
+			},
+			"tags": [
+				"equipment",
+				"weapon",
+				"blacksmith",
+				"hero",
+				"era:IX"
+			],
+			"categoryId": "equipment",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

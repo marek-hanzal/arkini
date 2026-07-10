@@ -1,0 +1,127 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-gold-mine-t1": {
+			"id": "item:blueprint-gold-mine-t1",
+			"type": "craft",
+			"title": "Gold Mine I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-gold-mine-t1"
+				],
+				"composite": "asset:producer:gold-mine-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VII"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:gold-mine-t1:construct",
+				"title": "Construct Gold Mine I",
+				"description": "Consumes construction resources to build Gold Mine I.",
+				"runtimeMs": 70000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 6
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 5
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:gold-deposit"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:gold-mine-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

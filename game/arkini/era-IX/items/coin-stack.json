@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:coin-stack": {
+			"id": "item:coin-stack",
+			"type": "simple",
+			"title": "Coin Stack",
+			"description": "Minted high-value currency stack produced by the Goldsmith and used to fund advanced guilds, university work, and long expeditions.",
+			"asset": {
+				"source": [
+					"asset:item:coin-stack"
+				]
+			},
+			"tags": [
+				"currency",
+				"coin",
+				"trade",
+				"goldsmith",
+				"era:IX"
+			],
+			"categoryId": "currency",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

@@ -1,0 +1,199 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-townhall-t3": {
+			"id": "item:blueprint-townhall-t3",
+			"type": "craft",
+			"title": "Town Hall III Blueprint",
+			"description": "Build plan that can be filled with resources to construct Town Hall III.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-townhall-t3"
+				],
+				"composite": "asset:producer:townhall-t3"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:townhall-t3:construct",
+				"title": "Construct Town Hall III",
+				"description": "Consumes construction resources to build Town Hall III.",
+				"runtimeMs": 45000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:townhall-t2"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:feast"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:wool"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:morale-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:wheat-field"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:cattle-farm-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:chicken-coop-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:farm-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:pig-farm-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:sheep-pasture-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:vegetable-garden-t1"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:townhall-t3",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

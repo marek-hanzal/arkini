@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:vineyard": {
+			"id": "item:vineyard",
+			"type": "simple",
+			"title": "Vineyard",
+			"description": "Movable vineyard source used by nearby wineries.",
+			"asset": {
+				"source": [
+					"asset:item:vineyard"
+				]
+			},
+			"tags": [
+				"source",
+				"food",
+				"wine",
+				"grapes",
+				"era:III"
+			],
+			"categoryId": "source",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:clay": {
+			"id": "item:clay",
+			"type": "simple",
+			"title": "Clay",
+			"description": "Raw clay prepared for brick and ceramic production.",
+			"asset": {
+				"source": [
+					"asset:item:clay"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"earth",
+				"era:VIII",
+				"industry",
+				"tier-3-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

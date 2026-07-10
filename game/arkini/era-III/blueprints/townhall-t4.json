@@ -1,0 +1,250 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-townhall-t4": {
+			"id": "item:blueprint-townhall-t4",
+			"type": "craft",
+			"title": "Town Hall IV Blueprint",
+			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-townhall-t4"
+				],
+				"composite": "asset:producer:townhall-t4"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:townhall-t4:construct",
+				"title": "Construct Town Hall IV",
+				"description": "Consumes construction resources to build Town Hall IV.",
+				"runtimeMs": 60000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:townhall-t3"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 5
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 5
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:feast"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:morale-t2"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:morale-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:hop-field"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:vineyard"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:bakery-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:brewery-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:cookhouse-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:dairy-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:market-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:slaughterhouse-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:tavern-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:windmill-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:winery-t1"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:townhall-t4",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

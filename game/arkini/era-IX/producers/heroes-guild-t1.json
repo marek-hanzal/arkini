@@ -1,0 +1,696 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:heroes-guild-t1": {
+			"id": "producer:heroes-guild-t1",
+			"type": "producer",
+			"title": "Heroes Guild I",
+			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
+			"asset": {
+				"source": [
+					"asset:producer:heroes-guild-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"hero",
+				"guild",
+				"expedition",
+				"master",
+				"unique",
+				"era:IX"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:heroes-guild-t1:chest-t1",
+					"title": "Chest I Expedition",
+					"description": "Runs chest i expedition for Heroes Guild I.",
+					"runtimeMs": 45000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:axe"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:leather-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 4
+							},
+							"capacity": 8
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:chest-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:heroes-guild-t1:chest-t2",
+					"title": "Chest II Expedition",
+					"description": "Runs chest ii expedition for Heroes Guild I.",
+					"runtimeMs": 55000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sword"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin-stack"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:chest-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:heroes-guild-t1:chest-t3",
+					"title": "Chest III Expedition",
+					"description": "Runs chest iii expedition for Heroes Guild I.",
+					"runtimeMs": 65000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sword"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t1"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin-stack"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:chest-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:heroes-guild-t1:chest-t4",
+					"title": "Chest IV Expedition",
+					"description": "Runs chest iv expedition for Heroes Guild I.",
+					"runtimeMs": 75000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sword"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t2"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin-stack"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:chest-t4",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:heroes-guild-t1:treasure-chest",
+					"title": "Grand Expedition",
+					"description": "Runs grand expedition for Heroes Guild I.",
+					"runtimeMs": 90000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sword"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t4"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:master-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:topaz"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:aquamarine"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin-stack"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:treasure-chest",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:heroes-guild-t1:treasure-chest-morale-t4",
+					"title": "Grand Expedition (Inspired)",
+					"description": "Runs grand expedition (inspired) for Heroes Guild I.",
+					"runtimeMs": 80000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sword"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:iron-armor"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:key-t4"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:master-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:topaz"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:aquamarine"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin-stack"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 4
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:morale-t4"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:treasure-chest",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.3,
+										"drop": [
+											{
+												"itemId": "item:aquamarine",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.3,
+										"drop": [
+											{
+												"itemId": "item:topaz",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

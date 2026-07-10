@@ -1,0 +1,90 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-tavern-t1": {
+			"id": "item:blueprint-tavern-t1",
+			"type": "craft",
+			"title": "Tavern I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Tavern I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-tavern-t1"
+				],
+				"composite": "asset:producer:tavern-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:III"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:tavern-t1:construct",
+				"title": "Construct Tavern I",
+				"description": "Consumes construction resources to build Tavern I.",
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:beer-barrel"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:tavern-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

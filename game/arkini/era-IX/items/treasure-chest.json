@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:treasure-chest": {
+			"id": "item:treasure-chest",
+			"type": "simple",
+			"title": "Treasure Chest",
+			"description": "Master reward from a grand Heroes Guild expedition, packed with gold and gems and ready to gate the next civic tier.",
+			"asset": {
+				"source": [
+					"asset:item:treasure-chest"
+				]
+			},
+			"tags": [
+				"treasure",
+				"chest",
+				"gem",
+				"gold",
+				"master",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 5
+		}
+	}
+}

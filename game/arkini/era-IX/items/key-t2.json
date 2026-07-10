@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:key-t2": {
+			"id": "item:key-t2",
+			"type": "simple",
+			"title": "Key II",
+			"description": "Gem-set goldsmith key used to open Chest II and fund tougher expeditions.",
+			"asset": {
+				"source": [
+					"asset:item:key-t2"
+				]
+			},
+			"tags": [
+				"key",
+				"goldsmith",
+				"gem",
+				"era:IX"
+			],
+			"categoryId": "treasure",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

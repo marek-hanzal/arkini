@@ -1,0 +1,151 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-brickyard": {
+			"id": "item:blueprint-brickyard",
+			"type": "craft",
+			"title": "Brickyard Blueprint",
+			"description": "Build plan that can be filled with resources to construct a Brickyard.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-brickyard"
+				],
+				"composite": "asset:producer:brickyard"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"clay",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:brickyard:construct",
+				"title": "Construct Brickyard",
+				"description": "Consumes construction resources to build Brickyard.",
+				"runtimeMs": 48000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:clay"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:charcoal"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:clay-pit"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:purifier-t1"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:brickyard",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

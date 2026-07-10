@@ -1,0 +1,114 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-library-t4": {
+			"id": "item:blueprint-library-t4",
+			"type": "craft",
+			"title": "Library IV Blueprint",
+			"description": "Build plan that upgrades Library III into Library IV.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-library-t4"
+				],
+				"composite": "asset:producer:library-t4"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"library",
+				"knowledge",
+				"era:XI"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:library-t4:construct",
+				"title": "Construct Library IV",
+				"description": "Consumes construction resources to build Library IV.",
+				"runtimeMs": 65000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:library-t3"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:master-knowledge"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:marble-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stained-glass"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin-stack"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:library-t4",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

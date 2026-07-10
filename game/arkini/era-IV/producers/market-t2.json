@@ -1,0 +1,199 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:market-t2": {
+			"id": "producer:market-t2",
+			"type": "producer",
+			"title": "Market II",
+			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
+			"asset": {
+				"source": [
+					"asset:producer:market-t2"
+				]
+			},
+			"tags": [
+				"producer",
+				"trade",
+				"market",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:market-t2:coin-from-paper",
+					"title": "Coins from Paper",
+					"description": "Runs coins from paper for Market II.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 3
+							},
+							"capacity": 5
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:coin",
+												"quantity": {
+													"type": "value",
+													"value": 2
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:market-t2:coin-from-feast",
+					"title": "Better Coins from Feast",
+					"description": "Runs better coins from feast for Market II.",
+					"runtimeMs": 14000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:coin",
+												"quantity": {
+													"type": "value",
+													"value": 7
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:market-t2:coin-from-common-clothing",
+					"title": "Coins from Common Clothing",
+					"description": "Runs coins from common clothing for Market II.",
+					"runtimeMs": 15000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:common-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:coin",
+												"quantity": {
+													"type": "value",
+													"value": 5
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:market-t2:coin-from-luxury-clothing",
+					"title": "Coins from Luxury Clothing",
+					"description": "Runs coins from luxury clothing for Market II.",
+					"runtimeMs": 18000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:luxury-clothing"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:coin",
+												"quantity": {
+													"type": "value",
+													"value": 8
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

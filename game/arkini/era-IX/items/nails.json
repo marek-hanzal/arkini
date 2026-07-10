@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:nails": {
+			"id": "item:nails",
+			"type": "simple",
+			"title": "Nails",
+			"description": "Forged fasteners produced by the Blacksmith and consumed by armories and later advanced construction.",
+			"asset": {
+				"source": [
+					"asset:item:nails"
+				]
+			},
+			"tags": [
+				"material",
+				"construction",
+				"metal",
+				"blacksmith",
+				"era:IX",
+				"tier-4-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

@@ -1,0 +1,120 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-sand-pit": {
+			"id": "item:blueprint-sand-pit",
+			"type": "craft",
+			"title": "Sand Pit Blueprint",
+			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-sand-pit"
+				],
+				"composite": "asset:producer:sand-pit"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"sand",
+				"glass",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:sand-pit:construct",
+				"title": "Construct Sand Pit",
+				"description": "Consumes construction resources to build Sand Pit.",
+				"runtimeMs": 42000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:sand-deposit"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:sand-pit",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

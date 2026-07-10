@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:gold-ore": {
+			"id": "item:gold-ore",
+			"type": "simple",
+			"title": "Gold Ore Cart",
+			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
+			"asset": {
+				"source": [
+					"asset:item:gold-ore"
+				]
+			},
+			"tags": [
+				"material",
+				"industry",
+				"ore",
+				"gold",
+				"era:VII",
+				"master",
+				"tier-7-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

@@ -56,6 +56,18 @@
 		"clothing": {
 			"id": "clothing",
 			"title": "Clothing"
+		},
+		"building": {
+			"id": "building",
+			"title": "Buildings"
+		},
+		"treasure": {
+			"id": "treasure",
+			"title": "Treasure"
+		},
+		"utility": {
+			"id": "utility",
+			"title": "Utility"
 		}
 	},
 	"version": "1.0"

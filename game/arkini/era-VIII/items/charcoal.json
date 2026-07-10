@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:charcoal": {
+			"id": "item:charcoal",
+			"type": "simple",
+			"title": "Charcoal",
+			"description": "Controlled pre-industrial fuel made from logs and used by kilns and furnaces before coal mining is unlocked.",
+			"asset": {
+				"source": [
+					"asset:item:charcoal"
+				]
+			},
+			"tags": [
+				"material",
+				"fuel",
+				"construction",
+				"era:VIII",
+				"industry",
+				"tier-6-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

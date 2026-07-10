@@ -1,0 +1,119 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-clay-pit": {
+			"id": "item:blueprint-clay-pit",
+			"type": "craft",
+			"title": "Clay Pit Blueprint",
+			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-clay-pit"
+				],
+				"composite": "asset:producer:clay-pit"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"construction",
+				"clay",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:clay-pit:construct",
+				"title": "Construct Clay Pit",
+				"description": "Consumes construction resources to build Clay Pit.",
+				"runtimeMs": 42000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:plank"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "item:clay-deposit"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:clay-pit",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

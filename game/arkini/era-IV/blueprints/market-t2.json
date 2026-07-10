@@ -1,0 +1,119 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-market-t2": {
+			"id": "item:blueprint-market-t2",
+			"type": "craft",
+			"title": "Market II Blueprint",
+			"description": "Build plan that can upgrade Market into Market II.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-market-t2"
+				],
+				"composite": "asset:producer:market-t2"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"market",
+				"trade",
+				"era:IV"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:market-t2:construct",
+				"title": "Construct Market II",
+				"description": "Consumes construction resources to build Market II.",
+				"runtimeMs": 36000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "producer:market-t1"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:paper"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coin"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:civic-office-t1"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:market-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

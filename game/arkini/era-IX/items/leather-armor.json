@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:leather-armor": {
+			"id": "item:leather-armor",
+			"type": "simple",
+			"title": "Leather Armor",
+			"description": "Layered leather armor assembled by the Armory from leather, clothing, and forged nails.",
+			"asset": {
+				"source": [
+					"asset:item:leather-armor"
+				]
+			},
+			"tags": [
+				"equipment",
+				"armor",
+				"armory",
+				"hero",
+				"era:IX"
+			],
+			"categoryId": "equipment",
+			"scope": "any",
+			"maxStackSize": 1
+		}
+	}
+}

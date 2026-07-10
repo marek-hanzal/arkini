@@ -1,0 +1,138 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-smelter-t1": {
+			"id": "item:blueprint-smelter-t1",
+			"type": "craft",
+			"title": "Smelter I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Smelter I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-smelter-t1"
+				],
+				"composite": "asset:producer:smelter-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:VIII",
+				"industry"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:smelter-t1:construct",
+				"title": "Construct Smelter I",
+				"description": "Consumes construction resources to build Smelter I.",
+				"runtimeMs": 65000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:stone-block"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 5
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:bricks"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 4
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:coal"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 3
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:building-permit"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [
+					{
+						"type": "require",
+						"when": [
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:academy"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:coal-mine-t1"
+									}
+								}
+							},
+							{
+								"type": "exists",
+								"query": {
+									"scope": "any",
+									"selector": {
+										"type": "item",
+										"itemId": "producer:purifier-t1"
+									}
+								}
+							}
+						]
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:smelter-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

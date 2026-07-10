@@ -1,0 +1,164 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:prospector-guild-t1": {
+			"id": "producer:prospector-guild-t1",
+			"type": "producer",
+			"title": "Prospector Guild",
+			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
+			"asset": {
+				"source": [
+					"asset:producer:prospector-guild-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"prospecting",
+				"guild",
+				"civic",
+				"unique",
+				"era:IV"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:prospector-guild-t1:clay-deposit",
+					"title": "Prospect: Clay Deposit",
+					"description": "Runs prospect: clay deposit for Prospector Guild.",
+					"runtimeMs": 14000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:building-permit"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:basic-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 7
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:clay-deposit",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:prospector-guild-t1:sand-deposit",
+					"title": "Prospect: Sand Deposit",
+					"description": "Runs prospect: sand deposit for Prospector Guild.",
+					"runtimeMs": 14000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:building-permit"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:basic-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:coin"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 7
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:sand-deposit",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

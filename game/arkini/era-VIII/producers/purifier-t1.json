@@ -1,0 +1,52 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:purifier-t1": {
+			"id": "producer:purifier-t1",
+			"type": "producer",
+			"title": "Purifier I",
+			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
+			"asset": {
+				"source": [
+					"asset:producer:purifier-t1"
+				]
+			},
+			"tags": [
+				"producer",
+				"industry",
+				"purifier",
+				"pollution",
+				"era:VIII",
+				"unique"
+			],
+			"categoryId": "building",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:purifier-t1:pollution",
+					"title": "Purify Pollution",
+					"description": "Runs purify pollution for Purifier I.",
+					"runtimeMs": 55000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:pollution"
+							},
+							"quantity": {
+								"type": "range",
+								"min": 1,
+								"max": 4
+							}
+						}
+					],
+					"rules": []
+				}
+			]
+		}
+	}
+}

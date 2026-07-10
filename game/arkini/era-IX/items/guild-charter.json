@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:guild-charter": {
+			"id": "item:guild-charter",
+			"type": "simple",
+			"title": "Guild Charter",
+			"description": "Formal civic charter that authorizes advanced guild, university, and expedition buildings after the city has advanced construction capacity.",
+			"asset": {
+				"source": [
+					"asset:item:guild-charter"
+				]
+			},
+			"tags": [
+				"civic",
+				"charter",
+				"guild",
+				"permit",
+				"era:IX"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

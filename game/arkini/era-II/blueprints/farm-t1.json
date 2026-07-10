@@ -1,0 +1,79 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-farm-t1": {
+			"id": "item:blueprint-farm-t1",
+			"type": "craft",
+			"title": "Farm I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Farm I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-farm-t1"
+				],
+				"composite": "asset:producer:farm-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:II"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:farm-t1:construct",
+				"title": "Construct Farm I",
+				"description": "Consumes construction resources to build Farm I.",
+				"runtimeMs": 14000,
+				"input": [
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:log"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"type": "materials",
+						"selector": {
+							"type": "item",
+							"itemId": "item:water"
+						},
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:farm-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		}
+	}
+}

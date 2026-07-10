@@ -65,6 +65,7 @@ describe("BaseItemSchema", () => {
 							itemId: "tree",
 						},
 						action: "consume",
+						result: "tree",
 					},
 				],
 			}).success,

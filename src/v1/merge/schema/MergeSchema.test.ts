@@ -3,14 +3,22 @@ import { describe, expect, it } from "vitest";
 import { MergeSchema } from "./MergeSchema";
 
 describe("MergeSchema", () => {
-	it("defines a target-specific transform or removal action for a merge source", () => {
+	it("defines explicit keep, use, and consume merge variants", () => {
 		expect(
 			MergeSchema.safeParse({
 				target: {
 					type: "item",
 					itemId: "tree",
 				},
-				result: "tree",
+				action: "keep",
+			}).success,
+		).toBe(true);
+		expect(
+			MergeSchema.safeParse({
+				target: {
+					type: "item",
+					itemId: "tree",
+				},
 				action: "use",
 			}).success,
 		).toBe(true);
@@ -20,10 +28,13 @@ describe("MergeSchema", () => {
 					type: "tag",
 					tag: "tree",
 				},
-				result: "tree",
 				action: "consume",
+				result: "tree",
 			}).success,
 		).toBe(true);
+	});
+
+	it("rejects ambiguous or incomplete merge variants", () => {
 		expect(
 			MergeSchema.safeParse({
 				target: {
@@ -31,21 +42,31 @@ describe("MergeSchema", () => {
 					itemId: "tree",
 				},
 				action: "consume",
-			}).success,
-		).toBe(true);
-		expect(
-			MergeSchema.safeParse({
-				target: {
-					type: "item",
-					itemId: "tree",
-				},
-				result: "tree",
-				action: "replace",
 			}).success,
 		).toBe(false);
 		expect(
 			MergeSchema.safeParse({
-				action: "consume",
+				target: {
+					type: "item",
+					itemId: "tree",
+				},
+				action: "keep",
+				result: "tree",
+			}).success,
+		).toBe(false);
+		expect(
+			MergeSchema.safeParse({
+				target: {
+					type: "item",
+					itemId: "tree",
+				},
+				action: "replace",
+				result: "tree",
+			}).success,
+		).toBe(false);
+		expect(
+			MergeSchema.safeParse({
+				action: "keep",
 			}).success,
 		).toBe(false);
 	});

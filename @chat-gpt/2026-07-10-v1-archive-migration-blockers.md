@@ -29,7 +29,7 @@ All 249 source fragments pass `GameSourceSchema`; the merged 248-item configurat
 
 ### Migrated: authored initial game state
 
-`GameSchema` now owns an explicit `startingState` with board placements and inventory quantities. Completed-game validation requires referenced items to exist, keeps board coordinates inside the configured dimensions, and rejects duplicate initial board cells.
+`GameSchema` now owns an explicit `start` with board placements and inventory quantities. Completed-game validation requires referenced items to exist, keeps board coordinates inside the configured dimensions, and rejects duplicate initial board cells.
 
 ### Migrated special item types
 

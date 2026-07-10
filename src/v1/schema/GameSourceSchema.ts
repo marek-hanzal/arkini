@@ -4,6 +4,7 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import { CategorySchema } from "~/v1/category/schema/CategorySchema";
 import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
+import { StartSchema } from "~/v1/start/schema/StartSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
@@ -28,6 +29,12 @@ export const GameSourceSchema = z
 		 */
 		meta: MetaSchema.optional().describe(
 			"The optional game metadata contributed by this source fragment.",
+		),
+		/**
+		 * Optional new-game state contributed by this source fragment.
+		 */
+		start: StartSchema.optional().describe(
+			"The optional initial board and inventory state contributed by this source fragment.",
 		),
 		/**
 		 * Optional canonical UI-facing categories contributed by this source fragment.

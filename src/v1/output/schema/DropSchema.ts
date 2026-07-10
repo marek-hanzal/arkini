@@ -25,9 +25,12 @@ export const DropSchema = z
 		 * Board-placement strategy used after this drop is resolved.
 		 *
 		 * The default local drop searches from the source by Manhattan distance.
+		 * Regardless of the selected strategy, runtime first checks board capacity.
+		 * If the board cannot accept the emitted items, their item scope determines
+		 * whether the remainder may be placed in inventory.
 		 */
 		placement: PlacementEnumSchema.default("drop").describe(
-			"The board-placement strategy for this drop; defaults to a local Manhattan-distance drop.",
+			"The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
 		),
 		/**
 		 * Rules evaluated after this drop is selected by a successful roll.
@@ -43,7 +46,7 @@ export const DropSchema = z
 	.meta({
 		id: "DropSchema",
 		description:
-			"A canonical game item, quantity, placement strategy, and rules for a successful roll's drop.",
+			"A canonical game item, quantity, board-placement strategy, and rules for a successful roll's drop.",
 	});
 
 export type DropSchema = typeof DropSchema;

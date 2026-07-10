@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 /**
- * Discriminates how a resolved item drop is placed on the game board.
+ * Discriminates how a resolved item drop attempts board placement.
+ *
+ * This strategy controls only board placement. Inventory fallback is evaluated
+ * independently from the emitted item's storage scope.
  */
 export const PlacementEnumSchema = z
 	.enum([
@@ -21,7 +24,8 @@ export const PlacementEnumSchema = z
 	])
 	.meta({
 		id: "PlacementEnumSchema",
-		description: "How a resolved item drop is placed on the game board.",
+		description:
+			"How a resolved item drop attempts board placement, independently from inventory fallback.",
 	});
 
 export type PlacementEnumSchema = typeof PlacementEnumSchema;

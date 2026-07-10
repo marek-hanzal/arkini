@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { DropSchema } from "./DropSchema";
 
 describe("DropSchema", () => {
-	it("defaults resolved drops to local Manhattan-distance placement", () => {
+	it("defaults resolved drops to the local board-placement strategy", () => {
 		const drop = DropSchema.parse({
 			itemId: "item:log",
 			quantity: {

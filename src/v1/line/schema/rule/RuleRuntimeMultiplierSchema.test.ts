@@ -8,7 +8,7 @@ describe("RuleRuntimeMultiplierSchema", () => {
 			type: "runtime:multiplier",
 			when: [
 				{
-					type: "distance",
+					type: "exists",
 					query: {
 						scope: "board",
 						distance: "close",
@@ -17,7 +17,6 @@ describe("RuleRuntimeMultiplierSchema", () => {
 							itemId: "pollution",
 						},
 					},
-					count: 1,
 				},
 			],
 			multiplier: 2,

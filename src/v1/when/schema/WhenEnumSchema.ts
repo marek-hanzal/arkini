@@ -6,17 +6,17 @@ import { z } from "zod";
 export const WhenEnumSchema = z
 	.enum([
 		/**
-		 * Checks whether an item exists in a configured game-state scope often enough.
+		 * Checks whether the query returns any matching item quantity.
+		 */
+		"exists",
+		/**
+		 * Checks whether the query returns one exact item quantity.
 		 */
 		"count",
 		/**
-		 * Checks whether enough matching items exist at a configured board distance.
+		 * Checks whether the query result is within an inclusive quantity range.
 		 */
-		"distance",
-		/**
-		 * Checks a general item query against a configured count threshold.
-		 */
-		"query",
+		"range",
 	])
 	.meta({
 		id: "WhenEnumSchema",

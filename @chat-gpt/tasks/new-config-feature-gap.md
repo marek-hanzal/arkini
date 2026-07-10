@@ -28,32 +28,36 @@ A rejected selected drop is discarded. It is never rerolled or replaced implicit
 
 ### Conditions
 
-`WhenSchema` is intentionally small and currently has only:
+`WhenSchema` stays a small discriminated union over one shared `QuerySchema`:
 
 ```ts
-type WhenCount = {
-  type: "count";
-  itemId: Id;
-  scope: "board" | "inventory" | "any";
-  count: PositiveInteger;
+type WhenExists = {
+  type: "exists";
+  query: Query;
 };
 
-type WhenDistance = {
-  type: "distance";
-  itemId: Id;
-  distance: "close" | "near" | "far";
-  count: PositiveInteger;
+type WhenCount = {
+  type: "count";
+  query: Query;
+  count: NonNegativeInteger;
+};
+
+type WhenRange = {
+  type: "range";
+  query: Query;
+  min: NonNegativeInteger;
+  max: NonNegativeInteger;
 };
 ```
 
-- `count` means a minimum: the condition passes when the observed count is `>= count`.
+- `exists` passes when the query returns any logical item quantity.
+- `count` is exact equality, including zero.
+- `range` is inclusive and requires `min <= max`.
 - A rule owns a non-empty `when` tuple. All conditions must pass (flat AND).
-- Do not add generic selector trees, `WhenAny`, or `WhenNot` without a concrete data need.
-- `WhenDistance` uses Chebyshev distance.
-- A distance condition returns `false` without a board source; the source and all distance-zero matches are excluded.
+- Distance is a concern of board queries, not a standalone condition type.
+- Do not add generic selector trees, boolean composition, or comparison variants without a concrete data need. Future `gte`/`lte` variants can be added independently if gameplay requires them.
+- Board query distance uses Chebyshev distance. A distance query returns no matches without a board source; the source and all distance-zero matches are excluded.
 - `close` searches within one cell, `near` within two cells and `far` searches every non-source board cell.
-
-Existing source data does not need boolean OR: every one of 118 nearby selectors resolves to one item ID, and all 135 grant selectors are only ANDs of single-ID clauses.
 
 ### Rules
 
@@ -95,7 +99,7 @@ A failed line requirement leaves the line visible but unavailable. A matching bl
 
 - Add a line runtime multiplier rule for pollution/forest-style effects. This was an explicit desired new-game behavior and corresponds to 23 current duration modifiers.
 - Keep capacity spending separate from `WhenSchema`: the two current `nearby.capacity.spend` effects both test and mutate state, so they are not pure boolean conditions.
-- Decide the replacement for current passive/active grants. `WhenCount` can read item presence, but does not create a capability/state token. The current config has 60 items with passive `GameEffect`s plus active effect lines.
+- Decide the replacement for current passive/active grants. `WhenExists` can read item presence, but does not create a capability/state token. The current config has 60 items with passive `GameEffect`s plus active effect lines.
 - Add player-facing rule explanation metadata if the UI must explain why a line or drop is unavailable. The old effects carry label, reason and display policy; the new rules currently do not.
 
 ### Fourth: output/UI and validation

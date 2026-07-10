@@ -1,13 +1,12 @@
 import { z } from "zod";
 
-import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { QuerySchema } from "~/v1/query/schema/QuerySchema";
 
 /**
  * Fields shared by every item-query condition.
  *
- * Specialized conditions spread `BaseWhenSchema.shape` and may narrow the
- * accepted query variant while retaining the same positive count threshold.
+ * Specialized conditions spread `BaseWhenSchema.shape` and define how the
+ * quantity returned by the query is evaluated.
  */
 export const BaseWhenSchema = z
 	.object({
@@ -17,17 +16,11 @@ export const BaseWhenSchema = z
 		query: QuerySchema.describe(
 			"The query used to find the items evaluated by this condition.",
 		),
-		/**
-		 * Minimum number of matching items required for this condition to pass.
-		 */
-		count: PositiveIntegerSchema.describe(
-			"The minimum number of matching items required for this condition to pass.",
-		),
 	})
 	.strict()
 	.meta({
 		id: "BaseWhenSchema",
-		description: "The common item query and count threshold shared by conditions.",
+		description: "The common item query shared by every condition.",
 	});
 
 export type BaseWhenSchema = typeof BaseWhenSchema;

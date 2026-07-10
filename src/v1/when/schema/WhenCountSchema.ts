@@ -1,28 +1,32 @@
 import { z } from "zod";
 
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { BaseWhenSchema } from "./BaseWhenSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
 /**
- * A condition that checks the count of selected items in a game-state scope.
- *
- * The condition is satisfied when the matching item count is greater than or
- * equal to `count`.
+ * A condition that checks whether an item query returns one exact quantity.
  */
 export const WhenCountSchema = z
 	.object({
 		...BaseWhenSchema.shape,
 		/**
-		 * Identifies this condition as a game-state item-count check.
+		 * Identifies this condition as an exact item-query quantity check.
 		 */
 		type: WhenEnumSchema.extract([
 			"count",
-		]).describe("Identifies this condition as a game-state item-count check."),
+		]).describe("Identifies this condition as an exact item-query quantity check."),
+		/**
+		 * Exact item quantity that the query must return.
+		 */
+		count: NonNegativeIntegerSchema.describe(
+			"The exact item quantity that the query must return.",
+		),
 	})
 	.strict()
 	.meta({
 		id: "WhenCountSchema",
-		description: "A condition that checks the count of selected items in a game-state scope.",
+		description: "A condition that checks an item query against one exact quantity.",
 	});
 
 export type WhenCountSchema = typeof WhenCountSchema;

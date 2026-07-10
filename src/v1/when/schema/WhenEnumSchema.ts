@@ -13,6 +13,10 @@ export const WhenEnumSchema = z
 		 * Checks whether enough matching items exist at a configured board distance.
 		 */
 		"distance",
+		/**
+		 * Checks a general item query against a configured count threshold.
+		 */
+		"query",
 	])
 	.meta({
 		id: "WhenEnumSchema",

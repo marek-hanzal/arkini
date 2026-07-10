@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-import { DistanceEnumSchema } from "~/v1/distance/schema/DistanceEnumSchema";
-import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
-import { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
+import { QueryBoardSchema } from "~/v1/query/schema/QueryBoardSchema";
+import { BaseWhenSchema } from "./BaseWhenSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
 /**
@@ -14,6 +13,7 @@ import { WhenEnumSchema } from "./WhenEnumSchema";
  */
 export const WhenDistanceSchema = z
 	.object({
+		...BaseWhenSchema.shape,
 		/**
 		 * Identifies this condition as a board-distance item-count check.
 		 */
@@ -21,22 +21,10 @@ export const WhenDistanceSchema = z
 			"distance",
 		]).describe("Identifies this condition as a board-distance item-count check."),
 		/**
-		 * Strategy used to select the board items counted at the configured distance.
+		 * Board query used to select items at the configured distance.
 		 */
-		selector: SelectorSchema.describe(
-			"The strategy used to select the board items counted at the configured distance.",
-		),
-		/**
-		 * Board distance from the rule source at which matching items are counted.
-		 */
-		distance: DistanceEnumSchema.describe(
-			"The board distance from the rule source at which matching items are counted.",
-		),
-		/**
-		 * Minimum number of matching board items required for this condition to pass.
-		 */
-		count: PositiveIntegerSchema.describe(
-			"The minimum number of matching board items required for this condition to pass.",
+		query: QueryBoardSchema.describe(
+			"The board query used to select items at the configured distance.",
 		),
 	})
 	.strict()

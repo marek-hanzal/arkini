@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { WhenCountSchema } from "./WhenCountSchema";
 import { WhenDistanceSchema } from "./WhenDistanceSchema";
+import { WhenQuerySchema } from "./WhenQuerySchema";
 
 /**
  * A standalone condition that produces a boolean result from game-state facts.
@@ -13,6 +14,7 @@ export const WhenSchema = z
 	.discriminatedUnion("type", [
 		WhenCountSchema,
 		WhenDistanceSchema,
+		WhenQuerySchema,
 	])
 	.meta({
 		id: "WhenSchema",

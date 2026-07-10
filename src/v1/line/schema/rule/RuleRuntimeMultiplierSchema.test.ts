@@ -9,11 +9,14 @@ describe("RuleRuntimeMultiplierSchema", () => {
 			when: [
 				{
 					type: "distance",
-					selector: {
-						type: "item",
-						itemId: "pollution",
+					query: {
+						scope: "board",
+						distance: "close",
+						selector: {
+							type: "item",
+							itemId: "pollution",
+						},
 					},
-					distance: "close",
 					count: 1,
 				},
 			],

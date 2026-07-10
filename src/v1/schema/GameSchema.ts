@@ -50,67 +50,6 @@ export const GameSchema = z
 			.describe("Canonical game items keyed by a non-empty identifier."),
 	})
 	.strict()
-	.superRefine((game, context) => {
-		const occupiedBoardCells = new Set<string>();
-
-		for (const [index, placement] of game.start.board.entries()) {
-			if (!Object.hasOwn(game.items, placement.itemId)) {
-				context.addIssue({
-					code: "custom",
-					path: [
-						"start",
-						"board",
-						index,
-						"itemId",
-					],
-					message: `Unknown initial board item: ${placement.itemId}.`,
-				});
-			}
-
-			if (placement.x >= game.meta.board.width || placement.y >= game.meta.board.height) {
-				context.addIssue({
-					code: "custom",
-					path: [
-						"start",
-						"board",
-						index,
-					],
-					message: `Initial board coordinate (${placement.x}, ${placement.y}) is outside the configured board.`,
-				});
-			}
-
-			const cell = `${placement.x}:${placement.y}`;
-
-			if (occupiedBoardCells.has(cell)) {
-				context.addIssue({
-					code: "custom",
-					path: [
-						"start",
-						"board",
-						index,
-					],
-					message: `Initial board coordinate (${placement.x}, ${placement.y}) is occupied more than once.`,
-				});
-			}
-
-			occupiedBoardCells.add(cell);
-		}
-
-		for (const [index, item] of game.start.inventory.entries()) {
-			if (!Object.hasOwn(game.items, item.itemId)) {
-				context.addIssue({
-					code: "custom",
-					path: [
-						"start",
-						"inventory",
-						index,
-						"itemId",
-					],
-					message: `Unknown initial inventory item: ${item.itemId}.`,
-				});
-			}
-		}
-	})
 	.meta({
 		id: "GameSchema",
 		description: "The root configuration for a game.",

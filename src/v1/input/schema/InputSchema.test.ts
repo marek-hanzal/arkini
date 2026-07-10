@@ -6,7 +6,10 @@ describe("InputSchema", () => {
 	it("parses material requirements with their standard defaults", () => {
 		const input = InputSchema.parse({
 			type: "materials",
-			itemId: "item:water",
+			selector: {
+				type: "tag",
+				tag: "liquid",
+			},
 			quantity: {
 				type: "value",
 				value: 1,
@@ -43,7 +46,10 @@ describe("InputSchema", () => {
 	it("requires an explicit input discriminator", () => {
 		expect(
 			InputSchema.safeParse({
-				itemId: "item:water",
+				selector: {
+					type: "item",
+					itemId: "item:water",
+				},
 				quantity: {
 					type: "value",
 					value: 1,

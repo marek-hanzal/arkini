@@ -12,7 +12,10 @@ describe("LineSchema", () => {
 			input: [
 				{
 					type: "materials",
-					itemId: "tree",
+					selector: {
+						type: "item",
+						itemId: "tree",
+					},
 					quantity: {
 						type: "value",
 						value: 1,

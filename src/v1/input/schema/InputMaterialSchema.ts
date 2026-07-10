@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { QuantitySchema } from "~/v1/quantity/schema/QuantitySchema";
+import { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
 import { BaseInputSchema } from "./BaseInputSchema";
 import { InputEnumSchema } from "./InputEnumSchema";
 import { InputModeEnumSchema } from "./InputModeEnumSchema";
@@ -10,8 +10,9 @@ import { InputModeEnumSchema } from "./InputModeEnumSchema";
 /**
  * A directly delivered material item required by a product line.
  *
- * The item either disappears through `consume` or is temporarily held through
- * `reserve` and then returned after the line finishes or is cancelled.
+ * The matching items either disappear through `consume` or are temporarily
+ * held through `reserve` and then returned after the line finishes or is
+ * cancelled. Quantity and capacity aggregate every item matched by the selector.
  */
 export const InputMaterialSchema = z
 	.object({
@@ -23,9 +24,11 @@ export const InputMaterialSchema = z
 			"materials",
 		]).describe("Identifies this input as a directly delivered material item."),
 		/**
-		 * ID of the canonical game item accepted by this input.
+		 * Item or tag matching strategy for materials accepted by this input.
 		 */
-		itemId: IdSchema.describe("The ID of the canonical game item accepted by this input."),
+		selector: SelectorSchema.describe(
+			"The item or tag matching strategy for materials accepted by this input.",
+		),
 		/**
 		 * Whether this input is consumed or temporarily reserved by the line.
 		 *
@@ -36,21 +39,22 @@ export const InputMaterialSchema = z
 			"Whether this input is consumed or reserved; defaults to consume.",
 		),
 		/**
-		 * Exact or bounded amount accepted by this input.
+		 * Exact or bounded total amount accepted by this input.
 		 *
-		 * A range quantity replaces the legacy `upTo` input mode.
+		 * The amount aggregates every material item that matches this selector. A
+		 * range quantity replaces the legacy `upTo` input mode.
 		 */
 		quantity: QuantitySchema.describe(
-			"The exact or bounded amount accepted by this input, replacing legacy upTo mode.",
+			"The exact or bounded total amount accepted across all matching materials.",
 		),
 		/**
-		 * Extra quantity this input may buffer above its required `quantity`.
+		 * Extra total quantity this input may buffer above its required `quantity`.
 		 *
 		 * Zero accepts exactly the quantity required by the line and no additional
 		 * items. A positive value allows that many extra items to wait in the input.
 		 */
 		capacity: NonNegativeIntegerSchema.default(0).describe(
-			"The extra quantity this input may buffer above its required quantity; defaults to zero, which allows no extra items.",
+			"The extra total quantity this input may buffer above its required quantity; defaults to zero, which allows no extra materials.",
 		),
 	})
 	.strict()

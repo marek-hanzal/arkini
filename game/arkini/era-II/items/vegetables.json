@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:vegetables": {
+			"id": "item:vegetables",
+			"type": "simple",
+			"title": "Vegetables",
+			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
+			"asset": {
+				"source": [
+					"asset:item:vegetables"
+				]
+			},
+			"tags": [
+				"food",
+				"vegetable",
+				"era:II",
+				"tier-1-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

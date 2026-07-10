@@ -32,6 +32,30 @@
 		"quest": {
 			"id": "quest",
 			"title": "Quests"
+		},
+		"blueprint": {
+			"id": "blueprint",
+			"title": "Blueprints"
+		},
+		"food": {
+			"id": "food",
+			"title": "Food"
+		},
+		"morale": {
+			"id": "morale",
+			"title": "Morale"
+		},
+		"currency": {
+			"id": "currency",
+			"title": "Currency"
+		},
+		"knowledge": {
+			"id": "knowledge",
+			"title": "Knowledge"
+		},
+		"clothing": {
+			"id": "clothing",
+			"title": "Clothing"
 		}
 	},
 	"version": "1.0"

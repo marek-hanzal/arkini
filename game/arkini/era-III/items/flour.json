@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:flour": {
+			"id": "item:flour",
+			"type": "simple",
+			"title": "Flour",
+			"description": "Milled grain produced by windmills and baked into bread.",
+			"asset": {
+				"source": [
+					"asset:item:flour"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"grain",
+				"flour",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

@@ -1,0 +1,111 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:quest:tavern-commission": {
+			"id": "item:quest:tavern-commission",
+			"type": "craft",
+			"title": "Tavern Commission Quest",
+			"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
+			"asset": {
+				"source": [
+					"asset:item:quest"
+				]
+			},
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:III"
+			],
+			"categoryId": "quest",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:quest:tavern-commission:complete",
+				"title": "Complete Tavern Commission",
+				"description": "Consumes prepared drinks and payment to complete this tavern commission.",
+				"runtimeMs": 10000,
+				"input": [
+					{
+						"itemId": "item:beer",
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"itemId": "item:wine-glass",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"itemId": "item:coin",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 3,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:feast",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:cheese",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:feast",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:stone-block",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

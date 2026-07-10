@@ -1,0 +1,71 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-lumberjack-t1": {
+			"id": "item:blueprint-lumberjack-t1",
+			"type": "craft",
+			"title": "Lumberjack I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-lumberjack-t1"
+				],
+				"composite": "asset:producer:lumberjack-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:lumberjack-t1:construct",
+				"title": "Construct Lumberjack I",
+				"description": "Consumes construction resources to build Lumberjack I.",
+				"runtimeMs": 8000,
+				"input": [
+					{
+						"itemId": "item:log",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"itemId": "item:water",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:lumberjack-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

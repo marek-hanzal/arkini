@@ -1,0 +1,111 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:quest:farmers-favor": {
+			"id": "item:quest:farmers-favor",
+			"type": "craft",
+			"title": "Farmers' Favor Quest",
+			"description": "A modest farm quest that converts basic food supplies into a small processed dairy reward from the next era.",
+			"asset": {
+				"source": [
+					"asset:item:quest"
+				]
+			},
+			"tags": [
+				"quest",
+				"craft-target",
+				"request",
+				"era:II"
+			],
+			"categoryId": "quest",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:quest:farmers-favor:complete",
+				"title": "Complete Farmers' Favor",
+				"description": "Consumes farm supplies to complete this farmers' favor request.",
+				"runtimeMs": 8000,
+				"input": [
+					{
+						"itemId": "item:grain",
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"itemId": "item:water",
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"itemId": "item:egg",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"weight": 3,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:cheese",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"weight": 1,
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:beer",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										},
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

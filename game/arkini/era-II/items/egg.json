@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:egg": {
+			"id": "item:egg",
+			"type": "simple",
+			"title": "Egg",
+			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
+			"asset": {
+				"source": [
+					"asset:item:egg"
+				]
+			},
+			"tags": [
+				"food",
+				"egg",
+				"era:II",
+				"tier-2-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

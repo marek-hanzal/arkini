@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:luxury-cloth": {
+			"id": "item:luxury-cloth",
+			"type": "simple",
+			"title": "Luxury Cloth",
+			"description": "Refined dyed cloth used for high-status clothing and later civic luxuries.",
+			"asset": {
+				"source": [
+					"asset:item:luxury-cloth"
+				]
+			},
+			"tags": [
+				"material",
+				"cloth",
+				"luxury",
+				"textile",
+				"era:V",
+				"tier-5-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 30
+		}
+	}
+}

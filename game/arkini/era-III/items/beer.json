@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:beer": {
+			"id": "item:beer",
+			"type": "simple",
+			"title": "Beer",
+			"description": "A single mug of beer served by taverns.",
+			"asset": {
+				"source": [
+					"asset:item:beer"
+				]
+			},
+			"tags": [
+				"food",
+				"beer",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

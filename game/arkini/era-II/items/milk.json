@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:milk": {
+			"id": "item:milk",
+			"type": "simple",
+			"title": "Milk",
+			"description": "Fresh milk produced by cattle farms for base food supply chains.",
+			"asset": {
+				"source": [
+					"asset:item:milk"
+				]
+			},
+			"tags": [
+				"food",
+				"dairy",
+				"era:II",
+				"tier-2-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

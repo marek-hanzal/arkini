@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:bread": {
+			"id": "item:bread",
+			"type": "simple",
+			"title": "Bread",
+			"description": "Baked food produced by bakeries from flour and water.",
+			"asset": {
+				"source": [
+					"asset:item:bread"
+				]
+			},
+			"tags": [
+				"food",
+				"bread",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

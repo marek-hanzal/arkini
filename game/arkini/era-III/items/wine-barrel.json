@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:wine-barrel": {
+			"id": "item:wine-barrel",
+			"type": "simple",
+			"title": "Wine Barrel",
+			"description": "A barrel of wine produced by wineries and served by taverns.",
+			"asset": {
+				"source": [
+					"asset:item:wine-barrel"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"wine",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

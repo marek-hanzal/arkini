@@ -1,0 +1,94 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:feast-plate": {
+			"id": "item:feast-plate",
+			"type": "craft",
+			"title": "Feast Plate",
+			"description": "An empty serving plate from the cookhouse. Fill it with Era II farm food on the board to assemble a proper feast.",
+			"asset": {
+				"source": [
+					"asset:item:feast-plate",
+					"asset:item:feast-plate-stage-1",
+					"asset:item:feast-plate-stage-2",
+					"asset:item:feast"
+				]
+			},
+			"tags": [
+				"food",
+				"feast",
+				"craft-target",
+				"era:II",
+				"tier-4-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:feast-plate:assemble",
+				"title": "Assemble Feast",
+				"description": "Consumes Era II farm food to assemble a proper feast.",
+				"runtimeMs": 9000,
+				"input": [
+					{
+						"itemId": "item:grain",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"itemId": "item:piglet",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"itemId": "item:milk",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"itemId": "item:egg",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					},
+					{
+						"itemId": "item:vegetables",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:feast",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

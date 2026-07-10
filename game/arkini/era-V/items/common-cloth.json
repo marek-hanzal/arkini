@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:common-cloth": {
+			"id": "item:common-cloth",
+			"type": "simple",
+			"title": "Common Cloth",
+			"description": "Plain woven cloth produced from wool by weaver huts.",
+			"asset": {
+				"source": [
+					"asset:item:common-cloth"
+				]
+			},
+			"tags": [
+				"material",
+				"cloth",
+				"textile",
+				"era:V",
+				"tier-5-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

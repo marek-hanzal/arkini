@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:basic-knowledge": {
+			"id": "item:basic-knowledge",
+			"type": "simple",
+			"title": "Basic Knowledge",
+			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
+			"asset": {
+				"source": [
+					"asset:item:basic-knowledge"
+				]
+			},
+			"tags": [
+				"knowledge",
+				"education",
+				"research",
+				"era:IV"
+			],
+			"categoryId": "knowledge",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

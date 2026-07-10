@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:wool": {
+			"id": "item:wool",
+			"type": "simple",
+			"title": "Wool",
+			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
+			"asset": {
+				"source": [
+					"asset:item:wool"
+				]
+			},
+			"tags": [
+				"material",
+				"animal",
+				"era:II",
+				"tier-2-resource"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

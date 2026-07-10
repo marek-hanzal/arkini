@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:coin": {
+			"id": "item:coin",
+			"type": "simple",
+			"title": "Coin",
+			"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
+			"asset": {
+				"source": [
+					"asset:item:coin"
+				]
+			},
+			"tags": [
+				"currency",
+				"coin",
+				"trade",
+				"era:III"
+			],
+			"categoryId": "currency",
+			"scope": "any",
+			"maxStackSize": 100
+		}
+	}
+}

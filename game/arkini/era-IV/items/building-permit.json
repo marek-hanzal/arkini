@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:building-permit": {
+			"id": "item:building-permit",
+			"type": "simple",
+			"title": "Building Permit",
+			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
+			"asset": {
+				"source": [
+					"asset:item:building-permit"
+				]
+			},
+			"tags": [
+				"resource",
+				"master",
+				"permit",
+				"civic",
+				"era:IV"
+			],
+			"categoryId": "material",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

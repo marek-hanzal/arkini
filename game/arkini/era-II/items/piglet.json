@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:piglet": {
+			"id": "item:piglet",
+			"type": "simple",
+			"title": "Piglet",
+			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
+			"asset": {
+				"source": [
+					"asset:item:piglet"
+				]
+			},
+			"tags": [
+				"animal",
+				"food",
+				"pig",
+				"era:II",
+				"tier-2-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

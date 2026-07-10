@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:beer-barrel": {
+			"id": "item:beer-barrel",
+			"type": "simple",
+			"title": "Beer Barrel",
+			"description": "A barrel of beer produced by breweries and served by taverns.",
+			"asset": {
+				"source": [
+					"asset:item:beer-barrel"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"beer",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 20
+		}
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:grain": {
+			"id": "item:grain",
+			"type": "simple",
+			"title": "Grain",
+			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
+			"asset": {
+				"source": [
+					"asset:item:grain"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"grain",
+				"era:II",
+				"tier-1-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

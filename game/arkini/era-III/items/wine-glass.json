@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:wine-glass": {
+			"id": "item:wine-glass",
+			"type": "simple",
+			"title": "Wine Glass",
+			"description": "A single glass of wine served by taverns.",
+			"asset": {
+				"source": [
+					"asset:item:wine-glass"
+				]
+			},
+			"tags": [
+				"food",
+				"wine",
+				"era:III",
+				"tier-4-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

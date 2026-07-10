@@ -1,0 +1,25 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:common-clothing": {
+			"id": "item:common-clothing",
+			"type": "simple",
+			"title": "Common Clothing",
+			"description": "Practical clothing sewn from common cloth and leather.",
+			"asset": {
+				"source": [
+					"asset:item:common-clothing"
+				]
+			},
+			"tags": [
+				"clothing",
+				"textile",
+				"era:V",
+				"tier-5-resource"
+			],
+			"categoryId": "clothing",
+			"scope": "any",
+			"maxStackSize": 30
+		}
+	}
+}

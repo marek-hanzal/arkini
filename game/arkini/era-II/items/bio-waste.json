@@ -1,0 +1,27 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:bio-waste": {
+			"id": "item:bio-waste",
+			"type": "simple",
+			"title": "Bio Waste",
+			"description": "Farm byproduct from animals and messy food chains. It belongs on the board until processed, because pretending manure fits neatly in a pocket is how UI crimes begin.",
+			"asset": {
+				"source": [
+					"asset:item:bio-waste"
+				]
+			},
+			"tags": [
+				"byproduct",
+				"waste",
+				"bio-waste",
+				"farm",
+				"cleanup",
+				"era:II"
+			],
+			"categoryId": "waste",
+			"scope": "board",
+			"maxStackSize": 1
+		}
+	}
+}

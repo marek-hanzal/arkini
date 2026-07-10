@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:cheese": {
+			"id": "item:cheese",
+			"type": "simple",
+			"title": "Cheese",
+			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
+			"asset": {
+				"source": [
+					"asset:item:cheese"
+				]
+			},
+			"tags": [
+				"food",
+				"dairy",
+				"cheese",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

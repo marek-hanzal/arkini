@@ -1,0 +1,71 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:blueprint-quarry-t1": {
+			"id": "item:blueprint-quarry-t1",
+			"type": "craft",
+			"title": "Quarry I Blueprint",
+			"description": "Build plan that can be filled with resources to construct Quarry I.",
+			"asset": {
+				"source": [
+					"asset:item:blueprint-quarry-t1"
+				],
+				"composite": "asset:producer:quarry-t1"
+			},
+			"tags": [
+				"blueprint",
+				"building",
+				"craft-target",
+				"era:I"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxStackSize": 1,
+			"line": {
+				"id": "line:blueprint:quarry-t1:construct",
+				"title": "Construct Quarry I",
+				"description": "Consumes construction resources to build Quarry I.",
+				"runtimeMs": 9000,
+				"input": [
+					{
+						"itemId": "item:log",
+						"quantity": {
+							"type": "value",
+							"value": 2
+						}
+					},
+					{
+						"itemId": "item:stone",
+						"quantity": {
+							"type": "value",
+							"value": 1
+						}
+					}
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:quarry-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		}
+	}
+}

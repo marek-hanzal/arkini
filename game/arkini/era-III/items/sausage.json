@@ -1,0 +1,26 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:sausage": {
+			"id": "item:sausage",
+			"type": "simple",
+			"title": "Sausage",
+			"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
+			"asset": {
+				"source": [
+					"asset:item:sausage"
+				]
+			},
+			"tags": [
+				"food",
+				"meat",
+				"sausage",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

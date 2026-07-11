@@ -7,6 +7,7 @@ const internalStoreImport = 'from "~/v1/runtime/internal/RuntimeStoreFx"';
 const allowedImporters = new Set([
 	"src/v1/runtime/RuntimeBoundary.test.ts",
 	"src/v1/game/layer/GameLayerFx.ts",
+	"src/v1/placement/write/placeOutputFx.ts",
 	"src/v1/runtime/write/moveItemFx.ts",
 	"src/v1/runtime/write/removeItemFx.ts",
 	"src/v1/runtime/write/setItemQuantityFx.ts",

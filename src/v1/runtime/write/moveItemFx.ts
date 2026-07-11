@@ -1,5 +1,6 @@
 import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
 
+import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
@@ -7,6 +8,7 @@ import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError"
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
 import type { MoveItemResultSchema } from "~/v1/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace moveItemFx {
 	export interface Props {
@@ -69,13 +71,18 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				previousLocation: item.location,
 			} satisfies MoveItemResultSchema.Type;
 
+			const nextRuntime = {
+				items: runtime.items.map((candidate) => {
+					return candidate.id === itemId ? movedItem : candidate;
+				}),
+			} satisfies RuntimeSchema.Type;
+			yield* assertRuntimeFx({
+				runtime: nextRuntime,
+			});
+
 			return [
 				result,
-				{
-					items: runtime.items.map((candidate) => {
-						return candidate.id === itemId ? movedItem : candidate;
-					}),
-				},
+				nextRuntime,
 			] as const;
 		});
 	});

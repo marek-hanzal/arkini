@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import { fromStateItemFx } from "./fromStateItemFx";
@@ -23,7 +24,9 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 		});
 	});
 
-	return {
-		items,
-	} satisfies RuntimeSchema.Type;
+	return yield* assertRuntimeFx({
+		runtime: {
+			items,
+		} satisfies RuntimeSchema.Type,
+	});
 });

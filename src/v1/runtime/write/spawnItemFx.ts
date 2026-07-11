@@ -1,5 +1,6 @@
 import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
 
+import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
@@ -8,6 +9,7 @@ import { ItemAlreadyExistsError } from "~/v1/runtime/error/ItemAlreadyExistsErro
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace spawnItemFx {
 	export interface Props {
@@ -73,14 +75,19 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 				);
 			}
 
+			const nextRuntime = {
+				items: [
+					...runtime.items,
+					runtimeItem,
+				],
+			} satisfies RuntimeSchema.Type;
+			yield* assertRuntimeFx({
+				runtime: nextRuntime,
+			});
+
 			return [
 				runtimeItem,
-				{
-					items: [
-						...runtime.items,
-						runtimeItem,
-					],
-				},
+				nextRuntime,
 			] as const;
 		});
 	});

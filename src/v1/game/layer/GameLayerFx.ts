@@ -26,7 +26,7 @@ export const GameLayerFx = ({ config }: GameLayerFx.Props) => {
 				return Ref.make(runtime);
 			}),
 		),
-	).pipe(Layer.provide(configLayer));
+	);
 
 	return Layer.merge(configLayer, runtimeLayer);
 };

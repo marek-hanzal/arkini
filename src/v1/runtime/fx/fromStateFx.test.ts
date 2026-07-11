@@ -88,7 +88,6 @@ describe("fromStateFx", () => {
 			),
 		);
 
-		expect(runtime.config).toBe(config);
 		expect(runtime.board.cells).toEqual({});
 		expect(runtime.inventory.cells).toEqual({});
 	});
@@ -173,7 +172,6 @@ describe("fromStateFx", () => {
 		const canonicalTree = config.items.tree;
 		const inventoryTree = runtime.inventory.cells["0:0"];
 
-		expect(runtime.config).toBe(config);
 		expect(runtime.board.cells["1:2"]?.item).toBe(canonicalTree);
 		expect(inventoryTree?.item).toBe(canonicalTree);
 	});

@@ -1,13 +1,10 @@
 import { Array, Effect, Option, pipe, Random } from "effect";
 
-import type { RollSetSchema } from "~/v1/roll/schema/RollSetSchema";
+import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
 
 export namespace selectRollSetFx {
 	export interface Props {
-		set: readonly [
-			RollSetSchema.Type,
-			...RollSetSchema.Type[],
-		];
+		set: OutputSchema.Type["set"];
 	}
 }
 

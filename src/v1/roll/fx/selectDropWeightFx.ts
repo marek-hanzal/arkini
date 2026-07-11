@@ -1,14 +1,10 @@
-import { Effect, Random } from "effect";
+import { Array, Effect, Option, pipe, Random } from "effect";
 
-import type { DropWeightSchema } from "~/v1/roll/schema/DropWeightSchema";
+import type { RollWeightSchema } from "~/v1/roll/schema/RollWeightSchema";
 
 export namespace selectDropWeightFx {
 	export interface Props {
-		drop: readonly [
-			DropWeightSchema.Type,
-			DropWeightSchema.Type,
-			...DropWeightSchema.Type[],
-		];
+		drop: RollWeightSchema.Type["drop"];
 	}
 }
 
@@ -18,18 +14,25 @@ export namespace selectDropWeightFx {
 export const selectDropWeightFx = Effect.fn("selectDropWeightFx")(function* ({
 	drop,
 }: selectDropWeightFx.Props) {
-	const totalWeight = drop.reduce((total, candidate) => {
-		return total + candidate.weight;
-	}, 0);
+	const [totalWeight, weightedDrop] = Array.mapAccum(drop, 0, (accumulatedWeight, candidate) => {
+		const maximumWeight = accumulatedWeight + candidate.weight;
+
+		return [
+			maximumWeight,
+			{
+				candidate,
+				maximumWeight,
+			},
+		] as const;
+	});
 	const selectedWeight = yield* Random.nextRange(0, totalWeight);
-	let accumulatedWeight = 0;
 
-	for (const candidate of drop) {
-		accumulatedWeight += candidate.weight;
-		if (selectedWeight < accumulatedWeight) {
-			return candidate;
-		}
-	}
-
-	return drop[drop.length - 1];
+	return pipe(
+		weightedDrop,
+		Array.findFirst(({ maximumWeight }) => {
+			return selectedWeight < maximumWeight;
+		}),
+		Option.map(({ candidate }) => candidate),
+		Option.getOrElse(() => drop[drop.length - 1]),
+	);
 });

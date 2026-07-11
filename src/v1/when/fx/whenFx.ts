@@ -33,10 +33,9 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 			{
 				type: "exists",
 			},
-			(when) => {
+			() => {
 				return whenExistsFx({
 					quantity,
-					when,
 				});
 			},
 		)

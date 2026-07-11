@@ -1,10 +1,8 @@
 import { Effect } from "effect";
-
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
-import type { WhenExistsSchema } from "~/v1/when/schema/WhenExistsSchema";
 
 export namespace whenExistsFx {
-	export interface Props extends WhenExistsSchema.Type {
+	export interface Props {
 		quantity: NonNegativeIntegerSchema.Type;
 	}
 }

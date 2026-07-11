@@ -18,15 +18,10 @@ export const dropRuleEnableFx = Effect.fn("dropRuleEnableFx")(function* ({
 	origin,
 	rule,
 }: dropRuleEnableFx.Props) {
-	for (const when of rule.when) {
-		const passed = yield* whenFx({
+	return yield* Effect.every(rule.when, (when) => {
+		return whenFx({
 			origin,
 			when,
 		});
-		if (!passed) {
-			return false;
-		}
-	}
-
-	return true;
+	});
 });

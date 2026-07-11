@@ -24,6 +24,7 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		([cell, item]) => {
 			return fromRuntimeItemFx({
 				item,
+				scope: "board",
 			}).pipe(
 				Effect.map((state) => {
 					return [
@@ -39,6 +40,7 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		([cell, item]) => {
 			return fromRuntimeItemFx({
 				item,
+				scope: "inventory",
 			}).pipe(
 				Effect.map((state) => {
 					return [

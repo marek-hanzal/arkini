@@ -55,6 +55,7 @@ const state = StateSchema.parse({
 				id: "runtime:board:tree",
 				itemId: "tree",
 				quantity: 1,
+				scope: "board",
 				x: 1,
 				y: 2,
 			},
@@ -66,6 +67,7 @@ const state = StateSchema.parse({
 				id: "runtime:inventory:tree",
 				itemId: "tree",
 				quantity: 3,
+				scope: "inventory",
 				x: 0,
 				y: 0,
 			},
@@ -99,6 +101,7 @@ describe("fromStateFx", () => {
 						id: "runtime:placed:tree",
 						item: config.items.tree,
 						quantity: 1,
+						scope: "inventory",
 						x: 99,
 						y: 99,
 					},
@@ -125,6 +128,7 @@ describe("fromStateFx", () => {
 
 		expect(result.placed).toBe(result.read);
 		expect(result.read).toMatchObject({
+			scope: "board",
 			x: 2,
 			y: 1,
 		});

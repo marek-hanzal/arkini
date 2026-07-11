@@ -26,6 +26,7 @@ export const setItemFx = Effect.fn("setItemFx")(function* ({ item, scope, x, y }
 	const key = `${x}:${y}`;
 	const placedItem = {
 		...item,
+		scope,
 		x,
 		y,
 	} satisfies RuntimeItemSchema.Type;

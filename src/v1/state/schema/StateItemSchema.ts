@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
+import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
 
 /**
  * A persisted live item or item stack stored in a state grid cell.
@@ -25,6 +26,13 @@ export const StateItemSchema = z
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live state entry.",
 		),
+		/**
+		 * Persisted grid containing this item.
+		 */
+		scope: ScopeEnumSchema.extract([
+			"board",
+			"inventory",
+		]).describe("The persisted grid containing this item."),
 		/**
 		 * Zero-based horizontal coordinate of this item in its persisted grid.
 		 */

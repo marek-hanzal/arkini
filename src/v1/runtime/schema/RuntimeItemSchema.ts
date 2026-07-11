@@ -4,6 +4,7 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
+import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
 
 /**
  * A hydrated live item or item stack stored in a runtime grid cell.
@@ -26,6 +27,13 @@ export const RuntimeItemSchema = z
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live runtime entry.",
 		),
+		/**
+		 * Runtime grid currently containing this item.
+		 */
+		scope: ScopeEnumSchema.extract([
+			"board",
+			"inventory",
+		]).describe("The runtime grid currently containing this item."),
 		/**
 		 * Zero-based horizontal coordinate of this item in its runtime grid.
 		 */

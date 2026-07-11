@@ -6,17 +6,17 @@ import { z } from "zod";
 export const RuleEnumSchema = z
 	.enum([
 		/**
-		 * Requires the rule's condition to be satisfied before the selected drop can be emitted.
+		 * Enables the selected drop only when the rule's conditions pass.
 		 */
-		"require",
+		"enable",
 		/**
-		 * Prevents the selected drop from being emitted when the rule's condition is satisfied.
+		 * Disables the selected drop when the rule's conditions pass.
 		 */
-		"block",
+		"disable",
 	])
 	.meta({
 		id: "DropRuleEnumSchema",
-		description: "The kind of rule evaluated for a selected drop.",
+		description: "The kind of availability rule evaluated for a selected drop.",
 	});
 
 export type RuleEnumSchema = typeof RuleEnumSchema;

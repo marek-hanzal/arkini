@@ -6,19 +6,19 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 /**
  * A rule that disables a product line.
  *
- * When this rule applies, it takes precedence over the line's `enable` default
- * and any applicable `enable` rule. Unlike `hide`, this preserves the line in
- * the UI while preventing it from starting.
+ * An applicable disable rule vetoes the line's availability, taking precedence
+ * over its `enable` default and every enable gate. Unlike `hide`, this preserves
+ * the line in the UI while preventing it from starting.
  */
 export const RuleDisableSchema = z
 	.object({
 		...BaseRuleSchema.shape,
 		/**
-		 * Identifies this rule as a request to disable the line.
+		 * Identifies this rule as a disable veto for the line.
 		 */
 		type: RuleEnumSchema.extract([
 			"disable",
-		]).describe("Identifies this rule as a request to disable the product line."),
+		]).describe("Identifies this rule as a disable veto for the product line."),
 	})
 	.strict()
 	.meta({

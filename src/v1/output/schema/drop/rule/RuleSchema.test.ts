@@ -15,7 +15,7 @@ const when = [
 	},
 ];
 
-describe("line RuleSchema", () => {
+describe("drop RuleSchema", () => {
 	it("accepts symmetric enable and disable rules", () => {
 		for (const type of [
 			"enable",

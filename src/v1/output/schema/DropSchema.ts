@@ -35,8 +35,8 @@ export const DropSchema = z
 		/**
 		 * Rules evaluated after this drop is selected by a successful roll.
 		 *
-		 * A failed `require` or an applicable `block` prevents this drop from
-		 * being emitted; it does not reroll or replace the selected drop.
+		 * Every `enable` rule must pass and any applicable `disable` rule prevents
+		 * this drop from being emitted. Rejection does not reroll or replace it.
 		 */
 		rules: z
 			.array(RuleSchema)

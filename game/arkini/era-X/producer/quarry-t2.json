@@ -40,7 +40,7 @@
 					],
 					"rules": [
 						{
-							"type": "require",
+							"type": "enable",
 							"when": [
 								{
 									"type": "exists",
@@ -104,7 +104,7 @@
 					],
 					"rules": [
 						{
-							"type": "require",
+							"type": "enable",
 							"when": [
 								{
 									"type": "exists",

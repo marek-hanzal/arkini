@@ -1,22 +1,22 @@
 import { z } from "zod";
 
-import { RuleBlockSchema } from "./RuleBlockSchema";
-import { RuleRequireSchema } from "./RuleRequireSchema";
+import { RuleDisableSchema } from "./RuleDisableSchema";
+import { RuleEnableSchema } from "./RuleEnableSchema";
 
 /**
- * A rule evaluated for a drop selected by a successful roll.
+ * An availability rule evaluated for a drop selected by a successful roll.
  *
  * Each member owns its own behavior and fields. The `type` discriminator keeps
  * the union explicit and directly compatible with `ts-pattern`.
  */
 export const RuleSchema = z
 	.discriminatedUnion("type", [
-		RuleRequireSchema,
-		RuleBlockSchema,
+		RuleEnableSchema,
+		RuleDisableSchema,
 	])
 	.meta({
 		id: "DropRuleSchema",
-		description: "A rule evaluated for a drop selected by a successful roll.",
+		description: "An availability rule evaluated for a selected drop.",
 	});
 
 export type RuleSchema = typeof RuleSchema;

@@ -66,7 +66,7 @@
 				],
 				"rules": [
 					{
-						"type": "require",
+						"type": "enable",
 						"when": [
 							{
 								"type": "exists",

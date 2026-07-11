@@ -41,7 +41,9 @@ export const LineSchema = z
 		/**
 		 * Whether this product line is enabled before its rules are evaluated.
 		 *
-		 * A line disabled by default can be enabled by an applicable `enable` rule.
+		 * When enable rules are configured, all of them must pass; a fully satisfied
+		 * set can enable a line whose default is `false`. Any applicable `disable`
+		 * rule vetoes the final availability.
 		 */
 		enable: z
 			.boolean()
@@ -78,12 +80,14 @@ export const LineSchema = z
 		/**
 		 * Rules that can change this product line's visibility, availability, or behavior.
 		 *
-		 * Rules are evaluated after the line's `show` default. An applicable `show`
-		 * rule can reveal a line whose default visibility is `false`.
+		 * Show and hide rules resolve visibility. Enable rules form positive
+		 * availability gates, while any applicable disable rule has veto power.
 		 */
 		rules: z
 			.array(RuleSchema)
-			.describe("Rules that can change this product line's visibility or behavior."),
+			.describe(
+				"Rules that can change this product line's visibility, availability, or behavior.",
+			),
 	})
 	.strict()
 	.meta({

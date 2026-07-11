@@ -4,22 +4,25 @@ import { BaseRuleSchema } from "./BaseRuleSchema";
 import { RuleEnumSchema } from "./RuleEnumSchema";
 
 /**
- * A rule that enables an otherwise disabled product line.
+ * A rule that enables a product line only when all of its conditions pass.
+ *
+ * Every configured enable rule is a positive availability gate. A failed gate
+ * keeps the line visible but prevents it from starting.
  */
 export const RuleEnableSchema = z
 	.object({
 		...BaseRuleSchema.shape,
 		/**
-		 * Identifies this rule as a conditional request to enable the line.
+		 * Identifies this rule as an enable gate for the line.
 		 */
 		type: RuleEnumSchema.extract([
 			"enable",
-		]).describe("Identifies this rule as a request to enable the product line."),
+		]).describe("Identifies this rule as an enable gate for the product line."),
 	})
 	.strict()
 	.meta({
 		id: "LineRuleEnableSchema",
-		description: "A rule that conditionally enables a product line.",
+		description: "A rule that enables a product line when its conditions pass.",
 	});
 
 export type RuleEnableSchema = typeof RuleEnableSchema;

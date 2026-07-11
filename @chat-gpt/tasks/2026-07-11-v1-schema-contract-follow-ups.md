@@ -8,43 +8,21 @@ Completed in the same pass:
 - every query/when/rule/output `origin` contract was narrowed from `RuntimeItemSchema` to `PositionSchema`;
 - drop-rule evaluators now return neutral schema-backed rule results; only `dropFx` interprets enable gates and disable vetoes.
 
-## 1. Runtime item versus grid placement
+## Completed: runtime item location ownership
 
-This is the next issue to investigate before input runtime.
+The runtime item versus placement decision is implemented.
 
-Current runtime and state items contain `scope`, `x`, and `y`, while their owning container and cell key already encode the same information:
+- `LocationSchema` owns concrete `scope + position`.
+- `RuntimeItemSchema` and `StateItemSchema` own their location directly.
+- Runtime and state are flat item arrays with matching structure.
+- Board/inventory are derived views; there are no cell-key records or maps.
+- Public runtime access is read-only.
+- Dedicated atomic commands own every mutation; generic item patching does not exist.
+- Explicit runtime checkers validate IDs, scope, bounds, and location occupancy before hydration or command commit.
 
-```text
-runtime.board / runtime.inventory -> scope
-cells["2:1"]                      -> x/y
-RuntimeItemSchema                 -> scope + x + y
-```
+Full decision record: `@chat-gpt/archive/2026-07-11-v1-item-owned-location-runtime.md`.
 
-The same duplication exists in state. A cell key, container scope, and item fields may disagree. `setItemFx`, `fromStateFx`, and `fromRuntimeFx` currently synchronize or reconstruct these copies manually.
-
-Do not patch this locally. First decide the intended ownership model. Candidate direction:
-
-```text
-RuntimeItemSchema
-├── id
-├── item
-└── quantity
-
-Grid container owns scope
-Cell key owns position
-```
-
-If a located item is needed as a first-class value, introduce a dedicated placement/entry schema instead of making the item itself own grid coordinates.
-
-Questions to resolve:
-
-- whether persisted `StateItemSchema` should also lose `scope/x/y`;
-- whether cell keys remain serialized strings or become structured entries;
-- where cell-key parsing and validation belong;
-- whether APIs return an item, a placement, or a composed located-item result;
-- how moves preserve item identity without copying location fields.
-
-## 2. Drop result cardinality
+## 1. Drop result cardinality
 
 `dropFx` currently returns `DropResultSchema.Type[]`, although its contract is exactly zero or one result.
 
@@ -56,7 +34,7 @@ DropResultsSchema = array(DropResultSchema).max(1)
 
 Alternatively model explicit resolved/discarded variants if downstream composition benefits from preserving rejection information. Do not use an untyped array alias.
 
-## 3. Collection contracts derived from owner schemas
+## 2. Collection contracts derived from owner schemas
 
 Some Fx props manually restate tuple shapes already owned by schemas:
 
@@ -69,7 +47,7 @@ Prefer types derived from the owning schema fields, such as `OutputSchema.Type["
 
 The goal is to prevent runtime function contracts from drifting away from Zod structure.
 
-## 4. When comparator boundaries
+## 3. When comparator boundaries
 
 `whenFx` consumes `when.query`, then passes the whole `WhenCountSchema` or `WhenRangeSchema` to comparator leaves even though those leaves only use count/range values.
 
@@ -80,7 +58,7 @@ Choose one honest boundary:
 
 The current middle state is harmless but structurally imprecise.
 
-## 5. Pack tooling result contracts
+## 4. Pack tooling result contracts
 
 Several pack Fx return ad hoc `as const` objects rather than schema-backed results, including source collection, JSON reading, and directory packing.
 
@@ -89,10 +67,8 @@ This is lower priority because it is isolated tooling rather than gameplay runti
 ## Recommended order
 
 ```text
-1. Investigate and decide item versus placement ownership
-2. Implement that model before input runtime
-3. Add drop 0..1 result schema
-4. Derive collection props from owner schemas
-5. Tighten when comparator boundaries
-6. Review pack tooling result contracts
+1. Add drop 0..1 result schema
+2. Derive collection props from owner schemas
+3. Tighten when comparator boundaries
+4. Review pack tooling result contracts
 ```

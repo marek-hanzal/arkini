@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { RuleShowSchema } from "~/v1/line/schema/rule/RuleShowSchema";
 import type { RuleShowResultSchema } from "~/v1/line/schema/rule/RuleShowResultSchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 export namespace lineRuleShowFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		rule: RuleShowSchema.Type;
 	}
 }

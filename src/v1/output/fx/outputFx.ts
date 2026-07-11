@@ -4,12 +4,12 @@ import type { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
 import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
 import { rollSetFx } from "~/v1/roll/fx/rollSetFx";
 import { selectRollSetFx } from "~/v1/roll/fx/selectRollSetFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { dropFx } from "./dropFx";
 
 export namespace outputFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		output: OutputSchema.Type;
 	}
 }

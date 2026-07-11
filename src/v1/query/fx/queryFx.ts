@@ -2,14 +2,14 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { QuerySchema } from "~/v1/query/schema/QuerySchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { queryAnyFx } from "./queryAnyFx";
 import { queryBoardFx } from "./queryBoardFx";
 import { queryInventoryFx } from "./queryInventoryFx";
 
 export namespace queryFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		query: QuerySchema.Type;
 	}
 }

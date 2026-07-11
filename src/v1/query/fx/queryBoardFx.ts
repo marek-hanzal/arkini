@@ -3,12 +3,12 @@ import { Effect, Ref } from "effect";
 import { distanceFx } from "~/v1/distance/fx/distanceFx";
 import type { QueryBoardSchema } from "~/v1/query/schema/QueryBoardSchema";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryBoardFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		query: QueryBoardSchema.Type;
 	}
 }

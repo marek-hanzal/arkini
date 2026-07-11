@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import { queryFx } from "~/v1/query/fx/queryFx";
 import { queryQuantityFx } from "~/v1/query/fx/queryQuantityFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { WhenSchema } from "~/v1/when/schema/WhenSchema";
 import { whenCountFx } from "./whenCountFx";
 import { whenExistsFx } from "./whenExistsFx";
@@ -11,7 +11,7 @@ import { whenRangeFx } from "./whenRangeFx";
 
 export namespace whenFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		when: WhenSchema.Type;
 	}
 }

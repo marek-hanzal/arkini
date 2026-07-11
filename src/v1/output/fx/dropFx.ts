@@ -3,13 +3,13 @@ import { Effect } from "effect";
 import type { DropSchema } from "~/v1/output/schema/DropSchema";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
 import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { dropRuleFx } from "./dropRuleFx";
 
 export namespace dropFx {
 	export interface Props {
 		drop: DropSchema.Type;
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 	}
 }
 

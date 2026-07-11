@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { RuleDisableSchema } from "~/v1/line/schema/rule/RuleDisableSchema";
 import type { RuleDisableResultSchema } from "~/v1/line/schema/rule/RuleDisableResultSchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 export namespace lineRuleDisableFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		rule: RuleDisableSchema.Type;
 	}
 }

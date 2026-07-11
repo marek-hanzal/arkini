@@ -2,13 +2,13 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { RuleSchema } from "~/v1/output/schema/drop/rule/RuleSchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { dropRuleDisableFx } from "./dropRuleDisableFx";
 import { dropRuleEnableFx } from "./dropRuleEnableFx";
 
 export namespace dropRuleFx {
 	export interface Props {
-		origin: RuntimeItemSchema.Type;
+		origin: PositionSchema.Type;
 		rule: RuleSchema.Type;
 	}
 }

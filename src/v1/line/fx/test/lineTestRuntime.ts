@@ -1,4 +1,3 @@
-import { LineSchema } from "~/v1/line/schema/LineSchema";
 import { setItemFx } from "~/v1/runtime/fx/setItemFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
@@ -94,22 +93,6 @@ export const existsWhen = (itemId: string) => {
 		},
 		type: "exists" as const,
 	};
-};
-
-export const createLine = (line: Partial<LineSchema.Type> = {}) => {
-	return LineSchema.parse({
-		id: "line:test",
-		title: "Test line",
-		description: "A product line used by runtime tests.",
-		runtimeMs: 1_000,
-		input: [
-			{
-				type: "simple",
-			},
-		],
-		rules: [],
-		...line,
-	});
 };
 
 export const createOriginFx = () => {

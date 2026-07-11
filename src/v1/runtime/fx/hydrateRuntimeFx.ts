@@ -11,11 +11,11 @@ export namespace hydrateRuntimeFx {
 		game: GameSchema.Type;
 		state: StateSchema.Type;
 	}
-
-	export type Result = RuntimeSchema.Type;
 }
 
-/** Hydrates serializable state into the core runtime with canonical item references. */
+/**
+ * Hydrates serializable state into the core runtime with canonical item references.
+ */
 export const hydrateRuntimeFx = Effect.fn("hydrateRuntimeFx")(function* ({
 	game,
 	state,
@@ -46,5 +46,5 @@ export const hydrateRuntimeFx = Effect.fn("hydrateRuntimeFx")(function* ({
 		},
 	};
 
-	return result satisfies hydrateRuntimeFx.Result;
+	return result satisfies RuntimeSchema.Type;
 });

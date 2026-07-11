@@ -10,11 +10,11 @@ export namespace hydrateRuntimeInventoryItemFx {
 		game: GameSchema.Type;
 		state: StateInventoryItemSchema.Type;
 	}
-
-	export type Result = RuntimeInventoryItemSchema.Type;
 }
 
-/** Hydrates one persisted inventory item with its canonical item reference. */
+/**
+ * Hydrates one persisted inventory item with its canonical item reference.
+ */
 export const hydrateRuntimeInventoryItemFx = Effect.fn("hydrateRuntimeInventoryItemFx")(function* ({
 	game,
 	state,
@@ -29,5 +29,5 @@ export const hydrateRuntimeInventoryItemFx = Effect.fn("hydrateRuntimeInventoryI
 		quantity: state.quantity,
 	};
 
-	return result satisfies hydrateRuntimeInventoryItemFx.Result;
+	return result satisfies RuntimeInventoryItemSchema.Type;
 });

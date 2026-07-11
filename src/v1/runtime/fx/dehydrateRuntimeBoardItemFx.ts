@@ -7,11 +7,11 @@ export namespace dehydrateRuntimeBoardItemFx {
 	export interface Props {
 		item: RuntimeBoardItemSchema.Type;
 	}
-
-	export type Result = StateBoardItemSchema.Type;
 }
 
-/** Replaces one runtime board item's canonical object with its stable item ID. */
+/**
+ * Replaces one runtime board item's canonical object with its stable item ID.
+ */
 export const dehydrateRuntimeBoardItemFx = Effect.fn("dehydrateRuntimeBoardItemFx")(function* ({
 	item,
 }: dehydrateRuntimeBoardItemFx.Props) {
@@ -23,5 +23,5 @@ export const dehydrateRuntimeBoardItemFx = Effect.fn("dehydrateRuntimeBoardItemF
 		y: item.y,
 	};
 
-	return result satisfies dehydrateRuntimeBoardItemFx.Result;
+	return result satisfies StateBoardItemSchema.Type;
 });

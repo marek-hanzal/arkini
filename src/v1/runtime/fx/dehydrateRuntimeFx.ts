@@ -9,11 +9,11 @@ export namespace dehydrateRuntimeFx {
 	export interface Props {
 		runtime: RuntimeSchema.Type;
 	}
-
-	export type Result = StateSchema.Type;
 }
 
-/** Dehydrates the core runtime into serializable state containing canonical item IDs. */
+/**
+ * Dehydrates the core runtime into serializable state containing canonical item IDs.
+ */
 export const dehydrateRuntimeFx = Effect.fn("dehydrateRuntimeFx")(function* ({
 	runtime,
 }: dehydrateRuntimeFx.Props) {
@@ -40,5 +40,5 @@ export const dehydrateRuntimeFx = Effect.fn("dehydrateRuntimeFx")(function* ({
 		},
 	};
 
-	return result satisfies dehydrateRuntimeFx.Result;
+	return result satisfies StateSchema.Type;
 });

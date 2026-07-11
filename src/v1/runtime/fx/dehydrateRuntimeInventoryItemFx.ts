@@ -7,11 +7,11 @@ export namespace dehydrateRuntimeInventoryItemFx {
 	export interface Props {
 		item: RuntimeInventoryItemSchema.Type;
 	}
-
-	export type Result = StateInventoryItemSchema.Type;
 }
 
-/** Replaces one runtime inventory item's canonical object with its stable item ID. */
+/**
+ * Replaces one runtime inventory item's canonical object with its stable item ID.
+ */
 export const dehydrateRuntimeInventoryItemFx = Effect.fn("dehydrateRuntimeInventoryItemFx")(
 	function* ({ item }: dehydrateRuntimeInventoryItemFx.Props) {
 		const result = {
@@ -20,6 +20,6 @@ export const dehydrateRuntimeInventoryItemFx = Effect.fn("dehydrateRuntimeInvent
 			quantity: item.quantity,
 		};
 
-		return result satisfies dehydrateRuntimeInventoryItemFx.Result;
+		return result satisfies StateInventoryItemSchema.Type;
 	},
 );

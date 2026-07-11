@@ -10,11 +10,11 @@ export namespace resolveRuntimeItemFx {
 		game: GameSchema.Type;
 		itemId: IdSchema.Type;
 	}
-
-	export type Result = ItemSchema.Type;
 }
 
-/** Resolves one persisted item ID to its canonical loaded game object. */
+/**
+ * Resolves one persisted item ID to its canonical loaded game object.
+ */
 export const resolveRuntimeItemFx = Effect.fn("resolveRuntimeItemFx")(function* ({
 	game,
 	itemId,
@@ -29,5 +29,5 @@ export const resolveRuntimeItemFx = Effect.fn("resolveRuntimeItemFx")(function* 
 		);
 	}
 
-	return item satisfies resolveRuntimeItemFx.Result;
+	return item satisfies ItemSchema.Type;
 });

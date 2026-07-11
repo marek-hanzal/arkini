@@ -10,11 +10,11 @@ export namespace hydrateRuntimeBoardItemFx {
 		game: GameSchema.Type;
 		state: StateBoardItemSchema.Type;
 	}
-
-	export type Result = RuntimeBoardItemSchema.Type;
 }
 
-/** Hydrates one persisted board item with its canonical item reference. */
+/**
+ * Hydrates one persisted board item with its canonical item reference.
+ */
 export const hydrateRuntimeBoardItemFx = Effect.fn("hydrateRuntimeBoardItemFx")(function* ({
 	game,
 	state,
@@ -31,5 +31,5 @@ export const hydrateRuntimeBoardItemFx = Effect.fn("hydrateRuntimeBoardItemFx")(
 		y: state.y,
 	};
 
-	return result satisfies hydrateRuntimeBoardItemFx.Result;
+	return result satisfies RuntimeBoardItemSchema.Type;
 });

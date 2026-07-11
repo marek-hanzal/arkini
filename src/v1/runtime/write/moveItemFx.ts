@@ -3,9 +3,11 @@ import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
 import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { MoveItemResultSchema } from "~/v1/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -13,7 +15,7 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace moveItemFx {
 	export interface Props {
 		itemId: IdSchema.Type;
-		location: LocationSchema.Type;
+		location: GridLocationSchema.Type;
 	}
 }
 
@@ -37,6 +39,14 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId,
+					}),
+				);
+			}
+			if (!isGridRuntimeItem(item)) {
+				return yield* Effect.fail(
+					new ItemNotOnGridError({
+						itemId,
+						location: item.location,
 					}),
 				);
 			}

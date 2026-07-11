@@ -1,15 +1,16 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
+import type { GridRuntimeItemSchema } from "~/v1/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace readAvailableStackItemsFx {
 	export interface Props {
 		itemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
-		scope: LocationSchema.Type["scope"];
+		scope: GridLocationSchema.Type["scope"];
 	}
 }
 
@@ -22,6 +23,7 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 	scope,
 }: readAvailableStackItemsFx.Props) {
 	return runtime.items
+		.filter(isGridRuntimeItem)
 		.filter((item) => {
 			return (
 				item.item.id === itemId &&
@@ -35,5 +37,5 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 				left.location.position.x - right.location.position.x ||
 				left.id.localeCompare(right.id)
 			);
-		}) satisfies RuntimeItemSchema.Type[];
+		}) satisfies GridRuntimeItemSchema.Type[];
 });

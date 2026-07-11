@@ -2,8 +2,10 @@ import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
+import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
 import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { SwapItemsResultSchema } from "~/v1/runtime/schema/command/SwapItemsResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -46,6 +48,22 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId: secondItemId,
+					}),
+				);
+			}
+			if (!isGridRuntimeItem(first)) {
+				return yield* Effect.fail(
+					new ItemNotOnGridError({
+						itemId: firstItemId,
+						location: first.location,
+					}),
+				);
+			}
+			if (!isGridRuntimeItem(second)) {
+				return yield* Effect.fail(
+					new ItemNotOnGridError({
+						itemId: secondItemId,
+						location: second.location,
 					}),
 				);
 			}

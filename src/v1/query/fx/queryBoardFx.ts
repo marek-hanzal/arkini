@@ -4,6 +4,7 @@ import { distanceFx } from "~/v1/distance/fx/distanceFx";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { QueryBoardSchema } from "~/v1/query/schema/QueryBoardSchema";
 import { getItemsFx } from "~/v1/runtime/read/getItemsFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryBoardFx {
@@ -22,13 +23,13 @@ export const queryBoardFx = Effect.fn("queryBoardFx")(function* ({
 }: queryBoardFx.Props) {
 	const items = yield* getItemsFx();
 	const selected = yield* queryItemsFx({
-		items: items.filter((item) => {
+		items: items.filter(isGridRuntimeItem).filter((item) => {
 			return item.location.scope === "board";
 		}),
 		selector: query.selector,
 	});
 
-	return yield* Effect.filter(selected, (item) => {
+	return yield* Effect.filter(selected.filter(isGridRuntimeItem), (item) => {
 		return distanceFx({
 			distance: query.distance,
 			item: item.location.position,

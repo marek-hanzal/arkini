@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/v1/runtime/schema/check/LocationOccupiedIssueSchema";
@@ -15,20 +16,22 @@ export namespace checkRuntimeLocationsFx {
 }
 
 /**
- * Reports every violation of the item-owned location contract.
+ * Reports every violation of the item-owned grid-location contract.
  *
  * Rules are intentionally spelled out here instead of hidden in schema
  * refinements: canonical scope, configured grid bounds, and unique occupancy.
+ * Line-input locations are validated by the input runtime checker.
  */
 export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(function* ({
 	config,
 	runtime,
 }: checkRuntimeLocationsFx.Props) {
+	const items = runtime.items.filter(isGridRuntimeItem);
 	const scopeIssues: LocationScopeIssueSchema.Type[] = [];
 	const boundsIssues: LocationOutOfBoundsIssueSchema.Type[] = [];
 	const occupancyIssues: LocationOccupiedIssueSchema.Type[] = [];
 
-	for (const item of runtime.items) {
+	for (const item of items) {
 		const configuredScope = item.item.scope;
 		const scopeAllowed = configuredScope === "any" || configuredScope === item.location.scope;
 		if (!scopeAllowed) {
@@ -56,7 +59,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 		}
 	}
 
-	for (const [index, item] of runtime.items.entries()) {
+	for (const [index, item] of items.entries()) {
 		const alreadyReported = occupancyIssues.some((issue) => {
 			return (
 				issue.location.scope === item.location.scope &&
@@ -68,7 +71,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 			continue;
 		}
 
-		const occupants = runtime.items.slice(index).filter((candidate) => {
+		const occupants = items.slice(index).filter((candidate) => {
 			return (
 				candidate.location.scope === item.location.scope &&
 				candidate.location.position.x === item.location.position.x &&

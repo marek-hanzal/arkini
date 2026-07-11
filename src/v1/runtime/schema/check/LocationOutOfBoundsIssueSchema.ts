@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { GridSizeSchema } from "~/v1/grid/schema/GridSizeSchema";
-import { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 
 /**
  * One live item owns coordinates outside its concrete grid.
@@ -10,7 +10,7 @@ import { LocationSchema } from "~/v1/location/schema/LocationSchema";
 export const LocationOutOfBoundsIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The live item outside its grid bounds."),
-		location: LocationSchema.describe("The invalid concrete item location."),
+		location: GridLocationSchema.describe("The invalid concrete item location."),
 		size: GridSizeSchema.describe("The configured size of the targeted grid."),
 		type: z.literal("location:out-of-bounds"),
 	})

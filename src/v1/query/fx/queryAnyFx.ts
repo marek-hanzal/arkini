@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { QueryAnySchema } from "~/v1/query/schema/QueryAnySchema";
 import { getItemsFx } from "~/v1/runtime/read/getItemsFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryAnyFx {
@@ -17,7 +18,7 @@ export const queryAnyFx = Effect.fn("queryAnyFx")(function* ({ query }: queryAny
 	const items = yield* getItemsFx();
 
 	return yield* queryItemsFx({
-		items,
+		items: items.filter(isGridRuntimeItem),
 		selector: query.selector,
 	});
 });

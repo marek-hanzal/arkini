@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import { InputCapacityExceededIssueSchema } from "~/v1/input/schema/check/InputCapacityExceededIssueSchema";
+import { InputLineMissingIssueSchema } from "~/v1/input/schema/check/InputLineMissingIssueSchema";
+import { InputOwnerMissingIssueSchema } from "~/v1/input/schema/check/InputOwnerMissingIssueSchema";
+import { InputSelectorMismatchIssueSchema } from "~/v1/input/schema/check/InputSelectorMismatchIssueSchema";
+import { InputSlotInvalidIssueSchema } from "~/v1/input/schema/check/InputSlotInvalidIssueSchema";
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
 import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
@@ -15,6 +20,11 @@ export const RuntimeCheckIssueSchema = z
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,
 		ItemStackSizeIssueSchema,
+		InputOwnerMissingIssueSchema,
+		InputLineMissingIssueSchema,
+		InputSlotInvalidIssueSchema,
+		InputSelectorMismatchIssueSchema,
+		InputCapacityExceededIssueSchema,
 		LocationOccupiedIssueSchema,
 		LocationOutOfBoundsIssueSchema,
 		LocationScopeIssueSchema,

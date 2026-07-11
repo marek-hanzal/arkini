@@ -2,18 +2,18 @@ import { Chunk, Effect, Random } from "effect";
 import { match } from "ts-pattern";
 
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import type { PlacementEnumSchema } from "~/v1/placement/schema/PlacementEnumSchema";
 
 export namespace orderBoardLocationsFx {
 	export interface Props {
-		locations: ReadonlyArray<LocationSchema.Type>;
+		locations: ReadonlyArray<GridLocationSchema.Type>;
 		origin: PositionSchema.Type;
 		placement: Exclude<PlacementEnumSchema.Type, "replace">;
 	}
 }
 
-const compareByScanOrder = (left: LocationSchema.Type, right: LocationSchema.Type) => {
+const compareByScanOrder = (left: GridLocationSchema.Type, right: GridLocationSchema.Type) => {
 	return left.position.y - right.position.y || left.position.x - right.position.x;
 };
 

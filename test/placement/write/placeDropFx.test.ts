@@ -289,12 +289,16 @@ describe("placeDropFx", () => {
 
 		expect(result.placement.stack).toEqual([]);
 		expect(result.placement.spawn).toHaveLength(1);
-		expect(result.placement.spawn[0]?.location.scope).toBe("board");
+		const spawned = result.placement.spawn[0];
+		expect(spawned?.location.scope).toBe("board");
+		if (spawned?.location.scope !== "board") {
+			throw new Error("Expected one board placement.");
+		}
 		expect([
 			1,
 			2,
 			3,
-		]).toContain(result.placement.spawn[0]?.location.position.x);
+		]).toContain(spawned.location.position.x);
 	});
 
 	it("rejects replace placement for inventory-only outputs", () => {

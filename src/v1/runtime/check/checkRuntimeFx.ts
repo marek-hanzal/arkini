@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
+import { checkRuntimeInputLocationsFx } from "~/v1/input/check/checkRuntimeInputLocationsFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { RuntimeCheckResultSchema } from "~/v1/runtime/schema/check/RuntimeCheckResultSchema";
 import { checkRuntimeItemIdsFx } from "./checkRuntimeItemIdsFx";
@@ -26,6 +27,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx({
 		runtime,
 	});
+	const inputLocationIssues = yield* checkRuntimeInputLocationsFx({
+		runtime,
+	});
 	const locationIssues = yield* checkRuntimeLocationsFx({
 		config,
 		runtime,
@@ -35,6 +39,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 		issues: [
 			...itemIdIssues,
 			...itemQuantityIssues,
+			...inputLocationIssues,
 			...locationIssues,
 		],
 	} satisfies RuntimeCheckResultSchema.Type;

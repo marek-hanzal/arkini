@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
-import { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
 
 /**
@@ -13,7 +13,7 @@ export const LocationScopeIssueSchema = z
 			"The storage scope allowed by the canonical item definition.",
 		),
 		itemId: IdSchema.describe("The live item stored in a forbidden grid."),
-		location: LocationSchema.describe("The forbidden concrete item location."),
+		location: GridLocationSchema.describe("The forbidden concrete item location."),
 		type: z.literal("location:scope"),
 	})
 	.strict()

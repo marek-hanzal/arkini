@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace readEmptyLocationsFx {
 	export interface Props {
-		locations: ReadonlyArray<LocationSchema.Type>;
+		locations: ReadonlyArray<GridLocationSchema.Type>;
 		runtime: RuntimeSchema.Type;
 	}
 }

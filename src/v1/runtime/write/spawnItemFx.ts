@@ -4,7 +4,7 @@ import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { ItemAlreadyExistsError } from "~/v1/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
@@ -15,7 +15,7 @@ export namespace spawnItemFx {
 	export interface Props {
 		id: IdSchema.Type;
 		itemId: IdSchema.Type;
-		location: LocationSchema.Type;
+		location: GridLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 	}
 }

@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { GridRuntimeItemSchema } from "~/v1/runtime/schema/GridRuntimeItemSchema";
 
 export namespace orderStackItemsFx {
 	export interface Props {
-		items: ReadonlyArray<RuntimeItemSchema.Type>;
+		items: ReadonlyArray<GridRuntimeItemSchema.Type>;
 		origin?: PositionSchema.Type;
 	}
 }

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
 
 describe("LocationSchema", () => {
-	it("accepts only concrete board or inventory positions", () => {
+	it("accepts concrete grid and line-input locations", () => {
 		expect(
 			LocationSchema.safeParse({
 				scope: "board",
@@ -15,11 +15,37 @@ describe("LocationSchema", () => {
 		).toBe(true);
 		expect(
 			LocationSchema.safeParse({
+				scope: "input",
+				ownerItemId: "runtime:owner",
+				lineId: "line:owner:work",
+				inputIndex: 0,
+				returnLocation: {
+					scope: "inventory",
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+			}).success,
+		).toBe(true);
+	});
+
+	it("rejects abstract or incomplete locations", () => {
+		expect(
+			LocationSchema.safeParse({
 				scope: "any",
 				position: {
 					x: 2,
 					y: 3,
 				},
+			}).success,
+		).toBe(false);
+		expect(
+			LocationSchema.safeParse({
+				scope: "input",
+				ownerItemId: "runtime:owner",
+				lineId: "line:owner:work",
+				inputIndex: 0,
 			}).success,
 		).toBe(false);
 	});

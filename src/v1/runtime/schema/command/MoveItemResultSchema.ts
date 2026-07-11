@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 
 /**
@@ -9,7 +9,7 @@ import { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 export const MoveItemResultSchema = z
 	.object({
 		item: RuntimeItemSchema.describe("The moved runtime item at its new location."),
-		previousLocation: LocationSchema.describe("The location owned before the move."),
+		previousLocation: GridLocationSchema.describe("The location owned before the move."),
 	})
 	.strict()
 	.meta({

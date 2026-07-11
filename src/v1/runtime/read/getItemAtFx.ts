@@ -1,12 +1,12 @@
 import { Array, Effect, Option, pipe } from "effect";
 
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { getItemsFx } from "./getItemsFx";
 
 export namespace getItemAtFx {
 	export interface Props {
-		location: LocationSchema.Type;
+		location: GridLocationSchema.Type;
 	}
 }
 

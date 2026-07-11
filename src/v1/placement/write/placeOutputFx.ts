@@ -7,6 +7,7 @@ import type { DropPlacementResultSchema } from "~/v1/placement/schema/DropPlacem
 import type { OutputPlacementResultSchema } from "~/v1/placement/schema/OutputPlacementResultSchema";
 import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
 
@@ -39,6 +40,13 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 
 			const originItem = runtime.items.find((item) => item.id === originItemId);
 			if (originItem === undefined) {
+				return yield* Effect.fail(
+					new ItemNotFoundError({
+						itemId: originItemId,
+					}),
+				);
+			}
+			if (!isGridRuntimeItem(originItem)) {
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId: originItemId,

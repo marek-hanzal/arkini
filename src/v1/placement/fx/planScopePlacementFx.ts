@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
@@ -17,11 +17,11 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 export namespace planScopePlacementFx {
 	export interface Props {
 		item: ItemSchema.Type;
-		locations: ReadonlyArray<LocationSchema.Type>;
+		locations: ReadonlyArray<GridLocationSchema.Type>;
 		origin?: PositionSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
-		scope: LocationSchema.Type["scope"];
+		scope: GridLocationSchema.Type["scope"];
 	}
 }
 

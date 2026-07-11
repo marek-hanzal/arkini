@@ -1,29 +1,24 @@
 import { z } from "zod";
 
-import { StateBoardSchema } from "./StateBoardSchema";
-import { StateInventorySchema } from "./StateInventorySchema";
+import { StateItemSchema } from "./StateItemSchema";
 
 /**
  * Serializable gameplay state stored without canonical configuration objects.
  *
- * Loading hydrates every `itemId` into the canonical item reference owned by
- * the active game configuration.
+ * State mirrors the runtime item model so hydration only resolves canonical
+ * item definitions and never translates between competing storage shapes.
  */
 export const StateSchema = z
 	.object({
 		/**
-		 * Persisted board items keyed by their grid cell.
+		 * Every persisted live item owned by the saved game.
 		 */
-		board: StateBoardSchema.describe("The persisted board grid."),
-		/**
-		 * Persisted inventory items keyed by their grid cell.
-		 */
-		inventory: StateInventorySchema.describe("The persisted inventory grid."),
+		items: z.array(StateItemSchema).describe("Every persisted live item in the saved game."),
 	})
 	.strict()
 	.meta({
 		id: "StateSchema",
-		description: "Serializable gameplay state hydrated into the active runtime.",
+		description: "Serializable gameplay state composed of persisted live items.",
 	});
 
 export type StateSchema = typeof StateSchema;

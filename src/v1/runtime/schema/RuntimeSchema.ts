@@ -1,30 +1,27 @@
 import { z } from "zod";
 
-import { RuntimeBoardSchema } from "./RuntimeBoardSchema";
-import { RuntimeInventorySchema } from "./RuntimeInventorySchema";
+import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /**
- * Core mutable gameplay runtime.
+ * Core mutable gameplay runtime composed only of live items.
  *
- * Runtime item definitions are canonical references from `GameConfigFx`
- * created by hydration. Re-parsing an already hydrated runtime is not part of
- * the normal lifecycle because schema parsing cannot preserve object identity.
+ * Every item owns its identity, state, and concrete location. Board and
+ * inventory views are derived from these item locations instead of stored as
+ * independent containers or indexes.
  */
 export const RuntimeSchema = z
 	.object({
 		/**
-		 * Hydrated live board items keyed by their grid cell.
+		 * Every hydrated live item currently owned by the runtime.
 		 */
-		board: RuntimeBoardSchema.describe("The hydrated live board grid."),
-		/**
-		 * Hydrated live inventory items keyed by their grid cell.
-		 */
-		inventory: RuntimeInventorySchema.describe("The hydrated live inventory grid."),
+		items: z
+			.array(RuntimeItemSchema)
+			.describe("Every hydrated live item currently owned by the runtime."),
 	})
 	.strict()
 	.meta({
 		id: "RuntimeSchema",
-		description: "The core mutable hydrated gameplay runtime.",
+		description: "The core mutable gameplay runtime composed of live items.",
 	});
 
 export type RuntimeSchema = typeof RuntimeSchema;

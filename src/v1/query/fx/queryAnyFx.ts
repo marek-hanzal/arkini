@@ -11,17 +11,14 @@ export namespace queryAnyFx {
 }
 
 /**
- * Selects matching items across both runtime grids without a distance rule.
+ * Selects matching items across every runtime location without a distance rule.
  */
 export const queryAnyFx = Effect.fn("queryAnyFx")(function* ({ query }: queryAnyFx.Props) {
 	const runtimeRef = yield* RuntimeFx;
 	const runtime = yield* Ref.get(runtimeRef);
 
 	return yield* queryItemsFx({
-		items: [
-			...Object.values(runtime.board.cells),
-			...Object.values(runtime.inventory.cells),
-		],
+		items: runtime.items,
 		selector: query.selector,
 	});
 });

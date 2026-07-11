@@ -20,7 +20,9 @@ export const queryInventoryFx = Effect.fn("queryInventoryFx")(function* ({
 	const runtime = yield* Ref.get(runtimeRef);
 
 	return yield* queryItemsFx({
-		items: Object.values(runtime.inventory.cells),
+		items: runtime.items.filter((item) => {
+			return item.location.scope === "inventory";
+		}),
 		selector: query.selector,
 	});
 });

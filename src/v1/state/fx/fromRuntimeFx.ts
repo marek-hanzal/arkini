@@ -19,44 +19,13 @@ export namespace fromRuntimeFx {
 export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 	runtime,
 }: fromRuntimeFx.Props) {
-	const boardCells = yield* Effect.forEach(
-		Object.entries(runtime.board.cells),
-		([cell, item]) => {
-			return fromRuntimeItemFx({
-				item,
-			}).pipe(
-				Effect.map((state) => {
-					return [
-						cell,
-						state,
-					] as const;
-				}),
-			);
-		},
-	);
-	const inventoryCells = yield* Effect.forEach(
-		Object.entries(runtime.inventory.cells),
-		([cell, item]) => {
-			return fromRuntimeItemFx({
-				item,
-			}).pipe(
-				Effect.map((state) => {
-					return [
-						cell,
-						state,
-					] as const;
-				}),
-			);
-		},
-	);
-	const result = {
-		board: {
-			cells: Object.fromEntries(boardCells),
-		},
-		inventory: {
-			cells: Object.fromEntries(inventoryCells),
-		},
-	};
+	const items = yield* Effect.forEach(runtime.items, (item) => {
+		return fromRuntimeItemFx({
+			item,
+		});
+	});
 
-	return result satisfies StateSchema.Type;
+	return {
+		items,
+	} satisfies StateSchema.Type;
 });

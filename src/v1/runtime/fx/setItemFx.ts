@@ -1,5 +1,4 @@
 import { Effect, Ref } from "effect";
-import { match } from "ts-pattern";
 
 import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
@@ -13,50 +12,31 @@ export namespace setItemFx {
 }
 
 /**
- * Writes one item to a concrete runtime cell through an atomic update.
- *
- * This transitional write path is replaced by dedicated spatial commands once
- * runtime storage no longer mirrors locations through grid records.
+ * Transitional atomic item upsert used until dedicated runtime commands own
+ * every mutation.
  */
 export const setItemFx = Effect.fn("setItemFx")(function* ({ item, location }: setItemFx.Props) {
 	const runtimeRef = yield* RuntimeFx;
-	const {
-		scope,
-		position: { x, y },
-	} = location;
-	const key = `${x}:${y}`;
 	const placedItem = {
 		...item,
 		location,
 	} satisfies RuntimeItemSchema.Type;
 
 	yield* Ref.update(runtimeRef, (runtime) => {
-		return match(scope)
-			.with("board", () => {
-				return {
-					...runtime,
-					board: {
-						...runtime.board,
-						cells: {
-							...runtime.board.cells,
-							[key]: placedItem,
-						},
-					},
-				};
-			})
-			.with("inventory", () => {
-				return {
-					...runtime,
-					inventory: {
-						...runtime.inventory,
-						cells: {
-							...runtime.inventory.cells,
-							[key]: placedItem,
-						},
-					},
-				};
-			})
-			.exhaustive();
+		return {
+			items: [
+				...runtime.items.filter((candidate) => {
+					const sameItem = candidate.id === placedItem.id;
+					const sameLocation =
+						candidate.location.scope === placedItem.location.scope &&
+						candidate.location.position.x === placedItem.location.position.x &&
+						candidate.location.position.y === placedItem.location.position.y;
+
+					return !sameItem && !sameLocation;
+				}),
+				placedItem,
+			],
+		};
 	});
 
 	return placedItem;

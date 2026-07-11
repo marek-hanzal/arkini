@@ -49,38 +49,32 @@ const config = GameConfigSchema.parse({
 });
 
 const state = StateSchema.parse({
-	board: {
-		cells: {
-			"1:2": {
-				id: "runtime:board:tree",
-				itemId: "tree",
-				quantity: 1,
-				location: {
-					scope: "board",
-					position: {
-						x: 1,
-						y: 2,
-					},
+	items: [
+		{
+			id: "runtime:board:tree",
+			itemId: "tree",
+			location: {
+				scope: "board",
+				position: {
+					x: 1,
+					y: 2,
 				},
 			},
+			quantity: 1,
 		},
-	},
-	inventory: {
-		cells: {
-			"0:0": {
-				id: "runtime:inventory:tree",
-				itemId: "tree",
-				quantity: 3,
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
+		{
+			id: "runtime:inventory:tree",
+			itemId: "tree",
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
 				},
 			},
+			quantity: 3,
 		},
-	},
+	],
 });
 
 describe("fromStateFx", () => {
@@ -96,8 +90,7 @@ describe("fromStateFx", () => {
 			),
 		);
 
-		expect(runtime.board.cells).toEqual({});
-		expect(runtime.inventory.cells).toEqual({});
+		expect(runtime.items).toEqual([]);
 	});
 
 	it("atomically writes and reads an item through synchronized coordinates", () => {
@@ -202,9 +195,10 @@ describe("fromStateFx", () => {
 			),
 		);
 		const canonicalTree = config.items.tree;
-		const inventoryTree = runtime.inventory.cells["0:0"];
+		const boardTree = runtime.items.find((item) => item.id === "runtime:board:tree");
+		const inventoryTree = runtime.items.find((item) => item.id === "runtime:inventory:tree");
 
-		expect(runtime.board.cells["1:2"]?.item).toBe(canonicalTree);
+		expect(boardTree?.item).toBe(canonicalTree);
 		expect(inventoryTree?.item).toBe(canonicalTree);
 	});
 
@@ -229,15 +223,16 @@ describe("fromStateFx", () => {
 
 	it("fails when state references an unknown canonical item", () => {
 		const invalidState = StateSchema.parse({
-			...state,
-			board: {
-				cells: {
-					"1:2": {
-						...state.board.cells["1:2"],
-						itemId: "missing",
-					},
-				},
-			},
+			items: state.items.map((item) => {
+				if (item.id !== "runtime:board:tree") {
+					return item;
+				}
+
+				return {
+					...item,
+					itemId: "missing",
+				};
+			}),
 		});
 		const result = Effect.runSync(
 			Effect.either(

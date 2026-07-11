@@ -17,41 +17,13 @@ export namespace fromStateFx {
  * serializable state from this runtime.
  */
 export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromStateFx.Props) {
-	const boardCells = yield* Effect.forEach(Object.entries(state.board.cells), ([cell, state]) => {
+	const items = yield* Effect.forEach(state.items, (state) => {
 		return fromStateItemFx({
 			state,
-		}).pipe(
-			Effect.map((item) => {
-				return [
-					cell,
-					item,
-				] as const;
-			}),
-		);
+		});
 	});
-	const inventoryCells = yield* Effect.forEach(
-		Object.entries(state.inventory.cells),
-		([cell, state]) => {
-			return fromStateItemFx({
-				state,
-			}).pipe(
-				Effect.map((item) => {
-					return [
-						cell,
-						item,
-					] as const;
-				}),
-			);
-		},
-	);
-	const result = {
-		board: {
-			cells: Object.fromEntries(boardCells),
-		},
-		inventory: {
-			cells: Object.fromEntries(inventoryCells),
-		},
-	};
 
-	return result satisfies RuntimeSchema.Type;
+	return {
+		items,
+	} satisfies RuntimeSchema.Type;
 });

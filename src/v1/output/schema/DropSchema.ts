@@ -3,7 +3,7 @@ import { z } from "zod";
 import { QuantitySchema } from "~/v1/quantity/schema/QuantitySchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { RuleSchema } from "./drop/rule/RuleSchema";
-import { PlacementEnumSchema } from "./PlacementEnumSchema";
+import { PlacementEnumSchema } from "~/v1/placement/schema/PlacementEnumSchema";
 
 /**
  * A quantity of a canonical game item emitted by a successful roll.

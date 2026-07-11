@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
-import { PlacementEnumSchema } from "./PlacementEnumSchema";
+import { PlacementEnumSchema } from "~/v1/placement/schema/PlacementEnumSchema";
 
 /**
  * A fully resolved item drop ready for placement.

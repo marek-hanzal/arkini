@@ -12,7 +12,7 @@ import { VersionEnumSchema } from "./VersionEnumSchema";
  *
  * New game-wide configuration fields are added here as the schema is expanded.
  */
-export const GameSchema = z
+export const GameConfigSchema = z
 	.object({
 		/**
 		 * Optional JSON Schema reference used by configuration authoring tools.
@@ -51,12 +51,12 @@ export const GameSchema = z
 	})
 	.strict()
 	.meta({
-		id: "GameSchema",
+		id: "GameConfigSchema",
 		description: "The root configuration for a game.",
 	});
 
-export type GameSchema = typeof GameSchema;
+export type GameConfigSchema = typeof GameConfigSchema;
 
-export namespace GameSchema {
-	export type Type = z.infer<GameSchema>;
+export namespace GameConfigSchema {
+	export type Type = z.infer<GameConfigSchema>;
 }

@@ -1,12 +1,9 @@
 import { Effect } from "effect";
 
 import { GameLayerFx } from "~/v1/game/layer/GameLayerFx";
-import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 
 export namespace useGameFx {
-	export interface Props {
-		config: GameConfigSchema.Type;
-	}
+	export interface Props extends GameLayerFx.Props {}
 }
 
 /**
@@ -15,6 +12,6 @@ export namespace useGameFx {
  * This intentionally returns Effect's native `provide` operator instead of
  * manually mapping success, error, or requirement generics.
  */
-export const useGameFx = ({ config }: useGameFx.Props) => {
-	return Effect.provide(GameLayerFx(config));
+export const useGameFx = (props: useGameFx.Props) => {
+	return Effect.provide(GameLayerFx(props));
 };

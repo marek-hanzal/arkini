@@ -1,13 +1,13 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameFx } from "~/v1/game/context/GameFx";
-import { GameSchema } from "~/v1/schema/GameSchema";
+import { useGameFx } from "~/v1/game/fx/useGameFx";
+import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { StateSchema } from "~/v1/state/schema/StateSchema";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
 import { fromStateFx } from "./fromStateFx";
 
-const game = GameSchema.parse({
+const config = GameConfigSchema.parse({
 	version: "1.0",
 	meta: {
 		id: "game:test",
@@ -74,12 +74,16 @@ describe("fromStateFx", () => {
 		const runtime = Effect.runSync(
 			fromStateFx({
 				state,
-			}).pipe(Effect.provideService(GameFx, game)),
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
 		);
-		const canonicalTree = game.items.tree;
+		const canonicalTree = config.items.tree;
 		const inventoryTree = runtime.inventory.slots[0];
 
-		expect(runtime.game).toBe(game);
+		expect(runtime.config).toBe(config);
 		expect(runtime.board.items[0]?.item).toBe(canonicalTree);
 		expect(inventoryTree?.item).toBe(canonicalTree);
 	});
@@ -94,7 +98,9 @@ describe("fromStateFx", () => {
 						runtime,
 					});
 				}),
-				Effect.provideService(GameFx, game),
+				useGameFx({
+					config,
+				}),
 			),
 		);
 
@@ -117,7 +123,11 @@ describe("fromStateFx", () => {
 			Effect.either(
 				fromStateFx({
 					state: invalidState,
-				}).pipe(Effect.provideService(GameFx, game)),
+				}).pipe(
+					useGameFx({
+						config,
+					}),
+				),
 			),
 		);
 

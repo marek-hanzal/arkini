@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { GameFx } from "~/v1/game/context/GameFx";
+import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import { fromStateBoardItemFx } from "./fromStateBoardItemFx";
@@ -19,7 +19,7 @@ export namespace fromStateFx {
  * serializable state from this runtime.
  */
 export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromStateFx.Props) {
-	const game = yield* GameFx;
+	const config = yield* GameConfigFx;
 	const boardItems = yield* Effect.forEach(state.board.items, (state) => {
 		return fromStateBoardItemFx({
 			state,
@@ -35,7 +35,7 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 		});
 	});
 	const result = {
-		game,
+		config,
 		board: {
 			items: boardItems,
 		},

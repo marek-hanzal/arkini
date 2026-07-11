@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { GameSchema } from "~/v1/schema/GameSchema";
+import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { RuntimeBoardSchema } from "./RuntimeBoardSchema";
 import { RuntimeInventorySchema } from "./RuntimeInventorySchema";
 
 /**
  * Core hydrated gameplay runtime.
  *
- * Runtime item definitions are canonical references from `game.items` created
+ * Runtime item definitions are canonical references from `config.items` created
  * by hydration. Re-parsing an already hydrated runtime is not part of the
  * normal lifecycle because schema parsing cannot preserve object identity.
  */
@@ -16,7 +16,7 @@ export const RuntimeSchema = z
 		/**
 		 * Loaded immutable game configuration owning every canonical item definition.
 		 */
-		game: GameSchema.describe(
+		config: GameConfigSchema.describe(
 			"The loaded game configuration owning every canonical item definition.",
 		),
 		/**

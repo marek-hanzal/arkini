@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { readArkiniGameSources } from "./test/readArkiniGameSources";
-import { GameSchema } from "./GameSchema";
+import { GameConfigSchema } from "./GameConfigSchema";
 
-const readGame = () => {
+const readGameConfig = () => {
 	const sources = readArkiniGameSources();
 	const root = sources.find(({ path }) => path.endsWith("/game.json"));
 	const items = sources.reduce<Record<string, unknown>>((result, source) => {
@@ -26,12 +26,12 @@ const readGame = () => {
 	};
 };
 
-describe("GameSchema", () => {
+describe("GameConfigSchema", () => {
 	it("parses the current Arkini game configuration after source fragments are merged", () => {
-		const game = readGame();
-		const result = GameSchema.safeParse(game.value);
+		const config = readGameConfig();
+		const result = GameConfigSchema.safeParse(config.value);
 
-		expect(game.root).toBeDefined();
+		expect(config.root).toBeDefined();
 		expect(result.error?.issues).toBeUndefined();
 	});
 });

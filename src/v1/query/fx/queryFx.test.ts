@@ -169,7 +169,7 @@ describe("queryFx", () => {
 	it("selects inventory or both grids according to query scope", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				yield* placeTreeFx({
+				const origin = yield* placeTreeFx({
 					id: "board",
 					scope: "board",
 					x: 0,
@@ -182,6 +182,7 @@ describe("queryFx", () => {
 					y: 0,
 				});
 				const inventory = yield* queryFx({
+					origin,
 					query: {
 						scope: "inventory",
 						selector: {
@@ -191,6 +192,7 @@ describe("queryFx", () => {
 					},
 				});
 				const any = yield* queryFx({
+					origin,
 					query: {
 						scope: "any",
 						selector: {
@@ -200,6 +202,7 @@ describe("queryFx", () => {
 					},
 				});
 				const empty = yield* queryFx({
+					origin,
 					query: {
 						scope: "inventory",
 						selector: {

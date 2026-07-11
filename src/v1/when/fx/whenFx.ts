@@ -20,39 +20,10 @@ export namespace whenFx {
  * Resolves one runtime query and evaluates its total quantity as a condition.
  */
 export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Props) {
-	const items = yield* match(when.query)
-		.with(
-			{
-				scope: "board",
-			},
-			(query) => {
-				return queryFx({
-					origin,
-					query,
-				});
-			},
-		)
-		.with(
-			{
-				scope: "inventory",
-			},
-			(query) => {
-				return queryFx({
-					query,
-				});
-			},
-		)
-		.with(
-			{
-				scope: "any",
-			},
-			(query) => {
-				return queryFx({
-					query,
-				});
-			},
-		)
-		.exhaustive();
+	const items = yield* queryFx({
+		origin,
+		query: when.query,
+	});
 	const quantity = yield* queryQuantityFx({
 		items,
 	});
@@ -64,8 +35,8 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 			},
 			(when) => {
 				return whenExistsFx({
-					...when,
 					quantity,
+					when,
 				});
 			},
 		)
@@ -75,8 +46,8 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 			},
 			(when) => {
 				return whenCountFx({
-					...when,
 					quantity,
+					when,
 				});
 			},
 		)
@@ -86,8 +57,8 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 			},
 			(when) => {
 				return whenRangeFx({
-					...when,
 					quantity,
+					when,
 				});
 			},
 		)

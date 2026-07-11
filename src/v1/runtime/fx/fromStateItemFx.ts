@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
-import type { BaseRuntimeItemSchema } from "~/v1/runtime/schema/BaseRuntimeItemSchema";
-import type { BaseStateItemSchema } from "~/v1/state/schema/BaseStateItemSchema";
+import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { StateItemSchema } from "~/v1/state/schema/StateItemSchema";
 
 export namespace fromStateItemFx {
 	export interface Props {
-		state: BaseStateItemSchema.Type;
+		state: StateItemSchema.Type;
 	}
 }
 
@@ -28,5 +28,5 @@ export const fromStateItemFx = Effect.fn("fromStateItemFx")(function* ({
 		quantity: state.quantity,
 	};
 
-	return result satisfies BaseRuntimeItemSchema.Type;
+	return result satisfies RuntimeItemSchema.Type;
 });

@@ -5,9 +5,9 @@ import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema"
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 
 /**
- * Fields shared by every hydrated live item or item stack.
+ * A hydrated live item or item stack stored in a runtime grid cell.
  */
-export const BaseRuntimeItemSchema = z
+export const RuntimeItemSchema = z
 	.object({
 		/**
 		 * Stable identity of this live item or stack.
@@ -28,12 +28,12 @@ export const BaseRuntimeItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "BaseRuntimeItemSchema",
-		description: "The hydrated fields shared by every live item or item stack.",
+		id: "RuntimeItemSchema",
+		description: "A hydrated live item or item stack stored in a runtime grid cell.",
 	});
 
-export type BaseRuntimeItemSchema = typeof BaseRuntimeItemSchema;
+export type RuntimeItemSchema = typeof RuntimeItemSchema;
 
-export namespace BaseRuntimeItemSchema {
-	export type Type = z.infer<BaseRuntimeItemSchema>;
+export namespace RuntimeItemSchema {
+	export type Type = z.infer<RuntimeItemSchema>;
 }

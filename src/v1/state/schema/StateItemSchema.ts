@@ -4,9 +4,9 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
 /**
- * Fields persisted for every live item or item stack.
+ * A persisted live item or item stack stored in a state grid cell.
  */
-export const BaseStateItemSchema = z
+export const StateItemSchema = z
 	.object({
 		/**
 		 * Stable identity of this live item or stack.
@@ -27,12 +27,12 @@ export const BaseStateItemSchema = z
 	})
 	.strict()
 	.meta({
-		id: "BaseStateItemSchema",
-		description: "The persisted fields shared by every live item or item stack.",
+		id: "StateItemSchema",
+		description: "A persisted live item or item stack stored in a state grid cell.",
 	});
 
-export type BaseStateItemSchema = typeof BaseStateItemSchema;
+export type StateItemSchema = typeof StateItemSchema;
 
-export namespace BaseStateItemSchema {
-	export type Type = z.infer<BaseStateItemSchema>;
+export namespace StateItemSchema {
+	export type Type = z.infer<StateItemSchema>;
 }

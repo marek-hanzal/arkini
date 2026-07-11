@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import type { BaseRuntimeItemSchema } from "~/v1/runtime/schema/BaseRuntimeItemSchema";
-import type { BaseStateItemSchema } from "~/v1/state/schema/BaseStateItemSchema";
+import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import type { StateItemSchema } from "~/v1/state/schema/StateItemSchema";
 
 export namespace fromRuntimeItemFx {
 	export interface Props {
-		item: BaseRuntimeItemSchema.Type;
+		item: RuntimeItemSchema.Type;
 	}
 }
 
@@ -24,5 +24,5 @@ export const fromRuntimeItemFx = Effect.fn("fromRuntimeItemFx")(function* ({
 		quantity: item.quantity,
 	};
 
-	return result satisfies BaseStateItemSchema.Type;
+	return result satisfies StateItemSchema.Type;
 });

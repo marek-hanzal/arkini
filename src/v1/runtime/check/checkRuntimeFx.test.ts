@@ -42,6 +42,22 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 			type: "simple",
 		},
+		limited: {
+			id: "limited",
+			title: "Limited item",
+			description: "Has count and stack limits.",
+			asset: {
+				source: [
+					"asset:limited",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "any",
+			maxCount: 3,
+			maxStackSize: 2,
+			type: "simple",
+		},
 		board: {
 			id: "board",
 			title: "Board item",
@@ -146,6 +162,54 @@ describe("checkRuntimeFx", () => {
 				],
 				location: location("board", 1, 1),
 				type: "location:occupied",
+			},
+		]);
+	});
+
+	it("reports readable stack-size and max-count invariant violations", () => {
+		const runtime = {
+			items: [
+				{
+					id: "limited:first",
+					item: config.items.limited,
+					location: location("board", 0, 0),
+					quantity: 3,
+				},
+				{
+					id: "limited:second",
+					item: config.items.limited,
+					location: location("board", 1, 0),
+					quantity: 1,
+				},
+			],
+		} satisfies RuntimeSchema.Type;
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([
+			{
+				canonicalItemId: "limited",
+				itemId: "limited:first",
+				maxStackSize: 2,
+				quantity: 3,
+				type: "item:stack-size",
+			},
+			{
+				itemId: "limited",
+				itemIds: [
+					"limited:first",
+					"limited:second",
+				],
+				maxCount: 3,
+				quantity: 4,
+				type: "item:max-count",
 			},
 		]);
 	});

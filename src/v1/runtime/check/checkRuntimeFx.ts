@@ -4,6 +4,7 @@ import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { RuntimeCheckResultSchema } from "~/v1/runtime/schema/check/RuntimeCheckResultSchema";
 import { checkRuntimeItemIdsFx } from "./checkRuntimeItemIdsFx";
+import { checkRuntimeItemQuantitiesFx } from "./checkRuntimeItemQuantitiesFx";
 import { checkRuntimeLocationsFx } from "./checkRuntimeLocationsFx";
 
 export namespace checkRuntimeFx {
@@ -22,6 +23,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const itemIdIssues = yield* checkRuntimeItemIdsFx({
 		runtime,
 	});
+	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx({
+		runtime,
+	});
 	const locationIssues = yield* checkRuntimeLocationsFx({
 		config,
 		runtime,
@@ -30,6 +34,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	return {
 		issues: [
 			...itemIdIssues,
+			...itemQuantityIssues,
 			...locationIssues,
 		],
 	} satisfies RuntimeCheckResultSchema.Type;

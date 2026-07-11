@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
+import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
+import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
 import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
@@ -11,6 +13,8 @@ import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
 export const RuntimeCheckIssueSchema = z
 	.discriminatedUnion("type", [
 		DuplicateItemIdIssueSchema,
+		ItemMaxCountIssueSchema,
+		ItemStackSizeIssueSchema,
 		LocationOccupiedIssueSchema,
 		LocationOutOfBoundsIssueSchema,
 		LocationScopeIssueSchema,

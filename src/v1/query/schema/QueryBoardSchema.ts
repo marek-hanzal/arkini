@@ -17,12 +17,14 @@ export const QueryBoardSchema = z
 			"board",
 		]).describe("Identifies this query as a board-only query."),
 		/**
-		 * Maximum board distance from the query origin to a matching item.
+		 * Chebyshev distance rule from the query origin to a matching item.
 		 *
-		 * Use `far` to search anywhere on the board.
+		 * `close` matches exactly distance one, `near` exactly distance two, and
+		 * `far` every positive distance. All variants exclude the origin itself at
+		 * distance zero.
 		 */
 		distance: DistanceEnumSchema.describe(
-			"The maximum board distance from the query origin; far searches anywhere on the board.",
+			"The exact close or near Chebyshev distance, or any positive far distance from the query origin.",
 		),
 	})
 	.strict()

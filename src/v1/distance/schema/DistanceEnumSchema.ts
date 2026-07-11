@@ -6,21 +6,25 @@ import { z } from "zod";
 export const DistanceEnumSchema = z
 	.enum([
 		/**
-		 * Within one Chebyshev board cell of the source item.
+		 * Exactly one Chebyshev board cell away from the source item.
 		 */
 		"close",
 		/**
-		 * Within two Chebyshev board cells of the source item.
+		 * Exactly two Chebyshev board cells away from the source item.
 		 */
 		"near",
 		/**
-		 * Anywhere on the board, regardless of distance from the source item.
+		 * Any positive Chebyshev distance from the source item.
+		 *
+		 * This includes distances classified as `close` and `near`, but excludes
+		 * the source item itself at distance zero.
 		 */
 		"far",
 	])
 	.meta({
 		id: "DistanceEnumSchema",
-		description: "The Chebyshev board distance used by a distance-based gameplay rule.",
+		description:
+			"An exact close or near Chebyshev distance, or any positive far distance excluding the source cell.",
 	});
 
 export type DistanceEnumSchema = typeof DistanceEnumSchema;

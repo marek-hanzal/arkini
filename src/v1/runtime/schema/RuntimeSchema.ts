@@ -20,13 +20,13 @@ export const RuntimeSchema = z
 			"The loaded game configuration owning every canonical item definition.",
 		),
 		/**
-		 * Hydrated live board contents.
+		 * Hydrated live board items keyed by their grid cell.
 		 */
-		board: RuntimeBoardSchema.describe("The hydrated live board contents."),
+		board: RuntimeBoardSchema.describe("The hydrated live board grid."),
 		/**
-		 * Hydrated live inventory contents.
+		 * Hydrated live inventory items keyed by their grid cell.
 		 */
-		inventory: RuntimeInventorySchema.describe("The hydrated live inventory contents."),
+		inventory: RuntimeInventorySchema.describe("The hydrated live inventory grid."),
 	})
 	.strict()
 	.meta({

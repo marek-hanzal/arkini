@@ -262,4 +262,74 @@ describe("placeDropFx", () => {
 			});
 		}
 	});
+	it("uses random board placement only after stack capacity is exhausted", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+
+				return yield* placeDropFx({
+					drop: {
+						itemId: "log",
+						placement: "random",
+						quantity: 1,
+					},
+					originItemId: "runtime:origin",
+				});
+			}).pipe(
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(result.placement.stack).toEqual([]);
+		expect(result.placement.spawn).toHaveLength(1);
+		expect(result.placement.spawn[0]?.location.scope).toBe("board");
+		expect([
+			1,
+			2,
+			3,
+		]).toContain(result.placement.spawn[0]?.location.position.x);
+	});
+
+	it("rejects replace placement for inventory-only outputs", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+
+				return yield* Effect.either(
+					placeDropFx({
+						drop: {
+							itemId: "inventory-only",
+							placement: "replace",
+							quantity: 1,
+						},
+						originItemId: "runtime:origin",
+					}),
+				);
+			}).pipe(
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result)).toBe(true);
+		if (Either.isLeft(result)) {
+			expect(result.left).toMatchObject({
+				_tag: "PlacementUnavailableError",
+				reason: "replace:board-forbidden",
+			});
+		}
+	});
 });

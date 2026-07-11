@@ -46,35 +46,48 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 				);
 			}
 
-			let draft = runtime;
-			const results: DropPlacementResultSchema.Type[] = [];
-			for (const drop of output.drop) {
-				const plan = yield* planDropPlacementFx({
-					drop,
-					origin: originItem.location.position,
-					originItemId,
-					runtime: draft,
-				});
-				const [placement, nextDraft] = yield* applyPlacementPlanFx({
-					plan,
-					runtime: draft,
-				});
-				results.push({
-					drop,
-					placement,
-				});
-				draft = nextDraft;
-			}
+			const placement = yield* Effect.reduce(
+				output.drop,
+				{
+					draft: runtime,
+					results: [] as DropPlacementResultSchema.Type[],
+				},
+				(state, drop) => {
+					return Effect.gen(function* () {
+						const plan = yield* planDropPlacementFx({
+							drop,
+							origin: originItem.location.position,
+							originItemId,
+							runtime: state.draft,
+						});
+						const [result, draft] = yield* applyPlacementPlanFx({
+							plan,
+							runtime: state.draft,
+						});
+
+						return {
+							draft,
+							results: [
+								...state.results,
+								{
+									drop,
+									placement: result,
+								},
+							],
+						};
+					});
+				},
+			);
 
 			yield* assertRuntimeFx({
-				runtime: draft,
+				runtime: placement.draft,
 			});
 
 			return [
 				{
-					drop: results,
+					drop: placement.results,
 				} satisfies OutputPlacementResultSchema.Type,
-				draft,
+				placement.draft,
 			] as const;
 		});
 	});

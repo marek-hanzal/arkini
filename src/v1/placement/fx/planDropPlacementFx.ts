@@ -1,9 +1,7 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
 import { PlacementUnavailableError } from "~/v1/placement/error/PlacementUnavailableError";
@@ -11,14 +9,12 @@ import type { PlacementFailureReasonEnumSchema } from "~/v1/placement/schema/Pla
 import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
+import { assertPlacementMaxCountFx } from "./assertPlacementMaxCountFx";
 import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
-import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
-import { planScopePlacementFx } from "./planScopePlacementFx";
-import { planSpawnPlacementFx } from "./planSpawnPlacementFx";
-import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
-import { readGridLocationsFx } from "./readGridLocationsFx";
+import { planBoardPlacementFx } from "./planBoardPlacementFx";
+import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
+import { planReplacePlacementFx } from "./planReplacePlacementFx";
 import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
-import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 
 export namespace planDropPlacementFx {
 	export interface Props {
@@ -29,11 +25,11 @@ export namespace planDropPlacementFx {
 	}
 }
 
-const readPlacedQuantityFx = (plan: PlacementPlanSchema.Type) => {
-	return readPlacementPlanQuantityFx({
-		plan,
-	});
-};
+const emptyPlan = {
+	remove: [],
+	spawn: [],
+	stack: [],
+} satisfies PlacementPlanSchema.Type;
 
 const failPlacementFx = ({
 	drop,
@@ -64,145 +60,71 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	originItemId,
 	runtime,
 }: planDropPlacementFx.Props) {
-	const config = yield* GameConfigFx;
 	const item = yield* resolveItemFx({
 		itemId: drop.itemId,
 	});
 	const replace = drop.placement === "replace";
-	const originItem = replace
-		? runtime.items.find((candidate) => candidate.id === originItemId)
-		: undefined;
-	if (replace && originItem === undefined) {
-		return yield* Effect.fail(
-			new ItemNotFoundError({
-				itemId: originItemId,
-			}),
-		);
-	}
-	if (originItem !== undefined && originItem.location.scope !== "board") {
-		return yield* failPlacementFx({
-			drop,
-			reason: "replace:origin-not-board",
-			remainingQuantity: drop.quantity,
-		});
-	}
-	if (replace && item.scope === "inventory") {
-		return yield* failPlacementFx({
-			drop,
-			reason: "replace:board-forbidden",
-			remainingQuantity: drop.quantity,
-		});
-	}
-
-	const removePlan = {
-		remove: replace
-			? [
-					originItemId,
-				]
-			: [],
-		spawn: [],
-		stack: [],
-	} satisfies PlacementPlanSchema.Type;
-	const [, runtimeAfterRemove] = yield* applyPlacementPlanFx({
-		plan: removePlan,
+	const replacePlan = replace
+		? yield* planReplacePlacementFx({
+				drop,
+				item,
+				origin,
+				originItemId,
+				quantity: drop.quantity,
+				runtime,
+			})
+		: emptyPlan;
+	yield* assertPlacementMaxCountFx({
+		drop,
+		item,
+		removeItemId: replace ? originItemId : undefined,
 		runtime,
 	});
-	const existingQuantity = runtimeAfterRemove.items.reduce((quantity, candidate) => {
-		return candidate.item.id === item.id ? quantity + candidate.quantity : quantity;
-	}, 0);
-	if (item.maxCount !== undefined && existingQuantity + drop.quantity > item.maxCount) {
-		return yield* failPlacementFx({
-			drop,
-			reason: "item:max-count",
-			remainingQuantity: existingQuantity + drop.quantity - item.maxCount,
-		});
-	}
 
-	let draft = runtimeAfterRemove;
-	let remainingQuantity = drop.quantity;
-	const plans: PlacementPlanSchema.Type[] = [
-		removePlan,
+	let plans: PlacementPlanSchema.Type[] = [
+		replacePlan,
 	];
-
-	if (replace) {
-		const replacementSpawn = yield* planSpawnPlacementFx({
-			item,
-			locations: [
-				{
-					position: origin,
-					scope: "board",
-				},
-			],
-			quantity: remainingQuantity,
-		});
-		const replacementPlan = {
-			remove: [],
-			spawn: replacementSpawn,
-			stack: [],
-		} satisfies PlacementPlanSchema.Type;
-		plans.push(replacementPlan);
-		const placedQuantity = yield* readPlacedQuantityFx(replacementPlan);
-		remainingQuantity -= placedQuantity;
-		[, draft] = yield* applyPlacementPlanFx({
-			plan: replacementPlan,
-			runtime: draft,
-		});
-	}
+	let [, draft] = yield* applyPlacementPlanFx({
+		plan: replacePlan,
+		runtime,
+	});
+	let placedQuantity = yield* readPlacementPlanQuantityFx({
+		plan: replacePlan,
+	});
+	let remainingQuantity = drop.quantity - placedQuantity;
 
 	const boardAllowed = item.scope === "board" || item.scope === "any";
 	if (remainingQuantity > 0 && boardAllowed) {
-		const boardLocations = yield* readGridLocationsFx({
-			scope: "board",
-			size: config.meta.board,
-		});
-		const emptyBoardLocations = yield* readEmptyLocationsFx({
-			locations: boardLocations,
-			runtime: draft,
-		});
-		const orderedBoardLocations = yield* orderBoardLocationsFx({
-			locations: emptyBoardLocations,
-			origin,
-			placement: match(drop.placement)
-				.with("random", () => "random" as const)
-				.otherwise(() => "drop" as const),
-		});
-		const boardPlan = yield* planScopePlacementFx({
+		const boardPlan = yield* planBoardPlacementFx({
 			item,
-			locations: orderedBoardLocations,
-			origin: drop.placement === "random" ? undefined : origin,
+			origin,
+			placement: drop.placement === "random" ? "random" : "drop",
 			quantity: remainingQuantity,
 			runtime: draft,
-			scope: "board",
 		});
 		plans.push(boardPlan);
-		const placedQuantity = yield* readPlacedQuantityFx(boardPlan);
-		remainingQuantity -= placedQuantity;
 		[, draft] = yield* applyPlacementPlanFx({
 			plan: boardPlan,
 			runtime: draft,
 		});
+		placedQuantity = yield* readPlacementPlanQuantityFx({
+			plan: boardPlan,
+		});
+		remainingQuantity -= placedQuantity;
 	}
 
 	const inventoryAllowed = item.scope === "inventory" || item.scope === "any";
 	if (remainingQuantity > 0 && inventoryAllowed) {
-		const inventoryLocations = yield* readGridLocationsFx({
-			scope: "inventory",
-			size: config.meta.inventory,
-		});
-		const inventoryPlan = yield* planScopePlacementFx({
+		const inventoryPlan = yield* planInventoryPlacementFx({
 			item,
-			locations: inventoryLocations,
 			quantity: remainingQuantity,
 			runtime: draft,
-			scope: "inventory",
 		});
 		plans.push(inventoryPlan);
-		const placedQuantity = yield* readPlacedQuantityFx(inventoryPlan);
-		remainingQuantity -= placedQuantity;
-		[, draft] = yield* applyPlacementPlanFx({
+		placedQuantity = yield* readPlacementPlanQuantityFx({
 			plan: inventoryPlan,
-			runtime: draft,
 		});
+		remainingQuantity -= placedQuantity;
 	}
 
 	if (remainingQuantity > 0) {
@@ -212,6 +134,10 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 			remainingQuantity,
 		});
 	}
+
+	plans = plans.filter((plan) => {
+		return plan.remove.length > 0 || plan.spawn.length > 0 || plan.stack.length > 0;
+	});
 
 	return yield* mergePlacementPlansFx({
 		plans,

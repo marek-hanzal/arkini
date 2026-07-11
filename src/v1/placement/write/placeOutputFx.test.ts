@@ -143,4 +143,68 @@ describe("placeOutputFx", () => {
 		}
 		expect(result.after).toEqual(result.before);
 	});
+	it("lets later drops stack into items spawned by earlier drops", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+
+				const placement = yield* placeOutputFx({
+					originItemId: "runtime:origin",
+					output: {
+						drop: [
+							{
+								itemId: "log",
+								placement: "drop",
+								quantity: 2,
+							},
+							{
+								itemId: "log",
+								placement: "drop",
+								quantity: 2,
+							},
+						],
+					},
+				});
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					placement,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(result.placement.drop[0]?.placement.spawn).toHaveLength(1);
+		expect(result.placement.drop[1]?.placement.stack).toEqual([
+			{
+				item: expect.objectContaining({
+					quantity: 3,
+				}),
+				quantity: 1,
+			},
+		]);
+		expect(result.placement.drop[1]?.placement.spawn).toEqual([
+			expect.objectContaining({
+				location: boardLocation(2),
+				quantity: 1,
+			}),
+		]);
+		expect(
+			result.runtime.items
+				.filter((item) => item.item.id === "log")
+				.map((item) => item.quantity),
+		).toEqual([
+			3,
+			1,
+		]);
+	});
 });

@@ -22,25 +22,20 @@ export const planSpawnPlacementFx = Effect.fn("planSpawnPlacementFx")(function* 
 	locations,
 	quantity,
 }: planSpawnPlacementFx.Props) {
-	let remainingQuantity = quantity;
-	const spawn: PlacementPlanSchema.Type["spawn"] = [];
+	const stackCount = Math.min(locations.length, Math.ceil(quantity / item.maxStackSize));
 
-	for (const location of locations) {
-		if (remainingQuantity === 0) {
-			break;
-		}
-
-		const placedQuantity = Math.min(remainingQuantity, item.maxStackSize);
-		spawn.push({
-			item: {
-				id: yield* createRuntimeItemIdFx(),
-				item,
-				location,
-				quantity: placedQuantity,
-			},
-		});
-		remainingQuantity -= placedQuantity;
-	}
-
-	return spawn;
+	return yield* Effect.forEach(locations.slice(0, stackCount), (location, index) => {
+		return createRuntimeItemIdFx().pipe(
+			Effect.map((id) => {
+				return {
+					item: {
+						id,
+						item,
+						location,
+						quantity: Math.min(item.maxStackSize, quantity - index * item.maxStackSize),
+					},
+				} satisfies PlacementPlanSchema.Type["spawn"][number];
+			}),
+		);
+	});
 });

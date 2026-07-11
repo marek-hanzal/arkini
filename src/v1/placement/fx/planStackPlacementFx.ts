@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
@@ -18,26 +18,20 @@ export const planStackPlacementFx = Effect.fn("planStackPlacementFx")(function* 
 	items,
 	quantity,
 }: planStackPlacementFx.Props) {
-	let remainingQuantity = quantity;
-	const stack: PlacementPlanSchema.Type["stack"] = [];
-
-	for (const item of items) {
-		if (remainingQuantity === 0) {
-			break;
-		}
-
+	const [, candidates] = Array.mapAccum(items, quantity, (remainingQuantity, item) => {
 		const availableQuantity = item.item.maxStackSize - item.quantity;
 		const placedQuantity = Math.min(remainingQuantity, availableQuantity);
-		if (placedQuantity === 0) {
-			continue;
-		}
 
-		stack.push({
-			itemId: item.id,
-			quantity: placedQuantity,
-		});
-		remainingQuantity -= placedQuantity;
-	}
+		return [
+			remainingQuantity - placedQuantity,
+			placedQuantity > 0
+				? Option.some({
+						itemId: item.id,
+						quantity: placedQuantity,
+					} satisfies PlacementPlanSchema.Type["stack"][number])
+				: Option.none(),
+		] as const;
+	});
 
-	return stack;
+	return pipe(candidates, Array.getSomes);
 });

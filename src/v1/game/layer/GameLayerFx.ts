@@ -1,4 +1,4 @@
-import { Layer } from "effect";
+import { Effect, Layer, Ref } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
@@ -19,7 +19,14 @@ export namespace GameLayerFx {
  */
 export const GameLayerFx = ({ config }: GameLayerFx.Props) => {
 	const configLayer = Layer.succeed(GameConfigFx, config);
-	const runtimeLayer = Layer.effect(RuntimeFx, fromConfigFx()).pipe(Layer.provide(configLayer));
+	const runtimeLayer = Layer.effect(
+		RuntimeFx,
+		fromConfigFx().pipe(
+			Effect.flatMap((runtime) => {
+				return Ref.make(runtime);
+			}),
+		),
+	).pipe(Layer.provide(configLayer));
 
 	return Layer.merge(configLayer, runtimeLayer);
 };

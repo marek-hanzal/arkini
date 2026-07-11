@@ -4,18 +4,17 @@ import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeInt
 import type { WhenCountSchema } from "~/v1/when/schema/WhenCountSchema";
 
 export namespace whenCountFx {
-	export interface Props {
+	export type Props = Pick<WhenCountSchema.Type, "count"> & {
 		quantity: NonNegativeIntegerSchema.Type;
-		when: WhenCountSchema.Type;
-	}
+	};
 }
 
 /**
  * Tests whether a query result has one exact total quantity.
  */
 export const whenCountFx = Effect.fn("whenCountFx")(function* ({
+	count,
 	quantity,
-	when,
 }: whenCountFx.Props) {
-	return quantity === when.count;
+	return quantity === count;
 });

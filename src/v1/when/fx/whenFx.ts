@@ -43,10 +43,10 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 			{
 				type: "count",
 			},
-			(when) => {
+			({ count }) => {
 				return whenCountFx({
+					count,
 					quantity,
-					when,
 				});
 			},
 		)
@@ -54,10 +54,11 @@ export const whenFx = Effect.fn("whenFx")(function* ({ origin, when }: whenFx.Pr
 			{
 				type: "range",
 			},
-			(when) => {
+			({ max, min }) => {
 				return whenRangeFx({
+					max,
+					min,
 					quantity,
-					when,
 				});
 			},
 		)

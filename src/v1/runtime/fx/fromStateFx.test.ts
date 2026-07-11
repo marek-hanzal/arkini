@@ -1,10 +1,12 @@
-import { Effect, Either } from "effect";
+import { Effect, Either, Ref } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { StateSchema } from "~/v1/state/schema/StateSchema";
+import { getItemFx } from "./getItemFx";
+import { setItemFx } from "./setItemFx";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
 import { fromStateFx } from "./fromStateFx";
 
@@ -53,6 +55,8 @@ const state = StateSchema.parse({
 				id: "runtime:board:tree",
 				itemId: "tree",
 				quantity: 1,
+				x: 1,
+				y: 2,
 			},
 		},
 	},
@@ -62,6 +66,8 @@ const state = StateSchema.parse({
 				id: "runtime:inventory:tree",
 				itemId: "tree",
 				quantity: 3,
+				x: 0,
+				y: 0,
 			},
 		},
 	},
@@ -71,6 +77,9 @@ describe("fromStateFx", () => {
 	it("provides an empty layout-aware runtime at game startup", () => {
 		const runtime = Effect.runSync(
 			RuntimeFx.pipe(
+				Effect.flatMap((runtime) => {
+					return Ref.get(runtime);
+				}),
 				useGameFx({
 					config,
 				}),
@@ -80,6 +89,71 @@ describe("fromStateFx", () => {
 		expect(runtime.config).toBe(config);
 		expect(runtime.board.cells).toEqual({});
 		expect(runtime.inventory.cells).toEqual({});
+	});
+
+	it("atomically writes and reads an item through synchronized coordinates", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const placed = yield* setItemFx({
+					item: {
+						id: "runtime:placed:tree",
+						item: config.items.tree,
+						quantity: 1,
+						x: 99,
+						y: 99,
+					},
+					scope: "board",
+					x: 2,
+					y: 1,
+				});
+				const read = yield* getItemFx({
+					scope: "board",
+					x: 2,
+					y: 1,
+				});
+
+				return {
+					placed,
+					read,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.placed).toBe(result.read);
+		expect(result.read).toMatchObject({
+			x: 2,
+			y: 1,
+		});
+	});
+
+	it("uses the central item-not-found error for an empty runtime cell", () => {
+		const result = Effect.runSync(
+			Effect.either(
+				getItemFx({
+					scope: "inventory",
+					x: 4,
+					y: 3,
+				}),
+			).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result)).toBe(true);
+		if (Either.isLeft(result)) {
+			expect(result.left).toMatchObject({
+				_tag: "ItemNotFoundError",
+				scope: "inventory",
+				x: 4,
+				y: 3,
+			});
+		}
 	});
 
 	it("builds every runtime item with the original canonical game object", () => {

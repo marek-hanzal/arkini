@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
 /**
@@ -23,6 +24,18 @@ export const StateItemSchema = z
 		 */
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live state entry.",
+		),
+		/**
+		 * Zero-based horizontal coordinate of this item in its persisted grid.
+		 */
+		x: NonNegativeIntegerSchema.describe(
+			"The zero-based horizontal coordinate of this item in its persisted grid.",
+		),
+		/**
+		 * Zero-based vertical coordinate of this item in its persisted grid.
+		 */
+		y: NonNegativeIntegerSchema.describe(
+			"The zero-based vertical coordinate of this item in its persisted grid.",
 		),
 	})
 	.strict()

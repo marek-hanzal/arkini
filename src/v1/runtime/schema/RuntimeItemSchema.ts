@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 
@@ -24,6 +25,18 @@ export const RuntimeItemSchema = z
 		 */
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live runtime entry.",
+		),
+		/**
+		 * Zero-based horizontal coordinate of this item in its runtime grid.
+		 */
+		x: NonNegativeIntegerSchema.describe(
+			"The zero-based horizontal coordinate of this item in its runtime grid.",
+		),
+		/**
+		 * Zero-based vertical coordinate of this item in its runtime grid.
+		 */
+		y: NonNegativeIntegerSchema.describe(
+			"The zero-based vertical coordinate of this item in its runtime grid.",
 		),
 	})
 	.strict()

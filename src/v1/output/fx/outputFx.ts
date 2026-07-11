@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import type { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
 import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
@@ -32,6 +32,6 @@ export const outputFx = Effect.fn("outputFx")(function* ({ origin, output }: out
 	});
 
 	return {
-		drop: results.flat(),
+		drop: Array.filterMap(results, Option.fromNullable),
 	} satisfies OutputResultSchema.Type;
 });

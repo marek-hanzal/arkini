@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import type { DropResultsSchema } from "~/v1/output/schema/DropResultsSchema";
+import type { DropResolutionSchema } from "~/v1/output/schema/DropResolutionSchema";
 import type { DropSchema } from "~/v1/output/schema/DropSchema";
 import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
 import { dropRuleFx } from "./dropRuleFx";
@@ -15,7 +15,7 @@ export namespace dropFx {
 }
 
 /**
- * Resolves one selected drop into zero or one concrete item drops.
+ * Resolves one selected drop into one concrete result or undefined.
  *
  * Availability rules run before quantity resolution. The drop owns the
  * consumer-specific interpretation of neutral rule results. A rejected drop is
@@ -47,18 +47,16 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Pr
 		);
 	});
 	if (!enabled) {
-		return [];
+		return undefined;
 	}
 
 	const quantity = yield* rollQuantityFx({
 		quantity: drop.quantity,
 	});
 
-	return [
-		{
-			itemId: drop.itemId,
-			placement: drop.placement,
-			quantity,
-		},
-	] satisfies DropResultsSchema.Type;
+	return {
+		itemId: drop.itemId,
+		placement: drop.placement,
+		quantity,
+	} satisfies DropResolutionSchema.Type;
 });

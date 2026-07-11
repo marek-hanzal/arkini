@@ -103,13 +103,11 @@ describe("dropFx", () => {
 			),
 		);
 
-		expect(result).toEqual([
-			{
-				itemId: "item:log",
-				placement: "replace",
-				quantity: 3,
-			},
-		]);
+		expect(result).toEqual({
+			itemId: "item:log",
+			placement: "replace",
+			quantity: 3,
+		});
 	});
 
 	it("discards a failed enable gate and an applicable disable veto", () => {
@@ -167,8 +165,8 @@ describe("dropFx", () => {
 		);
 
 		expect(result).toEqual({
-			disableApplied: [],
-			enableRejected: [],
+			disableApplied: undefined,
+			enableRejected: undefined,
 		});
 	});
 
@@ -239,14 +237,12 @@ describe("dropFx", () => {
 		);
 
 		expect(result).toEqual({
-			accepted: [
-				{
-					itemId: "item:accepted",
-					placement: "drop",
-					quantity: 1,
-				},
-			],
-			rejected: [],
+			accepted: {
+				itemId: "item:accepted",
+				placement: "drop",
+				quantity: 1,
+			},
+			rejected: undefined,
 		});
 	});
 
@@ -306,14 +302,12 @@ describe("dropFx", () => {
 		);
 
 		expect(result).toEqual({
-			accepted: [
-				{
-					itemId: "item:accepted",
-					placement: "random",
-					quantity: 2,
-				},
-			],
-			rejected: [],
+			accepted: {
+				itemId: "item:accepted",
+				placement: "random",
+				quantity: 2,
+			},
+			rejected: undefined,
 		});
 	});
 });

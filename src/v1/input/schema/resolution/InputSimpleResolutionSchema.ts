@@ -1,0 +1,31 @@
+import { z } from "zod";
+
+import { InputEnumSchema } from "~/v1/input/schema/InputEnumSchema";
+
+/**
+ * Readiness of one simple input that requires no material operation.
+ */
+export const InputSimpleResolutionSchema = z
+	.object({
+		/**
+		 * Identifies this resolution as one simple input.
+		 */
+		type: InputEnumSchema.extract([
+			"simple",
+		]),
+		/**
+		 * Simple inputs are always ready because they own no resource requirement.
+		 */
+		ready: z.literal(true).describe("Simple inputs are always ready."),
+	})
+	.strict()
+	.meta({
+		id: "InputSimpleResolutionSchema",
+		description: "The always-ready resolution of one simple input.",
+	});
+
+export type InputSimpleResolutionSchema = typeof InputSimpleResolutionSchema;
+
+export namespace InputSimpleResolutionSchema {
+	export type Type = z.infer<InputSimpleResolutionSchema>;
+}

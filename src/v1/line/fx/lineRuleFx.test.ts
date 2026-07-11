@@ -57,7 +57,7 @@ describe("lineRuleFx", () => {
 
 				return yield* Effect.forEach(rules, (rule) => {
 					return lineRuleFx({
-						origin,
+						origin: origin.location.position,
 						rule,
 					});
 				});

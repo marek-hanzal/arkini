@@ -30,7 +30,7 @@ export const queryBoardFx = Effect.fn("queryBoardFx")(function* ({
 	return yield* Effect.filter(selected, (item) => {
 		return distanceFx({
 			distance: query.distance,
-			item,
+			item: item.location.position,
 			origin,
 		});
 	});

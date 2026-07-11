@@ -55,9 +55,13 @@ const state = StateSchema.parse({
 				id: "runtime:board:tree",
 				itemId: "tree",
 				quantity: 1,
-				scope: "board",
-				x: 1,
-				y: 2,
+				location: {
+					scope: "board",
+					position: {
+						x: 1,
+						y: 2,
+					},
+				},
 			},
 		},
 	},
@@ -67,9 +71,13 @@ const state = StateSchema.parse({
 				id: "runtime:inventory:tree",
 				itemId: "tree",
 				quantity: 3,
-				scope: "inventory",
-				x: 0,
-				y: 0,
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
 			},
 		},
 	},
@@ -100,18 +108,30 @@ describe("fromStateFx", () => {
 						id: "runtime:placed:tree",
 						item: config.items.tree,
 						quantity: 1,
-						scope: "inventory",
-						x: 99,
-						y: 99,
+						location: {
+							scope: "inventory",
+							position: {
+								x: 99,
+								y: 99,
+							},
+						},
 					},
-					scope: "board",
-					x: 2,
-					y: 1,
+					location: {
+						scope: "board",
+						position: {
+							x: 2,
+							y: 1,
+						},
+					},
 				});
 				const read = yield* getItemFx({
-					scope: "board",
-					x: 2,
-					y: 1,
+					location: {
+						scope: "board",
+						position: {
+							x: 2,
+							y: 1,
+						},
+					},
 				});
 
 				return {
@@ -127,9 +147,13 @@ describe("fromStateFx", () => {
 
 		expect(result.placed).toBe(result.read);
 		expect(result.read).toMatchObject({
-			scope: "board",
-			x: 2,
-			y: 1,
+			location: {
+				scope: "board",
+				position: {
+					x: 2,
+					y: 1,
+				},
+			},
 		});
 	});
 
@@ -137,9 +161,13 @@ describe("fromStateFx", () => {
 		const result = Effect.runSync(
 			Effect.either(
 				getItemFx({
-					scope: "inventory",
-					x: 4,
-					y: 3,
+					location: {
+						scope: "inventory",
+						position: {
+							x: 4,
+							y: 3,
+						},
+					},
 				}),
 			).pipe(
 				useGameFx({
@@ -152,9 +180,13 @@ describe("fromStateFx", () => {
 		if (Either.isLeft(result)) {
 			expect(result.left).toMatchObject({
 				_tag: "ItemNotFoundError",
-				scope: "inventory",
-				x: 4,
-				y: 3,
+				location: {
+					scope: "inventory",
+					position: {
+						x: 4,
+						y: 3,
+					},
+				},
 			});
 		}
 	});

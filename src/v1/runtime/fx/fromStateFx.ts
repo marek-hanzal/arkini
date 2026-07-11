@@ -19,7 +19,6 @@ export namespace fromStateFx {
 export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromStateFx.Props) {
 	const boardCells = yield* Effect.forEach(Object.entries(state.board.cells), ([cell, state]) => {
 		return fromStateItemFx({
-			scope: "board",
 			state,
 		}).pipe(
 			Effect.map((item) => {
@@ -34,7 +33,6 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 		Object.entries(state.inventory.cells),
 		([cell, state]) => {
 			return fromStateItemFx({
-				scope: "inventory",
 				state,
 			}).pipe(
 				Effect.map((item) => {

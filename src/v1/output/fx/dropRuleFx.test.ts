@@ -18,7 +18,7 @@ describe("dropRuleFx", () => {
 				yield* placePermitFx();
 
 				const enablePassed = yield* dropRuleFx({
-					origin,
+					origin: origin.location.position,
 					rule: {
 						type: "enable",
 						when: [
@@ -35,7 +35,7 @@ describe("dropRuleFx", () => {
 					},
 				});
 				const enableRejected = yield* dropRuleFx({
-					origin,
+					origin: origin.location.position,
 					rule: {
 						type: "enable",
 						when: [
@@ -52,7 +52,7 @@ describe("dropRuleFx", () => {
 					},
 				});
 				const disableApplied = yield* dropRuleFx({
-					origin,
+					origin: origin.location.position,
 					rule: {
 						type: "disable",
 						when: [
@@ -69,7 +69,7 @@ describe("dropRuleFx", () => {
 					},
 				});
 				const disableIgnored = yield* dropRuleFx({
-					origin,
+					origin: origin.location.position,
 					rule: {
 						type: "disable",
 						when: [

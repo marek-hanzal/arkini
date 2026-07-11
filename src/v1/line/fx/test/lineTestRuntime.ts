@@ -101,13 +101,21 @@ export const createOriginFx = () => {
 			id: "origin",
 			item: lineTestConfig.items.source,
 			quantity: 1,
-			scope: "board",
-			x: 5,
-			y: 5,
+			location: {
+				scope: "board",
+				position: {
+					x: 5,
+					y: 5,
+				},
+			},
 		} satisfies RuntimeItemSchema.Type,
-		scope: "board",
-		x: 5,
-		y: 5,
+		location: {
+			scope: "board",
+			position: {
+				x: 5,
+				y: 5,
+			},
+		},
 	});
 };
 
@@ -122,13 +130,21 @@ export const placeLineTestItemFx = ({
 		item: {
 			id: itemId,
 			item: lineTestConfig.items[itemId],
+			location: {
+				scope: "inventory",
+				position: {
+					x,
+					y: 0,
+				},
+			},
 			quantity: 1,
-			scope: "inventory",
-			x,
-			y: 0,
 		} satisfies RuntimeItemSchema.Type,
-		scope: "inventory",
-		x,
-		y: 0,
+		location: {
+			scope: "inventory",
+			position: {
+				x,
+				y: 0,
+			},
+		},
 	});
 };

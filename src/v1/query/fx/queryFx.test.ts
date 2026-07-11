@@ -47,29 +47,42 @@ const config = GameConfigSchema.parse({
 
 const placeTreeFx = ({
 	id,
-	scope,
-	x,
-	y,
+	location: {
+		scope,
+		position: { x, y },
+	},
 }: {
 	id: string;
-	scope: Exclude<ScopeEnumSchema.Type, "any">;
-	x: number;
-	y: number;
+	location: {
+		scope: Exclude<ScopeEnumSchema.Type, "any">;
+		position: {
+			x: number;
+			y: number;
+		};
+	};
 }) => {
 	const item = {
 		id,
 		item: config.items.tree,
 		quantity: 1,
-		scope,
-		x,
-		y,
+		location: {
+			scope,
+			position: {
+				x,
+				y,
+			},
+		},
 	} satisfies RuntimeItemSchema.Type;
 
 	return setItemFx({
 		item,
-		scope,
-		x,
-		y,
+		location: {
+			scope,
+			position: {
+				x,
+				y,
+			},
+		},
 	});
 };
 
@@ -85,30 +98,46 @@ describe("queryFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* placeTreeFx({
 					id: "origin",
-					scope: "board",
-					x: 5,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 5,
+							y: 5,
+						},
+					},
 				});
 				yield* placeTreeFx({
 					id: "close",
-					scope: "board",
-					x: 6,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 6,
+							y: 5,
+						},
+					},
 				});
 				yield* placeTreeFx({
 					id: "near",
-					scope: "board",
-					x: 7,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 7,
+							y: 5,
+						},
+					},
 				});
 				yield* placeTreeFx({
 					id: "far",
-					scope: "board",
-					x: 8,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 8,
+							y: 5,
+						},
+					},
 				});
 				const close = yield* queryFx({
-					origin,
+					origin: origin.location.position,
 					query: {
 						distance: "close",
 						scope: "board",
@@ -119,7 +148,7 @@ describe("queryFx", () => {
 					},
 				});
 				const near = yield* queryFx({
-					origin,
+					origin: origin.location.position,
 					query: {
 						distance: "near",
 						scope: "board",
@@ -130,7 +159,7 @@ describe("queryFx", () => {
 					},
 				});
 				const far = yield* queryFx({
-					origin,
+					origin: origin.location.position,
 					query: {
 						distance: "far",
 						scope: "board",
@@ -171,18 +200,26 @@ describe("queryFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* placeTreeFx({
 					id: "board",
-					scope: "board",
-					x: 0,
-					y: 0,
+					location: {
+						scope: "board",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
 				});
 				yield* placeTreeFx({
 					id: "inventory",
-					scope: "inventory",
-					x: 0,
-					y: 0,
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
 				});
 				const inventory = yield* queryFx({
-					origin,
+					origin: origin.location.position,
 					query: {
 						scope: "inventory",
 						selector: {
@@ -192,7 +229,7 @@ describe("queryFx", () => {
 					},
 				});
 				const any = yield* queryFx({
-					origin,
+					origin: origin.location.position,
 					query: {
 						scope: "any",
 						selector: {
@@ -202,7 +239,7 @@ describe("queryFx", () => {
 					},
 				});
 				const empty = yield* queryFx({
-					origin,
+					origin: origin.location.position,
 					query: {
 						scope: "inventory",
 						selector: {

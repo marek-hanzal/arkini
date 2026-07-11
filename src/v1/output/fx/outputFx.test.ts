@@ -51,13 +51,21 @@ const createOriginFx = () => {
 			id: "origin",
 			item: config.items.source,
 			quantity: 1,
-			scope: "board",
-			x: 5,
-			y: 5,
+			location: {
+				scope: "board",
+				position: {
+					x: 5,
+					y: 5,
+				},
+			},
 		} satisfies RuntimeItemSchema.Type,
-		scope: "board",
-		x: 5,
-		y: 5,
+		location: {
+			scope: "board",
+			position: {
+				x: 5,
+				y: 5,
+			},
+		},
 	});
 };
 
@@ -146,7 +154,7 @@ describe("outputFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* outputFx({
-					origin,
+					origin: origin.location.position,
 					output: {
 						set: [
 							createRollSet({
@@ -210,7 +218,7 @@ describe("outputFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* outputFx({
-					origin,
+					origin: origin.location.position,
 					output: {
 						set: [
 							createRollSet({
@@ -273,7 +281,7 @@ describe("outputFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* createOriginFx();
 				const output = yield* outputFx({
-					origin,
+					origin: origin.location.position,
 					output: {
 						set: [
 							createRollSet({

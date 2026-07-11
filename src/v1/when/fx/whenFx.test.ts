@@ -64,31 +64,44 @@ const placeItemFx = ({
 	id,
 	itemId,
 	quantity,
-	scope,
-	x,
-	y,
+	location: {
+		scope,
+		position: { x, y },
+	},
 }: {
 	id: string;
 	itemId: "source" | "tree";
 	quantity: number;
-	scope: Exclude<ScopeEnumSchema.Type, "any">;
-	x: number;
-	y: number;
+	location: {
+		scope: Exclude<ScopeEnumSchema.Type, "any">;
+		position: {
+			x: number;
+			y: number;
+		};
+	};
 }) => {
 	const item = {
 		id,
 		item: config.items[itemId],
 		quantity,
-		scope,
-		x,
-		y,
+		location: {
+			scope,
+			position: {
+				x,
+				y,
+			},
+		},
 	} satisfies RuntimeItemSchema.Type;
 
 	return setItemFx({
 		item,
-		scope,
-		x,
-		y,
+		location: {
+			scope,
+			position: {
+				x,
+				y,
+			},
+		},
 	});
 };
 
@@ -100,36 +113,52 @@ describe("whenFx", () => {
 					id: "origin",
 					itemId: "source",
 					quantity: 1,
-					scope: "board",
-					x: 5,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 5,
+							y: 5,
+						},
+					},
 				});
 				yield* placeItemFx({
 					id: "board-close",
 					itemId: "tree",
 					quantity: 2,
-					scope: "board",
-					x: 6,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 6,
+							y: 5,
+						},
+					},
 				});
 				yield* placeItemFx({
 					id: "board-near",
 					itemId: "tree",
 					quantity: 4,
-					scope: "board",
-					x: 7,
-					y: 5,
+					location: {
+						scope: "board",
+						position: {
+							x: 7,
+							y: 5,
+						},
+					},
 				});
 				yield* placeItemFx({
 					id: "inventory",
 					itemId: "tree",
 					quantity: 3,
-					scope: "inventory",
-					x: 0,
-					y: 0,
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
 				});
 				const exists = yield* whenFx({
-					origin,
+					origin: origin.location.position,
 					when: {
 						query: {
 							scope: "inventory",
@@ -142,7 +171,7 @@ describe("whenFx", () => {
 					},
 				});
 				const count = yield* whenFx({
-					origin,
+					origin: origin.location.position,
 					when: {
 						count: 9,
 						query: {
@@ -156,7 +185,7 @@ describe("whenFx", () => {
 					},
 				});
 				const range = yield* whenFx({
-					origin,
+					origin: origin.location.position,
 					when: {
 						max: 2,
 						min: 2,
@@ -172,7 +201,7 @@ describe("whenFx", () => {
 					},
 				});
 				const rejected = yield* whenFx({
-					origin,
+					origin: origin.location.position,
 					when: {
 						count: 8,
 						query: {

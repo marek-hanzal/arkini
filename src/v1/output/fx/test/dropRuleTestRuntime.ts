@@ -68,13 +68,21 @@ export const createDropRuleOriginFx = () => {
 			id: "origin",
 			item: dropRuleTestConfig.items.source,
 			quantity: 1,
-			scope: "board",
-			x: 5,
-			y: 5,
+			location: {
+				scope: "board",
+				position: {
+					x: 5,
+					y: 5,
+				},
+			},
 		} satisfies RuntimeItemSchema.Type,
-		scope: "board",
-		x: 5,
-		y: 5,
+		location: {
+			scope: "board",
+			position: {
+				x: 5,
+				y: 5,
+			},
+		},
 	});
 };
 
@@ -84,12 +92,20 @@ export const placePermitFx = () => {
 			id: "permit-stack",
 			item: dropRuleTestConfig.items.permit,
 			quantity: 2,
-			scope: "inventory",
-			x: 0,
-			y: 0,
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
 		} satisfies RuntimeItemSchema.Type,
-		scope: "inventory",
-		x: 0,
-		y: 0,
+		location: {
+			scope: "inventory",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		},
 	}).pipe(Effect.asVoid);
 };

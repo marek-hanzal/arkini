@@ -43,7 +43,7 @@ describe("lineRulesFx", () => {
 				] satisfies RuleSchema.Type[];
 
 				return yield* lineRulesFx({
-					origin,
+					origin: origin.location.position,
 					rules,
 				});
 			}).pipe(
@@ -76,7 +76,7 @@ describe("lineRulesFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* lineRulesFx({
-					origin,
+					origin: origin.location.position,
 					rules: [],
 				});
 			}).pipe(

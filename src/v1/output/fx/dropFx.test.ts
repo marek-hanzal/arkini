@@ -48,13 +48,21 @@ const createOriginFx = () => {
 			id: "origin",
 			item: config.items.source,
 			quantity: 1,
-			scope: "board",
-			x: 5,
-			y: 5,
+			location: {
+				scope: "board",
+				position: {
+					x: 5,
+					y: 5,
+				},
+			},
 		} satisfies RuntimeItemSchema.Type,
-		scope: "board",
-		x: 5,
-		y: 5,
+		location: {
+			scope: "board",
+			position: {
+				x: 5,
+				y: 5,
+			},
+		},
 	});
 };
 
@@ -96,7 +104,7 @@ describe("dropFx", () => {
 						},
 						rules: [],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 			}).pipe(
 				useGameFx({
@@ -135,7 +143,7 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 				const disableApplied = yield* dropFx({
 					drop: {
@@ -154,7 +162,7 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 
 				return {
@@ -201,7 +209,7 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 				const rejected = yield* dropFx({
 					drop: {
@@ -226,7 +234,7 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 
 				return {
@@ -274,7 +282,7 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 				const accepted = yield* dropFx({
 					drop: {
@@ -287,7 +295,7 @@ describe("dropFx", () => {
 						},
 						rules: [],
 					},
-					origin,
+					origin: origin.location.position,
 				});
 
 				return {

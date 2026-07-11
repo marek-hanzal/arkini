@@ -8,7 +8,9 @@ export namespace rollQuantityValueFx {
 	}
 }
 
-/** Resolves a fixed quantity. */
+/**
+ * Resolves a fixed quantity.
+ */
 export const rollQuantityValueFx = Effect.fn("rollQuantityValueFx")(function* ({
 	quantity,
 }: rollQuantityValueFx.Props) {

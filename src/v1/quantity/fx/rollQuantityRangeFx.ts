@@ -8,7 +8,9 @@ export namespace rollQuantityRangeFx {
 	}
 }
 
-/** Selects one integer from an inclusive configured quantity range. */
+/**
+ * Selects one integer from an inclusive configured quantity range.
+ */
 export const rollQuantityRangeFx = Effect.fn("rollQuantityRangeFx")(function* ({
 	quantity,
 }: rollQuantityRangeFx.Props) {

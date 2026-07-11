@@ -11,7 +11,9 @@ export namespace rollQuantityFx {
 	}
 }
 
-/** Dispatches a quantity configuration to its specialized resolver. */
+/**
+ * Dispatches a quantity configuration to its specialized resolver.
+ */
 export const rollQuantityFx = Effect.fn("rollQuantityFx")(function* ({
 	quantity,
 }: rollQuantityFx.Props) {

@@ -13,6 +13,7 @@ const allowedImporters = new Set([
 	"src/v1/runtime/write/setItemQuantityFx.ts",
 	"src/v1/runtime/write/spawnItemFx.ts",
 	"src/v1/runtime/write/swapItemsFx.ts",
+	"src/v1/start/write/startFx.ts",
 ]);
 
 const collectTypeScriptFilesFx = (

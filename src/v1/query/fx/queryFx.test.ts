@@ -2,8 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { setItemFx } from "~/v1/runtime/fx/setItemFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
 import { queryFx } from "./queryFx";
@@ -61,28 +61,17 @@ const placeTreeFx = ({
 		};
 	};
 }) => {
-	const item = {
+	return spawnItemFx({
 		id,
-		item: config.items.tree,
+		itemId: "tree",
+		location: {
+			scope,
+			position: {
+				x,
+				y,
+			},
+		},
 		quantity: 1,
-		location: {
-			scope,
-			position: {
-				x,
-				y,
-			},
-		},
-	} satisfies RuntimeItemSchema.Type;
-
-	return setItemFx({
-		item,
-		location: {
-			scope,
-			position: {
-				x,
-				y,
-			},
-		},
 	});
 };
 

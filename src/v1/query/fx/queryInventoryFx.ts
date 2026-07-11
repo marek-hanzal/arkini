@@ -1,7 +1,7 @@
-import { Effect, Ref } from "effect";
+import { Effect } from "effect";
 
 import type { QueryInventorySchema } from "~/v1/query/schema/QueryInventorySchema";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
+import { getItemsFx } from "~/v1/runtime/read/getItemsFx";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryInventoryFx {
@@ -16,11 +16,10 @@ export namespace queryInventoryFx {
 export const queryInventoryFx = Effect.fn("queryInventoryFx")(function* ({
 	query,
 }: queryInventoryFx.Props) {
-	const runtimeRef = yield* RuntimeFx;
-	const runtime = yield* Ref.get(runtimeRef);
+	const items = yield* getItemsFx();
 
 	return yield* queryItemsFx({
-		items: runtime.items.filter((item) => {
+		items: items.filter((item) => {
 			return item.location.scope === "inventory";
 		}),
 		selector: query.selector,

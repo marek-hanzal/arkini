@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
-import { setItemFx } from "~/v1/runtime/fx/setItemFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 
 export const dropRuleTestConfig = GameConfigSchema.parse({
@@ -63,19 +62,9 @@ export const permitQuery = {
 };
 
 export const createDropRuleOriginFx = () => {
-	return setItemFx({
-		item: {
-			id: "origin",
-			item: dropRuleTestConfig.items.source,
-			quantity: 1,
-			location: {
-				scope: "board",
-				position: {
-					x: 5,
-					y: 5,
-				},
-			},
-		} satisfies RuntimeItemSchema.Type,
+	return spawnItemFx({
+		id: "origin",
+		itemId: "source",
 		location: {
 			scope: "board",
 			position: {
@@ -83,23 +72,14 @@ export const createDropRuleOriginFx = () => {
 				y: 5,
 			},
 		},
+		quantity: 1,
 	});
 };
 
 export const placePermitFx = () => {
-	return setItemFx({
-		item: {
-			id: "permit-stack",
-			item: dropRuleTestConfig.items.permit,
-			quantity: 2,
-			location: {
-				scope: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
-		} satisfies RuntimeItemSchema.Type,
+	return spawnItemFx({
+		id: "permit-stack",
+		itemId: "permit",
 		location: {
 			scope: "inventory",
 			position: {
@@ -107,5 +87,6 @@ export const placePermitFx = () => {
 				y: 0,
 			},
 		},
+		quantity: 2,
 	}).pipe(Effect.asVoid);
 };

@@ -1,8 +1,9 @@
-import { Effect, Layer, Ref } from "effect";
+import { Effect, Layer, SynchronizedRef } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { fromConfigFx } from "~/v1/runtime/fx/fromConfigFx";
+import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 
 export namespace GameLayerFx {
@@ -14,18 +15,32 @@ export namespace GameLayerFx {
 /**
  * Builds the root layer providing every service owned by one loaded game.
  *
- * New game-wide services belong here so callers keep one stable composition
- * boundary instead of manually assembling individual service layers.
+ * The mutable runtime store remains internal. Callers receive only read-only
+ * runtime access plus dedicated atomic command effects.
  */
 export const GameLayerFx = ({ config }: GameLayerFx.Props) => {
 	const configLayer = Layer.succeed(GameConfigFx, config);
-	const runtimeLayer = Layer.effect(
-		RuntimeFx,
+	const runtimeStoreLayer = Layer.effect(
+		RuntimeStoreFx,
 		fromConfigFx().pipe(
 			Effect.flatMap((runtime) => {
-				return Ref.make(runtime);
+				return SynchronizedRef.make(runtime);
 			}),
 		),
+	);
+	const runtimeReadLayer = Layer.effect(
+		RuntimeFx,
+		RuntimeStoreFx.pipe(
+			Effect.map((store) => {
+				return {
+					read: SynchronizedRef.get(store),
+				};
+			}),
+		),
+	);
+	const runtimeLayer = Layer.merge(
+		runtimeStoreLayer,
+		runtimeReadLayer.pipe(Layer.provide(runtimeStoreLayer)),
 	);
 
 	return Layer.merge(configLayer, runtimeLayer);

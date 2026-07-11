@@ -1,5 +1,4 @@
-import { setItemFx } from "~/v1/runtime/fx/setItemFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 
 export const lineTestConfig = GameConfigSchema.parse({
@@ -96,19 +95,9 @@ export const existsWhen = (itemId: string) => {
 };
 
 export const createOriginFx = () => {
-	return setItemFx({
-		item: {
-			id: "origin",
-			item: lineTestConfig.items.source,
-			quantity: 1,
-			location: {
-				scope: "board",
-				position: {
-					x: 5,
-					y: 5,
-				},
-			},
-		} satisfies RuntimeItemSchema.Type,
+	return spawnItemFx({
+		id: "origin",
+		itemId: "source",
 		location: {
 			scope: "board",
 			position: {
@@ -116,6 +105,7 @@ export const createOriginFx = () => {
 				y: 5,
 			},
 		},
+		quantity: 1,
 	});
 };
 
@@ -126,19 +116,9 @@ export const placeLineTestItemFx = ({
 	itemId: "permit" | "booster" | "blocker";
 	x: number;
 }) => {
-	return setItemFx({
-		item: {
-			id: itemId,
-			item: lineTestConfig.items[itemId],
-			location: {
-				scope: "inventory",
-				position: {
-					x,
-					y: 0,
-				},
-			},
-			quantity: 1,
-		} satisfies RuntimeItemSchema.Type,
+	return spawnItemFx({
+		id: itemId,
+		itemId,
 		location: {
 			scope: "inventory",
 			position: {
@@ -146,5 +126,6 @@ export const placeLineTestItemFx = ({
 				y: 0,
 			},
 		},
+		quantity: 1,
 	});
 };

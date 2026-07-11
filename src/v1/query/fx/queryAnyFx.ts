@@ -1,7 +1,7 @@
-import { Effect, Ref } from "effect";
+import { Effect } from "effect";
 
 import type { QueryAnySchema } from "~/v1/query/schema/QueryAnySchema";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
+import { getItemsFx } from "~/v1/runtime/read/getItemsFx";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryAnyFx {
@@ -14,11 +14,10 @@ export namespace queryAnyFx {
  * Selects matching items across every runtime location without a distance rule.
  */
 export const queryAnyFx = Effect.fn("queryAnyFx")(function* ({ query }: queryAnyFx.Props) {
-	const runtimeRef = yield* RuntimeFx;
-	const runtime = yield* Ref.get(runtimeRef);
+	const items = yield* getItemsFx();
 
 	return yield* queryItemsFx({
-		items: runtime.items,
+		items,
 		selector: query.selector,
 	});
 });

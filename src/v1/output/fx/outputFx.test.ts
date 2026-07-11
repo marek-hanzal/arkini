@@ -5,8 +5,7 @@ import { useGameFx } from "~/v1/game/fx/useGameFx";
 import type { DropSchema } from "~/v1/output/schema/DropSchema";
 import type { RollSchema } from "~/v1/roll/schema/RollSchema";
 import type { RollSetSchema } from "~/v1/roll/schema/RollSetSchema";
-import { setItemFx } from "~/v1/runtime/fx/setItemFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { outputFx } from "./outputFx";
 
@@ -46,19 +45,9 @@ const config = GameConfigSchema.parse({
 });
 
 const createOriginFx = () => {
-	return setItemFx({
-		item: {
-			id: "origin",
-			item: config.items.source,
-			quantity: 1,
-			location: {
-				scope: "board",
-				position: {
-					x: 5,
-					y: 5,
-				},
-			},
-		} satisfies RuntimeItemSchema.Type,
+	return spawnItemFx({
+		id: "origin",
+		itemId: "source",
 		location: {
 			scope: "board",
 			position: {
@@ -66,6 +55,7 @@ const createOriginFx = () => {
 				y: 5,
 			},
 		},
+		quantity: 1,
 	});
 };
 

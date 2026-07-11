@@ -1,24 +1,22 @@
-import { Effect, Ref } from "effect";
-import { Array, Option, pipe } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
+import { getItemsFx } from "./getItemsFx";
 
-export namespace getItemFx {
+export namespace getItemAtFx {
 	export interface Props {
 		location: LocationSchema.Type;
 	}
 }
 
 /**
- * Reads one item at a concrete runtime location.
+ * Reads one live item at a concrete location.
  */
-export const getItemFx = Effect.fn("getItemFx")(function* ({ location }: getItemFx.Props) {
-	const runtimeRef = yield* RuntimeFx;
-	const runtime = yield* Ref.get(runtimeRef);
+export const getItemAtFx = Effect.fn("getItemAtFx")(function* ({ location }: getItemAtFx.Props) {
+	const items = yield* getItemsFx();
 	const item = pipe(
-		runtime.items,
+		items,
 		Array.findFirst((item) => {
 			return (
 				item.location.scope === location.scope &&

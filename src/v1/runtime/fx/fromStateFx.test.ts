@@ -1,12 +1,12 @@
-import { Effect, Either, Ref } from "effect";
+import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { StateSchema } from "~/v1/state/schema/StateSchema";
-import { getItemFx } from "./getItemFx";
-import { setItemFx } from "./setItemFx";
+import { getItemAtFx } from "~/v1/runtime/read/getItemAtFx";
+import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
 import { fromStateFx } from "./fromStateFx";
 
@@ -80,10 +80,7 @@ const state = StateSchema.parse({
 describe("fromStateFx", () => {
 	it("provides an empty layout-aware runtime at game startup", () => {
 		const runtime = Effect.runSync(
-			RuntimeFx.pipe(
-				Effect.flatMap((runtime) => {
-					return Ref.get(runtime);
-				}),
+			readRuntimeFx().pipe(
 				useGameFx({
 					config,
 				}),
@@ -93,22 +90,12 @@ describe("fromStateFx", () => {
 		expect(runtime.items).toEqual([]);
 	});
 
-	it("atomically writes and reads an item through synchronized coordinates", () => {
+	it("atomically spawns and reads an item through its owned location", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const placed = yield* setItemFx({
-					item: {
-						id: "runtime:placed:tree",
-						item: config.items.tree,
-						quantity: 1,
-						location: {
-							scope: "inventory",
-							position: {
-								x: 99,
-								y: 99,
-							},
-						},
-					},
+				const placed = yield* spawnItemFx({
+					id: "runtime:placed:tree",
+					itemId: "tree",
 					location: {
 						scope: "board",
 						position: {
@@ -116,15 +103,10 @@ describe("fromStateFx", () => {
 							y: 1,
 						},
 					},
+					quantity: 1,
 				});
-				const read = yield* getItemFx({
-					location: {
-						scope: "board",
-						position: {
-							x: 2,
-							y: 1,
-						},
-					},
+				const read = yield* getItemAtFx({
+					location: placed.location,
 				});
 
 				return {
@@ -139,13 +121,11 @@ describe("fromStateFx", () => {
 		);
 
 		expect(result.placed).toBe(result.read);
-		expect(result.read).toMatchObject({
-			location: {
-				scope: "board",
-				position: {
-					x: 2,
-					y: 1,
-				},
+		expect(result.read.location).toEqual({
+			scope: "board",
+			position: {
+				x: 2,
+				y: 1,
 			},
 		});
 	});
@@ -153,7 +133,7 @@ describe("fromStateFx", () => {
 	it("uses the central item-not-found error for an empty runtime cell", () => {
 		const result = Effect.runSync(
 			Effect.either(
-				getItemFx({
+				getItemAtFx({
 					location: {
 						scope: "inventory",
 						position: {

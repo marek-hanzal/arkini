@@ -3,8 +3,7 @@ import { Effect } from "effect";
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import { fromStateBoardItemFx } from "./fromStateBoardItemFx";
-import { fromStateInventoryItemFx } from "./fromStateInventoryItemFx";
+import { fromStateItemFx } from "./fromStateItemFx";
 
 export namespace fromStateFx {
 	export interface Props {
@@ -20,27 +19,40 @@ export namespace fromStateFx {
  */
 export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromStateFx.Props) {
 	const config = yield* GameConfigFx;
-	const boardItems = yield* Effect.forEach(state.board.items, (state) => {
-		return fromStateBoardItemFx({
+	const boardCells = yield* Effect.forEach(Object.entries(state.board.cells), ([cell, state]) => {
+		return fromStateItemFx({
 			state,
-		});
+		}).pipe(
+			Effect.map((item) => {
+				return [
+					cell,
+					item,
+				] as const;
+			}),
+		);
 	});
-	const inventorySlots = yield* Effect.forEach(state.inventory.slots, (state) => {
-		if (state === null) {
-			return Effect.succeed(null);
-		}
-
-		return fromStateInventoryItemFx({
-			state,
-		});
-	});
+	const inventoryCells = yield* Effect.forEach(
+		Object.entries(state.inventory.cells),
+		([cell, state]) => {
+			return fromStateItemFx({
+				state,
+			}).pipe(
+				Effect.map((item) => {
+					return [
+						cell,
+						item,
+					] as const;
+				}),
+			);
+		},
+	);
 	const result = {
 		config,
 		board: {
-			items: boardItems,
+			cells: Object.fromEntries(boardCells),
 		},
 		inventory: {
-			slots: inventorySlots,
+			cells: Object.fromEntries(inventoryCells),
 		},
 	};
 

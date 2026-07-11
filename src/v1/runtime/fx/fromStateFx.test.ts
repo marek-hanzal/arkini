@@ -48,25 +48,22 @@ const config = GameConfigSchema.parse({
 
 const state = StateSchema.parse({
 	board: {
-		items: [
-			{
+		cells: {
+			"1:2": {
 				id: "runtime:board:tree",
 				itemId: "tree",
 				quantity: 1,
-				x: 1,
-				y: 2,
 			},
-		],
+		},
 	},
 	inventory: {
-		slots: [
-			{
+		cells: {
+			"0:0": {
 				id: "runtime:inventory:tree",
 				itemId: "tree",
 				quantity: 3,
 			},
-			null,
-		],
+		},
 	},
 });
 
@@ -81,11 +78,8 @@ describe("fromStateFx", () => {
 		);
 
 		expect(runtime.config).toBe(config);
-		expect(runtime.board.items).toEqual([]);
-		expect(runtime.inventory.slots).toEqual([
-			null,
-			null,
-		]);
+		expect(runtime.board.cells).toEqual({});
+		expect(runtime.inventory.cells).toEqual({});
 	});
 
 	it("builds every runtime item with the original canonical game object", () => {
@@ -99,10 +93,10 @@ describe("fromStateFx", () => {
 			),
 		);
 		const canonicalTree = config.items.tree;
-		const inventoryTree = runtime.inventory.slots[0];
+		const inventoryTree = runtime.inventory.cells["0:0"];
 
 		expect(runtime.config).toBe(config);
-		expect(runtime.board.items[0]?.item).toBe(canonicalTree);
+		expect(runtime.board.cells["1:2"]?.item).toBe(canonicalTree);
 		expect(inventoryTree?.item).toBe(canonicalTree);
 	});
 
@@ -129,12 +123,12 @@ describe("fromStateFx", () => {
 		const invalidState = StateSchema.parse({
 			...state,
 			board: {
-				items: [
-					{
-						...state.board.items[0],
+				cells: {
+					"1:2": {
+						...state.board.cells["1:2"],
 						itemId: "missing",
 					},
-				],
+				},
 			},
 		});
 		const result = Effect.runSync(

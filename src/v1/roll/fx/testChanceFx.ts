@@ -8,7 +8,9 @@ export namespace testChanceFx {
 	}
 }
 
-/** Resolves one probability check without knowing anything about its caller. */
+/**
+ * Resolves one probability check without knowing anything about its caller.
+ */
 export const testChanceFx = Effect.fn("testChanceFx")(function* ({ chance }: testChanceFx.Props) {
 	const value = yield* Random.next;
 

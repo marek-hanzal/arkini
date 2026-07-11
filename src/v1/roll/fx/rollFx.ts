@@ -12,7 +12,9 @@ export namespace rollFx {
 	}
 }
 
-/** Dispatches one roll to the specialized resolver selected by its type. */
+/**
+ * Dispatches one roll to the specialized resolver selected by its type.
+ */
 export const rollFx = Effect.fn("rollFx")(function* ({ roll }: rollFx.Props) {
 	return yield* match(roll)
 		.with(

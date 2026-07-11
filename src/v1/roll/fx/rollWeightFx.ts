@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { RollResult } from "~/v1/roll/RollResult";
+import type { RollResultSchema } from "~/v1/roll/schema/RollResultSchema";
 import type { RollWeightSchema } from "~/v1/roll/schema/RollWeightSchema";
 import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
 import { selectDropWeightFx } from "./selectDropWeightFx";
@@ -11,12 +11,14 @@ export namespace rollWeightFx {
 	}
 }
 
-/** Composes quantity resolution with repeated weighted drop selection. */
+/**
+ * Composes quantity resolution with repeated weighted drop selection.
+ */
 export const rollWeightFx = Effect.fn("rollWeightFx")(function* ({ roll }: rollWeightFx.Props) {
 	const quantity = yield* rollQuantityFx({
 		quantity: roll.quantity,
 	});
-	const drop: RollResult["drop"][number][] = [];
+	const drop: RollResultSchema.Type["drop"] = [];
 
 	for (let index = 0; index < quantity; index += 1) {
 		const selected = yield* selectDropWeightFx({
@@ -27,5 +29,5 @@ export const rollWeightFx = Effect.fn("rollWeightFx")(function* ({ roll }: rollW
 
 	return {
 		drop,
-	} satisfies RollResult;
+	} satisfies RollResultSchema.Type;
 });

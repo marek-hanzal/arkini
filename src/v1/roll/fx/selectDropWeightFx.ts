@@ -12,7 +12,9 @@ export namespace selectDropWeightFx {
 	}
 }
 
-/** Selects exactly one drop candidate according to its relative weight. */
+/**
+ * Selects exactly one drop candidate according to its relative weight.
+ */
 export const selectDropWeightFx = Effect.fn("selectDropWeightFx")(function* ({
 	drop,
 }: selectDropWeightFx.Props) {

@@ -1,4 +1,4 @@
-import { Effect, Random } from "effect";
+import { Array, Effect, Option, pipe, Random } from "effect";
 
 import type { RollSetSchema } from "~/v1/roll/schema/RollSetSchema";
 
@@ -23,18 +23,25 @@ export const selectRollSetFx = Effect.fn("selectRollSetFx")(function* ({
 		return set[0];
 	}
 
-	const totalWeight = set.reduce((total, candidate) => {
-		return total + (candidate.weight ?? 1);
-	}, 0);
+	const [totalWeight, weightedSet] = Array.mapAccum(set, 0, (accumulatedWeight, candidate) => {
+		const maximumWeight = accumulatedWeight + (candidate.weight ?? 1);
+
+		return [
+			maximumWeight,
+			{
+				candidate,
+				maximumWeight,
+			},
+		] as const;
+	});
 	const selectedWeight = yield* Random.nextRange(0, totalWeight);
-	let accumulatedWeight = 0;
 
-	for (const candidate of set) {
-		accumulatedWeight += candidate.weight ?? 1;
-		if (selectedWeight < accumulatedWeight) {
-			return candidate;
-		}
-	}
-
-	return set[set.length - 1];
+	return pipe(
+		weightedSet,
+		Array.findFirst(({ maximumWeight }) => {
+			return selectedWeight < maximumWeight;
+		}),
+		Option.map(({ candidate }) => candidate),
+		Option.getOrElse(() => set[set.length - 1]),
+	);
 });

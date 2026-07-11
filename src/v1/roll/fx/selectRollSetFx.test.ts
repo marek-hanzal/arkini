@@ -52,6 +52,29 @@ describe("selectRollSetFx", () => {
 		expect(result).toBe(second);
 	});
 
+	it("selects a candidate from the middle cumulative weight range", () => {
+		const first = createSet("item:first", 1);
+		const middle = createSet("item:middle", 2);
+		const last = createSet("item:last", 1);
+		const result = Effect.runSync(
+			selectRollSetFx({
+				set: [
+					first,
+					middle,
+					last,
+				],
+			}).pipe(
+				Effect.withRandom(
+					Random.fixed([
+						0.5,
+					]),
+				),
+			),
+		);
+
+		expect(result).toBe(middle);
+	});
+
 	it("selects according to explicit relative weights", () => {
 		const frequent = createSet("item:frequent", 3);
 		const rare = createSet("item:rare", 1);

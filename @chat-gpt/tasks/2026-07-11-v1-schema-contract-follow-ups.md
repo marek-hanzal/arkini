@@ -7,7 +7,7 @@ Audit performed after query, when, drop, output, and standalone line-rule evalua
 - Immutable `GameConfigSchema` was removed from mutable `RuntimeSchema`; config remains owned by `GameConfigFx`.
 - Every query/when/rule/output `origin` contract was narrowed from `RuntimeItemSchema` to `PositionSchema`.
 - Drop-rule evaluators return neutral schema-backed rule results; only `dropFx` interprets enable gates and disable vetoes.
-- `LocationSchema` owns concrete `scope + position`, and runtime/state items own their location directly.
+- `LocationSchema` owns concrete grid or line-input location, and runtime/state items own their location directly.
 - Runtime and state use matching flat item collections; board and inventory are derived views.
 - Public runtime access is read-only and dedicated atomic commands own every mutation.
 - Explicit runtime checkers validate IDs, scope, bounds, and location occupancy before hydration or command commit.

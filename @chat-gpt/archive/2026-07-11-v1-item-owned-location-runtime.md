@@ -11,8 +11,14 @@ RuntimeItemSchema
 ├── id
 ├── item
 ├── location
-│   ├── scope
-│   └── position
+│   ├── GridLocationSchema
+│   │   ├── scope
+│   │   └── position
+│   └── InputLocationSchema
+│       ├── ownerItemId
+│       ├── lineId
+│       ├── inputIndex
+│       └── returnLocation
 └── quantity
 ```
 
@@ -50,9 +56,10 @@ Future mutations such as merge, split, replace, consume, or state-specific chang
 Cross-item and configuration-dependent invariants do not live in Zod refinements. They are explicit readable runtime checks:
 
 - duplicate live item identity;
-- canonical item scope versus concrete location scope;
-- location inside configured board/inventory bounds;
-- unique location occupancy.
+- canonical item scope versus concrete grid location scope;
+- grid location inside configured board/inventory bounds;
+- unique grid-location occupancy;
+- line-input owner, line, slot, selector, and aggregate capacity.
 
 `checkRuntimeFx` returns schema-backed issues. `assertRuntimeFx` fails with `RuntimeInvalidError`.
 

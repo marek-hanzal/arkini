@@ -1,9 +1,10 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
-import type { DropSchema } from "~/v1/output/schema/DropSchema";
-import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
-import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
+import type { DropSchema } from "~/v1/output/schema/DropSchema";
+import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
 import { dropRuleFx } from "./dropRuleFx";
 
 export namespace dropFx {
@@ -16,7 +17,8 @@ export namespace dropFx {
 /**
  * Resolves one selected drop into zero or one concrete item drops.
  *
- * Availability rules run before quantity resolution. A rejected drop is
+ * Availability rules run before quantity resolution. The drop owns the
+ * consumer-specific interpretation of neutral rule results. A rejected drop is
  * discarded without consuming quantity randomness, rerolling, or selecting a
  * replacement candidate.
  */
@@ -25,7 +27,24 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Pr
 		return dropRuleFx({
 			origin,
 			rule,
-		});
+		}).pipe(
+			Effect.map((result) => {
+				return match(result)
+					.with(
+						{
+							type: "enable",
+						},
+						({ active }) => active,
+					)
+					.with(
+						{
+							type: "disable",
+						},
+						({ active }) => !active,
+					)
+					.exhaustive();
+			}),
+		);
 	});
 	if (!enabled) {
 		return [];

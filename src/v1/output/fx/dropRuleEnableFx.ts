@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 
-import type { RuleEnableSchema } from "~/v1/output/schema/drop/rule/RuleEnableSchema";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { RuleEnableResultSchema } from "~/v1/output/schema/drop/rule/RuleEnableResultSchema";
+import type { RuleEnableSchema } from "~/v1/output/schema/drop/rule/RuleEnableSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 export namespace dropRuleEnableFx {
@@ -12,16 +13,21 @@ export namespace dropRuleEnableFx {
 }
 
 /**
- * Keeps a selected drop enabled only when every configured condition passes.
+ * Evaluates one selected-drop enable rule without interpreting its result.
  */
 export const dropRuleEnableFx = Effect.fn("dropRuleEnableFx")(function* ({
 	origin,
 	rule,
 }: dropRuleEnableFx.Props) {
-	return yield* Effect.every(rule.when, (when) => {
+	const active = yield* Effect.every(rule.when, (when) => {
 		return whenFx({
 			origin,
 			when,
 		});
 	});
+
+	return {
+		active,
+		type: rule.type,
+	} satisfies RuleEnableResultSchema.Type;
 });

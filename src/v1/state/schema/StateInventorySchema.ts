@@ -2,10 +2,14 @@ import { z } from "zod";
 
 import { StateInventoryItemSchema } from "./StateInventoryItemSchema";
 
-/** Persisted contents of the ordered runtime inventory. */
+/**
+ * Persisted contents of the ordered runtime inventory.
+ */
 export const StateInventorySchema = z
 	.object({
-		/** Ordered inventory slots; `null` represents an empty slot. */
+		/**
+		 * Ordered inventory slots; `null` represents an empty slot.
+		 */
 		slots: z
 			.array(StateInventoryItemSchema.nullable())
 			.describe("The ordered persisted inventory slots, including empty slots."),

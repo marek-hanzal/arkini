@@ -10,7 +10,9 @@ export namespace selectorTagFx {
 	}
 }
 
-/** Tests whether a canonical item has the tag selected by a tag selector. */
+/**
+ * Tests whether a canonical item has the tag selected by a tag selector.
+ */
 export const selectorTagFx = Effect.fn("selectorTagFx")(function* ({
 	selector,
 	item,

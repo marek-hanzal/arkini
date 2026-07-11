@@ -10,7 +10,9 @@ export namespace selectorItemFx {
 	}
 }
 
-/** Tests whether a canonical item has the ID selected by an item selector. */
+/**
+ * Tests whether a canonical item has the ID selected by an item selector.
+ */
 export const selectorItemFx = Effect.fn("selectorItemFx")(function* ({
 	selector,
 	item,

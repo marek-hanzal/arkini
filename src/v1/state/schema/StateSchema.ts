@@ -11,9 +11,13 @@ import { StateInventorySchema } from "./StateInventorySchema";
  */
 export const StateSchema = z
 	.object({
-		/** Persisted board contents. */
+		/**
+		 * Persisted board contents.
+		 */
 		board: StateBoardSchema.describe("The persisted board contents."),
-		/** Persisted ordered inventory contents. */
+		/**
+		 * Persisted ordered inventory contents.
+		 */
 		inventory: StateInventorySchema.describe("The persisted inventory contents."),
 	})
 	.strict()

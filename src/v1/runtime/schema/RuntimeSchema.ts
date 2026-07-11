@@ -13,13 +13,19 @@ import { RuntimeInventorySchema } from "./RuntimeInventorySchema";
  */
 export const RuntimeSchema = z
 	.object({
-		/** Loaded immutable game configuration owning every canonical item definition. */
+		/**
+		 * Loaded immutable game configuration owning every canonical item definition.
+		 */
 		game: GameSchema.describe(
 			"The loaded game configuration owning every canonical item definition.",
 		),
-		/** Hydrated live board contents. */
+		/**
+		 * Hydrated live board contents.
+		 */
 		board: RuntimeBoardSchema.describe("The hydrated live board contents."),
-		/** Hydrated live inventory contents. */
+		/**
+		 * Hydrated live inventory contents.
+		 */
 		inventory: RuntimeInventorySchema.describe("The hydrated live inventory contents."),
 	})
 	.strict()

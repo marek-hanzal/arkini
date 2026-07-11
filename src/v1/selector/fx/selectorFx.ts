@@ -13,7 +13,9 @@ export namespace selectorFx {
 	}
 }
 
-/** Dispatches an item selector to its specialized matching strategy. */
+/**
+ * Dispatches an item selector to its specialized matching strategy.
+ */
 export const selectorFx = Effect.fn("selectorFx")(function* ({ selector, item }: selectorFx.Props) {
 	const result = yield* match(selector)
 		.with(

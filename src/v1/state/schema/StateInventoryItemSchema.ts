@@ -2,7 +2,9 @@ import { z } from "zod";
 
 import { BaseStateItemSchema } from "./BaseStateItemSchema";
 
-/** A persisted live item or stack occupying one inventory slot. */
+/**
+ * A persisted live item or stack occupying one inventory slot.
+ */
 export const StateInventoryItemSchema = z
 	.object({
 		...BaseStateItemSchema.shape,

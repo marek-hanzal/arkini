@@ -3,16 +3,24 @@ import { z } from "zod";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
-/** Fields persisted for every live item or item stack. */
+/**
+ * Fields persisted for every live item or item stack.
+ */
 export const BaseStateItemSchema = z
 	.object({
-		/** Stable identity of this live item or stack. */
+		/**
+		 * Stable identity of this live item or stack.
+		 */
 		id: IdSchema.describe("The stable identity of this live item or stack."),
-		/** ID of the canonical item definition restored during hydration. */
+		/**
+		 * ID of the canonical item definition restored during hydration.
+		 */
 		itemId: IdSchema.describe(
 			"The ID of the canonical item definition restored during hydration.",
 		),
-		/** Number of canonical items represented by this live state entry. */
+		/**
+		 * Number of canonical items represented by this live state entry.
+		 */
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live state entry.",
 		),

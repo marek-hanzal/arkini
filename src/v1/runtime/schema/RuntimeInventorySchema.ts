@@ -2,10 +2,14 @@ import { z } from "zod";
 
 import { RuntimeInventoryItemSchema } from "./RuntimeInventoryItemSchema";
 
-/** Hydrated contents of the ordered live runtime inventory. */
+/**
+ * Hydrated contents of the ordered live runtime inventory.
+ */
 export const RuntimeInventorySchema = z
 	.object({
-		/** Ordered inventory slots; `null` represents an empty slot. */
+		/**
+		 * Ordered inventory slots; `null` represents an empty slot.
+		 */
 		slots: z
 			.array(RuntimeInventoryItemSchema.nullable())
 			.describe("The ordered hydrated inventory slots, including empty slots."),

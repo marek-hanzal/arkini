@@ -2,10 +2,14 @@ import { z } from "zod";
 
 import { RuntimeBoardItemSchema } from "./RuntimeBoardItemSchema";
 
-/** Hydrated contents of the live runtime board. */
+/**
+ * Hydrated contents of the live runtime board.
+ */
 export const RuntimeBoardSchema = z
 	.object({
-		/** Live board items linked to their canonical item definitions. */
+		/**
+		 * Live board items linked to their canonical item definitions.
+		 */
 		items: z
 			.array(RuntimeBoardItemSchema)
 			.describe("The hydrated live items placed on the board."),

@@ -20,12 +20,6 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 	runtime,
 }: applyPlacementPlanFx.Props) {
 	const removedItems = runtime.items.filter((item) => plan.remove.includes(item.id));
-	const stackByItemId = new Map(
-		plan.stack.map((stack) => [
-			stack.itemId,
-			stack.quantity,
-		]),
-	);
 	const stackResults: PlacementResultSchema.Type["stack"] = [];
 	const updatedItems: RuntimeItemSchema.Type[] = [];
 
@@ -34,20 +28,20 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 			continue;
 		}
 
-		const addedQuantity = stackByItemId.get(item.id);
-		if (addedQuantity === undefined) {
+		const stack = plan.stack.find((candidate) => candidate.itemId === item.id);
+		if (stack === undefined) {
 			updatedItems.push(item);
 			continue;
 		}
 
 		const updatedItem = {
 			...item,
-			quantity: item.quantity + addedQuantity,
+			quantity: item.quantity + stack.quantity,
 		} satisfies RuntimeItemSchema.Type;
 		updatedItems.push(updatedItem);
 		stackResults.push({
 			item: updatedItem,
-			quantity: addedQuantity,
+			quantity: stack.quantity,
 		});
 	}
 

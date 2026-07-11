@@ -54,5 +54,6 @@ export const runtimeInputTestItem = ({
 			},
 		},
 		quantity,
+		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };

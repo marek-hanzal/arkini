@@ -27,6 +27,7 @@ const runtimeItem = ({
 		item: placementTestConfig.items[itemId],
 		location,
 		quantity,
+		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };
 

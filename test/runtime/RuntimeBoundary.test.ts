@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 
 const internalStoreImport = 'from "~/v1/runtime/internal/RuntimeStoreFx"';
 const directRuntimeModify = "SynchronizedRef.modifyEffect(";
+const runtimeTransactionImport = 'from "~/v1/runtime/internal/modifyRuntimeFx"';
+const revisionGuardImport = 'from "~/v1/revision/fx/assertRevisionFx"';
 const allowedStoreImporters = new Set([
 	"src/v1/game/layer/GameLayerFx.ts",
 	"src/v1/runtime/internal/modifyRuntimeFx.ts",
@@ -12,6 +14,20 @@ const allowedStoreImporters = new Set([
 const allowedDirectModifiers = new Set([
 	"src/v1/runtime/internal/modifyRuntimeFx.ts",
 ]);
+const revisionFreeWriteFiles = new Set([
+	"src/v1/placement/write/placeDropFx.ts",
+	"src/v1/placement/write/placeOutputFx.ts",
+	"src/v1/runtime/write/spawnItemFx.ts",
+	"src/v1/start/write/startFx.ts",
+]);
+
+const stateDerivedDecisionImports = [
+	'from "~/v1/input/schema/run/InputRunPlanSchema"',
+	'from "~/v1/line/schema/run/LineRunPlanSchema"',
+	'from "~/v1/output/schema/DropResultSchema"',
+	'from "~/v1/output/schema/OutputResultSchema"',
+	'from "~/v1/placement/schema/PlacementPlanSchema"',
+];
 
 const collectTypeScriptFilesFx = (
 	directory: string,
@@ -59,6 +75,7 @@ describe("runtime mutation boundary", () => {
 	it("keeps the mutable runtime store behind one transaction helper", async () => {
 		const invalid = await Effect.runPromise(
 			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
 				const files = yield* collectTypeScriptFilesFx("src/v1");
 				const storeImporters = yield* findImportersFx({
 					files,
@@ -68,21 +85,59 @@ describe("runtime mutation boundary", () => {
 					files,
 					needle: directRuntimeModify,
 				});
+				const writeFiles = files.filter((file) => file.includes("/write/"));
+				const writeWithoutTransactionBoundary = (yield* Effect.filter(
+					writeFiles,
+					(file) => {
+						return fileSystem
+							.readFileString(file)
+							.pipe(
+								Effect.map((source) => !source.includes(runtimeTransactionImport)),
+							);
+					},
+				)).filter((file) => !revisionFreeWriteFiles.has(file));
+				const writeWithoutRevisionGuard = (yield* Effect.filter(writeFiles, (file) => {
+					return fileSystem
+						.readFileString(file)
+						.pipe(Effect.map((source) => !source.includes(revisionGuardImport)));
+				})).filter((file) => !revisionFreeWriteFiles.has(file));
+				const staleDecisionImporters = (yield* Effect.forEach(
+					stateDerivedDecisionImports,
+					(needle) => {
+						return findImportersFx({
+							files: writeFiles,
+							needle,
+						}).pipe(
+							Effect.map((importers) => {
+								return importers.map((file) => ({
+									file,
+									needle,
+								}));
+							}),
+						);
+					},
+				)).flat();
 
 				return {
 					directModifiers: directModifiers.filter(
 						(file) => !allowedDirectModifiers.has(file),
 					),
+					staleDecisionImporters,
 					storeImporters: storeImporters.filter(
 						(file) => !allowedStoreImporters.has(file),
 					),
+					writeWithoutRevisionGuard,
+					writeWithoutTransactionBoundary,
 				};
 			}).pipe(Effect.provide(NodeContext.layer)),
 		);
 
 		expect(invalid).toEqual({
 			directModifiers: [],
+			staleDecisionImporters: [],
 			storeImporters: [],
+			writeWithoutRevisionGuard: [],
+			writeWithoutTransactionBoundary: [],
 		});
 	});
 });

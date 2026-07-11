@@ -103,17 +103,22 @@ describe("runtime commands", () => {
 				const moved = yield* moveItemFx({
 					itemId: log.id,
 					location: boardB,
+					revision: log.revision,
 				});
 				const quantity = yield* setItemQuantityFx({
 					itemId: log.id,
 					quantity: 4,
+					revision: moved.item.revision,
 				});
 				const swapped = yield* swapItemsFx({
 					firstItemId: log.id,
+					firstItemRevision: quantity.revision,
 					secondItemId: stone.id,
+					secondItemRevision: stone.revision,
 				});
 				const removed = yield* removeItemFx({
 					itemId: stone.id,
+					revision: swapped.second.revision,
 				});
 				const runtime = yield* readRuntimeFx();
 
@@ -145,7 +150,7 @@ describe("runtime commands", () => {
 	it("rejects duplicate identities and occupied destinations without partial writes", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				yield* spawnItemFx({
+				const logItem = yield* spawnItemFx({
 					id: "runtime:log",
 					itemId: "log",
 					location: boardA,
@@ -170,6 +175,7 @@ describe("runtime commands", () => {
 					moveItemFx({
 						itemId: "runtime:log",
 						location: boardB,
+						revision: logItem.revision,
 					}),
 				);
 				const log = yield* getItemFx({
@@ -268,13 +274,13 @@ describe("runtime commands", () => {
 		};
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
-				yield* spawnItemFx({
+				const logItem = yield* spawnItemFx({
 					id: "runtime:log",
 					itemId: "log",
 					location: boardA,
 					quantity: 1,
 				});
-				yield* spawnItemFx({
+				const stoneItem = yield* spawnItemFx({
 					id: "runtime:stone",
 					itemId: "stone",
 					location: boardB,
@@ -286,12 +292,14 @@ describe("runtime commands", () => {
 							moveItemFx({
 								itemId: "runtime:log",
 								location: target,
+								revision: logItem.revision,
 							}),
 						),
 						Effect.either(
 							moveItemFx({
 								itemId: "runtime:stone",
 								location: target,
+								revision: stoneItem.revision,
 							}),
 						),
 					],
@@ -328,10 +336,69 @@ describe("runtime commands", () => {
 		).toHaveLength(1);
 	});
 
+	it("rejects concurrent absolute updates from one stale item revision", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const item = yield* spawnItemFx({
+					id: "runtime:log",
+					itemId: "log",
+					location: boardA,
+					quantity: 1,
+				});
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(
+							setItemQuantityFx({
+								itemId: item.id,
+								quantity: 2,
+								revision: item.revision,
+							}),
+						),
+						Effect.either(
+							setItemQuantityFx({
+								itemId: item.id,
+								quantity: 3,
+								revision: item.revision,
+							}),
+						),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.runtime.items[0]?.quantity).toSatisfy((quantity: number) => {
+			return quantity === 2 || quantity === 3;
+		});
+		const conflict = result.attempts.find(Either.isLeft);
+		if (conflict === undefined || Either.isRight(conflict)) {
+			throw new Error("Expected one stale quantity revision conflict.");
+		}
+		expect(conflict.left).toMatchObject({
+			_tag: "RevisionConflictError",
+			entityId: "runtime:log",
+			expectedRevision: expect.stringMatching(/^revision:/),
+		});
+	});
+
 	it("serializes concurrent removals of one item", async () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
-				yield* spawnItemFx({
+				const logItem = yield* spawnItemFx({
 					id: "runtime:log",
 					itemId: "log",
 					location: boardA,
@@ -342,11 +409,13 @@ describe("runtime commands", () => {
 						Effect.either(
 							removeItemFx({
 								itemId: "runtime:log",
+								revision: logItem.revision,
 							}),
 						),
 						Effect.either(
 							removeItemFx({
 								itemId: "runtime:log",
+								revision: logItem.revision,
 							}),
 						),
 					],

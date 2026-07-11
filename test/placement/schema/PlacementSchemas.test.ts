@@ -30,6 +30,7 @@ const runtimeItem = {
 		},
 	},
 	quantity: 3,
+	revision: "revision:runtime-log",
 } as const;
 
 describe("placement schemas", () => {

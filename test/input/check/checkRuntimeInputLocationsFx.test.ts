@@ -15,6 +15,7 @@ const owner = {
 	item: inputRuntimeTestConfig.items.workshop,
 	location: workshopLocation,
 	quantity: 1,
+	revision: "revision:owner",
 } as const;
 
 const inputItem = ({
@@ -43,6 +44,7 @@ const inputItem = ({
 			returnLocation: sourceLocation(1),
 		},
 		quantity,
+		revision: `revision:${id}`,
 	};
 };
 

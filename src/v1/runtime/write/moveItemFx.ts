@@ -4,7 +4,10 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
+import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
+import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { MoveItemResultSchema } from "~/v1/runtime/schema/command/MoveItemResultSchema";
@@ -15,6 +18,7 @@ export namespace moveItemFx {
 	export interface Props {
 		itemId: IdSchema.Type;
 		location: GridLocationSchema.Type;
+		revision: RevisionSchema.Type;
 	}
 }
 
@@ -24,6 +28,7 @@ export namespace moveItemFx {
 export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 	itemId,
 	location,
+	revision,
 }: moveItemFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
@@ -39,6 +44,11 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					}),
 				);
 			}
+			yield* assertRevisionFx({
+				actualRevision: item.revision,
+				entityId: item.id,
+				expectedRevision: revision,
+			});
 			if (!isGridRuntimeItem(item)) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -69,10 +79,12 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
-			const movedItem = {
-				...item,
-				location,
-			} satisfies RuntimeItemSchema.Type;
+			const movedItem = yield* reviseRuntimeItemFx({
+				item: {
+					...item,
+					location,
+				} satisfies RuntimeItemSchema.Type,
+			});
 			const result = {
 				item: movedItem,
 				previousLocation: item.location,

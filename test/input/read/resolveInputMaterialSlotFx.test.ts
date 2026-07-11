@@ -21,7 +21,7 @@ describe("resolveInputMaterialSlotFx", () => {
 					location: workshopLocation,
 					quantity: 1,
 				});
-				yield* spawnItemFx({
+				const source = yield* spawnItemFx({
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation(1),
@@ -32,6 +32,7 @@ describe("resolveInputMaterialSlotFx", () => {
 					lineId: "line:workshop:build",
 					inputIndex: 0,
 					sourceItemId: "runtime:water",
+					sourceItemRevision: source.revision,
 					quantity: 2,
 				});
 

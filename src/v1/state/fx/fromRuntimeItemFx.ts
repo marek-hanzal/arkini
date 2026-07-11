@@ -23,5 +23,6 @@ export const fromRuntimeItemFx = Effect.fn("fromRuntimeItemFx")(function* ({
 		itemId: item.item.id,
 		location: item.location,
 		quantity: item.quantity,
+		revision: item.revision,
 	} satisfies StateItemSchema.Type;
 });

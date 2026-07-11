@@ -7,9 +7,19 @@ import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { placeDropFx } from "~/v1/placement/write/placeDropFx";
 import {
 	boardLocation,
+	configuredDrop,
 	inventoryLocation,
 	placementTestConfig,
 } from "~test/placement/fx/support/placementTestConfig";
+
+const requirePlacement = <Value>(value: Value | undefined): Value => {
+	expect(value).toBeDefined();
+	if (value === undefined) {
+		throw new Error("Expected configured drop to be placed.");
+	}
+
+	return value;
+};
 
 describe("placeDropFx", () => {
 	it("fills board stacks, then nearby board cells, then inventory", () => {
@@ -35,11 +45,11 @@ describe("placeDropFx", () => {
 				});
 
 				const placement = yield* placeDropFx({
-					drop: {
+					drop: configuredDrop({
 						itemId: "log",
 						placement: "drop",
 						quantity: 5,
-					},
+					}),
 					originItemId: "runtime:origin",
 				});
 				const runtime = yield* readRuntimeFx();
@@ -55,7 +65,9 @@ describe("placeDropFx", () => {
 			),
 		);
 
-		expect(result.placement.placement.stack).toEqual([
+		const placement = requirePlacement(result.placement);
+
+		expect(placement.placement.stack).toEqual([
 			{
 				item: expect.objectContaining({
 					id: "runtime:log",
@@ -64,7 +76,7 @@ describe("placeDropFx", () => {
 				quantity: 1,
 			},
 		]);
-		expect(result.placement.placement.spawn).toEqual([
+		expect(placement.placement.spawn).toEqual([
 			expect.objectContaining({
 				item: expect.objectContaining({
 					id: "log",
@@ -108,11 +120,11 @@ describe("placeDropFx", () => {
 				});
 
 				const placement = yield* placeDropFx({
-					drop: {
+					drop: configuredDrop({
 						itemId: "inventory-only",
 						placement: "random",
 						quantity: 3,
-					},
+					}),
 					originItemId: "runtime:origin",
 				});
 				const runtime = yield* readRuntimeFx();
@@ -128,7 +140,9 @@ describe("placeDropFx", () => {
 			),
 		);
 
-		expect(result.placement.placement.stack).toEqual([
+		const placement = requirePlacement(result.placement);
+
+		expect(placement.placement.stack).toEqual([
 			{
 				item: expect.objectContaining({
 					id: "runtime:inventory-item",
@@ -137,7 +151,7 @@ describe("placeDropFx", () => {
 				quantity: 1,
 			},
 		]);
-		expect(result.placement.placement.spawn).toEqual([
+		expect(placement.placement.spawn).toEqual([
 			expect.objectContaining({
 				location: inventoryLocation(0),
 				quantity: 2,
@@ -185,11 +199,11 @@ describe("placeDropFx", () => {
 				const before = yield* readRuntimeFx();
 				const placement = yield* Effect.either(
 					placeDropFx({
-						drop: {
+						drop: configuredDrop({
 							itemId: "log",
 							placement: "drop",
 							quantity: 1,
-						},
+						}),
 						originItemId: "runtime:origin",
 					}),
 				);
@@ -237,11 +251,11 @@ describe("placeDropFx", () => {
 
 				return yield* Effect.either(
 					placeDropFx({
-						drop: {
+						drop: configuredDrop({
 							itemId: "limited",
 							placement: "drop",
 							quantity: 1,
-						},
+						}),
 						originItemId: "runtime:origin",
 					}),
 				);
@@ -273,11 +287,11 @@ describe("placeDropFx", () => {
 				});
 
 				return yield* placeDropFx({
-					drop: {
+					drop: configuredDrop({
 						itemId: "log",
 						placement: "random",
 						quantity: 1,
-					},
+					}),
 					originItemId: "runtime:origin",
 				});
 			}).pipe(
@@ -287,9 +301,11 @@ describe("placeDropFx", () => {
 			),
 		);
 
-		expect(result.placement.stack).toEqual([]);
-		expect(result.placement.spawn).toHaveLength(1);
-		const spawned = result.placement.spawn[0];
+		const placement = requirePlacement(result);
+
+		expect(placement.placement.stack).toEqual([]);
+		expect(placement.placement.spawn).toHaveLength(1);
+		const spawned = placement.placement.spawn[0];
 		expect(spawned?.location.scope).toBe("board");
 		if (spawned?.location.scope !== "board") {
 			throw new Error("Expected one board placement.");
@@ -313,11 +329,11 @@ describe("placeDropFx", () => {
 
 				return yield* Effect.either(
 					placeDropFx({
-						drop: {
+						drop: configuredDrop({
 							itemId: "inventory-only",
 							placement: "replace",
 							quantity: 1,
-						},
+						}),
 						originItemId: "runtime:origin",
 					}),
 				);
@@ -335,5 +351,69 @@ describe("placeDropFx", () => {
 				reason: "replace:board-forbidden",
 			});
 		}
+	});
+
+	it("serializes concurrent drops competing for the last board cell", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+				for (const x of [
+					2,
+					3,
+				]) {
+					yield* spawnItemFx({
+						id: `runtime:blocker:${x}`,
+						itemId: "blocker",
+						location: boardLocation(x),
+						quantity: 1,
+					});
+				}
+				const drop = configuredDrop({
+					itemId: "board-only",
+					placement: "drop",
+					quantity: 1,
+				});
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(
+							placeDropFx({
+								drop,
+								originItemId: "runtime:origin",
+							}),
+						),
+						Effect.either(
+							placeDropFx({
+								drop,
+								originItemId: "runtime:origin",
+							}),
+						),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.runtime.items.filter((item) => item.item.id === "board-only")).toHaveLength(
+			1,
+		);
 	});
 });

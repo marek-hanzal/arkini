@@ -42,7 +42,7 @@ const spawnPermitFx = () => {
 
 const storeWaterFx = ({ id, quantity, x }: { id: string; quantity: number; x: number }) => {
 	return Effect.gen(function* () {
-		yield* spawnItemFx({
+		const source = yield* spawnItemFx({
 			id,
 			itemId: "water",
 			location: {
@@ -59,6 +59,7 @@ const storeWaterFx = ({ id, quantity, x }: { id: string; quantity: number; x: nu
 			lineId,
 			inputIndex: 0,
 			sourceItemId: id,
+			sourceItemRevision: source.revision,
 			quantity,
 		});
 	});

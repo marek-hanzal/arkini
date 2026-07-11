@@ -24,6 +24,7 @@ const bufferedItem = ({ id, quantity }: { id: string; quantity: number }) => {
 			},
 		},
 		quantity,
+		revision: `revision:${id}`,
 	} satisfies InputRuntimeItemSchema.Type;
 };
 

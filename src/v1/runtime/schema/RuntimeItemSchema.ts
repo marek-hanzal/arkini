@@ -4,6 +4,7 @@ import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 
 /**
  * A hydrated live item or item stack that owns its current location.
@@ -29,6 +30,12 @@ export const RuntimeItemSchema = z
 		 */
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live runtime entry.",
+		),
+		/**
+		 * Opaque optimistic-concurrency token replaced after every mutation.
+		 */
+		revision: RevisionSchema.describe(
+			"The optimistic-concurrency revision of this mutable runtime item.",
 		),
 	})
 	.strict()

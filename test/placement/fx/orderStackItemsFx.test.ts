@@ -12,6 +12,7 @@ const runtimeItem = (id: string, x: number) => {
 		item: log,
 		location: boardLocation(x),
 		quantity: 1,
+		revision: `revision:${id}`,
 	};
 };
 

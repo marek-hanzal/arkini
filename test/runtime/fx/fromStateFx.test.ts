@@ -61,6 +61,7 @@ const state = StateSchema.parse({
 				},
 			},
 			quantity: 1,
+			revision: "revision:board-tree",
 		},
 		{
 			id: "runtime:inventory:tree",
@@ -73,6 +74,7 @@ const state = StateSchema.parse({
 				},
 			},
 			quantity: 3,
+			revision: "revision:inventory-tree",
 		},
 	],
 });

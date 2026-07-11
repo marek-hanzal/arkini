@@ -1,12 +1,16 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
+import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { placeOutputFx } from "~/v1/placement/write/placeOutputFx";
 import {
 	boardLocation,
+	configuredDrop,
+	configuredOutput,
 	inventoryLocation,
 	placementTestConfig,
 } from "~test/placement/fx/support/placementTestConfig";
@@ -30,20 +34,18 @@ describe("placeOutputFx", () => {
 
 				const placement = yield* placeOutputFx({
 					originItemId: "runtime:origin",
-					output: {
-						drop: [
-							{
-								itemId: "replacement",
-								placement: "replace",
-								quantity: 1,
-							},
-							{
-								itemId: "log",
-								placement: "drop",
-								quantity: 1,
-							},
-						],
-					},
+					output: configuredOutput([
+						configuredDrop({
+							itemId: "replacement",
+							placement: "replace",
+							quantity: 1,
+						}),
+						configuredDrop({
+							itemId: "log",
+							placement: "drop",
+							quantity: 1,
+						}),
+					]),
 				});
 				const runtime = yield* readRuntimeFx();
 
@@ -104,20 +106,18 @@ describe("placeOutputFx", () => {
 				const placement = yield* Effect.either(
 					placeOutputFx({
 						originItemId: "runtime:origin",
-						output: {
-							drop: [
-								{
-									itemId: "board-only",
-									placement: "drop",
-									quantity: 1,
-								},
-								{
-									itemId: "board-only",
-									placement: "drop",
-									quantity: 1,
-								},
-							],
-						},
+						output: configuredOutput([
+							configuredDrop({
+								itemId: "board-only",
+								placement: "drop",
+								quantity: 1,
+							}),
+							configuredDrop({
+								itemId: "board-only",
+								placement: "drop",
+								quantity: 1,
+							}),
+						]),
 					}),
 				);
 				const after = yield* readRuntimeFx();
@@ -155,20 +155,18 @@ describe("placeOutputFx", () => {
 
 				const placement = yield* placeOutputFx({
 					originItemId: "runtime:origin",
-					output: {
-						drop: [
-							{
-								itemId: "log",
-								placement: "drop",
-								quantity: 2,
-							},
-							{
-								itemId: "log",
-								placement: "drop",
-								quantity: 2,
-							},
-						],
-					},
+					output: configuredOutput([
+						configuredDrop({
+							itemId: "log",
+							placement: "drop",
+							quantity: 2,
+						}),
+						configuredDrop({
+							itemId: "log",
+							placement: "drop",
+							quantity: 2,
+						}),
+					]),
 				});
 				const runtime = yield* readRuntimeFx();
 
@@ -206,5 +204,74 @@ describe("placeOutputFx", () => {
 			3,
 			1,
 		]);
+	});
+
+	it("resolves output rules from the same snapshot that it commits", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+				const permit = yield* spawnItemFx({
+					id: "runtime:permit",
+					itemId: "permit",
+					location: inventoryLocation(0),
+					quantity: 1,
+				});
+				const staleRuntime = yield* readRuntimeFx();
+				yield* removeItemFx({
+					itemId: "runtime:permit",
+					revision: permit.revision,
+				});
+
+				const placement = yield* placeOutputFx({
+					originItemId: "runtime:origin",
+					output: configuredOutput([
+						configuredDrop({
+							itemId: "log",
+							placement: "drop",
+							quantity: 1,
+							rules: [
+								{
+									type: "enable",
+									when: [
+										{
+											type: "exists",
+											query: {
+												scope: "any",
+												selector: {
+													type: "item",
+													itemId: "permit",
+												},
+											},
+										},
+									],
+								},
+							],
+						}),
+					]),
+				}).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Effect.succeed(staleRuntime),
+					}),
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					placement,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		expect(result.placement.drop).toEqual([]);
+		expect(result.runtime.items.some((item) => item.item.id === "log")).toBe(false);
 	});
 });

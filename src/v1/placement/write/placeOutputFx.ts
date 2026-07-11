@@ -1,24 +1,21 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
-import type { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
-import type { DropPlacementResultSchema } from "~/v1/placement/schema/DropPlacementResultSchema";
-import type { OutputPlacementResultSchema } from "~/v1/placement/schema/OutputPlacementResultSchema";
+import { outputFx } from "~/v1/output/fx/outputFx";
+import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
+import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
+import { readPlacementOriginFx } from "~/v1/placement/fx/readPlacementOriginFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
-import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
-import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
 
 export namespace placeOutputFx {
 	export interface Props {
 		originItemId: IdSchema.Type;
-		output: OutputResultSchema.Type;
+		output: OutputSchema.Type;
 	}
 }
 
 /**
- * Atomically places every resolved drop from one output in authored order.
+ * Atomically resolves and places one configured output from the latest runtime snapshot.
  */
 export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 	originItemId,
@@ -26,70 +23,21 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 }: placeOutputFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			if (output.drop.length === 0) {
-				return [
-					{
-						drop: [],
-					} satisfies OutputPlacementResultSchema.Type,
-					runtime,
-				] as const;
-			}
+			const origin = yield* readPlacementOriginFx({
+				originItemId,
+				runtime,
+			});
+			const resolved = yield* outputFx({
+				origin: origin.location.position,
+				output,
+			});
 
-			const originItem = runtime.items.find((item) => item.id === originItemId);
-			if (originItem === undefined) {
-				return yield* Effect.fail(
-					new ItemNotFoundError({
-						itemId: originItemId,
-					}),
-				);
-			}
-			if (!isGridRuntimeItem(originItem)) {
-				return yield* Effect.fail(
-					new ItemNotFoundError({
-						itemId: originItemId,
-					}),
-				);
-			}
-
-			const placement = yield* Effect.reduce(
-				output.drop,
-				{
-					draft: runtime,
-					results: [] as DropPlacementResultSchema.Type[],
-				},
-				(state, drop) => {
-					return Effect.gen(function* () {
-						const plan = yield* planDropPlacementFx({
-							drop,
-							origin: originItem.location.position,
-							originItemId,
-							runtime: state.draft,
-						});
-						const [result, draft] = yield* applyPlacementPlanFx({
-							plan,
-							runtime: state.draft,
-						});
-
-						return {
-							draft,
-							results: [
-								...state.results,
-								{
-									drop,
-									placement: result,
-								},
-							],
-						};
-					});
-				},
-			);
-
-			return [
-				{
-					drop: placement.results,
-				} satisfies OutputPlacementResultSchema.Type,
-				placement.draft,
-			] as const;
+			return yield* applyOutputPlacementFx({
+				origin: origin.location.position,
+				originItemId,
+				output: resolved,
+				runtime,
+			});
 		});
 	});
 });

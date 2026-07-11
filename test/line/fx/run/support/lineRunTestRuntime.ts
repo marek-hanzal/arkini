@@ -160,6 +160,7 @@ const ownerItem = {
 		},
 	},
 	quantity: 1,
+	revision: "revision:owner",
 } satisfies RuntimeItemSchema.Type;
 
 const gridItem = ({
@@ -182,6 +183,7 @@ const gridItem = ({
 			},
 		},
 		quantity: 1,
+		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };
 
@@ -203,6 +205,7 @@ const bufferedWater = ({ id, quantity }: { id: string; quantity: number }) => {
 			},
 		},
 		quantity,
+		revision: `revision:${id}`,
 	} satisfies RuntimeItemSchema.Type;
 };
 

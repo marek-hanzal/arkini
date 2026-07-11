@@ -23,7 +23,7 @@ describe("input state", () => {
 					location: workshopLocation,
 					quantity: 1,
 				});
-				yield* spawnItemFx({
+				const source = yield* spawnItemFx({
 					id: "runtime:water",
 					itemId: "water",
 					location: sourceLocation(1),
@@ -34,6 +34,7 @@ describe("input state", () => {
 					lineId: "line:workshop:build",
 					inputIndex: 0,
 					sourceItemId: "runtime:water",
+					sourceItemRevision: source.revision,
 					quantity: 2,
 				});
 

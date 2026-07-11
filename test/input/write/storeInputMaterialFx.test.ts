@@ -51,12 +51,19 @@ const storeFx = ({
 	quantity: number;
 	sourceItemId?: string;
 }) => {
-	return storeInputMaterialFx({
-		ownerItemId: "runtime:workshop",
-		lineId: "line:workshop:build",
-		inputIndex: 0,
-		sourceItemId,
-		quantity,
+	return Effect.gen(function* () {
+		const source = yield* getItemFx({
+			itemId: sourceItemId,
+		});
+
+		return yield* storeInputMaterialFx({
+			ownerItemId: "runtime:workshop",
+			lineId: "line:workshop:build",
+			inputIndex: 0,
+			sourceItemId,
+			sourceItemRevision: source.revision,
+			quantity,
+		});
 	});
 };
 
@@ -121,10 +128,15 @@ describe("storeInputMaterialFx", () => {
 					quantity: 2,
 				});
 
+				const item = yield* getItemFx({
+					itemId: "runtime:water",
+				});
+
 				return yield* Effect.either(
 					moveItemFx({
 						itemId: "runtime:water",
 						location: sourceLocation(2),
+						revision: item.revision,
 					}),
 				);
 			}).pipe(
@@ -280,18 +292,28 @@ describe("storeInputMaterialFx", () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
-				yield* spawnSourceFx({
+				const source = yield* spawnSourceFx({
 					quantity: 2,
 				});
 				const attempts = yield* Effect.all(
 					[
 						Effect.either(
-							storeFx({
+							storeInputMaterialFx({
+								ownerItemId: "runtime:workshop",
+								lineId: "line:workshop:build",
+								inputIndex: 0,
+								sourceItemId: source.id,
+								sourceItemRevision: source.revision,
 								quantity: 1,
 							}),
 						),
 						Effect.either(
-							storeFx({
+							storeInputMaterialFx({
+								ownerItemId: "runtime:workshop",
+								lineId: "line:workshop:build",
+								inputIndex: 0,
+								sourceItemId: source.id,
+								sourceItemRevision: source.revision,
 								quantity: 1,
 							}),
 						),
@@ -319,12 +341,25 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
-		expect(result.attempts.every(Either.isRight)).toBe(true);
-		expect(result.buffered.reduce((total, item) => total + item.quantity, 0)).toBe(2);
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.buffered.reduce((total, item) => total + item.quantity, 0)).toBe(1);
 		expect(
 			result.runtime.items.some((item) => {
-				return item.id === "runtime:water" && item.location.scope !== "input";
+				return (
+					item.id === "runtime:water" &&
+					item.location.scope !== "input" &&
+					item.quantity === 1
+				);
 			}),
-		).toBe(false);
+		).toBe(true);
+		const conflict = result.attempts.find(Either.isLeft);
+		if (conflict === undefined || Either.isRight(conflict)) {
+			throw new Error("Expected one stale input delivery conflict.");
+		}
+		expect(conflict.left).toMatchObject({
+			_tag: "RevisionConflictError",
+			entityId: "runtime:water",
+		});
 	});
 });

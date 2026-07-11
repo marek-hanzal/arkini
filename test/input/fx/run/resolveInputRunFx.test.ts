@@ -23,6 +23,7 @@ const owner = {
 		},
 	},
 	quantity: 1,
+	revision: "revision:owner",
 } as const;
 
 const bufferedItem = ({
@@ -51,6 +52,7 @@ const bufferedItem = ({
 			},
 		},
 		quantity,
+		revision: `revision:${id}`,
 	} satisfies InputRuntimeItemSchema.Type;
 };
 

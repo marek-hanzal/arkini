@@ -3,6 +3,9 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
+import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { SwapItemsResultSchema } from "~/v1/runtime/schema/command/SwapItemsResultSchema";
@@ -12,7 +15,9 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace swapItemsFx {
 	export interface Props {
 		firstItemId: IdSchema.Type;
+		firstItemRevision: RevisionSchema.Type;
 		secondItemId: IdSchema.Type;
+		secondItemRevision: RevisionSchema.Type;
 	}
 }
 
@@ -21,7 +26,9 @@ export namespace swapItemsFx {
  */
 export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 	firstItemId,
+	firstItemRevision,
 	secondItemId,
+	secondItemRevision,
 }: swapItemsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
@@ -48,6 +55,16 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					}),
 				);
 			}
+			yield* assertRevisionFx({
+				actualRevision: first.revision,
+				entityId: first.id,
+				expectedRevision: firstItemRevision,
+			});
+			yield* assertRevisionFx({
+				actualRevision: second.revision,
+				entityId: second.id,
+				expectedRevision: secondItemRevision,
+			});
 			if (!isGridRuntimeItem(first)) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
@@ -65,14 +82,18 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				);
 			}
 
-			const swappedFirst = {
-				...first,
-				location: second.location,
-			} satisfies RuntimeItemSchema.Type;
-			const swappedSecond = {
-				...second,
-				location: first.location,
-			} satisfies RuntimeItemSchema.Type;
+			const swappedFirst = yield* reviseRuntimeItemFx({
+				item: {
+					...first,
+					location: second.location,
+				} satisfies RuntimeItemSchema.Type,
+			});
+			const swappedSecond = yield* reviseRuntimeItemFx({
+				item: {
+					...second,
+					location: first.location,
+				} satisfies RuntimeItemSchema.Type,
+			});
 			const result = {
 				first: swappedFirst,
 				second: swappedSecond,

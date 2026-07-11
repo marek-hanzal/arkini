@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
 import type { PlacementResultSchema } from "~/v1/placement/schema/PlacementResultSchema";
+import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
@@ -34,10 +35,12 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 			continue;
 		}
 
-		const updatedItem = {
-			...item,
-			quantity: item.quantity + stack.quantity,
-		} satisfies RuntimeItemSchema.Type;
+		const updatedItem = yield* reviseRuntimeItemFx({
+			item: {
+				...item,
+				quantity: item.quantity + stack.quantity,
+			} satisfies RuntimeItemSchema.Type,
+		});
 		updatedItems.push(updatedItem);
 		stackResults.push({
 			item: updatedItem,

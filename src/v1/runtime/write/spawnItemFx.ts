@@ -6,8 +6,8 @@ import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { ItemAlreadyExistsError } from "~/v1/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
+import { createRuntimeItemFx } from "~/v1/runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace spawnItemFx {
@@ -31,12 +31,12 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 	const item = yield* resolveItemFx({
 		itemId,
 	});
-	const runtimeItem = {
+	const runtimeItem = yield* createRuntimeItemFx({
 		id,
 		item,
 		location,
 		quantity,
-	} satisfies RuntimeItemSchema.Type;
+	});
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const duplicate = pipe(

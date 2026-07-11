@@ -8,6 +8,8 @@ import { applyInputMaterialStorePlanFx } from "~/v1/input/fx/applyInputMaterialS
 import { planInputMaterialStoreFx } from "~/v1/input/fx/planInputMaterialStoreFx";
 import type { InputMaterialStoreResultSchema } from "~/v1/input/schema/command/InputMaterialStoreResultSchema";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { filterInputMaterialItems } from "~/v1/input/read/filterInputMaterialItems";
 import { readItemMaterialInputFx } from "~/v1/input/read/readItemMaterialInputFx";
@@ -20,6 +22,7 @@ export namespace storeInputMaterialFx {
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		sourceItemId: IdSchema.Type;
+		sourceItemRevision: RevisionSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 	}
 }
@@ -32,6 +35,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 	lineId,
 	inputIndex,
 	sourceItemId,
+	sourceItemRevision,
 	quantity,
 }: storeInputMaterialFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
@@ -43,6 +47,11 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 			const source = yield* readRuntimeItemByIdFx({
 				itemId: sourceItemId,
 				runtime,
+			});
+			yield* assertRevisionFx({
+				actualRevision: source.revision,
+				entityId: source.id,
+				expectedRevision: sourceItemRevision,
 			});
 			if (!isGridRuntimeItem(source)) {
 				return yield* Effect.fail(

@@ -35,11 +35,17 @@ Planning and mutation are separate:
 
 ```text
 planDropPlacementFx
+├── assertPlacementMaxCountFx
 ├── planReplacePlacementFx
-├── planBoardPlacementFx
-│   └── planScopePlacementFx
-├── planInventoryPlacementFx
-│   └── planScopePlacementFx
+├── planDropScopePlacementFx
+│   ├── planBoardPlacementFx
+│   │   └── planScopePlacementFx
+│   ├── planInventoryPlacementFx
+│   │   └── planScopePlacementFx
+│   └── planBoardThenInventoryPlacementFx
+│       ├── planBoardPlacementFx
+│       ├── planInventoryPlacementFx
+│       └── assertPlacementPlanCompleteFx
 └── mergePlacementPlansFx
 
 placeOutputFx

@@ -2,23 +2,26 @@ import { Effect } from "effect";
 
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import { dehydrateRuntimeBoardItemFx } from "./dehydrateRuntimeBoardItemFx";
-import { dehydrateRuntimeInventoryItemFx } from "./dehydrateRuntimeInventoryItemFx";
+import { fromRuntimeBoardItemFx } from "./fromRuntimeBoardItemFx";
+import { fromRuntimeInventoryItemFx } from "./fromRuntimeInventoryItemFx";
 
-export namespace dehydrateRuntimeFx {
+export namespace fromRuntimeFx {
 	export interface Props {
 		runtime: RuntimeSchema.Type;
 	}
 }
 
 /**
- * Dehydrates the core runtime into serializable state containing canonical item IDs.
+ * Builds serializable state from the core runtime using canonical item IDs.
+ *
+ * Counterpart: `fromStateFx` in `~/v1/runtime/fx/fromStateFx` builds the
+ * runtime from this state.
  */
-export const dehydrateRuntimeFx = Effect.fn("dehydrateRuntimeFx")(function* ({
+export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 	runtime,
-}: dehydrateRuntimeFx.Props) {
+}: fromRuntimeFx.Props) {
 	const boardItems = yield* Effect.forEach(runtime.board.items, (item) => {
-		return dehydrateRuntimeBoardItemFx({
+		return fromRuntimeBoardItemFx({
 			item,
 		});
 	});
@@ -27,7 +30,7 @@ export const dehydrateRuntimeFx = Effect.fn("dehydrateRuntimeFx")(function* ({
 			return Effect.succeed(null);
 		}
 
-		return dehydrateRuntimeInventoryItemFx({
+		return fromRuntimeInventoryItemFx({
 			item,
 		});
 	});

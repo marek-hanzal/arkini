@@ -3,18 +3,21 @@ import { Effect } from "effect";
 import type { RuntimeBoardItemSchema } from "~/v1/runtime/schema/RuntimeBoardItemSchema";
 import type { StateBoardItemSchema } from "~/v1/state/schema/StateBoardItemSchema";
 
-export namespace dehydrateRuntimeBoardItemFx {
+export namespace fromRuntimeBoardItemFx {
 	export interface Props {
 		item: RuntimeBoardItemSchema.Type;
 	}
 }
 
 /**
- * Replaces one runtime board item's canonical object with its stable item ID.
+ * Builds one persisted board item from its runtime representation.
+ *
+ * Counterpart: `fromStateBoardItemFx` in
+ * `~/v1/runtime/fx/fromStateBoardItemFx` builds runtime from this state item.
  */
-export const dehydrateRuntimeBoardItemFx = Effect.fn("dehydrateRuntimeBoardItemFx")(function* ({
+export const fromRuntimeBoardItemFx = Effect.fn("fromRuntimeBoardItemFx")(function* ({
 	item,
-}: dehydrateRuntimeBoardItemFx.Props) {
+}: fromRuntimeBoardItemFx.Props) {
 	const result = {
 		id: item.id,
 		itemId: item.item.id,

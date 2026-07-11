@@ -5,7 +5,7 @@ import type { RuntimeInventoryItemSchema } from "~/v1/runtime/schema/RuntimeInve
 import type { StateInventoryItemSchema } from "~/v1/state/schema/StateInventoryItemSchema";
 import { resolveRuntimeItemFx } from "./resolveRuntimeItemFx";
 
-export namespace hydrateRuntimeInventoryItemFx {
+export namespace fromStateInventoryItemFx {
 	export interface Props {
 		game: GameSchema.Type;
 		state: StateInventoryItemSchema.Type;
@@ -13,12 +13,15 @@ export namespace hydrateRuntimeInventoryItemFx {
 }
 
 /**
- * Hydrates one persisted inventory item with its canonical item reference.
+ * Builds one runtime inventory item from its persisted state representation.
+ *
+ * Counterpart: `fromRuntimeInventoryItemFx` in
+ * `~/v1/state/fx/fromRuntimeInventoryItemFx` builds state from this runtime item.
  */
-export const hydrateRuntimeInventoryItemFx = Effect.fn("hydrateRuntimeInventoryItemFx")(function* ({
+export const fromStateInventoryItemFx = Effect.fn("fromStateInventoryItemFx")(function* ({
 	game,
 	state,
-}: hydrateRuntimeInventoryItemFx.Props) {
+}: fromStateInventoryItemFx.Props) {
 	const item = yield* resolveRuntimeItemFx({
 		game,
 		itemId: state.itemId,

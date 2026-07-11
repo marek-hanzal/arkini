@@ -5,7 +5,7 @@ import type { RuntimeBoardItemSchema } from "~/v1/runtime/schema/RuntimeBoardIte
 import type { StateBoardItemSchema } from "~/v1/state/schema/StateBoardItemSchema";
 import { resolveRuntimeItemFx } from "./resolveRuntimeItemFx";
 
-export namespace hydrateRuntimeBoardItemFx {
+export namespace fromStateBoardItemFx {
 	export interface Props {
 		game: GameSchema.Type;
 		state: StateBoardItemSchema.Type;
@@ -13,12 +13,15 @@ export namespace hydrateRuntimeBoardItemFx {
 }
 
 /**
- * Hydrates one persisted board item with its canonical item reference.
+ * Builds one runtime board item from its persisted state representation.
+ *
+ * Counterpart: `fromRuntimeBoardItemFx` in
+ * `~/v1/state/fx/fromRuntimeBoardItemFx` builds state from this runtime item.
  */
-export const hydrateRuntimeBoardItemFx = Effect.fn("hydrateRuntimeBoardItemFx")(function* ({
+export const fromStateBoardItemFx = Effect.fn("fromStateBoardItemFx")(function* ({
 	game,
 	state,
-}: hydrateRuntimeBoardItemFx.Props) {
+}: fromStateBoardItemFx.Props) {
 	const item = yield* resolveRuntimeItemFx({
 		game,
 		itemId: state.itemId,

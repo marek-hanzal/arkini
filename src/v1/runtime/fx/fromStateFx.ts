@@ -3,10 +3,10 @@ import { Effect } from "effect";
 import type { GameSchema } from "~/v1/schema/GameSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import { hydrateRuntimeBoardItemFx } from "./hydrateRuntimeBoardItemFx";
-import { hydrateRuntimeInventoryItemFx } from "./hydrateRuntimeInventoryItemFx";
+import { fromStateBoardItemFx } from "./fromStateBoardItemFx";
+import { fromStateInventoryItemFx } from "./fromStateInventoryItemFx";
 
-export namespace hydrateRuntimeFx {
+export namespace fromStateFx {
 	export interface Props {
 		game: GameSchema.Type;
 		state: StateSchema.Type;
@@ -14,14 +14,14 @@ export namespace hydrateRuntimeFx {
 }
 
 /**
- * Hydrates serializable state into the core runtime with canonical item references.
+ * Builds the core runtime from serializable state and canonical game items.
+ *
+ * Counterpart: `fromRuntimeFx` in `~/v1/state/fx/fromRuntimeFx` builds
+ * serializable state from this runtime.
  */
-export const hydrateRuntimeFx = Effect.fn("hydrateRuntimeFx")(function* ({
-	game,
-	state,
-}: hydrateRuntimeFx.Props) {
+export const fromStateFx = Effect.fn("fromStateFx")(function* ({ game, state }: fromStateFx.Props) {
 	const boardItems = yield* Effect.forEach(state.board.items, (state) => {
-		return hydrateRuntimeBoardItemFx({
+		return fromStateBoardItemFx({
 			game,
 			state,
 		});
@@ -31,7 +31,7 @@ export const hydrateRuntimeFx = Effect.fn("hydrateRuntimeFx")(function* ({
 			return Effect.succeed(null);
 		}
 
-		return hydrateRuntimeInventoryItemFx({
+		return fromStateInventoryItemFx({
 			game,
 			state,
 		});

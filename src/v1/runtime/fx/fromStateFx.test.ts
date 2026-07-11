@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { GameSchema } from "~/v1/schema/GameSchema";
 import { StateSchema } from "~/v1/state/schema/StateSchema";
-import { dehydrateRuntimeFx } from "./dehydrateRuntimeFx";
-import { hydrateRuntimeFx } from "./hydrateRuntimeFx";
+import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
+import { fromStateFx } from "./fromStateFx";
 
 const game = GameSchema.parse({
 	version: "1.0",
@@ -68,10 +68,10 @@ const state = StateSchema.parse({
 	},
 });
 
-describe("hydrateRuntimeFx", () => {
-	it("hydrates every state item with the original canonical game object", () => {
+describe("fromStateFx", () => {
+	it("builds every runtime item with the original canonical game object", () => {
 		const runtime = Effect.runSync(
-			hydrateRuntimeFx({
+			fromStateFx({
 				game,
 				state,
 			}),
@@ -84,14 +84,14 @@ describe("hydrateRuntimeFx", () => {
 		expect(inventoryTree?.item).toBe(canonicalTree);
 	});
 
-	it("round-trips hydrated runtime back to serializable state", () => {
+	it("round-trips runtime through the state domain counterpart", () => {
 		const dehydrated = Effect.runSync(
-			hydrateRuntimeFx({
+			fromStateFx({
 				game,
 				state,
 			}).pipe(
 				Effect.flatMap((runtime) => {
-					return dehydrateRuntimeFx({
+					return fromRuntimeFx({
 						runtime,
 					});
 				}),
@@ -101,7 +101,7 @@ describe("hydrateRuntimeFx", () => {
 		expect(dehydrated).toEqual(state);
 	});
 
-	it("fails hydration when state references an unknown canonical item", () => {
+	it("fails when state references an unknown canonical item", () => {
 		const invalidState = StateSchema.parse({
 			...state,
 			board: {
@@ -115,7 +115,7 @@ describe("hydrateRuntimeFx", () => {
 		});
 		const result = Effect.runSync(
 			Effect.either(
-				hydrateRuntimeFx({
+				fromStateFx({
 					game,
 					state: invalidState,
 				}),

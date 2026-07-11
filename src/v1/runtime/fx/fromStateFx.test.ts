@@ -2,6 +2,7 @@ import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
+import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { StateSchema } from "~/v1/state/schema/StateSchema";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
@@ -70,6 +71,23 @@ const state = StateSchema.parse({
 });
 
 describe("fromStateFx", () => {
+	it("provides an empty layout-aware runtime at game startup", () => {
+		const runtime = Effect.runSync(
+			RuntimeFx.pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(runtime.config).toBe(config);
+		expect(runtime.board.items).toEqual([]);
+		expect(runtime.inventory.slots).toEqual([
+			null,
+			null,
+		]);
+	});
+
 	it("builds every runtime item with the original canonical game object", () => {
 		const runtime = Effect.runSync(
 			fromStateFx({

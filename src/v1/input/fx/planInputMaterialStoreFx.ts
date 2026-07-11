@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { InputMaterialSchema } from "~/v1/input/schema/InputMaterialSchema";
 import type { InputMaterialStoreResolutionSchema } from "~/v1/input/schema/store/InputMaterialStoreResolutionSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
@@ -11,6 +12,7 @@ export namespace planInputMaterialStoreFx {
 	export interface Props {
 		input: InputMaterialSchema.Type;
 		item: RuntimeItemSchema.Type;
+		requestedQuantity: PositiveIntegerSchema.Type;
 		storedQuantity: NonNegativeIntegerSchema.Type;
 	}
 }
@@ -21,6 +23,7 @@ export namespace planInputMaterialStoreFx {
 export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(function* ({
 	input,
 	item,
+	requestedQuantity,
 	storedQuantity,
 }: planInputMaterialStoreFx.Props) {
 	const matches = yield* selectorFx({
@@ -41,6 +44,6 @@ export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(fu
 
 	return {
 		sourceItemId: item.id,
-		quantity: Math.min(item.quantity, resolution.availableCapacity),
+		quantity: Math.min(item.quantity, requestedQuantity, resolution.availableCapacity),
 	} satisfies InputMaterialStoreResolutionSchema.Type;
 });

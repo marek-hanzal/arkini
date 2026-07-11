@@ -24,6 +24,7 @@ describe("planInputMaterialStoreFx", () => {
 			Effect.runSync(
 				planInputMaterialStoreFx({
 					input,
+					requestedQuantity: 10,
 					item: runtimeInputTestItem({
 						id: "runtime:water",
 						itemId: "water",
@@ -43,6 +44,7 @@ describe("planInputMaterialStoreFx", () => {
 			Effect.runSync(
 				planInputMaterialStoreFx({
 					input,
+					requestedQuantity: 10,
 					item: runtimeInputTestItem({
 						id: "runtime:log",
 						itemId: "log",
@@ -59,6 +61,7 @@ describe("planInputMaterialStoreFx", () => {
 			Effect.runSync(
 				planInputMaterialStoreFx({
 					input,
+					requestedQuantity: 10,
 					item: runtimeInputTestItem({
 						id: "runtime:water",
 						itemId: "water",
@@ -87,6 +90,7 @@ describe("planInputMaterialStoreFx", () => {
 			Effect.runSync(
 				planInputMaterialStoreFx({
 					input: taggedInput,
+					requestedQuantity: 10,
 					item: runtimeInputTestItem({
 						id: "runtime:water",
 						itemId: "water",

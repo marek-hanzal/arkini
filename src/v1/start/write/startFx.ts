@@ -1,10 +1,9 @@
-import { Effect, SynchronizedRef } from "effect";
+import { Effect } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import { RuntimeNotEmptyError } from "~/v1/runtime/error/RuntimeNotEmptyError";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { planStartFx } from "~/v1/start/fx/planStartFx";
 
 /**
@@ -12,9 +11,7 @@ import { planStartFx } from "~/v1/start/fx/planStartFx";
  */
 export const startFx = Effect.fn("startFx")(function* () {
 	const config = yield* GameConfigFx;
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			if (runtime.items.length > 0) {
 				return yield* Effect.fail(
@@ -31,9 +28,6 @@ export const startFx = Effect.fn("startFx")(function* () {
 			const [, nextRuntime] = yield* applyPlacementPlanFx({
 				plan,
 				runtime,
-			});
-			yield* assertRuntimeFx({
-				runtime: nextRuntime,
 			});
 
 			return [

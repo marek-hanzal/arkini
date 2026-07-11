@@ -275,4 +275,56 @@ describe("storeInputMaterialFx", () => {
 			quantity: 2,
 		});
 	});
+
+	it("serializes concurrent deliveries from the same source stack", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnSourceFx({
+					quantity: 2,
+				});
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(
+							storeFx({
+								quantity: 1,
+							}),
+						),
+						Effect.either(
+							storeFx({
+								quantity: 1,
+							}),
+						),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const buffered = yield* readInputMaterialItemsFx({
+					ownerItemId: "runtime:workshop",
+					lineId: "line:workshop:build",
+					inputIndex: 0,
+				});
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					buffered,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config: inputRuntimeTestConfig,
+				}),
+			),
+		);
+
+		expect(result.attempts.every(Either.isRight)).toBe(true);
+		expect(result.buffered.reduce((total, item) => total + item.quantity, 0)).toBe(2);
+		expect(
+			result.runtime.items.some((item) => {
+				return item.id === "runtime:water" && item.location.scope !== "input";
+			}),
+		).toBe(false);
+	});
 });

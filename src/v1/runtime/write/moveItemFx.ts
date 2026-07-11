@@ -1,12 +1,11 @@
-import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { MoveItemResultSchema } from "~/v1/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
@@ -26,9 +25,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 	itemId,
 	location,
 }: moveItemFx.Props) {
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const item = pipe(
 				runtime.items,
@@ -86,9 +83,6 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					return candidate.id === itemId ? movedItem : candidate;
 				}),
 			} satisfies RuntimeSchema.Type;
-			yield* assertRuntimeFx({
-				runtime: nextRuntime,
-			});
 
 			return [
 				result,

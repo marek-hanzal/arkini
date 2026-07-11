@@ -1,10 +1,9 @@
-import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
@@ -22,9 +21,7 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 	itemId,
 	quantity,
 }: setItemQuantityFx.Props) {
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const item = pipe(
 				runtime.items,
@@ -48,9 +45,6 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 					return candidate.id === itemId ? updatedItem : candidate;
 				}),
 			} satisfies RuntimeSchema.Type;
-			yield* assertRuntimeFx({
-				runtime: nextRuntime,
-			});
 
 			return [
 				updatedItem,

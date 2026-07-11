@@ -1,4 +1,4 @@
-import { Effect, SynchronizedRef } from "effect";
+import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
@@ -8,8 +8,7 @@ import { applyInputMaterialStorePlanFx } from "~/v1/input/fx/applyInputMaterialS
 import { planInputMaterialStoreFx } from "~/v1/input/fx/planInputMaterialStoreFx";
 import type { InputMaterialStoreResultSchema } from "~/v1/input/schema/command/InputMaterialStoreResultSchema";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { filterInputMaterialItems } from "~/v1/input/read/filterInputMaterialItems";
 import { readItemMaterialInputFx } from "~/v1/input/read/readItemMaterialInputFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
@@ -35,9 +34,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 	sourceItemId,
 	quantity,
 }: storeInputMaterialFx.Props) {
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const owner = yield* readRuntimeItemByIdFx({
 				itemId: ownerItemId,
@@ -107,9 +104,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				plan,
 				runtime,
 				source,
-			});
-			yield* assertRuntimeFx({
-				runtime: nextRuntime,
 			});
 
 			return [

@@ -213,4 +213,162 @@ describe("runtime commands", () => {
 		expect(result.stone.id).toBe("runtime:stone");
 		expect(result.runtime.items).toHaveLength(2);
 	});
+	it("serializes concurrent spawns competing for one location", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(
+							spawnItemFx({
+								id: "runtime:log",
+								itemId: "log",
+								location: boardA,
+								quantity: 1,
+							}),
+						),
+						Effect.either(
+							spawnItemFx({
+								id: "runtime:stone",
+								itemId: "stone",
+								location: boardA,
+								quantity: 1,
+							}),
+						),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.runtime.items).toHaveLength(1);
+		expect(result.runtime.items[0]?.location).toEqual(boardA);
+	});
+
+	it("serializes concurrent moves competing for one location", async () => {
+		const target = {
+			scope: "board" as const,
+			position: {
+				x: 2,
+				y: 0,
+			},
+		};
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:log",
+					itemId: "log",
+					location: boardA,
+					quantity: 1,
+				});
+				yield* spawnItemFx({
+					id: "runtime:stone",
+					itemId: "stone",
+					location: boardB,
+					quantity: 1,
+				});
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(
+							moveItemFx({
+								itemId: "runtime:log",
+								location: target,
+							}),
+						),
+						Effect.either(
+							moveItemFx({
+								itemId: "runtime:stone",
+								location: target,
+							}),
+						),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.runtime.items.filter((item) => item.location.scope === "board")).toHaveLength(
+			2,
+		);
+		expect(
+			result.runtime.items.filter((item) => {
+				return (
+					item.location.scope === target.scope &&
+					item.location.position.x === target.position.x &&
+					item.location.position.y === target.position.y
+				);
+			}),
+		).toHaveLength(1);
+	});
+
+	it("serializes concurrent removals of one item", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:log",
+					itemId: "log",
+					location: boardA,
+					quantity: 1,
+				});
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(
+							removeItemFx({
+								itemId: "runtime:log",
+							}),
+						),
+						Effect.either(
+							removeItemFx({
+								itemId: "runtime:log",
+							}),
+						),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.runtime.items).toEqual([]);
+	});
 });

@@ -1,10 +1,9 @@
-import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { SwapItemsResultSchema } from "~/v1/runtime/schema/command/SwapItemsResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
@@ -24,9 +23,7 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 	firstItemId,
 	secondItemId,
 }: swapItemsFx.Props) {
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const findItem = (itemId: IdSchema.Type) => {
 				return pipe(
@@ -92,9 +89,6 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					return candidate;
 				}),
 			} satisfies RuntimeSchema.Type;
-			yield* assertRuntimeFx({
-				runtime: nextRuntime,
-			});
 
 			return [
 				result,

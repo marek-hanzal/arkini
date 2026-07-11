@@ -1,13 +1,12 @@
-import { Array, Effect, Option, pipe, SynchronizedRef } from "effect";
+import { Array, Effect, Option, pipe } from "effect";
 
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { ItemAlreadyExistsError } from "~/v1/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
@@ -38,9 +37,7 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 		location,
 		quantity,
 	} satisfies RuntimeItemSchema.Type;
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const duplicate = pipe(
 				runtime.items,
@@ -81,9 +78,6 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 					runtimeItem,
 				],
 			} satisfies RuntimeSchema.Type;
-			yield* assertRuntimeFx({
-				runtime: nextRuntime,
-			});
 
 			return [
 				runtimeItem,

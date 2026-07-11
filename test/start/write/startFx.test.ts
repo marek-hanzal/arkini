@@ -229,4 +229,34 @@ describe("startFx", () => {
 			]),
 		);
 	});
+
+	it("serializes concurrent start attempts against one empty runtime", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const attempts = yield* Effect.all(
+					[
+						Effect.either(startFx()),
+						Effect.either(startFx()),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				const runtime = yield* readRuntimeFx();
+
+				return {
+					attempts,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
+		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.runtime.items).toHaveLength(3);
+	});
 });

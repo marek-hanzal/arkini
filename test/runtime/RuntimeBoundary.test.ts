@@ -4,16 +4,13 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 const internalStoreImport = 'from "~/v1/runtime/internal/RuntimeStoreFx"';
-const allowedImporters = new Set([
+const directRuntimeModify = "SynchronizedRef.modifyEffect(";
+const allowedStoreImporters = new Set([
 	"src/v1/game/layer/GameLayerFx.ts",
-	"src/v1/input/write/storeInputMaterialFx.ts",
-	"src/v1/placement/write/placeOutputFx.ts",
-	"src/v1/runtime/write/moveItemFx.ts",
-	"src/v1/runtime/write/removeItemFx.ts",
-	"src/v1/runtime/write/setItemQuantityFx.ts",
-	"src/v1/runtime/write/spawnItemFx.ts",
-	"src/v1/runtime/write/swapItemsFx.ts",
-	"src/v1/start/write/startFx.ts",
+	"src/v1/runtime/internal/modifyRuntimeFx.ts",
+]);
+const allowedDirectModifiers = new Set([
+	"src/v1/runtime/internal/modifyRuntimeFx.ts",
 ]);
 
 const collectTypeScriptFilesFx = (
@@ -46,22 +43,46 @@ const collectTypeScriptFilesFx = (
 	});
 };
 
+const findImportersFx = ({ files, needle }: { files: string[]; needle: string }) => {
+	return Effect.gen(function* () {
+		const fileSystem = yield* FileSystem.FileSystem;
+
+		return yield* Effect.filter(files, (file) => {
+			return fileSystem
+				.readFileString(file)
+				.pipe(Effect.map((source) => source.includes(needle)));
+		});
+	});
+};
+
 describe("runtime mutation boundary", () => {
-	it("keeps the mutable runtime store inside the layer and dedicated commands", async () => {
-		const invalidImporters = await Effect.runPromise(
+	it("keeps the mutable runtime store behind one transaction helper", async () => {
+		const invalid = await Effect.runPromise(
 			Effect.gen(function* () {
-				const fileSystem = yield* FileSystem.FileSystem;
 				const files = yield* collectTypeScriptFilesFx("src/v1");
-				const importers = yield* Effect.filter(files, (file) => {
-					return fileSystem
-						.readFileString(file)
-						.pipe(Effect.map((source) => source.includes(internalStoreImport)));
+				const storeImporters = yield* findImportersFx({
+					files,
+					needle: internalStoreImport,
+				});
+				const directModifiers = yield* findImportersFx({
+					files,
+					needle: directRuntimeModify,
 				});
 
-				return importers.filter((file) => !allowedImporters.has(file));
+				return {
+					directModifiers: directModifiers.filter(
+						(file) => !allowedDirectModifiers.has(file),
+					),
+					storeImporters: storeImporters.filter(
+						(file) => !allowedStoreImporters.has(file),
+					),
+				};
 			}).pipe(Effect.provide(NodeContext.layer)),
 		);
 
-		expect(invalidImporters).toEqual([]);
+		expect(invalid).toEqual({
+			directModifiers: [],
+			storeImporters: [],
+		});
 	});
 });

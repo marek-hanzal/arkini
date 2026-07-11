@@ -1,12 +1,11 @@
-import { Effect, SynchronizedRef } from "effect";
+import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import type { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
 import type { DropPlacementResultSchema } from "~/v1/placement/schema/DropPlacementResultSchema";
 import type { OutputPlacementResultSchema } from "~/v1/placement/schema/OutputPlacementResultSchema";
-import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
@@ -25,9 +24,7 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 	originItemId,
 	output,
 }: placeOutputFx.Props) {
-	const store = yield* RuntimeStoreFx;
-
-	return yield* SynchronizedRef.modifyEffect(store, (runtime) => {
+	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			if (output.drop.length === 0) {
 				return [
@@ -86,10 +83,6 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 					});
 				},
 			);
-
-			yield* assertRuntimeFx({
-				runtime: placement.draft,
-			});
 
 			return [
 				{

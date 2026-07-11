@@ -2,8 +2,7 @@ import { Effect } from "effect";
 
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import { fromRuntimeBoardItemFx } from "./fromRuntimeBoardItemFx";
-import { fromRuntimeInventoryItemFx } from "./fromRuntimeInventoryItemFx";
+import { fromRuntimeItemFx } from "./fromRuntimeItemFx";
 
 export namespace fromRuntimeFx {
 	export interface Props {
@@ -20,26 +19,42 @@ export namespace fromRuntimeFx {
 export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 	runtime,
 }: fromRuntimeFx.Props) {
-	const boardItems = yield* Effect.forEach(runtime.board.items, (item) => {
-		return fromRuntimeBoardItemFx({
-			item,
-		});
-	});
-	const inventorySlots = yield* Effect.forEach(runtime.inventory.slots, (item) => {
-		if (item === null) {
-			return Effect.succeed(null);
-		}
-
-		return fromRuntimeInventoryItemFx({
-			item,
-		});
-	});
+	const boardCells = yield* Effect.forEach(
+		Object.entries(runtime.board.cells),
+		([cell, item]) => {
+			return fromRuntimeItemFx({
+				item,
+			}).pipe(
+				Effect.map((state) => {
+					return [
+						cell,
+						state,
+					] as const;
+				}),
+			);
+		},
+	);
+	const inventoryCells = yield* Effect.forEach(
+		Object.entries(runtime.inventory.cells),
+		([cell, item]) => {
+			return fromRuntimeItemFx({
+				item,
+			}).pipe(
+				Effect.map((state) => {
+					return [
+						cell,
+						state,
+					] as const;
+				}),
+			);
+		},
+	);
 	const result = {
 		board: {
-			items: boardItems,
+			cells: Object.fromEntries(boardCells),
 		},
 		inventory: {
-			slots: inventorySlots,
+			cells: Object.fromEntries(inventoryCells),
 		},
 	};
 

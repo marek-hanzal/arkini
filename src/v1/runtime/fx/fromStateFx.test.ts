@@ -1,6 +1,7 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameFx } from "~/v1/game/context/GameFx";
 import { GameSchema } from "~/v1/schema/GameSchema";
 import { StateSchema } from "~/v1/state/schema/StateSchema";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
@@ -72,9 +73,8 @@ describe("fromStateFx", () => {
 	it("builds every runtime item with the original canonical game object", () => {
 		const runtime = Effect.runSync(
 			fromStateFx({
-				game,
 				state,
-			}),
+			}).pipe(Effect.provideService(GameFx, game)),
 		);
 		const canonicalTree = game.items.tree;
 		const inventoryTree = runtime.inventory.slots[0];
@@ -87,7 +87,6 @@ describe("fromStateFx", () => {
 	it("round-trips runtime through the state domain counterpart", () => {
 		const dehydrated = Effect.runSync(
 			fromStateFx({
-				game,
 				state,
 			}).pipe(
 				Effect.flatMap((runtime) => {
@@ -95,6 +94,7 @@ describe("fromStateFx", () => {
 						runtime,
 					});
 				}),
+				Effect.provideService(GameFx, game),
 			),
 		);
 
@@ -116,16 +116,15 @@ describe("fromStateFx", () => {
 		const result = Effect.runSync(
 			Effect.either(
 				fromStateFx({
-					game,
 					state: invalidState,
-				}),
+				}).pipe(Effect.provideService(GameFx, game)),
 			),
 		);
 
 		expect(Either.isLeft(result)).toBe(true);
 		if (Either.isLeft(result)) {
 			expect(result.left).toMatchObject({
-				_tag: "RuntimeItemNotFoundError",
+				_tag: "ItemNotFoundError",
 				itemId: "missing",
 			});
 		}

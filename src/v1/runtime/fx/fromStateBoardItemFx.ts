@@ -1,13 +1,11 @@
 import { Effect } from "effect";
 
-import type { GameSchema } from "~/v1/schema/GameSchema";
+import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { RuntimeBoardItemSchema } from "~/v1/runtime/schema/RuntimeBoardItemSchema";
 import type { StateBoardItemSchema } from "~/v1/state/schema/StateBoardItemSchema";
-import { resolveRuntimeItemFx } from "./resolveRuntimeItemFx";
 
 export namespace fromStateBoardItemFx {
 	export interface Props {
-		game: GameSchema.Type;
 		state: StateBoardItemSchema.Type;
 	}
 }
@@ -19,11 +17,9 @@ export namespace fromStateBoardItemFx {
  * `~/v1/state/fx/fromRuntimeBoardItemFx` builds state from this runtime item.
  */
 export const fromStateBoardItemFx = Effect.fn("fromStateBoardItemFx")(function* ({
-	game,
 	state,
 }: fromStateBoardItemFx.Props) {
-	const item = yield* resolveRuntimeItemFx({
-		game,
+	const item = yield* resolveItemFx({
 		itemId: state.itemId,
 	});
 	const result = {

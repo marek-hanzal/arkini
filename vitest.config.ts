@@ -5,6 +5,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"~": fileURLToPath(new URL("./src", import.meta.url)),
+			"~test": fileURLToPath(new URL("./test", import.meta.url)),
 		},
 	},
 	test: {
@@ -13,7 +14,7 @@ export default defineConfig({
 		fileParallelism: false,
 		isolate: false,
 		include: [
-			"src/v1/**/*.test.ts",
+			"test/**/*.test.ts",
 		],
 		maxWorkers: 1,
 		pool: "threads",

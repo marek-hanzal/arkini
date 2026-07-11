@@ -24,7 +24,6 @@
 		"cli",
 		"src/v1",
 		"src/vite-env.d.ts",
-		"vite.config.ts",
-		"vitest.config.ts"
+		"vite.config.ts"
 	]
 }

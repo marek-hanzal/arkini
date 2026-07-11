@@ -5,7 +5,9 @@
 	"type": "module",
 	"packageManager": "npm@10.9.2",
 	"scripts": {
-		"typecheck": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
+		"typecheck:src": "tsc -p tsconfig.json --noEmit --noUnusedLocals --noUnusedParameters",
+		"typecheck:test": "tsc -p tsconfig.test.json --noEmit --noUnusedLocals --noUnusedParameters",
+		"typecheck": "npm run typecheck:src && npm run typecheck:test",
 		"test": "vitest run --no-color",
 		"check": "npm run format:check && npm run typecheck && npm run test",
 		"format": "biome format --write .",

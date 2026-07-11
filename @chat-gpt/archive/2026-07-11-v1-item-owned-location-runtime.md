@@ -19,7 +19,8 @@ RuntimeItemSchema
 │       ├── lineId
 │       ├── inputIndex
 │       └── returnLocation
-└── quantity
+├── quantity
+└── revision
 ```
 
 `LocationSchema` is a standalone domain contract in `src/v1/location`.
@@ -37,9 +38,9 @@ There are no board/inventory storage containers, cell-key indexes, or runtime ma
 
 ## Mutation boundary
 
-The mutable `SynchronizedRef<RuntimeSchema>` is provided through internal `RuntimeStoreFx` and may be imported only by `GameLayerFx` and dedicated modules under `runtime/write`.
+The mutable `SynchronizedRef<RuntimeSchema>` is provided through internal `RuntimeStoreFx` and may be imported only by `GameLayerFx` and `runtime/internal/modifyRuntimeFx`.
 
-Public `RuntimeFx` is read-only. A static guard test enforces the internal-store import boundary.
+Public `RuntimeFx` is read-only. Every write entrypoint must use `modifyRuntimeFx`, which serializes planning and mutation against one snapshot, validates the complete candidate runtime, and commits once. Static guard tests enforce these boundaries.
 
 There is no generic item patch/update command. Existing atomic commands are:
 
@@ -48,6 +49,8 @@ There is no generic item patch/update command. Existing atomic commands are:
 - `removeItemFx`
 - `setItemQuantityFx`
 - `swapItemsFx`
+
+Existing mutable items also own a persisted CUID2-backed revision. Entity-intent commands compare the caller's observed revision inside the transaction and every successful item mutation creates a fresh revision.
 
 Future mutations such as merge, split, replace, consume, or state-specific changes must receive their own single-responsibility atomic commands. They must never be implemented by exposing a general item patch.
 

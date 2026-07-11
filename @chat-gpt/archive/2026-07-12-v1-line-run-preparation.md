@@ -57,7 +57,7 @@ reading whatever runtime happens to be current later in the Effect graph.
 write authorization and must never be accepted by a mutation command.
 
 The future `startLineFx` contract must accept identifiers only and execute this
-sequence inside one `SynchronizedRef.modifyEffect`:
+sequence inside one `modifyRuntimeFx` transaction:
 
 ```text
 read current runtime snapshot

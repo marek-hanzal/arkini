@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
+import type { DropResultsSchema } from "~/v1/output/schema/DropResultsSchema";
 import type { DropSchema } from "~/v1/output/schema/DropSchema";
 import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
 import { dropRuleFx } from "./dropRuleFx";
@@ -60,5 +60,5 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Pr
 			placement: drop.placement,
 			quantity,
 		},
-	] satisfies DropResultSchema.Type[];
+	] satisfies DropResultsSchema.Type;
 });

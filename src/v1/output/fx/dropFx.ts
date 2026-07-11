@@ -21,26 +21,25 @@ export namespace dropFx {
  * replacement candidate.
  */
 export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Props) {
-	for (const rule of drop.rules) {
-		const enabled = yield* dropRuleFx({
+	const enabled = yield* Effect.every(drop.rules, (rule) => {
+		return dropRuleFx({
 			origin,
 			rule,
 		});
-		if (!enabled) {
-			return [] satisfies DropResultSchema.Type[];
-		}
+	});
+	if (!enabled) {
+		return [];
 	}
 
 	const quantity = yield* rollQuantityFx({
 		quantity: drop.quantity,
 	});
-	const result = {
-		itemId: drop.itemId,
-		placement: drop.placement,
-		quantity,
-	} satisfies DropResultSchema.Type;
 
 	return [
-		result,
+		{
+			itemId: drop.itemId,
+			placement: drop.placement,
+			quantity,
+		},
 	] satisfies DropResultSchema.Type[];
 });

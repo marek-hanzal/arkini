@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
+import { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
 
@@ -11,6 +11,7 @@ import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
  */
 export const RuntimeItemSchema = z
 	.object({
+		...PositionSchema.shape,
 		/**
 		 * Stable identity of this live item or stack.
 		 */
@@ -34,18 +35,6 @@ export const RuntimeItemSchema = z
 			"board",
 			"inventory",
 		]).describe("The runtime grid currently containing this item."),
-		/**
-		 * Zero-based horizontal coordinate of this item in its runtime grid.
-		 */
-		x: NonNegativeIntegerSchema.describe(
-			"The zero-based horizontal coordinate of this item in its runtime grid.",
-		),
-		/**
-		 * Zero-based vertical coordinate of this item in its runtime grid.
-		 */
-		y: NonNegativeIntegerSchema.describe(
-			"The zero-based vertical coordinate of this item in its runtime grid.",
-		),
 	})
 	.strict()
 	.meta({

@@ -1,29 +1,18 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
+import { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 
 /**
  * Places one item instance at an explicit cell in the initial board layout.
  */
 export const BoardItemSchema = z
 	.object({
+		...PositionSchema.shape,
 		/**
 		 * Canonical item placed on the board.
 		 */
 		itemId: IdSchema.describe("The canonical item ID placed on the initial board."),
-		/**
-		 * Zero-based horizontal board coordinate.
-		 */
-		x: NonNegativeIntegerSchema.describe(
-			"The zero-based horizontal coordinate of the initial board item.",
-		),
-		/**
-		 * Zero-based vertical board coordinate.
-		 */
-		y: NonNegativeIntegerSchema.describe(
-			"The zero-based vertical coordinate of the initial board item.",
-		),
 	})
 	.strict()
 	.meta({

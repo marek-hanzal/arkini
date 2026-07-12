@@ -1,8 +1,6 @@
 import { Effect } from "effect";
 
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
-import { mergePlacementPlansFx } from "~/v1/placement/fx/mergePlacementPlansFx";
-import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
 import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { StartSchema } from "~/v1/start/schema/StartSchema";
@@ -18,11 +16,10 @@ export namespace planStartFx {
 
 interface PlanningState {
 	readonly draft: RuntimeSchema.Type;
-	readonly plans: PlacementPlanSchema.Type[];
 }
 
 /**
- * Plans every initial board and inventory item against one immutable runtime draft.
+ * Builds the exact initial runtime by applying every start entry sequentially.
  */
 export const planStartFx = Effect.fn("planStartFx")(function* ({
 	runtime,
@@ -30,7 +27,6 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 }: planStartFx.Props) {
 	const initialState: PlanningState = {
 		draft: runtime,
-		plans: [],
 	};
 	const board = yield* Effect.reduce(start.board, initialState, (state, item) => {
 		return Effect.gen(function* () {
@@ -44,10 +40,6 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 
 			return {
 				draft,
-				plans: [
-					...state.plans,
-					plan,
-				],
 			} satisfies PlanningState;
 		});
 	});
@@ -64,10 +56,6 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 
 			return {
 				draft,
-				plans: [
-					...state.plans,
-					plan,
-				],
 			} satisfies PlanningState;
 		});
 	});
@@ -76,7 +64,5 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 		runtime: inventory.draft,
 	});
 
-	return yield* mergePlacementPlansFx({
-		plans: inventory.plans,
-	});
+	return inventory.draft;
 });

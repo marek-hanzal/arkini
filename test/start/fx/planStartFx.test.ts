@@ -2,7 +2,6 @@ import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 import { planStartFx } from "~/v1/start/fx/planStartFx";
 
@@ -14,16 +13,10 @@ describe("planStartFx", () => {
 					items: [],
 					jobs: [],
 				};
-				const plan = yield* planStartFx({
+				return yield* planStartFx({
 					runtime,
 					start: startTestConfig.start,
 				});
-				const [, nextRuntime] = yield* applyPlacementPlanFx({
-					plan,
-					runtime,
-				});
-
-				return nextRuntime;
 			}).pipe(
 				useGameFx({
 					config: startTestConfig,
@@ -69,6 +62,41 @@ describe("planStartFx", () => {
 				}),
 			]),
 		);
+	});
+
+	it("preserves quantity across dependent repeated inventory entries", () => {
+		const result = Effect.runSync(
+			planStartFx({
+				runtime: {
+					items: [],
+					jobs: [],
+				},
+				start: {
+					board: [],
+					inventory: [
+						{
+							itemId: "log",
+							quantity: 2,
+						},
+						{
+							itemId: "log",
+							quantity: 3,
+						},
+					],
+				},
+			}).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(result.items).toHaveLength(2);
+		expect(result.items.map((item) => item.quantity)).toEqual([
+			3,
+			2,
+		]);
+		expect(result.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
 	});
 
 	it("rejects conflicting exact board locations", () => {

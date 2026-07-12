@@ -68,6 +68,39 @@ describe("startFx", () => {
 		);
 	});
 
+	it("commits the exact sequential runtime for repeated stackable entries", () => {
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			start: {
+				board: [],
+				inventory: [
+					{
+						itemId: "log",
+						quantity: 2,
+					},
+					{
+						itemId: "log",
+						quantity: 3,
+					},
+				],
+			},
+		});
+		const runtime = Effect.runSync(
+			startFx().pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(runtime.items).toHaveLength(2);
+		expect(runtime.items.map((item) => item.quantity)).toEqual([
+			3,
+			2,
+		]);
+		expect(runtime.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
+	});
+
 	it("rejects an already populated runtime without changing it", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

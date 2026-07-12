@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
-import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { RuntimeNotEmptyError } from "~/v1/runtime/error/RuntimeNotEmptyError";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { planStartFx } from "~/v1/start/fx/planStartFx";
@@ -21,13 +20,9 @@ export const startFx = Effect.fn("startFx")(function* () {
 				);
 			}
 
-			const plan = yield* planStartFx({
+			const nextRuntime = yield* planStartFx({
 				runtime,
 				start: config.start,
-			});
-			const [, nextRuntime] = yield* applyPlacementPlanFx({
-				plan,
-				runtime,
 			});
 
 			return [

@@ -3,11 +3,9 @@ import { gzip } from "node:zlib";
 import { FileSystem, Path } from "@effect/platform";
 import { Effect } from "effect";
 
-import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
+import { compileGameDirectoryFx } from "~/v1/compiler/fx/compileGameDirectoryFx";
 import { assertGameConfigValidFx } from "~/v1/validation/fx/assertGameConfigValidFx";
-import { collectSourceFilesFx } from "~/v1/source/fx/collectSourceFilesFx";
 import { encodeFx } from "./encodeFx";
-import { readGameSourceFileFx } from "~/v1/source/fx/readGameSourceFileFx";
 import { readPngAssetFx } from "./readPngAssetFx";
 
 const gzipAsync = promisify(gzip);
@@ -25,20 +23,14 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 }: packDirectoryFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
-	const sourceFiles = yield* collectSourceFilesFx({
+	const compilation = yield* compileGameDirectoryFx({
 		input,
 	});
-	const jsonSources = yield* Effect.forEach(sourceFiles.json, (sourcePath) =>
-		readGameSourceFileFx({
-			path: sourcePath,
-		}),
-	);
-	const pngAssets = yield* Effect.forEach(sourceFiles.png, (assetPath) =>
+	const pngAssets = yield* Effect.forEach(compilation.resources, ({ path: assetPath }) =>
 		readPngAssetFx({
 			path: assetPath,
 		}),
 	);
-	const compilation = yield* compileGameSourcesFx(jsonSources);
 	const config = yield* assertGameConfigValidFx(compilation);
 	const bytes = yield* encodeFx({
 		config,
@@ -48,8 +40,8 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 	const outputPath = path.resolve(
 		output ??
 			path.join(
-				path.dirname(sourceFiles.root),
-				`${path.basename(sourceFiles.root)}.game.arkpack`,
+				path.dirname(path.resolve(input)),
+				`${path.basename(path.resolve(input))}.game.arkpack`,
 			),
 	);
 
@@ -59,9 +51,9 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 	yield* fileSystem.writeFile(outputPath, compressed);
 
 	return {
-		input: sourceFiles.root,
+		input: path.resolve(input),
 		output: outputPath,
-		json: jsonSources.length,
+		json: compilation.json,
 		png: pngAssets.length,
 		bytes: compressed.byteLength,
 		diagnostics: compilation.diagnostics,

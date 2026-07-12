@@ -8,7 +8,7 @@
 			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
 			"asset": {
 				"source": [
-					"asset:producer:prospector-guild-t1"
+					"producer-prospector-guild-t1"
 				]
 			},
 			"tags": [

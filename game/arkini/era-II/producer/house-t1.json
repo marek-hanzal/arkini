@@ -8,7 +8,7 @@
 			"description": "Basic housing that turns warmth and water into early morale.",
 			"asset": {
 				"source": [
-					"asset:producer:house-t1"
+					"producer-house-t1"
 				]
 			},
 			"tags": [

@@ -5,6 +5,9 @@ import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 
 export const dropRuleTestConfig = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:drop-rule-test",
 		title: "Drop rule test",

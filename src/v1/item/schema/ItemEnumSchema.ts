@@ -10,6 +10,10 @@ export const ItemEnumSchema = z
 		 */
 		"deposit",
 		/**
+		 * A construction blueprint with an explicit target item.
+		 */
+		"blueprint",
+		/**
 		 * An item with no specialized gameplay behavior.
 		 */
 		"simple",

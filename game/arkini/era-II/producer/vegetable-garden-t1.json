@@ -8,7 +8,7 @@
 			"description": "Consumes water to produce vegetables.",
 			"asset": {
 				"source": [
-					"asset:producer:vegetable-garden-t1"
+					"producer-vegetable-garden-t1"
 				]
 			},
 			"tags": [

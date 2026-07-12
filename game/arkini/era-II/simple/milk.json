@@ -8,7 +8,7 @@
 			"description": "Fresh milk produced by cattle farms for base food supply chains.",
 			"asset": {
 				"source": [
-					"asset:item:milk"
+					"item-milk"
 				]
 			},
 			"tags": [

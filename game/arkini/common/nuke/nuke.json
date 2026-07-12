@@ -8,7 +8,7 @@
 			"description": "A dangerous reset charge that opens the nuke confirmation.",
 			"asset": {
 				"source": [
-					"asset:item:nuke"
+					"item-nuke"
 				]
 			},
 			"tags": [

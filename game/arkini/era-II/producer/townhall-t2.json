@@ -8,7 +8,7 @@
 			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
 			"asset": {
 				"source": [
-					"asset:producer:townhall-t2"
+					"producer-townhall-t2"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Masterwork gem-set goldsmith key used to open Chest IV.",
 			"asset": {
 				"source": [
-					"asset:item:key-t4"
+					"item-key-t4"
 				]
 			},
 			"tags": [

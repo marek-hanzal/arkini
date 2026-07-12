@@ -22,6 +22,9 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 export const createJobTestConfig = (maxQueueSize = 2) =>
 	GameConfigSchema.parse({
 		version: "1.0",
+		resources: {
+			hero: "hero",
+		},
 		meta: {
 			id: `game:job:${maxQueueSize}`,
 			title: "Job test",

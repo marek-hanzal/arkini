@@ -8,7 +8,7 @@
 			"description": "A barrel of wine produced by wineries and served by taverns.",
 			"asset": {
 				"source": [
-					"asset:item:wine-barrel"
+					"item-wine-barrel"
 				]
 			},
 			"tags": [

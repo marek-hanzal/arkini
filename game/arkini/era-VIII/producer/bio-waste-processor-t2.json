@@ -8,7 +8,7 @@
 			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
 			"asset": {
 				"source": [
-					"asset:producer:bio-waste-processor-t2"
+					"producer-bio-waste-processor-t2"
 				]
 			},
 			"tags": [

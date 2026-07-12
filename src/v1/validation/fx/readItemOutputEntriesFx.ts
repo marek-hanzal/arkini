@@ -39,7 +39,7 @@ export const readItemOutputEntriesFx = Effect.fn("readItemOutputEntriesFx")(func
 	const directOutput = match(item)
 		.with(
 			{
-				type: P.union("deposit", "stash", "temporary"),
+				type: P.union("blueprint", "deposit", "stash", "temporary"),
 			},
 			({ output }) => output,
 		)

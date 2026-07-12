@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { BaseItemSchema } from "~/v1/item/schema/BaseItemSchema";
+import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import type { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
 import { selectorItemFx } from "./selectorItemFx";
 import { selectorTagFx } from "./selectorTagFx";
@@ -9,7 +9,7 @@ import { selectorTagFx } from "./selectorTagFx";
 export namespace selectorFx {
 	export interface Props {
 		selector: SelectorSchema.Type;
-		item: BaseItemSchema.Type;
+		item: ItemSchema.Type;
 	}
 }
 

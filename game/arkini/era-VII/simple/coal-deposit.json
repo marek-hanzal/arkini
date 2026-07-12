@@ -8,7 +8,7 @@
 			"description": "Movable coal source used by nearby coal mines.",
 			"asset": {
 				"source": [
-					"asset:item:coal-deposit"
+					"item-coal-deposit"
 				]
 			},
 			"tags": [

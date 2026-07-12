@@ -33,6 +33,9 @@ const simpleItem = ({
 
 export const placementTestConfig = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:placement",
 		title: "Placement",

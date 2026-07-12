@@ -8,7 +8,7 @@
 			"description": "Raw white marble extracted by Quarry II before being finished by Stonemason II.",
 			"asset": {
 				"source": [
-					"asset:item:marble"
+					"item-marble"
 				]
 			},
 			"tags": [

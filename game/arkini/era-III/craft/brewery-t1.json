@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-brewery-t1": {
 			"id": "item:blueprint-brewery-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Brewery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Brewery I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-brewery-t1"
-				],
-				"composite": "asset:producer:brewery-t1"
-			},
+			"asset": [
+				"item-blueprint-brewery-t1",
+				"producer-brewery-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -61,30 +59,9 @@
 						}
 					}
 				],
-				"rules": [],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:brewery-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				"rules": []
+			},
+			"targetId": "producer:brewery-t1"
 		}
 	}
 }

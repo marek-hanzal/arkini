@@ -8,7 +8,7 @@
 			"description": "Advanced gem-set goldsmith key used to open Chest III and authorize grand expeditions.",
 			"asset": {
 				"source": [
-					"asset:item:key-t3"
+					"item-key-t3"
 				]
 			},
 			"tags": [

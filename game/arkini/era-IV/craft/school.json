@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-school": {
 			"id": "item:blueprint-school",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "School Blueprint",
 			"description": "Build plan that can be filled with supplies to construct a School.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-school"
-				],
-				"composite": "asset:producer:school"
-			},
+			"asset": [
+				"item-blueprint-school",
+				"producer-school"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -89,30 +87,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:school",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:school"
 		}
 	}
 }

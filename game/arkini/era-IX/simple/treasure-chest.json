@@ -8,7 +8,7 @@
 			"description": "Master reward from a grand Heroes Guild expedition, packed with gold and gems and ready to gate the next civic tier.",
 			"asset": {
 				"source": [
-					"asset:item:treasure-chest"
+					"item-treasure-chest"
 				]
 			},
 			"tags": [

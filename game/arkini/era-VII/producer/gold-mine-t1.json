@@ -8,7 +8,7 @@
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"asset": {
 				"source": [
-					"asset:producer:gold-mine-t1"
+					"producer-gold-mine-t1"
 				]
 			},
 			"tags": [

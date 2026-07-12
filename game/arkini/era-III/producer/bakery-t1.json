@@ -8,7 +8,7 @@
 			"description": "Consumes flour and water to bake bread.",
 			"asset": {
 				"source": [
-					"asset:producer:bakery-t1"
+					"producer-bakery-t1"
 				]
 			},
 			"tags": [

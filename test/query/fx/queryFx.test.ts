@@ -10,6 +10,9 @@ import { queryFx } from "~/v1/query/fx/queryFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:query-test",
 		title: "Query test",

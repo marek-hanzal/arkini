@@ -8,7 +8,7 @@
 			"description": "Choose The Path keystone for the Engineers branch. Owning it locks Faith and Mages and prepares later machinery, power, and industrial upgrade lines.",
 			"asset": {
 				"source": [
-					"asset:producer:house-of-engineers"
+					"producer-house-of-engineers"
 				]
 			},
 			"tags": [

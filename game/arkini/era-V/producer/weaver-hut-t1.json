@@ -8,7 +8,7 @@
 			"description": "Textile producer that weaves wool into common cloth.",
 			"asset": {
 				"source": [
-					"asset:producer:weaver-hut-t1"
+					"producer-weaver-hut-t1"
 				]
 			},
 			"tags": [

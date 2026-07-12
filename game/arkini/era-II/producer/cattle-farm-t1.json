@@ -8,7 +8,7 @@
 			"description": "Consumes grain and water to produce milk.",
 			"asset": {
 				"source": [
-					"asset:producer:cattle-farm-t1"
+					"producer-cattle-farm-t1"
 				]
 			},
 			"tags": [

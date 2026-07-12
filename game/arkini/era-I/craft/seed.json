@@ -8,8 +8,8 @@
 			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Feed it water on the board until it grows into a sapling stage, then let it finish into a tree.",
 			"asset": {
 				"source": [
-					"asset:item:seed",
-					"asset:item:sapling"
+					"item-seed",
+					"item-sapling"
 				]
 			},
 			"tags": [

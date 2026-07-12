@@ -8,7 +8,7 @@
 			"description": "Processes milk into cheese.",
 			"asset": {
 				"source": [
-					"asset:producer:dairy-t1"
+					"producer-dairy-t1"
 				]
 			},
 			"tags": [

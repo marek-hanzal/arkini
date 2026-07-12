@@ -8,7 +8,7 @@
 			"description": "Formal civic charter that authorizes advanced guild, university, and expedition buildings after the city has advanced construction capacity.",
 			"asset": {
 				"source": [
-					"asset:item:guild-charter"
+					"item-guild-charter"
 				]
 			},
 			"tags": [

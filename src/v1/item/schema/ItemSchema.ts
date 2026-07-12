@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { BlueprintItemSchema } from "./BlueprintItemSchema";
 import { CheatInventoryItemSchema } from "./CheatInventoryItemSchema";
 import { CheatSpeedItemSchema } from "./CheatSpeedItemSchema";
 import { CraftItemSchema } from "./CraftItemSchema";
@@ -20,6 +21,7 @@ import { TemporaryItemSchema } from "./TemporaryItemSchema";
  */
 export const ItemSchema = z
 	.discriminatedUnion("type", [
+		BlueprintItemSchema,
 		DepositItemSchema,
 		SimpleItemSchema,
 		ProducerItemSchema,

@@ -8,7 +8,7 @@
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"asset": {
 				"source": [
-					"asset:producer:brickyard"
+					"producer-brickyard"
 				]
 			},
 			"tags": [

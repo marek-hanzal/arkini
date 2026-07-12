@@ -8,7 +8,7 @@
 			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
 			"asset": {
 				"source": [
-					"asset:item:egg"
+					"item-egg"
 				]
 			},
 			"tags": [

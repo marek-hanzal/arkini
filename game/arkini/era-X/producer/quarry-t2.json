@@ -8,7 +8,7 @@
 			"description": "Upgraded quarry that keeps common stone extraction and adds marble extraction near marble deposits.",
 			"asset": {
 				"source": [
-					"asset:producer:quarry-t2"
+					"producer-quarry-t2"
 				]
 			},
 			"tags": [

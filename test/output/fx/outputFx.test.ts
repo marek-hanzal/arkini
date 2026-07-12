@@ -11,6 +11,9 @@ import { outputFx } from "~/v1/output/fx/outputFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:output-test",
 		title: "Output test",

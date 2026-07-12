@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-mage-lodge": {
 			"id": "item:blueprint-mage-lodge",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Mage Lodge Blueprint",
 			"description": "Build plan for Mage Lodge, one of the mutually exclusive Choose The Path keystone buildings.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-mage-lodge"
-				],
-				"composite": "asset:producer:mage-lodge"
-			},
+			"asset": [
+				"item-blueprint-mage-lodge",
+				"producer-mage-lodge"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -239,30 +237,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:mage-lodge",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:mage-lodge"
 		}
 	}
 }

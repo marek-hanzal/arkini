@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-smelter-t1": {
 			"id": "item:blueprint-smelter-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Smelter I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Smelter I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-smelter-t1"
-				],
-				"composite": "asset:producer:smelter-t1"
-			},
+			"asset": [
+				"item-blueprint-smelter-t1",
+				"producer-smelter-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -109,30 +107,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:smelter-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:smelter-t1"
 		}
 	}
 }

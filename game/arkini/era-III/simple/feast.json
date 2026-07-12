@@ -8,7 +8,7 @@
 			"description": "Hearty processed food platter that proves Era III food production is complete.",
 			"asset": {
 				"source": [
-					"asset:item:feast"
+					"item-feast"
 				]
 			},
 			"tags": [

@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-vegetable-garden-t1": {
 			"id": "item:blueprint-vegetable-garden-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Vegetable Garden I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-vegetable-garden-t1"
-				],
-				"composite": "asset:producer:vegetable-garden-t1"
-			},
+			"asset": [
+				"item-blueprint-vegetable-garden-t1",
+				"producer-vegetable-garden-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -50,30 +48,9 @@
 						}
 					}
 				],
-				"rules": [],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:vegetable-garden-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				"rules": []
+			},
+			"targetId": "producer:vegetable-garden-t1"
 		}
 	}
 }

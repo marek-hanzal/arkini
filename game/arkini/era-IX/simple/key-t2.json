@@ -8,7 +8,7 @@
 			"description": "Gem-set goldsmith key used to open Chest II and fund tougher expeditions.",
 			"asset": {
 				"source": [
-					"asset:item:key-t2"
+					"item-key-t2"
 				]
 			},
 			"tags": [

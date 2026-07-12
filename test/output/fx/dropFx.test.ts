@@ -8,6 +8,9 @@ import { dropFx } from "~/v1/output/fx/dropFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:drop-test",
 		title: "Drop test",

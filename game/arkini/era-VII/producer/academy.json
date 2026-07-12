@@ -8,7 +8,7 @@
 			"description": "Industrial education hub that converts civic knowledge into advanced knowledge and issues mining and metallurgy plans.",
 			"asset": {
 				"source": [
-					"asset:producer:academy"
+					"producer-academy"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Movable stone deposit used by nearby quarries or mined manually with a single-use pickaxe.",
 			"asset": {
 				"source": [
-					"asset:item:rock"
+					"item-rock"
 				]
 			},
 			"tags": [

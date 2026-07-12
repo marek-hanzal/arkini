@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-roof-tile-factory": {
 			"id": "item:blueprint-roof-tile-factory",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Roof Tile Factory Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-roof-tile-factory"
-				],
-				"composite": "asset:producer:roof-tile-factory"
-			},
+			"asset": [
+				"item-blueprint-roof-tile-factory",
+				"producer-roof-tile-factory"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -132,30 +130,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:roof-tile-factory",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:roof-tile-factory"
 		}
 	}
 }

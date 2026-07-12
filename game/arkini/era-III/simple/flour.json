@@ -8,7 +8,7 @@
 			"description": "Milled grain produced by windmills and baked into bread.",
 			"asset": {
 				"source": [
-					"asset:item:flour"
+					"item-flour"
 				]
 			},
 			"tags": [

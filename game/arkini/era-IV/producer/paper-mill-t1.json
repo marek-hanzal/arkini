@@ -8,7 +8,7 @@
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
 			"asset": {
 				"source": [
-					"asset:producer:paper-mill-t1"
+					"producer-paper-mill-t1"
 				]
 			},
 			"tags": [

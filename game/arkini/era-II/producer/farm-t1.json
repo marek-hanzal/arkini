@@ -8,7 +8,7 @@
 			"description": "Consumes water and produces grain when placed near a wheat field.",
 			"asset": {
 				"source": [
-					"asset:producer:farm-t1"
+					"producer-farm-t1"
 				]
 			},
 			"tags": [

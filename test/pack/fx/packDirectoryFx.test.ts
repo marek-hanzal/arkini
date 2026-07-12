@@ -51,6 +51,9 @@ describe("packDirectoryFx", () => {
 								height: 7,
 							},
 						},
+						resources: {
+							hero: "hero",
+						},
 						start: {
 							board: [],
 							inventory: [],
@@ -64,6 +67,7 @@ describe("packDirectoryFx", () => {
 						items: {},
 					}),
 				);
+				yield* fileSystem.writeFile(path.join(assets, "hero.png"), png);
 				yield* fileSystem.writeFile(path.join(assets, "item-log.png"), png);
 
 				const result = yield* packDirectoryFx({
@@ -81,15 +85,22 @@ describe("packDirectoryFx", () => {
 
 		expect(packed.result).toMatchObject({
 			json: 2,
-			png: 1,
+			png: 2,
 		});
-		expect(packed.payload.resources).toEqual([
-			{
-				id: "item-log",
-				mime: "image/png",
-				bytes: png,
-			},
-		]);
+		expect(packed.payload.resources).toEqual(
+			expect.arrayContaining([
+				{
+					id: "hero",
+					mime: "image/png",
+					bytes: png,
+				},
+				{
+					id: "item-log",
+					mime: "image/png",
+					bytes: png,
+				},
+			]),
+		);
 	});
 
 	it("fails through the completed-game validation boundary", async () => {
@@ -118,6 +129,9 @@ describe("packDirectoryFx", () => {
 								width: 1,
 								height: 1,
 							},
+						},
+						resources: {
+							hero: "hero",
 						},
 						categories: {},
 						items: {},

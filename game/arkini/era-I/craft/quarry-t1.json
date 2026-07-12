@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-quarry-t1": {
 			"id": "item:blueprint-quarry-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Quarry I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Quarry I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-quarry-t1"
-				],
-				"composite": "asset:producer:quarry-t1"
-			},
+			"asset": [
+				"item-blueprint-quarry-t1",
+				"producer-quarry-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -50,30 +48,9 @@
 						}
 					}
 				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:quarry-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				},
 				"rules": []
-			}
+			},
+			"targetId": "producer:quarry-t1"
 		}
 	}
 }

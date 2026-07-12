@@ -8,7 +8,7 @@
 			"description": "Baked food produced by bakeries from flour and water.",
 			"asset": {
 				"source": [
-					"asset:item:bread"
+					"item-bread"
 				]
 			},
 			"tags": [

@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-heroes-guild-t1": {
 			"id": "item:blueprint-heroes-guild-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Heroes Guild I Blueprint",
 			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-heroes-guild-t1"
-				],
-				"composite": "asset:producer:heroes-guild-t1"
-			},
+			"asset": [
+				"item-blueprint-heroes-guild-t1",
+				"producer-heroes-guild-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -142,30 +140,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:heroes-guild-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:heroes-guild-t1"
 		}
 	}
 }

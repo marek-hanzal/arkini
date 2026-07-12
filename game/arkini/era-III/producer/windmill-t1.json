@@ -8,7 +8,7 @@
 			"description": "Mills grain into flour.",
 			"asset": {
 				"source": [
-					"asset:producer:windmill-t1"
+					"producer-windmill-t1"
 				]
 			},
 			"tags": [

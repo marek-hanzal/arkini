@@ -8,7 +8,7 @@
 			"description": "A polished red gemstone recovered from low-tier hero loot.",
 			"asset": {
 				"source": [
-					"asset:item:ruby"
+					"item-ruby"
 				]
 			},
 			"tags": [

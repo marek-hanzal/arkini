@@ -34,6 +34,9 @@ const existsWhen = (itemId: string) => {
 
 export const lineRunTestConfig = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:line-run",
 		title: "Line run",

@@ -5,6 +5,7 @@ import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import { CategorySchema } from "~/v1/category/schema/CategorySchema";
 import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
 import { StartSchema } from "~/v1/start/schema/StartSchema";
+import { ResourceConfigSchema } from "~/v1/resource/schema/ResourceConfigSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
@@ -29,6 +30,12 @@ export const GameSourceSchema = z
 		 */
 		meta: MetaSchema.optional().describe(
 			"The optional game metadata contributed by this source fragment.",
+		),
+		/**
+		 * Optional named non-item resources contributed by this source fragment.
+		 */
+		resources: ResourceConfigSchema.optional().describe(
+			"The optional named non-item resources contributed by this source fragment.",
 		),
 		/**
 		 * Optional new-game state contributed by this source fragment.

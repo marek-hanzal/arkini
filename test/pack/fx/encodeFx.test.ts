@@ -10,6 +10,9 @@ describe("encodeFx", () => {
 			encodeFx({
 				config: {
 					version: "1.0",
+					resources: {
+						hero: "hero",
+					},
 					meta: {
 						id: "game:test",
 						title: "Test",
@@ -46,6 +49,9 @@ describe("encodeFx", () => {
 		expect(decoded).toEqual({
 			config: {
 				version: "1.0",
+				resources: {
+					hero: "hero",
+				},
 				meta: {
 					id: "game:test",
 					title: "Test",

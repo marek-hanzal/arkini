@@ -8,7 +8,7 @@
 			"description": "A small piglet produced by pig farms and processed by slaughterhouses.",
 			"asset": {
 				"source": [
-					"asset:item:piglet"
+					"item-piglet"
 				]
 			},
 			"tags": [

@@ -9,6 +9,7 @@ export const DuplicateProviderDiagnosticSchema = z
 		severity: z.literal("error"),
 		provider: z.enum([
 			"meta",
+			"resources",
 			"start",
 			"version",
 		]),

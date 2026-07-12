@@ -8,7 +8,7 @@
 			"description": "Movable hop source used by nearby breweries.",
 			"asset": {
 				"source": [
-					"asset:item:hop-field"
+					"item-hop-field"
 				]
 			},
 			"tags": [

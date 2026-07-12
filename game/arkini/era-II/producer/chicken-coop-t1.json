@@ -8,7 +8,7 @@
 			"description": "Consumes grain and water to produce eggs.",
 			"asset": {
 				"source": [
-					"asset:producer:chicken-coop-t1"
+					"producer-chicken-coop-t1"
 				]
 			},
 			"tags": [

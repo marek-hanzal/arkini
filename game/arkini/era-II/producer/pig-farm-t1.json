@@ -8,7 +8,7 @@
 			"description": "Consumes grain and water to produce piglets.",
 			"asset": {
 				"source": [
-					"asset:producer:pig-farm-t1"
+					"producer-pig-farm-t1"
 				]
 			},
 			"tags": [

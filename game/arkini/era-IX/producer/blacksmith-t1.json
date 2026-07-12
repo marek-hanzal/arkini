@@ -8,7 +8,7 @@
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"asset": {
 				"source": [
-					"asset:producer:blacksmith-t1"
+					"producer-blacksmith-t1"
 				]
 			},
 			"tags": [

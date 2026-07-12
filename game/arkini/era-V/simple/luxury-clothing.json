@@ -8,7 +8,7 @@
 			"description": "Prestige clothing sewn from luxury cloth, leather, and coins.",
 			"asset": {
 				"source": [
-					"asset:item:luxury-clothing"
+					"item-luxury-clothing"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Polished marble construction block for future prestige buildings that should not be made from yet another heroic pile of planks.",
 			"asset": {
 				"source": [
-					"asset:item:marble-block"
+					"item-marble-block"
 				]
 			},
 			"tags": [

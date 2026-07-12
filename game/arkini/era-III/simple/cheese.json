@@ -8,7 +8,7 @@
 			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
 			"asset": {
 				"source": [
-					"asset:item:cheese"
+					"item-cheese"
 				]
 			},
 			"tags": [

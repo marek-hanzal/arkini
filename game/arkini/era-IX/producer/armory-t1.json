@@ -8,7 +8,7 @@
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
 			"asset": {
 				"source": [
-					"asset:producer:armory-t1"
+					"producer-armory-t1"
 				]
 			},
 			"tags": [

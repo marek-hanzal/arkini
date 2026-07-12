@@ -8,7 +8,7 @@
 			"description": "Education building that turns civic support into Basic Knowledge.",
 			"asset": {
 				"source": [
-					"asset:producer:school"
+					"producer-school"
 				]
 			},
 			"tags": [

@@ -9,6 +9,9 @@ import { whenFx } from "~/v1/when/fx/whenFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:when-test",
 		title: "When test",

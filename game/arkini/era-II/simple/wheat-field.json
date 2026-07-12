@@ -8,7 +8,7 @@
 			"description": "Movable grain source used by nearby farms.",
 			"asset": {
 				"source": [
-					"asset:item:wheat-field"
+					"item-wheat-field"
 				]
 			},
 			"tags": [

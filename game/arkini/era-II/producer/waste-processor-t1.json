@@ -8,7 +8,7 @@
 			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
 			"asset": {
 				"source": [
-					"asset:producer:waste-processor-t1"
+					"producer-waste-processor-t1"
 				]
 			},
 			"tags": [

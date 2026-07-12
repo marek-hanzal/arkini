@@ -8,7 +8,7 @@
 			"description": "Advanced library that researches and reissues blueprints up through Era VIII.",
 			"asset": {
 				"source": [
-					"asset:producer:library-t3"
+					"producer-library-t3"
 				]
 			},
 			"tags": [

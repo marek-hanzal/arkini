@@ -8,7 +8,7 @@
 			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
 			"asset": {
 				"source": [
-					"asset:item:vegetables"
+					"item-vegetables"
 				]
 			},
 			"tags": [

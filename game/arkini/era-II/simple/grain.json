@@ -8,7 +8,7 @@
 			"description": "Harvested grain produced by farms and milled into flour or used as pig feed.",
 			"asset": {
 				"source": [
-					"asset:item:grain"
+					"item-grain"
 				]
 			},
 			"tags": [

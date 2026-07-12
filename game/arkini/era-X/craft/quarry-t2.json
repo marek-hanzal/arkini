@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-quarry-t2": {
 			"id": "item:blueprint-quarry-t2",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Quarry Blueprint",
 			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-quarry-t2"
-				],
-				"composite": "asset:producer:quarry-t2"
-			},
+			"asset": [
+				"item-blueprint-quarry-t2",
+				"producer-quarry-t2"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -113,30 +111,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:quarry-t2",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:quarry-t2"
 		}
 	}
 }

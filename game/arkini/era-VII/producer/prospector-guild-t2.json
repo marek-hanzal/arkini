@@ -8,7 +8,7 @@
 			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
 			"asset": {
 				"source": [
-					"asset:producer:prospector-guild-t2"
+					"producer-prospector-guild-t2"
 				]
 			},
 			"tags": [

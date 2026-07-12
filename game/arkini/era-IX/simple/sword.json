@@ -8,7 +8,7 @@
 			"description": "Expedition weapon forged from iron ingots, leather grip work, and charcoal heat.",
 			"asset": {
 				"source": [
-					"asset:item:sword"
+					"item-sword"
 				]
 			},
 			"tags": [

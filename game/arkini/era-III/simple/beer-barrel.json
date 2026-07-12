@@ -8,7 +8,7 @@
 			"description": "A barrel of beer produced by breweries and served by taverns.",
 			"asset": {
 				"source": [
-					"asset:item:beer-barrel"
+					"item-beer-barrel"
 				]
 			},
 			"tags": [

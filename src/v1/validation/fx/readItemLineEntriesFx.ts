@@ -38,7 +38,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		)
 		.with(
 			{
-				type: P.union("craft", "stash"),
+				type: P.union("blueprint", "craft", "stash"),
 			},
 			({ line }) => [
 				{

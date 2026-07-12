@@ -23,6 +23,9 @@ const readSourcePath = (
 	if (root === "meta") {
 		return provenance.meta;
 	}
+	if (root === "resources") {
+		return provenance.resources;
+	}
 	if (root === "start") {
 		return provenance.start;
 	}

@@ -8,7 +8,7 @@
 			"description": "Clothing producer that sews common and luxury clothing.",
 			"asset": {
 				"source": [
-					"asset:producer:tailor-workshop-t1"
+					"producer-tailor-workshop-t1"
 				]
 			},
 			"tags": [

@@ -71,6 +71,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 
 		for (const provider of [
 			"meta",
+			"resources",
 			"start",
 			"version",
 		] as const) {
@@ -102,6 +103,9 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			switch (provider) {
 				case "meta":
 					value.meta = source.value.meta;
+					break;
+				case "resources":
+					value.resources = source.value.resources;
 					break;
 				case "start":
 					value.start = source.value.start;

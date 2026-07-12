@@ -8,7 +8,7 @@
 			"description": "Advanced institution that converts paper, glass, coin stacks, and advanced knowledge into Master Knowledge.",
 			"asset": {
 				"source": [
-					"asset:producer:university"
+					"producer-university"
 				]
 			},
 			"tags": [

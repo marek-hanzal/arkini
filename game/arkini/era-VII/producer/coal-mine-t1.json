@@ -8,7 +8,7 @@
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"asset": {
 				"source": [
-					"asset:producer:coal-mine-t1"
+					"producer-coal-mine-t1"
 				]
 			},
 			"tags": [

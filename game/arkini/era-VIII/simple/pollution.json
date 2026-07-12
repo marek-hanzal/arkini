@@ -8,7 +8,7 @@
 			"description": "Dirty board-only industrial pollution emitted by coal or charcoal processing. It stays on the board and must be cleaned by Purifier I.",
 			"asset": {
 				"source": [
-					"asset:item:pollution"
+					"item-pollution"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Serves finished drink items; cooking and feast prep belong to Cookhouse I.",
 			"asset": {
 				"source": [
-					"asset:producer:tavern-t1"
+					"producer-tavern-t1"
 				]
 			},
 			"tags": [

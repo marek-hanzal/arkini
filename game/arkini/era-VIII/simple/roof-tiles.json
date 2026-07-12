@@ -8,7 +8,7 @@
 			"description": "Curved fired roof tiles prepared for higher-tier building construction.",
 			"asset": {
 				"source": [
-					"asset:item:roof-tiles"
+					"item-roof-tiles"
 				]
 			},
 			"tags": [

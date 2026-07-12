@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-cathedral": {
 			"id": "item:blueprint-cathedral",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Cathedral Blueprint",
 			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-cathedral"
-				],
-				"composite": "asset:producer:cathedral"
-			},
+			"asset": [
+				"item-blueprint-cathedral",
+				"producer-cathedral"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -216,30 +214,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:cathedral",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:cathedral"
 		}
 	}
 }

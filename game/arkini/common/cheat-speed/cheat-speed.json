@@ -8,8 +8,8 @@
 			"description": "Cheat timepiece that toggles the engine between normal timing and one-second instant actions.",
 			"asset": {
 				"source": [
-					"asset:item:cheat-speed:on",
-					"asset:item:cheat-speed:off"
+					"item-cheat-speed-on",
+					"item-cheat-speed-off"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Generic board waste byproduct from messy production lines.",
 			"asset": {
 				"source": [
-					"asset:item:trash"
+					"item-trash"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Basic currency produced by markets from processed food and drink, and later by specialist economy buildings.",
 			"asset": {
 				"source": [
-					"asset:item:coin"
+					"item-coin"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Layered leather armor assembled by the Armory from leather, clothing, and forged nails.",
 			"asset": {
 				"source": [
-					"asset:item:leather-armor"
+					"item-leather-armor"
 				]
 			},
 			"tags": [

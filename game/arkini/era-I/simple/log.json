@@ -8,7 +8,7 @@
 			"description": "Basic wood material produced by lumberjacks.",
 			"asset": {
 				"source": [
-					"asset:item:log"
+					"item-log"
 				]
 			},
 			"tags": [

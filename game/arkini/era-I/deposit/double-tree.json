@@ -8,7 +8,7 @@
 			"description": "Tier-2 watered wood source: two conifers packed together for stronger nearby lumberjack log rolls. Harvesting it with a single-use axe removes the source and drops logs.",
 			"asset": {
 				"source": [
-					"asset:item:double-tree"
+					"item-double-tree"
 				]
 			},
 			"tags": [

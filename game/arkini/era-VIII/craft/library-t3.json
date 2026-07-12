@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-library-t3": {
 			"id": "item:blueprint-library-t3",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Library III Blueprint",
 			"description": "Build plan that upgrades Library II into Library III.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-library-t3"
-				],
-				"composite": "asset:producer:library-t3"
-			},
+			"asset": [
+				"item-blueprint-library-t3",
+				"producer-library-t3"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -96,30 +94,9 @@
 						}
 					}
 				],
-				"rules": [],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:library-t3",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				"rules": []
+			},
+			"targetId": "producer:library-t3"
 		}
 	}
 }

@@ -8,7 +8,7 @@
 			"description": "Meat food produced by slaughterhouses from piglets and consumed by heavy industry workers.",
 			"asset": {
 				"source": [
-					"asset:item:sausage"
+					"item-sausage"
 				]
 			},
 			"tags": [

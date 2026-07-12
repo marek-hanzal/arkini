@@ -8,7 +8,7 @@
 			"description": "Produces water.",
 			"asset": {
 				"source": [
-					"asset:producer:well-t1"
+					"producer-well-t1"
 				]
 			},
 			"tags": [

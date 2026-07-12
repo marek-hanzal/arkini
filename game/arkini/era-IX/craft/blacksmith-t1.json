@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-blacksmith-t1": {
 			"id": "item:blueprint-blacksmith-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Blacksmith I Blueprint",
 			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-blacksmith-t1"
-				],
-				"composite": "asset:producer:blacksmith-t1"
-			},
+			"asset": [
+				"item-blueprint-blacksmith-t1",
+				"producer-blacksmith-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -131,30 +129,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:blacksmith-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:blacksmith-t1"
 		}
 	}
 }

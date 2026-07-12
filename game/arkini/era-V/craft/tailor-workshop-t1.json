@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-tailor-workshop-t1": {
 			"id": "item:blueprint-tailor-workshop-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Tailor Workshop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-tailor-workshop-t1"
-				],
-				"composite": "asset:producer:tailor-workshop-t1"
-			},
+			"asset": [
+				"item-blueprint-tailor-workshop-t1",
+				"producer-tailor-workshop-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -111,30 +109,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:tailor-workshop-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:tailor-workshop-t1"
 		}
 	}
 }

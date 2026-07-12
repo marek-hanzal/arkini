@@ -8,7 +8,7 @@
 			"description": "Processed stone material produced by stonemasons.",
 			"asset": {
 				"source": [
-					"asset:item:stone-block"
+					"item-stone-block"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Processed wood material produced by sawmills.",
 			"asset": {
 				"source": [
-					"asset:item:plank"
+					"item-plank"
 				]
 			},
 			"tags": [

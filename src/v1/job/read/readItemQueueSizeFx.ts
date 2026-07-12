@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
@@ -23,7 +23,7 @@ export const readItemQueueSizeFx = Effect.fn("readItemQueueSizeFx")(function* ({
 		)
 		.with(
 			{
-				type: "craft",
+				type: P.union("blueprint", "craft"),
 			},
 			() => 1,
 		)

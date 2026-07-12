@@ -8,7 +8,7 @@
 			"description": "Locked chest returned from a tougher Heroes Guild expedition. Open it with a Key II.",
 			"asset": {
 				"source": [
-					"asset:item:chest-t2"
+					"item-chest-t2"
 				]
 			},
 			"tags": [

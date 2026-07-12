@@ -8,7 +8,7 @@
 			"description": "Turns simple offerings into temporary production blessings.",
 			"asset": {
 				"source": [
-					"asset:producer:shrine-t1"
+					"producer-shrine-t1"
 				]
 			},
 			"tags": [

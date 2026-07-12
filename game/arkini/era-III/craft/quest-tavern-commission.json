@@ -8,7 +8,7 @@
 			"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
 			"asset": {
 				"source": [
-					"asset:item:quest"
+					"item-quest"
 				]
 			},
 			"tags": [

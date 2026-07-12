@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-stonemason-t2": {
 			"id": "item:blueprint-stonemason-t2",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Stonemason Blueprint",
 			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-stonemason-t2"
-				],
-				"composite": "asset:producer:stonemason-t2"
-			},
+			"asset": [
+				"item-blueprint-stonemason-t2",
+				"producer-stonemason-t2"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -114,30 +112,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:stonemason-t2",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:stonemason-t2"
 		}
 	}
 }

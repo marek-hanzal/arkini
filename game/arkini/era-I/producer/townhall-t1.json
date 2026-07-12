@@ -8,7 +8,7 @@
 			"description": "Starter civic hub that issues basic settlement blueprints.",
 			"asset": {
 				"source": [
-					"asset:producer:townhall-t1"
+					"producer-townhall-t1"
 				]
 			},
 			"tags": [

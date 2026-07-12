@@ -28,6 +28,9 @@ const simpleItem = ({
 
 export const startTestConfig = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:start",
 		title: "Start",

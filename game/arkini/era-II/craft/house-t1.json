@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-house-t1": {
 			"id": "item:blueprint-house-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "House I Blueprint",
 			"description": "Build plan for House I, a housing producer that generates morale.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-house-t1"
-				],
-				"composite": "asset:producer:house-t1"
-			},
+			"asset": [
+				"item-blueprint-house-t1",
+				"producer-house-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -90,30 +88,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:house-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:house-t1"
 		}
 	}
 }

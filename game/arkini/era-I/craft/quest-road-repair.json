@@ -8,7 +8,7 @@
 			"description": "A small board quest asking for raw building materials and rewarding a processed block.",
 			"asset": {
 				"source": [
-					"asset:item:quest"
+					"item-quest"
 				]
 			},
 			"tags": [

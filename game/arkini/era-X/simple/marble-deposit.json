@@ -8,7 +8,7 @@
 			"description": "Movable premium stone source discovered by Prospector Guild 2 and used by Quarry II for luxury construction materials.",
 			"asset": {
 				"source": [
-					"asset:item:marble-deposit"
+					"item-marble-deposit"
 				]
 			},
 			"tags": [

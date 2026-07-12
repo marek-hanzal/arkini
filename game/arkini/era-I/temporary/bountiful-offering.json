@@ -8,7 +8,7 @@
 			"description": "A temporary shrine blessing that later rules can use to improve production rewards while it occupies the board.",
 			"asset": {
 				"source": [
-					"asset:producer:shrine-t1"
+					"producer-shrine-t1"
 				]
 			},
 			"tags": [

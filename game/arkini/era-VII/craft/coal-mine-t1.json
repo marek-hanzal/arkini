@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-coal-mine-t1": {
 			"id": "item:blueprint-coal-mine-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Coal Mine I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-coal-mine-t1"
-				],
-				"composite": "asset:producer:coal-mine-t1"
-			},
+			"asset": [
+				"item-blueprint-coal-mine-t1",
+				"producer-coal-mine-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -98,30 +96,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:coal-mine-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:coal-mine-t1"
 		}
 	}
 }

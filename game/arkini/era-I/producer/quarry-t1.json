@@ -8,7 +8,7 @@
 			"description": "Produces stone when placed near a rock.",
 			"asset": {
 				"source": [
-					"asset:producer:quarry-t1"
+					"producer-quarry-t1"
 				]
 			},
 			"tags": [

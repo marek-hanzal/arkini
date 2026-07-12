@@ -8,7 +8,7 @@
 			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
 			"asset": {
 				"source": [
-					"asset:producer:townhall-t4"
+					"producer-townhall-t4"
 				]
 			},
 			"tags": [

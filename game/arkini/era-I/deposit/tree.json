@@ -8,7 +8,7 @@
 			"description": "Movable tier-1 wood source. Nearby lumberjacks use it for log drop rolls. Harvesting it with a single-use axe removes the source and drops logs.",
 			"asset": {
 				"source": [
-					"asset:item:tree"
+					"item-tree"
 				]
 			},
 			"tags": [

@@ -12,6 +12,9 @@ import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:test",
 		title: "Test game",

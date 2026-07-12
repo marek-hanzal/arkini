@@ -8,7 +8,7 @@
 			"description": "A polished green gemstone prepared for later treasure recipes.",
 			"asset": {
 				"source": [
-					"asset:item:emerald"
+					"item-emerald"
 				]
 			},
 			"tags": [

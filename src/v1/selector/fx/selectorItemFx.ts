@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import type { BaseItemSchema } from "~/v1/item/schema/BaseItemSchema";
+import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import type { SelectorItemSchema } from "~/v1/selector/schema/SelectorItemSchema";
 
 export namespace selectorItemFx {
 	export interface Props {
 		selector: SelectorItemSchema.Type;
-		item: BaseItemSchema.Type;
+		item: ItemSchema.Type;
 	}
 }
 

@@ -8,7 +8,7 @@
 			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
 			"asset": {
 				"source": [
-					"asset:producer:library-t1"
+					"producer-library-t1"
 				]
 			},
 			"tags": [

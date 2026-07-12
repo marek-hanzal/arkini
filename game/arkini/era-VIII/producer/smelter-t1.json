@@ -8,7 +8,7 @@
 			"description": "Dirty heavy-industry furnace that refines ore with coal and water into ingots while sometimes dumping board-only pollution.",
 			"asset": {
 				"source": [
-					"asset:producer:smelter-t1"
+					"producer-smelter-t1"
 				]
 			},
 			"tags": [

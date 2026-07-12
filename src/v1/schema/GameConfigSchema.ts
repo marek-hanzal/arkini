@@ -5,6 +5,7 @@ import { CategorySchema } from "~/v1/category/schema/CategorySchema";
 import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
 import { StartSchema } from "~/v1/start/schema/StartSchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { ResourceConfigSchema } from "~/v1/resource/schema/ResourceConfigSchema";
 import { VersionEnumSchema } from "./VersionEnumSchema";
 
 /**
@@ -26,6 +27,12 @@ export const GameConfigSchema = z
 		 * Core metadata and player-available layouts for this game.
 		 */
 		meta: MetaSchema.describe("Core metadata and player-available layouts for this game."),
+		/**
+		 * Explicit non-item resource roles used by the game shell.
+		 */
+		resources: ResourceConfigSchema.describe(
+			"Explicit non-item resource roles used by the game shell.",
+		),
 		/**
 		 * Board and inventory contents created for a new game.
 		 */

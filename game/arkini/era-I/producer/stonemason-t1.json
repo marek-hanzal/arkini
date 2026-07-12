@@ -8,7 +8,7 @@
 			"description": "Turns stone into stone blocks when placed near a quarry.",
 			"asset": {
 				"source": [
-					"asset:producer:stonemason-t1"
+					"producer-stonemason-t1"
 				]
 			},
 			"tags": [

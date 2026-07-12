@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-townhall-t4": {
 			"id": "item:blueprint-townhall-t4",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Town Hall IV Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-townhall-t4"
-				],
-				"composite": "asset:producer:townhall-t4"
-			},
+			"asset": [
+				"item-blueprint-townhall-t4",
+				"producer-townhall-t4"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -221,30 +219,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:townhall-t4",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:townhall-t4"
 		}
 	}
 }

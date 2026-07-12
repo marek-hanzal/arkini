@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-sheep-pasture-t1": {
 			"id": "item:blueprint-sheep-pasture-t1",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Sheep Pasture I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-sheep-pasture-t1"
-				],
-				"composite": "asset:producer:sheep-pasture-t1"
-			},
+			"asset": [
+				"item-blueprint-sheep-pasture-t1",
+				"producer-sheep-pasture-t1"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -72,30 +70,9 @@
 						}
 					}
 				],
-				"rules": [],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:sheep-pasture-t1",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				"rules": []
+			},
+			"targetId": "producer:sheep-pasture-t1"
 		}
 	}
 }

@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-market-t2": {
 			"id": "item:blueprint-market-t2",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Market II Blueprint",
 			"description": "Build plan that can upgrade Market into Market II.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-market-t2"
-				],
-				"composite": "asset:producer:market-t2"
-			},
+			"asset": [
+				"item-blueprint-market-t2",
+				"producer-market-t2"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -90,30 +88,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:market-t2",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:market-t2"
 		}
 	}
 }

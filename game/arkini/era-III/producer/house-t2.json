@@ -8,7 +8,7 @@
 			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
 			"asset": {
 				"source": [
-					"asset:producer:house-t2"
+					"producer-house-t2"
 				]
 			},
 			"tags": [

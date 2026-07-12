@@ -8,7 +8,7 @@
 			"description": "Choose The Path keystone for the Faith branch. Owning it locks Engineers and Mages and prepares later devotion, cleansing, and order lines.",
 			"asset": {
 				"source": [
-					"asset:producer:cathedral"
+					"producer-cathedral"
 				]
 			},
 			"tags": [

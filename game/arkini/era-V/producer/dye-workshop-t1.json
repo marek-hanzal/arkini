@@ -8,7 +8,7 @@
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
 			"asset": {
 				"source": [
-					"asset:producer:dye-workshop-t1"
+					"producer-dye-workshop-t1"
 				]
 			},
 			"tags": [

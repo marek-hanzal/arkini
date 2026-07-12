@@ -8,7 +8,7 @@
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
 			"asset": {
 				"source": [
-					"asset:producer:glazier-workshop-t1"
+					"producer-glazier-workshop-t1"
 				]
 			},
 			"tags": [

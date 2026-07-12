@@ -8,7 +8,7 @@
 			"description": "Movable clay source used by nearby clay pits.",
 			"asset": {
 				"source": [
-					"asset:item:clay-deposit"
+					"item-clay-deposit"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
 			"asset": {
 				"source": [
-					"asset:producer:market-t2"
+					"producer-market-t2"
 				]
 			},
 			"tags": [

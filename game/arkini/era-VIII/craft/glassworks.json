@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-glassworks": {
 			"id": "item:blueprint-glassworks",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Glassworks Blueprint",
 			"description": "Build plan that can be filled with resources to construct Glassworks.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-glassworks"
-				],
-				"composite": "asset:producer:glassworks"
-			},
+			"asset": [
+				"item-blueprint-glassworks",
+				"producer-glassworks"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -133,30 +131,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:glassworks",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:glassworks"
 		}
 	}
 }

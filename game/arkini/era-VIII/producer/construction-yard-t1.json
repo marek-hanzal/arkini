@@ -8,7 +8,7 @@
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
 			"asset": {
 				"source": [
-					"asset:producer:construction-yard-t1"
+					"producer-construction-yard-t1"
 				]
 			},
 			"tags": [

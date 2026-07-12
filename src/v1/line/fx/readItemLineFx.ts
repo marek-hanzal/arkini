@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
@@ -28,7 +28,7 @@ export const readItemLineFx = Effect.fn("readItemLineFx")(function* ({
 		)
 		.with(
 			{
-				type: "craft",
+				type: P.union("blueprint", "craft"),
 			},
 			({ line }) => (line.id === lineId ? line : undefined),
 		)

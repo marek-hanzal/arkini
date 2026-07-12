@@ -8,7 +8,7 @@
 			"description": "Movable iron source used by nearby iron mines.",
 			"asset": {
 				"source": [
-					"asset:item:iron-deposit"
+					"item-iron-deposit"
 				]
 			},
 			"tags": [

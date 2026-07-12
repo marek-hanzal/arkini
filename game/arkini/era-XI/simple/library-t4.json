@@ -8,7 +8,7 @@
 			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
 			"asset": {
 				"source": [
-					"asset:producer:library-t4"
+					"producer-library-t4"
 				]
 			},
 			"tags": [

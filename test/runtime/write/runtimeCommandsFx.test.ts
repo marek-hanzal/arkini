@@ -14,6 +14,9 @@ import { swapItemsFx } from "~/v1/runtime/write/swapItemsFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:runtime-commands",
 		title: "Runtime commands",

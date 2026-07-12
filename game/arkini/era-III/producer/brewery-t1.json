@@ -8,7 +8,7 @@
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"asset": {
 				"source": [
-					"asset:producer:brewery-t1"
+					"producer-brewery-t1"
 				]
 			},
 			"tags": [

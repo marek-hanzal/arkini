@@ -8,7 +8,7 @@
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"asset": {
 				"source": [
-					"asset:producer:clay-pit"
+					"producer-clay-pit"
 				]
 			},
 			"tags": [

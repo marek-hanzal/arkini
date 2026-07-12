@@ -12,6 +12,9 @@ import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:runtime-check",
 		title: "Runtime check",

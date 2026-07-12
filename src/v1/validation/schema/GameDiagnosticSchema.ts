@@ -2,6 +2,9 @@ import { z } from "zod";
 
 import { ConfigSchemaDiagnosticSchema } from "./diagnostic/ConfigSchemaDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./diagnostic/DuplicateProviderDiagnosticSchema";
+import { UnusedResourceDiagnosticSchema } from "./diagnostic/UnusedResourceDiagnosticSchema";
+import { MissingResourceDiagnosticSchema } from "./diagnostic/MissingResourceDiagnosticSchema";
+import { DuplicateResourceDiagnosticSchema } from "./diagnostic/DuplicateResourceDiagnosticSchema";
 import { DuplicateRecordDiagnosticSchema } from "./diagnostic/DuplicateRecordDiagnosticSchema";
 import { InputAcceptanceCycleDiagnosticSchema } from "./diagnostic/InputAcceptanceCycleDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./diagnostic/KeyIdMismatchDiagnosticSchema";
@@ -15,6 +18,9 @@ export const GameDiagnosticSchema = z
 	.discriminatedUnion("code", [
 		DuplicateRecordDiagnosticSchema,
 		DuplicateProviderDiagnosticSchema,
+		DuplicateResourceDiagnosticSchema,
+		MissingResourceDiagnosticSchema,
+		UnusedResourceDiagnosticSchema,
 		SchemaReferenceConflictDiagnosticSchema,
 		ConfigSchemaDiagnosticSchema,
 		KeyIdMismatchDiagnosticSchema,

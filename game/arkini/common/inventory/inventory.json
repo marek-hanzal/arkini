@@ -8,7 +8,7 @@
 			"description": "A trusty backpack that opens the shared inventory from the board.",
 			"asset": {
 				"source": [
-					"asset:item:inventory"
+					"item-inventory"
 				]
 			},
 			"tags": [

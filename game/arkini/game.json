@@ -12,6 +12,9 @@
 			"height": 7
 		}
 	},
+	"resources": {
+		"hero": "hero"
+	},
 	"start": {
 		"board": [
 			{

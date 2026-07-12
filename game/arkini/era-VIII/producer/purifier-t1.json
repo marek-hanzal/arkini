@@ -8,7 +8,7 @@
 			"description": "Industrial cleanup producer that must be present near dirty coal or charcoal processing and consumes board pollution together with water and fuel.",
 			"asset": {
 				"source": [
-					"asset:producer:purifier-t1"
+					"producer-purifier-t1"
 				]
 			},
 			"tags": [

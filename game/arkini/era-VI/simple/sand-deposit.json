@@ -8,7 +8,7 @@
 			"description": "Movable sand source used by nearby sand pits.",
 			"asset": {
 				"source": [
-					"asset:item:sand-deposit"
+					"item-sand-deposit"
 				]
 			},
 			"tags": [

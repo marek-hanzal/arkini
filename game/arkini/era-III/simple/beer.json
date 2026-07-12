@@ -8,7 +8,7 @@
 			"description": "A single mug of beer served by taverns.",
 			"asset": {
 				"source": [
-					"asset:item:beer"
+					"item-beer"
 				]
 			},
 			"tags": [

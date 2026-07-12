@@ -8,7 +8,7 @@
 			"description": "Consumes grain and water to produce wool.",
 			"asset": {
 				"source": [
-					"asset:producer:sheep-pasture-t1"
+					"producer-sheep-pasture-t1"
 				]
 			},
 			"tags": [

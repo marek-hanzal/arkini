@@ -8,7 +8,7 @@
 			"description": "Processes piglets into sausage and leather.",
 			"asset": {
 				"source": [
-					"asset:producer:slaughterhouse-t1"
+					"producer-slaughterhouse-t1"
 				]
 			},
 			"tags": [

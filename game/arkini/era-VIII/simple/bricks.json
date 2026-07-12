@@ -8,7 +8,7 @@
 			"description": "Fired clay building material prepared for sturdier construction.",
 			"asset": {
 				"source": [
-					"asset:item:bricks"
+					"item-bricks"
 				]
 			},
 			"tags": [

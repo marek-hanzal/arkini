@@ -3,6 +3,9 @@ import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 
 export const lineTestConfig = GameConfigSchema.parse({
 	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
 	meta: {
 		id: "game:line-test",
 		title: "Line test",

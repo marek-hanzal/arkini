@@ -8,7 +8,7 @@
 			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
 			"asset": {
 				"source": [
-					"asset:item:chest-t4"
+					"item-chest-t4"
 				]
 			},
 			"tags": [

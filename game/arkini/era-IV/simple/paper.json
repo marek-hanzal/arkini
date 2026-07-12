@@ -8,7 +8,7 @@
 			"description": "Processed writing material used by schools, civic offices, prospectors, and improved trade.",
 			"asset": {
 				"source": [
-					"asset:item:paper"
+					"item-paper"
 				]
 			},
 			"tags": [

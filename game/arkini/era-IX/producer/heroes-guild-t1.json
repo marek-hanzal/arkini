@@ -8,7 +8,7 @@
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"asset": {
 				"source": [
-					"asset:producer:heroes-guild-t1"
+					"producer-heroes-guild-t1"
 				]
 			},
 			"tags": [

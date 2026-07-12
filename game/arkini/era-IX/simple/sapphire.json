@@ -8,7 +8,7 @@
 			"description": "A polished blue gemstone from better guild rewards.",
 			"asset": {
 				"source": [
-					"asset:item:sapphire"
+					"item-sapphire"
 				]
 			},
 			"tags": [

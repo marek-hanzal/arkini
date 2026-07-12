@@ -3,15 +3,13 @@
 	"items": {
 		"item:blueprint-clay-pit": {
 			"id": "item:blueprint-clay-pit",
-			"type": "craft",
+			"type": "blueprint",
 			"title": "Clay Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
-			"asset": {
-				"source": [
-					"asset:item:blueprint-clay-pit"
-				],
-				"composite": "asset:producer:clay-pit"
-			},
+			"asset": [
+				"item-blueprint-clay-pit",
+				"producer-clay-pit"
+			],
 			"tags": [
 				"blueprint",
 				"building",
@@ -90,30 +88,9 @@
 							}
 						]
 					}
-				],
-				"output": {
-					"set": [
-						{
-							"roll": [
-								{
-									"type": "guaranteed",
-									"drop": [
-										{
-											"itemId": "producer:clay-pit",
-											"quantity": {
-												"type": "value",
-												"value": 1
-											},
-											"placement": "replace",
-											"rules": []
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			}
+				]
+			},
+			"targetId": "producer:clay-pit"
 		}
 	}
 }

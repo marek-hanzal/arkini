@@ -8,7 +8,7 @@
 			"description": "Movable gold source used by nearby gold mines.",
 			"asset": {
 				"source": [
-					"asset:item:gold-deposit"
+					"item-gold-deposit"
 				]
 			},
 			"tags": [

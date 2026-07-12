@@ -8,7 +8,7 @@
 			"description": "Produces logs when placed near a tree.",
 			"asset": {
 				"source": [
-					"asset:producer:lumberjack-t1"
+					"producer-lumberjack-t1"
 				]
 			},
 			"tags": [

@@ -8,7 +8,7 @@
 			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
 			"asset": {
 				"source": [
-					"asset:producer:iron-mine-t1"
+					"producer-iron-mine-t1"
 				]
 			},
 			"tags": [

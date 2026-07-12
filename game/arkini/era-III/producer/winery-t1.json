@@ -8,7 +8,7 @@
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
 			"asset": {
 				"source": [
-					"asset:producer:winery-t1"
+					"producer-winery-t1"
 				]
 			},
 			"tags": [

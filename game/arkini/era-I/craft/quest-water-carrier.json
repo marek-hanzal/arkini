@@ -8,7 +8,7 @@
 			"description": "A small board quest for settlement supplies, rewarding a modest early vegetable delivery from the next era.",
 			"asset": {
 				"source": [
-					"asset:item:quest"
+					"item-quest"
 				]
 			},
 			"tags": [

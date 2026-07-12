@@ -8,7 +8,7 @@
 			"description": "A single glass of wine served by taverns.",
 			"asset": {
 				"source": [
-					"asset:item:wine-glass"
+					"item-wine-glass"
 				]
 			},
 			"tags": [

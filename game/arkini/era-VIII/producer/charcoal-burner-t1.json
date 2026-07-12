@@ -8,7 +8,7 @@
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"asset": {
 				"source": [
-					"asset:producer:charcoal-burner-t1"
+					"producer-charcoal-burner-t1"
 				]
 			},
 			"tags": [

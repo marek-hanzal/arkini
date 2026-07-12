@@ -8,7 +8,7 @@
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
 			"asset": {
 				"source": [
-					"asset:producer:civic-office-t1"
+					"producer-civic-office-t1"
 				]
 			},
 			"tags": [

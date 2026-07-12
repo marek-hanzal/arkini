@@ -8,7 +8,7 @@
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
 			"asset": {
 				"source": [
-					"asset:producer:tannery-t1"
+					"producer-tannery-t1"
 				]
 			},
 			"tags": [

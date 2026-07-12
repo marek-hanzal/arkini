@@ -8,7 +8,7 @@
 			"description": "Heavy iron armor upgraded by the Armory from leather armor, iron ingots, nails, and charcoal-fired fittings.",
 			"asset": {
 				"source": [
-					"asset:item:iron-armor"
+					"item-iron-armor"
 				]
 			},
 			"tags": [

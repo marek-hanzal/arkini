@@ -8,7 +8,7 @@
 			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
 			"asset": {
 				"source": [
-					"asset:item:coal"
+					"item-coal"
 				]
 			},
 			"tags": [

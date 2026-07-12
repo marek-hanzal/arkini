@@ -8,7 +8,7 @@
 			"description": "Basic stone material produced by quarries.",
 			"asset": {
 				"source": [
-					"asset:item:stone"
+					"item-stone"
 				]
 			},
 			"tags": [

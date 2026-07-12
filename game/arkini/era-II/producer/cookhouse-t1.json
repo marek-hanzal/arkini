@@ -8,7 +8,7 @@
 			"description": "Prepares empty feast plates for manual assembly or slowly cooks complete feasts from Era II farm food.",
 			"asset": {
 				"source": [
-					"asset:producer:cookhouse-t1"
+					"producer-cookhouse-t1"
 				]
 			},
 			"tags": [

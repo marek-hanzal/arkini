@@ -9,6 +9,7 @@ import { LimitedDepositWarningDiagnosticSchema } from "./diagnostic/LimitedDepos
 import { MissingReferenceDiagnosticSchema } from "./diagnostic/MissingReferenceDiagnosticSchema";
 import { MultipleReplaceDiagnosticSchema } from "./diagnostic/MultipleReplaceDiagnosticSchema";
 import { SchemaReferenceConflictDiagnosticSchema } from "./diagnostic/SchemaReferenceConflictDiagnosticSchema";
+import { StartInvalidDiagnosticSchema } from "./diagnostic/StartInvalidDiagnosticSchema";
 
 export const GameDiagnosticSchema = z
 	.discriminatedUnion("code", [
@@ -21,6 +22,7 @@ export const GameDiagnosticSchema = z
 		InputAcceptanceCycleDiagnosticSchema,
 		MultipleReplaceDiagnosticSchema,
 		LimitedDepositWarningDiagnosticSchema,
+		StartInvalidDiagnosticSchema,
 	])
 	.meta({
 		id: "GameDiagnosticSchema",

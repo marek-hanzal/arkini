@@ -7,6 +7,7 @@ import { validateConfigReferencesFx } from "../rule/validateConfigReferencesFx";
 import { validateInputAcceptanceCyclesFx } from "../rule/validateInputAcceptanceCyclesFx";
 import { validateLimitedDepositsFx } from "../rule/validateLimitedDepositsFx";
 import { validateOutputReplaceCardinalityFx } from "../rule/validateOutputReplaceCardinalityFx";
+import { validateStartStateFx } from "../rule/validateStartStateFx";
 
 export namespace validateGameConfigFx {
 	export interface Props {
@@ -38,6 +39,10 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateLimitedDepositsFx({
+			config,
+			provenance,
+		}),
+		validateStartStateFx({
 			config,
 			provenance,
 		}),

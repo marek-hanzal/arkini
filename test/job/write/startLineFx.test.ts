@@ -7,6 +7,8 @@ import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readLineRunFx } from "~/v1/line/fx/run/readLineRunFx";
 import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
+import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
+import { setItemQuantityFx } from "~/v1/runtime/write/setItemQuantityFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
@@ -81,6 +83,69 @@ describe("startLineFx", () => {
 			result.started.job,
 		]);
 		expect(result.restored).toEqual(result.runtime);
+	});
+
+	it("keeps job-scoped reservations immutable through generic item commands", () => {
+		const config = createJobTestConfig();
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				const started = yield* startLineFx(startProps);
+				const before = yield* readRuntimeFx();
+				const reserved = before.items.find((item) => {
+					return item.location.scope === "job" && item.location.jobId === started.job.id;
+				});
+				if (reserved === undefined) {
+					return yield* Effect.dieMessage("Expected one job-scoped reservation.");
+				}
+
+				const removed = yield* Effect.either(
+					removeItemFx({
+						itemId: reserved.id,
+						revision: reserved.revision,
+					}),
+				);
+				const quantity = yield* Effect.either(
+					setItemQuantityFx({
+						itemId: reserved.id,
+						quantity: reserved.quantity + 1,
+						revision: reserved.revision,
+					}),
+				);
+				const after = yield* readRuntimeFx();
+
+				return {
+					after,
+					before,
+					quantity,
+					removed,
+					reserved,
+					started,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result.removed)).toBe(true);
+		if (Either.isLeft(result.removed)) {
+			expect(result.removed.left).toMatchObject({
+				_tag: "ItemJobScopedError",
+				itemId: result.reserved.id,
+				jobId: result.started.job.id,
+			});
+		}
+		expect(Either.isLeft(result.quantity)).toBe(true);
+		if (Either.isLeft(result.quantity)) {
+			expect(result.quantity.left).toMatchObject({
+				_tag: "ItemJobScopedError",
+				itemId: result.reserved.id,
+				jobId: result.started.job.id,
+			});
+		}
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("serializes concurrent starts against one queue slot", async () => {

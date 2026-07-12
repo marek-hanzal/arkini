@@ -3,6 +3,7 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
+import { assertNonJobScopeFx } from "~/v1/runtime/fx/assertNonJobScopeFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -40,6 +41,10 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 				actualRevision: item.revision,
 				entityId: item.id,
 				expectedRevision: revision,
+			});
+
+			yield* assertNonJobScopeFx({
+				item,
 			});
 
 			const nextRuntime = {

@@ -14,7 +14,7 @@ export namespace filterInputSlotItemsFx {
 	}
 }
 
-/** Filters buffered and reserved materials occupying one concrete input slot. */
+/** Filters buffered materials currently occupying one concrete input slot. */
 export const filterInputSlotItemsFx = Effect.fn("filterInputSlotItemsFx")(function* ({
 	inputIndex,
 	items,

@@ -4,6 +4,7 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
+import { assertNonJobScopeFx } from "~/v1/runtime/fx/assertNonJobScopeFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
@@ -45,6 +46,10 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 				actualRevision: item.revision,
 				entityId: item.id,
 				expectedRevision: revision,
+			});
+
+			yield* assertNonJobScopeFx({
+				item,
 			});
 
 			const updatedItem = yield* reviseRuntimeItemFx({

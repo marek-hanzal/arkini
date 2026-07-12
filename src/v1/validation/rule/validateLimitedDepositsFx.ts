@@ -4,7 +4,10 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
-import { readOutputItemIdsFx } from "../fx/readOutputItemIdsFx";
+import {
+	readOutputRecreationCertaintyFx,
+	type OutputRecreationCertainty,
+} from "../fx/readOutputRecreationCertaintyFx";
 import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateLimitedDepositsFx {
@@ -14,16 +17,25 @@ export namespace validateLimitedDepositsFx {
 	}
 }
 
-/** Warns when a finite deposit has no configured output or merge path that recreates it. */
+const strongerCertainty = (
+	current: OutputRecreationCertainty,
+	candidate: OutputRecreationCertainty,
+): OutputRecreationCertainty => {
+	if (current === "guaranteed" || candidate === "guaranteed") return "guaranteed";
+	if (current === "stochastic" || candidate === "stochastic") return "stochastic";
+	return "none";
+};
+
+/** Warns when a finite deposit lacks a deterministic configured recreation path. */
 export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(function* ({
 	config,
 	provenance,
 }: validateLimitedDepositsFx.Props) {
-	const produced = new Set<IdSchema.Type>();
+	const certainty = new Map<IdSchema.Type, OutputRecreationCertainty>();
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
 			if (merge.effect === "replace") {
-				produced.add(merge.result);
+				certainty.set(merge.result, "guaranteed");
 			}
 		}
 		const outputs = yield* readItemOutputEntriesFx({
@@ -31,15 +43,34 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 			item,
 		});
 		for (const { output } of outputs) {
-			for (const outputItemId of yield* readOutputItemIdsFx(output)) {
-				produced.add(outputItemId);
+			for (const depositId of Object.keys(config.items)) {
+				if (config.items[depositId]?.type !== "deposit") continue;
+				const outputCertainty = yield* readOutputRecreationCertaintyFx(output, depositId);
+				certainty.set(
+					depositId,
+					strongerCertainty(certainty.get(depositId) ?? "none", outputCertainty),
+				);
 			}
 		}
 	}
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type !== "deposit" || produced.has(itemId)) {
+		if (item.type !== "deposit") continue;
+		const itemCertainty = certainty.get(itemId) ?? "none";
+		if (itemCertainty === "guaranteed") continue;
+		if (itemCertainty === "stochastic") {
+			diagnostics.push({
+				code: "deposit:stochastic-softlock",
+				severity: "warning",
+				path: [
+					"items",
+					itemId,
+				],
+				source: provenance.items[itemId],
+				message: `Finite deposit ${itemId} is recreated only through probabilistic, weighted, or conditional output paths.`,
+				itemId,
+			});
 			continue;
 		}
 		diagnostics.push({

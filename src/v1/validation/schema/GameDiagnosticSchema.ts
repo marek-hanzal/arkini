@@ -11,10 +11,13 @@ import { DuplicateRecordDiagnosticSchema } from "./diagnostic/DuplicateRecordDia
 import { InputAcceptanceCycleDiagnosticSchema } from "./diagnostic/InputAcceptanceCycleDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./diagnostic/KeyIdMismatchDiagnosticSchema";
 import { LimitedDepositWarningDiagnosticSchema } from "./diagnostic/LimitedDepositWarningDiagnosticSchema";
+import { StochasticLimitedDepositWarningDiagnosticSchema } from "./diagnostic/StochasticLimitedDepositWarningDiagnosticSchema";
 import { MissingReferenceDiagnosticSchema } from "./diagnostic/MissingReferenceDiagnosticSchema";
 import { MultipleReplaceDiagnosticSchema } from "./diagnostic/MultipleReplaceDiagnosticSchema";
 import { SchemaReferenceConflictDiagnosticSchema } from "./diagnostic/SchemaReferenceConflictDiagnosticSchema";
 import { StartInvalidDiagnosticSchema } from "./diagnostic/StartInvalidDiagnosticSchema";
+import { SourceJsonDiagnosticSchema } from "./diagnostic/SourceJsonDiagnosticSchema";
+import { SourceSchemaDiagnosticSchema } from "./diagnostic/SourceSchemaDiagnosticSchema";
 
 export const GameDiagnosticSchema = z
 	.discriminatedUnion("code", [
@@ -30,7 +33,10 @@ export const GameDiagnosticSchema = z
 		InputAcceptanceCycleDiagnosticSchema,
 		MultipleReplaceDiagnosticSchema,
 		LimitedDepositWarningDiagnosticSchema,
+		StochasticLimitedDepositWarningDiagnosticSchema,
 		StartInvalidDiagnosticSchema,
+		SourceJsonDiagnosticSchema,
+		SourceSchemaDiagnosticSchema,
 		DuplicateLineIdDiagnosticSchema,
 		EmptyMaterialTagDiagnosticSchema,
 	])

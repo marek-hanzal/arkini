@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
 import { DepositItemSchema } from "~/v1/item/schema/DepositItemSchema";
+import { OutputSchema } from "~/v1/output/schema/OutputSchema";
 import {
 	createOutput,
 	createProducerItem,
@@ -17,7 +18,7 @@ const createDeposit = (id: string) =>
 		count: 10,
 	});
 
-const warnings = async (items: Record<string, unknown>) =>
+const diagnostics = async (items: Record<string, unknown>) =>
 	(
 		await Effect.runPromise(
 			compileGameSourcesFx([
@@ -26,39 +27,108 @@ const warnings = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === "deposit:unsustainable");
+	).diagnostics.filter(({ code }) => code.startsWith("deposit:"));
+
+const chanceOutput = (itemId: string, chance: number) =>
+	OutputSchema.parse({
+		set: [
+			{
+				roll: [
+					{
+						type: "chance",
+						chance,
+						drop: [
+							{
+								itemId,
+								quantity: {
+									type: "value",
+									value: 1,
+								},
+								placement: "drop",
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	});
 
 describe("validateLimitedDepositsFx", () => {
 	it("warns when a finite deposit has no configured recreation path", async () => {
 		const deposit = createDeposit("item:deposit");
 
 		expect(
-			await warnings({
+			await diagnostics({
 				[deposit.id]: deposit,
 			}),
 		).toEqual([
 			expect.objectContaining({
+				code: "deposit:unsustainable",
 				severity: "warning",
 				itemId: deposit.id,
 			}),
 		]);
 	});
 
-	it("accepts a deposit emitted by another configured output", async () => {
+	it("does not count a zero-chance output as recreation", async () => {
 		const deposit = createDeposit("item:deposit");
 		const producer = createProducerItem({
 			id: "item:producer",
+			output: chanceOutput(deposit.id, 0),
+		});
+
+		expect(
+			await diagnostics({
+				[deposit.id]: deposit,
+				[producer.id]: producer,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				code: "deposit:unsustainable",
+			}),
+		]);
+	});
+
+	it("warns when recreation is only stochastic", async () => {
+		const deposit = createDeposit("item:deposit");
+		const producer = createProducerItem({
+			id: "item:producer",
+			output: chanceOutput(deposit.id, 0.5),
+		});
+
+		expect(
+			await diagnostics({
+				[deposit.id]: deposit,
+				[producer.id]: producer,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				code: "deposit:stochastic-softlock",
+			}),
+		]);
+	});
+
+	it("accepts a guaranteed recreation path and suppresses weaker warnings", async () => {
+		const deposit = createDeposit("item:deposit");
+		const guaranteed = createProducerItem({
+			id: "item:guaranteed",
 			output: createOutput([
 				{
 					itemId: deposit.id,
 				},
 			]),
 		});
+		const stochastic = createProducerItem({
+			id: "item:stochastic",
+			output: chanceOutput(deposit.id, 0.5),
+		});
 
 		expect(
-			await warnings({
+			await diagnostics({
 				[deposit.id]: deposit,
-				[producer.id]: producer,
+				[guaranteed.id]: guaranteed,
+				[stochastic.id]: stochastic,
 			}),
 		).toEqual([]);
 	});

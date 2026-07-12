@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { makeJobCompletionRandom } from "~/v1/job/random/makeJobCompletionRandom";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 import { outputFx } from "~/v1/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
@@ -18,52 +19,54 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 	job,
 	runtime,
 }: completeJobRuntimeFx.Props) {
-	const owner = runtime.items.find((item) => item.id === job.ownerItemId);
-	if (owner === undefined || !isGridRuntimeItem(owner))
-		return yield* Effect.dieMessage(`Job ${job.id} owner is not available on the grid.`);
-	const line = yield* readItemLineFx({
-		item: owner.item,
-		lineId: job.lineId,
-	});
-	if (line === undefined)
-		return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
-	const reservations = runtime.items.filter(
-		(item) => item.location.scope === "job" && item.location.jobId === job.id,
-	);
-	let draft: RuntimeSchema.Type = {
-		...runtime,
-		items: runtime.items.filter((item) => !reservations.includes(item)),
-		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
-	};
-	for (const reservation of reservations) {
-		const plan = yield* planDropPlacementFx({
-			drop: {
-				itemId: reservation.item.id,
-				quantity: reservation.quantity,
-				placement: "drop",
-			},
-			origin: owner.location.position,
-			originItemId: owner.id,
-			runtime: draft,
+	return yield* Effect.gen(function* () {
+		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
+		if (owner === undefined || !isGridRuntimeItem(owner))
+			return yield* Effect.dieMessage(`Job ${job.id} owner is not available on the grid.`);
+		const line = yield* readItemLineFx({
+			item: owner.item,
+			lineId: job.lineId,
 		});
-		const [, nextDraft] = yield* applyPlacementPlanFx({
-			plan,
-			runtime: draft,
-		});
-		draft = nextDraft;
-	}
-	if (line.output !== undefined) {
-		const output = yield* outputFx({
-			origin: owner.location.position,
-			output: line.output,
-		});
-		const [, nextDraft] = yield* applyOutputPlacementFx({
-			origin: owner.location.position,
-			originItemId: owner.id,
-			output,
-			runtime: draft,
-		});
-		draft = nextDraft;
-	}
-	return draft;
+		if (line === undefined)
+			return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
+		const reservations = runtime.items.filter(
+			(item) => item.location.scope === "job" && item.location.jobId === job.id,
+		);
+		let draft: RuntimeSchema.Type = {
+			...runtime,
+			items: runtime.items.filter((item) => !reservations.includes(item)),
+			jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
+		};
+		for (const reservation of reservations) {
+			const plan = yield* planDropPlacementFx({
+				drop: {
+					itemId: reservation.item.id,
+					quantity: reservation.quantity,
+					placement: "drop",
+				},
+				origin: owner.location.position,
+				originItemId: owner.id,
+				runtime: draft,
+			});
+			const [, nextDraft] = yield* applyPlacementPlanFx({
+				plan,
+				runtime: draft,
+			});
+			draft = nextDraft;
+		}
+		if (line.output !== undefined) {
+			const output = yield* outputFx({
+				origin: owner.location.position,
+				output: line.output,
+			});
+			const [, nextDraft] = yield* applyOutputPlacementFx({
+				origin: owner.location.position,
+				originItemId: owner.id,
+				output,
+				runtime: draft,
+			});
+			draft = nextDraft;
+		}
+		return draft;
+	}).pipe(Effect.withRandom(makeJobCompletionRandom(job)));
 });

@@ -1,0 +1,17 @@
+import { Random } from "effect";
+
+import type { JobSchema } from "~/v1/job/schema/JobSchema";
+
+/** Bump only when intentionally changing completion random compatibility. */
+export const JobCompletionRandomVersion = 1;
+
+/**
+ * Creates the deterministic random stream owned by one stable job completion.
+ *
+ * Retries, blocked delivery and state restore must replay the same random
+ * choices. Job revision and wall-clock state are deliberately excluded.
+ */
+export const makeJobCompletionRandom = (job: JobSchema.Type) =>
+	Random.make(
+		`arkini:job-completion:v${JobCompletionRandomVersion}:${job.id}:${job.ownerItemId}:${job.lineId}`,
+	);

@@ -60,6 +60,13 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Dispose stops Tick, interrupts and awaits in-flight commands, then performs final save.
 - [x] A delayed command cannot commit after the final save.
 
+### Completed review follow-up: deterministic completion randomness
+
+- [x] Give every completion a versioned deterministic Effect `Random` stream derived from stable job identity.
+- [x] Scope the stream around the entire completion, including output rolls and random placement ordering.
+- [x] Keep blocked retry and state-restore outcomes stable without persisting a resolved output manifest.
+- [x] Keep job revision, Tick state and wall-clock time out of the seed.
+
 ### Block 6: runtime invariants and cleanup
 
 - Enforce at most one active job per owner.

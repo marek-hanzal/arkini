@@ -46,6 +46,10 @@
 - One blocked completion does not rollback time or successful completion for unrelated owners in the same step.
 - Invalid replacement semantics and unexpected invariant failures remain real Tick failures and retain the unconsumed Tick budget.
 - No historical slot, position, runtime instance identity, or source stack is retained.
+- Completion randomness is local to the stable job identity and versioned by `JobCompletionRandomVersion`.
+- The entire completion operation, including roll-set selection, chance, weights, quantity ranges and random placement ordering, uses that one deterministic Effect `Random` stream.
+- A blocked completion, later retry or restored save therefore resolves the same random outcome for the same job.
+- Job revision, Tick state and wall-clock time must never participate in the completion seed.
 
 ## Current implementation boundaries
 

@@ -33,10 +33,16 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 						job,
 					} satisfies StartLineResultSchema.Type,
 					nextRuntime,
-				] as readonly [
-					StartLineResultSchema.Type,
-					RuntimeSchema.Type,
-				];
+					[
+						{
+							type: "job:started",
+							jobId: job.id,
+							ownerItemId: job.ownerItemId,
+							lineId: job.lineId,
+							source: "explicit",
+						},
+					],
+				] as const;
 			}
 			const resolution = yield* resolveLineStartFx({
 				ownerItemId,

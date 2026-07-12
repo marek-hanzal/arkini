@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+
+import type { GameEventSchema } from "~/v1/event/schema/GameEventSchema";
 import { completeJobRuntimeFx } from "~/v1/job/fx/completeJobRuntimeFx";
 import { resolveJobRunnableFx } from "~/v1/job/fx/resolveJobRunnableFx";
 import { reviseJobFx } from "~/v1/job/fx/reviseJobFx";
@@ -7,6 +9,11 @@ import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { TickFx } from "~/v1/tick/context/TickFx";
 
+interface OwnerAdvanceResult {
+	readonly events: readonly GameEventSchema.Type[];
+	readonly runtime: RuntimeSchema.Type;
+}
+
 const advanceOwnerFx = Effect.fn("advanceOwnerFx")(function* (
 	ownerItemId: string,
 	elapsedMs: number,
@@ -14,6 +21,7 @@ const advanceOwnerFx = Effect.fn("advanceOwnerFx")(function* (
 ) {
 	let budgetMs = elapsedMs;
 	let draft = initial;
+	const events: GameEventSchema.Type[] = [];
 	while (true) {
 		const job = draft.jobs.find((candidate) => candidate.ownerItemId === ownerItemId);
 		if (job === undefined) break;
@@ -40,6 +48,12 @@ const advanceOwnerFx = Effect.fn("advanceOwnerFx")(function* (
 			job,
 			runtime: draft,
 		});
+		events.push({
+			type: "job:completed",
+			jobId: job.id,
+			ownerItemId: job.ownerItemId,
+			lineId: job.lineId,
+		});
 		const requestIndex = (draft.jobQueue ?? []).findIndex(
 			(request) => request.ownerItemId === ownerItemId,
 		);
@@ -58,10 +72,21 @@ const advanceOwnerFx = Effect.fn("advanceOwnerFx")(function* (
 			}),
 		);
 		if (started._tag === "Left") break;
-		draft = started.right[1];
-		if (budgetMs === 0 && started.right[0].remainingMs > 0) break;
+		const [nextJob, nextRuntime] = started.right;
+		draft = nextRuntime;
+		events.push({
+			type: "job:started",
+			jobId: nextJob.id,
+			ownerItemId: nextJob.ownerItemId,
+			lineId: nextJob.lineId,
+			source: "queue",
+		});
+		if (budgetMs === 0 && nextJob.remainingMs > 0) break;
 	}
-	return draft;
+	return {
+		events,
+		runtime: draft,
+	} satisfies OwnerAdvanceResult;
 });
 
 /** Applies one real elapsed-time tick, including whole queued chains, atomically. */
@@ -70,14 +95,19 @@ export const runTickRuntimeFx = Effect.fn("runTickRuntimeFx")(function* () {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			let draft = runtime;
+			const events: GameEventSchema.Type[] = [];
 			const owners = [
 				...new Set(runtime.jobs.map((job) => job.ownerItemId)),
 			];
-			for (const ownerItemId of owners)
-				draft = yield* advanceOwnerFx(ownerItemId, tick.elapsedMs, draft);
+			for (const ownerItemId of owners) {
+				const advanced = yield* advanceOwnerFx(ownerItemId, tick.elapsedMs, draft);
+				draft = advanced.runtime;
+				events.push(...advanced.events);
+			}
 			return [
 				draft,
 				draft,
+				events,
 			] as const;
 		}),
 	);

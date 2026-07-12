@@ -154,6 +154,28 @@ describe("startLineFx", () => {
 			),
 		).toHaveLength(2);
 	});
+	it("schedules queued jobs sequentially instead of running them concurrently", () => {
+		const config = createJobTestConfig(2);
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				const first = yield* startLineFx(startProps);
+				const second = yield* startLineFx(startProps);
+				return {
+					first: first.job,
+					second: second.job,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.second.startedAtMs).toBe(result.first.dueAtMs);
+		expect(result.second.dueAtMs - result.second.startedAtMs).toBe(1_000);
+	});
+
 	it("rejects an unavailable line without partially creating a job", () => {
 		const config = createJobTestConfig();
 		const result = Effect.runSync(

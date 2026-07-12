@@ -15,8 +15,10 @@ export const JobSchema = z
 		ownerItemId: IdSchema.describe("The runtime item that owns this product-line run."),
 		/** Stable ID of the configured product line executed by this run. */
 		lineId: IdSchema.describe("The configured product line executed by this run."),
-		/** Timestamp at which this run started. */
-		startedAtMs: TimestampSchema.describe("The timestamp at which this run started."),
+		/** Timestamp at which this queued run starts executing. */
+		startedAtMs: TimestampSchema.describe(
+			"The timestamp at which this queued run starts executing.",
+		),
 		/** Timestamp at which this run becomes due for completion. */
 		dueAtMs: TimestampSchema.describe("The timestamp at which this run becomes due."),
 		/** Opaque optimistic-concurrency token replaced after every job mutation. */

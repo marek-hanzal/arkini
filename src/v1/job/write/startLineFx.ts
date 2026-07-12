@@ -4,6 +4,7 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { assertLineStartReadyFx } from "~/v1/job/fx/assertLineStartReadyFx";
 import { resolveLineStartFx } from "~/v1/job/fx/read/resolveLineStartFx";
 import { createJobFx } from "~/v1/job/fx/createJobFx";
+import { filterOwnerJobsFx } from "~/v1/job/read/filterOwnerJobsFx";
 import type { StartLineResultSchema } from "~/v1/job/schema/StartLineResultSchema";
 import { applyLineRunPlanFx } from "~/v1/line/fx/run/applyLineRunPlanFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
@@ -34,7 +35,12 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 				resolution,
 			});
 
-			const startedAtMs = yield* Clock.currentTimeMillis;
+			const nowMs = yield* Clock.currentTimeMillis;
+			const ownerJobs = yield* filterOwnerJobsFx({
+				jobs: runtime.jobs,
+				ownerItemId,
+			});
+			const startedAtMs = Math.max(nowMs, ownerJobs.at(-1)?.dueAtMs ?? nowMs);
 			const job = yield* createJobFx({
 				ownerItemId,
 				lineId,

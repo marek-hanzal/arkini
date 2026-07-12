@@ -31,7 +31,7 @@ export const resolveLineStartFx = Effect.fn("resolveLineStartFx")(function* ({
 		runtime,
 	});
 	const queue = yield* resolveJobQueueFx({
-		jobs: runtime.jobs,
+		runtime,
 		owner,
 	});
 

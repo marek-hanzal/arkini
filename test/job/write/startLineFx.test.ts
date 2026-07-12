@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
+import type { StartLineResultSchema } from "~/v1/job/schema/StartLineResultSchema";
 import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readLineRunFx } from "~/v1/line/fx/run/readLineRunFx";
 import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
@@ -16,6 +17,13 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTest
 const startProps = {
 	ownerItemId: "runtime:forge",
 	lineId: "line:forge:run",
+};
+
+const readStartedJob = (result: StartLineResultSchema.Type) => {
+	if (result.type !== "started") {
+		throw new Error("Expected an immediately started job.");
+	}
+	return result.job;
 };
 
 describe("startLineFx", () => {
@@ -47,9 +55,9 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.started.job.dueAtMs - result.started.job.startedAtMs).toBe(1_000);
+		expect(readStartedJob(result.started).durationMs).toBe(1_000);
 		expect(result.runtime.jobs).toEqual([
-			result.started.job,
+			readStartedJob(result.started),
 		]);
 		expect(result.runtime.items.find((item) => item.item.id === "water")).toMatchObject({
 			quantity: 3,
@@ -73,14 +81,14 @@ describe("startLineFx", () => {
 					quantity: 1,
 					location: {
 						scope: "job",
-						jobId: result.started.job.id,
+						jobId: readStartedJob(result.started).id,
 					},
 				}),
 			]),
 		);
 		expect(result.preview.ready).toBe(true);
 		expect(result.state.jobs).toEqual([
-			result.started.job,
+			readStartedJob(result.started),
 		]);
 		expect(result.restored).toEqual(result.runtime);
 	});
@@ -93,7 +101,10 @@ describe("startLineFx", () => {
 				const started = yield* startLineFx(startProps);
 				const before = yield* readRuntimeFx();
 				const reserved = before.items.find((item) => {
-					return item.location.scope === "job" && item.location.jobId === started.job.id;
+					return (
+						item.location.scope === "job" &&
+						item.location.jobId === readStartedJob(started).id
+					);
 				});
 				if (reserved === undefined) {
 					return yield* Effect.dieMessage("Expected one job-scoped reservation.");
@@ -134,7 +145,7 @@ describe("startLineFx", () => {
 			expect(result.removed.left).toMatchObject({
 				_tag: "ItemJobScopedError",
 				itemId: result.reserved.id,
-				jobId: result.started.job.id,
+				jobId: readStartedJob(result.started).id,
 			});
 		}
 		expect(Either.isLeft(result.quantity)).toBe(true);
@@ -142,7 +153,7 @@ describe("startLineFx", () => {
 			expect(result.quantity.left).toMatchObject({
 				_tag: "ItemJobScopedError",
 				itemId: result.reserved.id,
-				jobId: result.started.job.id,
+				jobId: readStartedJob(result.started).id,
 			});
 		}
 		expect(result.after).toEqual(result.before);
@@ -211,13 +222,16 @@ describe("startLineFx", () => {
 		);
 
 		expect(result.attempts.every(Either.isRight)).toBe(true);
-		expect(result.runtime.jobs).toHaveLength(2);
-		expect(result.runtime.items.filter((item) => item.item.id === "water")).toHaveLength(0);
+		expect(result.runtime.jobs).toHaveLength(1);
+		expect(result.runtime.jobQueue).toHaveLength(1);
+		expect(result.runtime.items.find((item) => item.item.id === "water")).toMatchObject({
+			quantity: 3,
+		});
 		expect(
 			result.runtime.items.filter(
 				(item) => item.item.id === "tool" && item.location.scope === "job",
 			),
-		).toHaveLength(2);
+		).toHaveLength(1);
 	});
 	it("schedules queued jobs sequentially instead of running them concurrently", () => {
 		const config = createJobTestConfig(2);
@@ -227,8 +241,8 @@ describe("startLineFx", () => {
 				const first = yield* startLineFx(startProps);
 				const second = yield* startLineFx(startProps);
 				return {
-					first: first.job,
-					second: second.job,
+					first,
+					second,
 				};
 			}).pipe(
 				useGameFx({
@@ -237,8 +251,8 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.second.startedAtMs).toBe(result.first.dueAtMs);
-		expect(result.second.dueAtMs - result.second.startedAtMs).toBe(1_000);
+		expect(result.first.type).toBe("started");
+		expect(result.second.type).toBe("queued");
 	});
 
 	it("rejects an unavailable line without partially creating a job", () => {

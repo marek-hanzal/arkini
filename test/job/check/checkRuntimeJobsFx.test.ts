@@ -25,8 +25,8 @@ const job = (id: string, overrides: Partial<RuntimeSchema.Type["jobs"][number]> 
 	id,
 	ownerItemId: owner.id,
 	lineId: "line:forge:run",
-	startedAtMs: 1_000,
-	dueAtMs: 2_000,
+	durationMs: 1_000,
+	remainingMs: 1_000,
 	revision: `revision:${id}`,
 	...overrides,
 });
@@ -68,8 +68,8 @@ describe("checkRuntimeJobsFx", () => {
 					lineId: "line:missing",
 				}),
 				job("job:invalid-time", {
-					startedAtMs: 3_000,
-					dueAtMs: 2_000,
+					durationMs: 1_000,
+					remainingMs: 2_000,
 				}),
 			],
 		} satisfies RuntimeSchema.Type;

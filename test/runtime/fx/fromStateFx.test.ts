@@ -82,6 +82,7 @@ const state = StateSchema.parse({
 	],
 
 	jobs: [],
+	jobQueue: [],
 });
 
 describe("fromStateFx", () => {

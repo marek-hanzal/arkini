@@ -59,8 +59,11 @@ describe("readLineStartFx", () => {
 			capacity: 1,
 			available: false,
 		});
-		expect(result.resolution.queue.jobs).toEqual([
-			result.started.job,
-		]);
+		expect(result.started.type).toBe("started");
+		if (result.started.type === "started") {
+			expect(result.resolution.queue.jobs).toEqual([
+				result.started.job,
+			]);
+		}
 	});
 });

@@ -1,71 +1,72 @@
-import { Clock, Effect } from "effect";
-
+import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { assertLineStartReadyFx } from "~/v1/job/fx/assertLineStartReadyFx";
+import { createJobQueueRequestFx } from "~/v1/job/fx/createJobQueueRequestFx";
 import { resolveLineStartFx } from "~/v1/job/fx/read/resolveLineStartFx";
-import { createJobFx } from "~/v1/job/fx/createJobFx";
-import { filterOwnerJobsFx } from "~/v1/job/read/filterOwnerJobsFx";
+import { startLineRuntimeFx } from "~/v1/job/fx/startLineRuntimeFx";
 import type { StartLineResultSchema } from "~/v1/job/schema/StartLineResultSchema";
-import { applyLineRunPlanFx } from "~/v1/line/fx/run/applyLineRunPlanFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-
 export namespace startLineFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 		lineId: IdSchema.Type;
 	}
 }
-
-/**
- * Atomically re-resolves one current line-start state, applies its inputs, and creates its job.
- */
+/** Explicitly starts a free owner or appends one FIFO start request behind its active job. */
 export const startLineFx = Effect.fn("startLineFx")(function* ({
 	ownerItemId,
 	lineId,
 }: startLineFx.Props) {
-	return yield* modifyRuntimeFx((runtime) => {
-		return Effect.gen(function* () {
+	return yield* modifyRuntimeFx((runtime) =>
+		Effect.gen(function* () {
+			const hasActiveJob = runtime.jobs.some((job) => job.ownerItemId === ownerItemId);
+			if (!hasActiveJob) {
+				const [job, nextRuntime] = yield* startLineRuntimeFx({
+					ownerItemId,
+					lineId,
+					runtime,
+				});
+				return [
+					{
+						type: "started",
+						job,
+					} satisfies StartLineResultSchema.Type,
+					nextRuntime,
+				] as readonly [
+					StartLineResultSchema.Type,
+					RuntimeSchema.Type,
+				];
+			}
 			const resolution = yield* resolveLineStartFx({
 				ownerItemId,
 				lineId,
 				runtime,
 			});
-			const plan = yield* assertLineStartReadyFx({
+			yield* assertLineStartReadyFx({
 				resolution,
 			});
-
-			const nowMs = yield* Clock.currentTimeMillis;
-			const ownerJobs = yield* filterOwnerJobsFx({
-				jobs: runtime.jobs,
-				ownerItemId,
-			});
-			const startedAtMs = Math.max(nowMs, ownerJobs.at(-1)?.dueAtMs ?? nowMs);
-			const job = yield* createJobFx({
+			const request = yield* createJobQueueRequestFx({
 				ownerItemId,
 				lineId,
-				startedAtMs,
-				dueAtMs: startedAtMs + plan.runtimeMs,
-			});
-			const inputRuntime = yield* applyLineRunPlanFx({
-				job,
-				plan,
-				runtime,
 			});
 			const nextRuntime = {
-				...inputRuntime,
-				jobs: [
-					...inputRuntime.jobs,
-					job,
+				...runtime,
+				jobQueue: [
+					...(runtime.jobQueue ?? []),
+					request,
 				],
 			} satisfies RuntimeSchema.Type;
-
 			return [
 				{
-					job,
+					type: "queued",
+					request,
 				} satisfies StartLineResultSchema.Type,
 				nextRuntime,
-			] as const;
-		});
-	});
+			] as readonly [
+				StartLineResultSchema.Type,
+				RuntimeSchema.Type,
+			];
+		}),
+	);
 });

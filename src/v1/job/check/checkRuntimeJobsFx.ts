@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-
 import type { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
 import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
@@ -20,7 +19,7 @@ export namespace checkRuntimeJobsFx {
 	}
 }
 
-/** Reports every invalid active-job and job-reservation invariant. */
+/** Reports invalid active jobs, queued start requests, and job reservations. */
 export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	runtime,
 }: checkRuntimeJobsFx.Props) {
@@ -31,89 +30,87 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
 	const reservationMissingIssues: JobReservationMissingIssueSchema.Type[] = [];
+	const queue = runtime.jobQueue ?? [];
+	const entries = [
+		...runtime.jobs,
+		...queue,
+	];
+	const seenIds = new Set<IdSchema.Type>();
 
-	const seenJobIds = new Set<IdSchema.Type>();
-	for (const job of runtime.jobs) {
-		if (seenJobIds.has(job.id)) {
+	for (const entry of entries) {
+		if (seenIds.has(entry.id))
 			duplicateIssues.push({
-				jobId: job.id,
+				jobId: entry.id,
 				type: "job:id:duplicate",
 			});
-		} else {
-			seenJobIds.add(job.id);
-		}
-		if (job.dueAtMs < job.startedAtMs) {
+		else seenIds.add(entry.id);
+
+		const job = runtime.jobs.find((candidate) => candidate.id === entry.id);
+		if (job !== undefined && job.remainingMs > job.durationMs) {
 			timeIssues.push({
 				jobId: job.id,
-				startedAtMs: job.startedAtMs,
-				dueAtMs: job.dueAtMs,
+				durationMs: job.durationMs,
+				remainingMs: job.remainingMs,
 				type: "job:time-invalid",
 			});
 		}
-		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
+		const owner = runtime.items.find((item) => item.id === entry.ownerItemId);
 		if (owner === undefined) {
 			ownerIssues.push({
-				jobId: job.id,
-				ownerItemId: job.ownerItemId,
+				jobId: entry.id,
+				ownerItemId: entry.ownerItemId,
 				type: "job:owner-missing",
 			});
 			continue;
 		}
-		if (!isGridRuntimeItem(owner)) {
+		if (!isGridRuntimeItem(owner))
 			ownerGridIssues.push({
-				jobId: job.id,
+				jobId: entry.id,
 				ownerItemId: owner.id,
 				location: owner.location,
 				type: "job:owner-not-on-grid",
 			});
-		}
-
 		const line = yield* readItemLineFx({
 			item: owner.item,
-			lineId: job.lineId,
+			lineId: entry.lineId,
 		});
-		if (line === undefined) {
+		if (line === undefined)
 			lineIssues.push({
-				jobId: job.id,
-				ownerItemId: job.ownerItemId,
-				lineId: job.lineId,
+				jobId: entry.id,
+				ownerItemId: entry.ownerItemId,
+				lineId: entry.lineId,
 				type: "job:line-missing",
 			});
-		}
 	}
 
-	const checkedOwners = new Set<IdSchema.Type>();
-	for (const job of runtime.jobs) {
-		if (checkedOwners.has(job.ownerItemId)) continue;
-		checkedOwners.add(job.ownerItemId);
-		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
+	for (const ownerItemId of new Set(entries.map((entry) => entry.ownerItemId))) {
+		const owner = runtime.items.find((item) => item.id === ownerItemId);
 		if (owner === undefined) continue;
 		const maxQueueSize = yield* readItemQueueSizeFx({
 			item: owner.item,
 		});
 		if (maxQueueSize === undefined) continue;
-		const ownerJobs = runtime.jobs.filter((candidate) => candidate.ownerItemId === owner.id);
-		if (ownerJobs.length > maxQueueSize) {
+		const ids = entries
+			.filter((entry) => entry.ownerItemId === ownerItemId)
+			.map((entry) => entry.id);
+		if (ids.length > maxQueueSize)
 			queueIssues.push({
-				ownerItemId: owner.id,
-				jobIds: ownerJobs.map((candidate) => candidate.id),
+				ownerItemId,
+				jobIds: ids,
 				maxQueueSize,
-				queueSize: ownerJobs.length,
+				queueSize: ids.length,
 				type: "job:queue-exceeded",
 			});
-		}
 	}
 
 	for (const item of runtime.items.filter(isJobRuntimeItem)) {
-		const job = runtime.jobs.find((candidate) => candidate.id === item.location.jobId);
-		if (job === undefined) {
+		if (!runtime.jobs.some((job) => job.id === item.location.jobId)) {
 			reservationMissingIssues.push({
 				itemId: item.id,
 				jobId: item.location.jobId,
 				location: item.location,
 				type: "job:reservation-missing",
 			});
-			continue;
 		}
 	}
 

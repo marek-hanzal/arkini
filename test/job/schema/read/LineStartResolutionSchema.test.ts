@@ -31,6 +31,7 @@ describe("LineStartResolutionSchema", () => {
 				run,
 				queue: {
 					jobs: [],
+					requests: [],
 					used: 0,
 					capacity: 2,
 					available: true,

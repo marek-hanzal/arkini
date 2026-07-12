@@ -7,8 +7,8 @@ const job = {
 	id: "job:test",
 	ownerItemId: "runtime:forge",
 	lineId: "line:forge:run",
-	startedAtMs: 1_000,
-	dueAtMs: 2_000,
+	durationMs: 1_000,
+	remainingMs: 1_000,
 	revision: "revision:job",
 };
 

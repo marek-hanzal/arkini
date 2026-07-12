@@ -1,6 +1,8 @@
 # Effect concurrency architecture audit
 
 Snapshot: `628c17b9`
+
+Implementation status: phases 1-3 were implemented in `3f22ec50`. Canonical runtime/session contract: `@chat-gpt/2026-07-12-v1-managed-session-runtime.md`. Local subsystem Queue remains deliberately deferred.
 Effect: `3.21.4` from `package-lock.json`
 Scope: v1 runtime, tick, future React UI integration, save subsystem and sound/event delivery.
 

@@ -1,40 +1,49 @@
-# V1 job queue execution state
+# V1 tick, active job, and queued start model
 
-## Implemented
+## Canonical mental model
 
-- Jobs are created only by the explicit `startLineFx` command.
-- A queued job is scheduled after the current owner queue tail rather than starting concurrently.
-- `resolveOwnerJobQueueFx` derives `queued`, `running`, and `ready` from persisted job timing and the supplied current timestamp.
-- `readOwnerJobQueueFx` exposes that declarative state without mutating runtime.
-- Queue order remains the persisted owner-job order; each resolution exposes its queue index and previous job ID.
+- Filling a product line is passive and never starts work.
+- `startLineFx` is the explicit command used by UI and automation.
+- One owner may have one active job plus FIFO queued start requests up to `maxQueueSize`.
+- A queued request is not a job. It has no time, consumes nothing, and reserves nothing.
+- Queue dispatch uses the same internal `startLineRuntimeFx` pipeline as an immediate explicit start.
+- A queued request is revalidated against the current runtime when dispatched. If it cannot start, it remains first in FIFO and nothing behind it may pass.
 
-## Fixed semantic decisions
+## Time model
 
-- Product lines only declare readiness. They never start work by themselves.
-- UI and future automation may both read state and invoke the same explicit start command.
-- Started jobs cannot be cancelled. Starting a job semantically commits its inputs to irreversible work.
-- Do not add a cancel-job path.
-- Completion will be a separate explicit write command. A scheduler may discover ready jobs, but it must call the same completion command rather than implement a second completion path.
+- Effect `Clock` is the only real-clock source.
+- `TickFx` stores one immutable tick snapshot: `nowMs` and real `elapsedMs`.
+- `pulseTickFx` captures elapsed real time through Effect `Clock`; sleeping or backgrounding a tab does not discard elapsed time.
+- Active jobs persist only `durationMs` and `remainingMs`.
+- No job timestamps, scheduled start timestamps, due timestamps, pause timestamps, or relative-time reconstruction are allowed.
+- A runnable job decrements `remainingMs` by the tick budget.
+- A job whose live rules fail is paused and keeps `remainingMs` unchanged.
+- A long tick may complete the active job, dispatch and complete every runnable queued request, and leave the final job partially progressed with the unused remainder of the same elapsed budget.
+- Each owner receives the full elapsed tick budget independently because owners work concurrently.
 
-## Next implementation step
+## Completion and reservations
 
-Add explicit job completion:
+- Started jobs cannot be cancelled.
+- `reserve` inputs move to `location.scope === "job"` and remain an exclusive job-owned lock.
+- Generic item mutations reject job-scoped items through `assertNonJobScopeFx`.
+- Completion removes all reservation representations, releases all reserved resources through standard drop placement, resolves output through standard output placement, and removes the job.
+- Completion is all-or-nothing. Partial reservation release or partial output placement is forbidden.
+- No historical slot, position, runtime instance identity, or source stack is retained.
 
-1. resolve one current job by ID and revision;
-2. require derived status `ready`;
-3. collect every item owned by the job through `location.scope === "job"`;
-4. release every reservation through the standard drop-placement path over one evolving runtime draft;
-5. resolve and place output through the standard output placement path;
-6. remove the completed job only after every release and output placement succeeds;
-7. commit the entire completion all-or-nothing, leaving the job and every reservation unchanged on failure;
-8. leave later queued jobs scheduled by their persisted timing;
-9. provide a read operation for discovering ready jobs without mutating runtime.
+## Current implementation boundaries
 
-## Reserved-resource authority
+- `TickFx`: shared tick snapshot service backed by a Ref in `GameLayerFx`.
+- `pulseTickFx`: captures one real-time tick from Effect `Clock`.
+- `runTickRuntimeFx`: applies one tick atomically to all active owners.
+- `startLineRuntimeFx`: canonical internal start pipeline used by direct start and queue dispatch.
+- `completeJobRuntimeFx`: canonical internal completion draft operation.
+- `readOwnerJobQueueFx`: derives `running`, `paused`, or `ready` from `remainingMs` and live rules.
 
-- A job-scoped item is an exclusive resource lock owned by its job.
-- Generic item commands must reject `location.scope === "job"`; `assertNonJobScopeFx` is the shared command-boundary guard.
-- Reservations remain job-scoped until successful completion.
-- Completion releases all reservations through ordinary drop placement in one transaction.
-- Partial release is forbidden. If any reservation or output cannot be placed, nothing is committed.
-- No original slot, position, instance identity, or source stack is retained.
+## Guardrails
+
+- Do not reintroduce `startedAtMs`, `dueAtMs`, `pausedAtMs`, or future queued job timestamps.
+- Do not create queued jobs in advance.
+- Do not create a queue-specific start implementation.
+- Do not pass stale preview plans into writes.
+- Do not clamp or discard elapsed real time merely because the browser tab slept.
+- Do not add job cancellation.

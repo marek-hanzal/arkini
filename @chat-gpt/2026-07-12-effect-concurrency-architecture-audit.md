@@ -117,13 +117,12 @@ The browser needs a periodic impulse without manual interval handles, cleanup bo
 scoped game session
 → one tick-loop fiber
 → Schedule.spaced(configured cadence)
-→ pulseTickFx using Effect Clock
-→ runTickRuntimeFx
+→ runTickRuntimeFx acquires Effect Clock time and applies it atomically
 ```
 
 `Schedule` defines only wake cadence. It does not define elapsed gameplay time.
 
-After a sleeping tab wakes late, `pulseTickFx` reads Effect Clock and produces the full real elapsed duration. The existing long-tick engine may then complete the active job and any number of queued requests.
+After a sleeping tab wakes late, `runTickRuntimeFx` folds the full real elapsed duration into the failure-safe pending Tick budget and applies it at most once. The runtime engine may then complete the active job and any number of queued requests.
 
 ### Why `spaced`, not `fixed`
 
@@ -148,13 +147,13 @@ GameSessionLayerFx
   core + loop + future UI/save/event consumers
 ```
 
-Tests can provide only the core layer and set Tick locally.
+Tests can provide only the core layer and call `runTickRuntimeByFx` with explicit deterministic elapsed time.
 
 ### Error policy
 
 One failed tick must not silently kill the loop fiber forever.
 
-Each pulse should capture/report its failure and continue to the next scheduled pulse. Failed runtime transitions already rollback atomically.
+Each scheduled advancement should capture/report its failure and continue. Failed runtime transitions rollback atomically while the Tick service retains their elapsed budget for retry.
 
 The eventual error channel may be logging plus a transient engine event. It must not be persisted as gameplay state unless the domain explicitly needs it.
 
@@ -441,10 +440,10 @@ No command Queue and no Deferred are present in the default topology.
 ### Phase 1: session and tick lifetime
 
 1. Split core game services from optional production loop layer.
-2. Add one scoped Schedule-based tick fiber using `pulseTickFx` and `runTickRuntimeFx`.
+2. Add one scoped Schedule-based tick fiber using the atomic `runTickRuntimeFx` entrypoint.
 3. Add a long-lived browser `GameSession` backed by `ManagedRuntime`.
 4. Ensure disposal interrupts all scoped fibers and releases subscribers.
-5. Keep tests on the core layer with manually controlled TickFx.
+5. Keep tests on the core layer with deterministic `runTickRuntimeByFx` impulses.
 
 ### Phase 2: observable state and React/save integration
 

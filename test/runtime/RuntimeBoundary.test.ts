@@ -83,7 +83,7 @@ describe("runtime mutation boundary", () => {
 					needle: internalStoreImport,
 				});
 				const directModifiers = yield* findImportersFx({
-					files,
+					files: storeImporters,
 					needle: directRuntimeModify,
 				});
 				const writeFiles = files.filter((file) => file.includes("/write/"));

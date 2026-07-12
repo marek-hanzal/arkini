@@ -3,16 +3,20 @@ import { z } from "zod";
 import { TimeSchema } from "~/v1/common/schema/TimeSchema";
 import { TimestampSchema } from "~/v1/common/schema/TimestampSchema";
 
-/** One immutable real-time impulse consumed by the engine. */
+/** Transient clock cursor and elapsed budget owned by one game session. */
 export const TickSchema = z
 	.object({
-		nowMs: TimestampSchema.describe("The Effect clock timestamp captured for this tick."),
-		elapsedMs: TimeSchema.describe("The real milliseconds elapsed since the preceding tick."),
+		observedAtMs: TimestampSchema.describe(
+			"The latest Effect Clock timestamp already folded into the pending budget.",
+		),
+		pendingElapsedMs: TimeSchema.describe(
+			"Real elapsed milliseconds waiting for one successful runtime advancement.",
+		),
 	})
 	.strict()
 	.meta({
 		id: "TickSchema",
-		description: "One immutable real-time impulse consumed by the engine.",
+		description: "Transient clock cursor and elapsed budget owned by one game session.",
 	});
 
 export type TickSchema = typeof TickSchema;

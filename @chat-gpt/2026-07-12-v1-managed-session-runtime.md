@@ -50,10 +50,11 @@ Owns one scoped production Tick fiber.
 
 - cadence defaults to 200 ms;
 - cadence uses `Schedule.spaced`;
-- elapsed gameplay time always comes from Effect Clock through `pulseTickFx`;
-- a sleeping browser tab therefore produces one long real-time Tick after wake;
+- elapsed gameplay time always comes from Effect Clock through `runTickRuntimeFx`;
+- `TickFx` atomically acquires newly elapsed time and applies its accumulated pending budget;
+- a sleeping browser tab therefore contributes the full real elapsed duration after wake;
 - one failed Tick does not kill the loop;
-- failed Tick restores the previous Tick snapshot so elapsed time is retried instead of silently discarded.
+- failed advancement leaves the whole elapsed budget pending for the next attempt instead of restoring or replaying a snapshot.
 
 ### `GameSessionLayerFx`
 

@@ -2,14 +2,14 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readOwnerJobQueueFx } from "~/v1/job/read/readOwnerJobQueueFx";
+import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { TickFx } from "~/v1/tick/context/TickFx";
-import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
+import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 
@@ -50,19 +50,80 @@ const createLiveRuleConfig = () => {
 	});
 };
 
-describe("runTickRuntimeFx", () => {
+describe("TickFx elapsed budget", () => {
+	it("does not replay one successful elapsed budget", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				yield* startLineFx(props);
+				yield* runTickRuntimeByFx({
+					elapsedMs: 500,
+				});
+				const afterFirst = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 0,
+				});
+				return {
+					afterFirst,
+					afterSecond: yield* readRuntimeFx(),
+					state: yield* (yield* TickFx).read,
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(),
+				}),
+			),
+		);
+
+		expect(result.afterFirst.jobs[0]?.remainingMs).toBe(500);
+		expect(result.afterSecond).toEqual(result.afterFirst);
+		expect(result.state.pendingElapsedMs).toBe(0);
+	});
+
+	it("serializes concurrent elapsed impulses without losing time", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				yield* startLineFx(props);
+				yield* Effect.all(
+					[
+						runTickRuntimeByFx({
+							elapsedMs: 200,
+						}),
+						runTickRuntimeByFx({
+							elapsedMs: 300,
+						}),
+					],
+					{
+						concurrency: "unbounded",
+					},
+				);
+				return {
+					runtime: yield* readRuntimeFx(),
+					state: yield* (yield* TickFx).read,
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(),
+				}),
+			),
+		);
+
+		expect(result.runtime.jobs[0]?.remainingMs).toBe(500);
+		expect(result.state.pendingElapsedMs).toBe(0);
+	});
+});
+
+describe("runTickRuntimeByFx", () => {
 	it("uses one long real-time tick to complete an active job and its whole queued chain", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				const first = yield* startLineFx(props);
 				const second = yield* startLineFx(props);
-				const tick = yield* TickFx;
-				yield* tick.set({
-					nowMs: 10_000,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 2_500,
 				});
-				yield* runTickRuntimeFx();
 				return {
 					first,
 					second,
@@ -109,12 +170,9 @@ describe("runTickRuntimeFx", () => {
 					itemId: permit.id,
 					revision: permit.revision,
 				});
-				const tick = yield* TickFx;
-				yield* tick.set({
-					nowMs: 500,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 500,
 				});
-				yield* runTickRuntimeFx();
 				const paused = yield* readOwnerJobQueueFx({
 					ownerItemId: props.ownerItemId,
 				});
@@ -130,11 +188,9 @@ describe("runTickRuntimeFx", () => {
 					},
 					quantity: 1,
 				});
-				yield* tick.set({
-					nowMs: 1_000,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 500,
 				});
-				yield* runTickRuntimeFx();
 				const resumed = yield* readOwnerJobQueueFx({
 					ownerItemId: props.ownerItemId,
 				});

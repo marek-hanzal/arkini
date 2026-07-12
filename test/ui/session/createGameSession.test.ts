@@ -1,10 +1,8 @@
-import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { startLineFx } from "~/v1/job/write/startLineFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { TickFx } from "~/v1/tick/context/TickFx";
-import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
+import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 import { createGameSession } from "~/v1/ui/session/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
@@ -88,13 +86,8 @@ describe("createGameSession", () => {
 
 		try {
 			await session.run(
-				Effect.gen(function* () {
-					const tick = yield* TickFx;
-					yield* tick.set({
-						nowMs: 100,
-						elapsedMs: 100,
-					});
-					yield* runTickRuntimeFx();
+				runTickRuntimeByFx({
+					elapsedMs: 100,
 				}),
 			);
 			await new Promise((resolve) => setTimeout(resolve, 20));
@@ -134,13 +127,8 @@ describe("createGameSession", () => {
 				}),
 			);
 			await session.run(
-				Effect.gen(function* () {
-					const tick = yield* TickFx;
-					yield* tick.set({
-						nowMs: 2_000,
-						elapsedMs: 2_000,
-					});
-					yield* runTickRuntimeFx();
+				runTickRuntimeByFx({
+					elapsedMs: 2_000,
 				}),
 			);
 

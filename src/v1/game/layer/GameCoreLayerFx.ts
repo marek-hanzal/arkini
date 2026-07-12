@@ -1,4 +1,4 @@
-import { Clock, Effect, Layer, PubSub, Ref, Stream, SubscriptionRef } from "effect";
+import { Effect, Layer, PubSub, Stream, SubscriptionRef } from "effect";
 
 import { GameEventsFx } from "~/v1/event/context/GameEventsFx";
 import { GameEventBusFx } from "~/v1/event/internal/GameEventBusFx";
@@ -11,6 +11,7 @@ import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import { TickFx } from "~/v1/tick/context/TickFx";
+import { makeTickFx } from "~/v1/tick/internal/makeTickFx";
 
 export namespace GameCoreLayerFx {
 	export interface Props {
@@ -47,20 +48,7 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));
-	const tickLayer = Layer.effect(
-		TickFx,
-		Effect.gen(function* () {
-			const nowMs = yield* Clock.currentTimeMillis;
-			const ref = yield* Ref.make({
-				nowMs,
-				elapsedMs: 0,
-			});
-			return {
-				read: Ref.get(ref),
-				set: (tick) => Ref.set(ref, tick),
-			};
-		}),
-	);
+	const tickLayer = Layer.effect(TickFx, makeTickFx());
 	const eventBusLayer = Layer.effect(
 		GameEventBusFx,
 		PubSub.sliding({

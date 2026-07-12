@@ -8,7 +8,7 @@ import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { TickFx } from "~/v1/tick/context/TickFx";
-import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
+import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const props = {
@@ -149,12 +149,9 @@ describe("job board and inventory flow", () => {
 				const second = yield* startLineFx(props);
 				yield* fillFreeBoardFx();
 
-				const tick = yield* TickFx;
-				yield* tick.set({
-					nowMs: 2_500,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 2_500,
 				});
-				yield* runTickRuntimeFx();
 				return {
 					first,
 					second,
@@ -197,7 +194,7 @@ describe("job board and inventory flow", () => {
 		expect(inventoryItems).toHaveLength(2);
 		expect(result.runtime.items.filter((item) => item.item.id === "blocker")).toHaveLength(9);
 	});
-	it("rolls back the whole long tick when completion cannot place every release and output", () => {
+	it("keeps a failed elapsed budget pending and retries it after capacity returns", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
@@ -206,16 +203,29 @@ describe("job board and inventory flow", () => {
 				yield* fillFreeBoardFx();
 				const before = yield* readRuntimeFx();
 
-				const tick = yield* TickFx;
-				yield* tick.set({
-					nowMs: 2_500,
-					elapsedMs: 2_500,
+				const attempt = yield* Effect.either(
+					runTickRuntimeByFx({
+						elapsedMs: 2_500,
+					}),
+				);
+				const afterFailure = yield* readRuntimeFx();
+				const pendingAfterFailure = yield* (yield* TickFx).read;
+				const blocker = afterFailure.items.find((item) => item.item.id === "blocker");
+				if (blocker === undefined) throw new Error("Expected a board blocker.");
+				yield* removeItemFx({
+					itemId: blocker.id,
+					revision: blocker.revision,
 				});
-				const attempt = yield* Effect.either(runTickRuntimeFx());
+				yield* runTickRuntimeByFx({
+					elapsedMs: 0,
+				});
 				return {
 					attempt,
-					after: yield* readRuntimeFx(),
+					afterFailure,
+					afterRetry: yield* readRuntimeFx(),
 					before,
+					pendingAfterFailure,
+					settledTick: yield* (yield* TickFx).read,
 				};
 			}).pipe(
 				useGameFx({
@@ -225,11 +235,18 @@ describe("job board and inventory flow", () => {
 		);
 
 		expect(Either.isLeft(result.attempt)).toBe(true);
-		expect(result.after).toEqual(result.before);
-		expect(result.after.jobs).toHaveLength(1);
-		expect(result.after.jobQueue).toHaveLength(1);
-		expect(result.after.items.filter((item) => item.location.scope === "job")).toHaveLength(1);
-		expect(result.after.items.filter((item) => item.item.id === "ingot")).toEqual([]);
+		expect(result.afterFailure).toEqual(result.before);
+		expect(result.afterFailure.jobs).toHaveLength(1);
+		expect(result.afterFailure.jobQueue).toHaveLength(1);
+		expect(
+			result.afterFailure.items.filter((item) => item.location.scope === "job"),
+		).toHaveLength(1);
+		expect(result.afterFailure.items.filter((item) => item.item.id === "ingot")).toEqual([]);
+		expect(result.pendingAfterFailure.pendingElapsedMs).toBe(2_500);
+		expect(result.afterRetry.jobs).toEqual([]);
+		expect(result.afterRetry.jobQueue).toEqual([]);
+		expect(result.afterRetry.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(result.settledTick.pendingElapsedMs).toBe(0);
 	});
 
 	it("pauses a queued production flow without consuming elapsed time and resumes the whole chain later", () => {
@@ -251,23 +268,18 @@ describe("job board and inventory flow", () => {
 				yield* startLineFx(props);
 				yield* startLineFx(props);
 
-				const tick = yield* TickFx;
-				yield* tick.set({
-					nowMs: 400,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 400,
 				});
-				yield* runTickRuntimeFx();
 				const beforePause = yield* readRuntimeFx();
 
 				yield* removeItemFx({
 					itemId: permit.id,
 					revision: permit.revision,
 				});
-				yield* tick.set({
-					nowMs: 5_400,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 5_000,
 				});
-				yield* runTickRuntimeFx();
 				const paused = yield* readRuntimeFx();
 
 				yield* spawnItemFx({
@@ -282,11 +294,9 @@ describe("job board and inventory flow", () => {
 					},
 					quantity: 1,
 				});
-				yield* tick.set({
-					nowMs: 7_000,
+				yield* runTickRuntimeByFx({
 					elapsedMs: 1_600,
 				});
-				yield* runTickRuntimeFx();
 				return {
 					beforePause,
 					paused,

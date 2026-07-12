@@ -1,13 +1,17 @@
 import { Context, type Effect } from "effect";
 
+import type { advanceRuntimeElapsedFx } from "~/v1/tick/internal/advanceRuntimeElapsedFx";
 import type { TickSchema } from "~/v1/tick/schema/TickSchema";
+
+type RuntimeAdvanceFx = ReturnType<typeof advanceRuntimeElapsedFx>;
 
 export interface TickFxService {
 	readonly read: Effect.Effect<TickSchema.Type>;
-	readonly set: (tick: TickSchema.Type) => Effect.Effect<void>;
+	readonly advanceRuntime: RuntimeAdvanceFx;
+	readonly advanceRuntimeBy: (elapsedMs: number) => RuntimeAdvanceFx;
 }
 
-/** Shared current tick snapshot backed by the game layer. */
+/** Owns one failure-safe, at-most-once elapsed-time budget for a game session. */
 export class TickFx extends Context.Tag("TickFx")<TickFx, TickFxService>() {
 	//
 }

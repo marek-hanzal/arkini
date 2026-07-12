@@ -59,7 +59,7 @@ describe("validateInputAcceptanceCyclesFx", () => {
 		]);
 	});
 
-	it("rejects a two-item cycle with the full cycle path", async () => {
+	it("rejects a direct reciprocal pair with the full cycle path", async () => {
 		const a = createProducerItem({
 			id: "item:a",
 			input: materials({
@@ -101,7 +101,7 @@ describe("validateInputAcceptanceCyclesFx", () => {
 		]);
 	});
 
-	it("rejects a three-item cycle", async () => {
+	it("does not reject a longer cycle without a direct reciprocal pair", async () => {
 		const a = createProducerItem({
 			id: "item:a",
 			input: materials({
@@ -130,7 +130,7 @@ describe("validateInputAcceptanceCyclesFx", () => {
 				[b.id]: b,
 				[c.id]: c,
 			}),
-		).toHaveLength(1);
+		).toEqual([]);
 	});
 
 	it("accepts an acyclic material chain", async () => {

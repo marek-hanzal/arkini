@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { ConfigSchemaDiagnosticSchema } from "./diagnostic/ConfigSchemaDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./diagnostic/DuplicateProviderDiagnosticSchema";
+import { DuplicateLineIdDiagnosticSchema } from "./diagnostic/DuplicateLineIdDiagnosticSchema";
+import { EmptyMaterialTagDiagnosticSchema } from "./diagnostic/EmptyMaterialTagDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./diagnostic/UnusedResourceDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./diagnostic/MissingResourceDiagnosticSchema";
 import { DuplicateResourceDiagnosticSchema } from "./diagnostic/DuplicateResourceDiagnosticSchema";
@@ -29,6 +31,8 @@ export const GameDiagnosticSchema = z
 		MultipleReplaceDiagnosticSchema,
 		LimitedDepositWarningDiagnosticSchema,
 		StartInvalidDiagnosticSchema,
+		DuplicateLineIdDiagnosticSchema,
+		EmptyMaterialTagDiagnosticSchema,
 	])
 	.meta({
 		id: "GameDiagnosticSchema",

@@ -50,15 +50,17 @@ export const createProducerItem = ({
 	id,
 	input,
 	output,
+	lines,
 }: {
 	id: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	output?: OutputSchema.Type;
+	lines?: ReadonlyArray<LineSchema.Type>;
 }) =>
 	ProducerItemSchema.parse({
 		...createSimpleItem(id),
 		type: "producer",
-		lines: [
+		lines: lines ?? [
 			createLine({
 				input,
 				output,
@@ -110,6 +112,9 @@ export const createRootSource = ({
 		value: {
 			$schema: "../schema.json",
 			version: "1.0",
+			resources: {
+				hero: "hero",
+			},
 			meta: {
 				id: "game:test",
 				title: "Test",

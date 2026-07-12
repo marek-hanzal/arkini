@@ -5,6 +5,8 @@ import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { validateCanonicalIdsFx } from "../rule/validateCanonicalIdsFx";
 import { validateConfigReferencesFx } from "../rule/validateConfigReferencesFx";
 import { validateInputAcceptanceCyclesFx } from "../rule/validateInputAcceptanceCyclesFx";
+import { validateItemLineIdsFx } from "../rule/validateItemLineIdsFx";
+import { validateMaterialTagSelectorsFx } from "../rule/validateMaterialTagSelectorsFx";
 import { validateLimitedDepositsFx } from "../rule/validateLimitedDepositsFx";
 import { validateOutputReplaceCardinalityFx } from "../rule/validateOutputReplaceCardinalityFx";
 import { validateStartStateFx } from "../rule/validateStartStateFx";
@@ -31,6 +33,14 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateInputAcceptanceCyclesFx({
+			config,
+			provenance,
+		}),
+		validateItemLineIdsFx({
+			config,
+			provenance,
+		}),
+		validateMaterialTagSelectorsFx({
 			config,
 			provenance,
 		}),

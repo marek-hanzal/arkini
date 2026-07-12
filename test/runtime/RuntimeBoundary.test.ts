@@ -15,6 +15,7 @@ const allowedDirectModifiers = new Set([
 	"src/v1/runtime/internal/modifyRuntimeFx.ts",
 ]);
 const revisionFreeWriteFiles = new Set([
+	"src/v1/job/write/startLineFx.ts",
 	"src/v1/placement/write/placeDropFx.ts",
 	"src/v1/placement/write/placeOutputFx.ts",
 	"src/v1/runtime/write/spawnItemFx.ts",

@@ -33,9 +33,19 @@ const job = (id: string, overrides: Partial<RuntimeSchema.Type["jobs"][number]> 
 
 describe("checkRuntimeJobsFx", () => {
 	it("reports invalid jobs and job-owned material locations", () => {
+		const invalidOwner = {
+			...owner,
+			location: {
+				scope: "input",
+				ownerItemId: owner.id,
+				lineId: "line:forge:run",
+				inputIndex: 0,
+				returnLocation: owner.location,
+			},
+		} satisfies RuntimeItemSchema.Type;
 		const runtime = {
 			items: [
-				owner,
+				invalidOwner,
 				{
 					id: "runtime:tool:missing-job",
 					item: config.items.tool,
@@ -113,6 +123,7 @@ describe("checkRuntimeJobsFx", () => {
 			expect.arrayContaining([
 				"job:id:duplicate",
 				"job:owner-missing",
+				"job:owner-not-on-grid",
 				"job:line-missing",
 				"job:queue-exceeded",
 				"job:time-invalid",

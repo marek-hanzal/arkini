@@ -3,12 +3,14 @@ import { Effect } from "effect";
 import type { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
 import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
+import type { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
 import type { JobReservationMismatchIssueSchema } from "~/v1/job/schema/JobReservationMismatchIssueSchema";
 import type { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
 import type { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFx } from "~/v1/job/read/readItemQueueSizeFx";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { isJobRuntimeItem } from "~/v1/runtime/read/isJobRuntimeItem";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
@@ -25,6 +27,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const duplicateIssues: DuplicateJobIdIssueSchema.Type[] = [];
 	const ownerIssues: JobOwnerMissingIssueSchema.Type[] = [];
 	const lineIssues: JobLineMissingIssueSchema.Type[] = [];
+	const ownerGridIssues: JobOwnerNotOnGridIssueSchema.Type[] = [];
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
 	const reservationMissingIssues: JobReservationMissingIssueSchema.Type[] = [];
@@ -57,6 +60,15 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			});
 			continue;
 		}
+		if (!isGridRuntimeItem(owner)) {
+			ownerGridIssues.push({
+				jobId: job.id,
+				ownerItemId: owner.id,
+				location: owner.location,
+				type: "job:owner-not-on-grid",
+			});
+		}
+
 		const line = yield* readItemLineFx({
 			item: owner.item,
 			lineId: job.lineId,
@@ -120,6 +132,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	return [
 		...duplicateIssues,
 		...ownerIssues,
+		...ownerGridIssues,
 		...lineIssues,
 		...queueIssues,
 		...timeIssues,

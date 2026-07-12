@@ -5,7 +5,8 @@ import { outputFx } from "~/v1/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
-import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
+import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
+import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 export namespace completeJobRuntimeFx {
@@ -21,8 +22,14 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 }: completeJobRuntimeFx.Props) {
 	return yield* Effect.gen(function* () {
 		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
-		if (owner === undefined || !isGridRuntimeItem(owner))
-			return yield* Effect.dieMessage(`Job ${job.id} owner is not available on the grid.`);
+		if (owner === undefined) return yield* Effect.dieMessage(`Job ${job.id} owner is missing.`);
+		if (!isBoardRuntimeItem(owner))
+			return yield* Effect.fail(
+				new ItemNotOnBoardError({
+					itemId: owner.id,
+					location: owner.location,
+				}),
+			);
 		const line = yield* readItemLineFx({
 			item: owner.item,
 			lineId: job.lineId,

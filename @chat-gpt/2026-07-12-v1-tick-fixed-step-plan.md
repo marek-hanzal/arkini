@@ -67,10 +67,17 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Keep blocked retry and state-restore outcomes stable without persisting a resolved output manifest.
 - [x] Keep job revision, Tick state and wall-clock time out of the seed.
 
+### Completed review follow-up: board-only owner execution
+
+- [x] Treat inventory as a hard pause for active and ready jobs.
+- [x] Prevent queue dispatch and explicit line start while the owner is in inventory.
+- [x] Resume normal execution after the owner returns to the board.
+- [x] Reject inventory coordinates as line-rule and placement origins.
+
 ### Block 6: runtime invariants and cleanup
 
 - Enforce at most one active job per owner.
 - Treat queue-only owners as explicit valid runtime state.
 - Remove the misleading unused owner queue time helper.
-- Owner movement on board or into inventory remains allowed and may pause live rules.
 - Permanent owner removal is forbidden while active or queued work exists.
+- Removing an idle owner releases its buffered input contents through the ordinary drop path.

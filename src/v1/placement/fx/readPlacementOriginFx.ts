@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
 import { readRuntimeItemByIdFx } from "~/v1/runtime/read/readRuntimeItemByIdFx";
-import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
-import type { GridRuntimeItemSchema } from "~/v1/runtime/schema/GridRuntimeItemSchema";
+import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
+import type { BoardRuntimeItemSchema } from "~/v1/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace readPlacementOriginFx {
@@ -15,7 +15,7 @@ export namespace readPlacementOriginFx {
 }
 
 /**
- * Reads the current grid origin used by output and drop placement.
+ * Reads the current board origin used by output and drop placement.
  */
 export const readPlacementOriginFx = Effect.fn("readPlacementOriginFx")(function* ({
 	originItemId,
@@ -25,14 +25,14 @@ export const readPlacementOriginFx = Effect.fn("readPlacementOriginFx")(function
 		itemId: originItemId,
 		runtime,
 	});
-	if (!isGridRuntimeItem(origin)) {
+	if (!isBoardRuntimeItem(origin)) {
 		return yield* Effect.fail(
-			new ItemNotOnGridError({
+			new ItemNotOnBoardError({
 				itemId: originItemId,
 				location: origin.location,
 			}),
 		);
 	}
 
-	return origin satisfies GridRuntimeItemSchema.Type;
+	return origin satisfies BoardRuntimeItemSchema.Type;
 });

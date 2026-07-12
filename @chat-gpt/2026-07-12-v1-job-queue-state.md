@@ -10,6 +10,9 @@
 - A queue-only owner is a valid runtime state and is retried at the beginning of every fixed simulation step.
 - A queued request is revalidated against the current runtime when dispatched. If it cannot start, it remains first in FIFO and nothing behind it may pass.
 - An explicit start begins immediately only when the owner has no active job and no queued request. Otherwise it appends behind existing FIFO work.
+- Product-line spatial execution is board-only. Inventory coordinates are never valid board origins.
+- Moving an owner into inventory pauses every active job, including a ready job, and prevents queued dispatch. Returning the same owner to the board resumes normal fixed-step evaluation without a separate resume mutation.
+- Starting a line while its owner is in inventory is an invalid command and fails with `ItemNotOnBoardError`.
 
 ## Time acquisition model
 
@@ -30,7 +33,7 @@
 - The canonical simulation step is 200 ms and `GameLoopLayerFx` uses the same value as its default wake cadence.
 - Each fixed step resolves every active job's live rules from one shared step-start runtime snapshot.
 - Runnable jobs decrement `remainingMs` by one step, clamped at zero; paused jobs keep `remainingMs` unchanged.
-- Jobs reaching zero complete at the step boundary in stable job-ID order. A queued successor may start at that boundary but does not consume work time until the following step.
+- Jobs reaching zero complete at the step boundary in stable job-ID order only while their owner is on the board. A ready owner in inventory remains paused with reservations locked. A queued successor may start at that boundary but does not consume work time until the following step.
 - Cross-owner mutations created during one step therefore affect another job's time progression only from the next step.
 - Runtime job-array ordering does not affect step semantics.
 - A long elapsed interval is replayed immediately as consecutive fixed steps and must match the equivalent sequence of explicit 200 ms advancements.
@@ -72,3 +75,4 @@
 - Do not pass stale preview plans into writes.
 - Do not clamp or discard elapsed real time merely because the browser tab slept.
 - Do not add job cancellation.
+- Do not pass inventory coordinates into board-distance, drop-origin, output-origin, or replacement logic.

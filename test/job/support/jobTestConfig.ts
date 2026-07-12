@@ -19,7 +19,11 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 	maxStackSize: 10,
 });
 
-export const createJobTestConfig = (maxQueueSize = 2) =>
+export const createJobTestConfig = (
+	maxQueueSize = 2,
+	forgeScope: "board" | "any" = "board",
+	runtimeMs = 1_000,
+) =>
 	GameConfigSchema.parse({
 		version: "1.0",
 		resources: {
@@ -43,7 +47,7 @@ export const createJobTestConfig = (maxQueueSize = 2) =>
 			forge: {
 				...baseItem({
 					id: "forge",
-					scope: "board",
+					scope: forgeScope,
 				}),
 				type: "producer",
 				maxStackSize: 1,
@@ -53,7 +57,7 @@ export const createJobTestConfig = (maxQueueSize = 2) =>
 						id: "line:forge:run",
 						title: "Run",
 						description: "Run the forge.",
-						runtimeMs: 1_000,
+						runtimeMs,
 						input: [
 							{
 								type: "materials",

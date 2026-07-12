@@ -125,6 +125,8 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	for (const job of jobs) {
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
 		if (liveJob === undefined || liveJob.remainingMs !== 0) continue;
+		const owner = draft.items.find((item) => item.id === liveJob.ownerItemId);
+		if (owner?.location.scope === "inventory") continue;
 		const completion = yield* attemptJobCompletionFx({
 			job: liveJob,
 			runtime: draft,

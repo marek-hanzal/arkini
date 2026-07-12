@@ -3,13 +3,13 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { resolveInputRunFx } from "~/v1/input/fx/run/resolveInputRunFx";
 import type { InputRunResolutionSchema } from "~/v1/input/schema/run/InputRunResolutionSchema";
-import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/v1/line/error/LineNotFoundError";
 import { lineRulesFx } from "~/v1/line/fx/lineRulesFx";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import type { LineRunResolutionSchema } from "~/v1/line/schema/run/LineRunResolutionSchema";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
-import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/v1/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { planLineRunFx } from "./planLineRunFx";
@@ -41,9 +41,9 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		itemId: ownerItemId,
 		runtime,
 	});
-	if (!isGridRuntimeItem(owner)) {
+	if (!isBoardRuntimeItem(owner)) {
 		return yield* Effect.fail(
-			new ItemNotOnGridError({
+			new ItemNotOnBoardError({
 				itemId: ownerItemId,
 				location: owner.location,
 			}),

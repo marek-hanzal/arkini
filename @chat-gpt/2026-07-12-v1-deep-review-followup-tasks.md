@@ -53,7 +53,7 @@ A reserved item is detached from the input buffer while its job is active, so th
 - [ ] Completion must release every reservation, place outputs, and remove the job atomically all-or-nothing.
 - [ ] Failed completion placement must preserve the job and every reservation unchanged.
 - [x] Generic remove and quantity mutation reject job-scoped reservations through `assertNonJobScopeFx`.
-- [ ] Define owner removal/move behavior while jobs are active.
+- [x] Define owner movement semantics: board movement is live; inventory is a hard pause; permanent removal with active or queued work is invalid. Implementation of permanent-owner removal policy remains in the runtime-invariant block.
 - [ ] Add architecture tests if new public write commands appear.
 
 ## Deep-review guardrails

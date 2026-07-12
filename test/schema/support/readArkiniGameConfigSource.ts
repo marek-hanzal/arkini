@@ -1,10 +1,11 @@
 import { NodeContext } from "@effect/platform-node";
+import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/v1/compiler/fx/compileGameDirectoryFx";
 import { assertGameConfigValidFx } from "~/v1/validation/fx/assertGameConfigValidFx";
 
-const ArkiniDirectory = new URL("../../../game/arkini/", import.meta.url).pathname;
+const ArkiniDirectory = fileURLToPath(new URL("../../../game/arkini/", import.meta.url));
 
 /** Reads the current authoring directory through the production completed-game compiler. */
 export const readArkiniGameConfigSource = () =>

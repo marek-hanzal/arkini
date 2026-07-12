@@ -149,4 +149,116 @@ describe("compileGameSourcesFx", () => {
 		);
 		expect(result.config?.$schema).toBe("../schema.json");
 	});
+	it("requires explicit completed collection providers", async () => {
+		const result = await compile(
+			GameSourceFileSchema.parse({
+				path: "/game/game.json",
+				value: {
+					version: "1.0",
+					meta: {
+						id: "game:test",
+						title: "Test",
+						board: {
+							width: 1,
+							height: 1,
+						},
+						inventory: {
+							width: 1,
+							height: 1,
+						},
+					},
+					start: {
+						board: [],
+						inventory: [],
+					},
+				},
+			}),
+		);
+
+		expect(result.config).toBeUndefined();
+		expect(result.diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: "config:schema",
+					path: [
+						"categories",
+					],
+				}),
+				expect.objectContaining({
+					code: "config:schema",
+					path: [
+						"items",
+					],
+				}),
+			]),
+		);
+	});
+
+	it("accepts explicit empty completed collections", async () => {
+		const result = await compile(createRootSource());
+
+		expect(result.config?.categories).toEqual({
+			"category:test": {
+				id: "category:test",
+				title: "Test",
+			},
+		});
+		expect(result.config?.items).toEqual({});
+	});
+
+	it("reports duplicate category keys with both source paths", async () => {
+		const result = await compile(
+			createRootSource(),
+			GameSourceFileSchema.parse({
+				path: "/game/categories/test.json",
+				value: {
+					categories: {
+						"category:test": {
+							id: "category:test",
+							title: "Other",
+						},
+					},
+				},
+			}),
+		);
+
+		expect(result.diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: "source:duplicate-record",
+					entity: "category",
+					key: "category:test",
+					sources: [
+						"/game/game.json",
+						"/game/categories/test.json",
+					],
+				}),
+			]),
+		);
+	});
+
+	it("reports JSON Schema references resolving to different targets", async () => {
+		const result = await compile(
+			createRootSource(),
+			GameSourceFileSchema.parse({
+				path: "/game/items/a.json",
+				value: {
+					$schema: "../different-schema.json",
+					items: {},
+				},
+			}),
+		);
+
+		expect(result.diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: "source:schema-reference-conflict",
+					sources: [
+						"/game/game.json",
+						"/game/items/a.json",
+					],
+				}),
+			]),
+		);
+	});
 });

@@ -16,10 +16,7 @@ import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosti
 export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function* (
 	sources: ReadonlyArray<GameSourceFileSchema.Type>,
 ) {
-	const value: GameSourceSchema.Type = {
-		categories: {},
-		items: {},
-	};
+	const value: GameSourceSchema.Type = {};
 	const provenance: GameSourceProvenanceSchema.Type = {
 		categories: {},
 		items: {},
@@ -115,6 +112,9 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			}
 		}
 
+		const categories =
+			source.value.categories === undefined ? undefined : (value.categories ??= {});
+
 		for (const [key, category] of Object.entries(source.value.categories ?? {})) {
 			const previousPath = provenance.categories[key];
 			if (previousPath !== undefined) {
@@ -138,9 +138,10 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			}
 
 			provenance.categories[key] = source.path;
-			value.categories = value.categories ?? {};
-			value.categories[key] = category;
+			categories![key] = category;
 		}
+
+		const items = source.value.items === undefined ? undefined : (value.items ??= {});
 
 		for (const [key, item] of Object.entries(source.value.items ?? {})) {
 			const previousPath = provenance.items[key];
@@ -165,8 +166,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			}
 
 			provenance.items[key] = source.path;
-			value.items = value.items ?? {};
-			value.items[key] = item;
+			items![key] = item;
 		}
 	}
 

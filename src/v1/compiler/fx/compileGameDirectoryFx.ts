@@ -22,9 +22,14 @@ export const compileGameDirectoryFx = Effect.fn("compileGameDirectoryFx")(functi
 		input,
 	});
 	const compilation = yield* compileGameSourcesFx(sourceFiles.sources);
+	const diagnostics = [
+		...sourceFiles.diagnostics,
+		...compilation.diagnostics,
+	];
 	if (compilation.config === undefined) {
 		return {
 			...compilation,
+			diagnostics,
 			resources,
 			json: sourceFiles.sources.length,
 		};
@@ -38,7 +43,7 @@ export const compileGameDirectoryFx = Effect.fn("compileGameDirectoryFx")(functi
 	return {
 		...compilation,
 		diagnostics: [
-			...compilation.diagnostics,
+			...diagnostics,
 			...resourceDiagnostics,
 		],
 		resources,

@@ -161,4 +161,32 @@ describe("packDirectoryFx", () => {
 			},
 		});
 	});
+	it("blocks packing malformed JSON through structured diagnostics", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
+				const path = yield* Path.Path;
+				const input = yield* fileSystem.makeTempDirectoryScoped();
+				yield* fileSystem.writeFileString(path.join(input, "broken.json"), "{ nope");
+
+				return yield* Effect.either(
+					packDirectoryFx({
+						input,
+					}),
+				);
+			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+		);
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameValidationError",
+				diagnostics: expect.arrayContaining([
+					expect.objectContaining({
+						code: "source:json-invalid",
+					}),
+				]),
+			},
+		});
+	});
 });

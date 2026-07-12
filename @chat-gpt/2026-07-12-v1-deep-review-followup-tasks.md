@@ -1,7 +1,8 @@
 # Arkini v1 deep review follow-up tasks
 
 Baseline review: `6bb12839`
-Reviewed snapshot: `84e5bc82`
+Implementation baseline: `538dd642`
+Updated through: `05401c80`
 
 ## Verified complete
 
@@ -19,51 +20,48 @@ Reviewed snapshot: `84e5bc82`
 - [x] Empty material tag selectors are rejected.
 - [x] One canonical `IdSchema` is enforced architecturally.
 - [x] Job start is atomic, queue-safe, persisted, and validated with reservations.
+- [x] Limited deposits distinguish obvious guaranteed, stochastic, and impossible recreation.
+- [x] `chance: 0` does not count as recreation.
+- [x] Stochastic-only recreation produces `deposit:stochastic-softlock`.
+- [x] Malformed JSON and invalid source fragments produce source-aware diagnostics.
+- [x] Multiple malformed source files are collected in one read pass.
+- [x] Source errors remain blocking and stop pack through `GameValidationError`.
 
-## Remaining from the original review
+## Final project decisions
 
-### P2: Limited-deposit certainty
+### Nested ownership
 
-- [ ] Replace presence-only output scanning with certainty-aware recreation analysis.
-- [ ] `chance: 0` must not count as recreation.
-- [ ] Probabilistic and weighted-only recreation should produce a stochastic soft-lock warning.
-- [ ] One guaranteed recreation path should suppress weaker stochastic warnings.
-- [ ] Keep reachability/economic-cycle solving outside this pass.
+Do not add further lifecycle handling. The existing offline input-acceptance cycle validation covers the intended A/B configuration mistakes. No runtime graph paranoia or recursive ownership policy is wanted.
 
-### P2: Structured source diagnostics
+### Reserved-material return
 
-- [ ] Convert malformed JSON into source-aware diagnostics instead of raw defects.
-- [ ] Convert invalid `GameSourceSchema` fragments into source-aware diagnostics.
-- [ ] Collect multiple malformed source failures in one validation pass where practical.
-- [ ] Keep parsing policy in source/compiler domain, not CLI rendering.
+Reserved material remembers only its owning `jobId`.
 
-## Required before job completion/cancel/withdraw
+When completion or cancellation releases it, emit it through the ordinary drop-placement path. Do not retain or reconstruct:
 
-### Input ownership policy
+- original input slot;
+- original grid position;
+- original runtime instance ID;
+- source item or stack reference.
 
-- [ ] Decide whether an item with buffered child inputs may itself be stored as material.
-- [ ] Preferred simple policy: reject loaded owners as material before nested ownership becomes observable.
-- [ ] Add runtime and authoring tests around the chosen policy.
+A reserved item is detached from the input buffer while its job is active, so the buffer may be refilled for queued work.
 
-### Reserved-material return policy
+## Required before job completion/cancel
 
-- [ ] Define cancel/return behavior when the original input slot is occupied by the split remainder.
-- [ ] Preferred order: merge into compatible remainder, deterministic fallback placement, typed capacity failure/retained reservation.
-- [ ] Implement the policy once in a shared domain helper, not independently per command.
-
-### Job lifecycle integrity
-
-- [ ] Completion must resolve the exact live job by id + revision inside one transaction.
-- [ ] Completion must remove/consume reservations and place output atomically.
-- [ ] Cancel must restore reserved materials according to the shared return policy and remove the job atomically.
-- [ ] Owner removal/move rules while jobs are active must be explicit.
+- [ ] Add one shared helper that releases reserved items through standard drop placement.
+- [ ] Completion must resolve the exact live job by ID + revision inside one transaction.
+- [ ] Completion must remove reservations, place outputs, and remove/update the job atomically.
+- [ ] Cancel must release reservations through standard drop placement and remove the job atomically.
+- [ ] Define owner removal/move behavior while jobs are active.
 - [ ] Add architecture tests if new public write commands appear.
 
 ## Deep-review guardrails
 
 - Do not add runtime graph-cycle detection for input acceptance.
+- Do not add nested ownership handling beyond current offline cycle validation.
 - Do not add a global runtime revision.
 - Do not nest public write commands.
 - Do not create a second validation path for pack.
 - Do not infer blueprint resources from target IDs; explicit tuples stay authoritative.
 - Do not create domain-specific ID schemas or aliases. Everything exact uses `IdSchema`.
+- Do not add reservation return metadata to runtime state.

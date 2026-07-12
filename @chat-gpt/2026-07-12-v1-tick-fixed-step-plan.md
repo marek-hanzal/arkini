@@ -74,6 +74,14 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Resume normal execution after the owner returns to the board.
 - [x] Reject inventory coordinates as line-rule and placement origins.
 
+### Completed review follow-up: stable no-op fast-forward
+
+- [x] Replay changing 200 ms steps literally inside one locked runtime transaction.
+- [x] Detect an event-free same-reference step as a stable no-op boundary.
+- [x] Consume the remaining elapsed backlog without repeating identical domain work.
+- [x] Preserve long-Tick equivalence by fast-forwarding only after the first proven stable step.
+- [x] Cover empty, inventory-paused and completed-then-idle backlogs with processed/skipped-step regressions.
+
 ### Block 6: runtime invariants and cleanup
 
 - Enforce at most one active job per owner.

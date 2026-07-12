@@ -37,6 +37,7 @@
 - Cross-owner mutations created during one step therefore affect another job's time progression only from the next step.
 - Runtime job-array ordering does not affect step semantics.
 - A long elapsed interval is replayed immediately as consecutive fixed steps and must match the equivalent sequence of explicit 200 ms advancements.
+- Inside the locked replay transaction, one event-free step that returns the identical runtime reference proves a stable no-op boundary. The remaining backlog is consumed without repeating identical empty, paused or otherwise blocked steps.
 
 ## Completion and reservations
 

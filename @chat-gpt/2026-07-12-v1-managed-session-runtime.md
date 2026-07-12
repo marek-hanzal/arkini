@@ -88,6 +88,18 @@ The session acquires its PubSub subscription before being exposed, so the first 
 
 The synchronous snapshot is loaded before subscriptions start. The runtime stream drops its initial current-value emission because React already owns that exact snapshot; attaching a subscriber must not manufacture a fake runtime change or gratuitous render.
 
+Session shutdown has one explicit order:
+
+```text
+stop production Tick loop
+→ stop UI runtime/event bridges
+→ close the event subscription
+→ flush the latest stable runtime
+→ dispose the ManagedRuntime
+```
+
+The Tick loop must stop before the final save starts. Otherwise a slow save could serialize one snapshot while the still-running loop commits a newer runtime, leaving disposal dependent on racing layer finalizers.
+
 ### React
 
 - `GameSessionProvider` provides one stable session.
@@ -167,5 +179,5 @@ A UI animation or sound subsystem may introduce its own local Queue only after a
 - invalid candidate rollback publishes no event;
 - save debounces committed snapshots;
 - failed mutation triggers no save;
-- dispose flushes the latest committed runtime;
+- dispose stops the production Tick loop before flushing the latest stable runtime;
 - architecture prevents React/UI dependency leakage into core v1.

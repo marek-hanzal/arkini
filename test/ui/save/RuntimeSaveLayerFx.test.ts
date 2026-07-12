@@ -1,11 +1,12 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { startLineFx } from "~/v1/job/write/startLineFx";
 import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import { createGameSession } from "~/v1/ui/session/createGameSession";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -140,6 +141,57 @@ describe("RuntimeSaveLayerFx", () => {
 			]);
 		} finally {
 			releaseFirstSave?.();
+			await session.dispose();
+		}
+	});
+
+	it("stops the production Tick loop before flushing the final runtime", async () => {
+		const config = createJobTestConfig();
+		const forge = config.items.forge;
+		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		forge.lines[0]!.runtimeMs = 10_000;
+		const savedRemainingMs: Array<number | undefined> = [];
+		let markSaveStarted: (() => void) | undefined;
+		let releaseSave: (() => void) | undefined;
+		const saveStarted = new Promise<void>((resolve) => {
+			markSaveStarted = resolve;
+		});
+		const saveGate = new Promise<void>((resolve) => {
+			releaseSave = resolve;
+		});
+		const session = await createGameSession({
+			config,
+			tickIntervalMs: 5,
+			save: {
+				debounceMs: 60_000,
+				write: (state) =>
+					Effect.promise(async () => {
+						savedRemainingMs.push(state.jobs[0]?.remainingMs);
+						markSaveStarted?.();
+						await saveGate;
+					}),
+			},
+		});
+
+		try {
+			const owner = await session.run(prepareJobLineFx());
+			await session.run(
+				startLineFx({
+					ownerItemId: owner.id,
+					lineId: "line:forge:run",
+				}),
+			);
+
+			const dispose = session.dispose();
+			await saveStarted;
+			await sleep(30);
+			releaseSave?.();
+			await dispose;
+
+			expect(savedRemainingMs).toHaveLength(1);
+			expect(savedRemainingMs[0]).toBeGreaterThan(0);
+		} finally {
+			releaseSave?.();
 			await session.dispose();
 		}
 	});

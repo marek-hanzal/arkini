@@ -1,5 +1,6 @@
-import { Duration, Effect, Layer, Schedule } from "effect";
+import { Duration, Effect, Fiber, Layer, Schedule } from "effect";
 
+import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
 import { TickFx } from "~/v1/tick/context/TickFx";
 import { pulseTickFx } from "~/v1/tick/fx/pulseTickFx";
 import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
@@ -33,10 +34,14 @@ export const GameLoopLayerFx = ({
 		);
 	});
 
-	return Layer.scopedDiscard(
+	return Layer.scoped(
+		GameLoopFx,
 		pulse.pipe(
 			Effect.repeat(Schedule.spaced(Duration.millis(Math.max(1, intervalMs)))),
 			Effect.forkScoped,
+			Effect.map((fiber) => ({
+				stop: Fiber.interrupt(fiber).pipe(Effect.asVoid),
+			})),
 		),
 	);
 };

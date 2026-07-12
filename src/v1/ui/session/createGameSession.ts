@@ -1,6 +1,7 @@
 import { Effect, Exit, Fiber, Layer, ManagedRuntime, Queue, Scope, Stream } from "effect";
 
 import { GameEventsFx } from "~/v1/event/context/GameEventsFx";
+import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
 import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
 import { GameSessionLayerFx } from "~/v1/game/layer/GameSessionLayerFx";
 import { RuntimeChangesFx } from "~/v1/runtime/context/RuntimeChangesFx";
@@ -101,6 +102,7 @@ export const createGameSession = async <SaveError>({
 			if (disposed) return;
 			disposed = true;
 			let flushError: unknown;
+			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
 			await managed.runPromise(Fiber.interrupt(runtimeFiber));
 			await managed.runPromise(Fiber.interrupt(eventFiber));
 			await managed.runPromise(Scope.close(eventScope, Exit.void));

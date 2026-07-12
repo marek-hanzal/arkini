@@ -7,7 +7,7 @@
 			"title": "Smelter I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Smelter I.",
 			"asset": [
-				"item-blueprint-smelter-t1",
+				"blueprint",
 				"producer-smelter-t1"
 			],
 			"tags": [

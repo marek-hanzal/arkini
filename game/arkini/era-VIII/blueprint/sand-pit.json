@@ -7,7 +7,7 @@
 			"title": "Sand Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
 			"asset": [
-				"item-blueprint-sand-pit",
+				"blueprint",
 				"producer-sand-pit"
 			],
 			"tags": [

@@ -7,7 +7,7 @@
 			"title": "Well I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Well I.",
 			"asset": [
-				"item-blueprint-well-t1",
+				"blueprint",
 				"producer-well-t1"
 			],
 			"tags": [

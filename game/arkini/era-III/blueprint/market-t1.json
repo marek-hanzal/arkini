@@ -7,7 +7,7 @@
 			"title": "Market Blueprint",
 			"description": "Build plan that can be filled with resources to construct the Market.",
 			"asset": [
-				"item-blueprint-market-t1",
+				"blueprint",
 				"producer-market-t1"
 			],
 			"tags": [

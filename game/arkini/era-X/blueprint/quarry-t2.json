@@ -7,7 +7,7 @@
 			"title": "Quarry Blueprint",
 			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
 			"asset": [
-				"item-blueprint-quarry-t2",
+				"blueprint",
 				"producer-quarry-t2"
 			],
 			"tags": [

@@ -7,7 +7,7 @@
 			"title": "Roof Tile Factory Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
 			"asset": [
-				"item-blueprint-roof-tile-factory",
+				"blueprint",
 				"producer-roof-tile-factory"
 			],
 			"tags": [

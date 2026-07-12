@@ -7,7 +7,7 @@
 			"title": "Iron Mine I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
 			"asset": [
-				"item-blueprint-iron-mine-t1",
+				"blueprint",
 				"producer-iron-mine-t1"
 			],
 			"tags": [

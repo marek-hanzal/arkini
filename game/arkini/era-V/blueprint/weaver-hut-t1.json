@@ -7,7 +7,7 @@
 			"title": "Weaver Hut I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
 			"asset": [
-				"item-blueprint-weaver-hut-t1",
+				"blueprint",
 				"producer-weaver-hut-t1"
 			],
 			"tags": [

@@ -7,7 +7,7 @@
 			"title": "Vegetable Garden I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Vegetable Garden I.",
 			"asset": [
-				"item-blueprint-vegetable-garden-t1",
+				"blueprint",
 				"producer-vegetable-garden-t1"
 			],
 			"tags": [

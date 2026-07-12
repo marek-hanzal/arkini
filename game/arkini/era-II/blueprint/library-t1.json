@@ -7,7 +7,7 @@
 			"title": "Library I Blueprint",
 			"description": "Build plan that can be filled with early resources to construct Library I.",
 			"asset": [
-				"item-blueprint-library-t1",
+				"blueprint",
 				"producer-library-t1"
 			],
 			"tags": [

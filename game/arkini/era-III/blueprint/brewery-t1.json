@@ -7,7 +7,7 @@
 			"title": "Brewery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Brewery I.",
 			"asset": [
-				"item-blueprint-brewery-t1",
+				"blueprint",
 				"producer-brewery-t1"
 			],
 			"tags": [

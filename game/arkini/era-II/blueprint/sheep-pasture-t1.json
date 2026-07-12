@@ -7,7 +7,7 @@
 			"title": "Sheep Pasture I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Sheep Pasture I.",
 			"asset": [
-				"item-blueprint-sheep-pasture-t1",
+				"blueprint",
 				"producer-sheep-pasture-t1"
 			],
 			"tags": [

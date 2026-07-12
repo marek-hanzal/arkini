@@ -7,7 +7,7 @@
 			"title": "Tavern I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Tavern I.",
 			"asset": [
-				"item-blueprint-tavern-t1",
+				"blueprint",
 				"producer-tavern-t1"
 			],
 			"tags": [

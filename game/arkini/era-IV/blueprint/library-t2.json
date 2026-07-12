@@ -7,7 +7,7 @@
 			"title": "Library II Blueprint",
 			"description": "Build plan that upgrades Library I into Library II.",
 			"asset": [
-				"item-blueprint-library-t2",
+				"blueprint",
 				"producer-library-t2"
 			],
 			"tags": [

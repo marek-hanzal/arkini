@@ -7,7 +7,7 @@
 			"title": "Academy Blueprint",
 			"description": "Build plan that upgrades a School into an Academy.",
 			"asset": [
-				"item-blueprint-academy",
+				"blueprint",
 				"producer-academy"
 			],
 			"tags": [

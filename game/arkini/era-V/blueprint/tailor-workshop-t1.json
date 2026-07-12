@@ -7,7 +7,7 @@
 			"title": "Tailor Workshop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Tailor Workshop I.",
 			"asset": [
-				"item-blueprint-tailor-workshop-t1",
+				"blueprint",
 				"producer-tailor-workshop-t1"
 			],
 			"tags": [

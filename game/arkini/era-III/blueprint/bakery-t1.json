@@ -7,7 +7,7 @@
 			"title": "Bakery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Bakery I.",
 			"asset": [
-				"item-blueprint-bakery-t1",
+				"blueprint",
 				"producer-bakery-t1"
 			],
 			"tags": [

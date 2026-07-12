@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { validateGameResourcesFx } from "~/v1/validation/rule/validateGameResourcesFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 
@@ -72,5 +73,86 @@ describe("validateGameResourcesFx", () => {
 				}),
 			]),
 		);
+	});
+
+	it("allows multiple blueprints to reference one explicit shared visual", () => {
+		const blueprintItem = ({
+			id,
+			targetId,
+			targetAsset,
+		}: {
+			id: string;
+			targetId: string;
+			targetAsset: string;
+		}) => ({
+			id,
+			type: "blueprint" as const,
+			title: id,
+			description: id,
+			asset: [
+				"blueprint",
+				targetAsset,
+			] as const,
+			targetId,
+			tags: [],
+			categoryId: "blueprint",
+			scope: "any" as const,
+			maxStackSize: 1,
+			line: {
+				id: `line:${id}:construct`,
+				title: id,
+				description: id,
+				runtimeMs: 0,
+				input: [
+					{
+						type: "simple" as const,
+					},
+				],
+				rules: [],
+			},
+		});
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			items: {
+				...startTestConfig.items,
+				"blueprint:tree": blueprintItem({
+					id: "blueprint:tree",
+					targetId: "tree",
+					targetAsset: "asset:tree",
+				}),
+				"blueprint:log": blueprintItem({
+					id: "blueprint:log",
+					targetId: "log",
+					targetAsset: "asset:log",
+				}),
+			},
+		});
+		const diagnostics = Effect.runSync(
+			validateGameResourcesFx({
+				config,
+				provenance: {
+					...provenance,
+					items: Object.fromEntries(
+						Object.keys(config.items).map((id) => [
+							id,
+							`${id}.json`,
+						]),
+					),
+				},
+				resources: [
+					"hero",
+					"asset:tree",
+					"asset:log",
+					"asset:lens",
+					"blueprint",
+				].map((id) => ({
+					id,
+					path: `${id}.png`,
+					mime: "image/png" as const,
+				})),
+			}),
+		);
+
+		expect(diagnostics).toEqual([]);
 	});
 });

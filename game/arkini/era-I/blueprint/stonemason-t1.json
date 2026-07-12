@@ -7,7 +7,7 @@
 			"title": "Stonemason I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Stonemason I.",
 			"asset": [
-				"item-blueprint-stonemason-t1",
+				"blueprint",
 				"producer-stonemason-t1"
 			],
 			"tags": [

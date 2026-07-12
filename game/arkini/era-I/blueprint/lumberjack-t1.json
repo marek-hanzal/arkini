@@ -7,7 +7,7 @@
 			"title": "Lumberjack I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
 			"asset": [
-				"item-blueprint-lumberjack-t1",
+				"blueprint",
 				"producer-lumberjack-t1"
 			],
 			"tags": [

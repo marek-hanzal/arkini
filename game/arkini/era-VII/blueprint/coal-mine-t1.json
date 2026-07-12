@@ -7,7 +7,7 @@
 			"title": "Coal Mine I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Coal Mine I.",
 			"asset": [
-				"item-blueprint-coal-mine-t1",
+				"blueprint",
 				"producer-coal-mine-t1"
 			],
 			"tags": [

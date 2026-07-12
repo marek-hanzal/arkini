@@ -7,7 +7,7 @@
 			"title": "House II Blueprint",
 			"description": "Build plan for House II, a housing producer that generates morale.",
 			"asset": [
-				"item-blueprint-house-t2",
+				"blueprint",
 				"producer-house-t2"
 			],
 			"tags": [

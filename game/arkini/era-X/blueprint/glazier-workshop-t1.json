@@ -7,7 +7,7 @@
 			"title": "Glazier Workshop I Blueprint",
 			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
 			"asset": [
-				"item-blueprint-glazier-workshop-t1",
+				"blueprint",
 				"producer-glazier-workshop-t1"
 			],
 			"tags": [

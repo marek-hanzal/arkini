@@ -7,7 +7,7 @@
 			"title": "Tannery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Tannery I.",
 			"asset": [
-				"item-blueprint-tannery-t1",
+				"blueprint",
 				"producer-tannery-t1"
 			],
 			"tags": [

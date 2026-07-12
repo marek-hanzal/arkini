@@ -7,7 +7,7 @@
 			"title": "Winery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Winery I.",
 			"asset": [
-				"item-blueprint-winery-t1",
+				"blueprint",
 				"producer-winery-t1"
 			],
 			"tags": [

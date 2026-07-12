@@ -7,7 +7,7 @@
 			"title": "Market II Blueprint",
 			"description": "Build plan that can upgrade Market into Market II.",
 			"asset": [
-				"item-blueprint-market-t2",
+				"blueprint",
 				"producer-market-t2"
 			],
 			"tags": [

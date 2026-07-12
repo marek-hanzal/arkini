@@ -7,7 +7,7 @@
 			"title": "Heroes Guild I Blueprint",
 			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
 			"asset": [
-				"item-blueprint-heroes-guild-t1",
+				"blueprint",
 				"producer-heroes-guild-t1"
 			],
 			"tags": [

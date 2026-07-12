@@ -7,7 +7,7 @@
 			"title": "Wayside Shrine Blueprint",
 			"description": "Build plan that can be filled with resources to construct Wayside Shrine.",
 			"asset": [
-				"item-blueprint-shrine-t1",
+				"blueprint",
 				"producer-shrine-t1"
 			],
 			"tags": [

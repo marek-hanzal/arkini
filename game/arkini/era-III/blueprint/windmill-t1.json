@@ -7,7 +7,7 @@
 			"title": "Windmill I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Windmill I.",
 			"asset": [
-				"item-blueprint-windmill-t1",
+				"blueprint",
 				"producer-windmill-t1"
 			],
 			"tags": [

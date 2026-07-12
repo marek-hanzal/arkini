@@ -7,7 +7,7 @@
 			"title": "Waste Processor I Blueprint",
 			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
 			"asset": [
-				"item-blueprint-waste-processor-t1",
+				"blueprint",
 				"producer-waste-processor-t1"
 			],
 			"tags": [

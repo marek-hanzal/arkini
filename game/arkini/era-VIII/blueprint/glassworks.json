@@ -7,7 +7,7 @@
 			"title": "Glassworks Blueprint",
 			"description": "Build plan that can be filled with resources to construct Glassworks.",
 			"asset": [
-				"item-blueprint-glassworks",
+				"blueprint",
 				"producer-glassworks"
 			],
 			"tags": [

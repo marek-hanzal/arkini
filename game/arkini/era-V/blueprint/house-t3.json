@@ -7,7 +7,7 @@
 			"title": "House III Blueprint",
 			"description": "Build plan for House III, a housing producer that generates morale.",
 			"asset": [
-				"item-blueprint-house-t3",
+				"blueprint",
 				"producer-house-t3"
 			],
 			"tags": [

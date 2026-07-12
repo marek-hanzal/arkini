@@ -7,7 +7,7 @@
 			"title": "Quarry I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Quarry I.",
 			"asset": [
-				"item-blueprint-quarry-t1",
+				"blueprint",
 				"producer-quarry-t1"
 			],
 			"tags": [

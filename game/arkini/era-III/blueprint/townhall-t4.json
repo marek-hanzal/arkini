@@ -7,7 +7,7 @@
 			"title": "Town Hall IV Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall IV.",
 			"asset": [
-				"item-blueprint-townhall-t4",
+				"blueprint",
 				"producer-townhall-t4"
 			],
 			"tags": [

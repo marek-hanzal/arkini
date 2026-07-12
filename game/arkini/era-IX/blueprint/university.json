@@ -7,7 +7,7 @@
 			"title": "University Blueprint",
 			"description": "Build plan that upgrades an Academy into a University as part of the guild and institution era.",
 			"asset": [
-				"item-blueprint-university",
+				"blueprint",
 				"producer-university"
 			],
 			"tags": [

@@ -7,7 +7,7 @@
 			"title": "Paper Mill I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
 			"asset": [
-				"item-blueprint-paper-mill-t1",
+				"blueprint",
 				"producer-paper-mill-t1"
 			],
 			"tags": [

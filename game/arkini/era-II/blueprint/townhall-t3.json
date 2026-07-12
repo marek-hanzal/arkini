@@ -7,7 +7,7 @@
 			"title": "Town Hall III Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall III.",
 			"asset": [
-				"item-blueprint-townhall-t3",
+				"blueprint",
 				"producer-townhall-t3"
 			],
 			"tags": [

@@ -7,7 +7,7 @@
 			"title": "Dye Workshop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
 			"asset": [
-				"item-blueprint-dye-workshop-t1",
+				"blueprint",
 				"producer-dye-workshop-t1"
 			],
 			"tags": [

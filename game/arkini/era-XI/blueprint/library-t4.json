@@ -7,7 +7,7 @@
 			"title": "Library IV Blueprint",
 			"description": "Build plan that upgrades Library III into Library IV.",
 			"asset": [
-				"item-blueprint-library-t4",
+				"blueprint",
 				"producer-library-t4"
 			],
 			"tags": [

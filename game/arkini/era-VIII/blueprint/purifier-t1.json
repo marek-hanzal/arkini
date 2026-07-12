@@ -7,7 +7,7 @@
 			"title": "Purifier I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Purifier I.",
 			"asset": [
-				"item-blueprint-purifier-t1",
+				"blueprint",
 				"producer-purifier-t1"
 			],
 			"tags": [

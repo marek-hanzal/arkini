@@ -7,7 +7,7 @@
 			"title": "Chicken Coop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
 			"asset": [
-				"item-blueprint-chicken-coop-t1",
+				"blueprint",
 				"producer-chicken-coop-t1"
 			],
 			"tags": [

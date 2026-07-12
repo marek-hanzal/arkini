@@ -7,7 +7,7 @@
 			"title": "Stonemason Blueprint",
 			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
 			"asset": [
-				"item-blueprint-stonemason-t2",
+				"blueprint",
 				"producer-stonemason-t2"
 			],
 			"tags": [

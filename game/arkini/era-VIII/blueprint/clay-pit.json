@@ -7,7 +7,7 @@
 			"title": "Clay Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
 			"asset": [
-				"item-blueprint-clay-pit",
+				"blueprint",
 				"producer-clay-pit"
 			],
 			"tags": [

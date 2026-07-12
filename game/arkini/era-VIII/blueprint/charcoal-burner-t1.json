@@ -7,7 +7,7 @@
 			"title": "Charcoal Burner I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
 			"asset": [
-				"item-blueprint-charcoal-burner-t1",
+				"blueprint",
 				"producer-charcoal-burner-t1"
 			],
 			"tags": [

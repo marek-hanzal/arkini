@@ -7,7 +7,7 @@
 			"title": "Goldsmith I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
 			"asset": [
-				"item-blueprint-goldsmith-t1",
+				"blueprint",
 				"producer-goldsmith-t1"
 			],
 			"tags": [

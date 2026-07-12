@@ -7,7 +7,7 @@
 			"title": "Slaughterhouse I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
 			"asset": [
-				"item-blueprint-slaughterhouse-t1",
+				"blueprint",
 				"producer-slaughterhouse-t1"
 			],
 			"tags": [

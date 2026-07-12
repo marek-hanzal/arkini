@@ -7,7 +7,7 @@
 			"title": "Sawmill I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Sawmill I.",
 			"asset": [
-				"item-blueprint-sawmill-t1",
+				"blueprint",
 				"producer-sawmill-t1"
 			],
 			"tags": [

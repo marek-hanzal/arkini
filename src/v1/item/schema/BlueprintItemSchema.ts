@@ -11,6 +11,8 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
  *
  * The asset tuple is ordered as `[blueprintAssetId, targetAssetId]`. Both
  * resources are authored explicitly; neither is inferred from `targetId`.
+ * Multiple blueprints may intentionally reference the same blueprint visual;
+ * explicit reference reuse is not an implicit naming convention.
  * The construction line owns timing and inputs, while `targetId` owns the
  * canonical replacement produced on completion. Optional `output` represents
  * additional rolled by-products such as trash or pollution.
@@ -26,7 +28,9 @@ export const BlueprintItemSchema = z
 				IdSchema,
 				IdSchema,
 			])
-			.describe("The explicit [blueprint asset ID, completed target asset ID] tuple."),
+			.describe(
+				"The explicit [blueprint asset ID, completed target asset ID] tuple; either resource may be shared by multiple items.",
+			),
 		targetId: IdSchema.describe("The canonical item created when this blueprint completes."),
 		line: LineSchema.omit({
 			output: true,

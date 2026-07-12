@@ -7,7 +7,7 @@
 			"title": "Cathedral Blueprint",
 			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
 			"asset": [
-				"item-blueprint-cathedral",
+				"blueprint",
 				"producer-cathedral"
 			],
 			"tags": [

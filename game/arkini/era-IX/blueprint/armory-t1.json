@@ -7,7 +7,7 @@
 			"title": "Armory I Blueprint",
 			"description": "Build plan that can be filled with guild resources to construct Armory I.",
 			"asset": [
-				"item-blueprint-armory-t1",
+				"blueprint",
 				"producer-armory-t1"
 			],
 			"tags": [

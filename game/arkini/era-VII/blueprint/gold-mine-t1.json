@@ -7,7 +7,7 @@
 			"title": "Gold Mine I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
 			"asset": [
-				"item-blueprint-gold-mine-t1",
+				"blueprint",
 				"producer-gold-mine-t1"
 			],
 			"tags": [

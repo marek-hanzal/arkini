@@ -7,7 +7,7 @@
 			"title": "Cookhouse I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Cookhouse I.",
 			"asset": [
-				"item-blueprint-cookhouse-t1",
+				"blueprint",
 				"producer-cookhouse-t1"
 			],
 			"tags": [

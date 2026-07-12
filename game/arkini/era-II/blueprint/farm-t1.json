@@ -7,7 +7,7 @@
 			"title": "Farm I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Farm I.",
 			"asset": [
-				"item-blueprint-farm-t1",
+				"blueprint",
 				"producer-farm-t1"
 			],
 			"tags": [

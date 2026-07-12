@@ -7,7 +7,7 @@
 			"title": "Civic Office I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Civic Office I.",
 			"asset": [
-				"item-blueprint-civic-office-t1",
+				"blueprint",
 				"producer-civic-office-t1"
 			],
 			"tags": [

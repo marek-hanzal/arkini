@@ -13,15 +13,17 @@ export namespace startLineFx {
 		lineId: IdSchema.Type;
 	}
 }
-/** Explicitly starts a free owner or appends one FIFO start request behind its active job. */
+/** Explicitly starts an idle owner or appends one FIFO request behind any existing owner work. */
 export const startLineFx = Effect.fn("startLineFx")(function* ({
 	ownerItemId,
 	lineId,
 }: startLineFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			const hasActiveJob = runtime.jobs.some((job) => job.ownerItemId === ownerItemId);
-			if (!hasActiveJob) {
+			const hasOwnerWork =
+				runtime.jobs.some((job) => job.ownerItemId === ownerItemId) ||
+				(runtime.jobQueue ?? []).some((request) => request.ownerItemId === ownerItemId);
+			if (!hasOwnerWork) {
 				const [job, nextRuntime] = yield* startLineRuntimeFx({
 					ownerItemId,
 					lineId,

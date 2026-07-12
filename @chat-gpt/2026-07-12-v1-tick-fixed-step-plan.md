@@ -37,11 +37,13 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Make runtime job-array ordering irrelevant to cross-owner time progression.
 - [x] Prove one long Tick equals equivalent small fixed steps.
 
-### Block 3: queue-only owner and FIFO
+### Completed block 3: queue-only owner and FIFO
 
-- Tick workset is owners with active jobs union owners with queued requests.
-- Dispatch a queue-only FIFO head through `startLineRuntimeFx`.
-- Never let an explicit start overtake an older queued request.
+- [x] Tick workset includes owners with active jobs and queue-only owners with queued requests.
+- [x] Dispatch a queue-only FIFO head through `startLineRuntimeFx` at the beginning of every fixed step.
+- [x] Leave a blocked FIFO head in place and retry it on a later step.
+- [x] Never let an explicit start overtake an older queued request.
+- [x] Append newer explicit requests behind existing FIFO work when capacity permits.
 
 ### Block 4: blocked completion isolation
 

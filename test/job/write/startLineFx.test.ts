@@ -8,6 +8,7 @@ import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readLineRunFx } from "~/v1/line/fx/run/readLineRunFx";
 import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
+import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { setItemQuantityFx } from "~/v1/runtime/write/setItemQuantityFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
@@ -253,6 +254,80 @@ describe("startLineFx", () => {
 
 		expect(result.first.type).toBe("started");
 		expect(result.second.type).toBe("queued");
+	});
+
+	it("never starts ahead of an existing blocked FIFO request", () => {
+		const config = createJobTestConfig(3);
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				yield* startLineFx(startProps);
+				const queued = yield* startLineFx(startProps);
+				if (queued.type !== "queued") throw new Error("Expected queued request.");
+
+				const runtime = yield* readRuntimeFx();
+				const water = runtime.items.find(
+					(item) => item.item.id === "water" && item.location.scope === "input",
+				);
+				if (water === undefined) throw new Error("Expected buffered water.");
+				yield* removeItemFx({
+					itemId: water.id,
+					revision: water.revision,
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 1_000,
+				});
+
+				const refill = yield* spawnItemFx({
+					id: "runtime:water:refill",
+					itemId: "water",
+					location: {
+						scope: "board",
+						position: {
+							x: 3,
+							y: 0,
+						},
+					},
+					quantity: 3,
+				});
+				yield* storeInputMaterialFx({
+					ownerItemId: startProps.ownerItemId,
+					lineId: startProps.lineId,
+					inputIndex: 0,
+					sourceItemId: refill.id,
+					sourceItemRevision: refill.revision,
+					quantity: 3,
+				});
+
+				const newer = yield* startLineFx(startProps);
+				const queuedRuntime = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				return {
+					afterDispatch: yield* readRuntimeFx(),
+					newer,
+					queued,
+					queuedRuntime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.newer.type).toBe("queued");
+		expect(result.queuedRuntime.jobs).toEqual([]);
+		expect(result.queuedRuntime.jobQueue).toHaveLength(2);
+		expect((result.queuedRuntime.jobQueue ?? [])[0]?.id).toBe(result.queued.request.id);
+		if (result.newer.type === "queued") {
+			expect((result.queuedRuntime.jobQueue ?? [])[1]?.id).toBe(result.newer.request.id);
+			expect(result.afterDispatch.jobs).toHaveLength(1);
+			expect(result.afterDispatch.jobs[0]?.remainingMs).toBe(800);
+			expect(result.afterDispatch.jobQueue).toHaveLength(1);
+			expect((result.afterDispatch.jobQueue ?? [])[0]?.id).toBe(result.newer.request.id);
+		}
 	});
 
 	it("rejects an unavailable line without partially creating a job", () => {

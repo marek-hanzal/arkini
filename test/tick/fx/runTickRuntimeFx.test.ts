@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
+import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
 import { readOwnerJobQueueFx } from "~/v1/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
@@ -23,6 +24,41 @@ const props = {
 	ownerItemId: "runtime:forge",
 	lineId: "line:forge:run",
 };
+
+const removeBufferedWaterFx = Effect.fn("removeBufferedWaterFx")(function* () {
+	const runtime = yield* readRuntimeFx();
+	const water = runtime.items.find(
+		(item) => item.item.id === "water" && item.location.scope === "input",
+	);
+	if (water === undefined) throw new Error("Expected buffered water.");
+	yield* removeItemFx({
+		itemId: water.id,
+		revision: water.revision,
+	});
+});
+
+const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
+	const water = yield* spawnItemFx({
+		id: "runtime:water:refill",
+		itemId: "water",
+		location: {
+			scope: "board",
+			position: {
+				x: 3,
+				y: 0,
+			},
+		},
+		quantity: 3,
+	});
+	yield* storeInputMaterialFx({
+		ownerItemId: props.ownerItemId,
+		lineId: props.lineId,
+		inputIndex: 0,
+		sourceItemId: water.id,
+		sourceItemRevision: water.revision,
+		quantity: 3,
+	});
+});
 
 const createLiveRuleConfig = () => {
 	const base = createJobTestConfig(2);
@@ -159,6 +195,41 @@ describe("runTickRuntimeByFx", () => {
 				.reduce((quantity, item) => quantity + item.quantity, 0),
 		).toBe(2);
 		expect(result.runtime.items.some((item) => item.location.scope === "job")).toBe(false);
+	});
+
+	it("retries a blocked queue-only owner on a later fixed step", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				yield* startLineFx(props);
+				yield* startLineFx(props);
+				yield* removeBufferedWaterFx();
+
+				yield* runTickRuntimeByFx({
+					elapsedMs: 1_000,
+				});
+				const blocked = yield* readRuntimeFx();
+
+				yield* refillBufferedWaterFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				return {
+					blocked,
+					resumed: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(2),
+				}),
+			),
+		);
+
+		expect(result.blocked.jobs).toEqual([]);
+		expect(result.blocked.jobQueue).toHaveLength(1);
+		expect(result.resumed.jobs).toHaveLength(1);
+		expect(result.resumed.jobs[0]?.remainingMs).toBe(800);
+		expect(result.resumed.jobQueue).toEqual([]);
 	});
 
 	it("keeps remaining time unchanged while a live rule pauses the job", () => {

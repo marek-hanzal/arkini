@@ -4,10 +4,12 @@
 
 - Filling a product line is passive and never starts work.
 - `startLineFx` is the explicit command used by UI and automation.
-- One owner may have one active job plus FIFO queued start requests up to `maxQueueSize`.
+- One owner may have zero or one active job plus FIFO queued start requests up to `maxQueueSize`.
 - A queued request is not a job. It has no time, consumes nothing, and reserves nothing.
 - Queue dispatch uses the same internal `startLineRuntimeFx` pipeline as an immediate explicit start.
+- A queue-only owner is a valid runtime state and is retried at the beginning of every fixed simulation step.
 - A queued request is revalidated against the current runtime when dispatched. If it cannot start, it remains first in FIFO and nothing behind it may pass.
+- An explicit start begins immediately only when the owner has no active job and no queued request. Otherwise it appends behind existing FIFO work.
 
 ## Time acquisition model
 

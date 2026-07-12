@@ -88,6 +88,15 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Treat queue-only owners as explicit valid runtime state.
 - [x] Classify only missing inputs, disabled line state and inventory ownership as retryable queue blocks.
 - [x] Propagate missing owner, missing line and future structural start failures instead of retrying forever.
-- [ ] Remove the misleading unused owner queue time helper.
-- [ ] Permanent owner removal is forbidden while active or queued work exists.
-- [ ] Removing an idle owner releases its buffered input contents through the ordinary drop path.
+- [x] Remove the misleading unused owner queue time helper.
+- [x] Permanent owner removal is forbidden while active or queued work exists.
+- [x] Removing an idle owner releases its buffered input contents through ordinary scope-aware drop placement, all-or-nothing.
+
+## Final owner removal contract
+
+- An owner with an active job or queued request cannot be removed.
+- Moving an owner to inventory is not removal; its work remains paused and intact.
+- Removing an idle owner also removes its buffered input representations and re-emits their quantities atomically through normal placement.
+- A board owner uses its current board position as the drop origin.
+- An inventory owner uses each buffered material's last real grid scope; inventory coordinates are never interpreted as board coordinates.
+- Any placement failure rolls back the owner removal and every buffered release.

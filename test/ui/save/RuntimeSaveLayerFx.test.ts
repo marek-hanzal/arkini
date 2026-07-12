@@ -73,6 +73,77 @@ describe("RuntimeSaveLayerFx", () => {
 		}
 	});
 
+	it("serializes autosave and explicit flush so an older write cannot win", async () => {
+		const savedItemCounts: number[] = [];
+		let releaseFirstSave: (() => void) | undefined;
+		let markFirstSaveStarted: (() => void) | undefined;
+		const firstSaveStarted = new Promise<void>((resolve) => {
+			markFirstSaveStarted = resolve;
+		});
+		const firstSaveGate = new Promise<void>((resolve) => {
+			releaseFirstSave = resolve;
+		});
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 0,
+				write: (state) =>
+					Effect.promise(async () => {
+						if (state.items.length === 1) {
+							markFirstSaveStarted?.();
+							await firstSaveGate;
+						}
+						savedItemCounts.push(state.items.length);
+					}),
+			},
+		});
+
+		try {
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:race:first",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await firstSaveStarted;
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:race:second",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+
+			const flush = session.flushSave();
+			releaseFirstSave?.();
+			await flush;
+
+			expect(savedItemCounts).toEqual([
+				1,
+				2,
+			]);
+		} finally {
+			releaseFirstSave?.();
+			await session.dispose();
+		}
+	});
+
 	it("flushes the latest committed runtime when the session is disposed", async () => {
 		const saves: StateSchema.Type[] = [];
 		const session = await createGameSession({

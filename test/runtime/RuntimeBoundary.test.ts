@@ -87,21 +87,23 @@ describe("runtime mutation boundary", () => {
 					needle: directRuntimeModify,
 				});
 				const writeFiles = files.filter((file) => file.includes("/write/"));
-				const writeWithoutTransactionBoundary = (yield* Effect.filter(
-					writeFiles,
-					(file) => {
-						return fileSystem
-							.readFileString(file)
-							.pipe(
-								Effect.map((source) => !source.includes(runtimeTransactionImport)),
-							);
-					},
-				)).filter((file) => !revisionFreeWriteFiles.has(file));
+				const writeWithoutTransactionBoundary = yield* Effect.filter(writeFiles, (file) => {
+					return fileSystem
+						.readFileString(file)
+						.pipe(Effect.map((source) => !source.includes(runtimeTransactionImport)));
+				});
 				const writeWithoutRevisionGuard = (yield* Effect.filter(writeFiles, (file) => {
 					return fileSystem
 						.readFileString(file)
 						.pipe(Effect.map((source) => !source.includes(revisionGuardImport)));
 				})).filter((file) => !revisionFreeWriteFiles.has(file));
+				const nestedWriteImports = yield* Effect.filter(writeFiles, (file) => {
+					return fileSystem.readFileString(file).pipe(
+						Effect.map((source) => {
+							return /from "~\/v1\/[^"]+\/write\//.test(source);
+						}),
+					);
+				});
 				const staleDecisionImporters = (yield* Effect.forEach(
 					stateDerivedDecisionImports,
 					(needle) => {
@@ -124,6 +126,7 @@ describe("runtime mutation boundary", () => {
 						(file) => !allowedDirectModifiers.has(file),
 					),
 					staleDecisionImporters,
+					nestedWriteImports,
 					storeImporters: storeImporters.filter(
 						(file) => !allowedStoreImporters.has(file),
 					),
@@ -136,6 +139,7 @@ describe("runtime mutation boundary", () => {
 		expect(invalid).toEqual({
 			directModifiers: [],
 			staleDecisionImporters: [],
+			nestedWriteImports: [],
 			storeImporters: [],
 			writeWithoutRevisionGuard: [],
 			writeWithoutTransactionBoundary: [],

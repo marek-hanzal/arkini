@@ -7,6 +7,7 @@ import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
+import { SwapSameItemError } from "~/v1/runtime/error/SwapSameItemError";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { SwapItemsResultSchema } from "~/v1/runtime/schema/command/SwapItemsResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
@@ -30,6 +31,14 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 	secondItemId,
 	secondItemRevision,
 }: swapItemsFx.Props) {
+	if (firstItemId === secondItemId) {
+		return yield* Effect.fail(
+			new SwapSameItemError({
+				itemId: firstItemId,
+			}),
+		);
+	}
+
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const findItem = (itemId: IdSchema.Type) => {

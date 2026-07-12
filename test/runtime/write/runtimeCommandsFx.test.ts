@@ -150,6 +150,48 @@ describe("runtime commands", () => {
 		]);
 	});
 
+	it("rejects swapping one runtime item with itself without changing its revision", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const item = yield* spawnItemFx({
+					id: "runtime:log",
+					itemId: "log",
+					location: boardA,
+					quantity: 1,
+				});
+				const swapped = yield* Effect.either(
+					swapItemsFx({
+						firstItemId: item.id,
+						firstItemRevision: item.revision,
+						secondItemId: item.id,
+						secondItemRevision: item.revision,
+					}),
+				);
+				const runtime = yield* readRuntimeFx();
+				return {
+					item,
+					runtime,
+					swapped,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result.swapped)).toBe(true);
+		if (Either.isLeft(result.swapped)) {
+			expect(result.swapped.left).toMatchObject({
+				_tag: "SwapSameItemError",
+				itemId: "runtime:log",
+			});
+		}
+		expect(result.runtime.items).toEqual([
+			result.item,
+		]);
+	});
+
 	it("rejects duplicate identities and occupied destinations without partial writes", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

@@ -53,10 +53,12 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Invalid replacement semantics and unexpected defects still rollback the whole advancement and retain its Tick budget.
 - [x] A later fixed step retries the ready completion after capacity changes.
 
-### Block 5: session command shutdown
+### Completed block 5: session command shutdown
 
-- Track command fibers started through `GameSession.run`.
-- Dispose stops Tick, interrupts/awaits in-flight commands, then performs final save.
+- [x] Track command fibers started through `GameSession.run` in a session-owned `FiberSet`.
+- [x] Reject new commands once disposal starts.
+- [x] Dispose stops Tick, interrupts and awaits in-flight commands, then performs final save.
+- [x] A delayed command cannot commit after the final save.
 
 ### Block 6: runtime invariants and cleanup
 

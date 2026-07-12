@@ -1,4 +1,4 @@
-import { Effect, Exit, Fiber, Layer, ManagedRuntime, Queue, Scope, Stream } from "effect";
+import { Effect, Exit, Fiber, FiberSet, Layer, ManagedRuntime, Queue, Scope, Stream } from "effect";
 
 import { GameEventsFx } from "~/v1/event/context/GameEventsFx";
 import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
@@ -8,7 +8,7 @@ import { RuntimeChangesFx } from "~/v1/runtime/context/RuntimeChangesFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import type { GameSession } from "~/v1/ui/session/GameSession";
+import type { GameSession, GameSessionServices } from "~/v1/ui/session/GameSession";
 import { RuntimeSaveFx } from "~/v1/ui/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/v1/ui/save/RuntimeSaveLayerFx";
 
@@ -52,6 +52,10 @@ export const createGameSession = async <SaveError>({
 				}).pipe(Layer.provide(sessionLayer));
 	const layer = Layer.merge(sessionLayer, saveLayer);
 	const managed = ManagedRuntime.make(layer);
+	const commandScope = await managed.runPromise(Scope.make());
+	const runCommand = await managed.runPromise(
+		FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(commandScope)),
+	);
 	let snapshot = await managed.runPromise(readRuntimeFx());
 	let disposed = false;
 	const runtimeListeners = new Set<() => void>();
@@ -103,6 +107,7 @@ export const createGameSession = async <SaveError>({
 			disposed = true;
 			let flushError: unknown;
 			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
+			await managed.runPromise(Scope.close(commandScope, Exit.void));
 			await managed.runPromise(Fiber.interrupt(runtimeFiber));
 			await managed.runPromise(Fiber.interrupt(eventFiber));
 			await managed.runPromise(Scope.close(eventScope, Exit.void));
@@ -120,7 +125,7 @@ export const createGameSession = async <SaveError>({
 		getSnapshot: () => snapshot,
 		run: (effect) => {
 			if (disposed) return Promise.reject(new Error("Game session is disposed."));
-			return managed.runPromise(effect);
+			return runCommand(effect);
 		},
 		subscribe: (listener) => {
 			if (disposed) return () => undefined;

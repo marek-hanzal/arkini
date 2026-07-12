@@ -196,6 +196,50 @@ describe("RuntimeSaveLayerFx", () => {
 		}
 	});
 
+	it("interrupts in-flight session commands before the final save", async () => {
+		const saves: StateSchema.Type[] = [];
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 60_000,
+				write: (state) =>
+					Effect.sync(() => {
+						saves.push(state);
+					}),
+			},
+		});
+		const command = session
+			.run(
+				Effect.sleep("50 millis").pipe(
+					Effect.zipRight(
+						spawnItemFx({
+							id: "runtime:save:late-command",
+							itemId: "water",
+							location: {
+								scope: "inventory",
+								position: {
+									x: 0,
+									y: 0,
+								},
+							},
+							quantity: 1,
+						}),
+					),
+				),
+			)
+			.then(
+				() => "completed" as const,
+				() => "interrupted" as const,
+			);
+
+		await session.dispose();
+
+		expect(await command).toBe("interrupted");
+		expect(saves).toHaveLength(1);
+		expect(saves[0]?.items).toHaveLength(0);
+	});
+
 	it("flushes the latest committed runtime when the session is disposed", async () => {
 		const saves: StateSchema.Type[] = [];
 		const session = await createGameSession({

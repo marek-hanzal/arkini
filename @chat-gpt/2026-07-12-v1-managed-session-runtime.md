@@ -92,14 +92,18 @@ The synchronous snapshot is loaded before subscriptions start. The runtime strea
 Session shutdown has one explicit order:
 
 ```text
-stop production Tick loop
+reject new GameSession.run calls
+→ stop production Tick loop
+→ interrupt and await every in-flight session command fiber
 → stop UI runtime/event bridges
 → close the event subscription
 → flush the latest stable runtime
 → dispose the ManagedRuntime
 ```
 
-The Tick loop must stop before the final save starts. Otherwise a slow save could serialize one snapshot while the still-running loop commits a newer runtime, leaving disposal dependent on racing layer finalizers.
+`GameSession.run` executes commands in a session-owned `FiberSet`. Closing its scope interrupts commands that have not committed yet and waits for uninterruptible commit sections that are already finishing. The final save therefore happens only after no session command can mutate runtime again.
+
+The Tick loop must also stop before the final save starts. Otherwise a slow save could serialize one snapshot while the still-running loop commits a newer runtime, leaving disposal dependent on racing layer finalizers.
 
 ### React
 

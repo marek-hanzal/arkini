@@ -46,7 +46,6 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 				const location = {
 					scope: "job",
 					jobId,
-					returnLocation: item.location,
 				} satisfies JobLocationSchema.Type;
 
 				if (allocation.quantity === item.quantity) {

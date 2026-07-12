@@ -6,7 +6,6 @@ import type { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIs
 import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
 import type { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
-import type { JobReservationMismatchIssueSchema } from "~/v1/job/schema/JobReservationMismatchIssueSchema";
 import type { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
 import type { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFx } from "~/v1/job/read/readItemQueueSizeFx";
@@ -32,7 +31,6 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
 	const reservationMissingIssues: JobReservationMissingIssueSchema.Type[] = [];
-	const reservationMismatchIssues: JobReservationMismatchIssueSchema.Type[] = [];
 
 	const seenJobIds = new Set<IdSchema.Type>();
 	for (const job of runtime.jobs) {
@@ -117,17 +115,6 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			});
 			continue;
 		}
-		if (
-			item.location.returnLocation.ownerItemId !== job.ownerItemId ||
-			item.location.returnLocation.lineId !== job.lineId
-		) {
-			reservationMismatchIssues.push({
-				itemId: item.id,
-				jobId: job.id,
-				location: item.location,
-				type: "job:reservation-mismatch",
-			});
-		}
 	}
 
 	return [
@@ -138,6 +125,5 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		...queueIssues,
 		...timeIssues,
 		...reservationMissingIssues,
-		...reservationMismatchIssues,
 	];
 });

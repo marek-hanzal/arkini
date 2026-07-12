@@ -69,13 +69,10 @@ describe("startLineFx", () => {
 				}),
 				expect.objectContaining({
 					quantity: 1,
-					location: expect.objectContaining({
+					location: {
 						scope: "job",
 						jobId: result.started.job.id,
-						returnLocation: expect.objectContaining({
-							inputIndex: 1,
-						}),
-					}),
+					},
 				}),
 			]),
 		);
@@ -198,7 +195,7 @@ describe("startLineFx", () => {
 		expect(result.runtime.items).toHaveLength(1);
 	});
 
-	it("keeps reserved materials counted against their input buffer capacity", () => {
+	it("lets the input buffer refill while prior material is reserved by a job", () => {
 		const config = createJobTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -234,11 +231,6 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
-				_tag: "InputMaterialUnavailableError",
-			});
-		}
+		expect(Either.isRight(result)).toBe(true);
 	});
 });

@@ -1,10 +1,13 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
-import { InputLocationSchema } from "./InputLocationSchema";
 
 /**
  * One material item reserved by an active product-line job.
+ *
+ * Reserved materials intentionally remember only the owning job. When released,
+ * they re-enter the runtime through the normal drop-placement policy rather than
+ * returning to a historical item, slot, or position.
  */
 export const JobLocationSchema = z
 	.object({
@@ -12,10 +15,6 @@ export const JobLocationSchema = z
 		scope: z.literal("job"),
 		/** Stable identity of the active job reserving this material. */
 		jobId: IdSchema.describe("The active job reserving this material."),
-		/** Input-buffer location restored when this reservation ends. */
-		returnLocation: InputLocationSchema.describe(
-			"The input-buffer location restored when this reservation ends.",
-		),
 	})
 	.strict()
 	.meta({

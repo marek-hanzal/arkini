@@ -19,21 +19,8 @@ describe("JobSchema", () => {
 			JobLocationSchema.parse({
 				scope: "job",
 				jobId: job.id,
-				returnLocation: {
-					scope: "input",
-					ownerItemId: job.ownerItemId,
-					lineId: job.lineId,
-					inputIndex: 1,
-					returnLocation: {
-						scope: "board",
-						position: {
-							x: 2,
-							y: 0,
-						},
-					},
-				},
 			}),
-		).toMatchObject({
+		).toEqual({
 			scope: "job",
 			jobId: job.id,
 		});

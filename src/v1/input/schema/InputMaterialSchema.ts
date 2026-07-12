@@ -32,8 +32,8 @@ export const InputMaterialSchema = z
 		/**
 		 * Whether this input is consumed or temporarily reserved by the line.
 		 *
-		 * A reserved input returns to its prior game-state location when the work
-		 * completes or is cancelled. Consumption is the standard input behavior.
+		 * A reserved input is emitted through the standard drop-placement policy when
+		 * the work completes or is cancelled. Consumption is the standard behavior.
 		 */
 		mode: InputModeEnumSchema.default("consume").describe(
 			"Whether this input is consumed or reserved; defaults to consume.",

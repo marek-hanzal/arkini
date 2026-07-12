@@ -9,16 +9,12 @@ export namespace readInputSlotLocationFx {
 	}
 }
 
-/** Reads the input slot occupied by one buffered or job-reserved material. */
+/** Reads the concrete input slot occupied by one buffered material. */
 export const readInputSlotLocationFx = Effect.fn("readInputSlotLocationFx")(function* ({
 	item,
 }: readInputSlotLocationFx.Props) {
 	if (item.location.scope === "input") {
 		return item.location;
 	}
-	if (item.location.scope === "job") {
-		return item.location.returnLocation;
-	}
-
 	return undefined satisfies InputLocationSchema.Type | undefined;
 });

@@ -52,45 +52,9 @@ describe("checkRuntimeJobsFx", () => {
 					location: {
 						scope: "job",
 						jobId: "job:missing",
-						returnLocation: {
-							scope: "input",
-							ownerItemId: owner.id,
-							lineId: "line:forge:run",
-							inputIndex: 1,
-							returnLocation: {
-								scope: "board",
-								position: {
-									x: 1,
-									y: 0,
-								},
-							},
-						},
 					},
 					quantity: 1,
 					revision: "revision:tool:missing-job",
-				},
-				{
-					id: "runtime:tool:mismatch",
-					item: config.items.tool,
-					location: {
-						scope: "job",
-						jobId: "job:valid",
-						returnLocation: {
-							scope: "input",
-							ownerItemId: "runtime:other",
-							lineId: "line:forge:run",
-							inputIndex: 1,
-							returnLocation: {
-								scope: "board",
-								position: {
-									x: 2,
-									y: 0,
-								},
-							},
-						},
-					},
-					quantity: 1,
-					revision: "revision:tool:mismatch",
 				},
 			],
 			jobs: [
@@ -128,7 +92,6 @@ describe("checkRuntimeJobsFx", () => {
 				"job:queue-exceeded",
 				"job:time-invalid",
 				"job:reservation-missing",
-				"job:reservation-mismatch",
 			]),
 		);
 	});

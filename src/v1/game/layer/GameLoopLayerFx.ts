@@ -2,6 +2,7 @@ import { Duration, Effect, Fiber, Layer, Schedule } from "effect";
 
 import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
 import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
+import { TickStepMs } from "~/v1/tick/TickStepMs";
 
 export namespace GameLoopLayerFx {
 	export interface Props {
@@ -16,7 +17,7 @@ const defaultOnTickError = (cause: unknown) => {
 
 /** Starts one scoped production tick fiber for the lifetime of a game session. */
 export const GameLoopLayerFx = ({
-	intervalMs = 200,
+	intervalMs = TickStepMs,
 	onTickError = defaultOnTickError,
 }: GameLoopLayerFx.Props = {}) => {
 	const advance = runTickRuntimeFx().pipe(

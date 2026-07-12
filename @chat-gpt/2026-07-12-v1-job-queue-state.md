@@ -14,9 +14,9 @@
 - Effect `Clock` is the only production real-clock source.
 - `TickFx` owns one transient session cursor: `observedAtMs` plus `pendingElapsedMs`.
 - Clock acquisition and runtime application are one serialized failure-safe operation. There is no public `pulse → run` protocol and no mutable replayable Tick snapshot.
-- `runTickRuntimeFx` reads Effect Clock, adds newly elapsed real time to the pending budget, and applies the whole budget at most once.
+- `runTickRuntimeFx` reads Effect Clock, adds newly elapsed real time to the pending budget, and applies every complete fixed step at most once.
 - `runTickRuntimeByFx` injects an explicit local elapsed duration through the exact same budget protocol for deterministic tests and controlled callers.
-- A successful runtime advancement consumes the pending budget.
+- A successful runtime advancement consumes only complete 200 ms steps; a smaller remainder stays pending until later elapsed time completes the next step.
 - A failed runtime advancement advances the clock cursor but retains the entire combined pending budget for retry. No elapsed time is lost or replayed accidentally.
 - A second run without newly elapsed or explicitly injected time is a no-op.
 - Concurrent Tick advancement requests serialize through the Tick service.
@@ -25,11 +25,13 @@
 
 - Active jobs persist only `durationMs` and `remainingMs`.
 - No job timestamps, scheduled start timestamps, due timestamps, pause timestamps, or relative-time reconstruction are allowed.
-- A runnable job decrements `remainingMs` by the acquired Tick budget.
-- A job whose live rules fail is paused and keeps `remainingMs` unchanged.
-- A long Tick may complete the active job, dispatch and complete every runnable queued request, and leave the final job partially progressed with the unused remainder of the same elapsed budget.
-- Each owner currently receives the full elapsed budget independently because owners work concurrently.
-- Fixed-step segmentation and cross-owner snapshot semantics are the next Tick architecture block. Do not treat the current long-budget owner loop as the final cross-owner time model.
+- The canonical simulation step is 200 ms and `GameLoopLayerFx` uses the same value as its default wake cadence.
+- Each fixed step resolves every active job's live rules from one shared step-start runtime snapshot.
+- Runnable jobs decrement `remainingMs` by one step, clamped at zero; paused jobs keep `remainingMs` unchanged.
+- Jobs reaching zero complete at the step boundary in stable job-ID order. A queued successor may start at that boundary but does not consume work time until the following step.
+- Cross-owner mutations created during one step therefore affect another job's time progression only from the next step.
+- Runtime job-array ordering does not affect step semantics.
+- A long elapsed interval is replayed immediately as consecutive fixed steps and must match the equivalent sequence of explicit 200 ms advancements.
 
 ## Completion and reservations
 
@@ -45,7 +47,9 @@
 - `TickFx`: failure-safe pending elapsed-budget service backed by a `SynchronizedRef` in `GameCoreLayerFx`.
 - `runTickRuntimeFx`: production Tick entrypoint using Effect Clock.
 - `runTickRuntimeByFx`: deterministic local elapsed-time entrypoint using the same Tick protocol.
-- `advanceRuntimeElapsedFx`: internal runtime application for one already-acquired elapsed budget.
+- `TickStepMs`: the single canonical 200 ms simulation resolution and default production loop cadence.
+- `advanceRuntimeElapsedFx`: replays one already-acquired whole-step budget in one runtime transaction.
+- `advanceRuntimeStepFx`: advances one shared-snapshot fixed simulation step.
 - `startLineRuntimeFx`: canonical internal start pipeline used by direct start and queue dispatch.
 - `completeJobRuntimeFx`: canonical internal completion draft operation.
 - `readOwnerJobQueueFx`: derives `running`, `paused`, or `ready` from `remainingMs` and live rules.

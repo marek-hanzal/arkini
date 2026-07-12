@@ -246,7 +246,7 @@ describe("job board and inventory flow", () => {
 		expect(result.afterRetry.jobs).toEqual([]);
 		expect(result.afterRetry.jobQueue).toEqual([]);
 		expect(result.afterRetry.items.some((item) => item.location.scope === "job")).toBe(false);
-		expect(result.settledTick.pendingElapsedMs).toBe(0);
+		expect(result.settledTick.pendingElapsedMs).toBe(100);
 	});
 
 	it("pauses a queued production flow without consuming elapsed time and resumes the whole chain later", () => {

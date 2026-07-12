@@ -48,10 +48,10 @@ The runtime store is now `SubscriptionRef<RuntimeSchema.Type>`, while `RuntimeSt
 
 Owns one scoped production Tick fiber.
 
-- cadence defaults to 200 ms;
+- cadence defaults to the canonical `TickStepMs` value of 200 ms;
 - cadence uses `Schedule.spaced`;
 - elapsed gameplay time always comes from Effect Clock through `runTickRuntimeFx`;
-- `TickFx` atomically acquires newly elapsed time and applies its accumulated pending budget;
+- `TickFx` atomically acquires newly elapsed time, replays every complete 200 ms simulation step, and retains any smaller remainder;
 - a sleeping browser tab therefore contributes the full real elapsed duration after wake;
 - one failed Tick does not kill the loop;
 - failed advancement leaves the whole elapsed budget pending for the next attempt instead of restoring or replaying a snapshot.

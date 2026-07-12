@@ -2,6 +2,7 @@ import { Clock, Effect, Exit, SynchronizedRef } from "effect";
 
 import type { TickFxService } from "~/v1/tick/context/TickFx";
 import { advanceRuntimeElapsedFx } from "~/v1/tick/internal/advanceRuntimeElapsedFx";
+import { TickStepMs } from "~/v1/tick/TickStepMs";
 import { TickSchema } from "~/v1/tick/schema/TickSchema";
 
 interface ElapsedObservation {
@@ -10,7 +11,7 @@ interface ElapsedObservation {
 }
 
 const resumeExitFx = <Error>(exit: Exit.Exit<void, Error>) =>
-	Exit.isSuccess(exit) ? Effect.void : Effect.failCause(exit.cause);
+	Exit.isSuccess(exit) ? Effect.succeed(undefined) : Effect.failCause(exit.cause);
 
 /** Builds the transient Tick service owned by one game core layer. */
 export const makeTickFx = Effect.fn("makeTickFx")(function* () {
@@ -34,19 +35,21 @@ export const makeTickFx = Effect.fn("makeTickFx")(function* () {
 						observedAtMs: Math.max(state.observedAtMs, observation.observedAtMs),
 						pendingElapsedMs: state.pendingElapsedMs + observation.elapsedMs,
 					});
-					if (next.pendingElapsedMs === 0) {
+					const applicableElapsedMs =
+						next.pendingElapsedMs - (next.pendingElapsedMs % TickStepMs);
+					if (applicableElapsedMs === 0) {
 						return [
 							Exit.void,
 							next,
 						] as const;
 					}
-					const exit = yield* Effect.exit(apply(next.pendingElapsedMs));
+					const exit = yield* Effect.exit(apply(applicableElapsedMs));
 					return [
 						exit,
 						Exit.isSuccess(exit)
 							? {
 									...next,
-									pendingElapsedMs: 0,
+									pendingElapsedMs: next.pendingElapsedMs - applicableElapsedMs,
 								}
 							: next,
 					] as const;

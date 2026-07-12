@@ -10,7 +10,7 @@ export const TickSchema = z
 			"The latest Effect Clock timestamp already folded into the pending budget.",
 		),
 		pendingElapsedMs: TimeSchema.describe(
-			"Real elapsed milliseconds waiting for one successful runtime advancement.",
+			"Real elapsed milliseconds waiting to form canonical fixed simulation steps.",
 		),
 	})
 	.strict()

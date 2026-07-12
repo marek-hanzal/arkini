@@ -26,13 +26,16 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 
 ## Remaining blocks
 
-### Block 2: fixed-step runtime
+### Completed block 2: fixed-step runtime
 
-- Split each acquired elapsed budget into 200 ms simulation steps plus a retained sub-step remainder.
-- Evaluate live rules from one step-start runtime snapshot.
-- Advance concurrent owners from the same snapshot semantics.
-- Make runtime job-array ordering irrelevant.
-- Prove one long Tick equals equivalent small fixed steps.
+- [x] Split each acquired elapsed budget into 200 ms simulation steps plus a retained sub-step remainder.
+- [x] Use one `TickStepMs` value for simulation resolution and the default production loop cadence.
+- [x] Evaluate active-job live rules from one step-start runtime snapshot.
+- [x] Advance concurrent jobs from the same snapshot semantics.
+- [x] Apply completions at the step boundary in stable job-ID order.
+- [x] Start queued successors at the boundary without granting them retroactive time from that step.
+- [x] Make runtime job-array ordering irrelevant to cross-owner time progression.
+- [x] Prove one long Tick equals equivalent small fixed steps.
 
 ### Block 3: queue-only owner and FIFO
 

@@ -22,7 +22,7 @@ const collectTypeScriptFiles = (directory: string): string[] =>
 describe("completed game compiler boundary", () => {
 	it("keeps pack and test config loading on the production compiler", () => {
 		expect(read("src/v1/pack/fx/packDirectoryFx.ts")).toContain(
-			'from "~/v1/compiler/fx/compileGameSourcesFx"',
+			'from "~/v1/compiler/fx/compileGameDirectoryFx"',
 		);
 		expect(read("test/schema/support/readArkiniGameConfigSource.ts")).toContain(
 			'from "~/v1/compiler/fx/compileGameDirectoryFx"',

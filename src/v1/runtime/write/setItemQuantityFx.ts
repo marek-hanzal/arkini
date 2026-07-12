@@ -54,6 +54,7 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 				} satisfies RuntimeItemSchema.Type,
 			});
 			const nextRuntime = {
+				...runtime,
 				items: runtime.items.map((candidate) => {
 					return candidate.id === itemId ? updatedItem : candidate;
 				}),

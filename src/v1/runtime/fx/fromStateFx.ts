@@ -27,6 +27,7 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 	return yield* assertRuntimeFx({
 		runtime: {
 			items,
+			jobs: state.jobs,
 		} satisfies RuntimeSchema.Type,
 	});
 });

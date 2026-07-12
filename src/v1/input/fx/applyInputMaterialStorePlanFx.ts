@@ -36,6 +36,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 			} satisfies InputRuntimeItemSchema.Type,
 		});
 		const nextRuntime = {
+			...runtime,
 			items: runtime.items.map((item) => {
 				return item.id === source.id ? storedItem : item;
 			}),
@@ -64,6 +65,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 		quantity: plan.quantity,
 	});
 	const nextRuntime = {
+		...runtime,
 		items: [
 			...runtime.items.map((item) => {
 				return item.id === source.id ? sourceItem : item;

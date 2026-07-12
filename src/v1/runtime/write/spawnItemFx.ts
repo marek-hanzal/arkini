@@ -73,6 +73,7 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 			}
 
 			const nextRuntime = {
+				...runtime,
 				items: [
 					...runtime.items,
 					runtimeItem,

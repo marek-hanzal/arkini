@@ -133,6 +133,7 @@ describe("checkRuntimeFx", () => {
 					revision: "revision:test",
 				},
 			],
+			jobs: [],
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -190,6 +191,7 @@ describe("checkRuntimeFx", () => {
 					revision: "revision:test",
 				},
 			],
+			jobs: [],
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			checkRuntimeFx({
@@ -295,6 +297,7 @@ describe("checkRuntimeFx", () => {
 					revision: "revision:test",
 				},
 			],
+			jobs: [],
 		});
 		const result = Effect.runSync(
 			Effect.either(

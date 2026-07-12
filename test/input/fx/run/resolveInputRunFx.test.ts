@@ -68,6 +68,7 @@ describe("resolveInputRunFx", () => {
 					items: [
 						owner,
 					],
+					jobs: [],
 				},
 			}),
 		);
@@ -103,6 +104,7 @@ describe("resolveInputRunFx", () => {
 					quantity: 2,
 				}),
 			],
+			jobs: [],
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			resolveInputRunFx({
@@ -160,6 +162,7 @@ describe("resolveInputRunFx", () => {
 						items: [
 							owner,
 						],
+						jobs: [],
 					},
 				}),
 			),

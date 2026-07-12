@@ -262,5 +262,6 @@ export const lineRunRuntime = ({
 
 	return {
 		items,
+		jobs: [],
 	} satisfies RuntimeSchema.Type;
 };

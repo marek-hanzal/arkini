@@ -16,6 +16,7 @@ describe("planStartInventoryItemFx", () => {
 				},
 				runtime: {
 					items: [],
+					jobs: [],
 				},
 			}).pipe(
 				useGameFx({
@@ -73,6 +74,7 @@ describe("planStartInventoryItemFx", () => {
 					},
 					runtime: {
 						items: [],
+						jobs: [],
 					},
 				}),
 			).pipe(

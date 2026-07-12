@@ -1,15 +1,16 @@
 import { Effect } from "effect";
 
 import { resolveInputMaterialFx } from "~/v1/input/fx/resolveInputMaterialFx";
+import { readInputSlotLocationFx } from "~/v1/input/read/readInputSlotLocationFx";
 import type { InputMaterialSchema } from "~/v1/input/schema/InputMaterialSchema";
 import type { InputCapacityExceededIssueSchema } from "~/v1/input/schema/check/InputCapacityExceededIssueSchema";
 import type { InputLineMissingIssueSchema } from "~/v1/input/schema/check/InputLineMissingIssueSchema";
 import type { InputOwnerMissingIssueSchema } from "~/v1/input/schema/check/InputOwnerMissingIssueSchema";
 import type { InputSelectorMismatchIssueSchema } from "~/v1/input/schema/check/InputSelectorMismatchIssueSchema";
 import type { InputSlotInvalidIssueSchema } from "~/v1/input/schema/check/InputSlotInvalidIssueSchema";
+import type { InputLocationSchema } from "~/v1/location/schema/InputLocationSchema";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
-import { isInputRuntimeItem } from "~/v1/runtime/read/isInputRuntimeItem";
-import type { InputRuntimeItemSchema } from "~/v1/runtime/schema/InputRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { selectorFx } from "~/v1/selector/fx/selectorFx";
 
@@ -19,13 +20,20 @@ export namespace checkRuntimeInputLocationsFx {
 	}
 }
 
-interface ValidInputItem {
+interface LocatedInputItem {
+	item: RuntimeItemSchema.Type;
+	location: InputLocationSchema.Type;
+}
+
+interface ValidInputItem extends LocatedInputItem {
 	input: InputMaterialSchema.Type;
-	item: InputRuntimeItemSchema.Type;
 }
 
 /**
- * Reports every invalid line-input location and material-buffer invariant.
+ * Reports every invalid input-buffer location and material-capacity invariant.
+ *
+ * Job-reserved materials remain unavailable to run planning but still occupy
+ * the input slot capacity they will return to when their job ends.
  */
 export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocationsFx")(function* ({
 	runtime,
@@ -37,12 +45,27 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 	const capacityIssues: InputCapacityExceededIssueSchema.Type[] = [];
 	const validItems: ValidInputItem[] = [];
 
-	for (const item of runtime.items.filter(isInputRuntimeItem)) {
-		const owner = runtime.items.find((candidate) => candidate.id === item.location.ownerItemId);
+	const locatedItems = (yield* Effect.forEach(runtime.items, (item) => {
+		return readInputSlotLocationFx({
+			item,
+		}).pipe(
+			Effect.map((location) => {
+				return location === undefined
+					? undefined
+					: ({
+							item,
+							location,
+						} satisfies LocatedInputItem);
+			}),
+		);
+	})).filter((item): item is LocatedInputItem => item !== undefined);
+
+	for (const { item, location } of locatedItems) {
+		const owner = runtime.items.find((candidate) => candidate.id === location.ownerItemId);
 		if (owner === undefined) {
 			ownerIssues.push({
 				itemId: item.id,
-				location: item.location,
+				location,
 				type: "input:owner-missing",
 			});
 			continue;
@@ -50,22 +73,22 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 
 		const line = yield* readItemLineFx({
 			item: owner.item,
-			lineId: item.location.lineId,
+			lineId: location.lineId,
 		});
 		if (line === undefined) {
 			lineIssues.push({
 				itemId: item.id,
-				location: item.location,
+				location,
 				type: "input:line-missing",
 			});
 			continue;
 		}
 
-		const input = line.input[item.location.inputIndex];
+		const input = line.input[location.inputIndex];
 		if (input === undefined || input.type !== "materials") {
 			slotIssues.push({
 				itemId: item.id,
-				location: item.location,
+				location,
 				type: "input:slot-invalid",
 			});
 			continue;
@@ -78,7 +101,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		if (!matches) {
 			selectorIssues.push({
 				itemId: item.id,
-				location: item.location,
+				location,
 				type: "input:selector-mismatch",
 			});
 			continue;
@@ -87,28 +110,27 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		validItems.push({
 			input,
 			item,
+			location,
 		});
 	}
 
-	const checkedLocations: InputRuntimeItemSchema.Type["location"][] = [];
+	const checkedLocations: InputLocationSchema.Type[] = [];
 	for (const current of validItems) {
 		const alreadyChecked = checkedLocations.some((location) => {
 			return (
-				location.ownerItemId === current.item.location.ownerItemId &&
-				location.lineId === current.item.location.lineId &&
-				location.inputIndex === current.item.location.inputIndex
+				location.ownerItemId === current.location.ownerItemId &&
+				location.lineId === current.location.lineId &&
+				location.inputIndex === current.location.inputIndex
 			);
 		});
-		if (alreadyChecked) {
-			continue;
-		}
-		checkedLocations.push(current.item.location);
+		if (alreadyChecked) continue;
+		checkedLocations.push(current.location);
 
 		const items = validItems.filter((candidate) => {
 			return (
-				candidate.item.location.ownerItemId === current.item.location.ownerItemId &&
-				candidate.item.location.lineId === current.item.location.lineId &&
-				candidate.item.location.inputIndex === current.item.location.inputIndex
+				candidate.location.ownerItemId === current.location.ownerItemId &&
+				candidate.location.lineId === current.location.lineId &&
+				candidate.location.inputIndex === current.location.inputIndex
 			);
 		});
 		const storedQuantity = items.reduce((quantity, candidate) => {
@@ -120,9 +142,9 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		});
 		if (storedQuantity > resolution.maxStoredQuantity) {
 			capacityIssues.push({
-				ownerItemId: current.item.location.ownerItemId,
-				lineId: current.item.location.lineId,
-				inputIndex: current.item.location.inputIndex,
+				ownerItemId: current.location.ownerItemId,
+				lineId: current.location.lineId,
+				inputIndex: current.location.inputIndex,
 				itemIds: items.map((candidate) => candidate.item.id),
 				storedQuantity,
 				maxStoredQuantity: resolution.maxStoredQuantity,

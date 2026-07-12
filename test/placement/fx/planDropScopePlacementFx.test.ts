@@ -58,6 +58,7 @@ describe("planDropScopePlacementFx", () => {
 					});
 				}),
 			],
+			jobs: [],
 		} satisfies RuntimeSchema.Type;
 
 		const result = run(
@@ -105,6 +106,7 @@ describe("planDropScopePlacementFx", () => {
 					quantity: 1,
 				}),
 			],
+			jobs: [],
 		} satisfies RuntimeSchema.Type;
 
 		const plan = run(
@@ -162,6 +164,7 @@ describe("planDropScopePlacementFx", () => {
 					quantity: 1,
 				}),
 			],
+			jobs: [],
 		} satisfies RuntimeSchema.Type;
 
 		const plan = run(

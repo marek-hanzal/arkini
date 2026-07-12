@@ -43,6 +43,7 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 			});
 
 			const nextRuntime = {
+				...runtime,
 				items: runtime.items.filter((candidate) => candidate.id !== itemId),
 			} satisfies RuntimeSchema.Type;
 

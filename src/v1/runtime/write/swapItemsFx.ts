@@ -99,6 +99,7 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				second: swappedSecond,
 			} satisfies SwapItemsResultSchema.Type;
 			const nextRuntime = {
+				...runtime,
 				items: runtime.items.map((candidate) => {
 					if (candidate.id === firstItemId) {
 						return swappedFirst;

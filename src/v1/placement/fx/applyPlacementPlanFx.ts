@@ -50,6 +50,7 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 
 	const spawnedItems = plan.spawn.map(({ item }) => item);
 	const nextRuntime = {
+		...runtime,
 		items: [
 			...updatedItems,
 			...spawnedItems,

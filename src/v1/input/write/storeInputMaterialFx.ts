@@ -11,7 +11,7 @@ import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import { filterInputMaterialItems } from "~/v1/input/read/filterInputMaterialItems";
+import { filterInputSlotItemsFx } from "~/v1/input/read/filterInputSlotItemsFx";
 import { readItemMaterialInputFx } from "~/v1/input/read/readItemMaterialInputFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/v1/runtime/read/readRuntimeItemByIdFx";
@@ -79,12 +79,13 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				ownerItemId,
 			});
 
-			const storedQuantity = filterInputMaterialItems({
+			const storedItems = yield* filterInputSlotItemsFx({
 				inputIndex,
 				items: runtime.items,
 				lineId,
 				ownerItemId,
-			}).reduce((total, item) => total + item.quantity, 0);
+			});
+			const storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
 			const plan = yield* planInputMaterialStoreFx({
 				input,
 				item: source,

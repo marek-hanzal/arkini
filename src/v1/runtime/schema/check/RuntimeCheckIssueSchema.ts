@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+import { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
+import { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
+import { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
+import { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
+import { JobReservationMismatchIssueSchema } from "~/v1/job/schema/JobReservationMismatchIssueSchema";
+import { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
+import { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { InputCapacityExceededIssueSchema } from "~/v1/input/schema/check/InputCapacityExceededIssueSchema";
 import { InputLineMissingIssueSchema } from "~/v1/input/schema/check/InputLineMissingIssueSchema";
 import { InputOwnerMissingIssueSchema } from "~/v1/input/schema/check/InputOwnerMissingIssueSchema";
@@ -17,6 +24,13 @@ import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
  */
 export const RuntimeCheckIssueSchema = z
 	.discriminatedUnion("type", [
+		DuplicateJobIdIssueSchema,
+		JobOwnerMissingIssueSchema,
+		JobLineMissingIssueSchema,
+		JobQueueExceededIssueSchema,
+		JobTimeInvalidIssueSchema,
+		JobReservationMissingIssueSchema,
+		JobReservationMismatchIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,
 		ItemStackSizeIssueSchema,

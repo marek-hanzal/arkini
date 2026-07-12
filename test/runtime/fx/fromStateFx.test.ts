@@ -77,6 +77,8 @@ const state = StateSchema.parse({
 			revision: "revision:inventory-tree",
 		},
 	],
+
+	jobs: [],
 });
 
 describe("fromStateFx", () => {
@@ -215,6 +217,8 @@ describe("fromStateFx", () => {
 					itemId: "missing",
 				};
 			}),
+
+			jobs: [],
 		});
 		const result = Effect.runSync(
 			Effect.either(

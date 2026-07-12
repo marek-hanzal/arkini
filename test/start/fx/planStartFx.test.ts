@@ -12,6 +12,7 @@ describe("planStartFx", () => {
 			Effect.gen(function* () {
 				const runtime = {
 					items: [],
+					jobs: [],
 				};
 				const plan = yield* planStartFx({
 					runtime,
@@ -76,6 +77,7 @@ describe("planStartFx", () => {
 				planStartFx({
 					runtime: {
 						items: [],
+						jobs: [],
 					},
 					start: {
 						board: [

@@ -27,5 +27,6 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 
 	return {
 		items,
+		jobs: runtime.jobs,
 	} satisfies StateSchema.Type;
 });

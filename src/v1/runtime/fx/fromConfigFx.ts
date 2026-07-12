@@ -11,5 +11,6 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 	return {
 		items: [] as RuntimeSchema.Type["items"],
+		jobs: [] as RuntimeSchema.Type["jobs"],
 	} satisfies RuntimeSchema.Type;
 });

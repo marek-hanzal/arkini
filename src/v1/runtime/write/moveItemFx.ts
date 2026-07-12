@@ -91,6 +91,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 			} satisfies MoveItemResultSchema.Type;
 
 			const nextRuntime = {
+				...runtime,
 				items: runtime.items.map((candidate) => {
 					return candidate.id === itemId ? movedItem : candidate;
 				}),

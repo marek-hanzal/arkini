@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { JobSchema } from "~/v1/job/schema/JobSchema";
 import { StateItemSchema } from "./StateItemSchema";
 
 /**
@@ -14,11 +15,14 @@ export const StateSchema = z
 		 * Every persisted live item owned by the saved game.
 		 */
 		items: z.array(StateItemSchema).describe("Every persisted live item in the saved game."),
+		/** Every persisted active product-line run. */
+		jobs: z.array(JobSchema).describe("Every persisted active product-line run."),
 	})
 	.strict()
 	.meta({
 		id: "StateSchema",
-		description: "Serializable gameplay state composed of persisted live items.",
+		description:
+			"Serializable gameplay state composed of persisted live items and active jobs.",
 	});
 
 export type StateSchema = typeof StateSchema;

@@ -1,0 +1,37 @@
+import { Effect } from "effect";
+
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
+import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { readInputSlotLocationFx } from "./readInputSlotLocationFx";
+
+export namespace filterInputSlotItemsFx {
+	export interface Props {
+		inputIndex: NonNegativeIntegerSchema.Type;
+		items: RuntimeItemSchema.Type[];
+		lineId: IdSchema.Type;
+		ownerItemId: IdSchema.Type;
+	}
+}
+
+/** Filters buffered and reserved materials occupying one concrete input slot. */
+export const filterInputSlotItemsFx = Effect.fn("filterInputSlotItemsFx")(function* ({
+	inputIndex,
+	items,
+	lineId,
+	ownerItemId,
+}: filterInputSlotItemsFx.Props) {
+	return yield* Effect.filter(items, (item) => {
+		return readInputSlotLocationFx({
+			item,
+		}).pipe(
+			Effect.map((location) => {
+				return (
+					location?.ownerItemId === ownerItemId &&
+					location.lineId === lineId &&
+					location.inputIndex === inputIndex
+				);
+			}),
+		);
+	});
+});

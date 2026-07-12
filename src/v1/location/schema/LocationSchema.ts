@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { GridLocationSchema } from "./GridLocationSchema";
 import { InputLocationSchema } from "./InputLocationSchema";
+import { JobLocationSchema } from "./JobLocationSchema";
 
 /**
  * The concrete runtime or persisted location owned by one live item.
@@ -13,10 +14,12 @@ export const LocationSchema = z
 	.discriminatedUnion("scope", [
 		GridLocationSchema,
 		InputLocationSchema,
+		JobLocationSchema,
 	])
 	.meta({
 		id: "LocationSchema",
-		description: "The concrete grid or line-input location owned by one live item.",
+		description:
+			"The concrete grid, line-input, or active-job location owned by one live item.",
 	});
 
 export type LocationSchema = typeof LocationSchema;

@@ -89,6 +89,7 @@ describe("checkRuntimeInputLocationsFx", () => {
 						quantity: 3,
 					}),
 				],
+				jobs: [],
 			}),
 		);
 

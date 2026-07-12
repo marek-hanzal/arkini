@@ -44,6 +44,37 @@ describe("completed config reference validation", () => {
 		);
 	});
 
+	it("reports category record key and embedded ID mismatches", async () => {
+		const root = createRootSource();
+		const result = await Effect.runPromise(
+			compileGameSourcesFx([
+				{
+					...root,
+					value: {
+						...root.value,
+						categories: {
+							"category:key": {
+								id: "category:embedded",
+								title: "Embedded",
+							},
+						},
+					},
+				},
+			]),
+		);
+
+		expect(result.diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: "config:key-id-mismatch",
+					entity: "category",
+					key: "category:key",
+					id: "category:embedded",
+				}),
+			]),
+		);
+	});
+
 	it("reports missing start, category, selector, and output item references together", async () => {
 		const producer = {
 			...createProducerItem({

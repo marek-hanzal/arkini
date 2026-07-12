@@ -2,6 +2,7 @@ import { Args, Command } from "@effect/cli";
 import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/v1/pack/fx/packDirectoryFx";
+import { renderGameDiagnosticsFx } from "~/v1/validation/fx/renderGameDiagnosticsFx";
 
 export namespace PackCommand {
 	export interface Props {
@@ -24,7 +25,14 @@ export const PackCommand = ({ input }: PackCommand.Props) =>
 			Effect.gen(function* () {
 				const result = yield* packDirectoryFx({
 					input,
-				});
+				}).pipe(
+					Effect.catchTag("GameValidationError", (error) =>
+						renderGameDiagnosticsFx(error.diagnostics).pipe(
+							Effect.zipRight(Effect.fail(error)),
+						),
+					),
+				);
+				yield* renderGameDiagnosticsFx(result.diagnostics);
 
 				yield* Console.log(
 					`Packed ${result.json} JSON sources and ${result.png} PNG assets.`,

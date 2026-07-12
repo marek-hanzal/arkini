@@ -51,6 +51,10 @@ describe("packDirectoryFx", () => {
 								height: 7,
 							},
 						},
+						start: {
+							board: [],
+							inventory: [],
+						},
 						categories: {},
 					}),
 				);
@@ -86,5 +90,61 @@ describe("packDirectoryFx", () => {
 				bytes: png,
 			},
 		]);
+	});
+
+	it("fails through the completed-game validation boundary", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
+				const path = yield* Path.Path;
+				const directory = yield* fileSystem.makeTempDirectoryScoped();
+				const input = path.join(directory, "invalid");
+
+				yield* fileSystem.makeDirectory(input, {
+					recursive: true,
+				});
+				yield* fileSystem.writeFileString(
+					path.join(input, "game.json"),
+					JSON.stringify({
+						version: "1.0",
+						meta: {
+							id: "invalid",
+							title: "Invalid",
+							board: {
+								width: 1,
+								height: 1,
+							},
+							inventory: {
+								width: 1,
+								height: 1,
+							},
+						},
+						categories: {},
+						items: {},
+					}),
+				);
+
+				return yield* Effect.either(
+					packDirectoryFx({
+						input,
+					}),
+				);
+			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+		);
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "GameValidationError",
+				diagnostics: expect.arrayContaining([
+					expect.objectContaining({
+						code: "config:schema",
+						path: [
+							"start",
+						],
+					}),
+				]),
+			},
+		});
 	});
 });

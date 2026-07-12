@@ -1,6 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 
+import { GameSourceFileSchema } from "~/v1/compiler/schema/GameSourceFileSchema";
 import { GameSourceSchema } from "~/v1/schema/GameSourceSchema";
 
 export namespace readJsonSourceFx {
@@ -19,5 +20,5 @@ export const readJsonSourceFx = Effect.fn("readJsonSourceFx")(function* ({
 	return {
 		path,
 		value,
-	} as const;
+	} satisfies GameSourceFileSchema.Type;
 });

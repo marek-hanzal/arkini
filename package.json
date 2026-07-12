@@ -13,6 +13,7 @@
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"game:pack": "tsx cli/arkini.ts pack",
+		"game:validate": "tsx cli/arkini.ts validate",
 		"game:schema": "tsx cli/arkini.ts schema"
 	},
 	"dependencies": {

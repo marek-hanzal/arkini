@@ -191,9 +191,8 @@ describe("startFx", () => {
 		expect(result.runtime.items).toEqual([]);
 	});
 
-	it("boots the current Arkini authoring config into a valid runtime", () => {
-		const source = readArkiniGameConfigSource();
-		const config = GameConfigSchema.parse(source.value);
+	it("boots the current Arkini authoring config into a valid runtime", async () => {
+		const config = GameConfigSchema.parse(await readArkiniGameConfigSource());
 		const runtime = Effect.runSync(
 			startFx().pipe(
 				useGameFx({

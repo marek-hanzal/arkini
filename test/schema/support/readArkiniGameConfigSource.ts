@@ -1,27 +1,19 @@
-import { readArkiniGameSources } from "~test/schema/support/readArkiniGameSources";
+import { NodeContext } from "@effect/platform-node";
+import { Effect } from "effect";
 
-/**
- * Reads and merges the current fragmented Arkini authoring sources into one root config value.
- */
-export const readArkiniGameConfigSource = () => {
-	const sources = readArkiniGameSources();
-	const root = sources.find(({ path }) => path.endsWith("/game.json"));
-	const items = sources.reduce<Record<string, unknown>>((result, source) => {
-		const value = source.value as {
-			readonly items?: Record<string, unknown>;
-		};
+import { compileGameDirectoryFx } from "~/v1/compiler/fx/compileGameDirectoryFx";
+import { assertGameConfigValidFx } from "~/v1/validation/fx/assertGameConfigValidFx";
 
-		return {
-			...result,
-			...value.items,
-		};
-	}, {});
+const ArkiniDirectory = new URL("../../../game/arkini/", import.meta.url).pathname;
 
-	return {
-		root,
-		value: {
-			...(root?.value as object),
-			items,
-		},
-	};
-};
+/** Reads the current authoring directory through the production completed-game compiler. */
+export const readArkiniGameConfigSource = () =>
+	Effect.runPromise(
+		Effect.gen(function* () {
+			const result = yield* compileGameDirectoryFx({
+				input: ArkiniDirectory,
+			});
+
+			return yield* assertGameConfigValidFx(result);
+		}).pipe(Effect.provide(NodeContext.layer)),
+	);

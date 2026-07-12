@@ -3,9 +3,10 @@ import { gzip } from "node:zlib";
 import { FileSystem, Path } from "@effect/platform";
 import { Effect } from "effect";
 
+import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
+import { assertGameConfigValidFx } from "~/v1/validation/fx/assertGameConfigValidFx";
 import { collectSourceFilesFx } from "./collectSourceFilesFx";
 import { encodeFx } from "./encodeFx";
-import { mergeSourceFx } from "./mergeSourceFx";
 import { readJsonSourceFx } from "./readJsonSourceFx";
 import { readPngAssetFx } from "./readPngAssetFx";
 
@@ -37,7 +38,8 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 			path: assetPath,
 		}),
 	);
-	const config = yield* mergeSourceFx(jsonSources.map((source) => source.value));
+	const compilation = yield* compileGameSourcesFx(jsonSources);
+	const config = yield* assertGameConfigValidFx(compilation);
 	const bytes = yield* encodeFx({
 		config,
 		resources: pngAssets,
@@ -62,5 +64,6 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		json: jsonSources.length,
 		png: pngAssets.length,
 		bytes: compressed.byteLength,
+		diagnostics: compilation.diagnostics,
 	} as const;
 });

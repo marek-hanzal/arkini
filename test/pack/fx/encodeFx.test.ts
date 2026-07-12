@@ -10,7 +10,24 @@ describe("encodeFx", () => {
 			encodeFx({
 				config: {
 					version: "1.0",
-					kept: true,
+					meta: {
+						id: "game:test",
+						title: "Test",
+						board: {
+							width: 1,
+							height: 1,
+						},
+						inventory: {
+							width: 1,
+							height: 1,
+						},
+					},
+					start: {
+						board: [],
+						inventory: [],
+					},
+					categories: {},
+					items: {},
 				},
 				resources: [
 					{
@@ -29,7 +46,24 @@ describe("encodeFx", () => {
 		expect(decoded).toEqual({
 			config: {
 				version: "1.0",
-				kept: true,
+				meta: {
+					id: "game:test",
+					title: "Test",
+					board: {
+						width: 1,
+						height: 1,
+					},
+					inventory: {
+						width: 1,
+						height: 1,
+					},
+				},
+				start: {
+					board: [],
+					inventory: [],
+				},
+				categories: {},
+				items: {},
 			},
 			resources: [
 				{

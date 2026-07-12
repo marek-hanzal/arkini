@@ -60,6 +60,7 @@ export const createGameSession = async <SaveError>({
 		RuntimeChangesFx.pipe(
 			Effect.flatMap((service) =>
 				service.changes.pipe(
+					Stream.drop(1),
 					Stream.runForEach((runtime) =>
 						Effect.sync(() => {
 							snapshot = runtime;

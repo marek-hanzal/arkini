@@ -2,6 +2,8 @@
 
 Implementation baseline: `3f22ec50`
 
+Follow-up integration cleanup: pending commit
+
 ## Final topology
 
 One loaded game owns one long-lived `ManagedRuntime`.
@@ -84,6 +86,8 @@ The same runtime is used by UI commands, Tick, save and events. Never rebuild th
 
 The session acquires its PubSub subscription before being exposed, so the first command cannot outrun the event consumer.
 
+The synchronous snapshot is loaded before subscriptions start. The runtime stream drops its initial current-value emission because React already owns that exact snapshot; attaching a subscriber must not manufacture a fake runtime change or gratuitous render.
+
 ### React
 
 - `GameSessionProvider` provides one stable session.
@@ -108,7 +112,8 @@ GameEventsFx     → one-shot facts for animation, sound and telemetry
 - serializes runtime through `fromRuntimeFx`;
 - failed mutations emit no snapshot and therefore trigger no save;
 - explicit flush and session disposal persist the latest committed runtime;
-- duplicate flushes of the same runtime object are suppressed.
+- duplicate flushes of the same runtime object are suppressed;
+- no decorative pending-state mirror is kept: flush reads the current canonical runtime and compares it with the last successfully saved snapshot.
 
 The save port is an Effect callback. Dexie can implement that port later without entering engine domains.
 
@@ -155,6 +160,7 @@ A UI animation or sound subsystem may introduce its own local Queue only after a
 ## Tests added
 
 - one ManagedRuntime persists command state and updates synchronous UI snapshots;
+- attaching React subscribers does not emit a fake initial change;
 - no-op Tick does not notify React subscribers;
 - production scoped Tick loop completes a job from Effect Clock;
 - explicit and queued jobs publish ordered event batches;

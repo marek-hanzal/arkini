@@ -30,7 +30,6 @@ export const RuntimeSaveLayerFx = <Error>({
 		Effect.gen(function* () {
 			const runtimeChanges = yield* RuntimeChangesFx;
 			const runtimeFx = yield* RuntimeFx;
-			const pending = yield* Ref.make<RuntimeSchema.Type | undefined>(undefined);
 			const lastSaved = yield* Ref.make<RuntimeSchema.Type | undefined>(undefined);
 
 			const persistRuntimeFx = (runtime: RuntimeSchema.Type) =>
@@ -39,11 +38,6 @@ export const RuntimeSaveLayerFx = <Error>({
 				}).pipe(
 					Effect.flatMap(save),
 					Effect.tap(() => Ref.set(lastSaved, runtime)),
-					Effect.tap(() =>
-						Ref.update(pending, (current) =>
-							current === runtime ? undefined : current,
-						),
-					),
 				);
 
 			const flush = Effect.all([
@@ -53,12 +47,10 @@ export const RuntimeSaveLayerFx = <Error>({
 				Effect.flatMap(([runtime, saved]) =>
 					runtime === saved ? Effect.void : persistRuntimeFx(runtime),
 				),
-				Effect.zipRight(Ref.set(pending, undefined)),
 			);
 
 			const stream = runtimeChanges.changes.pipe(
 				Stream.drop(1),
-				Stream.tap((runtime) => Ref.set(pending, runtime)),
 				debounceMs > 0 ? Stream.debounce(`${debounceMs} millis`) : (value) => value,
 				Stream.runForEach((runtime) =>
 					persistRuntimeFx(runtime).pipe(

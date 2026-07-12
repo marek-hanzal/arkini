@@ -19,6 +19,25 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 };
 
 describe("createGameSession", () => {
+	it("does not notify React subscribers merely for attaching to the initial snapshot", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let notifications = 0;
+		const unsubscribe = session.subscribe(() => {
+			notifications += 1;
+		});
+
+		try {
+			await new Promise((resolve) => setTimeout(resolve, 20));
+			expect(notifications).toBe(0);
+		} finally {
+			unsubscribe();
+			await session.dispose();
+		}
+	});
+
 	it("keeps one managed runtime for commands and synchronous UI snapshots", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),

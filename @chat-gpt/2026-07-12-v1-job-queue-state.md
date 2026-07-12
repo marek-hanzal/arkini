@@ -42,6 +42,9 @@
 - Generic item mutations reject job-scoped items through `assertNonJobScopeFx`.
 - Completion removes all reservation representations, releases all reserved resources through standard drop placement, resolves output through standard output placement, and removes the job.
 - Completion is all-or-nothing. Partial reservation release or partial output placement is forbidden.
+- Capacity or `maxCount` blocking is a valid ready-job state: the job and every reservation remain unchanged and completion is retried on later fixed steps.
+- One blocked completion does not rollback time or successful completion for unrelated owners in the same step.
+- Invalid replacement semantics and unexpected invariant failures remain real Tick failures and retain the unconsumed Tick budget.
 - No historical slot, position, runtime instance identity, or source stack is retained.
 
 ## Current implementation boundaries

@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
@@ -194,37 +194,37 @@ describe("job board and inventory flow", () => {
 		expect(inventoryItems).toHaveLength(2);
 		expect(result.runtime.items.filter((item) => item.item.id === "blocker")).toHaveLength(9);
 	});
-	it("keeps a failed elapsed budget pending and retries it after capacity returns", () => {
+	it("keeps a blocked completion ready and retries it after capacity returns", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
 				yield* startLineFx(props);
 				yield* fillFreeBoardFx();
-				const before = yield* readRuntimeFx();
 
-				const attempt = yield* Effect.either(
-					runTickRuntimeByFx({
-						elapsedMs: 2_500,
-					}),
-				);
-				const afterFailure = yield* readRuntimeFx();
-				const pendingAfterFailure = yield* (yield* TickFx).read;
-				const blocker = afterFailure.items.find((item) => item.item.id === "blocker");
+				yield* runTickRuntimeByFx({
+					elapsedMs: 2_500,
+				});
+				const blocked = yield* readRuntimeFx();
+				const pendingAfterBlocked = yield* (yield* TickFx).read;
+				const blocker = blocked.items.find((item) => item.item.id === "blocker");
 				if (blocker === undefined) throw new Error("Expected a board blocker.");
 				yield* removeItemFx({
 					itemId: blocker.id,
 					revision: blocker.revision,
 				});
 				yield* runTickRuntimeByFx({
-					elapsedMs: 0,
+					elapsedMs: 100,
+				});
+				const resumed = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 1_000,
 				});
 				return {
-					attempt,
-					afterFailure,
-					afterRetry: yield* readRuntimeFx(),
-					before,
-					pendingAfterFailure,
+					blocked,
+					completed: yield* readRuntimeFx(),
+					pendingAfterBlocked,
+					resumed,
 					settledTick: yield* (yield* TickFx).read,
 				};
 			}).pipe(
@@ -234,19 +234,21 @@ describe("job board and inventory flow", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		expect(result.afterFailure).toEqual(result.before);
-		expect(result.afterFailure.jobs).toHaveLength(1);
-		expect(result.afterFailure.jobQueue).toHaveLength(1);
-		expect(
-			result.afterFailure.items.filter((item) => item.location.scope === "job"),
-		).toHaveLength(1);
-		expect(result.afterFailure.items.filter((item) => item.item.id === "ingot")).toEqual([]);
-		expect(result.pendingAfterFailure.pendingElapsedMs).toBe(2_500);
-		expect(result.afterRetry.jobs).toEqual([]);
-		expect(result.afterRetry.jobQueue).toEqual([]);
-		expect(result.afterRetry.items.some((item) => item.location.scope === "job")).toBe(false);
-		expect(result.settledTick.pendingElapsedMs).toBe(100);
+		expect(result.blocked.jobs).toHaveLength(1);
+		expect(result.blocked.jobs[0]?.remainingMs).toBe(0);
+		expect(result.blocked.jobQueue).toHaveLength(1);
+		expect(result.blocked.items.filter((item) => item.location.scope === "job")).toHaveLength(
+			1,
+		);
+		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
+		expect(result.pendingAfterBlocked.pendingElapsedMs).toBe(100);
+		expect(result.resumed.jobs).toHaveLength(1);
+		expect(result.resumed.jobs[0]?.remainingMs).toBe(1_000);
+		expect(result.resumed.jobQueue).toEqual([]);
+		expect(result.completed.jobs).toEqual([]);
+		expect(result.completed.jobQueue).toEqual([]);
+		expect(result.completed.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(result.settledTick.pendingElapsedMs).toBe(0);
 	});
 
 	it("pauses a queued production flow without consuming elapsed time and resumes the whole chain later", () => {

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { GameEventSchema } from "~/v1/event/schema/GameEventSchema";
-import { completeJobRuntimeFx } from "~/v1/job/fx/completeJobRuntimeFx";
+import { attemptJobCompletionFx } from "~/v1/job/fx/attemptJobCompletionFx";
 import { resolveJobRunnableFx } from "~/v1/job/fx/resolveJobRunnableFx";
 import { reviseJobFx } from "~/v1/job/fx/reviseJobFx";
 import { startLineRuntimeFx } from "~/v1/job/fx/startLineRuntimeFx";
@@ -125,10 +125,12 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	for (const job of jobs) {
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
 		if (liveJob === undefined || liveJob.remainingMs !== 0) continue;
-		draft = yield* completeJobRuntimeFx({
+		const completion = yield* attemptJobCompletionFx({
 			job: liveJob,
 			runtime: draft,
 		});
+		if (completion.type === "blocked") continue;
+		draft = completion.runtime;
 		events.push({
 			type: "job:completed",
 			jobId: liveJob.id,

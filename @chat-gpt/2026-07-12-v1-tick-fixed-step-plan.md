@@ -45,12 +45,13 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Never let an explicit start overtake an older queued request.
 - [x] Append newer explicit requests behind existing FIFO work when capacity permits.
 
-### Block 4: blocked completion isolation
+### Completed block 4: blocked completion isolation
 
-- One completion remains reservation/output/job-removal all-or-nothing.
-- Expected placement blocking leaves that job ready and its reservations locked.
-- Other owners continue through the same fixed step.
-- Unexpected defects/invariant failures rollback the whole step and retain its Tick budget.
+- [x] One completion remains reservation/output/job-removal all-or-nothing.
+- [x] Capacity and max-count placement blocking leave that job ready and its reservations locked.
+- [x] Other owners continue and commit through the same fixed step.
+- [x] Invalid replacement semantics and unexpected defects still rollback the whole advancement and retain its Tick budget.
+- [x] A later fixed step retries the ready completion after capacity changes.
 
 ### Block 5: session command shutdown
 

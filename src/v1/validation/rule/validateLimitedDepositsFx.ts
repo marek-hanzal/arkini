@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
 
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
@@ -18,7 +19,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 	config,
 	provenance,
 }: validateLimitedDepositsFx.Props) {
-	const produced = new Set<string>();
+	const produced = new Set<IdSchema.Type>();
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
 			if (merge.effect === "replace") {

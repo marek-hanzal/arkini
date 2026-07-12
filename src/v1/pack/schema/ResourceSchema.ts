@@ -1,10 +1,11 @@
 import { z } from "zod";
 
+import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonEmptyStringSchema } from "~/v1/common/schema/NonEmptyStringSchema";
 
 export const ResourceSchema = z
 	.object({
-		id: NonEmptyStringSchema.describe("The stable resource identifier."),
+		id: IdSchema.describe("The stable resource identifier."),
 		mime: NonEmptyStringSchema.describe("The MIME type of the resource bytes."),
 		bytes: z
 			.custom<Uint8Array>((value) => value instanceof Uint8Array)

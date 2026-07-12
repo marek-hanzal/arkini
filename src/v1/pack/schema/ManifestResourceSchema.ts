@@ -1,11 +1,12 @@
 import { z } from "zod";
 
+import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonEmptyStringSchema } from "~/v1/common/schema/NonEmptyStringSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 
 export const ManifestResourceSchema = z
 	.object({
-		id: NonEmptyStringSchema.describe("The stable resource identifier."),
+		id: IdSchema.describe("The stable resource identifier."),
 		mime: NonEmptyStringSchema.describe("The MIME type of the resource bytes."),
 		length: NonNegativeIntegerSchema.describe("The resource payload size in bytes."),
 	})

@@ -1,14 +1,15 @@
 import { z } from "zod";
 
 /**
- * A generic non-empty configuration identifier.
+ * The single scalar contract for every exact identity in Arkini.
  *
- * Its domain and cross-reference validity are enforced by the configuration
- * schemas that consume it, not by this scalar schema.
+ * Domain meaning belongs to the field name and its owning schema. Reference,
+ * uniqueness and lifecycle rules are enforced by the relevant compiler or
+ * runtime boundary, not by parallel domain-specific ID scalar schemas.
  */
 export const IdSchema = z.string().min(1).meta({
 	id: "IdSchema",
-	description: "A non-empty configuration identifier.",
+	description: "A non-empty exact identity used across Arkini.",
 });
 
 export type IdSchema = typeof IdSchema;

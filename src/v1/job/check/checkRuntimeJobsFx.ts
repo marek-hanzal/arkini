@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
 
 import type { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
@@ -33,7 +34,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const reservationMissingIssues: JobReservationMissingIssueSchema.Type[] = [];
 	const reservationMismatchIssues: JobReservationMismatchIssueSchema.Type[] = [];
 
-	const seenJobIds = new Set<string>();
+	const seenJobIds = new Set<IdSchema.Type>();
 	for (const job of runtime.jobs) {
 		if (seenJobIds.has(job.id)) {
 			duplicateIssues.push({
@@ -83,7 +84,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		}
 	}
 
-	const checkedOwners = new Set<string>();
+	const checkedOwners = new Set<IdSchema.Type>();
 	for (const job of runtime.jobs) {
 		if (checkedOwners.has(job.ownerItemId)) continue;
 		checkedOwners.add(job.ownerItemId);

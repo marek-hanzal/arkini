@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { MaterialInputEdgeSchema } from "../schema/MaterialInputEdgeSchema";
@@ -13,7 +14,7 @@ export namespace validateInputAcceptanceCyclesFx {
 	}
 }
 
-const readCycleKey = (cycle: ReadonlyArray<string>) => {
+const readCycleKey = (cycle: ReadonlyArray<IdSchema.Type>) => {
 	const nodes = cycle.slice(0, -1);
 	const rotations = nodes.map((_, index) =>
 		[
@@ -32,7 +33,7 @@ export const validateInputAcceptanceCyclesFx = Effect.fn("validateInputAcceptanc
 			config,
 			provenance,
 		});
-		const adjacency: Record<string, MaterialInputEdgeSchema.Type[]> = {};
+		const adjacency: Record<IdSchema.Type, MaterialInputEdgeSchema.Type[]> = {};
 		for (const edge of edges) {
 			adjacency[edge.ownerItemId] = [
 				...(adjacency[edge.ownerItemId] ?? []),
@@ -40,13 +41,13 @@ export const validateInputAcceptanceCyclesFx = Effect.fn("validateInputAcceptanc
 			];
 		}
 
-		const state: Record<string, "visiting" | "done" | undefined> = {};
-		const nodeStack: string[] = [];
+		const state: Record<IdSchema.Type, "visiting" | "done" | undefined> = {};
+		const nodeStack: IdSchema.Type[] = [];
 		const edgeStack: MaterialInputEdgeSchema.Type[] = [];
 		const reported = new Set<string>();
 		const diagnostics: GameDiagnosticsSchema.Type = [];
 
-		const visit = (itemId: string): void => {
+		const visit = (itemId: IdSchema.Type): void => {
 			state[itemId] = "visiting";
 			nodeStack.push(itemId);
 

@@ -84,8 +84,10 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 
 ### Block 6: runtime invariants and cleanup
 
-- Enforce at most one active job per owner.
-- Treat queue-only owners as explicit valid runtime state.
-- Remove the misleading unused owner queue time helper.
-- Permanent owner removal is forbidden while active or queued work exists.
-- Removing an idle owner releases its buffered input contents through the ordinary drop path.
+- [x] Enforce at most one active job per owner.
+- [x] Treat queue-only owners as explicit valid runtime state.
+- [x] Classify only missing inputs, disabled line state and inventory ownership as retryable queue blocks.
+- [x] Propagate missing owner, missing line and future structural start failures instead of retrying forever.
+- [ ] Remove the misleading unused owner queue time helper.
+- [ ] Permanent owner removal is forbidden while active or queued work exists.
+- [ ] Removing an idle owner releases its buffered input contents through the ordinary drop path.

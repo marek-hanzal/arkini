@@ -3,6 +3,7 @@ import { z } from "zod";
 import { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
 import { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
+import { JobOwnerMultipleActiveIssueSchema } from "~/v1/job/schema/JobOwnerMultipleActiveIssueSchema";
 import { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
 import { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
@@ -26,6 +27,7 @@ export const RuntimeCheckIssueSchema = z
 	.discriminatedUnion("type", [
 		DuplicateJobIdIssueSchema,
 		JobOwnerMissingIssueSchema,
+		JobOwnerMultipleActiveIssueSchema,
 		JobOwnerNotOnGridIssueSchema,
 		JobLineMissingIssueSchema,
 		JobQueueExceededIssueSchema,

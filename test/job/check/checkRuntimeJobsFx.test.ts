@@ -87,6 +87,7 @@ describe("checkRuntimeJobsFx", () => {
 			expect.arrayContaining([
 				"job:id:duplicate",
 				"job:owner-missing",
+				"job:owner:multiple-active",
 				"job:owner-not-on-grid",
 				"job:line-missing",
 				"job:queue-exceeded",
@@ -94,5 +95,33 @@ describe("checkRuntimeJobsFx", () => {
 				"job:reservation-missing",
 			]),
 		);
+	});
+
+	it("accepts a queue-only owner as a first-class runtime state", () => {
+		const runtime = {
+			items: [
+				owner,
+			],
+			jobs: [],
+			jobQueue: [
+				{
+					id: "job:queued",
+					ownerItemId: owner.id,
+					lineId: "line:forge:run",
+					revision: "revision:queued",
+				},
+			],
+		} satisfies RuntimeSchema.Type;
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([]);
 	});
 });

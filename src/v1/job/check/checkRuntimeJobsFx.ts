@@ -3,6 +3,7 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
 import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
+import type { JobOwnerMultipleActiveIssueSchema } from "~/v1/job/schema/JobOwnerMultipleActiveIssueSchema";
 import type { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
 import type { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
@@ -25,6 +26,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 }: checkRuntimeJobsFx.Props) {
 	const duplicateIssues: DuplicateJobIdIssueSchema.Type[] = [];
 	const ownerIssues: JobOwnerMissingIssueSchema.Type[] = [];
+	const multipleActiveIssues: JobOwnerMultipleActiveIssueSchema.Type[] = [];
 	const lineIssues: JobLineMissingIssueSchema.Type[] = [];
 	const ownerGridIssues: JobOwnerNotOnGridIssueSchema.Type[] = [];
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
@@ -83,6 +85,19 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			});
 	}
 
+	for (const ownerItemId of new Set(runtime.jobs.map((job) => job.ownerItemId))) {
+		const jobIds = runtime.jobs
+			.filter((job) => job.ownerItemId === ownerItemId)
+			.map((job) => job.id);
+		if (jobIds.length > 1) {
+			multipleActiveIssues.push({
+				ownerItemId,
+				jobIds,
+				type: "job:owner:multiple-active",
+			});
+		}
+	}
+
 	for (const ownerItemId of new Set(entries.map((entry) => entry.ownerItemId))) {
 		const owner = runtime.items.find((item) => item.id === ownerItemId);
 		if (owner === undefined) continue;
@@ -117,6 +132,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	return [
 		...duplicateIssues,
 		...ownerIssues,
+		...multipleActiveIssues,
 		...ownerGridIssues,
 		...lineIssues,
 		...queueIssues,

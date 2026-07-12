@@ -3,9 +3,9 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { GameEventSchema } from "~/v1/event/schema/GameEventSchema";
 import { attemptJobCompletionFx } from "~/v1/job/fx/attemptJobCompletionFx";
+import { attemptQueuedLineStartFx } from "~/v1/job/fx/attemptQueuedLineStartFx";
 import { resolveJobRunnableFx } from "~/v1/job/fx/resolveJobRunnableFx";
 import { reviseJobFx } from "~/v1/job/fx/reviseJobFx";
-import { startLineRuntimeFx } from "~/v1/job/fx/startLineRuntimeFx";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/v1/tick/TickStepMs";
@@ -29,35 +29,33 @@ const dispatchOwnerQueueFx = Effect.fn("dispatchOwnerQueueFx")(function* (
 	ownerItemId: IdSchema.Type,
 	runtime: RuntimeSchema.Type,
 ) {
-	const requestIndex = (runtime.jobQueue ?? []).findIndex(
-		(request) => request.ownerItemId === ownerItemId,
+	const request = (runtime.jobQueue ?? []).find(
+		(candidate) => candidate.ownerItemId === ownerItemId,
 	);
-	if (requestIndex < 0) return undefined;
-	const request = (runtime.jobQueue ?? [])[requestIndex];
-	if (request === undefined) return undefined;
-	const withoutRequest = {
-		...runtime,
-		jobQueue: (runtime.jobQueue ?? []).filter((_, index) => index !== requestIndex),
-	};
-	const started = yield* Effect.either(
-		startLineRuntimeFx({
-			ownerItemId: request.ownerItemId,
-			lineId: request.lineId,
-			runtime: withoutRequest,
-		}),
-	);
-	if (started._tag === "Left") return undefined;
-	const [job, nextRuntime] = started.right;
+	if (request === undefined) {
+		return {
+			type: "empty",
+			runtime,
+		} as const;
+	}
+
+	const attempt = yield* attemptQueuedLineStartFx({
+		request,
+		runtime,
+	});
+	if (attempt.type === "blocked") return attempt;
+
 	return {
+		type: "started",
 		event: {
 			type: "job:started",
-			jobId: job.id,
-			ownerItemId: job.ownerItemId,
-			lineId: job.lineId,
+			jobId: attempt.job.id,
+			ownerItemId: attempt.job.ownerItemId,
+			lineId: attempt.job.lineId,
 			source: "queue",
 		} satisfies GameEventSchema.Type,
-		runtime: nextRuntime,
-	};
+		runtime: attempt.runtime,
+	} as const;
 });
 
 const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(function* (
@@ -76,7 +74,7 @@ const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(functio
 	const events: GameEventSchema.Type[] = [];
 	for (const ownerItemId of queueOnlyOwnerItemIds) {
 		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
-		if (dispatched === undefined) continue;
+		if (dispatched.type !== "started") continue;
 		draft = dispatched.runtime;
 		events.push(dispatched.event);
 	}
@@ -146,7 +144,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		...new Set(completedOwnerItemIds),
 	].sort((first, second) => first.localeCompare(second))) {
 		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
-		if (dispatched === undefined) continue;
+		if (dispatched.type !== "started") continue;
 		draft = dispatched.runtime;
 		events.push(dispatched.event);
 	}

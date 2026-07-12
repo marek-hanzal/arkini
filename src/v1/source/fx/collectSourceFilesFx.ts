@@ -7,6 +7,7 @@ export namespace collectSourceFilesFx {
 	}
 }
 
+/** Collects deterministic JSON and PNG source paths from one authoring directory. */
 export const collectSourceFilesFx = Effect.fn("collectSourceFilesFx")(function* ({
 	input,
 }: collectSourceFilesFx.Props) {

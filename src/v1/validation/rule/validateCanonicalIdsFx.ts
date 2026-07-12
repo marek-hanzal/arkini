@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
+import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateCanonicalIdsFx {

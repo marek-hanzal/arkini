@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
-import { GameSourceProvenanceSchema } from "./GameSourceProvenanceSchema";
+import { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 
 export const GameCompilationResultSchema = z
 	.object({

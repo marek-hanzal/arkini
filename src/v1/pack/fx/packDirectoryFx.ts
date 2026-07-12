@@ -5,9 +5,9 @@ import { Effect } from "effect";
 
 import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
 import { assertGameConfigValidFx } from "~/v1/validation/fx/assertGameConfigValidFx";
-import { collectSourceFilesFx } from "./collectSourceFilesFx";
+import { collectSourceFilesFx } from "~/v1/source/fx/collectSourceFilesFx";
 import { encodeFx } from "./encodeFx";
-import { readJsonSourceFx } from "./readJsonSourceFx";
+import { readGameSourceFileFx } from "~/v1/source/fx/readGameSourceFileFx";
 import { readPngAssetFx } from "./readPngAssetFx";
 
 const gzipAsync = promisify(gzip);
@@ -29,7 +29,7 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		input,
 	});
 	const jsonSources = yield* Effect.forEach(sourceFiles.json, (sourcePath) =>
-		readJsonSourceFx({
+		readGameSourceFileFx({
 			path: sourcePath,
 		}),
 	);

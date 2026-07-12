@@ -1,18 +1,19 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 
-import { GameSourceFileSchema } from "~/v1/compiler/schema/GameSourceFileSchema";
+import { GameSourceFileSchema } from "~/v1/source/schema/GameSourceFileSchema";
 import { GameSourceSchema } from "~/v1/schema/GameSourceSchema";
 
-export namespace readJsonSourceFx {
+export namespace readGameSourceFileFx {
 	export interface Props {
 		path: string;
 	}
 }
 
-export const readJsonSourceFx = Effect.fn("readJsonSourceFx")(function* ({
+/** Parses one JSON authoring fragment together with its source path. */
+export const readGameSourceFileFx = Effect.fn("readGameSourceFileFx")(function* ({
 	path,
-}: readJsonSourceFx.Props) {
+}: readGameSourceFileFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const source = yield* fileSystem.readFileString(path);
 	const value = yield* Effect.sync(() => GameSourceSchema.parse(JSON.parse(source)));

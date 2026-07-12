@@ -4,8 +4,8 @@ import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { validateGameConfigFx } from "~/v1/validation/fx/validateGameConfigFx";
 import type { DiagnosticPathSchema } from "~/v1/validation/schema/DiagnosticPathSchema";
 import type { GameCompilationResultSchema } from "../schema/GameCompilationResultSchema";
-import type { GameSourceFileSchema } from "../schema/GameSourceFileSchema";
-import type { GameSourceProvenanceSchema } from "../schema/GameSourceProvenanceSchema";
+import type { GameSourceFileSchema } from "~/v1/source/schema/GameSourceFileSchema";
+import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import { assembleGameSourcesFx } from "./assembleGameSourcesFx";
 import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 

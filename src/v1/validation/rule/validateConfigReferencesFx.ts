@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
+import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";

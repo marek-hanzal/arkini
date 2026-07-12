@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
+import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import { readOutputItemIdsFx } from "../fx/readOutputItemIdsFx";

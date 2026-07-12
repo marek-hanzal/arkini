@@ -4,8 +4,8 @@ import { Effect } from "effect";
 
 import type { GameSourceSchema } from "~/v1/schema/GameSourceSchema";
 import type { GameSourceAssemblySchema } from "../schema/GameSourceAssemblySchema";
-import type { GameSourceFileSchema } from "../schema/GameSourceFileSchema";
-import type { GameSourceProvenanceSchema } from "../schema/GameSourceProvenanceSchema";
+import type { GameSourceFileSchema } from "~/v1/source/schema/GameSourceFileSchema";
+import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 /**

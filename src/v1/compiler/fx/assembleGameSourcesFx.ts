@@ -3,10 +3,10 @@ import path from "node:path";
 import { Effect } from "effect";
 
 import type { GameSourceSchema } from "~/v1/schema/GameSourceSchema";
-import type { GameDiagnosticSchema } from "~/v1/validation/schema/GameDiagnosticSchema";
 import type { GameSourceAssemblySchema } from "../schema/GameSourceAssemblySchema";
 import type { GameSourceFileSchema } from "../schema/GameSourceFileSchema";
 import type { GameSourceProvenanceSchema } from "../schema/GameSourceProvenanceSchema";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 /**
  * Assembles parsed source fragments without allowing later files to overwrite
@@ -24,7 +24,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 		categories: {},
 		items: {},
 	};
-	const diagnostics: GameDiagnosticSchema.Type[] = [];
+	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const source of sources) {
 		if (source.value.$schema !== undefined) {

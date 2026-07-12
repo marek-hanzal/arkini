@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import { readOutputMaximumReplaceFx } from "../fx/readOutputMaximumReplaceFx";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateOutputReplaceCardinalityFx {
 	export interface Props {
@@ -16,7 +16,7 @@ export namespace validateOutputReplaceCardinalityFx {
 /** Enforces one origin transformation per selected output result. */
 export const validateOutputReplaceCardinalityFx = Effect.fn("validateOutputReplaceCardinalityFx")(
 	function* ({ config, provenance }: validateOutputReplaceCardinalityFx.Props) {
-		const diagnostics: GameDiagnosticSchema.Type[] = [];
+		const diagnostics: GameDiagnosticsSchema.Type = [];
 
 		for (const [itemId, item] of Object.entries(config.items)) {
 			const outputs = yield* readItemOutputEntriesFx({

@@ -3,12 +3,12 @@ import { match } from "ts-pattern";
 
 import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import { validateLineReferencesFx } from "../fx/validateLineReferencesFx";
 import { validateOutputReferencesFx } from "../fx/validateOutputReferencesFx";
 import { validateSelectorReferenceFx } from "../fx/validateSelectorReferenceFx";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateConfigReferencesFx {
 	export interface Props {
@@ -22,7 +22,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 	config,
 	provenance,
 }: validateConfigReferencesFx.Props) {
-	const diagnostics: GameDiagnosticSchema.Type[] = [];
+	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [index, value] of config.start.board.entries()) {
 		if (config.items[value.itemId] !== undefined) {

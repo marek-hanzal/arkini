@@ -12,7 +12,7 @@ export namespace queryAnyFx {
 }
 
 /**
- * Selects matching items across every runtime location without a distance rule.
+ * Selects matching board and inventory items while ignoring non-grid runtime locations.
  */
 export const queryAnyFx = Effect.fn("queryAnyFx")(function* ({ query }: queryAnyFx.Props) {
 	const items = yield* getItemsFx();

@@ -81,7 +81,7 @@ export const placementTestConfig = GameConfigSchema.parse({
 		}),
 		replacement: simpleItem({
 			id: "replacement",
-			maxStackSize: 1,
+			maxStackSize: 3,
 			scope: "any",
 		}),
 		permit: simpleItem({

@@ -5,6 +5,7 @@ import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
 import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateSelectorReferenceFx {
 	export interface Props {
@@ -27,7 +28,7 @@ export const validateSelectorReferenceFx = Effect.fn("validateSelectorReferenceF
 			{
 				type: "tag",
 			},
-			() => [] as GameDiagnosticSchema.Type[],
+			() => [] as GameDiagnosticsSchema.Type,
 		)
 		.with(
 			{
@@ -35,7 +36,7 @@ export const validateSelectorReferenceFx = Effect.fn("validateSelectorReferenceF
 			},
 			({ itemId }) => {
 				if (config.items[itemId] !== undefined) {
-					return [] as GameDiagnosticSchema.Type[];
+					return [] as GameDiagnosticsSchema.Type;
 				}
 
 				return [

@@ -4,8 +4,8 @@ import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { DropSchema } from "~/v1/output/schema/DropSchema";
 import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateOutputReferencesFx {
 	export interface Props {
@@ -27,7 +27,7 @@ const validateDropFx = Effect.fn("validateOutputDropReferencesFx")(function* ({
 	path: DiagnosticPathSchema.Type;
 	source?: string;
 }) {
-	const diagnostics: GameDiagnosticSchema.Type[] = [];
+	const diagnostics: GameDiagnosticsSchema.Type = [];
 	if (config.items[drop.itemId] === undefined) {
 		diagnostics.push({
 			code: "config:missing-reference",
@@ -73,7 +73,7 @@ export const validateOutputReferencesFx = Effect.fn("validateOutputReferencesFx"
 	path,
 	source,
 }: validateOutputReferencesFx.Props) {
-	const diagnostics: GameDiagnosticSchema.Type[] = [];
+	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [setIndex, set] of output.set.entries()) {
 		for (const [rollIndex, roll] of set.roll.entries()) {

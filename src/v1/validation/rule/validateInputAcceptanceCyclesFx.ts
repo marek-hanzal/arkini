@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import type { MaterialInputEdgeSchema } from "../schema/MaterialInputEdgeSchema";
 import { collectMaterialInputEdgesFx } from "../fx/collectMaterialInputEdgesFx";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateInputAcceptanceCyclesFx {
 	export interface Props {
@@ -44,7 +44,7 @@ export const validateInputAcceptanceCyclesFx = Effect.fn("validateInputAcceptanc
 		const nodeStack: string[] = [];
 		const edgeStack: MaterialInputEdgeSchema.Type[] = [];
 		const reported = new Set<string>();
-		const diagnostics: GameDiagnosticSchema.Type[] = [];
+		const diagnostics: GameDiagnosticsSchema.Type = [];
 
 		const visit = (itemId: string): void => {
 			state[itemId] = "visiting";

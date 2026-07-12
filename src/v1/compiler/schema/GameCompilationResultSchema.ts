@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { GameDiagnosticSchema } from "~/v1/validation/schema/GameDiagnosticSchema";
+import { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 import { GameSourceProvenanceSchema } from "./GameSourceProvenanceSchema";
 
 export const GameCompilationResultSchema = z
 	.object({
 		config: GameConfigSchema.optional(),
-		diagnostics: z.array(GameDiagnosticSchema),
+		diagnostics: GameDiagnosticsSchema,
 		provenance: GameSourceProvenanceSchema,
 	})
 	.strict()

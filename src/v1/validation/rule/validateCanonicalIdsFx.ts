@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateCanonicalIdsFx {
 	export interface Props {
@@ -16,7 +16,7 @@ export const validateCanonicalIdsFx = Effect.fn("validateCanonicalIdsFx")(functi
 	config,
 	provenance,
 }: validateCanonicalIdsFx.Props) {
-	const diagnostics: GameDiagnosticSchema.Type[] = [];
+	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [key, category] of Object.entries(config.categories)) {
 		if (category.id === key) {

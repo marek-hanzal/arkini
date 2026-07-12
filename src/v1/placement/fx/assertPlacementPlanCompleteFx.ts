@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
+import { PlacementPlanInvalidError } from "~/v1/placement/error/PlacementPlanInvalidError";
 import { PlacementUnavailableError } from "~/v1/placement/error/PlacementUnavailableError";
 import type { PlacementFailureReasonEnumSchema } from "~/v1/placement/schema/PlacementFailureReasonEnumSchema";
 import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
@@ -28,9 +29,18 @@ export const assertPlacementPlanCompleteFx = Effect.fn("assertPlacementPlanCompl
 	const placedQuantity = yield* readPlacementPlanQuantityFx({
 		plan,
 	});
-	const remainingQuantity = quantity - placedQuantity;
-	if (remainingQuantity <= 0) {
+	if (placedQuantity === quantity) {
 		return plan;
+	}
+	if (placedQuantity > quantity) {
+		return yield* Effect.fail(
+			new PlacementPlanInvalidError({
+				itemId: drop.itemId,
+				placement: drop.placement,
+				requestedQuantity: quantity,
+				placedQuantity,
+			}),
+		);
 	}
 
 	return yield* Effect.fail(
@@ -39,7 +49,7 @@ export const assertPlacementPlanCompleteFx = Effect.fn("assertPlacementPlanCompl
 			placement: drop.placement,
 			quantity: drop.quantity,
 			reason,
-			remainingQuantity,
+			remainingQuantity: quantity - placedQuantity,
 		}),
 	);
 });

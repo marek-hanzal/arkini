@@ -1,8 +1,8 @@
 import { Data } from "effect";
 
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
+import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
 
 /** One completed-game compile or validation pass produced blocking diagnostics. */
 export class GameValidationError extends Data.TaggedError("GameValidationError")<{
-	diagnostics: ReadonlyArray<GameDiagnosticSchema.Type>;
+	diagnostics: GameDiagnosticsSchema.Type;
 }> {}

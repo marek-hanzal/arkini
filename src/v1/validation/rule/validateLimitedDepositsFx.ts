@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import type { GameSourceProvenanceSchema } from "~/v1/compiler/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import { readOutputItemIdsFx } from "../fx/readOutputItemIdsFx";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateLimitedDepositsFx {
 	export interface Props {
@@ -36,7 +36,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 		}
 	}
 
-	const diagnostics: GameDiagnosticSchema.Type[] = [];
+	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
 		if (item.type !== "deposit" || produced.has(itemId)) {
 			continue;

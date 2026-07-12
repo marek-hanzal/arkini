@@ -3,11 +3,11 @@ import { Effect } from "effect";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { validateGameConfigFx } from "~/v1/validation/fx/validateGameConfigFx";
 import type { DiagnosticPathSchema } from "~/v1/validation/schema/DiagnosticPathSchema";
-import type { GameDiagnosticSchema } from "~/v1/validation/schema/GameDiagnosticSchema";
 import type { GameCompilationResultSchema } from "../schema/GameCompilationResultSchema";
 import type { GameSourceFileSchema } from "../schema/GameSourceFileSchema";
 import type { GameSourceProvenanceSchema } from "../schema/GameSourceProvenanceSchema";
 import { assembleGameSourcesFx } from "./assembleGameSourcesFx";
+import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
 
 const readSourcePath = (
 	path: DiagnosticPathSchema.Type,
@@ -45,7 +45,7 @@ export const compileGameSourcesFx = Effect.fn("compileGameSourcesFx")(function* 
 ) {
 	const assembly = yield* assembleGameSourcesFx(sources);
 	const parsed = GameConfigSchema.safeParse(assembly.value);
-	const diagnostics: GameDiagnosticSchema.Type[] = [
+	const diagnostics: GameDiagnosticsSchema.Type = [
 		...assembly.diagnostics,
 	];
 

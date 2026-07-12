@@ -2,7 +2,7 @@
 
 Baseline review: `6bb12839`
 Implementation baseline: `538dd642`
-Updated through: `05401c80`
+Updated through: `86d158a8`
 
 ## Verified complete
 
@@ -37,7 +37,7 @@ Do not add further lifecycle handling. The existing offline input-acceptance cyc
 
 Reserved material remembers only its owning `jobId`.
 
-When completion or cancellation releases it, emit it through the ordinary drop-placement path. Do not retain or reconstruct:
+When completion releases it, emit it through the ordinary drop-placement path. Do not retain or reconstruct:
 
 - original input slot;
 - original grid position;
@@ -46,12 +46,13 @@ When completion or cancellation releases it, emit it through the ordinary drop-p
 
 A reserved item is detached from the input buffer while its job is active, so the buffer may be refilled for queued work.
 
-## Required before job completion/cancel
+## Required before job completion
 
-- [ ] Add one shared helper that releases reserved items through standard drop placement.
+- [ ] Add one internal helper that releases all reserved items through standard drop placement over one evolving runtime draft.
 - [ ] Completion must resolve the exact live job by ID + revision inside one transaction.
-- [ ] Completion must remove reservations, place outputs, and remove/update the job atomically.
-- [ ] Cancel must release reservations through standard drop placement and remove the job atomically.
+- [ ] Completion must release every reservation, place outputs, and remove the job atomically all-or-nothing.
+- [ ] Failed completion placement must preserve the job and every reservation unchanged.
+- [x] Generic remove and quantity mutation reject job-scoped reservations through `assertNonJobScopeFx`.
 - [ ] Define owner removal/move behavior while jobs are active.
 - [ ] Add architecture tests if new public write commands appear.
 
@@ -65,3 +66,5 @@ A reserved item is detached from the input buffer while its job is active, so th
 - Do not infer blueprint resources from target IDs; explicit tuples stay authoritative.
 - Do not create domain-specific ID schemas or aliases. Everything exact uses `IdSchema`.
 - Do not add reservation return metadata to runtime state.
+- Do not add job cancellation.
+- Do not allow partial reservation release.

@@ -43,13 +43,6 @@ const bufferedItem = ({
 			ownerItemId: owner.id,
 			lineId: "line:workshop:build",
 			inputIndex,
-			returnLocation: {
-				scope: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
 		},
 		quantity,
 		revision: `revision:${id}`,

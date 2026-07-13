@@ -64,7 +64,6 @@ describe("input state", () => {
 			ownerItemId: "runtime:workshop",
 			lineId: "line:workshop:build",
 			inputIndex: 0,
-			returnLocation: sourceLocation(1),
 		});
 	});
 });

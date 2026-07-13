@@ -109,7 +109,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					ownerItemId,
 					lineId,
 					inputIndex,
-					returnLocation: source.location,
 				},
 				plan,
 				runtime,

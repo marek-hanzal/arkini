@@ -19,13 +19,6 @@ describe("LocationSchema", () => {
 				ownerItemId: "runtime:owner",
 				lineId: "line:owner:work",
 				inputIndex: 0,
-				returnLocation: {
-					scope: "inventory",
-					position: {
-						x: 1,
-						y: 0,
-					},
-				},
 			}).success,
 		).toBe(true);
 	});
@@ -45,7 +38,21 @@ describe("LocationSchema", () => {
 				scope: "input",
 				ownerItemId: "runtime:owner",
 				lineId: "line:owner:work",
+			}).success,
+		).toBe(false);
+		expect(
+			LocationSchema.safeParse({
+				scope: "input",
+				ownerItemId: "runtime:owner",
+				lineId: "line:owner:work",
 				inputIndex: 0,
+				returnLocation: {
+					scope: "board",
+					position: {
+						x: 1,
+						y: 1,
+					},
+				},
 			}).success,
 		).toBe(false);
 	});

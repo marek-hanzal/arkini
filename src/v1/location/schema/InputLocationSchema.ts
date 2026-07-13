@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
-import { GridLocationSchema } from "./GridLocationSchema";
 
 /**
  * One material item currently buffered by a concrete owner line input.
@@ -26,12 +25,6 @@ export const InputLocationSchema = z
 		 */
 		inputIndex: NonNegativeIntegerSchema.describe(
 			"The zero-based position of this material input inside the product line.",
-		),
-		/**
-		 * Grid location owned by the material before it entered this input buffer.
-		 */
-		returnLocation: GridLocationSchema.describe(
-			"The grid location owned before this material entered the input buffer.",
 		),
 	})
 	.strict()

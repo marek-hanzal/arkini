@@ -112,7 +112,6 @@ describe("storeInputMaterialFx", () => {
 			ownerItemId: "runtime:workshop",
 			lineId: "line:workshop:build",
 			inputIndex: 0,
-			returnLocation: sourceLocation(1),
 		});
 		expect(result.queried).toEqual([]);
 	});

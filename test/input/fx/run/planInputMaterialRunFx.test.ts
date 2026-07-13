@@ -15,13 +15,6 @@ const bufferedItem = ({ id, quantity }: { id: string; quantity: number }) => {
 			ownerItemId: "runtime:workshop",
 			lineId: "line:workshop:build",
 			inputIndex: 0,
-			returnLocation: {
-				scope: "inventory",
-				position: {
-					x: 0,
-					y: 0,
-				},
-			},
 		},
 		quantity,
 		revision: `revision:${id}`,

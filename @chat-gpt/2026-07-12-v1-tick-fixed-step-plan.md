@@ -98,5 +98,6 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - Moving an owner to inventory is not removal; its work remains paused and intact.
 - Removing an idle owner also removes its buffered input representations and re-emits their quantities atomically through normal placement.
 - A board owner uses its current board position as the drop origin.
-- An inventory owner uses each buffered material's last real grid scope; inventory coordinates are never interpreted as board coordinates.
+- An owner outside the board releases buffered inputs into inventory.
+- Buffered inputs retain no historical source location, source stack, or source runtime identity.
 - Any placement failure rolls back the owner removal and every buffered release.

@@ -32,15 +32,10 @@ const planBufferedReleaseFx = Effect.fn("planBufferedReleaseFx")(function* ({
 		placement: "drop" as const,
 		quantity: bufferedItem.quantity,
 	};
-	const boardOrigin = isBoardRuntimeItem(owner)
-		? owner.location.position
-		: bufferedItem.location.returnLocation.scope === "board"
-			? bufferedItem.location.returnLocation.position
-			: undefined;
-	if (boardOrigin !== undefined) {
+	if (isBoardRuntimeItem(owner)) {
 		return yield* planDropPlacementFx({
 			drop,
-			origin: boardOrigin,
+			origin: owner.location.position,
 			originItemId: owner.id,
 			runtime,
 		});
@@ -65,12 +60,12 @@ const planBufferedReleaseFx = Effect.fn("planBufferedReleaseFx")(function* ({
 });
 
 /**
- * Removes every buffered input owned by one idle item and re-emits it through
- * ordinary scope-aware placement over one evolving runtime draft.
+ * Removes every buffered input owned by one idle item and re-emits it from the
+ * owner's current scope over one evolving runtime draft.
  *
- * A board owner drops from its current board position. An inventory owner uses
- * each buffered material's last real grid scope without treating inventory
- * coordinates as board coordinates.
+ * A board owner drops around its current board position. An owner outside the
+ * board releases into inventory. Buffered inputs retain no historical source
+ * location or source runtime identity.
  */
 export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* ({
 	owner,

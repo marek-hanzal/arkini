@@ -6,7 +6,6 @@ import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import {
 	inputRuntimeTestConfig,
-	sourceLocation,
 	workshopLocation,
 } from "~test/input/support/inputRuntimeTestConfig";
 
@@ -41,7 +40,6 @@ const inputItem = ({
 			ownerItemId,
 			lineId,
 			inputIndex,
-			returnLocation: sourceLocation(1),
 		},
 		quantity,
 		revision: `revision:${id}`,

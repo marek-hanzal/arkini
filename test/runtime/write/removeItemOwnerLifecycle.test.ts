@@ -194,6 +194,11 @@ describe("removeItemFx owner lifecycle", () => {
 				.reduce((total, item) => total + item.quantity, 0),
 		).toBe(1);
 		expect(result.runtime.items.every((item) => item.location.scope !== "input")).toBe(true);
+		expect(
+			result.runtime.items
+				.filter((item) => item.item.id === "water" || item.item.id === "tool")
+				.every((item) => item.location.scope === "board"),
+		).toBe(true);
 	});
 
 	it("removes an idle inventory owner without treating its inventory coordinates as board origin", () => {
@@ -226,13 +231,10 @@ describe("removeItemFx owner lifecycle", () => {
 		expect(result.items.some((item) => item.id === startProps.ownerItemId)).toBe(false);
 		expect(result.items.some((item) => item.location.scope === "input")).toBe(false);
 		expect(
-			result.items.some(
-				(item) =>
-					item.location.scope === "board" &&
-					item.location.position.x === 0 &&
-					item.location.position.y === 0,
-			),
-		).toBe(false);
+			result.items
+				.filter((item) => item.item.id === "water" || item.item.id === "tool")
+				.every((item) => item.location.scope === "inventory"),
+		).toBe(true);
 		expect(
 			result.items
 				.filter((item) => item.item.id === "water")

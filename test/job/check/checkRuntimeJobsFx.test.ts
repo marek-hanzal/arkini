@@ -40,7 +40,6 @@ describe("checkRuntimeJobsFx", () => {
 				ownerItemId: owner.id,
 				lineId: "line:forge:run",
 				inputIndex: 0,
-				returnLocation: owner.location,
 			},
 		} satisfies RuntimeItemSchema.Type;
 		const runtime = {

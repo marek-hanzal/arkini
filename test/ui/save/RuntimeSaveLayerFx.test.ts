@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { startLineFx } from "~/v1/job/write/startLineFx";
+import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
@@ -19,6 +20,22 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 		await sleep(5);
 	}
 };
+
+const emitCompletedEventFx = (jobId: string) =>
+	modifyRuntimeFx((runtime) =>
+		Effect.succeed([
+			undefined,
+			runtime,
+			[
+				{
+					type: "job:completed" as const,
+					jobId,
+					ownerItemId: "owner:save",
+					lineId: "line:save",
+				},
+			],
+		] as const),
+	);
 
 describe("RuntimeSaveLayerFx", () => {
 	it("debounces committed snapshots and ignores failed mutations", async () => {
@@ -79,6 +96,62 @@ describe("RuntimeSaveLayerFx", () => {
 			).rejects.toBeDefined();
 			await sleep(30);
 			expect(saves).toHaveLength(1);
+		} finally {
+			await session.dispose();
+		}
+	});
+
+	it("does not let event-only traffic wake or postpone runtime autosave", async () => {
+		const savedItemCounts: number[] = [];
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 40,
+				write: (state) =>
+					Effect.sync(() => {
+						savedItemCounts.push(state.items.length);
+					}),
+			},
+		});
+
+		try {
+			await waitFor(() => savedItemCounts.length === 1);
+			expect(savedItemCounts).toEqual([
+				0,
+			]);
+
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:event-isolation",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+
+			for (let index = 0; index < 5; index += 1) {
+				await sleep(15);
+				await session.run(emitCompletedEventFx(`job:save:event:${index}`));
+			}
+
+			expect(savedItemCounts).toEqual([
+				0,
+				1,
+			]);
+
+			await session.run(emitCompletedEventFx("job:save:event:after-save"));
+			await sleep(60);
+			expect(savedItemCounts).toEqual([
+				0,
+				1,
+			]);
 		} finally {
 			await session.dispose();
 		}

@@ -20,7 +20,7 @@ const defaultOnError = (error: unknown) => {
 	console.error("Arkini autosave failed; the latest runtime remains pending.", error);
 };
 
-/** Debounces committed transitions and serializes every save against the latest runtime. */
+/** Debounces committed runtime identities and serializes saves against the latest runtime. */
 export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
 	onError = defaultOnError,
@@ -55,6 +55,8 @@ export const RuntimeSaveLayerFx = <Error>({
 
 			const stream = Stream.make(subscription.current).pipe(
 				Stream.concat(subscription.changes),
+				Stream.map((transition) => transition.runtime),
+				Stream.changesWith(Object.is),
 				debounceMs > 0 ? Stream.debounce(`${debounceMs} millis`) : (value) => value,
 				Stream.runForEach(() =>
 					flush.pipe(

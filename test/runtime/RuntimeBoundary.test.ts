@@ -4,11 +4,12 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 const internalStoreImport = 'from "~/v1/runtime/internal/RuntimeStoreFx"';
-const directRuntimeModify = "SynchronizedRef.modifyEffect(";
+const directRuntimeModify = "store.modifyEffect(";
 const runtimeTransactionImport = 'from "~/v1/runtime/internal/modifyRuntimeFx"';
 const revisionGuardImport = 'from "~/v1/revision/fx/assertRevisionFx"';
 const allowedStoreImporters = new Set([
 	"src/v1/game/layer/GameCoreLayerFx.ts",
+	"src/v1/runtime/internal/makeRuntimeStoreFx.ts",
 	"src/v1/runtime/internal/modifyRuntimeFx.ts",
 ]);
 const allowedDirectModifiers = new Set([

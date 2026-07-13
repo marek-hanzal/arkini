@@ -43,6 +43,18 @@ const boundaryRules = [
 	},
 
 	{
+		name: "v1-core-no-ui-imports",
+		comment:
+			"V1 engine/core remains standalone. UI adapters depend on public core services, never the other way around.",
+		severity: "error",
+		from: {
+			path: "^src/v1/(?!ui(?:/|$))",
+		},
+		to: {
+			path: "^src/v1/ui(?:/|$)",
+		},
+	},
+	{
 		name: "v1-ui-no-core-internal-imports",
 		comment:
 			"V1 UI is a thin adapter over public engine services. Core internal modules stay behind their owning domain boundaries.",

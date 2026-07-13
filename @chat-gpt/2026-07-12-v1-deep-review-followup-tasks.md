@@ -2,7 +2,11 @@
 
 Baseline review: `6bb12839`
 Implementation baseline: `538dd642`
-Updated through: job live-entity boundary hardening
+Updated through: fixed-step Tick / FIFO / session review closeout
+
+## Review cycle status
+
+Closed. The fixed-step Tick, FIFO queue, completion, owner lifecycle, committed-transition, save, and session-lifecycle findings from the follow-up reviews are implemented and covered. The remaining unchecked architecture-test item below is a conditional future guardrail, not pending work.
 
 ## Verified complete
 
@@ -56,6 +60,12 @@ A reserved item is detached from the input buffer while its job is active, so th
 - [x] Define owner movement semantics: board movement is live; inventory is a hard pause; permanent removal with active or queued work is invalid. Permanent removal now rejects active or queued work and atomically releases buffered inputs for idle owners.
 - [x] Queue dispatch accepts only `ownerItemId`, resolves the live FIFO head internally, and cannot start a detached request.
 - [x] Completion randomness is created through strict `makeJobCompletionRandomFx`; core has no pure-helper exception.
+- [x] Runtime and transient events commit through one `CommittedTransition`; no separate event PubSub or ordering bridge exists.
+- [x] Session and save process the initial transition emission instead of dropping it. Duplicate notifications and saves are acceptable.
+- [x] External reporters and listeners are isolated so one throwing callback cannot terminate Tick, autosave, or the session transition bridge.
+- [x] Concurrent `dispose()` callers share one cleanup Promise and observe the same completion or failure.
+- [x] Runtime validation reports orphan reservations with `job:reservation-orphan`; reverse reservation reconstruction remains deliberately unsupported.
+- [x] Tick sub-step remainder and retained failed-budget loss on session disposal are documented as intentional transient adapter behavior.
 - [ ] Add architecture tests if new public write commands appear.
 
 ## Deep-review guardrails

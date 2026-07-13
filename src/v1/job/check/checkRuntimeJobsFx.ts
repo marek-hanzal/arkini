@@ -6,7 +6,7 @@ import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissing
 import type { JobOwnerMultipleActiveIssueSchema } from "~/v1/job/schema/JobOwnerMultipleActiveIssueSchema";
 import type { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
-import type { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
+import type { JobReservationOrphanIssueSchema } from "~/v1/job/schema/JobReservationOrphanIssueSchema";
 import type { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFx } from "~/v1/job/read/readItemQueueSizeFx";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
@@ -31,7 +31,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const ownerGridIssues: JobOwnerNotOnGridIssueSchema.Type[] = [];
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
-	const reservationMissingIssues: JobReservationMissingIssueSchema.Type[] = [];
+	const reservationOrphanIssues: JobReservationOrphanIssueSchema.Type[] = [];
 	const queue = runtime.jobQueue ?? [];
 	const entries = [
 		...runtime.jobs,
@@ -120,11 +120,11 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 
 	for (const item of runtime.items.filter(isJobRuntimeItem)) {
 		if (!runtime.jobs.some((job) => job.id === item.location.jobId)) {
-			reservationMissingIssues.push({
+			reservationOrphanIssues.push({
 				itemId: item.id,
 				jobId: item.location.jobId,
 				location: item.location,
-				type: "job:reservation-missing",
+				type: "job:reservation-orphan",
 			});
 		}
 	}
@@ -137,6 +137,6 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		...lineIssues,
 		...queueIssues,
 		...timeIssues,
-		...reservationMissingIssues,
+		...reservationOrphanIssues,
 	];
 });

@@ -91,7 +91,7 @@ describe("checkRuntimeJobsFx", () => {
 				"job:line-missing",
 				"job:queue-exceeded",
 				"job:time-invalid",
-				"job:reservation-missing",
+				"job:reservation-orphan",
 			]),
 		);
 	});

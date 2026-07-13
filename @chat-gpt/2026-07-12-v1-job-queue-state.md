@@ -26,6 +26,14 @@
 - A second run without newly elapsed or explicitly injected time is a no-op.
 - Concurrent Tick advancement requests serialize through the Tick service.
 
+## Tick shutdown persistence policy
+
+- `observedAtMs` and `pendingElapsedMs` are session-only Tick adapter state. They are never persisted into `RuntimeSchema` or jobs.
+- Closing a session may discard an incomplete fixed-step remainder of at most `TickStepMs - 1` milliseconds, currently 199 ms. This is intentional.
+- An unexpected Tick failure retains its complete pending budget only for retry inside the same live session. Disposing or reloading that session discards the retained failed budget.
+- Expected gameplay blockers do not fail Tick advancement, so a large retained budget indicates a structural or unexpected error rather than normal paused or capacity-blocked gameplay.
+- Do not add job timestamps, persisted Tick cursors, or recovery metadata to reconstruct discarded adapter time after reload. The persisted runtime remains the only gameplay truth.
+
 ## Job time model
 
 - Active jobs persist only `durationMs` and `remainingMs`.
@@ -55,6 +63,8 @@
 - The entire completion operation, including roll-set selection, chance, weights, quantity ranges and random placement ordering, uses that one deterministic Effect `Random` stream.
 - A blocked completion, later retry or restored save therefore resolves the same random outcome for the same job.
 - Job revision, Tick state and wall-clock time must never participate in the completion seed.
+- Runtime validation checks the direction `job reservation -> referenced active job exists` and reports `job:reservation-orphan` when it fails.
+- Runtime does not reconstruct the reverse direction `job -> original reservation manifest`. Jobs deliberately do not persist selector decisions, source slots, source stacks, or a reservation manifest. Do not add a second selector solver merely to infer that history.
 
 ## Current implementation boundaries
 

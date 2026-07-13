@@ -102,6 +102,12 @@ Save never depends on transient events.
 
 The production loop uses Effect Schedule and Effect Clock. Gameplay jobs use fixed-step `remainingMs`; no job wall-clock timestamps exist.
 
+`TickFx` cursor state is transient session infrastructure:
+
+- an incomplete fixed-step remainder of at most 199 ms may be discarded on dispose;
+- a budget retained after an unexpected Tick failure is retried only within that live session and is discarded on dispose or reload;
+- neither value belongs in `RuntimeSchema`, save state, or job timestamps.
+
 Session shutdown order remains:
 
 ```text

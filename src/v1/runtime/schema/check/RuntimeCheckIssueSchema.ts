@@ -6,7 +6,7 @@ import { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssue
 import { JobOwnerMultipleActiveIssueSchema } from "~/v1/job/schema/JobOwnerMultipleActiveIssueSchema";
 import { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
-import { JobReservationMissingIssueSchema } from "~/v1/job/schema/JobReservationMissingIssueSchema";
+import { JobReservationOrphanIssueSchema } from "~/v1/job/schema/JobReservationOrphanIssueSchema";
 import { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { InputCapacityExceededIssueSchema } from "~/v1/input/schema/check/InputCapacityExceededIssueSchema";
 import { InputLineMissingIssueSchema } from "~/v1/input/schema/check/InputLineMissingIssueSchema";
@@ -32,7 +32,7 @@ export const RuntimeCheckIssueSchema = z
 		JobLineMissingIssueSchema,
 		JobQueueExceededIssueSchema,
 		JobTimeInvalidIssueSchema,
-		JobReservationMissingIssueSchema,
+		JobReservationOrphanIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,
 		ItemStackSizeIssueSchema,

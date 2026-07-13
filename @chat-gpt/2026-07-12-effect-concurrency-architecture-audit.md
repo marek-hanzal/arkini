@@ -1,4 +1,4 @@
-> Historical architecture audit. The separate runtime-stream plus event-PubSub proposal was superseded by the atomically committed `CommittedTransition { runtime, events }` store. Keep this file as decision history, not current implementation guidance.
+> **Superseded historical architecture audit.** The separate runtime stream plus event PubSub described below was rejected after it produced two independently ordered integration paths. Current code atomically commits `CommittedTransition { runtime, events }` through one `SubscriptionRef`. Use `@chat-gpt/2026-07-12-v1-managed-session-runtime.md` as the canonical contract; keep this file only as decision history.
 
 # Effect concurrency architecture audit
 
@@ -17,7 +17,7 @@ Adopt:
 1. `ManagedRuntime` as the lifetime boundary for one loaded game session.
 2. `Schedule` plus one scoped fiber as the production tick driver.
 3. `SubscriptionRef` as the runtime store once UI/save integration begins.
-4. `PubSub` for committed transient domain-event batches once v1 event schemas exist.
+4. ~~`PubSub` for committed transient domain-event batches.~~ Superseded: event metadata now travels inside the same committed transition as runtime.
 
 Keep:
 
@@ -217,7 +217,9 @@ The save stream is state-based. It must not depend on transient domain events.
 
 Tick mutations can update runtime frequently. UI notification should remain cheap, and save must debounce. The runtime stream is not a command queue and must not contain work requests.
 
-## `PubSub`: adopt later for committed transient event batches
+## Historical `PubSub` proposal — superseded
+
+This entire section records the rejected two-pipe design. Do not implement it. Runtime and event metadata must remain one atomically committed transition so publication order, React snapshot visibility, save observation, and shutdown ownership cannot diverge.
 
 ### Problems solved
 
@@ -251,7 +253,7 @@ The mutation boundary should eventually support an internal result envelope such
 }
 ```
 
-`modifyRuntimeFx` commits the validated runtime first and then publishes the event batch through a `GameEventsFx` service.
+The rejected design would have committed the validated runtime first and then published the event batch through a separate event service.
 
 Public commands still return their current typed result.
 
@@ -456,12 +458,12 @@ No command Queue and no Deferred are present in the default topology.
 5. Build one debounced sequential autosave consumer.
 6. Test that failed mutations emit no runtime change and trigger no save.
 
-### Phase 3: transient events and sound
+### Historical phase 3: transient events and sound — superseded
 
 1. Define v1 domain event schemas.
 2. Extend the internal mutation result with an event batch.
 3. Publish only after successful commit.
-4. Add `GameEventsFx` backed by PubSub.
+4. Rejected: add a separate PubSub-backed event service.
 5. Build sound and one-shot UI consumers.
 6. Test that rollback publishes no event and one long tick publishes one ordered batch.
 

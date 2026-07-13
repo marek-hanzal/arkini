@@ -1,6 +1,6 @@
 import { Effect, Fiber, Layer, Ref, Stream } from "effect";
 
-import { RuntimeChangesFx } from "~/v1/runtime/context/RuntimeChangesFx";
+import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
@@ -19,7 +19,7 @@ const defaultOnError = (error: unknown) => {
 	console.error("Arkini autosave failed; the latest runtime remains pending.", error);
 };
 
-/** Debounces committed runtime snapshots and serializes every save against the latest runtime. */
+/** Debounces committed transitions and serializes every save against the latest runtime. */
 export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
 	onError = defaultOnError,
@@ -28,7 +28,7 @@ export const RuntimeSaveLayerFx = <Error>({
 	Layer.scoped(
 		RuntimeSaveFx,
 		Effect.gen(function* () {
-			const runtimeChanges = yield* RuntimeChangesFx;
+			const committedTransitions = yield* CommittedTransitionsFx;
 			const runtimeFx = yield* RuntimeFx;
 			const lastSaved = yield* Ref.make<RuntimeSchema.Type | undefined>(undefined);
 			const saveMutex = yield* Effect.makeSemaphore(1);
@@ -51,8 +51,7 @@ export const RuntimeSaveLayerFx = <Error>({
 				),
 			);
 
-			const stream = runtimeChanges.changes.pipe(
-				Stream.drop(1),
+			const stream = committedTransitions.changes.pipe(
 				debounceMs > 0 ? Stream.debounce(`${debounceMs} millis`) : (value) => value,
 				Stream.runForEach(() =>
 					flush.pipe(Effect.catchAll((error) => Effect.sync(() => onError(error)))),

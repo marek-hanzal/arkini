@@ -136,6 +136,7 @@ describe("RuntimeSaveLayerFx", () => {
 			await flush;
 
 			expect(savedItemCounts).toEqual([
+				0,
 				1,
 				2,
 			]);

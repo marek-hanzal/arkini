@@ -1,10 +1,9 @@
-import { Effect, Exit, Fiber, FiberSet, Layer, ManagedRuntime, Queue, Scope, Stream } from "effect";
+import { Effect, Exit, Fiber, FiberSet, Layer, ManagedRuntime, Scope, Stream } from "effect";
 
-import { GameEventsFx } from "~/v1/event/context/GameEventsFx";
 import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
 import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
 import { GameSessionLayerFx } from "~/v1/game/layer/GameSessionLayerFx";
-import { RuntimeChangesFx } from "~/v1/runtime/context/RuntimeChangesFx";
+import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
@@ -61,38 +60,23 @@ export const createGameSession = async <SaveError>({
 	const runtimeListeners = new Set<() => void>();
 	const eventListeners = new Set<(batch: GameEventBatchSchema.Type) => void>();
 
-	const runtimeFiber = managed.runFork(
-		RuntimeChangesFx.pipe(
+	const transitionFiber = managed.runFork(
+		CommittedTransitionsFx.pipe(
 			Effect.flatMap((service) =>
 				service.changes.pipe(
-					Stream.drop(1),
-					Stream.runForEach((runtime) =>
+					Stream.runForEach((transition) =>
 						Effect.sync(() => {
-							snapshot = runtime;
+							snapshot = transition.runtime;
 							for (const listener of runtimeListeners) listener();
+
+							if (transition.events.length > 0) {
+								const batch = {
+									events: transition.events,
+								};
+								for (const listener of eventListeners) listener(batch);
+							}
 						}),
 					),
-				),
-			),
-		),
-	);
-
-	// Acquire the one session-level PubSub subscription before exposing the
-	// session, so the first command cannot outrun its presentation event consumer.
-	const eventScope = await managed.runPromise(Scope.make());
-	const eventSubscription = await managed.runPromise(
-		GameEventsFx.pipe(
-			Effect.flatMap((service) => service.subscribe),
-			Scope.extend(eventScope),
-		),
-	);
-	const eventFiber = managed.runFork(
-		Effect.forever(
-			Queue.take(eventSubscription).pipe(
-				Effect.tap((batch) =>
-					Effect.sync(() => {
-						for (const listener of eventListeners) listener(batch);
-					}),
 				),
 			),
 		),
@@ -108,9 +92,7 @@ export const createGameSession = async <SaveError>({
 			let flushError: unknown;
 			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
 			await managed.runPromise(Scope.close(commandScope, Exit.void));
-			await managed.runPromise(Fiber.interrupt(runtimeFiber));
-			await managed.runPromise(Fiber.interrupt(eventFiber));
-			await managed.runPromise(Scope.close(eventScope, Exit.void));
+			await managed.runPromise(Fiber.interrupt(transitionFiber));
 			try {
 				await flushSave();
 			} catch (error) {

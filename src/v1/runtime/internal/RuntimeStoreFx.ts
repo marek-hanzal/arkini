@@ -1,11 +1,11 @@
 import { Context, type SubscriptionRef } from "effect";
 
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import type { CommittedTransitionSchema } from "~/v1/runtime/schema/CommittedTransitionSchema";
 
-/** Internal mutable runtime store used only by dedicated runtime commands. */
+/** Internal mutable transition store used only by dedicated runtime commands. */
 export class RuntimeStoreFx extends Context.Tag("RuntimeStoreFx")<
 	RuntimeStoreFx,
-	SubscriptionRef.SubscriptionRef<RuntimeSchema.Type>
+	SubscriptionRef.SubscriptionRef<CommittedTransitionSchema.Type>
 >() {
 	//
 }

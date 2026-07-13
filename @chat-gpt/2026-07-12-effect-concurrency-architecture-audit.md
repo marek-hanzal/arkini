@@ -1,3 +1,5 @@
+> Historical architecture audit. The separate runtime-stream plus event-PubSub proposal was superseded by the atomically committed `CommittedTransition { runtime, events }` store. Keep this file as decision history, not current implementation guidance.
+
 # Effect concurrency architecture audit
 
 Snapshot: `628c17b9`

@@ -1,9 +1,8 @@
 import { Effect, SynchronizedRef } from "effect";
 
-import { publishGameEventsFx } from "~/v1/event/fx/publishGameEventsFx";
 import type { GameEventSchema } from "~/v1/event/schema/GameEventSchema";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
+import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { RuntimeStoreFx } from "./RuntimeStoreFx";
 
@@ -29,8 +28,8 @@ export namespace modifyRuntimeFx {
  *
  * Every nested RuntimeFx read observes the same transaction snapshot instead
  * of touching the locked mutable store. The candidate runtime is validated
- * before the synchronized reference commits it. Transient events publish only
- * after that successful commit and therefore never describe a rolled-back state.
+ * before one committed transition atomically replaces the previous runtime
+ * together with the transient events describing that exact mutation.
  */
 export const modifyRuntimeFx = <Result, Error, Requirements>(
 	update: modifyRuntimeFx.Update<Result, Error, Requirements>,
@@ -38,41 +37,33 @@ export const modifyRuntimeFx = <Result, Error, Requirements>(
 	return Effect.gen(function* () {
 		const store = yield* RuntimeStoreFx;
 
-		const [result, events] = yield* SynchronizedRef.modifyEffect(store, (runtime) => {
-			return update(runtime).pipe(
+		return yield* SynchronizedRef.modifyEffect(store, (transition) => {
+			return update(transition.runtime).pipe(
 				Effect.provideService(RuntimeFx, {
-					read: Effect.succeed(runtime),
+					read: Effect.succeed(transition.runtime),
 				}),
 				Effect.tap(([, nextRuntime]) => {
 					return assertRuntimeFx({
 						runtime: nextRuntime,
 					});
 				}),
-				Effect.map(
-					([value, nextRuntime, emittedEvents = []]) =>
-						[
-							[
-								value,
-								emittedEvents,
-							] as const,
-							nextRuntime,
-						] as const,
-				),
-			);
-		});
+				Effect.map(([result, nextRuntime, emittedEvents = []]) => {
+					const nextTransition =
+						nextRuntime === transition.runtime && emittedEvents.length === 0
+							? transition
+							: {
+									runtime: nextRuntime,
+									events: [
+										...emittedEvents,
+									],
+								};
 
-		const [firstEvent, ...remainingEvents] = events;
-		if (firstEvent !== undefined) {
-			yield* Effect.uninterruptible(
-				publishGameEventsFx({
-					events: [
-						firstEvent,
-						...remainingEvents,
-					],
+					return [
+						result,
+						nextTransition,
+					] as const;
 				}),
 			);
-		}
-
-		return result;
+		});
 	});
 };

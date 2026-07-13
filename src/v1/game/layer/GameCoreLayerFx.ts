@@ -1,10 +1,9 @@
-import { Effect, Layer, PubSub, Stream, SubscriptionRef } from "effect";
+import { Effect, Layer, Stream, SubscriptionRef } from "effect";
 
-import { GameEventsFx } from "~/v1/event/context/GameEventsFx";
-import { GameEventBusFx } from "~/v1/event/internal/GameEventBusFx";
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
-import { RuntimeChangesFx } from "~/v1/runtime/context/RuntimeChangesFx";
+import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
+import type { CommittedTransitionSchema } from "~/v1/runtime/schema/CommittedTransitionSchema";
 import { fromConfigFx } from "~/v1/runtime/fx/fromConfigFx";
 import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
@@ -30,18 +29,29 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 			: fromStateFx({
 					state,
 				})
-		).pipe(Effect.flatMap(SubscriptionRef.make), Effect.provide(configLayer)),
+		).pipe(
+			Effect.map(
+				(runtime): CommittedTransitionSchema.Type => ({
+					runtime,
+					events: [],
+				}),
+			),
+			Effect.flatMap(SubscriptionRef.make),
+			Effect.provide(configLayer),
+		),
 	);
 	const runtimeReadLayer = Layer.effect(
 		RuntimeFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
-				read: SubscriptionRef.get(store),
+				read: SubscriptionRef.get(store).pipe(
+					Effect.map((transition) => transition.runtime),
+				),
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));
-	const runtimeChangesLayer = Layer.effect(
-		RuntimeChangesFx,
+	const committedTransitionsLayer = Layer.effect(
+		CommittedTransitionsFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
 				changes: store.changes.pipe(Stream.changesWith(Object.is)),
@@ -49,28 +59,12 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));
 	const tickLayer = Layer.effect(TickFx, makeTickFx());
-	const eventBusLayer = Layer.effect(
-		GameEventBusFx,
-		PubSub.sliding({
-			capacity: 64,
-		}),
-	);
-	const gameEventsLayer = Layer.effect(
-		GameEventsFx,
-		GameEventBusFx.pipe(
-			Effect.map((bus) => ({
-				subscribe: PubSub.subscribe(bus),
-			})),
-		),
-	).pipe(Layer.provide(eventBusLayer));
 
 	return Layer.mergeAll(
 		configLayer,
 		runtimeStoreLayer,
 		runtimeReadLayer,
-		runtimeChangesLayer,
+		committedTransitionsLayer,
 		tickLayer,
-		eventBusLayer,
-		gameEventsLayer,
 	);
 };

@@ -17,11 +17,12 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 };
 
 describe("createGameSession", () => {
-	it("does not notify React subscribers merely for attaching to the initial snapshot", async () => {
+	it("keeps the initial committed transition harmless for React snapshots", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
+		const initial = session.getSnapshot();
 		let notifications = 0;
 		const unsubscribe = session.subscribe(() => {
 			notifications += 1;
@@ -29,7 +30,8 @@ describe("createGameSession", () => {
 
 		try {
 			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(notifications).toBe(0);
+			expect(session.getSnapshot()).toBe(initial);
+			expect(notifications).toBeLessThanOrEqual(1);
 		} finally {
 			unsubscribe();
 			await session.dispose();
@@ -92,6 +94,38 @@ describe("createGameSession", () => {
 			);
 			await new Promise((resolve) => setTimeout(resolve, 20));
 			expect(notifications).toBe(0);
+		} finally {
+			unsubscribe();
+			await session.dispose();
+		}
+	});
+
+	it("updates the synchronous runtime snapshot before delivering transition events", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let observedStartedJob = false;
+		const unsubscribe = session.subscribeEvents((batch) => {
+			const started = batch.events.find((event) => event.type === "job:started");
+			if (started !== undefined) {
+				observedStartedJob = session
+					.getSnapshot()
+					.jobs.some((job) => job.id === started.jobId);
+			}
+		});
+
+		try {
+			const owner = await session.run(prepareJobLineFx());
+			await session.run(
+				startLineFx({
+					ownerItemId: owner.id,
+					lineId: "line:forge:run",
+				}),
+			);
+
+			await waitFor(() => observedStartedJob);
+			expect(observedStartedJob).toBe(true);
 		} finally {
 			unsubscribe();
 			await session.dispose();

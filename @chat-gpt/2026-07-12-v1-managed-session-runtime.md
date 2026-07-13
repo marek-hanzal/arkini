@@ -1,8 +1,6 @@
 # V1 managed game session runtime
 
-Implementation baseline: `3f22ec50`
-
-Follow-up integration cleanup: pending commit
+Current implementation: atomically committed runtime transitions.
 
 ## Final topology
 
@@ -21,44 +19,42 @@ React / automation / debug
        GameSessionLayerFx
           ├── GameCoreLayerFx
           │     ├── GameConfigFx
-          │     ├── SubscriptionRef runtime store
+          │     ├── SubscriptionRef<CommittedTransition>
           │     ├── RuntimeFx
-          │     ├── RuntimeChangesFx
-          │     ├── TickFx
-          │     └── GameEventsFx / PubSub
+          │     ├── CommittedTransitionsFx
+          │     └── TickFx
           └── GameLoopLayerFx
-                └── scoped Schedule + Effect Clock tick fiber
+                └── scoped Schedule + Effect Clock Tick fiber
 ```
 
-`RuntimeSchema` remains the only gameplay truth. Effect live objects are session infrastructure reconstructed when a game is loaded.
+`RuntimeSchema` remains the only gameplay truth. A committed transition is one atomically stored envelope:
 
-## Layer ownership
+```text
+{
+  runtime,
+  events,
+}
+```
 
-### `GameCoreLayerFx`
+Events are transient metadata describing that exact committed runtime transition. They are not a second history, a second state store or a gameplay input.
 
-Owns deterministic game services without background work.
+## Core mutation boundary
 
-Use it through `GameLayerFx` / `useGameFx` in tests and composed programs where Tick is controlled manually.
+`RuntimeStoreFx` owns one `SubscriptionRef<CommittedTransition>`.
 
-The runtime store is now `SubscriptionRef<RuntimeSchema.Type>`, while `RuntimeStoreFx` and `modifyRuntimeFx` remain the only mutation boundary.
+`modifyRuntimeFx` performs one serialized operation:
 
-`RuntimeChangesFx` exposes committed snapshots and filters same-reference no-op commits so an idle Tick does not invalidate React or trigger save work.
+```text
+read current transition.runtime
+→ build candidate runtime + ordered event metadata
+→ validate candidate runtime
+→ atomically commit { runtime, events }
+→ return command result
+```
 
-### `GameLoopLayerFx`
+A failed candidate commits neither runtime nor events. A no-op mutation with no events preserves the same transition reference and therefore emits no change.
 
-Owns one scoped production Tick fiber.
-
-- cadence defaults to the canonical `TickStepMs` value of 200 ms;
-- cadence uses `Schedule.spaced`;
-- elapsed gameplay time always comes from Effect Clock through `runTickRuntimeFx`;
-- `TickFx` atomically acquires newly elapsed time, replays every complete 200 ms simulation step, and retains any smaller remainder;
-- a sleeping browser tab therefore contributes the full real elapsed duration after wake;
-- one failed Tick does not kill the loop;
-- failed advancement leaves the whole elapsed budget pending for the next attempt instead of restoring or replaying a snapshot.
-
-### `GameSessionLayerFx`
-
-Combines one core and one production loop. The loop is disposed with the session scope.
+There is no core event PubSub, separate event publisher or output Queue.
 
 ## Browser/UI integration
 
@@ -68,98 +64,54 @@ Everything that directly adapts engine services for React or browser session own
 src/v1/ui/<domain>
 ```
 
-Core v1 code must not import from `src/v1/ui` and React imports are restricted to that tree by `V1UiBoundary.test.ts`.
-
-### `createGameSession`
-
-Creates one `ManagedRuntime` and exposes a stable `GameSession`:
+`createGameSession` owns one committed-transition bridge. For each emission it always performs:
 
 ```text
-getSnapshot()
-subscribe(listener)
-run(effect)
-subscribeEvents(listener)
-flushSave()
-dispose()
+set synchronous runtime snapshot
+→ notify runtime listeners
+→ notify event listeners when events are present
 ```
 
-The same runtime is used by UI commands, Tick, save and events. Never rebuild the game layer per React render or command.
+Therefore an event listener always observes the runtime snapshot committed with that event batch. Runtime and event ordering cannot diverge because they travel through the same transition stream.
 
-The session acquires its PubSub subscription before being exposed, so the first command cannot outrun the event consumer.
-
-The synchronous snapshot is loaded before subscriptions start. The runtime stream drops its initial current-value emission because React already owns that exact snapshot; attaching a subscriber must not manufacture a fake runtime change or gratuitous render.
-
-Session shutdown has one explicit order:
-
-```text
-reject new GameSession.run calls
-→ stop production Tick loop
-→ interrupt and await every in-flight session command fiber
-→ stop UI runtime/event bridges
-→ close the event subscription
-→ flush the latest stable runtime
-→ dispose the ManagedRuntime
-```
-
-`GameSession.run` executes commands in a session-owned `FiberSet`. Closing its scope interrupts commands that have not committed yet and waits for uninterruptible commit sections that are already finishing. The final save therefore happens only after no session command can mutate runtime again.
-
-The Tick loop must also stop before the final save starts. Otherwise a slow save could serialize one snapshot while the still-running loop commits a newer runtime, leaving disposal dependent on racing layer finalizers.
+The stream's initial current-value emission is processed normally. A duplicate initial notification is harmless and preferred over dropping a real commit that races session construction.
 
 ### React
 
 - `GameSessionProvider` provides one stable session.
-- `useRuntimeSelector` adapts committed runtime state through `useSyncExternalStore` and preserves selected values through equality checks.
-- `useGameCommand` adapts a public Effect command to a React callback while keeping direct typed command results/errors.
-- `useGameEvents` subscribes a session-level presentation coordinator to transient event batches.
+- `useRuntimeSelector` adapts the latest committed runtime through `useSyncExternalStore`.
+- `useGameCommand` runs typed Effect commands against the same session runtime.
+- `useGameEvents` observes transient metadata from the same committed-transition bridge.
 
-State and events stay separate:
-
-```text
-RuntimeChangesFx → current truth for board, inventory, jobs and progress
-GameEventsFx     → one-shot facts for animation, sound and telemetry
-```
+UI state must always be read from the runtime snapshot. Events may trigger animation, sound or telemetry but never reconstruct gameplay state.
 
 ## Save
 
-`RuntimeSaveLayerFx` lives under `src/v1/ui/save` because it is session/browser integration, not gameplay logic.
+`RuntimeSaveLayerFx` consumes the same committed-transition stream.
 
-- consumes committed runtime snapshots;
-- skips the initial stream emission;
-- debounces rapid Tick commits;
-- serializes runtime through `fromRuntimeFx`;
-- failed mutations emit no snapshot and therefore trigger no save;
-- explicit flush and session disposal persist the latest committed runtime;
-- duplicate flushes of the same runtime object are suppressed;
-- no decorative pending-state mirror is kept: flush reads the current canonical runtime and compares it with the last successfully saved snapshot.
+- the initial emission may produce an initial save;
+- duplicate saves are acceptable;
+- rapid transitions are debounced;
+- actual writes are serialized;
+- flush always reads the latest canonical runtime;
+- failed mutations emit no transition and therefore trigger no save.
 
-The save port is an Effect callback. Dexie can implement that port later without entering engine domains.
+Save never depends on transient events.
 
-## Transient events
+## Tick and shutdown
 
-`modifyRuntimeFx` may receive an optional ordered event list from the mutation callback.
+The production loop uses Effect Schedule and Effect Clock. Gameplay jobs use fixed-step `remainingMs`; no job wall-clock timestamps exist.
 
-The mutation boundary performs:
+Session shutdown order remains:
 
 ```text
-build candidate runtime + events
-→ validate candidate
-→ commit SubscriptionRef
-→ publish one event batch
-→ return command result
+reject new GameSession.run calls
+→ stop production Tick loop
+→ interrupt and await session-owned command fibers
+→ stop the committed-transition bridge
+→ flush the latest stable runtime
+→ dispose ManagedRuntime
 ```
-
-A rolled-back candidate publishes nothing. Publication is best-effort presentation infrastructure and is never required for gameplay correctness.
-
-The event bus uses a sliding PubSub with bounded transient capacity. There is no global output Queue.
-
-Currently emitted semantic events:
-
-- `job:started` with `explicit` or `queue` source;
-- `job:completed`.
-
-Long Tick processing emits one ordered batch containing the whole completed/started chain.
-
-Future item, merge and placement events should extend `GameEventSchema`; they must still publish only after successful commit.
 
 ## Explicit non-decisions
 
@@ -167,22 +119,9 @@ Do not introduce by default:
 
 - global `Queue<EngineCommand>`;
 - global engine output Queue;
+- core PubSub duplicating committed transitions;
 - `Deferred` command responses;
 - fibers, sleeps or latches per gameplay job;
-- save driven by transient events;
-- UI state reconstructed from events.
+- UI or save state reconstructed from events.
 
-A UI animation or sound subsystem may introduce its own local Queue only after a concrete sequencing/back-pressure requirement exists.
-
-## Tests added
-
-- one ManagedRuntime persists command state and updates synchronous UI snapshots;
-- attaching React subscribers does not emit a fake initial change;
-- no-op Tick does not notify React subscribers;
-- production scoped Tick loop completes a job from Effect Clock;
-- explicit and queued jobs publish ordered event batches;
-- invalid candidate rollback publishes no event;
-- save debounces committed snapshots;
-- failed mutation triggers no save;
-- dispose stops the production Tick loop before flushing the latest stable runtime;
-- architecture prevents React/UI dependency leakage into core v1.
+A concrete animation or audio subsystem may introduce its own local Queue only when it has a demonstrated sequencing or back-pressure requirement.

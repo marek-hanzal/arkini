@@ -9,7 +9,8 @@ export const GameEventBatchSchema = z
 	.strict()
 	.meta({
 		id: "GameEventBatchSchema",
-		description: "One ordered transient event batch emitted after a committed mutation.",
+		description:
+			"One ordered transient event batch carried by an atomically committed runtime transition.",
 	});
 
 export type GameEventBatchSchema = typeof GameEventBatchSchema;

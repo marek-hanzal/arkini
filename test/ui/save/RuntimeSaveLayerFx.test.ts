@@ -10,6 +10,16 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTest
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
+	const startedAt = performance.now();
+	while (!assertion()) {
+		if (performance.now() - startedAt > timeoutMs) {
+			throw new Error("Timed out while waiting for autosave.");
+		}
+		await sleep(5);
+	}
+};
+
 describe("RuntimeSaveLayerFx", () => {
 	it("debounces committed snapshots and ignores failed mutations", async () => {
 		const saves: StateSchema.Type[] = [];
@@ -201,6 +211,82 @@ describe("RuntimeSaveLayerFx", () => {
 			expect(reports).toBeGreaterThanOrEqual(2);
 		} finally {
 			await expect(session.dispose()).rejects.toThrow("save failed");
+		}
+	});
+
+	it("keeps the autosave consumer alive when its async reporting callback rejects", async () => {
+		const unhandledRejections: unknown[] = [];
+		const onUnhandledRejection = (reason: unknown) => {
+			unhandledRejections.push(reason);
+		};
+		process.on("unhandledRejection", onUnhandledRejection);
+		let writes = 0;
+		let reports = 0;
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 0,
+				onError: async () => {
+					reports += 1;
+					throw new Error("async save reporter exploded");
+				},
+				write: () =>
+					Effect.sync(() => {
+						writes += 1;
+					}).pipe(Effect.zipRight(Effect.fail(new Error("save failed")))),
+			},
+		});
+
+		try {
+			await waitFor(() => writes >= 1 && reports >= 1);
+			const initialWrites = writes;
+			const initialReports = reports;
+
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:async-reporter:first",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await waitFor(() => writes > initialWrites && reports > initialReports);
+			const firstWrites = writes;
+			const firstReports = reports;
+
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:async-reporter:second",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await waitFor(() => writes > firstWrites && reports > firstReports);
+			await sleep(20);
+
+			expect(unhandledRejections).toEqual([]);
+		} finally {
+			try {
+				await expect(session.dispose()).rejects.toThrow("save failed");
+				await sleep(20);
+				expect(unhandledRejections).toEqual([]);
+			} finally {
+				process.off("unhandledRejection", onUnhandledRejection);
+			}
 		}
 	});
 

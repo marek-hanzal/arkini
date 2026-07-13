@@ -67,7 +67,9 @@ describe("committed transition events", () => {
 			tickIntervalMs: 60_000,
 		});
 		const batches: unknown[] = [];
-		const unsubscribe = session.subscribeEvents((batch) => batches.push(batch));
+		const unsubscribe = session.subscribeEvents((batch) => {
+			batches.push(batch);
+		});
 
 		try {
 			await session.run(

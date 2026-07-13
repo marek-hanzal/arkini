@@ -11,7 +11,7 @@ import { RuntimeSaveFx } from "~/v1/ui/save/RuntimeSaveFx";
 export namespace RuntimeSaveLayerFx {
 	export interface Props<Error = unknown> {
 		debounceMs?: number;
-		onError?: (error: Error) => void;
+		onError?: (error: Error) => void | PromiseLike<void>;
 		save: (state: StateSchema.Type) => Effect.Effect<void, Error>;
 	}
 }

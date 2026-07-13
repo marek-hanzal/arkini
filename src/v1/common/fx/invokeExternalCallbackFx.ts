@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 export namespace invokeExternalCallbackFx {
 	export interface Props<Value> {
-		callback: (value: Value) => unknown;
+		callback: (value: Value) => void | PromiseLike<void>;
 		failureMessage: string;
 		value: Value;
 	}

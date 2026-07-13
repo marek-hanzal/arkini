@@ -125,7 +125,7 @@ Duplicate saves remain acceptable.
 
 ## External callback isolation
 
-Browser/user callbacks are outside the engine failure boundary. Tick reporting, save reporting, runtime listeners and event listeners run through `invokeExternalCallbackFx`.
+Browser/user callbacks are outside the engine failure boundary. Tick reporting, save reporting, runtime listeners and event listeners explicitly accept `void | PromiseLike<void>` and run through `invokeExternalCallbackFx`.
 
 - synchronous throws are logged and swallowed;
 - returned PromiseLike values are observed without awaiting them inline;

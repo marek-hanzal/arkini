@@ -8,7 +8,7 @@ import { TickStepMs } from "~/v1/tick/TickStepMs";
 export namespace GameLoopLayerFx {
 	export interface Props {
 		intervalMs?: number;
-		onTickError?: (cause: unknown) => void;
+		onTickError?: (cause: unknown) => void | PromiseLike<void>;
 	}
 }
 

@@ -15,10 +15,10 @@ export namespace createGameSession {
 		config: GameConfigSchema.Type;
 		state?: StateSchema.Type;
 		tickIntervalMs?: number;
-		onTickError?: (cause: unknown) => void;
+		onTickError?: (cause: unknown) => void | PromiseLike<void>;
 		save?: {
 			debounceMs?: number;
-			onError?: (error: SaveError) => void;
+			onError?: (error: SaveError) => void | PromiseLike<void>;
 			write: (state: StateSchema.Type) => Effect.Effect<void, SaveError>;
 		};
 	}

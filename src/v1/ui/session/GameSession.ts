@@ -18,6 +18,8 @@ export interface GameSession {
 	readonly run: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
 	) => Promise<Result>;
-	readonly subscribe: (listener: () => void) => () => void;
-	readonly subscribeEvents: (listener: (batch: GameEventBatchSchema.Type) => void) => () => void;
+	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
+	readonly subscribeEvents: (
+		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
+	) => () => void;
 }

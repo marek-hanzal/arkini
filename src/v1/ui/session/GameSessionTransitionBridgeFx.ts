@@ -5,8 +5,10 @@ import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchem
 import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 
 export interface GameSessionTransitionBridge {
-	readonly subscribe: (listener: () => void) => () => void;
-	readonly subscribeEvents: (listener: (batch: GameEventBatchSchema.Type) => void) => () => void;
+	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
+	readonly subscribeEvents: (
+		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
+	) => () => void;
 }
 
 /**
@@ -16,8 +18,10 @@ export interface GameSessionTransitionBridge {
 export const GameSessionTransitionBridgeFx = Effect.gen(function* () {
 	const committedTransitions = yield* CommittedTransitionsFx;
 	const subscription = yield* committedTransitions.subscribe;
-	const runtimeListeners = new Set<() => void>();
-	const eventListeners = new Set<(batch: GameEventBatchSchema.Type) => void>();
+	const runtimeListeners = new Set<() => void | PromiseLike<void>>();
+	const eventListeners = new Set<
+		(batch: GameEventBatchSchema.Type) => void | PromiseLike<void>
+	>();
 
 	const delivery = subscription.changes.pipe(
 		Stream.mapAccum(
@@ -84,11 +88,13 @@ export const GameSessionTransitionBridgeFx = Effect.gen(function* () {
 	yield* Effect.forkScoped(delivery);
 
 	return {
-		subscribe: (listener: () => void) => {
+		subscribe: (listener: () => void | PromiseLike<void>) => {
 			runtimeListeners.add(listener);
 			return () => runtimeListeners.delete(listener);
 		},
-		subscribeEvents: (listener: (batch: GameEventBatchSchema.Type) => void) => {
+		subscribeEvents: (
+			listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
+		) => {
 			eventListeners.add(listener);
 			return () => eventListeners.delete(listener);
 		},

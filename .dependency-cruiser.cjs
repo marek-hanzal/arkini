@@ -41,6 +41,19 @@ const boundaryRules = [
 			],
 		},
 	},
+
+	{
+		name: "v1-ui-no-core-internal-imports",
+		comment:
+			"V1 UI is a thin adapter over public engine services. Core internal modules stay behind their owning domain boundaries.",
+		severity: "error",
+		from: {
+			path: "^src/v1/ui(?:/|$)",
+		},
+		to: {
+			path: "^src/v1/(?!ui(?:/|$)).+/internal(?:/|$)",
+		},
+	},
 	{
 		name: "no-local-index-barrel-imports",
 		comment:

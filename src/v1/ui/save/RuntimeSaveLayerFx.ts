@@ -30,6 +30,7 @@ export const RuntimeSaveLayerFx = <Error>({
 		RuntimeSaveFx,
 		Effect.gen(function* () {
 			const committedTransitions = yield* CommittedTransitionsFx;
+			const subscription = yield* committedTransitions.subscribe;
 			const runtimeFx = yield* RuntimeFx;
 			const lastSaved = yield* Ref.make<RuntimeSchema.Type | undefined>(undefined);
 			const saveMutex = yield* Effect.makeSemaphore(1);
@@ -52,7 +53,8 @@ export const RuntimeSaveLayerFx = <Error>({
 				),
 			);
 
-			const stream = committedTransitions.changes.pipe(
+			const stream = Stream.make(subscription.current).pipe(
+				Stream.concat(subscription.changes),
 				debounceMs > 0 ? Stream.debounce(`${debounceMs} millis`) : (value) => value,
 				Stream.runForEach(() =>
 					flush.pipe(

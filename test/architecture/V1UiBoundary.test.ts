@@ -25,6 +25,15 @@ describe("v1 UI boundary", () => {
 		expect(offenders).toEqual([]);
 	});
 
+	it("keeps UI adapters out of core internal modules", () => {
+		const offenders = readFiles(resolve(root, "ui"))
+			.filter((path) => /\.(ts|tsx)$/.test(path))
+			.filter((path) => /~\/v1\/(?!ui\/)[^"']*\/internal\//.test(readFileSync(path, "utf8")))
+			.map((path) => relative(root, path));
+
+		expect(offenders).toEqual([]);
+	});
+
 	it("keeps core v1 code independent from UI adapters", () => {
 		const offenders = readFiles(root)
 			.filter((path) => /\.(ts|tsx)$/.test(path))

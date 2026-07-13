@@ -1,14 +1,12 @@
-import { Effect, Exit, Fiber, FiberSet, Layer, ManagedRuntime, Scope, Stream } from "effect";
+import { Effect, Exit, FiberSet, Layer, ManagedRuntime, Scope } from "effect";
 
-import { invokeExternalCallbackFx } from "~/v1/common/fx/invokeExternalCallbackFx";
 import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
-import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
 import { GameSessionLayerFx } from "~/v1/game/layer/GameSessionLayerFx";
-import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import type { GameSession, GameSessionServices } from "~/v1/ui/session/GameSession";
+import { GameSessionTransitionBridgeFx } from "~/v1/ui/session/GameSessionTransitionBridgeFx";
 import { RuntimeSaveFx } from "~/v1/ui/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/v1/ui/save/RuntimeSaveLayerFx";
 
@@ -52,65 +50,15 @@ export const createGameSession = async <SaveError>({
 				}).pipe(Layer.provide(sessionLayer));
 	const layer = Layer.merge(sessionLayer, saveLayer);
 	const managed = ManagedRuntime.make(layer);
-	const commandScope = await managed.runPromise(Scope.make());
-	const runCommand = await managed.runPromise(
-		FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(commandScope)),
+	const sessionScope = await managed.runPromise(Scope.make());
+	const transitionBridge = await managed.runPromise(
+		GameSessionTransitionBridgeFx.pipe(Scope.extend(sessionScope)),
 	);
-	let snapshot = await managed.runPromise(readRuntimeFx());
+	const runCommand = await managed.runPromise(
+		FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(sessionScope)),
+	);
 	let disposed = false;
 	let disposePromise: Promise<void> | undefined;
-	const runtimeListeners = new Set<() => void>();
-	const eventListeners = new Set<(batch: GameEventBatchSchema.Type) => void>();
-
-	const transitionFiber = managed.runFork(
-		CommittedTransitionsFx.pipe(
-			Effect.flatMap((service) =>
-				service.changes.pipe(
-					Stream.runForEach((transition) =>
-						Effect.gen(function* () {
-							snapshot = transition.runtime;
-							yield* Effect.forEach(
-								[
-									...runtimeListeners,
-								],
-								(listener) =>
-									invokeExternalCallbackFx({
-										callback: listener,
-										failureMessage:
-											"Arkini runtime listener failed; remaining session listeners continue.",
-										value: undefined,
-									}),
-								{
-									discard: true,
-								},
-							);
-
-							if (transition.events.length === 0) return;
-
-							const batch = {
-								events: transition.events,
-							};
-							yield* Effect.forEach(
-								[
-									...eventListeners,
-								],
-								(listener) =>
-									invokeExternalCallbackFx({
-										callback: listener,
-										failureMessage:
-											"Arkini event listener failed; remaining session listeners continue.",
-										value: batch,
-									}),
-								{
-									discard: true,
-								},
-							);
-						}),
-					),
-				),
-			),
-		),
-	);
 
 	const flushSave = () =>
 		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)));
@@ -122,15 +70,12 @@ export const createGameSession = async <SaveError>({
 		disposePromise = (async () => {
 			let flushError: unknown;
 			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
-			await managed.runPromise(Scope.close(commandScope, Exit.void));
-			await managed.runPromise(Fiber.interrupt(transitionFiber));
+			await managed.runPromise(Scope.close(sessionScope, Exit.void));
 			try {
 				await flushSave();
 			} catch (error) {
 				flushError = error;
 			}
-			runtimeListeners.clear();
-			eventListeners.clear();
 			await managed.dispose();
 			if (flushError !== undefined) throw flushError;
 		})();
@@ -141,20 +86,18 @@ export const createGameSession = async <SaveError>({
 	return {
 		dispose,
 		flushSave,
-		getSnapshot: () => snapshot,
+		getSnapshot: () => managed.runSync(readRuntimeFx()),
 		run: (effect) => {
 			if (disposed) return Promise.reject(new Error("Game session is disposed."));
 			return runCommand(effect);
 		},
 		subscribe: (listener) => {
 			if (disposed) return () => undefined;
-			runtimeListeners.add(listener);
-			return () => runtimeListeners.delete(listener);
+			return transitionBridge.subscribe(listener);
 		},
 		subscribeEvents: (listener) => {
 			if (disposed) return () => undefined;
-			eventListeners.add(listener);
-			return () => eventListeners.delete(listener);
+			return transitionBridge.subscribeEvents(listener);
 		},
 	};
 };

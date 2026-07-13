@@ -1,4 +1,4 @@
-import { Effect, Layer, Stream, SubscriptionRef } from "effect";
+import { Effect, Layer, Option, Sink, Stream, SubscriptionRef } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
@@ -54,7 +54,14 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		CommittedTransitionsFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
-				changes: store.changes.pipe(Stream.changesWith(Object.is)),
+				subscribe: store.changes.pipe(
+					Stream.changesWith(Object.is),
+					Stream.peel(Sink.head<CommittedTransitionSchema.Type>()),
+					Effect.map(([current, changes]) => ({
+						current: Option.getOrThrow(current),
+						changes,
+					})),
+				),
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));

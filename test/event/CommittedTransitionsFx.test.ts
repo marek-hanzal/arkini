@@ -1,6 +1,8 @@
-import { Effect } from "effect";
+import { Effect, Fiber, Option, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameLayerFx } from "~/v1/game/layer/GameLayerFx";
+import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { createGameSession } from "~/v1/ui/session/createGameSession";
@@ -19,6 +21,46 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 };
 
 describe("committed transition events", () => {
+	it("opens an atomic current-plus-tail subscription without replaying current", async () => {
+		const [current, next, itemId] = await Effect.runPromise(
+			Effect.scoped(
+				Effect.gen(function* () {
+					const transitions = yield* CommittedTransitionsFx;
+					const subscription = yield* transitions.subscribe;
+					const nextFiber = yield* subscription.changes.pipe(Stream.runHead, Effect.fork);
+					const item = yield* spawnItemFx({
+						id: "runtime:subscription:first-tail",
+						itemId: "water",
+						location: {
+							scope: "inventory",
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
+					const next = Option.getOrThrow(yield* Fiber.join(nextFiber));
+
+					return [
+						subscription.current,
+						next,
+						item.id,
+					] as const;
+				}),
+			).pipe(
+				Effect.provide(
+					GameLayerFx({
+						config: createJobTestConfig(),
+					}),
+				),
+			),
+		);
+
+		expect(current.runtime.items).toEqual([]);
+		expect(next.runtime.items.some((item) => item.id === itemId)).toBe(true);
+	});
+
 	it("does not publish events for a candidate runtime that fails validation", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),

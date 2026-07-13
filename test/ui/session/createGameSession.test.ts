@@ -19,8 +19,24 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 	}
 };
 
+const emitCompletedEventFx = (jobId: string) =>
+	modifyRuntimeFx((runtime) =>
+		Effect.succeed([
+			undefined,
+			runtime,
+			[
+				{
+					type: "job:completed" as const,
+					jobId,
+					ownerItemId: "owner:listener",
+					lineId: "line:listener",
+				},
+			],
+		] as const),
+	);
+
 describe("createGameSession", () => {
-	it("keeps the initial committed transition harmless for React snapshots", async () => {
+	it("does not replay the initial committed transition to React subscribers", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
@@ -34,18 +50,19 @@ describe("createGameSession", () => {
 		try {
 			await new Promise((resolve) => setTimeout(resolve, 20));
 			expect(session.getSnapshot()).toBe(initial);
-			expect(notifications).toBeLessThanOrEqual(1);
+			expect(notifications).toBe(0);
 		} finally {
 			unsubscribe();
 			await session.dispose();
 		}
 	});
 
-	it("keeps one managed runtime for commands and synchronous UI snapshots", async () => {
+	it("exposes a committed command runtime synchronously when run resolves", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
+		const initial = session.getSnapshot();
 		let notifications = 0;
 		const unsubscribe = session.subscribe(() => {
 			notifications += 1;
@@ -67,13 +84,40 @@ describe("createGameSession", () => {
 				}),
 			);
 
-			await waitFor(() =>
-				session.getSnapshot().items.some((candidate) => candidate.id === item.id),
-			);
-			expect(session.getSnapshot().items).toHaveLength(1);
-			expect(notifications).toBeGreaterThan(0);
+			const committed = session.getSnapshot();
+			expect(committed).not.toBe(initial);
+			expect(committed.items.some((candidate) => candidate.id === item.id)).toBe(true);
+			expect(committed.items).toHaveLength(1);
+			await waitFor(() => notifications === 1);
 		} finally {
 			unsubscribe();
+			await session.dispose();
+		}
+	});
+
+	it("does not notify runtime subscribers for event-only transitions", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let runtimeNotifications = 0;
+		let eventNotifications = 0;
+		const unsubscribeRuntime = session.subscribe(() => {
+			runtimeNotifications += 1;
+		});
+		const unsubscribeEvents = session.subscribeEvents(() => {
+			eventNotifications += 1;
+		});
+
+		try {
+			const before = session.getSnapshot();
+			await session.run(emitCompletedEventFx("job:event-only"));
+			expect(session.getSnapshot()).toBe(before);
+			await waitFor(() => eventNotifications === 1);
+			expect(runtimeNotifications).toBe(0);
+		} finally {
+			unsubscribeRuntime();
+			unsubscribeEvents();
 			await session.dispose();
 		}
 	});
@@ -83,7 +127,6 @@ describe("createGameSession", () => {
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		await new Promise((resolve) => setTimeout(resolve, 10));
 		let notifications = 0;
 		const unsubscribe = session.subscribe(() => {
 			notifications += 1;
@@ -103,7 +146,7 @@ describe("createGameSession", () => {
 		}
 	});
 
-	it("updates the synchronous runtime snapshot before delivering transition events", async () => {
+	it("updates the canonical runtime before delivering transition events", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
@@ -131,6 +174,107 @@ describe("createGameSession", () => {
 			expect(observedStartedJob).toBe(true);
 		} finally {
 			unsubscribe();
+			await session.dispose();
+		}
+	});
+
+	it("delivers runtime invalidation before events for a combined transition", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const delivery: string[] = [];
+		let observedSnapshot = session.getSnapshot();
+		const unsubscribeRuntime = session.subscribe(() => {
+			delivery.push("runtime");
+		});
+		const unsubscribeEvents = session.subscribeEvents(() => {
+			delivery.push("events");
+			observedSnapshot = session.getSnapshot();
+		});
+
+		try {
+			const before = session.getSnapshot();
+			await session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.succeed([
+						undefined,
+						{
+							...runtime,
+						},
+						[
+							{
+								type: "job:completed" as const,
+								jobId: "job:combined",
+								ownerItemId: "owner:combined",
+								lineId: "line:combined",
+							},
+						],
+					] as const),
+				),
+			);
+			const committed = session.getSnapshot();
+			expect(committed).not.toBe(before);
+			await waitFor(() => delivery.length === 2);
+			expect(delivery).toEqual([
+				"runtime",
+				"events",
+			]);
+			expect(observedSnapshot).toBe(committed);
+		} finally {
+			unsubscribeRuntime();
+			unsubscribeEvents();
+			await session.dispose();
+		}
+	});
+
+	it("does not let pending async listeners block the remaining delivery", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let releasePending: (() => void) | undefined;
+		const pending = new Promise<void>((resolve) => {
+			releasePending = resolve;
+		});
+		let healthyNotifications = 0;
+		let eventNotifications = 0;
+		const unsubscribePending = session.subscribe(async () => {
+			await pending;
+		});
+		const unsubscribeHealthy = session.subscribe(() => {
+			healthyNotifications += 1;
+		});
+		const unsubscribeEvents = session.subscribeEvents(() => {
+			eventNotifications += 1;
+		});
+
+		try {
+			const item = await session.run(
+				spawnItemFx({
+					id: "runtime:water:pending-listener",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+
+			expect(session.getSnapshot().items.some((candidate) => candidate.id === item.id)).toBe(
+				true,
+			);
+			await waitFor(() => healthyNotifications === 1);
+			expect(eventNotifications).toBe(0);
+		} finally {
+			releasePending?.();
+			unsubscribePending();
+			unsubscribeHealthy();
+			unsubscribeEvents();
 			await session.dispose();
 		}
 	});
@@ -168,6 +312,7 @@ describe("createGameSession", () => {
 					elapsedMs: 2_000,
 				}),
 			);
+			expect(session.getSnapshot().jobs).toHaveLength(0);
 
 			await waitFor(() => batches.length === 2);
 			expect(batches).toEqual([
@@ -186,12 +331,16 @@ describe("createGameSession", () => {
 		}
 	});
 
-	it("keeps the committed-transition bridge alive when runtime and event listeners throw", async () => {
+	it("isolates throwing and rejected listeners without losing later transitions", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		await new Promise((resolve) => setTimeout(resolve, 20));
+		const unhandledRejections: unknown[] = [];
+		const onUnhandledRejection = (reason: unknown) => {
+			unhandledRejections.push(reason);
+		};
+		process.on("unhandledRejection", onUnhandledRejection);
 		let runtimeNotifications = 0;
 		let eventNotifications = 0;
 		const unsubscribeThrowingRuntime = session.subscribe(() => {
@@ -200,52 +349,59 @@ describe("createGameSession", () => {
 		const unsubscribeHealthyRuntime = session.subscribe(() => {
 			runtimeNotifications += 1;
 		});
-		const unsubscribeThrowingEvent = session.subscribeEvents(() => {
-			throw new Error("event listener exploded");
+		const unsubscribeRejectedEvent = session.subscribeEvents(async () => {
+			throw new Error("async event listener exploded");
 		});
 		const unsubscribeHealthyEvent = session.subscribeEvents(() => {
 			eventNotifications += 1;
 		});
-		const emit = (jobId: string) =>
-			modifyRuntimeFx((runtime) =>
-				Effect.succeed([
-					undefined,
-					runtime,
-					[
-						{
-							type: "job:completed" as const,
-							jobId,
-							ownerItemId: "owner:listener",
-							lineId: "line:listener",
-						},
-					],
-				] as const),
-			);
 
 		try {
-			await session.run(emit("job:listener:first"));
-			await session.run(emit("job:listener:second"));
-			await waitFor(() => runtimeNotifications === 2 && eventNotifications === 2);
+			await session.run(
+				spawnItemFx({
+					id: "runtime:water:listener",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await session.run(emitCompletedEventFx("job:listener:first"));
+			await session.run(emitCompletedEventFx("job:listener:second"));
+			await waitFor(() => runtimeNotifications === 1 && eventNotifications === 2);
+			await new Promise((resolve) => setTimeout(resolve, 20));
 
-			expect(runtimeNotifications).toBe(2);
+			expect(runtimeNotifications).toBe(1);
 			expect(eventNotifications).toBe(2);
+			expect(unhandledRejections).toEqual([]);
 		} finally {
+			process.off("unhandledRejection", onUnhandledRejection);
 			unsubscribeThrowingRuntime();
 			unsubscribeHealthyRuntime();
-			unsubscribeThrowingEvent();
+			unsubscribeRejectedEvent();
 			unsubscribeHealthyEvent();
 			await session.dispose();
 		}
 	});
 
-	it("keeps retrying Tick failures when the reporting callback throws", async () => {
+	it("keeps retrying Tick failures when an async reporting callback rejects", async () => {
+		const unhandledRejections: unknown[] = [];
+		const onUnhandledRejection = (reason: unknown) => {
+			unhandledRejections.push(reason);
+		};
+		process.on("unhandledRejection", onUnhandledRejection);
 		let reports = 0;
 		const session = await createGameSession({
 			config: createInvalidReplacementTestConfig(),
-			tickIntervalMs: 1,
-			onTickError: () => {
+			tickIntervalMs: 5,
+			onTickError: async () => {
 				reports += 1;
-				throw new Error("tick reporter exploded");
+				throw new Error("async tick reporter exploded");
 			},
 		});
 
@@ -272,8 +428,12 @@ describe("createGameSession", () => {
 			);
 
 			await waitFor(() => reports >= 2, 2_000);
+			await session.dispose();
+			await new Promise((resolve) => setTimeout(resolve, 20));
 			expect(reports).toBeGreaterThanOrEqual(2);
+			expect(unhandledRejections).toEqual([]);
 		} finally {
+			process.off("unhandledRejection", onUnhandledRejection);
 			await session.dispose();
 		}
 	});

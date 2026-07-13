@@ -29,21 +29,11 @@ const dispatchOwnerQueueFx = Effect.fn("dispatchOwnerQueueFx")(function* (
 	ownerItemId: IdSchema.Type,
 	runtime: RuntimeSchema.Type,
 ) {
-	const request = (runtime.jobQueue ?? []).find(
-		(candidate) => candidate.ownerItemId === ownerItemId,
-	);
-	if (request === undefined) {
-		return {
-			type: "empty",
-			runtime,
-		} as const;
-	}
-
 	const attempt = yield* attemptQueuedLineStartFx({
-		request,
+		ownerItemId,
 		runtime,
 	});
-	if (attempt.type === "blocked") return attempt;
+	if (attempt.type !== "started") return attempt;
 
 	return {
 		type: "started",
@@ -126,7 +116,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		const owner = draft.items.find((item) => item.id === liveJob.ownerItemId);
 		if (owner?.location.scope === "inventory") continue;
 		const completion = yield* attemptJobCompletionFx({
-			job: liveJob,
+			jobId: liveJob.id,
 			runtime: draft,
 		});
 		if (completion.type === "blocked") continue;

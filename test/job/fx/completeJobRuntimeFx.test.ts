@@ -1,11 +1,11 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { attemptJobCompletionFx } from "~/v1/job/fx/attemptJobCompletionFx";
 import { completeJobRuntimeFx } from "~/v1/job/fx/completeJobRuntimeFx";
-import { makeJobCompletionRandom } from "~/v1/job/random/makeJobCompletionRandom";
+import { makeJobCompletionRandomFx } from "~/v1/job/random/makeJobCompletionRandomFx";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
-import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import {
 	createRandomCompletionConfig,
@@ -19,7 +19,7 @@ describe("completeJobRuntimeFx", () => {
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();
 				const immediate = yield* completeJobRuntimeFx({
-					job: prepared.job,
+					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
 					Effect.withRandom(
@@ -29,7 +29,7 @@ describe("completeJobRuntimeFx", () => {
 					),
 				);
 				const blocked = yield* attemptJobCompletionFx({
-					job: prepared.job,
+					jobId: prepared.job.id,
 					runtime: prepared.fullRuntime,
 				}).pipe(
 					Effect.withRandom(
@@ -39,7 +39,7 @@ describe("completeJobRuntimeFx", () => {
 					),
 				);
 				const retried = yield* completeJobRuntimeFx({
-					job: prepared.job,
+					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
 					Effect.withRandom(
@@ -54,7 +54,7 @@ describe("completeJobRuntimeFx", () => {
 				const restoredJob = restoredRuntime.jobs[0];
 				if (restoredJob === undefined) throw new Error("Expected restored completion job.");
 				const restored = yield* completeJobRuntimeFx({
-					job: restoredJob,
+					jobId: restoredJob.id,
 					runtime: restoredRuntime,
 				}).pipe(
 					Effect.withRandom(
@@ -83,6 +83,69 @@ describe("completeJobRuntimeFx", () => {
 		expect(result.restored).toEqual(result.immediate);
 	});
 
+	it("rejects an absent stale job before producing output", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const prepared = yield* prepareRandomCompletionRuntimeFx();
+				return yield* Effect.either(
+					completeJobRuntimeFx({
+						jobId: prepared.job.id,
+						runtime: {
+							...prepared.freeRuntime,
+							jobs: [],
+						},
+					}),
+				);
+			}).pipe(
+				useGameFx({
+					config: createRandomCompletionConfig(),
+				}),
+			),
+		);
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "JobNotFoundError",
+			},
+		});
+	});
+
+	it("rejects a live running job at the completion boundary", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const prepared = yield* prepareRandomCompletionRuntimeFx();
+				const runningJob = {
+					...prepared.job,
+					remainingMs: 200,
+				} satisfies JobSchema.Type;
+				return yield* Effect.either(
+					attemptJobCompletionFx({
+						jobId: runningJob.id,
+						runtime: {
+							...prepared.freeRuntime,
+							jobs: [
+								runningJob,
+							],
+						},
+					}),
+				);
+			}).pipe(
+				useGameFx({
+					config: createRandomCompletionConfig(),
+				}),
+			),
+		);
+
+		expect(result).toMatchObject({
+			_tag: "Left",
+			left: {
+				_tag: "JobNotReadyError",
+				remainingMs: 200,
+			},
+		});
+	});
+
 	it("derives distinct deterministic streams for distinct jobs", () => {
 		const baseJob = {
 			id: "job:completion-random:first",
@@ -99,12 +162,15 @@ describe("completeJobRuntimeFx", () => {
 		} satisfies JobSchema.Type;
 		const readStream = (job: JobSchema.Type) =>
 			Effect.runSync(
-				Effect.all([
-					Random.next,
-					Random.next,
-					Random.next,
-					Random.next,
-				]).pipe(Effect.withRandom(makeJobCompletionRandom(job))),
+				Effect.gen(function* () {
+					const random = yield* makeJobCompletionRandomFx(job);
+					return yield* Effect.all([
+						Random.next,
+						Random.next,
+						Random.next,
+						Random.next,
+					]).pipe(Effect.withRandom(random));
+				}),
 			);
 
 		expect(readStream(secondJob)).not.toEqual(readStream(baseJob));

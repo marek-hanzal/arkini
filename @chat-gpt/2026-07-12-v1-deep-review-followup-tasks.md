@@ -2,7 +2,7 @@
 
 Baseline review: `6bb12839`
 Implementation baseline: `538dd642`
-Updated through: `86d158a8`
+Updated through: job live-entity boundary hardening
 
 ## Verified complete
 
@@ -48,12 +48,14 @@ A reserved item is detached from the input buffer while its job is active, so th
 
 ## Required before job completion
 
-- [ ] Add one internal helper that releases all reserved items through standard drop placement over one evolving runtime draft.
-- [ ] Completion must resolve the exact live job by ID + revision inside one transaction.
-- [ ] Completion must release every reservation, place outputs, and remove the job atomically all-or-nothing.
-- [ ] Failed completion placement must preserve the job and every reservation unchanged.
+- [x] Completion releases all reserved items through standard drop placement over one evolving runtime draft.
+- [x] Completion accepts only the stable job ID, resolves the exact live job inside the current runtime draft, and rejects missing or still-running jobs before mutation. Revision is deliberately not accepted as detached caller state.
+- [x] Completion releases every reservation, places outputs, and removes the job atomically all-or-nothing.
+- [x] Failed completion placement preserves the job and every reservation unchanged.
 - [x] Generic remove and quantity mutation reject job-scoped reservations through `assertNonJobScopeFx`.
 - [x] Define owner movement semantics: board movement is live; inventory is a hard pause; permanent removal with active or queued work is invalid. Permanent removal now rejects active or queued work and atomically releases buffered inputs for idle owners.
+- [x] Queue dispatch accepts only `ownerItemId`, resolves the live FIFO head internally, and cannot start a detached request.
+- [x] Completion randomness is created through strict `makeJobCompletionRandomFx`; core has no pure-helper exception.
 - [ ] Add architecture tests if new public write commands appear.
 
 ## Deep-review guardrails

@@ -1,4 +1,4 @@
-import { Random } from "effect";
+import { Effect, Random } from "effect";
 
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 
@@ -11,7 +11,10 @@ export const JobCompletionRandomVersion = 1;
  * Retries, blocked delivery and state restore must replay the same random
  * choices. Job revision and wall-clock state are deliberately excluded.
  */
-export const makeJobCompletionRandom = (job: JobSchema.Type) =>
-	Random.make(
+export const makeJobCompletionRandomFx = Effect.fn("makeJobCompletionRandomFx")(function* (
+	job: JobSchema.Type,
+) {
+	return Random.make(
 		`arkini:job-completion:v${JobCompletionRandomVersion}:${job.id}:${job.ownerItemId}:${job.lineId}`,
 	);
+});

@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
-import type { JobSchema } from "~/v1/job/schema/JobSchema";
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { completeJobRuntimeFx } from "~/v1/job/fx/completeJobRuntimeFx";
 import type { PlacementUnavailableError } from "~/v1/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace attemptJobCompletionFx {
 	export interface Props {
-		job: JobSchema.Type;
+		jobId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 
@@ -35,13 +35,13 @@ const isExpectedCompletionBlock = (error: PlacementUnavailableError) => {
 	}
 };
 
-/** Keeps expected delivery-capacity failures local to one ready job. */
+/** Resolves one live ready job and keeps only expected delivery failures local. */
 export const attemptJobCompletionFx = Effect.fn("attemptJobCompletionFx")(function* ({
-	job,
+	jobId,
 	runtime,
 }: attemptJobCompletionFx.Props) {
 	return yield* completeJobRuntimeFx({
-		job,
+		jobId,
 		runtime,
 	}).pipe(
 		Effect.map(

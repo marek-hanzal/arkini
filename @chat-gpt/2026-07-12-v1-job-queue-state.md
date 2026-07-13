@@ -8,7 +8,7 @@
 - A queued request is not a job. It has no time, consumes nothing, and reserves nothing.
 - Queue dispatch uses the same internal `startLineRuntimeFx` pipeline as an immediate explicit start.
 - A queue-only owner is a valid runtime state and is retried at the beginning of every fixed simulation step.
-- A queued request is revalidated against the current runtime when dispatched. If it cannot start, it remains first in FIFO and nothing behind it may pass.
+- Queue dispatch accepts only the owner ID, resolves that owner's live FIFO head from the current runtime, and revalidates it before starting. If it cannot start, it remains first in FIFO and nothing behind it may pass. Detached queued-request objects are never accepted by the dispatch boundary.
 - An explicit start begins immediately only when the owner has no active job and no queued request. Otherwise it appends behind existing FIFO work.
 - Product-line spatial execution is board-only. Inventory coordinates are never valid board origins.
 - Moving an owner into inventory pauses every active job, including a ready job, and prevents queued dispatch. Returning the same owner to the board resumes normal fixed-step evaluation without a separate resume mutation.
@@ -44,6 +44,7 @@
 - Started jobs cannot be cancelled.
 - `reserve` inputs move to `location.scope === "job"` and remain an exclusive job-owned lock.
 - Generic item mutations reject job-scoped items through `assertNonJobScopeFx`.
+- Completion accepts only a stable job ID, resolves the live job from the supplied runtime, and rejects missing or still-running jobs before any draft work. Detached job objects are never accepted by the completion boundary.
 - Completion removes all reservation representations, releases all reserved resources through standard drop placement, resolves output through standard output placement, and removes the job.
 - Completion is all-or-nothing. Partial reservation release or partial output placement is forbidden.
 - Capacity or `maxCount` blocking is a valid ready-job state: the job and every reservation remain unchanged and completion is retried on later fixed steps.
@@ -64,7 +65,9 @@
 - `advanceRuntimeElapsedFx`: replays one already-acquired whole-step budget in one runtime transaction.
 - `advanceRuntimeStepFx`: advances one shared-snapshot fixed simulation step.
 - `startLineRuntimeFx`: canonical internal start pipeline used by direct start and queue dispatch.
-- `completeJobRuntimeFx`: canonical internal completion draft operation.
+- `completeJobRuntimeFx`: canonical internal completion boundary; resolves one live ready job by stable ID before building the atomic completion draft.
+- `attemptQueuedLineStartFx`: resolves one owner's live FIFO head and classifies only known transient start blockers.
+- `makeJobCompletionRandomFx`: Effect-program factory for the deterministic job-local completion `Random` service. Core helpers remain under the strict `*Fx` grammar.
 - `readOwnerJobQueueFx`: derives `running`, `paused`, or `ready` from `remainingMs` and live rules.
 
 ## Guardrails
@@ -73,7 +76,7 @@
 - Do not reintroduce `startedAtMs`, `dueAtMs`, `pausedAtMs`, or future queued job timestamps.
 - Do not create queued jobs in advance.
 - Do not create a queue-specific start implementation.
-- Do not pass stale preview plans into writes.
+- Do not pass stale preview plans, detached jobs, or detached queued requests into runtime mutations. Resolve live work by stable ID inside the owning boundary.
 - Do not clamp or discard elapsed real time merely because the browser tab slept.
 - Do not add job cancellation.
 - Do not pass inventory coordinates into board-distance, drop-origin, output-origin, or replacement logic.

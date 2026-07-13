@@ -1,25 +1,46 @@
 import { Effect } from "effect";
-import { makeJobCompletionRandom } from "~/v1/job/random/makeJobCompletionRandom";
-import type { JobSchema } from "~/v1/job/schema/JobSchema";
+
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
+import { JobNotFoundError } from "~/v1/job/error/JobNotFoundError";
+import { JobNotReadyError } from "~/v1/job/error/JobNotReadyError";
+import { makeJobCompletionRandomFx } from "~/v1/job/random/makeJobCompletionRandomFx";
+import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import { outputFx } from "~/v1/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
-import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
 import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
+
 export namespace completeJobRuntimeFx {
 	export interface Props {
-		job: JobSchema.Type;
+		jobId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
-/** Completes one job and releases every reservation plus output as one draft operation. */
+
+/** Resolves and completes one live ready job as one atomic draft operation. */
 export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* ({
-	job,
+	jobId,
 	runtime,
 }: completeJobRuntimeFx.Props) {
+	const job = runtime.jobs.find((candidate) => candidate.id === jobId);
+	if (job === undefined)
+		return yield* Effect.fail(
+			new JobNotFoundError({
+				jobId,
+			}),
+		);
+	if (job.remainingMs !== 0)
+		return yield* Effect.fail(
+			new JobNotReadyError({
+				jobId: job.id,
+				remainingMs: job.remainingMs,
+			}),
+		);
+
+	const random = yield* makeJobCompletionRandomFx(job);
 	return yield* Effect.gen(function* () {
 		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
 		if (owner === undefined) return yield* Effect.dieMessage(`Job ${job.id} owner is missing.`);
@@ -75,5 +96,5 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 			draft = nextDraft;
 		}
 		return draft;
-	}).pipe(Effect.withRandom(makeJobCompletionRandom(job)));
+	}).pipe(Effect.withRandom(random));
 });

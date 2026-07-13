@@ -4,9 +4,10 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { attemptQueuedLineStartFx } from "~/v1/job/fx/attemptQueuedLineStartFx";
 import type { JobQueueRequestSchema } from "~/v1/job/schema/JobQueueRequestSchema";
+import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const config = createJobTestConfig(2);
 const request = {
@@ -29,11 +30,11 @@ const owner = {
 	revision: "revision:owner",
 } satisfies RuntimeItemSchema.Type;
 
-const runAttempt = (runtime: RuntimeSchema.Type, candidate = request) =>
+const runAttempt = (runtime: RuntimeSchema.Type, ownerItemId = request.ownerItemId) =>
 	Effect.runSync(
 		Effect.either(
 			attemptQueuedLineStartFx({
-				request: candidate,
+				ownerItemId,
 				runtime,
 			}),
 		).pipe(
@@ -44,6 +45,26 @@ const runAttempt = (runtime: RuntimeSchema.Type, candidate = request) =>
 	);
 
 describe("attemptQueuedLineStartFx", () => {
+	it("returns empty when the owner has no live queued request", () => {
+		const runtime = {
+			items: [
+				owner,
+			],
+			jobs: [],
+			jobQueue: [],
+		} satisfies RuntimeSchema.Type;
+
+		const result = runAttempt(runtime);
+
+		expect(result).toMatchObject({
+			_tag: "Right",
+			right: {
+				type: "empty",
+			},
+		});
+		if (result._tag === "Right") expect(result.right.runtime).toBe(runtime);
+	});
+
 	it("keeps missing inputs as an explicit retryable block", () => {
 		const runtime = {
 			items: [
@@ -121,7 +142,7 @@ describe("attemptQueuedLineStartFx", () => {
 		});
 	});
 
-	it("propagates a missing line instead of retrying forever", () => {
+	it("propagates a missing line from the live FIFO head", () => {
 		const missingLineRequest = {
 			...request,
 			lineId: "line:missing",
@@ -136,11 +157,49 @@ describe("attemptQueuedLineStartFx", () => {
 			],
 		} satisfies RuntimeSchema.Type;
 
-		expect(runAttempt(runtime, missingLineRequest)).toMatchObject({
+		expect(runAttempt(runtime)).toMatchObject({
 			_tag: "Left",
 			left: {
 				_tag: "LineNotFoundError",
 			},
 		});
+	});
+
+	it("starts only the owner's live FIFO head through the canonical pipeline", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				const prepared = yield* readRuntimeFx();
+				const secondRequest = {
+					...request,
+					id: "job:request:second",
+					revision: "revision:request:second",
+				} satisfies JobQueueRequestSchema.Type;
+				const runtime = {
+					...prepared,
+					jobQueue: [
+						request,
+						secondRequest,
+					],
+				} satisfies RuntimeSchema.Type;
+				return yield* attemptQueuedLineStartFx({
+					ownerItemId: request.ownerItemId,
+					runtime,
+				});
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.type).toBe("started");
+		if (result.type !== "started") throw new Error("Expected the FIFO request to start.");
+		expect(result.job.lineId).toBe(request.lineId);
+		expect(result.runtime.jobQueue).toEqual([
+			expect.objectContaining({
+				id: "job:request:second",
+			}),
+		]);
 	});
 });

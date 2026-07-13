@@ -1,5 +1,6 @@
 import { Effect, Fiber, Layer, Ref, Stream } from "effect";
 
+import { invokeExternalCallbackFx } from "~/v1/common/fx/invokeExternalCallbackFx";
 import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -54,7 +55,16 @@ export const RuntimeSaveLayerFx = <Error>({
 			const stream = committedTransitions.changes.pipe(
 				debounceMs > 0 ? Stream.debounce(`${debounceMs} millis`) : (value) => value,
 				Stream.runForEach(() =>
-					flush.pipe(Effect.catchAll((error) => Effect.sync(() => onError(error)))),
+					flush.pipe(
+						Effect.catchAll((error) =>
+							invokeExternalCallbackFx({
+								callback: onError,
+								failureMessage:
+									"Arkini autosave error callback failed; the save consumer remains active.",
+								value: error,
+							}),
+						),
+					),
 				),
 			);
 			const consumer = yield* Effect.forkScoped(stream);
@@ -62,7 +72,16 @@ export const RuntimeSaveLayerFx = <Error>({
 			yield* Effect.addFinalizer(() =>
 				Fiber.interrupt(consumer).pipe(
 					Effect.zipRight(
-						flush.pipe(Effect.catchAll((error) => Effect.sync(() => onError(error)))),
+						flush.pipe(
+							Effect.catchAll((error) =>
+								invokeExternalCallbackFx({
+									callback: onError,
+									failureMessage:
+										"Arkini autosave error callback failed during finalization.",
+									value: error,
+								}),
+							),
+						),
 					),
 				),
 			);

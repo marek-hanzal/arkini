@@ -146,6 +146,107 @@ describe("RuntimeSaveLayerFx", () => {
 		}
 	});
 
+	it("keeps the autosave consumer alive when its reporting callback throws", async () => {
+		let writes = 0;
+		let reports = 0;
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 0,
+				onError: () => {
+					reports += 1;
+					throw new Error("save reporter exploded");
+				},
+				write: () =>
+					Effect.sync(() => {
+						writes += 1;
+					}).pipe(Effect.zipRight(Effect.fail(new Error("save failed")))),
+			},
+		});
+
+		try {
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:reporter:first",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await sleep(30);
+			await session.run(
+				spawnItemFx({
+					id: "runtime:save:reporter:second",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			await sleep(30);
+
+			expect(writes).toBeGreaterThanOrEqual(2);
+			expect(reports).toBeGreaterThanOrEqual(2);
+		} finally {
+			await expect(session.dispose()).rejects.toThrow("save failed");
+		}
+	});
+
+	it("makes concurrent dispose callers await the same final cleanup", async () => {
+		let markSaveStarted: (() => void) | undefined;
+		let releaseSave: (() => void) | undefined;
+		const saveStarted = new Promise<void>((resolve) => {
+			markSaveStarted = resolve;
+		});
+		const saveGate = new Promise<void>((resolve) => {
+			releaseSave = resolve;
+		});
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 60_000,
+				write: () =>
+					Effect.promise(async () => {
+						markSaveStarted?.();
+						await saveGate;
+					}),
+			},
+		});
+
+		const first = session.dispose();
+		await saveStarted;
+		const second = session.dispose();
+		let secondSettled = false;
+		void second.finally(() => {
+			secondSettled = true;
+		});
+
+		try {
+			expect(second).toBe(first);
+			await sleep(20);
+			expect(secondSettled).toBe(false);
+		} finally {
+			releaseSave?.();
+			await Promise.all([
+				first,
+				second,
+			]);
+		}
+	});
+
 	it("stops the production Tick loop before flushing the final runtime", async () => {
 		const config = createJobTestConfig();
 		const forge = config.items.forge;

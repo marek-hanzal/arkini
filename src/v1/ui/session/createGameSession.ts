@@ -1,5 +1,6 @@
 import { Effect, Exit, Fiber, FiberSet, Layer, ManagedRuntime, Scope, Stream } from "effect";
 
+import { invokeExternalCallbackFx } from "~/v1/common/fx/invokeExternalCallbackFx";
 import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
 import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
 import { GameSessionLayerFx } from "~/v1/game/layer/GameSessionLayerFx";
@@ -57,6 +58,7 @@ export const createGameSession = async <SaveError>({
 	);
 	let snapshot = await managed.runPromise(readRuntimeFx());
 	let disposed = false;
+	let disposePromise: Promise<void> | undefined;
 	const runtimeListeners = new Set<() => void>();
 	const eventListeners = new Set<(batch: GameEventBatchSchema.Type) => void>();
 
@@ -65,16 +67,44 @@ export const createGameSession = async <SaveError>({
 			Effect.flatMap((service) =>
 				service.changes.pipe(
 					Stream.runForEach((transition) =>
-						Effect.sync(() => {
+						Effect.gen(function* () {
 							snapshot = transition.runtime;
-							for (const listener of runtimeListeners) listener();
+							yield* Effect.forEach(
+								[
+									...runtimeListeners,
+								],
+								(listener) =>
+									invokeExternalCallbackFx({
+										callback: listener,
+										failureMessage:
+											"Arkini runtime listener failed; remaining session listeners continue.",
+										value: undefined,
+									}),
+								{
+									discard: true,
+								},
+							);
 
-							if (transition.events.length > 0) {
-								const batch = {
-									events: transition.events,
-								};
-								for (const listener of eventListeners) listener(batch);
-							}
+							if (transition.events.length === 0) return;
+
+							const batch = {
+								events: transition.events,
+							};
+							yield* Effect.forEach(
+								[
+									...eventListeners,
+								],
+								(listener) =>
+									invokeExternalCallbackFx({
+										callback: listener,
+										failureMessage:
+											"Arkini event listener failed; remaining session listeners continue.",
+										value: batch,
+									}),
+								{
+									discard: true,
+								},
+							);
 						}),
 					),
 				),
@@ -85,10 +115,11 @@ export const createGameSession = async <SaveError>({
 	const flushSave = () =>
 		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)));
 
-	return {
-		dispose: async () => {
-			if (disposed) return;
-			disposed = true;
+	const dispose = () => {
+		if (disposePromise !== undefined) return disposePromise;
+
+		disposed = true;
+		disposePromise = (async () => {
 			let flushError: unknown;
 			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
 			await managed.runPromise(Scope.close(commandScope, Exit.void));
@@ -102,7 +133,13 @@ export const createGameSession = async <SaveError>({
 			eventListeners.clear();
 			await managed.dispose();
 			if (flushError !== undefined) throw flushError;
-		},
+		})();
+
+		return disposePromise;
+	};
+
+	return {
+		dispose,
 		flushSave,
 		getSnapshot: () => snapshot,
 		run: (effect) => {

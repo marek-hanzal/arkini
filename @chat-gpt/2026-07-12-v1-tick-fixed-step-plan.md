@@ -59,6 +59,8 @@ Accepted after the independent Tick/queue review and follow-up architecture disc
 - [x] Reject new commands once disposal starts.
 - [x] Dispose stops Tick, interrupts and awaits in-flight commands, then performs final save.
 - [x] A delayed command cannot commit after the final save.
+- [x] Concurrent dispose callers await the same memoized cleanup Promise.
+- [x] Throwing Tick/save reporters and runtime/event listeners are logged without killing infrastructure fibers.
 
 ### Completed review follow-up: deterministic completion randomness
 

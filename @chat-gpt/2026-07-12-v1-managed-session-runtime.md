@@ -113,6 +113,18 @@ reject new GameSession.run calls
 → dispose ManagedRuntime
 ```
 
+The first `dispose()` call owns one memoized cleanup Promise. Every concurrent or later caller receives that same Promise and therefore observes the real completion or failure of the one shutdown operation. No caller may resolve merely because disposal has already started.
+
+## External callback isolation
+
+User/browser callbacks are outside the engine failure boundary. Tick reporting, save reporting, runtime listeners and event listeners run through `invokeExternalCallbackFx`. A callback defect is logged and swallowed so that:
+
+- one broken reporter does not terminate Tick or autosave retry;
+- one broken listener does not prevent remaining listeners from receiving the transition;
+- the committed-transition consumer remains alive for later commits.
+
+This is best-effort delivery only. Gameplay truth remains in the committed runtime even when one presentation callback fails.
+
 ## Explicit non-decisions
 
 Do not introduce by default:

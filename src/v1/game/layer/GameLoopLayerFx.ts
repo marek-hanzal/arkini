@@ -1,5 +1,6 @@
 import { Duration, Effect, Fiber, Layer, Schedule } from "effect";
 
+import { invokeExternalCallbackFx } from "~/v1/common/fx/invokeExternalCallbackFx";
 import { GameLoopFx } from "~/v1/game/context/GameLoopFx";
 import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
 import { TickStepMs } from "~/v1/tick/TickStepMs";
@@ -21,7 +22,13 @@ export const GameLoopLayerFx = ({
 	onTickError = defaultOnTickError,
 }: GameLoopLayerFx.Props = {}) => {
 	const advance = runTickRuntimeFx().pipe(
-		Effect.catchAllCause((cause) => Effect.sync(() => onTickError(cause))),
+		Effect.catchAllCause((cause) =>
+			invokeExternalCallbackFx({
+				callback: onTickError,
+				failureMessage: "Arkini tick error callback failed; the Tick loop remains active.",
+				value: cause,
+			}),
+		),
 	);
 
 	return Layer.scoped(

@@ -95,6 +95,89 @@ describe("createGameSession", () => {
 		}
 	});
 
+	it("does not replay transitions committed before event subscription", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const jobIds: string[] = [];
+
+		try {
+			await session.run(emitCompletedEventFx("job:event:before-subscribe"));
+			const unsubscribe = session.subscribeEvents((batch) => {
+				jobIds.push(...batch.events.map((event) => event.jobId));
+			});
+
+			try {
+				await new Promise((resolve) => setTimeout(resolve, 20));
+				expect(jobIds).toEqual([]);
+
+				await session.run(emitCompletedEventFx("job:event:after-subscribe"));
+				await waitFor(() => jobIds.length === 1);
+				expect(jobIds).toEqual([
+					"job:event:after-subscribe",
+				]);
+			} finally {
+				unsubscribe();
+			}
+		} finally {
+			await session.dispose();
+		}
+	});
+
+	it("does not invalidate runtime subscribers for commits completed before registration", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let notifications = 0;
+
+		try {
+			await session.run(
+				spawnItemFx({
+					id: "runtime:before-subscribe",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			);
+			const unsubscribe = session.subscribe(() => {
+				notifications += 1;
+			});
+
+			try {
+				await new Promise((resolve) => setTimeout(resolve, 20));
+				expect(notifications).toBe(0);
+
+				await session.run(
+					spawnItemFx({
+						id: "runtime:after-subscribe",
+						itemId: "water",
+						location: {
+							scope: "inventory",
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					}),
+				);
+				await waitFor(() => notifications === 1);
+			} finally {
+				unsubscribe();
+			}
+		} finally {
+			await session.dispose();
+		}
+	});
+
 	it("does not notify runtime subscribers for event-only transitions", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
@@ -178,18 +261,19 @@ describe("createGameSession", () => {
 		}
 	});
 
-	it("delivers runtime invalidation before events for a combined transition", async () => {
+	it("exposes the canonical runtime to every callback for a combined transition", async () => {
 		const session = await createGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		const delivery: string[] = [];
+		let runtimeNotifications = 0;
+		let eventNotifications = 0;
 		let observedSnapshot = session.getSnapshot();
 		const unsubscribeRuntime = session.subscribe(() => {
-			delivery.push("runtime");
+			runtimeNotifications += 1;
 		});
 		const unsubscribeEvents = session.subscribeEvents(() => {
-			delivery.push("events");
+			eventNotifications += 1;
 			observedSnapshot = session.getSnapshot();
 		});
 
@@ -215,15 +299,79 @@ describe("createGameSession", () => {
 			);
 			const committed = session.getSnapshot();
 			expect(committed).not.toBe(before);
-			await waitFor(() => delivery.length === 2);
-			expect(delivery).toEqual([
-				"runtime",
-				"events",
-			]);
+			await waitFor(() => runtimeNotifications === 1 && eventNotifications === 1);
 			expect(observedSnapshot).toBe(committed);
 		} finally {
 			unsubscribeRuntime();
 			unsubscribeEvents();
+			await session.dispose();
+		}
+	});
+
+	it("does not deliver the current transition to listeners registered during its callbacks", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const nestedJobIds: string[] = [];
+		let nestedUnsubscribe: (() => void) | undefined;
+		const unsubscribeRuntime = session.subscribe(() => {
+			nestedUnsubscribe ??= session.subscribeEvents((batch) => {
+				nestedJobIds.push(...batch.events.map((event) => event.jobId));
+			});
+		});
+
+		try {
+			await session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.succeed([
+						undefined,
+						{
+							...runtime,
+						},
+						[
+							{
+								type: "job:completed" as const,
+								jobId: "job:nested:current",
+								ownerItemId: "owner:nested",
+								lineId: "line:nested",
+							},
+						],
+					] as const),
+				),
+			);
+			await waitFor(() => nestedUnsubscribe !== undefined);
+			await new Promise((resolve) => setTimeout(resolve, 20));
+			expect(nestedJobIds).toEqual([]);
+
+			await session.run(emitCompletedEventFx("job:nested:next"));
+			await waitFor(() => nestedJobIds.length === 1);
+			expect(nestedJobIds).toEqual([
+				"job:nested:next",
+			]);
+		} finally {
+			nestedUnsubscribe?.();
+			unsubscribeRuntime();
+			await session.dispose();
+		}
+	});
+
+	it("stops subscriptions synchronously before later commits", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let notifications = 0;
+		const unsubscribe = session.subscribeEvents(() => {
+			notifications += 1;
+		});
+
+		try {
+			unsubscribe();
+			await session.run(emitCompletedEventFx("job:after-unsubscribe"));
+			await new Promise((resolve) => setTimeout(resolve, 20));
+			expect(notifications).toBe(0);
+		} finally {
 			await session.dispose();
 		}
 	});

@@ -7,6 +7,8 @@ export interface CommittedTransitionSubscription {
 	readonly current: CommittedTransitionSchema.Type;
 	/** Every successful commit after `current`, in commit order. */
 	readonly changes: Stream.Stream<CommittedTransitionSchema.Type>;
+	/** Stops this subscription immediately; its owning scope still releases resources. */
+	readonly shutdown: Effect.Effect<void>;
 }
 
 export interface CommittedTransitionsFxService {

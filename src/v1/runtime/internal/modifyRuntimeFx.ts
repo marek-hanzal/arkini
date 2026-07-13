@@ -1,4 +1,4 @@
-import { Effect, SynchronizedRef } from "effect";
+import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/v1/event/schema/GameEventSchema";
 import { assertRuntimeFx } from "~/v1/runtime/check/assertRuntimeFx";
@@ -37,7 +37,7 @@ export const modifyRuntimeFx = <Result, Error, Requirements>(
 	return Effect.gen(function* () {
 		const store = yield* RuntimeStoreFx;
 
-		return yield* SynchronizedRef.modifyEffect(store, (transition) => {
+		return yield* store.modifyEffect((transition) => {
 			return update(transition.runtime).pipe(
 				Effect.provideService(RuntimeFx, {
 					read: Effect.succeed(transition.runtime),

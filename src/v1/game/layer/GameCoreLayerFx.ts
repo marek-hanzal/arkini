@@ -1,4 +1,4 @@
-import { Effect, Layer, Option, Sink, Stream, SubscriptionRef } from "effect";
+import { Effect, Layer } from "effect";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
@@ -6,6 +6,7 @@ import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import type { CommittedTransitionSchema } from "~/v1/runtime/schema/CommittedTransitionSchema";
 import { fromConfigFx } from "~/v1/runtime/fx/fromConfigFx";
 import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
+import { makeRuntimeStoreFx } from "~/v1/runtime/internal/makeRuntimeStoreFx";
 import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
@@ -36,7 +37,7 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 					events: [],
 				}),
 			),
-			Effect.flatMap(SubscriptionRef.make),
+			Effect.flatMap(makeRuntimeStoreFx),
 			Effect.provide(configLayer),
 		),
 	);
@@ -44,9 +45,7 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		RuntimeFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
-				read: SubscriptionRef.get(store).pipe(
-					Effect.map((transition) => transition.runtime),
-				),
+				read: store.read.pipe(Effect.map((transition) => transition.runtime)),
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));
@@ -54,14 +53,7 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		CommittedTransitionsFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
-				subscribe: store.changes.pipe(
-					Stream.changesWith(Object.is),
-					Stream.peel(Sink.head<CommittedTransitionSchema.Type>()),
-					Effect.map(([current, changes]) => ({
-						current: Option.getOrThrow(current),
-						changes,
-					})),
-				),
+				subscribe: store.subscribe,
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));

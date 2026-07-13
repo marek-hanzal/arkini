@@ -6,7 +6,10 @@ import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import type { GameSession, GameSessionServices } from "~/v1/ui/session/GameSession";
-import { GameSessionTransitionBridgeFx } from "~/v1/ui/session/GameSessionTransitionBridgeFx";
+import {
+	type GameSessionTransitionSubscriptionCleanup,
+	GameSessionTransitionSubscriptionsFx,
+} from "~/v1/ui/session/GameSessionTransitionSubscriptionsFx";
 import { RuntimeSaveFx } from "~/v1/ui/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/v1/ui/save/RuntimeSaveLayerFx";
 
@@ -51,8 +54,8 @@ export const createGameSession = async <SaveError>({
 	const layer = Layer.merge(sessionLayer, saveLayer);
 	const managed = ManagedRuntime.make(layer);
 	const sessionScope = await managed.runPromise(Scope.make());
-	const transitionBridge = await managed.runPromise(
-		GameSessionTransitionBridgeFx.pipe(Scope.extend(sessionScope)),
+	const transitionSubscriptions = await managed.runPromise(
+		GameSessionTransitionSubscriptionsFx.pipe(Scope.extend(sessionScope)),
 	);
 	const runCommand = await managed.runPromise(
 		FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(sessionScope)),
@@ -83,6 +86,18 @@ export const createGameSession = async <SaveError>({
 		return disposePromise;
 	};
 
+	const openSubscription = (effect: Effect.Effect<GameSessionTransitionSubscriptionCleanup>) => {
+		const cleanup = managed.runSync(effect);
+		let closed = false;
+
+		return () => {
+			if (closed || disposed) return;
+			closed = true;
+			managed.runSync(cleanup.shutdown);
+			managed.runFork(cleanup.release);
+		};
+	};
+
 	return {
 		dispose,
 		flushSave,
@@ -93,11 +108,11 @@ export const createGameSession = async <SaveError>({
 		},
 		subscribe: (listener) => {
 			if (disposed) return () => undefined;
-			return transitionBridge.subscribe(listener);
+			return openSubscription(transitionSubscriptions.subscribe(listener));
 		},
 		subscribeEvents: (listener) => {
 			if (disposed) return () => undefined;
-			return transitionBridge.subscribeEvents(listener);
+			return openSubscription(transitionSubscriptions.subscribeEvents(listener));
 		},
 	};
 };

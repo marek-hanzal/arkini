@@ -1,5 +1,7 @@
 # 02 — Blueprint lifecycle
 
+
+> **Task 04 normalization:** finite item lifetime now comes from generic item charges and input charge costs. `afterCompletion` and output `replace` no longer exist. This file is historical only; root documentation and `@chat-gpt/CURRENT.md` own current behavior.
 **Status:** Done
 
 > **Later normalization:** Task 03 replaced the item-type completion branches and specialized output contracts described below with one `line.output` + item-level `afterCompletion` lifecycle. This file remains a historical decision record; current behavior is owned by root documentation and `@chat-gpt/CURRENT.md`.

@@ -31,7 +31,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Craft completion lifecycle | Partial | Generic authored completion lifecycle is canonical; presentation behavior remains | 13–15 |
 | Blueprint completion lifecycle | Partial | Generic authored output, placement, max-count reservation, and atomic retry are canonical; presentation feedback remains | 13–15 |
 | Stash completion lifecycle | Partial | Generic authored completion lifecycle is canonical; presentation and sound remain | 13–15 |
-| Deposit capacity/input/depletion | Reference | Behavior and edge cases remain | 04 |
+| Item charges, deposit input, depletion | Partial | Generic runtime behavior is canonical; read-model, detail, feedback, and animation remain | 10, 13, 14 |
 | Directional gameplay merge | Reference | Behavior, feedback, and tests remain | 05, 11, 14 |
 | Temporary lifetime/expiry | Reference | Timing/output behavior remains | 06 |
 | Speed cheat | Reference | Toggle behavior remains; old time model is rejected | 07 |
@@ -57,7 +57,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `board/` | Partial | Board runtime writes and canonical locations are superseded | Board layout, taps, drag feedback, visual state | 11, 12, 14 |
 | `board-memory/` | Reference | Only schema exists currently | Full save/restore behavior and edge cases | 08, 14 |
 | `browser/` | Reference | No active browser shell | Hard reset behavior only | 12, 17 |
-| `capacity/` | Reference | Current runtime has no deposit capacity | Capacity spending/depletion behavior | 04 |
+| `capacity/` | Partial | Generic item charges, deterministic deposit input, depletion, and output are superseded | Detail/read-model feedback and depletion animation | 10, 13, 14, 17 |
 | `cheat/` | Reference | Schema only | Speed toggle behavior | 07 |
 | `cli/` | Removed | Canonical compiler/validator/packer supersede it completely | Nothing; use Git only for archaeology | Done |
 | `config/` | Partial | Old compiler conventions and config model are rejected | Historical feature definitions when a task needs semantics | 01–09, 17 |

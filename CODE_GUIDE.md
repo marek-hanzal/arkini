@@ -186,15 +186,17 @@ attach state to the original board identity
 → validate and commit once
 ```
 
-Input storage and line start are the first callers. Future charges, temporary lifetime, deposit capacity, memory, or similar state must follow the same path. Inventory is passive storage: it may hold an already stateful owner, but no new identity-bound state is attached there.
+Input storage, line start, and partial charge spending are canonical callers. A fresh charged item remains pure while `remainingCharges` is absent; a partial spend stores identity-bound state and must isolate one board instance. Full idle depletion consumes one quantity in place because no changed identity survives. Inventory is passive storage: it may hold an already stateful owner, but no new identity-bound state is attached or spent there.
+
+Charge resolution and application are line-wide operations. Resolve payer identity per input, reserve charge budget by runtime item ID across all inputs, aggregate costs by payer, and spend each payer once inside the same candidate. Resolve idle full depletions before surviving stateful payers so capacity freed by the command is available to later isolation. Never let separate input previews overbook the same payer and rely on rollback as the first line of correctness.
 
 ### Future output and max-count
 
-Every active job reserves the worst possible quantity of each canonical item its completion may create. Resolve and assert that reservation inside the same candidate runtime that creates the job. Queue entries reserve nothing until dispatch.
+Every active job reserves the worst possible quantity of each canonical item its completion may create. This includes `line.output` and deferred `charges.output` for an owner already at zero charges. Resolve and assert that reservation inside the same candidate runtime that creates the job. Queue entries reserve nothing until dispatch.
 
-All later quantity-creating paths must include active-job reservations in canonical `maxCount`: placement planners, direct spawn, and direct quantity replacement. Completion must remove its own ready job from the candidate before placing output so the job spends rather than duplicates its reservation. A removing owner offsets worst-case output of its own canonical item by the quantity that will disappear. Do not use expected values, average chances, or one sampled roll as capacity planning.
+All later quantity-creating paths must include active-job reservations in canonical `maxCount`: placement planners, direct spawn, and direct quantity mutation. Completion must remove its own ready job from the candidate before placing output so the job spends rather than duplicates its reservation. A depleted owner offsets worst-case output of its own canonical item by the quantity that will disappear. Immediate external depletion output is placed during start and must see the new job's future reservations. Do not use expected values, average chances, or one sampled roll as capacity planning.
 
-Line completion is data-driven. Producer, craft, blueprint, and stash use `line.output` plus item-level `afterCompletion`; completion code must not switch on item type or reinterpret authored placement. `replace` is invalid with `afterCompletion: "keep"`, and game validation owns output replace cardinality. Keep separate item schemas, but do not reintroduce specialized line/input schemas or top-level lifecycle outputs.
+Line completion is data-driven but lifetime is not a line property. Every item type uses optional `line.output`; optional item `charges` and input charge costs alone decide finite lifetime. A non-depleted owner remains. A depleted owner is removed before line output, then emits optional `charges.output`, releases owned inputs, and returns reservations. Completion code must not switch on item type or reinterpret authored placement. Output placement supports only ordinary `drop` and `random`; do not reintroduce replacement as hidden item lifecycle.
 
 Do not pass feature-specific exclusion IDs through generic placement or hide them in Effect Context. Put stack eligibility in the canonical purity predicate and state attachment in the canonical isolation operation. Do not create craft-, producer-, stash-, or blueprint-specific split variants.
 

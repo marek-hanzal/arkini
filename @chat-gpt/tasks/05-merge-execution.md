@@ -1,6 +1,6 @@
 # 05 — Directional merge execution
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 
@@ -12,7 +12,8 @@ Implement the authored directional source/target interaction as an atomic engine
 - source action is `use` or `consume`;
 - target effect is `keep`, `remove`, or `replace`;
 - optional output exists;
-- move, swap, remove, replace-oriented placement, output rolls, and revision guards exist;
+- move, swap, removal, ordinary output placement, output rolls, and revision guards exist;
+- merge target `replace` is a merge effect, not an output placement strategy;
 - no public merge execution command exists.
 
 ## Historical oracle

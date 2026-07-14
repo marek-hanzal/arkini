@@ -174,76 +174,67 @@ Reservations are exclusive job-owned locks. They are not a second inventory and 
 
 Started jobs cannot be cancelled.
 
-## 12. Completion
+## 12. Charges and completion
 
-A ready job completes only while its owner is on the board.
-
-Completion resolves the live job by stable ID, detaches the completed job and reservations inside one immutable candidate, and executes one authored lifecycle:
+Any item may have a finite authored lifetime:
 
 ```text
-resolve optional line.output
-→ apply every drop with its authored placement
-→ keep or remove the owner according to afterCompletion
-→ release buffered inputs when the owner is removed
+charges.amount
+charges.output?
+```
+
+Missing live `remainingCharges` means the instance is fresh at the authored full amount. Charge costs are authored on individual line inputs. A self cost charges the owner; a target cost charges the deterministic board item resolved by a deposit input. Queueing pays nothing. Costs are resolved and paid only when a job actually starts.
+
+All costs for the same runtime payer are aggregated before mutation. The engine spends each payer once inside the same candidate. A partial spend makes one concrete item stateful and isolates it from a stack. Fully depleting an idle quantity consumes one quantity in place. An idle depleted target is removed immediately and emits its optional charge output from its former origin. A payer that owns an active job may temporarily remain at zero charges until that job completes.
+
+A ready job completes only while its owner is on the board. Completion resolves the live job by stable ID, detaches the completed job and reservations inside one immutable candidate, and executes one generic lifecycle:
+
+```text
+remove the owner when it is depleted
+→ resolve optional line.output
+→ resolve optional depleted-owner charges.output
+→ release depleted-owner buffered inputs
 → return detached reservations
 → commit everything atomically
 ```
 
-A `keep` owner remains available for later starts and retains buffered storage and queue state. A `remove` owner loses its identity and queue; when no resolved drop uses `replace`, its board cell is freed before ordinary output placement. Output claims capacity before buffered inputs and reservations return. Placement, capacity, or return failure is a valid blocked-ready state. The published runtime keeps the job, owner, queue, buffered inputs, and reservations unchanged and retries on a later step.
+A non-depleted owner remains available for later starts and retains buffered storage and queue state. A depleted owner loses its identity and queue before output placement, so line output gets first access to the freed origin and depletion output follows. Placement, charge, max-count, or return failure is a valid blocked state: the published runtime keeps the job, owner, queue, inputs, reservations, and charges unchanged for retry.
 
 One blocked owner does not prevent unrelated owners from progressing or completing in the same fixed step.
 
-Unexpected invariant or replacement failures fail the runtime advancement and preserve the elapsed Tick budget for retry.
-
 ## 13. Future output and `maxCount`
 
-A job may start only when every possible output remains within canonical `maxCount` after accounting for live items and all active jobs. Capacity planning uses the worst possible result rather than an average or one sampled roll:
+A job may start only when every possible deferred output remains within canonical `maxCount` after accounting for live items and all active jobs. Deferred output includes `line.output` and `charges.output` when the owner has already paid its last charge. Capacity planning uses the worst possible result rather than an average or one sampled roll:
 
 - a fixed quantity reserves its value;
 - a range reserves its maximum;
 - a chance reserves the successful drop;
 - repeated weighted selection reserves the worst candidate for every draw;
 - all rolls in one selected set add together;
-- alternative sets reserve the per-item maximum;
+- alternative sets reserve the per-item maximum.
 
-Queued requests reserve nothing. When the FIFO head attempts to become active, the same check runs; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity replacement cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation. If the owner is removed, output of the same canonical item reserves only the net increase beyond the live owner quantity.
+Queued requests reserve nothing. When the FIFO head attempts to become active, the same charge and max-count checks run; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity mutation cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation. A depleted owner offsets output of its own canonical item by the live quantity that disappears.
+
+Immediate charge output from an idle external target is placed during the start candidate. It is not left as a future reservation, but its placement sees all active-job reservations including the job being started.
 
 ## 14. Deterministic output
 
-Completion randomness is stable for one job identity and algorithm version.
+Line completion and deferred owner-depletion randomness are stable for one job identity and explicit algorithm versions. Immediate external depletion randomness is stable for the unchanged owner, line, payer, quantity, pre-spend charge state, and cost.
 
-The same deterministic random stream controls:
-
-- alternative output-set selection;
-- chance rolls;
-- weighted rolls;
-- quantity ranges;
-- random placement ordering.
-
-A blocked completion or restored saved state therefore produces the same result when the same job is retried.
+Deterministic streams control alternative set selection, chance, weights, quantity ranges, and random placement ordering. A blocked start, blocked completion, or restored saved state therefore retries the same result while the relevant canonical state is unchanged.
 
 ## 15. Placement
 
 All runtime-executed output uses the shared placement policy, including:
 
 - generic line output;
+- charge-depletion output;
 - reservation return;
 - buffered-input release;
 - direct drop/output commands;
 - initial placement planning where applicable.
 
-Schema-only merge, depletion, and expiry outputs do not become executable merely because they reuse `OutputSchema`.
-
-Placement respects:
-
-- configured storage scope;
-- max count;
-- stack size;
-- explicit replacement semantics;
-- board/inventory capacity;
-- origin-based board ordering.
-
-When an allowed board-first placement cannot fit fully on the board, the remainder may continue into inventory.
+Placement respects configured storage scope, max count, purity and stack size, board/inventory capacity, authored `drop` or `random` board strategy, and origin-based ordering. When an allowed board-first placement cannot fit fully on the board, the remainder may continue into inventory.
 
 Partial placement is forbidden. The owning gameplay mutation rolls back if the complete quantity cannot be placed.
 
@@ -255,15 +246,11 @@ The completed configuration accepts more item semantics than the current command
 
 Directional merge schemas and validation exist. There is no active merge write command. Ordinary stack placement and `mergePlacementPlansFx` are not gameplay merge execution.
 
-### Line-owner completion lifecycle
+### Line owners and charged items
 
-Craft, blueprint, and stash each expose one ordinary `LineSchema`; producers expose one or more. Positive material capacity is supported only for producer lines and is rejected for the other line owners by game validation. Like every line owner, the first attached input or active job isolates one quantity from a pure stack. Starting work still resolves the line from the pre-command world; a split performed by that same start may change line rules and make the new job pause on its first Tick. This is intentional command semantics, not a second mid-command resolution.
+Craft, blueprint, and stash each expose one ordinary `LineSchema`; producers expose one or more. Positive material capacity is supported only for producer lines and is rejected for the other line owners by game validation. Like every line owner, the first attached input, active job, or partial charge state isolates one quantity from a pure stack. Starting work resolves the line from the pre-command world; changes produced by that same start may make the new job pause on its first Tick. This is intentional command semantics, not a second mid-command resolution.
 
-Every line may omit output. When output exists, producer, craft, blueprint, and stash all resolve `line.output` identically and preserve authored placement. A blueprint can therefore replace itself, drop a random item nearby, or produce nothing; its visual remains an explicit standard asset rather than being inferred from output. `afterCompletion` independently declares whether any line owner remains or disappears, so a one-use producer and a persistent craft are both legal. Removed owners discard their queue and return buffered inputs only after output placement; blocked output or return rolls the entire completion back.
-
-### Deposits
-
-Deposit item and deposit-input schemas plus validation exist. Runtime deposit capacity, spending, depletion, and depletion output are not implemented. Deposit input resolution fails explicitly rather than simulating fake support.
+Every line may omit output and every item type may be persistent or charged. Item type never decides whether the owner survives. A blueprint can drop a random item nearby or produce nothing; its visual remains an explicit standard asset rather than being inferred from output. Deposit inputs are fully runtime-backed deterministic selectors for external charged board targets; deposit is not a separate capacity state system.
 
 ### Temporary items
 

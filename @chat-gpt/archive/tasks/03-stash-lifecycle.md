@@ -1,5 +1,7 @@
 # 03 — Stash lifecycle
 
+
+> **Task 04 normalization:** finite item lifetime now comes from generic item charges and input charge costs. `afterCompletion` and output `replace` no longer exist. This file is historical only; root documentation and `@chat-gpt/CURRENT.md` own current behavior.
 **Status:** Done
 
 ## Goal

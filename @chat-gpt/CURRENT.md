@@ -4,23 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 04 — Deposit capacity and inputs**
+**Task 05 — Directional merge execution**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/04-deposit-capacity.md`;
-3. the deposit/capacity rows in `tasks/COVERAGE.md`;
-4. current input, job start, purity, runtime item state, placement, removal, output, Tick, and persistence code;
-5. only the historical files named by task 04.
+2. `tasks/05-merge-execution.md`;
+3. the merge rows in `tasks/COVERAGE.md`;
+4. current item, placement, purity, revision, command, event, and runtime mutation code;
+5. only the historical merge files named by task 05.
 
 Next action:
 
-> Design finite deposit capacity as item-owned runtime state. Decide the exact reservation/spend boundary, deterministic multi-deposit selection, whether capacity may combine, move/removal guards, and depletion lifecycle before changing schemas or runtime state.
-
-Do not recreate a parallel capacity map or preserve historical location references. Deposit state must participate in item purity and stateful-owner isolation.
+> Define the directional source/target merge write contract against the current atomic runtime grammar. Preserve exact source/target identity intent, purity rules, authored merge actions, standard output placement, and rollback semantics without copying the historical action topology.
 
 ## Absolute code rules
 
@@ -47,35 +45,37 @@ Do not recreate a parallel capacity map or preserve historical location referenc
 - Fixed simulation step: 200 ms; production time source: Effect Clock.
 - Jobs store only `durationMs` and `remainingMs`; one active job per owner.
 - Filling inputs never starts work; starting is explicit.
-- Inventory is passive storage and a hard pause. No new identity-bound state attaches there.
-- Started jobs cannot be cancelled; queued requests are FIFO and reserve nothing until dispatch.
-- Producer, craft, blueprint, and stash keep separate item schemas but use one `LineSchema`, optional `line.output`, and one completion lifecycle.
-- Every line-owning item declares `afterCompletion: "keep" | "remove"`. Item type does not decide output interpretation or owner survival.
-- Completion respects every authored placement. `replace` is invalid for a keep owner, and any possible resolved result may contain at most one replace drop.
-- A remove owner loses its identity and queue. Output claims capacity before buffered inputs and reservations return. Any failure rolls back the entire completion.
-- Active jobs reserve worst-case future output against `maxCount`; removing owners offset output of their own canonical item by the live quantity that disappears.
+- Inventory is passive storage and a hard pause. No new identity-bound state attaches or spends there.
+- Started jobs cannot be cancelled; queued requests are FIFO and reserve or pay nothing until dispatch.
+- Producer, craft, blueprint, and stash keep separate item schemas but use one `LineSchema`, optional `line.output`, and one generic completion path.
+- Item type never decides lifetime. An item without charges persists; an item with charges dies when one instance reaches zero.
+- Completion removes a depleted owner before line output, emits optional depletion output second, releases its inputs, then returns reservations. Any failure rolls back the entire candidate.
+- Active jobs reserve worst-case `line.output` plus deferred depleted-owner output against `maxCount`; the dying owner offsets output of its own canonical item.
 
-## Inputs, purity, and isolation
+## Charges, inputs, purity, and isolation
 
-- Runtime purity is derived, never stored. Line input/job/queue state makes a line non-pure; item purity composes every owned line and item-owned state.
+- Item authoring uses `charges: { amount, output? }`; live `remainingCharges` is stored only after a spend changes the full amount.
+- Input authoring uses `charges: { cost, from: "self" | "target" }`. Target charging is valid only for deposit inputs, which deterministically resolve one board payer.
+- Charge costs are reserved across line input resolution, aggregated by runtime payer ID, and spent once inside the start candidate.
+- Idle full depletions resolve before surviving stateful payers so capacity freed by the command may satisfy later isolation.
+- A fresh charged stack is pure. A partial spend stores state, preserves the original board identity at quantity `1`, and standard-places the pure remainder. Full idle depletion consumes one quantity in place.
+- A zero-capacity material input is closed during its active job; positive capacity stays open storage. Game validation permits positive capacity only on producer-owned lines.
 - Pure items use configured `maxStackSize`; impure items have effective stack size `1`.
-- Any write that would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder in the same candidate.
-- Input storage and generic line start share that isolation path. Failed remainder placement publishes no state or events.
-- A zero-capacity input is closed during its active job; positive capacity stays open storage.
-- One schema grammar allows material capacity, but game validation permits positive capacity only on producer-owned lines. Craft, blueprint, and stash lines must author zero.
 
-## Reservations and removal
+## Placement, reservations, and removal
 
+- Output board placement is only `drop` or `random`; inventory fallback follows item scope. There is no output replacement lifecycle.
 - Reserved material always returns through standard placement and retains no historical instance, stack, slot, or position.
 - Generic mutations reject job-scoped items.
 - Shared identity removal deletes the owner and queue; full public removal additionally releases buffered inputs.
-- Completion detaches its active job before using the shared identity-removal primitive.
+- Completion and depletion use the same atomic primitives without nesting public write commands.
 
 ## Randomness
 
-- Completion randomness derives from stable job identity plus explicit algorithm version.
+- Completion randomness derives from stable job identity plus explicit algorithm versions.
+- Immediate depletion randomness derives from stable unchanged start/payer facts.
 - Tick time and wall clock are not seed inputs.
-- Blocked retries and restored jobs preserve the same random result.
+- Blocked retries and restored jobs preserve the same random result while canonical inputs remain unchanged.
 
 ## Configuration
 

@@ -234,73 +234,78 @@ Input closure is resolved from the same live runtime draft as the delivery comma
 
 Storing the first input on a stacked owner is a general state-attachment transition. The input transfer is applied inside one candidate first, so a fully consumed source may free board capacity, then the original owner identity is isolated at quantity `1` and the pure remainder follows standard placement. A blocked remainder rolls back the input transfer, split, and every generated event together.
 
-Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and executes one line lifecycle driven by authored data:
+Charge costs are authored on individual inputs. `from: "self"` charges the line owner; `from: "target"` charges the deterministic board item resolved by a deposit input. Resolution reserves charge budget by runtime item ID across the whole line so several inputs cannot independently overbook the same payer. Apply aggregates every cost for one payer and spends it exactly once inside the same candidate runtime.
+
+A fresh charged item keeps no redundant live counter: missing `remainingCharges` means the authored full amount and remains pure. A partial spend stores `remainingCharges`, makes the item stateful, isolates the original board identity at quantity `1`, and standard-places the pure remainder. Fully depleting one idle quantity consumes that quantity in place instead of relocating the rest of its stack. Idle payers that die are resolved before surviving payers that need isolation, allowing one atomic start to use board capacity it frees itself.
+
+A charged item dies when its remaining charges reach zero. An idle external payer is removed immediately during the starting command and emits its optional charge output from its own board origin. A self payer or any payer that already owns an active job may remain temporarily at `remainingCharges: 0`; that active job is the only legal deferred-depletion state.
+
+Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and executes one generic line lifecycle:
 
 ```text
-resolve optional line.output deterministically
-→ preserve every authored drop placement
-→ apply item.afterCompletion keep/remove
-→ release removed-owner buffered inputs
+remove a depleted owner identity and queue
+→ resolve optional line.output deterministically
+→ resolve optional depleted-owner charges.output deterministically
+→ release depleted-owner buffered inputs
 → return job reservations
 ```
 
-Producer, craft, blueprint, and stash keep their separate item schemas, but completion never switches on item type. Every line-owning item declares `afterCompletion: "keep" | "remove"`; any line may omit output, and output always lives on `line.output`. A `keep` owner retains its identity, buffered inputs, and queue. A `remove` owner loses its identity and queue, output claims capacity before buffered inputs and reservations return, and a non-replacement completion frees the owner cell before ordinary output placement. Authored `replace` is valid only for a removing owner and removes the old identity through the standard placement plan.
+A non-depleted owner remains with its identity, inputs, and queue. A depleted owner is removed before output placement, so ordinary line output receives first access to its freed board origin and depletion output follows. Producer, craft, blueprint, and stash keep separate item schemas, but completion never switches on item type. Item lifetime is controlled only by optional charges and authored input costs.
 
-Starting any stacked line owner first resolves eligibility from the pre-command snapshot, then creates the job and applies its input plan inside the candidate draft, isolates the original owner at quantity `1`, and routes the pure remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Public item removal and completion share the same identity-removal primitive rather than nesting public write commands.
+Starting any stacked line owner resolves eligibility from the pre-command snapshot, then creates the job, applies material plans, and pays all charge plans inside one candidate draft. Charge spending or the active job makes a surviving owner non-pure before isolation, so the pure remainder cannot merge back into it. Public item removal and completion share identity-removal primitives rather than nesting public write commands.
 
-Completion is all-or-nothing. Placement or return blocking leaves the ready job, owner, queue, buffered inputs, and reservations unchanged for a later fixed-step retry.
+Start and completion are all-or-nothing. Insufficient charges, max-count blockage, depletion-output placement failure, remainder placement failure, or material return blockage publishes no partial runtime or transient events.
 
 Reservations retain no original runtime instance, stack, slot, or source position. Never add return-location metadata or reverse reservation reconstruction.
 
 ## 10. Future output and max-count reservations
 
-An active job reserves the worst-case future quantity of every canonical item its line output may create. The calculation is deliberately conservative:
+An active job reserves the worst-case future quantity of every canonical item its completion may create. This includes its `line.output` and, when its owner has already reached zero charges, the owner's deferred `charges.output`. The calculation is deliberately conservative:
 
 - fixed quantities reserve their value;
 - ranges reserve `max`;
 - chance rolls reserve the successful outcome;
 - repeated weighted rolls reserve the same worst candidate for every selection;
 - rolls inside one selected set add together;
-- alternative roll sets reserve the per-item maximum;
+- alternative roll sets reserve the per-item maximum.
 
-A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; max-count blockage leaves the request in place.
+A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; unavailable charges or max-count blockage leaves the request in place.
 
-Placement, direct spawn, and direct quantity replacement include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it. For a removing owner, reservation planning subtracts the live owner quantity from worst-case output of the same canonical item, because replacement is a net change rather than a second copy.
+Placement, direct spawn, and direct quantity mutation include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it. A depleted owner offsets worst-case output of its own canonical item by the live quantity that will disappear.
 
-## 11. Deterministic completion randomness
+Immediate depletion output from an idle external payer is created during the start candidate rather than reserved afterward. Its placement still sees the candidate job's future reservations and therefore cannot consume capacity promised to the new job.
 
-Job completion randomness is derived from stable job identity and an explicit algorithm version.
+## 11. Deterministic randomness
 
-The same random stream owns roll-set selection, chance, weights, quantity ranges, and random placement ordering for that completion.
+Line-completion randomness derives from stable job identity and an explicit algorithm version. Deferred depletion output derives from the same job plus the depleted item identity.
 
-A blocked completion, restored state, or retry therefore produces the same random outcome for the same job.
+Immediate depletion during start derives from stable owner, line, payer, quantity, pre-spend charges, cost, and an explicit algorithm version. An unchanged failed retry therefore resolves the same output and placement order; a successful spend changes the payer state before any later use.
 
-Tick state and wall-clock time do not participate in the seed.
+Roll-set selection, chance, weights, quantity ranges, and random placement ordering all use the owned deterministic stream. Tick state and wall-clock time never participate in the seed.
 
 ## 12. Purity and placement
 
-Purity is a runtime-derived boolean, not an item-config flag. A line is pure only when it owns no buffered inputs, active job, or queued request. An item is pure only when every line it owns is pure and it owns no additional identity-bound state. Future temporary lifetime, deposit capacity, charges, memory, or similar state must extend the item purity boundary.
+Purity is a runtime-derived boolean, not an item-config flag. A line is pure only when it owns no buffered inputs, active job, or queued request. An item is pure only when every line it owns is pure and it owns no additional identity-bound state. Explicit `remainingCharges` is item-owned state; an untouched charged item with no stored counter remains pure at its authored full amount.
 
 Generic stack and quantity mutations may target only pure items. A pure item uses its configured stack size; an impure item has an effective stack size of `1`. Purity is resolved inside the same immutable runtime draft as the mutation and is checked both while planning stack placement and again while applying the plan. Never cache or carry a purity result across a write boundary.
 
-Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage and generic line start use one shared isolation primitive. Failure publishes no intermediate state or events. Do not add feature-specific split helpers, and do not invent an inventory placement origin for a stored owner.
+Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage, line start, and partial charge spending share this isolation rule. Full idle depletion is consumption, not state attachment: it removes one quantity in place. Failure publishes no intermediate state or events. Do not add feature-specific split helpers, and do not invent an inventory placement origin for a stored owner.
 
-Placement is one shared policy used by commands, job output, reservation return, and owner-input release.
+Placement is one shared policy used by commands, line output, charge-depletion output, reservation return, and owner-input release.
 
 The high-level order is:
 
 ```text
-validate max count and replacement contract
-→ apply explicit replacement prefix when present
+validate max count against live and reserved quantities
 → choose allowed scope policy
 → fill compatible pure stacks
 → spawn into empty locations
 → require full quantity placement
 ```
 
-Board-first fallback may continue into inventory when the item scope allows it.
+Output board placement is explicitly `drop` or `random`; inventory fallback is derived independently from item scope. Board-first fallback may continue into inventory when the item scope allows it.
 
-Placement failure is a domain failure and rolls back the complete owning mutation. Do not partially place an output or partially release reservations.
+Placement failure is a domain failure and rolls back the complete owning mutation. Do not partially place an output, partially spend charges, or partially release reservations.
 
 ## 13. Save boundary
 

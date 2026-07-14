@@ -179,10 +179,21 @@ Schema-recognized input kinds:
 ```text
 simple     A condition-like requirement with no material operation.
 materials  Delivered items that are consumed or reserved.
-deposit    Authored capacity from a matching board deposit.
+deposit    One deterministic external charged-item target selected from the board.
 ```
 
-The active runtime resolves `simple` and `materials`. Deposit input authoring and validation exist, but runtime capacity resolution intentionally fails until deposit state is implemented. Do not claim deposit gameplay support merely because the schema parses it.
+Every input may optionally author a charge cost:
+
+```json
+{
+  "charges": {
+    "cost": 1,
+    "from": "self" | "target"
+  }
+}
+```
+
+`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. A deposit input must author a target charge cost and never moves the target into an input buffer.
 
 Material mode:
 
@@ -225,9 +236,9 @@ chance
 weight
 ```
 
-Runtime-executed outputs use standard placement. They do not bypass stack, scope, max-count, replacement, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Queue entries reserve nothing until dispatch. For `afterCompletion: "remove"`, output of the owner's own canonical item reserves only its net increase after the old owner disappears. Schema-only outputs remain authoring intent until an owned runtime path executes them.
+Each resolved drop authors board placement as `drop` or `random`. Inventory fallback is determined independently by the emitted item's scope. There is no output replacement operation; item lifetime and output placement are separate contracts.
 
-Game validation rejects any possible resolved output containing more than one `replace` drop. It also rejects `replace` output for an item configured with `afterCompletion: "keep"`; replacement and owner preservation are contradictory contracts.
+Runtime-executed outputs use standard placement and never bypass stack, scope, max-count, purity, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Queue entries reserve nothing until dispatch.
 
 ## 8. Item capability status
 
@@ -237,15 +248,16 @@ Schema support and runtime support are different facts.
 
 - `simple` items participate in stacking, placement, queries, rules, and ordinary runtime commands.
 - `producer` items expose one or more lines and queue capacity; `craft`, `blueprint`, and `stash` expose one line. All use the same line/input/output runtime.
-- Every line-owning item declares `afterCompletion: "keep" | "remove"`. Item type does not decide whether completion preserves or consumes the owner.
-- `line.output` is optional for every line and is the only job output location. Every resolved drop keeps its authored placement, including blueprint output.
-- Starting any stacked line owner resolves eligibility from the pre-command world, attaches the job/input state in one candidate, atomically isolates one owner quantity, and standard-places the pure remainder.
-- Completion is one generic lifecycle: resolve optional output, respect authored placement, apply `afterCompletion`, release removed-owner buffered inputs, then return reservations atomically.
+- `line.output` is optional for every line and is the only job output location. Every resolved drop keeps its authored `drop` or `random` placement.
+- Any item may author finite lifetime as `charges: { amount, output? }`. An item without charges persists; an item dies when one instance reaches zero charges.
+- Any input may author a charge cost. `from: "self"` charges its line owner; `from: "target"` is restricted to deposit inputs and charges one deterministic matching board target.
+- A fresh charged item omits `remainingCharges` and remains pure at its authored full amount. Partial spend stores the remaining value and isolates one stateful board instance. Full idle depletion consumes one quantity without relocating the rest of its stack.
+- An idle depleted target dies and emits optional `charges.output` immediately during start. A depleted active owner remains only until its current job completes, then dies before `line.output`; depletion output follows line output.
+- Starting any stacked line owner resolves eligibility from the pre-command world, attaches job/input/charge state in one candidate, atomically isolates surviving stateful quantities, and standard-places pure remainders.
 - Blueprint assets are explicit standard item assets; no target or visual is inferred from output.
 
 ### Schema-backed but incomplete in runtime
 
-- deposit capacity spending, depletion, and depletion output are not implemented.
 - temporary-item lifetime and expiry are not implemented.
 - memory, inventory-opener, speed-cheat, nuke, and cheat-inventory item kinds are authoring contracts without active public runtime commands.
 
@@ -271,7 +283,7 @@ Validation covers more than Zod shape parsing. It includes, among other rules:
 - exact item/category/line references;
 - selector and condition references;
 - output references;
-- replacement constraints;
+- input charge payer and affordability constraints;
 - resource existence;
 - runtime-relevant semantic cycles or impossible relationships;
 - completed-config validity.

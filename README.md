@@ -81,7 +81,7 @@ line/         Product-line rules, reads, resolution and run plans.
 merge/        Directional item interaction authoring contracts; execution is pending.
 output/       Output rules and result resolution.
 pack/         Binary encode/decode and directory packing.
-placement/    Stack, spawn, replace, scope and drop placement planning.
+placement/    Stack, spawn, scope and drop placement planning.
 query/        Runtime item queries.
 runtime/      Canonical runtime, committed-transition store and write boundary.
 schema/       Completed game configuration root and JSON Schema generation.

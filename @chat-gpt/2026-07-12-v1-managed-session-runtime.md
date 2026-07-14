@@ -81,6 +81,8 @@ read current TRef
 → commit both atomically
 ```
 
+The combined STM acquisition is owned through `Effect.acquireRelease`. A successfully attached queue and its scoped `queue.shutdown` finalizer therefore cannot be separated by cancellation. Explicit shutdown remains available and is idempotent with later scope cleanup.
+
 This creates one explicit linearization point without a revision counter, readiness latch, mirror or registration marker:
 
 ```text
@@ -91,7 +93,7 @@ transition committed after subscription registration
 → queued in changes exactly once
 ```
 
-The acquisition contains no asynchronous boundary, does not wait for an in-flight mutation planner, and can be completed through `ManagedRuntime.runSync`, which is required by React's synchronous `subscribe()` contract.
+The acquisition contains no asynchronous boundary, does not wait for an in-flight mutation planner, and can be completed through `ManagedRuntime.runSync`, which is required by React's synchronous `subscribe()` contract. Resource ownership is nevertheless cancellation-safe for general scoped Effect consumers, not only for the current synchronous browser adapter.
 
 ## Browser/UI integration
 

@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import { assertJobOutputMaxCountFx } from "~/v1/job/fx/assertJobOutputMaxCountFx";
 import { assertLineStartReadyFx } from "~/v1/job/fx/assertLineStartReadyFx";
 import { createJobFx } from "~/v1/job/fx/createJobFx";
 import { resolveLineStartFx } from "~/v1/job/fx/read/resolveLineStartFx";
@@ -39,17 +40,21 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 			job,
 		],
 	} satisfies RuntimeSchema.Type;
-	const ownerRuntime = yield* splitCraftOwnerForStartFx({
-		ownerItemId,
-		runtime: jobRuntime,
-	});
 	const inputRuntime = yield* applyLineRunPlanFx({
 		job,
 		plan,
-		runtime: ownerRuntime,
+		runtime: jobRuntime,
+	});
+	yield* assertJobOutputMaxCountFx({
+		job,
+		runtime: inputRuntime,
+	});
+	const ownerRuntime = yield* splitCraftOwnerForStartFx({
+		ownerItemId,
+		runtime: inputRuntime,
 	});
 	return [
 		job,
-		inputRuntime,
+		ownerRuntime,
 	] as const;
 });

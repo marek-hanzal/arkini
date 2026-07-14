@@ -5,6 +5,7 @@ import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSc
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemStatefulError } from "~/v1/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
+import { assertPlacementMaxCountFx } from "~/v1/placement/fx/assertPlacementMaxCountFx";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import { assertNonJobScopeFx } from "~/v1/runtime/fx/assertNonJobScopeFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
@@ -65,6 +66,17 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 					}),
 				);
 			}
+
+			yield* assertPlacementMaxCountFx({
+				drop: {
+					itemId: item.item.id,
+					placement: "drop",
+					quantity,
+				},
+				item: item.item,
+				removeItemId: item.id,
+				runtime,
+			});
 
 			const updatedItem = yield* reviseRuntimeItemFx({
 				item: {

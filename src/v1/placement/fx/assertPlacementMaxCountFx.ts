@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
+import { readReservedJobOutputQuantityFx } from "~/v1/job/fx/read/readReservedJobOutputQuantityFx";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
 import { PlacementUnavailableError } from "~/v1/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -35,7 +36,11 @@ export const assertPlacementMaxCountFx = Effect.fn("assertPlacementMaxCountFx")(
 
 		return quantity + candidate.quantity;
 	}, 0);
-	const excessQuantity = existingQuantity + drop.quantity - item.maxCount;
+	const reservedQuantity = yield* readReservedJobOutputQuantityFx({
+		itemId: item.id,
+		runtime,
+	});
+	const excessQuantity = existingQuantity + reservedQuantity + drop.quantity - item.maxCount;
 	if (excessQuantity <= 0) {
 		return;
 	}

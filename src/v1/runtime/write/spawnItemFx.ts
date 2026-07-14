@@ -4,6 +4,7 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
+import { assertPlacementMaxCountFx } from "~/v1/placement/fx/assertPlacementMaxCountFx";
 import { ItemAlreadyExistsError } from "~/v1/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
 import { createRuntimeItemFx } from "~/v1/runtime/fx/createRuntimeItemFx";
@@ -71,6 +72,16 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 					}),
 				);
 			}
+
+			yield* assertPlacementMaxCountFx({
+				drop: {
+					itemId,
+					placement: "drop",
+					quantity,
+				},
+				item,
+				runtime,
+			});
 
 			const nextRuntime = {
 				...runtime,

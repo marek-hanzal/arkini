@@ -131,7 +131,13 @@ npm run format:check
 npm run dc
 npm run typecheck
 npm run test
+npm run test:shards
+npm run test:shard:1
 ```
+
+`npm run test` remains the canonical one-process full-suite command. Use
+`npm run test:shards` or the six individual `test:shard:N` commands when the
+execution environment has a short process timeout.
 
 ## Game authoring commands
 

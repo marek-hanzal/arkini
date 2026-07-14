@@ -61,21 +61,23 @@ export const makeRuntimeStoreFx = (initial: CommittedTransitionSchema.Type) =>
 			);
 		const subscribe = Effect.gen(function* () {
 			// Registration never touches the long-running mutation semaphore.
-			// STM linearizes current capture and queue creation against commit.
-			const subscription = yield* STM.commit(
-				STM.gen(function* () {
-					const captured = yield* TRef.get(current);
-					const queue = yield* TPubSub.subscribe(changes);
+			// STM linearizes current capture and queue creation against commit, while
+			// acquireRelease makes queue ownership cancellation-safe for the Scope.
+			const subscription = yield* Effect.acquireRelease(
+				STM.commit(
+					STM.gen(function* () {
+						const captured = yield* TRef.get(current);
+						const queue = yield* TPubSub.subscribe(changes);
 
-					return {
-						captured,
-						queue,
-					};
-				}),
+						return {
+							captured,
+							queue,
+						};
+					}),
+				),
+				({ queue }) => STM.commit(queue.shutdown),
 			);
 			const shutdown = STM.commit(subscription.queue.shutdown);
-
-			yield* Effect.addFinalizer(() => shutdown);
 
 			return {
 				current: subscription.captured,

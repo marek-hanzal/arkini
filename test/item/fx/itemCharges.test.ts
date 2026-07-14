@@ -269,6 +269,69 @@ const chargesConfig = GameConfigSchema.parse({
 				},
 			],
 		},
+		"producer:capped-shrine": {
+			...base({
+				id: "producer:capped-shrine",
+			}),
+			type: "producer",
+			charges: {
+				amount: 1,
+				output: output("item:capped-gift"),
+			},
+			maxQueueSize: 1,
+			lines: [
+				{
+					id: "line:capped-shrine:work",
+					title: "Capped shrine",
+					description: "Both completion outputs share one max count.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+							charges: {
+								from: "self",
+								cost: 1,
+							},
+						},
+					],
+					output: output("item:capped-gift"),
+					rules: [],
+				},
+			],
+		},
+		"producer:capped-lumberjack": {
+			...base({
+				id: "producer:capped-lumberjack",
+			}),
+			type: "producer",
+			maxQueueSize: 1,
+			lines: [
+				{
+					id: "line:capped-lumberjack:work",
+					title: "Capped lumberjack",
+					description: "Deplete one capped sapling.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "deposit",
+							query: {
+								scope: "board",
+								selector: {
+									type: "item",
+									itemId: "deposit:capped-sapling",
+								},
+								distance: "close",
+							},
+							charges: {
+								from: "target",
+								cost: 1,
+							},
+						},
+					],
+					rules: [],
+				},
+			],
+		},
 		"deposit:tree": {
 			...base({
 				id: "deposit:tree",
@@ -294,6 +357,16 @@ const chargesConfig = GameConfigSchema.parse({
 			charges: {
 				amount: 1,
 				output: output("item:seed"),
+			},
+		},
+		"deposit:capped-sapling": {
+			...base({
+				id: "deposit:capped-sapling",
+			}),
+			type: "deposit",
+			charges: {
+				amount: 1,
+				output: output("item:capped-seed"),
 			},
 		},
 		"deposit:empty": {
@@ -347,6 +420,20 @@ const chargesConfig = GameConfigSchema.parse({
 				id: "item:trash",
 			}),
 			type: "simple",
+		},
+		"item:capped-gift": {
+			...base({
+				id: "item:capped-gift",
+			}),
+			type: "simple",
+			maxCount: 1,
+		},
+		"item:capped-seed": {
+			...base({
+				id: "item:capped-seed",
+			}),
+			type: "simple",
+			maxCount: 1,
 		},
 		"item:blocker": {
 			...base({
@@ -746,6 +833,88 @@ describe("item charges", () => {
 
 		expect(runtime.items.some((item) => item.item.id === "deposit:sapling")).toBe(false);
 		expect(runtime.items.filter((item) => item.item.id === "item:seed")).toHaveLength(2);
+	});
+
+	it("blocks a self-depleting job when line and depletion outputs exceed maxCount together", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:capped-shrine",
+					itemId: "producer:capped-shrine",
+					location: board(0),
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.either(
+					startLineFx({
+						ownerItemId: owner.id,
+						lineId: "line:capped-shrine:work",
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					attempt,
+					before,
+				};
+			}),
+		);
+
+		expect(result.attempt).toEqual(
+			Either.left(
+				expect.objectContaining({
+					_tag: "JobOutputMaxCountError",
+					itemId: "item:capped-gift",
+				}),
+			),
+		);
+		expect(result.after).toEqual(result.before);
+	});
+
+	it("rolls back an external depletion when its immediate output exceeds maxCount", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:capped-lumberjack",
+					itemId: "producer:capped-lumberjack",
+					location: board(0),
+					quantity: 1,
+				});
+				yield* spawnItemFx({
+					id: "runtime:capped-sapling",
+					itemId: "deposit:capped-sapling",
+					location: board(1),
+					quantity: 1,
+				});
+				yield* spawnItemFx({
+					id: "runtime:capped-seed",
+					itemId: "item:capped-seed",
+					location: board(2),
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.either(
+					startLineFx({
+						ownerItemId: owner.id,
+						lineId: "line:capped-lumberjack:work",
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					attempt,
+					before,
+				};
+			}),
+		);
+
+		expect(result.attempt).toEqual(
+			Either.left(
+				expect.objectContaining({
+					_tag: "PlacementUnavailableError",
+					reason: "item:max-count",
+				}),
+			),
+		);
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("persists partial charges and restores a fresh runtime identity state", () => {

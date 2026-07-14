@@ -215,7 +215,7 @@ A job may start only when every possible deferred output remains within canonica
 
 Queued requests reserve nothing. When the FIFO head attempts to become active, the same charge and max-count checks run; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity mutation cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation. A depleted owner offsets output of its own canonical item by the live quantity that disappears.
 
-Immediate charge output from an idle external target is placed during the start candidate. It is not left as a future reservation, but its placement sees all active-job reservations including the job being started.
+Immediate charge output from an idle external target is placed during the start candidate and is not left as a future reservation. After all charge spends, the final start max-count assertion validates the live immediate output together with every active-job reservation, including the job being started. Failure rolls back the complete start.
 
 ## 14. Deterministic output
 

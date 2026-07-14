@@ -273,7 +273,7 @@ A queued request owns no reservation. The same authoritative check runs when its
 
 Placement, direct spawn, and direct quantity mutation include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it. A depleted owner offsets worst-case output of its own canonical item by the live quantity that will disappear.
 
-Immediate depletion output from an idle external payer is created during the start candidate rather than reserved afterward. Its placement still sees the candidate job's future reservations and therefore cannot consume capacity promised to the new job.
+Immediate depletion output from an idle external payer is created during the start candidate rather than reserved afterward. After all charge spends, the final start max-count assertion validates those live immediate outputs together with every active job reservation, including the candidate job. Any overbooking rejects the complete candidate atomically.
 
 ## 11. Deterministic randomness
 

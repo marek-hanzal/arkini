@@ -49,7 +49,7 @@ A payer with an active job may remain temporarily at zero charges. Completion re
 
 - Active jobs reserve worst-case `line.output` and deferred owner-depletion output.
 - A dying owner offsets output of its own canonical item.
-- Immediate external depletion output is placed during start and sees active-job reservations.
+- Immediate external depletion output is placed during start; the final start max-count assertion then validates live immediate outputs together with every active-job reservation.
 - Deferred depletion randomness derives from job identity plus depleted item identity.
 - Immediate depletion randomness derives from stable unchanged owner/line/payer/spend facts.
 

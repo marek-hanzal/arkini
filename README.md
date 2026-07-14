@@ -26,6 +26,7 @@ The active documentation surface is deliberately small. Read it in this order:
 4. [`CONFIG.md`](CONFIG.md) — game authoring, compiler, validation, schema, and packing.
 5. [`GAME.MD`](GAME.MD) — implemented gameplay semantics.
 6. [`@chat-gpt/README.md`](@chat-gpt/README.md) — LLM working-memory index and archive policy.
+7. [`@chat-gpt/tasks/README.md`](@chat-gpt/tasks/README.md) — ordered behavior-recovery queue when continuing from historical code.
 
 When documentation and implementation disagree, stop and resolve the contradiction. Do not quietly choose whichever version makes the current task easier.
 

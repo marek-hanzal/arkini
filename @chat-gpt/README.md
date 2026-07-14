@@ -13,6 +13,7 @@ Before changing code, read:
 5. `../GAME.MD` when touching gameplay semantics
 6. `CURRENT.md`
 7. `tasks/README.md`
+8. the one numbered task named by `CURRENT.md`
 
 Do not begin with archived reviews. They explain history, not the current contract.
 
@@ -21,7 +22,9 @@ Do not begin with archived reviews. They explain history, not the current contra
 ```text
 README.md       This index and maintenance policy.
 CURRENT.md      Compact durable project memory and non-obvious decisions.
-tasks/README.md Current task queue status.
+tasks/README.md Ordered task queue and continuation protocol.
+tasks/COVERAGE.md Historical behavior coverage and pruning map.
+tasks/NN-*.md Numbered vertical slices; read only the current task unless planning dependencies.
 archive/        Historical reviews, plans, handoffs, and superseded notes.
 ```
 

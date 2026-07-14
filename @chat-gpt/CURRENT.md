@@ -1,6 +1,26 @@
 # Current project memory
 
-This file contains durable non-obvious decisions. Root documentation owns the full contracts.
+This file contains durable non-obvious decisions and the exact continuation pointer. Root documentation owns the full architecture and code contracts.
+
+## Current implementation task
+
+**Task 01 — Craft lifecycle**
+
+Status: **Ready**
+
+Read:
+
+1. `tasks/README.md`;
+2. `tasks/01-craft-lifecycle.md`;
+3. the craft and completion rows in `tasks/COVERAGE.md`;
+4. current completion, Tick, placement, input, state, and runtime code;
+5. only the historical files named by task 01.
+
+Next action:
+
+> Compare historical craft completion behavior with the current generic `completeJobRuntimeFx` path, identify the smallest owner-specific completion extension, and return a design/review plan before implementation.
+
+Do not begin by designing a generic special-item completion framework. Let craft establish the first real specialization; blueprint and stash follow as separate vertical slices.
 
 ## Absolute code rules
 
@@ -56,6 +76,9 @@ This file contains durable non-obvious decisions. Root documentation owns the fu
 - Duplicate providers and record IDs are diagnostics; later files never overwrite silently.
 - Blueprint visuals are explicit `[blueprintAssetId, targetAssetId]` tuples and may intentionally share the blueprint asset.
 
-## Current task state
+## Migration policy
 
-No active architecture migration or review cleanup remains at this snapshot. Continue feature work from the current source unless `tasks/README.md` states otherwise.
+- Historical source is a behavioral oracle, never an architectural donor.
+- Follow the numbered queue in `tasks/README.md`.
+- Update `tasks/COVERAGE.md` and prune historical source after every completed slice.
+- Do not repeatedly inspect areas marked **Superseded**, **Rejected**, or **Removed** unless a current task names a concrete unresolved behavior.

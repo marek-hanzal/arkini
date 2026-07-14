@@ -1,14 +1,107 @@
-# Active tasks
+# Ordered implementation queue
 
-No active task queue is recorded in this snapshot.
+This directory is the active handoff surface for continuing the game from the historical implementation.
 
-When work is opened, create one concise task file containing:
+## Current task
 
-- goal;
-- current facts;
-- accepted decisions;
-- explicit non-goals;
-- acceptance criteria;
-- completion status.
+**Next implementation task: [`01-craft-lifecycle.md`](01-craft-lifecycle.md)**
 
-Do not keep completed task files here. Move them to `../archive/tasks/` immediately after closeout and update this index back to the actual queue state.
+The migration-control setup in task 00 is complete. A new thread must:
+
+1. read the root documentation in the order defined by `@chat-gpt/README.md`;
+2. read `@chat-gpt/CURRENT.md`;
+3. read only the current numbered task and the relevant rows in [`COVERAGE.md`](COVERAGE.md);
+4. inspect the referenced historical source as a behavioral oracle;
+5. design the behavior in the current engine grammar instead of copying historical topology.
+
+Do not read every queued task before starting. The queue is an ordered backlog, not a mandatory context dump.
+
+## Queue
+
+| # | Task | Status | Depends on |
+| ---: | --- | --- | --- |
+| 00 | [`Migration control surface`](00-migration-control.md) | **Done** | — |
+| 01 | [`Craft lifecycle`](01-craft-lifecycle.md) | **Ready** | 00 |
+| 02 | [`Blueprint lifecycle`](02-blueprint-lifecycle.md) | Queued | 01 |
+| 03 | [`Stash lifecycle`](03-stash-lifecycle.md) | Queued | 01–02 |
+| 04 | [`Deposit capacity and inputs`](04-deposit-capacity.md) | Queued | 03 |
+| 05 | [`Directional merge execution`](05-merge-execution.md) | Queued | 04 |
+| 06 | [`Temporary item lifetime`](06-temporary-lifetime.md) | Queued | 05 |
+| 07 | [`Speed cheat`](07-speed-cheat.md) | Queued | 06 |
+| 08 | [`Board memory`](08-board-memory.md) | Queued | 07 |
+| 09 | [`Destructive utility items`](09-destructive-utilities.md) | Queued | 08 |
+| 10 | [`Engine-owned read models`](10-engine-read-models.md) | Queued | 01–09 |
+| 11 | [`Player interaction contract`](11-player-interaction.md) | Queued | 05, 10 |
+| 12 | [`Renderer shell, board, and inventory`](12-renderer-board-inventory.md) | Queued | 11 |
+| 13 | [`Detail and line controls`](13-detail-line-ui.md) | Queued | 10, 12 |
+| 14 | [`Presentation events and animations`](14-presentation-animations.md) | Queued | 11–13 |
+| 15 | [`Audio`](15-audio.md) | Queued | 14 |
+| 16 | [`Debug and explain tooling`](16-debug-explain.md) | Queued | 10–15 |
+| 17 | [`Behavioral parity and historical pruning`](17-parity-pruning.md) | Queued | 01–16 |
+| 18 | [`Promote the active source tree`](18-promote-source-root.md) | Queued | 17 |
+
+## Status transitions
+
+Use only these statuses:
+
+- **Ready** — next task with no unresolved dependency;
+- **In progress** — currently owned by one implementation thread;
+- **Blocked** — requires an explicit product or architecture decision;
+- **Queued** — ordered work not started yet;
+- **Done** — implementation, tests, documentation, and historical cleanup completed.
+
+When starting a task:
+
+1. mark it **In progress** here;
+2. update `@chat-gpt/CURRENT.md` with the exact next action;
+3. record newly accepted decisions in the task file;
+4. do not create another competing plan document.
+
+When closing a task:
+
+1. satisfy its acceptance criteria and required tests;
+2. update [`COVERAGE.md`](COVERAGE.md);
+3. delete historical source that has no remaining oracle value;
+4. update or remove local `src/v0/**/README.md` markers;
+5. move the completed task file to `@chat-gpt/archive/tasks/`;
+6. promote the next task to **Ready** and update `CURRENT.md`.
+
+## Migration rule
+
+The historical implementation is a **behavioral oracle**, never an architectural donor.
+
+Preserve deliberately selected:
+
+- player-visible behavior;
+- product decisions;
+- edge cases;
+- animation and audio intent;
+- useful test scenarios;
+- UI information requirements.
+
+Do not copy by default:
+
+- save topology;
+- runtime mirrors;
+- action bus or adapter layers;
+- wall-clock job scheduling;
+- old directory structure;
+- UI-owned gameplay decisions;
+- previous compiler conventions;
+- subsystem-specific state maps.
+
+Every feature is rebuilt as one vertical slice through the current grammar:
+
+```text
+schema or capability decision
+→ validation
+→ resolver
+→ planner
+→ apply
+→ command or Tick lifecycle
+→ runtime invariant
+→ event
+→ engine-owned read model
+→ flow test
+→ thin presentation adapter
+```

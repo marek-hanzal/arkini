@@ -225,8 +225,10 @@ Material inputs may be consumed or reserved.
 
 - `consume` removes the accepted quantity when work starts.
 - `reserve` moves accepted material representations into job scope.
+- a zero-capacity material input is closed while its line owns an active job;
+- a positive-capacity material input remains open as storage while the line runs.
 
-Job-scoped items are exclusive locks and are inaccessible to generic item mutations.
+Input closure is resolved from the same live runtime draft as the delivery command. A queued request does not close an input because it is not an active job. Job-scoped items are exclusive locks and are inaccessible to generic item mutations.
 
 Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and dispatches an explicit owner-specific branch:
 
@@ -237,7 +239,7 @@ blueprint completion
 stash completion
 ```
 
-The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting a stacked craft atomically isolates one owner quantity and routes the remainder through standard placement before the job exists. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations. Blueprint and stash branches remain explicit extension points for their dedicated lifecycle tasks rather than growing conditionals inside producer completion.
+The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting a stacked craft first resolves eligibility from the pre-command snapshot, then creates the job inside the candidate draft, isolates one owner quantity, and routes the remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations. Blueprint and stash branches remain explicit extension points for their dedicated lifecycle tasks rather than growing conditionals inside producer completion.
 
 Completion is all-or-nothing. Capacity or max-count blocking leaves the ready job, owner quantity, and reservations unchanged for a later fixed-step retry.
 
@@ -253,7 +255,11 @@ A blocked completion, restored state, or retry therefore produces the same rando
 
 Tick state, wall-clock time, and job revision do not participate in the seed.
 
-## 11. Placement
+## 11. Purity and placement
+
+Purity is a runtime-derived boolean, not an item-config flag. A line is pure only when it owns no buffered inputs, active job, or queued request. An item is pure only when every line it owns is pure and it owns no additional identity-bound state. Future temporary lifetime, deposit capacity, charges, memory, or similar state must extend the item purity boundary.
+
+Generic stack and quantity mutations may target only pure items. Purity is resolved inside the same immutable runtime draft as the mutation and is checked both while planning stack placement and again while applying the plan. Never cache or carry a purity result across a write boundary. Owner-specific transformations such as craft start may split an impure stack only when they preserve all state on the original identity and perform the complete transformation atomically.
 
 Placement is one shared policy used by commands, job output, reservation return, and owner-input release.
 
@@ -263,7 +269,7 @@ The high-level order is:
 validate max count and replacement contract
 → apply explicit replacement prefix when present
 → choose allowed scope policy
-→ fill compatible stacks
+→ fill compatible pure stacks
 → spawn into empty locations
 → require full quantity placement
 ```

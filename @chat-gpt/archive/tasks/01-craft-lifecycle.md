@@ -83,9 +83,11 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 
 - Job completion dispatches to explicit producer, craft, blueprint, and stash branches after resolving shared live facts once.
 - No schema shape or contract changed. Only the stale craft schema comment was aligned with implemented runtime behavior; craft replacement uses the existing resolved `line.output` placement contract.
-- Starting a stacked craft atomically isolates one quantity as the running owner and routes the remainder through standard placement.
+- Starting a stacked craft resolves eligibility from the pre-command world, creates the job in the candidate draft, atomically isolates one quantity as the non-pure running owner, and routes the remainder through standard pure-stack placement. The split may intentionally change rules and pause the job on its first Tick.
 - A placement failure aborts the whole start before the job or split commits.
 - The separated remainder can start another independent craft while the first job is active.
+- Runtime purity is composed from line input, active-job, and queue state. Generic placement and quantity writes reject non-pure items at both planning and apply boundaries.
+- Craft material inputs author only `capacity: 0`; a running zero-capacity input is closed and hydrated buffered state is rejected by runtime validation.
 - One completed job consumes its already isolated craft owner exactly once.
 - A resolved `replace` drop claims the original craft cell first; without replacement, owner removal frees that cell for ordinary output.
 - Completion output claims capacity before reservation return.
@@ -106,7 +108,13 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 - inventory pause;
 - queue capacity remains one total owner-work slot, so a single-use craft cannot retain a successor behind its active job;
 - active-job state round-trip;
-- authored seed flow using a stack of three.
+- authored seed flow using a stack of three;
+- active/queued/buffered owners excluded from stacking;
+- paused active owner excluded in inventory;
+- direct quantity mutation rejected for stateful owners;
+- zero-capacity input closure and positive-capacity live storage;
+- hydrated craft quantity and closed-input invariant diagnostics;
+- explicit pre-command start resolution followed by first-Tick pause after split.
 
 ## Historical cleanup result
 

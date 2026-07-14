@@ -54,7 +54,9 @@ Do not fold blueprint behavior into craft completion. Shared primitives may emer
 - Started jobs cannot be cancelled.
 - Queue-only owners remain valid and are retried at fixed-step boundaries.
 - Shared completion facts are resolved once, then dispatched to explicit producer, craft, blueprint, or stash branches.
-- Starting a stacked craft atomically isolates one running quantity and places the remainder through standard placement; completion consumes only that isolated owner, supports an optional resolved replacement, and places output before returning reservations.
+- Runtime purity is a composable boolean. Line input/job/queue state makes a line non-pure; an item is pure only when all owned lines and item state are pure. Generic stack and quantity mutation require purity inside the same runtime draft.
+- A zero-capacity material input is closed during its active line job; positive capacity remains open storage. Craft authoring fixes every material capacity to zero.
+- Starting a stacked craft resolves against the pre-command world, creates the job in the candidate draft, isolates one running quantity, and places the remainder through standard pure-stack placement; completion consumes only that isolated owner, supports an optional resolved replacement, and places output before returning reservations.
 
 ## Reservations and removal
 

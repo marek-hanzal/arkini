@@ -138,7 +138,7 @@ Runtime locations additionally include line-input and job scopes. Those are live
 
 ### Stacking
 
-`maxStackSize` is the configured stack limit. Runtime stateful instances remain separate even when the configured item can otherwise stack.
+`maxStackSize` is the configured stack limit. Stack compatibility also requires runtime purity: the concrete item must own no buffered line input, active job, queued request, or other identity-bound state. Purity is runtime state, not an authored item flag.
 
 ### Assets
 
@@ -193,7 +193,9 @@ reserve
 
 Reserved inputs are job-owned locks and return only after completion through standard drop placement. Jobs are not cancellable.
 
-Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode.
+Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode. While a line runs, capacity zero closes that material input and positive capacity keeps it open as storage.
+
+Craft authoring uses `CraftLineSchema`, `CraftInputSchema`, and `CraftInputMaterialSchema`. Its material capacity is fixed to `0` at schema parse time. Authors may omit the field or write `0`; any positive craft capacity is rejected before semantic validation. The completed runtime shape still contains `capacity: 0`, so generic line and input execution retain one uniform contract.
 
 ### Rules
 
@@ -234,7 +236,7 @@ Schema support and runtime support are different facts.
 - `simple` items participate in stacking, placement, queries, rules, and ordinary runtime commands.
 - `producer` items expose one or more lines, queue capacity, explicit start, fixed-step jobs, material consume/reserve inputs, generic line output, and FIFO dispatch.
 - `craft`, `blueprint`, and `stash` items expose their configured line through the shared line/start/job machinery.
-- Starting a stacked `craft` atomically isolates one owner quantity and places the remainder through the standard stack-first/drop/inventory policy. Completion then consumes that isolated owner, applies any resolved `replace` drop at the original board cell, and places additional `line.output` drops atomically.
+- Starting a stacked `craft` resolves eligibility from the pre-command world, creates the active job in the candidate draft, atomically isolates one owner quantity, and places the remainder through the standard pure-stack/drop/inventory policy. Completion then consumes that isolated owner, applies any resolved `replace` drop at the original board cell, and places additional `line.output` drops atomically.
 
 ### Schema-backed but incomplete in runtime
 

@@ -44,11 +44,11 @@ Moving an item to inventory is not item removal. Instance state, jobs, queue req
 
 ## 4. Stacks
 
-Compatible stateless items may share one runtime stack up to the configured `maxStackSize`.
+Compatible pure items may share one runtime stack up to the configured `maxStackSize`.
 
-Items with instance-specific mutable state remain separate.
+A line becomes non-pure when it owns buffered input, an active job, or a queued request. An item is pure only when all of its lines and any item-owned lifecycle state are pure. A passive empty producer or craft can therefore stack; the same runtime item becomes non-pure as soon as state attaches to its identity.
 
-Placement fills compatible stacks before spawning additional item instances in empty locations.
+Placement fills compatible pure stacks before spawning additional item instances in empty locations. Generic stack and quantity commands reject non-pure items.
 
 Stack handling is automatic. Gameplay commands should operate on quantities rather than require the player or UI to normalize stacks manually.
 
@@ -88,7 +88,7 @@ Work starts only through the explicit line-start command.
 
 Delivered materials may be stored in a specific owner/line/input slot before start.
 
-An input accepts only matching material and only up to its required quantity plus configured extra capacity.
+An input accepts only matching material and only up to its required quantity plus configured extra capacity. During an active job, a zero-capacity input is closed and rejects new delivery; a positive-capacity input remains open as storage. A queued request does not close the input.
 
 Removing an idle owner releases every buffered material through ordinary scope-aware drop placement in the same atomic mutation.
 
@@ -98,7 +98,7 @@ If any release cannot be placed, owner removal and all releases roll back.
 
 ## 8. Starting work
 
-Starting resolves the live owner and live line from the current serialized runtime.
+Starting resolves the live owner and live line from the pre-command serialized runtime. The command's own atomic consequences may change later runnability; the first Tick can therefore pause a job whose start created a new nearby item or otherwise changed line rules. Start does not re-resolve midway through its own candidate transformation.
 
 A start validates:
 
@@ -241,7 +241,7 @@ Directional merge schemas and validation exist. There is no active merge write c
 
 ### Craft lifecycle
 
-A craft exposes one line. Starting work on a stacked craft atomically leaves one quantity at the original cell as the job owner and sends the remainder through standard placement, so another separated craft can start independently. If the remainder cannot be placed, the whole start fails unchanged. Completion therefore always consumes one isolated owner quantity. A resolved `replace` drop claims the original craft cell; without replacement, removing the owner frees that cell for ordinary output. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
+A craft exposes one line whose material inputs author only `capacity: 0`. Starting work on a stacked craft resolves the line from the pre-command world, creates the job inside the candidate draft, leaves one quantity at the original cell as the non-pure job owner, and sends the remainder through standard pure-stack placement so another separated craft can start independently. If the remainder cannot be placed, the whole start fails unchanged. The split itself may change line rules and make the new job pause on its first Tick; this is intentional command semantics, not a second mid-command resolution. Completion always consumes one isolated owner quantity. A resolved `replace` drop claims the original craft cell; without replacement, removing the owner frees that cell for ordinary output. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
 
 ### Blueprint lifecycle
 

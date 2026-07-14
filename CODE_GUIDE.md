@@ -171,6 +171,14 @@ Forbidden:
 
 Use stable IDs and resolve the live entity inside the owning mutation.
 
+### Purity and identity-changing operations
+
+Runtime purity is a composable boolean resolved from the current runtime draft. Line purity owns line input, active-job, and queue checks. Item purity composes every owned line and future item-specific state.
+
+Generic stacking and quantity replacement may operate only on pure items. Evaluate purity inside the same `modifyRuntimeFx` candidate or internal immutable draft as the mutation, and re-check it at the authoritative apply boundary. Never read purity from one snapshot and carry the boolean into a later write.
+
+Do not pass feature-specific exclusion IDs through generic placement or hide them in Effect Context. Put the invariant in the canonical purity predicate. Owner-specific operations may transform an impure item only when they explicitly preserve its state on the surviving identity and commit the full transformation atomically.
+
 ## 7. Effects, services, and layers
 
 Use Effect services for owned capabilities and lifecycle boundaries, not as ceremony.

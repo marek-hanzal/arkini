@@ -1,42 +1,88 @@
-import { Effect, PubSub, Queue, Ref, Stream } from "effect";
+import { Effect, STM, Stream, TPubSub, TRef } from "effect";
 
-import type { CommittedTransitionSchema } from "~/v1/runtime/schema/CommittedTransitionSchema";
 import type { RuntimeStoreFxService } from "~/v1/runtime/internal/RuntimeStoreFx";
+import type { CommittedTransitionSchema } from "~/v1/runtime/schema/CommittedTransitionSchema";
 
-/** Builds one serialized committed-transition store from Effect primitives. */
+/**
+ * Builds one committed-transition store with two explicit synchronization edges:
+ * interruptible serialized mutation planning and synchronous atomic STM
+ * commit/subscription registration.
+ */
 export const makeRuntimeStoreFx = (initial: CommittedTransitionSchema.Type) =>
 	Effect.gen(function* () {
-		const current = yield* Ref.make(initial);
-		const changes = yield* PubSub.unbounded<CommittedTransitionSchema.Type>();
-		const mutex = yield* Effect.makeSemaphore(1);
-
-		const read = Ref.get(current);
-		const modifyEffect: RuntimeStoreFxService["modifyEffect"] = (update) =>
-			mutex.withPermits(1)(
-				Effect.gen(function* () {
-					const transition = yield* read;
-					const [result, nextTransition] = yield* update(transition);
-
-					if (nextTransition !== transition) {
-						yield* Ref.set(current, nextTransition);
-						yield* PubSub.publish(changes, nextTransition);
-					}
-
-					return result;
-				}),
-			);
-		const subscribe = mutex.withPermits(1)(
-			Effect.gen(function* () {
-				const captured = yield* read;
-				const queue = yield* PubSub.subscribe(changes);
+		const { changes, current } = yield* STM.commit(
+			STM.gen(function* () {
+				const current = yield* TRef.make(initial);
+				const changes = yield* TPubSub.unbounded<CommittedTransitionSchema.Type>();
 
 				return {
-					current: captured,
-					changes: Stream.fromQueue(queue),
-					shutdown: Queue.shutdown(queue),
+					changes,
+					current,
 				};
 			}),
 		);
+		const mutationSemaphore = yield* Effect.makeSemaphore(1);
+
+		const read = STM.commit(TRef.get(current));
+		const modifyEffect: RuntimeStoreFxService["modifyEffect"] = (update) =>
+			Effect.uninterruptibleMask((restore) =>
+				// Waiting for ownership and all candidate planning remain cancellable.
+				restore(mutationSemaphore.take(1)).pipe(
+					Effect.flatMap((permits) =>
+						restore(
+							Effect.gen(function* () {
+								const transition = yield* read;
+								return {
+									transition,
+									updateResult: yield* update(transition),
+								};
+							}),
+						).pipe(
+							Effect.flatMap(
+								({ transition, updateResult: [result, nextTransition] }) => {
+									if (nextTransition === transition)
+										return Effect.succeed(result);
+
+									// Point of no return: one non-yielding STM transaction replaces
+									// current, publishes the same transition and returns the command result.
+									return STM.commit(
+										STM.gen(function* () {
+											yield* TRef.set(current, nextTransition);
+											yield* TPubSub.publish(changes, nextTransition);
+											return result;
+										}),
+									);
+								},
+							),
+							Effect.ensuring(mutationSemaphore.release(permits)),
+						),
+					),
+				),
+			);
+		const subscribe = Effect.gen(function* () {
+			// Registration never touches the long-running mutation semaphore.
+			// STM linearizes current capture and queue creation against commit.
+			const subscription = yield* STM.commit(
+				STM.gen(function* () {
+					const captured = yield* TRef.get(current);
+					const queue = yield* TPubSub.subscribe(changes);
+
+					return {
+						captured,
+						queue,
+					};
+				}),
+			);
+			const shutdown = STM.commit(subscription.queue.shutdown);
+
+			yield* Effect.addFinalizer(() => shutdown);
+
+			return {
+				current: subscription.captured,
+				changes: Stream.fromTQueue(subscription.queue),
+				shutdown,
+			};
+		});
 
 		return {
 			read,

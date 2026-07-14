@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { startLineFx } from "~/v1/job/write/startLineFx";
@@ -53,6 +53,115 @@ describe("createGameSession", () => {
 			expect(notifications).toBe(0);
 		} finally {
 			unsubscribe();
+			await session.dispose();
+		}
+	});
+
+	it("opens runtime subscriptions synchronously while a mutation is still planning", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let markPlanningEntered: (() => void) | undefined;
+		let releasePlanning: (() => void) | undefined;
+		const planningEntered = new Promise<void>((resolve) => {
+			markPlanningEntered = resolve;
+		});
+		const planningGate = new Promise<void>((resolve) => {
+			releasePlanning = resolve;
+		});
+		let notifications = 0;
+
+		try {
+			const pending = session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.promise(async () => {
+						markPlanningEntered?.();
+						await planningGate;
+
+						return [
+							undefined,
+							{
+								...runtime,
+							},
+						] as const;
+					}),
+				),
+			);
+			await planningEntered;
+
+			const unsubscribe = session.subscribe(() => {
+				notifications += 1;
+			});
+
+			try {
+				releasePlanning?.();
+				await pending;
+				await waitFor(() => notifications === 1);
+			} finally {
+				unsubscribe();
+			}
+		} finally {
+			releasePlanning?.();
+			await session.dispose();
+		}
+	});
+
+	it("opens event subscriptions synchronously while a mutation is still planning", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		let markPlanningEntered: (() => void) | undefined;
+		let releasePlanning: (() => void) | undefined;
+		const planningEntered = new Promise<void>((resolve) => {
+			markPlanningEntered = resolve;
+		});
+		const planningGate = new Promise<void>((resolve) => {
+			releasePlanning = resolve;
+		});
+		const jobIds: string[] = [];
+
+		try {
+			const pending = session.run(
+				modifyRuntimeFx((runtime) =>
+					Effect.promise(async () => {
+						markPlanningEntered?.();
+						await planningGate;
+
+						return [
+							undefined,
+							runtime,
+							[
+								{
+									type: "job:completed" as const,
+									jobId: "job:event:planned",
+									ownerItemId: "owner:event:planned",
+									lineId: "line:event:planned",
+								},
+							],
+						] as const;
+					}),
+				),
+			);
+			await planningEntered;
+
+			const unsubscribe = session.subscribeEvents((batch) => {
+				jobIds.push(...batch.events.map((event) => event.jobId));
+			});
+
+			try {
+				releasePlanning?.();
+				await pending;
+				await waitFor(() => jobIds.length === 1);
+				expect(jobIds).toEqual([
+					"job:event:planned",
+				]);
+			} finally {
+				unsubscribe();
+			}
+		} finally {
+			releasePlanning?.();
 			await session.dispose();
 		}
 	});
@@ -422,6 +531,58 @@ describe("createGameSession", () => {
 			releasePending?.();
 			unsubscribePending();
 			unsubscribeHealthy();
+			unsubscribeEvents();
+			await session.dispose();
+		}
+	});
+
+	it("disposes an in-flight planner without committing runtime or events", async () => {
+		const session = await createGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const planningEntered = await Effect.runPromise(Deferred.make<void>());
+		const planningGate = await Effect.runPromise(Deferred.make<void>());
+		let runtimeNotifications = 0;
+		let eventNotifications = 0;
+		const unsubscribeRuntime = session.subscribe(() => {
+			runtimeNotifications += 1;
+		});
+		const unsubscribeEvents = session.subscribeEvents(() => {
+			eventNotifications += 1;
+		});
+		const pending = session.run(
+			modifyRuntimeFx((runtime) =>
+				Deferred.succeed(planningEntered, undefined).pipe(
+					Effect.zipRight(Deferred.await(planningGate)),
+					Effect.as([
+						undefined,
+						{
+							...runtime,
+						},
+						[
+							{
+								type: "job:completed" as const,
+								jobId: "job:dispose:pending",
+								ownerItemId: "owner:dispose:pending",
+								lineId: "line:dispose:pending",
+							},
+						],
+					] as const),
+				),
+			),
+		);
+
+		try {
+			await Effect.runPromise(Deferred.await(planningEntered));
+			const disposing = session.dispose();
+
+			await expect(pending).rejects.toBeDefined();
+			await disposing;
+			expect(runtimeNotifications).toBe(0);
+			expect(eventNotifications).toBe(0);
+		} finally {
+			unsubscribeRuntime();
 			unsubscribeEvents();
 			await session.dispose();
 		}

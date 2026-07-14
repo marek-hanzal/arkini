@@ -217,6 +217,8 @@ Do not add due times, start timestamps, pause timestamps, persisted Tick cursors
 
 Inventory is a hard pause for active and ready jobs. Returning the same owner to the board resumes evaluation without a separate resume mutation.
 
+Inventory is passive storage. Commands may move an already stateful owner into inventory, but no command may attach new identity-bound state to an owner while it is stored there.
+
 Started jobs cannot be cancelled.
 
 ## 9. Inputs and reservations
@@ -230,6 +232,8 @@ Material inputs may be consumed or reserved.
 
 Input closure is resolved from the same live runtime draft as the delivery command. A queued request does not close an input because it is not an active job. Job-scoped items are exclusive locks and are inaccessible to generic item mutations.
 
+Storing the first input on a stacked owner is a general state-attachment transition. The input transfer is applied inside one candidate first, so a fully consumed source may free board capacity, then the original owner identity is isolated at quantity `1` and the pure remainder follows standard placement. A blocked remainder rolls back the input transfer, split, and every generated event together.
+
 Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and dispatches an explicit owner-specific branch:
 
 ```text
@@ -239,7 +243,7 @@ blueprint completion
 stash completion
 ```
 
-The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting a stacked craft first resolves eligibility from the pre-command snapshot, then creates the job inside the candidate draft, isolates one owner quantity, and routes the remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations.
+The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting any stacked line owner first resolves eligibility from the pre-command snapshot, then creates the job and applies its input plan inside the candidate draft, isolates the original owner at quantity `1`, and routes the pure remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations.
 
 Blueprint completion creates a new target identity at the exact owner cell, places top-level by-products, removes all state bound to the vanished blueprint identity, and releases job reservations last. Public item removal and owner-specific completion share one runtime removal primitive rather than nesting public write commands. The stash branch remains an explicit extension point for its dedicated lifecycle task.
 
@@ -277,7 +281,9 @@ Tick state, wall-clock time, and job revision do not participate in the seed.
 
 Purity is a runtime-derived boolean, not an item-config flag. A line is pure only when it owns no buffered inputs, active job, or queued request. An item is pure only when every line it owns is pure and it owns no additional identity-bound state. Future temporary lifetime, deposit capacity, charges, memory, or similar state must extend the item purity boundary.
 
-Generic stack and quantity mutations may target only pure items. Purity is resolved inside the same immutable runtime draft as the mutation and is checked both while planning stack placement and again while applying the plan. Never cache or carry a purity result across a write boundary. Owner-specific transformations such as craft start may split an impure stack only when they preserve all state on the original identity and perform the complete transformation atomically.
+Generic stack and quantity mutations may target only pure items. A pure item uses its configured stack size; an impure item has an effective stack size of `1`. Purity is resolved inside the same immutable runtime draft as the mutation and is checked both while planning stack placement and again while applying the plan. Never cache or carry a purity result across a write boundary.
+
+Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage and generic line start use one shared isolation primitive. Failure publishes no intermediate state or events. Do not add feature-specific split helpers, and do not invent an inventory placement origin for a stored owner.
 
 Placement is one shared policy used by commands, job output, reservation return, and owner-input release.
 

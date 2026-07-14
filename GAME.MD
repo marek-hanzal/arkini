@@ -38,17 +38,20 @@ Inventory is passive storage:
 - active and ready jobs pause while their owner is in inventory;
 - queued work does not dispatch while the owner is in inventory;
 - board-origin rules cannot use inventory coordinates;
+- new input, job, queue, or other identity-bound state cannot be attached there;
 - returning the same owner to the board resumes normal evaluation.
 
 Moving an item to inventory is not item removal. Instance state, jobs, queue requests, buffered inputs, and remaining time stay attached to the same owner.
 
 ## 4. Stacks
 
-Compatible pure items may share one runtime stack up to the configured `maxStackSize`.
+Compatible pure items may share one runtime stack up to the configured `maxStackSize`. An impure item has an effective stack size of `1`.
 
 A line becomes non-pure when it owns buffered input, an active job, or a queued request. An item is pure only when all of its lines and any item-owned lifecycle state are pure. A passive empty producer or craft can therefore stack; the same runtime item becomes non-pure as soon as state attaches to its identity.
 
 Placement fills compatible pure stacks before spawning additional item instances in empty locations. Generic stack and quantity commands reject non-pure items.
+
+When a board command first attaches identity-bound state to a stack, the original runtime identity keeps that state at quantity `1` and the remaining pure quantity follows standard placement. The attachment, split, remainder placement, and emitted events are one atomic mutation. If the remainder cannot be placed, nothing changes.
 
 Stack handling is automatic. Gameplay commands should operate on quantities rather than require the player or UI to normalize stacks manually.
 
@@ -86,7 +89,7 @@ Work starts only through the explicit line-start command.
 
 ## 7. Input buffering
 
-Delivered materials may be stored in a specific owner/line/input slot before start.
+Delivered materials may be stored in a specific owner/line/input slot before start. Delivering the first material to a stacked owner isolates one stateful owner instance before commit; this is shared line behavior rather than a producer, craft, blueprint, or stash exception.
 
 An input accepts only matching material and only up to its required quantity plus configured extra capacity. During an active job, a zero-capacity input is closed and rejects new delivery; a positive-capacity input remains open as storage. A queued request does not close the input.
 
@@ -255,7 +258,7 @@ Directional merge schemas and validation exist. There is no active merge write c
 
 ### Craft lifecycle
 
-A craft exposes one line whose material inputs author only `capacity: 0`. Starting work on a stacked craft resolves the line from the pre-command world, creates the job inside the candidate draft, leaves one quantity at the original cell as the non-pure job owner, and sends the remainder through standard pure-stack placement so another separated craft can start independently. If the remainder cannot be placed, the whole start fails unchanged. The split itself may change line rules and make the new job pause on its first Tick; this is intentional command semantics, not a second mid-command resolution. Completion always consumes one isolated owner quantity. A resolved `replace` drop claims the original craft cell; without replacement, removing the owner frees that cell for ordinary output. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
+A craft exposes one line whose material inputs author only `capacity: 0`. Like every line owner, the first attached input or active job isolates one quantity from a pure stack. Starting work still resolves the line from the pre-command world; a split performed by that same start may change line rules and make the new job pause on its first Tick. This is intentional command semantics, not a second mid-command resolution. Completion always consumes one isolated owner quantity. A resolved `replace` drop claims the original craft cell; without replacement, removing the owner frees that cell for ordinary output. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
 
 ### Blueprint lifecycle
 

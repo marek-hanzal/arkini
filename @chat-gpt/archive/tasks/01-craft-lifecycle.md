@@ -83,7 +83,7 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 
 - Job completion dispatches to explicit producer, craft, blueprint, and stash branches after resolving shared live facts once.
 - No schema shape or contract changed. Only the stale craft schema comment was aligned with implemented runtime behavior; craft replacement uses the existing resolved `line.output` placement contract.
-- Starting a stacked craft resolves eligibility from the pre-command world, creates the job in the candidate draft, atomically isolates one quantity as the non-pure running owner, and routes the remainder through standard pure-stack placement. The split may intentionally change rules and pause the job on its first Tick.
+- A stacked craft is isolated by the first operation that attaches identity-bound state. Material delivery may therefore isolate it before start; a simple-input craft is isolated when start creates its job. Start still resolves eligibility from the pre-command world, and a split performed by that same start may intentionally change rules and pause the job on its first Tick.
 - A placement failure aborts the whole start before the job or split commits.
 - The separated remainder can start another independent craft while the first job is active.
 - Runtime purity is composed from line input, active-job, and queue state. Generic placement and quantity writes reject non-pure items at both planning and apply boundaries.
@@ -99,7 +99,7 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 - ordinary output from a consumed owner;
 - replacement plus additional output;
 - sink craft with no output;
-- stacked craft split during start;
+- stacked craft isolation during first input attachment or start;
 - parallel starts from successively separated craft quantities;
 - atomic start rejection when the remainder has no placement capacity;
 - replacement completion while the previously separated remainder stays available;
@@ -113,7 +113,7 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 - paused active owner excluded in inventory;
 - direct quantity mutation rejected for stateful owners;
 - zero-capacity input closure and positive-capacity live storage;
-- hydrated craft quantity and closed-input invariant diagnostics;
+- effective singleton stack diagnostics for any non-pure owner and closed-input diagnostics;
 - explicit pre-command start resolution followed by first-Tick pause after split.
 
 ## Historical cleanup result

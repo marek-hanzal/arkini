@@ -177,13 +177,24 @@ Runtime purity is a composable boolean resolved from the current runtime draft. 
 
 Generic stacking and quantity replacement may operate only on pure items. Evaluate purity inside the same `modifyRuntimeFx` candidate or internal immutable draft as the mutation, and re-check it at the authoritative apply boundary. Never read purity from one snapshot and carry the boolean into a later write.
 
+Any write whose candidate would make an item non-pure while its quantity exceeds `1` must use the canonical owner-isolation operation inside that same candidate:
+
+```text
+attach state to the original board identity
+→ revise the original identity to quantity 1
+→ standard-place the pure remainder
+→ validate and commit once
+```
+
+Input storage and line start are the first callers. Future charges, temporary lifetime, deposit capacity, memory, or similar state must follow the same path. Inventory is passive storage: it may hold an already stateful owner, but no new identity-bound state is attached there.
+
 ### Future output and max-count
 
 Every active job reserves the worst possible quantity of each canonical item its completion may create. Resolve and assert that reservation inside the same candidate runtime that creates the job. Queue entries reserve nothing until dispatch.
 
 All later quantity-creating paths must include active-job reservations in canonical `maxCount`: placement planners, direct spawn, and direct quantity replacement. Completion must remove its own ready job from the candidate before placing output so the job spends rather than duplicates its reservation. Do not use expected values, average chances, or one sampled roll as capacity planning.
 
-Do not pass feature-specific exclusion IDs through generic placement or hide them in Effect Context. Put the invariant in the canonical purity predicate. Owner-specific operations may transform an impure item only when they explicitly preserve its state on the surviving identity and commit the full transformation atomically.
+Do not pass feature-specific exclusion IDs through generic placement or hide them in Effect Context. Put stack eligibility in the canonical purity predicate and state attachment in the canonical isolation operation. Do not create craft-, producer-, stash-, or blueprint-specific split variants.
 
 ## 7. Effects, services, and layers
 

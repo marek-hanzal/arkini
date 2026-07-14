@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import { readItemEffectiveMaxStackSizeFx } from "~/v1/item/fx/purity/readItemEffectiveMaxStackSizeFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { ItemMaxCountIssueSchema } from "~/v1/runtime/schema/check/ItemMaxCountIssueSchema";
 import type { ItemStackSizeIssueSchema } from "~/v1/runtime/schema/check/ItemStackSizeIssueSchema";
@@ -22,11 +23,15 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 	const checkedCanonicalItemIds: IdSchema.Type[] = [];
 
 	for (const item of runtime.items) {
-		if (item.quantity > item.item.maxStackSize) {
+		const maxStackSize = yield* readItemEffectiveMaxStackSizeFx({
+			item,
+			runtime,
+		});
+		if (item.quantity > maxStackSize) {
 			stackIssues.push({
 				canonicalItemId: item.item.id,
 				itemId: item.id,
-				maxStackSize: item.item.maxStackSize,
+				maxStackSize,
 				quantity: item.quantity,
 				type: "item:stack-size",
 			});

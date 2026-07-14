@@ -48,8 +48,8 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 		workshop: {
 			...baseItem({
 				id: "workshop",
-				maxStackSize: 1,
-				scope: "board",
+				maxStackSize: 10,
+				scope: "any",
 			}),
 			type: "producer",
 			lines: [

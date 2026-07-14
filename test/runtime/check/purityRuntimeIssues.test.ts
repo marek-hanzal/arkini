@@ -15,7 +15,7 @@ const board = (x: number) => ({
 });
 
 describe("runtime purity invariants", () => {
-	it("rejects a non-isolated active craft owner and buffered closed input", () => {
+	it("reports the effective singleton stack limit and buffered closed input", () => {
 		const runtime = {
 			items: [
 				{
@@ -62,6 +62,13 @@ describe("runtime purity invariants", () => {
 
 		expect(result.issues).toEqual([
 			{
+				canonicalItemId: "craft",
+				itemId: "runtime:craft",
+				maxStackSize: 1,
+				quantity: 2,
+				type: "item:stack-size",
+			},
+			{
 				ownerItemId: "runtime:craft",
 				lineId: "line:craft",
 				inputIndex: 0,
@@ -70,13 +77,117 @@ describe("runtime purity invariants", () => {
 				],
 				type: "line:input-closed",
 			},
-			{
-				jobId: "job:craft",
-				ownerItemId: "runtime:craft",
-				quantity: 2,
-				type: "job:craft-owner-quantity",
-			},
 		]);
+	});
+
+	it.each([
+		{
+			name: "buffered input",
+			items: [
+				{
+					id: "runtime:material",
+					item: purityTestConfig.items.material,
+					location: {
+						scope: "input" as const,
+						ownerItemId: "runtime:producer",
+						lineId: "line:producer:buffer",
+						inputIndex: 0,
+					},
+					quantity: 1,
+					revision: "revision:material",
+				},
+			],
+			jobs: [],
+			jobQueue: [],
+		},
+		{
+			name: "active job",
+			items: [],
+			jobs: [
+				{
+					id: "job:producer",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer:buffer",
+					durationMs: 1_000,
+					remainingMs: 1_000,
+					revision: "revision:job",
+				},
+			],
+			jobQueue: [],
+		},
+		{
+			name: "queued request",
+			items: [],
+			jobs: [],
+			jobQueue: [
+				{
+					id: "request:producer",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer:buffer",
+					revision: "revision:request",
+				},
+			],
+		},
+	])("rejects an impure producer stack with $name", ({ items, jobs, jobQueue }) => {
+		const runtime = {
+			items: [
+				{
+					id: "runtime:producer",
+					item: purityTestConfig.items.producer,
+					location: board(0),
+					quantity: 2,
+					revision: "revision:producer",
+				},
+				...items,
+			],
+			jobs,
+			jobQueue,
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(result.issues).toContainEqual({
+			canonicalItemId: "producer",
+			itemId: "runtime:producer",
+			maxStackSize: 1,
+			quantity: 2,
+			type: "item:stack-size",
+		});
+	});
+
+	it("keeps a pure producer stack at its configured limit", () => {
+		const runtime = {
+			items: [
+				{
+					id: "runtime:producer",
+					item: purityTestConfig.items.producer,
+					location: board(0),
+					quantity: 2,
+					revision: "revision:producer",
+				},
+			],
+			jobs: [],
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([]);
 	});
 
 	it("allows buffered input on a running positive-capacity line", () => {

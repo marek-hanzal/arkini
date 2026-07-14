@@ -116,5 +116,31 @@ export const purityTestConfig = GameConfigSchema.parse({
 				rules: [],
 			},
 		},
+		stash: {
+			...baseItem({
+				id: "stash",
+			}),
+			type: "stash",
+			line: {
+				id: "line:stash",
+				title: "Stash",
+				description: "One stash line.",
+				runtimeMs: 1_000,
+				input: [
+					{
+						type: "materials",
+						selector: {
+							type: "item",
+							itemId: "material",
+						},
+						quantity: {
+							type: "value",
+							value: 1,
+						},
+					},
+				],
+				rules: [],
+			},
+		},
 	},
 });

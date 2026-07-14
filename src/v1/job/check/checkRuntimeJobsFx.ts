@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import type { CraftJobOwnerQuantityIssueSchema } from "~/v1/job/schema/CraftJobOwnerQuantityIssueSchema";
 import type { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
 import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
@@ -25,7 +24,6 @@ export namespace checkRuntimeJobsFx {
 export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	runtime,
 }: checkRuntimeJobsFx.Props) {
-	const craftOwnerQuantityIssues: CraftJobOwnerQuantityIssueSchema.Type[] = [];
 	const duplicateIssues: DuplicateJobIdIssueSchema.Type[] = [];
 	const ownerIssues: JobOwnerMissingIssueSchema.Type[] = [];
 	const multipleActiveIssues: JobOwnerMultipleActiveIssueSchema.Type[] = [];
@@ -74,14 +72,6 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 				location: owner.location,
 				type: "job:owner-not-on-grid",
 			});
-		if (job !== undefined && owner.item.type === "craft" && owner.quantity !== 1) {
-			craftOwnerQuantityIssues.push({
-				jobId: job.id,
-				ownerItemId: owner.id,
-				quantity: owner.quantity,
-				type: "job:craft-owner-quantity",
-			});
-		}
 		const line = yield* readItemLineFx({
 			item: owner.item,
 			lineId: entry.lineId,
@@ -140,7 +130,6 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	}
 
 	return [
-		...craftOwnerQuantityIssues,
 		...duplicateIssues,
 		...ownerIssues,
 		...multipleActiveIssues,

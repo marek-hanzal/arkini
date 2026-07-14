@@ -7,6 +7,7 @@ import { InputMaterialUnavailableError } from "~/v1/input/error/InputMaterialUna
 import { applyInputMaterialStorePlanFx } from "~/v1/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/v1/input/fx/planInputMaterialStoreFx";
 import type { InputMaterialStoreResultSchema } from "~/v1/input/schema/command/InputMaterialStoreResultSchema";
+import { isolateStatefulOwnerFx } from "~/v1/item/fx/isolateStatefulOwnerFx";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
 import { LineInputClosedError } from "~/v1/line/error/LineInputClosedError";
 import { isLineInputClosedFx } from "~/v1/line/fx/input/isLineInputClosedFx";
@@ -120,7 +121,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				);
 			}
 
-			const [result, nextRuntime] = yield* applyInputMaterialStorePlanFx({
+			const [result, inputRuntime] = yield* applyInputMaterialStorePlanFx({
 				location: {
 					scope: "input",
 					ownerItemId,
@@ -130,6 +131,10 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				plan,
 				runtime,
 				source,
+			});
+			const nextRuntime = yield* isolateStatefulOwnerFx({
+				ownerItemId,
+				runtime: inputRuntime,
 			});
 
 			return [

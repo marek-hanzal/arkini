@@ -1,13 +1,15 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
+import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
 import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/v1/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
-export namespace splitCraftOwnerForStartFx {
+export namespace isolateStatefulOwnerFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
@@ -15,26 +17,39 @@ export namespace splitCraftOwnerForStartFx {
 }
 
 /**
- * Detaches every excess craft quantity through standard placement before one unit starts work.
+ * Keeps one state-owning board identity and standard-places every excess pure quantity.
  */
-export const splitCraftOwnerForStartFx = Effect.fn("splitCraftOwnerForStartFx")(function* ({
+export const isolateStatefulOwnerFx = Effect.fn("isolateStatefulOwnerFx")(function* ({
 	ownerItemId,
 	runtime,
-}: splitCraftOwnerForStartFx.Props) {
+}: isolateStatefulOwnerFx.Props) {
 	const owner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
-	if (owner.item.type !== "craft" || owner.quantity === 1) {
+	if (!isBoardRuntimeItem(owner)) {
+		return yield* Effect.fail(
+			new ItemNotOnBoardError({
+				itemId: owner.id,
+				location: owner.location,
+			}),
+		);
+	}
+	if (owner.quantity === 1) {
 		return runtime;
 	}
-	if (!isBoardRuntimeItem(owner)) {
+
+	const pure = yield* isItemPureFx({
+		item: owner,
+		runtime,
+	});
+	if (pure) {
 		return yield* Effect.dieMessage(
-			`Craft owner ${owner.id} left the board after its start plan was accepted.`,
+			`Owner ${owner.id} must own identity-bound state before it can be isolated.`,
 		);
 	}
 
-	const runningOwner = yield* reviseRuntimeItemFx({
+	const statefulOwner = yield* reviseRuntimeItemFx({
 		item: {
 			...owner,
 			quantity: 1,
@@ -42,7 +57,7 @@ export const splitCraftOwnerForStartFx = Effect.fn("splitCraftOwnerForStartFx")(
 	});
 	const ownerRuntime = {
 		...runtime,
-		items: runtime.items.map((item) => (item.id === owner.id ? runningOwner : item)),
+		items: runtime.items.map((item) => (item.id === owner.id ? statefulOwner : item)),
 	} satisfies RuntimeSchema.Type;
 	const [, nextRuntime] = yield* applyOutputPlacementFx({
 		origin: owner.location.position,

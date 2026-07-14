@@ -4,7 +4,7 @@ import { assertJobOutputMaxCountFx } from "~/v1/job/fx/assertJobOutputMaxCountFx
 import { assertLineStartReadyFx } from "~/v1/job/fx/assertLineStartReadyFx";
 import { createJobFx } from "~/v1/job/fx/createJobFx";
 import { resolveLineStartFx } from "~/v1/job/fx/read/resolveLineStartFx";
-import { splitCraftOwnerForStartFx } from "~/v1/job/fx/splitCraftOwnerForStartFx";
+import { isolateStatefulOwnerFx } from "~/v1/item/fx/isolateStatefulOwnerFx";
 import { applyLineRunPlanFx } from "~/v1/line/fx/run/applyLineRunPlanFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace startLineRuntimeFx {
@@ -49,7 +49,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		job,
 		runtime: inputRuntime,
 	});
-	const ownerRuntime = yield* splitCraftOwnerForStartFx({
+	const ownerRuntime = yield* isolateStatefulOwnerFx({
 		ownerItemId,
 		runtime: inputRuntime,
 	});

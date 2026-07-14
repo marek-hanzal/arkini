@@ -4,12 +4,15 @@
 		"item:blueprint-stonemason-t1": {
 			"id": "item:blueprint-stonemason-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Stonemason I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Stonemason I.",
-			"asset": [
-				"blueprint",
-				"producer-stonemason-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-stonemason-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -48,9 +51,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:stonemason-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:stonemason-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

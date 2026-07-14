@@ -50,6 +50,7 @@ export const createJobTestConfig = (
 					scope: forgeScope,
 				}),
 				type: "producer",
+				afterCompletion: "keep",
 				maxStackSize: 1,
 				maxQueueSize,
 				lines: [

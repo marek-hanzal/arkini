@@ -4,6 +4,7 @@
 		"producer:construction-yard-t1": {
 			"id": "producer:construction-yard-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Construction Yard I",
 			"description": "Advanced construction yard that bundles bricks, glass, roof tiles, permits, and civic goods into settlement expansion packages.",
 			"asset": {

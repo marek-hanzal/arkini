@@ -4,12 +4,15 @@
 		"item:blueprint-academy": {
 			"id": "item:blueprint-academy",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Academy Blueprint",
 			"description": "Build plan that upgrades a School into an Academy.",
-			"asset": [
-				"blueprint",
-				"producer-academy"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-academy"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -108,9 +111,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:academy"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:academy",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

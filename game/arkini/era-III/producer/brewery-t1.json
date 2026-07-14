@@ -4,6 +4,7 @@
 		"producer:brewery-t1": {
 			"id": "producer:brewery-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Brewery I",
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"asset": {

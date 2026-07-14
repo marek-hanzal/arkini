@@ -4,12 +4,15 @@
 		"item:blueprint-university": {
 			"id": "item:blueprint-university",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "University Blueprint",
 			"description": "Build plan that upgrades an Academy into a University as part of the guild and institution era.",
-			"asset": [
-				"blueprint",
-				"producer-university"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-university"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -172,9 +175,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:university"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:university",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

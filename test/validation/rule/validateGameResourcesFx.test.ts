@@ -22,8 +22,7 @@ describe("validateGameResourcesFx", () => {
 			startTestConfig.resources.hero,
 		]);
 		for (const item of Object.values(startTestConfig.items)) {
-			if (item.type === "blueprint") item.asset.forEach((id) => ids.add(id));
-			else item.asset.source.forEach((id) => ids.add(id));
+			item.asset.source.forEach((id) => ids.add(id));
 		}
 		const diagnostics = Effect.runSync(
 			validateGameResourcesFx({
@@ -87,13 +86,15 @@ describe("validateGameResourcesFx", () => {
 		}) => ({
 			id,
 			type: "blueprint" as const,
+			afterCompletion: "remove" as const,
 			title: id,
 			description: id,
-			asset: [
-				"blueprint",
-				targetAsset,
-			] as const,
-			targetId,
+			asset: {
+				source: [
+					"blueprint",
+					targetAsset,
+				] as const,
+			},
 			tags: [],
 			categoryId: "blueprint",
 			scope: "any" as const,
@@ -108,6 +109,28 @@ describe("validateGameResourcesFx", () => {
 						type: "simple" as const,
 					},
 				],
+				output: {
+					set: [
+						{
+							roll: [
+								{
+									type: "guaranteed" as const,
+									drop: [
+										{
+											itemId: targetId,
+											quantity: {
+												type: "value" as const,
+												value: 1,
+											},
+											placement: "replace" as const,
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
 				rules: [],
 			},
 		});

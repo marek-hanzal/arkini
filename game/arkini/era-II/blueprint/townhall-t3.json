@@ -4,12 +4,15 @@
 		"item:blueprint-townhall-t3": {
 			"id": "item:blueprint-townhall-t3",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Town Hall III Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall III.",
-			"asset": [
-				"blueprint",
-				"producer-townhall-t3"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-townhall-t3"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -168,9 +171,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:townhall-t3"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:townhall-t3",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

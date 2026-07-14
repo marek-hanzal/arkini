@@ -4,12 +4,15 @@
 		"item:blueprint-iron-mine-t1": {
 			"id": "item:blueprint-iron-mine-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Iron Mine I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Iron Mine I.",
-			"asset": [
-				"blueprint",
-				"producer-iron-mine-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-iron-mine-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -96,9 +99,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:iron-mine-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:iron-mine-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

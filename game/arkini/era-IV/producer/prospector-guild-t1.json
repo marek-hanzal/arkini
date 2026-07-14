@@ -4,6 +4,7 @@
 		"producer:prospector-guild-t1": {
 			"id": "producer:prospector-guild-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Prospector Guild",
 			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
 			"asset": {

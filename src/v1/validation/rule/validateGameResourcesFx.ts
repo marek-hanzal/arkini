@@ -59,21 +59,6 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 	];
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		if (item.type === "blueprint") {
-			item.asset.forEach((id, index) => {
-				references.push({
-					id,
-					path: [
-						"items",
-						itemId,
-						"asset",
-						index,
-					],
-					source,
-				});
-			});
-			continue;
-		}
 		item.asset.source.forEach((id, index) => {
 			references.push({
 				id,

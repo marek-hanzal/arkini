@@ -4,6 +4,7 @@
 		"item:quest:farmers-favor": {
 			"id": "item:quest:farmers-favor",
 			"type": "craft",
+			"afterCompletion": "remove",
 			"title": "Farmers' Favor Quest",
 			"description": "A modest farm quest that converts basic food supplies into a small processed dairy reward from the next era.",
 			"asset": {

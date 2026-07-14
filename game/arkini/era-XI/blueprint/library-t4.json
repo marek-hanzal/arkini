@@ -4,12 +4,15 @@
 		"item:blueprint-library-t4": {
 			"id": "item:blueprint-library-t4",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Library IV Blueprint",
 			"description": "Build plan that upgrades Library III into Library IV.",
-			"asset": [
-				"blueprint",
-				"producer-library-t4"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-library-t4"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -83,9 +86,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:library-t4"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:library-t4",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

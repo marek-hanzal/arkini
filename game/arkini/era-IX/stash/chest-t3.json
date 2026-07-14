@@ -4,6 +4,7 @@
 		"item:chest-t3": {
 			"id": "item:chest-t3",
 			"type": "stash",
+			"afterCompletion": "remove",
 			"title": "Chest III",
 			"description": "Locked chest returned from a dangerous Heroes Guild expedition. Open it with a Key III.",
 			"asset": {
@@ -36,75 +37,74 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
-						},
-						"capacity": 1
+						}
 					}
 				],
-				"rules": []
-			},
-			"output": {
-				"set": [
-					{
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "item:coin",
-										"quantity": {
-											"type": "range",
-											"min": 7,
-											"max": 10
-										},
-										"rules": []
-									}
-								]
-							},
-							{
-								"type": "chance",
-								"chance": 0.35,
-								"drop": [
-									{
-										"itemId": "item:emerald",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							},
-							{
-								"type": "chance",
-								"chance": 0.65,
-								"drop": [
-									{
-										"itemId": "item:sapphire",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							},
-							{
-								"type": "chance",
-								"chance": 0.25,
-								"drop": [
-									{
-										"itemId": "item:topaz",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "range",
+												"min": 7,
+												"max": 10
+											},
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:emerald",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.65,
+									"drop": [
+										{
+											"itemId": "item:sapphire",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.25,
+									"drop": [
+										{
+											"itemId": "item:topaz",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
 			}
 		}
 	}

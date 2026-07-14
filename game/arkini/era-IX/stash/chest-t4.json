@@ -4,6 +4,7 @@
 		"item:chest-t4": {
 			"id": "item:chest-t4",
 			"type": "stash",
+			"afterCompletion": "remove",
 			"title": "Chest IV",
 			"description": "Locked chest returned from the longest Heroes Guild expedition. Open it with a Key IV.",
 			"asset": {
@@ -36,75 +37,74 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
-						},
-						"capacity": 1
+						}
 					}
 				],
-				"rules": []
-			},
-			"output": {
-				"set": [
-					{
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "item:coin",
-										"quantity": {
-											"type": "range",
-											"min": 10,
-											"max": 15
-										},
-										"rules": []
-									}
-								]
-							},
-							{
-								"type": "chance",
-								"chance": 0.35,
-								"drop": [
-									{
-										"itemId": "item:sapphire",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							},
-							{
-								"type": "chance",
-								"chance": 0.55,
-								"drop": [
-									{
-										"itemId": "item:topaz",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							},
-							{
-								"type": "chance",
-								"chance": 0.35,
-								"drop": [
-									{
-										"itemId": "item:aquamarine",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:coin",
+											"quantity": {
+												"type": "range",
+												"min": 10,
+												"max": 15
+											},
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:sapphire",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.55,
+									"drop": [
+										{
+											"itemId": "item:topaz",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "chance",
+									"chance": 0.35,
+									"drop": [
+										{
+											"itemId": "item:aquamarine",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
 			}
 		}
 	}

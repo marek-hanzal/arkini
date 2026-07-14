@@ -22,6 +22,7 @@ export const createInvalidReplacementTestConfig = () => {
 			},
 			forge: {
 				...forge,
+				afterCompletion: "remove",
 				lines: [
 					{
 						...line,

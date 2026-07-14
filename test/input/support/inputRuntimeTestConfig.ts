@@ -52,6 +52,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 				scope: "any",
 			}),
 			type: "producer",
+			afterCompletion: "keep",
 			lines: [
 				{
 					id: "line:workshop:build",

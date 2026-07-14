@@ -4,6 +4,7 @@
 		"producer:clay-pit": {
 			"id": "producer:clay-pit",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Clay Pit",
 			"description": "Prepared extraction pit that produces clay near a surveyed clay deposit.",
 			"asset": {

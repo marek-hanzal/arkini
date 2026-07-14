@@ -4,6 +4,7 @@
 		"item:quest:road-repair": {
 			"id": "item:quest:road-repair",
 			"type": "craft",
+			"afterCompletion": "remove",
 			"title": "Road Repair Quest",
 			"description": "A small board quest asking for raw building materials and rewarding a processed block.",
 			"asset": {

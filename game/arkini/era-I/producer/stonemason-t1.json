@@ -4,6 +4,7 @@
 		"producer:stonemason-t1": {
 			"id": "producer:stonemason-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Stonemason I",
 			"description": "Turns stone into stone blocks when placed near a quarry.",
 			"asset": {

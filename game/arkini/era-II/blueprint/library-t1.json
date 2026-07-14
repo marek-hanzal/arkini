@@ -4,12 +4,15 @@
 		"item:blueprint-library-t1": {
 			"id": "item:blueprint-library-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Library I Blueprint",
 			"description": "Build plan that can be filled with early resources to construct Library I.",
-			"asset": [
-				"blueprint",
-				"producer-library-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-library-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -61,9 +64,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:library-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:library-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

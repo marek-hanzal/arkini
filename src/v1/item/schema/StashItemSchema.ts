@@ -1,39 +1,31 @@
 import { z } from "zod";
+
 import { LineSchema } from "~/v1/line/schema/LineSchema";
-import { OutputSchema } from "~/v1/output/schema/OutputSchema";
+import { AfterCompletionEnumSchema } from "./AfterCompletionEnumSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An item configuration that owns one stash product line and optional output.
+ * An item configuration that owns one ordinary product line.
  *
- * The schema captures intended stash output. Automatic stash consumption and
- * top-level stash output execution remain separate runtime capabilities.
+ * Output and placement use the shared line contract. Completion behavior is
+ * authored explicitly instead of being inferred from the stash type.
  */
 export const StashItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		/**
-		 * Identifies this item as a stash authoring definition.
-		 */
 		type: ItemEnumSchema.extract([
 			"stash",
 		]),
-		/**
-		 * The one product line authored for this stash.
-		 */
-		line: LineSchema.describe("The one product line authored for this stash."),
-		/**
-		 * Optional output intended for stash-specific completion behavior.
-		 */
-		output: OutputSchema.optional().describe(
-			"The optional output intended for stash-specific completion behavior.",
+		afterCompletion: AfterCompletionEnumSchema.describe(
+			"What happens to this stash after its line completes.",
 		),
+		line: LineSchema.describe("The one product line owned by this stash."),
 	})
 	.strict()
 	.meta({
 		id: "StashItemSchema",
-		description: "An item configuration with one stash product line and optional output.",
+		description: "An item configuration with one product line.",
 	});
 
 export type StashItemSchema = typeof StashItemSchema;

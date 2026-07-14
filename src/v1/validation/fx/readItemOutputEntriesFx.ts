@@ -1,6 +1,4 @@
 import { Effect } from "effect";
-import { match, P } from "ts-pattern";
-
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import type { ItemOutputEntrySchema } from "../schema/ItemOutputEntrySchema";
@@ -13,7 +11,7 @@ export namespace readItemOutputEntriesFx {
 	}
 }
 
-/** Reads line, lifecycle, stash, and merge outputs owned by one canonical item. */
+/** Reads line, direct item, and merge outputs owned by one canonical item. */
 export const readItemOutputEntriesFx = Effect.fn("readItemOutputEntriesFx")(function* ({
 	itemId,
 	item,
@@ -36,33 +34,9 @@ export const readItemOutputEntriesFx = Effect.fn("readItemOutputEntriesFx")(func
 				],
 	);
 
-	const directOutput = match(item)
-		.with(
-			{
-				type: P.union("blueprint", "deposit", "stash", "temporary"),
-			},
-			({ output }) => output,
-		)
-		.with(
-			{
-				type: P.union(
-					"simple",
-					"producer",
-					"craft",
-					"inventory",
-					"memory",
-					"cheat:speed",
-					"nuke",
-					"cheat:inventory",
-				),
-			},
-			() => undefined,
-		)
-		.exhaustive();
-
-	if (directOutput !== undefined) {
+	if ((item.type === "deposit" || item.type === "temporary") && item.output !== undefined) {
 		entries.push({
-			output: directOutput,
+			output: item.output,
 			path: [
 				"items",
 				itemId,

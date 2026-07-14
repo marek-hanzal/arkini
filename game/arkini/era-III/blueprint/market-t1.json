@@ -4,12 +4,15 @@
 		"item:blueprint-market-t1": {
 			"id": "item:blueprint-market-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Market Blueprint",
 			"description": "Build plan that can be filled with resources to construct the Market.",
-			"asset": [
-				"blueprint",
-				"producer-market-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-market-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -72,9 +75,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:market-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:market-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

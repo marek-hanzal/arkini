@@ -4,6 +4,7 @@
 		"producer:goldsmith-t1": {
 			"id": "producer:goldsmith-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Goldsmith I",
 			"description": "Guild-era gold sink that mints coin stacks and crafts gem-set keys for the expedition loop.",
 			"asset": {

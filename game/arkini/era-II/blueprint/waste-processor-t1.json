@@ -4,12 +4,15 @@
 		"item:blueprint-waste-processor-t1": {
 			"id": "item:blueprint-waste-processor-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Waste Processor I Blueprint",
 			"description": "Build plan that can be filled with early resources to construct Waste Processor I.",
-			"asset": [
-				"blueprint",
-				"producer-waste-processor-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-waste-processor-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -61,9 +64,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:waste-processor-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:waste-processor-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

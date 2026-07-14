@@ -4,6 +4,7 @@
 		"producer:civic-office-t1": {
 			"id": "producer:civic-office-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Civic Office I",
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
 			"asset": {

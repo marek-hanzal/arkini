@@ -5,10 +5,12 @@ import { DuplicateProviderDiagnosticSchema } from "./diagnostic/DuplicateProvide
 import { DuplicateLineIdDiagnosticSchema } from "./diagnostic/DuplicateLineIdDiagnosticSchema";
 import { EmptyMaterialTagDiagnosticSchema } from "./diagnostic/EmptyMaterialTagDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./diagnostic/UnusedResourceDiagnosticSchema";
+import { UnsupportedInputCapacityDiagnosticSchema } from "./diagnostic/UnsupportedInputCapacityDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./diagnostic/MissingResourceDiagnosticSchema";
 import { DuplicateResourceDiagnosticSchema } from "./diagnostic/DuplicateResourceDiagnosticSchema";
 import { DuplicateRecordDiagnosticSchema } from "./diagnostic/DuplicateRecordDiagnosticSchema";
 import { InputAcceptanceCycleDiagnosticSchema } from "./diagnostic/InputAcceptanceCycleDiagnosticSchema";
+import { KeepReplaceConflictDiagnosticSchema } from "./diagnostic/KeepReplaceConflictDiagnosticSchema";
 import { KeyIdMismatchDiagnosticSchema } from "./diagnostic/KeyIdMismatchDiagnosticSchema";
 import { LimitedDepositWarningDiagnosticSchema } from "./diagnostic/LimitedDepositWarningDiagnosticSchema";
 import { StochasticLimitedDepositWarningDiagnosticSchema } from "./diagnostic/StochasticLimitedDepositWarningDiagnosticSchema";
@@ -31,6 +33,8 @@ export const GameDiagnosticSchema = z
 		KeyIdMismatchDiagnosticSchema,
 		MissingReferenceDiagnosticSchema,
 		InputAcceptanceCycleDiagnosticSchema,
+		UnsupportedInputCapacityDiagnosticSchema,
+		KeepReplaceConflictDiagnosticSchema,
 		MultipleReplaceDiagnosticSchema,
 		LimitedDepositWarningDiagnosticSchema,
 		StochasticLimitedDepositWarningDiagnosticSchema,

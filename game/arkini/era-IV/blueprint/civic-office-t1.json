@@ -4,12 +4,15 @@
 		"item:blueprint-civic-office-t1": {
 			"id": "item:blueprint-civic-office-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Civic Office I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Civic Office I.",
-			"asset": [
-				"blueprint",
-				"producer-civic-office-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-civic-office-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -72,9 +75,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:civic-office-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:civic-office-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

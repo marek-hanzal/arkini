@@ -4,12 +4,15 @@
 		"item:blueprint-chicken-coop-t1": {
 			"id": "item:blueprint-chicken-coop-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Chicken Coop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Chicken Coop I.",
-			"asset": [
-				"blueprint",
-				"producer-chicken-coop-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-chicken-coop-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -48,9 +51,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:chicken-coop-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:chicken-coop-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

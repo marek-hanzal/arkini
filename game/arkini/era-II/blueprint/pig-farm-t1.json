@@ -4,12 +4,15 @@
 		"item:blueprint-pig-farm-t1": {
 			"id": "item:blueprint-pig-farm-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Pig Farm I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
-			"asset": [
-				"blueprint",
-				"producer-pig-farm-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-pig-farm-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -59,9 +62,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:pig-farm-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:pig-farm-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

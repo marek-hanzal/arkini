@@ -4,6 +4,7 @@
 		"producer:dye-workshop-t1": {
 			"id": "producer:dye-workshop-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Dye Workshop I",
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
 			"asset": {

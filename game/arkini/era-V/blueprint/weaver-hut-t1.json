@@ -4,12 +4,15 @@
 		"item:blueprint-weaver-hut-t1": {
 			"id": "item:blueprint-weaver-hut-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Weaver Hut I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
-			"asset": [
-				"blueprint",
-				"producer-weaver-hut-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-weaver-hut-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -72,9 +75,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:weaver-hut-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:weaver-hut-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

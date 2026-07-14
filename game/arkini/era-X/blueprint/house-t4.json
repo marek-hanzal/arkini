@@ -4,12 +4,15 @@
 		"item:blueprint-house-t4": {
 			"id": "item:blueprint-house-t4",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "House IV Blueprint",
 			"description": "Build plan for House IV, a housing producer that generates morale.",
-			"asset": [
-				"blueprint",
-				"producer-house-t4"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-house-t4"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -141,9 +144,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:house-t4"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:house-t4",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

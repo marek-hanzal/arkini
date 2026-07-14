@@ -4,6 +4,7 @@
 		"producer:quarry-t1": {
 			"id": "producer:quarry-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Quarry I",
 			"description": "Produces stone when placed near a rock.",
 			"asset": {

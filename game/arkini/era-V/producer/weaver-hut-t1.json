@@ -4,6 +4,7 @@
 		"producer:weaver-hut-t1": {
 			"id": "producer:weaver-hut-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Weaver Hut I",
 			"description": "Textile producer that weaves wool into common cloth.",
 			"asset": {

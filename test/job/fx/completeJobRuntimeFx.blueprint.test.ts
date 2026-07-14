@@ -44,29 +44,28 @@ const simpleItem = ({
 const blueprintItem = ({
 	id,
 	lineId,
-	targetId,
 	output,
 	reserveTool = false,
 }: {
 	id: string;
 	lineId: string;
-	targetId: string;
 	output?: unknown;
 	reserveTool?: boolean;
 }) => ({
 	id,
 	type: "blueprint" as const,
+	afterCompletion: "remove" as const,
 	title: id,
 	description: id,
-	asset: [
-		`asset:${id}`,
-		`asset:${targetId}`,
-	],
+	asset: {
+		source: [
+			`asset:${id}`,
+		],
+	},
 	tags: [],
 	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
-	targetId,
 	line: {
 		id: lineId,
 		title: lineId,
@@ -92,30 +91,53 @@ const blueprintItem = ({
 						type: "simple" as const,
 					},
 				],
+		output,
 		rules: [],
 	},
-	output,
 });
 
-const guaranteedOutput = (itemId: string, quantity: unknown) => ({
+const guaranteedOutput = (
+	drops: ReadonlyArray<{
+		itemId: string;
+		quantity: unknown;
+		placement?: "drop" | "replace";
+	}>,
+) => ({
 	set: [
 		{
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
-						{
-							itemId,
-							quantity,
-							placement: "drop" as const,
-							rules: [],
-						},
-					],
+					drop: drops.map(({ itemId, quantity, placement = "drop" }) => ({
+						itemId,
+						quantity,
+						placement,
+						rules: [],
+					})),
 				},
 			],
 		},
 	],
 });
+
+const blueprintOutput = (
+	replacementItemId: string,
+	byproducts: ReadonlyArray<{
+		itemId: string;
+		quantity: unknown;
+	}> = [],
+) =>
+	guaranteedOutput([
+		{
+			itemId: replacementItemId,
+			quantity: {
+				type: "value" as const,
+				value: 1,
+			},
+			placement: "replace",
+		},
+		...byproducts,
+	]);
 
 const blueprintConfig = GameConfigSchema.parse({
 	version: "1.0",
@@ -140,36 +162,48 @@ const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:plain": blueprintItem({
 			id: "blueprint:plain",
 			lineId: "line:blueprint:plain",
-			targetId: "item:target",
+			output: blueprintOutput("item:target"),
 		}),
 		"blueprint:output": blueprintItem({
 			id: "blueprint:output",
 			lineId: "line:blueprint:output",
-			targetId: "item:target-unlimited",
-			output: guaranteedOutput("item:byproduct", {
-				type: "value",
-				value: 1,
-			}),
+			output: blueprintOutput("item:target-unlimited", [
+				{
+					itemId: "item:byproduct",
+					quantity: {
+						type: "value",
+						value: 1,
+					},
+				},
+			]),
 		}),
 		"blueprint:reserve": blueprintItem({
 			id: "blueprint:reserve",
 			lineId: "line:blueprint:reserve",
-			targetId: "item:target-unlimited",
-			output: guaranteedOutput("item:byproduct", {
-				type: "value",
-				value: 1,
-			}),
+			output: blueprintOutput("item:target-unlimited", [
+				{
+					itemId: "item:byproduct",
+					quantity: {
+						type: "value",
+						value: 1,
+					},
+				},
+			]),
 			reserveTool: true,
 		}),
 		"blueprint:range": blueprintItem({
 			id: "blueprint:range",
 			lineId: "line:blueprint:range",
-			targetId: "item:target-unlimited",
-			output: guaranteedOutput("item:limited", {
-				type: "range",
-				min: 1,
-				max: 5,
-			}),
+			output: blueprintOutput("item:target-unlimited", [
+				{
+					itemId: "item:limited",
+					quantity: {
+						type: "range",
+						min: 1,
+						max: 5,
+					},
+				},
+			]),
 		}),
 		"item:target": simpleItem({
 			id: "item:target",
@@ -200,6 +234,7 @@ const blueprintConfig = GameConfigSchema.parse({
 		"producer:limited": {
 			id: "producer:limited",
 			type: "producer",
+			afterCompletion: "keep",
 			title: "Limited producer",
 			description: "Produces one singleton output.",
 			asset: {
@@ -223,10 +258,15 @@ const blueprintConfig = GameConfigSchema.parse({
 							type: "simple",
 						},
 					],
-					output: guaranteedOutput("item:queue-product", {
-						type: "value",
-						value: 1,
-					}),
+					output: guaranteedOutput([
+						{
+							itemId: "item:queue-product",
+							quantity: {
+								type: "value",
+								value: 1,
+							},
+						},
+					]),
 					rules: [],
 				},
 			],

@@ -4,12 +4,15 @@
 		"item:blueprint-tavern-t1": {
 			"id": "item:blueprint-tavern-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Tavern I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Tavern I.",
-			"asset": [
-				"blueprint",
-				"producer-tavern-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-tavern-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -59,9 +62,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:tavern-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:tavern-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

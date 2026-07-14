@@ -42,6 +42,7 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 10,
 			type: "producer",
+			afterCompletion: "keep",
 			lines: [
 				{
 					id: "line:producer",

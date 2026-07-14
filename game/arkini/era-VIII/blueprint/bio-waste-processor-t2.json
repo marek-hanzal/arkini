@@ -4,12 +4,15 @@
 		"item:blueprint-bio-waste-processor-t2": {
 			"id": "item:blueprint-bio-waste-processor-t2",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Bio-Waste Processor II Blueprint",
 			"description": "Build plan that upgrades Bio-Waste Processor I into Bio-Waste Processor II for coal and charcoal disposal lines.",
-			"asset": [
-				"blueprint",
-				"producer-bio-waste-processor-t2"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-bio-waste-processor-t2"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -132,9 +135,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:bio-waste-processor-t2"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:bio-waste-processor-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

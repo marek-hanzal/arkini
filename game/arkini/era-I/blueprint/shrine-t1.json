@@ -4,12 +4,15 @@
 		"item:blueprint-shrine-t1": {
 			"id": "item:blueprint-shrine-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Wayside Shrine Blueprint",
 			"description": "Build plan that can be filled with resources to construct Wayside Shrine.",
-			"asset": [
-				"blueprint",
-				"producer-shrine-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-shrine-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -48,9 +51,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:shrine-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:shrine-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

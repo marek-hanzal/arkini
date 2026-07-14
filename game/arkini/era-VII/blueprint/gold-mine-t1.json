@@ -4,12 +4,15 @@
 		"item:blueprint-gold-mine-t1": {
 			"id": "item:blueprint-gold-mine-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Gold Mine I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Gold Mine I.",
-			"asset": [
-				"blueprint",
-				"producer-gold-mine-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-gold-mine-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -96,9 +99,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:gold-mine-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:gold-mine-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

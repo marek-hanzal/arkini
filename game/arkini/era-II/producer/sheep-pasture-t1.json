@@ -4,6 +4,7 @@
 		"producer:sheep-pasture-t1": {
 			"id": "producer:sheep-pasture-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Sheep Pasture I",
 			"description": "Consumes grain and water to produce wool.",
 			"asset": {

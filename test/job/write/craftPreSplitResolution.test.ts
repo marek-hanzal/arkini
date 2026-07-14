@@ -42,6 +42,7 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 10,
 			type: "craft",
+			afterCompletion: "remove",
 			line: {
 				id: "line:craft",
 				title: "Run",

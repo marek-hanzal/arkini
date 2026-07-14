@@ -4,12 +4,15 @@
 		"item:blueprint-prospector-guild-t2": {
 			"id": "item:blueprint-prospector-guild-t2",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Prospector Guild Blueprint",
 			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
-			"asset": [
-				"blueprint",
-				"producer-prospector-guild-t2"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-prospector-guild-t2"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -78,9 +81,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:prospector-guild-t2"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:prospector-guild-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

@@ -4,6 +4,7 @@
 		"producer:well-t1": {
 			"id": "producer:well-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Well I",
 			"description": "Produces water.",
 			"asset": {

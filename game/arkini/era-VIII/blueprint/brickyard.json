@@ -4,12 +4,15 @@
 		"item:blueprint-brickyard": {
 			"id": "item:blueprint-brickyard",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Brickyard Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Brickyard.",
-			"asset": [
-				"blueprint",
-				"producer-brickyard"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-brickyard"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -120,9 +123,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:brickyard"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:brickyard",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

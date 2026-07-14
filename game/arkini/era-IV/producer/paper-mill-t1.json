@@ -4,6 +4,7 @@
 		"producer:paper-mill-t1": {
 			"id": "producer:paper-mill-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Paper Mill I",
 			"description": "Civic workshop that turns planks and water into paper for education and permits.",
 			"asset": {

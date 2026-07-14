@@ -4,6 +4,7 @@
 		"item:feast-plate": {
 			"id": "item:feast-plate",
 			"type": "craft",
+			"afterCompletion": "remove",
 			"title": "Feast Plate",
 			"description": "An empty serving plate from the cookhouse. Fill it with Era II farm food on the board to assemble a proper feast.",
 			"asset": {

@@ -4,6 +4,7 @@
 		"producer:iron-mine-t1": {
 			"id": "producer:iron-mine-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Iron Mine I",
 			"description": "Mines iron ore carts from a nearby iron deposit using food and tavern supplies for the crew.",
 			"asset": {

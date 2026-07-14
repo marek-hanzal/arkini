@@ -4,12 +4,15 @@
 		"item:blueprint-market-t2": {
 			"id": "item:blueprint-market-t2",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Market II Blueprint",
 			"description": "Build plan that can upgrade Market into Market II.",
-			"asset": [
-				"blueprint",
-				"producer-market-t2"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-market-t2"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -88,9 +91,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:market-t2"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:market-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

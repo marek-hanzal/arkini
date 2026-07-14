@@ -4,12 +4,15 @@
 		"item:blueprint-glazier-workshop-t1": {
 			"id": "item:blueprint-glazier-workshop-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Glazier Workshop I Blueprint",
 			"description": "Build plan that can be filled with prestige materials to construct Glazier Workshop I.",
-			"asset": [
-				"blueprint",
-				"producer-glazier-workshop-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-glazier-workshop-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -141,9 +144,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:glazier-workshop-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:glazier-workshop-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

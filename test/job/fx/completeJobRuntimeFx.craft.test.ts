@@ -38,6 +38,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:drop": {
 			id: "craft:drop",
 			type: "craft",
+			afterCompletion: "remove",
 			title: "Drop craft",
 			description: "Consumes itself and emits one ordinary output.",
 			asset: {
@@ -87,6 +88,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:replace": {
 			id: "craft:replace",
 			type: "craft",
+			afterCompletion: "remove",
 			title: "Replace craft",
 			description: "Replaces itself and emits a bonus output.",
 			asset: {
@@ -145,6 +147,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:reserve": {
 			id: "craft:reserve",
 			type: "craft",
+			afterCompletion: "remove",
 			title: "Reserve craft",
 			description: "Returns its reserved tool after output placement.",
 			asset: {
@@ -203,6 +206,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:sink": {
 			id: "craft:sink",
 			type: "craft",
+			afterCompletion: "remove",
 			title: "Sink craft",
 			description: "Consumes itself without output.",
 			asset: {
@@ -230,6 +234,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:random": {
 			id: "craft:random",
 			type: "craft",
+			afterCompletion: "remove",
 			title: "Random craft",
 			description: "Produces one deterministic two-item alternative.",
 			asset: {

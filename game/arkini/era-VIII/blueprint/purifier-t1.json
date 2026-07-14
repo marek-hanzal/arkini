@@ -4,12 +4,15 @@
 		"item:blueprint-purifier-t1": {
 			"id": "item:blueprint-purifier-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Purifier I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Purifier I.",
-			"asset": [
-				"blueprint",
-				"producer-purifier-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-purifier-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -119,9 +122,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:purifier-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:purifier-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

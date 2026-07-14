@@ -4,12 +4,15 @@
 		"item:blueprint-sand-pit": {
 			"id": "item:blueprint-sand-pit",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Sand Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
-			"asset": [
-				"blueprint",
-				"producer-sand-pit"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-sand-pit"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -89,9 +92,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:sand-pit"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:sand-pit",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

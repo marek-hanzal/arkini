@@ -4,12 +4,15 @@
 		"item:blueprint-armory-t1": {
 			"id": "item:blueprint-armory-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Armory I Blueprint",
 			"description": "Build plan that can be filled with guild resources to construct Armory I.",
-			"asset": [
-				"blueprint",
-				"producer-armory-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-armory-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -130,9 +133,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:armory-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:armory-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

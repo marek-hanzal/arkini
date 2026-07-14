@@ -4,12 +4,15 @@
 		"item:blueprint-goldsmith-t1": {
 			"id": "item:blueprint-goldsmith-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Goldsmith I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Goldsmith I.",
-			"asset": [
-				"blueprint",
-				"producer-goldsmith-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-goldsmith-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -128,9 +131,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:goldsmith-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:goldsmith-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

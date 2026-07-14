@@ -4,12 +4,15 @@
 		"item:blueprint-dairy-t1": {
 			"id": "item:blueprint-dairy-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Dairy I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Dairy I.",
-			"asset": [
-				"blueprint",
-				"producer-dairy-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-dairy-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -59,9 +62,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:dairy-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:dairy-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

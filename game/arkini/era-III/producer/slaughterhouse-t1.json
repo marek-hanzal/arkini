@@ -4,6 +4,7 @@
 		"producer:slaughterhouse-t1": {
 			"id": "producer:slaughterhouse-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Slaughterhouse I",
 			"description": "Processes piglets into sausage and leather.",
 			"asset": {

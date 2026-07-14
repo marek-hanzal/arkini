@@ -4,6 +4,7 @@
 		"producer:market-t2": {
 			"id": "producer:market-t2",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Market II",
 			"description": "Improved trade producer that expands the market with paper trade and better feast sales.",
 			"asset": {

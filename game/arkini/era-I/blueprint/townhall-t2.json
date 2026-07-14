@@ -4,12 +4,15 @@
 		"item:blueprint-townhall-t2": {
 			"id": "item:blueprint-townhall-t2",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Town Hall II Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall II.",
-			"asset": [
-				"blueprint",
-				"producer-townhall-t2"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-townhall-t2"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -126,9 +129,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:townhall-t2"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:townhall-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

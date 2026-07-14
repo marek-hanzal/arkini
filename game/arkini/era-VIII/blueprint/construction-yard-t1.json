@@ -4,12 +4,15 @@
 		"item:blueprint-construction-yard-t1": {
 			"id": "item:blueprint-construction-yard-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Construction Yard I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
-			"asset": [
-				"blueprint",
-				"producer-construction-yard-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-construction-yard-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -172,9 +175,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:construction-yard-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:construction-yard-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

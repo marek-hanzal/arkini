@@ -4,6 +4,7 @@
 		"producer:house-t4": {
 			"id": "producer:house-t4",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "House",
 			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
 			"asset": {

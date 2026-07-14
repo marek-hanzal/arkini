@@ -4,6 +4,7 @@
 		"producer:townhall-t4": {
 			"id": "producer:townhall-t4",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Town Hall IV",
 			"description": "Civic administration hub that issues education, paper, permit, survey, and improved market plans.",
 			"asset": {

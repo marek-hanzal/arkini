@@ -4,12 +4,15 @@
 		"item:blueprint-lumberjack-t1": {
 			"id": "item:blueprint-lumberjack-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Lumberjack I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Lumberjack I.",
-			"asset": [
-				"blueprint",
-				"producer-lumberjack-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-lumberjack-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -48,9 +51,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:lumberjack-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:lumberjack-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

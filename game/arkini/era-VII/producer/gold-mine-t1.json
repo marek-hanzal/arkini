@@ -4,6 +4,7 @@
 		"producer:gold-mine-t1": {
 			"id": "producer:gold-mine-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Gold Mine I",
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"asset": {

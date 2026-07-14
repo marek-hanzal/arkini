@@ -28,13 +28,7 @@ export const readItemLineFx = Effect.fn("readItemLineFx")(function* ({
 		)
 		.with(
 			{
-				type: P.union("blueprint", "craft"),
-			},
-			({ line }) => (line.id === lineId ? line : undefined),
-		)
-		.with(
-			{
-				type: "stash",
+				type: P.union("blueprint", "craft", "stash"),
 			},
 			({ line }) => (line.id === lineId ? line : undefined),
 		)

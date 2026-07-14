@@ -59,6 +59,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 			}),
 			maxStackSize: 1,
 			type: "producer",
+			afterCompletion: "keep",
 			maxQueueSize: 2,
 			lines: [
 				{

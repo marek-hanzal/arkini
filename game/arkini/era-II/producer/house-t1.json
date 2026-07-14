@@ -4,6 +4,7 @@
 		"producer:house-t1": {
 			"id": "producer:house-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "House",
 			"description": "Basic housing that turns warmth and water into early morale.",
 			"asset": {

@@ -4,12 +4,15 @@
 		"item:blueprint-school": {
 			"id": "item:blueprint-school",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "School Blueprint",
 			"description": "Build plan that can be filled with supplies to construct a School.",
-			"asset": [
-				"blueprint",
-				"producer-school"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-school"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -87,9 +90,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:school"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:school",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

@@ -4,6 +4,7 @@
 		"producer:townhall-t1": {
 			"id": "producer:townhall-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Town Hall I",
 			"description": "Starter civic hub that issues basic settlement blueprints.",
 			"asset": {

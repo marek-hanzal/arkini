@@ -60,6 +60,7 @@ export const createProducerItem = ({
 	ProducerItemSchema.parse({
 		...createSimpleItem(id),
 		type: "producer",
+		afterCompletion: "keep",
 		lines: lines ?? [
 			createLine({
 				input,

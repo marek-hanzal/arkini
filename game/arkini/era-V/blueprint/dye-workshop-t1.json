@@ -4,12 +4,15 @@
 		"item:blueprint-dye-workshop-t1": {
 			"id": "item:blueprint-dye-workshop-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Dye Workshop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
-			"asset": [
-				"blueprint",
-				"producer-dye-workshop-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-dye-workshop-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -99,9 +102,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:dye-workshop-t1"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:dye-workshop-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

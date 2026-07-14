@@ -4,6 +4,7 @@
 		"producer:lumberjack-t1": {
 			"id": "producer:lumberjack-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Lumberjack I",
 			"description": "Produces logs when placed near a tree.",
 			"asset": {

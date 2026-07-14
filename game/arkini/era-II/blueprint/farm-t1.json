@@ -4,12 +4,15 @@
 		"item:blueprint-farm-t1": {
 			"id": "item:blueprint-farm-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Farm I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Farm I.",
-			"asset": [
-				"blueprint",
-				"producer-farm-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-farm-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -48,9 +51,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:farm-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:farm-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

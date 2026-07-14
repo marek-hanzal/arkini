@@ -4,6 +4,7 @@
 		"producer:bakery-t1": {
 			"id": "producer:bakery-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Bakery I",
 			"description": "Consumes flour and water to bake bread.",
 			"asset": {

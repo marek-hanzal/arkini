@@ -4,12 +4,15 @@
 		"item:blueprint-bakery-t1": {
 			"id": "item:blueprint-bakery-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Bakery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Bakery I.",
-			"asset": [
-				"blueprint",
-				"producer-bakery-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-bakery-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -70,9 +73,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:bakery-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:bakery-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

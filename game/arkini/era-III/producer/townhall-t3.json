@@ -4,6 +4,7 @@
 		"producer:townhall-t3": {
 			"id": "producer:townhall-t3",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Town Hall III",
 			"description": "Food processing and first trade civic hub that issues milling, baking, dairy, brewing, wine, market, and Era IV plans.",
 			"asset": {

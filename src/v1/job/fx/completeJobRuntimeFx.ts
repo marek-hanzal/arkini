@@ -1,14 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import type {
-	JobCompletionContext,
-	JobCompletionOwner,
-} from "~/v1/job/completion/JobCompletionContext";
-import { completeBlueprintJobRuntimeFx } from "~/v1/job/completion/fx/completeBlueprintJobRuntimeFx";
-import { completeCraftJobRuntimeFx } from "~/v1/job/completion/fx/completeCraftJobRuntimeFx";
-import { completeProducerJobRuntimeFx } from "~/v1/job/completion/fx/completeProducerJobRuntimeFx";
-import { completeStashJobRuntimeFx } from "~/v1/job/completion/fx/completeStashJobRuntimeFx";
+import type { JobCompletionOwner } from "~/v1/job/completion/JobCompletionContext";
+import { completeLineJobRuntimeFx } from "~/v1/job/completion/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
 import { JobNotFoundError } from "~/v1/job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/v1/job/error/JobNotReadyError";
@@ -24,7 +18,7 @@ export namespace completeJobRuntimeFx {
 	}
 }
 
-/** Resolves one ready job once and dispatches its atomic owner-specific completion branch. */
+/** Resolves one ready job once and applies its authored line and owner completion contract. */
 export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* ({
 	jobId,
 	runtime,
@@ -53,6 +47,11 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 				location: owner.location,
 			}),
 		);
+	if (!("afterCompletion" in owner.item)) {
+		return yield* Effect.dieMessage(
+			`Job ${job.id} owner ${owner.id} does not declare completion behavior.`,
+		);
+	}
 	const line = yield* readItemLineFx({
 		item: owner.item,
 		lineId: job.lineId,
@@ -69,44 +68,11 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 	} satisfies RuntimeSchema.Type;
 	const random = yield* makeJobCompletionRandomFx(job);
 
-	return yield* Effect.gen(function* () {
-		switch (owner.item.type) {
-			case "producer":
-				return yield* completeProducerJobRuntimeFx({
-					job,
-					line,
-					owner: owner as JobCompletionOwner<"producer">,
-					reservations,
-					runtime: completionRuntime,
-				} satisfies JobCompletionContext<"producer">);
-			case "craft":
-				return yield* completeCraftJobRuntimeFx({
-					job,
-					line,
-					owner: owner as JobCompletionOwner<"craft">,
-					reservations,
-					runtime: completionRuntime,
-				} satisfies JobCompletionContext<"craft">);
-			case "blueprint":
-				return yield* completeBlueprintJobRuntimeFx({
-					job,
-					line,
-					owner: owner as JobCompletionOwner<"blueprint">,
-					reservations,
-					runtime: completionRuntime,
-				} satisfies JobCompletionContext<"blueprint">);
-			case "stash":
-				return yield* completeStashJobRuntimeFx({
-					job,
-					line,
-					owner: owner as JobCompletionOwner<"stash">,
-					reservations,
-					runtime: completionRuntime,
-				} satisfies JobCompletionContext<"stash">);
-			default:
-				return yield* Effect.dieMessage(
-					`Job ${job.id} owner ${owner.id} has unsupported completion type ${owner.item.type}.`,
-				);
-		}
+	return yield* completeLineJobRuntimeFx({
+		job,
+		line,
+		owner: owner as JobCompletionOwner,
+		reservations,
+		runtime: completionRuntime,
 	}).pipe(Effect.withRandom(random));
 });

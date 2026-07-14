@@ -16,6 +16,7 @@ const craft = {
 	scope: "any",
 	maxStackSize: 10,
 	type: "craft",
+	afterCompletion: "remove",
 	line: {
 		id: "line:craft",
 		title: "Craft",
@@ -49,7 +50,7 @@ describe("CraftItemSchema", () => {
 		expect(input.capacity).toBe(0);
 	});
 
-	it("accepts explicit zero capacity and rejects positive craft capacity", () => {
+	it("accepts both zero and positive material capacity at the shared schema boundary", () => {
 		expect(
 			CraftItemSchema.safeParse({
 				...craft,
@@ -77,6 +78,6 @@ describe("CraftItemSchema", () => {
 					],
 				},
 			}).success,
-		).toBe(false);
+		).toBe(true);
 	});
 });

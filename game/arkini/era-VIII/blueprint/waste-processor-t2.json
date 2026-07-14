@@ -4,12 +4,15 @@
 		"item:blueprint-waste-processor-t2": {
 			"id": "item:blueprint-waste-processor-t2",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Waste Processor II Blueprint",
 			"description": "Build plan that upgrades Waste Processor I into Waste Processor II for coal and charcoal disposal lines.",
-			"asset": [
-				"blueprint",
-				"producer-waste-processor-t2"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-waste-processor-t2"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -131,9 +134,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:waste-processor-t2"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:waste-processor-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

@@ -5,29 +5,28 @@ import type { BoardRuntimeItemSchema } from "~/v1/runtime/schema/BoardRuntimeIte
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
-export type JobCompletionOwner<ItemType extends ItemSchema.Type["type"]> = Omit<
-	BoardRuntimeItemSchema.Type,
-	"item"
-> & {
-	readonly item: Extract<
-		ItemSchema.Type,
-		{
-			type: ItemType;
-		}
-	>;
+export type JobCompletionItem = Extract<
+	ItemSchema.Type,
+	{
+		readonly afterCompletion: "keep" | "remove";
+	}
+>;
+
+export type JobCompletionOwner = Omit<BoardRuntimeItemSchema.Type, "item"> & {
+	readonly item: JobCompletionItem;
 };
 
 /**
- * Shared live facts resolved once before dispatching one owner-specific completion branch.
+ * Shared live facts resolved once before completing one line job.
  *
- * `runtime` already excludes the completed job and every job-scoped reservation. Each
- * branch owns the order in which it places output, consumes or replaces its owner, and
- * returns those detached reservations through the standard drop-placement path.
+ * `runtime` already excludes the completed job and every job-scoped reservation. The
+ * line output keeps its authored placement and the owner item declares whether its
+ * identity survives completion.
  */
-export interface JobCompletionContext<ItemType extends ItemSchema.Type["type"]> {
+export interface JobCompletionContext {
 	readonly job: JobSchema.Type;
 	readonly line: LineSchema.Type;
-	readonly owner: JobCompletionOwner<ItemType>;
+	readonly owner: JobCompletionOwner;
 	readonly reservations: readonly RuntimeItemSchema.Type[];
 	readonly runtime: RuntimeSchema.Type;
 }

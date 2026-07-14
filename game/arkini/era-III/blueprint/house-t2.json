@@ -4,12 +4,15 @@
 		"item:blueprint-house-t2": {
 			"id": "item:blueprint-house-t2",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "House II Blueprint",
 			"description": "Build plan for House II, a housing producer that generates morale.",
-			"asset": [
-				"blueprint",
-				"producer-house-t2"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-house-t2"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -120,9 +123,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:house-t2"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:house-t2",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

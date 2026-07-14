@@ -4,12 +4,15 @@
 		"item:blueprint-house-of-engineers": {
 			"id": "item:blueprint-house-of-engineers",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "House of Engineers Blueprint",
 			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
-			"asset": [
-				"blueprint",
-				"producer-house-of-engineers"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-house-of-engineers"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -236,9 +239,30 @@
 							}
 						]
 					}
-				]
-			},
-			"targetId": "producer:house-of-engineers"
+				],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:house-of-engineers",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

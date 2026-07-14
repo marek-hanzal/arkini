@@ -4,6 +4,7 @@
 		"producer:tailor-workshop-t1": {
 			"id": "producer:tailor-workshop-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Tailor Workshop I",
 			"description": "Clothing producer that sews common and luxury clothing.",
 			"asset": {

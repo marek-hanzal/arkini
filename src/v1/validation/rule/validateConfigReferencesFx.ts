@@ -66,22 +66,6 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		if (item.type === "blueprint" && config.items[item.targetId] === undefined) {
-			diagnostics.push({
-				code: "config:missing-reference",
-				severity: "error",
-				path: [
-					"items",
-					itemId,
-					"targetId",
-				],
-				source,
-				message: `Blueprint ${itemId} references missing target ${item.targetId}.`,
-				reference: "item",
-				referenceId: item.targetId,
-			});
-		}
-
 		if (config.categories[item.categoryId] === undefined) {
 			diagnostics.push({
 				code: "config:missing-reference",

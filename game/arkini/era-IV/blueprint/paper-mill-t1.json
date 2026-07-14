@@ -4,12 +4,15 @@
 		"item:blueprint-paper-mill-t1": {
 			"id": "item:blueprint-paper-mill-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Paper Mill I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
-			"asset": [
-				"blueprint",
-				"producer-paper-mill-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-paper-mill-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -72,9 +75,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:paper-mill-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:paper-mill-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

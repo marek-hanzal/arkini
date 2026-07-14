@@ -4,6 +4,7 @@
 		"producer:townhall-t2": {
 			"id": "producer:townhall-t2",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Town Hall II",
 			"description": "Base food civic hub that issues farming, livestock, garden, and Era III transition plans.",
 			"asset": {

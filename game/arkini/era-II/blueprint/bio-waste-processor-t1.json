@@ -4,12 +4,15 @@
 		"item:blueprint-bio-waste-processor-t1": {
 			"id": "item:blueprint-bio-waste-processor-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Bio-Waste Processor I Blueprint",
 			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
-			"asset": [
-				"blueprint",
-				"producer-bio-waste-processor-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-bio-waste-processor-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -73,9 +76,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:bio-waste-processor-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:bio-waste-processor-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

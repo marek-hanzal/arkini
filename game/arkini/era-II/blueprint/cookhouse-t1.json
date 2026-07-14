@@ -4,12 +4,15 @@
 		"item:blueprint-cookhouse-t1": {
 			"id": "item:blueprint-cookhouse-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Cookhouse I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Cookhouse I.",
-			"asset": [
-				"blueprint",
-				"producer-cookhouse-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-cookhouse-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -70,9 +73,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:cookhouse-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:cookhouse-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

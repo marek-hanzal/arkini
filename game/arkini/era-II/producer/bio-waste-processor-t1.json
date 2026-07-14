@@ -4,6 +4,7 @@
 		"producer:bio-waste-processor-t1": {
 			"id": "producer:bio-waste-processor-t1",
 			"type": "producer",
+			"afterCompletion": "keep",
 			"title": "Bio-Waste Processor I",
 			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
 			"asset": {

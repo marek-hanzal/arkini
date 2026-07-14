@@ -1,8 +1,6 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import { readOutputMaximumQuantitiesFx } from "~/v1/output/fx/readOutputMaximumQuantitiesFx";
@@ -16,7 +14,13 @@ export namespace readJobMaximumOutputQuantitiesFx {
 	}
 }
 
-/** Reads the per-item worst-case output reserved by one active job's implemented lifecycle. */
+/**
+ * Reads the per-item worst-case net quantity increase reserved by one active job.
+ *
+ * A remove-after-completion owner already contributes its live quantity to maxCount,
+ * so an output of the same canonical item reserves only the increase beyond that
+ * quantity. The result never exposes negative future capacity.
+ */
 export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQuantitiesFx")(
 	function* ({ job, runtime }: readJobMaximumOutputQuantitiesFx.Props) {
 		const owner = yield* readRuntimeItemByIdFx({
@@ -31,32 +35,24 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 			return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
 		}
 
-		return yield* match(owner.item)
-			.with(
-				{
-					type: "blueprint",
-				},
-				(item) =>
-					Effect.gen(function* () {
-						const target = yield* resolveItemFx({
-							itemId: item.targetId,
-						});
-						const quantities =
-							item.output === undefined
-								? new Map<IdSchema.Type, number>()
-								: yield* readOutputMaximumQuantitiesFx({
-										output: item.output,
-									});
-						quantities.set(target.id, (quantities.get(target.id) ?? 0) + 1);
-						return quantities;
-					}),
-			)
-			.otherwise(() =>
-				line.output === undefined
-					? Effect.succeed(new Map<IdSchema.Type, number>())
-					: readOutputMaximumQuantitiesFx({
-							output: line.output,
-						}),
-			);
+		const quantities =
+			line.output === undefined
+				? new Map<IdSchema.Type, number>()
+				: yield* readOutputMaximumQuantitiesFx({
+						output: line.output,
+					});
+		if (!("afterCompletion" in owner.item) || owner.item.afterCompletion !== "remove") {
+			return quantities;
+		}
+
+		const ownerOutputQuantity = quantities.get(owner.item.id) ?? 0;
+		const netOwnerQuantity = Math.max(0, ownerOutputQuantity - owner.quantity);
+		if (netOwnerQuantity === 0) {
+			quantities.delete(owner.item.id);
+		} else {
+			quantities.set(owner.item.id, netOwnerQuantity);
+		}
+
+		return quantities;
 	},
 );

@@ -4,12 +4,15 @@
 		"item:blueprint-well-t1": {
 			"id": "item:blueprint-well-t1",
 			"type": "blueprint",
+			"afterCompletion": "remove",
 			"title": "Well I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Well I.",
-			"asset": [
-				"blueprint",
-				"producer-well-t1"
-			],
+			"asset": {
+				"source": [
+					"blueprint",
+					"producer-well-t1"
+				]
+			},
 			"tags": [
 				"blueprint",
 				"building",
@@ -48,9 +51,30 @@
 						}
 					}
 				],
-				"rules": []
-			},
-			"targetId": "producer:well-t1"
+				"rules": [],
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "producer:well-t1",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"placement": "replace",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
 		}
 	}
 }

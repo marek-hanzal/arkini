@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { TimeSchema } from "~/v1/common/schema/TimeSchema";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
-import { createRevisionFx } from "~/v1/revision/fx/createRevisionFx";
 import { createJobIdFx } from "./createJobIdFx";
 export namespace createJobFx {
 	export interface Props {
@@ -22,6 +21,5 @@ export const createJobFx = Effect.fn("createJobFx")(function* ({
 		lineId,
 		durationMs,
 		remainingMs: durationMs,
-		revision: yield* createRevisionFx(),
 	} satisfies JobSchema.Type;
 });

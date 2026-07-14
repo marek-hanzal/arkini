@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
-import { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 
 /** One FIFO request to start a line later through the canonical start pipeline. */
 export const JobQueueRequestSchema = z
@@ -8,7 +7,6 @@ export const JobQueueRequestSchema = z
 		id: IdSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
-		revision: RevisionSchema,
 	})
 	.strict()
 	.meta({

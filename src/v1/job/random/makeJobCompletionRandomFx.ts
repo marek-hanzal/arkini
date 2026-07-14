@@ -9,7 +9,7 @@ export const JobCompletionRandomVersion = 1;
  * Creates the deterministic random stream owned by one stable job completion.
  *
  * Retries, blocked delivery and state restore must replay the same random
- * choices. Job revision and wall-clock state are deliberately excluded.
+ * choices. Wall-clock state is deliberately excluded.
  */
 export const makeJobCompletionRandomFx = Effect.fn("makeJobCompletionRandomFx")(function* (
 	job: JobSchema.Type,

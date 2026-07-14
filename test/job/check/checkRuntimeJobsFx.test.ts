@@ -107,7 +107,6 @@ describe("checkRuntimeJobsFx", () => {
 					id: "job:queued",
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
-					revision: "revision:queued",
 				},
 			],
 		} satisfies RuntimeSchema.Type;

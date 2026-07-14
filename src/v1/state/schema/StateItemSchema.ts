@@ -3,7 +3,6 @@ import { z } from "zod";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
-import { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 
 /**
  * A persisted live item or item stack that owns its current location.
@@ -31,12 +30,6 @@ export const StateItemSchema = z
 		 */
 		quantity: PositiveIntegerSchema.describe(
 			"The positive quantity represented by this live state entry.",
-		),
-		/**
-		 * Persisted optimistic-concurrency token of this mutable item.
-		 */
-		revision: RevisionSchema.describe(
-			"The optimistic-concurrency revision persisted with this item.",
 		),
 	})
 	.strict()

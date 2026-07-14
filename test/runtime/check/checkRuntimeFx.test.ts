@@ -297,7 +297,6 @@ describe("checkRuntimeFx", () => {
 					itemId: "board",
 					location: location("inventory", 0, 0),
 					quantity: 1,
-					revision: "revision:test",
 				},
 			],
 			jobs: [],

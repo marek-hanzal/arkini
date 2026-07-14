@@ -14,7 +14,6 @@ const request = {
 	id: "job:request",
 	ownerItemId: "runtime:forge",
 	lineId: "line:forge:run",
-	revision: "revision:request",
 } satisfies JobQueueRequestSchema.Type;
 const owner = {
 	id: request.ownerItemId,
@@ -173,7 +172,6 @@ describe("attemptQueuedLineStartFx", () => {
 				const secondRequest = {
 					...request,
 					id: "job:request:second",
-					revision: "revision:request:second",
 				} satisfies JobQueueRequestSchema.Type;
 				const runtime = {
 					...prepared,

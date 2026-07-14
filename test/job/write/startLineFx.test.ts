@@ -42,12 +42,16 @@ describe("startLineFx", () => {
 				const restored = yield* fromStateFx({
 					state,
 				});
+				const restoredState = yield* fromRuntimeFx({
+					runtime: restored,
+				});
 				return {
 					started,
 					runtime,
 					preview,
 					state,
 					restored,
+					restoredState,
 				};
 			}).pipe(
 				useGameFx({
@@ -91,7 +95,14 @@ describe("startLineFx", () => {
 		expect(result.state.jobs).toEqual([
 			readStartedJob(result.started),
 		]);
-		expect(result.restored).toEqual(result.runtime);
+		expect(result.restoredState).toEqual(result.state);
+		for (const item of result.runtime.items) {
+			const restoredItem = result.restored.items.find(
+				(candidate) => candidate.id === item.id,
+			);
+			expect(restoredItem?.revision).toMatch(/^revision:/);
+			expect(restoredItem?.revision).not.toBe(item.revision);
+		}
 	});
 
 	it("keeps job-scoped reservations immutable through generic item commands", () => {

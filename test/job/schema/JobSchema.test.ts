@@ -9,7 +9,6 @@ const job = {
 	lineId: "line:forge:run",
 	durationMs: 1_000,
 	remainingMs: 1_000,
-	revision: "revision:job",
 };
 
 describe("JobSchema", () => {

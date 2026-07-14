@@ -153,12 +153,10 @@ describe("completeJobRuntimeFx", () => {
 			lineId: "line:owner:run",
 			durationMs: 200,
 			remainingMs: 0,
-			revision: "revision:first",
 		} satisfies JobSchema.Type;
 		const secondJob = {
 			...baseJob,
 			id: "job:completion-random:second",
-			revision: "revision:second",
 		} satisfies JobSchema.Type;
 		const readStream = (job: JobSchema.Type) =>
 			Effect.runSync(

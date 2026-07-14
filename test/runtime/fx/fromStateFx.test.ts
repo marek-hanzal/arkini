@@ -64,7 +64,6 @@ const state = StateSchema.parse({
 				},
 			},
 			quantity: 1,
-			revision: "revision:board-tree",
 		},
 		{
 			id: "runtime:inventory:tree",
@@ -77,7 +76,6 @@ const state = StateSchema.parse({
 				},
 			},
 			quantity: 3,
-			revision: "revision:inventory-tree",
 		},
 	],
 
@@ -190,23 +188,38 @@ describe("fromStateFx", () => {
 		expect(inventoryTree?.item).toBe(canonicalTree);
 	});
 
-	it("round-trips runtime through the state domain counterpart", () => {
-		const dehydrated = Effect.runSync(
-			fromStateFx({
-				state,
+	it("round-trips gameplay state without persisting runtime revisions", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const firstRuntime = yield* fromStateFx({
+					state,
+				});
+				const secondRuntime = yield* fromStateFx({
+					state,
+				});
+				const dehydrated = yield* fromRuntimeFx({
+					runtime: firstRuntime,
+				});
+
+				return {
+					dehydrated,
+					firstRuntime,
+					secondRuntime,
+				};
 			}).pipe(
-				Effect.flatMap((runtime) => {
-					return fromRuntimeFx({
-						runtime,
-					});
-				}),
 				useGameFx({
 					config,
 				}),
 			),
 		);
 
-		expect(dehydrated).toEqual(state);
+		expect(result.dehydrated).toEqual(state);
+		expect(result.firstRuntime.items.map((item) => item.revision)).not.toEqual(
+			result.secondRuntime.items.map((item) => item.revision),
+		);
+		for (const item of result.firstRuntime.items) {
+			expect(item.revision).toMatch(/^revision:/);
+		}
 	});
 
 	it("fails when state references an unknown canonical item", () => {

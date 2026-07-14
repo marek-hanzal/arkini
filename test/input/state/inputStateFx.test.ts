@@ -45,9 +45,13 @@ describe("input state", () => {
 				const restored = yield* fromStateFx({
 					state,
 				});
+				const restoredState = yield* fromRuntimeFx({
+					runtime: restored,
+				});
 
 				return {
 					restored,
+					restoredState,
 					runtime,
 					state,
 				};
@@ -58,7 +62,14 @@ describe("input state", () => {
 			),
 		);
 
-		expect(result.restored).toEqual(result.runtime);
+		expect(result.restoredState).toEqual(result.state);
+		for (const item of result.runtime.items) {
+			const restoredItem = result.restored.items.find(
+				(candidate) => candidate.id === item.id,
+			);
+			expect(restoredItem?.revision).toMatch(/^revision:/);
+			expect(restoredItem?.revision).not.toBe(item.revision);
+		}
 		expect(result.state.items[1]?.location).toEqual({
 			scope: "input",
 			ownerItemId: "runtime:workshop",

@@ -85,6 +85,9 @@ describe("RuntimeSaveLayerFx", () => {
 			await sleep(50);
 			expect(saves).toHaveLength(1);
 			expect(saves[0]?.items).toHaveLength(2);
+			for (const item of saves[0]?.items ?? []) {
+				expect(item).not.toHaveProperty("revision");
+			}
 
 			await expect(
 				session.run(

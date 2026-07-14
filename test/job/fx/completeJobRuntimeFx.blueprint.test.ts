@@ -809,7 +809,6 @@ describe("blueprint job completion", () => {
 								id: "request:stale",
 								ownerItemId: owner.id,
 								lineId: "line:blueprint:plain",
-								revision: "revision:stale",
 							},
 						],
 					},

@@ -10,7 +10,7 @@ export namespace fromRuntimeItemFx {
 }
 
 /**
- * Builds one persisted item from its runtime representation.
+ * Builds one persisted gameplay item without the runtime-only revision token.
  *
  * Counterpart: `fromStateItemFx` in `~/v1/runtime/fx/fromStateItemFx` builds
  * runtime from this state item.
@@ -23,6 +23,5 @@ export const fromRuntimeItemFx = Effect.fn("fromRuntimeItemFx")(function* ({
 		itemId: item.item.id,
 		location: item.location,
 		quantity: item.quantity,
-		revision: item.revision,
 	} satisfies StateItemSchema.Type;
 });

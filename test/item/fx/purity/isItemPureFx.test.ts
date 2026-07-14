@@ -100,7 +100,6 @@ describe("isItemPureFx", () => {
 					lineId: "line:producer:zero",
 					durationMs: 1_000,
 					remainingMs: 1_000,
-					revision: "revision:job",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -114,7 +113,6 @@ describe("isItemPureFx", () => {
 					id: "request:queued",
 					ownerItemId: producer.id,
 					lineId: "line:producer:zero",
-					revision: "revision:request",
 				},
 			],
 		} satisfies RuntimeSchema.Type;

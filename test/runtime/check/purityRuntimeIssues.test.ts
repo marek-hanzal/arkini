@@ -45,7 +45,6 @@ describe("runtime purity invariants", () => {
 					lineId: "line:craft",
 					durationMs: 1_000,
 					remainingMs: 1_000,
-					revision: "revision:job",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -110,7 +109,6 @@ describe("runtime purity invariants", () => {
 					lineId: "line:producer:buffer",
 					durationMs: 1_000,
 					remainingMs: 1_000,
-					revision: "revision:job",
 				},
 			],
 			jobQueue: [],
@@ -124,7 +122,6 @@ describe("runtime purity invariants", () => {
 					id: "request:producer",
 					ownerItemId: "runtime:producer",
 					lineId: "line:producer:buffer",
-					revision: "revision:request",
 				},
 			],
 		},
@@ -220,7 +217,6 @@ describe("runtime purity invariants", () => {
 					lineId: "line:producer:buffer",
 					durationMs: 1_000,
 					remainingMs: 1_000,
-					revision: "revision:job",
 				},
 			],
 		} satisfies RuntimeSchema.Type;

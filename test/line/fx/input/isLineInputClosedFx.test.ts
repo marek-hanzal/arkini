@@ -13,7 +13,6 @@ const activeRuntime = {
 			lineId: "line:run",
 			durationMs: 1_000,
 			remainingMs: 1_000,
-			revision: "revision:job",
 		},
 	],
 } satisfies RuntimeSchema.Type;

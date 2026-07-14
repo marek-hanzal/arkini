@@ -5,7 +5,6 @@ import type { GameEventSchema } from "~/v1/event/schema/GameEventSchema";
 import { attemptJobCompletionFx } from "~/v1/job/fx/attemptJobCompletionFx";
 import { attemptQueuedLineStartFx } from "~/v1/job/fx/attemptQueuedLineStartFx";
 import { resolveJobRunnableFx } from "~/v1/job/fx/resolveJobRunnableFx";
-import { reviseJobFx } from "~/v1/job/fx/reviseJobFx";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/v1/tick/TickStepMs";
@@ -99,11 +98,10 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (job.remainingMs === 0 || runnableByJobId.get(job.id) !== true) continue;
 		const liveJob = draft.jobs.find((candidate) => candidate.id === job.id);
 		if (liveJob === undefined) continue;
-		const revised = yield* reviseJobFx({
+		draft = replaceJob(draft, {
 			...liveJob,
 			remainingMs: Math.max(0, liveJob.remainingMs - TickStepMs),
 		});
-		draft = replaceJob(draft, revised);
 	}
 
 	const events: GameEventSchema.Type[] = [

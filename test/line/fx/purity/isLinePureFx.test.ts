@@ -111,7 +111,6 @@ describe("line purity", () => {
 					lineId: lineProps.lineId,
 					durationMs: 1_000,
 					remainingMs: 1_000,
-					revision: "revision:job",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -142,7 +141,6 @@ describe("line purity", () => {
 					id: "request:queued",
 					ownerItemId: owner.id,
 					lineId: lineProps.lineId,
-					revision: "revision:request",
 				},
 			],
 		} satisfies RuntimeSchema.Type;

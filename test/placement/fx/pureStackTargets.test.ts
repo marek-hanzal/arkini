@@ -75,7 +75,6 @@ describe("pure placement stack targets", () => {
 					id: "request:queued",
 					ownerItemId: queued.id,
 					lineId: "line:craft",
-					revision: "revision:request",
 				},
 			],
 		} satisfies RuntimeSchema.Type;

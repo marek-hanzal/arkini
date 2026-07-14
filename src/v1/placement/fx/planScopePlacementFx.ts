@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
@@ -17,7 +16,6 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planScopePlacementFx {
 	export interface Props {
-		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		item: ItemSchema.Type;
 		locations: ReadonlyArray<GridLocationSchema.Type>;
 		origin?: PositionSchema.Type;
@@ -27,11 +25,8 @@ export namespace planScopePlacementFx {
 	}
 }
 
-/**
- * Plans stack-first placement within one concrete runtime scope.
- */
+/** Plans stack-first placement within one concrete runtime scope. */
 export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* ({
-	excludedStackItemIds,
 	item,
 	locations,
 	origin,
@@ -40,7 +35,6 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 	scope,
 }: planScopePlacementFx.Props) {
 	const availableStacks = yield* readAvailableStackItemsFx({
-		excludedStackItemIds,
 		itemId: item.id,
 		runtime,
 		scope,

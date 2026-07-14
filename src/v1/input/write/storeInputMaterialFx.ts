@@ -8,6 +8,8 @@ import { applyInputMaterialStorePlanFx } from "~/v1/input/fx/applyInputMaterialS
 import { planInputMaterialStoreFx } from "~/v1/input/fx/planInputMaterialStoreFx";
 import type { InputMaterialStoreResultSchema } from "~/v1/input/schema/command/InputMaterialStoreResultSchema";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import { LineInputClosedError } from "~/v1/line/error/LineInputClosedError";
+import { isLineInputClosedFx } from "~/v1/line/fx/input/isLineInputClosedFx";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
@@ -78,6 +80,21 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				lineId,
 				ownerItemId,
 			});
+			const closed = yield* isLineInputClosedFx({
+				input,
+				ownerItemId,
+				lineId,
+				runtime,
+			});
+			if (closed) {
+				return yield* Effect.fail(
+					new LineInputClosedError({
+						ownerItemId,
+						lineId,
+						inputIndex,
+					}),
+				);
+			}
 
 			const storedItems = yield* filterInputSlotItemsFx({
 				inputIndex,

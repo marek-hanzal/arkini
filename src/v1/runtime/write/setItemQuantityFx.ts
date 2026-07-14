@@ -3,6 +3,8 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
+import { ItemStatefulError } from "~/v1/item/error/ItemStatefulError";
+import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import { assertNonJobScopeFx } from "~/v1/runtime/fx/assertNonJobScopeFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
@@ -51,6 +53,18 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 			yield* assertNonJobScopeFx({
 				item,
 			});
+
+			const pure = yield* isItemPureFx({
+				item,
+				runtime,
+			});
+			if (!pure) {
+				return yield* Effect.fail(
+					new ItemStatefulError({
+						itemId: item.id,
+					}),
+				);
+			}
 
 			const updatedItem = yield* reviseRuntimeItemFx({
 				item: {

@@ -9,6 +9,8 @@ import type { InputOwnerMissingIssueSchema } from "~/v1/input/schema/check/Input
 import type { InputSelectorMismatchIssueSchema } from "~/v1/input/schema/check/InputSelectorMismatchIssueSchema";
 import type { InputSlotInvalidIssueSchema } from "~/v1/input/schema/check/InputSlotInvalidIssueSchema";
 import type { InputLocationSchema } from "~/v1/location/schema/InputLocationSchema";
+import { isLineInputClosedFx } from "~/v1/line/fx/input/isLineInputClosedFx";
+import type { LineInputClosedIssueSchema } from "~/v1/line/schema/check/LineInputClosedIssueSchema";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -43,6 +45,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 	const slotIssues: InputSlotInvalidIssueSchema.Type[] = [];
 	const selectorIssues: InputSelectorMismatchIssueSchema.Type[] = [];
 	const capacityIssues: InputCapacityExceededIssueSchema.Type[] = [];
+	const closedIssues: LineInputClosedIssueSchema.Type[] = [];
 	const validItems: ValidInputItem[] = [];
 
 	const locatedItems = (yield* Effect.forEach(runtime.items, (item) => {
@@ -136,6 +139,21 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		const storedQuantity = items.reduce((quantity, candidate) => {
 			return quantity + candidate.item.quantity;
 		}, 0);
+		const closed = yield* isLineInputClosedFx({
+			input: current.input,
+			ownerItemId: current.location.ownerItemId,
+			lineId: current.location.lineId,
+			runtime,
+		});
+		if (closed) {
+			closedIssues.push({
+				ownerItemId: current.location.ownerItemId,
+				lineId: current.location.lineId,
+				inputIndex: current.location.inputIndex,
+				itemIds: items.map((candidate) => candidate.item.id),
+				type: "line:input-closed",
+			});
+		}
 		const resolution = yield* resolveInputMaterialFx({
 			input: current.input,
 			storedQuantity,
@@ -159,5 +177,6 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		...slotIssues,
 		...selectorIssues,
 		...capacityIssues,
+		...closedIssues,
 	];
 });

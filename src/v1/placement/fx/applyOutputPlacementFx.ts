@@ -11,7 +11,6 @@ import { planDropPlacementFx } from "./planDropPlacementFx";
 
 export namespace applyOutputPlacementFx {
 	export interface Props {
-		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		origin: PositionSchema.Type;
 		originItemId: IdSchema.Type;
 		output: OutputResultSchema.Type;
@@ -19,11 +18,8 @@ export namespace applyOutputPlacementFx {
 	}
 }
 
-/**
- * Applies one already resolved output to one explicit runtime draft.
- */
+/** Applies one already resolved output to one explicit runtime draft. */
 export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(function* ({
-	excludedStackItemIds,
 	origin,
 	originItemId,
 	output,
@@ -39,7 +35,6 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 			return Effect.gen(function* () {
 				const plan = yield* planDropPlacementFx({
 					drop,
-					excludedStackItemIds,
 					origin,
 					originItemId,
 					runtime: state.draft,

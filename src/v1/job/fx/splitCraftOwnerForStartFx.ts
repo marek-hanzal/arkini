@@ -44,12 +44,7 @@ export const splitCraftOwnerForStartFx = Effect.fn("splitCraftOwnerForStartFx")(
 		...runtime,
 		items: runtime.items.map((item) => (item.id === owner.id ? runningOwner : item)),
 	} satisfies RuntimeSchema.Type;
-	const excludedStackItemIds = [
-		owner.id,
-		...runtime.jobs.map((job) => job.ownerItemId),
-	];
 	const [, nextRuntime] = yield* applyOutputPlacementFx({
-		excludedStackItemIds,
 		origin: owner.location.position,
 		originItemId: owner.id,
 		output: {

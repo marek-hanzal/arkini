@@ -16,7 +16,6 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 export namespace planDropPlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
-		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		origin: PositionSchema.Type;
 		originItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
@@ -29,12 +28,9 @@ const emptyPlan = {
 	stack: [],
 } satisfies PlacementPlanSchema.Type;
 
-/**
- * Orchestrates one complete all-or-nothing placement plan for a resolved drop.
- */
+/** Orchestrates one complete all-or-nothing placement plan for a resolved drop. */
 export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	drop,
-	excludedStackItemIds,
 	origin,
 	originItemId,
 	runtime,
@@ -75,7 +71,6 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	});
 	const scopePlan = yield* planDropScopePlacementFx({
 		drop,
-		excludedStackItemIds,
 		item,
 		origin,
 		quantity: remainingQuantity,

@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { ItemStatefulError } from "~/v1/item/error/ItemStatefulError";
+import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
 import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
 import type { PlacementResultSchema } from "~/v1/placement/schema/PlacementResultSchema";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
@@ -33,6 +35,18 @@ export const applyPlacementPlanFx = Effect.fn("applyPlacementPlanFx")(function* 
 		if (stack === undefined) {
 			updatedItems.push(item);
 			continue;
+		}
+
+		const pure = yield* isItemPureFx({
+			item,
+			runtime,
+		});
+		if (!pure) {
+			return yield* Effect.fail(
+				new ItemStatefulError({
+					itemId: item.id,
+				}),
+			);
 		}
 
 		const updatedItem = yield* reviseRuntimeItemFx({

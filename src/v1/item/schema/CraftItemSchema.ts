@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
-import { LineSchema } from "~/v1/line/schema/LineSchema";
+import { CraftLineSchema } from "~/v1/line/schema/CraftLineSchema";
 
 /**
  * An item configuration that provides one craft product line.
@@ -20,7 +20,7 @@ export const CraftItemSchema = z
 		/**
 		 * The one product line owned by this craft.
 		 */
-		line: LineSchema.describe("The one product line owned by this craft."),
+		line: CraftLineSchema.describe("The one product line owned by this craft."),
 	})
 	.strict()
 	.meta({

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { CraftJobOwnerQuantityIssueSchema } from "~/v1/job/schema/CraftJobOwnerQuantityIssueSchema";
 import { DuplicateJobIdIssueSchema } from "~/v1/job/schema/DuplicateJobIdIssueSchema";
 import { JobLineMissingIssueSchema } from "~/v1/job/schema/JobLineMissingIssueSchema";
 import { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssueSchema";
@@ -18,6 +19,7 @@ import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
 import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
+import { LineInputClosedIssueSchema } from "~/v1/line/schema/check/LineInputClosedIssueSchema";
 import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
 
 /**
@@ -25,6 +27,7 @@ import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
  */
 export const RuntimeCheckIssueSchema = z
 	.discriminatedUnion("type", [
+		CraftJobOwnerQuantityIssueSchema,
 		DuplicateJobIdIssueSchema,
 		JobOwnerMissingIssueSchema,
 		JobOwnerMultipleActiveIssueSchema,
@@ -41,6 +44,7 @@ export const RuntimeCheckIssueSchema = z
 		InputSlotInvalidIssueSchema,
 		InputSelectorMismatchIssueSchema,
 		InputCapacityExceededIssueSchema,
+		LineInputClosedIssueSchema,
 		LocationOccupiedIssueSchema,
 		LocationOutOfBoundsIssueSchema,
 		LocationScopeIssueSchema,

@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
@@ -15,7 +14,6 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 export namespace planBoardThenInventoryPlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
-		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		item: ItemSchema.Type;
 		origin: PositionSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
@@ -23,20 +21,10 @@ export namespace planBoardThenInventoryPlacementFx {
 	}
 }
 
-/**
- * Plans board placement first and sends only its remainder to inventory.
- */
+/** Plans board placement first and sends only its remainder to inventory. */
 export const planBoardThenInventoryPlacementFx = Effect.fn("planBoardThenInventoryPlacementFx")(
-	function* ({
-		drop,
-		excludedStackItemIds,
-		item,
-		origin,
-		quantity,
-		runtime,
-	}: planBoardThenInventoryPlacementFx.Props) {
+	function* ({ drop, item, origin, quantity, runtime }: planBoardThenInventoryPlacementFx.Props) {
 		const boardPlan = yield* planBoardPlacementFx({
-			excludedStackItemIds,
 			item,
 			origin,
 			placement: drop.placement === "random" ? "random" : "drop",
@@ -52,7 +40,6 @@ export const planBoardThenInventoryPlacementFx = Effect.fn("planBoardThenInvento
 		}
 
 		const inventoryPlan = yield* planInventoryPlacementFx({
-			excludedStackItemIds,
 			item,
 			quantity: remainingQuantity,
 			runtime,

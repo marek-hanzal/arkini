@@ -32,9 +32,16 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		lineId,
 		durationMs: plan.runtimeMs,
 	});
+	const jobRuntime = {
+		...runtime,
+		jobs: [
+			...runtime.jobs,
+			job,
+		],
+	} satisfies RuntimeSchema.Type;
 	const ownerRuntime = yield* splitCraftOwnerForStartFx({
 		ownerItemId,
-		runtime,
+		runtime: jobRuntime,
 	});
 	const inputRuntime = yield* applyLineRunPlanFx({
 		job,
@@ -43,12 +50,6 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	});
 	return [
 		job,
-		{
-			...inputRuntime,
-			jobs: [
-				...inputRuntime.jobs,
-				job,
-			],
-		} satisfies RuntimeSchema.Type,
+		inputRuntime,
 	] as const;
 });

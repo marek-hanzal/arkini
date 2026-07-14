@@ -241,7 +241,7 @@ Directional merge schemas and validation exist. There is no active merge write c
 
 ### Craft lifecycle
 
-A craft exposes one line. One completed job consumes exactly one craft quantity. A resolved `replace` drop claims the original craft cell; any remaining owner-stack quantity returns through standard placement before additional ordinary output. Without replacement, the remaining stack stays at the origin and the cell becomes empty only when the consumed unit was the last quantity. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
+A craft exposes one line. Starting work on a stacked craft atomically leaves one quantity at the original cell as the job owner and sends the remainder through standard placement, so another separated craft can start independently. If the remainder cannot be placed, the whole start fails unchanged. Completion therefore always consumes one isolated owner quantity. A resolved `replace` drop claims the original craft cell; without replacement, removing the owner frees that cell for ordinary output. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
 
 ### Blueprint lifecycle
 

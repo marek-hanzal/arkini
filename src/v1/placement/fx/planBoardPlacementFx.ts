@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
@@ -13,6 +14,7 @@ import { readGridLocationsFx } from "./readGridLocationsFx";
 
 export namespace planBoardPlacementFx {
 	export interface Props {
+		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		item: ItemSchema.Type;
 		origin: PositionSchema.Type;
 		placement: Exclude<PlacementEnumSchema.Type, "replace">;
@@ -25,6 +27,7 @@ export namespace planBoardPlacementFx {
  * Plans stack-first board placement using one concrete board ordering strategy.
  */
 export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* ({
+	excludedStackItemIds,
 	item,
 	origin,
 	placement,
@@ -47,6 +50,7 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	});
 
 	return yield* planScopePlacementFx({
+		excludedStackItemIds,
 		item,
 		locations: orderedBoardLocations,
 		origin: placement === "drop" ? origin : undefined,

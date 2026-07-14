@@ -54,7 +54,7 @@ Do not fold blueprint behavior into craft completion. Shared primitives may emer
 - Started jobs cannot be cancelled.
 - Queue-only owners remain valid and are retried at fixed-step boundaries.
 - Shared completion facts are resolved once, then dispatched to explicit producer, craft, blueprint, or stash branches.
-- Craft completion consumes exactly one quantity, supports an optional resolved replacement, preserves stack remainder through standard placement, and places output before returning reservations.
+- Starting a stacked craft atomically isolates one running quantity and places the remainder through standard placement; completion consumes only that isolated owner, supports an optional resolved replacement, and places output before returning reservations.
 
 ## Reservations and removal
 

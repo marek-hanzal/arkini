@@ -1,4 +1,4 @@
-import { Effect, Random } from "effect";
+import { Effect, Either, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
@@ -567,7 +567,7 @@ describe("craft job completion", () => {
 		);
 	});
 
-	it("consumes one quantity from a stacked craft owner without requiring UI normalization", () => {
+	it("splits a stacked craft before starting one isolated owner", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
@@ -578,9 +578,6 @@ describe("craft job completion", () => {
 					ownerItemId: owner.id,
 					lineId: "line:craft:drop",
 				});
-				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
-				});
 				return yield* readRuntimeFx();
 			}).pipe(
 				useGameFx({
@@ -589,11 +586,16 @@ describe("craft job completion", () => {
 			),
 		);
 
+		expect(runtime.jobs).toEqual([
+			expect.objectContaining({
+				ownerItemId: "runtime:craft:drop",
+			}),
+		]);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					id: "runtime:craft:drop",
-					quantity: 2,
+					quantity: 1,
 					location: {
 						scope: "board",
 						position: {
@@ -604,14 +606,124 @@ describe("craft job completion", () => {
 				}),
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:product",
+						id: "craft:drop",
 					}),
+					quantity: 2,
 				}),
 			]),
 		);
+		expect(runtime.items.filter((item) => item.item.id === "craft:drop")).toHaveLength(2);
 	});
 
-	it("replaces one stacked craft unit and returns the remaining stack through placement", () => {
+	it("rejects a stacked craft start atomically when its remainder cannot be placed", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnCraftFx({
+					itemId: "craft:drop",
+					quantity: 2,
+				});
+				let blockerIndex = 0;
+				for (let y = 0; y < 2; y += 1) {
+					for (let x = 0; x < 3; x += 1) {
+						if (x === 0 && y === 0) continue;
+						yield* spawnItemFx({
+							id: `runtime:start-blocker:${blockerIndex}`,
+							itemId: "item:blocker",
+							location: {
+								scope: "board",
+								position: {
+									x,
+									y,
+								},
+							},
+							quantity: 1,
+						});
+						blockerIndex += 1;
+					}
+				}
+				yield* spawnItemFx({
+					id: "runtime:start-inventory-blocker",
+					itemId: "item:blocker",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.either(
+					startLineFx({
+						ownerItemId: owner.id,
+						lineId: "line:craft:drop",
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					attempt,
+					before,
+				};
+			}).pipe(
+				useGameFx({
+					config: craftCompletionConfig,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result.attempt)).toBe(true);
+		if (Either.isLeft(result.attempt)) {
+			expect(result.attempt.left).toMatchObject({
+				_tag: "PlacementUnavailableError",
+			});
+		}
+		expect(result.after).toEqual(result.before);
+	});
+
+	it("starts another craft from the separated stack while the first craft is running", () => {
+		const runtime = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnCraftFx({
+					itemId: "craft:drop",
+					quantity: 3,
+				});
+				yield* startLineFx({
+					ownerItemId: owner.id,
+					lineId: "line:craft:drop",
+				});
+				const afterFirst = yield* readRuntimeFx();
+				const remainder = afterFirst.items.find(
+					(item) => item.item.id === "craft:drop" && item.id !== owner.id,
+				);
+				if (remainder === undefined) throw new Error("Expected separated craft remainder.");
+				yield* startLineFx({
+					ownerItemId: remainder.id,
+					lineId: "line:craft:drop",
+				});
+				return yield* readRuntimeFx();
+			}).pipe(
+				useGameFx({
+					config: craftCompletionConfig,
+				}),
+			),
+		);
+
+		expect(runtime.jobs).toHaveLength(2);
+		const runningOwnerIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
+		for (const ownerItemId of runningOwnerIds) {
+			expect(runtime.items.find((item) => item.id === ownerItemId)?.quantity).toBe(1);
+		}
+		expect(
+			runtime.items.find(
+				(item) => item.item.id === "craft:drop" && !runningOwnerIds.has(item.id),
+			),
+		).toMatchObject({
+			quantity: 1,
+		});
+	});
+
+	it("replaces one isolated craft while its already separated remainder stays available", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({

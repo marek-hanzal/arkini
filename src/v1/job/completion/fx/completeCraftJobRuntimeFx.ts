@@ -1,24 +1,28 @@
 import { Effect } from "effect";
 
 import type { JobCompletionContext } from "~/v1/job/completion/JobCompletionContext";
-import { consumeCraftOwnerFx } from "~/v1/job/completion/fx/consumeCraftOwnerFx";
-import { placeCraftOwnerRemainderFx } from "~/v1/job/completion/fx/placeCraftOwnerRemainderFx";
 import { releaseJobReservationsFx } from "~/v1/job/completion/fx/releaseJobReservationsFx";
 import { outputFx } from "~/v1/output/fx/outputFx";
 import type { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
 import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
+import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 
 /**
- * Completes one single-use craft unit from its original board origin.
+ * Completes one already isolated single-use craft owner from its board origin.
  *
- * A resolved replace drop claims the craft cell first. Any unprocessed owner-stack
- * remainder then returns through standard placement before additional output. Without a
- * replacement, one owner quantity is consumed in place and the cell becomes available
- * only when no stack remainder survives. Reservations return after completion output.
+ * A resolved replace drop claims the craft cell first. Without replacement, the
+ * owner is removed before ordinary output so the original cell becomes available.
+ * Reservations return after all completion output.
  */
 export const completeCraftJobRuntimeFx = Effect.fn("completeCraftJobRuntimeFx")(function* (
 	context: JobCompletionContext<"craft">,
 ) {
+	if (context.owner.quantity !== 1) {
+		return yield* Effect.dieMessage(
+			`Craft job ${context.job.id} owner ${context.owner.id} must represent exactly one quantity.`,
+		);
+	}
+
 	const resolvedOutput =
 		context.line.output === undefined
 			? ({
@@ -30,11 +34,7 @@ export const completeCraftJobRuntimeFx = Effect.fn("completeCraftJobRuntimeFx")(
 				});
 	const replaceDrops = resolvedOutput.drop.filter((drop) => drop.placement === "replace");
 	const ordinaryDrops = resolvedOutput.drop.filter((drop) => drop.placement !== "replace");
-	const consumed = yield* consumeCraftOwnerFx({
-		context,
-		replaced: replaceDrops.length > 0,
-	});
-	let draft = consumed.runtime;
+	let draft = context.runtime;
 
 	if (replaceDrops.length > 0) {
 		const [, withReplacement] = yield* applyOutputPlacementFx({
@@ -46,13 +46,19 @@ export const completeCraftJobRuntimeFx = Effect.fn("completeCraftJobRuntimeFx")(
 			runtime: draft,
 		});
 		draft = withReplacement;
+	} else {
+		const [, withoutOwner] = yield* applyPlacementPlanFx({
+			plan: {
+				remove: [
+					context.owner.id,
+				],
+				spawn: [],
+				stack: [],
+			},
+			runtime: draft,
+		});
+		draft = withoutOwner;
 	}
-
-	draft = yield* placeCraftOwnerRemainderFx({
-		context,
-		quantity: consumed.remainderQuantity,
-		runtime: draft,
-	});
 
 	if (ordinaryDrops.length > 0) {
 		const [, withOutput] = yield* applyOutputPlacementFx({

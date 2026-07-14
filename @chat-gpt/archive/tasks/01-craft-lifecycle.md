@@ -83,10 +83,11 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 
 - Job completion dispatches to explicit producer, craft, blueprint, and stash branches after resolving shared live facts once.
 - No schema shape or contract changed. Only the stale craft schema comment was aligned with implemented runtime behavior; craft replacement uses the existing resolved `line.output` placement contract.
-- One completed job consumes exactly one craft quantity.
-- A resolved `replace` drop claims the original craft cell first.
-- Any remaining craft stack returns through standard placement before additional ordinary output.
-- Without replacement, a remaining stack stays at the original cell; the cell is free only after consuming the last quantity.
+- Starting a stacked craft atomically isolates one quantity as the running owner and routes the remainder through standard placement.
+- A placement failure aborts the whole start before the job or split commits.
+- The separated remainder can start another independent craft while the first job is active.
+- One completed job consumes its already isolated craft owner exactly once.
+- A resolved `replace` drop claims the original craft cell first; without replacement, owner removal frees that cell for ordinary output.
 - Completion output claims capacity before reservation return.
 - Blueprint and stash lifecycle remain intentionally partial in their own explicit branches until tasks 02 and 03.
 - The existing generic `job:completed` event remains the engine event. Presentation-specific enrichment belongs to task 14 and requires an explicit event-contract decision rather than an unreviewed schema change.
@@ -96,8 +97,10 @@ Delete historical craft runtime/save/timestamp machinery once all remaining UI, 
 - ordinary output from a consumed owner;
 - replacement plus additional output;
 - sink craft with no output;
-- stacked craft without replacement;
-- stacked craft with replacement and standard remainder placement;
+- stacked craft split during start;
+- parallel starts from successively separated craft quantities;
+- atomic start rejection when the remainder has no placement capacity;
+- replacement completion while the previously separated remainder stays available;
 - blocked deterministic retry;
 - consume/reserve semantics;
 - inventory pause;

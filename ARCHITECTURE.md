@@ -237,7 +237,7 @@ blueprint completion
 stash completion
 ```
 
-The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Craft completion consumes exactly one owner quantity, applies an optional resolved replacement at the original cell, returns any remaining owner stack through standard placement, places additional output, and then releases reservations. Blueprint and stash branches remain explicit extension points for their dedicated lifecycle tasks rather than growing conditionals inside producer completion.
+The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting a stacked craft atomically isolates one owner quantity and routes the remainder through standard placement before the job exists. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations. Blueprint and stash branches remain explicit extension points for their dedicated lifecycle tasks rather than growing conditionals inside producer completion.
 
 Completion is all-or-nothing. Capacity or max-count blocking leaves the ready job, owner quantity, and reservations unchanged for a later fixed-step retry.
 

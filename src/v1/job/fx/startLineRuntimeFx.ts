@@ -3,6 +3,7 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { assertLineStartReadyFx } from "~/v1/job/fx/assertLineStartReadyFx";
 import { createJobFx } from "~/v1/job/fx/createJobFx";
 import { resolveLineStartFx } from "~/v1/job/fx/read/resolveLineStartFx";
+import { splitCraftOwnerForStartFx } from "~/v1/job/fx/splitCraftOwnerForStartFx";
 import { applyLineRunPlanFx } from "~/v1/line/fx/run/applyLineRunPlanFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace startLineRuntimeFx {
@@ -31,10 +32,14 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		lineId,
 		durationMs: plan.runtimeMs,
 	});
+	const ownerRuntime = yield* splitCraftOwnerForStartFx({
+		ownerItemId,
+		runtime,
+	});
 	const inputRuntime = yield* applyLineRunPlanFx({
 		job,
 		plan,
-		runtime,
+		runtime: ownerRuntime,
 	});
 	return [
 		job,

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
@@ -14,6 +15,7 @@ import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
 export namespace planDropScopePlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
+		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		item: ItemSchema.Type;
 		origin: PositionSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
@@ -26,6 +28,7 @@ export namespace planDropScopePlacementFx {
  */
 export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function* ({
 	drop,
+	excludedStackItemIds,
 	item,
 	origin,
 	quantity,
@@ -37,6 +40,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with("board", () => {
 			return Effect.gen(function* () {
 				const plan = yield* planBoardPlacementFx({
+					excludedStackItemIds,
 					item,
 					origin,
 					placement: boardPlacement,
@@ -55,6 +59,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with("inventory", () => {
 			return Effect.gen(function* () {
 				const plan = yield* planInventoryPlacementFx({
+					excludedStackItemIds,
 					item,
 					quantity,
 					runtime,
@@ -71,6 +76,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with("any", () => {
 			return planBoardThenInventoryPlacementFx({
 				drop,
+				excludedStackItemIds,
 				item,
 				origin,
 				quantity,

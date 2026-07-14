@@ -8,6 +8,7 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace readAvailableStackItemsFx {
 	export interface Props {
+		excludedStackItemIds?: ReadonlyArray<IdSchema.Type>;
 		itemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 		scope: GridLocationSchema.Type["scope"];
@@ -18,6 +19,7 @@ export namespace readAvailableStackItemsFx {
  * Reads every compatible non-full stack in row-major location order.
  */
 export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(function* ({
+	excludedStackItemIds = [],
 	itemId,
 	runtime,
 	scope,
@@ -26,6 +28,7 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 		.filter(isGridRuntimeItem)
 		.filter((item) => {
 			return (
+				!excludedStackItemIds.includes(item.id) &&
 				item.item.id === itemId &&
 				item.location.scope === scope &&
 				item.quantity < item.item.maxStackSize

@@ -234,7 +234,7 @@ Schema support and runtime support are different facts.
 - `simple` items participate in stacking, placement, queries, rules, and ordinary runtime commands.
 - `producer` items expose one or more lines, queue capacity, explicit start, fixed-step jobs, material consume/reserve inputs, generic line output, and FIFO dispatch.
 - `craft`, `blueprint`, and `stash` items expose their configured line through the shared line/start/job machinery.
-- A `craft` completion consumes exactly one owner quantity, applies any resolved `replace` drop at the original board cell, preserves a remaining craft stack through standard placement, and places additional `line.output` drops atomically.
+- Starting a stacked `craft` atomically isolates one owner quantity and places the remainder through the standard stack-first/drop/inventory policy. Completion then consumes that isolated owner, applies any resolved `replace` drop at the original board cell, and places additional `line.output` drops atomically.
 
 ### Schema-backed but incomplete in runtime
 

@@ -195,7 +195,7 @@ Reserved inputs are job-owned locks and return only after completion through sta
 
 Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode. While a line runs, capacity zero closes that material input and positive capacity keeps it open as storage.
 
-Craft authoring uses `CraftLineSchema`, `CraftInputSchema`, and `CraftInputMaterialSchema`. Its material capacity is fixed to `0` at schema parse time. Authors may omit the field or write `0`; any positive craft capacity is rejected before semantic validation. The completed runtime shape still contains `capacity: 0`, so generic line and input execution retain one uniform contract.
+Every line owner uses the same `LineSchema` and `InputMaterialSchema`. Positive material `capacity` is syntactically valid, but game validation allows it only on producer-owned lines; craft, blueprint, and stash lines must author zero capacity. This semantic rule keeps one schema grammar while still rejecting unsupported buffering with an exact authoring path.
 
 ### Rules
 
@@ -225,7 +225,9 @@ chance
 weight
 ```
 
-Runtime-executed outputs use standard placement. They do not bypass stack, scope, max-count, replacement, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Queue entries reserve nothing until dispatch. Schema-only outputs remain authoring intent until an owned runtime path executes them.
+Runtime-executed outputs use standard placement. They do not bypass stack, scope, max-count, replacement, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Queue entries reserve nothing until dispatch. For `afterCompletion: "remove"`, output of the owner's own canonical item reserves only its net increase after the old owner disappears. Schema-only outputs remain authoring intent until an owned runtime path executes them.
+
+Game validation rejects any possible resolved output containing more than one `replace` drop. It also rejects `replace` output for an item configured with `afterCompletion: "keep"`; replacement and owner preservation are contradictory contracts.
 
 ## 8. Item capability status
 
@@ -234,14 +236,15 @@ Schema support and runtime support are different facts.
 ### Runtime-backed now
 
 - `simple` items participate in stacking, placement, queries, rules, and ordinary runtime commands.
-- `producer` items expose one or more lines, queue capacity, explicit start, fixed-step jobs, material consume/reserve inputs, generic line output, and FIFO dispatch.
-- `craft`, `blueprint`, and `stash` items expose their configured line through the shared line/start/job machinery.
-- Starting a stacked `craft` resolves eligibility from the pre-command world, creates the active job in the candidate draft, atomically isolates one owner quantity, and places the remainder through the standard pure-stack/drop/inventory policy. Completion then consumes that isolated owner, applies any resolved `replace` drop at the original board cell, and places additional `line.output` drops atomically.
-- Blueprint completion creates a new `targetId` identity at the exact blueprint cell, places optional top-level blueprint output as by-products, removes state bound to the blueprint identity, and returns reservations atomically.
+- `producer` items expose one or more lines and queue capacity; `craft`, `blueprint`, and `stash` expose one line. All use the same line/input/output runtime.
+- Every line-owning item declares `afterCompletion: "keep" | "remove"`. Item type does not decide whether completion preserves or consumes the owner.
+- `line.output` is optional for every line and is the only job output location. Every resolved drop keeps its authored placement, including blueprint output.
+- Starting any stacked line owner resolves eligibility from the pre-command world, attaches the job/input state in one candidate, atomically isolates one owner quantity, and standard-places the pure remainder.
+- Completion is one generic lifecycle: resolve optional output, respect authored placement, apply `afterCompletion`, release removed-owner buffered inputs, then return reservations atomically.
+- Blueprint assets are explicit standard item assets; no target or visual is inferred from output.
 
 ### Schema-backed but incomplete in runtime
 
-- top-level `stash.output` and stash self-consumption are not yet applied by job completion.
 - deposit capacity spending, depletion, and depletion output are not implemented.
 - temporary-item lifetime and expiry are not implemented.
 - memory, inventory-opener, speed-cheat, nuke, and cheat-inventory item kinds are authoring contracts without active public runtime commands.

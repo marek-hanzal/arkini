@@ -192,7 +192,9 @@ Input storage and line start are the first callers. Future charges, temporary li
 
 Every active job reserves the worst possible quantity of each canonical item its completion may create. Resolve and assert that reservation inside the same candidate runtime that creates the job. Queue entries reserve nothing until dispatch.
 
-All later quantity-creating paths must include active-job reservations in canonical `maxCount`: placement planners, direct spawn, and direct quantity replacement. Completion must remove its own ready job from the candidate before placing output so the job spends rather than duplicates its reservation. Do not use expected values, average chances, or one sampled roll as capacity planning.
+All later quantity-creating paths must include active-job reservations in canonical `maxCount`: placement planners, direct spawn, and direct quantity replacement. Completion must remove its own ready job from the candidate before placing output so the job spends rather than duplicates its reservation. A removing owner offsets worst-case output of its own canonical item by the quantity that will disappear. Do not use expected values, average chances, or one sampled roll as capacity planning.
+
+Line completion is data-driven. Producer, craft, blueprint, and stash use `line.output` plus item-level `afterCompletion`; completion code must not switch on item type or reinterpret authored placement. `replace` is invalid with `afterCompletion: "keep"`, and game validation owns output replace cardinality. Keep separate item schemas, but do not reintroduce specialized line/input schemas or top-level lifecycle outputs.
 
 Do not pass feature-specific exclusion IDs through generic placement or hide them in Effect Context. Put stack eligibility in the canonical purity predicate and state attachment in the canonical isolation operation. Do not create craft-, producer-, stash-, or blueprint-specific split variants.
 

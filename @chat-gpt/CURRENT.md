@@ -4,89 +4,87 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 03 — Stash lifecycle**
+**Task 04 — Deposit capacity and inputs**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/03-stash-lifecycle.md`;
-3. the stash and completion rows in `tasks/COVERAGE.md`;
-4. current completion, output, placement, removal, max-count reservation, state, Tick, and runtime code;
-5. only the historical files named by task 03.
+2. `tasks/04-deposit-capacity.md`;
+3. the deposit/capacity rows in `tasks/COVERAGE.md`;
+4. current input, job start, purity, runtime item state, placement, removal, output, Tick, and persistence code;
+5. only the historical files named by task 04.
 
 Next action:
 
-> Compare historical stash owner consumption and top-level output with the explicit `completeStashJobRuntimeFx` branch, then return the smallest lifecycle design that preserves deterministic output, atomic owner removal, buffered-input release, reservation return, and blocked retry. Surface any `line.output` versus top-level `output` schema ambiguity before changing a schema.
+> Design finite deposit capacity as item-owned runtime state. Decide the exact reservation/spend boundary, deterministic multi-deposit selection, whether capacity may combine, move/removal guards, and depletion lifecycle before changing schemas or runtime state.
 
-Do not fold stash behavior into producer or blueprint completion. Shared removal and placement primitives are already available; lifecycle order remains owner-specific.
+Do not recreate a parallel capacity map or preserve historical location references. Deposit state must participate in item purity and stateful-owner isolation.
 
 ## Absolute code rules
 
 - Named project operations are Effect programs and use `*Fx` without “pure helper” exceptions.
-- Every exact identifier uses `IdSchema`; never create `ItemIdSchema`, `LineIdSchema`, `JobIdSchema`, `AssetIdSchema`, or similar wrappers.
+- Every exact identifier uses `IdSchema`; never create domain-specific ID schema aliases.
 - One concept per file; no barrels, helper piles, or generic junk-drawer domains.
 - Production writes enter through `modifyRuntimeFx` and build immutable validated candidates.
 - The engine is standalone; UI is a thin presentation adapter.
-- Configuration schemas are stable. Do not change a schema shape or contract without first surfacing and agreeing on the exact need.
+- Do not change a configuration or runtime schema without first surfacing and agreeing on the exact need.
 
 ## Runtime and session
 
 - One canonical committed transition owns runtime plus transient events.
 - Mutation planning is serialized and interruptible.
 - STM owns accepted commit and subscription registration.
-- `getSnapshot()` reads the canonical runtime directly.
-- Listener subscriptions are current-plus-tail, listener-specific, scoped, and cancellation-safe.
-- Runtime callbacks, event callbacks, save reporting, and Tick reporting accept `void | PromiseLike<void>` and are failure-isolated.
+- Runtime callbacks, event callbacks, save reporting, and Tick reporting are failure-isolated.
 - Duplicate saves are acceptable.
 - UI animation intentionally lags runtime and may be redirected by later events.
 
 ## Tick, jobs, queue, and completion
 
-- Fixed simulation step: 200 ms.
-- Production time source: Effect Clock.
-- Tick adapter time is session-only and never persisted.
-- Jobs store only `durationMs` and `remainingMs`.
-- One active job per owner; queued requests are FIFO and are not jobs.
+- Fixed simulation step: 200 ms; production time source: Effect Clock.
+- Jobs store only `durationMs` and `remainingMs`; one active job per owner.
 - Filling inputs never starts work; starting is explicit.
-- Inventory is a hard pause.
-- Started jobs cannot be cancelled.
-- Queue-only owners remain valid and are retried at fixed-step boundaries.
-- Shared completion facts are resolved once, then dispatched to explicit producer, craft, blueprint, or stash branches.
-- Active jobs reserve the worst-case future quantity of every possible output against canonical `maxCount`. Quantity ranges reserve their maximum, chance rolls reserve success, weighted rolls reserve repeatable worst candidates, and alternative roll sets reserve the per-item maximum. Queued requests reserve nothing until authoritative dispatch.
-- Ordinary placement, direct spawn, and direct quantity replacement respect active-job output reservations. Completion removes its own job before materializing output, so it spends rather than duplicates its reservation.
-- Runtime purity is a composable boolean. Line input/job/queue state makes a line non-pure; an item is pure only when all owned lines and item state are pure. Generic stack and quantity mutation require purity inside the same runtime draft.
-- A pure item uses configured `maxStackSize`; an impure item has effective stack size `1`. Any write that would attach identity-bound state to quantity greater than `1` must isolate the original board identity at quantity `1` and standard-place the pure remainder inside the same candidate. Inventory is passive and accepts no new state attachment.
-- A zero-capacity material input is closed during its active line job; positive capacity remains open storage. Craft authoring fixes every material capacity to zero.
-- Input storage and generic line start share the canonical stateful-owner isolation path. A start resolves against the pre-command world, attaches its job and input state in the candidate, then isolates one owner quantity; craft completion consumes only that isolated owner, supports an optional resolved replacement, and places output before returning reservations.
-- Blueprint completion creates a new target identity at the exact owner cell, places top-level by-products, removes all state bound to the blueprint identity, and returns reservations last. Any failure rolls back the entire completion.
+- Inventory is passive storage and a hard pause. No new identity-bound state attaches there.
+- Started jobs cannot be cancelled; queued requests are FIFO and reserve nothing until dispatch.
+- Producer, craft, blueprint, and stash keep separate item schemas but use one `LineSchema`, optional `line.output`, and one completion lifecycle.
+- Every line-owning item declares `afterCompletion: "keep" | "remove"`. Item type does not decide output interpretation or owner survival.
+- Completion respects every authored placement. `replace` is invalid for a keep owner, and any possible resolved result may contain at most one replace drop.
+- A remove owner loses its identity and queue. Output claims capacity before buffered inputs and reservations return. Any failure rolls back the entire completion.
+- Active jobs reserve worst-case future output against `maxCount`; removing owners offset output of their own canonical item by the live quantity that disappears.
+
+## Inputs, purity, and isolation
+
+- Runtime purity is derived, never stored. Line input/job/queue state makes a line non-pure; item purity composes every owned line and item-owned state.
+- Pure items use configured `maxStackSize`; impure items have effective stack size `1`.
+- Any write that would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder in the same candidate.
+- Input storage and generic line start share that isolation path. Failed remainder placement publishes no state or events.
+- A zero-capacity input is closed during its active job; positive capacity stays open storage.
+- One schema grammar allows material capacity, but game validation permits positive capacity only on producer-owned lines. Craft, blueprint, and stash lines must author zero.
 
 ## Reservations and removal
 
-- Reserved material is always returned through standard drop placement.
-- Never retain original instance ID, stack, slot, source item, or historical position for return.
+- Reserved material always returns through standard placement and retains no historical instance, stack, slot, or position.
 - Generic mutations reject job-scoped items.
-- Completion is all-or-nothing.
-- An owner with active or queued work cannot be permanently removed through the public command.
-- Shared runtime removal releases buffered inputs, removes the owner, and discards queued work bound to the removed identity. Owner-specific completion may use it only after detaching its completed active job.
+- Shared identity removal deletes the owner and queue; full public removal additionally releases buffered inputs.
+- Completion detaches its active job before using the shared identity-removal primitive.
 
 ## Randomness
 
-- Completion randomness is deterministic from stable job identity plus explicit algorithm version.
+- Completion randomness derives from stable job identity plus explicit algorithm version.
 - Tick time, wall clock, and job revision are not seed inputs.
-- Blocked completion retries must preserve the same random outcome.
+- Blocked retries and restored jobs preserve the same random result.
 
 ## Configuration
 
-- Authoring uses recursive JSON fragments and PNG resources.
+- Authoring uses recursive JSON fragments and explicit PNG resources.
 - Compiler, validator, tests, and packer share one completed-config compiler.
-- Duplicate providers and record IDs are diagnostics; later files never overwrite silently.
-- Blueprint visuals are explicit `[blueprintAssetId, targetAssetId]` tuples and may intentionally share the blueprint asset.
+- Duplicate providers and IDs are diagnostics; later files never overwrite silently.
+- Blueprint assets are explicit standard assets. No target, output, or visual is inferred from item type or file name.
 
 ## Migration policy
 
 - Historical source is a behavioral oracle, never an architectural donor.
 - Follow the numbered queue in `tasks/README.md`.
-- Update `tasks/COVERAGE.md` and prune historical source after every completed slice.
-- Do not repeatedly inspect areas marked **Superseded**, **Rejected**, or **Removed** unless a current task names a concrete unresolved behavior.
+- Update `tasks/COVERAGE.md` after every completed slice.
+- Do not repeatedly inspect areas marked **Superseded**, **Rejected**, **Archive-ready**, or **Removed** unless a current task names a concrete unresolved behavior.

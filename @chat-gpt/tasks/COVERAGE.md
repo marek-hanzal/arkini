@@ -28,9 +28,9 @@ A status describes oracle value, not whether historical code still compiles. The
 | Fixed-step Tick and offline catch-up | Superseded | Wall-clock scheduler is rejected | Done |
 | Deterministic output rolls | Superseded | Sound/visual grouping may remain useful | 14, 15 |
 | Distance, conditions, runtime line rules | Superseded | Old active-effect store is rejected | 10, 13 |
-| Craft completion lifecycle | Partial | Runtime lifecycle is superseded; presentation behavior remains | 13–15 |
-| Blueprint completion lifecycle | Partial | Runtime replacement, by-products, max-count reservation, and atomic retry are superseded; presentation feedback remains | 13–15 |
-| Stash completion lifecycle | Partial | Top-level output, consumption, feedback remain | 03 |
+| Craft completion lifecycle | Partial | Generic authored completion lifecycle is canonical; presentation behavior remains | 13–15 |
+| Blueprint completion lifecycle | Partial | Generic authored output, placement, max-count reservation, and atomic retry are canonical; presentation feedback remains | 13–15 |
+| Stash completion lifecycle | Partial | Generic authored completion lifecycle is canonical; presentation and sound remain | 13–15 |
 | Deposit capacity/input/depletion | Reference | Behavior and edge cases remain | 04 |
 | Directional gameplay merge | Reference | Behavior, feedback, and tests remain | 05, 11, 14 |
 | Temporary lifetime/expiry | Reference | Timing/output behavior remains | 06 |
@@ -77,7 +77,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `merge/` | Reference | Schema/validation only; placement stack merge is not gameplay merge | Directional source/target semantics and tests | 05, 11, 14 |
 | `placement/` | Partial | Current placement planner/write path is canonical | Drag feedback and animation intent | 11, 14 |
 | `play/` | Reference | Runtime mirrors and bridge-owned gameplay truth are rejected | Information requirements, sheets, visual/audio orchestration | 10–16 |
-| `producer/` | Partial | Engine lifecycle, input, queue, Tick, output, and blueprint construction are superseded | Detail/read-model behavior, stash oracle, feedback, audio | 03, 10, 13–15 |
+| `producer/` | Partial | Engine lifecycle, input, queue, Tick, generic completion, and output are superseded | Detail/read-model behavior, feedback, audio | 10, 13–15 |
 | `quantity/` | Superseded | Current quantity schemas/plans own semantics | Nothing unless a specific edge case is missing | 17 |
 | `random/` | Superseded | Completion-local deterministic RNG is canonical | Nothing architectural | 17 |
 | `react/` | Reference | No current renderer shell | Tiny generic hook ergonomics only | 12 |
@@ -85,7 +85,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `save/` | Superseded | Current state/session/save boundary is canonical | Initial UX only if needed | 17 |
 | `selector/` | Superseded | Current query/selector compiler and runtime evaluation are canonical | Nothing architectural | 17 |
 | `stack/` | Superseded | Current placement stacking is canonical | Animation intent only | 14 |
-| `stash/` | Reference | Generic line starts, specialized completion does not | Stash output/consumption behavior | 03, 13–15 |
+| `stash/` | Archive-ready | Generic line start/output/completion supersede runtime behavior | Product copy, animation, and audio only | 13–15, 17 |
 | `storage/` | Partial | Current save service boundary exists | Browser persistence and reset policy | 12, 17 |
 | `tile-engine/` | Reference | Its cyclic package topology is rejected | Pointer, DnD, hit testing, motion behavior | 11, 12, 14 |
 | `time/` | Superseded | Wall-clock jobs and hidden catch-up are rejected | Formatting only | 13, 17 |

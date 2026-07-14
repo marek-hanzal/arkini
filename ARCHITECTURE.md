@@ -234,18 +234,19 @@ Input closure is resolved from the same live runtime draft as the delivery comma
 
 Storing the first input on a stacked owner is a general state-attachment transition. The input transfer is applied inside one candidate first, so a fully consumed source may free board capacity, then the original owner identity is isolated at quantity `1` and the pure remainder follows standard placement. A blocked remainder rolls back the input transfer, split, and every generated event together.
 
-Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and dispatches an explicit owner-specific branch:
+Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and executes one line lifecycle driven by authored data:
 
 ```text
-producer completion
-craft completion
-blueprint completion
-stash completion
+resolve optional line.output deterministically
+→ preserve every authored drop placement
+→ apply item.afterCompletion keep/remove
+→ release removed-owner buffered inputs
+→ return job reservations
 ```
 
-The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting any stacked line owner first resolves eligibility from the pre-command snapshot, then creates the job and applies its input plan inside the candidate draft, isolates the original owner at quantity `1`, and routes the pure remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations.
+Producer, craft, blueprint, and stash keep their separate item schemas, but completion never switches on item type. Every line-owning item declares `afterCompletion: "keep" | "remove"`; any line may omit output, and output always lives on `line.output`. A `keep` owner retains its identity, buffered inputs, and queue. A `remove` owner loses its identity and queue, output claims capacity before buffered inputs and reservations return, and a non-replacement completion frees the owner cell before ordinary output placement. Authored `replace` is valid only for a removing owner and removes the old identity through the standard placement plan.
 
-Blueprint completion creates a new target identity at the exact owner cell, places top-level by-products, removes all state bound to the vanished blueprint identity, and releases job reservations last. Public item removal and owner-specific completion share one runtime removal primitive rather than nesting public write commands. The stash branch remains an explicit extension point for its dedicated lifecycle task.
+Starting any stacked line owner first resolves eligibility from the pre-command snapshot, then creates the job and applies its input plan inside the candidate draft, isolates the original owner at quantity `1`, and routes the pure remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Public item removal and completion share the same identity-removal primitive rather than nesting public write commands.
 
 Completion is all-or-nothing. Placement or return blocking leaves the ready job, owner, queue, buffered inputs, and reservations unchanged for a later fixed-step retry.
 
@@ -253,7 +254,7 @@ Reservations retain no original runtime instance, stack, slot, or source positio
 
 ## 10. Future output and max-count reservations
 
-An active job reserves the worst-case future quantity of every canonical item its implemented completion lifecycle may create. The calculation is deliberately conservative:
+An active job reserves the worst-case future quantity of every canonical item its line output may create. The calculation is deliberately conservative:
 
 - fixed quantities reserve their value;
 - ranges reserve `max`;
@@ -261,11 +262,10 @@ An active job reserves the worst-case future quantity of every canonical item it
 - repeated weighted rolls reserve the same worst candidate for every selection;
 - rolls inside one selected set add together;
 - alternative roll sets reserve the per-item maximum;
-- blueprint jobs additionally reserve one configured target.
 
 A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; max-count blockage leaves the request in place.
 
-Placement, direct spawn, and direct quantity replacement include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it.
+Placement, direct spawn, and direct quantity replacement include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it. For a removing owner, reservation planning subtracts the live owner quantity from worst-case output of the same canonical item, because replacement is a net change rather than a second copy.
 
 ## 11. Deterministic completion randomness
 

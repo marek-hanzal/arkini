@@ -74,7 +74,7 @@ Every write uses the canonical serialized mutation boundary. UI must not invent 
 
 ## 6. Product lines
 
-Producers, crafts, blueprints, and stashes can expose the shared product-line model. Their generic line discovery/start/job behavior is implemented. Craft and blueprint completion own their distinct single-use lifecycles; stash completion remains a separate explicit branch for its later contract.
+Producers, crafts, blueprints, and stashes expose the shared product-line model. They use one input, start, queue, max-count, deterministic output, placement, and completion lifecycle. Separate item schemas remain for authoring identity and presentation, but item type does not decide output interpretation or whether the owner survives completion.
 
 A line owns:
 
@@ -178,18 +178,18 @@ Started jobs cannot be cancelled.
 
 A ready job completes only while its owner is on the board.
 
-Completion resolves the live job by stable ID, detaches the completed job and reservations inside one immutable candidate, and dispatches the owner-specific lifecycle. Each branch owns its order. Blueprint completion performs:
+Completion resolves the live job by stable ID, detaches the completed job and reservations inside one immutable candidate, and executes one authored lifecycle:
 
 ```text
-create a new target identity at the exact blueprint cell
-→ resolve and place top-level by-products
-→ release buffered blueprint inputs and remove the blueprint identity
-→ discard queue bound to the vanished identity
+resolve optional line.output
+→ apply every drop with its authored placement
+→ keep or remove the owner according to afterCompletion
+→ release buffered inputs when the owner is removed
 → return detached reservations
 → commit everything atomically
 ```
 
-Placement, capacity, or return failure is a valid blocked-ready state. The published runtime keeps the job, owner, queue, buffered inputs, and reservations unchanged and retries on a later step.
+A `keep` owner remains available for later starts and retains buffered storage and queue state. A `remove` owner loses its identity and queue; when no resolved drop uses `replace`, its board cell is freed before ordinary output placement. Output claims capacity before buffered inputs and reservations return. Placement, capacity, or return failure is a valid blocked-ready state. The published runtime keeps the job, owner, queue, buffered inputs, and reservations unchanged and retries on a later step.
 
 One blocked owner does not prevent unrelated owners from progressing or completing in the same fixed step.
 
@@ -205,9 +205,8 @@ A job may start only when every possible output remains within canonical `maxCou
 - repeated weighted selection reserves the worst candidate for every draw;
 - all rolls in one selected set add together;
 - alternative sets reserve the per-item maximum;
-- a blueprint reserves one target plus its possible by-products.
 
-Queued requests reserve nothing. When the FIFO head attempts to become active, the same check runs; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity replacement cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation.
+Queued requests reserve nothing. When the FIFO head attempts to become active, the same check runs; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity replacement cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation. If the owner is removed, output of the same canonical item reserves only the net increase beyond the live owner quantity.
 
 ## 14. Deterministic output
 
@@ -256,17 +255,11 @@ The completed configuration accepts more item semantics than the current command
 
 Directional merge schemas and validation exist. There is no active merge write command. Ordinary stack placement and `mergePlacementPlansFx` are not gameplay merge execution.
 
-### Craft lifecycle
+### Line-owner completion lifecycle
 
-A craft exposes one line whose material inputs author only `capacity: 0`. Like every line owner, the first attached input or active job isolates one quantity from a pure stack. Starting work still resolves the line from the pre-command world; a split performed by that same start may change line rules and make the new job pause on its first Tick. This is intentional command semantics, not a second mid-command resolution. Completion always consumes one isolated owner quantity. A resolved `replace` drop claims the original craft cell; without replacement, removing the owner frees that cell for ordinary output. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
+Craft, blueprint, and stash each expose one ordinary `LineSchema`; producers expose one or more. Positive material capacity is supported only for producer lines and is rejected for the other line owners by game validation. Like every line owner, the first attached input or active job isolates one quantity from a pure stack. Starting work still resolves the line from the pre-command world; a split performed by that same start may change line rules and make the new job pause on its first Tick. This is intentional command semantics, not a second mid-command resolution.
 
-### Blueprint lifecycle
-
-A blueprint job reserves one future target plus the worst possible quantity of every top-level by-product before it starts. Completion creates a new target runtime identity at the exact blueprint cell, then places by-products, removes the blueprint and all state bound to its identity, and returns reservations last. A blocked by-product, buffered-input return, or reservation return rolls the entire completion back. Queue requests attached to the consumed blueprint disappear with that identity.
-
-### Stash lifecycle
-
-A stash's line can start, but top-level stash output and owner consumption are not yet applied by completion.
+Every line may omit output. When output exists, producer, craft, blueprint, and stash all resolve `line.output` identically and preserve authored placement. A blueprint can therefore replace itself, drop a random item nearby, or produce nothing; its visual remains an explicit standard asset rather than being inferred from output. `afterCompletion` independently declares whether any line owner remains or disappears, so a one-use producer and a persistent craft are both legal. Removed owners discard their queue and return buffered inputs only after output placement; blocked output or return rolls the entire completion back.
 
 ### Deposits
 
@@ -322,6 +315,5 @@ Pending capabilities must be implemented through canonical engine boundaries rat
 
 - directional merge execution;
 - deposit capacity and depletion;
-- specialized stash completion lifecycle;
 - temporary-item expiry;
 - utility-item commands.

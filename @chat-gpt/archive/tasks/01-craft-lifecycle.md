@@ -2,6 +2,8 @@
 
 **Status:** Done
 
+> **Later normalization:** Task 03 replaced the item-type completion branches and specialized output contracts described below with one `line.output` + item-level `afterCompletion` lifecycle. This file remains a historical decision record; current behavior is owned by root documentation and `@chat-gpt/CURRENT.md`.
+
 ## Goal
 
 Complete one craft as a true single-use gameplay lifecycle instead of merely running its generic line.

@@ -1,6 +1,6 @@
 # 04 — Deposit capacity and inputs
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

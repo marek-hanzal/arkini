@@ -56,7 +56,8 @@
 												"type": "value",
 												"value": 1
 											},
-											"rules": []
+											"rules": [],
+											"placement": "replace"
 										}
 									]
 								}

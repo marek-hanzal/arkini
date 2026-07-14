@@ -8,8 +8,8 @@ import { LineSchema } from "~/v1/line/schema/LineSchema";
  * An item configuration that provides one craft product line.
  *
  * A craft owns one product line instead of a producer's multiple selectable
- * product lines. Generic line execution is supported; automatic owner consumption
- * remains a separate runtime capability and must not be inferred from this schema.
+ * product lines. Runtime completion consumes exactly one craft quantity and interprets
+ * any resolved replacement through the line output's standard placement contract.
  */
 export const CraftItemSchema = z
 	.object({

@@ -1,15 +1,19 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import type {
+	JobCompletionContext,
+	JobCompletionOwner,
+} from "~/v1/job/completion/JobCompletionContext";
+import { completeBlueprintJobRuntimeFx } from "~/v1/job/completion/fx/completeBlueprintJobRuntimeFx";
+import { completeCraftJobRuntimeFx } from "~/v1/job/completion/fx/completeCraftJobRuntimeFx";
+import { completeProducerJobRuntimeFx } from "~/v1/job/completion/fx/completeProducerJobRuntimeFx";
+import { completeStashJobRuntimeFx } from "~/v1/job/completion/fx/completeStashJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
 import { JobNotFoundError } from "~/v1/job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/v1/job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/v1/job/random/makeJobCompletionRandomFx";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
-import { outputFx } from "~/v1/output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
-import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
-import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
 import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
@@ -20,7 +24,7 @@ export namespace completeJobRuntimeFx {
 	}
 }
 
-/** Resolves and completes one live ready job as one atomic draft operation. */
+/** Resolves one ready job once and dispatches its atomic owner-specific completion branch. */
 export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* ({
 	jobId,
 	runtime,
@@ -40,61 +44,69 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 			}),
 		);
 
-	const random = yield* makeJobCompletionRandomFx(job);
-	return yield* Effect.gen(function* () {
-		const owner = runtime.items.find((item) => item.id === job.ownerItemId);
-		if (owner === undefined) return yield* Effect.dieMessage(`Job ${job.id} owner is missing.`);
-		if (!isBoardRuntimeItem(owner))
-			return yield* Effect.fail(
-				new ItemNotOnBoardError({
-					itemId: owner.id,
-					location: owner.location,
-				}),
-			);
-		const line = yield* readItemLineFx({
-			item: owner.item,
-			lineId: job.lineId,
-		});
-		if (line === undefined)
-			return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
-		const reservations = runtime.items.filter(
-			(item) => item.location.scope === "job" && item.location.jobId === job.id,
+	const owner = runtime.items.find((item) => item.id === job.ownerItemId);
+	if (owner === undefined) return yield* Effect.dieMessage(`Job ${job.id} owner is missing.`);
+	if (!isBoardRuntimeItem(owner))
+		return yield* Effect.fail(
+			new ItemNotOnBoardError({
+				itemId: owner.id,
+				location: owner.location,
+			}),
 		);
-		let draft: RuntimeSchema.Type = {
-			...runtime,
-			items: runtime.items.filter((item) => !reservations.includes(item)),
-			jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
-		};
-		for (const reservation of reservations) {
-			const plan = yield* planDropPlacementFx({
-				drop: {
-					itemId: reservation.item.id,
-					quantity: reservation.quantity,
-					placement: "drop",
-				},
-				origin: owner.location.position,
-				originItemId: owner.id,
-				runtime: draft,
-			});
-			const [, nextDraft] = yield* applyPlacementPlanFx({
-				plan,
-				runtime: draft,
-			});
-			draft = nextDraft;
+	const line = yield* readItemLineFx({
+		item: owner.item,
+		lineId: job.lineId,
+	});
+	if (line === undefined)
+		return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
+	const reservations = runtime.items.filter(
+		(item) => item.location.scope === "job" && item.location.jobId === job.id,
+	);
+	const completionRuntime = {
+		...runtime,
+		items: runtime.items.filter((item) => !reservations.includes(item)),
+		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
+	} satisfies RuntimeSchema.Type;
+	const random = yield* makeJobCompletionRandomFx(job);
+
+	return yield* Effect.gen(function* () {
+		switch (owner.item.type) {
+			case "producer":
+				return yield* completeProducerJobRuntimeFx({
+					job,
+					line,
+					owner: owner as JobCompletionOwner<"producer">,
+					reservations,
+					runtime: completionRuntime,
+				} satisfies JobCompletionContext<"producer">);
+			case "craft":
+				return yield* completeCraftJobRuntimeFx({
+					job,
+					line,
+					owner: owner as JobCompletionOwner<"craft">,
+					reservations,
+					runtime: completionRuntime,
+				} satisfies JobCompletionContext<"craft">);
+			case "blueprint":
+				return yield* completeBlueprintJobRuntimeFx({
+					job,
+					line,
+					owner: owner as JobCompletionOwner<"blueprint">,
+					reservations,
+					runtime: completionRuntime,
+				} satisfies JobCompletionContext<"blueprint">);
+			case "stash":
+				return yield* completeStashJobRuntimeFx({
+					job,
+					line,
+					owner: owner as JobCompletionOwner<"stash">,
+					reservations,
+					runtime: completionRuntime,
+				} satisfies JobCompletionContext<"stash">);
+			default:
+				return yield* Effect.dieMessage(
+					`Job ${job.id} owner ${owner.id} has unsupported completion type ${owner.item.type}.`,
+				);
 		}
-		if (line.output !== undefined) {
-			const output = yield* outputFx({
-				origin: owner.location.position,
-				output: line.output,
-			});
-			const [, nextDraft] = yield* applyOutputPlacementFx({
-				origin: owner.location.position,
-				originItemId: owner.id,
-				output,
-				runtime: draft,
-			});
-			draft = nextDraft;
-		}
-		return draft;
 	}).pipe(Effect.withRandom(random));
 });

@@ -275,7 +275,7 @@ The same random stream owns roll-set selection, chance, weights, quantity ranges
 
 A blocked completion, restored state, or retry therefore produces the same random outcome for the same job.
 
-Tick state, wall-clock time, and job revision do not participate in the seed.
+Tick state and wall-clock time do not participate in the seed.
 
 ## 12. Purity and placement
 
@@ -304,7 +304,7 @@ Placement failure is a domain failure and rolls back the complete owning mutatio
 
 ## 13. Save boundary
 
-Autosave owns persistence, not gameplay truth.
+Autosave owns persistence, not gameplay truth. Item revisions are runtime-only stale-intent tokens: state omits them, and every hydration creates fresh revisions for the new session. Jobs and queued requests are not revisioned because no command targets their previously observed mutable shape.
 
 ```text
 current + later committed transitions

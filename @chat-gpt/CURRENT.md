@@ -39,6 +39,8 @@ Do not recreate a parallel capacity map or preserve historical location referenc
 - Runtime callbacks, event callbacks, save reporting, and Tick reporting are failure-isolated.
 - Duplicate saves are acceptable.
 - UI animation intentionally lags runtime and may be redirected by later events.
+- Item revision is a runtime-only stale-intent token. Saves omit it and hydration creates fresh revisions for the new session.
+- Jobs and queued requests are not revisioned because commands never target a previously observed mutable job/request shape.
 
 ## Tick, jobs, queue, and completion
 
@@ -72,7 +74,7 @@ Do not recreate a parallel capacity map or preserve historical location referenc
 ## Randomness
 
 - Completion randomness derives from stable job identity plus explicit algorithm version.
-- Tick time, wall clock, and job revision are not seed inputs.
+- Tick time and wall clock are not seed inputs.
 - Blocked retries and restored jobs preserve the same random result.
 
 ## Configuration

@@ -20,9 +20,9 @@ React / automation / debug
           ├── GameCoreLayerFx
           │     ├── GameConfigFx
           │     ├── RuntimeStoreFx
-          │     │     ├── Ref<CommittedTransition>
-          │     │     ├── PubSub<CommittedTransition>
-          │     │     └── one Effect Semaphore
+          │     │     ├── TRef<CommittedTransition>
+          │     │     ├── TPubSub<CommittedTransition>
+          │     │     └── one mutation-planning Semaphore
           │     ├── RuntimeFx
           │     ├── CommittedTransitionsFx
           │     └── TickFx
@@ -43,22 +43,23 @@ Events are transient metadata describing that exact successful runtime transitio
 
 ## Core mutation boundary
 
-`RuntimeStoreFx` is one engine-owned committed-transition store built from Effect primitives. It owns exactly one current transition, one publication source and one mutex.
+`RuntimeStoreFx` is one engine-owned committed-transition store built from Effect primitives. It owns exactly one current transition, one publication source and one semaphore used only to serialize mutation planning.
 
 `modifyRuntimeFx` performs one serialized operation:
 
 ```text
-acquire store mutex
+acquire mutation-planning semaphore interruptibly
 → read current transition.runtime
 → build candidate runtime + ordered event metadata
 → validate candidate runtime
-→ replace current { runtime, events }
-→ publish that same transition
-→ release mutex
-→ return command result
+→ enter one non-yielding STM point of no return
+     replace current { runtime, events }
+     publish that same transition
+     return command result
+→ release mutation-planning semaphore
 ```
 
-The current value is replaced before publication, and publication completes before the serialized write returns. A failed candidate changes and publishes nothing. A no-op mutation with no events preserves transition identity and therefore publishes nothing.
+Planning and semaphore acquisition remain interruptible. Interruption before the accepted STM tail changes and publishes nothing. Once the STM tail starts, current replacement, publication and the command result are one atomic transaction with no asynchronous boundary between them. A no-op mutation with no events preserves transition identity and therefore publishes nothing.
 
 Committed runtime values are treated as immutable snapshots by convention. Production mutations must enter through the engine write path and create a candidate graph without mutating the committed graph in place. Recursive clone/freeze infrastructure is intentionally not part of this architecture.
 
@@ -72,13 +73,12 @@ current committed transition captured at registration
 + an immediate subscription shutdown Effect
 ```
 
-The store performs registration under the same mutex as commits:
+The store performs registration in one STM transaction independent of long mutation planning:
 
 ```text
-acquire store mutex
-→ read current transition
-→ subscribe one Effect Queue to the PubSub
-→ release mutex
+read current TRef
++ subscribe one TQueue to the TPubSub
+→ commit both atomically
 ```
 
 This creates one explicit linearization point without a revision counter, readiness latch, mirror or registration marker:
@@ -91,7 +91,7 @@ transition committed after subscription registration
 → queued in changes exactly once
 ```
 
-The acquisition contains no asynchronous boundary and can be completed through `ManagedRuntime.runSync`, which is required by React's synchronous `subscribe()` contract.
+The acquisition contains no asynchronous boundary, does not wait for an in-flight mutation planner, and can be completed through `ManagedRuntime.runSync`, which is required by React's synchronous `subscribe()` contract.
 
 ## Browser/UI integration
 
@@ -123,7 +123,7 @@ open atomic current + tail subscription
 → deliver events only from later transitions
 ```
 
-Unsubscribe synchronously shuts down that listener's Effect Queue before its child scope is released. Closing the session scope closes every remaining listener subscription and command fiber.
+Unsubscribe synchronously shuts down that listener's `TQueue` before its child scope is released. Closing the session scope closes every remaining listener subscription and command fiber.
 
 There is intentionally no global callback ordering guarantee between independent runtime and event subscribers. The truthful invariant is:
 

@@ -5,37 +5,35 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * A single-use item that consumes its one product line when opened.
+ * An item configuration that owns one stash product line and optional output.
  *
- * A stash without `output` disappears after its line completes. A stash with
- * `output` evaluates that output before it disappears.
+ * The schema captures intended stash output. Automatic stash consumption and
+ * top-level stash output execution remain separate runtime capabilities.
  */
 export const StashItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
 		/**
-		 * Identifies this item as a single-use stash.
+		 * Identifies this item as a stash authoring definition.
 		 */
 		type: ItemEnumSchema.extract([
 			"stash",
 		]),
 		/**
-		 * The one product line consumed when this stash is opened.
+		 * The one product line authored for this stash.
 		 */
-		line: LineSchema.describe("The one product line consumed when this stash is opened."),
+		line: LineSchema.describe("The one product line authored for this stash."),
 		/**
-		 * Optional output evaluated after this stash's line completes.
-		 *
-		 * When omitted, the stash simply disappears after its line completes.
+		 * Optional output intended for stash-specific completion behavior.
 		 */
 		output: OutputSchema.optional().describe(
-			"The optional output evaluated after this stash's line completes.",
+			"The optional output intended for stash-specific completion behavior.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "StashItemSchema",
-		description: "A single-use stash that consumes one product line when opened.",
+		description: "An item configuration with one stash product line and optional output.",
 	});
 
 export type StashItemSchema = typeof StashItemSchema;

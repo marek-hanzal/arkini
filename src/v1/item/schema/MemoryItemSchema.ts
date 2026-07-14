@@ -9,7 +9,7 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An item that stores, restores, and clears one board layout snapshot.
+ * An authoring contract for a future board-layout memory capability.
  */
 export const MemoryItemSchema = z
 	.object({
@@ -40,7 +40,7 @@ export const MemoryItemSchema = z
 	.strict()
 	.meta({
 		id: "MemoryItemSchema",
-		description: "An individual item that stores and restores one board layout snapshot.",
+		description: "An authored board-layout memory item definition.",
 	});
 
 export type MemoryItemSchema = typeof MemoryItemSchema;

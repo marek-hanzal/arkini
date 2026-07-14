@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 /**
- * One opaque optimistic-concurrency token for a mutable runtime entity.
+ * One opaque optimistic-concurrency token for a versioned live runtime entity.
  */
 export const RevisionSchema = z.string().min(1).meta({
 	id: "RevisionSchema",
-	description: "An opaque optimistic-concurrency token for a mutable runtime entity.",
+	description: "An opaque optimistic-concurrency token for a versioned live runtime entity.",
 });
 
 export type RevisionSchema = typeof RevisionSchema;

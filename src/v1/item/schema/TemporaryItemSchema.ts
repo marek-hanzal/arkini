@@ -8,11 +8,11 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * A board-only item that expires independently from player interaction.
+ * A board-only item authoring contract with a configured lifetime.
  *
- * Runtime starts the lifetime when an instance is created and keeps it running
- * while the player moves that instance around the board. On expiry, runtime
- * removes the item before evaluating its optional output from the released cell.
+ * The schema captures the intended lifetime and expiry output. Runtime lifetime
+ * progression and expiry remain a separate capability and must not be inferred
+ * from schema support alone.
  */
 export const TemporaryItemSchema = z
 	.object({
@@ -38,23 +38,23 @@ export const TemporaryItemSchema = z
 			.default(1)
 			.describe("Fixes temporary item stacks to one instance."),
 		/**
-		 * Lifetime in milliseconds, starting when an item instance is created.
+		 * Authored lifetime in milliseconds for the intended expiry capability.
 		 */
 		durationMs: TimeSchema.min(500).describe(
-			"The lifetime in milliseconds from instance creation; must be at least 500 ms.",
+			"The authored lifetime in milliseconds; must be at least 500 ms.",
 		),
 		/**
-		 * Optional result evaluated after the expired item is removed.
+		 * Optional result intended for expiry behavior.
 		 */
 		output: OutputSchema.optional().describe(
-			"The optional output evaluated from the released board cell after expiry.",
+			"The optional output intended for the released board cell after expiry.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "TemporaryItemSchema",
 		description:
-			"A board-only, non-stackable item that disappears after its lifetime and may emit an output.",
+			"A board-only, non-stackable item configuration with lifetime and optional expiry output.",
 	});
 
 export type TemporaryItemSchema = typeof TemporaryItemSchema;

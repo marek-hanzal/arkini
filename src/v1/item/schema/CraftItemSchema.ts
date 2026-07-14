@@ -5,11 +5,11 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 import { LineSchema } from "~/v1/line/schema/LineSchema";
 
 /**
- * A single-use item that provides one craft product line.
+ * An item configuration that provides one craft product line.
  *
  * A craft owns one product line instead of a producer's multiple selectable
- * product lines. After that line completes, runtime consumes the craft item
- * and places its output from the craft item's released board position.
+ * product lines. Generic line execution is supported; automatic owner consumption
+ * remains a separate runtime capability and must not be inferred from this schema.
  */
 export const CraftItemSchema = z
 	.object({
@@ -25,8 +25,7 @@ export const CraftItemSchema = z
 	.strict()
 	.meta({
 		id: "CraftItemSchema",
-		description:
-			"A single-use craft item that consumes itself when its product line completes.",
+		description: "An item configuration that owns one craft product line.",
 	});
 
 export type CraftItemSchema = typeof CraftItemSchema;

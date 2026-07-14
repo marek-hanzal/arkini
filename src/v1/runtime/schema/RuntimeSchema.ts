@@ -4,7 +4,7 @@ import { JobQueueRequestSchema } from "~/v1/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/v1/job/schema/JobSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
-/** Core mutable gameplay runtime composed of live items, active jobs, and queued start requests. */
+/** Canonical gameplay state value composed of live items, active jobs, and queued start requests. */
 export const RuntimeSchema = z
 	.object({
 		items: z
@@ -21,7 +21,7 @@ export const RuntimeSchema = z
 	.strict()
 	.meta({
 		id: "RuntimeSchema",
-		description: "The core mutable gameplay runtime.",
+		description: "The canonical gameplay state value.",
 	});
 export type RuntimeSchema = typeof RuntimeSchema;
 export namespace RuntimeSchema {

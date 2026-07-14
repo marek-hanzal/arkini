@@ -28,9 +28,8 @@ export namespace resolveLineRunFx {
 /**
  * Resolves one line run against one explicit immutable runtime snapshot.
  *
- * Nested rule queries are provided the same snapshot, so a future write command
- * can call this resolver inside `SynchronizedRef.modifyEffect` and make queue,
- * rule, and input decisions without a stale-plan race.
+ * Nested rule queries are provided the same snapshot, so the serialized runtime
+ * mutation planner can make queue, rule, and input decisions without a stale-plan race.
  */
 export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 	lineId,

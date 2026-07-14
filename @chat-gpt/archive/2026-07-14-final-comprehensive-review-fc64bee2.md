@@ -1,9 +1,9 @@
 # Arkini v1 — final comprehensive review
 
-**Snapshot:** `fc64bee207bf8f89af2d36fbb72f238289ed8dd8`  
-**Baseline:** same snapshot as the closed STM subscription review  
-**Scope:** complete `src/v1`, active v1 tests, compiler/validator/pack flow, Tick/jobs/queue, runtime/state/save/session/UI boundaries, and active LLM-facing documentation  
-**Repository changes:** none  
+**Snapshot:** `fc64bee207bf8f89af2d36fbb72f238289ed8dd8`
+**Baseline:** same snapshot as the closed STM subscription review
+**Scope:** complete `src/v1`, active v1 tests, compiler/validator/pack flow, Tick/jobs/queue, runtime/state/save/session/UI boundaries, and active LLM-facing documentation
+**Repository changes:** none
 **Review goal:** verify that the codebase remains atomic, standalone-engine friendly, low in redundant synchronization/data hand-offs, understandable to an LLM, and free of changes made merely to manufacture review output.
 
 ---
@@ -425,8 +425,8 @@ commits during review: none
 
 # Final decision
 
-**Runtime/code architecture: approved.**  
-**STM atomic boundary block: remains closed.**  
+**Runtime/code architecture: approved.**
+**STM atomic boundary block: remains closed.**
 **Whole-v1 comprehensive review: code-complete, pending documentation truth cleanup only.**
 
 After the documentation/comments cleanup, the correct action is to continue feature work rather than perform another general architecture refactor.

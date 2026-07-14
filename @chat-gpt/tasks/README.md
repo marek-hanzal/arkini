@@ -1,13 +1,14 @@
-# Arkini GPT tasks
+# Active tasks
 
-Active queue opened on 2026-07-09 for effect/proximity/distance simplification.
+No active task queue is recorded in this snapshot.
 
-Read in order:
+When work is opened, create one concise task file containing:
 
-1. `2026-07-09-001-effects-proximity-current-state.md`
-2. `2026-07-09-002-distance-model-unification.md`
-3. `2026-07-09-003-effect-runtime-pipeline-simplification.md`
-4. `2026-07-09-004-effect-authoring-simplification.md`
-5. `2026-07-09-005-validation-ui-parity-pass.md`
+- goal;
+- current facts;
+- accepted decisions;
+- explicit non-goals;
+- acceptance criteria;
+- completion status.
 
-Scope guardrail: this queue starts with analysis and task planning only. Do not change runtime behavior until the tuning direction is agreed.
+Do not keep completed task files here. Move them to `../archive/tasks/` immediately after closeout and update this index back to the actual queue state.

@@ -6,10 +6,11 @@ import { BaseInputSchema } from "./BaseInputSchema";
 import { InputEnumSchema } from "./InputEnumSchema";
 
 /**
- * Capacity required from a matching deposit on the board.
+ * Authored capacity requirement from a matching deposit on the board.
  *
- * Every completed line spends the declared quantity from one deposit found by
- * its query; deposit items are never delivered or moved into the line's
+ * Runtime capacity state is not implemented yet. The schema and validator preserve
+ * the intended query and quantity while active input resolution rejects this kind;
+ * deposit items are never delivered or moved into the line's
  * ordinary material buffer.
  */
 export const InputDepositSchema = z
@@ -31,13 +32,13 @@ export const InputDepositSchema = z
 		 * Exact or bounded amount of deposit capacity spent every time the line completes.
 		 */
 		quantity: QuantitySchema.describe(
-			"The exact or bounded amount of matching deposit capacity spent when the line completes.",
+			"The exact or bounded amount of matching deposit capacity intended to be spent by completion.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "InputDepositSchema",
-		description: "Capacity required from a matching deposit on the board.",
+		description: "An authored capacity requirement from a matching board deposit.",
 	});
 
 export type InputDepositSchema = typeof InputDepositSchema;

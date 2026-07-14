@@ -6,7 +6,7 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * A singleton board item that opens the shared inventory.
+ * A singleton board-item authoring contract for a future shared inventory opener.
  */
 export const InventoryItemSchema = z
 	.object({
@@ -29,7 +29,8 @@ export const InventoryItemSchema = z
 	.strict()
 	.meta({
 		id: "InventoryItemSchema",
-		description: "A singleton board item that opens the shared inventory.",
+		description:
+			"A singleton board-item authoring contract for a future shared inventory opener.",
 	});
 
 export type InventoryItemSchema = typeof InventoryItemSchema;

@@ -4,7 +4,7 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An item that will trigger the nuke gameplay effect.
+ * An authoring marker for the nuke gameplay capability.
  */
 export const NukeItemSchema = z
 	.object({
@@ -16,7 +16,7 @@ export const NukeItemSchema = z
 	.strict()
 	.meta({
 		id: "NukeItemSchema",
-		description: "An item that triggers the nuke gameplay effect.",
+		description: "An authored item marker for a future nuke gameplay capability.",
 	});
 
 export type NukeItemSchema = typeof NukeItemSchema;

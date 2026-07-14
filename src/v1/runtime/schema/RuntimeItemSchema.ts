@@ -35,7 +35,7 @@ export const RuntimeItemSchema = z
 		 * Opaque optimistic-concurrency token replaced after every mutation.
 		 */
 		revision: RevisionSchema.describe(
-			"The optimistic-concurrency revision of this mutable runtime item.",
+			"The optimistic-concurrency revision of this live runtime item.",
 		),
 	})
 	.strict()

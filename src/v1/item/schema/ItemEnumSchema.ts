@@ -6,7 +6,7 @@ import { z } from "zod";
 export const ItemEnumSchema = z
 	.enum([
 		/**
-		 * A finite resource item that disappears after its capacity is used.
+		 * A finite-resource authoring definition with configured capacity.
 		 */
 		"deposit",
 		/**
@@ -26,23 +26,23 @@ export const ItemEnumSchema = z
 		 */
 		"craft",
 		/**
-		 * A single-use item that owns one stash product line.
+		 * An item definition that owns one stash product line.
 		 */
 		"stash",
 		/**
-		 * A board-only item that expires after a configured duration.
+		 * A board-only item definition with a configured duration.
 		 */
 		"temporary",
 		/**
-		 * A board item that opens the shared inventory.
+		 * An authoring marker for the shared inventory opener.
 		 */
 		"inventory",
 		/**
-		 * An item that stores and restores a board layout.
+		 * An authoring marker for board-layout memory.
 		 */
 		"memory",
 		/**
-		 * A stateful item that toggles the speed cheat.
+		 * An authoring marker for the speed-cheat capability.
 		 */
 		"cheat:speed",
 		"nuke",

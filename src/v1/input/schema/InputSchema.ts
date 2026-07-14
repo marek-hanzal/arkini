@@ -8,8 +8,9 @@ import { InputSimpleSchema } from "./InputSimpleSchema";
  * A discriminated resource requirement for one product line.
  *
  * Simple inputs carry no resource operation. Material inputs are directly
- * delivered items. Deposit inputs instead spend capacity from a matching board
- * source without moving that source into a line.
+ * delivered items. Deposit inputs describe intended capacity spending from a
+ * matching board source; active runtime resolution rejects them until deposit
+ * capacity state exists.
  */
 export const InputSchema = z
 	.discriminatedUnion("type", [
@@ -20,7 +21,7 @@ export const InputSchema = z
 	.meta({
 		id: "InputSchema",
 		description:
-			"A simple, material-item, or board-deposit input requirement for a product line.",
+			"A simple, material-item, or authored board-deposit input requirement for a product line.",
 	});
 
 export type InputSchema = typeof InputSchema;

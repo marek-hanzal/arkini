@@ -6,7 +6,7 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * A finite resource item that disappears after all of its capacity is used.
+ * A finite-resource authoring contract with configured capacity and optional depletion output.
  */
 export const DepositItemSchema = z
 	.object({
@@ -18,24 +18,22 @@ export const DepositItemSchema = z
 			"deposit",
 		]),
 		/**
-		 * Initial number of uses available to this deposit.
+		 * Authored initial capacity of this deposit.
 		 */
 		count: PositiveIntegerSchema.describe(
-			"The initial positive number of uses available to this deposit.",
+			"The authored positive initial capacity of this deposit.",
 		),
 		/**
-		 * Optional output evaluated when this deposit is depleted.
-		 *
-		 * When omitted, the deposit simply disappears after its final use.
+		 * Optional output intended for deposit depletion.
 		 */
 		output: OutputSchema.optional().describe(
-			"The optional output evaluated when this deposit is depleted.",
+			"The optional output intended for deposit depletion.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "DepositItemSchema",
-		description: "A finite resource deposit that disappears when its capacity is depleted.",
+		description: "A finite-resource configuration with capacity and optional depletion output.",
 	});
 
 export type DepositItemSchema = typeof DepositItemSchema;

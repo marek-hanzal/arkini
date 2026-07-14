@@ -1,51 +1,9 @@
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
 	{
-		name: "tile-engine-no-arkini-domain-imports",
+		name: "engine-core-no-ui-imports",
 		comment:
-			"TileEngine is generic interaction infrastructure. Inject Arkini behavior through props/adapters instead of importing gameplay domains.",
-		severity: "error",
-		from: {
-			path: "^src/tile-engine(?:/|$)",
-		},
-		to: {
-			path: [
-				"^src/(?:action|activation|board|cheat|config|craft|debug|effects|engine|event|inventory|item|job|limit|loot|merge|placement|play|producer|quantity|remove|save|selector|stash|storage|world)(?:/|$)",
-			],
-		},
-	},
-	{
-		name: "domain-no-react-imports",
-		comment:
-			"Core gameplay domains are durable state/Effect logic. React belongs in app, UI, play, board/inventory surfaces and TileEngine adapters, not in producer/craft/runtime rules.",
-		severity: "error",
-		from: {
-			path: "^src/(?:action|activation|cheat|config|craft|effects|engine|event|job|limit|loot|merge|placement|producer|quantity|random|remove|save|selector|stash|storage|world)(?:/|$)",
-		},
-		to: {
-			path: "^node_modules/(?:react|react-dom)(?:/|$)",
-		},
-	},
-	{
-		name: "gameplay-domain-no-runtime-ui-imports",
-		comment:
-			"Gameplay domains are pure state/Effect logic. UI, Play runtime and TileEngine depend on them, never the other way around.",
-		severity: "error",
-		from: {
-			path: "^src/(?:action|activation|cheat|config|craft|effects|engine|event|job|limit|loot|merge|placement|producer|quantity|random|remove|save|selector|stash|storage|world)(?:/|$)",
-		},
-		to: {
-			path: [
-				"^src/(?:item|play|tile-engine|ui)(?:/|$)",
-				"^node_modules/(?:react|react-dom)(?:/|$)",
-			],
-		},
-	},
-
-	{
-		name: "v1-core-no-ui-imports",
-		comment:
-			"V1 engine/core remains standalone. UI adapters depend on public core services, never the other way around.",
+			"The engine remains standalone. UI adapters depend on public engine services, never the other way around.",
 		severity: "error",
 		from: {
 			path: "^src/v1/(?!ui(?:/|$))",
@@ -55,9 +13,9 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "v1-ui-no-core-internal-imports",
+		name: "ui-no-engine-internal-imports",
 		comment:
-			"V1 UI is a thin adapter over public engine services. Core internal modules stay behind their owning domain boundaries.",
+			"UI is a thin adapter over public engine services. Internal modules stay behind their owning domain boundaries.",
 		severity: "error",
 		from: {
 			path: "^src/v1/ui(?:/|$)",
@@ -86,7 +44,7 @@ module.exports = {
 		{
 			name: "no-circular",
 			comment:
-				"Circular imports make ownership unclear. Extract shared types/helpers instead of making modules shake hands behind the shed.",
+				"Circular imports make ownership unclear. Extract the owning concept instead of making modules shake hands behind the shed.",
 			severity: "error",
 			from: {},
 			to: {
@@ -96,7 +54,7 @@ module.exports = {
 		{
 			name: "not-to-unresolvable",
 			comment:
-				"This module depends on a module that cannot be found. If it is an npm module, add it to package.json; otherwise fix the import path.",
+				"This module depends on a module that cannot be found. Add a declared package or fix the import path.",
 			severity: "error",
 			from: {},
 			to: {
@@ -106,7 +64,7 @@ module.exports = {
 		{
 			name: "no-non-package-json",
 			comment:
-				"Runtime imports must be declared in package.json. Hidden dependency roulette is somehow still frowned upon.",
+				"Runtime imports must be declared in package.json. Hidden dependency roulette remains frowned upon.",
 			severity: "error",
 			from: {},
 			to: {
@@ -119,13 +77,13 @@ module.exports = {
 		{
 			name: "not-to-dev-dep-from-src",
 			comment:
-				"Production src code must not import devDependencies unless the import is type-only or test-only.",
+				"Production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
 				path: "^src(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
-					"^src/vite-env\.d\.ts$",
+					"^src/vite-env\\.d\\.ts$",
 				],
 			},
 			to: {
@@ -143,12 +101,12 @@ module.exports = {
 		{
 			name: "not-to-test-from-production",
 			comment:
-				"Production code must not import test files or fixtures. Tests can depend on production; not the other way around.",
+				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
-					"^src/vite-env\.d\.ts$",
+					"^src/vite-env\\.d\\.ts$",
 				],
 			},
 			to: {

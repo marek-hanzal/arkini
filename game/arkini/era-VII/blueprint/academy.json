@@ -4,7 +4,6 @@
 		"item:blueprint-academy": {
 			"id": "item:blueprint-academy",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Academy Blueprint",
 			"description": "Build plan that upgrades a School into an Academy.",
 			"asset": {
@@ -38,6 +37,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -125,7 +128,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -134,6 +137,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

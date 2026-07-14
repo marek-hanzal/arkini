@@ -4,7 +4,6 @@
 		"producer:armory-t1": {
 			"id": "producer:armory-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Armory I",
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
 			"asset": {

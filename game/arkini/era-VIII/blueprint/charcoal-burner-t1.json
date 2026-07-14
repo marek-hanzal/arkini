@@ -4,7 +4,6 @@
 		"item:blueprint-charcoal-burner-t1": {
 			"id": "item:blueprint-charcoal-burner-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Charcoal Burner I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Charcoal Burner I.",
 			"asset": {
@@ -38,6 +37,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 3
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -125,7 +128,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -134,6 +137,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

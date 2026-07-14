@@ -29,6 +29,7 @@ export const fromStateItemFx = Effect.fn("fromStateItemFx")(function* ({
 		item,
 		location: state.location,
 		quantity: state.quantity,
+		remainingCharges: state.remainingCharges,
 		revision: yield* createRevisionFx(),
 	} satisfies RuntimeItemSchema.Type;
 });

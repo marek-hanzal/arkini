@@ -2,55 +2,68 @@ import { Effect } from "effect";
 
 import type { JobCompletionContext } from "~/v1/job/completion/JobCompletionContext";
 import { releaseJobReservationsFx } from "~/v1/job/completion/fx/releaseJobReservationsFx";
+import { makeChargeDepletionRandomFx } from "~/v1/job/random/makeChargeDepletionRandomFx";
 import { releaseOwnerInputsFx } from "~/v1/input/fx/releaseOwnerInputsFx";
 import { outputFx } from "~/v1/output/fx/outputFx";
 import type { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
 import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/v1/runtime/fx/removeRuntimeItemIdentityFx";
 
-/** Completes one line job from authored output placement and owner lifecycle data. */
+const emptyOutput = {
+	drop: [],
+} satisfies OutputResultSchema.Type;
+
+/** Completes one line job and removes its owner only when the owner is depleted. */
 export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(function* (
 	context: JobCompletionContext,
 ) {
-	const resolvedOutput =
+	const depleted =
+		context.owner.item.charges !== undefined && context.owner.remainingCharges === 0;
+	let draft = context.runtime;
+
+	if (depleted) {
+		draft = yield* removeRuntimeItemIdentityFx({
+			item: context.owner,
+			runtime: draft,
+		});
+	}
+
+	const lineOutput =
 		context.line.output === undefined
-			? ({
-					drop: [],
-				} satisfies OutputResultSchema.Type)
+			? emptyOutput
 			: yield* outputFx({
 					origin: context.owner.location.position,
 					output: context.line.output,
 				});
-	const replacesOwner = resolvedOutput.drop.some((drop) => drop.placement === "replace");
-	if (context.owner.item.afterCompletion === "keep" && replacesOwner) {
-		return yield* Effect.dieMessage(
-			`Job ${context.job.id} resolved replacement output for keep owner ${context.owner.id}.`,
-		);
-	}
-
-	let draft = context.runtime;
-	if (context.owner.item.afterCompletion === "remove" && !replacesOwner) {
-		draft = yield* removeRuntimeItemIdentityFx({
-			item: context.owner,
-			runtime: draft,
-		});
-	}
-
-	if (resolvedOutput.drop.length > 0) {
-		const [, withOutput] = yield* applyOutputPlacementFx({
+	if (lineOutput.drop.length > 0) {
+		const [, withLineOutput] = yield* applyOutputPlacementFx({
 			origin: context.owner.location.position,
-			originItemId: context.owner.id,
-			output: resolvedOutput,
+			output: lineOutput,
 			runtime: draft,
 		});
-		draft = withOutput;
+		draft = withLineOutput;
 	}
 
-	if (context.owner.item.afterCompletion === "remove") {
-		draft = yield* removeRuntimeItemIdentityFx({
-			item: context.owner,
-			runtime: draft,
+	if (depleted && context.owner.item.charges?.output !== undefined) {
+		const random = yield* makeChargeDepletionRandomFx({
+			itemId: context.owner.id,
+			job: context.job,
 		});
+		const depletionOutput = yield* outputFx({
+			origin: context.owner.location.position,
+			output: context.owner.item.charges.output,
+		}).pipe(Effect.withRandom(random));
+		if (depletionOutput.drop.length > 0) {
+			const [, withDepletionOutput] = yield* applyOutputPlacementFx({
+				origin: context.owner.location.position,
+				output: depletionOutput,
+				runtime: draft,
+			});
+			draft = withDepletionOutput;
+		}
+	}
+
+	if (depleted) {
 		draft = yield* releaseOwnerInputsFx({
 			owner: context.owner,
 			runtime: draft,
@@ -59,7 +72,6 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 
 	return yield* releaseJobReservationsFx({
 		origin: context.owner.location.position,
-		originItemId: context.owner.id,
 		reservations: context.reservations,
 		runtime: draft,
 	});

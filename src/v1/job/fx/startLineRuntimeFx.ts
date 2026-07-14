@@ -6,6 +6,7 @@ import { createJobFx } from "~/v1/job/fx/createJobFx";
 import { resolveLineStartFx } from "~/v1/job/fx/read/resolveLineStartFx";
 import { isolateStatefulOwnerFx } from "~/v1/item/fx/isolateStatefulOwnerFx";
 import { applyLineRunPlanFx } from "~/v1/line/fx/run/applyLineRunPlanFx";
+import { applyLineChargePlansFx } from "~/v1/line/fx/run/applyLineChargePlansFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace startLineRuntimeFx {
 	export interface Props {
@@ -45,13 +46,18 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		plan,
 		runtime: jobRuntime,
 	});
+	const chargedRuntime = yield* applyLineChargePlansFx({
+		job,
+		plan,
+		runtime: inputRuntime,
+	});
 	yield* assertJobOutputMaxCountFx({
 		job,
-		runtime: inputRuntime,
+		runtime: chargedRuntime,
 	});
 	const ownerRuntime = yield* isolateStatefulOwnerFx({
 		ownerItemId,
-		runtime: inputRuntime,
+		runtime: chargedRuntime,
 	});
 	return [
 		job,

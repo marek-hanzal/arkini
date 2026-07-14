@@ -4,7 +4,6 @@
 		"producer:waste-processor-t2": {
 			"id": "producer:waste-processor-t2",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Waste Processor II",
 			"description": "Upgraded cleanup building that can also burn trash with coal or charcoal for faster disposal and uglier air.",
 			"asset": {

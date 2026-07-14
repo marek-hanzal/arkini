@@ -11,7 +11,7 @@ export namespace readItemOutputEntriesFx {
 	}
 }
 
-/** Reads line, direct item, and merge outputs owned by one canonical item. */
+/** Reads line, charge-depletion, temporary, and merge outputs owned by one canonical item. */
 export const readItemOutputEntriesFx = Effect.fn("readItemOutputEntriesFx")(function* ({
 	itemId,
 	item,
@@ -34,7 +34,19 @@ export const readItemOutputEntriesFx = Effect.fn("readItemOutputEntriesFx")(func
 				],
 	);
 
-	if ((item.type === "deposit" || item.type === "temporary") && item.output !== undefined) {
+	if (item.charges?.output !== undefined) {
+		entries.push({
+			output: item.charges.output,
+			path: [
+				"items",
+				itemId,
+				"charges",
+				"output",
+			],
+		});
+	}
+
+	if (item.type === "temporary" && item.output !== undefined) {
 		entries.push({
 			output: item.output,
 			path: [

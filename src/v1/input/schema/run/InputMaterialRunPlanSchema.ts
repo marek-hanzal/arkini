@@ -4,6 +4,7 @@ import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema"
 import { InputEnumSchema } from "~/v1/input/schema/InputEnumSchema";
 import { InputModeEnumSchema } from "~/v1/input/schema/InputModeEnumSchema";
 import { InputRunItemPlanSchema } from "./InputRunItemPlanSchema";
+import { InputChargeRunPlanSchema } from "./InputChargeRunPlanSchema";
 
 /**
  * Exact buffered material allocation required by one line run.
@@ -27,6 +28,9 @@ export const InputMaterialRunPlanSchema = z
 		 */
 		quantity: PositiveIntegerSchema.describe(
 			"The total positive quantity allocated across buffered runtime items.",
+		),
+		charges: InputChargeRunPlanSchema.optional().describe(
+			"The optional exact charge payment attached to this material input.",
 		),
 		/**
 		 * Ordered concrete item allocations whose quantity sums to `quantity`.

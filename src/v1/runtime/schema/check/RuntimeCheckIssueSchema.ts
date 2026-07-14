@@ -15,6 +15,7 @@ import { InputSelectorMismatchIssueSchema } from "~/v1/input/schema/check/InputS
 import { InputSlotInvalidIssueSchema } from "~/v1/input/schema/check/InputSlotInvalidIssueSchema";
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemMaxCountIssueSchema } from "./ItemMaxCountIssueSchema";
+import { ItemChargesIssueSchema } from "./ItemChargesIssueSchema";
 import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
@@ -36,6 +37,7 @@ export const RuntimeCheckIssueSchema = z
 		JobReservationOrphanIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,
+		ItemChargesIssueSchema,
 		ItemStackSizeIssueSchema,
 		InputOwnerMissingIssueSchema,
 		InputLineMissingIssueSchema,

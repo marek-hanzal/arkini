@@ -4,7 +4,6 @@
 		"item:blueprint-prospector-guild-t2": {
 			"id": "item:blueprint-prospector-guild-t2",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Prospector Guild Blueprint",
 			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
 			"asset": {
@@ -40,6 +39,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -95,7 +98,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -104,6 +107,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

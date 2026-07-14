@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
 
 /**
@@ -24,6 +25,14 @@ export const StateItemSchema = z
 		 */
 		location: LocationSchema.describe(
 			"The current concrete location owned by this persisted item.",
+		),
+		/**
+		 * Remaining charges of this concrete item instance after its first use.
+		 *
+		 * Undefined means the instance still owns its authored full charge amount.
+		 */
+		remainingCharges: NonNegativeIntegerSchema.optional().describe(
+			"The optional remaining charges of this concrete item instance; undefined means the authored full amount.",
 		),
 		/**
 		 * Number of canonical items represented by this live state entry.

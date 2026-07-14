@@ -4,7 +4,6 @@
 		"item:blueprint-paper-mill-t1": {
 			"id": "item:blueprint-paper-mill-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Paper Mill I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Paper Mill I.",
 			"asset": {
@@ -39,6 +38,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 3
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -89,7 +92,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -98,6 +101,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

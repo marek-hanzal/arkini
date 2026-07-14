@@ -38,7 +38,9 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:drop": {
 			id: "craft:drop",
 			type: "craft",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			title: "Drop craft",
 			description: "Consumes itself and emits one ordinary output.",
 			asset: {
@@ -58,6 +60,10 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "simple",
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 					},
 				],
 				output: {
@@ -85,15 +91,17 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				rules: [],
 			},
 		},
-		"craft:replace": {
-			id: "craft:replace",
+		"craft:ordered-output": {
+			id: "craft:ordered-output",
 			type: "craft",
-			afterCompletion: "remove",
-			title: "Replace craft",
-			description: "Replaces itself and emits a bonus output.",
+			charges: {
+				amount: 1,
+			},
+			title: "Ordered output craft",
+			description: "Emits ordered outputs when its final charge completes.",
 			asset: {
 				source: [
-					"asset:craft-replace",
+					"asset:craft-ordered-output",
 				],
 			},
 			tags: [],
@@ -101,13 +109,17 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 3,
 			line: {
-				id: "line:craft:replace",
+				id: "line:craft:ordered-output",
 				title: "Complete",
-				description: "Complete the replacement craft.",
+				description: "Complete the ordered-output craft.",
 				runtimeMs: 200,
 				input: [
 					{
 						type: "simple",
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 					},
 				],
 				output: {
@@ -127,12 +139,12 @@ const craftCompletionConfig = GameConfigSchema.parse({
 											rules: [],
 										},
 										{
-											itemId: "item:replacement",
+											itemId: "item:result",
 											quantity: {
 												type: "value",
 												value: 1,
 											},
-											placement: "replace",
+											placement: "drop",
 											rules: [],
 										},
 									],
@@ -147,7 +159,9 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:reserve": {
 			id: "craft:reserve",
 			type: "craft",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			title: "Reserve craft",
 			description: "Returns its reserved tool after output placement.",
 			asset: {
@@ -167,6 +181,10 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "materials",
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 						selector: {
 							type: "item",
 							itemId: "item:tool",
@@ -206,7 +224,9 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:sink": {
 			id: "craft:sink",
 			type: "craft",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			title: "Sink craft",
 			description: "Consumes itself without output.",
 			asset: {
@@ -226,6 +246,10 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "simple",
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 					},
 				],
 				rules: [],
@@ -234,7 +258,9 @@ const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:random": {
 			id: "craft:random",
 			type: "craft",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			title: "Random craft",
 			description: "Produces one deterministic two-item alternative.",
 			asset: {
@@ -254,6 +280,10 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "simple",
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 					},
 				],
 				output: {
@@ -316,14 +346,14 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 1,
 		},
-		"item:replacement": {
-			id: "item:replacement",
+		"item:result": {
+			id: "item:result",
 			type: "simple",
-			title: "Replacement",
-			description: "Craft replacement output.",
+			title: "Result",
+			description: "Craft result output.",
 			asset: {
 				source: [
-					"asset:replacement",
+					"asset:result",
 				],
 			},
 			tags: [],
@@ -413,7 +443,7 @@ const spawnCraftFx = Effect.fn("spawnCraftFx")(function* ({
 	itemId,
 	quantity = 1,
 }: {
-	itemId: "craft:drop" | "craft:replace" | "craft:reserve" | "craft:sink" | "craft:random";
+	itemId: "craft:drop" | "craft:ordered-output" | "craft:reserve" | "craft:sink" | "craft:random";
 	quantity?: number;
 }) {
 	return yield* spawnItemFx({
@@ -520,15 +550,15 @@ describe("craft job completion", () => {
 		expect(runtime.items.some((item) => item.location.scope === "job")).toBe(false);
 	});
 
-	it("replaces the craft first and places additional output around the same origin", () => {
+	it("removes the depleted craft first and places ordered output from the freed origin", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:replace",
+					itemId: "craft:ordered-output",
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:replace",
+					lineId: "line:craft:ordered-output",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -541,12 +571,12 @@ describe("craft job completion", () => {
 			),
 		);
 
-		expect(runtime.items.some((item) => item.item.id === "craft:replace")).toBe(false);
+		expect(runtime.items.some((item) => item.item.id === "craft:ordered-output")).toBe(false);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:replacement",
+						id: "item:bonus",
 					}),
 					location: {
 						scope: "board",
@@ -558,15 +588,8 @@ describe("craft job completion", () => {
 				}),
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:bonus",
+						id: "item:result",
 					}),
-					location: {
-						scope: "board",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
 				}),
 			]),
 		);
@@ -728,16 +751,16 @@ describe("craft job completion", () => {
 		});
 	});
 
-	it("replaces one isolated craft while its already separated remainder stays available", () => {
+	it("depletes one isolated craft while its already separated remainder stays available", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
-					itemId: "craft:replace",
+					itemId: "craft:ordered-output",
 					quantity: 3,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:replace",
+					lineId: "line:craft:ordered-output",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -754,7 +777,18 @@ describe("craft job completion", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					item: expect.objectContaining({
-						id: "item:replacement",
+						id: "item:result",
+					}),
+				}),
+				expect.objectContaining({
+					item: expect.objectContaining({
+						id: "craft:ordered-output",
+					}),
+					quantity: 2,
+				}),
+				expect.objectContaining({
+					item: expect.objectContaining({
+						id: "item:bonus",
 					}),
 					location: {
 						scope: "board",
@@ -764,21 +798,10 @@ describe("craft job completion", () => {
 						},
 					},
 				}),
-				expect.objectContaining({
-					item: expect.objectContaining({
-						id: "craft:replace",
-					}),
-					quantity: 2,
-				}),
-				expect.objectContaining({
-					item: expect.objectContaining({
-						id: "item:bonus",
-					}),
-				}),
 			]),
 		);
 		expect(
-			runtime.items.find((item) => item.item.id === "craft:replace")?.location,
+			runtime.items.find((item) => item.item.id === "craft:ordered-output")?.location,
 		).not.toEqual({
 			scope: "board",
 			position: {

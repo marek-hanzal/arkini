@@ -4,7 +4,6 @@
 		"producer:lumberjack-t1": {
 			"id": "producer:lumberjack-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Lumberjack I",
 			"description": "Produces logs when placed near a tree.",
 			"asset": {
@@ -40,9 +39,9 @@
 									"itemId": "item:tree"
 								}
 							},
-							"quantity": {
-								"type": "value",
-								"value": 1
+							"charges": {
+								"cost": 1,
+								"from": "target"
 							}
 						}
 					],
@@ -100,9 +99,9 @@
 									"itemId": "item:double-tree"
 								}
 							},
-							"quantity": {
-								"type": "value",
-								"value": 1
+							"charges": {
+								"cost": 1,
+								"from": "target"
 							}
 						}
 					],
@@ -160,9 +159,9 @@
 									"itemId": "item:micro-forest"
 								}
 							},
-							"quantity": {
-								"type": "value",
-								"value": 1
+							"charges": {
+								"cost": 1,
+								"from": "target"
 							}
 						}
 					],

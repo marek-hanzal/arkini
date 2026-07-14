@@ -36,7 +36,6 @@ const planBufferedReleaseFx = Effect.fn("planBufferedReleaseFx")(function* ({
 		return yield* planDropPlacementFx({
 			drop,
 			origin: owner.location.position,
-			originItemId: owner.id,
 			runtime,
 		});
 	}

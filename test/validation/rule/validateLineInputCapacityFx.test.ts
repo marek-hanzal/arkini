@@ -29,7 +29,9 @@ const bufferedInput = (capacity: number): ReadonlyArray<InputSchema.Type> => [
 const lineOwner = (type: "blueprint" | "craft" | "stash", capacity: number) => ({
 	...createSimpleItem(`item:${type}`),
 	type,
-	afterCompletion: "remove" as const,
+	charges: {
+		amount: 1,
+	},
 	line: createLine({
 		input: bufferedInput(capacity),
 	}),

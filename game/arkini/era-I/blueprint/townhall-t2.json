@@ -4,7 +4,6 @@
 		"item:blueprint-townhall-t2": {
 			"id": "item:blueprint-townhall-t2",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Town Hall II Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall II.",
 			"asset": {
@@ -37,6 +36,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -143,7 +146,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -152,6 +155,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

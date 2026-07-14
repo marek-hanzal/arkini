@@ -17,10 +17,6 @@ export const PlacementEnumSchema = z
 		 * Places the drop at a random free board location.
 		 */
 		"random",
-		/**
-		 * Replaces the board item that generated this drop.
-		 */
-		"replace",
 	])
 	.meta({
 		id: "PlacementEnumSchema",

@@ -4,7 +4,6 @@
 		"item:blueprint-tannery-t1": {
 			"id": "item:blueprint-tannery-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Tannery I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Tannery I.",
 			"asset": {
@@ -39,6 +38,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 3
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -100,7 +103,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -109,6 +112,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

@@ -20,27 +20,29 @@
 			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1,
-			"count": 64,
-			"output": {
-				"set": [
-					{
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "item:cracked-rock",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
+			"charges": {
+				"amount": 64,
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:cracked-rock",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
 			}
 		}
 	}

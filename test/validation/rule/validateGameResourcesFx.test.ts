@@ -86,7 +86,9 @@ describe("validateGameResourcesFx", () => {
 		}) => ({
 			id,
 			type: "blueprint" as const,
-			afterCompletion: "remove" as const,
+			charges: {
+				amount: 1,
+			},
 			title: id,
 			description: id,
 			asset: {
@@ -122,7 +124,7 @@ describe("validateGameResourcesFx", () => {
 												type: "value" as const,
 												value: 1,
 											},
-											placement: "replace" as const,
+											placement: "drop" as const,
 											rules: [],
 										},
 									],

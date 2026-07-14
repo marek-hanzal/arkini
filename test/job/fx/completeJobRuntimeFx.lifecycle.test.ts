@@ -70,7 +70,9 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"producer:trader": {
 			...base("producer:trader"),
 			type: "producer",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			maxQueueSize: 1,
 			lines: [
 				{
@@ -81,6 +83,10 @@ const lifecycleConfig = GameConfigSchema.parse({
 					input: [
 						{
 							type: "materials",
+							charges: {
+								from: "self",
+								cost: 1,
+							},
 							selector: {
 								type: "item",
 								itemId: "item:material",
@@ -100,18 +106,24 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"producer:phoenix": {
 			...base("producer:phoenix"),
 			type: "producer",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			maxCount: 1,
 			maxQueueSize: 1,
 			lines: [
 				{
 					id: "line:phoenix:renew",
 					title: "Renew",
-					description: "Replace this owner with a new identity.",
+					description: "Consume this owner and create a fresh identity.",
 					runtimeMs: 200,
 					input: [
 						{
 							type: "simple",
+							charges: {
+								from: "self",
+								cost: 1,
+							},
 						},
 					],
 					output: {
@@ -127,7 +139,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 													type: "value",
 													value: 1,
 												},
-												placement: "replace",
+												placement: "drop",
 												rules: [],
 											},
 										],
@@ -143,7 +155,9 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"blueprint:empty": {
 			...base("blueprint:empty"),
 			type: "blueprint",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			line: {
 				id: "line:blueprint:empty",
 				title: "Build nothing",
@@ -152,6 +166,10 @@ const lifecycleConfig = GameConfigSchema.parse({
 				input: [
 					{
 						type: "simple",
+						charges: {
+							from: "self",
+							cost: 1,
+						},
 					},
 				],
 				rules: [],
@@ -160,7 +178,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"craft:repeatable": {
 			...base("craft:repeatable"),
 			type: "craft",
-			afterCompletion: "keep",
 			line: {
 				id: "line:craft:repeatable",
 				title: "Repeat",
@@ -196,8 +213,8 @@ const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 		) as Effect.Effect<A, E, never>,
 	);
 
-describe("authored completion lifecycle", () => {
-	it("removes a producer and releases buffered input after placing output", () => {
+describe("charge-driven completion lifecycle", () => {
+	it("removes a depleted producer and releases buffered input after placing output", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -268,7 +285,7 @@ describe("authored completion lifecycle", () => {
 		);
 	});
 
-	it("allows a removing blueprint to complete without any output", () => {
+	it("allows a depleted blueprint to complete without any output", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -336,7 +353,7 @@ describe("authored completion lifecycle", () => {
 		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(1);
 	});
 
-	it("reserves only the net maxCount increase when a removing owner replaces itself", () => {
+	it("reserves only the net maxCount increase when a depleted owner reproduces itself", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({

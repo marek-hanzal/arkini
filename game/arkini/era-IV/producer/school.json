@@ -4,7 +4,6 @@
 		"producer:school": {
 			"id": "producer:school",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "School",
 			"description": "Education building that turns civic support into Basic Knowledge.",
 			"asset": {

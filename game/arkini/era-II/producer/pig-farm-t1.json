@@ -4,7 +4,6 @@
 		"producer:pig-farm-t1": {
 			"id": "producer:pig-farm-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Pig Farm I",
 			"description": "Consumes grain and water to produce piglets.",
 			"asset": {

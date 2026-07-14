@@ -4,7 +4,6 @@
 		"producer:blacksmith-t1": {
 			"id": "producer:blacksmith-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Blacksmith I",
 			"description": "Guild-era iron sink that forges nails, axes, and swords from iron ingots and charcoal.",
 			"asset": {

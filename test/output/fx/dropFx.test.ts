@@ -90,7 +90,7 @@ describe("dropFx", () => {
 				return yield* dropFx({
 					drop: {
 						itemId: "item:log",
-						placement: "replace",
+						placement: "random",
 						quantity: {
 							type: "value",
 							value: 3,
@@ -108,7 +108,7 @@ describe("dropFx", () => {
 
 		expect(result).toEqual({
 			itemId: "item:log",
-			placement: "replace",
+			placement: "random",
 			quantity: 3,
 		});
 	});

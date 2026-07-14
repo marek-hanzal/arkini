@@ -4,7 +4,6 @@
 		"item:quest:water-carrier": {
 			"id": "item:quest:water-carrier",
 			"type": "craft",
-			"afterCompletion": "remove",
 			"title": "Water Carrier Quest",
 			"description": "A small board quest for settlement supplies, rewarding a modest early vegetable delivery from the next era.",
 			"asset": {
@@ -36,6 +35,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 4
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -107,6 +110,9 @@
 					]
 				},
 				"rules": []
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

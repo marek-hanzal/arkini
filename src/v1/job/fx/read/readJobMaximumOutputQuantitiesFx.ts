@@ -14,13 +14,16 @@ export namespace readJobMaximumOutputQuantitiesFx {
 	}
 }
 
-/**
- * Reads the per-item worst-case net quantity increase reserved by one active job.
- *
- * A remove-after-completion owner already contributes its live quantity to maxCount,
- * so an output of the same canonical item reserves only the increase beyond that
- * quantity. The result never exposes negative future capacity.
- */
+const addQuantities = (
+	target: Map<IdSchema.Type, number>,
+	source: ReadonlyMap<IdSchema.Type, number>,
+) => {
+	for (const [itemId, quantity] of source) {
+		target.set(itemId, (target.get(itemId) ?? 0) + quantity);
+	}
+};
+
+/** Reads the per-item worst-case net quantity increase reserved by one active job. */
 export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQuantitiesFx")(
 	function* ({ job, runtime }: readJobMaximumOutputQuantitiesFx.Props) {
 		const owner = yield* readRuntimeItemByIdFx({
@@ -35,13 +38,27 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 			return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
 		}
 
-		const quantities =
-			line.output === undefined
-				? new Map<IdSchema.Type, number>()
-				: yield* readOutputMaximumQuantitiesFx({
-						output: line.output,
-					});
-		if (!("afterCompletion" in owner.item) || owner.item.afterCompletion !== "remove") {
+		const quantities = new Map<IdSchema.Type, number>();
+		if (line.output !== undefined) {
+			addQuantities(
+				quantities,
+				yield* readOutputMaximumQuantitiesFx({
+					output: line.output,
+				}),
+			);
+		}
+
+		const depleted = owner.item.charges !== undefined && owner.remainingCharges === 0;
+		if (depleted && owner.item.charges?.output !== undefined) {
+			addQuantities(
+				quantities,
+				yield* readOutputMaximumQuantitiesFx({
+					output: owner.item.charges.output,
+				}),
+			);
+		}
+
+		if (!depleted) {
 			return quantities;
 		}
 

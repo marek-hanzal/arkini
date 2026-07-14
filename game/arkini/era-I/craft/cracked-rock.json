@@ -4,7 +4,6 @@
 		"item:cracked-rock": {
 			"id": "item:cracked-rock",
 			"type": "craft",
-			"afterCompletion": "remove",
 			"title": "Cracked Rock",
 			"description": "A mined-out rocky crack. Use a Magnifying Glass to survey it for a fresh stone deposit somewhere on the board.",
 			"asset": {
@@ -39,6 +38,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					}
 				],
@@ -65,6 +68,9 @@
 					]
 				},
 				"rules": []
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

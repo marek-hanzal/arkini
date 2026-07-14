@@ -23,27 +23,29 @@
 			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1,
-			"count": 72,
-			"output": {
-				"set": [
-					{
-						"roll": [
-							{
-								"type": "guaranteed",
-								"drop": [
-									{
-										"itemId": "item:seed",
-										"quantity": {
-											"type": "value",
-											"value": 1
-										},
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
+			"charges": {
+				"amount": 72,
+				"output": {
+					"set": [
+						{
+							"roll": [
+								{
+									"type": "guaranteed",
+									"drop": [
+										{
+											"itemId": "item:seed",
+											"quantity": {
+												"type": "value",
+												"value": 1
+											},
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
 			}
 		}
 	}

@@ -4,7 +4,6 @@
 		"producer:chicken-coop-t1": {
 			"id": "producer:chicken-coop-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Chicken Coop I",
 			"description": "Consumes grain and water to produce eggs.",
 			"asset": {

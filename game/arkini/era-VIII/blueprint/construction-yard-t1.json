@@ -4,7 +4,6 @@
 		"item:blueprint-construction-yard-t1": {
 			"id": "item:blueprint-construction-yard-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Construction Yard I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
 			"asset": {
@@ -38,6 +37,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 4
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -189,7 +192,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -198,6 +201,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

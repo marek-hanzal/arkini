@@ -14,7 +14,7 @@ import {
 	freeCompletionOwnerId,
 	prepareBlockedCompletionRuntimeFx,
 } from "~test/tick/support/blockedCompletionTestRuntime";
-import { createInvalidReplacementTestConfig } from "~test/tick/support/createInvalidReplacementTestConfig";
+import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 
 describe("blocked job completion", () => {
 	it("keeps one ready job blocked without rolling back unrelated owner completion", () => {
@@ -72,11 +72,12 @@ describe("blocked job completion", () => {
 				.reduce((quantity, item) => quantity + item.quantity, 0),
 		).toBe(1);
 	});
-	it("keeps invalid replacement completion as a real Tick failure", () => {
+	it("keeps an invalidated output completion as a real Tick failure", () => {
+		const config = createTickFailureTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
-					id: "runtime:invalid-replacement-forge",
+					id: "runtime:invalid-output-forge",
 					itemId: "forge",
 					location: {
 						scope: "board",
@@ -91,6 +92,7 @@ describe("blocked job completion", () => {
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
 				});
+				delete (config.items as Record<string, unknown>).inventoryOutput;
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.either(
 					runTickRuntimeByFx({
@@ -105,7 +107,7 @@ describe("blocked job completion", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config: createInvalidReplacementTestConfig(),
+					config,
 				}),
 			),
 		);
@@ -113,8 +115,8 @@ describe("blocked job completion", () => {
 		expect(Either.isLeft(result.attempt)).toBe(true);
 		if (Either.isRight(result.attempt)) throw new Error("Expected Tick failure.");
 		expect(result.attempt.left).toMatchObject({
-			_tag: "PlacementUnavailableError",
-			reason: "replace:board-forbidden",
+			_tag: "ItemNotFoundError",
+			itemId: "inventoryOutput",
 		});
 		expect(result.after).toEqual(result.before);
 		expect(result.tick.pendingElapsedMs).toBe(200);

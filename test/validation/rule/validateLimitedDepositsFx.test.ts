@@ -15,7 +15,9 @@ const createDeposit = (id: string) =>
 	DepositItemSchema.parse({
 		...createSimpleItem(id),
 		type: "deposit",
-		count: 10,
+		charges: {
+			amount: 10,
+		},
 	});
 
 const diagnostics = async (items: Record<string, unknown>) =>

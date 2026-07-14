@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
@@ -10,7 +9,6 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace releaseJobReservationsFx {
 	export interface Props {
 		origin: PositionSchema.Type;
-		originItemId: IdSchema.Type;
 		reservations: readonly RuntimeItemSchema.Type[];
 		runtime: RuntimeSchema.Type;
 	}
@@ -19,7 +17,6 @@ export namespace releaseJobReservationsFx {
 /** Returns detached job reservations through the ordinary drop-placement path. */
 export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(function* ({
 	origin,
-	originItemId,
 	reservations,
 	runtime,
 }: releaseJobReservationsFx.Props) {
@@ -32,7 +29,6 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 				placement: "drop",
 			},
 			origin,
-			originItemId,
 			runtime: draft,
 		});
 		const [, nextDraft] = yield* applyPlacementPlanFx({

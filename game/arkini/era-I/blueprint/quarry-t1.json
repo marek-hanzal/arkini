@@ -4,7 +4,6 @@
 		"item:blueprint-quarry-t1": {
 			"id": "item:blueprint-quarry-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Quarry I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Quarry I.",
 			"asset": {
@@ -37,6 +36,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 2
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -65,7 +68,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -74,6 +77,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

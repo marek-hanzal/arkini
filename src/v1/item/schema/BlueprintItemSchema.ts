@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { LineSchema } from "~/v1/line/schema/LineSchema";
-import { AfterCompletionEnumSchema } from "./AfterCompletionEnumSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -10,7 +9,7 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
  *
  * The blueprint visual is authored explicitly through the standard item asset. Its
  * line may emit any configured output and every resolved drop keeps its authored
- * placement strategy. Completion behavior is not inferred from the blueprint type.
+ * placement strategy. Item lifetime is expressed independently through optional charges.
  */
 export const BlueprintItemSchema = z
 	.object({
@@ -18,9 +17,6 @@ export const BlueprintItemSchema = z
 		type: ItemEnumSchema.extract([
 			"blueprint",
 		]),
-		afterCompletion: AfterCompletionEnumSchema.describe(
-			"What happens to this blueprint after its line completes.",
-		),
 		line: LineSchema.describe("The one product line owned by this blueprint."),
 	})
 	.strict()

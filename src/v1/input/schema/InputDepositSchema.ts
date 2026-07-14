@@ -1,44 +1,35 @@
 import { z } from "zod";
 
-import { QuantitySchema } from "~/v1/quantity/schema/QuantitySchema";
-import { QuerySchema } from "~/v1/query/schema/QuerySchema";
+import { QueryBoardSchema } from "~/v1/query/schema/QueryBoardSchema";
 import { BaseInputSchema } from "./BaseInputSchema";
 import { InputEnumSchema } from "./InputEnumSchema";
 
 /**
- * Authored capacity requirement from a matching deposit on the board.
+ * An external charged-item target selected from the board.
  *
- * Runtime capacity state is not implemented yet. The schema and validator preserve
- * the intended query and quantity while active input resolution rejects this kind;
- * deposit items are never delivered or moved into the line's
- * ordinary material buffer.
+ * The target is never delivered into an input buffer. Its charge cost is authored
+ * through the shared input `charges` field and paid atomically when the line starts.
  */
 export const InputDepositSchema = z
 	.object({
 		...BaseInputSchema.shape,
 		/**
-		 * Identifies this input as capacity from a matching board deposit.
+		 * Identifies this input as one external charged-item target on the board.
 		 */
 		type: InputEnumSchema.extract([
 			"deposit",
-		]).describe("Identifies this input as capacity from a matching board deposit."),
+		]).describe("Identifies this input as one external charged-item target on the board."),
 		/**
-		 * Query used to find a deposit that can satisfy this input.
+		 * Board query used to select one charged target for this input.
 		 */
-		query: QuerySchema.describe(
-			"The query used to find a deposit that can satisfy this input.",
-		),
-		/**
-		 * Exact or bounded amount of deposit capacity spent every time the line completes.
-		 */
-		quantity: QuantitySchema.describe(
-			"The exact or bounded amount of matching deposit capacity intended to be spent by completion.",
+		query: QueryBoardSchema.describe(
+			"The board query used to select one charged target for this input.",
 		),
 	})
 	.strict()
 	.meta({
 		id: "InputDepositSchema",
-		description: "An authored capacity requirement from a matching board deposit.",
+		description: "A board query that resolves one external charged-item target.",
 	});
 
 export type InputDepositSchema = typeof InputDepositSchema;

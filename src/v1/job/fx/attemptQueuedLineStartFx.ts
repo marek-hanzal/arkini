@@ -1,10 +1,12 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
+import type { ItemChargesUnavailableError } from "~/v1/item/error/ItemChargesUnavailableError";
 import type { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
 import type { JobOutputMaxCountError } from "~/v1/job/error/JobOutputMaxCountError";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 import type { LineRunUnavailableError } from "~/v1/line/error/LineRunUnavailableError";
+import type { PlacementUnavailableError } from "~/v1/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { startLineRuntimeFx } from "./startLineRuntimeFx";
 
@@ -21,7 +23,12 @@ export namespace attemptQueuedLineStartFx {
 		  }
 		| {
 				type: "blocked";
-				error: ItemNotOnBoardError | JobOutputMaxCountError | LineRunUnavailableError;
+				error:
+					| ItemChargesUnavailableError
+					| ItemNotOnBoardError
+					| JobOutputMaxCountError
+					| LineRunUnavailableError
+					| PlacementUnavailableError;
 				runtime: RuntimeSchema.Type;
 		  }
 		| {
@@ -64,6 +71,18 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 				}) satisfies attemptQueuedLineStartFx.Result,
 		),
 		Effect.catchTags({
+			ItemChargesUnavailableError: (error) =>
+				Effect.succeed({
+					type: "blocked",
+					error,
+					runtime,
+				} satisfies attemptQueuedLineStartFx.Result),
+			PlacementUnavailableError: (error) =>
+				Effect.succeed({
+					type: "blocked",
+					error,
+					runtime,
+				} satisfies attemptQueuedLineStartFx.Result),
 			JobOutputMaxCountError: (error) =>
 				Effect.succeed({
 					type: "blocked",

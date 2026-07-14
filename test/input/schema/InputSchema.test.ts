@@ -45,9 +45,9 @@ describe("InputSchema", () => {
 						tag: "wood-source",
 					},
 				},
-				quantity: {
-					type: "value",
-					value: 1,
+				charges: {
+					from: "target",
+					cost: 1,
 				},
 			}).success,
 		).toBe(true);

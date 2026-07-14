@@ -4,7 +4,6 @@
 		"item:blueprint-stonemason-t2": {
 			"id": "item:blueprint-stonemason-t2",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Stonemason Blueprint",
 			"description": "Build plan that upgrades Stonemason 1 into Stonemason 2 for marble block finishing.",
 			"asset": {
@@ -42,6 +41,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -129,7 +132,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -138,6 +141,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

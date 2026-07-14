@@ -4,7 +4,6 @@
 		"producer:cookhouse-t1": {
 			"id": "producer:cookhouse-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Cookhouse I",
 			"description": "Prepares empty feast plates for manual assembly or slowly cooks complete feasts from Era II farm food.",
 			"asset": {

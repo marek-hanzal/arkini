@@ -3,14 +3,13 @@ import { Effect } from "effect";
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { validateCanonicalIdsFx } from "../rule/validateCanonicalIdsFx";
-import { validateCompletionLifecycleFx } from "../rule/validateCompletionLifecycleFx";
 import { validateConfigReferencesFx } from "../rule/validateConfigReferencesFx";
 import { validateInputAcceptanceCyclesFx } from "../rule/validateInputAcceptanceCyclesFx";
+import { validateInputChargesFx } from "../rule/validateInputChargesFx";
 import { validateItemLineIdsFx } from "../rule/validateItemLineIdsFx";
 import { validateMaterialTagSelectorsFx } from "../rule/validateMaterialTagSelectorsFx";
 import { validateLimitedDepositsFx } from "../rule/validateLimitedDepositsFx";
 import { validateLineInputCapacityFx } from "../rule/validateLineInputCapacityFx";
-import { validateOutputReplaceCardinalityFx } from "../rule/validateOutputReplaceCardinalityFx";
 import { validateStartStateFx } from "../rule/validateStartStateFx";
 
 export namespace validateGameConfigFx {
@@ -50,11 +49,7 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			config,
 			provenance,
 		}),
-		validateCompletionLifecycleFx({
-			config,
-			provenance,
-		}),
-		validateOutputReplaceCardinalityFx({
+		validateInputChargesFx({
 			config,
 			provenance,
 		}),

@@ -4,7 +4,6 @@
 		"item:blueprint-prospector-guild-t1": {
 			"id": "item:blueprint-prospector-guild-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Prospector Guild Blueprint",
 			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
 			"asset": {
@@ -40,6 +39,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 3
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -101,7 +104,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -110,6 +113,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

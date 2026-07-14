@@ -19,7 +19,7 @@ const board = (x: number) => ({
 });
 
 describe("setItemQuantityFx purity", () => {
-	it("rejects generic quantity replacement of an active craft owner", () => {
+	it("rejects generic quantity mutation of an active craft owner", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const craft = yield* spawnItemFx({

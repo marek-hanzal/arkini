@@ -4,7 +4,6 @@
 		"item:blueprint-townhall-t3": {
 			"id": "item:blueprint-townhall-t3",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Town Hall III Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall III.",
 			"asset": {
@@ -37,6 +36,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -185,7 +188,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -194,6 +197,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

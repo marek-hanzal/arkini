@@ -4,7 +4,6 @@
 		"producer:market-t1": {
 			"id": "producer:market-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Market",
 			"description": "First trade producer that converts processed food and drink into coins.",
 			"asset": {

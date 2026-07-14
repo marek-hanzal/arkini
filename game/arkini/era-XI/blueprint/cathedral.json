@@ -4,7 +4,6 @@
 		"item:blueprint-cathedral": {
 			"id": "item:blueprint-cathedral",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Cathedral Blueprint",
 			"description": "Build plan for Cathedral, one of the mutually exclusive Choose The Path keystone buildings.",
 			"asset": {
@@ -40,6 +39,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -231,7 +234,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -240,6 +243,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

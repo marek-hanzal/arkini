@@ -34,7 +34,6 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 
 			return yield* applyOutputPlacementFx({
 				origin: origin.location.position,
-				originItemId,
 				output: resolved,
 				runtime,
 			});

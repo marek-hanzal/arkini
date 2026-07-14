@@ -60,7 +60,6 @@ export const createProducerItem = ({
 	ProducerItemSchema.parse({
 		...createSimpleItem(id),
 		type: "producer",
-		afterCompletion: "keep",
 		lines: lines ?? [
 			createLine({
 				input,
@@ -72,7 +71,7 @@ export const createProducerItem = ({
 export const createOutput = (
 	drops: ReadonlyArray<{
 		itemId: string;
-		placement?: "drop" | "random" | "replace";
+		placement?: "drop" | "random";
 	}>,
 ) =>
 	OutputSchema.parse({

@@ -61,7 +61,6 @@ export const isolateStatefulOwnerFx = Effect.fn("isolateStatefulOwnerFx")(functi
 	} satisfies RuntimeSchema.Type;
 	const [, nextRuntime] = yield* applyOutputPlacementFx({
 		origin: owner.location.position,
-		originItemId: owner.id,
 		output: {
 			drop: [
 				{

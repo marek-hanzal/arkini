@@ -4,7 +4,6 @@
 		"producer:cattle-farm-t1": {
 			"id": "producer:cattle-farm-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Cattle Farm I",
 			"description": "Consumes grain and water to produce milk.",
 			"asset": {

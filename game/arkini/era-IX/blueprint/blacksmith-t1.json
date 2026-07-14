@@ -4,7 +4,6 @@
 		"item:blueprint-blacksmith-t1": {
 			"id": "item:blueprint-blacksmith-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Blacksmith I Blueprint",
 			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
 			"asset": {
@@ -38,6 +37,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -146,7 +149,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -155,6 +158,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

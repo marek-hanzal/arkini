@@ -4,7 +4,6 @@
 		"producer:dairy-t1": {
 			"id": "producer:dairy-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Dairy I",
 			"description": "Processes milk into cheese.",
 			"asset": {

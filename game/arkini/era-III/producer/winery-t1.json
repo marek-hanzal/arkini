@@ -4,7 +4,6 @@
 		"producer:winery-t1": {
 			"id": "producer:winery-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Winery I",
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
 			"asset": {

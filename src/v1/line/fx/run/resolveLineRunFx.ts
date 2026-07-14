@@ -82,15 +82,27 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		line,
 		rules,
 	});
-	const resolvedInputs = yield* Effect.forEach(line.input, (input, inputIndex) => {
-		return resolveInputRunFx({
-			input,
+	const resolvedInputs: InputRunResolutionSchema.Type[] = [];
+	const reservedCharges = new Map<IdSchema.Type, number>();
+	for (const [inputIndex, configuredInput] of line.input.entries()) {
+		const resolvedInput = yield* resolveInputRunFx({
+			input: configuredInput,
 			inputIndex,
 			lineId,
 			ownerItemId,
+			reservedCharges,
 			runtime,
 		});
-	});
+		resolvedInputs.push(resolvedInput);
+
+		const chargePlan = resolvedInput.plan?.charges;
+		if (chargePlan !== undefined) {
+			reservedCharges.set(
+				chargePlan.itemId,
+				(reservedCharges.get(chargePlan.itemId) ?? 0) + chargePlan.cost,
+			);
+		}
+	}
 	const [firstInput, ...remainingInputs] = resolvedInputs;
 	if (firstInput === undefined) {
 		return yield* Effect.dieMessage("LineSchema unexpectedly resolved without an input.");

@@ -149,7 +149,6 @@ describe("pure placement stack targets", () => {
 		const [placement, nextRuntime] = Effect.runSync(
 			applyOutputPlacementFx({
 				origin: origin.location.position,
-				originItemId: origin.id,
 				output: {
 					drop: [
 						{

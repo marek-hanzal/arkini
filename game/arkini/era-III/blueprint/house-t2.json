@@ -4,7 +4,6 @@
 		"item:blueprint-house-t2": {
 			"id": "item:blueprint-house-t2",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "House II Blueprint",
 			"description": "Build plan for House II, a housing producer that generates morale.",
 			"asset": {
@@ -39,6 +38,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -137,7 +140,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -146,6 +149,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

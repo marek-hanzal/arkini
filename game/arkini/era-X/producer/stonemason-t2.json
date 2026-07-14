@@ -4,7 +4,6 @@
 		"producer:stonemason-t2": {
 			"id": "producer:stonemason-t2",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Stonemason",
 			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
 			"asset": {

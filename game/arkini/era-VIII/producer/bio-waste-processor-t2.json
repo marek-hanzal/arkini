@@ -4,7 +4,6 @@
 		"producer:bio-waste-processor-t2": {
 			"id": "producer:bio-waste-processor-t2",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Bio-Waste Processor II",
 			"description": "Upgraded farm cleanup building that can also burn bio-waste with coal or charcoal when speed beats dignity.",
 			"asset": {

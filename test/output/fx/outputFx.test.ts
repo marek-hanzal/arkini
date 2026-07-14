@@ -170,7 +170,7 @@ describe("outputFx", () => {
 									}),
 									createDrop({
 										itemId: "item:stone",
-										placement: "replace",
+										placement: "random",
 									}),
 								),
 							}),
@@ -198,7 +198,7 @@ describe("outputFx", () => {
 				},
 				{
 					itemId: "item:stone",
-					placement: "replace",
+					placement: "random",
 					quantity: 1,
 				},
 			],

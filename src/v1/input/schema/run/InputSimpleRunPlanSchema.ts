@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { InputEnumSchema } from "~/v1/input/schema/InputEnumSchema";
+import { InputChargeRunPlanSchema } from "./InputChargeRunPlanSchema";
 
 /**
  * One line-run input plan that owns no resource operation.
@@ -13,6 +14,9 @@ export const InputSimpleRunPlanSchema = z
 		type: InputEnumSchema.extract([
 			"simple",
 		]),
+		charges: InputChargeRunPlanSchema.optional().describe(
+			"The optional exact charge payment attached to this simple input.",
+		),
 	})
 	.strict()
 	.meta({

@@ -14,9 +14,11 @@ export const InputSimpleResolutionSchema = z
 			"simple",
 		]),
 		/**
-		 * Simple inputs are always ready because they own no resource requirement.
+		 * Simple inputs own no material operation but may still require an authored charge payment.
 		 */
-		ready: z.literal(true).describe("Simple inputs are always ready."),
+		ready: z
+			.boolean()
+			.describe("Whether this simple input and its optional charge cost are ready."),
 	})
 	.strict()
 	.meta({

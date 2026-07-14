@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { resolveInputRunFx } from "~/v1/input/fx/run/resolveInputRunFx";
@@ -57,6 +57,7 @@ describe("resolveInputRunFx", () => {
 				inputIndex: 1,
 				lineId: "line:workshop:build",
 				ownerItemId: owner.id,
+				reservedCharges: new Map(),
 				runtime: {
 					items: [
 						owner,
@@ -105,6 +106,7 @@ describe("resolveInputRunFx", () => {
 				inputIndex: 0,
 				lineId: "line:workshop:build",
 				ownerItemId: owner.id,
+				reservedCharges: new Map(),
 				runtime,
 			}),
 		);
@@ -129,44 +131,64 @@ describe("resolveInputRunFx", () => {
 		});
 	});
 
-	it("fails explicitly for deposit input until capacity state exists", () => {
+	it("resolves one charged deposit target into a charge run plan", () => {
+		const target = {
+			id: "runtime:stone",
+			item: inputRuntimeTestConfig.items.stone,
+			location: {
+				scope: "board" as const,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+			quantity: 1,
+			revision: "revision:stone",
+		};
 		const result = Effect.runSync(
-			Effect.either(
-				resolveInputRunFx({
-					input: {
-						type: "deposit",
-						query: {
-							scope: "board",
-							selector: {
-								type: "item",
-								itemId: "deposit:stone",
-							},
-							distance: "near",
+			resolveInputRunFx({
+				input: {
+					type: "deposit",
+					query: {
+						scope: "board",
+						selector: {
+							type: "item",
+							itemId: "stone",
 						},
-						quantity: {
-							type: "value",
-							value: 1,
-						},
+						distance: "close",
 					},
-					inputIndex: 0,
-					lineId: "line:workshop:build",
-					ownerItemId: owner.id,
-					runtime: {
-						items: [
-							owner,
-						],
-						jobs: [],
+					charges: {
+						from: "target",
+						cost: 1,
 					},
-				}),
-			),
+				},
+				inputIndex: 0,
+				lineId: "line:workshop:build",
+				ownerItemId: owner.id,
+				reservedCharges: new Map(),
+				runtime: {
+					items: [
+						owner,
+						target,
+					],
+					jobs: [],
+				},
+			}),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
-				_tag: "InputRunUnsupportedError",
+		expect(result).toEqual({
+			resolution: {
 				type: "deposit",
-			});
-		}
+				ready: true,
+				targetItemId: target.id,
+			},
+			plan: {
+				type: "deposit",
+				charges: {
+					itemId: target.id,
+					cost: 1,
+				},
+			},
+		});
 	});
 });

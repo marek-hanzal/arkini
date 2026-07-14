@@ -6,6 +6,7 @@ import { checkRuntimeJobsFx } from "~/v1/job/check/checkRuntimeJobsFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import type { RuntimeCheckResultSchema } from "~/v1/runtime/schema/check/RuntimeCheckResultSchema";
 import { checkRuntimeItemIdsFx } from "./checkRuntimeItemIdsFx";
+import { checkRuntimeItemChargesFx } from "./checkRuntimeItemChargesFx";
 import { checkRuntimeItemQuantitiesFx } from "./checkRuntimeItemQuantitiesFx";
 import { checkRuntimeLocationsFx } from "./checkRuntimeLocationsFx";
 
@@ -22,6 +23,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	runtime,
 }: checkRuntimeFx.Props) {
 	const config = yield* GameConfigFx;
+	const itemChargeIssues = yield* checkRuntimeItemChargesFx({
+		runtime,
+	});
 	const itemIdIssues = yield* checkRuntimeItemIdsFx({
 		runtime,
 	});
@@ -41,6 +45,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 
 	return {
 		issues: [
+			...itemChargeIssues,
 			...itemIdIssues,
 			...itemQuantityIssues,
 			...inputLocationIssues,

@@ -1,8 +1,8 @@
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
-/** Creates one line whose ready completion must fail as a structural replacement error. */
-export const createInvalidReplacementTestConfig = () => {
+/** Creates one line whose output item can be removed after start to force a Tick failure. */
+export const createTickFailureTestConfig = () => {
 	const base = createJobTestConfig(1);
 	const forge = base.items.forge;
 	if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -16,13 +16,11 @@ export const createInvalidReplacementTestConfig = () => {
 			inventoryOutput: {
 				...base.items.tool,
 				id: "inventoryOutput",
-				title: "Inventory output",
-				description: "Cannot replace one board owner.",
-				scope: "inventory",
+				title: "Tick failure output",
+				description: "Removed after start by the test.",
 			},
 			forge: {
 				...forge,
-				afterCompletion: "remove",
 				lines: [
 					{
 						...line,
@@ -45,7 +43,7 @@ export const createInvalidReplacementTestConfig = () => {
 														type: "value",
 														value: 1,
 													},
-													placement: "replace",
+													placement: "drop",
 													rules: [],
 												},
 											],
@@ -54,6 +52,7 @@ export const createInvalidReplacementTestConfig = () => {
 								},
 							],
 						},
+						rules: [],
 					},
 				],
 			},

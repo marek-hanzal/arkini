@@ -9,7 +9,7 @@ export namespace orderBoardLocationsFx {
 	export interface Props {
 		locations: ReadonlyArray<GridLocationSchema.Type>;
 		origin: PositionSchema.Type;
-		placement: Exclude<PlacementEnumSchema.Type, "replace">;
+		placement: PlacementEnumSchema.Type;
 	}
 }
 

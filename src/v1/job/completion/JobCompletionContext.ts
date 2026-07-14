@@ -8,7 +8,7 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export type JobCompletionItem = Extract<
 	ItemSchema.Type,
 	{
-		readonly afterCompletion: "keep" | "remove";
+		readonly type: "producer" | "craft" | "blueprint" | "stash";
 	}
 >;
 
@@ -19,9 +19,8 @@ export type JobCompletionOwner = Omit<BoardRuntimeItemSchema.Type, "item"> & {
 /**
  * Shared live facts resolved once before completing one line job.
  *
- * `runtime` already excludes the completed job and every job-scoped reservation. The
- * line output keeps its authored placement and the owner item declares whether its
- * identity survives completion.
+ * `runtime` already excludes the completed job and every job-scoped reservation.
+ * Item lifetime is determined only by its live charge state.
  */
 export interface JobCompletionContext {
 	readonly job: JobSchema.Type;

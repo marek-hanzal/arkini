@@ -34,6 +34,10 @@ export const isItemPureFx = Effect.fn("isItemPureFx")(function* ({
 		)
 		.otherwise(() => []);
 
+	if (item.remainingCharges !== undefined) {
+		return false;
+	}
+
 	const linePurity = yield* Effect.forEach(lines, (line) => {
 		return isLinePureFx({
 			ownerItemId: item.id,
@@ -42,7 +46,6 @@ export const isItemPureFx = Effect.fn("isItemPureFx")(function* ({
 		});
 	});
 
-	// Future item-owned state such as temporary lifetime, deposit capacity,
-	// charges, or memory must extend this predicate at this boundary.
+	// Future item-owned state such as temporary lifetime or memory must extend this predicate here.
 	return linePurity.every(Boolean);
 });

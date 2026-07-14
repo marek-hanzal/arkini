@@ -8,6 +8,7 @@ import { TitleSchema } from "~/v1/common/schema/TitleSchema";
 import { MergeSchema } from "~/v1/merge/schema/MergeSchema";
 import { TagSchema } from "~/v1/tag/schema/TagSchema";
 import { AssetSchema } from "./AssetSchema";
+import { ChargeSchema } from "./ChargeSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -67,6 +68,12 @@ export const BaseItemSchema = z
 		 */
 		maxStackSize: PositiveIntegerSchema.describe(
 			"The maximum number of this item that one stack can hold before it has mutable state.",
+		),
+		/**
+		 * Optional finite lifetime shared by every fresh instance of this item.
+		 */
+		charges: ChargeSchema.optional().describe(
+			"The optional finite lifetime and depletion output of each item instance.",
 		),
 		/**
 		 * Optional target-specific merges initiated when this item is dropped onto another item.

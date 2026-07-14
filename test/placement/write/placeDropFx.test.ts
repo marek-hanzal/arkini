@@ -317,42 +317,6 @@ describe("placeDropFx", () => {
 		]).toContain(spawned.location.position.x);
 	});
 
-	it("rejects replace placement for inventory-only outputs", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(0),
-					quantity: 1,
-				});
-
-				return yield* Effect.either(
-					placeDropFx({
-						drop: configuredDrop({
-							itemId: "inventory-only",
-							placement: "replace",
-							quantity: 1,
-						}),
-						originItemId: "runtime:origin",
-					}),
-				);
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
-				_tag: "PlacementUnavailableError",
-				reason: "replace:board-forbidden",
-			});
-		}
-	});
-
 	it("serializes concurrent drops competing for the last board cell", async () => {
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {

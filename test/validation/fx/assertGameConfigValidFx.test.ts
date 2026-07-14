@@ -14,7 +14,9 @@ describe("assertGameConfigValidFx", () => {
 		const deposit = DepositItemSchema.parse({
 			...createSimpleItem("item:deposit"),
 			type: "deposit",
-			count: 1,
+			charges: {
+				amount: 1,
+			},
 		});
 		const compilation = await Effect.runPromise(
 			compileGameSourcesFx([

@@ -66,5 +66,11 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 				});
 			},
 		)
+		.with(
+			{
+				type: "deposit",
+			},
+			() => Effect.succeed(runtime),
+		)
 		.exhaustive();
 });

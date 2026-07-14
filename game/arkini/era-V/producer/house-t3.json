@@ -4,7 +4,6 @@
 		"producer:house-t3": {
 			"id": "producer:house-t3",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "House",
 			"description": "Prosperous housing that consumes clothing, food, and comfort goods to produce mid-tier morale and lower morale.",
 			"asset": {

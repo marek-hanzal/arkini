@@ -4,7 +4,6 @@
 		"item:blueprint-roof-tile-factory": {
 			"id": "item:blueprint-roof-tile-factory",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Roof Tile Factory Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Roof Tile Factory.",
 			"asset": {
@@ -40,6 +39,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 3
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -147,7 +150,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -156,6 +159,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

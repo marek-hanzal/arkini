@@ -18,7 +18,7 @@ export namespace completeJobRuntimeFx {
 	}
 }
 
-/** Resolves one ready job once and applies its authored line and owner completion contract. */
+/** Resolves one ready job once and applies line output plus charge depletion lifecycle. */
 export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* ({
 	jobId,
 	runtime,
@@ -47,11 +47,6 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 				location: owner.location,
 			}),
 		);
-	if (!("afterCompletion" in owner.item)) {
-		return yield* Effect.dieMessage(
-			`Job ${job.id} owner ${owner.id} does not declare completion behavior.`,
-		);
-	}
 	const line = yield* readItemLineFx({
 		item: owner.item,
 		lineId: job.lineId,

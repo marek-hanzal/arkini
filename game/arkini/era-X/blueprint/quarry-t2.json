@@ -4,7 +4,6 @@
 		"item:blueprint-quarry-t2": {
 			"id": "item:blueprint-quarry-t2",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Quarry Blueprint",
 			"description": "Build plan that upgrades Quarry 1 into Quarry 2 for marble extraction.",
 			"asset": {
@@ -41,6 +40,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -128,7 +131,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -137,6 +140,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

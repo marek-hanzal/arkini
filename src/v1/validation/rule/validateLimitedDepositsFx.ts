@@ -56,7 +56,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type !== "deposit") continue;
+		if (item.type !== "deposit" || item.charges === undefined) continue;
 		const itemCertainty = certainty.get(itemId) ?? "none";
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {

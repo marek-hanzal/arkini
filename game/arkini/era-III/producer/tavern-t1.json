@@ -4,7 +4,6 @@
 		"producer:tavern-t1": {
 			"id": "producer:tavern-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Tavern I",
 			"description": "Serves finished drink items; cooking and feast prep belong to Cookhouse I.",
 			"asset": {

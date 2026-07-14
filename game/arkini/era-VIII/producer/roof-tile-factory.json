@@ -4,7 +4,6 @@
 		"producer:roof-tile-factory": {
 			"id": "producer:roof-tile-factory",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Roof Tile Factory",
 			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"asset": {

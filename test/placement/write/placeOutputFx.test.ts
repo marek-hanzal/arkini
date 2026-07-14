@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
 import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { placeOutputFx } from "~/v1/placement/write/placeOutputFx";
@@ -17,117 +16,6 @@ import {
 } from "~test/placement/fx/support/placementTestConfig";
 
 describe("placeOutputFx", () => {
-	it("replaces the origin exactly and keeps its position for later drops", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(2),
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:blocker",
-					itemId: "blocker",
-					location: boardLocation(3),
-					quantity: 1,
-				});
-
-				const placement = yield* placeOutputFx({
-					originItemId: "runtime:origin",
-					output: configuredOutput([
-						configuredDrop({
-							itemId: "replacement",
-							placement: "replace",
-							quantity: 1,
-						}),
-						configuredDrop({
-							itemId: "log",
-							placement: "drop",
-							quantity: 1,
-						}),
-					]),
-				});
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					placement,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-
-		expect(result.placement.drop[0]?.placement.remove).toEqual([
-			expect.objectContaining({
-				id: "runtime:origin",
-			}),
-		]);
-		expect(result.placement.drop[0]?.placement.spawn[0]?.location).toEqual(boardLocation(2));
-		expect(result.placement.drop[1]?.placement.spawn[0]?.location).toEqual(boardLocation(1));
-		expect(result.runtime.items.some((item) => item.id === "runtime:origin")).toBe(false);
-	});
-
-	it("places a replace prefix at the origin and routes its remainder through scope placement", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: "runtime:origin",
-					itemId: "origin",
-					location: boardLocation(1),
-					quantity: 1,
-				});
-
-				const placement = yield* placeOutputFx({
-					originItemId: "runtime:origin",
-					output: configuredOutput([
-						configuredDrop({
-							itemId: "replacement",
-							placement: "replace",
-							quantity: 5,
-						}),
-					]),
-				});
-				const runtime = yield* readRuntimeFx();
-
-				return {
-					placement,
-					runtime,
-				};
-			}).pipe(
-				useGameFx({
-					config: placementTestConfig,
-				}),
-			),
-		);
-		const replacements = result.runtime.items
-			.filter(isGridRuntimeItem)
-			.filter((item) => item.item.id === "replacement")
-			.sort((left, right) => left.location.position.x - right.location.position.x);
-
-		expect(result.placement.drop[0]?.placement.remove).toEqual([
-			expect.objectContaining({
-				id: "runtime:origin",
-			}),
-		]);
-		expect(replacements).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					location: boardLocation(1),
-					quantity: 3,
-				}),
-				expect.objectContaining({
-					location: boardLocation(0),
-					quantity: 2,
-				}),
-			]),
-		);
-		expect(replacements.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
-	});
-
 	it("rolls back every earlier drop when a later drop cannot be placed", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

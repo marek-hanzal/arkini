@@ -4,7 +4,6 @@
 		"producer:glazier-workshop-t1": {
 			"id": "producer:glazier-workshop-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Glazier Workshop I",
 			"description": "Artisan glass finishing workshop that turns plain glass and pigment into stained glass for future prestige buildings.",
 			"asset": {

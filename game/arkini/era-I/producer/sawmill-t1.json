@@ -4,7 +4,6 @@
 		"producer:sawmill-t1": {
 			"id": "producer:sawmill-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Sawmill I",
 			"description": "Turns logs into planks when placed near a lumberjack.",
 			"asset": {

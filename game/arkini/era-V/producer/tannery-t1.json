@@ -4,7 +4,6 @@
 		"producer:tannery-t1": {
 			"id": "producer:tannery-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Tannery I",
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
 			"asset": {

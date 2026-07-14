@@ -41,7 +41,6 @@ export const placeDropFx = Effect.fn("placeDropFx")(function* ({
 
 			const [output, nextRuntime] = yield* applyOutputPlacementFx({
 				origin: origin.location.position,
-				originItemId,
 				output: {
 					drop: [
 						resolved,

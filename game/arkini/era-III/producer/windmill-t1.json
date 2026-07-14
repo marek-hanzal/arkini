@@ -4,7 +4,6 @@
 		"producer:windmill-t1": {
 			"id": "producer:windmill-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Windmill I",
 			"description": "Mills grain into flour.",
 			"asset": {

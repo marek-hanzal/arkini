@@ -4,7 +4,6 @@
 		"item:blueprint-heroes-guild-t1": {
 			"id": "item:blueprint-heroes-guild-t1",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Heroes Guild I Blueprint",
 			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
 			"asset": {
@@ -39,6 +38,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -157,7 +160,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -166,6 +169,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

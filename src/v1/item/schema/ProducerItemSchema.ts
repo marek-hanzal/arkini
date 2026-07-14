@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { LineSchema } from "~/v1/line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
-import { AfterCompletionEnumSchema } from "./AfterCompletionEnumSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -11,9 +10,6 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const ProducerItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		afterCompletion: AfterCompletionEnumSchema.describe(
-			"What happens to this producer after any owned line completes.",
-		),
 		/**
 		 * Maximum number of this producer's product lines that may run in parallel.
 		 */

@@ -4,7 +4,6 @@
 		"producer:farm-t1": {
 			"id": "producer:farm-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Farm I",
 			"description": "Consumes water and produces grain when placed near a wheat field.",
 			"asset": {

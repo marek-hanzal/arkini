@@ -4,7 +4,6 @@
 		"producer:brickyard": {
 			"id": "producer:brickyard",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Brickyard",
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"asset": {

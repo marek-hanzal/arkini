@@ -4,7 +4,6 @@
 		"producer:prospector-guild-t2": {
 			"id": "producer:prospector-guild-t2",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Prospector Guild",
 			"description": "Upgraded prospecting guild that keeps surface surveys and adds coal, iron, and gold deposit prospecting for industry.",
 			"asset": {

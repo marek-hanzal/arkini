@@ -7,7 +7,7 @@ import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 import { createGameSession } from "~/v1/ui/session/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
-import { createInvalidReplacementTestConfig } from "~test/tick/support/createInvalidReplacementTestConfig";
+import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 	const startedAt = performance.now();
@@ -705,8 +705,9 @@ describe("createGameSession", () => {
 		};
 		process.on("unhandledRejection", onUnhandledRejection);
 		let reports = 0;
+		const config = createTickFailureTestConfig();
 		const session = await createGameSession({
-			config: createInvalidReplacementTestConfig(),
+			config,
 			tickIntervalMs: 5,
 			onTickError: async () => {
 				reports += 1;
@@ -735,6 +736,7 @@ describe("createGameSession", () => {
 					lineId: "line:forge:run",
 				}),
 			);
+			delete (config.items as Record<string, unknown>).inventoryOutput;
 
 			await waitFor(() => reports >= 2, 2_000);
 			await session.dispose();

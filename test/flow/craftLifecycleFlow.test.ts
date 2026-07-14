@@ -11,7 +11,7 @@ import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 describe("authored craft lifecycle", () => {
-	it("pauses a seed craft in inventory and replaces it after returning to the board", async () => {
+	it("pauses a seed craft in inventory and completes it after returning to the board", async () => {
 		const config = await readArkiniGameConfigSource();
 		const result = Effect.runSync(
 			Effect.gen(function* () {

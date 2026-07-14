@@ -4,7 +4,6 @@
 		"item:chest-t1": {
 			"id": "item:chest-t1",
 			"type": "stash",
-			"afterCompletion": "remove",
 			"title": "Chest I",
 			"description": "Locked chest returned from a short Heroes Guild expedition. Open it with a Key I.",
 			"asset": {
@@ -37,6 +36,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 1
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					}
 				],
@@ -91,6 +94,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

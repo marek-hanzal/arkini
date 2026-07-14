@@ -23,7 +23,7 @@ export namespace setItemQuantityFx {
 }
 
 /**
- * Atomically replaces one live item's stack quantity.
+ * Atomically sets one live item's stack quantity.
  */
 export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 	itemId,
@@ -74,7 +74,6 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 					quantity,
 				},
 				item: item.item,
-				removeItemId: item.id,
 				runtime,
 			});
 

@@ -4,7 +4,6 @@
 		"producer:house-t2": {
 			"id": "producer:house-t2",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "House",
 			"description": "Improved housing that consumes processed food and coins to produce stronger morale while still creating lower morale.",
 			"asset": {

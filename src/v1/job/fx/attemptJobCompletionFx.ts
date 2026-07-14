@@ -29,9 +29,6 @@ const isExpectedCompletionBlock = (error: PlacementUnavailableError) => {
 		case "inventory:full":
 		case "item:max-count":
 			return true;
-		case "replace:board-forbidden":
-		case "replace:origin-not-board":
-			return false;
 	}
 };
 

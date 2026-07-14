@@ -4,7 +4,6 @@
 		"producer:glassworks": {
 			"id": "producer:glassworks",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Glassworks",
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"asset": {

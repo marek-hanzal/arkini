@@ -4,7 +4,6 @@
 		"producer:charcoal-burner-t1": {
 			"id": "producer:charcoal-burner-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Charcoal Burner I",
 			"description": "Dirty kiln workshop that turns logs into charcoal and must work near a purifier.",
 			"asset": {

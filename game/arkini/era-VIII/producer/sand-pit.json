@@ -4,7 +4,6 @@
 		"producer:sand-pit": {
 			"id": "producer:sand-pit",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Sand Pit",
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"asset": {

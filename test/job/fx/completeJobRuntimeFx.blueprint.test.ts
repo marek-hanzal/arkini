@@ -54,7 +54,9 @@ const blueprintItem = ({
 }) => ({
 	id,
 	type: "blueprint" as const,
-	afterCompletion: "remove" as const,
+	charges: {
+		amount: 1,
+	},
 	title: id,
 	description: id,
 	asset: {
@@ -75,6 +77,10 @@ const blueprintItem = ({
 			? [
 					{
 						type: "materials" as const,
+						charges: {
+							from: "self" as const,
+							cost: 1,
+						},
 						selector: {
 							type: "item" as const,
 							itemId: "item:tool",
@@ -89,6 +95,10 @@ const blueprintItem = ({
 			: [
 					{
 						type: "simple" as const,
+						charges: {
+							from: "self" as const,
+							cost: 1,
+						},
 					},
 				],
 		output,
@@ -100,7 +110,7 @@ const guaranteedOutput = (
 	drops: ReadonlyArray<{
 		itemId: string;
 		quantity: unknown;
-		placement?: "drop" | "replace";
+		placement?: "drop";
 	}>,
 ) => ({
 	set: [
@@ -121,7 +131,7 @@ const guaranteedOutput = (
 });
 
 const blueprintOutput = (
-	replacementItemId: string,
+	primaryItemId: string,
 	byproducts: ReadonlyArray<{
 		itemId: string;
 		quantity: unknown;
@@ -129,12 +139,12 @@ const blueprintOutput = (
 ) =>
 	guaranteedOutput([
 		{
-			itemId: replacementItemId,
+			itemId: primaryItemId,
 			quantity: {
 				type: "value" as const,
 				value: 1,
 			},
-			placement: "replace",
+			placement: "drop",
 		},
 		...byproducts,
 	]);
@@ -234,7 +244,6 @@ const blueprintConfig = GameConfigSchema.parse({
 		"producer:limited": {
 			id: "producer:limited",
 			type: "producer",
-			afterCompletion: "keep",
 			title: "Limited producer",
 			description: "Produces one singleton output.",
 			asset: {
@@ -309,7 +318,7 @@ const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 	);
 
 describe("blueprint job completion", () => {
-	it("replaces the blueprint at its exact cell with a new target identity", () => {
+	it("removes the depleted blueprint and places the first output at its freed cell", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
@@ -620,7 +629,7 @@ describe("blueprint job completion", () => {
 		expect(result.runtime.jobs).toHaveLength(1);
 	});
 
-	it("prevents direct quantity replacement from consuming output capacity promised to a job", () => {
+	it("prevents direct quantity mutation from consuming output capacity promised to a job", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const byproduct = yield* spawnItemFx({
@@ -779,7 +788,7 @@ describe("blueprint job completion", () => {
 		expect(result.state.jobs).toHaveLength(1);
 	});
 
-	it("discards queued work bound to the blueprint identity when replacement completes", () => {
+	it("discards queued work bound to the depleted blueprint identity", () => {
 		const runtime = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({

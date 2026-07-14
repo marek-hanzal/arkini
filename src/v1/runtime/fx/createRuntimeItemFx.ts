@@ -13,6 +13,7 @@ export namespace createRuntimeItemFx {
 		item: ItemSchema.Type;
 		location: Location;
 		quantity: PositiveIntegerSchema.Type;
+		remainingCharges?: number;
 	}
 
 	export type Result<Location extends LocationSchema.Type> = Omit<
@@ -31,6 +32,7 @@ export const createRuntimeItemFx = <Location extends LocationSchema.Type>({
 	item,
 	location,
 	quantity,
+	remainingCharges,
 }: createRuntimeItemFx.Props<Location>) => {
 	return createRevisionFx().pipe(
 		Effect.map((revision) => {
@@ -39,6 +41,7 @@ export const createRuntimeItemFx = <Location extends LocationSchema.Type>({
 				item,
 				location,
 				quantity,
+				remainingCharges,
 				revision,
 			} satisfies createRuntimeItemFx.Result<Location>;
 		}),

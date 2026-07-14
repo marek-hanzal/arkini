@@ -4,7 +4,6 @@
 		"item:blueprint-clay-pit": {
 			"id": "item:blueprint-clay-pit",
 			"type": "blueprint",
-			"afterCompletion": "remove",
 			"title": "Clay Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
 			"asset": {
@@ -40,6 +39,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 3
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -105,7 +108,7 @@
 												"type": "value",
 												"value": 1
 											},
-											"placement": "replace",
+											"placement": "drop",
 											"rules": []
 										}
 									]
@@ -114,6 +117,9 @@
 						}
 					]
 				}
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

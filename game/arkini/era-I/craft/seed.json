@@ -4,7 +4,6 @@
 		"item:seed": {
 			"id": "item:seed",
 			"type": "craft",
-			"afterCompletion": "remove",
 			"title": "Seed",
 			"description": "Tiny forest seed that can drop when watering a mature micro-forest. Feed it water on the board until it grows into a sapling stage, then let it finish into a tree.",
 			"asset": {
@@ -41,6 +40,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 6
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					}
 				],
@@ -58,7 +61,7 @@
 												"value": 1
 											},
 											"rules": [],
-											"placement": "replace"
+											"placement": "drop"
 										}
 									]
 								}
@@ -67,6 +70,9 @@
 					]
 				},
 				"rules": []
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

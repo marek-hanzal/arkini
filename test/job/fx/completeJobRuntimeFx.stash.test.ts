@@ -83,7 +83,9 @@ const stashItem = ({
 }) => ({
 	id,
 	type: "stash" as const,
-	afterCompletion: "remove" as const,
+	charges: {
+		amount: 1,
+	},
 	title: id,
 	description: id,
 	asset: {
@@ -103,6 +105,10 @@ const stashItem = ({
 		input: [
 			{
 				type: "materials" as const,
+				charges: {
+					from: "self" as const,
+					cost: 1,
+				},
 				selector: {
 					type: "item" as const,
 					itemId: "item:key",

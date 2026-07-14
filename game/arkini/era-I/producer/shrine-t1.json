@@ -4,7 +4,6 @@
 		"producer:shrine-t1": {
 			"id": "producer:shrine-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Wayside Shrine",
 			"description": "Turns simple offerings into temporary production blessings.",
 			"asset": {

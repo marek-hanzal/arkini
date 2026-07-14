@@ -4,7 +4,6 @@
 		"producer:vegetable-garden-t1": {
 			"id": "producer:vegetable-garden-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Vegetable Garden I",
 			"description": "Consumes water to produce vegetables.",
 			"asset": {

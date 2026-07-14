@@ -46,7 +46,6 @@ export const purityTestConfig = GameConfigSchema.parse({
 				id: "producer",
 			}),
 			type: "producer",
-			afterCompletion: "keep",
 			lines: [
 				{
 					id: "line:producer:zero",
@@ -96,7 +95,9 @@ export const purityTestConfig = GameConfigSchema.parse({
 				id: "craft",
 			}),
 			type: "craft",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			line: {
 				id: "line:craft",
 				title: "Craft",
@@ -123,7 +124,9 @@ export const purityTestConfig = GameConfigSchema.parse({
 				id: "stash",
 			}),
 			type: "stash",
-			afterCompletion: "remove",
+			charges: {
+				amount: 1,
+			},
 			line: {
 				id: "line:stash",
 				title: "Stash",

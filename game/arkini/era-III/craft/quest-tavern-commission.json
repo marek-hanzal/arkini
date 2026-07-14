@@ -4,7 +4,6 @@
 		"item:quest:tavern-commission": {
 			"id": "item:quest:tavern-commission",
 			"type": "craft",
-			"afterCompletion": "remove",
 			"title": "Tavern Commission Quest",
 			"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
 			"asset": {
@@ -36,6 +35,10 @@
 						"quantity": {
 							"type": "value",
 							"value": 2
+						},
+						"charges": {
+							"cost": 1,
+							"from": "self"
 						}
 					},
 					{
@@ -118,6 +121,9 @@
 					]
 				},
 				"rules": []
+			},
+			"charges": {
+				"amount": 1
 			}
 		}
 	}

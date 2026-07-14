@@ -15,7 +15,7 @@ export namespace planBoardPlacementFx {
 	export interface Props {
 		item: ItemSchema.Type;
 		origin: PositionSchema.Type;
-		placement: Exclude<PlacementEnumSchema.Type, "replace">;
+		placement: PlacementEnumSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}

@@ -4,7 +4,6 @@
 		"producer:coal-mine-t1": {
 			"id": "producer:coal-mine-t1",
 			"type": "producer",
-			"afterCompletion": "keep",
 			"title": "Coal Mine I",
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"asset": {

@@ -1,7 +1,7 @@
 # Craft historical status
 
-**Status:** Reference for task 01, then presentation-only.
+**Status:** Runtime superseded; presentation reference only.
 
-Current engine already runs the craft line through generic jobs, inputs, queue, Tick, RNG, and placement. Missing behavior is the single-use owner lifecycle and its player-facing feedback.
+The current engine owns craft line start, inputs, queue, fixed-step progress, deterministic output, blocked retry, single-unit owner consumption, optional same-cell replacement, stack remainder placement, reservation return, and state round-trip.
 
-Read this directory only from task 01 or later UI/animation/audio tasks. Do not port craft-specific save maps, timestamps, realtime synchronization, or readiness architecture.
+Do not inspect this directory for runtime architecture or completion behavior. Tasks 13–15 may still consult concrete detail-view copy, animation intent, and audio feedback. Do not port craft-specific save maps, timestamps, realtime synchronization, readiness architecture, or historical placement ownership.

@@ -1,6 +1,6 @@
 # 01 — Craft lifecycle
 
-**Status:** Ready
+**Status:** Done
 
 ## Goal
 
@@ -78,3 +78,33 @@ Reuse generic job, input, Tick, RNG, and placement behavior. Add specialization 
 ## Historical cleanup on closeout
 
 Delete historical craft runtime/save/timestamp machinery once all remaining UI, animation, and audio knowledge is captured in later task references. Keep only files explicitly listed for tasks 13–15.
+
+## Final decisions
+
+- Job completion dispatches to explicit producer, craft, blueprint, and stash branches after resolving shared live facts once.
+- No schema shape or contract changed. Only the stale craft schema comment was aligned with implemented runtime behavior; craft replacement uses the existing resolved `line.output` placement contract.
+- One completed job consumes exactly one craft quantity.
+- A resolved `replace` drop claims the original craft cell first.
+- Any remaining craft stack returns through standard placement before additional ordinary output.
+- Without replacement, a remaining stack stays at the original cell; the cell is free only after consuming the last quantity.
+- Completion output claims capacity before reservation return.
+- Blueprint and stash lifecycle remain intentionally partial in their own explicit branches until tasks 02 and 03.
+- The existing generic `job:completed` event remains the engine event. Presentation-specific enrichment belongs to task 14 and requires an explicit event-contract decision rather than an unreviewed schema change.
+
+## Verification completed
+
+- ordinary output from a consumed owner;
+- replacement plus additional output;
+- sink craft with no output;
+- stacked craft without replacement;
+- stacked craft with replacement and standard remainder placement;
+- blocked deterministic retry;
+- consume/reserve semantics;
+- inventory pause;
+- queue capacity remains one total owner-work slot, so a single-use craft cannot retain a successor behind its active job;
+- active-job state round-trip;
+- authored seed flow using a stack of three.
+
+## Historical cleanup result
+
+Craft runtime behavior is fully superseded. Historical `craft/` remains only for tasks 13–15 presentation details and is marked accordingly by its local README.

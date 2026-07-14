@@ -1,6 +1,6 @@
 # 02 — Blueprint lifecycle
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

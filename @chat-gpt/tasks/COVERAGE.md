@@ -28,7 +28,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Fixed-step Tick and offline catch-up | Superseded | Wall-clock scheduler is rejected | Done |
 | Deterministic output rolls | Superseded | Sound/visual grouping may remain useful | 14, 15 |
 | Distance, conditions, runtime line rules | Superseded | Old active-effect store is rejected | 10, 13 |
-| Craft completion lifecycle | Partial | Owner consumption and UX are oracle material | 01 |
+| Craft completion lifecycle | Partial | Runtime lifecycle is superseded; presentation behavior remains | 13–15 |
 | Blueprint completion lifecycle | Partial | Target replacement and feedback are oracle material | 02 |
 | Stash completion lifecycle | Partial | Top-level output, consumption, feedback remain | 03 |
 | Deposit capacity/input/depletion | Reference | Behavior and edge cases remain | 04 |
@@ -61,7 +61,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `cheat/` | Reference | Schema only | Speed toggle behavior | 07 |
 | `cli/` | Removed | Canonical compiler/validator/packer supersede it completely | Nothing; use Git only for archaeology | Done |
 | `config/` | Partial | Old compiler conventions and config model are rejected | Historical feature definitions when a task needs semantics | 01–09, 17 |
-| `craft/` | Reference | Generic line/job path exists | Single-use completion, UI, blocked output behavior | 01, 13–15 |
+| `craft/` | Partial | Generic and single-use runtime lifecycle are superseded | Detail, animation, and audio behavior only | 13–15 |
 | `debug/` | Reference | No current debug/explain surface | Scenarios, explanations, spawn/delete UX | 16 |
 | `effects/` | Partial | Current conditions/rules supersede global effective-line recomputation; persistent effect map is rejected | Effect labels and concrete product behavior | 06, 10, 13 |
 | `engine/` | Superseded | Save topology, action dispatch, adapter, readiness mutation, world catch-up are rejected | Tests only when extracting behavior for an open task | 17 |

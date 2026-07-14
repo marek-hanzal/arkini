@@ -71,7 +71,7 @@ Every write uses the canonical serialized mutation boundary. UI must not invent 
 
 ## 6. Product lines
 
-Producers, crafts, blueprints, and stashes can expose the shared product-line model. Their generic line discovery/start/job behavior is implemented; type-specific owner consumption or replacement is not automatically implied.
+Producers, crafts, blueprints, and stashes can expose the shared product-line model. Their generic line discovery/start/job behavior is implemented. Craft completion additionally owns its single-use quantity lifecycle; blueprint and stash completion remain separate explicit branches for their later contracts.
 
 A line owns:
 
@@ -241,7 +241,7 @@ Directional merge schemas and validation exist. There is no active merge write c
 
 ### Craft lifecycle
 
-A craft's configured line can start and its `line.output` can complete through the generic job path. The owner is not yet consumed automatically, so single-use craft lifecycle is incomplete.
+A craft exposes one line. One completed job consumes exactly one craft quantity. A resolved `replace` drop claims the original craft cell; any remaining owner-stack quantity returns through standard placement before additional ordinary output. Without replacement, the remaining stack stays at the origin and the cell becomes empty only when the consumed unit was the last quantity. Output placement, reservation return, blocked retry, inventory pause, state round-trip, and deterministic RNG use the shared engine paths.
 
 ### Blueprint lifecycle
 
@@ -305,6 +305,6 @@ Pending capabilities must be implemented through canonical engine boundaries rat
 
 - directional merge execution;
 - deposit capacity and depletion;
-- specialized craft, blueprint, and stash completion lifecycle;
+- specialized blueprint and stash completion lifecycle;
 - temporary-item expiry;
 - utility-item commands.

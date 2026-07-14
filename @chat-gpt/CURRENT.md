@@ -4,23 +4,23 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 01 — Craft lifecycle**
+**Task 02 — Blueprint lifecycle**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/01-craft-lifecycle.md`;
-3. the craft and completion rows in `tasks/COVERAGE.md`;
-4. current completion, Tick, placement, input, state, and runtime code;
-5. only the historical files named by task 01.
+2. `tasks/02-blueprint-lifecycle.md`;
+3. the blueprint and completion rows in `tasks/COVERAGE.md`;
+4. current completion, placement, max-count, state, Tick, and runtime code;
+5. only the historical files named by task 02.
 
 Next action:
 
-> Compare historical craft completion behavior with the current generic `completeJobRuntimeFx` path, identify the smallest owner-specific completion extension, and return a design/review plan before implementation.
+> Compare historical blueprint target replacement and by-product behavior with the explicit `completeBlueprintJobRuntimeFx` branch, then return the smallest design that uses the existing `targetId`, output, placement, and atomic retry contracts without changing stable schemas.
 
-Do not begin by designing a generic special-item completion framework. Let craft establish the first real specialization; blueprint and stash follow as separate vertical slices.
+Do not fold blueprint behavior into craft completion. Shared primitives may emerge only from concrete repeated behavior; lifecycle order remains owner-specific.
 
 ## Absolute code rules
 
@@ -29,6 +29,7 @@ Do not begin by designing a generic special-item completion framework. Let craft
 - One concept per file; no barrels, helper piles, or generic junk-drawer domains.
 - Production writes enter through `modifyRuntimeFx` and build immutable validated candidates.
 - The engine is standalone; UI is a thin presentation adapter.
+- Configuration schemas are stable. Do not change a schema shape or contract without first surfacing and agreeing on the exact need.
 
 ## Runtime and session
 
@@ -41,25 +42,26 @@ Do not begin by designing a generic special-item completion framework. Let craft
 - Duplicate saves are acceptable.
 - UI animation intentionally lags runtime and may be redirected by later events.
 
-## Tick, jobs, and queue
+## Tick, jobs, queue, and completion
 
 - Fixed simulation step: 200 ms.
 - Production time source: Effect Clock.
 - Tick adapter time is session-only and never persisted.
 - Jobs store only `durationMs` and `remainingMs`.
 - One active job per owner; queued requests are FIFO and are not jobs.
-- Filling inputs never starts work.
-- Starting is explicit.
+- Filling inputs never starts work; starting is explicit.
 - Inventory is a hard pause.
 - Started jobs cannot be cancelled.
 - Queue-only owners remain valid and are retried at fixed-step boundaries.
+- Shared completion facts are resolved once, then dispatched to explicit producer, craft, blueprint, or stash branches.
+- Craft completion consumes exactly one quantity, supports an optional resolved replacement, preserves stack remainder through standard placement, and places output before returning reservations.
 
 ## Reservations and removal
 
 - Reserved material is always returned through standard drop placement.
 - Never retain original instance ID, stack, slot, source item, or historical position for return.
 - Generic mutations reject job-scoped items.
-- Completion is reservation release + output placement + job removal, all-or-nothing.
+- Completion is all-or-nothing.
 - An owner with active or queued work cannot be permanently removed.
 - Removing an idle owner releases buffered inputs through ordinary placement in the same atomic mutation.
 

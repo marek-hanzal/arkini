@@ -4,9 +4,9 @@ This directory is the active handoff surface for continuing the game from the hi
 
 ## Current task
 
-**Next implementation task: [`01-craft-lifecycle.md`](01-craft-lifecycle.md)**
+**Next implementation task: [`02-blueprint-lifecycle.md`](02-blueprint-lifecycle.md)**
 
-The migration-control setup in task 00 is complete. A new thread must:
+Tasks 00 and 01 are complete. A new thread must:
 
 1. read the root documentation in the order defined by `@chat-gpt/README.md`;
 2. read `@chat-gpt/CURRENT.md`;
@@ -21,8 +21,8 @@ Do not read every queued task before starting. The queue is an ordered backlog, 
 | # | Task | Status | Depends on |
 | ---: | --- | --- | --- |
 | 00 | [`Migration control surface`](00-migration-control.md) | **Done** | — |
-| 01 | [`Craft lifecycle`](01-craft-lifecycle.md) | **Ready** | 00 |
-| 02 | [`Blueprint lifecycle`](02-blueprint-lifecycle.md) | Queued | 01 |
+| 01 | [`Craft lifecycle`](../archive/tasks/01-craft-lifecycle.md) | **Done** | 00 |
+| 02 | [`Blueprint lifecycle`](02-blueprint-lifecycle.md) | **Ready** | 01 |
 | 03 | [`Stash lifecycle`](03-stash-lifecycle.md) | Queued | 01–02 |
 | 04 | [`Deposit capacity and inputs`](04-deposit-capacity.md) | Queued | 03 |
 | 05 | [`Directional merge execution`](05-merge-execution.md) | Queued | 04 |

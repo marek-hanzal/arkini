@@ -234,11 +234,10 @@ Schema support and runtime support are different facts.
 - `simple` items participate in stacking, placement, queries, rules, and ordinary runtime commands.
 - `producer` items expose one or more lines, queue capacity, explicit start, fixed-step jobs, material consume/reserve inputs, generic line output, and FIFO dispatch.
 - `craft`, `blueprint`, and `stash` items expose their configured line through the shared line/start/job machinery.
-- A `craft` line's own `line.output` is resolved by generic job completion.
+- A `craft` completion consumes exactly one owner quantity, applies any resolved `replace` drop at the original board cell, preserves a remaining craft stack through standard placement, and places additional `line.output` drops atomically.
 
 ### Schema-backed but incomplete in runtime
 
-- `craft` completion does not yet consume the craft owner automatically.
 - `blueprint.targetId` and blueprint-specific replacement are not yet applied by job completion.
 - top-level `stash.output` and stash self-consumption are not yet applied by job completion.
 - deposit capacity spending, depletion, and depletion output are not implemented.

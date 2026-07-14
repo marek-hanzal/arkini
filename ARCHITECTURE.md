@@ -228,17 +228,18 @@ Material inputs may be consumed or reserved.
 
 Job-scoped items are exclusive locks and are inaccessible to generic item mutations.
 
-Completion:
+Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and dispatches an explicit owner-specific branch:
 
 ```text
-resolve live ready job by stable ID
-→ remove job reservations
-→ return reserved quantities through standard drop placement
-→ resolve and place output
-→ remove job
+producer completion
+craft completion
+blueprint completion
+stash completion
 ```
 
-Completion is all-or-nothing. Capacity or max-count blocking leaves the ready job and reservations unchanged for a later fixed-step retry.
+The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Craft completion consumes exactly one owner quantity, applies an optional resolved replacement at the original cell, returns any remaining owner stack through standard placement, places additional output, and then releases reservations. Blueprint and stash branches remain explicit extension points for their dedicated lifecycle tasks rather than growing conditionals inside producer completion.
+
+Completion is all-or-nothing. Capacity or max-count blocking leaves the ready job, owner quantity, and reservations unchanged for a later fixed-step retry.
 
 Reservations retain no original runtime instance, stack, slot, or source position. Never add return-location metadata or reverse reservation reconstruction.
 

@@ -4,23 +4,23 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 02 — Blueprint lifecycle**
+**Task 03 — Stash lifecycle**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/02-blueprint-lifecycle.md`;
-3. the blueprint and completion rows in `tasks/COVERAGE.md`;
-4. current completion, placement, max-count, state, Tick, and runtime code;
-5. only the historical files named by task 02.
+2. `tasks/03-stash-lifecycle.md`;
+3. the stash and completion rows in `tasks/COVERAGE.md`;
+4. current completion, output, placement, removal, max-count reservation, state, Tick, and runtime code;
+5. only the historical files named by task 03.
 
 Next action:
 
-> Compare historical blueprint target replacement and by-product behavior with the explicit `completeBlueprintJobRuntimeFx` branch, then return the smallest design that uses the existing `targetId`, output, placement, and atomic retry contracts without changing stable schemas.
+> Compare historical stash owner consumption and top-level output with the explicit `completeStashJobRuntimeFx` branch, then return the smallest lifecycle design that preserves deterministic output, atomic owner removal, buffered-input release, reservation return, and blocked retry. Surface any `line.output` versus top-level `output` schema ambiguity before changing a schema.
 
-Do not fold blueprint behavior into craft completion. Shared primitives may emerge only from concrete repeated behavior; lifecycle order remains owner-specific.
+Do not fold stash behavior into producer or blueprint completion. Shared removal and placement primitives are already available; lifecycle order remains owner-specific.
 
 ## Absolute code rules
 
@@ -54,9 +54,12 @@ Do not fold blueprint behavior into craft completion. Shared primitives may emer
 - Started jobs cannot be cancelled.
 - Queue-only owners remain valid and are retried at fixed-step boundaries.
 - Shared completion facts are resolved once, then dispatched to explicit producer, craft, blueprint, or stash branches.
+- Active jobs reserve the worst-case future quantity of every possible output against canonical `maxCount`. Quantity ranges reserve their maximum, chance rolls reserve success, weighted rolls reserve repeatable worst candidates, and alternative roll sets reserve the per-item maximum. Queued requests reserve nothing until authoritative dispatch.
+- Ordinary placement, direct spawn, and direct quantity replacement respect active-job output reservations. Completion removes its own job before materializing output, so it spends rather than duplicates its reservation.
 - Runtime purity is a composable boolean. Line input/job/queue state makes a line non-pure; an item is pure only when all owned lines and item state are pure. Generic stack and quantity mutation require purity inside the same runtime draft.
 - A zero-capacity material input is closed during its active line job; positive capacity remains open storage. Craft authoring fixes every material capacity to zero.
 - Starting a stacked craft resolves against the pre-command world, creates the job in the candidate draft, isolates one running quantity, and places the remainder through standard pure-stack placement; completion consumes only that isolated owner, supports an optional resolved replacement, and places output before returning reservations.
+- Blueprint completion creates a new target identity at the exact owner cell, places top-level by-products, removes all state bound to the blueprint identity, and returns reservations last. Any failure rolls back the entire completion.
 
 ## Reservations and removal
 
@@ -64,8 +67,8 @@ Do not fold blueprint behavior into craft completion. Shared primitives may emer
 - Never retain original instance ID, stack, slot, source item, or historical position for return.
 - Generic mutations reject job-scoped items.
 - Completion is all-or-nothing.
-- An owner with active or queued work cannot be permanently removed.
-- Removing an idle owner releases buffered inputs through ordinary placement in the same atomic mutation.
+- An owner with active or queued work cannot be permanently removed through the public command.
+- Shared runtime removal releases buffered inputs, removes the owner, and discards queued work bound to the removed identity. Owner-specific completion may use it only after detaching its completed active job.
 
 ## Randomness
 

@@ -71,7 +71,7 @@ Every write uses the canonical serialized mutation boundary. UI must not invent 
 
 ## 6. Product lines
 
-Producers, crafts, blueprints, and stashes can expose the shared product-line model. Their generic line discovery/start/job behavior is implemented. Craft completion additionally owns its single-use quantity lifecycle; blueprint and stash completion remain separate explicit branches for their later contracts.
+Producers, crafts, blueprints, and stashes can expose the shared product-line model. Their generic line discovery/start/job behavior is implemented. Craft and blueprint completion own their distinct single-use lifecycles; stash completion remains a separate explicit branch for its later contract.
 
 A line owns:
 
@@ -175,24 +175,38 @@ Started jobs cannot be cancelled.
 
 A ready job completes only while its owner is on the board.
 
-Completion resolves the live job by stable ID and performs one all-or-nothing operation:
+Completion resolves the live job by stable ID, detaches the completed job and reservations inside one immutable candidate, and dispatches the owner-specific lifecycle. Each branch owns its order. Blueprint completion performs:
 
 ```text
-release reservations
-→ place released quantities
-→ resolve deterministic output
-→ place output
-→ remove job
-→ dispatch eligible FIFO successor at the boundary
+create a new target identity at the exact blueprint cell
+→ resolve and place top-level by-products
+→ release buffered blueprint inputs and remove the blueprint identity
+→ discard queue bound to the vanished identity
+→ return detached reservations
+→ commit everything atomically
 ```
 
-Capacity or max-count failure is a valid blocked-ready state. The job and reservations stay unchanged and completion is retried on a later step.
+Placement, capacity, or return failure is a valid blocked-ready state. The published runtime keeps the job, owner, queue, buffered inputs, and reservations unchanged and retries on a later step.
 
 One blocked owner does not prevent unrelated owners from progressing or completing in the same fixed step.
 
 Unexpected invariant or replacement failures fail the runtime advancement and preserve the elapsed Tick budget for retry.
 
-## 13. Deterministic output
+## 13. Future output and `maxCount`
+
+A job may start only when every possible output remains within canonical `maxCount` after accounting for live items and all active jobs. Capacity planning uses the worst possible result rather than an average or one sampled roll:
+
+- a fixed quantity reserves its value;
+- a range reserves its maximum;
+- a chance reserves the successful drop;
+- repeated weighted selection reserves the worst candidate for every draw;
+- all rolls in one selected set add together;
+- alternative sets reserve the per-item maximum;
+- a blueprint reserves one target plus its possible by-products.
+
+Queued requests reserve nothing. When the FIFO head attempts to become active, the same check runs; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity replacement cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation.
+
+## 14. Deterministic output
 
 Completion randomness is stable for one job identity and algorithm version.
 
@@ -206,7 +220,7 @@ The same deterministic random stream controls:
 
 A blocked completion or restored saved state therefore produces the same result when the same job is retried.
 
-## 14. Placement
+## 15. Placement
 
 All runtime-executed output uses the shared placement policy, including:
 
@@ -231,7 +245,7 @@ When an allowed board-first placement cannot fit fully on the board, the remaind
 
 Partial placement is forbidden. The owning gameplay mutation rolls back if the complete quantity cannot be placed.
 
-## 15. Authored capabilities not fully runtime-backed
+## 16. Authored capabilities not fully runtime-backed
 
 The completed configuration accepts more item semantics than the current command surface executes. This is intentional migration state, not permission to pretend the behavior exists.
 
@@ -245,7 +259,7 @@ A craft exposes one line whose material inputs author only `capacity: 0`. Starti
 
 ### Blueprint lifecycle
 
-A blueprint's line can start, but `targetId` replacement and blueprint-specific by-products are not yet applied by completion.
+A blueprint job reserves one future target plus the worst possible quantity of every top-level by-product before it starts. Completion creates a new target runtime identity at the exact blueprint cell, then places by-products, removes the blueprint and all state bound to its identity, and returns reservations last. A blocked by-product, buffered-input return, or reservation return rolls the entire completion back. Queue requests attached to the consumed blueprint disappear with that identity.
 
 ### Stash lifecycle
 
@@ -265,7 +279,7 @@ Inventory opener, memory, speed cheat, nuke, and cheat inventory have explicit c
 
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 
-## 16. Save and reload semantics
+## 17. Save and reload semantics
 
 Serializable state contains live items, active jobs, and FIFO requests.
 
@@ -275,7 +289,7 @@ Restored jobs continue from persisted `remainingMs`. No due time is reconstructe
 
 Invalid persisted state must fail close to hydration or runtime validation. Do not silently invent missing job, reservation, or queue history.
 
-## 17. Presentation lag
+## 18. Presentation lag
 
 Canonical runtime changes immediately when a command or Tick transition commits.
 
@@ -288,7 +302,7 @@ This is valid provided that:
 - new engine events may redirect or supersede presentation;
 - a new subscriber does not replay historical engine events merely because another surface is still animating them.
 
-## 18. Hard exclusions and pending work
+## 19. Hard exclusions and pending work
 
 Hard exclusions without a deliberate new design:
 
@@ -305,6 +319,6 @@ Pending capabilities must be implemented through canonical engine boundaries rat
 
 - directional merge execution;
 - deposit capacity and depletion;
-- specialized blueprint and stash completion lifecycle;
+- specialized stash completion lifecycle;
 - temporary-item expiry;
 - utility-item commands.

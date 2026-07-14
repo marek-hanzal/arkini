@@ -16,7 +16,7 @@ Already solved or exceeded:
 
 Still consult only for:
 
-- blueprint/stash edge cases in tasks 02–03;
+- stash edge cases in task 03;
 - line/detail read requirements in tasks 10 and 13;
 - animation/audio intent in tasks 14–15.
 

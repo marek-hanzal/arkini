@@ -225,7 +225,7 @@ chance
 weight
 ```
 
-Runtime-executed outputs use standard placement. They do not bypass stack, scope, max-count, replacement, or capacity rules. Schema-only outputs remain authoring intent until an owned runtime path executes them.
+Runtime-executed outputs use standard placement. They do not bypass stack, scope, max-count, replacement, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Queue entries reserve nothing until dispatch. Schema-only outputs remain authoring intent until an owned runtime path executes them.
 
 ## 8. Item capability status
 
@@ -237,10 +237,10 @@ Schema support and runtime support are different facts.
 - `producer` items expose one or more lines, queue capacity, explicit start, fixed-step jobs, material consume/reserve inputs, generic line output, and FIFO dispatch.
 - `craft`, `blueprint`, and `stash` items expose their configured line through the shared line/start/job machinery.
 - Starting a stacked `craft` resolves eligibility from the pre-command world, creates the active job in the candidate draft, atomically isolates one owner quantity, and places the remainder through the standard pure-stack/drop/inventory policy. Completion then consumes that isolated owner, applies any resolved `replace` drop at the original board cell, and places additional `line.output` drops atomically.
+- Blueprint completion creates a new `targetId` identity at the exact blueprint cell, places optional top-level blueprint output as by-products, removes state bound to the blueprint identity, and returns reservations atomically.
 
 ### Schema-backed but incomplete in runtime
 
-- `blueprint.targetId` and blueprint-specific replacement are not yet applied by job completion.
 - top-level `stash.output` and stash self-consumption are not yet applied by job completion.
 - deposit capacity spending, depletion, and depletion output are not implemented.
 - temporary-item lifetime and expiry are not implemented.

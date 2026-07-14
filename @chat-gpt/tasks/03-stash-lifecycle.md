@@ -1,6 +1,6 @@
 # 03 — Stash lifecycle
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

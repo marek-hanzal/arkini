@@ -239,13 +239,31 @@ blueprint completion
 stash completion
 ```
 
-The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting a stacked craft first resolves eligibility from the pre-command snapshot, then creates the job inside the candidate draft, isolates one owner quantity, and routes the remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations. Blueprint and stash branches remain explicit extension points for their dedicated lifecycle tasks rather than growing conditionals inside producer completion.
+The branches share deterministic RNG, placement primitives, and the same validated Tick mutation, but each branch owns its lifecycle order. Producers remain persistent. Starting a stacked craft first resolves eligibility from the pre-command snapshot, then creates the job inside the candidate draft, isolates one owner quantity, and routes the remainder through standard placement. The job makes the owner non-pure before placement, so the remainder cannot merge back into it. Craft completion therefore owns exactly one quantity, applies an optional resolved replacement at the original cell, places additional output, and then releases reservations.
 
-Completion is all-or-nothing. Capacity or max-count blocking leaves the ready job, owner quantity, and reservations unchanged for a later fixed-step retry.
+Blueprint completion creates a new target identity at the exact owner cell, places top-level by-products, removes all state bound to the vanished blueprint identity, and releases job reservations last. Public item removal and owner-specific completion share one runtime removal primitive rather than nesting public write commands. The stash branch remains an explicit extension point for its dedicated lifecycle task.
+
+Completion is all-or-nothing. Placement or return blocking leaves the ready job, owner, queue, buffered inputs, and reservations unchanged for a later fixed-step retry.
 
 Reservations retain no original runtime instance, stack, slot, or source position. Never add return-location metadata or reverse reservation reconstruction.
 
-## 10. Deterministic completion randomness
+## 10. Future output and max-count reservations
+
+An active job reserves the worst-case future quantity of every canonical item its implemented completion lifecycle may create. The calculation is deliberately conservative:
+
+- fixed quantities reserve their value;
+- ranges reserve `max`;
+- chance rolls reserve the successful outcome;
+- repeated weighted rolls reserve the same worst candidate for every selection;
+- rolls inside one selected set add together;
+- alternative roll sets reserve the per-item maximum;
+- blueprint jobs additionally reserve one configured target.
+
+A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; max-count blockage leaves the request in place.
+
+Placement, direct spawn, and direct quantity replacement include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it.
+
+## 11. Deterministic completion randomness
 
 Job completion randomness is derived from stable job identity and an explicit algorithm version.
 
@@ -255,7 +273,7 @@ A blocked completion, restored state, or retry therefore produces the same rando
 
 Tick state, wall-clock time, and job revision do not participate in the seed.
 
-## 11. Purity and placement
+## 12. Purity and placement
 
 Purity is a runtime-derived boolean, not an item-config flag. A line is pure only when it owns no buffered inputs, active job, or queued request. An item is pure only when every line it owns is pure and it owns no additional identity-bound state. Future temporary lifetime, deposit capacity, charges, memory, or similar state must extend the item purity boundary.
 
@@ -278,7 +296,7 @@ Board-first fallback may continue into inventory when the item scope allows it.
 
 Placement failure is a domain failure and rolls back the complete owning mutation. Do not partially place an output or partially release reservations.
 
-## 12. Save boundary
+## 13. Save boundary
 
 Autosave owns persistence, not gameplay truth.
 
@@ -294,7 +312,7 @@ Event-only transitions neither wake nor postpone autosave.
 
 Flush always reads the latest canonical runtime. Duplicate saves are acceptable. Failed mutations publish nothing and trigger no save.
 
-## 13. Shutdown
+## 14. Shutdown
 
 Session disposal is coordinated:
 
@@ -310,7 +328,7 @@ Concurrent callers share the same cleanup Promise.
 
 A long planner interrupted before commit changes nothing. Once the STM point of no return begins, current state, publication, and success remain coherent.
 
-## 14. Explicit non-decisions
+## 15. Explicit non-decisions
 
 Do not introduce without a concrete reproduced requirement:
 

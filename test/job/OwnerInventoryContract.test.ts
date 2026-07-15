@@ -192,8 +192,15 @@ describe("job owner inventory contract", () => {
 		]);
 		expect(result.inventoryRuntime.jobs).toHaveLength(1);
 		expect(
-			result.inventoryRuntime.items.filter((item) => item.location.scope === "job"),
-		).toHaveLength(1);
+			result.inventoryRuntime.items.map((item) =>
+				item.location.scope === "job" ? item.location.mode : undefined,
+			),
+		).toEqual(
+			expect.arrayContaining([
+				"consume",
+				"reserve",
+			]),
+		);
 		expect(result.completed.jobs).toEqual([]);
 		expect(result.completed.items.some((item) => item.location.scope === "job")).toBe(false);
 	});

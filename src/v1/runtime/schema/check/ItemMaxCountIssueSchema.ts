@@ -1,26 +1,36 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 
 /**
- * The total live quantity of one canonical item exceeds its configured maximum.
+ * Live quantity plus active worst-case job output exceeds one canonical maxCount.
  */
 export const ItemMaxCountIssueSchema = z
 	.object({
-		itemId: IdSchema.describe("The canonical item whose live quantity exceeds maxCount."),
+		itemId: IdSchema.describe("The canonical item whose committed capacity exceeds maxCount."),
 		itemIds: z
 			.array(IdSchema)
-			.min(1)
-			.describe("The live item identities contributing to the excessive quantity."),
-		maxCount: PositiveIntegerSchema.describe("The configured maximum live quantity."),
-		quantity: PositiveIntegerSchema.describe("The current excessive live quantity."),
+			.describe("The live item identities contributing to the committed quantity."),
+		jobIds: z
+			.array(IdSchema)
+			.describe("The active jobs reserving future quantity of this canonical item."),
+		liveQuantity: NonNegativeIntegerSchema.describe("The currently live canonical quantity."),
+		reservedQuantity: NonNegativeIntegerSchema.describe(
+			"The worst-case future quantity reserved by active jobs.",
+		),
+		maxCount: PositiveIntegerSchema.describe("The configured maximum committed quantity."),
+		quantity: PositiveIntegerSchema.describe(
+			"The excessive committed quantity including live and reserved amounts.",
+		),
 		type: z.literal("item:max-count"),
 	})
 	.strict()
 	.meta({
 		id: "ItemMaxCountIssueSchema",
-		description: "The total live quantity of one canonical item exceeds maxCount.",
+		description:
+			"Live quantity plus active worst-case job output exceeds one canonical maxCount.",
 	});
 
 export type ItemMaxCountIssueSchema = typeof ItemMaxCountIssueSchema;

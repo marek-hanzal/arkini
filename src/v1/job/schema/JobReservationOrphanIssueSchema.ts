@@ -11,7 +11,7 @@ export const JobReservationOrphanIssueSchema = z
 	.strict()
 	.meta({
 		id: "JobReservationOrphanIssueSchema",
-		description: "One reserved item references a missing active job.",
+		description: "One job-owned material item references a missing active job.",
 	});
 export type JobReservationOrphanIssueSchema = typeof JobReservationOrphanIssueSchema;
 export namespace JobReservationOrphanIssueSchema {

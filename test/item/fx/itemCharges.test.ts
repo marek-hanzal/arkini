@@ -6,9 +6,11 @@ import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readLineRunFx } from "~/v1/line/fx/run/readLineRunFx";
 import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
+import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
+import { StateSchema } from "~/v1/state/schema/StateSchema";
 import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
 import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 
@@ -833,6 +835,88 @@ describe("item charges", () => {
 
 		expect(runtime.items.some((item) => item.item.id === "deposit:sapling")).toBe(false);
 		expect(runtime.items.filter((item) => item.item.id === "item:seed")).toHaveLength(2);
+	});
+
+	it("rejects hydrated active-job output reservations that overbook maxCount", () => {
+		const state = StateSchema.parse({
+			items: [
+				{
+					id: "runtime:capped-shrine",
+					itemId: "producer:capped-shrine",
+					location: board(0),
+					remainingCharges: 0,
+					quantity: 1,
+				},
+			],
+			jobs: [
+				{
+					id: "job:capped-shrine",
+					ownerItemId: "runtime:capped-shrine",
+					lineId: "line:capped-shrine:work",
+					durationMs: 200,
+					remainingMs: 200,
+				},
+			],
+		});
+		const result = run(
+			Effect.either(
+				fromStateFx({
+					state,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result)).toBe(true);
+		if (Either.isLeft(result)) {
+			expect(result.left).toMatchObject({
+				_tag: "RuntimeInvalidError",
+				result: {
+					issues: expect.arrayContaining([
+						{
+							itemId: "item:capped-gift",
+							itemIds: [],
+							jobIds: [
+								"job:capped-shrine",
+							],
+							liveQuantity: 0,
+							reservedQuantity: 2,
+							maxCount: 1,
+							quantity: 2,
+							type: "item:max-count",
+						},
+					]),
+				},
+			});
+		}
+	});
+
+	it("does not reserve maxCount for queued requests before dispatch", () => {
+		const runtime = {
+			items: [
+				{
+					id: "runtime:capped-shrine",
+					item: chargesConfig.items["producer:capped-shrine"],
+					location: board(0),
+					quantity: 1,
+					revision: "revision:capped-shrine",
+				},
+			],
+			jobs: [],
+			jobQueue: [
+				{
+					id: "request:capped-shrine",
+					ownerItemId: "runtime:capped-shrine",
+					lineId: "line:capped-shrine:work",
+				},
+			],
+		} satisfies RuntimeSchema.Type;
+		const result = run(
+			checkRuntimeFx({
+				runtime,
+			}),
+		);
+
+		expect(result.issues.some((issue) => issue.type === "item:max-count")).toBe(false);
 	});
 
 	it("blocks a self-depleting job when line and depletion outputs exceed maxCount together", () => {

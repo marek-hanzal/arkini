@@ -51,6 +51,7 @@ describe("checkRuntimeJobsFx", () => {
 					location: {
 						scope: "job",
 						jobId: "job:missing",
+						mode: "reserve",
 					},
 					quantity: 1,
 					revision: "revision:tool:missing-job",

@@ -87,6 +87,7 @@ describe("startLineFx", () => {
 					location: {
 						scope: "job",
 						jobId: readStartedJob(result.started).id,
+						mode: "reserve",
 					},
 				}),
 			]),

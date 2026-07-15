@@ -1,10 +1,9 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import { JobOutputMaxCountError } from "~/v1/job/error/JobOutputMaxCountError";
-import { readJobMaximumOutputQuantitiesFx } from "~/v1/job/fx/read/readJobMaximumOutputQuantitiesFx";
+import { readReservedJobOutputQuantitiesFx } from "~/v1/job/fx/read/readReservedJobOutputQuantitiesFx";
 import type { JobSchema } from "~/v1/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
@@ -20,18 +19,12 @@ export const assertJobOutputMaxCountFx = Effect.fn("assertJobOutputMaxCountFx")(
 	job,
 	runtime,
 }: assertJobOutputMaxCountFx.Props) {
-	const reserved = new Map<IdSchema.Type, number>();
-	for (const activeJob of runtime.jobs) {
-		const quantities = yield* readJobMaximumOutputQuantitiesFx({
-			job: activeJob,
-			runtime,
-		});
-		for (const [itemId, quantity] of quantities) {
-			reserved.set(itemId, (reserved.get(itemId) ?? 0) + quantity);
-		}
-	}
+	const reserved = yield* readReservedJobOutputQuantitiesFx({
+		runtime,
+	});
 
-	for (const [itemId, reservedQuantity] of reserved) {
+	for (const [itemId, reservation] of reserved) {
+		const reservedQuantity = reservation.quantity;
 		const item = yield* resolveItemFx({
 			itemId,
 		});

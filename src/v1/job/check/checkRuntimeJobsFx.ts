@@ -20,7 +20,7 @@ export namespace checkRuntimeJobsFx {
 	}
 }
 
-/** Reports invalid active jobs, queued start requests, and job reservations. */
+/** Reports invalid active jobs, queued start requests, and job-owned materials. */
 export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	runtime,
 }: checkRuntimeJobsFx.Props) {

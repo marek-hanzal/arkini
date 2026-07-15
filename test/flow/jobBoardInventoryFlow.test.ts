@@ -237,8 +237,19 @@ describe("job board and inventory flow", () => {
 		expect(result.blocked.jobs).toHaveLength(1);
 		expect(result.blocked.jobs[0]?.remainingMs).toBe(0);
 		expect(result.blocked.jobQueue).toHaveLength(1);
-		expect(result.blocked.items.filter((item) => item.location.scope === "job")).toHaveLength(
-			1,
+		const blockedJobItems = result.blocked.items.filter(
+			(item) => item.location.scope === "job",
+		);
+		expect(blockedJobItems).toHaveLength(2);
+		expect(
+			blockedJobItems.map((item) =>
+				item.location.scope === "job" ? item.location.mode : undefined,
+			),
+		).toEqual(
+			expect.arrayContaining([
+				"consume",
+				"reserve",
+			]),
 		);
 		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
 		expect(result.pendingAfterBlocked.pendingElapsedMs).toBe(100);

@@ -10,9 +10,10 @@ import { InputModeEnumSchema } from "./InputModeEnumSchema";
 /**
  * A directly delivered material item required by a product line.
  *
- * The matching items either disappear through `consume` or are temporarily
- * held through `reserve` and then returned after the line finishes. Quantity and
- * capacity aggregate every item matched by the selector.
+ * The matching items are committed to the active job. `consume` destroys owned
+ * state at start and discards the committed root at completion; `reserve`
+ * preserves the item and returns it after completion. Quantity and capacity
+ * aggregate every item matched by the selector.
  */
 export const InputMaterialSchema = z
 	.object({
@@ -32,9 +33,9 @@ export const InputMaterialSchema = z
 		/**
 		 * Whether this input is consumed or temporarily reserved by the line.
 		 *
-		 * A reserved input is emitted through the standard drop-placement policy when
-		 * the work completes. Started jobs are not cancellable. Consumption is the
-		 * standard behavior.
+		 * A reserved input is emitted through standard drop placement when work
+		 * completes. A consumed input discards its owned state when the job starts and
+		 * its committed root when the job completes. Started jobs are not cancellable.
 		 */
 		mode: InputModeEnumSchema.default("consume").describe(
 			"Whether this input is consumed or reserved; defaults to consume.",

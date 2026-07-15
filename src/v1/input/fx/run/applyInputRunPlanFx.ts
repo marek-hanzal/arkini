@@ -42,6 +42,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 			},
 			(plan) => {
 				return applyInputMaterialConsumeRunPlanFx({
+					jobId,
 					ownerItemId,
 					lineId,
 					inputIndex,

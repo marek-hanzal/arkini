@@ -54,8 +54,15 @@ describe("blocked job completion", () => {
 		expect(result.blocked.jobs.some((job) => job.ownerItemId === freeCompletionOwnerId)).toBe(
 			false,
 		);
-		expect(result.blocked.items.filter((item) => item.location.scope === "job")).toHaveLength(
-			1,
+		expect(
+			result.blocked.items.map((item) =>
+				item.location.scope === "job" ? item.location.mode : undefined,
+			),
+		).toEqual(
+			expect.arrayContaining([
+				"consume",
+				"reserve",
+			]),
 		);
 		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
 

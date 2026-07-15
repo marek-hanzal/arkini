@@ -23,6 +23,16 @@ const addQuantities = (
 	}
 };
 
+const subtractQuantity = (
+	quantities: Map<IdSchema.Type, number>,
+	itemId: IdSchema.Type,
+	quantity: number,
+) => {
+	const netQuantity = Math.max(0, (quantities.get(itemId) ?? 0) - quantity);
+	if (netQuantity === 0) quantities.delete(itemId);
+	else quantities.set(itemId, netQuantity);
+};
+
 /** Reads the per-item worst-case net quantity increase reserved by one active job. */
 export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQuantitiesFx")(
 	function* ({ job, runtime }: readJobMaximumOutputQuantitiesFx.Props) {
@@ -58,16 +68,18 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 			);
 		}
 
-		if (!depleted) {
-			return quantities;
+		for (const item of runtime.items) {
+			if (
+				item.location.scope === "job" &&
+				item.location.jobId === job.id &&
+				item.location.mode === "consume"
+			) {
+				subtractQuantity(quantities, item.item.id, item.quantity);
+			}
 		}
 
-		const ownerOutputQuantity = quantities.get(owner.item.id) ?? 0;
-		const netOwnerQuantity = Math.max(0, ownerOutputQuantity - owner.quantity);
-		if (netOwnerQuantity === 0) {
-			quantities.delete(owner.item.id);
-		} else {
-			quantities.set(owner.item.id, netOwnerQuantity);
+		if (depleted) {
+			subtractQuantity(quantities, owner.item.id, owner.quantity);
 		}
 
 		return quantities;

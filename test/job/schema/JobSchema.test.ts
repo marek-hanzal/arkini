@@ -22,6 +22,7 @@ describe("JobSchema", () => {
 		).toEqual({
 			scope: "job",
 			jobId: job.id,
+			mode: "reserve",
 		});
 	});
 });

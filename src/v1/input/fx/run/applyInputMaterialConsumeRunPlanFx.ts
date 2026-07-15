@@ -4,12 +4,18 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/v1/input/read/readInputRunItemFx";
 import type { InputMaterialRunPlanSchema } from "~/v1/input/schema/run/InputMaterialRunPlanSchema";
+import type { JobLocationSchema } from "~/v1/location/schema/JobLocationSchema";
+import { createRuntimeItemFx } from "~/v1/runtime/fx/createRuntimeItemFx";
+import { createRuntimeItemIdFx } from "~/v1/runtime/fx/createRuntimeItemIdFx";
+import { discardRuntimeItemOwnedStateFx } from "~/v1/runtime/fx/discardRuntimeItemOwnedStateFx";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/v1/runtime/schema/InputRuntimeItemSchema";
+import type { JobRuntimeItemSchema } from "~/v1/runtime/schema/JobRuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace applyInputMaterialConsumeRunPlanFx {
 	export interface Props {
+		jobId: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
@@ -18,9 +24,10 @@ export namespace applyInputMaterialConsumeRunPlanFx {
 	}
 }
 
-/** Applies one exact consume allocation to an immutable runtime draft. */
+/** Commits exact consume allocations to one job and discards their owned state. */
 export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialConsumeRunPlanFx")(
 	function* ({
+		jobId,
 		ownerItemId,
 		lineId,
 		inputIndex,
@@ -37,25 +44,52 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 					plannedQuantity: allocation.quantity,
 					runtime: draft,
 				});
+				const location = {
+					scope: "job",
+					jobId,
+					mode: "consume",
+				} satisfies JobLocationSchema.Type;
+
 				if (allocation.quantity === item.quantity) {
+					const discardedRuntime = yield* discardRuntimeItemOwnedStateFx({
+						ownerItemId: item.id,
+						runtime: draft,
+					});
+					const consumedItem = yield* reviseRuntimeItemFx({
+						item: {
+							...item,
+							location,
+						} satisfies JobRuntimeItemSchema.Type,
+					});
 					return {
-						...draft,
-						items: draft.items.filter((candidate) => candidate.id !== item.id),
+						...discardedRuntime,
+						items: discardedRuntime.items.map((candidate) => {
+							return candidate.id === item.id ? consumedItem : candidate;
+						}),
 					} satisfies RuntimeSchema.Type;
 				}
 
-				const updatedItem = yield* reviseRuntimeItemFx({
+				const sourceItem = yield* reviseRuntimeItemFx({
 					item: {
 						...item,
 						quantity: item.quantity - allocation.quantity,
 					} satisfies InputRuntimeItemSchema.Type,
 				});
+				const consumedItem = yield* createRuntimeItemFx({
+					id: yield* createRuntimeItemIdFx(),
+					item: item.item,
+					location,
+					quantity: allocation.quantity,
+				});
 
 				return {
 					...draft,
-					items: draft.items.map((candidate) => {
-						return candidate.id === item.id ? updatedItem : candidate;
-					}),
+					items: [
+						...draft.items.map((candidate) => {
+							return candidate.id === item.id ? sourceItem : candidate;
+						}),
+						consumedItem,
+					],
 				} satisfies RuntimeSchema.Type;
 			});
 		});

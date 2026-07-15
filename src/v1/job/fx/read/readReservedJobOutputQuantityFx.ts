@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { readJobMaximumOutputQuantitiesFx } from "./readJobMaximumOutputQuantitiesFx";
+import { readReservedJobOutputQuantitiesFx } from "./readReservedJobOutputQuantitiesFx";
 
 export namespace readReservedJobOutputQuantityFx {
 	export interface Props {
@@ -11,18 +11,12 @@ export namespace readReservedJobOutputQuantityFx {
 	}
 }
 
-/** Sums the worst-case future quantity of one canonical item reserved by active jobs. */
+/** Reads the worst-case future quantity of one canonical item reserved by active jobs. */
 export const readReservedJobOutputQuantityFx = Effect.fn("readReservedJobOutputQuantityFx")(
 	function* ({ itemId, runtime }: readReservedJobOutputQuantityFx.Props) {
-		let quantity = 0;
-		for (const job of runtime.jobs) {
-			const quantities = yield* readJobMaximumOutputQuantitiesFx({
-				job,
-				runtime,
-			});
-			quantity += quantities.get(itemId) ?? 0;
-		}
-
-		return quantity;
+		const reserved = yield* readReservedJobOutputQuantitiesFx({
+			runtime,
+		});
+		return reserved.get(itemId)?.quantity ?? 0;
 	},
 );

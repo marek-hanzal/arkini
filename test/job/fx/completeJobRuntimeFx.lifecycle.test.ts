@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
+import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
 import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
@@ -372,10 +373,15 @@ describe("charge-driven completion lifecycle", () => {
 					ownerItemId: owner.id,
 					lineId: "line:phoenix:renew",
 				});
+				const activeRuntime = yield* readRuntimeFx();
+				const activeCheck = yield* checkRuntimeFx({
+					runtime: activeRuntime,
+				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
 				return {
+					activeCheck,
 					owner,
 					runtime: yield* readRuntimeFx(),
 					started,
@@ -384,6 +390,9 @@ describe("charge-driven completion lifecycle", () => {
 		);
 
 		expect(result.started.type).toBe("started");
+		expect(result.activeCheck.issues.some((issue) => issue.type === "item:max-count")).toBe(
+			false,
+		);
 		const phoenixes = result.runtime.items.filter(
 			(item) => item.item.id === "producer:phoenix",
 		);

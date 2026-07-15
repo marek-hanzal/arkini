@@ -16,3 +16,9 @@ The multi-space review was resolved with the following accepted product semantic
 - local dependencies are re-evaluated after travel and may pause work; universe dependencies remain visible;
 - exported plain selector, eligibility, location-equality, and input-filter helpers were removed in favor of coarse Effect operations with private local predicates;
 - malformed scalar hardening was deliberately rejected because trusted schema boundaries own primitive validity.
+
+## Deep-review follow-up
+
+The independent follow-up review is closed. Permanent query coverage places matching identities in board space A, board space B, shared inventory, input, job, and reserved scopes and proves that `board`, `any`, and `universe` expose only their documented grid reach. Input-, job-, and reservation-owned identities remain invisible.
+
+The destructive-reset lifecycle finding is separate from this engine closeout and remains deliberately deferred to Task 12, where the browser shell will replace one complete application root through a plain factory/composition function and single-flight the whole dispose/delete/create/publish transition.

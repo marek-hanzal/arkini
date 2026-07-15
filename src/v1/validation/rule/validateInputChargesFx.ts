@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { selectorFx } from "~/v1/selector/fx/selectorFx";
+import { selectItemsFx } from "~/v1/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
@@ -127,22 +127,18 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					});
 				}
 
-				let available = false;
-				for (const candidate of Object.values(config.items)) {
-					const matches = yield* selectorFx({
-						selector: input.query.selector,
-						item: candidate,
-					});
-					if (
-						matches &&
+				const targetChargeCost = input.charges.cost;
+				const matchedCandidates = yield* selectItemsFx({
+					items: Object.values(config.items),
+					selector: input.query.selector,
+				});
+				const available = matchedCandidates.some((candidate) => {
+					return (
 						(candidate.scope === "board" || candidate.scope === "any") &&
 						candidate.charges !== undefined &&
-						candidate.charges.amount >= input.charges.cost
-					) {
-						available = true;
-						break;
-					}
-				}
+						candidate.charges.amount >= targetChargeCost
+					);
+				});
 				if (!available) {
 					diagnostics.push({
 						code: "input:charges-invalid",

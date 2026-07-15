@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { getItemsFx } from "~/v1/runtime/read/getItemsFx";
-import { filterInputMaterialItems } from "./filterInputMaterialItems";
+import { isInputRuntimeItem } from "~/v1/runtime/read/isInputRuntimeItem";
 
 export namespace readInputMaterialItemsFx {
 	export interface Props {
@@ -23,10 +23,11 @@ export const readInputMaterialItemsFx = Effect.fn("readInputMaterialItemsFx")(fu
 }: readInputMaterialItemsFx.Props) {
 	const items = yield* getItemsFx();
 
-	return filterInputMaterialItems({
-		inputIndex,
-		items,
-		lineId,
-		ownerItemId,
+	return items.filter(isInputRuntimeItem).filter((item) => {
+		return (
+			item.location.ownerItemId === ownerItemId &&
+			item.location.lineId === lineId &&
+			item.location.inputIndex === inputIndex
+		);
 	});
 });

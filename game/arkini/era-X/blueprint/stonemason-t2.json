@@ -99,7 +99,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:quarry-t2"
@@ -109,7 +109,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:university"

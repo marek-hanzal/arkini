@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { DistanceEnumSchema } from "~/v1/distance/schema/DistanceEnumSchema";
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 import { BaseQuerySchema } from "./BaseQuerySchema";
 
 /**
@@ -13,7 +13,7 @@ export const QueryBoardSchema = z
 		/**
 		 * Identifies this query as a board-only query.
 		 */
-		scope: ScopeEnumSchema.extract([
+		scope: QueryScopeEnumSchema.extract([
 			"board",
 		]).describe("Identifies this query as a board-only query."),
 		/**

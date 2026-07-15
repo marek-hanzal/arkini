@@ -44,6 +44,8 @@ There is no exception for “this helper could stay pure.” Do not create a nam
 
 Existing plain project helpers are cleanup debt, not precedent. Do not copy their shape into new code.
 
+Private synchronous functions are allowed only as non-exported implementation details inside one Effect-operation file. Use them to keep hot collection loops local without creating a reusable plain-operation grammar. The exported project operation remains the same-named `*Fx` entry point, and architecture tests guard this boundary.
+
 Framework-required declarations are not named project operations and retain their framework grammar:
 
 - React components;

@@ -109,7 +109,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:academy"
@@ -119,7 +119,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:charcoal-burner-t1"
@@ -129,7 +129,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:coal-mine-t1"

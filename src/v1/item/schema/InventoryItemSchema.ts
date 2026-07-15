@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { StorageScopeEnumSchema } from "~/v1/scope/schema/StorageScopeEnumSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -14,7 +14,7 @@ export const InventoryItemSchema = z
 		type: ItemEnumSchema.extract([
 			"inventory",
 		]).describe("Identifies this item as the shared inventory opener."),
-		scope: ScopeEnumSchema.extract([
+		scope: StorageScopeEnumSchema.extract([
 			"board",
 		])
 			.default("board")

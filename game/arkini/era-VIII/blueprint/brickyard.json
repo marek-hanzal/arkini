@@ -97,7 +97,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:academy"
@@ -107,7 +107,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:clay-pit"
@@ -117,7 +117,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:purifier-t1"

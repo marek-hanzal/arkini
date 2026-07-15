@@ -3,7 +3,7 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
-import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
+import { readGridLocationOccupantsFx } from "~/v1/location/read/readGridLocationOccupantsFx";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
@@ -85,16 +85,15 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
-			const occupant = pipe(
-				runtime.items,
-				Array.findFirst(
-					(candidate) =>
-						candidate.id !== itemId &&
-						isGridRuntimeItem(candidate) &&
-						isSameGridLocation(candidate.location, location),
-				),
-				Option.getOrUndefined,
-			);
+			const [occupants] = yield* readGridLocationOccupantsFx({
+				items: runtime.items
+					.filter(isGridRuntimeItem)
+					.filter((candidate) => candidate.id !== itemId),
+				locations: [
+					location,
+				],
+			});
+			const occupant = occupants?.items[0];
 			if (occupant !== undefined) {
 				return yield* Effect.fail(
 					new LocationOccupiedError({

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import { isItemMaterialInputEligible } from "~/v1/input/read/isItemMaterialInputEligible";
-import { matchesSelector } from "~/v1/selector/read/matchesSelector";
+import { readMaterialInputEligibilityFx } from "~/v1/input/read/readMaterialInputEligibilityFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { selectItemsFx } from "~/v1/selector/fx/selectItemsFx";
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
@@ -14,10 +14,11 @@ export namespace validateMaterialInputEligibilityFx {
 	}
 }
 
-/** Rejects material selectors whose accepted candidate set contains an ineligible item. */
+/** Rejects material selectors whose complete candidate set contains an ineligible item. */
 export const validateMaterialInputEligibilityFx = Effect.fn("validateMaterialInputEligibilityFx")(
 	function* ({ config, provenance }: validateMaterialInputEligibilityFx.Props) {
 		const diagnostics: GameDiagnosticsSchema.Type = [];
+		const canonicalItems = Object.values(config.items);
 
 		for (const [ownerItemId, owner] of Object.entries(config.items)) {
 			const entries = yield* readItemLineEntriesFx({
@@ -28,13 +29,14 @@ export const validateMaterialInputEligibilityFx = Effect.fn("validateMaterialInp
 				for (const [inputIndex, input] of line.input.entries()) {
 					if (input.type !== "materials") continue;
 
-					for (const candidate of Object.values(config.items)) {
-						const matches = matchesSelector({
-							item: candidate,
-							selector: input.selector,
-						});
-						if (!matches || isItemMaterialInputEligible(candidate)) continue;
-
+					const matchedItems = yield* selectItemsFx({
+						items: canonicalItems,
+						selector: input.selector,
+					});
+					const eligibility = yield* readMaterialInputEligibilityFx({
+						items: matchedItems,
+					});
+					for (const candidate of eligibility.ineligibleItems) {
 						diagnostics.push({
 							code: "input:material-ineligible",
 							severity: "error",

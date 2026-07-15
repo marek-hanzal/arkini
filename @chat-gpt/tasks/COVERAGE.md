@@ -35,7 +35,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Directional gameplay merge | Partial | Canonical atomic execution, deterministic output, and semantic event are implemented; interaction feedback and animation remain | 11, 14 |
 | Temporary lifetime/expiry | Partial | Canonical fixed-step state, save/restore, deterministic atomic expiry, and retry are implemented; read-model and presentation behavior remain | 10, 13, 14, 15 |
 | Speed cheat | Partial | Canonical root runtime session mode, 1×/30× Tick input, save reset, toggle command, and event are implemented | Read-model/asset projection, control UI, and audio remain | 10, 13, 15 |
-| Multi-space board runtime | Partial | Canonical spaces, persistent navigation, isolation, placement, Tick, and save are implemented; renderer/navigation presentation remains | 10–14 |
+| Multi-space board runtime | Partial | Canonical spaces, persistent navigation, isolation, placement, Tick, save, explicit `any` versus `universe` query reach, and ownership-graph travel are implemented; renderer/navigation presentation remains | 10–14 |
 | Board memory | Rejected | Destructive snapshot/restore and active v1 item authoring were removed in favor of multi-space boards | Done |
 | Cheat inventory sink and nuke-save confirmation | Partial | Canonical sink command, committed feedback event, nuke confirmation request, save-discard shutdown, persisted deletion coordinator, and fresh-session recreation are implemented | Interaction wiring, confirmation UI, animation, and browser storage adapter remain in 11–14/16 |
 | Public board/inventory/line read models | Partial | Historical bridge is an information-requirement catalogue | 10 |

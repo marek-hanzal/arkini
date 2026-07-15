@@ -139,7 +139,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:brickyard"
@@ -149,7 +149,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:glassworks"
@@ -159,7 +159,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:roof-tile-factory"
@@ -169,7 +169,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:smelter-t1"

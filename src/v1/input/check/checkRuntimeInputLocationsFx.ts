@@ -14,7 +14,7 @@ import type { LineInputClosedIssueSchema } from "~/v1/line/schema/check/LineInpu
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { selectorFx } from "~/v1/selector/fx/selectorFx";
+import { selectItemsFx } from "~/v1/selector/fx/selectItemsFx";
 
 export namespace checkRuntimeInputLocationsFx {
 	export interface Props {
@@ -97,11 +97,13 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			continue;
 		}
 
-		const matches = yield* selectorFx({
-			item: item.item,
+		const matches = yield* selectItemsFx({
+			items: [
+				item.item,
+			],
 			selector: input.selector,
 		});
-		if (!matches) {
+		if (matches.length === 0) {
 			selectorIssues.push({
 				itemId: item.id,
 				location,

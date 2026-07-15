@@ -108,7 +108,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:academy"
@@ -118,7 +118,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:purifier-t1"
@@ -128,7 +128,7 @@
 							{
 								"type": "exists",
 								"query": {
-									"scope": "any",
+									"scope": "universe",
 									"selector": {
 										"type": "item",
 										"itemId": "producer:sand-pit"

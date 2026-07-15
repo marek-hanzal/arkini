@@ -199,6 +199,17 @@ describe("queryFx", () => {
 					},
 				});
 				yield* placeTreeFx({
+					id: "other-space",
+					location: {
+						scope: "board",
+						space: 1,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				yield* placeTreeFx({
 					id: "inventory",
 					location: {
 						scope: "inventory",
@@ -236,6 +247,20 @@ describe("queryFx", () => {
 						},
 					},
 				});
+				const universe = yield* queryFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					query: {
+						scope: "universe",
+						selector: {
+							itemId: "tree",
+							type: "item",
+						},
+					},
+				});
 				const empty = yield* queryFx({
 					origin: {
 						scope: "board",
@@ -255,6 +280,7 @@ describe("queryFx", () => {
 					any,
 					empty,
 					inventory,
+					universe,
 				};
 			}).pipe(
 				useGameFx({
@@ -268,6 +294,11 @@ describe("queryFx", () => {
 		]);
 		expect(readIds(result.any)).toEqual([
 			"board",
+			"inventory",
+		]);
+		expect(readIds(result.universe)).toEqual([
+			"board",
+			"other-space",
 			"inventory",
 		]);
 		expect(result.empty).toEqual([]);

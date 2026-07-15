@@ -5,8 +5,8 @@ import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSc
 import type { InputMaterialSchema } from "~/v1/input/schema/InputMaterialSchema";
 import type { InputMaterialStoreResolutionSchema } from "~/v1/input/schema/store/InputMaterialStoreResolutionSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
-import { isItemMaterialInputEligible } from "~/v1/input/read/isItemMaterialInputEligible";
-import { selectorFx } from "~/v1/selector/fx/selectorFx";
+import { readMaterialInputEligibilityFx } from "~/v1/input/read/readMaterialInputEligibilityFx";
+import { selectItemsFx } from "~/v1/selector/fx/selectItemsFx";
 import { resolveInputMaterialFx } from "./resolveInputMaterialFx";
 
 export namespace planInputMaterialStoreFx {
@@ -27,11 +27,18 @@ export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(fu
 	requestedQuantity,
 	storedQuantity,
 }: planInputMaterialStoreFx.Props) {
-	const matches = yield* selectorFx({
-		item: item.item,
+	const matches = yield* selectItemsFx({
+		items: [
+			item.item,
+		],
 		selector: input.selector,
 	});
-	if (!matches || !isItemMaterialInputEligible(item.item)) {
+	const eligibility = yield* readMaterialInputEligibilityFx({
+		items: [
+			item.item,
+		],
+	});
+	if (matches.length === 0 || eligibility.eligibleItems.length === 0) {
 		return undefined;
 	}
 

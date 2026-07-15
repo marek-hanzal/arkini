@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
-import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
+import { readGridLocationOccupantsFx } from "~/v1/location/read/readGridLocationOccupantsFx";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { GridRuntimeItemSchema } from "~/v1/runtime/schema/GridRuntimeItemSchema";
@@ -22,13 +22,13 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 	locations,
 	runtime,
 }: readAvailableStackItemsFx.Props) {
-	const candidates = runtime.items.filter(isGridRuntimeItem).filter((item) => {
-		return (
-			item.item.id === itemId &&
-			item.quantity < item.item.maxStackSize &&
-			locations.some((location) => isSameGridLocation(item.location, location))
-		);
+	const occupants = yield* readGridLocationOccupantsFx({
+		items: runtime.items.filter(isGridRuntimeItem),
+		locations,
 	});
+	const candidates = occupants
+		.flatMap((entry) => entry.items)
+		.filter((item) => item.item.id === itemId && item.quantity < item.item.maxStackSize);
 	const purity = yield* Effect.forEach(candidates, (item) =>
 		isItemPureFx({
 			item,

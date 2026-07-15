@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 import { BaseQuerySchema } from "./BaseQuerySchema";
 
 /**
- * A query that selects matching items across both board and inventory.
+ * A query that selects matching items from the origin-space board and shared inventory.
  *
  * It intentionally has no distance because inventory candidates have no board
  * position to measure against the query origin.
@@ -13,16 +13,19 @@ export const QueryAnySchema = z
 	.object({
 		...BaseQuerySchema.shape,
 		/**
-		 * Identifies this query as one that searches board and inventory.
+		 * Identifies this query as one that searches the origin-space board and shared inventory.
 		 */
-		scope: ScopeEnumSchema.extract([
+		scope: QueryScopeEnumSchema.extract([
 			"any",
-		]).describe("Identifies this query as one that searches board and inventory."),
+		]).describe(
+			"Identifies this query as one that searches the origin-space board and shared inventory.",
+		),
 	})
 	.strict()
 	.meta({
 		id: "QueryAnySchema",
-		description: "An item query that searches across board and inventory without a distance.",
+		description:
+			"An item query that searches the origin-space board and shared inventory without a distance.",
 	});
 
 export type QueryAnySchema = typeof QueryAnySchema;

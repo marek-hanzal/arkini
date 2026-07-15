@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 import { BaseQuerySchema } from "./BaseQuerySchema";
 
 /**
@@ -14,7 +14,7 @@ export const QueryInventorySchema = z
 		/**
 		 * Identifies this query as an inventory-only query.
 		 */
-		scope: ScopeEnumSchema.extract([
+		scope: QueryScopeEnumSchema.extract([
 			"inventory",
 		]).describe("Identifies this query as an inventory-only query."),
 	})

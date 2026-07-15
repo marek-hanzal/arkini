@@ -2,14 +2,14 @@ import { z } from "zod";
 
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { StorageScopeEnumSchema } from "~/v1/scope/schema/StorageScopeEnumSchema";
 
 /**
  * One live item occupies a grid forbidden by its canonical item definition.
  */
 export const LocationScopeIssueSchema = z
 	.object({
-		configuredScope: ScopeEnumSchema.describe(
+		configuredScope: StorageScopeEnumSchema.describe(
 			"The storage scope allowed by the canonical item definition.",
 		),
 		itemId: IdSchema.describe("The live item stored in a forbidden grid."),

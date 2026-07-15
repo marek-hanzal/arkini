@@ -3,7 +3,7 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { TimeSchema } from "~/v1/common/schema/TimeSchema";
 import { OutputSchema } from "~/v1/output/schema/OutputSchema";
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { StorageScopeEnumSchema } from "~/v1/scope/schema/StorageScopeEnumSchema";
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -26,7 +26,7 @@ export const TemporaryItemSchema = z
 		/**
 		 * Temporary items are always stored on the board.
 		 */
-		scope: ScopeEnumSchema.extract([
+		scope: StorageScopeEnumSchema.extract([
 			"board",
 		])
 			.default("board")

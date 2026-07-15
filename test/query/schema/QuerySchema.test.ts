@@ -25,10 +25,11 @@ describe("QuerySchema", () => {
 		).toBe(false);
 	});
 
-	it("forbids distance for inventory and cross-state queries", () => {
+	it("forbids distance for inventory, local combined, and universe queries", () => {
 		for (const scope of [
 			"inventory",
 			"any",
+			"universe",
 		]) {
 			expect(
 				QuerySchema.safeParse({

@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
-import { filterInputMaterialItems } from "~/v1/input/read/filterInputMaterialItems";
+import { isInputRuntimeItem } from "~/v1/runtime/read/isInputRuntimeItem";
 import type { InputSchema } from "~/v1/input/schema/InputSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { resolveInputMaterialRunFx } from "./resolveInputMaterialRunFx";
@@ -32,6 +32,16 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	reservedCharges,
 	runtime,
 }: resolveInputRunFx.Props) {
+	const readMaterialItems = () => {
+		return runtime.items.filter(isInputRuntimeItem).filter((item) => {
+			return (
+				item.location.ownerItemId === ownerItemId &&
+				item.location.lineId === lineId &&
+				item.location.inputIndex === inputIndex
+			);
+		});
+	};
+
 	return yield* match(input)
 		.with(
 			{
@@ -56,12 +66,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 					ownerItemId,
 					reservedCharges,
 					runtime,
-					items: filterInputMaterialItems({
-						inputIndex,
-						items: runtime.items,
-						lineId,
-						ownerItemId,
-					}),
+					items: readMaterialItems(),
 				});
 			},
 		)

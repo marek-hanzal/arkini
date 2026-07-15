@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { selectorFx } from "~/v1/selector/fx/selectorFx";
+import { selectItemsFx } from "~/v1/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/v1/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/v1/validation/schema/GameDiagnosticsSchema";
@@ -48,17 +48,13 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 					});
 				}
 
-				let targetAvailable = false;
-				for (const candidate of Object.values(config.items)) {
-					const matches = yield* selectorFx({
-						selector: merge.target,
-						item: candidate,
-					});
-					if (matches && (candidate.scope === "board" || candidate.scope === "any")) {
-						targetAvailable = true;
-						break;
-					}
-				}
+				const matchedTargets = yield* selectItemsFx({
+					items: Object.values(config.items),
+					selector: merge.target,
+				});
+				const targetAvailable = matchedTargets.some((candidate) => {
+					return candidate.scope === "board" || candidate.scope === "any";
+				});
 				if (!targetAvailable) {
 					diagnostics.push({
 						code: "merge:invalid",

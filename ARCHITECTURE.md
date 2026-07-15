@@ -313,7 +313,9 @@ Every operation whose candidate would attach identity-bound state to quantity gr
 
 Placement is one shared policy used by commands, line output, charge-depletion output, reserved-instance return, and buffered-input release. `placeRuntimeItemFx` is the sole internal entry point for relocating an existing live item; lifecycle callsites must not invent specialized placement branches.
 
-Every board location includes mandatory `space`; one cell is `space + x + y`. Board origins carry that full location through the pipeline. Occupancy, stacking, nearest-first ordering, random origin, queries, charges, merge, and output are local to the origin space. Scope fallback may continue into the global inventory but never another board space. `runtime.currentSpace` is persistent presentation/navigation state only and never filters Tick or background completion.
+Every board location includes mandatory `space`; one cell is `space + x + y`. Board origins carry that full location through the pipeline. Occupancy, stacking, nearest-first ordering, random origin, charges, merge, and output are local to the origin space. Query reach is explicit: `board` is origin-space board with distance, `inventory` is shared inventory, `any` is origin-space board plus inventory, and `universe` is every board space plus inventory without distance. Scope fallback may continue into the global inventory but never another board space. `runtime.currentSpace` is persistent presentation/navigation state only and never filters Tick, background completion, or explicit off-screen inventory interactions.
+
+Attached ownership state has no independent space while owned. A movable owner transports its complete ownership graph through inventory; destination-local rules are re-evaluated after placement, and all surviving output or reserved state materializes from the owner's current board location rather than any historical origin.
 
 Materialized drops follow this high-level order:
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { StorageScopeEnumSchema } from "~/v1/scope/schema/StorageScopeEnumSchema";
 import { DescriptionSchema } from "~/v1/common/schema/DescriptionSchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
@@ -53,7 +53,9 @@ export const BaseItemSchema = z
 		/**
 		 * Part of game state in which this item may be stored.
 		 */
-		scope: ScopeEnumSchema.describe("The part of game state in which this item may be stored."),
+		scope: StorageScopeEnumSchema.describe(
+			"The part of game state in which this item may be stored.",
+		),
 		/**
 		 * Optional maximum number of this item allowed across the game state.
 		 */

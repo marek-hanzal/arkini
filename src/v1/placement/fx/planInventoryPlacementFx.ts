@@ -5,7 +5,7 @@ import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { planScopePlacementFx } from "./planScopePlacementFx";
-import { readGridLocationsFx } from "./readGridLocationsFx";
+import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
 
 export namespace planInventoryPlacementFx {
 	export interface Props {
@@ -15,15 +15,14 @@ export namespace planInventoryPlacementFx {
 	}
 }
 
-/** Plans stack-first inventory placement in deterministic slot order. */
+/** Plans stack-first placement in the universe-wide passive inventory. */
 export const planInventoryPlacementFx = Effect.fn("planInventoryPlacementFx")(function* ({
 	item,
 	quantity,
 	runtime,
 }: planInventoryPlacementFx.Props) {
 	const config = yield* GameConfigFx;
-	const inventoryLocations = yield* readGridLocationsFx({
-		scope: "inventory",
+	const inventoryLocations = yield* readInventoryLocationsFx({
 		size: config.meta.inventory,
 	});
 
@@ -32,6 +31,5 @@ export const planInventoryPlacementFx = Effect.fn("planInventoryPlacementFx")(fu
 		locations: inventoryLocations,
 		quantity,
 		runtime,
-		scope: "inventory",
 	});
 });

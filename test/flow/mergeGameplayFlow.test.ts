@@ -34,6 +34,7 @@ describe("authored directional merge gameplay", () => {
 					itemId: "item:water",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -46,6 +47,7 @@ describe("authored directional merge gameplay", () => {
 					itemId: "item:tree",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -74,6 +76,7 @@ describe("authored directional merge gameplay", () => {
 				useGameFx({
 					config,
 					state: {
+						currentSpace: 0,
 						items: [],
 						jobs: [],
 						jobQueue: [],
@@ -131,6 +134,7 @@ describe("authored directional merge gameplay", () => {
 					itemId: "item:tree",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -155,6 +159,7 @@ describe("authored directional merge gameplay", () => {
 					itemId: "item:rock",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 5,
 							y: 0,
@@ -175,6 +180,7 @@ describe("authored directional merge gameplay", () => {
 				useGameFx({
 					config,
 					state: {
+						currentSpace: 0,
 						items: [],
 						jobs: [],
 						jobQueue: [],

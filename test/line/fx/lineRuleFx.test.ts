@@ -57,7 +57,11 @@ describe("lineRuleFx", () => {
 
 				return yield* Effect.forEach(rules, (rule) => {
 					return lineRuleFx({
-						origin: origin.location.position,
+						origin: {
+							scope: "board",
+							space: 0,
+							position: origin.location.position,
+						},
 						rule,
 					});
 				});

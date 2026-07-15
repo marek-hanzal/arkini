@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 
@@ -9,6 +10,9 @@ import { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 export const BoardItemSchema = z
 	.object({
 		...PositionSchema.shape,
+		space: NonNegativeIntegerSchema.describe(
+			"The explicit board space containing this initial item.",
+		),
 		/**
 		 * Canonical item placed on the board.
 		 */

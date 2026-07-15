@@ -26,7 +26,10 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 	start,
 }: planStartFx.Props) {
 	const initialState: PlanningState = {
-		draft: runtime,
+		draft: {
+			...runtime,
+			currentSpace: start.currentSpace,
+		},
 	};
 	const board = yield* Effect.reduce(start.board, initialState, (state, item) => {
 		return Effect.gen(function* () {

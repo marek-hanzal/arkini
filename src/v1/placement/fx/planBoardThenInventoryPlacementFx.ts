@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -15,7 +15,7 @@ export namespace planBoardThenInventoryPlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
 		item: ItemSchema.Type;
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}

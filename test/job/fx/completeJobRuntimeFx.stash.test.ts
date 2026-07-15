@@ -138,7 +138,9 @@ const stashConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"stash:guaranteed": stashItem({
@@ -202,6 +204,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 		itemId,
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -214,6 +217,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 		itemId: "item:key",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 1,
 				y: 0,
@@ -311,6 +315,7 @@ describe("stash line completion", () => {
 					itemId: "item:blocker",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

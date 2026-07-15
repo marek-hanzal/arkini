@@ -23,7 +23,9 @@ const config = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		source: {
@@ -50,6 +52,7 @@ const createOriginFx = () => {
 		itemId: "source",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 5,
 				y: 5,
@@ -97,7 +100,11 @@ describe("dropFx", () => {
 						},
 						rules: [],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 			}).pipe(
 				useGameFx({
@@ -134,7 +141,11 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 				const disableApplied = yield* dropFx({
 					drop: {
@@ -153,7 +164,11 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 
 				return {
@@ -200,7 +215,11 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 				const rejected = yield* dropFx({
 					drop: {
@@ -225,7 +244,11 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 
 				return {
@@ -271,7 +294,11 @@ describe("dropFx", () => {
 							},
 						],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 				const accepted = yield* dropFx({
 					drop: {
@@ -284,7 +311,11 @@ describe("dropFx", () => {
 						},
 						rules: [],
 					},
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 				});
 
 				return {

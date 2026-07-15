@@ -13,6 +13,7 @@ describe("planStartFx", () => {
 					session: {
 						speedMode: "normal" as const,
 					},
+					currentSpace: 0,
 					items: [],
 					jobs: [],
 				};
@@ -33,6 +34,7 @@ describe("planStartFx", () => {
 				expect.objectContaining({
 					item: startTestConfig.items.tree,
 					location: {
+						space: 0,
 						position: {
 							x: 1,
 							y: 1,
@@ -74,10 +76,12 @@ describe("planStartFx", () => {
 					session: {
 						speedMode: "normal" as const,
 					},
+					currentSpace: 0,
 					items: [],
 					jobs: [],
 				},
 				start: {
+					currentSpace: 0,
 					board: [],
 					inventory: [
 						{
@@ -113,17 +117,21 @@ describe("planStartFx", () => {
 						session: {
 							speedMode: "normal" as const,
 						},
+						currentSpace: 0,
 						items: [],
 						jobs: [],
 					},
 					start: {
+						currentSpace: 0,
 						board: [
 							{
+								space: 0,
 								itemId: "tree",
 								x: 0,
 								y: 0,
 							},
 							{
+								space: 0,
 								itemId: "tree",
 								x: 0,
 								y: 0,

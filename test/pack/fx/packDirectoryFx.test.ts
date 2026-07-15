@@ -55,6 +55,7 @@ describe("packDirectoryFx", () => {
 							hero: "hero",
 						},
 						start: {
+							currentSpace: 0,
 							board: [],
 							inventory: [],
 						},

@@ -1,7 +1,9 @@
 import { Array, Effect, Option, pipe } from "effect";
 
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
+import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
+import { isGridRuntimeItem } from "./isGridRuntimeItem";
 import { getItemsFx } from "./getItemsFx";
 
 export namespace getItemAtFx {
@@ -17,13 +19,9 @@ export const getItemAtFx = Effect.fn("getItemAtFx")(function* ({ location }: get
 	const items = yield* getItemsFx();
 	const item = pipe(
 		items,
-		Array.findFirst((item) => {
-			return (
-				item.location.scope === location.scope &&
-				item.location.position.x === location.position.x &&
-				item.location.position.y === location.position.y
-			);
-		}),
+		Array.findFirst(
+			(item) => isGridRuntimeItem(item) && isSameGridLocation(item.location, location),
+		),
 		Option.getOrUndefined,
 	);
 

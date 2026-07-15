@@ -16,6 +16,7 @@ const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
 
 const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
+	currentSpace: 0,
 	items: runtime.items
 		.map((item) => ({
 			itemId: item.item.id,

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import type { DropResolutionSchema } from "~/v1/output/schema/DropResolutionSchema";
 import type { DropSchema } from "~/v1/output/schema/DropSchema";
 import { rollQuantityFx } from "~/v1/quantity/fx/rollQuantityFx";
@@ -10,7 +10,7 @@ import { dropRuleFx } from "./dropRuleFx";
 export namespace dropFx {
 	export interface Props {
 		drop: DropSchema.Type;
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 	}
 }
 

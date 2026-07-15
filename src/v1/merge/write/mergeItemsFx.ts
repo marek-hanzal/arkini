@@ -14,6 +14,7 @@ import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/v1/runtime/read/readRuntimeItemByIdFx";
+import { CrossSpaceBoardOperationError } from "~/v1/space/error/CrossSpaceBoardOperationError";
 
 export namespace mergeItemsFx {
 	export interface Props {
@@ -74,6 +75,14 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 					new ItemNotOnBoardError({
 						itemId: target.id,
 						location: target.location,
+					}),
+				);
+			}
+			if (isBoardRuntimeItem(source) && source.location.space !== target.location.space) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: source.location.space,
+						toSpace: target.location.space,
 					}),
 				);
 			}

@@ -1,9 +1,13 @@
 import { z } from "zod";
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { JobQueueRequestSchema } from "~/v1/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/v1/job/schema/JobSchema";
 import { StateItemSchema } from "./StateItemSchema";
 export const StateSchema = z
 	.object({
+		currentSpace: NonNegativeIntegerSchema.describe(
+			"The persistent board space currently presented to the player.",
+		),
 		items: z.array(StateItemSchema),
 		jobs: z.array(JobSchema),
 		jobQueue: z.array(JobQueueRequestSchema).optional(),

@@ -26,7 +26,9 @@ const config = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		source: {
@@ -53,6 +55,7 @@ const createOriginFx = () => {
 		itemId: "source",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 5,
 				y: 5,
@@ -147,7 +150,11 @@ describe("outputFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* outputFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					output: {
 						set: [
 							createRollSet({
@@ -211,7 +218,11 @@ describe("outputFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* outputFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					output: {
 						set: [
 							createRollSet({
@@ -274,7 +285,11 @@ describe("outputFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* createOriginFx();
 				const output = yield* outputFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					output: {
 						set: [
 							createRollSet({

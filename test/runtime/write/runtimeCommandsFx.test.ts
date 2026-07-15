@@ -29,7 +29,9 @@ const config = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		log: {
@@ -67,6 +69,7 @@ const config = GameConfigSchema.parse({
 
 const boardA = {
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 0,
 		y: 0,
@@ -74,6 +77,7 @@ const boardA = {
 };
 const boardB = {
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 1,
 		y: 0,
@@ -312,6 +316,7 @@ describe("runtime commands", () => {
 	it("serializes concurrent moves competing for one location", async () => {
 		const target = {
 			scope: "board" as const,
+			space: 0,
 			position: {
 				x: 2,
 				y: 0,

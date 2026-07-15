@@ -5,6 +5,7 @@ import { orderBoardLocationsFx } from "~/v1/placement/fx/orderBoardLocationsFx";
 
 const location = (x: number, y = 0) => {
 	return {
+		space: 0,
 		position: {
 			x,
 			y,

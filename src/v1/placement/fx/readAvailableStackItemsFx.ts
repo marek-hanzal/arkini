@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
+import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { GridRuntimeItemSchema } from "~/v1/runtime/schema/GridRuntimeItemSchema";
@@ -10,26 +11,26 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace readAvailableStackItemsFx {
 	export interface Props {
 		itemId: IdSchema.Type;
+		locations: ReadonlyArray<GridLocationSchema.Type>;
 		runtime: RuntimeSchema.Type;
-		scope: GridLocationSchema.Type["scope"];
 	}
 }
 
-/** Reads every pure compatible non-full stack in row-major location order. */
+/** Reads every pure compatible non-full stack inside one explicit location set. */
 export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(function* ({
 	itemId,
+	locations,
 	runtime,
-	scope,
 }: readAvailableStackItemsFx.Props) {
 	const candidates = runtime.items.filter(isGridRuntimeItem).filter((item) => {
 		return (
 			item.item.id === itemId &&
-			item.location.scope === scope &&
-			item.quantity < item.item.maxStackSize
+			item.quantity < item.item.maxStackSize &&
+			locations.some((location) => isSameGridLocation(item.location, location))
 		);
 	});
-	const purity = yield* Effect.forEach(candidates, (item) => {
-		return isItemPureFx({
+	const purity = yield* Effect.forEach(candidates, (item) =>
+		isItemPureFx({
 			item,
 			runtime,
 		}).pipe(
@@ -37,8 +38,8 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 				item,
 				pure,
 			})),
-		);
-	});
+		),
+	);
 
 	return purity
 		.filter(({ pure }) => pure)

@@ -5,7 +5,7 @@ import { useGameFx } from "~/v1/game/fx/useGameFx";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { queryFx } from "~/v1/query/fx/queryFx";
 
 const config = GameConfigSchema.parse({
@@ -25,7 +25,9 @@ const config = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		tree: {
@@ -48,32 +50,11 @@ const config = GameConfigSchema.parse({
 	},
 });
 
-const placeTreeFx = ({
-	id,
-	location: {
-		scope,
-		position: { x, y },
-	},
-}: {
-	id: string;
-	location: {
-		scope: Exclude<ScopeEnumSchema.Type, "any">;
-		position: {
-			x: number;
-			y: number;
-		};
-	};
-}) => {
+const placeTreeFx = ({ id, location }: { id: string; location: GridLocationSchema.Type }) => {
 	return spawnItemFx({
 		id,
 		itemId: "tree",
-		location: {
-			scope,
-			position: {
-				x,
-				y,
-			},
-		},
+		location,
 		quantity: 1,
 	});
 };
@@ -92,6 +73,7 @@ describe("queryFx", () => {
 					id: "origin",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 5,
 							y: 5,
@@ -102,6 +84,7 @@ describe("queryFx", () => {
 					id: "close",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 6,
 							y: 5,
@@ -112,6 +95,7 @@ describe("queryFx", () => {
 					id: "near",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 7,
 							y: 5,
@@ -122,6 +106,7 @@ describe("queryFx", () => {
 					id: "far",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 8,
 							y: 5,
@@ -129,7 +114,11 @@ describe("queryFx", () => {
 					},
 				});
 				const close = yield* queryFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					query: {
 						distance: "close",
 						scope: "board",
@@ -140,7 +129,11 @@ describe("queryFx", () => {
 					},
 				});
 				const near = yield* queryFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					query: {
 						distance: "near",
 						scope: "board",
@@ -151,7 +144,11 @@ describe("queryFx", () => {
 					},
 				});
 				const far = yield* queryFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					query: {
 						distance: "far",
 						scope: "board",
@@ -194,6 +191,7 @@ describe("queryFx", () => {
 					id: "board",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -211,7 +209,11 @@ describe("queryFx", () => {
 					},
 				});
 				const inventory = yield* queryFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					query: {
 						scope: "inventory",
 						selector: {
@@ -221,7 +223,11 @@ describe("queryFx", () => {
 					},
 				});
 				const any = yield* queryFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					query: {
 						scope: "any",
 						selector: {
@@ -231,7 +237,11 @@ describe("queryFx", () => {
 					},
 				});
 				const empty = yield* queryFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					query: {
 						scope: "inventory",
 						selector: {

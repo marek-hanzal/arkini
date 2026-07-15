@@ -27,7 +27,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		any: {
@@ -80,13 +82,22 @@ const config = GameConfigSchema.parse({
 });
 
 const location = (scope: "board" | "inventory", x: number, y: number) => {
-	return {
-		scope,
-		position: {
-			x,
-			y,
-		},
-	} as const;
+	return scope === "board"
+		? ({
+				scope: "board",
+				space: 0,
+				position: {
+					x,
+					y,
+				},
+			} as const)
+		: ({
+				scope: "inventory",
+				position: {
+					x,
+					y,
+				},
+			} as const);
 };
 
 describe("checkRuntimeFx", () => {
@@ -95,6 +106,7 @@ describe("checkRuntimeFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "duplicate",
@@ -184,6 +196,7 @@ describe("checkRuntimeFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "limited:first",
@@ -300,6 +313,7 @@ describe("checkRuntimeFx", () => {
 
 	it("rejects invalid persisted state before it becomes runtime", () => {
 		const state = StateSchema.parse({
+			currentSpace: 0,
 			items: [
 				{
 					id: "wrong-scope",

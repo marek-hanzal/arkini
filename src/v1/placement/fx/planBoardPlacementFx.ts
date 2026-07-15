@@ -2,27 +2,26 @@ import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import type { PlacementEnumSchema } from "~/v1/placement/schema/PlacementEnumSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
-import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
-import { readGridLocationsFx } from "./readGridLocationsFx";
+import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { resolveBoardPlacementOriginFx } from "./resolveBoardPlacementOriginFx";
 
 export namespace planBoardPlacementFx {
 	export interface Props {
 		item: ItemSchema.Type;
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		placement: PlacementEnumSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
 
-/** Resolves one board origin, then plans canonical stack-first nearest placement. */
+/** Resolves one board-space origin, then plans stack-first nearest placement there. */
 export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* ({
 	item,
 	origin,
@@ -36,25 +35,20 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 		placement,
 		size: config.meta.board,
 	});
-	const boardLocations = yield* readGridLocationsFx({
-		scope: "board",
+	const boardLocations = yield* readBoardLocationsFx({
 		size: config.meta.board,
-	});
-	const emptyBoardLocations = yield* readEmptyLocationsFx({
-		locations: boardLocations,
-		runtime,
+		space: origin.space,
 	});
 	const orderedBoardLocations = yield* orderBoardLocationsFx({
-		locations: emptyBoardLocations,
-		origin: placementOrigin,
+		locations: boardLocations,
+		origin: placementOrigin.position,
 	});
 
 	return yield* planScopePlacementFx({
 		item,
 		locations: orderedBoardLocations,
-		origin: placementOrigin,
+		origin: placementOrigin.position,
 		quantity,
 		runtime,
-		scope: "board",
 	});
 });

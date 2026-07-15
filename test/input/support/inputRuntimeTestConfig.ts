@@ -42,7 +42,9 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		workshop: {
@@ -103,6 +105,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 
 export const workshopLocation = {
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 0,
 		y: 0,
@@ -112,6 +115,7 @@ export const workshopLocation = {
 export const sourceLocation = (x: number) => {
 	return {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x,
 			y: 0,

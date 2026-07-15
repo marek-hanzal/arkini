@@ -17,6 +17,7 @@ const owner = {
 	item: inputRuntimeTestConfig.items.workshop,
 	location: {
 		scope: "board",
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -62,6 +63,7 @@ describe("resolveInputRunFx", () => {
 					session: {
 						speedMode: "normal" as const,
 					},
+					currentSpace: 0,
 					items: [
 						owner,
 					],
@@ -86,6 +88,7 @@ describe("resolveInputRunFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				owner,
 				bufferedItem({
@@ -143,6 +146,7 @@ describe("resolveInputRunFx", () => {
 			item: inputRuntimeTestConfig.items.stone,
 			location: {
 				scope: "board" as const,
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,
@@ -176,6 +180,7 @@ describe("resolveInputRunFx", () => {
 					session: {
 						speedMode: "normal" as const,
 					},
+					currentSpace: 0,
 					items: [
 						owner,
 						target,

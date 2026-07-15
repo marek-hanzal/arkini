@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
+
 import { BoardItemSchema } from "./BoardItemSchema";
 import { InventoryItemSchema } from "./InventoryItemSchema";
 
@@ -8,6 +10,9 @@ import { InventoryItemSchema } from "./InventoryItemSchema";
  */
 export const StartSchema = z
 	.object({
+		currentSpace: NonNegativeIntegerSchema.describe(
+			"The board space presented when a new game starts.",
+		),
 		/**
 		 * Items placed at explicit initial board coordinates.
 		 */

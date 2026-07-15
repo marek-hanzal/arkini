@@ -16,6 +16,7 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 	);
 	return yield* assertRuntimeFx({
 		runtime: {
+			currentSpace: state.currentSpace,
 			session: {
 				speedMode: "normal" as const,
 			},

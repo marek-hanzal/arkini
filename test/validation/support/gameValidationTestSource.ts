@@ -99,6 +99,7 @@ export const createRootSource = ({
 	path = "/game/game.json",
 	items = {},
 	start = {
+		currentSpace: 0,
 		board: [],
 		inventory: [],
 	},

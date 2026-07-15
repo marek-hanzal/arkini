@@ -1,29 +1,17 @@
 import { z } from "zod";
 
-import { PositionSchema } from "~/v1/grid/schema/PositionSchema";
-import { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import { BoardLocationSchema } from "./BoardLocationSchema";
+import { InventoryLocationSchema } from "./InventoryLocationSchema";
 
-/**
- * One concrete board or inventory grid location.
- */
+/** One concrete location on a board space or in the universe-wide inventory. */
 export const GridLocationSchema = z
-	.object({
-		/**
-		 * Concrete grid currently containing the item.
-		 */
-		scope: ScopeEnumSchema.extract([
-			"board",
-			"inventory",
-		]).describe("The concrete board or inventory grid containing the item."),
-		/**
-		 * Coordinates of the item inside its current grid.
-		 */
-		position: PositionSchema.describe("The coordinates inside the current grid."),
-	})
-	.strict()
+	.discriminatedUnion("scope", [
+		BoardLocationSchema,
+		InventoryLocationSchema,
+	])
 	.meta({
 		id: "GridLocationSchema",
-		description: "One concrete board or inventory grid location.",
+		description: "One concrete board-space or inventory location.",
 	});
 
 export type GridLocationSchema = typeof GridLocationSchema;

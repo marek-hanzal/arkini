@@ -27,13 +27,16 @@ describe("validateStartStateFx", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			start: {
+				currentSpace: 0,
 				board: [
 					{
+						space: 0,
 						itemId: "tree",
 						x: 0,
 						y: 0,
 					},
 					{
+						space: 0,
 						itemId: "tree",
 						x: 0,
 						y: 0,

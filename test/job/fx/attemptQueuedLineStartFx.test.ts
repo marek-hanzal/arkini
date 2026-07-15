@@ -20,6 +20,7 @@ const owner = {
 	item: config.items.forge,
 	location: {
 		scope: "board",
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -49,6 +50,7 @@ describe("attemptQueuedLineStartFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				owner,
 			],
@@ -72,6 +74,7 @@ describe("attemptQueuedLineStartFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				owner,
 			],
@@ -110,6 +113,7 @@ describe("attemptQueuedLineStartFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				inventoryOwner,
 			],
@@ -138,6 +142,7 @@ describe("attemptQueuedLineStartFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [],
 			jobs: [],
 			jobQueue: [
@@ -162,6 +167,7 @@ describe("attemptQueuedLineStartFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				owner,
 			],

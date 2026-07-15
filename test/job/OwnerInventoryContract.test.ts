@@ -22,13 +22,23 @@ const moveOwnerFx = Effect.fn("moveOwnerFx")(function* (scope: "board" | "invent
 	return yield* moveItemFx({
 		itemId: owner.id,
 		revision: owner.revision,
-		location: {
-			scope,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
+		location:
+			scope === "board"
+				? {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					}
+				: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
 	});
 });
 
@@ -50,6 +60,7 @@ const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
 		itemId: "water",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 3,
 				y: 0,

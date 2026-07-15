@@ -13,6 +13,7 @@ import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig
 const makeState = ({
 	sourceLocation = {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -21,6 +22,7 @@ const makeState = ({
 	sourceQuantity = 2,
 	targetLocation = {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x: 1,
 			y: 0,
@@ -34,6 +36,7 @@ const makeState = ({
 	targetQuantity?: number;
 } = {}) =>
 	({
+		currentSpace: 0,
 		items: [
 			{
 				id: "runtime:source",

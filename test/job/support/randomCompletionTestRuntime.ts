@@ -120,6 +120,7 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 			itemId: "forge",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -136,6 +137,7 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 					itemId: "blocker",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x,
 							y,

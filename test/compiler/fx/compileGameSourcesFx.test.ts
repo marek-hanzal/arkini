@@ -168,6 +168,7 @@ describe("compileGameSourcesFx", () => {
 						},
 					},
 					start: {
+						currentSpace: 0,
 						board: [],
 						inventory: [],
 					},

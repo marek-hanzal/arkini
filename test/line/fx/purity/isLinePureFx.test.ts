@@ -13,6 +13,7 @@ const owner = {
 	item: purityTestConfig.items.producer,
 	location: {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -26,6 +27,7 @@ const baseRuntime = {
 	session: {
 		speedMode: "normal" as const,
 	},
+	currentSpace: 0,
 	items: [
 		owner,
 	],

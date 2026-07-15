@@ -27,7 +27,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		tree: {
@@ -52,12 +54,14 @@ const config = GameConfigSchema.parse({
 });
 
 const state = StateSchema.parse({
+	currentSpace: 0,
 	items: [
 		{
 			id: "runtime:board:tree",
 			itemId: "tree",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 2,
@@ -104,6 +108,7 @@ describe("fromStateFx", () => {
 					itemId: "tree",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 2,
 							y: 1,
@@ -129,6 +134,7 @@ describe("fromStateFx", () => {
 		expect(result.placed).toBe(result.read);
 		expect(result.read.location).toEqual({
 			scope: "board",
+			space: 0,
 			position: {
 				x: 2,
 				y: 1,
@@ -224,6 +230,7 @@ describe("fromStateFx", () => {
 
 	it("fails when state references an unknown canonical item", () => {
 		const invalidState = StateSchema.parse({
+			currentSpace: 0,
 			items: state.items.map((item) => {
 				if (item.id !== "runtime:board:tree") {
 					return item;

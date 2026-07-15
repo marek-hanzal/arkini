@@ -18,7 +18,9 @@ export const lineTestConfig = GameConfigSchema.parse({
 			height: 3,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		source: {
@@ -103,6 +105,7 @@ export const createOriginFx = () => {
 		itemId: "source",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 5,
 				y: 5,

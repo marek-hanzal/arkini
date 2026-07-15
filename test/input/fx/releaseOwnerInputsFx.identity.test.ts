@@ -53,7 +53,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		outer: {
@@ -133,6 +135,7 @@ const boardOwner = {
 	itemId: "outer",
 	location: {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -194,6 +197,7 @@ const runRemoveFx = (state: StateSchema.Type) =>
 describe("releaseOwnerInputsFx existing identity", () => {
 	it("preserves one impure buffered root and its passive subtree", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardOwner,
 				inputItem({
@@ -219,6 +223,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			remainingCharges: 1,
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -235,6 +240,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 	it("allows a pure buffered root to normalize into an existing stack", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardOwner,
 				{
@@ -250,6 +256,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					itemId: "material",
 					location: {
 						scope: "board" as const,
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -275,6 +282,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 	it("preserves impure identities across board-first inventory fallback", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardOwner,
 				inputItem({
@@ -294,6 +302,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					itemId: "blocker",
 					location: {
 						scope: "board" as const,
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -311,6 +320,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			remainingCharges: 1,
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -331,6 +341,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 	it("rolls back the whole removal when one impure root has no exclusive cell", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardOwner,
 				inputItem({
@@ -350,6 +361,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					itemId: "blocker",
 					location: {
 						scope: "board" as const,
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

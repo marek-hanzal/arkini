@@ -102,6 +102,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 		itemId: "enabler",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -114,6 +115,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 		itemId: "dependent",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 1,
 				y: 0,
@@ -126,6 +128,7 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 		itemId: "permit",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 2,
 				y: 0,

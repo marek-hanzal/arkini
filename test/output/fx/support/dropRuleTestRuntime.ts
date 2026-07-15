@@ -20,7 +20,9 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		source: {
@@ -70,6 +72,7 @@ export const createDropRuleOriginFx = () => {
 		itemId: "source",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 5,
 				y: 5,

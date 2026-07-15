@@ -25,7 +25,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		producer: {
@@ -128,6 +130,7 @@ const config = GameConfigSchema.parse({
 
 const ownerLocation = {
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 0,
 		y: 0,
@@ -178,6 +181,7 @@ describe("line start state owner isolation", () => {
 		).toMatchObject({
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,
@@ -196,6 +200,7 @@ describe("line start state owner isolation", () => {
 					itemId: "blocker",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -282,6 +287,7 @@ describe("line start state owner isolation", () => {
 					itemId: "blocker",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

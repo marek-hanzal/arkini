@@ -32,12 +32,12 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 		context.line.output === undefined
 			? emptyOutput
 			: yield* outputFx({
-					origin: context.owner.location.position,
+					origin: context.owner.location,
 					output: context.line.output,
 				});
 	if (lineOutput.drop.length > 0) {
 		const [, withLineOutput] = yield* applyOutputPlacementFx({
-			origin: context.owner.location.position,
+			origin: context.owner.location,
 			output: lineOutput,
 			runtime: draft,
 		});
@@ -50,12 +50,12 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 			job: context.job,
 		});
 		const depletionOutput = yield* outputFx({
-			origin: context.owner.location.position,
+			origin: context.owner.location,
 			output: context.owner.item.charges.output,
 		}).pipe(Effect.withRandom(random));
 		if (depletionOutput.drop.length > 0) {
 			const [, withDepletionOutput] = yield* applyOutputPlacementFx({
-				origin: context.owner.location.position,
+				origin: context.owner.location,
 				output: depletionOutput,
 				runtime: draft,
 			});
@@ -71,7 +71,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	}
 
 	return yield* releaseJobReservationsFx({
-		origin: context.owner.location.position,
+		origin: context.owner.location,
 		reservations: context.reservations,
 		runtime: draft,
 	});

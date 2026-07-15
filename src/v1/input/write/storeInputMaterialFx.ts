@@ -16,7 +16,9 @@ import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { filterInputSlotItemsFx } from "~/v1/input/read/filterInputSlotItemsFx";
 import { readItemMaterialInputFx } from "~/v1/input/read/readItemMaterialInputFx";
+import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
+import { CrossSpaceBoardOperationError } from "~/v1/space/error/CrossSpaceBoardOperationError";
 import { readRuntimeItemByIdFx } from "~/v1/runtime/read/readRuntimeItemByIdFx";
 
 export namespace storeInputMaterialFx {
@@ -61,6 +63,18 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					new ItemNotOnGridError({
 						itemId: sourceItemId,
 						location: source.location,
+					}),
+				);
+			}
+			if (
+				isBoardRuntimeItem(owner) &&
+				isBoardRuntimeItem(source) &&
+				owner.location.space !== source.location.space
+			) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: source.location.space,
+						toSpace: owner.location.space,
 					}),
 				);
 			}

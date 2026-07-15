@@ -13,6 +13,7 @@ import {
 const compileItems = (
 	items: Record<string, unknown>,
 	start: StartSchema.Type = {
+		currentSpace: 0,
 		board: [],
 		inventory: [],
 	},
@@ -107,8 +108,10 @@ describe("completed config reference validation", () => {
 				[producer.id]: producer,
 			},
 			{
+				currentSpace: 0,
 				board: [
 					{
+						space: 0,
 						itemId: "item:missing-start",
 						x: 0,
 						y: 0,

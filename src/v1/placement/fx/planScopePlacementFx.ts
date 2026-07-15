@@ -21,7 +21,6 @@ export namespace planScopePlacementFx {
 		origin?: PositionSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
-		scope: GridLocationSchema.Type["scope"];
 	}
 }
 
@@ -32,12 +31,11 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 	origin,
 	quantity,
 	runtime,
-	scope,
 }: planScopePlacementFx.Props) {
 	const availableStacks = yield* readAvailableStackItemsFx({
 		itemId: item.id,
+		locations,
 		runtime,
-		scope,
 	});
 	const orderedStacks = yield* orderStackItemsFx({
 		items: availableStacks,

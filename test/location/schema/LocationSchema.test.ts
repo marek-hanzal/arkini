@@ -7,6 +7,7 @@ describe("LocationSchema", () => {
 		expect(
 			LocationSchema.safeParse({
 				scope: "board",
+				space: 0,
 				position: {
 					x: 2,
 					y: 3,
@@ -38,6 +39,15 @@ describe("LocationSchema", () => {
 	it("rejects abstract or incomplete locations", () => {
 		expect(
 			LocationSchema.safeParse({
+				scope: "board",
+				position: {
+					x: 2,
+					y: 3,
+				},
+			}).success,
+		).toBe(false);
+		expect(
+			LocationSchema.safeParse({
 				scope: "any",
 				position: {
 					x: 2,
@@ -60,6 +70,7 @@ describe("LocationSchema", () => {
 				inputIndex: 0,
 				returnLocation: {
 					scope: "board",
+					space: 0,
 					position: {
 						x: 1,
 						y: 1,

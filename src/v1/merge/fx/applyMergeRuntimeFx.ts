@@ -37,18 +37,18 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		target,
 	});
 	draft = yield* returnMergeSourceFx({
-		origin: target.location.position,
+		origin: target.location,
 		returnDrop: sourceAction.returnDrop,
 		runtime: draft,
 	});
 
 	if (rule.output === undefined) return draft;
 	const output = yield* outputFx({
-		origin: target.location.position,
+		origin: target.location,
 		output: rule.output,
 	});
 	const [, withOutput] = yield* applyOutputPlacementFx({
-		origin: target.location.position,
+		origin: target.location,
 		output,
 		runtime: draft,
 	});

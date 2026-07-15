@@ -66,7 +66,9 @@ const lifecycleConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"producer:trader": {
@@ -227,6 +229,7 @@ describe("charge-driven completion lifecycle", () => {
 					itemId: "producer:trader",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -239,6 +242,7 @@ describe("charge-driven completion lifecycle", () => {
 					itemId: "item:material",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -274,6 +278,7 @@ describe("charge-driven completion lifecycle", () => {
 					}),
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -292,12 +297,14 @@ describe("charge-driven completion lifecycle", () => {
 
 	it("preserves one impure buffered input after depleted-owner outputs claim priority", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:trader",
 					itemId: "producer:trader",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -356,6 +363,7 @@ describe("charge-driven completion lifecycle", () => {
 		expect(runtime.items.find((item) => item.item.id === "item:gift")).toMatchObject({
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -367,6 +375,7 @@ describe("charge-driven completion lifecycle", () => {
 				remainingCharges: 1,
 				location: {
 					scope: "board",
+					space: 0,
 					position: {
 						x: 1,
 						y: 0,
@@ -384,6 +393,7 @@ describe("charge-driven completion lifecycle", () => {
 					itemId: "blueprint:empty",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -414,6 +424,7 @@ describe("charge-driven completion lifecycle", () => {
 					itemId: "craft:repeatable",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -452,6 +463,7 @@ describe("charge-driven completion lifecycle", () => {
 					itemId: "producer:phoenix",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

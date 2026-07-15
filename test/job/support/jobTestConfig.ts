@@ -41,7 +41,9 @@ export const createJobTestConfig = (
 				height: 1,
 			},
 		},
-		start: {},
+		start: {
+			currentSpace: 0,
+		},
 		categories: {},
 		items: {
 			forge: {
@@ -113,6 +115,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 		itemId: "forge",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -125,6 +128,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 		itemId: "water",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 1,
 				y: 0,
@@ -137,6 +141,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 		itemId: "tool",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 2,
 				y: 0,

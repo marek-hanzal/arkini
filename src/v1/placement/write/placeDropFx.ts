@@ -30,7 +30,7 @@ export const placeDropFx = Effect.fn("placeDropFx")(function* ({
 			});
 			const resolved = yield* dropFx({
 				drop,
-				origin: origin.location.position,
+				origin: origin.location,
 			});
 			if (resolved === undefined) {
 				return [
@@ -40,7 +40,7 @@ export const placeDropFx = Effect.fn("placeDropFx")(function* ({
 			}
 
 			const [output, nextRuntime] = yield* applyOutputPlacementFx({
-				origin: origin.location.position,
+				origin: origin.location,
 				output: {
 					drop: [
 						resolved,

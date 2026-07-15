@@ -44,8 +44,10 @@ export const startTestConfig = GameConfigSchema.parse({
 		},
 	},
 	start: {
+		currentSpace: 0,
 		board: [
 			{
+				space: 0,
 				itemId: "tree",
 				x: 1,
 				y: 1,

@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { RuleHideSchema } from "~/v1/line/schema/rule/RuleHideSchema";
 import type { RuleHideResultSchema } from "~/v1/line/schema/rule/RuleHideResultSchema";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 export namespace lineRuleHideFx {
 	export interface Props {
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		rule: RuleHideSchema.Type;
 	}
 }

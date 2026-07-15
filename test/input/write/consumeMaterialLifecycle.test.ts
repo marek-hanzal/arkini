@@ -91,7 +91,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"producer:converter": {
@@ -133,6 +135,7 @@ const config = GameConfigSchema.parse({
 
 const board = (x: number) => ({
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x,
 		y: 0,

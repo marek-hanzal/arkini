@@ -2,13 +2,13 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { RuleSchema } from "~/v1/output/schema/drop/rule/RuleSchema";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { dropRuleDisableFx } from "./dropRuleDisableFx";
 import { dropRuleEnableFx } from "./dropRuleEnableFx";
 
 export namespace dropRuleFx {
 	export interface Props {
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		rule: RuleSchema.Type;
 	}
 }

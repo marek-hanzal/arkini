@@ -36,7 +36,7 @@ export const completeTemporaryItemExpiryFx = Effect.fn("completeTemporaryItemExp
 		runtime,
 	});
 	if (item.item.output === undefined) return draft;
-	const origin = item.location.position;
+	const origin = item.location;
 	const configuredOutput = item.item.output;
 
 	const random = yield* makeTemporaryExpiryRandomFx({

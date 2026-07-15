@@ -82,7 +82,9 @@ export const createTemporaryLifetimeTestConfig = () =>
 				height: 1,
 			},
 		},
-		start: {},
+		start: {
+			currentSpace: 0,
+		},
 		categories: {},
 		items: {
 			transformer: {

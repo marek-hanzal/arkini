@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
 import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
 import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
@@ -8,7 +8,7 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace returnMergeSourceFx {
 	export interface Props {
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		returnDrop?: DropResultSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}

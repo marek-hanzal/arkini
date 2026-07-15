@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -60,24 +61,16 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 	}
 
 	for (const [index, item] of items.entries()) {
-		const alreadyReported = occupancyIssues.some((issue) => {
-			return (
-				issue.location.scope === item.location.scope &&
-				issue.location.position.x === item.location.position.x &&
-				issue.location.position.y === item.location.position.y
-			);
-		});
+		const alreadyReported = occupancyIssues.some((issue) =>
+			isSameGridLocation(issue.location, item.location),
+		);
 		if (alreadyReported) {
 			continue;
 		}
 
-		const occupants = items.slice(index).filter((candidate) => {
-			return (
-				candidate.location.scope === item.location.scope &&
-				candidate.location.position.x === item.location.position.x &&
-				candidate.location.position.y === item.location.position.y
-			);
-		});
+		const occupants = items
+			.slice(index)
+			.filter((candidate) => isSameGridLocation(candidate.location, item.location));
 		if (occupants.length > 1) {
 			occupancyIssues.push({
 				itemIds: occupants.map((occupant) => occupant.id),

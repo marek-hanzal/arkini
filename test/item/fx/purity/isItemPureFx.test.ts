@@ -7,6 +7,7 @@ import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const location = {
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 0,
 		y: 0,
@@ -35,6 +36,7 @@ describe("isItemPureFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				producer,
 			],
@@ -57,6 +59,7 @@ describe("isItemPureFx", () => {
 						session: {
 							speedMode: "normal" as const,
 						},
+						currentSpace: 0,
 						items: [
 							simple,
 						],
@@ -72,6 +75,7 @@ describe("isItemPureFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				producer,
 				{
@@ -102,6 +106,7 @@ describe("isItemPureFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				producer,
 			],
@@ -119,6 +124,7 @@ describe("isItemPureFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				producer,
 			],

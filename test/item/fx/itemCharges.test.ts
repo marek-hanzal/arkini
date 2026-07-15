@@ -76,7 +76,9 @@ const chargesConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"producer:shrine": {
@@ -458,6 +460,7 @@ const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 
 const board = (x: number, y = 0) => ({
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x,
 		y,
@@ -839,6 +842,7 @@ describe("item charges", () => {
 
 	it("rejects hydrated active-job output reservations that overbook maxCount", () => {
 		const state = StateSchema.parse({
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:capped-shrine",
@@ -895,6 +899,7 @@ describe("item charges", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:capped-shrine",
@@ -1048,6 +1053,7 @@ describe("item charges", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:missing-config",

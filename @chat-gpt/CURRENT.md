@@ -4,21 +4,20 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 08 — Board memory**
+**Task 08 — Multi-space board runtime**
 
-Status: **Ready**
+Status: **In progress**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/08-board-memory.md`;
-3. the board-memory rows in `tasks/COVERAGE.md`;
-4. current runtime item state, board/inventory placement, save, ownership, and event code;
-5. only the historical board-memory files named by task 08.
+2. `tasks/08-multi-space-board-runtime.md`;
+3. the multi-space rows in `tasks/COVERAGE.md`;
+4. current board-location, placement, occupancy, query, Tick, save, and command code.
 
 Next action:
 
-> Define the memory payload and exact atomic capture/restore contract, including item identity/location participation, busy/job-owned items, inventory capacity shortfall, deterministic loss policy, one-shot clearing, save round-trip, and presentation facts.
+> Add mandatory board `space` and persistent root `currentSpace`, then make every spatial engine path strictly space-local while keeping inventory global and all spaces simulated together.
 
 ## Absolute code rules
 
@@ -48,6 +47,17 @@ Next action:
 - Normal mode feeds newly observed wall time into Tick at `1×`; accelerated mode uses `30×`. Both use the same 200 ms fixed-step engine.
 - Toggling first folds elapsed wall time under the old mode, then changes the root state. Pending normal time is never accelerated retroactively.
 - Explicit `runTickRuntimeByFx` input is simulation time and never receives the speed multiplier.
+
+
+## Multi-space board runtime
+
+- Board memory is rejected. The world uses multiple isolated board spaces plus one universe-wide passive inventory.
+- Every board location has mandatory `space`; no default, optional field, or legacy fallback exists. A board cell is `space + x + y`.
+- `runtime.currentSpace` is persistent root navigation state and is saved/restored. It is not part of runtime-only `session`.
+- `currentSpace` controls presentation and explicit inventory-to-board destination only. Every space continues to Tick, dispatch, complete, spend, and expire.
+- Every spatial operation is local to one space. Placement may fall back to inventory according to item scope but never to another board space.
+- Direct board-to-board cross-space movement, swap, merge, output, and placement do not exist. Inventory is the only cross-space bridge.
+- `setCurrentSpaceFx({ space })` is a root command with no item dependency or unlock policy. Jump/Home items are future UI representations only.
 
 ## Tick, jobs, queue, and completion
 

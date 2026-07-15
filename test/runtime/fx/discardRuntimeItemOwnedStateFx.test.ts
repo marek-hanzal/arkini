@@ -8,6 +8,7 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 const config = createJobTestConfig();
 const board = {
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x: 0,
 		y: 0,
@@ -41,6 +42,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				root,
 				passiveChild,
@@ -72,6 +74,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				root,
 				passiveChild,

@@ -10,12 +10,14 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const config = createJobTestConfig(3);
 const state = {
+	currentSpace: 0,
 	items: [
 		{
 			id: "runtime:forge:primary",
 			itemId: "forge",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -28,6 +30,7 @@ const state = {
 			itemId: "forge",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,

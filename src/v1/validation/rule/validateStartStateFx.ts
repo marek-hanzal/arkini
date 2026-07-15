@@ -27,6 +27,7 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 	const result = yield* Effect.either(
 		planStartFx({
 			runtime: {
+				currentSpace: config.start.currentSpace,
 				session: {
 					speedMode: "normal" as const,
 				},

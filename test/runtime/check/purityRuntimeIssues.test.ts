@@ -8,6 +8,7 @@ import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x,
 		y: 0,
@@ -20,6 +21,7 @@ describe("runtime purity invariants", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:craft",
@@ -85,6 +87,7 @@ describe("runtime purity invariants", () => {
 	it.each([
 		{
 			name: "buffered input",
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:material",
@@ -104,6 +107,7 @@ describe("runtime purity invariants", () => {
 		},
 		{
 			name: "active job",
+			currentSpace: 0,
 			items: [],
 			jobs: [
 				{
@@ -118,6 +122,7 @@ describe("runtime purity invariants", () => {
 		},
 		{
 			name: "queued request",
+			currentSpace: 0,
 			items: [],
 			jobs: [],
 			jobQueue: [
@@ -133,6 +138,7 @@ describe("runtime purity invariants", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:producer",
@@ -171,6 +177,7 @@ describe("runtime purity invariants", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:producer",
@@ -201,6 +208,7 @@ describe("runtime purity invariants", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				{
 					id: "runtime:producer",

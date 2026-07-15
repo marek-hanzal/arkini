@@ -16,6 +16,7 @@ const spawnOwnerFx = () => {
 		itemId: "workshop",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -47,6 +48,7 @@ const storeWaterFx = ({ id, quantity, x }: { id: string; quantity: number; x: nu
 			itemId: "water",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x,
 					y: 0,

@@ -63,7 +63,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 	}
 
 	const rules = yield* lineRulesFx({
-		origin: owner.location.position,
+		origin: owner.location,
 		rules: line.rules,
 	}).pipe(
 		Effect.provideService(RuntimeFx, {

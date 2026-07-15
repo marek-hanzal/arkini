@@ -48,7 +48,9 @@ export const placementTestConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		origin: simpleItem({
@@ -97,6 +99,7 @@ export const placementTestConfig = GameConfigSchema.parse({
 
 export const boardLocation = (x: number) => {
 	return {
+		space: 0,
 		position: {
 			x,
 			y: 0,

@@ -1,7 +1,9 @@
 import { Effect } from "effect";
 
+import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 
 export namespace readEmptyLocationsFx {
 	export interface Props {
@@ -10,20 +12,13 @@ export namespace readEmptyLocationsFx {
 	}
 }
 
-/**
- * Filters concrete locations down to currently unoccupied cells.
- */
+/** Filters concrete locations down to currently unoccupied cells. */
 export const readEmptyLocationsFx = Effect.fn("readEmptyLocationsFx")(function* ({
 	locations,
 	runtime,
 }: readEmptyLocationsFx.Props) {
-	return locations.filter((location) => {
-		return !runtime.items.some((item) => {
-			return (
-				item.location.scope === location.scope &&
-				item.location.position.x === location.position.x &&
-				item.location.position.y === location.position.y
-			);
-		});
-	});
+	const gridItems = runtime.items.filter(isGridRuntimeItem);
+	return locations.filter(
+		(location) => !gridItems.some((item) => isSameGridLocation(item.location, location)),
+	);
 });

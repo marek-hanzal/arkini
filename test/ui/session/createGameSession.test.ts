@@ -746,6 +746,7 @@ describe("createGameSession", () => {
 					itemId: "forge",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

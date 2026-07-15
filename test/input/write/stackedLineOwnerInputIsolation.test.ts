@@ -26,6 +26,7 @@ describe("stacked line owner input isolation", () => {
 					itemId,
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -38,6 +39,7 @@ describe("stacked line owner input isolation", () => {
 					itemId: "material",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -86,6 +88,7 @@ describe("stacked line owner input isolation", () => {
 		expect(result.remainder).toMatchObject({
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,

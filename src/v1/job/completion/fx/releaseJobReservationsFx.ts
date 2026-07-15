@@ -1,13 +1,13 @@
 import { Effect } from "effect";
 
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { placeRuntimeItemFx } from "~/v1/placement/fx/placeRuntimeItemFx";
 import type { ReservedRuntimeItemSchema } from "~/v1/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace releaseJobReservationsFx {
 	export interface Props {
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		reservations: readonly ReservedRuntimeItemSchema.Type[];
 		runtime: RuntimeSchema.Type;
 	}

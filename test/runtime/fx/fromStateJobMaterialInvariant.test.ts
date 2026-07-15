@@ -19,6 +19,7 @@ const owner = {
 	itemId: "forge",
 	location: {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -39,6 +40,7 @@ const consumedRoot = {
 describe("fromStateFx job material invariants", () => {
 	it("accepts the canonical empty consumed root produced by authoritative start", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				owner,
 				consumedRoot,
@@ -71,6 +73,7 @@ describe("fromStateFx job material invariants", () => {
 			amount: 2,
 		};
 		const state = {
+			currentSpace: 0,
 			items: [
 				owner,
 				{
@@ -127,6 +130,7 @@ describe("fromStateFx job material invariants", () => {
 
 	it("rejects persisted consumed roots that still own runtime state", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				owner,
 				consumedRoot,
@@ -176,6 +180,7 @@ describe("fromStateFx job material invariants", () => {
 	});
 	it("rejects persisted consumed roots with nested owned descendants", () => {
 		const state = {
+			currentSpace: 0,
 			items: [
 				owner,
 				consumedRoot,
@@ -248,6 +253,7 @@ describe("fromStateFx job material invariants", () => {
 			remainingMs: 500,
 		};
 		const state = {
+			currentSpace: 0,
 			items: [
 				owner,
 				consumedRoot,

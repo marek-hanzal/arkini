@@ -24,6 +24,7 @@ const runtimeItem = {
 	},
 	location: {
 		scope: "board",
+		space: 0,
 		position: {
 			x: 1,
 			y: 2,

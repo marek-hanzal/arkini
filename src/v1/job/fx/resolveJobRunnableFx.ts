@@ -44,7 +44,7 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 			}),
 		);
 	const rules = yield* lineRulesFx({
-		origin: owner.location.position,
+		origin: owner.location,
 		rules: line.rules,
 	}).pipe(
 		Effect.provideService(RuntimeFx, {

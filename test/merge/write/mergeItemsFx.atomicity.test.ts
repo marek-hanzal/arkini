@@ -17,6 +17,7 @@ const boardItem = (id: "source" | "target", itemId: "source" | "target", x: numb
 	itemId,
 	location: {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x,
 			y: 0,
@@ -50,6 +51,7 @@ const mergeAttemptFx = () =>
 
 const blockedOutputState = (includeBlocker = true) =>
 	({
+		currentSpace: 0,
 		items: [
 			boardItem("source", "source", 0),
 			boardItem("target", "target", 1),
@@ -89,6 +91,7 @@ describe("mergeItemsFx atomicity", () => {
 			},
 		});
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardItem("source", "source", 0),
 				boardItem("target", "target", 1),
@@ -237,6 +240,7 @@ describe("mergeItemsFx atomicity", () => {
 			},
 		});
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardItem("source", "source", 0),
 				boardItem("target", "target", 1),

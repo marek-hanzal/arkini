@@ -150,7 +150,9 @@ const createLifecycleConfig = ({
 				height: 1,
 			},
 		},
-		start: {},
+		start: {
+			currentSpace: 0,
+		},
 		categories: {},
 		items: {
 			source,
@@ -193,6 +195,7 @@ const boardItem = (id: "source" | "target" | "owner", x: number) => ({
 	itemId: id,
 	location: {
 		scope: "board" as const,
+		space: 0,
 		position: {
 			x,
 			y: 0,
@@ -248,6 +251,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 								jobId: "job:owner",
 							};
 				const state = {
+					currentSpace: 0,
 					items: [
 						participant === "source"
 							? {
@@ -305,6 +309,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			"queued",
 		] as const) {
 			const state = {
+				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -362,6 +367,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				targetProducer: true,
 			});
 			const state = {
+				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -411,6 +417,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				sourceProducer: true,
 			});
 			const state = {
+				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -459,6 +466,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			resultCharges: 2,
 		});
 		const state = {
+			currentSpace: 0,
 			items: [
 				boardItem("source", 0),
 				boardItem("target", 1),
@@ -502,6 +510,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				targetProducer: true,
 			});
 			const state = {
+				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -554,6 +563,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			effect: "replace",
 		});
 		const stackedState = {
+			currentSpace: 0,
 			items: [
 				boardItem("source", 0),
 				{

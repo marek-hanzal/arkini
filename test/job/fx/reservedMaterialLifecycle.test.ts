@@ -55,7 +55,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"producer:employer": {
@@ -149,6 +151,7 @@ const config = GameConfigSchema.parse({
 
 const board = (x: number, y = 0) => ({
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x,
 		y,

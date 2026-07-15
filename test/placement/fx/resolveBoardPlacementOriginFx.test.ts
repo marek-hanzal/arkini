@@ -9,8 +9,12 @@ describe("resolveBoardPlacementOriginFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* resolveBoardPlacementOriginFx({
 					origin: {
-						x: 7,
-						y: 8,
+						scope: "board",
+						space: 3,
+						position: {
+							x: 7,
+							y: 8,
+						},
 					},
 					placement: "drop",
 					size: {
@@ -36,8 +40,12 @@ describe("resolveBoardPlacementOriginFx", () => {
 		expect(result).toEqual({
 			nextRandom: 0.75,
 			origin: {
-				x: 7,
-				y: 8,
+				scope: "board",
+				space: 3,
+				position: {
+					x: 7,
+					y: 8,
+				},
 			},
 		});
 	});
@@ -47,8 +55,12 @@ describe("resolveBoardPlacementOriginFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* resolveBoardPlacementOriginFx({
 					origin: {
-						x: 7,
-						y: 8,
+						scope: "board",
+						space: 3,
+						position: {
+							x: 7,
+							y: 8,
+						},
 					},
 					placement: "random",
 					size: {
@@ -75,8 +87,12 @@ describe("resolveBoardPlacementOriginFx", () => {
 		expect(result).toEqual({
 			nextRandom: 0.75,
 			origin: {
-				x: 1,
-				y: 1,
+				scope: "board",
+				space: 3,
+				position: {
+					x: 1,
+					y: 1,
+				},
 			},
 		});
 	});

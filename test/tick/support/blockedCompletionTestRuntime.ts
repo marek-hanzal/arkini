@@ -104,6 +104,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 			itemId: "blockedForge",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 0,
 					y: 0,
@@ -116,6 +117,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 			itemId: "freeForge",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 0,
@@ -128,6 +130,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 			itemId: "water",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 2,
 					y: 0,
@@ -140,6 +143,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 			itemId: "tool",
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 3,
 					y: 0,
@@ -182,6 +186,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 					itemId: "blocker",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x,
 							y,

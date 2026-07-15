@@ -2,19 +2,20 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { PlacementUnavailableError } from "~/v1/placement/error/PlacementUnavailableError";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
 import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
-import { readGridLocationsFx } from "./readGridLocationsFx";
+import { readBoardLocationsFx } from "./readBoardLocationsFx";
+import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
 
 export namespace readRuntimeItemDropLocationFx {
 	export interface Props {
 		item: RuntimeItemSchema.Type;
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -26,19 +27,18 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 	runtime,
 }: readRuntimeItemDropLocationFx.Props) {
 	const config = yield* GameConfigFx;
-	const board = yield* readGridLocationsFx({
-		scope: "board",
+	const board = yield* readBoardLocationsFx({
 		size: config.meta.board,
+		space: origin.space,
 	});
 	const orderedBoard = yield* orderBoardLocationsFx({
 		locations: yield* readEmptyLocationsFx({
 			locations: board,
 			runtime,
 		}),
-		origin,
+		origin: origin.position,
 	});
-	const inventory = yield* readGridLocationsFx({
-		scope: "inventory",
+	const inventory = yield* readInventoryLocationsFx({
 		size: config.meta.inventory,
 	});
 	const emptyInventory = yield* readEmptyLocationsFx({

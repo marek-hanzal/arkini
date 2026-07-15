@@ -38,7 +38,9 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		owner: {
@@ -91,6 +93,7 @@ describe("temporary material input eligibility", () => {
 					itemId: "owner",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -105,6 +108,7 @@ describe("temporary material input eligibility", () => {
 					itemId: "temporary",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

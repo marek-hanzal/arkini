@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { RuleRuntimeMultiplierSchema } from "~/v1/line/schema/rule/RuleRuntimeMultiplierSchema";
 import type { RuleRuntimeMultiplierResultSchema } from "~/v1/line/schema/rule/RuleRuntimeMultiplierResultSchema";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 export namespace lineRuleRuntimeMultiplierFx {
 	export interface Props {
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		rule: RuleRuntimeMultiplierSchema.Type;
 	}
 }

@@ -40,7 +40,11 @@ describe("dropRulesFx", () => {
 				] satisfies RuleSchema.Type[];
 
 				return yield* dropRulesFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					rules,
 				});
 			}).pipe(
@@ -68,7 +72,11 @@ describe("dropRulesFx", () => {
 				const origin = yield* createDropRuleOriginFx();
 
 				return yield* dropRulesFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					rules: [],
 				});
 			}).pipe(

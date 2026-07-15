@@ -18,6 +18,7 @@ describe("planStartInventoryItemFx", () => {
 					session: {
 						speedMode: "normal" as const,
 					},
+					currentSpace: 0,
 					items: [],
 					jobs: [],
 				},
@@ -79,6 +80,7 @@ describe("planStartInventoryItemFx", () => {
 						session: {
 							speedMode: "normal" as const,
 						},
+						currentSpace: 0,
 						items: [],
 						jobs: [],
 					},

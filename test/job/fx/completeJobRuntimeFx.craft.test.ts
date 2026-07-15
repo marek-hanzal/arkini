@@ -32,7 +32,9 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"craft:drop": {
@@ -451,6 +453,7 @@ const spawnCraftFx = Effect.fn("spawnCraftFx")(function* ({
 		itemId,
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -487,6 +490,7 @@ describe("craft job completion", () => {
 					itemId: "item:tool",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -527,6 +531,7 @@ describe("craft job completion", () => {
 					}),
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -539,6 +544,7 @@ describe("craft job completion", () => {
 					}),
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -584,6 +590,7 @@ describe("craft job completion", () => {
 					}),
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -630,6 +637,7 @@ describe("craft job completion", () => {
 					quantity: 1,
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -663,6 +671,7 @@ describe("craft job completion", () => {
 							itemId: "item:blocker",
 							location: {
 								scope: "board",
+								space: 0,
 								position: {
 									x,
 									y,
@@ -796,6 +805,7 @@ describe("craft job completion", () => {
 					}),
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -808,6 +818,7 @@ describe("craft job completion", () => {
 			runtime.items.find((item) => item.item.id === "craft:ordered-output")?.location,
 		).not.toEqual({
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -855,6 +866,7 @@ describe("craft job completion", () => {
 							itemId: "item:blocker",
 							location: {
 								scope: "board",
+								space: 0,
 								position: {
 									x,
 									y,
@@ -972,6 +984,7 @@ describe("craft job completion", () => {
 					itemId: "item:tool",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,

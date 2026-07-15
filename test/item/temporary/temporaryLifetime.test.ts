@@ -18,6 +18,7 @@ import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/
 const config = createTemporaryLifetimeTestConfig();
 
 const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
+	currentSpace: 0,
 	items: runtime.items
 		.map((item) => ({
 			id: item.id,
@@ -45,6 +46,7 @@ const spawnTemporaryFx = Effect.fn("spawnTemporaryFx")(function* ({
 		itemId,
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x,
 				y: 0,
@@ -60,6 +62,7 @@ const spawnBlockerFx = Effect.fn("spawnBlockerFx")(function* (id: string, x: num
 		itemId: "blocker",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x,
 				y: 0,
@@ -190,6 +193,7 @@ describe("temporary item lifetime", () => {
 				}),
 				location: {
 					scope: "board",
+					space: 0,
 					position: {
 						x: 2,
 						y: 0,
@@ -308,6 +312,7 @@ describe("temporary item lifetime", () => {
 					itemId: "producer",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -348,6 +353,7 @@ describe("temporary item lifetime", () => {
 					itemId: "transformer",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -468,6 +474,7 @@ describe("temporary item lifetime", () => {
 				remainingDurationMs: 400,
 				location: {
 					scope: "board",
+					space: 0,
 					position: {
 						x: 0,
 						y: 0,

@@ -30,6 +30,7 @@ describe("mergeItemsFx events", () => {
 				},
 			}),
 			state: {
+				currentSpace: 0,
 				items: [
 					{
 						id: "runtime:source",
@@ -48,6 +49,7 @@ describe("mergeItemsFx events", () => {
 						itemId: "target",
 						location: {
 							scope: "board",
+							space: 0,
 							position: {
 								x: 1,
 								y: 0,

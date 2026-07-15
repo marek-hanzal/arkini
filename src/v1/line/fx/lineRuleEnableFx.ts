@@ -2,12 +2,12 @@ import { Effect } from "effect";
 
 import type { RuleEnableSchema } from "~/v1/line/schema/rule/RuleEnableSchema";
 import type { RuleEnableResultSchema } from "~/v1/line/schema/rule/RuleEnableResultSchema";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 export namespace lineRuleEnableFx {
 	export interface Props {
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		rule: RuleEnableSchema.Type;
 	}
 }

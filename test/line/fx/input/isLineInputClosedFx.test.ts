@@ -8,6 +8,7 @@ const activeRuntime = {
 	session: {
 		speedMode: "normal" as const,
 	},
+	currentSpace: 0,
 	items: [],
 	jobs: [
 		{
@@ -64,6 +65,7 @@ describe("isLineInputClosedFx", () => {
 						session: {
 							speedMode: "normal" as const,
 						},
+						currentSpace: 0,
 						items: [],
 						jobs: [],
 					},

@@ -294,6 +294,7 @@ describe("startLineFx", () => {
 					itemId: "water",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 3,
 							y: 0,
@@ -350,6 +351,7 @@ describe("startLineFx", () => {
 					itemId: "forge",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -393,6 +395,7 @@ describe("startLineFx", () => {
 					itemId: "tool",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 3,
 							y: 0,

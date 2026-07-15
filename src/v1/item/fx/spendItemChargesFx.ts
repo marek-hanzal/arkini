@@ -111,11 +111,11 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			remainingCharges,
 		});
 		const output = yield* outputFx({
-			origin: item.location.position,
+			origin: item.location,
 			output: item.item.charges.output,
 		}).pipe(Effect.withRandom(random));
 		const [, withOutput] = yield* applyOutputPlacementFx({
-			origin: item.location.position,
+			origin: item.location,
 			output,
 			runtime: draft,
 		});

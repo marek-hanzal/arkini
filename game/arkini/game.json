@@ -20,67 +20,80 @@
 			{
 				"itemId": "item:memory",
 				"x": 3,
-				"y": 10
+				"y": 10,
+				"space": 0
 			},
 			{
 				"itemId": "item:cheat-speed",
 				"x": 5,
-				"y": 10
+				"y": 10,
+				"space": 0
 			},
 			{
 				"itemId": "item:memory",
 				"x": 4,
-				"y": 10
+				"y": 10,
+				"space": 0
 			},
 			{
 				"itemId": "item:nuke",
 				"x": 6,
-				"y": 8
+				"y": 8,
+				"space": 0
 			},
 			{
 				"itemId": "item:cheat",
 				"x": 6,
-				"y": 9
+				"y": 9,
+				"space": 0
 			},
 			{
 				"itemId": "item:inventory",
 				"x": 6,
-				"y": 10
+				"y": 10,
+				"space": 0
 			},
 			{
 				"itemId": "item:tree",
 				"x": 0,
-				"y": 1
+				"y": 1,
+				"space": 0
 			},
 			{
 				"itemId": "item:tree",
 				"x": 1,
-				"y": 0
+				"y": 0,
+				"space": 0
 			},
 			{
 				"itemId": "item:tree",
 				"x": 2,
-				"y": 1
+				"y": 1,
+				"space": 0
 			},
 			{
 				"itemId": "producer:lumberjack-t1",
 				"x": 1,
-				"y": 1
+				"y": 1,
+				"space": 0
 			},
 			{
 				"itemId": "producer:townhall-t1",
 				"x": 3,
-				"y": 4
+				"y": 4,
+				"space": 0
 			},
 			{
 				"itemId": "item:rock",
 				"x": 0,
-				"y": 6
+				"y": 6,
+				"space": 0
 			},
 			{
 				"itemId": "producer:quarry-t1",
 				"x": 1,
-				"y": 6
+				"y": 6,
+				"space": 0
 			}
 		],
 		"inventory": [
@@ -88,7 +101,8 @@
 				"itemId": "item:magnifying-glass",
 				"quantity": 1
 			}
-		]
+		],
+		"currentSpace": 0
 	},
 	"categories": {
 		"material": {

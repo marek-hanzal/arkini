@@ -21,6 +21,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 		itemId: "forge",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 0,
 				y: 0,
@@ -33,6 +34,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 		itemId: "water",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 1,
 				y: 0,
@@ -45,6 +47,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 		itemId: "tool",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 2,
 				y: 0,
@@ -82,6 +85,7 @@ describe("removeItemFx owner lifecycle", () => {
 					itemId: "water",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 3,
 							y: 0,
@@ -94,6 +98,7 @@ describe("removeItemFx owner lifecycle", () => {
 					itemId: "tool",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 4,
 							y: 0,
@@ -291,6 +296,7 @@ describe("removeItemFx owner lifecycle", () => {
 						itemId: "water",
 						location: {
 							scope: "board",
+							space: 0,
 							position,
 						},
 						quantity: 10,

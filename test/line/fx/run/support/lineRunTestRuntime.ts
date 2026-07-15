@@ -49,7 +49,9 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		workshop: {
@@ -157,6 +159,7 @@ const ownerItem = {
 	item: lineRunTestConfig.items.workshop,
 	location: {
 		scope: "board",
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -260,6 +263,7 @@ export const lineRunRuntime = ({
 		session: {
 			speedMode: "normal" as const,
 		},
+		currentSpace: 0,
 		items,
 		jobs: [],
 	} satisfies RuntimeSchema.Type;

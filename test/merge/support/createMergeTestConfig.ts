@@ -88,7 +88,9 @@ export const createMergeTestConfig = ({
 			board,
 			inventory,
 		},
-		start: {},
+		start: {
+			currentSpace: 0,
+		},
 		categories: {},
 		items: {
 			source: simpleItem({

@@ -102,6 +102,7 @@ describe("runtime session speed mode", () => {
 						itemId: "temporaryPlain",
 						location: {
 							scope: "board",
+							space: 0,
 							position: {
 								x: 0,
 								y: 0,

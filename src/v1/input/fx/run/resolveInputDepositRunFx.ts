@@ -80,7 +80,7 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 	}
 
 	const candidates = yield* queryFx({
-		origin: owner.location.position,
+		origin: owner.location,
 		query: input.query,
 	}).pipe(
 		Effect.provideService(RuntimeFx, {

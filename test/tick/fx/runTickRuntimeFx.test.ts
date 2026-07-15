@@ -43,6 +43,7 @@ const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
 		itemId: "water",
 		location: {
 			scope: "board",
+			space: 0,
 			position: {
 				x: 3,
 				y: 0,
@@ -244,6 +245,7 @@ describe("runTickRuntimeByFx", () => {
 					itemId: "permit",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 4,
 							y: 0,
@@ -268,6 +270,7 @@ describe("runTickRuntimeByFx", () => {
 					itemId: "permit",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 4,
 							y: 0,

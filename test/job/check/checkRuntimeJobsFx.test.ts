@@ -13,6 +13,7 @@ const owner = {
 	item: config.items.forge,
 	location: {
 		scope: "board",
+		space: 0,
 		position: {
 			x: 0,
 			y: 0,
@@ -46,6 +47,7 @@ describe("checkRuntimeJobsFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				invalidOwner,
 				{
@@ -104,6 +106,7 @@ describe("checkRuntimeJobsFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				owner,
 			],
@@ -143,6 +146,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		session: {
 			speedMode: "normal" as const,
 		},
+		currentSpace: 0,
 		items: [
 			owner,
 			consumedRoot,

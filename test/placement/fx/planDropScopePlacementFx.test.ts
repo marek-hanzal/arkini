@@ -41,6 +41,7 @@ describe("planDropScopePlacementFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				runtimeItem({
 					id: "runtime:origin",
@@ -74,8 +75,12 @@ describe("planDropScopePlacementFx", () => {
 					},
 					item: placementTestConfig.items["board-only"],
 					origin: {
-						x: 0,
-						y: 0,
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
 					},
 					quantity: 1,
 					runtime,
@@ -98,6 +103,7 @@ describe("planDropScopePlacementFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				runtimeItem({
 					id: "runtime:origin",
@@ -124,8 +130,12 @@ describe("planDropScopePlacementFx", () => {
 				},
 				item: placementTestConfig.items["inventory-only"],
 				origin: {
-					x: 0,
-					y: 0,
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
 				},
 				quantity: 3,
 				runtime,
@@ -153,6 +163,7 @@ describe("planDropScopePlacementFx", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				runtimeItem({
 					id: "runtime:origin",
@@ -185,8 +196,12 @@ describe("planDropScopePlacementFx", () => {
 				},
 				item: placementTestConfig.items.log,
 				origin: {
-					x: 0,
-					y: 0,
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
 				},
 				quantity: 5,
 				runtime,

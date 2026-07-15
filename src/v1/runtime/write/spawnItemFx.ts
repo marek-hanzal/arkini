@@ -3,12 +3,14 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
+import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/v1/placement/fx/assertPlacementMaxCountFx";
 import { ItemAlreadyExistsError } from "~/v1/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
 import { createRuntimeItemFx } from "~/v1/runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
+import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace spawnItemFx {
@@ -55,13 +57,11 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 
 			const occupant = pipe(
 				runtime.items,
-				Array.findFirst((candidate) => {
-					return (
-						candidate.location.scope === location.scope &&
-						candidate.location.position.x === location.position.x &&
-						candidate.location.position.y === location.position.y
-					);
-				}),
+				Array.findFirst(
+					(candidate) =>
+						isGridRuntimeItem(candidate) &&
+						isSameGridLocation(candidate.location, location),
+				),
 				Option.getOrUndefined,
 			);
 			if (occupant !== undefined) {

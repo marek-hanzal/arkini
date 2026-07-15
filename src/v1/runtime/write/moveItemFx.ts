@@ -3,10 +3,12 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/v1/item/error/ItemNotFoundError";
 import { ItemNotOnGridError } from "~/v1/item/error/ItemNotOnGridError";
+import { isSameGridLocation } from "~/v1/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/v1/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { LocationOccupiedError } from "~/v1/runtime/error/LocationOccupiedError";
+import { CrossSpaceBoardOperationError } from "~/v1/space/error/CrossSpaceBoardOperationError";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
@@ -58,16 +60,39 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
+			if (
+				item.location.scope === "board" &&
+				location.scope === "board" &&
+				item.location.space !== location.space
+			) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: item.location.space,
+						toSpace: location.space,
+					}),
+				);
+			}
+			if (
+				item.location.scope === "inventory" &&
+				location.scope === "board" &&
+				location.space !== runtime.currentSpace
+			) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: runtime.currentSpace,
+						toSpace: location.space,
+					}),
+				);
+			}
+
 			const occupant = pipe(
 				runtime.items,
-				Array.findFirst((candidate) => {
-					return (
+				Array.findFirst(
+					(candidate) =>
 						candidate.id !== itemId &&
-						candidate.location.scope === location.scope &&
-						candidate.location.position.x === location.position.x &&
-						candidate.location.position.y === location.position.y
-					);
-				}),
+						isGridRuntimeItem(candidate) &&
+						isSameGridLocation(candidate.location, location),
+				),
 				Option.getOrUndefined,
 			);
 			if (occupant !== undefined) {

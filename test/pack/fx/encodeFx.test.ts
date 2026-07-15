@@ -26,6 +26,7 @@ describe("encodeFx", () => {
 						},
 					},
 					start: {
+						currentSpace: 0,
 						board: [],
 						inventory: [],
 					},
@@ -65,6 +66,7 @@ describe("encodeFx", () => {
 					},
 				},
 				start: {
+					currentSpace: 0,
 					board: [],
 					inventory: [],
 				},

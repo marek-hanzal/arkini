@@ -166,7 +166,9 @@ const blueprintConfig = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		"blueprint:plain": blueprintItem({
@@ -286,11 +288,13 @@ const blueprintConfig = GameConfigSchema.parse({
 const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 	id,
 	itemId,
+	space,
 	x,
 	y,
 }: {
 	id: string;
 	itemId: "blueprint:output" | "blueprint:plain" | "blueprint:range" | "blueprint:reserve";
+	space: number;
 	x: number;
 	y: number;
 }) {
@@ -299,6 +303,7 @@ const spawnBlueprintFx = Effect.fn("spawnBlueprintFx")(function* ({
 		itemId,
 		location: {
 			scope: "board",
+			space,
 			position: {
 				x,
 				y,
@@ -323,6 +328,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:plain",
 					x: 1,
 					y: 1,
@@ -347,6 +353,7 @@ describe("blueprint job completion", () => {
 		expect(target).toMatchObject({
 			location: {
 				scope: "board",
+				space: 0,
 				position: {
 					x: 1,
 					y: 1,
@@ -362,6 +369,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:reserve",
 					x: 0,
 					y: 0,
@@ -371,6 +379,7 @@ describe("blueprint job completion", () => {
 					itemId: "item:tool",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -416,6 +425,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:output",
 					x: 0,
 					y: 0,
@@ -447,6 +457,7 @@ describe("blueprint job completion", () => {
 						itemId: "item:blocker",
 						location: {
 							scope: "board",
+							space: 0,
 							position,
 						},
 						quantity: 1,
@@ -478,6 +489,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:reserve",
 					x: 0,
 					y: 0,
@@ -487,6 +499,7 @@ describe("blueprint job completion", () => {
 					itemId: "item:tool",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -517,6 +530,7 @@ describe("blueprint job completion", () => {
 						itemId: "item:blocker",
 						location: {
 							scope: "board",
+							space: 0,
 							position,
 						},
 						quantity: 1,
@@ -557,12 +571,14 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const first = yield* spawnBlueprintFx({
 					id: "runtime:first",
+					space: 0,
 					itemId: "blueprint:plain",
 					x: 0,
 					y: 0,
 				});
 				const second = yield* spawnBlueprintFx({
 					id: "runtime:second",
+					space: 0,
 					itemId: "blueprint:plain",
 					x: 1,
 					y: 0,
@@ -592,6 +608,7 @@ describe("blueprint job completion", () => {
 					itemId: "item:target",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 2,
 							y: 0,
@@ -641,6 +658,7 @@ describe("blueprint job completion", () => {
 					itemId: "item:byproduct",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 2,
 							y: 0,
@@ -650,6 +668,7 @@ describe("blueprint job completion", () => {
 				});
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:output",
 					x: 0,
 					y: 0,
@@ -690,6 +709,7 @@ describe("blueprint job completion", () => {
 					itemId: "producer:limited",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -729,6 +749,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:range",
+					space: 0,
 					itemId: "blueprint:range",
 					x: 0,
 					y: 0,
@@ -762,6 +783,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:plain",
 					x: 0,
 					y: 0,
@@ -797,6 +819,7 @@ describe("blueprint job completion", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnBlueprintFx({
 					id: "runtime:blueprint",
+					space: 0,
 					itemId: "blueprint:plain",
 					x: 0,
 					y: 0,

@@ -16,6 +16,7 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		}),
 	);
 	return {
+		currentSpace: runtime.currentSpace,
 		items,
 		jobs: runtime.jobs,
 		jobQueue: runtime.jobQueue ?? [],

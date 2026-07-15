@@ -50,7 +50,7 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	for (const bufferedItem of bufferedItems) {
 		draft = yield* placeRuntimeItemFx({
 			itemId: bufferedItem.id,
-			origin: owner.location.position,
+			origin: owner.location,
 			runtime: draft,
 		});
 	}

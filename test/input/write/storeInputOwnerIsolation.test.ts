@@ -16,13 +16,23 @@ const spawnOwnerFx = (quantity: number, scope: "board" | "inventory" = "board") 
 	return spawnItemFx({
 		id: "runtime:workshop",
 		itemId: "workshop",
-		location: {
-			scope,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		},
+		location:
+			scope === "board"
+				? {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					}
+				: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
 		quantity,
 	});
 };
@@ -91,6 +101,7 @@ const fillRemainingCapacityFx = Effect.fn("fillRemainingInputIsolationCapacityFx
 			itemId: "stone",
 			location: {
 				scope: "board",
+				space: 0,
 				position,
 			},
 			quantity: 1,

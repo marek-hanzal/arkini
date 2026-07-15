@@ -63,6 +63,7 @@ describe("checkRuntimeInputLocationsFx", () => {
 				session: {
 					speedMode: "normal" as const,
 				},
+				currentSpace: 0,
 				items: [
 					owner,
 					inputItem({

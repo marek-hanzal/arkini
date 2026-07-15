@@ -11,6 +11,7 @@ import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x,
 		y: 0,

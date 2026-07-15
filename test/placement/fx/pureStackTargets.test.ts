@@ -10,6 +10,7 @@ import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const board = (x: number) => ({
 	scope: "board" as const,
+	space: 0,
 	position: {
 		x,
 		y: 0,
@@ -65,6 +66,7 @@ describe("pure placement stack targets", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				active,
 				queued,
@@ -85,8 +87,12 @@ describe("pure placement stack targets", () => {
 		const stacks = Effect.runSync(
 			readAvailableStackItemsFx({
 				itemId: "craft",
+				locations: [
+					board(0),
+					board(1),
+					board(2),
+				],
 				runtime,
-				scope: "board",
 			}),
 		);
 
@@ -108,6 +114,7 @@ describe("pure placement stack targets", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				active,
 				idle,
@@ -120,8 +127,11 @@ describe("pure placement stack targets", () => {
 		const stacks = Effect.runSync(
 			readAvailableStackItemsFx({
 				itemId: "craft",
+				locations: [
+					inventory(0),
+					inventory(1),
+				],
 				runtime,
-				scope: "inventory",
 			}),
 		);
 
@@ -146,6 +156,7 @@ describe("pure placement stack targets", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				origin,
 				active,
@@ -157,7 +168,11 @@ describe("pure placement stack targets", () => {
 
 		const [placement, nextRuntime] = Effect.runSync(
 			applyOutputPlacementFx({
-				origin: origin.location.position,
+				origin: {
+					scope: "board",
+					space: 0,
+					position: origin.location.position,
+				},
 				output: {
 					drop: [
 						{
@@ -190,6 +205,7 @@ describe("pure placement stack targets", () => {
 			session: {
 				speedMode: "normal" as const,
 			},
+			currentSpace: 0,
 			items: [
 				active,
 			],

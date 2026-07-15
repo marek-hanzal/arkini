@@ -24,6 +24,7 @@ export const planStartBoardItemFx = Effect.fn("planStartBoardItemFx")(function* 
 		item,
 		locations: [
 			{
+				space: startItem.space,
 				position: {
 					x: startItem.x,
 					y: startItem.y,

@@ -10,6 +10,7 @@ describe("planStartBoardItemFx", () => {
 		const plan = Effect.runSync(
 			planStartBoardItemFx({
 				item: {
+					space: 0,
 					itemId: "tree",
 					x: 2,
 					y: 0,
@@ -28,6 +29,7 @@ describe("planStartBoardItemFx", () => {
 				item: expect.objectContaining({
 					item: startTestConfig.items.tree,
 					location: {
+						space: 0,
 						position: {
 							x: 2,
 							y: 0,

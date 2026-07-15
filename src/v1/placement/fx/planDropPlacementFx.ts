@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import type { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -10,7 +10,7 @@ import { planDropScopePlacementFx } from "./planDropScopePlacementFx";
 export namespace planDropPlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }

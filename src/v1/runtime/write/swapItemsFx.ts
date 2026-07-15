@@ -8,7 +8,9 @@ import type { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
 import { SwapSameItemError } from "~/v1/runtime/error/SwapSameItemError";
+import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
+import { CrossSpaceBoardOperationError } from "~/v1/space/error/CrossSpaceBoardOperationError";
 import type { SwapItemsResultSchema } from "~/v1/runtime/schema/command/SwapItemsResultSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
@@ -87,6 +89,33 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 					new ItemNotOnGridError({
 						itemId: secondItemId,
 						location: second.location,
+					}),
+				);
+			}
+			if (
+				isBoardRuntimeItem(first) &&
+				isBoardRuntimeItem(second) &&
+				first.location.space !== second.location.space
+			) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: first.location.space,
+						toSpace: second.location.space,
+					}),
+				);
+			}
+			const firstOnBoard = isBoardRuntimeItem(first);
+			const secondOnBoard = isBoardRuntimeItem(second);
+			const boardItem = firstOnBoard ? first : secondOnBoard ? second : undefined;
+			if (
+				firstOnBoard !== secondOnBoard &&
+				boardItem !== undefined &&
+				boardItem.location.space !== runtime.currentSpace
+			) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: runtime.currentSpace,
+						toSpace: boardItem.location.space,
 					}),
 				);
 			}

@@ -34,6 +34,7 @@ describe("startFx", () => {
 				expect.objectContaining({
 					item: startTestConfig.items.tree,
 					location: {
+						space: 0,
 						position: {
 							x: 1,
 							y: 1,
@@ -72,6 +73,7 @@ describe("startFx", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			start: {
+				currentSpace: 0,
 				board: [],
 				inventory: [
 					{
@@ -108,6 +110,7 @@ describe("startFx", () => {
 					id: "runtime:existing",
 					itemId: "tree",
 					location: {
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -146,13 +149,16 @@ describe("startFx", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
 			start: {
+				currentSpace: 0,
 				board: [
 					{
+						space: 0,
 						itemId: "tree",
 						x: 0,
 						y: 0,
 					},
 					{
+						space: 0,
 						itemId: "tree",
 						x: 0,
 						y: 0,
@@ -240,6 +246,7 @@ describe("startFx", () => {
 				expect.objectContaining({
 					item: config.items["producer:townhall-t1"],
 					location: {
+						space: 0,
 						position: {
 							x: 3,
 							y: 4,

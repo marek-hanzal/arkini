@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/v1/common/schema/IdSchema";
-import type { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import type { BoardLocationSchema } from "~/v1/location/schema/BoardLocationSchema";
 import { ItemStatefulError } from "~/v1/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
 import { assertOwnerIdleFx } from "~/v1/job/fx/assertOwnerIdleFx";
@@ -17,7 +17,7 @@ import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 export namespace placeRuntimeItemFx {
 	export interface Props {
 		itemId: IdSchema.Type;
-		origin: PositionSchema.Type;
+		origin: BoardLocationSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }

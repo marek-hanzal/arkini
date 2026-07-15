@@ -28,12 +28,12 @@ export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
 				runtime,
 			});
 			const resolved = yield* outputFx({
-				origin: origin.location.position,
+				origin: origin.location,
 				output,
 			});
 
 			return yield* applyOutputPlacementFx({
-				origin: origin.location.position,
+				origin: origin.location,
 				output: resolved,
 				runtime,
 			});

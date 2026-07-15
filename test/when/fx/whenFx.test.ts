@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/v1/game/fx/useGameFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { ScopeEnumSchema } from "~/v1/scope/schema/ScopeEnumSchema";
+import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
 import { whenFx } from "~/v1/when/fx/whenFx";
 
 const config = GameConfigSchema.parse({
@@ -24,7 +24,9 @@ const config = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
-	start: {},
+	start: {
+		currentSpace: 0,
+	},
 	categories: {},
 	items: {
 		source: {
@@ -66,32 +68,17 @@ const placeItemFx = ({
 	id,
 	itemId,
 	quantity,
-	location: {
-		scope,
-		position: { x, y },
-	},
+	location,
 }: {
 	id: string;
 	itemId: "source" | "tree";
 	quantity: number;
-	location: {
-		scope: Exclude<ScopeEnumSchema.Type, "any">;
-		position: {
-			x: number;
-			y: number;
-		};
-	};
+	location: GridLocationSchema.Type;
 }) => {
 	return spawnItemFx({
 		id,
 		itemId,
-		location: {
-			scope,
-			position: {
-				x,
-				y,
-			},
-		},
+		location,
 		quantity,
 	});
 };
@@ -106,6 +93,7 @@ describe("whenFx", () => {
 					quantity: 1,
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 5,
 							y: 5,
@@ -118,6 +106,7 @@ describe("whenFx", () => {
 					quantity: 2,
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 6,
 							y: 5,
@@ -130,6 +119,7 @@ describe("whenFx", () => {
 					quantity: 4,
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 7,
 							y: 5,
@@ -149,7 +139,11 @@ describe("whenFx", () => {
 					},
 				});
 				const exists = yield* whenFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					when: {
 						query: {
 							scope: "inventory",
@@ -162,7 +156,11 @@ describe("whenFx", () => {
 					},
 				});
 				const count = yield* whenFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					when: {
 						count: 9,
 						query: {
@@ -176,7 +174,11 @@ describe("whenFx", () => {
 					},
 				});
 				const range = yield* whenFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					when: {
 						max: 2,
 						min: 2,
@@ -192,7 +194,11 @@ describe("whenFx", () => {
 					},
 				});
 				const rejected = yield* whenFx({
-					origin: origin.location.position,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
 					when: {
 						count: 8,
 						query: {

@@ -20,6 +20,7 @@ describe("authored craft lifecycle", () => {
 					itemId: "item:seed",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -32,6 +33,7 @@ describe("authored craft lifecycle", () => {
 					itemId: "item:water",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 1,
 							y: 0,
@@ -85,6 +87,7 @@ describe("authored craft lifecycle", () => {
 					revision: inventorySeed.revision,
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,
@@ -156,6 +159,7 @@ describe("authored craft lifecycle", () => {
 					}),
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 0,
 							y: 0,

@@ -128,6 +128,7 @@ const fillFreeBoardFx = Effect.fn("fillFreeBoardFx")(function* () {
 				itemId: "blocker",
 				location: {
 					scope: "board",
+					space: 0,
 					position: {
 						x,
 						y,
@@ -280,6 +281,7 @@ describe("job board and inventory flow", () => {
 					itemId: "permit",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 4,
 							y: 1,
@@ -310,6 +312,7 @@ describe("job board and inventory flow", () => {
 					itemId: "permit",
 					location: {
 						scope: "board",
+						space: 0,
 						position: {
 							x: 4,
 							y: 1,

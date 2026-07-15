@@ -37,7 +37,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Speed cheat | Partial | Canonical root runtime session mode, 1×/30× Tick input, save reset, toggle command, and event are implemented | Read-model/asset projection, control UI, and audio remain | 10, 13, 15 |
 | Multi-space board runtime | Partial | Canonical spaces, persistent navigation, isolation, placement, Tick, save, explicit `any` versus `universe` query reach, and ownership-graph travel are implemented; renderer/navigation presentation remains | 10–14 |
 | Board memory | Rejected | Destructive snapshot/restore and active v1 item authoring were removed in favor of multi-space boards | Done |
-| Cheat inventory sink and nuke-save confirmation | Partial | Canonical sink command, committed feedback event, nuke confirmation request, save-discard shutdown, persisted deletion coordinator, and fresh-session recreation are implemented | Interaction wiring, confirmation UI, animation, and browser storage adapter remain in 11–14/16 |
+| Cheat inventory sink and nuke-save confirmation | Partial | Canonical sink command, committed feedback event, nuke confirmation request, save-discard shutdown, and provisional dispose/delete/create sequencing are implemented | Final hard reset must be shell-owned application-root replacement through one shared factory and complete-transition single-flight in 12; interaction, confirmation UI, animation, and debug wiring remain in 11–14/16 |
 | Public board/inventory/line read models | Partial | Historical bridge is an information-requirement catalogue | 10 |
 | Drag/drop and activation orchestration | Reference | Historical interaction behavior remains | 11 |
 | React board/inventory renderer | Reference | Layout and UX remain; state topology is rejected | 12 |
@@ -45,7 +45,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Visual planning and animation | Reference | Historical event-to-motion behavior remains | 14 |
 | Audio | Reference | Sound policy and synthesis remain | 15 |
 | Debug/explain tools | Reference | Explanation scenarios remain | 16 |
-| Persistent browser shell | Partial | Current save boundary exists; browser adapter is pending | 12, 17 |
+| Persistent browser shell | Partial | Current save boundary exists; browser adapter and root factory are pending | Application-root ownership, atomic publication, truthful failure state, and single-flight hard reset belong to 12; final pruning belongs to 17 |
 
 ## Historical directory map
 

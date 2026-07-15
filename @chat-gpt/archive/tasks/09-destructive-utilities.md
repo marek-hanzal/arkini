@@ -92,3 +92,9 @@ Implemented:
 - permanent coverage for eligible/protected/busy sink drops, buffered release, cancellation, storage success/failure, save races, disposal, events, and fresh hydration.
 
 Historical sink interaction, nuke sheet, animation, and concrete browser storage wiring remain deliberately available only as oracles for tasks 11–14 and 16, as required by this task's deferred cleanup rule.
+
+## Deferred shell ownership follow-up
+
+A later deep review confirmed that `nukeGameSessionFx` is not single-flight across the complete dispose/delete/create transition. This does not reopen gameplay utility behavior. The final production hard reset is deliberately deferred to Task 12, where the browser shell can own and replace the complete application root.
+
+Task 12 must use a plain application factory/composition function for both initial startup and post-reset startup, single-flight the whole transition, and atomically publish one fully created fresh root. Do not evolve `nukeGameSessionFx` into an in-place engine reset or hide ownership in a React component, class wrapper, or module-global lock.

@@ -67,6 +67,10 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 				);
 			}
 
+			const replacementRuntime = {
+				...runtime,
+				items: runtime.items.filter((candidate) => candidate.id !== item.id),
+			} satisfies RuntimeSchema.Type;
 			yield* assertPlacementMaxCountFx({
 				drop: {
 					itemId: item.item.id,
@@ -74,7 +78,7 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 					quantity,
 				},
 				item: item.item,
-				runtime,
+				runtime: replacementRuntime,
 			});
 
 			const updatedItem = yield* reviseRuntimeItemFx({

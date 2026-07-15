@@ -1,6 +1,6 @@
 # 06 — Temporary item lifetime
 
-**Status:** Ready
+**Status:** Done
 
 ## Goal
 
@@ -27,9 +27,18 @@ Give temporary items canonical fixed-step lifetime state and expiry behavior wit
 - expiry mutation outside Tick;
 - effect IDs as a second source of item truth.
 
-## Required design decisions
+## Accepted design
 
-Choose the smallest canonical representation, likely instance-owned remaining lifetime or an explicit runtime work record. It must survive save/restore and preserve fixed-step equivalence.
+- every committed temporary identity owns `remainingDurationMs`, initialized from authored `durationMs`;
+- lifetime advances only for identities present at the start of one canonical 200 ms Tick step;
+- creation during a step receives no retroactive time;
+- duration is clamped at zero, so non-aligned authored durations expire on the first fixed boundary at or after their value;
+- ready expiries run after job completion in stable runtime-ID order;
+- expiry removes the temporary item first and resolves optional output from its released board origin through canonical deterministic output and placement;
+- expected placement failure rolls the expiry back, leaves `remainingDurationMs: 0`, and retries after later runtime changes;
+- one deterministic random stream derived from the stable item identity covers output rolls and random placement origin;
+- temporary items are board-only and identity-bound, therefore impure;
+- legacy state without `remainingDurationMs` initializes a temporary item at its full authored duration rather than reconstructing wall-clock history.
 
 ## Acceptance criteria
 

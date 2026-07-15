@@ -161,6 +161,17 @@ Runnable jobs decrement by one step, clamped at zero. Paused jobs keep their rem
 
 Completions are applied at the step boundary in stable job-ID order. A queued successor may start at that boundary but receives no retroactive time from the completed step.
 
+Temporary board items store:
+
+```text
+durationMs             authored immutable lifetime
+remainingDurationMs    persisted runtime lifetime
+```
+
+Every temporary identity present at the start of a fixed step loses one step, clamped at zero. Authored durations that are not exact multiples of 200 ms therefore expire on the first fixed boundary at or after their duration. Items created by work completed during the current step begin at the full authored duration and are first advanced by the next step.
+
+After job completion and queue dispatch, ready temporary items expire in stable runtime-ID order. Expiry removes the temporary item and resolves its optional output from the released board origin through the same deterministic output and placement pipeline used elsewhere. A blocked output rolls the whole expiry back, leaves the item at zero, and retries from the same deterministic random stream after later runtime changes create capacity.
+
 ## 11. Inputs at job start
 
 Material inputs use one of two modes.
@@ -257,7 +268,7 @@ Every line may omit output and every item type may be persistent or charged. Ite
 
 ### Temporary items
 
-Temporary-item duration and output are authored, but runtime lifetime progression and expiry are not implemented.
+Temporary items are board-only, non-stackable identities with fixed-step `remainingDurationMs`. Creation initializes the full authored `durationMs`; save/restore preserves the remaining value. Tick owns progression and atomic expiry. Optional expiry output uses standard deterministic output plus scope-aware placement, and blocked output keeps the zero-duration item available for retry.
 
 ### Utility item kinds
 
@@ -272,6 +283,8 @@ Serializable state contains live items, active jobs, and FIFO requests.
 Tick adapter timing is session-only and is not persisted. Closing a session may discard a sub-step remainder smaller than one fixed step.
 
 Restored jobs continue from persisted `remainingMs`. No due time is reconstructed from wall-clock history.
+
+Restored temporary items continue from persisted `remainingDurationMs`. Legacy state without that field initializes a temporary item at its full authored duration; no wall-clock lifetime is reconstructed.
 
 Invalid persisted state must fail close to hydration or runtime validation. Do not silently invent missing job, reservation, or queue history.
 
@@ -305,5 +318,4 @@ Pending capabilities must be implemented through canonical engine boundaries rat
 
 - directional merge execution;
 - deposit capacity and depletion;
-- temporary-item expiry;
 - utility-item commands.

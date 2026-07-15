@@ -256,10 +256,10 @@ Schema support and runtime support are different facts.
 - Starting any stacked line owner resolves eligibility from the pre-command world, attaches job/input/charge state in one candidate, atomically isolates surviving stateful quantities, and standard-places pure remainders.
 - Blueprint assets are explicit standard item assets; no target or visual is inferred from output.
 - Directional gameplay merge is an engine-owned atomic command over one revised source identity and one revised board target. Source-owned authored rules decide source action, target effect, and optional output.
+- Temporary items author `durationMs` and optional expiry `output`. Every committed runtime identity starts at the authored duration, remains board-only and non-stackable, persists `remainingDurationMs`, and expires through canonical Tick plus deterministic output placement.
 
 ### Schema-backed but incomplete in runtime
 
-- temporary-item lifetime and expiry are not implemented.
 - memory, inventory-opener, speed-cheat, nuke, and cheat-inventory item kinds are authoring contracts without active public runtime commands.
 
 Keep authored data valid, but do not build UI or gameplay assumptions on schema-only capabilities. A capability becomes implemented only when it has a canonical runtime command/path and focused behavioral tests.

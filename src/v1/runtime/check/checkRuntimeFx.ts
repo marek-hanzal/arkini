@@ -8,6 +8,7 @@ import type { RuntimeCheckResultSchema } from "~/v1/runtime/schema/check/Runtime
 import { checkRuntimeItemIdsFx } from "./checkRuntimeItemIdsFx";
 import { checkRuntimeItemChargesFx } from "./checkRuntimeItemChargesFx";
 import { checkRuntimeItemQuantitiesFx } from "./checkRuntimeItemQuantitiesFx";
+import { checkRuntimeItemTemporaryDurationsFx } from "./checkRuntimeItemTemporaryDurationsFx";
 import { checkRuntimeLocationsFx } from "./checkRuntimeLocationsFx";
 
 export namespace checkRuntimeFx {
@@ -32,6 +33,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const itemQuantityIssues = yield* checkRuntimeItemQuantitiesFx({
 		runtime,
 	});
+	const itemTemporaryDurationIssues = yield* checkRuntimeItemTemporaryDurationsFx({
+		runtime,
+	});
 	const inputLocationIssues = yield* checkRuntimeInputLocationsFx({
 		runtime,
 	});
@@ -48,6 +52,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 			...itemChargeIssues,
 			...itemIdIssues,
 			...itemQuantityIssues,
+			...itemTemporaryDurationIssues,
 			...inputLocationIssues,
 			...jobIssues,
 			...locationIssues,

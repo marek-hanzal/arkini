@@ -4,9 +4,9 @@ This directory is the active handoff surface for continuing the game from the hi
 
 ## Current task
 
-**Next implementation task: [`06-temporary-lifetime.md`](06-temporary-lifetime.md)**
+**Next implementation task: [`07-speed-cheat.md`](07-speed-cheat.md)**
 
-Tasks 00–04 are complete. A new thread must:
+Tasks 00–06 are complete. A new thread must:
 
 1. read the root documentation in the order defined by `@chat-gpt/README.md`;
 2. read `@chat-gpt/CURRENT.md`;
@@ -26,8 +26,8 @@ Do not read every queued task before starting. The queue is an ordered backlog, 
 | 03 | [`Stash lifecycle`](../archive/tasks/03-stash-lifecycle.md) | **Done** | 01–02 |
 | 04 | [`Item charges and deposit inputs`](../archive/tasks/04-deposit-capacity.md) | **Done** | 03 |
 | 05 | [`Directional merge execution`](../archive/tasks/05-merge-execution.md) | **Done** | 04 |
-| 06 | [`Temporary item lifetime`](06-temporary-lifetime.md) | **Ready** | 05 |
-| 07 | [`Speed cheat`](07-speed-cheat.md) | Queued | 06 |
+| 06 | [`Temporary item lifetime`](../archive/tasks/06-temporary-lifetime.md) | **Done** | 05 |
+| 07 | [`Speed cheat`](07-speed-cheat.md) | **Ready** | 06 |
 | 08 | [`Board memory`](08-board-memory.md) | Queued | 07 |
 | 09 | [`Destructive utility items`](09-destructive-utilities.md) | Queued | 08 |
 | 10 | [`Engine-owned read models`](10-engine-read-models.md) | Queued | 01–09 |

@@ -103,6 +103,8 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 							item: resultItem,
 							location: target.location,
 							quantity: 1,
+							remainingDurationMs:
+								resultItem.type === "temporary" ? resultItem.durationMs : undefined,
 							revision: target.revision,
 						} satisfies BoardRuntimeItemSchema.Type,
 					});

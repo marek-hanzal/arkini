@@ -24,5 +24,6 @@ export const fromRuntimeItemFx = Effect.fn("fromRuntimeItemFx")(function* ({
 		location: item.location,
 		quantity: item.quantity,
 		remainingCharges: item.remainingCharges,
+		remainingDurationMs: item.remainingDurationMs,
 	} satisfies StateItemSchema.Type;
 });

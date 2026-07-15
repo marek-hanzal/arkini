@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/v1/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSchema";
 import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
+import { TimeSchema } from "~/v1/common/schema/TimeSchema";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
 
 /**
@@ -33,6 +34,12 @@ export const StateItemSchema = z
 		 */
 		remainingCharges: NonNegativeIntegerSchema.optional().describe(
 			"The optional remaining charges of this concrete item instance; undefined means the authored full amount.",
+		),
+		/**
+		 * Remaining fixed-step lifetime of one persisted temporary item instance.
+		 */
+		remainingDurationMs: TimeSchema.optional().describe(
+			"The optional remaining fixed-step lifetime of this persisted temporary item instance.",
 		),
 		/**
 		 * Number of canonical items represented by this live state entry.

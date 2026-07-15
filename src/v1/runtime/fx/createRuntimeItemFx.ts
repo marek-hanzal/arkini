@@ -14,6 +14,7 @@ export namespace createRuntimeItemFx {
 		location: Location;
 		quantity: PositiveIntegerSchema.Type;
 		remainingCharges?: number;
+		remainingDurationMs?: number;
 	}
 
 	export type Result<Location extends LocationSchema.Type> = Omit<
@@ -33,6 +34,7 @@ export const createRuntimeItemFx = <Location extends LocationSchema.Type>({
 	location,
 	quantity,
 	remainingCharges,
+	remainingDurationMs,
 }: createRuntimeItemFx.Props<Location>) => {
 	return createRevisionFx().pipe(
 		Effect.map((revision) => {
@@ -42,6 +44,9 @@ export const createRuntimeItemFx = <Location extends LocationSchema.Type>({
 				location,
 				quantity,
 				remainingCharges,
+				remainingDurationMs:
+					remainingDurationMs ??
+					(item.type === "temporary" ? item.durationMs : undefined),
 				revision,
 			} satisfies createRuntimeItemFx.Result<Location>;
 		}),

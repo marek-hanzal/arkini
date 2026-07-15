@@ -13,6 +13,7 @@ Rebuild item detail, producer/craft/blueprint/stash controls, input state, progr
 - `src/v0/board/view/`;
 - sheet components under `src/v0/play/sheet/`;
 - product copy and labels from historical UI.
+- temporary/effect labels retained under `src/v0/effects/readNearbyLineEffectLabel.ts`, `src/v0/effects/readRuntimeLineEffectLabel.ts`, and `src/v0/effects/readEffectiveLineBonusEntries.ts`; do not reconstruct the removed active-effect save/timestamp lifecycle.
 
 ## Do not port
 

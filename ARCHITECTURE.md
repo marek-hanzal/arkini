@@ -193,6 +193,10 @@ Long elapsed intervals are replayed immediately as consecutive fixed steps and m
 
 One event-free step returning the identical runtime reference proves a stable no-op boundary; the remaining identical backlog may be skipped.
 
+Temporary board items own `remainingDurationMs`, initialized from their authored `durationMs` when the concrete runtime identity is committed. Each identity observed at a step boundary loses exactly one 200 ms step, clamped at zero. An item created by a completion during that step is not in the boundary snapshot and receives no retroactive time.
+
+Ready temporary items expire after job completions in stable runtime-ID order. Expiry removes the item first, then resolves and places its optional output from the released board origin through the canonical deterministic output and placement pipeline. Expected placement failure leaves the same item at `remainingDurationMs: 0` for a later retry; the complete random stream, including random placement origin, is derived from the stable temporary identity. Temporary items are board-only, always identity-bound, and therefore impure.
+
 ## 8. Jobs and FIFO requests
 
 Filling inputs is passive. Work starts only through the explicit line-start command.

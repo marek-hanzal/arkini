@@ -6,6 +6,7 @@ import { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerS
 import { ItemSchema } from "~/v1/item/schema/ItemSchema";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
 import { RevisionSchema } from "~/v1/revision/schema/RevisionSchema";
+import { TimeSchema } from "~/v1/common/schema/TimeSchema";
 
 /**
  * A hydrated live item or item stack that owns its current location.
@@ -33,6 +34,14 @@ export const RuntimeItemSchema = z
 		 */
 		remainingCharges: NonNegativeIntegerSchema.optional().describe(
 			"The optional remaining charges of this concrete item instance; undefined means the authored full amount.",
+		),
+		/**
+		 * Remaining fixed-step lifetime of one temporary item instance.
+		 *
+		 * Undefined is canonical for every non-temporary item.
+		 */
+		remainingDurationMs: TimeSchema.optional().describe(
+			"The optional remaining fixed-step lifetime of this temporary item instance.",
 		),
 		/**
 		 * Number of canonical items represented by this live runtime entry.

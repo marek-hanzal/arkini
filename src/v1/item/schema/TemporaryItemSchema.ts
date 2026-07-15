@@ -10,9 +10,9 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 /**
  * A board-only item authoring contract with a configured lifetime.
  *
- * The schema captures the intended lifetime and expiry output. Runtime lifetime
- * progression and expiry remain a separate capability and must not be inferred
- * from schema support alone.
+ * Every committed runtime instance starts with the authored duration, advances
+ * only through canonical fixed Tick steps, and atomically expires with its
+ * optional output.
  */
 export const TemporaryItemSchema = z
 	.object({
@@ -38,13 +38,13 @@ export const TemporaryItemSchema = z
 			.default(1)
 			.describe("Fixes temporary item stacks to one instance."),
 		/**
-		 * Authored lifetime in milliseconds for the intended expiry capability.
+		 * Authored lifetime in milliseconds for fixed-step runtime expiry.
 		 */
 		durationMs: TimeSchema.min(500).describe(
 			"The authored lifetime in milliseconds; must be at least 500 ms.",
 		),
 		/**
-		 * Optional result intended for expiry behavior.
+		 * Optional result resolved atomically when the item expires.
 		 */
 		output: OutputSchema.optional().describe(
 			"The optional output intended for the released board cell after expiry.",

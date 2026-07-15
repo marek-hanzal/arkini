@@ -4,21 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 06 — Temporary item lifetime**
+**Task 07 — Speed cheat**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/06-temporary-lifetime.md`;
-3. the temporary-lifetime rows in `tasks/COVERAGE.md`;
-4. current Tick, output, placement, item-state, hydration, and event code;
-5. only the historical expiry files named by task 06.
+2. `tasks/07-speed-cheat.md`;
+3. the speed-cheat rows in `tasks/COVERAGE.md`;
+4. current Tick/session adapter, utility item schema, runtime state, save, and event code;
+5. only the historical cheat files named by task 07.
 
 Next action:
 
-> Decide and implement the smallest canonical fixed-step lifetime representation for temporary board items, including exact creation boundary, deterministic Tick progression, save/restore, atomic expiry output, blocked-output retry policy, stable completion order, and one semantic expiry event without reviving timestamps or an active-effect subsystem.
+> Decide whether enabled speed mode is persisted gameplay state or session-only adapter state, then implement one explicit toggle/read contract that changes elapsed budget fed into the existing fixed-step engine without rewriting jobs, temporary durations, or timestamps.
 
 ## Absolute code rules
 
@@ -44,6 +44,8 @@ Next action:
 
 - Fixed simulation step: 200 ms; production time source: Effect Clock.
 - Jobs store only `durationMs` and `remainingMs`; one active job per owner.
+- Temporary items store authored `durationMs` plus persisted `remainingDurationMs`. Every identity present at a step boundary loses one fixed step; identities created during that step begin at full duration and first advance on the next step.
+- Ready temporary items expire after job completions in stable runtime-ID order. Expiry removes the item first, then resolves optional output from the released board origin through one deterministic output/placement stream. Expected capacity failure leaves the same item at `remainingDurationMs: 0` for retry.
 - Filling inputs never starts work; starting is explicit.
 - Inventory is passive storage and a hard pause. No new identity-bound state attaches or spends there.
 - Started jobs cannot be cancelled; queued requests are FIFO and reserve or pay nothing until dispatch. A blocked head remains until fresh runtime makes it runnable or the player explicitly clears the owner's whole pending queue.
@@ -62,6 +64,7 @@ Next action:
 - A fresh charged stack is pure. A partial spend stores state, preserves the original board identity at quantity `1`, and standard-places the pure remainder. Full idle depletion consumes one quantity in place.
 - A zero-capacity material input is closed during its active job; positive capacity stays open storage. Game validation permits positive capacity only on producer-owned lines.
 - Pure items use configured `maxStackSize`; impure items have effective stack size `1`.
+- Temporary lifetime is identity-bound runtime state, so every temporary item is impure even at full authored duration.
 
 ## Placement, reservations, and removal
 
@@ -87,6 +90,7 @@ Next action:
 
 - Completion randomness derives from stable job identity plus explicit algorithm versions.
 - Immediate depletion randomness derives from stable unchanged start/payer facts.
+- Temporary expiry randomness derives from stable temporary runtime identity and covers both output resolution and random placement origin.
 - Tick time and wall clock are not seed inputs.
 - Blocked retries and restored jobs preserve the same random result while canonical inputs remain unchanged.
 

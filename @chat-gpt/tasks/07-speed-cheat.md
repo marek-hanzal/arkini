@@ -1,6 +1,6 @@
 # 07 — Speed cheat
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

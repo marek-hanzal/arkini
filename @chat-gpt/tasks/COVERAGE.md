@@ -33,7 +33,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Stash completion lifecycle | Partial | Generic authored completion lifecycle is canonical; presentation and sound remain | 13–15 |
 | Item charges, deposit input, depletion | Partial | Generic runtime behavior is canonical; read-model, detail, feedback, and animation remain | 10, 13, 14 |
 | Directional gameplay merge | Partial | Canonical atomic execution, deterministic output, and semantic event are implemented; interaction feedback and animation remain | 11, 14 |
-| Temporary lifetime/expiry | Reference | Timing/output behavior remains | 06 |
+| Temporary lifetime/expiry | Partial | Canonical fixed-step state, save/restore, deterministic atomic expiry, and retry are implemented; read-model and presentation behavior remain | 10, 13, 14, 15 |
 | Speed cheat | Reference | Toggle behavior remains; old time model is rejected | 07 |
 | Board memory | Reference | Snapshot/restore behavior and animation remain | 08, 14 |
 | Cheat inventory sink and nuke-save confirmation | Reference | Drop-to-remove and persisted-save reset remain | 09 |
@@ -63,7 +63,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `config/` | Partial | Old compiler conventions and config model are rejected | Historical feature definitions when a task needs semantics | 01–09, 17 |
 | `craft/` | Partial | Generic and single-use runtime lifecycle are superseded | Detail, animation, and audio behavior only | 13–15 |
 | `debug/` | Reference | No current debug/explain surface | Scenarios, explanations, spawn/delete UX | 16 |
-| `effects/` | Partial | Current conditions/rules supersede global effective-line recomputation; persistent effect map is rejected | Effect labels and concrete product behavior | 06, 10, 13 |
+| `effects/` | Partial | Current conditions/rules and temporary-item expiry supersede global effective-line recomputation plus persistent active-effect timing | Effect labels, concrete product behavior, presentation, and audio intent | 10, 13–15 |
 | `engine/` | Superseded | Save topology, action dispatch, adapter, readiness mutation, world catch-up are rejected | Tests only when extracting behavior for an open task | 17 |
 | `event/` | Partial | Current transitions own runtime events atomically | Event naming and presentation/audio intent | 14, 15 |
 | `hash/` | Superseded | Not engine architecture | Only if browser persistence needs compatible hashing | 17 |

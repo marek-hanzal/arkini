@@ -19,6 +19,7 @@ Treat these as an information-requirement catalogue, not architecture:
 - `src/v0/producer/view/`;
 - `src/v0/item-detail/`;
 - relevant debug explanations.
+- temporary/effect copy and benefit labels in `src/v0/effects/readNearbyLineEffectLabel.ts`, `src/v0/effects/readRuntimeLineEffectLabel.ts`, and `src/v0/effects/readEffectiveLineBonusEntries.ts`; the old persistent active-effect timing model is removed and is not an oracle.
 
 ## Candidate read surfaces
 

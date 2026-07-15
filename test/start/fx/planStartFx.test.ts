@@ -10,6 +10,9 @@ describe("planStartFx", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const runtime = {
+					session: {
+						speedMode: "normal" as const,
+					},
 					items: [],
 					jobs: [],
 				};
@@ -68,6 +71,9 @@ describe("planStartFx", () => {
 		const result = Effect.runSync(
 			planStartFx({
 				runtime: {
+					session: {
+						speedMode: "normal" as const,
+					},
 					items: [],
 					jobs: [],
 				},
@@ -104,6 +110,9 @@ describe("planStartFx", () => {
 			Effect.either(
 				planStartFx({
 					runtime: {
+						session: {
+							speedMode: "normal" as const,
+						},
 						items: [],
 						jobs: [],
 					},

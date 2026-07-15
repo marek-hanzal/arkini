@@ -34,7 +34,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Item charges, deposit input, depletion | Partial | Generic runtime behavior is canonical; read-model, detail, feedback, and animation remain | 10, 13, 14 |
 | Directional gameplay merge | Partial | Canonical atomic execution, deterministic output, and semantic event are implemented; interaction feedback and animation remain | 11, 14 |
 | Temporary lifetime/expiry | Partial | Canonical fixed-step state, save/restore, deterministic atomic expiry, and retry are implemented; read-model and presentation behavior remain | 10, 13, 14, 15 |
-| Speed cheat | Reference | Toggle behavior remains; old time model is rejected | 07 |
+| Speed cheat | Partial | Canonical root runtime session mode, 1×/30× Tick input, save reset, toggle command, and event are implemented | Read-model/asset projection, control UI, and audio remain | 10, 13, 15 |
 | Board memory | Reference | Snapshot/restore behavior and animation remain | 08, 14 |
 | Cheat inventory sink and nuke-save confirmation | Reference | Drop-to-remove and persisted-save reset remain | 09 |
 | Public board/inventory/line read models | Partial | Historical bridge is an information-requirement catalogue | 10 |
@@ -58,7 +58,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `board-memory/` | Reference | Only schema exists currently | Full save/restore behavior and edge cases | 08, 14 |
 | `browser/` | Reference | No active browser shell | Hard reset behavior only | 12, 17 |
 | `capacity/` | Partial | Generic item charges, deterministic deposit input, depletion, and output are superseded | Detail/read-model feedback and depletion animation | 10, 13, 14, 17 |
-| `cheat/` | Reference | Schema only | Speed toggle behavior | 07 |
+| `cheat/` | Partial | Root runtime speed mode and fixed-step acceleration supersede historical runtime/timestamp behavior | Board control, ordered asset projection, and sound intent only | 10, 13, 15, 17 |
 | `cli/` | Removed | Canonical compiler/validator/packer supersede it completely | Nothing; use Git only for archaeology | Done |
 | `config/` | Partial | Old compiler conventions and config model are rejected | Historical feature definitions when a task needs semantics | 01–09, 17 |
 | `craft/` | Partial | Generic and single-use runtime lifecycle are superseded | Detail, animation, and audio behavior only | 13–15 |

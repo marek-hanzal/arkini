@@ -892,6 +892,9 @@ describe("item charges", () => {
 
 	it("does not reserve maxCount for queued requests before dispatch", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "runtime:capped-shrine",
@@ -1042,6 +1045,9 @@ describe("item charges", () => {
 
 	it("reports non-canonical persisted charge states", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "runtime:missing-config",

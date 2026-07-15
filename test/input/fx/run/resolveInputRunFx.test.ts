@@ -59,6 +59,9 @@ describe("resolveInputRunFx", () => {
 				ownerItemId: owner.id,
 				reservedCharges: new Map(),
 				runtime: {
+					session: {
+						speedMode: "normal" as const,
+					},
 					items: [
 						owner,
 					],
@@ -80,6 +83,9 @@ describe("resolveInputRunFx", () => {
 
 	it("plans only materials owned by the exact input slot", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				owner,
 				bufferedItem({
@@ -167,6 +173,9 @@ describe("resolveInputRunFx", () => {
 				ownerItemId: owner.id,
 				reservedCharges: new Map(),
 				runtime: {
+					session: {
+						speedMode: "normal" as const,
+					},
 					items: [
 						owner,
 						target,

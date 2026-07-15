@@ -272,7 +272,9 @@ Temporary items are board-only, non-stackable identities with fixed-step `remain
 
 ### Utility item kinds
 
-Inventory opener, memory, speed cheat, nuke, and cheat inventory have explicit configuration schemas. Their dedicated gameplay commands are not part of the current engine slice.
+Speed mode is runtime-backed as root session state. `toggleSpeedModeFx()` switches `runtime.session.speedMode` directly between `normal` and `accelerated`; it does not require, mutate, or derive truth from a speed-cheat item. Newly observed wall-clock time is fed into the same fixed-step engine at `1×` or `30×`. Explicit simulation advancement remains unscaled.
+
+The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Inventory opener, memory, nuke, and cheat inventory remain schema-backed without dedicated runtime commands.
 
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 
@@ -280,7 +282,7 @@ A capability is runtime-backed only when it has an owned command or Tick path an
 
 Serializable state contains live items, active jobs, and FIFO requests.
 
-Tick adapter timing is session-only and is not persisted. Closing a session may discard a sub-step remainder smaller than one fixed step.
+Tick adapter timing and `runtime.session.speedMode` are session-only and are not persisted. Closing a session may discard a sub-step remainder smaller than one fixed step; loading or creating a session always starts speed mode at `normal`.
 
 Restored jobs continue from persisted `remainingMs`. No due time is reconstructed from wall-clock history.
 

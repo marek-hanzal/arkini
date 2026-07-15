@@ -7,9 +7,9 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An authoring contract for a future speed-cheat item capability.
+ * An authored user-facing control for the global runtime session speed mode.
  *
- * Its two ordered asset sources represent the enabled and disabled states.
+ * The item owns no toggle state. Its two ordered assets project the root accelerated and normal modes.
  */
 export const CheatSpeedItemSchema = z
 	.object({
@@ -25,17 +25,15 @@ export const CheatSpeedItemSchema = z
 						IdSchema,
 						IdSchema,
 					])
-					.describe(
-						"Exactly two ordered asset IDs: speed cheat on, then speed cheat off.",
-					),
+					.describe("Exactly two ordered asset IDs: accelerated mode, then normal mode."),
 			})
 			.strict(),
 	})
 	.strict()
-	.describe("An authored speed-cheat item definition with ordered on and off assets.")
+	.describe("An authored speed-cheat control with ordered accelerated and normal assets.")
 	.meta({
 		id: "CheatSpeedItemSchema",
-		description: "An authored speed-cheat item definition with ordered on and off assets.",
+		description: "An authored speed-cheat control with ordered accelerated and normal assets.",
 	});
 
 export type CheatSpeedItemSchema = typeof CheatSpeedItemSchema;

@@ -5,7 +5,7 @@
 			"id": "item:cheat-speed",
 			"type": "cheat:speed",
 			"title": "Onion Watch",
-			"description": "Cheat timepiece that toggles the engine between normal timing and one-second instant actions.",
+			"description": "Cheat timepiece that toggles the loaded runtime between normal and accelerated simulation time.",
 			"asset": {
 				"source": [
 					"item-cheat-speed-on",

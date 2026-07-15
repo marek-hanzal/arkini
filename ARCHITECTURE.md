@@ -169,23 +169,34 @@ UI may not own or reconstruct:
 
 Effect Clock is the only production wall-clock source.
 
-The Tick adapter owns transient session timing:
+The loaded runtime owns engine-visible ephemeral session state:
+
+```text
+runtime.session.speedMode
+```
+
+It is canonical for the live session but intentionally absent from serialized gameplay state. Hydration always starts in `normal` mode.
+
+The Tick adapter separately owns transient observation state:
 
 ```text
 observedAtMs
 pendingElapsedMs
 ```
 
-These values are not gameplay state and are not persisted.
+`pendingElapsedMs` is simulation time, not raw wall time. Neither Tick observation field is persisted.
 
 Simulation uses one canonical 200 ms fixed step.
 
 ```text
-observe elapsed time
-→ add to pending budget
+observe new wall-clock delta
+→ scale only that delta by runtime.session.speedMode
+→ add simulation milliseconds to pending budget
 → replay all complete fixed steps
 → keep sub-step remainder for the live session
 ```
+
+Normal mode uses `1×`; accelerated mode uses `30×`. Toggling first folds elapsed wall time under the old mode and only then changes the root runtime session state, so previously observed or pending normal time is never accelerated retroactively. Explicit Tick advancement already supplies simulation milliseconds and never applies the multiplier.
 
 A failed advancement retains its complete pending budget for retry in the same session. A successful advancement consumes each complete step at most once.
 

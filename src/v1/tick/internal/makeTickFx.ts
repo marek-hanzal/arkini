@@ -1,5 +1,7 @@
 import { Clock, Effect, Exit, SynchronizedRef } from "effect";
 
+import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
+import { SpeedModeMultiplier } from "~/v1/session/SpeedModeMultiplier";
 import type { TickFxService } from "~/v1/tick/context/TickFx";
 import { advanceRuntimeElapsedFx } from "~/v1/tick/internal/advanceRuntimeElapsedFx";
 import { TickStepMs } from "~/v1/tick/TickStepMs";
@@ -16,6 +18,7 @@ const resumeExitFx = <Error>(exit: Exit.Exit<void, Error>) =>
 /** Builds the transient Tick service owned by one game core layer. */
 export const makeTickFx = Effect.fn("makeTickFx")(function* () {
 	const observedAtMs = yield* Clock.currentTimeMillis;
+	const runtimeFx = yield* RuntimeFx;
 	const store = yield* SynchronizedRef.make(
 		TickSchema.parse({
 			observedAtMs,
@@ -61,12 +64,17 @@ export const makeTickFx = Effect.fn("makeTickFx")(function* () {
 		read: SynchronizedRef.get(store),
 		advanceRuntime: advanceObserved(
 			(state) =>
-				Clock.currentTimeMillis.pipe(
-					Effect.map((nowMs) => ({
-						elapsedMs: Math.max(0, nowMs - state.observedAtMs),
+				Effect.gen(function* () {
+					const nowMs = yield* Clock.currentTimeMillis;
+					const runtime = yield* runtimeFx.read;
+
+					return {
+						elapsedMs:
+							Math.max(0, nowMs - state.observedAtMs) *
+							SpeedModeMultiplier[runtime.session.speedMode],
 						observedAtMs: nowMs,
-					})),
-				),
+					};
+				}),
 			(elapsedMs) =>
 				advanceRuntimeElapsedFx({
 					elapsedMs,

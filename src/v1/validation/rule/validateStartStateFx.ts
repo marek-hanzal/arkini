@@ -27,6 +27,9 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 	const result = yield* Effect.either(
 		planStartFx({
 			runtime: {
+				session: {
+					speedMode: "normal" as const,
+				},
 				items: [],
 				jobs: [],
 				jobQueue: [],

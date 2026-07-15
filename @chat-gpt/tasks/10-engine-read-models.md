@@ -30,7 +30,7 @@ Treat these as an information-requirement catalogue, not architecture:
 - item target/max-count facts;
 - input slot state and accepted quantity;
 - job/reservation state;
-- utility capability state;
+- utility capability state, including root speed mode and presentation facts required to project every speed-cheat item consistently;
 - human-readable blocked reasons where product needs them.
 
 ## Do not port
@@ -46,6 +46,7 @@ Treat these as an information-requirement catalogue, not architecture:
 - every gameplay boolean is decided by the engine;
 - a charge-blocked input or queued start exposes enough engine-owned facts for UI to explain the exact payer and deficit without reading raw config/runtime and rebuilding charge logic;
 - queue reads expose whether pending requests exist so UI can offer clear-all while active-job cancellation remains unavailable;
+- speed reads expose the canonical root mode and ordered asset projection without treating any speed-cheat item as the source of truth;
 - reads are pure snapshot projections and never catch up time or mutate state;
 - public surfaces are coherent by use case, not one method per field;
 - raw runtime remains available where presentation-only projection is sufficient;

@@ -62,6 +62,9 @@ describe("pure placement stack targets", () => {
 			location: board(2),
 		});
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				active,
 				queued,
@@ -102,6 +105,9 @@ describe("pure placement stack targets", () => {
 			location: inventory(1),
 		});
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				active,
 				idle,
@@ -137,6 +143,9 @@ describe("pure placement stack targets", () => {
 			revision: "revision:origin",
 		};
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				origin,
 				active,
@@ -178,6 +187,9 @@ describe("pure placement stack targets", () => {
 			location: board(0),
 		});
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				active,
 			],

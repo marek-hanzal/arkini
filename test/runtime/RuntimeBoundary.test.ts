@@ -22,6 +22,7 @@ const revisionFreeWriteFiles = new Set([
 	"src/v1/placement/write/placeOutputFx.ts",
 	"src/v1/runtime/write/spawnItemFx.ts",
 	"src/v1/start/write/startFx.ts",
+	"src/v1/session/write/toggleSpeedModeFx.ts",
 ]);
 
 const stateDerivedDecisionImports = [

@@ -92,6 +92,9 @@ const location = (scope: "board" | "inventory", x: number, y: number) => {
 describe("checkRuntimeFx", () => {
 	it("reports readable identity and location invariant violations", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "duplicate",
@@ -178,6 +181,9 @@ describe("checkRuntimeFx", () => {
 
 	it("reports readable stack-size and max-count invariant violations", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "limited:first",

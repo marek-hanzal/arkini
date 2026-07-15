@@ -38,6 +38,9 @@ const passiveChild = {
 describe("discardRuntimeItemOwnedStateFx", () => {
 	it("discards passive input descendants and queued intents while preserving the root", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				root,
 				passiveChild,
@@ -66,6 +69,9 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 
 	it("rejects committed work anywhere beneath the discarded ownership tree", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				root,
 				passiveChild,

@@ -28,7 +28,7 @@ Restore synth/audio feedback as a transient presentation consumer of engine even
 
 ## Required tests
 
-- event-to-sound mapping;
+- event-to-sound mapping, including `speed-mode:changed`;
 - batch limits and deduplication;
 - rapid completion groups;
 - callback rejection isolation;

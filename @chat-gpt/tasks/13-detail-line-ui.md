@@ -30,6 +30,7 @@ Rebuild item detail, producer/craft/blueprint/stash controls, input state, progr
 - progress follows `remainingMs` and canonical Tick state;
 - blocked reasons are stable and human-presentable;
 - special item panels reflect implemented capabilities only;
+- a speed-cheat control toggles the global root speed mode directly and renders accelerated/normal assets from engine-owned presentation facts, never item-local state;
 - schema-only features are not shown as operational.
 
 ## Required tests
@@ -39,7 +40,8 @@ Rebuild item detail, producer/craft/blueprint/stash controls, input state, progr
 - input fill/withdraw behavior;
 - max-count and output-capacity messages;
 - inventory pause;
-- stale command rejection presentation.
+- stale command rejection presentation;
+- speed toggle and consistent asset projection across all speed-cheat item instances.
 
 ## Historical cleanup on closeout
 

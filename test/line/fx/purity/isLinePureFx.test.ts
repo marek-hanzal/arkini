@@ -23,6 +23,9 @@ const owner = {
 };
 
 const baseRuntime = {
+	session: {
+		speedMode: "normal" as const,
+	},
 	items: [
 		owner,
 	],

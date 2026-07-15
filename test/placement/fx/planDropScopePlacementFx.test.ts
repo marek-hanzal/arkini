@@ -38,6 +38,9 @@ const run = <A, E>(effect: Effect.Effect<A, E, GameConfigFx>) => {
 describe("planDropScopePlacementFx", () => {
 	it("keeps board-only placement on the board and reports board capacity", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				runtimeItem({
 					id: "runtime:origin",
@@ -92,6 +95,9 @@ describe("planDropScopePlacementFx", () => {
 
 	it("routes inventory-only placement directly to inventory", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				runtimeItem({
 					id: "runtime:origin",
@@ -144,6 +150,9 @@ describe("planDropScopePlacementFx", () => {
 
 	it("plans board first and sends only the remainder to inventory for any-scope items", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				runtimeItem({
 					id: "runtime:origin",

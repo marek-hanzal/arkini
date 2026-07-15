@@ -15,6 +15,9 @@ describe("planStartInventoryItemFx", () => {
 					quantity: 4,
 				},
 				runtime: {
+					session: {
+						speedMode: "normal" as const,
+					},
 					items: [],
 					jobs: [],
 				},
@@ -73,6 +76,9 @@ describe("planStartInventoryItemFx", () => {
 						quantity: 4,
 					},
 					runtime: {
+						session: {
+							speedMode: "normal" as const,
+						},
 						items: [],
 						jobs: [],
 					},

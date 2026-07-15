@@ -43,6 +43,9 @@ describe("checkRuntimeJobsFx", () => {
 			},
 		} satisfies RuntimeItemSchema.Type;
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				invalidOwner,
 				{
@@ -98,6 +101,9 @@ describe("checkRuntimeJobsFx", () => {
 
 	it("accepts a queue-only owner as a first-class runtime state", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				owner,
 			],
@@ -134,6 +140,9 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		},
 	} satisfies RuntimeItemSchema.Type;
 	const runtime = {
+		session: {
+			speedMode: "normal" as const,
+		},
 		items: [
 			owner,
 			consumedRoot,

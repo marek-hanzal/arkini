@@ -2,11 +2,15 @@ import { z } from "zod";
 
 import { JobQueueRequestSchema } from "~/v1/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/v1/job/schema/JobSchema";
+import { RuntimeSessionSchema } from "~/v1/session/schema/RuntimeSessionSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
-/** Canonical gameplay state value composed of live items, active jobs, and queued start requests. */
+/** Canonical loaded runtime composed of ephemeral session state and live gameplay state. */
 export const RuntimeSchema = z
 	.object({
+		session: RuntimeSessionSchema.describe(
+			"Engine-visible ephemeral state for this loaded runtime session.",
+		),
 		items: z
 			.array(RuntimeItemSchema)
 			.describe("Every hydrated live item currently owned by the runtime."),
@@ -21,7 +25,7 @@ export const RuntimeSchema = z
 	.strict()
 	.meta({
 		id: "RuntimeSchema",
-		description: "The canonical gameplay state value.",
+		description: "The canonical loaded runtime state value.",
 	});
 export type RuntimeSchema = typeof RuntimeSchema;
 export namespace RuntimeSchema {

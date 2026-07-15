@@ -17,6 +17,9 @@ const board = (x: number) => ({
 describe("runtime purity invariants", () => {
 	it("reports the effective singleton stack limit and buffered closed input", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "runtime:craft",
@@ -127,6 +130,9 @@ describe("runtime purity invariants", () => {
 		},
 	])("rejects an impure producer stack with $name", ({ items, jobs, jobQueue }) => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "runtime:producer",
@@ -162,6 +168,9 @@ describe("runtime purity invariants", () => {
 
 	it("keeps a pure producer stack at its configured limit", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "runtime:producer",
@@ -189,6 +198,9 @@ describe("runtime purity invariants", () => {
 
 	it("allows buffered input on a running positive-capacity line", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				{
 					id: "runtime:producer",

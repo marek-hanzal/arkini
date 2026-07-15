@@ -32,6 +32,9 @@ const simple = {
 describe("isItemPureFx", () => {
 	it("accepts items that own no line or item state", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				producer,
 			],
@@ -51,6 +54,9 @@ describe("isItemPureFx", () => {
 				isItemPureFx({
 					item: simple,
 					runtime: {
+						session: {
+							speedMode: "normal" as const,
+						},
 						items: [
 							simple,
 						],
@@ -63,6 +69,9 @@ describe("isItemPureFx", () => {
 
 	it("rejects an item when any owned line has buffered input", () => {
 		const runtime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				producer,
 				{
@@ -90,6 +99,9 @@ describe("isItemPureFx", () => {
 
 	it("rejects an item when any owned line has an active or queued run", () => {
 		const activeRuntime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				producer,
 			],
@@ -104,6 +116,9 @@ describe("isItemPureFx", () => {
 			],
 		} satisfies RuntimeSchema.Type;
 		const queuedRuntime = {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items: [
 				producer,
 			],

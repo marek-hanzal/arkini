@@ -5,6 +5,9 @@ import { isLineInputClosedFx } from "~/v1/line/fx/input/isLineInputClosedFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 const activeRuntime = {
+	session: {
+		speedMode: "normal" as const,
+	},
 	items: [],
 	jobs: [
 		{
@@ -58,6 +61,9 @@ describe("isLineInputClosedFx", () => {
 					ownerItemId: "runtime:owner",
 					lineId: "line:run",
 					runtime: {
+						session: {
+							speedMode: "normal" as const,
+						},
 						items: [],
 						jobs: [],
 					},

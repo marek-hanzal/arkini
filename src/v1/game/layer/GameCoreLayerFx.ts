@@ -57,7 +57,7 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));
-	const tickLayer = Layer.effect(TickFx, makeTickFx());
+	const tickLayer = Layer.effect(TickFx, makeTickFx()).pipe(Layer.provide(runtimeReadLayer));
 
 	return Layer.mergeAll(
 		configLayer,

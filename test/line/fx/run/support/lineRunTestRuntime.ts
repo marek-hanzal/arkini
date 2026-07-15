@@ -257,6 +257,9 @@ export const lineRunRuntime = ({
 	});
 
 	return {
+		session: {
+			speedMode: "normal" as const,
+		},
 		items,
 		jobs: [],
 	} satisfies RuntimeSchema.Type;

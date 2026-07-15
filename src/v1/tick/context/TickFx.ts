@@ -11,7 +11,7 @@ export interface TickFxService {
 	readonly advanceRuntimeBy: (elapsedMs: number) => RuntimeAdvanceFx;
 }
 
-/** Owns one failure-safe, at-most-once elapsed-time budget for a game session. */
+/** Owns one failure-safe, at-most-once simulation-time budget for a game session. */
 export class TickFx extends Context.Tag("TickFx")<TickFx, TickFxService>() {
 	//
 }

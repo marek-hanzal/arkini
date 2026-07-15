@@ -8,7 +8,7 @@ Arkini is a client-only, offline merge and production game built around a determ
 
 ## Current status
 
-The engine, compiler, validator, binary packer, deterministic Tick model, jobs, queueing, reservations, placement, persistence boundary, and React session adapters are implemented and covered by the repository check gate.
+The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and React session adapters are implemented and covered by the repository check gate.
 
 No active browser entrypoint or deployment workflow is committed in this snapshot. A future renderer shell must be introduced against the current engine rather than reviving the archived application bootstrap.
 
@@ -78,12 +78,13 @@ input/        Input resolution, buffering, consume and reserve plans.
 item/         Canonical item schemas and item reads.
 job/          Active jobs, FIFO requests, start and completion behavior.
 line/         Product-line rules, reads, resolution and run plans.
-merge/        Directional item interaction authoring contracts; execution is pending.
+merge/        Directional item interaction authoring, validation, and atomic execution.
 output/       Output rules and result resolution.
 pack/         Binary encode/decode and directory packing.
 placement/    Stack, spawn, scope and drop placement planning.
 query/        Runtime item queries.
 runtime/      Canonical runtime, committed-transition store and write boundary.
+session/      Engine-visible ephemeral root state and session commands.
 schema/       Completed game configuration root and JSON Schema generation.
 start/        Initial board/inventory planning.
 state/        Serializable state conversion.

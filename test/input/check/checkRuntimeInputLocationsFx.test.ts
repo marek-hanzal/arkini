@@ -60,6 +60,9 @@ describe("checkRuntimeInputLocationsFx", () => {
 	it("reports missing owners, lines, slots, selector mismatches, and exceeded capacity", () => {
 		const result = Effect.runSync(
 			checkFx({
+				session: {
+					speedMode: "normal" as const,
+				},
 				items: [
 					owner,
 					inputItem({

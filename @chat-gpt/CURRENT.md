@@ -4,21 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 07 — Speed cheat**
+**Task 08 — Board memory**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/07-speed-cheat.md`;
-3. the speed-cheat rows in `tasks/COVERAGE.md`;
-4. current Tick/session adapter, utility item schema, runtime state, save, and event code;
-5. only the historical cheat files named by task 07.
+2. `tasks/08-board-memory.md`;
+3. the board-memory rows in `tasks/COVERAGE.md`;
+4. current runtime item state, board/inventory placement, save, ownership, and event code;
+5. only the historical board-memory files named by task 08.
 
 Next action:
 
-> Decide whether enabled speed mode is persisted gameplay state or session-only adapter state, then implement one explicit toggle/read contract that changes elapsed budget fed into the existing fixed-step engine without rewriting jobs, temporary durations, or timestamps.
+> Define the memory payload and exact atomic capture/restore contract, including item identity/location participation, busy/job-owned items, inventory capacity shortfall, deterministic loss policy, one-shot clearing, save round-trip, and presentation facts.
 
 ## Absolute code rules
 
@@ -39,6 +39,15 @@ Next action:
 - UI animation intentionally lags runtime and may be redirected by later events.
 - Item revision is a runtime-only stale-intent token. Saves omit it and hydration creates fresh revisions for the new session.
 - Jobs and queued requests are not revisioned because commands never target a previously observed mutable job/request shape.
+
+## Runtime session speed
+
+- `runtime.session.speedMode` is the single canonical live-session truth: `normal` or `accelerated`.
+- Runtime session state is engine-visible but intentionally absent from `StateSchema`; hydration and a new session always start in `normal`.
+- `toggleSpeedModeFx()` has no item dependency. A speed-cheat item is only a user-facing control and asset projection, never an authorization token or source of truth.
+- Normal mode feeds newly observed wall time into Tick at `1×`; accelerated mode uses `30×`. Both use the same 200 ms fixed-step engine.
+- Toggling first folds elapsed wall time under the old mode, then changes the root state. Pending normal time is never accelerated retroactively.
+- Explicit `runTickRuntimeByFx` input is simulation time and never receives the speed multiplier.
 
 ## Tick, jobs, queue, and completion
 

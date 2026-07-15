@@ -16,6 +16,9 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 	);
 	return yield* assertRuntimeFx({
 		runtime: {
+			session: {
+				speedMode: "normal" as const,
+			},
 			items,
 			jobs: state.jobs,
 			jobQueue: state.jobQueue ?? [],

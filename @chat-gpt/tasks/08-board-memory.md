@@ -1,6 +1,6 @@
 # 08 — Board memory
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

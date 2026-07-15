@@ -119,6 +119,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					});
 					if (
 						matches &&
+						(candidate.scope === "board" || candidate.scope === "any") &&
 						candidate.charges !== undefined &&
 						candidate.charges.amount >= input.charges.cost
 					) {
@@ -132,7 +133,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 						severity: "error",
 						path: diagnosticPath,
 						source: provenance.items[itemId],
-						message: `Deposit input ${inputIndex} of line ${line.id} cannot match any item with at least ${input.charges.cost} charges.`,
+						message: `Deposit input ${inputIndex} of line ${line.id} cannot match any board-capable item with at least ${input.charges.cost} charges.`,
 						ownerItemId: itemId,
 						lineId: line.id,
 						inputIndex,

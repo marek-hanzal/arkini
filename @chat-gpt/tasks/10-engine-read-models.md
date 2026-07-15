@@ -24,6 +24,8 @@ Treat these as an information-requirement catalogue, not architecture:
 
 - board and inventory item presentation facts;
 - line visibility, run/queue/blocked status, progress, and missing inputs;
+- charge readiness facts owned by the engine: payer kind (`self | target`), resolved payer runtime item ID when available, required charges, available charges, missing charges, and blocked reason;
+- queue facts required to present blocked FIFO work and the explicit clear-all-pending command without implying that active jobs are cancellable;
 - item target/max-count facts;
 - input slot state and accepted quantity;
 - job/reservation state;
@@ -41,6 +43,8 @@ Treat these as an information-requirement catalogue, not architecture:
 ## Acceptance criteria
 
 - every gameplay boolean is decided by the engine;
+- a charge-blocked input or queued start exposes enough engine-owned facts for UI to explain the exact payer and deficit without reading raw config/runtime and rebuilding charge logic;
+- queue reads expose whether pending requests exist so UI can offer clear-all while active-job cancellation remains unavailable;
 - reads are pure snapshot projections and never catch up time or mutate state;
 - public surfaces are coherent by use case, not one method per field;
 - raw runtime remains available where presentation-only projection is sufficient;

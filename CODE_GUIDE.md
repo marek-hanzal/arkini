@@ -192,7 +192,7 @@ Charge resolution and application are line-wide operations. Resolve payer identi
 
 ### Future output and max-count
 
-Every active job reserves the worst possible quantity of each canonical item its completion may create. This includes `line.output` and deferred `charges.output` for an owner already at zero charges. Resolve and assert that reservation inside the same candidate runtime that creates the job. Queue entries reserve nothing until dispatch.
+Every active job reserves the worst possible quantity of each canonical item its completion may create. This includes `line.output` and deferred `charges.output` for an owner already at zero charges. Resolve and assert that reservation inside the same candidate runtime that creates the job. Queue entries reserve nothing until dispatch. `clearItemJobQueueFx({ ownerItemId })` may remove all pending requests of one owner, but must never cancel active work, reinterpret resources, require item/request revisions, target individual stale request shapes, or silently discard blocked heads.
 
 All later quantity-creating paths and runtime hydration must include active-job reservations in canonical `maxCount`: placement planners, direct spawn, direct quantity mutation, and runtime invariant checks all use the same reservation reader. Completion must remove its own ready job from the candidate before placing output so the job spends rather than duplicates its reservation. A depleted owner and job-owned consumed material offset worst-case output of their own canonical items by the quantities that will disappear. Immediate external depletion output is placed during start and must see the new job's future reservations. Do not use expected values, average chances, or one sampled roll as capacity planning.
 

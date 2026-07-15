@@ -202,9 +202,9 @@ An owner may have:
 - zero or one active job;
 - FIFO queued start requests up to its configured capacity.
 
-A queued request is not a job. It owns no time, consumes nothing, and reserves nothing.
+A queued request is not a job. It owns no time, consumes nothing, and reserves nothing. Pending requests remain editable intent: one explicit owner command may clear the whole pending queue without touching an active job, materials, charges, or outputs.
 
-Immediate and queued starts use the same internal start pipeline. A blocked FIFO head remains first and cannot be overtaken.
+Immediate and queued starts use the same internal start pipeline. A blocked FIFO head remains first and cannot be overtaken. It waits for fresh runtime facts to make it runnable or for the player to clear that owner's pending queue; the engine never drops it automatically.
 
 Jobs persist only:
 
@@ -219,7 +219,7 @@ Inventory is a hard pause for active and ready jobs. Returning the same owner to
 
 Inventory is passive storage. Commands may move an already stateful owner into inventory, but no command may attach new identity-bound state to an owner while it is stored there.
 
-Started jobs cannot be cancelled.
+Started jobs cannot be cancelled. Pending queue requests may be cleared only as the whole current queue of one owner; no command targets a previously observed request shape.
 
 ## 9. Inputs and reservations
 
@@ -271,7 +271,7 @@ An active job reserves the worst-case future quantity of every canonical item it
 - rolls inside one selected set add together;
 - alternative roll sets reserve the per-item maximum.
 
-A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; unavailable charges or max-count blockage leaves the request in place.
+A queued request owns no reservation. The same authoritative check runs when its FIFO head attempts dispatch; unavailable charges or max-count blockage leaves the request in place until fresh state makes it runnable or the player explicitly clears the owner's pending queue.
 
 Placement, direct spawn, and direct quantity mutation include active-job reservations in their max-count check, so later operations cannot consume capacity already promised to a job. Completion first detaches its ready job from the immutable candidate and then materializes output, which spends that job's reservation without double-counting it. A depleted owner offsets worst-case output of its own canonical item by the live quantity that will disappear.
 

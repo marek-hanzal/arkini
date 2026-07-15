@@ -193,7 +193,7 @@ Every input may optionally author a charge cost:
 }
 ```
 
-`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. A deposit input must author a target charge cost and never moves the target into an input buffer.
+`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. `deposit` is the interaction kind for one external board payer, not a required item type. Validation therefore requires the selector to match at least one sufficiently charged item whose scope is `board` or `any`. A deposit input must author a target charge cost and never moves the target into an input buffer.
 
 Material mode:
 

@@ -25,6 +25,7 @@ Rebuild item detail, producer/craft/blueprint/stash controls, input state, progr
 
 - controls render from coherent engine reads;
 - start/store/withdraw/default-selection commands are explicit;
+- pending queue requests can be cleared as one explicit owner action while active jobs remain non-cancellable;
 - progress follows `remainingMs` and canonical Tick state;
 - blocked reasons are stable and human-presentable;
 - special item panels reflect implemented capabilities only;

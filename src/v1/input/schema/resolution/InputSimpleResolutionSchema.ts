@@ -23,7 +23,7 @@ export const InputSimpleResolutionSchema = z
 	.strict()
 	.meta({
 		id: "InputSimpleResolutionSchema",
-		description: "The always-ready resolution of one simple input.",
+		description: "The readiness of one simple input with no material operation.",
 	});
 
 export type InputSimpleResolutionSchema = typeof InputSimpleResolutionSchema;

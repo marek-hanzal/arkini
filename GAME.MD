@@ -125,7 +125,8 @@ A queued request:
 - owns no time;
 - consumes nothing;
 - reserves nothing;
-- stores only the stable information needed to retry the start.
+- stores only the stable information needed to retry the start;
+- may be discarded only by explicitly clearing the whole pending queue of its owner.
 
 ## 9. FIFO behavior
 
@@ -133,7 +134,9 @@ Queued work starts through the same internal pipeline as an immediate start.
 
 The oldest request is always considered first.
 
-A retryable blocked head remains at the front. Work behind it may not overtake it.
+A retryable blocked head remains at the front. Work behind it may not overtake it. The head keeps retrying against fresh runtime facts, so a later matching deposit or other restored requirement may unblock it. The engine never silently discards pending work.
+
+The player may explicitly clear every pending request of one owner. Clearing a queue does not cancel or modify an active job, return materials, spend or restore charges, or create output. Repeating the command on an empty queue is a safe no-op.
 
 Queue-only owners are valid runtime state and are retried at fixed-step boundaries.
 
@@ -183,7 +186,7 @@ charges.amount
 charges.output?
 ```
 
-Missing live `remainingCharges` means the instance is fresh at the authored full amount. Charge costs are authored on individual line inputs. A self cost charges the owner; a target cost charges the deterministic board item resolved by a deposit input. Queueing pays nothing. Costs are resolved and paid only when a job actually starts.
+Missing live `remainingCharges` means the instance is fresh at the authored full amount. Charge costs are authored on individual line inputs. A self cost charges the owner; a target cost charges the deterministic board item resolved by a deposit input. Here `deposit` names the external-board-target interaction, not a required target item category. Queueing pays nothing. Costs are resolved and paid only when a job actually starts.
 
 All costs for the same runtime payer are aggregated before mutation. The engine spends each payer once inside the same candidate. A partial spend makes one concrete item stateful and isolates it from a stack. Fully depleting an idle quantity consumes one quantity in place. An idle depleted target is removed immediately and emits its optional charge output from its former origin. A payer that owns an active job may temporarily remain at zero charges until that job completes.
 

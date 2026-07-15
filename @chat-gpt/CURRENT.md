@@ -46,7 +46,8 @@ Next action:
 - Jobs store only `durationMs` and `remainingMs`; one active job per owner.
 - Filling inputs never starts work; starting is explicit.
 - Inventory is passive storage and a hard pause. No new identity-bound state attaches or spends there.
-- Started jobs cannot be cancelled; queued requests are FIFO and reserve or pay nothing until dispatch.
+- Started jobs cannot be cancelled; queued requests are FIFO and reserve or pay nothing until dispatch. A blocked head remains until fresh runtime makes it runnable or the player explicitly clears the owner's whole pending queue.
+- `clearItemJobQueueFx({ ownerItemId })` removes every current pending request for that owner, does not target request or item revisions, and never touches active work or resources.
 - Producer, craft, blueprint, and stash keep separate item schemas but use one `LineSchema`, optional `line.output`, and one generic completion path.
 - Item type never decides lifetime. An item without charges persists; an item with charges dies when one instance reaches zero.
 - Completion removes a depleted owner before line output, emits optional depletion output second, releases its inputs, discards consumed job materials, then returns reservations. Any failure rolls back the entire candidate.
@@ -55,7 +56,7 @@ Next action:
 ## Charges, inputs, purity, and isolation
 
 - Item authoring uses `charges: { amount, output? }`; live `remainingCharges` is stored only after a spend changes the full amount.
-- Input authoring uses `charges: { cost, from: "self" | "target" }`. Target charging is valid only for deposit inputs, which deterministically resolve one board payer.
+- Input authoring uses `charges: { cost, from: "self" | "target" }`. Target charging is valid only for deposit inputs, which deterministically resolve one sufficiently charged board-capable payer. `deposit` is an external-payer interaction kind, not a target item category.
 - Charge costs are reserved across line input resolution, aggregated by runtime payer ID, and spent once inside the start candidate.
 - Idle full depletions resolve before surviving stateful payers so capacity freed by the command may satisfy later isolation.
 - A fresh charged stack is pure. A partial spend stores state, preserves the original board identity at quantity `1`, and standard-places the pure remainder. Full idle depletion consumes one quantity in place.

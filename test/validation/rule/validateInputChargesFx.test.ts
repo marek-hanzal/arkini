@@ -41,6 +41,22 @@ const depositInput = ({
 	},
 });
 
+const exactDepositInput = (itemId: string, cost = 1) => ({
+	type: "deposit" as const,
+	query: {
+		scope: "board" as const,
+		distance: "close" as const,
+		selector: {
+			type: "item" as const,
+			itemId,
+		},
+	},
+	charges: {
+		cost,
+		from: "target" as const,
+	},
+});
+
 describe("validateInputChargesFx", () => {
 	it("requires every deposit input to author a target charge cost", async () => {
 		const producer = createProducerItem({
@@ -214,6 +230,136 @@ describe("validateInputChargesFx", () => {
 		);
 	});
 
+	it("rejects an exact inventory-only external payer", async () => {
+		const producer = createProducerItem({
+			id: "exact-inventory-target",
+			input: [
+				exactDepositInput("inventory-target"),
+			],
+		});
+		const target = {
+			...createSimpleItem("inventory-target"),
+			scope: "inventory" as const,
+			charges: {
+				amount: 1,
+			},
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[target.id]: target,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				reason: "target-unavailable",
+			}),
+		]);
+	});
+
+	it("rejects a selector that matches only inventory-only charged items", async () => {
+		const producer = createProducerItem({
+			id: "inventory-selector-target",
+			input: [
+				depositInput(),
+			],
+		});
+		const target = {
+			...createSimpleItem("inventory-source", [
+				"source",
+			]),
+			scope: "inventory" as const,
+			charges: {
+				amount: 1,
+			},
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[target.id]: target,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				reason: "target-unavailable",
+			}),
+		]);
+	});
+
+	it("accepts board and any external payer scopes", async () => {
+		const producer = createProducerItem({
+			id: "board-capable-target",
+			input: [
+				depositInput(),
+			],
+		});
+		const boardTarget = {
+			...createSimpleItem("board-source", [
+				"source",
+			]),
+			scope: "board" as const,
+			charges: {
+				amount: 1,
+			},
+		};
+		const anyTarget = {
+			...createSimpleItem("any-source", [
+				"source",
+			]),
+			charges: {
+				amount: 1,
+			},
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[boardTarget.id]: boardTarget,
+			}),
+		).toEqual([]);
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[anyTarget.id]: anyTarget,
+			}),
+		).toEqual([]);
+	});
+
+	it("accepts a mixed selector when at least one charged match is board-capable", async () => {
+		const producer = createProducerItem({
+			id: "mixed-selector-target",
+			input: [
+				depositInput(),
+			],
+		});
+		const inventoryTarget = {
+			...createSimpleItem("inventory-source", [
+				"source",
+			]),
+			scope: "inventory" as const,
+			charges: {
+				amount: 1,
+			},
+		};
+		const boardTarget = {
+			...createSimpleItem("board-source", [
+				"source",
+			]),
+			scope: "board" as const,
+			charges: {
+				amount: 1,
+			},
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[inventoryTarget.id]: inventoryTarget,
+				[boardTarget.id]: boardTarget,
+			}),
+		).toEqual([]);
+	});
+
 	it("requires a deposit selector to match at least one sufficiently charged item", async () => {
 		const producer = createProducerItem({
 			id: "producer",
@@ -227,6 +373,7 @@ describe("validateInputChargesFx", () => {
 			...createSimpleItem("weak", [
 				"source",
 			]),
+			scope: "board" as const,
 			charges: {
 				amount: 1,
 			},

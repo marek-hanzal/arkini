@@ -74,8 +74,8 @@ A status describes oracle value, not whether historical code still compiles. The
 | `layer/` | Removed | Old UI layering audit had no current source ownership | Nothing | Done |
 | `limit/` | Partial | Runtime max count and placement checks exist | Target-limit presentation | 10, 13 |
 | `loot/` | Superseded | Current output/roll model is canonical | Presentation/audio grouping only | 14, 15 |
-| `merge/` | Partial | Canonical directional execution and tests supersede historical runtime mutation; placement stack merge remains separate | Drag feedback and animation/audio intent only | 11, 14, 15 |
-| `placement/` | Partial | Current placement planner/write path is canonical | Drag feedback and animation intent | 11, 14 |
+| `merge/` | Partial | Canonical directional execution, board-viability validation, and tests supersede historical runtime mutation; placement stack merge remains separate | Drag feedback and animation/audio intent only | 11, 14, 15 |
+| `placement/` | Partial | Current material placement plus `placeRuntimeItemFx` existing-identity relocation are canonical | Drag feedback and animation intent | 11, 14 |
 | `play/` | Reference | Runtime mirrors and bridge-owned gameplay truth are rejected | Information requirements, sheets, visual/audio orchestration | 10–16 |
 | `producer/` | Partial | Engine lifecycle, input, queue, Tick, generic completion, and output are superseded | Detail/read-model behavior, feedback, audio | 10, 13–15 |
 | `quantity/` | Superseded | Current quantity schemas/plans own semantics | Nothing unless a specific edge case is missing | 17 |

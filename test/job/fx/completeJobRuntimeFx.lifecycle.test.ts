@@ -8,6 +8,7 @@ import { startLineFx } from "~/v1/job/write/startLineFx";
 import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import type { StateSchema } from "~/v1/state/schema/StateSchema";
 import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
 
 const output = {
@@ -196,6 +197,9 @@ const lifecycleConfig = GameConfigSchema.parse({
 		"item:material": {
 			...base("item:material"),
 			type: "simple",
+			charges: {
+				amount: 2,
+			},
 			maxStackSize: 2,
 		},
 		"item:gift": {
@@ -283,6 +287,92 @@ describe("charge-driven completion lifecycle", () => {
 					quantity: 1,
 				}),
 			]),
+		);
+	});
+
+	it("preserves one impure buffered input after depleted-owner outputs claim priority", () => {
+		const state = {
+			items: [
+				{
+					id: "runtime:trader",
+					itemId: "producer:trader",
+					location: {
+						scope: "board",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					remainingCharges: 0,
+					quantity: 1,
+				},
+				{
+					id: "runtime:consumed-material",
+					itemId: "item:material",
+					location: {
+						scope: "job",
+						jobId: "job:trader",
+					},
+					quantity: 1,
+				},
+				{
+					id: "runtime:buffered-material",
+					itemId: "item:material",
+					location: {
+						scope: "input",
+						ownerItemId: "runtime:trader",
+						lineId: "line:trader:trade",
+						inputIndex: 0,
+					},
+					remainingCharges: 1,
+					quantity: 1,
+				},
+			],
+			jobs: [
+				{
+					id: "job:trader",
+					ownerItemId: "runtime:trader",
+					lineId: "line:trader:trade",
+					durationMs: 200,
+					remainingMs: 200,
+				},
+			],
+		} satisfies StateSchema.Type;
+		const runtime = Effect.runSync(
+			Effect.gen(function* () {
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				return yield* readRuntimeFx();
+			}).pipe(
+				useGameFx({
+					config: lifecycleConfig,
+					state,
+				}),
+			),
+		);
+
+		expect(runtime.items.some((item) => item.id === "runtime:trader")).toBe(false);
+		expect(runtime.items.find((item) => item.item.id === "item:gift")).toMatchObject({
+			location: {
+				scope: "board",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		});
+		expect(runtime.items.find((item) => item.id === "runtime:buffered-material")).toMatchObject(
+			{
+				remainingCharges: 1,
+				location: {
+					scope: "board",
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+			},
 		);
 	});
 

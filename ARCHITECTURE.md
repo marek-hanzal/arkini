@@ -299,7 +299,7 @@ Generic stack and quantity mutations may target only pure items. A pure item use
 
 Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage, line start, and partial charge spending share this isolation rule. Full idle depletion is consumption, not state attachment: it removes one quantity in place. Failure publishes no intermediate state or events. Do not add feature-specific split helpers, and do not invent an inventory placement origin for a stored owner.
 
-Placement is one shared policy used by commands, line output, charge-depletion output, existing reserved-instance return, and owner-input release.
+Placement is one shared policy used by commands, line output, charge-depletion output, reserved-instance return, and buffered-input release. `placeRuntimeItemFx` is the sole internal entry point for relocating an existing live item; lifecycle callsites must not invent specialized placement branches.
 
 Materialized drops follow this high-level order:
 
@@ -311,7 +311,7 @@ validate max count against live and reserved quantities
 → require full quantity placement
 ```
 
-Existing-item placement uses the same origin, scope, nearest-first board ordering, and inventory fallback. A pure existing item may normalize through ordinary stack/spawn placement and lose its disposable runtime identity. An impure existing item preserves its exact identity and complete state graph, cannot stack or split, and requires one exclusive empty cell.
+Existing-item placement uses the same origin, scope, nearest-first board ordering, and inventory fallback. A pure existing item may normalize through ordinary stack/spawn placement and lose its disposable runtime identity. An impure existing item preserves its exact identity and complete state graph, cannot stack or split, and requires one exclusive empty cell. Buffered release starts only from a board owner position; a loaded owner in passive inventory must return to the board before removal, and inventory coordinates are never reinterpreted as a board origin.
 
 Output board placement is explicitly `drop` or `random`; inventory fallback is derived independently from item scope. Board-first fallback may continue into inventory when the item scope allows it.
 

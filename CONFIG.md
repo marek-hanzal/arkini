@@ -266,7 +266,7 @@ Keep authored data valid, but do not build UI or gameplay assumptions on schema-
 
 ## 9. Merge authoring and execution
 
-The authored source item owns an ordered list of directional merge rules. The first rule whose selector matches the concrete board target wins; reverse matching is never inferred.
+The authored source item owns an ordered list of directional merge rules. The first rule whose selector matches the concrete board target wins; reverse matching is never inferred. Semantic validation requires every target selector to match at least one board-capable canonical item, and every replacement result to allow board presence.
 
 Each rule describes:
 

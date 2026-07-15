@@ -10,6 +10,7 @@ import { validateItemLineIdsFx } from "../rule/validateItemLineIdsFx";
 import { validateMaterialTagSelectorsFx } from "../rule/validateMaterialTagSelectorsFx";
 import { validateLimitedDepositsFx } from "../rule/validateLimitedDepositsFx";
 import { validateLineInputCapacityFx } from "../rule/validateLineInputCapacityFx";
+import { validateMergeViabilityFx } from "../rule/validateMergeViabilityFx";
 import { validateStartStateFx } from "../rule/validateStartStateFx";
 
 export namespace validateGameConfigFx {
@@ -50,6 +51,10 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateInputChargesFx({
+			config,
+			provenance,
+		}),
+		validateMergeViabilityFx({
 			config,
 			provenance,
 		}),

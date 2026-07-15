@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 
-import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
-import { assertPlacementMaxCountFx } from "~/v1/placement/fx/assertPlacementMaxCountFx";
-import { assertPlacementPlanCompleteFx } from "~/v1/placement/fx/assertPlacementPlanCompleteFx";
-import { planDropPlacementFx } from "~/v1/placement/fx/planDropPlacementFx";
-import { planInventoryPlacementFx } from "~/v1/placement/fx/planInventoryPlacementFx";
+import { ItemNotOnBoardError } from "~/v1/item/error/ItemNotOnBoardError";
+import { placeRuntimeItemFx } from "~/v1/placement/fx/placeRuntimeItemFx";
 import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { isInputRuntimeItem } from "~/v1/runtime/read/isInputRuntimeItem";
 import type { InputRuntimeItemSchema } from "~/v1/runtime/schema/InputRuntimeItemSchema";
@@ -18,53 +15,12 @@ export namespace releaseOwnerInputsFx {
 	}
 }
 
-const planBufferedReleaseFx = Effect.fn("planBufferedReleaseFx")(function* ({
-	bufferedItem,
-	owner,
-	runtime,
-}: {
-	bufferedItem: InputRuntimeItemSchema.Type;
-	owner: RuntimeItemSchema.Type;
-	runtime: RuntimeSchema.Type;
-}) {
-	const drop = {
-		itemId: bufferedItem.item.id,
-		placement: "drop" as const,
-		quantity: bufferedItem.quantity,
-	};
-	if (isBoardRuntimeItem(owner)) {
-		return yield* planDropPlacementFx({
-			drop,
-			origin: owner.location.position,
-			runtime,
-		});
-	}
-
-	yield* assertPlacementMaxCountFx({
-		drop,
-		item: bufferedItem.item,
-		runtime,
-	});
-	const plan = yield* planInventoryPlacementFx({
-		item: bufferedItem.item,
-		quantity: bufferedItem.quantity,
-		runtime,
-	});
-	return yield* assertPlacementPlanCompleteFx({
-		drop,
-		plan,
-		quantity: bufferedItem.quantity,
-		reason: "inventory:full",
-	});
-});
-
 /**
- * Removes every buffered input owned by one idle item and re-emits it from the
- * owner's current scope over one evolving runtime draft.
+ * Detaches one board owner and relocates each direct buffered root through the
+ * canonical existing-item placement path from the released owner position.
  *
- * A board owner drops around its current board position. An owner outside the
- * board releases into inventory. Buffered inputs retain no historical source
- * location or source runtime identity.
+ * Pure roots may normalize into ordinary stacks and identities. Impure roots
+ * preserve their exact runtime identity, state, and passive owned subtree.
  */
 export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* ({
 	owner,
@@ -77,27 +33,26 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	if (bufferedItems.length === 0) {
 		return runtime;
 	}
+	if (!isBoardRuntimeItem(owner)) {
+		return yield* Effect.fail(
+			new ItemNotOnBoardError({
+				itemId: owner.id,
+				location: owner.location,
+			}),
+		);
+	}
 
 	let draft = {
 		...runtime,
-		items: runtime.items.filter(
-			(item) =>
-				item.id !== owner.id &&
-				!(isInputRuntimeItem(item) && item.location.ownerItemId === owner.id),
-		),
+		items: runtime.items.filter((item) => item.id !== owner.id),
 	} satisfies RuntimeSchema.Type;
 
 	for (const bufferedItem of bufferedItems) {
-		const plan = yield* planBufferedReleaseFx({
-			bufferedItem,
-			owner,
+		draft = yield* placeRuntimeItemFx({
+			itemId: bufferedItem.id,
+			origin: owner.location.position,
 			runtime: draft,
 		});
-		const [, nextDraft] = yield* applyPlacementPlanFx({
-			plan,
-			runtime: draft,
-		});
-		draft = nextDraft;
 	}
 
 	return draft;

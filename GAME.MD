@@ -93,9 +93,9 @@ Delivered materials may be stored in a specific owner/line/input slot before sta
 
 An input accepts only matching material and only up to its required quantity plus configured extra capacity. During an active job, a zero-capacity input is closed and rejects new delivery; a positive-capacity input remains open as storage. A queued request does not close the input.
 
-Removing an idle owner releases every buffered material through ordinary scope-aware drop placement in the same atomic mutation.
+Removing an idle board owner releases every direct buffered root through canonical existing-item placement in the same atomic mutation. The released owner position is the single board origin; normal scope policy may still place an allowed item into inventory when board capacity is exhausted. A loaded owner in passive inventory must return to the board before removal because inventory coordinates are never invented as a board origin.
 
-Buffered material does not retain its original stack, runtime instance, slot, or position. The current owner and placement policy are authoritative.
+Buffered material retains no historical stack, slot, or position. Pure roots may normalize into ordinary stacks and identities. Impure roots preserve their exact runtime identity, state, and passive owned subtree.
 
 If any release cannot be placed, owner removal and all releases roll back.
 

@@ -201,7 +201,7 @@ describe("removeItemFx owner lifecycle", () => {
 		).toBe(true);
 	});
 
-	it("removes an idle inventory owner without treating its inventory coordinates as board origin", () => {
+	it("rejects releasing buffered inputs from a passive inventory owner", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* prepareIdleOwnerInputsFx();
@@ -216,11 +216,18 @@ describe("removeItemFx owner lifecycle", () => {
 					},
 					revision: owner.revision,
 				});
-				yield* removeItemFx({
-					itemId: owner.id,
-					revision: moved.item.revision,
-				});
-				return yield* readRuntimeFx();
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.either(
+					removeItemFx({
+						itemId: owner.id,
+						revision: moved.item.revision,
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					attempt,
+					before,
+				};
 			}).pipe(
 				useGameFx({
 					config: createJobTestConfig(2, "any"),
@@ -228,23 +235,13 @@ describe("removeItemFx owner lifecycle", () => {
 			),
 		);
 
-		expect(result.items.some((item) => item.id === startProps.ownerItemId)).toBe(false);
-		expect(result.items.some((item) => item.location.scope === "input")).toBe(false);
-		expect(
-			result.items
-				.filter((item) => item.item.id === "water" || item.item.id === "tool")
-				.every((item) => item.location.scope === "inventory"),
-		).toBe(true);
-		expect(
-			result.items
-				.filter((item) => item.item.id === "water")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(3);
-		expect(
-			result.items
-				.filter((item) => item.item.id === "tool")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(1);
+		expect(Either.isLeft(result.attempt)).toBe(true);
+		if (Either.isLeft(result.attempt)) {
+			expect(result.attempt.left).toMatchObject({
+				_tag: "ItemNotOnBoardError",
+			});
+		}
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("keeps the owner and every buffered input when one released item cannot be placed", () => {

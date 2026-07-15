@@ -167,6 +167,9 @@ const createLifecycleConfig = ({
 						"participant",
 					],
 				}),
+				charges: {
+					amount: 2,
+				},
 				type: "simple",
 			},
 			owner: producerItem({
@@ -465,6 +468,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 							inputIndex: 0,
 						},
 						quantity: 1,
+						remainingCharges: 1,
 					},
 				],
 				jobs: [],
@@ -487,9 +491,15 @@ describe("mergeItemsFx participant lifecycle", () => {
 			} else {
 				expect(Either.isRight(result.attempt)).toBe(true);
 				expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
-				const released = result.after.items.find((item) => item.item.id === "material");
-				expect(released?.location.scope).toBe("board");
-				expect(released?.id).not.toBe("runtime:target:material");
+				const released = result.after.items.find(
+					(item) => item.id === "runtime:target:material",
+				);
+				expect(released).toMatchObject({
+					remainingCharges: 1,
+					location: {
+						scope: "board",
+					},
+				});
 			}
 		}
 

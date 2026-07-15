@@ -23,7 +23,8 @@ export namespace placeRuntimeItemFx {
 }
 
 /**
- * Places one existing non-job item through the canonical drop policy.
+ * Sole lifecycle entry for placing one existing non-job item through the
+ * canonical drop policy.
  *
  * Pure items may normalize into ordinary stacks and identities. Impure items
  * preserve their exact runtime identity and receive one exclusive grid cell.

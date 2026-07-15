@@ -13,6 +13,8 @@ export type GameSessionServices =
 /** Stable browser-facing owner of one loaded game's Effect services and resources. */
 export interface GameSession {
 	readonly dispose: () => Promise<void>;
+	/** Destructive-reset shutdown; use only before deleting persisted state. */
+	readonly disposeWithoutSave: () => Promise<void>;
 	readonly flushSave: () => Promise<void>;
 	readonly getSnapshot: () => RuntimeSchema.Type;
 	readonly run: <Result, Error, Requirements extends GameSessionServices>(

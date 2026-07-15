@@ -266,11 +266,13 @@ Schema support and runtime support are different facts.
 - Temporary items author `durationMs` and optional expiry `output`. Every committed runtime identity starts at the authored duration, remains board-only and non-stackable, persists `remainingDurationMs`, and expires through canonical Tick plus deterministic output placement.
 - `cheat:speed` authors two ordered assets for the user-facing accelerated and normal states. The item owns no local toggle state; `runtime.session.speedMode` is the global live-session truth, and `toggleSpeedModeFx()` switches it without requiring an item identity.
 
-### Schema-backed but incomplete in runtime
+### Utility capabilities
 
-- inventory-opener, nuke, and cheat-inventory item kinds are authoring contracts without active public runtime commands.
+- `cheat:inventory` is a board sink. `consumeItemIntoCheatInventoryFx` consumes one complete revised board identity through ordinary owner removal, preserves the sink, and emits committed feedback.
+- `nuke` is a presentation control. `requestNukeSaveFx()` requests explicit confirmation; confirmed deletion belongs to the browser session/storage boundary and never to gameplay runtime mutation.
+- `inventory` remains a presentation-only opener until renderer and interaction tasks wire it.
 
-Keep authored data valid, but do not build UI or gameplay assumptions on schema-only capabilities. A capability becomes implemented only when it has a canonical runtime command/path and focused behavioral tests.
+A capability becomes implemented only when it has a canonical command/path and focused behavioral tests. Schema presence alone is not behavior.
 
 ## 9. Merge authoring and execution
 

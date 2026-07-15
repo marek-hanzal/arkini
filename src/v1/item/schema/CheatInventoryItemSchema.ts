@@ -4,7 +4,7 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An authoring marker for the inventory-cheat capability.
+ * An authoring marker for the cheat-inventory sink capability.
  */
 export const CheatInventoryItemSchema = z
 	.object({
@@ -16,7 +16,7 @@ export const CheatInventoryItemSchema = z
 	.strict()
 	.meta({
 		id: "CheatInventoryItemSchema",
-		description: "An authored item marker for a future inventory-cheat capability.",
+		description: "An authored board utility that consumes eligible items dropped onto it.",
 	});
 
 export type CheatInventoryItemSchema = typeof CheatInventoryItemSchema;

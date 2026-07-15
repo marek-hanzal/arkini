@@ -1,6 +1,6 @@
 # 10 — Engine-owned read models
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

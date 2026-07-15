@@ -37,7 +37,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Speed cheat | Partial | Canonical root runtime session mode, 1×/30× Tick input, save reset, toggle command, and event are implemented | Read-model/asset projection, control UI, and audio remain | 10, 13, 15 |
 | Multi-space board runtime | Partial | Canonical spaces, persistent navigation, isolation, placement, Tick, and save are implemented; renderer/navigation presentation remains | 10–14 |
 | Board memory | Rejected | Destructive snapshot/restore and active v1 item authoring were removed in favor of multi-space boards | Done |
-| Cheat inventory sink and nuke-save confirmation | Reference | Drop-to-remove and persisted-save reset remain | 09 |
+| Cheat inventory sink and nuke-save confirmation | Partial | Canonical sink command, committed feedback event, nuke confirmation request, save-discard shutdown, persisted deletion coordinator, and fresh-session recreation are implemented | Interaction wiring, confirmation UI, animation, and browser storage adapter remain in 11–14/16 |
 | Public board/inventory/line read models | Partial | Historical bridge is an information-requirement catalogue | 10 |
 | Drag/drop and activation orchestration | Reference | Historical interaction behavior remains | 11 |
 | React board/inventory renderer | Reference | Layout and UX remain; state topology is rejected | 12 |

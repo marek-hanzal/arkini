@@ -4,7 +4,7 @@ import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
 /**
- * An authoring marker for the nuke gameplay capability.
+ * An authoring marker for the persisted-save nuke control.
  */
 export const NukeItemSchema = z
 	.object({
@@ -16,7 +16,8 @@ export const NukeItemSchema = z
 	.strict()
 	.meta({
 		id: "NukeItemSchema",
-		description: "An authored item marker for a future nuke gameplay capability.",
+		description:
+			"An authored presentation control for explicit persisted-save deletion confirmation.",
 	});
 
 export type NukeItemSchema = typeof NukeItemSchema;

@@ -116,7 +116,8 @@ It exposes:
 - `subscribe(listener)` — runtime invalidation subscription;
 - `subscribeEvents(listener)` — transient event batches for presentation;
 - `flushSave()` — explicit persistence flush;
-- `dispose()` — coordinated shutdown.
+- `dispose()` — coordinated shutdown with a final save;
+- `disposeWithoutSave()` — destructive-reset shutdown that stops autosave and waits for in-flight persistence without writing a final snapshot.
 
 `GameSession.run()` remains generic by deliberate soft contract. UI and normal consumers may run public commands and reads only. They may not reach internal runtime-store services through the generic runner.
 
@@ -358,7 +359,19 @@ reject new commands
 → dispose ManagedRuntime
 ```
 
-Concurrent callers share the same cleanup Promise.
+Concurrent callers share the same cleanup Promise. Confirmed persisted-save nuke uses the separate destructive path:
+
+```text
+reject new commands
+→ stop production Tick
+→ mark autosave discarded
+→ wait for any in-flight write
+→ close session scopes without final flush
+→ delete persisted state
+→ create a fresh session
+```
+
+The nuke request itself is only a transient presentation event. Cancellation never enters this path, and storage failure propagates without manufacturing a fresh-session success.
 
 A long planner interrupted before commit changes nothing. Once the STM point of no return begins, current state, publication, and success remain coherent.
 

@@ -276,7 +276,7 @@ Temporary items are board-only, non-stackable identities with fixed-step `remain
 
 Speed mode is runtime-backed as root session state. `toggleSpeedModeFx()` switches `runtime.session.speedMode` directly between `normal` and `accelerated`; it does not require, mutate, or derive truth from a speed-cheat item. Newly observed wall-clock time is fed into the same fixed-step engine at `1×` or `30×`. Explicit simulation advancement remains unscaled.
 
-The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Inventory opener, nuke, and cheat inventory remain schema-backed without dedicated runtime commands.
+The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Cheat inventory is a board sink backed by one atomic consume command and a committed removal-feedback event. Nuke activation emits an explicit confirmation request; confirmed deletion is performed by the browser session/storage boundary and never by deleting every live runtime item. The inventory opener remains presentation-only.
 
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 

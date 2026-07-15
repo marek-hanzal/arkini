@@ -1,6 +1,6 @@
 # 09 — Destructive utility items
 
-**Status:** Ready
+**Status:** Done
 
 ## Goal
 
@@ -10,6 +10,13 @@ Implement the two authored destructive utility items with their already accepted
 - the nuke opens an explicit confirmation and deletes the active persisted save before restarting a fresh session.
 
 They are different ownership boundaries and must not be forced into one generic destructive-runtime abstraction merely because both delete something.
+
+
+## Accepted implementation contract
+
+- `consumeItemIntoCheatInventoryFx` targets one live board source and one revised board cheat-inventory target in the same space. It consumes the complete source runtime identity through the ordinary idle-owner removal lifecycle, preserves the utility item, and emits one sink-specific event for later removal feedback. Inventory sources, stale targets, cross-space drops, protected job material, and busy owners are rejected atomically.
+- `requestNukeSaveFx()` is an event-only root command. The authored nuke item is a presentation control, not an engine dependency or source of truth.
+- Confirmed nuke execution is owned by the browser session/storage boundary, not gameplay runtime mutation. It disposes the active session without a final save write, waits for all in-flight save work to stop, deletes persisted state, and only then creates a fresh session. Delete/create failures propagate and never report success. Cancellation means the reset operation is never invoked.
 
 ## Current engine facts
 
@@ -73,3 +80,15 @@ The historical `CheatInventorySheet` item-spawn catalogue is debug tooling for t
 ## Historical cleanup on closeout
 
 Remove historical sink drop handling and nuke-save sheet/storage wiring after tasks 12, 14, and 16 capture the remaining shell, animation, and debug-spawn behavior.
+
+## Closeout
+
+Implemented:
+
+- `consumeItemIntoCheatInventoryFx` with source/target revisions, same-space board topology, ordinary owner removal, sink preservation, and `cheat-inventory:consumed`;
+- `requestNukeSaveFx()` as an item-independent confirmation request;
+- save discard and `GameSession.disposeWithoutSave()` with in-flight write ordering;
+- `nukeGameSessionFx` sequencing session disposal, persisted deletion, and fresh session creation;
+- permanent coverage for eligible/protected/busy sink drops, buffered release, cancellation, storage success/failure, save races, disposal, events, and fresh hydration.
+
+Historical sink interaction, nuke sheet, animation, and concrete browser storage wiring remain deliberately available only as oracles for tasks 11–14 and 16, as required by this task's deferred cleanup rule.

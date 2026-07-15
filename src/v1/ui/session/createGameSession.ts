@@ -44,6 +44,7 @@ export const createGameSession = async <SaveError>({
 	const saveLayer =
 		save === undefined
 			? Layer.succeed(RuntimeSaveFx, {
+					discard: Effect.void,
 					flush: Effect.void,
 				})
 			: RuntimeSaveLayerFx({
@@ -65,19 +66,24 @@ export const createGameSession = async <SaveError>({
 
 	const flushSave = () =>
 		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)));
+	const discardSave = () =>
+		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.discard)));
 
-	const dispose = () => {
+	const disposeWithSaveMode = (saveMode: "flush" | "discard") => {
 		if (disposePromise !== undefined) return disposePromise;
 
 		disposed = true;
 		disposePromise = (async () => {
 			let flushError: unknown;
 			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
+			if (saveMode === "discard") await discardSave();
 			await managed.runPromise(Scope.close(sessionScope, Exit.void));
-			try {
-				await flushSave();
-			} catch (error) {
-				flushError = error;
+			if (saveMode === "flush") {
+				try {
+					await flushSave();
+				} catch (error) {
+					flushError = error;
+				}
 			}
 			await managed.dispose();
 			if (flushError !== undefined) throw flushError;
@@ -85,6 +91,9 @@ export const createGameSession = async <SaveError>({
 
 		return disposePromise;
 	};
+
+	const dispose = () => disposeWithSaveMode("flush");
+	const disposeWithoutSave = () => disposeWithSaveMode("discard");
 
 	const openSubscription = (effect: Effect.Effect<GameSessionTransitionSubscriptionCleanup>) => {
 		const cleanup = managed.runSync(effect);
@@ -100,6 +109,7 @@ export const createGameSession = async <SaveError>({
 
 	return {
 		dispose,
+		disposeWithoutSave,
 		flushSave,
 		getSnapshot: () => managed.runSync(readRuntimeFx()),
 		run: (effect) => {

@@ -4,8 +4,8 @@
 		"item:cheat": {
 			"id": "item:cheat",
 			"type": "cheat:inventory",
-			"title": "Cheat Kit",
-			"description": "A shameless little toolkit that opens the cheat inventory for testing.",
+			"title": "Cheat Sink",
+			"description": "A shameless board sink that consumes eligible items dropped onto it.",
 			"asset": {
 				"source": [
 					"item-cheat"

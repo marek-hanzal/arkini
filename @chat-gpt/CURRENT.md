@@ -4,20 +4,20 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 09 — Destructive utility items**
+**Task 10 — Engine-owned read models**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/09-destructive-utilities.md`;
-3. the destructive-utility rows in `tasks/COVERAGE.md`;
-4. current item removal, event, session, save, and storage boundaries.
+2. `tasks/10-engine-read-models.md`;
+3. the read-model rows in `tasks/COVERAGE.md`;
+4. current public reads, runtime/config schemas, command results, and historical bridge/view files named by the task.
 
 Next action:
 
-> Define and implement the cheat-inventory sink and persisted-save nuke without merging their distinct ownership boundaries into one generic destroy command.
+> Define the smallest coherent engine-owned read surfaces for board/inventory presentation, line readiness and blocked reasons, queue/reservation state, charges, multi-space navigation, and utility projections without recreating a second engine in React.
 
 ## Absolute code rules
 
@@ -127,3 +127,9 @@ Next action:
 - Follow the numbered queue in `tasks/README.md`.
 - Update `tasks/COVERAGE.md` after every completed slice.
 - Do not repeatedly inspect areas marked **Superseded**, **Rejected**, **Archive-ready**, or **Removed** unless a current task names a concrete unresolved behavior.
+
+## Destructive utilities
+
+- `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
+- `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
+- Confirmed reset uses `nukeGameSessionFx`: stop/discard the active session without a final save, wait for in-flight persistence to finish, delete persisted state, then create a fresh session. Cancellation never invokes it; deletion failure propagates and no fresh session is fabricated.

@@ -33,7 +33,8 @@ At line start:
 ```text
 resolve material and charge plans against one runtime
 → create the candidate job
-→ apply material consume/reserve
+→ commit material consume/reserve to job scope
+→ destructively discard owned state beneath consumed roots
 → aggregate and spend charges
 → resolve idle depletion output immediately
 → isolate surviving stateful payers
@@ -48,7 +49,8 @@ A payer with an active job may remain temporarily at zero charges. Completion re
 ## Max-count and randomness
 
 - Active jobs reserve worst-case `line.output` and deferred owner-depletion output.
-- A dying owner offsets output of its own canonical item.
+- A dying owner and consumed job material offset output of their own canonical item.
+- Runtime hydration validates live quantity plus every active-job reservation with the same canonical reader used by commands.
 - Immediate external depletion output is placed during start; the final start max-count assertion then validates live immediate outputs together with every active-job reservation.
 - Deferred depletion randomness derives from job identity plus depleted item identity.
 - Immediate depletion randomness derives from stable unchanged owner/line/payer/spend facts.
@@ -89,7 +91,10 @@ Coverage includes:
 - capacity freed by an idle depletion before another payer isolation;
 - save/restore of partial charge state;
 - invalid runtime charge states;
-- authored deposit flow and validation.
+- authored deposit flow and validation;
+- deep destructive consume of nested impure material;
+- rollback of destructive consume when a later start invariant fails;
+- hydrated active-job max-count overbooking and queue-only non-reservation.
 
 ## Historical cleanup
 

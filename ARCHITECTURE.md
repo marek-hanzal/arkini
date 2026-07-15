@@ -225,8 +225,9 @@ Started jobs cannot be cancelled.
 
 Material inputs may be consumed or reserved.
 
-- `consume` removes the accepted quantity when work starts.
-- `reserve` moves accepted material representations into job scope.
+- both modes commit the accepted quantity to job scope only when work actually starts;
+- `consume` discards the material's complete owned subtree at start and its committed root at completion;
+- `reserve` preserves the material and returns it through standard placement after completion;
 - a zero-capacity material input is closed while its line owns an active job;
 - a positive-capacity material input remains open as storage while the line runs.
 
@@ -240,14 +241,15 @@ A fresh charged item keeps no redundant live counter: missing `remainingCharges`
 
 A charged item dies when its remaining charges reach zero. An idle external payer is removed immediately during the starting command and emits its optional charge output from its own board origin. A self payer or any payer that already owns an active job may remain temporarily at `remainingCharges: 0`; that active job is the only legal deferred-depletion state.
 
-Completion resolves shared live facts once, removes the ready job and detached reservations from one immutable draft, and executes one generic line lifecycle:
+Completion resolves shared live facts once, removes the ready job plus every job-owned material root from one immutable draft, and executes one generic line lifecycle:
 
 ```text
-remove a depleted owner identity and queue
+discard consumed material roots
+→ remove a depleted owner identity and queue
 → resolve optional line.output deterministically
 → resolve optional depleted-owner charges.output deterministically
 → release depleted-owner buffered inputs
-→ return job reservations
+→ return reserved material
 ```
 
 A non-depleted owner remains with its identity, inputs, and queue. A depleted owner is removed before output placement, so ordinary line output receives first access to its freed board origin and depletion output follows. Producer, craft, blueprint, and stash keep separate item schemas, but completion never switches on item type. Item lifetime is controlled only by optional charges and authored input costs.
@@ -256,7 +258,7 @@ Starting any stacked line owner resolves eligibility from the pre-command snapsh
 
 Start and completion are all-or-nothing. Insufficient charges, max-count blockage, depletion-output placement failure, remainder placement failure, or material return blockage publishes no partial runtime or transient events.
 
-Reservations retain no original runtime instance, stack, slot, or source position. Never add return-location metadata or reverse reservation reconstruction.
+Reserved materials retain no original stack, slot, or source position when returned. Consumed materials return nothing and never trigger charge depletion output merely because they were converted. Never add return-location metadata or reverse reservation reconstruction.
 
 ## 10. Future output and max-count reservations
 

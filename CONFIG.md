@@ -202,7 +202,7 @@ consume
 reserve
 ```
 
-Reserved inputs are job-owned locks and return only after completion through standard drop placement. Jobs are not cancellable.
+Both modes commit the accepted quantity to the active job. Reserved inputs are job-owned locks and return after completion through standard drop placement. Consumed inputs are destructive conversion: their nested owned state is discarded when the job actually starts, their root remains inaccessible in job scope, and completion discards it permanently. Merely storing material in the input does not destroy anything. Jobs are not cancellable.
 
 Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode. While a line runs, capacity zero closes that material input and positive capacity keeps it open as storage.
 
@@ -238,7 +238,7 @@ weight
 
 Each resolved drop authors board placement as `drop` or `random`. Inventory fallback is determined independently by the emitted item's scope. There is no output replacement operation; item lifetime and output placement are separate contracts.
 
-Runtime-executed outputs use standard placement and never bypass stack, scope, max-count, purity, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Queue entries reserve nothing until dispatch.
+Runtime-executed outputs use standard placement and never bypass stack, scope, max-count, purity, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Consumed job materials and depleted owners offset output of the same canonical item because they disappear at completion. Runtime hydration validates the same live-plus-reserved capacity. Queue entries reserve nothing until dispatch.
 
 ## 8. Item capability status
 

@@ -49,8 +49,8 @@ Next action:
 - Started jobs cannot be cancelled; queued requests are FIFO and reserve or pay nothing until dispatch.
 - Producer, craft, blueprint, and stash keep separate item schemas but use one `LineSchema`, optional `line.output`, and one generic completion path.
 - Item type never decides lifetime. An item without charges persists; an item with charges dies when one instance reaches zero.
-- Completion removes a depleted owner before line output, emits optional depletion output second, releases its inputs, then returns reservations. Any failure rolls back the entire candidate.
-- Active jobs reserve worst-case `line.output` plus deferred depleted-owner output against `maxCount`; the dying owner offsets output of its own canonical item.
+- Completion removes a depleted owner before line output, emits optional depletion output second, releases its inputs, discards consumed job materials, then returns reservations. Any failure rolls back the entire candidate.
+- Active jobs reserve worst-case `line.output` plus deferred depleted-owner output against `maxCount`; dying owners and consumed job materials offset output of their own canonical items. Runtime hydration validates the same live-plus-reserved capacity used by commands.
 
 ## Charges, inputs, purity, and isolation
 
@@ -65,7 +65,7 @@ Next action:
 ## Placement, reservations, and removal
 
 - Output board placement is only `drop` or `random`; inventory fallback follows item scope. There is no output replacement lifecycle.
-- Reserved material always returns through standard placement and retains no historical instance, stack, slot, or position.
+- Reserved material returns through standard placement and retains no historical instance, stack, slot, or position. Consumed material is destructive conversion: owned state is discarded at actual start, the root remains inaccessible in job scope, and completion discards it without return or depletion output.
 - Generic mutations reject job-scoped items.
 - Shared identity removal deletes the owner and queue; full public removal additionally releases buffered inputs.
 - Completion and depletion use the same atomic primitives without nesting public write commands.

@@ -164,13 +164,13 @@ Material inputs use one of two modes.
 
 ### Consume
 
-The accepted quantity is removed when the job starts.
+Before start, the accepted material remains in its input with its complete owned state. When the job actually starts, its owned subtree is discarded without returns and the consumed root moves into job scope. The root remains inaccessible while the job runs and is discarded permanently at completion. Consuming a charged item does not trigger depletion output because conversion is not charge depletion.
 
 ### Reserve
 
-The accepted quantity moves into job scope and becomes inaccessible to generic item operations.
+The accepted quantity moves into job scope and becomes inaccessible to generic item operations. Completion returns it through standard placement.
 
-Reservations are exclusive job-owned locks. They are not a second inventory and do not remember where they came from.
+Job-owned materials are not a second inventory and do not remember where they came from. Consume and reserve are both committed only by the authoritative start candidate.
 
 Started jobs cannot be cancelled.
 

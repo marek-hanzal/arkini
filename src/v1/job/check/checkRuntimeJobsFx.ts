@@ -6,12 +6,14 @@ import type { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissing
 import type { JobOwnerMultipleActiveIssueSchema } from "~/v1/job/schema/JobOwnerMultipleActiveIssueSchema";
 import type { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
-import type { JobReservationOrphanIssueSchema } from "~/v1/job/schema/JobReservationOrphanIssueSchema";
+import type { JobConsumedMaterialStateIssueSchema } from "~/v1/job/schema/JobConsumedMaterialStateIssueSchema";
+import type { JobMaterialOrphanIssueSchema } from "~/v1/job/schema/JobMaterialOrphanIssueSchema";
 import type { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFx } from "~/v1/job/read/readItemQueueSizeFx";
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import { isGridRuntimeItem } from "~/v1/runtime/read/isGridRuntimeItem";
 import { isJobRuntimeItem } from "~/v1/runtime/read/isJobRuntimeItem";
+import { readRuntimeItemOwnedStateFx } from "~/v1/runtime/read/readRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace checkRuntimeJobsFx {
@@ -31,7 +33,8 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	const ownerGridIssues: JobOwnerNotOnGridIssueSchema.Type[] = [];
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
-	const reservationOrphanIssues: JobReservationOrphanIssueSchema.Type[] = [];
+	const materialOrphanIssues: JobMaterialOrphanIssueSchema.Type[] = [];
+	const consumedStateIssues: JobConsumedMaterialStateIssueSchema.Type[] = [];
 	const queue = runtime.jobQueue ?? [];
 	const entries = [
 		...runtime.jobs,
@@ -118,15 +121,43 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			});
 	}
 
-	for (const item of runtime.items.filter(isJobRuntimeItem)) {
-		if (!runtime.jobs.some((job) => job.id === item.location.jobId)) {
-			reservationOrphanIssues.push({
+	for (const item of runtime.items) {
+		if (item.location.scope !== "job" && item.location.scope !== "reserved") continue;
+		const location = item.location;
+		if (!runtime.jobs.some((job) => job.id === location.jobId)) {
+			materialOrphanIssues.push({
 				itemId: item.id,
-				jobId: item.location.jobId,
-				location: item.location,
-				type: "job:reservation-orphan",
+				jobId: location.jobId,
+				location,
+				type: "job:material-orphan",
 			});
 		}
+	}
+
+	for (const item of runtime.items.filter(isJobRuntimeItem)) {
+		const owned = yield* readRuntimeItemOwnedStateFx({
+			ownerItemId: item.id,
+			runtime,
+		});
+		if (
+			owned.inputItems.length === 0 &&
+			owned.jobs.length === 0 &&
+			owned.jobItems.length === 0 &&
+			owned.queue.length === 0
+		) {
+			continue;
+		}
+		consumedStateIssues.push({
+			itemId: item.id,
+			jobId: item.location.jobId,
+			ownedItemIds: [
+				...owned.inputItems.map((ownedItem) => ownedItem.id),
+				...owned.jobItems.map((ownedItem) => ownedItem.id),
+			],
+			ownedJobIds: owned.jobs.map((job) => job.id),
+			requestIds: owned.queue.map((request) => request.id),
+			type: "job:consumed-material-state",
+		});
 	}
 
 	return [
@@ -137,6 +168,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		...lineIssues,
 		...queueIssues,
 		...timeIssues,
-		...reservationOrphanIssues,
+		...materialOrphanIssues,
+		...consumedStateIssues,
 	];
 });

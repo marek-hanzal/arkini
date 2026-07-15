@@ -3,6 +3,7 @@ import { z } from "zod";
 import { GridLocationSchema } from "./GridLocationSchema";
 import { InputLocationSchema } from "./InputLocationSchema";
 import { JobLocationSchema } from "./JobLocationSchema";
+import { ReservedLocationSchema } from "./ReservedLocationSchema";
 
 /**
  * The concrete runtime or persisted location owned by one live item.
@@ -15,11 +16,12 @@ export const LocationSchema = z
 		GridLocationSchema,
 		InputLocationSchema,
 		JobLocationSchema,
+		ReservedLocationSchema,
 	])
 	.meta({
 		id: "LocationSchema",
 		description:
-			"The concrete grid, line-input, or active-job location owned by one live item.",
+			"The concrete grid, line-input, reserved, or consumed-job location owned by one live item.",
 	});
 
 export type LocationSchema = typeof LocationSchema;

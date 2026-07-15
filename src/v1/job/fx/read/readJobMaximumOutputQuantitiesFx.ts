@@ -69,11 +69,7 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 		}
 
 		for (const item of runtime.items) {
-			if (
-				item.location.scope === "job" &&
-				item.location.jobId === job.id &&
-				item.location.mode === "consume"
-			) {
+			if (item.location.scope === "job" && item.location.jobId === job.id) {
 				subtractQuantity(quantities, item.item.id, item.quantity);
 			}
 		}

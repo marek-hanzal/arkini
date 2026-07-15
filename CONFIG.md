@@ -193,7 +193,7 @@ Every input may optionally author a charge cost:
 }
 ```
 
-`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. `deposit` is the interaction kind for one external board payer, not a required item type. Validation therefore requires the selector to match at least one sufficiently charged item whose scope is `board` or `any`. A deposit input must author a target charge cost and never moves the target into an input buffer.
+`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. `deposit` is the interaction kind for one external board payer, not a required item type. Validation therefore requires the selector to match at least one sufficiently charged item whose scope is `board` or `any`. For exact-item target selectors, validation also sums unavoidable costs within one line and rejects totals above `charges.amount × finite maxCount`; broader selector feasibility remains deliberately outside this lightweight proof. A deposit input must author a target charge cost and never moves the target into an input buffer.
 
 Material mode:
 
@@ -202,7 +202,7 @@ consume
 reserve
 ```
 
-Both modes commit the accepted quantity to the active job. Reserved inputs are job-owned locks and return after completion through standard drop placement. Consumed inputs are destructive conversion: their nested owned state is discarded when the job actually starts, their root remains inaccessible in job scope, and completion discards it permanently. Merely storing material in the input does not destroy anything. Jobs are not cancellable.
+Both modes commit the accepted quantity to the active job. Reserved inputs move the same live runtime instance into `reserved` scope, retain identity and state, remember no historical location, and return through canonical existing-item placement. Pure reserved items may normalize into ordinary stacks; impure reserved items preserve identity and require an exclusive cell. Consumed inputs are destructive conversion: their passive owned state is discarded when the job actually starts, only the root remains inaccessible in `job` scope, and completion discards it permanently. Merely storing material in the input does not destroy anything. Jobs are not cancellable.
 
 Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode. While a line runs, capacity zero closes that material input and positive capacity keeps it open as storage.
 

@@ -547,7 +547,11 @@ describe("craft job completion", () => {
 				}),
 			]),
 		);
-		expect(runtime.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			runtime.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 	});
 
 	it("removes the depleted craft first and places ordered output from the freed origin", () => {
@@ -1011,6 +1015,6 @@ describe("craft job completion", () => {
 		expect(result.restored.items.map((item) => item.location)).toEqual(
 			result.runtime.items.map((item) => item.location),
 		);
-		expect(result.state.items.some((item) => item.location.scope === "job")).toBe(true);
+		expect(result.state.items.some((item) => item.location.scope === "reserved")).toBe(true);
 	});
 });

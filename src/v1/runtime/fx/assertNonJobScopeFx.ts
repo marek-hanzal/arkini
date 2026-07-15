@@ -9,11 +9,11 @@ export namespace assertNonJobScopeFx {
 	}
 }
 
-/** Rejects generic mutations of resources exclusively owned by an active job. */
+/** Rejects generic mutations of consumed or reserved materials owned by an active job. */
 export const assertNonJobScopeFx = Effect.fn("assertNonJobScopeFx")(function* ({
 	item,
 }: assertNonJobScopeFx.Props) {
-	if (item.location.scope !== "job") return;
+	if (item.location.scope !== "job" && item.location.scope !== "reserved") return;
 
 	return yield* Effect.fail(
 		new ItemJobScopedError({

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { LocationSchema } from "~/v1/location/schema/LocationSchema";
 
 describe("LocationSchema", () => {
-	it("accepts concrete grid and line-input locations", () => {
+	it("accepts concrete grid, line-input, consumed-job, and reserved locations", () => {
 		expect(
 			LocationSchema.safeParse({
 				scope: "board",
@@ -19,6 +19,18 @@ describe("LocationSchema", () => {
 				ownerItemId: "runtime:owner",
 				lineId: "line:owner:work",
 				inputIndex: 0,
+			}).success,
+		).toBe(true);
+		expect(
+			LocationSchema.safeParse({
+				scope: "job",
+				jobId: "job:owner:work",
+			}).success,
+		).toBe(true);
+		expect(
+			LocationSchema.safeParse({
+				scope: "reserved",
+				jobId: "job:owner:work",
 			}).success,
 		).toBe(true);
 	});
@@ -53,6 +65,13 @@ describe("LocationSchema", () => {
 						y: 1,
 					},
 				},
+			}).success,
+		).toBe(false);
+		expect(
+			LocationSchema.safeParse({
+				scope: "job",
+				jobId: "job:owner:work",
+				mode: "reserve",
 			}).success,
 		).toBe(false);
 	});

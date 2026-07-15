@@ -50,13 +50,13 @@ Next action:
 - `clearItemJobQueueFx({ ownerItemId })` removes every current pending request for that owner, does not target request or item revisions, and never touches active work or resources.
 - Producer, craft, blueprint, and stash keep separate item schemas but use one `LineSchema`, optional `line.output`, and one generic completion path.
 - Item type never decides lifetime. An item without charges persists; an item with charges dies when one instance reaches zero.
-- Completion removes a depleted owner before line output, emits optional depletion output second, releases its inputs, discards consumed job materials, then returns reservations. Any failure rolls back the entire candidate.
+- Completion removes consumed roots and the ready job in one candidate, removes a depleted owner before line output, emits optional depletion output second, releases depleted-owner inputs, then relocates the same live reserved instances. Any failure rolls back the entire candidate.
 - Active jobs reserve worst-case `line.output` plus deferred depleted-owner output against `maxCount`; dying owners and consumed job materials offset output of their own canonical items. Runtime hydration validates the same live-plus-reserved capacity used by commands.
 
 ## Charges, inputs, purity, and isolation
 
 - Item authoring uses `charges: { amount, output? }`; live `remainingCharges` is stored only after a spend changes the full amount.
-- Input authoring uses `charges: { cost, from: "self" | "target" }`. Target charging is valid only for deposit inputs, which deterministically resolve one sufficiently charged board-capable payer. `deposit` is an external-payer interaction kind, not a target item category.
+- Input authoring uses `charges: { cost, from: "self" | "target" }`. Target charging is valid only for deposit inputs, which deterministically resolve one sufficiently charged board-capable payer. `deposit` is an external-payer interaction kind, not a target item category. Validation also rejects the deliberately narrow provably impossible case where exact-item target costs exceed `charges.amount × finite maxCount`.
 - Charge costs are reserved across line input resolution, aggregated by runtime payer ID, and spent once inside the start candidate.
 - Idle full depletions resolve before surviving stateful payers so capacity freed by the command may satisfy later isolation.
 - A fresh charged stack is pure. A partial spend stores state, preserves the original board identity at quantity `1`, and standard-places the pure remainder. Full idle depletion consumes one quantity in place.
@@ -66,8 +66,10 @@ Next action:
 ## Placement, reservations, and removal
 
 - Output board placement is only `drop` or `random`; inventory fallback follows item scope. `random` chooses one origin from every board cell, including occupied cells, then runs the normal stack-first nearest placement for the complete drop without rerolling. There is no output replacement lifecycle.
-- Reserved material returns through standard placement and retains no historical instance, stack, slot, or position. Consumed material is destructive conversion: owned state is discarded at actual start, the root remains inaccessible in job scope, and completion discards it without return or depletion output.
-- Generic mutations reject job-scoped items.
+- `scope: "reserved"` retains the same live reserved runtime instance, revisioned state, and passive owned subtree for one active job. It remembers no historical stack, slot, or position. Completion relocates that same instance from the current board position of the line owner.
+- Existing-item placement is the canonical relocation tool. Pure items may normalize into ordinary stacks and new identities through standard drop placement. Impure items preserve their exact identity and state, require one exclusive grid cell, and use the same scope, origin, nearest-first, and inventory-fallback policy.
+- `scope: "job"` means consumed root only. Consume discards the passive owned subtree at actual start; hydration requires the committed root to own no remaining subtree, work, or queue, and completion discards the root without return or depletion output.
+- Generic mutations reject both consumed and reserved job-owned items. The passive-state discard primitive fails rather than silently deleting active jobs or committed job material.
 - Shared identity removal deletes the owner and queue; full public removal additionally releases buffered inputs.
 - Completion and depletion use the same atomic primitives without nesting public write commands.
 

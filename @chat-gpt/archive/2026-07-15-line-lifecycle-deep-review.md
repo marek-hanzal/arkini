@@ -2,8 +2,8 @@
 
 # Arkini v1 line lifecycle deep review
 
-**HEAD:** `1994f7f81f454c9ff5fa9d234c779a7b5712090c`  
-**Baseline:** `e3991d33`  
+**HEAD:** `1994f7f81f454c9ff5fa9d234c779a7b5712090c`
+**Baseline:** `e3991d33`
 **Review mode:** read-only, no repository commits
 
 ## Executive verdict

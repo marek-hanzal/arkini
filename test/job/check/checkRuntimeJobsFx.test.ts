@@ -49,9 +49,8 @@ describe("checkRuntimeJobsFx", () => {
 					id: "runtime:tool:missing-job",
 					item: config.items.tool,
 					location: {
-						scope: "job",
+						scope: "reserved",
 						jobId: "job:missing",
-						mode: "reserve",
 					},
 					quantity: 1,
 					revision: "revision:tool:missing-job",
@@ -92,7 +91,7 @@ describe("checkRuntimeJobsFx", () => {
 				"job:line-missing",
 				"job:queue-exceeded",
 				"job:time-invalid",
-				"job:reservation-orphan",
+				"job:material-orphan",
 			]),
 		);
 	});
@@ -122,5 +121,57 @@ describe("checkRuntimeJobsFx", () => {
 		);
 
 		expect(result.issues).toEqual([]);
+	});
+});
+
+it("reports owned runtime state beneath one consumed job material root", () => {
+	const consumedRoot = {
+		...owner,
+		id: "runtime:consumed-root",
+		location: {
+			scope: "job",
+			jobId: "job:outer",
+		},
+	} satisfies RuntimeItemSchema.Type;
+	const runtime = {
+		items: [
+			owner,
+			consumedRoot,
+			{
+				id: "runtime:owned-water",
+				item: config.items.water,
+				location: {
+					scope: "input",
+					ownerItemId: consumedRoot.id,
+					lineId: "line:forge:run",
+					inputIndex: 0,
+				},
+				quantity: 1,
+				revision: "revision:owned-water",
+			},
+		],
+		jobs: [
+			job("job:outer"),
+		],
+	} satisfies RuntimeSchema.Type;
+	const result = Effect.runSync(
+		checkRuntimeFx({
+			runtime,
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+
+	expect(result.issues).toContainEqual({
+		itemId: consumedRoot.id,
+		jobId: "job:outer",
+		ownedItemIds: [
+			"runtime:owned-water",
+		],
+		ownedJobIds: [],
+		requestIds: [],
+		type: "job:consumed-material-state",
 	});
 });

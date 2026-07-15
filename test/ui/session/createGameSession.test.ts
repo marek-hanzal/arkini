@@ -792,9 +792,14 @@ describe("createGameSession", () => {
 				}),
 			);
 			await waitFor(() => session.getSnapshot().jobs.length === 0);
-			expect(session.getSnapshot().items.some((item) => item.location.scope === "job")).toBe(
-				false,
-			);
+			expect(
+				session
+					.getSnapshot()
+					.items.some(
+						(item) =>
+							item.location.scope === "job" || item.location.scope === "reserved",
+					),
+			).toBe(false);
 		} finally {
 			await session.dispose();
 		}

@@ -27,6 +27,13 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 		});
 		for (const { line, path } of lines) {
 			let selfCost = 0;
+			const exactTargetCosts = new Map<
+				string,
+				{
+					cost: number;
+					inputIndex: number;
+				}
+			>();
 			for (const [inputIndex, input] of line.input.entries()) {
 				const diagnosticPath = [
 					...path,
@@ -111,6 +118,15 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					continue;
 				}
 
+				if (input.query.selector.type === "item") {
+					const payerItemId = input.query.selector.itemId;
+					const current = exactTargetCosts.get(payerItemId);
+					exactTargetCosts.set(payerItemId, {
+						cost: (current?.cost ?? 0) + input.charges.cost,
+						inputIndex,
+					});
+				}
+
 				let available = false;
 				for (const candidate of Object.values(config.items)) {
 					const matches = yield* selectorFx({
@@ -140,6 +156,37 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 						reason: "target-unavailable",
 					});
 				}
+			}
+
+			for (const [payerItemId, total] of exactTargetCosts) {
+				const payer = config.items[payerItemId];
+				if (
+					payer === undefined ||
+					(payer.scope !== "board" && payer.scope !== "any") ||
+					payer.charges === undefined ||
+					payer.maxCount === undefined
+				) {
+					continue;
+				}
+				const maximumSupply = payer.charges.amount * payer.maxCount;
+				if (total.cost <= maximumSupply) continue;
+
+				diagnostics.push({
+					code: "input:charges-invalid",
+					severity: "error",
+					path: [
+						...path,
+						"input",
+						total.inputIndex,
+						"charges",
+					],
+					source: provenance.items[itemId],
+					message: `Line ${line.id} requires ${total.cost} total charges from exact payer ${payerItemId}, but at most ${maximumSupply} can exist.`,
+					ownerItemId: itemId,
+					lineId: line.id,
+					inputIndex: total.inputIndex,
+					reason: "target-insufficient-total-charges",
+				});
 			}
 		}
 	}

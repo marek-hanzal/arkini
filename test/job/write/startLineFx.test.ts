@@ -85,9 +85,8 @@ describe("startLineFx", () => {
 				expect.objectContaining({
 					quantity: 1,
 					location: {
-						scope: "job",
+						scope: "reserved",
 						jobId: readStartedJob(result.started).id,
-						mode: "reserve",
 					},
 				}),
 			]),
@@ -115,12 +114,12 @@ describe("startLineFx", () => {
 				const before = yield* readRuntimeFx();
 				const reserved = before.items.find((item) => {
 					return (
-						item.location.scope === "job" &&
+						item.location.scope === "reserved" &&
 						item.location.jobId === readStartedJob(started).id
 					);
 				});
 				if (reserved === undefined) {
-					return yield* Effect.dieMessage("Expected one job-scoped reservation.");
+					return yield* Effect.dieMessage("Expected one reserved runtime item.");
 				}
 
 				const removed = yield* Effect.either(
@@ -242,7 +241,7 @@ describe("startLineFx", () => {
 		});
 		expect(
 			result.runtime.items.filter(
-				(item) => item.item.id === "tool" && item.location.scope === "job",
+				(item) => item.item.id === "tool" && item.location.scope === "reserved",
 			),
 		).toHaveLength(1);
 	});

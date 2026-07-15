@@ -225,13 +225,13 @@ Started jobs cannot be cancelled. Pending queue requests may be cleared only as 
 
 Material inputs may be consumed or reserved.
 
-- both modes commit the accepted quantity to job scope only when work actually starts;
-- `consume` discards the material's complete owned subtree at start and its committed root at completion;
-- `reserve` preserves the material and returns it through standard placement after completion;
+- both modes commit the accepted quantity only when work actually starts;
+- `consume` discards the material's complete passive owned subtree at start, moves the surviving root into consumed `job` scope, and discards that root at completion;
+- `reserve` moves the same live instance into `reserved` scope, preserving its identity, runtime state, and passive owned subtree until completion relocates it;
 - a zero-capacity material input is closed while its line owns an active job;
 - a positive-capacity material input remains open as storage while the line runs.
 
-Input closure is resolved from the same live runtime draft as the delivery command. A queued request does not close an input because it is not an active job. Job-scoped items are exclusive locks and are inaccessible to generic item mutations.
+Input closure is resolved from the same live runtime draft as the delivery command. A queued request does not close an input because it is not an active job. Consumed and reserved items are exclusive job-owned locks and are inaccessible to generic item mutations.
 
 Storing the first input on a stacked owner is a general state-attachment transition. The input transfer is applied inside one candidate first, so a fully consumed source may free board capacity, then the original owner identity is isolated at quantity `1` and the pure remainder follows standard placement. A blocked remainder rolls back the input transfer, split, and every generated event together.
 
@@ -241,7 +241,7 @@ A fresh charged item keeps no redundant live counter: missing `remainingCharges`
 
 A charged item dies when its remaining charges reach zero. An idle external payer is removed immediately during the starting command and emits its optional charge output from its own board origin. A self payer or any payer that already owns an active job may remain temporarily at `remainingCharges: 0`; that active job is the only legal deferred-depletion state.
 
-Completion resolves shared live facts once, removes the ready job plus every job-owned material root from one immutable draft, and executes one generic line lifecycle:
+Completion resolves shared live facts once, removes the ready job and consumed material roots from one immutable draft, keeps reserved instances live, and executes one generic line lifecycle:
 
 ```text
 discard consumed material roots
@@ -249,7 +249,7 @@ discard consumed material roots
 → resolve optional line.output deterministically
 → resolve optional depleted-owner charges.output deterministically
 → release depleted-owner buffered inputs
-→ return reserved material
+→ relocate the same live reserved instances
 ```
 
 A non-depleted owner remains with its identity, inputs, and queue. A depleted owner is removed before output placement, so ordinary line output receives first access to its freed board origin and depletion output follows. Producer, craft, blueprint, and stash keep separate item schemas, but completion never switches on item type. Item lifetime is controlled only by optional charges and authored input costs.
@@ -258,7 +258,9 @@ Starting any stacked line owner resolves eligibility from the pre-command snapsh
 
 Start and completion are all-or-nothing. Insufficient charges, max-count blockage, depletion-output placement failure, remainder placement failure, or material return blockage publishes no partial runtime or transient events.
 
-Reserved materials retain no original stack, slot, or source position when returned. Consumed materials return nothing and never trigger charge depletion output merely because they were converted. Never add return-location metadata or reverse reservation reconstruction.
+Reserved materials retain their runtime identity and state but no original stack, slot, or source position. Completion places each existing instance from the current board position of the line owner. Pure instances may normalize into ordinary stack placement and new identities; impure instances preserve their exact identity and require one exclusive grid cell. Consumed materials return nothing and never trigger charge depletion output merely because they were converted. Never add return-location metadata.
+
+Hydration requires every consumed `job` root to own no remaining input subtree, active work, committed job material, or queued intent. Destructive passive-state cleanup fails rather than cancelling active jobs or deleting committed job material.
 
 ## 10. Future output and max-count reservations
 
@@ -293,9 +295,9 @@ Generic stack and quantity mutations may target only pure items. A pure item use
 
 Every operation whose candidate would attach identity-bound state to quantity greater than `1` must preserve the original board identity at quantity `1` and standard-place the pure remainder inside that same candidate. Input storage, line start, and partial charge spending share this isolation rule. Full idle depletion is consumption, not state attachment: it removes one quantity in place. Failure publishes no intermediate state or events. Do not add feature-specific split helpers, and do not invent an inventory placement origin for a stored owner.
 
-Placement is one shared policy used by commands, line output, charge-depletion output, reservation return, and owner-input release.
+Placement is one shared policy used by commands, line output, charge-depletion output, existing reserved-instance return, and owner-input release.
 
-The high-level order is:
+Materialized drops follow this high-level order:
 
 ```text
 validate max count against live and reserved quantities
@@ -304,6 +306,8 @@ validate max count against live and reserved quantities
 → spawn into empty locations
 → require full quantity placement
 ```
+
+Existing-item placement uses the same origin, scope, nearest-first board ordering, and inventory fallback. A pure existing item may normalize through ordinary stack/spawn placement and lose its disposable runtime identity. An impure existing item preserves its exact identity and complete state graph, cannot stack or split, and requires one exclusive empty cell.
 
 Output board placement is explicitly `drop` or `random`; inventory fallback is derived independently from item scope. Board-first fallback may continue into inventory when the item scope allows it.
 

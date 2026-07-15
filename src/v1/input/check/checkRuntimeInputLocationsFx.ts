@@ -34,8 +34,8 @@ interface ValidInputItem extends LocatedInputItem {
 /**
  * Reports every invalid input-buffer location and material-capacity invariant.
  *
- * Job-owned materials leave the input buffer entirely. Reserved materials return
- * through normal placement; consumed roots remain committed only until completion.
+ * Job-owned materials leave the input buffer entirely. Reserved live instances
+ * relocate through existing-item placement; consumed roots survive only to completion.
  */
 export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocationsFx")(function* ({
 	runtime,

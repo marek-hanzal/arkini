@@ -168,7 +168,11 @@ describe("job board and inventory flow", () => {
 		expect(result.second.type).toBe("queued");
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
-		expect(result.runtime.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			result.runtime.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 		expect(result.runtime.items.some((item) => item.location.scope === "input")).toBe(false);
 		expect(result.runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
 
@@ -238,17 +242,19 @@ describe("job board and inventory flow", () => {
 		expect(result.blocked.jobs[0]?.remainingMs).toBe(0);
 		expect(result.blocked.jobQueue).toHaveLength(1);
 		const blockedJobItems = result.blocked.items.filter(
-			(item) => item.location.scope === "job",
+			(item) => item.location.scope === "job" || item.location.scope === "reserved",
 		);
 		expect(blockedJobItems).toHaveLength(2);
 		expect(
 			blockedJobItems.map((item) =>
-				item.location.scope === "job" ? item.location.mode : undefined,
+				item.location.scope === "job" || item.location.scope === "reserved"
+					? item.location.scope
+					: undefined,
 			),
 		).toEqual(
 			expect.arrayContaining([
-				"consume",
-				"reserve",
+				"job",
+				"reserved",
 			]),
 		);
 		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
@@ -258,7 +264,11 @@ describe("job board and inventory flow", () => {
 		expect(result.resumed.jobQueue).toEqual([]);
 		expect(result.completed.jobs).toEqual([]);
 		expect(result.completed.jobQueue).toEqual([]);
-		expect(result.completed.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			result.completed.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 		expect(result.settledTick.pendingElapsedMs).toBe(0);
 	});
 

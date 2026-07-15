@@ -4,12 +4,12 @@ import type { IdSchema } from "~/v1/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/v1/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/v1/input/read/readInputRunItemFx";
 import type { InputMaterialRunPlanSchema } from "~/v1/input/schema/run/InputMaterialRunPlanSchema";
-import type { JobLocationSchema } from "~/v1/location/schema/JobLocationSchema";
+import type { ReservedLocationSchema } from "~/v1/location/schema/ReservedLocationSchema";
 import { createRuntimeItemFx } from "~/v1/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/v1/runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/v1/runtime/schema/InputRuntimeItemSchema";
-import type { JobRuntimeItemSchema } from "~/v1/runtime/schema/JobRuntimeItemSchema";
+import type { ReservedRuntimeItemSchema } from "~/v1/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace applyInputMaterialReserveRunPlanFx {
@@ -44,17 +44,16 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 					runtime: draft,
 				});
 				const location = {
-					scope: "job",
+					scope: "reserved",
 					jobId,
-					mode: "reserve",
-				} satisfies JobLocationSchema.Type;
+				} satisfies ReservedLocationSchema.Type;
 
 				if (allocation.quantity === item.quantity) {
 					const reservedItem = yield* reviseRuntimeItemFx({
 						item: {
 							...item,
 							location,
-						} satisfies JobRuntimeItemSchema.Type,
+						} satisfies ReservedRuntimeItemSchema.Type,
 					});
 					return {
 						...draft,

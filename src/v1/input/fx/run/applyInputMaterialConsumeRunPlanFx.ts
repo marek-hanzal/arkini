@@ -47,7 +47,6 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 				const location = {
 					scope: "job",
 					jobId,
-					mode: "consume",
 				} satisfies JobLocationSchema.Type;
 
 				if (allocation.quantity === item.quantity) {

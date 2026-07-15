@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { JobSchema } from "~/v1/job/schema/JobSchema";
 import { JobLocationSchema } from "~/v1/location/schema/JobLocationSchema";
+import { ReservedLocationSchema } from "~/v1/location/schema/ReservedLocationSchema";
 
 const job = {
 	id: "job:test",
@@ -12,7 +13,7 @@ const job = {
 };
 
 describe("JobSchema", () => {
-	it("accepts one active job and its reserved-item location", () => {
+	it("accepts one active job and its consumed and reserved material locations", () => {
 		expect(JobSchema.parse(job)).toEqual(job);
 		expect(
 			JobLocationSchema.parse({
@@ -22,7 +23,15 @@ describe("JobSchema", () => {
 		).toEqual({
 			scope: "job",
 			jobId: job.id,
-			mode: "reserve",
+		});
+		expect(
+			ReservedLocationSchema.parse({
+				scope: "reserved",
+				jobId: job.id,
+			}),
+		).toEqual({
+			scope: "reserved",
+			jobId: job.id,
 		});
 	});
 });

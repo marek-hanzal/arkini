@@ -6,7 +6,8 @@ import { JobOwnerMissingIssueSchema } from "~/v1/job/schema/JobOwnerMissingIssue
 import { JobOwnerMultipleActiveIssueSchema } from "~/v1/job/schema/JobOwnerMultipleActiveIssueSchema";
 import { JobOwnerNotOnGridIssueSchema } from "~/v1/job/schema/JobOwnerNotOnGridIssueSchema";
 import { JobQueueExceededIssueSchema } from "~/v1/job/schema/JobQueueExceededIssueSchema";
-import { JobReservationOrphanIssueSchema } from "~/v1/job/schema/JobReservationOrphanIssueSchema";
+import { JobConsumedMaterialStateIssueSchema } from "~/v1/job/schema/JobConsumedMaterialStateIssueSchema";
+import { JobMaterialOrphanIssueSchema } from "~/v1/job/schema/JobMaterialOrphanIssueSchema";
 import { JobTimeInvalidIssueSchema } from "~/v1/job/schema/JobTimeInvalidIssueSchema";
 import { InputCapacityExceededIssueSchema } from "~/v1/input/schema/check/InputCapacityExceededIssueSchema";
 import { InputLineMissingIssueSchema } from "~/v1/input/schema/check/InputLineMissingIssueSchema";
@@ -34,7 +35,8 @@ export const RuntimeCheckIssueSchema = z
 		JobLineMissingIssueSchema,
 		JobQueueExceededIssueSchema,
 		JobTimeInvalidIssueSchema,
-		JobReservationOrphanIssueSchema,
+		JobMaterialOrphanIssueSchema,
+		JobConsumedMaterialStateIssueSchema,
 		DuplicateItemIdIssueSchema,
 		ItemMaxCountIssueSchema,
 		ItemChargesIssueSchema,

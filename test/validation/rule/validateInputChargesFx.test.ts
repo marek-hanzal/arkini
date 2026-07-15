@@ -391,6 +391,99 @@ describe("validateInputChargesFx", () => {
 		]);
 	});
 
+	it("rejects aggregate exact-target costs above finite authored charge supply", async () => {
+		const producer = createProducerItem({
+			id: "aggregate-target",
+			input: [
+				exactDepositInput("payer"),
+				exactDepositInput("payer"),
+			],
+		});
+		const payer = {
+			...createSimpleItem("payer"),
+			scope: "board" as const,
+			charges: {
+				amount: 1,
+			},
+			maxCount: 1,
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[payer.id]: payer,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				inputIndex: 1,
+				reason: "target-insufficient-total-charges",
+			}),
+		]);
+	});
+
+	it("accepts aggregate exact-target costs within finite or unknown authored supply", async () => {
+		const producer = createProducerItem({
+			id: "aggregate-target-valid",
+			input: [
+				exactDepositInput("payer"),
+				exactDepositInput("payer"),
+			],
+		});
+		const finitePayer = {
+			...createSimpleItem("payer"),
+			scope: "board" as const,
+			charges: {
+				amount: 1,
+			},
+			maxCount: 2,
+		};
+		const unboundedPayer = {
+			...finitePayer,
+			maxCount: undefined,
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[finitePayer.id]: finitePayer,
+			}),
+		).toEqual([]);
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[unboundedPayer.id]: unboundedPayer,
+			}),
+		).toEqual([]);
+	});
+
+	it("accounts for independent exact target payers separately", async () => {
+		const producer = createProducerItem({
+			id: "independent-targets",
+			input: [
+				exactDepositInput("payer:a"),
+				exactDepositInput("payer:b"),
+			],
+		});
+		const payer = (id: string) => ({
+			...createSimpleItem(id),
+			scope: "board" as const,
+			charges: {
+				amount: 1,
+			},
+			maxCount: 1,
+		});
+		const first = payer("payer:a");
+		const second = payer("payer:b");
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+				[first.id]: first,
+				[second.id]: second,
+			}),
+		).toEqual([]);
+	});
+
 	it("accepts explicit self and target charge payers", async () => {
 		const shrine = {
 			...createProducerItem({

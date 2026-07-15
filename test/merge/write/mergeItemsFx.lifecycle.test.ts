@@ -217,6 +217,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 	for (const scope of [
 		"input",
 		"job",
+		"reserved",
 	] as const) {
 		for (const participant of [
 			"source",
@@ -234,7 +235,6 @@ describe("mergeItemsFx participant lifecycle", () => {
 						: {
 								scope,
 								jobId: "job:owner",
-								mode: "reserve" as const,
 							};
 				const state = {
 					items: [
@@ -253,7 +253,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						boardItem("owner", 2),
 					],
 					jobs:
-						scope === "job"
+						scope === "job" || scope === "reserved"
 							? [
 									{
 										id: "job:owner",

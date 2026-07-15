@@ -19,6 +19,7 @@ export const InvalidInputChargesDiagnosticSchema = z
 			"self-missing-charges",
 			"self-insufficient-charges",
 			"target-unavailable",
+			"target-insufficient-total-charges",
 		]),
 	})
 	.strict()

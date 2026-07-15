@@ -56,18 +56,24 @@ describe("blocked job completion", () => {
 		);
 		expect(
 			result.blocked.items.map((item) =>
-				item.location.scope === "job" ? item.location.mode : undefined,
+				item.location.scope === "job" || item.location.scope === "reserved"
+					? item.location.scope
+					: undefined,
 			),
 		).toEqual(
 			expect.arrayContaining([
-				"consume",
-				"reserve",
+				"job",
+				"reserved",
 			]),
 		);
 		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
 
 		expect(result.recovered.jobs).toEqual([]);
-		expect(result.recovered.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			result.recovered.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 		expect(
 			result.recovered.items
 				.filter((item) => item.item.id === "tool")

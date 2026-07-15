@@ -3,12 +3,12 @@ import { z } from "zod";
 import { JobLocationSchema } from "~/v1/location/schema/JobLocationSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
-/** One live runtime material currently committed to an active job. */
+/** One consumed material root currently committed to an active job. */
 export const JobRuntimeItemSchema = RuntimeItemSchema.extend({
 	location: JobLocationSchema,
 }).meta({
 	id: "JobRuntimeItemSchema",
-	description: "One live runtime material committed to an active product-line job.",
+	description: "One consumed material root committed to an active product-line job.",
 });
 
 export type JobRuntimeItemSchema = typeof JobRuntimeItemSchema;

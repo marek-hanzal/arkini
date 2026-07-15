@@ -404,7 +404,11 @@ describe("blueprint job completion", () => {
 				"item:tool",
 			]),
 		);
-		expect(runtime.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			runtime.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 	});
 
 	it("rolls back the target when a by-product cannot be placed", () => {
@@ -545,7 +549,7 @@ describe("blueprint job completion", () => {
 				remainingMs: 0,
 			}),
 		]);
-		expect(runtime.items.some((item) => item.location.scope === "job")).toBe(true);
+		expect(runtime.items.some((item) => item.location.scope === "reserved")).toBe(true);
 	});
 
 	it("reserves a shared target maxCount across concurrent blueprint jobs", () => {

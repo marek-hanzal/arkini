@@ -10,6 +10,7 @@ import { makeJobCompletionRandomFx } from "~/v1/job/random/makeJobCompletionRand
 import { readItemLineFx } from "~/v1/line/fx/readItemLineFx";
 import { isBoardRuntimeItem } from "~/v1/runtime/read/isBoardRuntimeItem";
 import { isJobRuntimeItem } from "~/v1/runtime/read/isJobRuntimeItem";
+import { isReservedRuntimeItem } from "~/v1/runtime/read/isReservedRuntimeItem";
 import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
 
 export namespace completeJobRuntimeFx {
@@ -54,14 +55,16 @@ export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* 
 	});
 	if (line === undefined)
 		return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
-	const jobItems = runtime.items
+	const consumedItems = runtime.items
 		.filter(isJobRuntimeItem)
 		.filter((item) => item.location.jobId === job.id);
-	const reservations = jobItems.filter((item) => item.location.mode === "reserve");
-	const jobItemIds = new Set(jobItems.map((item) => item.id));
+	const reservations = runtime.items
+		.filter(isReservedRuntimeItem)
+		.filter((item) => item.location.jobId === job.id);
+	const consumedItemIds = new Set(consumedItems.map((item) => item.id));
 	const completionRuntime = {
 		...runtime,
-		items: runtime.items.filter((item) => !jobItemIds.has(item.id)),
+		items: runtime.items.filter((item) => !consumedItemIds.has(item.id)),
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
 	} satisfies RuntimeSchema.Type;
 	const random = yield* makeJobCompletionRandomFx(job);

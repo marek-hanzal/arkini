@@ -147,7 +147,11 @@ describe("job owner inventory contract", () => {
 			}),
 		]);
 		expect(result.resumed.jobs).toEqual([]);
-		expect(result.resumed.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			result.resumed.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 	});
 
 	it("keeps a ready job paused in inventory until the owner returns to the board", () => {
@@ -193,16 +197,22 @@ describe("job owner inventory contract", () => {
 		expect(result.inventoryRuntime.jobs).toHaveLength(1);
 		expect(
 			result.inventoryRuntime.items.map((item) =>
-				item.location.scope === "job" ? item.location.mode : undefined,
+				item.location.scope === "job" || item.location.scope === "reserved"
+					? item.location.scope
+					: undefined,
 			),
 		).toEqual(
 			expect.arrayContaining([
-				"consume",
-				"reserve",
+				"job",
+				"reserved",
 			]),
 		);
 		expect(result.completed.jobs).toEqual([]);
-		expect(result.completed.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			result.completed.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 	});
 
 	it("keeps a queue-only owner blocked in inventory and dispatches it after returning", () => {

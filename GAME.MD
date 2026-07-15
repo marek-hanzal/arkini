@@ -167,11 +167,11 @@ Material inputs use one of two modes.
 
 ### Consume
 
-Before start, the accepted material remains in its input with its complete owned state. When the job actually starts, its owned subtree is discarded without returns and the consumed root moves into job scope. The root remains inaccessible while the job runs and is discarded permanently at completion. Consuming a charged item does not trigger depletion output because conversion is not charge depletion.
+Before start, the accepted material remains in its input with its complete owned state. When the job actually starts, its passive owned subtree is discarded without returns and only the consumed root moves into `job` scope. The root remains inaccessible while the job runs and is discarded permanently at completion. Hydration rejects any consumed root that still owns descendants, work, job material, or queued intent. Consuming a charged item does not trigger depletion output because conversion is not charge depletion.
 
 ### Reserve
 
-The accepted quantity moves into job scope and becomes inaccessible to generic item operations. Completion returns it through standard placement.
+The accepted quantity moves as the same live runtime instance into `reserved` scope and becomes inaccessible to generic item operations. Its identity, remaining charges, and passive owned subtree remain intact. Completion places that existing instance from the current board position of the line owner without remembering its former stack, slot, or position. Pure instances may normalize into ordinary stacks; impure instances preserve identity and require one exclusive cell.
 
 Job-owned materials are not a second inventory and do not remember where they came from. Consume and reserve are both committed only by the authoritative start candidate.
 
@@ -190,14 +190,14 @@ Missing live `remainingCharges` means the instance is fresh at the authored full
 
 All costs for the same runtime payer are aggregated before mutation. The engine spends each payer once inside the same candidate. A partial spend makes one concrete item stateful and isolates it from a stack. Fully depleting an idle quantity consumes one quantity in place. An idle depleted target is removed immediately and emits its optional charge output from its former origin. A payer that owns an active job may temporarily remain at zero charges until that job completes.
 
-A ready job completes only while its owner is on the board. Completion resolves the live job by stable ID, detaches the completed job and reservations inside one immutable candidate, and executes one generic lifecycle:
+A ready job completes only while its owner is on the board. Completion resolves the live job by stable ID, removes the completed job and consumed roots inside one immutable candidate, keeps reserved instances live, and executes one generic lifecycle:
 
 ```text
 remove the owner when it is depleted
 → resolve optional line.output
 → resolve optional depleted-owner charges.output
 → release depleted-owner buffered inputs
-→ return detached reservations
+→ relocate the same live reserved instances
 → commit everything atomically
 ```
 
@@ -218,7 +218,7 @@ A job may start only when every possible deferred output remains within canonica
 
 Queued requests reserve nothing. When the FIFO head attempts to become active, the same charge and max-count checks run; a blocked head stays first. Ordinary output placement, direct drops, direct spawn, and direct quantity mutation cannot consume capacity already promised to active jobs. A completing job is removed from the candidate before its output is placed, so its actual roll spends the reservation. A depleted owner offsets output of its own canonical item by the live quantity that disappears.
 
-Immediate charge output from an idle external target is placed during the start candidate and is not left as a future reservation. After all charge spends, the final start max-count assertion validates the live immediate output together with every active-job reservation, including the job being started. Failure rolls back the complete start.
+Immediate charge output from an idle external target is placed during the start candidate and is not left as a future reservation. After all charge spends, the final start max-count assertion validates the live immediate output together with every active-job reservation, including the job being started. Offline validation additionally catches the narrow exact-item case where unavoidable target costs exceed `charges.amount × finite maxCount`. Failure rolls back the complete start.
 
 ## 14. Deterministic output
 
@@ -228,16 +228,16 @@ Deterministic streams control alternative set selection, chance, weights, quanti
 
 ## 15. Placement
 
-All runtime-executed output uses the shared placement policy, including:
+All runtime-executed output and relocation use the shared placement policy, including:
 
 - generic line output;
 - charge-depletion output;
-- reservation return;
+- existing reserved-instance return;
 - buffered-input release;
 - direct drop/output commands;
 - initial placement planning where applicable.
 
-Placement respects configured storage scope, max count, purity and stack size, board/inventory capacity, authored `drop` or `random` board strategy, and origin-based ordering. When an allowed board-first placement cannot fit fully on the board, the remainder may continue into inventory.
+Materialized drops respect configured storage scope, max count, purity and stack size, board/inventory capacity, authored `drop` or `random` board strategy, and origin-based ordering. Existing-item placement uses the same scope and spatial policy: pure items may normalize through ordinary stack placement, while impure items preserve identity and require one exclusive cell. When an allowed board-first placement cannot fit fully on the board, the remainder may continue into inventory.
 
 Partial placement is forbidden. The owning gameplay mutation rolls back if the complete quantity cannot be placed.
 
@@ -247,7 +247,7 @@ The completed configuration accepts more item semantics than the current command
 
 ### Merge
 
-Directional merge schemas and validation exist. There is no active merge write command. Ordinary stack placement and `mergePlacementPlansFx` are not gameplay merge execution.
+Directional gameplay merge is runtime-backed through `mergeItemsFx`. Source-owned authored rules resolve one revised source against one revised board target; ordinary same-item stack placement and `mergePlacementPlansFx` remain a separate placement concern.
 
 ### Line owners and charged items
 

@@ -194,7 +194,11 @@ describe("runTickRuntimeByFx", () => {
 				.filter((item) => item.item.id === "tool")
 				.reduce((quantity, item) => quantity + item.quantity, 0),
 		).toBe(2);
-		expect(result.runtime.items.some((item) => item.location.scope === "job")).toBe(false);
+		expect(
+			result.runtime.items.some(
+				(item) => item.location.scope === "job" || item.location.scope === "reserved",
+			),
+		).toBe(false);
 	});
 
 	it("retries a blocked queue-only owner on a later fixed step", () => {

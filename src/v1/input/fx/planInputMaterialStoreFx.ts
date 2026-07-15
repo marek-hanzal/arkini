@@ -5,6 +5,7 @@ import type { PositiveIntegerSchema } from "~/v1/common/schema/PositiveIntegerSc
 import type { InputMaterialSchema } from "~/v1/input/schema/InputMaterialSchema";
 import type { InputMaterialStoreResolutionSchema } from "~/v1/input/schema/store/InputMaterialStoreResolutionSchema";
 import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { isItemMaterialInputEligible } from "~/v1/input/read/isItemMaterialInputEligible";
 import { selectorFx } from "~/v1/selector/fx/selectorFx";
 import { resolveInputMaterialFx } from "./resolveInputMaterialFx";
 
@@ -30,7 +31,7 @@ export const planInputMaterialStoreFx = Effect.fn("planInputMaterialStoreFx")(fu
 		item: item.item,
 		selector: input.selector,
 	});
-	if (!matches) {
+	if (!matches || !isItemMaterialInputEligible(item.item)) {
 		return undefined;
 	}
 

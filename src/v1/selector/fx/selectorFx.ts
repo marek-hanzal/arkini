@@ -1,10 +1,8 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
 import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
+import { matchesSelector } from "~/v1/selector/read/matchesSelector";
 import type { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
-import { selectorItemFx } from "./selectorItemFx";
-import { selectorTagFx } from "./selectorTagFx";
 
 export namespace selectorFx {
 	export interface Props {
@@ -14,33 +12,8 @@ export namespace selectorFx {
 }
 
 /**
- * Dispatches an item selector to its specialized matching strategy.
+ * Exposes canonical selector matching through an Effect boundary for runtime pipelines.
  */
-export const selectorFx = Effect.fn("selectorFx")(function* ({ selector, item }: selectorFx.Props) {
-	const result = yield* match(selector)
-		.with(
-			{
-				type: "item",
-			},
-			(selector) => {
-				return selectorItemFx({
-					selector,
-					item,
-				});
-			},
-		)
-		.with(
-			{
-				type: "tag",
-			},
-			(selector) => {
-				return selectorTagFx({
-					selector,
-					item,
-				});
-			},
-		)
-		.exhaustive();
-
-	return result;
+export const selectorFx = Effect.fn("selectorFx")(function* (props: selectorFx.Props) {
+	return matchesSelector(props);
 });

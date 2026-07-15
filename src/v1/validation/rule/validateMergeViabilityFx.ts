@@ -24,6 +24,30 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 			const missingExactTarget =
 				merge.target.type === "item" && config.items[merge.target.itemId] === undefined;
 			if (!missingExactTarget) {
+				const exactSelfTargetUnavailable =
+					merge.target.type === "item" &&
+					merge.target.itemId === ownerItemId &&
+					owner.maxCount === 1 &&
+					(owner.scope === "board" || owner.scope === "any");
+				if (exactSelfTargetUnavailable) {
+					diagnostics.push({
+						code: "merge:invalid",
+						severity: "error",
+						path: [
+							"items",
+							ownerItemId,
+							"merge",
+							mergeIndex,
+							"target",
+						],
+						source: provenance.items[ownerItemId],
+						message: `Merge ${mergeIndex} of item ${ownerItemId} requires a second live identity of itself, but maxCount is 1.`,
+						ownerItemId,
+						mergeIndex,
+						reason: "self-target-unavailable",
+					});
+				}
+
 				let targetAvailable = false;
 				for (const candidate of Object.values(config.items)) {
 					const matches = yield* selectorFx({

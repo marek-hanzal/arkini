@@ -71,6 +71,7 @@ Next action:
 - Charge costs are reserved across line input resolution, aggregated by runtime payer ID, and spent once inside the start candidate.
 - Idle full depletions resolve before surviving stateful payers so capacity freed by the command may satisfy later isolation.
 - A fresh charged stack is pure. A partial spend stores state, preserves the original board identity at quantity `1`, and standard-places the pure remainder. Full idle depletion consumes one quantity in place.
+- Material selectors describe their complete accepted candidate set. Every matched canonical item must be eligible for material-input storage; temporary items are board-bound and therefore rejected offline and by the authoritative store planner.
 - A zero-capacity material input is closed during its active job; positive capacity stays open storage. Game validation permits positive capacity only on producer-owned lines.
 - Pure items use configured `maxStackSize`; impure items have effective stack size `1`.
 - Temporary lifetime is identity-bound runtime state, so every temporary item is impure even at full authored duration.
@@ -91,9 +92,9 @@ Next action:
 - `mergeItemsFx` is the sole canonical gameplay-merge write. UI passes revised source and target identities only; source-owned authored rules decide behavior.
 - Source may be board or inventory; target must be board. The first authored matching rule wins and reverse rules are never inferred.
 - Exactly one source quantity participates. `consume` permanently converts it; `use` requires a pure idle source and standard-places it around the target after the target effect.
-- `keep` leaves target state untouched. `remove` removes one idle target quantity through standard owner removal. `replace` preserves target identity/location but requires one pure idle quantity and resets item-specific state to the replacement definition.
+- `keep` leaves target state untouched. `remove` removes one idle target quantity through standard owner removal. `replace` preserves target identity/location but requires one pure idle quantity and recreates canonical initial runtime state through `createRuntimeItemFx`.
 - Source action, target effect, source return, optional output, candidate validation, and `item:merged` event are atomic. Blocked retries preserve deterministic output rolls from stable source/target/rule facts.
-- Game validation requires merge target selectors to match at least one board-capable canonical item and replacement results to allow board presence. Gameplay merge is not identical-item stack placement. Historical merge runtime is superseded; only feedback and animation intent remain for tasks 11 and 14.
+- Game validation requires merge target selectors to match at least one board-capable canonical item, replacement results to allow board presence, and exact self-target rules with `maxCount: 1` to be rejected as identity-impossible. Gameplay merge is not identical-item stack placement. Historical merge runtime is superseded; only feedback and animation intent remain for tasks 11 and 14.
 
 ## Randomness
 

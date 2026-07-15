@@ -8,6 +8,7 @@ import { validateInputAcceptanceCyclesFx } from "../rule/validateInputAcceptance
 import { validateInputChargesFx } from "../rule/validateInputChargesFx";
 import { validateItemLineIdsFx } from "../rule/validateItemLineIdsFx";
 import { validateMaterialTagSelectorsFx } from "../rule/validateMaterialTagSelectorsFx";
+import { validateMaterialInputEligibilityFx } from "../rule/validateMaterialInputEligibilityFx";
 import { validateLimitedDepositsFx } from "../rule/validateLimitedDepositsFx";
 import { validateLineInputCapacityFx } from "../rule/validateLineInputCapacityFx";
 import { validateMergeViabilityFx } from "../rule/validateMergeViabilityFx";
@@ -43,6 +44,10 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			provenance,
 		}),
 		validateMaterialTagSelectorsFx({
+			config,
+			provenance,
+		}),
+		validateMaterialInputEligibilityFx({
 			config,
 			provenance,
 		}),

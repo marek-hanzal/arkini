@@ -75,9 +75,11 @@ const createLifecycleConfig = ({
 	effect = "keep",
 	sourceProducer = false,
 	targetProducer = false,
+	resultCharges,
 }: {
 	action?: "consume" | "use";
 	effect?: "keep" | "remove" | "replace";
+	resultCharges?: number;
 	sourceProducer?: boolean;
 	targetProducer?: boolean;
 } = {}) => {
@@ -157,6 +159,12 @@ const createLifecycleConfig = ({
 				...baseItem({
 					id: "result",
 				}),
+				charges:
+					resultCharges === undefined
+						? undefined
+						: {
+								amount: resultCharges,
+							},
 				type: "simple",
 			},
 			material: {
@@ -443,6 +451,45 @@ describe("mergeItemsFx participant lifecycle", () => {
 				).toBe(false);
 			}
 		}
+	});
+
+	it("initializes replacement state through the canonical runtime-item constructor", () => {
+		const config = createLifecycleConfig({
+			effect: "replace",
+			resultCharges: 2,
+		});
+		const state = {
+			items: [
+				boardItem("source", 0),
+				boardItem("target", 1),
+			],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(
+			attemptMergeFx().pipe(
+				useGameFx({
+					config,
+					state,
+				}),
+			),
+		);
+
+		expect(Either.isRight(result.attempt)).toBe(true);
+		const beforeTarget = result.before.items.find((item) => item.id === "runtime:target");
+		const replaced = result.after.items.find((item) => item.id === "runtime:target");
+		expect(replaced).toMatchObject({
+			id: "runtime:target",
+			item: {
+				id: "result",
+				charges: {
+					amount: 2,
+				},
+			},
+			location: beforeTarget?.location,
+			quantity: 1,
+			remainingCharges: undefined,
+		});
+		expect(replaced?.revision).not.toBe(beforeTarget?.revision);
 	});
 
 	it("rejects replacing stateful or stacked targets but remove releases buffered inputs", () => {

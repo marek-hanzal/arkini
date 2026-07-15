@@ -7,6 +7,7 @@ import { resolveItemFx } from "~/v1/item/fx/resolveItemFx";
 import { assertOwnerIdleFx } from "~/v1/job/fx/assertOwnerIdleFx";
 import { MergeTargetStackedError } from "~/v1/merge/error/MergeTargetStackedError";
 import type { MergeSchema } from "~/v1/merge/schema/MergeSchema";
+import { createRuntimeItemFx } from "~/v1/runtime/fx/createRuntimeItemFx";
 import { removeRuntimeItemFx } from "~/v1/runtime/fx/removeRuntimeItemFx";
 import { reviseRuntimeItemFx } from "~/v1/runtime/fx/reviseRuntimeItemFx";
 import type { BoardRuntimeItemSchema } from "~/v1/runtime/schema/BoardRuntimeItemSchema";
@@ -97,16 +98,11 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 					const resultItem = yield* resolveItemFx({
 						itemId: result,
 					});
-					const replacedTarget = yield* reviseRuntimeItemFx({
-						item: {
-							id: target.id,
-							item: resultItem,
-							location: target.location,
-							quantity: 1,
-							remainingDurationMs:
-								resultItem.type === "temporary" ? resultItem.durationMs : undefined,
-							revision: target.revision,
-						} satisfies BoardRuntimeItemSchema.Type,
+					const replacedTarget = yield* createRuntimeItemFx({
+						id: target.id,
+						item: resultItem,
+						location: target.location,
+						quantity: 1,
 					});
 					return {
 						...runtime,

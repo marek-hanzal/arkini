@@ -204,6 +204,8 @@ reserve
 
 Both modes commit the accepted quantity to the active job. Reserved inputs move the same live runtime instance into `reserved` scope, retain identity and state, remember no historical location, and return through canonical existing-item placement. Pure reserved items may normalize into ordinary stacks; impure reserved items preserve identity and require an exclusive cell. Consumed inputs are destructive conversion: their passive owned state is discarded when the job actually starts, only the root remains inaccessible in `job` scope, and completion discards it permanently. Merely storing material in the input does not destroy anything. Jobs are not cancellable.
 
+A material selector describes the complete accepted candidate set. Every canonical item matched by an exact or tag selector must be capable of entering material-input storage; temporary items are board-bound and therefore make the selector invalid rather than being silently filtered at runtime.
+
 Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode. While a line runs, capacity zero closes that material input and positive capacity keeps it open as storage.
 
 Every line owner uses the same `LineSchema` and `InputMaterialSchema`. Positive material `capacity` is syntactically valid, but game validation allows it only on producer-owned lines; craft, blueprint, and stash lines must author zero capacity. This semantic rule keeps one schema grammar while still rejecting unsupported buffering with an exact authoring path.
@@ -267,7 +269,7 @@ Keep authored data valid, but do not build UI or gameplay assumptions on schema-
 
 ## 9. Merge authoring and execution
 
-The authored source item owns an ordered list of directional merge rules. The first rule whose selector matches the concrete board target wins; reverse matching is never inferred. Semantic validation requires every target selector to match at least one board-capable canonical item, and every replacement result to allow board presence.
+The authored source item owns an ordered list of directional merge rules. The first rule whose selector matches the concrete board target wins; reverse matching is never inferred. Semantic validation requires every target selector to match at least one board-capable canonical item, every replacement result to allow board presence, and an exact self-target merge to permit at least two live identities when `maxCount` is finite.
 
 Each rule describes:
 

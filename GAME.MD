@@ -268,7 +268,7 @@ Every line may omit output and every item type may be persistent or charged. Ite
 
 ### Temporary items
 
-Temporary items are board-only, non-stackable identities with fixed-step `remainingDurationMs`. Creation initializes the full authored `durationMs`; save/restore preserves the remaining value. Tick owns progression and atomic expiry. Optional expiry output uses standard deterministic output plus scope-aware placement, and blocked output keeps the zero-duration item available for retry.
+Temporary items are board-only, non-stackable identities with fixed-step `remainingDurationMs`. Creation initializes the full authored `durationMs`; save/restore preserves the remaining value. Tick owns progression and atomic expiry. Optional expiry output uses standard deterministic output plus scope-aware placement, and blocked output keeps the zero-duration item available for retry. Their board-bound lifetime makes them ineligible for material-input storage.
 
 ### Utility item kinds
 

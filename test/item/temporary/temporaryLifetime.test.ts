@@ -341,7 +341,7 @@ describe("temporary item lifetime", () => {
 	});
 
 	it("initializes the full duration when merge replacement creates a temporary identity", () => {
-		const runtime = Effect.runSync(
+		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
 					id: "runtime:transformer",
@@ -362,7 +362,10 @@ describe("temporary item lifetime", () => {
 					targetItemId: target.id,
 					targetRevision: target.revision,
 				});
-				return yield* readRuntimeFx();
+				return {
+					runtime: yield* readRuntimeFx(),
+					target,
+				};
 			}).pipe(
 				useGameFx({
 					config,
@@ -370,15 +373,16 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(runtime.items).toContainEqual(
-			expect.objectContaining({
-				id: "runtime:target",
-				item: expect.objectContaining({
-					id: "temporaryPlain",
-				}),
-				remainingDurationMs: 600,
-			}),
-		);
+		const replaced = result.runtime.items.find((item) => item.id === "runtime:target");
+		expect(replaced).toMatchObject({
+			id: "runtime:target",
+			item: {
+				id: "temporaryPlain",
+			},
+			location: result.target.location,
+			remainingDurationMs: 600,
+		});
+		expect(replaced?.revision).not.toBe(result.target.revision);
 	});
 
 	it("reports temporary items outside the board", () => {

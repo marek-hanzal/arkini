@@ -20,10 +20,12 @@ const compileDiagnostics = async (items: Record<string, unknown>) =>
 
 const mergeSource = ({
 	effect = "keep",
+	maxCount,
 	result,
 	target,
 }: {
 	effect?: "keep" | "replace";
+	maxCount?: number;
 	result?: string;
 	target:
 		| {
@@ -36,6 +38,7 @@ const mergeSource = ({
 		  };
 }) => ({
 	...createSimpleItem("source"),
+	maxCount,
 	merge: [
 		effect === "replace"
 			? {
@@ -133,6 +136,67 @@ describe("validateMergeViabilityFx", () => {
 				[source.id]: source,
 				[inventoryTarget.id]: inventoryTarget,
 				[boardTarget.id]: boardTarget,
+			}),
+		).toEqual([]);
+	});
+
+	it("rejects an exact self-target when maxCount allows only one identity", async () => {
+		const source = mergeSource({
+			maxCount: 1,
+			target: {
+				type: "item",
+				itemId: "source",
+			},
+		});
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				reason: "self-target-unavailable",
+			}),
+		]);
+	});
+
+	it("does not reject exact self-target merely when a second identity is possible", async () => {
+		const source = mergeSource({
+			maxCount: 2,
+			target: {
+				type: "item",
+				itemId: "source",
+			},
+		});
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+			}),
+		).toEqual([]);
+	});
+
+	it("keeps a tag selector viable when it includes another board target", async () => {
+		const source = {
+			...mergeSource({
+				maxCount: 1,
+				target: {
+					type: "tag",
+					tag: "target",
+				},
+			}),
+			tags: [
+				"target",
+			],
+		};
+		const target = createSimpleItem("target", [
+			"target",
+		]);
+
+		expect(
+			await mergeDiagnostics({
+				[source.id]: source,
+				[target.id]: target,
 			}),
 		).toEqual([]);
 	});

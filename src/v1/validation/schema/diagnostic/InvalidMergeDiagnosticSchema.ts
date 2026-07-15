@@ -14,6 +14,7 @@ export const InvalidMergeDiagnosticSchema = z
 		reason: z.enum([
 			"target-unavailable",
 			"result-unavailable",
+			"self-target-unavailable",
 		]),
 	})
 	.strict()

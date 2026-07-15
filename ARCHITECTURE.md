@@ -238,7 +238,7 @@ Started jobs cannot be cancelled. Pending queue requests may be cleared only as 
 
 ## 9. Inputs and reservations
 
-Material inputs may be consumed or reserved.
+Material inputs may be consumed or reserved. A material selector names its complete accepted candidate set; every matched item must be eligible to enter input storage. Temporary identities are board-bound and are rejected by both semantic validation and the authoritative store planner.
 
 - both modes commit the accepted quantity only when work actually starts;
 - `consume` discards the material's complete passive owned subtree at start, moves the surviving root into consumed `job` scope, and discards that root at completion;

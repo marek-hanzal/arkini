@@ -27,7 +27,7 @@ export const planBoardThenInventoryPlacementFx = Effect.fn("planBoardThenInvento
 		const boardPlan = yield* planBoardPlacementFx({
 			item,
 			origin,
-			placement: drop.placement === "random" ? "random" : "drop",
+			placement: drop.placement,
 			quantity,
 			runtime,
 		});

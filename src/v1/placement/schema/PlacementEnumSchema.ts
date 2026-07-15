@@ -14,14 +14,15 @@ export const PlacementEnumSchema = z
 		 */
 		"drop",
 		/**
-		 * Places the drop at a random free board location.
+		 * Chooses one random board position as the origin, then uses the same
+		 * nearest-first board placement as a standard drop.
 		 */
 		"random",
 	])
 	.meta({
 		id: "PlacementEnumSchema",
 		description:
-			"How a resolved item drop attempts board placement, independently from inventory fallback.",
+			"How a resolved item drop chooses its board origin before canonical nearest-first placement, independently from inventory fallback.",
 	});
 
 export type PlacementEnumSchema = typeof PlacementEnumSchema;

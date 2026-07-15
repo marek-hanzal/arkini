@@ -10,6 +10,7 @@ import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
 import { planScopePlacementFx } from "./planScopePlacementFx";
 import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
 import { readGridLocationsFx } from "./readGridLocationsFx";
+import { resolveBoardPlacementOriginFx } from "./resolveBoardPlacementOriginFx";
 
 export namespace planBoardPlacementFx {
 	export interface Props {
@@ -21,7 +22,7 @@ export namespace planBoardPlacementFx {
 	}
 }
 
-/** Plans stack-first board placement using one concrete board ordering strategy. */
+/** Resolves one board origin, then plans canonical stack-first nearest placement. */
 export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* ({
 	item,
 	origin,
@@ -30,6 +31,11 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	runtime,
 }: planBoardPlacementFx.Props) {
 	const config = yield* GameConfigFx;
+	const placementOrigin = yield* resolveBoardPlacementOriginFx({
+		origin,
+		placement,
+		size: config.meta.board,
+	});
 	const boardLocations = yield* readGridLocationsFx({
 		scope: "board",
 		size: config.meta.board,
@@ -40,14 +46,13 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	});
 	const orderedBoardLocations = yield* orderBoardLocationsFx({
 		locations: emptyBoardLocations,
-		origin,
-		placement,
+		origin: placementOrigin,
 	});
 
 	return yield* planScopePlacementFx({
 		item,
 		locations: orderedBoardLocations,
-		origin: placement === "drop" ? origin : undefined,
+		origin: placementOrigin,
 		quantity,
 		runtime,
 		scope: "board",

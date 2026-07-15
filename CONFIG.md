@@ -236,7 +236,7 @@ chance
 weight
 ```
 
-Each resolved drop authors board placement as `drop` or `random`. Inventory fallback is determined independently by the emitted item's scope. There is no output replacement operation; item lifetime and output placement are separate contracts.
+Each resolved drop authors board placement as `drop` or `random`. `drop` uses the supplied source position as its spatial origin. `random` selects one position from the complete board, including occupied cells, then delegates the whole resolved quantity to the same stack-first, nearest-first placement used by `drop`. An occupied random origin is never rerolled; standard placement resolves outward from it. Inventory fallback is determined independently by the emitted item's scope. There is no output replacement operation; item lifetime and output placement are separate contracts.
 
 Runtime-executed outputs use standard placement and never bypass stack, scope, max-count, purity, or capacity rules. Active jobs reserve worst-case future output against `maxCount` before start: ranges use their maximum, chance rolls reserve success, repeated weighted rolls reserve the repeatable worst candidate, and alternative sets use the per-item maximum. Consumed job materials and depleted owners offset output of the same canonical item because they disappear at completion. Runtime hydration validates the same live-plus-reserved capacity. Queue entries reserve nothing until dispatch.
 

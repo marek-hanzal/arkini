@@ -65,7 +65,7 @@ Next action:
 
 ## Placement, reservations, and removal
 
-- Output board placement is only `drop` or `random`; inventory fallback follows item scope. There is no output replacement lifecycle.
+- Output board placement is only `drop` or `random`; inventory fallback follows item scope. `random` chooses one origin from every board cell, including occupied cells, then runs the normal stack-first nearest placement for the complete drop without rerolling. There is no output replacement lifecycle.
 - Reserved material returns through standard placement and retains no historical instance, stack, slot, or position. Consumed material is destructive conversion: owned state is discarded at actual start, the root remains inaccessible in job scope, and completion discards it without return or depletion output.
 - Generic mutations reject job-scoped items.
 - Shared identity removal deletes the owner and queue; full public removal additionally releases buffered inputs.

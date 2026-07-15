@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Either, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/v1/game/fx/useGameFx";
@@ -276,6 +276,156 @@ describe("placeDropFx", () => {
 			});
 		}
 	});
+	it("uses a free random board origin directly", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+
+				return yield* placeDropFx({
+					drop: configuredDrop({
+						itemId: "board-only",
+						placement: "random",
+						quantity: 1,
+					}),
+					originItemId: "runtime:origin",
+				});
+			}).pipe(
+				Effect.withRandom(
+					Random.fixed([
+						2,
+					]),
+				),
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		const placement = requirePlacement(result);
+
+		expect(placement.placement.spawn).toEqual([
+			expect.objectContaining({
+				location: boardLocation(2),
+			}),
+		]);
+	});
+
+	it("uses one occupied random origin for the complete standard placement", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+				yield* spawnItemFx({
+					id: "runtime:blocker",
+					itemId: "blocker",
+					location: boardLocation(2),
+					quantity: 1,
+				});
+
+				const placement = yield* placeDropFx({
+					drop: configuredDrop({
+						itemId: "board-only",
+						placement: "random",
+						quantity: 2,
+					}),
+					originItemId: "runtime:origin",
+				});
+				const nextRandom = yield* Random.next;
+
+				return {
+					nextRandom,
+					placement,
+				};
+			}).pipe(
+				Effect.withRandom(
+					Random.fixed([
+						2,
+						0.75,
+					]),
+				),
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		const placement = requirePlacement(result.placement);
+
+		expect(placement.placement.spawn).toEqual([
+			expect.objectContaining({
+				location: boardLocation(1),
+			}),
+			expect.objectContaining({
+				location: boardLocation(3),
+			}),
+		]);
+		expect(result.nextRandom).toBe(0.75);
+	});
+
+	it("orders stack-first placement around the random origin", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:origin",
+					itemId: "origin",
+					location: boardLocation(0),
+					quantity: 1,
+				});
+				yield* spawnItemFx({
+					id: "runtime:log:left",
+					itemId: "log",
+					location: boardLocation(1),
+					quantity: 2,
+				});
+				yield* spawnItemFx({
+					id: "runtime:log:right",
+					itemId: "log",
+					location: boardLocation(3),
+					quantity: 2,
+				});
+
+				return yield* placeDropFx({
+					drop: configuredDrop({
+						itemId: "log",
+						placement: "random",
+						quantity: 1,
+					}),
+					originItemId: "runtime:origin",
+				});
+			}).pipe(
+				Effect.withRandom(
+					Random.fixed([
+						3,
+					]),
+				),
+				useGameFx({
+					config: placementTestConfig,
+				}),
+			),
+		);
+
+		const placement = requirePlacement(result);
+
+		expect(placement.placement.stack).toEqual([
+			{
+				item: expect.objectContaining({
+					id: "runtime:log:right",
+					quantity: 3,
+				}),
+				quantity: 1,
+			},
+		]);
+	});
+
 	it("uses random board placement only after stack capacity is exhausted", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

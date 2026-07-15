@@ -29,15 +29,13 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 	quantity,
 	runtime,
 }: planDropScopePlacementFx.Props) {
-	const boardPlacement = drop.placement === "random" ? "random" : "drop";
-
 	return yield* match(item.scope)
 		.with("board", () => {
 			return Effect.gen(function* () {
 				const plan = yield* planBoardPlacementFx({
 					item,
 					origin,
-					placement: boardPlacement,
+					placement: drop.placement,
 					quantity,
 					runtime,
 				});

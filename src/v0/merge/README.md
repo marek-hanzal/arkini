@@ -1,7 +1,7 @@
 # Merge historical status
 
-**Status:** Reference for task 05 and presentation tasks 11/14.
+**Status:** Partial presentation oracle for tasks 11 and 14.
 
-Current schemas and validation describe directional merges. No gameplay merge command exists yet. Ordinary stack placement is already implemented and is not this feature.
+Canonical directional gameplay merge execution now lives in `src/v1/merge/` and is covered by current contract, lifecycle, atomicity, event, and authored-flow tests. Ordinary same-item stack placement remains a separate capability.
 
-Preserve source/target behavior and feedback. Do not port save mutation or UI-owned rule selection.
+Do not inspect or port the historical runtime mutation path again. Preserve only drag/drop feedback and animation intent until tasks 11 and 14 capture them, then remove this historical directory.

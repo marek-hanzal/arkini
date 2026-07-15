@@ -4,21 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 05 — Directional merge execution**
+**Task 06 — Temporary item lifetime**
 
 Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/05-merge-execution.md`;
-3. the merge rows in `tasks/COVERAGE.md`;
-4. current item, placement, purity, revision, command, event, and runtime mutation code;
-5. only the historical merge files named by task 05.
+2. `tasks/06-temporary-lifetime.md`;
+3. the temporary-lifetime rows in `tasks/COVERAGE.md`;
+4. current Tick, output, placement, item-state, hydration, and event code;
+5. only the historical expiry files named by task 06.
 
 Next action:
 
-> Define the directional source/target merge write contract against the current atomic runtime grammar. Preserve exact source/target identity intent, purity rules, authored merge actions, standard output placement, and rollback semantics without copying the historical action topology.
+> Decide and implement the smallest canonical fixed-step lifetime representation for temporary board items, including exact creation boundary, deterministic Tick progression, save/restore, atomic expiry output, blocked-output retry policy, stable completion order, and one semantic expiry event without reviving timestamps or an active-effect subsystem.
 
 ## Absolute code rules
 
@@ -70,6 +70,16 @@ Next action:
 - Generic mutations reject job-scoped items.
 - Shared identity removal deletes the owner and queue; full public removal additionally releases buffered inputs.
 - Completion and depletion use the same atomic primitives without nesting public write commands.
+
+
+## Directional gameplay merge
+
+- `mergeItemsFx` is the sole canonical gameplay-merge write. UI passes revised source and target identities only; source-owned authored rules decide behavior.
+- Source may be board or inventory; target must be board. The first authored matching rule wins and reverse rules are never inferred.
+- Exactly one source quantity participates. `consume` permanently converts it; `use` requires a pure idle source and standard-places it around the target after the target effect.
+- `keep` leaves target state untouched. `remove` removes one idle target quantity through standard owner removal. `replace` preserves target identity/location but requires one pure idle quantity and resets item-specific state to the replacement definition.
+- Source action, target effect, source return, optional output, candidate validation, and `item:merged` event are atomic. Blocked retries preserve deterministic output rolls from stable source/target/rule facts.
+- Gameplay merge is not identical-item stack placement. Historical merge runtime is superseded; only feedback and animation intent remain for tasks 11 and 14.
 
 ## Randomness
 

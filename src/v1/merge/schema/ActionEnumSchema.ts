@@ -6,7 +6,7 @@ import { z } from "zod";
 export const ActionEnumSchema = z
 	.enum([
 		/**
-		 * Uses the source item, then returns it to its original position.
+		 * Uses one source quantity, then returns it through standard placement.
 		 */
 		"use",
 		/**

@@ -4,7 +4,7 @@ This directory is the active handoff surface for continuing the game from the hi
 
 ## Current task
 
-**Next implementation task: [`05-merge-execution.md`](05-merge-execution.md)**
+**Next implementation task: [`06-temporary-lifetime.md`](06-temporary-lifetime.md)**
 
 Tasks 00–04 are complete. A new thread must:
 
@@ -25,8 +25,8 @@ Do not read every queued task before starting. The queue is an ordered backlog, 
 | 02 | [`Blueprint lifecycle`](../archive/tasks/02-blueprint-lifecycle.md) | **Done** | 01 |
 | 03 | [`Stash lifecycle`](../archive/tasks/03-stash-lifecycle.md) | **Done** | 01–02 |
 | 04 | [`Item charges and deposit inputs`](../archive/tasks/04-deposit-capacity.md) | **Done** | 03 |
-| 05 | [`Directional merge execution`](05-merge-execution.md) | **Ready** | 04 |
-| 06 | [`Temporary item lifetime`](06-temporary-lifetime.md) | Queued | 05 |
+| 05 | [`Directional merge execution`](../archive/tasks/05-merge-execution.md) | **Done** | 04 |
+| 06 | [`Temporary item lifetime`](06-temporary-lifetime.md) | **Ready** | 05 |
 | 07 | [`Speed cheat`](07-speed-cheat.md) | Queued | 06 |
 | 08 | [`Board memory`](08-board-memory.md) | Queued | 07 |
 | 09 | [`Destructive utility items`](09-destructive-utilities.md) | Queued | 08 |

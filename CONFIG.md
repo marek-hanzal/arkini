@@ -255,6 +255,7 @@ Schema support and runtime support are different facts.
 - An idle depleted target dies and emits optional `charges.output` immediately during start. A depleted active owner remains only until its current job completes, then dies before `line.output`; depletion output follows line output.
 - Starting any stacked line owner resolves eligibility from the pre-command world, attaches job/input/charge state in one candidate, atomically isolates surviving stateful quantities, and standard-places pure remainders.
 - Blueprint assets are explicit standard item assets; no target or visual is inferred from output.
+- Directional gameplay merge is an engine-owned atomic command over one revised source identity and one revised board target. Source-owned authored rules decide source action, target effect, and optional output.
 
 ### Schema-backed but incomplete in runtime
 
@@ -263,17 +264,22 @@ Schema support and runtime support are different facts.
 
 Keep authored data valid, but do not build UI or gameplay assumptions on schema-only capabilities. A capability becomes implemented only when it has a canonical runtime command/path and focused behavioral tests.
 
-## 9. Merge authoring
+## 9. Merge authoring and execution
 
-Merge schemas and reference validation are present. Runtime merge execution is not yet part of the active public command surface.
+The authored source item owns an ordered list of directional merge rules. The first rule whose selector matches the concrete board target wins; reverse matching is never inferred.
 
-The authored source item describes:
+Each rule describes:
 
-- which target it matches;
-- how the source should be handled;
-- whether the target should be kept, removed, or replaced.
+- `action: "consume" | "use"` for exactly one source quantity;
+- `effect: "keep" | "remove" | "replace"` for exactly one board target;
+- `result` only for replacement;
+- optional output resolved through the standard output and placement grammar.
 
-Treat these fields as validated authoring intent until a canonical merge write command implements them. Do not reconstruct merge behavior in UI, and do not confuse ordinary placement-plan merging with gameplay item merging.
+The canonical runtime command accepts revised source and target identities. A source may be on the board or in inventory; the target must be on the board. `consume` permanently converts one idle source quantity. `use` requires a pure idle source and returns that quantity through standard drop placement around the target after the target effect. `remove` uses standard owner removal, while `replace` preserves target identity and position but requires one pure idle target quantity.
+
+Source action, target effect, source return, optional output, runtime validation, and the `item:merged` event are one atomic committed transition. Failed placement or validation leaks no partial mutation or event. Merge randomness derives from stable source/target facts and the authored rule, so blocked retries do not reroll.
+
+UI passes only the selected source and target identities. It never chooses the rule or rebuilds merge logic. Ordinary same-item stack placement remains a separate capability despite humanity assigning both operations the same word.
 
 ## 10. Validation
 

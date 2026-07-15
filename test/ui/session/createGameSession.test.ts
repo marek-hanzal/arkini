@@ -147,7 +147,15 @@ describe("createGameSession", () => {
 			await planningEntered;
 
 			const unsubscribe = session.subscribeEvents((batch) => {
-				jobIds.push(...batch.events.map((event) => event.jobId));
+				jobIds.push(
+					...batch.events.flatMap((event) =>
+						"jobId" in event
+							? [
+									event.jobId,
+								]
+							: [],
+					),
+				);
 			});
 
 			try {
@@ -214,7 +222,15 @@ describe("createGameSession", () => {
 		try {
 			await session.run(emitCompletedEventFx("job:event:before-subscribe"));
 			const unsubscribe = session.subscribeEvents((batch) => {
-				jobIds.push(...batch.events.map((event) => event.jobId));
+				jobIds.push(
+					...batch.events.flatMap((event) =>
+						"jobId" in event
+							? [
+									event.jobId,
+								]
+							: [],
+					),
+				);
 			});
 
 			try {
@@ -426,7 +442,15 @@ describe("createGameSession", () => {
 		let nestedUnsubscribe: (() => void) | undefined;
 		const unsubscribeRuntime = session.subscribe(() => {
 			nestedUnsubscribe ??= session.subscribeEvents((batch) => {
-				nestedJobIds.push(...batch.events.map((event) => event.jobId));
+				nestedJobIds.push(
+					...batch.events.flatMap((event) =>
+						"jobId" in event
+							? [
+									event.jobId,
+								]
+							: [],
+					),
+				);
 			});
 		});
 

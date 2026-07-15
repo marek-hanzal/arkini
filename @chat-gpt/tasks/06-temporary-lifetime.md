@@ -1,6 +1,6 @@
 # 06 — Temporary item lifetime
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

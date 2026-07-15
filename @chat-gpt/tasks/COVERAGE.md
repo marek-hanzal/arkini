@@ -32,7 +32,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Blueprint completion lifecycle | Partial | Generic authored output, placement, max-count reservation, and atomic retry are canonical; presentation feedback remains | 13–15 |
 | Stash completion lifecycle | Partial | Generic authored completion lifecycle is canonical; presentation and sound remain | 13–15 |
 | Item charges, deposit input, depletion | Partial | Generic runtime behavior is canonical; read-model, detail, feedback, and animation remain | 10, 13, 14 |
-| Directional gameplay merge | Reference | Behavior, feedback, and tests remain | 05, 11, 14 |
+| Directional gameplay merge | Partial | Canonical atomic execution, deterministic output, and semantic event are implemented; interaction feedback and animation remain | 11, 14 |
 | Temporary lifetime/expiry | Reference | Timing/output behavior remains | 06 |
 | Speed cheat | Reference | Toggle behavior remains; old time model is rejected | 07 |
 | Board memory | Reference | Snapshot/restore behavior and animation remain | 08, 14 |
@@ -74,7 +74,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `layer/` | Removed | Old UI layering audit had no current source ownership | Nothing | Done |
 | `limit/` | Partial | Runtime max count and placement checks exist | Target-limit presentation | 10, 13 |
 | `loot/` | Superseded | Current output/roll model is canonical | Presentation/audio grouping only | 14, 15 |
-| `merge/` | Reference | Schema/validation only; placement stack merge is not gameplay merge | Directional source/target semantics and tests | 05, 11, 14 |
+| `merge/` | Partial | Canonical directional execution and tests supersede historical runtime mutation; placement stack merge remains separate | Drag feedback and animation/audio intent only | 11, 14, 15 |
 | `placement/` | Partial | Current placement planner/write path is canonical | Drag feedback and animation intent | 11, 14 |
 | `play/` | Reference | Runtime mirrors and bridge-owned gameplay truth are rejected | Information requirements, sheets, visual/audio orchestration | 10–16 |
 | `producer/` | Partial | Engine lifecycle, input, queue, Tick, generic completion, and output are superseded | Detail/read-model behavior, feedback, audio | 10, 13–15 |

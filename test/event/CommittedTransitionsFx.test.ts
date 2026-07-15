@@ -125,7 +125,15 @@ describe("committed transition events", () => {
 		});
 		const jobIds: string[] = [];
 		const unsubscribe = session.subscribeEvents((batch) => {
-			jobIds.push(...batch.events.map((event) => event.jobId));
+			jobIds.push(
+				...batch.events.flatMap((event) =>
+					"jobId" in event
+						? [
+								event.jobId,
+							]
+						: [],
+				),
+			);
 		});
 		let markFirstEntered: (() => void) | undefined;
 		let releaseFirst: (() => void) | undefined;

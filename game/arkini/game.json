@@ -18,20 +18,8 @@
 	"start": {
 		"board": [
 			{
-				"itemId": "item:memory",
-				"x": 3,
-				"y": 10,
-				"space": 0
-			},
-			{
 				"itemId": "item:cheat-speed",
 				"x": 5,
-				"y": 10,
-				"space": 0
-			},
-			{
-				"itemId": "item:memory",
-				"x": 4,
 				"y": 10,
 				"space": 0
 			},

@@ -4,20 +4,20 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 08 — Multi-space board runtime**
+**Task 09 — Destructive utility items**
 
-Status: **In progress**
+Status: **Ready**
 
 Read:
 
 1. `tasks/README.md`;
-2. `tasks/08-multi-space-board-runtime.md`;
-3. the multi-space rows in `tasks/COVERAGE.md`;
-4. current board-location, placement, occupancy, query, Tick, save, and command code.
+2. `tasks/09-destructive-utilities.md`;
+3. the destructive-utility rows in `tasks/COVERAGE.md`;
+4. current item removal, event, session, save, and storage boundaries.
 
 Next action:
 
-> Add mandatory board `space` and persistent root `currentSpace`, then make every spatial engine path strictly space-local while keeping inventory global and all spaces simulated together.
+> Define and implement the cheat-inventory sink and persisted-save nuke without merging their distinct ownership boundaries into one generic destroy command.
 
 ## Absolute code rules
 

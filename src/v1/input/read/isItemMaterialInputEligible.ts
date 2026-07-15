@@ -25,7 +25,6 @@ export const isItemMaterialInputEligible = (item: ItemSchema.Type) => {
 					"craft",
 					"deposit",
 					"inventory",
-					"memory",
 					"nuke",
 					"producer",
 					"simple",

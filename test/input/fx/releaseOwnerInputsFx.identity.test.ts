@@ -135,7 +135,7 @@ const boardOwner = {
 	itemId: "outer",
 	location: {
 		scope: "board" as const,
-		space: 0,
+		space: 2,
 		position: {
 			x: 0,
 			y: 0,
@@ -223,7 +223,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			remainingCharges: 1,
 			location: {
 				scope: "board",
-				space: 0,
+				space: 2,
 				position: {
 					x: 0,
 					y: 0,
@@ -256,7 +256,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					itemId: "material",
 					location: {
 						scope: "board" as const,
-						space: 0,
+						space: 2,
 						position: {
 							x: 1,
 							y: 0,
@@ -302,7 +302,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					itemId: "blocker",
 					location: {
 						scope: "board" as const,
-						space: 0,
+						space: 2,
 						position: {
 							x: 1,
 							y: 0,
@@ -320,7 +320,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			remainingCharges: 1,
 			location: {
 				scope: "board",
-				space: 0,
+				space: 2,
 				position: {
 					x: 0,
 					y: 0,
@@ -361,7 +361,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 					itemId: "blocker",
 					location: {
 						scope: "board" as const,
-						space: 0,
+						space: 2,
 						position: {
 							x: 1,
 							y: 0,

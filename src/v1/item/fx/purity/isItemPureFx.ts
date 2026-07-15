@@ -49,6 +49,6 @@ export const isItemPureFx = Effect.fn("isItemPureFx")(function* ({
 		});
 	});
 
-	// Future item-owned state such as memory must extend this predicate here.
+	// Future item-owned runtime state must extend this predicate here.
 	return linePurity.every(Boolean);
 });

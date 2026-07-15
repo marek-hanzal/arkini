@@ -58,7 +58,6 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 					"simple",
 					"temporary",
 					"inventory",
-					"memory",
 					"cheat:speed",
 					"nuke",
 					"cheat:inventory",

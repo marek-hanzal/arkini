@@ -9,7 +9,7 @@ Restore synth/audio feedback as a transient presentation consumer of engine even
 ## Historical oracle
 
 - `src/v0/audio/`;
-- event-specific sound decisions in producer, craft, stash, merge, memory, and cheat paths.
+- event-specific sound decisions in producer, craft, stash, merge, space-navigation, and cheat paths.
 
 ## Do not port
 

@@ -36,7 +36,6 @@ describe("writeGameJsonSchemaFx", () => {
 					$ref: expect.stringMatching(/^#\/\$defs\//),
 				},
 				start: {
-					currentSpace: 0,
 					$ref: expect.stringMatching(/^#\/\$defs\//),
 				},
 				version: {
@@ -48,6 +47,16 @@ describe("writeGameJsonSchemaFx", () => {
 			expect.stringMatching(/^__schema\d+$/),
 		);
 		expect(schema.$defs).toHaveProperty("ItemSchema");
+		expect(schema.$defs.StartSchema).toMatchObject({
+			required: expect.arrayContaining([
+				"currentSpace",
+			]),
+			properties: {
+				currentSpace: {
+					$ref: expect.stringMatching(/^#\/\$defs\//),
+				},
+			},
+		});
 		expect(jsonSchema.length).toBeLessThan(1_000_000);
 	});
 });

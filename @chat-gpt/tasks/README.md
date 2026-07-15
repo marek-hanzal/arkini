@@ -4,9 +4,9 @@ This directory is the active handoff surface for continuing the game from the hi
 
 ## Current task
 
-**Next implementation task: [`08-multi-space-board-runtime.md`](08-multi-space-board-runtime.md)**
+**Next implementation task: [`09-destructive-utilities.md`](09-destructive-utilities.md)**
 
-Tasks 00–07 are complete. A new thread must:
+Tasks 00–08 are complete. A new thread must:
 
 1. read the root documentation in the order defined by `@chat-gpt/README.md`;
 2. read `@chat-gpt/CURRENT.md`;
@@ -28,8 +28,8 @@ Do not read every queued task before starting. The queue is an ordered backlog, 
 | 05 | [`Directional merge execution`](../archive/tasks/05-merge-execution.md) | **Done** | 04 |
 | 06 | [`Temporary item lifetime`](../archive/tasks/06-temporary-lifetime.md) | **Done** | 05 |
 | 07 | [`Speed cheat`](../archive/tasks/07-speed-cheat.md) | **Done** | 06 |
-| 08 | [`Multi-space board runtime`](08-multi-space-board-runtime.md) | **Ready** | 07 |
-| 09 | [`Destructive utility items`](09-destructive-utilities.md) | Queued | 08 |
+| 08 | [`Multi-space board runtime`](../archive/tasks/08-multi-space-board-runtime.md) | **Done** | 07 |
+| 09 | [`Destructive utility items`](09-destructive-utilities.md) | **Ready** | 08 |
 | 10 | [`Engine-owned read models`](10-engine-read-models.md) | Queued | 01–09 |
 | 11 | [`Player interaction contract`](11-player-interaction.md) | Queued | 05, 10 |
 | 12 | [`Renderer shell, board, and inventory`](12-renderer-board-inventory.md) | Queued | 11 |

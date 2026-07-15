@@ -312,6 +312,8 @@ Every operation whose candidate would attach identity-bound state to quantity gr
 
 Placement is one shared policy used by commands, line output, charge-depletion output, reserved-instance return, and buffered-input release. `placeRuntimeItemFx` is the sole internal entry point for relocating an existing live item; lifecycle callsites must not invent specialized placement branches.
 
+Every board location includes mandatory `space`; one cell is `space + x + y`. Board origins carry that full location through the pipeline. Occupancy, stacking, nearest-first ordering, random origin, queries, charges, merge, and output are local to the origin space. Scope fallback may continue into the global inventory but never another board space. `runtime.currentSpace` is persistent presentation/navigation state only and never filters Tick or background completion.
+
 Materialized drops follow this high-level order:
 
 ```text

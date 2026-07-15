@@ -1,6 +1,6 @@
 # 08 — Multi-space board runtime
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -135,3 +135,17 @@ The first slice accepts any valid non-negative integer space. Unlock progression
 ## Historical decision
 
 The original board-memory concept is rejected and must not be implemented. It relied on destructive collect/reconstruct behavior with fragile identity, capacity, loss, and animation semantics. Multi-space boards use existing runtime identity, placement, inventory, Tick, and save contracts instead.
+
+
+## Closeout
+
+Implemented in the canonical v1 runtime:
+
+- mandatory explicit board `space`;
+- mandatory persistent root `currentSpace`;
+- space-aware occupancy, placement, queries, charges, merge, move, swap, Tick, and save;
+- global passive inventory as the only cross-space bridge;
+- `setCurrentSpaceFx` and current-space board reader;
+- complete removal of the active v1 board-memory item contract and Arkini content.
+
+The historical board-memory implementation is rejected and has no remaining architectural or product authority. It may remain in `src/v0` only until the final historical-pruning task removes coupled legacy code.

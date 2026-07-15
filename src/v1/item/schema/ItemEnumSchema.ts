@@ -38,10 +38,6 @@ export const ItemEnumSchema = z
 		 */
 		"inventory",
 		/**
-		 * An authoring marker for board-layout memory.
-		 */
-		"memory",
-		/**
 		 * An authoring marker for the speed-cheat capability.
 		 */
 		"cheat:speed",

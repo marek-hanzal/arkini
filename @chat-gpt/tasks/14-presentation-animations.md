@@ -10,7 +10,7 @@ Build a presentation-only event-to-animation layer that may lag, redirect, coale
 
 - `src/v0/play/game-engine-visual/`;
 - animation parts of `src/v0/tile-engine/`;
-- transient board tiles, stack/merge/drop feedback, memory effects, and timing constants.
+- transient board tiles, stack/merge/drop feedback, space-navigation feedback, and timing constants.
 
 ## Core contract
 
@@ -36,7 +36,7 @@ Animation completion never gates commands, Tick, save, or event publication.
 - later transitions can redirect in-flight motion;
 - stale animations can be shortened/skipped safely;
 - event batches preserve commit order per listener;
-- merge, stack, replacement, removal, input transfer, completion, memory, and utility actions have deliberate feedback;
+- merge, stack, replacement, removal, input transfer, completion, space navigation, and utility actions have deliberate feedback;
 - canonical snapshot remains directly readable throughout.
 
 ## Required tests
@@ -46,7 +46,7 @@ Animation completion never gates commands, Tick, save, or event publication.
 - redirect during movement;
 - late subscriber receives no historical event;
 - remove/replace/merge ordering;
-- memory collect/distribute backlog;
+- current-space transition backlog;
 - unmount/dispose cancels DOM work without touching engine state.
 
 ## Historical cleanup on closeout

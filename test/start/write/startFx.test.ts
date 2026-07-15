@@ -240,7 +240,7 @@ describe("startFx", () => {
 			),
 		);
 
-		expect(runtime.items).toHaveLength(14);
+		expect(runtime.items).toHaveLength(12);
 		expect(runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({

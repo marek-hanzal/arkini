@@ -188,6 +188,8 @@ attach state to the original board identity
 
 Input storage, line start, and partial charge spending are canonical callers. A fresh charged item remains pure while `remainingCharges` is absent; a partial spend stores identity-bound state and must isolate one board instance. Full idle depletion consumes one quantity in place because no changed identity survives. Inventory is passive storage: it may hold an already stateful owner, but no new identity-bound state is attached or spent there.
 
+Board location is always explicit: `space + position`. Never accept a bare position at a spatial domain boundary and never infer or default a space. Board operations remain local to the supplied origin space; inventory is the only cross-space bridge. Callers place new quantities through canonical material placement and surviving live identities through `placeRuntimeItemFx`; do not add lifecycle-specific placement entry points.
+
 Charge resolution and application are line-wide operations. Resolve payer identity per input, reserve charge budget by runtime item ID across all inputs, aggregate costs by payer, and spend each payer once inside the same candidate. Resolve idle full depletions before surviving stateful payers so capacity freed by the command is available to later isolation. Never let separate input previews overbook the same payer and rely on rollback as the first line of correctness.
 
 ### Future output and max-count

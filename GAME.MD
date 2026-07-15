@@ -6,11 +6,11 @@ Configuration owns concrete content and balance. This document owns the interpre
 
 ## 1. Game shape
 
-Arkini is a client-only, offline merge and production game played across a board and inventory.
+Arkini is a client-only, offline merge and production game played across multiple isolated board spaces and one shared inventory.
 
-The current engine lets callers create and move items, store line materials, start and queue product lines, advance deterministic jobs, resolve configured line outputs, and place resulting quantities through one shared policy. Merge and several specialized item capabilities are authored but not yet executable; their status is listed in section 15.
+The current engine lets callers create and move items, navigate persistent board spaces, store line materials, start and queue product lines, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Remaining schema-only utility capabilities are listed later in this document.
 
-The board and inventory sizes come from game metadata. They are not fixed engine constants.
+Every board space uses the board size from game metadata; the shared inventory uses its own configured size. They are not fixed engine constants.
 
 ## 2. Items and locations
 
@@ -25,13 +25,15 @@ Configured storage scope determines whether the item may occupy:
 Runtime may additionally place material representations into:
 
 - a specific owner line-input slot;
-- an active job reservation.
+- a consumed job material or live reserved material.
 
 Input and job locations are ownership states. They are not visible storage grids and cannot be manipulated as normal board/inventory items.
 
 ## 3. Board and inventory
 
-The board is the active spatial surface.
+Every board space is an active spatial surface. Board cells are identified by mandatory `space + x + y`, and equal coordinates in different spaces never collide. All spaces continue simulating together; `currentSpace` only selects the presented board and the destination of explicit inventory-to-board placement.
+
+Spatial mechanics never cross directly between boards. Placement, distance, merge, charges, outputs, and release stay inside their origin space. The shared inventory is the only bridge between spaces.
 
 Inventory is passive storage:
 
@@ -274,7 +276,7 @@ Temporary items are board-only, non-stackable identities with fixed-step `remain
 
 Speed mode is runtime-backed as root session state. `toggleSpeedModeFx()` switches `runtime.session.speedMode` directly between `normal` and `accelerated`; it does not require, mutate, or derive truth from a speed-cheat item. Newly observed wall-clock time is fed into the same fixed-step engine at `1×` or `30×`. Explicit simulation advancement remains unscaled.
 
-The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Inventory opener, memory, nuke, and cheat inventory remain schema-backed without dedicated runtime commands.
+The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Inventory opener, nuke, and cheat inventory remain schema-backed without dedicated runtime commands.
 
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 

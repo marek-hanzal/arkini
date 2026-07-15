@@ -35,7 +35,8 @@ A status describes oracle value, not whether historical code still compiles. The
 | Directional gameplay merge | Partial | Canonical atomic execution, deterministic output, and semantic event are implemented; interaction feedback and animation remain | 11, 14 |
 | Temporary lifetime/expiry | Partial | Canonical fixed-step state, save/restore, deterministic atomic expiry, and retry are implemented; read-model and presentation behavior remain | 10, 13, 14, 15 |
 | Speed cheat | Partial | Canonical root runtime session mode, 1×/30× Tick input, save reset, toggle command, and event are implemented | Read-model/asset projection, control UI, and audio remain | 10, 13, 15 |
-| Board memory | Reference | Snapshot/restore behavior and animation remain | 08, 14 |
+| Multi-space board runtime | Partial | Canonical spaces, persistent navigation, isolation, placement, Tick, and save are implemented; renderer/navigation presentation remains | 10–14 |
+| Board memory | Rejected | Destructive snapshot/restore and active v1 item authoring were removed in favor of multi-space boards | Done |
 | Cheat inventory sink and nuke-save confirmation | Reference | Drop-to-remove and persisted-save reset remain | 09 |
 | Public board/inventory/line read models | Partial | Historical bridge is an information-requirement catalogue | 10 |
 | Drag/drop and activation orchestration | Reference | Historical interaction behavior remains | 11 |
@@ -55,7 +56,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `app/` | Reference | Old bootstrap/runtime wiring is rejected | Splash, shell, layout, and user flow | 12 |
 | `audio/` | Reference | No current audio layer | Sound policy, batching, synth choices | 15 |
 | `board/` | Partial | Board runtime writes and canonical locations are superseded | Board layout, taps, drag feedback, visual state | 11, 12, 14 |
-| `board-memory/` | Reference | Only schema exists currently | Full save/restore behavior and edge cases | 08, 14 |
+| `board-memory/` | Rejected | Snapshot/restore semantics and active v1 schema/content are rejected | Nothing; final coupled v0 deletion belongs to task 17 |
 | `browser/` | Reference | No active browser shell | Hard reset behavior only | 12, 17 |
 | `capacity/` | Partial | Generic item charges, deterministic deposit input, depletion, and output are superseded | Detail/read-model feedback and depletion animation | 10, 13, 14, 17 |
 | `cheat/` | Partial | Root runtime speed mode and fixed-step acceleration supersede historical runtime/timestamp behavior | Board control, ordered asset projection, and sound intent only | 10, 13, 15, 17 |

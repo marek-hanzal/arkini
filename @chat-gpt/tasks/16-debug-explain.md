@@ -15,7 +15,7 @@ Provide development diagnostics and human-readable explanations through public e
 ## Candidate capabilities
 
 - spawn/remove development commands behind explicit development ownership;
-- explain why a drop, input store, line start, completion, or memory restore is blocked;
+- explain why a drop, input store, line start, completion, placement, or a cross-space operation is blocked;
 - inspect canonical runtime issues and config diagnostics;
 - reusable scenario/test ergonomics inspired by the historical `GameScenario` idea.
 

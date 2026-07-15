@@ -6,7 +6,6 @@ import { CheatSpeedItemSchema } from "./CheatSpeedItemSchema";
 import { CraftItemSchema } from "./CraftItemSchema";
 import { DepositItemSchema } from "./DepositItemSchema";
 import { InventoryItemSchema } from "./InventoryItemSchema";
-import { MemoryItemSchema } from "./MemoryItemSchema";
 import { NukeItemSchema } from "./NukeItemSchema";
 import { ProducerItemSchema } from "./ProducerItemSchema";
 import { SimpleItemSchema } from "./SimpleItemSchema";
@@ -29,7 +28,6 @@ export const ItemSchema = z
 		StashItemSchema,
 		TemporaryItemSchema,
 		InventoryItemSchema,
-		MemoryItemSchema,
 		CheatSpeedItemSchema,
 		NukeItemSchema,
 		CheatInventoryItemSchema,

@@ -1,6 +1,6 @@
 # 09 — Destructive utility items
 
-**Status:** Queued
+**Status:** Ready
 
 ## Goal
 

@@ -70,7 +70,7 @@ The completed game config contains:
 ```text
 meta        Game ID, title, board size, inventory size.
 resources   Explicit non-item resource roles used by the shell.
-start       Initial board coordinates and inventory quantities.
+start       Initial explicit-space board coordinates, inventory quantities, and current space.
 categories  UI-facing category records keyed by stable ID.
 version     Configuration schema version.
 items       Canonical item records keyed by stable ID.
@@ -116,7 +116,6 @@ stash
 deposit
 temporary
 inventory
-memory
 cheat-speed
 nuke
 cheat-inventory
@@ -135,6 +134,12 @@ any
 ```
 
 Runtime locations additionally include line-input and job scopes. Those are live ownership states, not authoring storage choices.
+
+### Board spaces
+
+Every authored start-board item has a mandatory non-negative `space` beside its coordinates. There is no default or compatibility fallback. `start.currentSpace` is also mandatory and becomes persistent root navigation state.
+
+Board occupancy and every spatial rule use `space + x + y`. Placement, distance, charges, merge, and outputs remain inside the origin space; allowed scope fallback may use the one universe-wide inventory but never another board space. Inventory is the only cross-space bridge.
 
 ### Stacking
 
@@ -263,7 +268,7 @@ Schema support and runtime support are different facts.
 
 ### Schema-backed but incomplete in runtime
 
-- memory, inventory-opener, nuke, and cheat-inventory item kinds are authoring contracts without active public runtime commands.
+- inventory-opener, nuke, and cheat-inventory item kinds are authoring contracts without active public runtime commands.
 
 Keep authored data valid, but do not build UI or gameplay assumptions on schema-only capabilities. A capability becomes implemented only when it has a canonical runtime command/path and focused behavioral tests.
 

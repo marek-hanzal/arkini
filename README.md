@@ -159,6 +159,8 @@ npm run build:desktop
 npm run preview:desktop
 ```
 
+The first desktop development or preview run verifies the Electron executable and downloads the matching binary through Electron's own installer when npm has installed only the JavaScript package shell. Later runs reuse the installed/cached binary.
+
 The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 
 Useful focused commands:

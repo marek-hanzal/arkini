@@ -37,6 +37,7 @@ Next action:
 - `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only platform capabilities, and may not import renderer/engine roots. The preload is intentionally empty until #226/#220 add narrow filesystem operations.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
+- Electron 43 may install its JavaScript package without downloading the native executable. `npm run dev:desktop` and `npm run preview:desktop` therefore run `electron/ensureElectronBinary.mjs`, which triggers Electron's own lazy installer only when the executable is missing.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
 - `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
 - `GameShell` loads the selected exact package through `bridge/game/createGameFx`, restores its separately namespaced save, owns exactly one live `Game`, and disposes it with the route subtree.

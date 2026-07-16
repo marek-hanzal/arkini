@@ -33,12 +33,14 @@
 		"game:pack": "tsx cli/arkini.ts pack",
 		"game:validate": "tsx cli/arkini.ts validate",
 		"game:schema": "tsx cli/arkini.ts schema",
-		"predev:desktop": "npm run game:pack",
+		"predev:desktop": "npm run desktop:ensure && npm run game:pack",
 		"dev:desktop": "electron-vite dev",
 		"prebuild:desktop": "npm run game:pack",
 		"build:desktop": "electron-vite build",
 		"preview:desktop": "electron-vite preview",
-		"typecheck:desktop": "tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters"
+		"typecheck:desktop": "tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters",
+		"desktop:ensure": "node electron/ensureElectronBinary.mjs",
+		"prepreview:desktop": "npm run desktop:ensure"
 	},
 	"dependencies": {
 		"@effect/cli": "^0.75.2",

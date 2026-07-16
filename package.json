@@ -10,6 +10,8 @@
 		"dev": "electron-vite dev",
 		"prebuild": "npm run game:pack",
 		"build": "electron-vite build",
+		"postbuild": "npm run build:verify",
+		"build:verify": "tsx electron/verify/verifyRendererAssetGraphFx.ts",
 		"prepreview": "npm run game:pack",
 		"preview": "electron-vite preview",
 		"dev:browser": "npm run game:pack && vite",

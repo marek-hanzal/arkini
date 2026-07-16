@@ -18,6 +18,8 @@ src/@routes → src/page → src/ui → src/bridge → src/engine
 
 Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard browser history in both environments: `/` is the Arkpack selector and `/game/$packageId` owns one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
 
+- The renderer entry declares `<base href="/">`, so generated relative assets resolve from the `arkini://app/` origin root even when the current history route is nested. Every production build verifies the generated `out/renderer/index.html` asset graph from root, game, and development routes.
+
 Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
 
 ## 1. Core model

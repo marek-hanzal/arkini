@@ -170,6 +170,8 @@ The main window opens centered at 75% of the active monitor work area. `F11` and
 
 The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 
+Packaged renderer assets are rooted through `<base href="/">`; `npm run build` verifies the generated asset graph from `/`, `/game/$packageId`, and nested `/dev/**` routes before succeeding.
+
 ## macOS packaging and prereleases
 
 The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:

@@ -147,8 +147,10 @@ npm run test:shard:1
 ```
 
 `npm run test` remains the canonical one-process full-suite command. Use
-`npm run test:shards` or the six individual `test:shard:N` commands when the
-execution environment has a short process timeout.
+`npm run test:shards` or the ten individual `test:shard:N` commands when the
+execution environment has a short process timeout. Each shard contains a smaller
+deterministic file partition and still runs with one worker from `vitest.config.ts`.
+When a chained runner fails to exit cleanly, run the affected shard independently.
 
 ## Game authoring commands
 

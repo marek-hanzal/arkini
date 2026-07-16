@@ -26,6 +26,13 @@ Next action:
 - `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
 - Dependency Cruiser runs over `src/engine`, `src/ui`, `cli`, and `test` and enforces these directions.
 
+## Test execution
+
+- The permanent Vitest suite is split into ten deterministic shards for constrained agent/CI environments.
+- Every shard inherits `maxWorkers: 1` from `vitest.config.ts`.
+- Prefer running affected shards independently when the chained runner prints a green summary but fails to exit cleanly.
+- `npm run test` remains the canonical full-suite command; sharding changes execution shape, not test semantics.
+
 ## Absolute code rules
 
 - Named project operations are Effect programs and use `*Fx` without “pure helper” exceptions.

@@ -287,6 +287,118 @@ describe("createGameOwner", () => {
 		});
 	});
 
+	it("isolates throwing subscribers from creation, disposal and replacement", async () => {
+		const listenerFailure = new Error("observer failed");
+		const report = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const disposed = vi.fn(() => Promise.resolve());
+		const deliveries: createGameOwner.State["type"][] = [];
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) =>
+				createFakeGame(packageId, packageId, packageId === "A" ? disposed : undefined),
+		});
+		const unsubscribeBroken = owner.subscribe(() => {
+			throw listenerFailure;
+		});
+		const unsubscribeHealthy = owner.subscribe(() => {
+			deliveries.push(owner.getSnapshot().type);
+		});
+
+		await owner.replace("A");
+		await owner.replace("B");
+
+		expect(disposed).toHaveBeenCalledTimes(1);
+		expect(expectReady(owner).arkpack.packageId).toBe("B");
+		expect(deliveries).toEqual([
+			"loading",
+			"loading",
+			"ready",
+			"loading",
+			"loading",
+			"ready",
+		]);
+		expect(report).toHaveBeenCalledTimes(deliveries.length);
+		expect(report).toHaveBeenCalledWith(
+			"Arkini game-owner listener failed; authoritative lifecycle continues.",
+			listenerFailure,
+		);
+
+		unsubscribeBroken();
+		unsubscribeHealthy();
+		await owner.replace(null);
+		report.mockRestore();
+	});
+
+	it("publishes over a stable listener snapshot while subscriptions mutate", async () => {
+		const deliveries: string[] = [];
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => createFakeGame(packageId, packageId),
+		});
+		let changedSubscriptions = false;
+		let unsubscribeSecond: () => void = () => undefined;
+		let unsubscribeAdded: () => void = () => undefined;
+		const unsubscribeFirst = owner.subscribe(() => {
+			deliveries.push("first");
+			if (changedSubscriptions) return;
+			changedSubscriptions = true;
+			unsubscribeSecond();
+			unsubscribeAdded = owner.subscribe(() => {
+				deliveries.push("added");
+			});
+		});
+		unsubscribeSecond = owner.subscribe(() => {
+			deliveries.push("second");
+		});
+
+		await owner.replace("A");
+
+		expect(deliveries).toEqual([
+			"first",
+			"second",
+			"first",
+			"added",
+			"first",
+			"added",
+		]);
+		unsubscribeSecond();
+		unsubscribeSecond();
+		unsubscribeFirst();
+		unsubscribeFirst();
+		unsubscribeAdded();
+		unsubscribeAdded();
+		await owner.replace(null);
+	});
+
+	it("isolates rejected Promise-like subscriber work and still notifies later listeners", async () => {
+		const listenerFailure = new Error("async observer failed");
+		const report = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const laterListener = vi.fn();
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => createFakeGame(packageId, packageId),
+		});
+		const unsubscribeBroken = owner.subscribe(() => Promise.reject(listenerFailure));
+		const unsubscribeHealthy = owner.subscribe(laterListener);
+
+		await owner.replace("A");
+		await Promise.resolve();
+		await Promise.resolve();
+
+		expect(expectReady(owner).arkpack.packageId).toBe("A");
+		expect(laterListener).toHaveBeenCalledTimes(3);
+		expect(report).toHaveBeenCalledTimes(3);
+		expect(report).toHaveBeenCalledWith(
+			"Arkini game-owner listener failed; authoritative lifecycle continues.",
+			listenerFailure,
+		);
+
+		unsubscribeBroken();
+		unsubscribeHealthy();
+		await owner.replace(null);
+		report.mockRestore();
+	});
+
 	it("runs hard reset as one shared discard, exact clear and fresh boot", async () => {
 		const calls: string[] = [];
 		let generation = 0;

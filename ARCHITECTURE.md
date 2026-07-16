@@ -151,6 +151,8 @@ latest requested package
 
 The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal. HMR stores the old owner shutdown Promise in Vite hot data; replacement code waits for that Promise before creating another session. Electron close is also controlled by the same shutdown: the window closes only after final save succeeds. A failed final save keeps the same frozen `Game` owned and retryable; repeating close retries that exact obligation. The shell exposes an explicit force-exit-without-saving decision. It starts best-effort discard cleanup and authorizes main to close immediately without pretending that the final save succeeded.
 
+Owner state publication is synchronous for `useSyncExternalStore`, but observer delivery is never authoritative lifecycle work. Every publication iterates one stable listener snapshot; each callback throw and each rejected returned Promise-like value is isolated independently, later listeners still receive the same publication, and subscription changes affect only later publications. Observer defects can be reported, but they cannot create owner failure state or stop game creation, disposal, replacement, reset, or shutdown.
+
 Hard reset is the same owner transition with destructive save policy:
 
 ```text

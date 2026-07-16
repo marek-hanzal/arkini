@@ -31,7 +31,7 @@ export namespace createGameOwner {
 		readonly clearFailedSaveAndRetry: () => Promise<void>;
 		readonly hardReset: () => Promise<void>;
 		readonly forceShutdown: () => Promise<void>;
-		readonly subscribe: (listener: () => void) => () => void;
+		readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
 	}
 }
 
@@ -40,7 +40,7 @@ export const createGameOwner = ({
 	create,
 	clearSave,
 }: createGameOwner.Props): createGameOwner.Owner => {
-	const listeners = new Set<() => void>();
+	const listeners = new Set<() => void | PromiseLike<void>>();
 	let requestedPackageId: string | null = null;
 	let requestedHardReset = false;
 	let requestedForceShutdown = false;
@@ -54,9 +54,30 @@ export const createGameOwner = ({
 		packageId: null,
 	};
 
+	const reportListenerFailure = (error: unknown) => {
+		try {
+			console.error(
+				"Arkini game-owner listener failed; authoritative lifecycle continues.",
+				error,
+			);
+		} catch {
+			// Reporting is best effort and must not become another lifecycle failure.
+		}
+	};
+
 	const publish = (next: createGameOwner.State) => {
 		state = next;
-		for (const listener of listeners) listener();
+		const delivery = Array.from(listeners);
+		for (const listener of delivery) {
+			try {
+				const result = listener();
+				if (result !== undefined) {
+					void Promise.resolve(result).catch(reportListenerFailure);
+				}
+			} catch (error) {
+				reportListenerFailure(error);
+			}
+		}
 	};
 
 	const fail = (version: number, error: unknown, saveRecoveryKey?: GameSaveStorage.Key) => {

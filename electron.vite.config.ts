@@ -24,6 +24,7 @@ export default defineConfig({
 	renderer: {
 		...rendererConfig,
 		root: ".",
+		publicDir: false,
 		build: {
 			...rendererConfig.build,
 			rollupOptions: {

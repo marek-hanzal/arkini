@@ -33,12 +33,17 @@
 		"test:shards": "npm run test:shard:1 && npm run test:shard:2 && npm run test:shard:3 && npm run test:shard:4 && npm run test:shard:5 && npm run test:shard:6 && npm run test:shard:7 && npm run test:shard:8 && npm run test:shard:9 && npm run test:shard:10",
 		"predc": "npm run game:pack",
 		"dc": "depcruise src/engine src/bridge src/ui src/page src/@routes src/main.tsx src/router.tsx src/_route.ts electron desktop electron.vite.config.ts cli test --output-type err-long",
-		"check": "npm run format:check && npm run dc && npm run typecheck && npm run build && npm run test",
+		"check": "npm run format:check && npm run dc && npm run typecheck && npm run game:validate && npm run build && npm run test:shards",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"game:pack": "tsx cli/arkini.ts pack",
 		"game:validate": "tsx cli/arkini.ts validate",
-		"game:schema": "tsx cli/arkini.ts schema"
+		"game:schema": "tsx cli/arkini.ts schema",
+		"package:clean": "tsx cli/desktop/cleanDesktopPackagingFx.ts",
+		"package:checksums": "tsx cli/desktop/createDesktopChecksumsFx.ts",
+		"package:verify": "tsx cli/desktop/verifyDesktopArtifactsFx.ts",
+		"package:mac": "npm run package:clean && npm run build && npm run package:stage && electron-builder --config electron-builder.yml --mac --arm64 --publish never && npm run package:checksums && npm run package:verify",
+		"package:stage": "tsx cli/desktop/stageDesktopPackageFx.ts"
 	},
 	"dependencies": {
 		"@effect/cli": "^0.75.2",
@@ -65,6 +70,7 @@
 		"@vitejs/plugin-react": "6.0.2",
 		"dependency-cruiser": "17.4.2",
 		"electron": "43.1.1",
+		"electron-builder": "26.15.3",
 		"electron-vite": "6.0.0-beta.1",
 		"jscpd": "5.0.11",
 		"knip": "6.18.0",
@@ -74,5 +80,7 @@
 		"vite": "8.0.16",
 		"vitest": "4.1.7"
 	},
-	"main": "./out/main/index.js"
+	"main": "./out/main/index.js",
+	"description": "Offline deterministic merge and production game.",
+	"author": "Marek Hanzal"
 }

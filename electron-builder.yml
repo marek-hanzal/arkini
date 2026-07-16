@@ -1,0 +1,27 @@
+appId: dev.marekhanzal.arkini
+productName: Arkini
+asar: true
+npmRebuild: false
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+directories:
+  app: desktop-package
+  output: release
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+  - '!out/**/*.map'
+mac:
+  category: public.app-category.games
+  icon: icon.png
+  identity: null
+  hardenedRuntime: false
+  target:
+    - target: dmg
+      arch:
+        - arm64
+    - target: zip
+      arch:
+        - arm64
+dmg:
+  title: ${productName} ${version}

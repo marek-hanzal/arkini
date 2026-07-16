@@ -19,6 +19,8 @@
 			"!**/.tanstack",
 			"!**/coverage",
 			"!**/results",
+			"!desktop-package",
+			"!release",
 			"!**/node_modules",
 			"!src/_archive/**",
 			"!src/_route.ts"

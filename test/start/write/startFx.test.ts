@@ -232,6 +232,11 @@ describe("startFx", () => {
 
 	it("boots the current Arkini authoring config into a valid runtime", async () => {
 		const config = GameConfigSchema.parse(await readArkiniGameConfigSource());
+		expect(config.meta.board).toEqual({
+			width: 11,
+			height: 7,
+		});
+
 		const runtime = Effect.runSync(
 			startFx().pipe(
 				useGameFx({
@@ -248,8 +253,8 @@ describe("startFx", () => {
 					location: {
 						space: 0,
 						position: {
-							x: 3,
-							y: 4,
+							x: 4,
+							y: 3,
 						},
 						scope: "board",
 					},

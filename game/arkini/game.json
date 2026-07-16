@@ -4,8 +4,8 @@
 		"id": "arkini",
 		"title": "Arkini",
 		"board": {
-			"width": 7,
-			"height": 11
+			"width": 11,
+			"height": 7
 		},
 		"inventory": {
 			"width": 7,
@@ -19,32 +19,26 @@
 		"board": [
 			{
 				"itemId": "item:cheat-speed",
-				"x": 5,
-				"y": 10,
+				"x": 10,
+				"y": 5,
 				"space": 0
 			},
 			{
 				"itemId": "item:nuke",
-				"x": 6,
-				"y": 8,
+				"x": 8,
+				"y": 6,
 				"space": 0
 			},
 			{
 				"itemId": "item:cheat",
-				"x": 6,
-				"y": 9,
+				"x": 9,
+				"y": 6,
 				"space": 0
 			},
 			{
 				"itemId": "item:inventory",
-				"x": 6,
-				"y": 10,
-				"space": 0
-			},
-			{
-				"itemId": "item:tree",
-				"x": 0,
-				"y": 1,
+				"x": 10,
+				"y": 6,
 				"space": 0
 			},
 			{
@@ -55,8 +49,14 @@
 			},
 			{
 				"itemId": "item:tree",
-				"x": 2,
+				"x": 0,
 				"y": 1,
+				"space": 0
+			},
+			{
+				"itemId": "item:tree",
+				"x": 1,
+				"y": 2,
 				"space": 0
 			},
 			{
@@ -67,20 +67,20 @@
 			},
 			{
 				"itemId": "producer:townhall-t1",
-				"x": 3,
-				"y": 4,
+				"x": 4,
+				"y": 3,
 				"space": 0
 			},
 			{
 				"itemId": "item:rock",
-				"x": 0,
-				"y": 6,
+				"x": 6,
+				"y": 0,
 				"space": 0
 			},
 			{
 				"itemId": "producer:quarry-t1",
-				"x": 1,
-				"y": 6,
+				"x": 6,
+				"y": 1,
 				"space": 0
 			}
 		],

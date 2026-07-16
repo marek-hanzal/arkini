@@ -26,6 +26,8 @@ describe("source isolation", () => {
 			"src/@routes",
 			"src/main.tsx",
 			"src/router.tsx",
+			"electron",
+			"electron.vite.config.ts",
 		]
 			.flatMap(collectTypeScriptFiles)
 			.filter((path) => {

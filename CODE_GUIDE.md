@@ -2,7 +2,7 @@
 
 This document is mandatory. It is not a collection of optional style preferences.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router registrations live under `src/@routes`. `src/_archive` is historical reference only and may never be imported by active code or tests.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router registrations live under `src/@routes`. `electron/` is the explicit main/preload platform boundary and may not import renderer or engine roots; renderer code may not import Electron. `src/_archive` is historical reference only and may never be imported by active code or tests.
 
 ## 1. The `*Fx` rule is absolute
 
@@ -260,7 +260,7 @@ Error precedence is observable behavior. Refactors must preserve it unless the c
 
 ## 10. UI boundary
 
-`src/engine` is standalone and framework-neutral. `src/bridge` owns concrete live adapters and snapshot projections grouped as `bridge/<domain>/<operation>`; it may use public engine modules but never engine internals or UI. `src/ui` owns reusable presentation and transient gesture/geometry/animation state. `src/page` composes route-level screens from UI components. `src/@routes` contains only TanStack Router registration seams that point at standalone page components. Dependency direction is `@routes → page → ui → bridge → engine`.
+`src/engine` is standalone and framework-neutral. `src/bridge` owns concrete live adapters and snapshot projections grouped as `bridge/<domain>/<operation>`; it may use public engine modules but never engine internals or UI. `src/ui` owns reusable presentation and transient gesture/geometry/animation state. `src/page` composes route-level screens from UI components. `src/@routes` contains only TanStack Router registration seams that point at standalone page components. Renderer dependency direction is `@routes → page → ui → bridge → engine`. `electron/` owns only actual Electron main/preload/protocol capabilities and is not part of that chain. Do not import renderer/game modules into Electron or Electron/Node APIs into renderer domains.
 
 Allowed:
 

@@ -4,20 +4,20 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 10 — Engine-owned decisions and live bridge projections**
+**GitHub #200 — Electron desktop host**
 
-Status: **In progress**
+Status: **Task #204 implementation complete; native macOS/HMR smoke pending**
 
 Read:
 
-1. `tasks/README.md`;
-2. `tasks/10-engine-read-models.md`;
-3. the rows for the next concrete UI slice in `tasks/COVERAGE.md`;
-4. the relevant renderer/detail task only when that slice reaches it.
+1. GitHub epic #200;
+2. GitHub task #204 for the remaining native macOS/HMR acceptance smoke;
+3. GitHub task #205 after #204 is verified and closed;
+4. related save epic #217 only when lifecycle touches flush/load/reset.
 
 Next action:
 
-> The root launcher now lists bundled Arkini plus validated persistent local arkpacks, and `/game/$packageId` restores the package-namespaced save before rendering the live board. Review this launcher/package boundary with Marek, then choose the next concrete board interaction and add only the bridge facts and public engine commands it requires.
+> Run `npm run dev:desktop` on Apple Silicon macOS and verify the root selector plus React/Tailwind HMR. After that closes #204, continue with whole-game ownership hardening in #205.
 
 ## Source topology
 
@@ -33,8 +33,11 @@ Next action:
 ## Browser shell foundation
 
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
-- The client uses hash history for static-host and future Electron compatibility. Electron must host the renderer on one stable storage origin/partition so IndexedDB package and save catalogs survive restarts; hash routing alone does not define that persistence identity.
-- `/#/` is the local arkpack selector. Bundled Arkini and imported packages share one validated catalog; uploads never leave the device.
+- TanStack Router uses standard browser history. Browser development runs on the Vite HTTP origin; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
+- `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
+- Electron main/preload live under `electron/`, own only platform capabilities, and may not import renderer/engine roots. The preload is intentionally empty until #226/#220 add narrow filesystem operations.
+- `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
+- Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
 - `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
 - `GameShell` loads the selected exact package through `bridge/game/createGameFx`, restores its separately namespaced save, owns exactly one live `Game`, and disposes it with the route subtree.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
@@ -42,8 +45,8 @@ Next action:
 
 ## Live bridge and tile foundation
 
-- `bridge/arkpack` validates compressed package bytes, derives SHA-256 identity, persists imported binaries, and exposes the bundled package through the same startup validation path.
-- `bridge/save` persists gameplay state separately from package binaries. Save hydration requires both route package identity and exact content hash; package removal never doubles as save deletion.
+- `bridge/arkpack` validates compressed package bytes, derives SHA-256 identity, currently persists imported binaries in IndexedDB, and exposes the bundled package through the same startup validation path. #226 moves the persistent catalog to Electron filesystem storage.
+- `bridge/save` currently persists gameplay state separately in IndexedDB. Save hydration requires route package identity plus exact content hash; #217 moves this keyed save policy to Electron filesystem storage without changing the multi-package model.
 - `bridge/runtime/useRuntimeSelector` uses `useSyncExternalStore` directly over `Game.getSnapshot` and `Game.subscribe`. It may memoize a selected value for one runtime root but never stores a second runtime or synchronizes through `useEffect`.
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
 - `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.

@@ -2,7 +2,23 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Dependency direction is `@routes → page → ui → bridge → engine`. `src/_archive` is outside every active source root and may never be imported.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Renderer dependency direction is `@routes → page → ui → bridge → engine`. `electron/` owns only Electron main/preload/protocol concerns and may not import renderer or engine roots. The renderer may not import Electron. `src/_archive` is outside every active source root and may never be imported.
+
+## 0. Desktop host boundary
+
+Electron is a thin sibling platform adapter, not another application or another game owner.
+
+```text
+electron/main + electron/preload
+→ BrowserWindow, custom protocol, future typed filesystem capabilities
+
+src/@routes → src/page → src/ui → src/bridge → src/engine
+→ the only renderer, route tree, game bridge, and engine
+```
+
+Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard browser history in both environments: `/` is the Arkpack selector and `/game/$packageId` owns one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
+
+Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The preload remains empty until a concrete typed platform capability is introduced.
 
 ## 1. Core model
 

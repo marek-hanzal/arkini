@@ -17,7 +17,7 @@ Create the active browser shell and render board/inventory directly from the can
 
 - `bridge/game` owns `Game`, `GameSession`, `createGameFx`, public command/event adapters, and live replacement identity;
 - `bridge/runtime/useRuntimeSelector` is the single React subscription path to canonical runtime;
-- the generated TanStack Router tree exists; `/#/` selects bundled or persistent local arkpacks and `/game/$packageId` loads the selected package, restores its save, and renders the first read-only board slice;
+- the generated TanStack Router tree exists; `/` selects bundled or persistent local Arkpacks and `/game/$packageId` loads the selected package, restores its save, and renders the first read-only board slice;
 - `bridge/board/useBoard`, `ui/board`, and the headless `ui/tile` foundation exist;
 - UI may intentionally lag visually during animation, but canonical truth remains the live runtime;
 - `nukeGameSessionFx` currently provides provisional dispose/delete/create sequencing, but it is not a safe final production reset owner because the complete transition is not shell-owned.
@@ -46,7 +46,7 @@ src/engine
 
 Dependency direction is `@routes → page → ui → bridge → engine`. Route modules point to standalone page components and contain no gameplay, session, or game composition. The `/game` file route is a layout branch whose page composes `GameShell` with an `Outlet`; future `/dev/**` routes remain outside this shell.
 
-The client uses hash history so the package selector is hosted at `/#/` and typed route `/game/$packageId` works without a server rewrite. The future Electron host must provide one stable renderer storage origin/partition; `file://` path choice must not accidentally fork or lose the IndexedDB package/save catalogs.
+The client uses standard browser history. Browser development uses Vite's HTTP SPA fallback; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://` and hash routing are not supported application modes. Persistent package/save ownership migrates from IndexedDB to typed Electron filesystem repositories under #226 and #217.
 
 The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. `GameShell` creates one complete live `Game` for the selected package through `createGameFx`; future hard reset replaces this whole game instance inside the same shell, leaving the router, package catalog, and non-game branches alive.
 

@@ -51,7 +51,7 @@ src/@routes
 → TanStack Router file registrations only; generated hierarchy lives in src/_route.ts
 ```
 
-Dependency direction is `@routes → page → ui → bridge → engine`; higher layers may use public lower-layer contracts, never the reverse. `src/router.tsx` creates the router from the generated tree and `src/main.tsx` is the browser entrypoint.
+Renderer dependency direction is `@routes → page → ui → bridge → engine`; higher layers may use public lower-layer contracts, never the reverse. `electron/` is a sibling platform boundary and may not import the renderer or engine roots. `src/router.tsx` creates the router from the generated tree and `src/main.tsx` is the sole renderer entrypoint.
 
 Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under `src/engine`. Presentation-owned paths are written explicitly.
 
@@ -148,15 +148,18 @@ Biome format check
 → complete Vitest suite
 ```
 
-Browser shell commands:
+Renderer and desktop shell commands:
 
 ```bash
 npm run dev
 npm run build
 npm run preview
+npm run dev:desktop
+npm run build:desktop
+npm run preview:desktop
 ```
 
-The local package selector is available at `/#/`. A selected package runs at `/#/game/<packageId>`; hash history avoids server rewrites while typed routing remains `/game/$packageId`. A future Electron host must keep one stable renderer storage origin/partition so IndexedDB package and save catalogs persist across launches.
+The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 
 Useful focused commands:
 
@@ -182,9 +185,10 @@ When a chained runner fails to exit cleanly, run the affected shard independentl
 The launcher treats `.arkpack` as the playable package boundary:
 
 - bundled Arkini is listed beside local imports and passes the same decode/schema/semantic/resource validation before startup;
-- imported binaries are addressed by SHA-256, deduplicated, and persisted locally in the `arkini-arkpacks` IndexedDB database;
+- imported binaries are addressed by SHA-256 and currently persist in the renderer `arkini-arkpacks` IndexedDB database;
 - package binaries and gameplay saves are separate storage boundaries; removing an imported package does not silently delete its save;
-- saves live in `arkini-game-saves`, are keyed by route package identity, and additionally require the exact package content hash before hydration;
+- saves currently live in `arkini-game-saves`, keyed by package identity plus exact content hash;
+- Electron filesystem migration is tracked by #226 for the Arkpack catalog and #217 for per-package saves. IndexedDB remains temporary implementation state until those tasks close;
 - arkpacks remain data-only. The current format accepts completed config plus PNG resources, never JavaScript or HTML.
 
 ## Game authoring commands

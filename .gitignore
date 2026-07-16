@@ -12,6 +12,7 @@ dist
 game/arkini.game.arkpack
 game/schema.json
 node_modules
+out
 npm-debug.log*
 pnpm-debug.log*
 pnpm-lock.yaml

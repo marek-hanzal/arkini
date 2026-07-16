@@ -12,7 +12,7 @@
 		"preview": "vite preview",
 		"typecheck:src": "tsc -p tsconfig.json --noEmit --noUnusedLocals --noUnusedParameters",
 		"typecheck:test": "tsc -p tsconfig.test.json --noEmit --noUnusedLocals --noUnusedParameters",
-		"typecheck": "npm run typecheck:src && npm run typecheck:test",
+		"typecheck": "npm run typecheck:src && npm run typecheck:test && npm run typecheck:desktop",
 		"test": "vitest run --no-color",
 		"test:shard:1": "vitest run --no-color --shard=1/10",
 		"test:shard:2": "vitest run --no-color --shard=2/10",
@@ -26,13 +26,19 @@
 		"test:shard:10": "vitest run --no-color --shard=10/10",
 		"test:shards": "npm run test:shard:1 && npm run test:shard:2 && npm run test:shard:3 && npm run test:shard:4 && npm run test:shard:5 && npm run test:shard:6 && npm run test:shard:7 && npm run test:shard:8 && npm run test:shard:9 && npm run test:shard:10",
 		"predc": "npm run game:pack",
-		"dc": "depcruise src/engine src/bridge src/ui src/page src/@routes src/main.tsx src/router.tsx src/_route.ts cli test --output-type err-long",
+		"dc": "depcruise src/engine src/bridge src/ui src/page src/@routes src/main.tsx src/router.tsx src/_route.ts electron electron.vite.config.ts cli test --output-type err-long",
 		"check": "npm run format:check && npm run dc && npm run typecheck && npm run build && npm run test",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"game:pack": "tsx cli/arkini.ts pack",
 		"game:validate": "tsx cli/arkini.ts validate",
-		"game:schema": "tsx cli/arkini.ts schema"
+		"game:schema": "tsx cli/arkini.ts schema",
+		"predev:desktop": "npm run game:pack",
+		"dev:desktop": "electron-vite dev",
+		"prebuild:desktop": "npm run game:pack",
+		"build:desktop": "electron-vite build",
+		"preview:desktop": "electron-vite preview",
+		"typecheck:desktop": "tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters"
 	},
 	"dependencies": {
 		"@effect/cli": "^0.75.2",
@@ -59,6 +65,8 @@
 		"@types/react-dom": "19.2.3",
 		"@vitejs/plugin-react": "6.0.2",
 		"dependency-cruiser": "17.4.2",
+		"electron": "43.1.1",
+		"electron-vite": "6.0.0-beta.1",
 		"fake-indexeddb": "^6.2.5",
 		"jscpd": "5.0.11",
 		"knip": "6.18.0",
@@ -67,5 +75,6 @@
 		"typescript": "6.0.3",
 		"vite": "8.0.16",
 		"vitest": "4.1.7"
-	}
+	},
+	"main": "./out/main/index.js"
 }

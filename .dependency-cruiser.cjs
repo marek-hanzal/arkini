@@ -109,13 +109,38 @@ const boundaryRules = [
 			path: "^src/(?:engine|bridge|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
+
+	{
+		name: "renderer-no-electron-imports",
+		comment:
+			"Renderer, engine, bridge, page, routes, and CLI stay independent from Electron and its platform source root.",
+		severity: "error",
+		from: {
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
+		},
+		to: {
+			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
+		},
+	},
+	{
+		name: "electron-platform-no-renderer-imports",
+		comment:
+			"Electron main/preload are thin platform adapters and never import engine, bridge, React UI, pages, routes, or renderer entrypoints.",
+		severity: "error",
+		from: {
+			path: "^electron(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:engine|bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+		},
+	},
 	{
 		name: "active-code-no-archive-imports",
 		comment:
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli|test)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -177,7 +202,7 @@ module.exports = {
 				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^src/(?:engine|bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],
@@ -191,6 +216,7 @@ module.exports = {
 				],
 				pathNot: [
 					"node_modules/@types/",
+					"node_modules/electron(?:/|$)",
 				],
 			},
 		},
@@ -200,7 +226,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

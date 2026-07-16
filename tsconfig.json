@@ -24,6 +24,11 @@
 		"cli",
 		"src/engine",
 		"src/ui",
+		"src/page",
+		"src/@routes",
+		"src/main.tsx",
+		"src/router.tsx",
+		"src/_route.ts",
 		"vite.config.ts"
 	]
 }

@@ -2,7 +2,7 @@
 
 This document is mandatory. It is not a collection of optional style preferences.
 
-Engine paths are relative to `src/engine` unless written explicitly. Browser, React, persistence, and application-lifecycle adapters live under `src/ui`. `src/_archive` is historical reference only and may never be imported by active code or tests.
+Engine paths are relative to `src/engine` unless written explicitly. Reusable browser, React, persistence, and application-lifecycle adapters live under `src/ui`; route-level composition lives under `src/page`; TanStack Router registrations live under `src/@routes`. `src/_archive` is historical reference only and may never be imported by active code or tests.
 
 ## 1. The `*Fx` rule is absolute
 
@@ -260,7 +260,7 @@ Error precedence is observable behavior. Refactors must preserve it unless the c
 
 ## 10. UI boundary
 
-`src/engine` is standalone and framework-neutral. `src/ui` is the browser, React, persistence, subscription, and application-lifecycle adapter boundary. UI is a presentation adapter.
+`src/engine` is standalone and framework-neutral. `src/ui` owns reusable browser, React, persistence, subscription, and application-lifecycle adapters. `src/page` composes route-level screens from UI components. `src/@routes` contains only TanStack Router registration seams that point at standalone page components. Dependency direction is `@routes → page → ui → engine`.
 
 Allowed:
 

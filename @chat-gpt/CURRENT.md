@@ -12,19 +12,28 @@ Read:
 
 1. `tasks/README.md`;
 2. `tasks/10-engine-read-models.md`;
-3. the read-model rows in `tasks/COVERAGE.md`;
-4. current public reads, runtime/config schemas, command results, and historical bridge/view files named by the task.
+3. the rows for the next concrete UI slice in `tasks/COVERAGE.md`;
+4. the relevant renderer/detail task only when that slice reaches it.
 
 Next action:
 
-> Define the smallest coherent engine-owned read surfaces for board/inventory presentation, line readiness and blocked reasons, queue/reservation state, charges, multi-space navigation, and utility projections without recreating a second engine in React.
+> Choose the next concrete `/game` UI slice and implement its page/UI component together with only the engine-owned reads and commands that slice actually requires. Do not prebuild a broad speculative read-model layer.
 
 ## Source topology
 
-- `src/engine` is the only standalone engine root. It owns gameplay, runtime, compiler, validation, packing, and public domain reads/commands and must not import React or `src/ui`.
-- `src/ui` owns browser, React, persistence, subscription, and application-lifecycle adapters. It may depend on public engine modules but not `src/engine/**/internal`.
+- `src/engine` is the only standalone engine root. It owns gameplay, runtime, compiler, validation, packing, and public domain reads/commands and must not import presentation code or React.
+- `src/ui` owns reusable browser, React, persistence, subscription, and application-lifecycle adapters. It may depend on public engine modules but not `src/engine/**/internal`, pages, or routes.
+- `src/page` owns route-level screen and layout composition. It may compose UI and use router APIs but never imports route registration modules.
+- `src/@routes` contains only TanStack Router file registrations pointing to standalone page components. `src/_route.ts` is generated and `src/router.tsx` owns router creation.
+- Dependency direction is `@routes → page → ui → engine`; Dependency Cruiser and permanent architecture tests enforce it.
 - `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
-- Dependency Cruiser runs over `src/engine`, `src/ui`, `cli`, and `test` and enforces these directions.
+
+## Browser shell foundation
+
+- TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
+- The client uses hash history for static-host compatibility; typed route `/game` is reached at `/#/game`.
+- `/game` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
+- The shell currently renders only a placeholder and intentionally creates no game session. Future application-root ownership and hard reset replacement belong inside this `/game` shell boundary, not in router creation or leaf pages.
 
 ## Test execution
 

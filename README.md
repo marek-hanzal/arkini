@@ -10,7 +10,7 @@ Arkini is a client-only, offline merge and production game built around a determ
 
 The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and React session adapters are implemented and covered by the repository check gate.
 
-No active browser entrypoint or deployment workflow is committed in this snapshot. A future renderer shell must be introduced against the current engine rather than reviving the archived application bootstrap.
+A minimal client-only browser entrypoint now uses TanStack Router file-based routing. The `/game` branch owns an isolated game shell and placeholder page; no engine application instance, board, inventory, or gameplay UI is mounted yet.
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
@@ -32,19 +32,27 @@ When documentation and implementation disagree, stop and resolve the contradicti
 
 ## Path convention
 
-The repository has two active source roots:
+The repository has explicit active boundaries:
 
 ```text
 src/engine
 → standalone canonical engine, compiler, validation, CLI support, runtime, and public domain operations
 
 src/ui
-→ React, browser, persistence, subscription, and application-lifecycle adapters
+→ reusable React, browser, persistence, subscription, and application-lifecycle adapters
+
+src/page
+→ route-level screen and layout composition over UI components
+
+src/@routes
+→ TanStack Router file registrations only; generated hierarchy lives in src/_route.ts
 ```
 
-Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under `src/engine`. UI-owned paths are written explicitly under `src/ui`.
+Dependency direction is `@routes → page → ui → engine`; higher layers may use public lower-layer contracts, never the reverse. `src/router.tsx` creates the router from the generated tree and `src/main.tsx` is the browser entrypoint.
 
-`src/_archive` is historical reference only. It is intentionally excluded from active tooling and may never be imported by `src/engine`, `src/ui`, `cli`, or `test`.
+Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under `src/engine`. Presentation-owned paths are written explicitly.
+
+`src/_archive` is historical reference only. It is intentionally excluded from active tooling and may never be imported by active source, CLI, or tests.
 
 ## Architecture in one screen
 
@@ -131,8 +139,19 @@ Biome format check
 → Dependency Cruiser architecture rules
 → source TypeScript check
 → test TypeScript check
+→ production browser build
 → complete Vitest suite
 ```
+
+Browser shell commands:
+
+```bash
+npm run dev
+npm run build
+npm run preview
+```
+
+The active game placeholder is available at `/#/game`; hash history preserves static-host compatibility while the typed route path remains `/game`.
 
 Useful focused commands:
 

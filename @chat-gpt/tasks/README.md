@@ -16,6 +16,8 @@ Tasks 00–09 are complete. A new thread must:
 
 Do not read every queued task before starting. The queue is an ordered backlog, not a mandatory context dump.
 
+Tasks 10–13 are implemented as vertical UI slices rather than four isolated horizontal phases. A concrete page/component need drives the smallest engine-owned read/command addition, its agreement tests, and the thin UI consumer in the same slice. Task 10 remains the current coverage owner until its read-model obligations are satisfied; the minimal TanStack Router `/game` shell from Task 12 is already present as non-gameplay foundation.
+
 ## Queue
 
 | # | Task | Status | Depends on |

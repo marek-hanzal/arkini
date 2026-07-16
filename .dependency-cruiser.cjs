@@ -1,15 +1,15 @@
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
 	{
-		name: "engine-no-ui-imports",
+		name: "engine-no-presentation-imports",
 		comment:
-			"The standalone engine never depends on browser, React, save-adapter, or application-shell code.",
+			"The standalone engine never depends on UI, page composition, routes, or browser entrypoints.",
 		severity: "error",
 		from: {
 			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: "^src/ui(?:/|$)",
+			path: "^src/(?:ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
@@ -25,14 +25,52 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "cli-no-ui-imports",
-		comment: "CLI tooling may use the engine but never browser or React adapters.",
+		name: "cli-no-presentation-imports",
+		comment:
+			"CLI tooling may use the engine but never UI, page, route, or browser entrypoint code.",
 		severity: "error",
 		from: {
 			path: "^cli(?:/|$)",
 		},
 		to: {
+			path: "^src/(?:ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+		},
+	},
+
+	{
+		name: "ui-no-page-or-route-imports",
+		comment:
+			"Reusable UI may depend on the engine but never on route-level page composition or router registration.",
+		severity: "error",
+		from: {
 			path: "^src/ui(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+		},
+	},
+	{
+		name: "page-no-route-registration-imports",
+		comment:
+			"Pages compose UI and may use router APIs, but they never import generated or file-route registration modules.",
+		severity: "error",
+		from: {
+			path: "^src/page(?:/|$)",
+		},
+		to: {
+			path: "^src/@routes(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+		},
+	},
+	{
+		name: "routes-only-compose-pages",
+		comment:
+			"File routes are registration seams. Active application code enters them through standalone page components.",
+		severity: "error",
+		from: {
+			path: "^src/@routes(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:engine|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 	{
@@ -53,7 +91,7 @@ const boundaryRules = [
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|ui)|cli|test)(?:/|$)",
+			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -65,10 +103,10 @@ const boundaryRules = [
 			"Import concrete modules directly. Barrel/index files hide ownership and are not a domain boundary.",
 		severity: "error",
 		from: {
-			path: "^src/(?:engine|ui)(?:/|$)",
+			path: "^src/(?:engine|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 		to: {
-			path: "^src/(?:engine|ui)/.+/index\\.ts$",
+			path: "^src/(?:engine|ui|page)/.+/index\\.ts$",
 		},
 	},
 ];
@@ -115,7 +153,7 @@ module.exports = {
 				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^src/(?:engine|ui)(?:/|$)",
+				path: "^src/(?:engine|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],
@@ -138,7 +176,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|ui)|cli)(?:/|$)",
+				path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

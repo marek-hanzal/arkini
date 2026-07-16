@@ -16,9 +16,34 @@ Create the active browser shell and render board/inventory directly from the can
 ## Current engine facts
 
 - `GameSession`, `useRuntimeSelector`, `useGameCommand`, and `useGameEvents` exist;
-- no active browser entrypoint exists;
+- a minimal browser entrypoint, generated TanStack Router tree, `/game` layout shell, and placeholder page exist;
 - UI may intentionally lag canonical runtime for animation;
 - `nukeGameSessionFx` currently provides provisional dispose/delete/create sequencing, but it is not a safe final production reset owner because the complete transition is not shell-owned.
+
+
+## Accepted router and page boundary
+
+The active browser uses TanStack Router file-based routing:
+
+```text
+src/@routes
+→ thin route registrations only
+
+src/page
+→ route-level screen and layout composition
+
+src/ui
+→ reusable UI and application adapters
+
+src/engine
+→ standalone game engine
+```
+
+Dependency direction is `@routes → page → ui → engine`. Route modules point to standalone page components and contain no gameplay, session, or application composition. The `/game` file route is a layout branch whose page composes `GameShell` with an `Outlet`; future `/dev/**` routes remain outside this shell.
+
+The client currently uses hash history so typed route `/game` is hosted at `/#/game` without requiring a server rewrite.
+
+The initial shell foundation deliberately creates no engine session. Future application-root creation and complete hard-reset replacement are inserted inside `GameShell`, leaving the router and non-game branches alive.
 
 ## Accepted hard-reset direction
 

@@ -2,7 +2,7 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-Engine paths are relative to `src/engine` unless written explicitly. Browser, React, persistence, and application-lifecycle adapters live under `src/ui`. `src/_archive` is outside every active source root and may never be imported.
+Engine paths are relative to `src/engine` unless written explicitly. Reusable browser, React, persistence, and application-lifecycle adapters live under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Dependency direction is `@routes → page → ui → engine`. `src/_archive` is outside every active source root and may never be imported.
 
 ## 1. Core model
 

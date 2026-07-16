@@ -1,23 +1,19 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const collectTypeScriptFiles = (directory: string): string[] => {
-	return readdirSync(directory, {
-		withFileTypes: true,
-	}).flatMap((entry) => {
-		const path = join(directory, entry.name);
-
-		if (entry.isDirectory()) {
-			return collectTypeScriptFiles(path);
-		}
-
-		return entry.isFile() && /\.(ts|tsx)$/.test(path)
+const collectTypeScriptFiles = (path: string): string[] => {
+	if (!statSync(path).isDirectory()) {
+		return /\.(ts|tsx)$/.test(path)
 			? [
 					path,
 				]
 			: [];
-	});
+	}
+
+	return readdirSync(path, {
+		withFileTypes: true,
+	}).flatMap((entry) => collectTypeScriptFiles(join(path, entry.name)));
 };
 
 describe("source isolation", () => {
@@ -25,6 +21,10 @@ describe("source isolation", () => {
 		const invalidFiles = [
 			"src/engine",
 			"src/ui",
+			"src/page",
+			"src/@routes",
+			"src/main.tsx",
+			"src/router.tsx",
 		]
 			.flatMap(collectTypeScriptFiles)
 			.filter((path) => {

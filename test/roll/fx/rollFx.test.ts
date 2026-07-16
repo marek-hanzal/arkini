@@ -1,8 +1,8 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { DropSchema } from "~/v1/output/schema/DropSchema";
-import { rollFx } from "~/v1/roll/fx/rollFx";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import { rollFx } from "~/engine/roll/fx/rollFx";
 
 const logDrop: DropSchema.Type = {
 	itemId: "item:log",

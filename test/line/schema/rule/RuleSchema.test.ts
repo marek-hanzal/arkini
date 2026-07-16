@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RuleSchema } from "~/v1/line/schema/rule/RuleSchema";
+import { RuleSchema } from "~/engine/line/schema/rule/RuleSchema";
 
 const when = [
 	{

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { planInputMaterialStoreFx } from "~/v1/input/fx/planInputMaterialStoreFx";
-import { InputMaterialSchema } from "~/v1/input/schema/InputMaterialSchema";
+import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
+import { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
 import { runtimeInputTestItem } from "~test/input/fx/support/inputTestItems";
 
 const input = InputMaterialSchema.parse({

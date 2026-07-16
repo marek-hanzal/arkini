@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 describe("GameConfigSchema", () => {

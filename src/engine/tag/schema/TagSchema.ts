@@ -1,0 +1,20 @@
+import { z } from "zod";
+
+import { NonEmptyStringSchema } from "~/engine/common/schema/NonEmptyStringSchema";
+
+/**
+ * A semantic label used to classify game items.
+ *
+ * Tags are deliberately open-ended. They support content grouping and later
+ * rule selectors without coupling the schema to a centrally maintained enum.
+ */
+export const TagSchema = NonEmptyStringSchema.meta({
+	id: "TagSchema",
+	description: "A non-empty semantic label used to classify a game item.",
+});
+
+export type TagSchema = typeof TagSchema;
+
+export namespace TagSchema {
+	export type Type = z.infer<TagSchema>;
+}

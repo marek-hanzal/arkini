@@ -1,18 +1,18 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { mergeItemsFx } from "~/v1/merge/write/mergeItemsFx";
-import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
-import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
-import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
-import { advanceRuntimeStepFx } from "~/v1/tick/internal/advanceRuntimeStepFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
+import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/createTemporaryLifetimeTestConfig";
 
 const config = createTemporaryLifetimeTestConfig();

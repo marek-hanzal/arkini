@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DropResultSchema } from "~/v1/output/schema/DropResultSchema";
+import { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 
 describe("DropResultSchema", () => {
 	it("accepts only a concrete resolved quantity and placement", () => {

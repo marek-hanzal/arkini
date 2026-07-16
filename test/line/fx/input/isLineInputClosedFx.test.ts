@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { isLineInputClosedFx } from "~/v1/line/fx/input/isLineInputClosedFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const activeRuntime = {
 	session: {

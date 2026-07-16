@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { orderBoardLocationsFx } from "~/v1/placement/fx/orderBoardLocationsFx";
+import { orderBoardLocationsFx } from "~/engine/placement/fx/orderBoardLocationsFx";
 
 const location = (x: number, y = 0) => {
 	return {

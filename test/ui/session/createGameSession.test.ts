@@ -1,11 +1,11 @@
 import { Deferred, Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { createGameSession } from "~/ui/session/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 

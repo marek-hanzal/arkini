@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { InputSchema } from "~/v1/input/schema/InputSchema";
+import { InputSchema } from "~/engine/input/schema/InputSchema";
 
 describe("InputSchema", () => {
 	it("parses a simple input without a consumption operation", () => {

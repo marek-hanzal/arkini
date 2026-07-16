@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { validateStartStateFx } from "~/v1/validation/rule/validateStartStateFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { validateStartStateFx } from "~/engine/validation/rule/validateStartStateFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 
 const provenance = {

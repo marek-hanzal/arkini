@@ -8,7 +8,7 @@ Provide development diagnostics and human-readable explanations through public e
 
 ## Historical oracle
 
-- `src/v0/debug/`;
+- `src/_archive/debug/`;
 - historical explanation tests;
 - action/test scenario ergonomics.
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { LocationSchema } from "~/v1/location/schema/LocationSchema";
+import { LocationSchema } from "~/engine/location/schema/LocationSchema";
 
 describe("LocationSchema", () => {
 	it("accepts concrete grid, line-input, consumed-job, and reserved locations", () => {

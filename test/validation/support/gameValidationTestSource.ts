@@ -1,10 +1,10 @@
-import { GameSourceFileSchema } from "~/v1/source/schema/GameSourceFileSchema";
-import { ProducerItemSchema } from "~/v1/item/schema/ProducerItemSchema";
-import { SimpleItemSchema } from "~/v1/item/schema/SimpleItemSchema";
-import { LineSchema } from "~/v1/line/schema/LineSchema";
-import { OutputSchema } from "~/v1/output/schema/OutputSchema";
-import type { InputSchema } from "~/v1/input/schema/InputSchema";
-import type { StartSchema } from "~/v1/start/schema/StartSchema";
+import { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
+import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
+import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import { LineSchema } from "~/engine/line/schema/LineSchema";
+import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { InputSchema } from "~/engine/input/schema/InputSchema";
+import type { StartSchema } from "~/engine/start/schema/StartSchema";
 
 export const createSimpleItem = (id: string, tags: string[] = []) =>
 	SimpleItemSchema.parse({

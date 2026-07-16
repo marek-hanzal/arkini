@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { readLineRunFx } from "~/v1/line/fx/run/readLineRunFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 
 const ownerItemId = "runtime:workshop";

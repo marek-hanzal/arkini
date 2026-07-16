@@ -4,8 +4,8 @@ import { NodeContext } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { decodeFx } from "~/v1/pack/fx/decodeFx";
-import { packDirectoryFx } from "~/v1/pack/fx/packDirectoryFx";
+import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 
 const png = new Uint8Array([
 	0x89,

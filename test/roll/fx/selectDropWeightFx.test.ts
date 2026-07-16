@@ -1,8 +1,8 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { DropWeightSchema } from "~/v1/roll/schema/DropWeightSchema";
-import { selectDropWeightFx } from "~/v1/roll/fx/selectDropWeightFx";
+import type { DropWeightSchema } from "~/engine/roll/schema/DropWeightSchema";
+import { selectDropWeightFx } from "~/engine/roll/fx/selectDropWeightFx";
 
 const createDrop = (itemId: string, weight: number): DropWeightSchema.Type => {
 	return {

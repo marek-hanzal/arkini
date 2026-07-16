@@ -1,14 +1,14 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { StateSchema } from "~/v1/state/schema/StateSchema";
-import { getItemAtFx } from "~/v1/runtime/read/getItemAtFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
-import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { StateSchema } from "~/engine/state/schema/StateSchema";
+import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

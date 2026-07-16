@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { TemporaryItemSchema } from "~/v1/item/schema/TemporaryItemSchema";
+import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
 
 const item = {
 	id: "item:effect:minor-haste",

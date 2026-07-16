@@ -1,19 +1,19 @@
 import { Effect, Either, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { attemptJobCompletionFx } from "~/v1/job/fx/attemptJobCompletionFx";
-import { completeJobRuntimeFx } from "~/v1/job/fx/completeJobRuntimeFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import type { JobSchema } from "~/v1/job/schema/JobSchema";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
-import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
-import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { attemptJobCompletionFx } from "~/engine/job/fx/attemptJobCompletionFx";
+import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import type { JobSchema } from "~/engine/job/schema/JobSchema";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const craftCompletionConfig = GameConfigSchema.parse({
 	version: "1.0",

@@ -1,8 +1,8 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { DropSchema } from "~/v1/output/schema/DropSchema";
-import { rollSetFx } from "~/v1/roll/fx/rollSetFx";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import { rollSetFx } from "~/engine/roll/fx/rollSetFx";
 
 const createDrop = (itemId: string): DropSchema.Type => {
 	return {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { LineStartResolutionSchema } from "~/v1/job/schema/read/LineStartResolutionSchema";
+import { LineStartResolutionSchema } from "~/engine/job/schema/read/LineStartResolutionSchema";
 
 const run = {
 	ownerItemId: "runtime:forge",

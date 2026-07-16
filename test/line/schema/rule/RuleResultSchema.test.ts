@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RuleResultSchema } from "~/v1/line/schema/rule/RuleResultSchema";
+import { RuleResultSchema } from "~/engine/line/schema/rule/RuleResultSchema";
 
 describe("line RuleResultSchema", () => {
 	it("discriminates boolean and runtime multiplier results", () => {

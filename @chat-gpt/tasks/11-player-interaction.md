@@ -8,8 +8,8 @@ Define the engine-facing interaction flow for tap, long press, drag, drop, swap,
 
 ## Historical oracle
 
-- `src/v0/tile-engine/`;
-- `src/v0/play/drop/` and `src/v0/play/interaction/`;
+- `src/_archive/tile-engine/`;
+- `src/_archive/play/drop/` and `src/_archive/play/interaction/`;
 - board/inventory drop and activation code;
 - action schemas as a vocabulary catalogue.
 

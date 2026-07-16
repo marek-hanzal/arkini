@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RollResultSchema } from "~/v1/roll/schema/RollResultSchema";
+import { RollResultSchema } from "~/engine/roll/schema/RollResultSchema";
 
 describe("RollResultSchema", () => {
 	it("intentionally accepts an empty result when a valid roll selects no drops", () => {

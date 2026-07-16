@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { SelectorSchema } from "~/v1/selector/schema/SelectorSchema";
+import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
 describe("SelectorSchema", () => {
 	it("selects items either directly or by their semantic tag", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { BaseItemSchema } from "~/v1/item/schema/BaseItemSchema";
-import { SimpleItemSchema } from "~/v1/item/schema/SimpleItemSchema";
+import { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
+import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
 
 describe("BaseItemSchema", () => {
 	it("requires presentation, storage scope, and permits an optional positive total limit", () => {

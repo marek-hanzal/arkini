@@ -1,5 +1,5 @@
-import { SimpleItemSchema } from "~/v1/item/schema/SimpleItemSchema";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
+import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
 	return SimpleItemSchema.parse({

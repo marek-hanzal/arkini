@@ -8,9 +8,9 @@ Create the active browser shell and render board/inventory directly from the can
 
 ## Historical oracle
 
-- `src/v0/app/` and `src/v0/ui/`;
-- `src/v0/board/` and `src/v0/inventory/`;
-- generic geometry/pointer ideas from `src/v0/tile-engine/`;
+- `src/_archive/app/` and `src/_archive/ui/`;
+- `src/_archive/board/` and `src/_archive/inventory/`;
+- generic geometry/pointer ideas from `src/_archive/tile-engine/`;
 - browser reset/storage behavior where still relevant.
 
 ## Current engine facts

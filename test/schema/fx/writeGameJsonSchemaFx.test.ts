@@ -3,7 +3,7 @@ import { NodeContext } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { writeGameJsonSchemaFx } from "~/v1/schema/fx/writeGameJsonSchemaFx";
+import { writeGameJsonSchemaFx } from "~/engine/schema/fx/writeGameJsonSchemaFx";
 
 describe("writeGameJsonSchemaFx", () => {
 	it("writes the JSON Schema for split game-source fragments", async () => {

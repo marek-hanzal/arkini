@@ -1,13 +1,13 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import type { DropSchema } from "~/v1/output/schema/DropSchema";
-import type { RollSchema } from "~/v1/roll/schema/RollSchema";
-import type { RollSetSchema } from "~/v1/roll/schema/RollSetSchema";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { outputFx } from "~/v1/output/fx/outputFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import type { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { outputFx } from "~/engine/output/fx/outputFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

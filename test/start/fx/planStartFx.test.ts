@@ -1,9 +1,9 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
-import { planStartFx } from "~/v1/start/fx/planStartFx";
+import { planStartFx } from "~/engine/start/fx/planStartFx";
 
 describe("planStartFx", () => {
 	it("combines board and inventory plans against one evolving draft", () => {

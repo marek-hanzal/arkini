@@ -1,9 +1,9 @@
 import { Cause, Deferred, Effect, Exit, Fiber, Option, Scope, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameCoreLayerFx } from "~/v1/game/layer/GameCoreLayerFx";
-import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
-import { RuntimeStoreFx } from "~/v1/runtime/internal/RuntimeStoreFx";
+import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
+import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const RuntimeStoreTestLayer = GameCoreLayerFx({

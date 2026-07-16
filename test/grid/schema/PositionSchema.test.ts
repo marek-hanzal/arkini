@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PositionSchema } from "~/v1/grid/schema/PositionSchema";
+import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
 describe("PositionSchema", () => {
 	it("accepts only zero-based non-negative integer coordinates", () => {

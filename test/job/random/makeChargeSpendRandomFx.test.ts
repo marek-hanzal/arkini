@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { makeChargeSpendRandomFx } from "~/v1/job/random/makeChargeSpendRandomFx";
+import { makeChargeSpendRandomFx } from "~/engine/job/random/makeChargeSpendRandomFx";
 
 const sampleFx = () =>
 	Effect.gen(function* () {

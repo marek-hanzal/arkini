@@ -1,11 +1,11 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { StateSchema } from "~/v1/state/schema/StateSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
 	id,

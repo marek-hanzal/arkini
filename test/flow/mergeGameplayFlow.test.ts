@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { mergeItemsFx } from "~/v1/merge/write/mergeItemsFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>

@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { clearItemJobQueueFx } from "~/v1/job/write/clearItemJobQueueFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import type { StateSchema } from "~/v1/state/schema/StateSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { clearItemJobQueueFx } from "~/engine/job/write/clearItemJobQueueFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const config = createJobTestConfig(3);

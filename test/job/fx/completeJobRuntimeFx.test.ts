@@ -1,12 +1,12 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { attemptJobCompletionFx } from "~/v1/job/fx/attemptJobCompletionFx";
-import { completeJobRuntimeFx } from "~/v1/job/fx/completeJobRuntimeFx";
-import { makeJobCompletionRandomFx } from "~/v1/job/random/makeJobCompletionRandomFx";
-import type { JobSchema } from "~/v1/job/schema/JobSchema";
-import { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { attemptJobCompletionFx } from "~/engine/job/fx/attemptJobCompletionFx";
+import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
+import { makeJobCompletionRandomFx } from "~/engine/job/random/makeJobCompletionRandomFx";
+import type { JobSchema } from "~/engine/job/schema/JobSchema";
+import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import {
 	createRandomCompletionConfig,
 	prepareRandomCompletionRuntimeFx,

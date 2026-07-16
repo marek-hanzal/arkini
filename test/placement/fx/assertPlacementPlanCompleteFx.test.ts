@@ -1,8 +1,8 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { assertPlacementPlanCompleteFx } from "~/v1/placement/fx/assertPlacementPlanCompleteFx";
-import type { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
+import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
+import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
 
 const drop = {
 	itemId: "item:test",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CheatSpeedItemSchema } from "~/v1/item/schema/CheatSpeedItemSchema";
+import { CheatSpeedItemSchema } from "~/engine/item/schema/CheatSpeedItemSchema";
 
 const item = {
 	id: "item:cheat-speed",

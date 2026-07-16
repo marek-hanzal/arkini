@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
-import { whenFx } from "~/v1/when/fx/whenFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { whenFx } from "~/engine/when/fx/whenFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { decodeFx } from "~/v1/pack/fx/decodeFx";
-import { encodeFx } from "~/v1/pack/fx/encodeFx";
+import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { encodeFx } from "~/engine/pack/fx/encodeFx";
 
 describe("encodeFx", () => {
 	it("round-trips MessagePack config and raw resource bytes", async () => {

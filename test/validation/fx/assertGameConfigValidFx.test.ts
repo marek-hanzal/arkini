@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
-import { DepositItemSchema } from "~/v1/item/schema/DepositItemSchema";
-import { assertGameConfigValidFx } from "~/v1/validation/fx/assertGameConfigValidFx";
+import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
+import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
+import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import {
 	createRootSource,
 	createSimpleItem,

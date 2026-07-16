@@ -1,18 +1,18 @@
 import { Effect, Fiber, Option, Stream, TestClock, TestContext } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
-import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { readSpeedModeFx } from "~/v1/session/read/readSpeedModeFx";
-import { toggleSpeedModeFx } from "~/v1/session/write/toggleSpeedModeFx";
-import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
-import { TickFx } from "~/v1/tick/context/TickFx";
-import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
-import { runTickRuntimeFx } from "~/v1/tick/fx/runTickRuntimeFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
+import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { readSpeedModeFx } from "~/engine/session/read/readSpeedModeFx";
+import { toggleSpeedModeFx } from "~/engine/session/write/toggleSpeedModeFx";
+import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { TickFx } from "~/engine/tick/context/TickFx";
+import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { runTickRuntimeFx } from "~/engine/tick/fx/runTickRuntimeFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/createTemporaryLifetimeTestConfig";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 

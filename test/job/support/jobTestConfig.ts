@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 	id,

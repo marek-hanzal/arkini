@@ -1,17 +1,17 @@
 import { Effect, Either, Fiber, Option, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
-import { fromStateFx } from "~/v1/runtime/fx/fromStateFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { readCurrentSpaceBoardItemsFx } from "~/v1/space/read/readCurrentSpaceBoardItemsFx";
-import { setCurrentSpaceFx } from "~/v1/space/write/setCurrentSpaceFx";
-import { fromRuntimeFx } from "~/v1/state/fx/fromRuntimeFx";
-import { StateSchema } from "~/v1/state/schema/StateSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
+import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { readCurrentSpaceBoardItemsFx } from "~/engine/space/read/readCurrentSpaceBoardItemsFx";
+import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
+import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
+import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { boardLocation, multiSpaceTestConfig } from "~test/space/support/multiSpaceTestConfig";
 
 const startInSpaceTwoConfig = GameConfigSchema.parse({

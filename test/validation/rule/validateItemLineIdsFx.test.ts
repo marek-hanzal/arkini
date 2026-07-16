@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
+import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import {
 	createLine,
 	createProducerItem,

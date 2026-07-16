@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { InventoryItemSchema } from "~/v1/item/schema/InventoryItemSchema";
+import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
 
 const item = {
 	id: "item:inventory",

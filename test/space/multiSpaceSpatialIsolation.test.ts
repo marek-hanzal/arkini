@@ -1,19 +1,19 @@
 import { Effect, Either, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { readLineRunFx } from "~/v1/line/fx/run/readLineRunFx";
-import { mergeItemsFx } from "~/v1/merge/write/mergeItemsFx";
-import { placeDropFx } from "~/v1/placement/write/placeDropFx";
-import { queryFx } from "~/v1/query/fx/queryFx";
-import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
-import { getItemAtFx } from "~/v1/runtime/read/getItemAtFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { moveItemFx } from "~/v1/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { swapItemsFx } from "~/v1/runtime/write/swapItemsFx";
-import { setCurrentSpaceFx } from "~/v1/space/write/setCurrentSpaceFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
+import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import { placeDropFx } from "~/engine/placement/write/placeDropFx";
+import { queryFx } from "~/engine/query/fx/queryFx";
+import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
+import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
+import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
 import {
 	boardLocation,
 	inventoryLocation,

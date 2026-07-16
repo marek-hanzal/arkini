@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { LineSchema } from "~/v1/line/schema/LineSchema";
+import { LineSchema } from "~/engine/line/schema/LineSchema";
 
 describe("LineSchema", () => {
 	it("requires stable identity and player-facing metadata", () => {

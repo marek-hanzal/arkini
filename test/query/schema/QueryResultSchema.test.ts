@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { QueryResultSchema } from "~/v1/query/schema/QueryResultSchema";
+import { QueryResultSchema } from "~/engine/query/schema/QueryResultSchema";
 
 describe("QueryResultSchema", () => {
 	it("intentionally accepts an empty result when no runtime item matches", () => {

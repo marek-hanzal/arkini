@@ -1,7 +1,7 @@
 import { Cause, Effect, Exit } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { decodeFx } from "~/v1/pack/fx/decodeFx";
+import { decodeFx } from "~/engine/pack/fx/decodeFx";
 
 describe("decodeFx", () => {
 	it("treats malformed pack data as a defect", () => {

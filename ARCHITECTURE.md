@@ -2,7 +2,7 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-All source paths are relative to the active source root.
+Engine paths are relative to `src/engine` unless written explicitly. Browser, React, persistence, and application-lifecycle adapters live under `src/ui`. `src/_archive` is outside every active source root and may never be imported.
 
 ## 1. Core model
 

@@ -1,13 +1,13 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { moveItemFx } from "~/v1/runtime/write/moveItemFx";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createJobTestConfig, prepareJobLineFx } from "../../job/support/jobTestConfig";
 
 const startProps = {

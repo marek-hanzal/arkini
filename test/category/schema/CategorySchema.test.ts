@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CategorySchema } from "~/v1/category/schema/CategorySchema";
+import { CategorySchema } from "~/engine/category/schema/CategorySchema";
 
 describe("CategorySchema", () => {
 	it("requires a stable ID and display title", () => {

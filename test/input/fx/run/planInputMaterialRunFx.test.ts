@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { planInputMaterialRunFx } from "~/v1/input/fx/run/planInputMaterialRunFx";
-import type { InputMaterialResolutionSchema } from "~/v1/input/schema/resolution/InputMaterialResolutionSchema";
-import type { InputRuntimeItemSchema } from "~/v1/runtime/schema/InputRuntimeItemSchema";
+import { planInputMaterialRunFx } from "~/engine/input/fx/run/planInputMaterialRunFx";
+import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
+import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import { inputTestItems } from "~test/input/fx/support/inputTestItems";
 
 const bufferedItem = ({ id, quantity }: { id: string; quantity: number }) => {

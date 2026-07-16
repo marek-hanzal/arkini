@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { createGameSession } from "~/ui/session/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

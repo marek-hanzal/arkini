@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { planLineRunFx } from "~/v1/line/fx/run/planLineRunFx";
-import type { InputRunResolutionSchema } from "~/v1/input/schema/run/InputRunResolutionSchema";
+import { planLineRunFx } from "~/engine/line/fx/run/planLineRunFx";
+import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 
 const simpleInput = {
 	resolution: {

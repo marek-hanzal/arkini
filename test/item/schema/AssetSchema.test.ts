@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { AssetSchema } from "~/v1/item/schema/AssetSchema";
+import { AssetSchema } from "~/engine/item/schema/AssetSchema";
 
 describe("AssetSchema", () => {
 	it("requires one or more ordered source assets", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CraftItemSchema } from "~/v1/item/schema/CraftItemSchema";
+import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
 
 const craft = {
 	id: "item:craft",

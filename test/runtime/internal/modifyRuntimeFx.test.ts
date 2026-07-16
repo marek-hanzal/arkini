@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 
 describe("modifyRuntimeFx", () => {

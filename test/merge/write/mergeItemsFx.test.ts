@@ -1,13 +1,13 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import type { ActionEnumSchema } from "~/v1/merge/schema/ActionEnumSchema";
-import type { EffectEnumSchema } from "~/v1/merge/schema/EffectEnumSchema";
-import type { MergeSchema } from "~/v1/merge/schema/MergeSchema";
-import { mergeItemsFx } from "~/v1/merge/write/mergeItemsFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import type { StateSchema } from "~/v1/state/schema/StateSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
+import type { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 
 const makeState = ({

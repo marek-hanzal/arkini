@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RuleRuntimeMultiplierSchema } from "~/v1/line/schema/rule/RuleRuntimeMultiplierSchema";
+import { RuleRuntimeMultiplierSchema } from "~/engine/line/schema/rule/RuleRuntimeMultiplierSchema";
 
 describe("RuleRuntimeMultiplierSchema", () => {
 	it("requires a positive runtime multiplier", () => {

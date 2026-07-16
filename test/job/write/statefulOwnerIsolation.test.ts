@@ -1,12 +1,12 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { createGameSession } from "~/ui/session/createGameSession";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

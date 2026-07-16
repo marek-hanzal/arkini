@@ -8,12 +8,12 @@ Rebuild item detail, producer/craft/blueprint/stash controls, input state, progr
 
 ## Historical oracle
 
-- `src/v0/item-detail/`;
-- `src/v0/producer/view/`;
-- `src/v0/board/view/`;
-- sheet components under `src/v0/play/sheet/`;
+- `src/_archive/item-detail/`;
+- `src/_archive/producer/view/`;
+- `src/_archive/board/view/`;
+- sheet components under `src/_archive/play/sheet/`;
 - product copy and labels from historical UI.
-- temporary/effect labels retained under `src/v0/effects/readNearbyLineEffectLabel.ts`, `src/v0/effects/readRuntimeLineEffectLabel.ts`, and `src/v0/effects/readEffectiveLineBonusEntries.ts`; do not reconstruct the removed active-effect save/timestamp lifecycle.
+- temporary/effect labels retained under `src/_archive/effects/readNearbyLineEffectLabel.ts`, `src/_archive/effects/readRuntimeLineEffectLabel.ts`, and `src/_archive/effects/readEffectiveLineBonusEntries.ts`; do not reconstruct the removed active-effect save/timestamp lifecycle.
 
 ## Do not port
 

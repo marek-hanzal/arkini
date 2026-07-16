@@ -1,11 +1,11 @@
 import { Effect, Fiber, Option, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameLayerFx } from "~/v1/game/layer/GameLayerFx";
-import { CommittedTransitionsFx } from "~/v1/runtime/context/CommittedTransitionsFx";
-import { modifyRuntimeFx } from "~/v1/runtime/internal/modifyRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
+import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
+import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
+import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { createGameSession } from "~/ui/session/createGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

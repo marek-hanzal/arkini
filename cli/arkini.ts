@@ -2,7 +2,7 @@ import { Command } from "@effect/cli";
 import { NodeContext, NodeRuntime } from "@effect/platform-node";
 import { Effect } from "effect";
 
-import { ArkiniCommand } from "~/v1/cli/ArkiniCommand";
+import { ArkiniCommand } from "~/engine/cli/ArkiniCommand";
 
 Command.run(ArkiniCommand, {
 	name: "Arkini",

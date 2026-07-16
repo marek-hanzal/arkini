@@ -38,7 +38,7 @@ Do not read every queued task before starting. The queue is an ordered backlog, 
 | 15 | [`Audio`](15-audio.md) | Queued | 14 |
 | 16 | [`Debug and explain tooling`](16-debug-explain.md) | Queued | 10–15 |
 | 17 | [`Behavioral parity and historical pruning`](17-parity-pruning.md) | Queued | 01–16 |
-| 18 | [`Promote the active source tree`](18-promote-source-root.md) | Queued | 17 |
+| 18 | [`Final historical source removal`](18-final-historical-source-removal.md) | Queued | 17 |
 
 ## Status transitions
 
@@ -62,7 +62,7 @@ When closing a task:
 1. satisfy its acceptance criteria and required tests;
 2. update [`COVERAGE.md`](COVERAGE.md);
 3. delete historical source that has no remaining oracle value;
-4. update or remove local `src/v0/**/README.md` markers;
+4. update or remove local `src/_archive/**/README.md` markers;
 5. move the completed task file to `@chat-gpt/archive/tasks/`;
 6. promote the next task to **Ready** and update `CURRENT.md`.
 

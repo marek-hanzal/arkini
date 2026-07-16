@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import type { RuleSchema } from "~/v1/output/schema/drop/rule/RuleSchema";
-import { dropRulesFx } from "~/v1/output/fx/dropRulesFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { RuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
+import { dropRulesFx } from "~/engine/output/fx/dropRulesFx";
 import {
 	createDropRuleOriginFx,
 	dropRuleTestConfig,

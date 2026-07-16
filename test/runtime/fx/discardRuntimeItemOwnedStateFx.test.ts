@@ -1,8 +1,8 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { discardRuntimeItemOwnedStateFx } from "~/v1/runtime/fx/discardRuntimeItemOwnedStateFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const config = createJobTestConfig();

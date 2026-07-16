@@ -14,7 +14,7 @@ No active browser entrypoint or deployment workflow is committed in this snapsho
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
-The historical implementation under `src/v0` is reference-only. It is not a source of current architecture, naming, runtime, configuration, time, save, or UI decisions.
+The historical implementation under `src/_archive` is reference-only and outside every active TypeScript, test, formatter, bundler, and Dependency Cruiser root. It is not importable from active code and is not a source of current architecture, naming, runtime, configuration, time, save, or UI decisions.
 
 ## Read this first
 
@@ -32,9 +32,19 @@ When documentation and implementation disagree, stop and resolve the contradicti
 
 ## Path convention
 
-Documentation writes engine source paths relative to the active source root. For example, `runtime/`, `tick/`, and `placement/` mean the corresponding directories in the active domain-oriented source tree.
+The repository has two active source roots:
 
-This keeps documentation independent from the temporary parent directory used while the active tree is moved into the repository root.
+```text
+src/engine
+→ standalone canonical engine, compiler, validation, CLI support, runtime, and public domain operations
+
+src/ui
+→ React, browser, persistence, subscription, and application-lifecycle adapters
+```
+
+Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under `src/engine`. UI-owned paths are written explicitly under `src/ui`.
+
+`src/_archive` is historical reference only. It is intentionally excluded from active tooling and may never be imported by `src/engine`, `src/ui`, `cli`, or `test`.
 
 ## Architecture in one screen
 

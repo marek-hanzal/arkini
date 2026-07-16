@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
-import { GameSourceFileSchema } from "~/v1/source/schema/GameSourceFileSchema";
+import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
+import { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import {
 	createRootSource,
 	createSimpleItem,

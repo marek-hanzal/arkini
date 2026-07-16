@@ -1,6 +1,6 @@
-import type { DropSchema } from "~/v1/output/schema/DropSchema";
-import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const simpleItem = ({
 	id,

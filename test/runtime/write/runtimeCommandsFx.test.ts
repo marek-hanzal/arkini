@@ -1,16 +1,16 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { getItemAtFx } from "~/v1/runtime/read/getItemAtFx";
-import { getItemFx } from "~/v1/runtime/read/getItemFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { moveItemFx } from "~/v1/runtime/write/moveItemFx";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import { setItemQuantityFx } from "~/v1/runtime/write/setItemQuantityFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { swapItemsFx } from "~/v1/runtime/write/swapItemsFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
+import { getItemFx } from "~/engine/runtime/read/getItemFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

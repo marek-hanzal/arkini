@@ -1,15 +1,15 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { readInputMaterialItemsFx } from "~/v1/input/read/readInputMaterialItemsFx";
-import { resolveInputMaterialSlotFx } from "~/v1/input/read/resolveInputMaterialSlotFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { queryFx } from "~/v1/query/fx/queryFx";
-import { getItemFx } from "~/v1/runtime/read/getItemFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { moveItemFx } from "~/v1/runtime/write/moveItemFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { readInputMaterialItemsFx } from "~/engine/input/read/readInputMaterialItemsFx";
+import { resolveInputMaterialSlotFx } from "~/engine/input/read/resolveInputMaterialSlotFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { queryFx } from "~/engine/query/fx/queryFx";
+import { getItemFx } from "~/engine/runtime/read/getItemFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { DropPlacementResultSchema } from "~/v1/placement/schema/DropPlacementResultSchema";
-import { OutputPlacementResultSchema } from "~/v1/placement/schema/OutputPlacementResultSchema";
-import { PlacementFailureReasonEnumSchema } from "~/v1/placement/schema/PlacementFailureReasonEnumSchema";
-import { PlacementPlanSchema } from "~/v1/placement/schema/PlacementPlanSchema";
+import { DropPlacementResultSchema } from "~/engine/placement/schema/DropPlacementResultSchema";
+import { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+import { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
 
 const runtimeItem = {
 	id: "runtime:log",

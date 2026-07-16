@@ -1,16 +1,16 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import type { LocationSchema } from "~/v1/location/schema/LocationSchema";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { GridLocationSchema } from "~/v1/location/schema/GridLocationSchema";
-import { queryFx } from "~/v1/query/fx/queryFx";
-import type { QuerySchema } from "~/v1/query/schema/QuerySchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { queryFx } from "~/engine/query/fx/queryFx";
+import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

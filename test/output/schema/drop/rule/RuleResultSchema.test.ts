@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RuleResultSchema } from "~/v1/output/schema/drop/rule/RuleResultSchema";
+import { RuleResultSchema } from "~/engine/output/schema/drop/rule/RuleResultSchema";
 
 describe("drop RuleResultSchema", () => {
 	it("discriminates enable and disable evaluation results", () => {

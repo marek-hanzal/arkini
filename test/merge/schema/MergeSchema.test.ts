@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MergeSchema } from "~/v1/merge/schema/MergeSchema";
+import { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 
 describe("MergeSchema", () => {
 	it("separates source actions from target effects", () => {

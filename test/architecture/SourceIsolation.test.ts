@@ -12,7 +12,7 @@ const collectTypeScriptFiles = (directory: string): string[] => {
 			return collectTypeScriptFiles(path);
 		}
 
-		return entry.isFile() && path.endsWith(".ts")
+		return entry.isFile() && /\.(ts|tsx)$/.test(path)
 			? [
 					path,
 				]
@@ -21,17 +21,21 @@ const collectTypeScriptFiles = (directory: string): string[] => {
 };
 
 describe("source isolation", () => {
-	it("keeps tests and test-only imports outside src/v1", () => {
-		const invalidFiles = collectTypeScriptFiles("src/v1").filter((path) => {
-			const source = readFileSync(path, "utf8");
+	it("keeps tests and test-only imports outside active source roots", () => {
+		const invalidFiles = [
+			"src/engine",
+			"src/ui",
+		]
+			.flatMap(collectTypeScriptFiles)
+			.filter((path) => {
+				const source = readFileSync(path, "utf8");
 
-			return (
-				path.endsWith(".test.ts") ||
-				path.endsWith(".spec.ts") ||
-				source.includes('from "~test/') ||
-				source.includes('from "vitest"')
-			);
-		});
+				return (
+					/\.(test|spec)\.(ts|tsx)$/.test(path) ||
+					source.includes('from "~test/') ||
+					source.includes('from "vitest"')
+				);
+			});
 
 		expect(invalidFiles).toEqual([]);
 	});

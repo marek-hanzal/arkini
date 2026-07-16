@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveBoardPlacementOriginFx } from "~/v1/placement/fx/resolveBoardPlacementOriginFx";
+import { resolveBoardPlacementOriginFx } from "~/engine/placement/fx/resolveBoardPlacementOriginFx";
 
 describe("resolveBoardPlacementOriginFx", () => {
 	it("keeps the configured origin without consuming randomness for drop placement", () => {

@@ -14,12 +14,12 @@ Core gameplay lifecycles should be known first so read contracts describe actual
 
 Treat these as an information-requirement catalogue, not architecture:
 
-- `src/v0/play/game-engine-bridge/`;
-- `src/v0/board/view/`;
-- `src/v0/producer/view/`;
-- `src/v0/item-detail/`;
+- `src/_archive/play/game-engine-bridge/`;
+- `src/_archive/board/view/`;
+- `src/_archive/producer/view/`;
+- `src/_archive/item-detail/`;
 - relevant debug explanations.
-- temporary/effect copy and benefit labels in `src/v0/effects/readNearbyLineEffectLabel.ts`, `src/v0/effects/readRuntimeLineEffectLabel.ts`, and `src/v0/effects/readEffectiveLineBonusEntries.ts`; the old persistent active-effect timing model is removed and is not an oracle.
+- temporary/effect copy and benefit labels in `src/_archive/effects/readNearbyLineEffectLabel.ts`, `src/_archive/effects/readRuntimeLineEffectLabel.ts`, and `src/_archive/effects/readEffectiveLineBonusEntries.ts`; the old persistent active-effect timing model is removed and is not an oracle.
 
 ## Candidate read surfaces
 

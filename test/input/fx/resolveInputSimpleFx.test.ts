@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveInputSimpleFx } from "~/v1/input/fx/resolveInputSimpleFx";
+import { resolveInputSimpleFx } from "~/engine/input/fx/resolveInputSimpleFx";
 
 describe("resolveInputSimpleFx", () => {
 	it("resolves one resource-free input as ready", () => {

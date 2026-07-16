@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { isItemPureFx } from "~/v1/item/fx/purity/isItemPureFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const location = {

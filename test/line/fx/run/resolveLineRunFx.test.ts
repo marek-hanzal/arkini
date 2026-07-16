@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveLineRunFx } from "~/v1/line/fx/run/resolveLineRunFx";
-import { RuntimeFx } from "~/v1/runtime/context/RuntimeFx";
+import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
 
 const resolveFx = (runtime: ReturnType<typeof lineRunRuntime>) => {

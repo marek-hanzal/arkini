@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
-import { planStartBoardItemFx } from "~/v1/start/fx/planStartBoardItemFx";
+import { planStartBoardItemFx } from "~/engine/start/fx/planStartBoardItemFx";
 
 describe("planStartBoardItemFx", () => {
 	it("plans one exact board spawn without fallback", () => {

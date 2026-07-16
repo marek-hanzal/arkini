@@ -11,7 +11,8 @@
 		}
 	},
 	"include": [
-		"src/v1",
+		"src/engine",
+		"src/ui",
 		"test",
 		"vitest.config.ts"
 	]

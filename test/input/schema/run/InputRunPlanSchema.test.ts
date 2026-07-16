@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { InputRunPlanSchema } from "~/v1/input/schema/run/InputRunPlanSchema";
+import { InputRunPlanSchema } from "~/engine/input/schema/run/InputRunPlanSchema";
 
 describe("InputRunPlanSchema", () => {
 	it("accepts a simple run plan", () => {

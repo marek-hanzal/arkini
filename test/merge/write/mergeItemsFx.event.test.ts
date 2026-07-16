@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
-import { mergeItemsFx } from "~/v1/merge/write/mergeItemsFx";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
+import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
+import { createGameSession } from "~/ui/session/createGameSession";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

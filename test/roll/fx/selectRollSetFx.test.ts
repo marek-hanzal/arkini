@@ -1,8 +1,8 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { RollSetSchema } from "~/v1/roll/schema/RollSetSchema";
-import { selectRollSetFx } from "~/v1/roll/fx/selectRollSetFx";
+import type { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
+import { selectRollSetFx } from "~/engine/roll/fx/selectRollSetFx";
 
 const createSet = (itemId: string, weight?: number): RollSetSchema.Type => {
 	return {

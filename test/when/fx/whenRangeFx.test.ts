@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { whenRangeFx } from "~/v1/when/fx/whenRangeFx";
+import { whenRangeFx } from "~/engine/when/fx/whenRangeFx";
 
 describe("whenRangeFx", () => {
 	it("includes both range boundaries", () => {

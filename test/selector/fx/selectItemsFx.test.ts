@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { ItemSchema } from "~/v1/item/schema/ItemSchema";
-import { selectItemsFx } from "~/v1/selector/fx/selectItemsFx";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 
 const item = {
 	id: "tree",

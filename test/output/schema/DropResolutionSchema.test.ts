@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DropResolutionSchema } from "~/v1/output/schema/DropResolutionSchema";
+import { DropResolutionSchema } from "~/engine/output/schema/DropResolutionSchema";
 
 const result = {
 	itemId: "item:log",

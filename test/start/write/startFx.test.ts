@@ -1,13 +1,13 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
-import { startFx } from "~/v1/start/write/startFx";
+import { startFx } from "~/engine/start/write/startFx";
 
 describe("startFx", () => {
 	it("atomically creates the configured board and inventory runtime", () => {

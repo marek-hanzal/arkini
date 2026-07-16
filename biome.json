@@ -18,7 +18,8 @@
 			"!**/.tanstack",
 			"!**/coverage",
 			"!**/results",
-			"!**/node_modules"
+			"!**/node_modules",
+			"!src/_archive/**"
 		]
 	},
 	"formatter": {

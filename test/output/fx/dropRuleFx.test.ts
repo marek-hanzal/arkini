@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { dropRuleFx } from "~/v1/output/fx/dropRuleFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { dropRuleFx } from "~/engine/output/fx/dropRuleFx";
 import {
 	createDropRuleOriginFx,
 	dropRuleTestConfig,

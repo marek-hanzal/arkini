@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
-import { requestNukeSaveFx } from "~/v1/utility/write/requestNukeSaveFx";
+import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { createGameSession } from "~/ui/session/createGameSession";
+import { requestNukeSaveFx } from "~/engine/utility/write/requestNukeSaveFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DropSchema } from "~/v1/output/schema/DropSchema";
+import { DropSchema } from "~/engine/output/schema/DropSchema";
 
 const drop = (placement?: string) => ({
 	itemId: "item:log",

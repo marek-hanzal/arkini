@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { JobSchema } from "~/v1/job/schema/JobSchema";
-import { JobLocationSchema } from "~/v1/location/schema/JobLocationSchema";
-import { ReservedLocationSchema } from "~/v1/location/schema/ReservedLocationSchema";
+import { JobSchema } from "~/engine/job/schema/JobSchema";
+import { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
+import { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
 
 const job = {
 	id: "job:test",

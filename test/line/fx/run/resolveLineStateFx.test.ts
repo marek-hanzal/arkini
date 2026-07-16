@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveLineEnableFx } from "~/v1/line/fx/run/resolveLineEnableFx";
-import { resolveLineRuntimeFx } from "~/v1/line/fx/run/resolveLineRuntimeFx";
-import { resolveLineShowFx } from "~/v1/line/fx/run/resolveLineShowFx";
-import type { RulesResultSchema } from "~/v1/line/schema/rule/RulesResultSchema";
+import { resolveLineEnableFx } from "~/engine/line/fx/run/resolveLineEnableFx";
+import { resolveLineRuntimeFx } from "~/engine/line/fx/run/resolveLineRuntimeFx";
+import { resolveLineShowFx } from "~/engine/line/fx/run/resolveLineShowFx";
+import type { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 
 const activeRules = [
 	{

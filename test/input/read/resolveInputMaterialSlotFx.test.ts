@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { resolveInputMaterialSlotFx } from "~/v1/input/read/resolveInputMaterialSlotFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { resolveInputMaterialSlotFx } from "~/engine/input/read/resolveInputMaterialSlotFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DepositItemSchema } from "~/v1/item/schema/DepositItemSchema";
+import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
 
 describe("DepositItemSchema", () => {
 	it("accepts the shared positive item charge contract", () => {

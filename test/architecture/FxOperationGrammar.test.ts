@@ -16,14 +16,13 @@ const readTypeScriptFiles = (directory: string): string[] => {
 	});
 };
 
-describe("v1 named operation grammar", () => {
+describe("engine named operation grammar", () => {
 	it("keeps exported domain operations as one same-named Fx per file", () => {
-		const root = resolve("src/v1");
+		const root = resolve("src/engine");
 		const violations: string[] = [];
 
 		for (const file of readTypeScriptFiles(root)) {
 			const projectPath = relative(root, file).replaceAll("\\", "/");
-			if (projectPath.startsWith("ui/")) continue;
 			if (/^runtime\/read\/is[A-Z].*RuntimeItem\.ts$/.test(projectPath)) continue;
 
 			const fileName = basename(file, ".ts");

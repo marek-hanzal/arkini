@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import type { StateSchema } from "~/v1/state/schema/StateSchema";
-import { runTickRuntimeByFx } from "~/v1/tick/fx/runTickRuntimeByFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const output = {
 	set: [

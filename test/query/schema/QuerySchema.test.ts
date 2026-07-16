@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { QuerySchema } from "~/v1/query/schema/QuerySchema";
+import { QuerySchema } from "~/engine/query/schema/QuerySchema";
 
 describe("QuerySchema", () => {
 	it("requires distance only for board queries", () => {

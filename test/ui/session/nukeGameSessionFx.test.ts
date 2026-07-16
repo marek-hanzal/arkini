@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import type { GameSession } from "~/v1/ui/session/GameSession";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
-import { nukeGameSessionFx } from "~/v1/ui/session/nukeGameSessionFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import type { GameSession } from "~/ui/session/GameSession";
+import { createGameSession } from "~/ui/session/createGameSession";
+import { nukeGameSessionFx } from "~/ui/session/nukeGameSessionFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

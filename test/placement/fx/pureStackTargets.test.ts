@@ -1,11 +1,11 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { applyOutputPlacementFx } from "~/v1/placement/fx/applyOutputPlacementFx";
-import { applyPlacementPlanFx } from "~/v1/placement/fx/applyPlacementPlanFx";
-import { readAvailableStackItemsFx } from "~/v1/placement/fx/readAvailableStackItemsFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
+import { applyPlacementPlanFx } from "~/engine/placement/fx/applyPlacementPlanFx";
+import { readAvailableStackItemsFx } from "~/engine/placement/fx/readAvailableStackItemsFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const board = (x: number) => ({

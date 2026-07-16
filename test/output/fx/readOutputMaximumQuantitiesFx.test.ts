@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readOutputMaximumQuantitiesFx } from "~/v1/output/fx/readOutputMaximumQuantitiesFx";
-import type { OutputSchema } from "~/v1/output/schema/OutputSchema";
+import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
+import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 const value = (amount: number) => ({
 	type: "value" as const,

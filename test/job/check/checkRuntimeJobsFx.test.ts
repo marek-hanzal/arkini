@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { checkRuntimeFx } from "~/v1/runtime/check/checkRuntimeFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const config = createJobTestConfig(2);

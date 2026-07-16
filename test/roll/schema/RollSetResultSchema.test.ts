@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RollSetResultSchema } from "~/v1/roll/schema/RollSetResultSchema";
+import { RollSetResultSchema } from "~/engine/roll/schema/RollSetResultSchema";
 
 describe("RollSetResultSchema", () => {
 	it("accepts an intentionally empty aggregation", () => {

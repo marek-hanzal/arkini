@@ -1,15 +1,38 @@
 /** @type {import('dependency-cruiser').IForbiddenRuleType[]} */
 const boundaryRules = [
 	{
-		name: "engine-core-no-ui-imports",
+		name: "engine-no-ui-imports",
 		comment:
-			"The engine remains standalone. UI adapters depend on public engine services, never the other way around.",
+			"The standalone engine never depends on browser, React, save-adapter, or application-shell code.",
 		severity: "error",
 		from: {
-			path: "^src/v1/(?!ui(?:/|$))",
+			path: "^src/engine(?:/|$)",
 		},
 		to: {
-			path: "^src/v1/ui(?:/|$)",
+			path: "^src/ui(?:/|$)",
+		},
+	},
+	{
+		name: "engine-no-react-dependencies",
+		comment:
+			"The engine is framework-neutral. React and React-specific packages belong to the UI boundary.",
+		severity: "error",
+		from: {
+			path: "^src/engine(?:/|$)",
+		},
+		to: {
+			path: "^node_modules/(?:react|react-dom|@tanstack/react-router|@vitejs/plugin-react|@types/react|@types/react-dom)(?:/|$)",
+		},
+	},
+	{
+		name: "cli-no-ui-imports",
+		comment: "CLI tooling may use the engine but never browser or React adapters.",
+		severity: "error",
+		from: {
+			path: "^cli(?:/|$)",
+		},
+		to: {
+			path: "^src/ui(?:/|$)",
 		},
 	},
 	{
@@ -18,10 +41,22 @@ const boundaryRules = [
 			"UI is a thin adapter over public engine services. Internal modules stay behind their owning domain boundaries.",
 		severity: "error",
 		from: {
-			path: "^src/v1/ui(?:/|$)",
+			path: "^src/ui(?:/|$)",
 		},
 		to: {
-			path: "^src/v1/(?!ui(?:/|$)).+/internal(?:/|$)",
+			path: "^src/engine/.+/internal(?:/|$)",
+		},
+	},
+	{
+		name: "active-code-no-archive-imports",
+		comment:
+			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
+		severity: "error",
+		from: {
+			path: "^(?:src/(?:engine|ui)|cli|test)(?:/|$)",
+		},
+		to: {
+			path: "^src/_archive(?:/|$)",
 		},
 	},
 	{
@@ -30,10 +65,10 @@ const boundaryRules = [
 			"Import concrete modules directly. Barrel/index files hide ownership and are not a domain boundary.",
 		severity: "error",
 		from: {
-			path: "^src(?:/|$)",
+			path: "^src/(?:engine|ui)(?:/|$)",
 		},
 		to: {
-			path: "^src/.+/index\\.ts$",
+			path: "^src/(?:engine|ui)/.+/index\\.ts$",
 		},
 	},
 ];
@@ -75,15 +110,14 @@ module.exports = {
 			},
 		},
 		{
-			name: "not-to-dev-dep-from-src",
+			name: "not-to-dev-dep-from-active-src",
 			comment:
-				"Production source must not import devDependencies unless the import is type-only or test-only.",
+				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^src(?:/|$)",
+				path: "^src/(?:engine|ui)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
-					"^src/vite-env\\.d\\.ts$",
 				],
 			},
 			to: {
@@ -104,9 +138,9 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
+				path: "^(?:src/(?:engine|ui)|cli)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
-					"^src/vite-env\\.d\\.ts$",
 				],
 			},
 			to: {
@@ -125,7 +159,7 @@ module.exports = {
 		prefix: `vscode://file/${process.cwd()}/`,
 		tsPreCompilationDeps: true,
 		tsConfig: {
-			fileName: "tsconfig.json",
+			fileName: "tsconfig.test.json",
 		},
 		enhancedResolveOptions: {
 			exportsFields: [

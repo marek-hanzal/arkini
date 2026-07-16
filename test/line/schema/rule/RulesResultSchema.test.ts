@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RulesResultSchema } from "~/v1/line/schema/rule/RulesResultSchema";
+import { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 
 describe("line RulesResultSchema", () => {
 	it("accepts an intentionally possibly empty ordered rule result collection", () => {

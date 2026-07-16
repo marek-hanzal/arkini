@@ -1,4 +1,4 @@
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 export const createDestructiveUtilityTestConfig = () => {

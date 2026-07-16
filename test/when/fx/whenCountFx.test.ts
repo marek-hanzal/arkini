@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { whenCountFx } from "~/v1/when/fx/whenCountFx";
+import { whenCountFx } from "~/engine/when/fx/whenCountFx";
 
 describe("whenCountFx", () => {
 	it("matches one exact quantity", () => {

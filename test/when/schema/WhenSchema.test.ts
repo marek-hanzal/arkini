@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { WhenSchema } from "~/v1/when/schema/WhenSchema";
+import { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 const inventoryQuery = {
 	scope: "inventory",

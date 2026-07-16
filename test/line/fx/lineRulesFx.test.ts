@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import type { RuleSchema } from "~/v1/line/schema/rule/RuleSchema";
-import { lineRulesFx } from "~/v1/line/fx/lineRulesFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import type { RuleSchema } from "~/engine/line/schema/rule/RuleSchema";
+import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import {
 	createOriginFx,
 	existsWhen,

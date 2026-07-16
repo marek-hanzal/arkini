@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
-import type { InputSchema } from "~/v1/input/schema/InputSchema";
+import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
+import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import {
 	createLine,
 	createProducerItem,

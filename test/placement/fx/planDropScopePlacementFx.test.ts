@@ -1,10 +1,10 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameConfigFx } from "~/v1/game/context/GameConfigFx";
-import { planDropScopePlacementFx } from "~/v1/placement/fx/planDropScopePlacementFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import {
 	boardLocation,
 	inventoryLocation,

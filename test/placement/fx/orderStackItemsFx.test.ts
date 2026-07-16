@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { orderStackItemsFx } from "~/v1/placement/fx/orderStackItemsFx";
+import { orderStackItemsFx } from "~/engine/placement/fx/orderStackItemsFx";
 import { boardLocation, placementTestConfig } from "~test/placement/fx/support/placementTestConfig";
 
 const log = placementTestConfig.items.log;

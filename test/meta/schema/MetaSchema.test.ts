@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MetaSchema } from "~/v1/meta/schema/MetaSchema";
+import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 
 describe("MetaSchema", () => {
 	it("requires explicit positive dimensions for both the board and inventory grids", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { OutputResultSchema } from "~/v1/output/schema/OutputResultSchema";
+import { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
 
 describe("OutputResultSchema", () => {
 	it("accepts an intentionally empty resolved output", () => {

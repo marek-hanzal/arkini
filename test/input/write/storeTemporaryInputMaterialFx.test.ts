@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { createGameSession } from "~/ui/session/createGameSession";
 
 const baseItem = (id: string) => ({
 	id,

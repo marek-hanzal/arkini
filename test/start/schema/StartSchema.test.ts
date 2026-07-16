@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { StartSchema } from "~/v1/start/schema/StartSchema";
+import { StartSchema } from "~/engine/start/schema/StartSchema";
 
 describe("StartSchema", () => {
 	it("requires one explicit current space while defaulting both item collections", () => {

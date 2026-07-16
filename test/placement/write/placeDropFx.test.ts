@@ -1,10 +1,10 @@
 import { Effect, Either, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { placeDropFx } from "~/v1/placement/write/placeDropFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { placeDropFx } from "~/engine/placement/write/placeDropFx";
 import {
 	boardLocation,
 	configuredDrop,

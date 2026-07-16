@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
-import { removeItemFx } from "~/v1/runtime/write/removeItemFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 

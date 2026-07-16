@@ -3,7 +3,7 @@ import { NodeContext } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readGameSourceFilesFx } from "~/v1/compiler/fx/readGameSourceFilesFx";
+import { readGameSourceFilesFx } from "~/engine/compiler/fx/readGameSourceFilesFx";
 
 describe("readGameSourceFilesFx", () => {
 	it("collects JSON syntax and fragment-schema diagnostics across files", async () => {

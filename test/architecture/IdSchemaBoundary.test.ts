@@ -22,7 +22,7 @@ const domainIdSchema =
 
 describe("canonical ID schema boundary", () => {
 	it("keeps IdSchema as the only exact identity scalar schema", () => {
-		const files = collectTypeScriptFiles("src/v1");
+		const files = collectTypeScriptFiles("src/engine");
 		const forbiddenSchemaFiles = files.filter(
 			(path) => basename(path).endsWith("IdSchema.ts") && basename(path) !== "IdSchema.ts",
 		);

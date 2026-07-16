@@ -3,36 +3,36 @@ import { NodeContext } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-const internalStoreImport = 'from "~/v1/runtime/internal/RuntimeStoreFx"';
+const internalStoreImport = 'from "~/engine/runtime/internal/RuntimeStoreFx"';
 const directRuntimeModify = "store.modifyEffect(";
-const runtimeTransactionImport = 'from "~/v1/runtime/internal/modifyRuntimeFx"';
-const revisionGuardImport = 'from "~/v1/revision/fx/assertRevisionFx"';
+const runtimeTransactionImport = 'from "~/engine/runtime/internal/modifyRuntimeFx"';
+const revisionGuardImport = 'from "~/engine/revision/fx/assertRevisionFx"';
 const allowedStoreImporters = new Set([
-	"src/v1/game/layer/GameCoreLayerFx.ts",
-	"src/v1/runtime/internal/makeRuntimeStoreFx.ts",
-	"src/v1/runtime/internal/modifyRuntimeFx.ts",
+	"src/engine/game/layer/GameCoreLayerFx.ts",
+	"src/engine/runtime/internal/makeRuntimeStoreFx.ts",
+	"src/engine/runtime/internal/modifyRuntimeFx.ts",
 ]);
 const allowedDirectModifiers = new Set([
-	"src/v1/runtime/internal/modifyRuntimeFx.ts",
+	"src/engine/runtime/internal/modifyRuntimeFx.ts",
 ]);
 const revisionFreeWriteFiles = new Set([
-	"src/v1/job/write/clearItemJobQueueFx.ts",
-	"src/v1/job/write/startLineFx.ts",
-	"src/v1/placement/write/placeDropFx.ts",
-	"src/v1/placement/write/placeOutputFx.ts",
-	"src/v1/runtime/write/spawnItemFx.ts",
-	"src/v1/start/write/startFx.ts",
-	"src/v1/session/write/toggleSpeedModeFx.ts",
-	"src/v1/space/write/setCurrentSpaceFx.ts",
-	"src/v1/utility/write/requestNukeSaveFx.ts",
+	"src/engine/job/write/clearItemJobQueueFx.ts",
+	"src/engine/job/write/startLineFx.ts",
+	"src/engine/placement/write/placeDropFx.ts",
+	"src/engine/placement/write/placeOutputFx.ts",
+	"src/engine/runtime/write/spawnItemFx.ts",
+	"src/engine/start/write/startFx.ts",
+	"src/engine/session/write/toggleSpeedModeFx.ts",
+	"src/engine/space/write/setCurrentSpaceFx.ts",
+	"src/engine/utility/write/requestNukeSaveFx.ts",
 ]);
 
 const stateDerivedDecisionImports = [
-	'from "~/v1/input/schema/run/InputRunPlanSchema"',
-	'from "~/v1/line/schema/run/LineRunPlanSchema"',
-	'from "~/v1/output/schema/DropResultSchema"',
-	'from "~/v1/output/schema/OutputResultSchema"',
-	'from "~/v1/placement/schema/PlacementPlanSchema"',
+	'from "~/engine/input/schema/run/InputRunPlanSchema"',
+	'from "~/engine/line/schema/run/LineRunPlanSchema"',
+	'from "~/engine/output/schema/DropResultSchema"',
+	'from "~/engine/output/schema/OutputResultSchema"',
+	'from "~/engine/placement/schema/PlacementPlanSchema"',
 ];
 
 const collectTypeScriptFilesFx = (
@@ -82,7 +82,7 @@ describe("runtime mutation boundary", () => {
 		const invalid = await Effect.runPromise(
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
-				const files = yield* collectTypeScriptFilesFx("src/v1");
+				const files = yield* collectTypeScriptFilesFx("src/engine");
 				const storeImporters = yield* findImportersFx({
 					files,
 					needle: internalStoreImport,
@@ -105,7 +105,7 @@ describe("runtime mutation boundary", () => {
 				const nestedWriteImports = yield* Effect.filter(writeFiles, (file) => {
 					return fileSystem.readFileString(file).pipe(
 						Effect.map((source) => {
-							return /from "~\/v1\/[^"]+\/write\//.test(source);
+							return /from "~\/engine\/[^"]+\/write\//.test(source);
 						}),
 					);
 				});

@@ -16,7 +16,7 @@
 		"test:shard:5": "vitest run --no-color --shard=5/6",
 		"test:shard:6": "vitest run --no-color --shard=6/6",
 		"test:shards": "npm run test:shard:1 && npm run test:shard:2 && npm run test:shard:3 && npm run test:shard:4 && npm run test:shard:5 && npm run test:shard:6",
-		"dc": "depcruise src/v1 --output-type err-long",
+		"dc": "depcruise src/engine src/ui cli test --output-type err-long",
 		"check": "npm run format:check && npm run dc && npm run typecheck && npm run test",
 		"format": "biome format --write .",
 		"format:check": "biome format .",

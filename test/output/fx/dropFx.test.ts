@@ -1,10 +1,10 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
-import { dropFx } from "~/v1/output/fx/dropFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { dropFx } from "~/engine/output/fx/dropFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

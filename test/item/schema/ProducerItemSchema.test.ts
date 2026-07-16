@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ProducerItemSchema } from "~/v1/item/schema/ProducerItemSchema";
+import { ProducerItemSchema } from "~/engine/item/schema/ProducerItemSchema";
 
 describe("ProducerItemSchema", () => {
 	it("requires a positive limit on parallel product lines", () => {

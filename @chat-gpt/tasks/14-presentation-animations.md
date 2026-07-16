@@ -8,8 +8,8 @@ Build a presentation-only event-to-animation layer that may lag, redirect, coale
 
 ## Historical oracle
 
-- `src/v0/play/game-engine-visual/`;
-- animation parts of `src/v0/tile-engine/`;
+- `src/_archive/play/game-engine-visual/`;
+- animation parts of `src/_archive/tile-engine/`;
 - transient board tiles, stack/merge/drop feedback, space-navigation feedback, and timing constants.
 
 ## Core contract

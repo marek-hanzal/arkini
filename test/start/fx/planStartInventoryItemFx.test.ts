@@ -1,10 +1,10 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
-import { planStartInventoryItemFx } from "~/v1/start/fx/planStartInventoryItemFx";
+import { planStartInventoryItemFx } from "~/engine/start/fx/planStartInventoryItemFx";
 
 describe("planStartInventoryItemFx", () => {
 	it("splits the complete quantity into deterministic inventory stacks", () => {

@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { attemptQueuedLineStartFx } from "~/v1/job/fx/attemptQueuedLineStartFx";
-import type { JobQueueRequestSchema } from "~/v1/job/schema/JobQueueRequestSchema";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import type { RuntimeItemSchema } from "~/v1/runtime/schema/RuntimeItemSchema";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { attemptQueuedLineStartFx } from "~/engine/job/fx/attemptQueuedLineStartFx";
+import type { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const config = createJobTestConfig(2);

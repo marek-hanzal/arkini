@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { readLineStartFx } from "~/v1/job/read/readLineStartFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { readLineStartFx } from "~/engine/job/read/readLineStartFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const props = {

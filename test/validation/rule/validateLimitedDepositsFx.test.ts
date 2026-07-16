@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { compileGameSourcesFx } from "~/v1/compiler/fx/compileGameSourcesFx";
-import { DepositItemSchema } from "~/v1/item/schema/DepositItemSchema";
-import { OutputSchema } from "~/v1/output/schema/OutputSchema";
+import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
+import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
+import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import {
 	createOutput,
 	createProducerItem,

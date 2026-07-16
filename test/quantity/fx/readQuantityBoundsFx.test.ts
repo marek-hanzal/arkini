@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readQuantityBoundsFx } from "~/v1/quantity/fx/readQuantityBoundsFx";
+import { readQuantityBoundsFx } from "~/engine/quantity/fx/readQuantityBoundsFx";
 
 describe("readQuantityBoundsFx", () => {
 	it("reads one fixed quantity as equal bounds", () => {

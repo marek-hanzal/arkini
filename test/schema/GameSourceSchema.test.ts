@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { readArkiniGameSources } from "~test/schema/support/readArkiniGameSources";
-import { GameSourceSchema } from "~/v1/schema/GameSourceSchema";
+import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
 
 describe("GameSourceSchema", () => {
 	it("parses every current Arkini authoring fragment independently", () => {

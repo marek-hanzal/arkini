@@ -1,4 +1,4 @@
-import { GameConfigSchema } from "~/v1/schema/GameConfigSchema";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number }) => ({
 	id,

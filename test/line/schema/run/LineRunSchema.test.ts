@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { LineRunPlanSchema } from "~/v1/line/schema/run/LineRunPlanSchema";
-import { LineRunResolutionSchema } from "~/v1/line/schema/run/LineRunResolutionSchema";
+import { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSchema";
+import { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
 
 const plan = {
 	ownerItemId: "runtime:workshop",

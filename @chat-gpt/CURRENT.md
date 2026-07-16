@@ -19,6 +19,13 @@ Next action:
 
 > Define the smallest coherent engine-owned read surfaces for board/inventory presentation, line readiness and blocked reasons, queue/reservation state, charges, multi-space navigation, and utility projections without recreating a second engine in React.
 
+## Source topology
+
+- `src/engine` is the only standalone engine root. It owns gameplay, runtime, compiler, validation, packing, and public domain reads/commands and must not import React or `src/ui`.
+- `src/ui` owns browser, React, persistence, subscription, and application-lifecycle adapters. It may depend on public engine modules but not `src/engine/**/internal`.
+- `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
+- Dependency Cruiser runs over `src/engine`, `src/ui`, `cli`, and `test` and enforces these directions.
+
 ## Absolute code rules
 
 - Named project operations are Effect programs and use `*Fx` without “pure helper” exceptions.

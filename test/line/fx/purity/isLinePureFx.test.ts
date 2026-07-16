@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { isLineInputPureFx } from "~/v1/line/fx/purity/isLineInputPureFx";
-import { isLineJobPureFx } from "~/v1/line/fx/purity/isLineJobPureFx";
-import { isLinePureFx } from "~/v1/line/fx/purity/isLinePureFx";
-import { isLineQueuePureFx } from "~/v1/line/fx/purity/isLineQueuePureFx";
-import type { RuntimeSchema } from "~/v1/runtime/schema/RuntimeSchema";
+import { isLineInputPureFx } from "~/engine/line/fx/purity/isLineInputPureFx";
+import { isLineJobPureFx } from "~/engine/line/fx/purity/isLineJobPureFx";
+import { isLinePureFx } from "~/engine/line/fx/purity/isLinePureFx";
+import { isLineQueuePureFx } from "~/engine/line/fx/purity/isLineQueuePureFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
 
 const owner = {

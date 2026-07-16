@@ -2,7 +2,7 @@
 
 This document is mandatory. It is not a collection of optional style preferences.
 
-All source paths are relative to the active source root.
+Engine paths are relative to `src/engine` unless written explicitly. Browser, React, persistence, and application-lifecycle adapters live under `src/ui`. `src/_archive` is historical reference only and may never be imported by active code or tests.
 
 ## 1. The `*Fx` rule is absolute
 
@@ -260,7 +260,7 @@ Error precedence is observable behavior. Refactors must preserve it unless the c
 
 ## 10. UI boundary
 
-UI is a presentation adapter.
+`src/engine` is standalone and framework-neutral. `src/ui` is the browser, React, persistence, subscription, and application-lifecycle adapter boundary. UI is a presentation adapter.
 
 Allowed:
 

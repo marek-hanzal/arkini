@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { resolveInputMaterialFx } from "~/v1/input/fx/resolveInputMaterialFx";
-import { InputMaterialSchema } from "~/v1/input/schema/InputMaterialSchema";
+import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
+import { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
 
 const fixedInput = InputMaterialSchema.parse({
 	type: "materials",

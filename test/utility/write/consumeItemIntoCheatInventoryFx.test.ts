@@ -1,14 +1,14 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { GameEventBatchSchema } from "~/v1/event/schema/GameEventBatchSchema";
-import { useGameFx } from "~/v1/game/fx/useGameFx";
-import { storeInputMaterialFx } from "~/v1/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/v1/job/write/startLineFx";
-import { readRuntimeFx } from "~/v1/runtime/read/readRuntimeFx";
-import { spawnItemFx } from "~/v1/runtime/write/spawnItemFx";
-import { createGameSession } from "~/v1/ui/session/createGameSession";
-import { consumeItemIntoCheatInventoryFx } from "~/v1/utility/write/consumeItemIntoCheatInventoryFx";
+import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { createGameSession } from "~/ui/session/createGameSession";
+import { consumeItemIntoCheatInventoryFx } from "~/engine/utility/write/consumeItemIntoCheatInventoryFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

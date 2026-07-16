@@ -21,24 +21,24 @@ const collectTypeScriptFiles = (directory: string): string[] =>
 
 describe("completed game compiler boundary", () => {
 	it("keeps pack and test config loading on the production compiler", () => {
-		expect(read("src/v1/pack/fx/packDirectoryFx.ts")).toContain(
-			'from "~/v1/compiler/fx/compileGameDirectoryFx"',
+		expect(read("src/engine/pack/fx/packDirectoryFx.ts")).toContain(
+			'from "~/engine/compiler/fx/compileGameDirectoryFx"',
 		);
 		expect(read("test/schema/support/readArkiniGameConfigSource.ts")).toContain(
-			'from "~/v1/compiler/fx/compileGameDirectoryFx"',
+			'from "~/engine/compiler/fx/compileGameDirectoryFx"',
 		);
 	});
 
 	it("keeps the canonical compiler independent from binary packing", () => {
-		const invalidImports = collectTypeScriptFiles("src/v1/compiler").filter((path) =>
-			read(path).includes('from "~/v1/pack/'),
+		const invalidImports = collectTypeScriptFiles("src/engine/compiler").filter((path) =>
+			read(path).includes('from "~/engine/pack/'),
 		);
 
 		expect(invalidImports).toEqual([]);
 	});
 
 	it("keeps completed config validation outside CLI adapters", () => {
-		const validateCommand = read("src/v1/validation/cli/ValidateCommand.ts");
+		const validateCommand = read("src/engine/validation/cli/ValidateCommand.ts");
 
 		expect(validateCommand).toContain("compileGameDirectoryFx");
 		expect(validateCommand).toContain("assertGameConfigValidFx");

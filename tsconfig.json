@@ -22,8 +22,8 @@
 	},
 	"include": [
 		"cli",
-		"src/v1",
-		"src/vite-env.d.ts",
+		"src/engine",
+		"src/ui",
 		"vite.config.ts"
 	]
 }

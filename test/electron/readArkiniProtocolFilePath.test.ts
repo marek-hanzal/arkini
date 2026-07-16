@@ -35,7 +35,7 @@ describe("readArkiniProtocolFilePath", () => {
 
 	it("falls back to the renderer entry for TanStack Router paths", async () => {
 		await expect(
-			readArkiniProtocolFilePath("arkini://app/game/builtin-arkini", rendererRoot),
+			readArkiniProtocolFilePath("arkini://app/game/arkini", rendererRoot),
 		).resolves.toBe(join(rendererRoot, "index.html"));
 	});
 

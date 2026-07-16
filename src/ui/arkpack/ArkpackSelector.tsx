@@ -84,7 +84,7 @@ export const ArkpackSelector = () => {
 											{arkpack.title}
 										</h2>
 										<span className="rounded-full bg-white/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-slate-300">
-											{arkpack.source === "built-in" ? "Built in" : "Local"}
+											{arkpack.source === "built-in" ? "Official" : "Local"}
 										</span>
 									</div>
 									<p className="mt-1 truncate text-xs text-slate-500">

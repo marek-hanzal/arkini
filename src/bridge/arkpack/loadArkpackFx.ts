@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { BuiltinArkpack } from "~/bridge/arkpack/BuiltinArkpack";
+import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import { DexieArkpackStorage } from "~/bridge/arkpack/DexieArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
@@ -12,9 +12,9 @@ export namespace loadArkpackFx {
 	}
 }
 
-const fetchBuiltinBytes = Effect.tryPromise({
+const fetchArkiniBytes = Effect.tryPromise({
 	try: async () => {
-		const response = await fetch(BuiltinArkpack.url);
+		const response = await fetch(ArkiniArkpack.url);
 		if (!response.ok) {
 			throw new Error(
 				`Unable to load bundled Arkini pack: ${response.status} ${response.statusText}.`,
@@ -25,14 +25,14 @@ const fetchBuiltinBytes = Effect.tryPromise({
 	catch: (cause) => cause,
 });
 
-/** Loads and revalidates one built-in or persisted package binary before game bootstrap. */
+/** Loads and revalidates the official Arkini or a persisted package binary before game bootstrap. */
 export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 	packageId,
 	storage: providedStorage,
 }: loadArkpackFx.Props) {
-	if (packageId === BuiltinArkpack.packageId) {
+	if (packageId === ArkiniArkpack.packageId) {
 		return yield* readArkpackFx({
-			bytes: yield* fetchBuiltinBytes,
+			bytes: yield* fetchArkiniBytes,
 			packageId,
 			source: "built-in",
 		});

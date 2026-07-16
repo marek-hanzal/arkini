@@ -6,18 +6,17 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **GitHub #200 — Electron desktop host**
 
-Status: **Task #204 implementation complete; native macOS/HMR smoke pending**
+Status: **#204, #205, #226, and save epic #217 are complete. Tasks #206 and #207 now have the local unsigned macOS arm64 package path and GitHub prerelease workflow implemented; native artifact/release smoke remains for the shared #208 integration pass.**
 
 Read:
 
 1. GitHub epic #200;
-2. GitHub task #204 for the remaining native macOS/HMR acceptance smoke;
-3. GitHub task #205 after #204 is verified and closed;
-4. related save epic #217 only when lifecycle touches flush/load/reset.
+2. GitHub tasks #206 and #207 for the implemented packaging/release contracts;
+3. GitHub task #208 before the final collaborative Apple Silicon integration pass.
 
 Next action:
 
-> Run `npm run dev` on Apple Silicon macOS and verify the root selector plus React/Tailwind HMR. After that closes #204, continue with whole-game ownership hardening in #205.
+> Push the packaging commits, run `npm run package:mac` or manually dispatch the macOS prerelease workflow, inspect/open the unsigned DMG/ZIP on Apple Silicon, then complete #208 together.
 
 ## Source topology
 
@@ -35,7 +34,7 @@ Next action:
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
 - TanStack Router uses standard browser history. Browser development runs on the Vite HTTP origin; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
 - `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
-- Electron main/preload live under `electron/`, own only platform capabilities, and may not import renderer/engine roots. The preload is intentionally empty until #226/#220 add narrow filesystem operations.
+- Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, and controlled-close contracts implemented by #226/#220.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
@@ -55,6 +54,8 @@ Next action:
 - `BoardTile` receives canonical identity + revision from the live board projection. Revision change or unmount cancels stale pointer state; replacing `Game` remounts the complete tile system.
 - `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
+- `npm run package:mac` is the sole local distribution path. It stages only `out/**` plus a minimal dependency-free manifest, then `electron-builder` emits unsigned arm64 DMG/ZIP artifacts and verifies `SHA256SUMS` plus the unpacked `Arkini.app` seam.
+- `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
 - Animations added later must continuously target the latest bridge snapshot. They may be interrupted/replanned and never queue authoritative state behind presentation.
 
 ## Test execution

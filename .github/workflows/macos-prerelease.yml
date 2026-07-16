@@ -1,0 +1,72 @@
+name: macOS Development Prerelease
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*-dev.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macos-prerelease-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Build unsigned macOS arm64 artifacts
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.16.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Use tag version for release artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        run: npm version --no-git-tag-version "${GITHUB_REF_NAME#v}"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run repository gate
+        run: npm run check
+
+      - name: Package unsigned macOS arm64 application
+        run: npm run package:mac
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: arkini-macos-arm64-${{ github.run_number }}
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish GitHub prerelease
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            release/*.dmg \
+            release/*.zip \
+            release/SHA256SUMS \
+            --verify-tag \
+            --prerelease \
+            --title "Arkini $GITHUB_REF_NAME" \
+            --notes "Unsigned macOS Apple Silicon development build. Verify SHA256SUMS before opening and use the normal macOS Gatekeeper override for unsigned local testing."

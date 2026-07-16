@@ -142,10 +142,10 @@ It runs:
 ```text
 Biome format check
 → Dependency Cruiser architecture rules
-→ source TypeScript check
-→ test TypeScript check
+→ source, test, and Electron TypeScript checks
+→ game configuration validation
 → production Electron build
-→ complete Vitest suite
+→ all ten deterministic Vitest shards
 ```
 
 Application commands:
@@ -169,6 +169,27 @@ npm run preview:browser
 The main window opens centered at 75% of the active monitor work area. `F11` and `Alt+Enter` toggle native fullscreen. One root renderer canvas owns the exact viewport, hides document scrollbars, and requires game/UI content to fit the available window rather than expanding it; the board continuously uses the largest rectangle that preserves its authored aspect ratio.
 
 The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
+
+## macOS packaging and prereleases
+
+The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:
+
+```bash
+npm run package:mac
+```
+
+The command cleans old package output, builds the official Arkini pack plus Electron main/preload/renderer, stages only `out/**` with a dependency-free production manifest, runs `electron-builder` for arm64 DMG and ZIP targets, writes `SHA256SUMS`, and verifies the artifacts plus unpacked `Arkini.app` seam. Output lives under `release/`:
+
+```text
+Arkini-<version>-mac-arm64.dmg
+Arkini-<version>-mac-arm64.zip
+SHA256SUMS
+mac-arm64/Arkini.app
+```
+
+Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
+
+`.github/workflows/macos-prerelease.yml` uses the same `npm run package:mac` command on the GitHub-hosted `macos-15` Apple Silicon runner. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 

@@ -6,7 +6,7 @@ import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

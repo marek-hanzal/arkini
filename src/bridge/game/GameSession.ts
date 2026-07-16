@@ -4,7 +4,7 @@ import type * as LayerModule from "effect/Layer";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import type { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { RuntimeSaveFx } from "~/ui/save/RuntimeSaveFx";
+import type { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 
 export type GameSessionServices =
 	| LayerModule.Layer.Success<ReturnType<typeof GameSessionLayerFx>>

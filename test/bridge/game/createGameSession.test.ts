@@ -5,7 +5,7 @@ import { startLineFx } from "~/engine/job/write/startLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 

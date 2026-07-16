@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

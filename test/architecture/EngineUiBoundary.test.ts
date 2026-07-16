@@ -3,6 +3,7 @@ import { join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const engineRoot = resolve("src/engine");
+const bridgeRoot = resolve("src/bridge");
 const uiRoot = resolve("src/ui");
 const pageRoot = resolve("src/page");
 const routeRoot = resolve("src/@routes");
@@ -23,7 +24,7 @@ const readTypeScriptFiles = (directory: string): string[] =>
 const readImportedModules = (path: string): string[] =>
 	Array.from(readFileSync(path, "utf8").matchAll(/from ["']([^"']+)["']/g), (match) => match[1]);
 
-describe("engine/UI/page/route source boundary", () => {
+describe("engine/bridge/UI/page/route source boundary", () => {
 	it("keeps React imports out of the standalone engine", () => {
 		const offenders = readTypeScriptFiles(engineRoot)
 			.filter((path) =>
@@ -36,17 +37,41 @@ describe("engine/UI/page/route source boundary", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	it("keeps the engine independent from presentation roots", () => {
+	it("keeps the engine independent from bridge and presentation roots", () => {
 		const offenders = readTypeScriptFiles(engineRoot)
-			.filter((path) => /~\/(?:ui|page|@routes)\//.test(readFileSync(path, "utf8")))
+			.filter((path) => /~\/(?:bridge|ui|page|@routes)\//.test(readFileSync(path, "utf8")))
 			.map((path) => relative(engineRoot, path));
 
 		expect(offenders).toEqual([]);
 	});
 
-	it("keeps UI adapters out of engine internal modules", () => {
-		const offenders = readTypeScriptFiles(uiRoot)
+	it("keeps bridge domains shallow and named after concrete ownership", () => {
+		const offenders = readTypeScriptFiles(bridgeRoot)
+			.map((path) => relative(bridgeRoot, path).replaceAll("\\", "/"))
+			.filter((path) => path.split("/").length !== 2);
+
+		expect(offenders).toEqual([]);
+	});
+
+	it("keeps bridge domains independent from presentation roots", () => {
+		const offenders = readTypeScriptFiles(bridgeRoot)
+			.filter((path) => /~\/(?:ui|page|@routes)\//.test(readFileSync(path, "utf8")))
+			.map((path) => relative(bridgeRoot, path));
+
+		expect(offenders).toEqual([]);
+	});
+
+	it("keeps bridge domains out of engine internal modules", () => {
+		const offenders = readTypeScriptFiles(bridgeRoot)
 			.filter((path) => /~\/engine\/[^"']*\/internal\//.test(readFileSync(path, "utf8")))
+			.map((path) => relative(bridgeRoot, path));
+
+		expect(offenders).toEqual([]);
+	});
+
+	it("keeps reusable UI connected to engine truth only through bridge domains", () => {
+		const offenders = readTypeScriptFiles(uiRoot)
+			.filter((path) => /~\/engine\//.test(readFileSync(path, "utf8")))
 			.map((path) => relative(uiRoot, path));
 
 		expect(offenders).toEqual([]);
@@ -60,9 +85,11 @@ describe("engine/UI/page/route source boundary", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	it("keeps pages independent from route registration modules", () => {
+	it("keeps pages as UI-only composition outside engine and bridge domains", () => {
 		const offenders = readTypeScriptFiles(pageRoot)
-			.filter((path) => /~\/(?:@routes\/|_route|router)/.test(readFileSync(path, "utf8")))
+			.filter((path) =>
+				/~\/(?:engine|bridge|@routes\/|_route|router)/.test(readFileSync(path, "utf8")),
+			)
 			.map((path) => relative(pageRoot, path));
 
 		expect(offenders).toEqual([]);

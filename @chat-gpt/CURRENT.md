@@ -4,9 +4,9 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Task 10 — Engine-owned read models**
+**Task 10 — Engine-owned decisions and live bridge projections**
 
-Status: **Ready**
+Status: **In progress**
 
 Read:
 
@@ -17,15 +17,17 @@ Read:
 
 Next action:
 
-> Choose the next concrete `/game` UI slice and implement its page/UI component together with only the engine-owned reads and commands that slice actually requires. Do not prebuild a broad speculative read-model layer.
+> The first vertical slice now loads one live `Game` and renders the current board through `bridge/board/useBoard` plus the headless tile system. Review this foundation with Marek, then choose the next concrete board/inventory interaction and add only the bridge facts and public engine commands it requires.
 
 ## Source topology
 
-- `src/engine` is the only standalone engine root. It owns gameplay, runtime, compiler, validation, packing, and public domain reads/commands and must not import presentation code or React.
-- `src/ui` owns reusable browser, React, persistence, subscription, and application-lifecycle adapters. It may depend on public engine modules but not `src/engine/**/internal`, pages, or routes.
-- `src/page` owns route-level screen and layout composition. It may compose UI and use router APIs but never imports route registration modules.
+- `src/engine` is the only standalone engine root. It owns gameplay, runtime, compiler, validation, packing, and public domain reads/commands and must not import bridge or presentation code.
+- `src/bridge/<domain>/<operation>` is the only legal UI connection to public engine contracts. It owns the loaded `Game`, runtime subscriptions, save/event adapters, and concrete snapshot projections without caching a second truth. Bridge domains may not import UI/pages/routes or `src/engine/**/internal`.
+- `src/ui` owns reusable React presentation and transient gesture/geometry/animation state. It may depend on bridge domains but never imports `src/engine` directly, pages, or routes.
+- `src/page` owns route-level screen and layout composition over UI only.
 - `src/@routes` contains only TanStack Router file registrations pointing to standalone page components. `src/_route.ts` is generated and `src/router.tsx` owns router creation.
-- Dependency direction is `@routes → page → ui → engine`; Dependency Cruiser and permanent architecture tests enforce it.
+- Dependency direction is `@routes → page → ui → bridge → engine`; Dependency Cruiser and permanent architecture tests enforce it.
+- Bridge paths remain shallow and concrete. `app` is reserved for genuinely Electron/router-wide application concerns; the loaded gameplay root is `Game`.
 - `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
 
 ## Browser shell foundation
@@ -33,7 +35,17 @@ Next action:
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
 - The client uses hash history for static-host compatibility; typed route `/game` is reached at `/#/game`.
 - `/game` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- The shell currently renders only a placeholder and intentionally creates no game session. Future application-root ownership and hard reset replacement belong inside this `/game` shell boundary, not in router creation or leaf pages.
+- `GameShell` loads the generated compressed Arkini pack through `bridge/game/createGameFx`, owns exactly one live `Game`, and disposes it with the route subtree.
+- `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
+- `/game` currently renders the canonical current-space board. Inventory, commands, and final hard reset ownership remain future slices.
+
+## Live bridge and tile foundation
+
+- `bridge/runtime/useRuntimeSelector` uses `useSyncExternalStore` directly over `Game.getSnapshot` and `Game.subscribe`. It may memoize a selected value for one runtime root but never stores a second runtime or synchronizes through `useEffect`.
+- `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
+- `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.
+- `BoardTile` receives canonical identity + revision from the live board projection. Revision change or unmount cancels stale pointer state; replacing `Game` remounts the complete tile system.
+- Animations added later must continuously target the latest bridge snapshot. They may be interrupted/replanned and never queue authoritative state behind presentation.
 
 ## Test execution
 
@@ -159,6 +171,6 @@ Next action:
 
 - `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
 - `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
-- The current `nukeGameSessionFx` is only provisional low-level dispose/delete/create sequencing. It is not the final production hard-reset ownership boundary and must not be expanded in place before the browser shell exists.
-- Final hard reset is deferred to Task 12. The browser shell must own one complete application root created by a plain factory/composition function. Reset disposes that entire root, deletes persisted state, creates a completely fresh root through the same factory used for initial startup, and only then atomically publishes it.
+- The current `nukeGameSessionFx` is only provisional low-level dispose/delete/create sequencing. It is not the final production hard-reset ownership boundary and must not be expanded in place before shell-owned game replacement is implemented.
+- Final hard reset is deferred to Task 12. `GameShell` must own one complete `Game` created by the same plain factory used for initial startup. Reset disposes that entire game root, deletes persisted state, creates a completely fresh `Game`, and only then atomically publishes it. Do not rename this gameplay root to an abstract “application”.
 - The root reset owner must single-flight the complete transition so concurrent callers share one result or one failure. Do not mutate the existing engine/session back to an initial state, hide correctness in React-local state, introduce a class solely for ownership, or use a module-global lock/map.

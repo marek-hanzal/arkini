@@ -5,7 +5,7 @@ import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

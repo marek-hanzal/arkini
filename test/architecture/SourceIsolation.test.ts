@@ -20,6 +20,7 @@ describe("source isolation", () => {
 	it("keeps tests and test-only imports outside active source roots", () => {
 		const invalidFiles = [
 			"src/engine",
+			"src/bridge",
 			"src/ui",
 			"src/page",
 			"src/@routes",

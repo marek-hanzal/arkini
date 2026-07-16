@@ -6,7 +6,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

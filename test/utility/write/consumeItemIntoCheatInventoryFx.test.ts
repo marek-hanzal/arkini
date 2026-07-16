@@ -7,7 +7,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 import { consumeItemIntoCheatInventoryFx } from "~/engine/utility/write/consumeItemIntoCheatInventoryFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 

@@ -2,9 +2,9 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import type { GameSession } from "~/ui/session/GameSession";
-import { createGameSession } from "~/ui/session/createGameSession";
-import { nukeGameSessionFx } from "~/ui/session/nukeGameSessionFx";
+import type { GameSession } from "~/bridge/game/GameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
+import { nukeGameSessionFx } from "~/bridge/game/nukeGameSessionFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {

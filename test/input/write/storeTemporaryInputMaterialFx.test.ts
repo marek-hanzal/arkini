@@ -4,7 +4,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 
 const baseItem = (id: string) => ({
 	id,

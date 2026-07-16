@@ -23,6 +23,7 @@
 	"include": [
 		"cli",
 		"src/engine",
+		"src/bridge",
 		"src/ui",
 		"src/page",
 		"src/@routes",

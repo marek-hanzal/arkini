@@ -1,20 +1,20 @@
 import { useEffect, useRef } from "react";
 
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
-import { useGameSession } from "~/ui/session/GameSessionContext";
+import { useGame } from "~/bridge/game/useGame";
 
 /** Subscribes one React presentation coordinator to committed transient event batches. */
 export const useGameEvents = (
 	listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
 ) => {
-	const session = useGameSession();
+	const game = useGame();
 	const listenerRef = useRef(listener);
 	listenerRef.current = listener;
 
 	useEffect(
-		() => session.subscribeEvents((batch) => listenerRef.current(batch)),
+		() => game.subscribeEvents((batch) => listenerRef.current(batch)),
 		[
-			session,
+			game,
 		],
 	);
 };

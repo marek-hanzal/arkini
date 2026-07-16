@@ -2,7 +2,7 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-Engine paths are relative to `src/engine` unless written explicitly. Reusable browser, React, persistence, and application-lifecycle adapters live under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Dependency direction is `@routes → page → ui → engine`. `src/_archive` is outside every active source root and may never be imported.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Dependency direction is `@routes → page → ui → bridge → engine`. `src/_archive` is outside every active source root and may never be imported.
 
 ## 1. Core model
 
@@ -105,11 +105,11 @@ commit after registration
 
 The acquired queue is owned with `Effect.acquireRelease`, so scope cancellation cannot orphan a subscription.
 
-## 4. Public session boundary
+## 4. Live game bridge boundary
 
-`GameSession` is the browser-facing owner of one loaded game.
+`GameSession` owns the Effect services, Tick, subscriptions, and save lifecycle of one loaded engine. The bridge-level `Game` adds the completed config, embedded resource URLs, and one replacement key owned by the `/game` shell. Neither object mirrors runtime state.
 
-It exposes:
+The live boundary exposes:
 
 - `getSnapshot()` — synchronous read of the canonical runtime;
 - `run(effect)` — execution of documented public engine Effects;
@@ -119,7 +119,7 @@ It exposes:
 - `dispose()` — coordinated shutdown with a final save;
 - `disposeWithoutSave()` — destructive-reset shutdown that stops autosave and waits for in-flight persistence without writing a final snapshot.
 
-`GameSession.run()` remains generic by deliberate soft contract. UI and normal consumers may run public commands and reads only. They may not reach internal runtime-store services through the generic runner.
+`GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
 
 ## 5. Runtime and event subscriptions
 
@@ -138,6 +138,9 @@ The engine is framework-neutral and authoritative. React is an adapter.
 ```text
 canonical runtime
 → immediate gameplay truth
+
+live bridge projection
+→ synchronous view over that exact snapshot, never cached authority
 
 committed transient events
 → facts about accepted mutations

@@ -7,7 +7,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { createGameSession } from "~/ui/session/createGameSession";
+import { createGameSession } from "~/bridge/game/createGameSession";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",

@@ -5,13 +5,13 @@ import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import type { GameSession, GameSessionServices } from "~/ui/session/GameSession";
+import type { GameSession, GameSessionServices } from "~/bridge/game/GameSession";
 import {
 	type GameSessionTransitionSubscriptionCleanup,
 	GameSessionTransitionSubscriptionsFx,
-} from "~/ui/session/GameSessionTransitionSubscriptionsFx";
-import { RuntimeSaveFx } from "~/ui/save/RuntimeSaveFx";
-import { RuntimeSaveLayerFx } from "~/ui/save/RuntimeSaveLayerFx";
+} from "~/bridge/game/GameSessionTransitionSubscriptionsFx";
+import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
+import { RuntimeSaveLayerFx } from "~/bridge/save/RuntimeSaveLayerFx";
 
 export namespace createGameSession {
 	export interface Props<SaveError = unknown> {

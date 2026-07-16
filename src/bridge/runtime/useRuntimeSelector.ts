@@ -1,14 +1,14 @@
 import { useCallback, useRef, useSyncExternalStore } from "react";
 
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { useGameSession } from "~/ui/session/GameSessionContext";
+import { useGame } from "~/bridge/game/useGame";
 
 /** Selects a stable projection from the latest committed runtime snapshot. */
 export const useRuntimeSelector = <Selected>(
 	selector: (runtime: RuntimeSchema.Type) => Selected,
 	isEqual: (left: Selected, right: Selected) => boolean = Object.is,
 ): Selected => {
-	const session = useGameSession();
+	const game = useGame();
 	const last = useRef<
 		| {
 				root: RuntimeSchema.Type;
@@ -18,7 +18,7 @@ export const useRuntimeSelector = <Selected>(
 		| undefined
 	>(undefined);
 	const getSnapshot = useCallback(() => {
-		const root = session.getSnapshot();
+		const root = game.getSnapshot();
 		const previous = last.current;
 		if (previous?.root === root && previous.selector === selector) return previous.selected;
 		const selected = selector(root);
@@ -39,8 +39,8 @@ export const useRuntimeSelector = <Selected>(
 	}, [
 		isEqual,
 		selector,
-		session,
+		game,
 	]);
 
-	return useSyncExternalStore(session.subscribe, getSnapshot, getSnapshot);
+	return useSyncExternalStore(game.subscribe, getSnapshot, getSnapshot);
 };

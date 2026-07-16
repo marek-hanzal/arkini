@@ -12,6 +12,7 @@
 	},
 	"include": [
 		"src/engine",
+		"src/bridge",
 		"src/ui",
 		"test",
 		"vitest.config.ts"

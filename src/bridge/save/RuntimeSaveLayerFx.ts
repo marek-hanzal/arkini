@@ -6,7 +6,7 @@ import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { RuntimeSaveFx } from "~/ui/save/RuntimeSaveFx";
+import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 
 export namespace RuntimeSaveLayerFx {
 	export interface Props<Error = unknown> {

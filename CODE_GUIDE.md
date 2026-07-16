@@ -2,7 +2,7 @@
 
 This document is mandatory. It is not a collection of optional style preferences.
 
-Engine paths are relative to `src/engine` unless written explicitly. Reusable browser, React, persistence, and application-lifecycle adapters live under `src/ui`; route-level composition lives under `src/page`; TanStack Router registrations live under `src/@routes`. `src/_archive` is historical reference only and may never be imported by active code or tests.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router registrations live under `src/@routes`. `src/_archive` is historical reference only and may never be imported by active code or tests.
 
 ## 1. The `*Fx` rule is absolute
 
@@ -260,12 +260,12 @@ Error precedence is observable behavior. Refactors must preserve it unless the c
 
 ## 10. UI boundary
 
-`src/engine` is standalone and framework-neutral. `src/ui` owns reusable browser, React, persistence, subscription, and application-lifecycle adapters. `src/page` composes route-level screens from UI components. `src/@routes` contains only TanStack Router registration seams that point at standalone page components. Dependency direction is `@routes → page → ui → engine`.
+`src/engine` is standalone and framework-neutral. `src/bridge` owns concrete live adapters and snapshot projections grouped as `bridge/<domain>/<operation>`; it may use public engine modules but never engine internals or UI. `src/ui` owns reusable presentation and transient gesture/geometry/animation state. `src/page` composes route-level screens from UI components. `src/@routes` contains only TanStack Router registration seams that point at standalone page components. Dependency direction is `@routes → page → ui → bridge → engine`.
 
 Allowed:
 
 - `useSyncExternalStore` over the canonical session snapshot;
-- public engine commands and reads;
+- public engine commands and reads exposed through concrete bridge domains;
 - transient-event reactions for animation, audio, and telemetry;
 - local presentation state;
 - pure visual projections.
@@ -276,7 +276,7 @@ Forbidden:
 - snapshot synchronization through `useEffect`;
 - line eligibility, missing input, queue, reservation, drop, or job logic in UI;
 - reconstruction of runtime from events;
-- imports from engine-internal modules;
+- direct UI imports from any engine module or bridge imports from engine internals;
 - a second read-model API without a concrete need.
 
 Presentation may lag runtime. Presentation is never authoritative.

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameSession } from "~/ui/session/GameSession";
+import type { GameSession } from "~/bridge/game/GameSession";
 
 export namespace nukeGameSessionFx {
 	export interface Props<DeleteError, CreateError> {

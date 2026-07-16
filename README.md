@@ -8,9 +8,9 @@ Arkini is a client-only, offline merge and production game built around a determ
 
 ## Current status
 
-The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and React session adapters are implemented and covered by the repository check gate.
+The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and live React bridge are implemented and covered by the repository check gate.
 
-A minimal client-only browser entrypoint now uses TanStack Router file-based routing. The `/game` branch owns an isolated game shell and placeholder page; no engine application instance, board, inventory, or gameplay UI is mounted yet.
+The client uses TanStack Router file-based routing. The `/game` branch owns one replaceable live `Game`, loads the canonical Arkini pack, starts the engine, and renders the current board through a headless tile system. Inventory and gameplay commands remain future slices.
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
@@ -38,8 +38,11 @@ The repository has explicit active boundaries:
 src/engine
 → standalone canonical engine, compiler, validation, CLI support, runtime, and public domain operations
 
+src/bridge
+→ the only legal live connection from UI to public engine contracts, grouped as bridge/<domain>/<operation>
+
 src/ui
-→ reusable React, browser, persistence, subscription, and application-lifecycle adapters
+→ reusable React presentation, gesture, geometry, animation, and browser components
 
 src/page
 → route-level screen and layout composition over UI components
@@ -48,7 +51,7 @@ src/@routes
 → TanStack Router file registrations only; generated hierarchy lives in src/_route.ts
 ```
 
-Dependency direction is `@routes → page → ui → engine`; higher layers may use public lower-layer contracts, never the reverse. `src/router.tsx` creates the router from the generated tree and `src/main.tsx` is the browser entrypoint.
+Dependency direction is `@routes → page → ui → bridge → engine`; higher layers may use public lower-layer contracts, never the reverse. `src/router.tsx` creates the router from the generated tree and `src/main.tsx` is the browser entrypoint.
 
 Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under `src/engine`. Presentation-owned paths are written explicitly.
 
@@ -107,7 +110,8 @@ schema/       Completed game configuration root and JSON Schema generation.
 start/        Initial board/inventory planning.
 state/        Serializable state conversion.
 tick/         Clock adapter and deterministic fixed-step advancement.
-ui/           Thin React/session/save/event adapters only.
+bridge/       Live game/session/runtime/save/event projections and adapters; never a second store.
+ui/           React presentation and transient interaction state only.
 validation/   Schema-adjacent semantic and resource diagnostics.
 when/         Runtime condition evaluation.
 ```
@@ -151,7 +155,7 @@ npm run build
 npm run preview
 ```
 
-The active game placeholder is available at `/#/game`; hash history preserves static-host compatibility while the typed route path remains `/game`.
+The active read-only board is available at `/#/game`; hash history preserves static-host compatibility while the typed route path remains `/game`.
 
 Useful focused commands:
 
@@ -183,7 +187,7 @@ npm run game:pack
 
 - `game:schema` writes the authoring JSON Schema to `game/schema.json`.
 - `game:validate` runs the canonical compiler and all diagnostics.
-- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` by default.
+- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` by default. `dev`, `build`, and Dependency Cruiser regenerate this ignored artifact before consuming it.
 
 The compiler, validator, tests, and packer must never assemble different versions of the game configuration.
 

@@ -4,7 +4,7 @@ This directory is the active handoff surface for continuing the game from the hi
 
 ## Current task
 
-**Next implementation task: [`10-engine-read-models.md`](10-engine-read-models.md)**
+**Current implementation task: [`10-engine-read-models.md`](10-engine-read-models.md)**
 
 Tasks 00–09 are complete. A new thread must:
 
@@ -16,7 +16,7 @@ Tasks 00–09 are complete. A new thread must:
 
 Do not read every queued task before starting. The queue is an ordered backlog, not a mandatory context dump.
 
-Tasks 10–13 are implemented as vertical UI slices rather than four isolated horizontal phases. A concrete page/component need drives the smallest engine-owned read/command addition, its agreement tests, and the thin UI consumer in the same slice. Task 10 remains the current coverage owner until its read-model obligations are satisfied; the minimal TanStack Router `/game` shell from Task 12 is already present as non-gameplay foundation.
+Tasks 10–13 are implemented as vertical UI slices rather than four isolated horizontal phases. A concrete page/component need drives the smallest engine-owned read/command addition, its agreement tests, and the thin UI consumer in the same slice. Task 10 remains the current coverage owner until its read-model obligations are satisfied; the TanStack Router `/game` shell now owns one live `Game` and the first read-only board/headless-tile slice while Task 10 remains the coverage owner.
 
 ## Queue
 
@@ -32,7 +32,7 @@ Tasks 10–13 are implemented as vertical UI slices rather than four isolated ho
 | 07 | [`Speed cheat`](../archive/tasks/07-speed-cheat.md) | **Done** | 06 |
 | 08 | [`Multi-space board runtime`](../archive/tasks/08-multi-space-board-runtime.md) | **Done** | 07 |
 | 09 | [`Destructive utility items`](../archive/tasks/09-destructive-utilities.md) | **Done** | 08 |
-| 10 | [`Engine-owned read models`](10-engine-read-models.md) | **Ready** | 01–09 |
+| 10 | [`Engine-owned read models`](10-engine-read-models.md) | **In progress** | 01–09 |
 | 11 | [`Player interaction contract`](11-player-interaction.md) | Queued | 05, 10 |
 | 12 | [`Renderer shell, board, and inventory`](12-renderer-board-inventory.md) | Queued | 11 |
 | 13 | [`Detail and line controls`](13-detail-line-ui.md) | Queued | 10, 12 |

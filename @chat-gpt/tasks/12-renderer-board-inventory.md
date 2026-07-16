@@ -17,7 +17,7 @@ Create the active browser shell and render board/inventory directly from the can
 
 - `bridge/game` owns `Game`, `GameSession`, `createGameFx`, public command/event adapters, and live replacement identity;
 - `bridge/runtime/useRuntimeSelector` is the single React subscription path to canonical runtime;
-- the generated TanStack Router tree and `/game` layout shell exist; the shell loads the Arkini pack and renders the first read-only board slice;
+- the generated TanStack Router tree exists; `/#/` selects bundled or persistent local arkpacks and `/game/$packageId` loads the selected package, restores its save, and renders the first read-only board slice;
 - `bridge/board/useBoard`, `ui/board`, and the headless `ui/tile` foundation exist;
 - UI may intentionally lag visually during animation, but canonical truth remains the live runtime;
 - `nukeGameSessionFx` currently provides provisional dispose/delete/create sequencing, but it is not a safe final production reset owner because the complete transition is not shell-owned.
@@ -46,9 +46,9 @@ src/engine
 
 Dependency direction is `@routes → page → ui → bridge → engine`. Route modules point to standalone page components and contain no gameplay, session, or game composition. The `/game` file route is a layout branch whose page composes `GameShell` with an `Outlet`; future `/dev/**` routes remain outside this shell.
 
-The client currently uses hash history so typed route `/game` is hosted at `/#/game` without requiring a server rewrite.
+The client uses hash history so the package selector is hosted at `/#/` and typed route `/game/$packageId` works without a server rewrite. The future Electron host must provide one stable renderer storage origin/partition; `file://` path choice must not accidentally fork or lose the IndexedDB package/save catalogs.
 
-`GameShell` now creates one complete live `Game` through `createGameFx`. Future hard reset replaces this whole game instance inside the same shell, leaving the router and non-game branches alive.
+The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. `GameShell` creates one complete live `Game` for the selected package through `createGameFx`; future hard reset replaces this whole game instance inside the same shell, leaving the router, package catalog, and non-game branches alive.
 
 ## Accepted hard-reset direction
 
@@ -93,7 +93,9 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 
 ## Acceptance criteria
 
-- browser entrypoint loads config/state and creates one session;
+- root launcher lists bundled Arkini and persistent validated local packages;
+- local upload validates before persistence and exact package selection survives refresh through the route;
+- browser game entrypoint loads selected config/namespaced state and creates one session;
 - board and inventory render canonical items;
 - `useSyncExternalStore` remains the runtime subscription path;
 - local UI state is limited to gesture, camera, panel, and animation state;
@@ -112,7 +114,8 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 - event-only transition does not rerender runtime selectors;
 - interaction smoke tests;
 - responsive geometry and stable IDs;
-- browser persistence restore;
+- arkpack import/deduplication/reload and package-removal isolation;
+- browser save persistence restore scoped to exact package identity/content;
 - initial startup and reset use the same game factory;
 - two concurrent confirmed resets dispose once, delete once, create once, publish once, and receive the exact same fresh root;
 - joined callers share delete/create failures and no fresh root is fabricated;

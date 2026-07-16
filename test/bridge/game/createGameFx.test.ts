@@ -1,117 +1,109 @@
-import { gzipSync } from "node:zlib";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { StoredArkpackRecord } from "~/bridge/arkpack/Arkpack";
+import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
+import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
-import { encodeFx } from "~/engine/pack/fx/encodeFx";
-import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import {
+	createTestArkpack,
+	testArkpackConfig,
+} from "~test/bridge/arkpack/support/createTestArkpack";
 
-const config = GameConfigSchema.parse({
-	version: "1.0",
-	resources: {
-		hero: "hero",
-	},
-	meta: {
-		id: "game:bridge",
-		title: "Bridge game",
-		board: {
-			width: 2,
-			height: 2,
-		},
-		inventory: {
-			width: 1,
-			height: 1,
-		},
-	},
-	start: {
-		currentSpace: 0,
-		board: [
-			{
-				itemId: "water",
-				space: 0,
-				x: 1,
-				y: 0,
-			},
-		],
-	},
-	categories: {},
-	items: {
-		water: {
-			id: "water",
-			type: "simple",
-			title: "Water",
-			description: "Water",
-			asset: {
-				source: [
-					"asset:water",
-				],
-			},
-			tags: [],
-			categoryId: "resource",
-			scope: "any",
-			maxStackSize: 10,
-		},
-	},
-});
-
-const createPackUrl = async () => {
-	const bytes = Effect.runSync(
-		encodeFx({
-			config,
-			resources: [
-				{
-					id: "hero",
-					mime: "image/png",
-					bytes: new Uint8Array([
-						1,
-					]),
-				},
-				{
-					id: "asset:water",
-					mime: "image/png",
-					bytes: new Uint8Array([
-						2,
-					]),
-				},
-			],
+const createStorages = async () => {
+	const bytes = createTestArkpack();
+	const loaded = await Effect.runPromise(
+		readArkpackFx({
+			bytes,
+			filename: "bridge.arkpack",
+			source: "imported",
 		}),
 	);
-	const compressed = gzipSync(bytes);
-	return `data:application/octet-stream;base64,${compressed.toString("base64")}`;
+	const record = {
+		...loaded.descriptor,
+		bytes: bytes.slice().buffer,
+	} satisfies StoredArkpackRecord;
+	const arkpackStorage: ArkpackStorage = {
+		close: () => undefined,
+		list: async () => [
+			record,
+		],
+		read: async (packageId) => (packageId === record.packageId ? record : undefined),
+		remove: async () => undefined,
+		write: async () => undefined,
+	};
+	let saved: StateSchema.Type | null = null;
+	const saveStorage: GameSaveStorage = {
+		close: () => undefined,
+		read: async () => saved,
+		remove: async () => {
+			saved = null;
+		},
+		write: async ({ state }) => {
+			saved = state;
+		},
+	};
+	return {
+		arkpackStorage,
+		packageId: record.packageId,
+		readSaved: () => saved,
+		saveStorage,
+	};
 };
 
 describe("createGameFx", () => {
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
-	it("loads one pack, starts one live game and exposes embedded resources", async () => {
-		const game = await Effect.runPromise(
+
+	it("starts one selected package, persists its state and restores it without a second start", async () => {
+		const storages = await createStorages();
+		const first = await Effect.runPromise(
 			createGameFx({
-				packUrl: await createPackUrl(),
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
 			}),
 		);
 
-		try {
-			expect(game.config).toEqual(config);
-			expect(game.getSnapshot().items).toEqual([
-				expect.objectContaining({
-					item: config.items.water,
-					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 1,
-							y: 0,
-						},
+		expect(first.arkpack.packageId).toBe(storages.packageId);
+		expect(first.config).toEqual(testArkpackConfig);
+		expect(first.getSnapshot().items).toEqual([
+			expect.objectContaining({
+				item: testArkpackConfig.items.water,
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
 					},
-				}),
-			]);
-			expect(game.getResourceUrl("asset:water")).toMatch(/^blob:/);
+				},
+			}),
+		]);
+		expect(first.getResourceUrl("asset:water")).toMatch(/^blob:/);
+		await first.dispose();
+		expect(storages.readSaved()).not.toBeNull();
+
+		const restored = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		try {
+			expect(restored.getSnapshot().items).toHaveLength(1);
+			expect(restored.getSnapshot().items[0]?.item.id).toBe("water");
 		} finally {
-			await game.dispose();
+			await restored.dispose();
 		}
 	});
+
 	it("disposes a partial game bootstrap and revokes created resources when resource setup fails", async () => {
+		const storages = await createStorages();
 		const createObjectUrl = vi
 			.spyOn(URL, "createObjectURL")
 			.mockReturnValueOnce("blob:created")
@@ -123,7 +115,9 @@ describe("createGameFx", () => {
 		await expect(
 			Effect.runPromise(
 				createGameFx({
-					packUrl: await createPackUrl(),
+					packageId: storages.packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
 				}),
 			),
 		).rejects.toThrow("resource setup failed");

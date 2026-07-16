@@ -17,7 +17,7 @@ Read:
 
 Next action:
 
-> The first vertical slice now loads one live `Game` and renders the current board through `bridge/board/useBoard` plus the headless tile system. Review this foundation with Marek, then choose the next concrete board/inventory interaction and add only the bridge facts and public engine commands it requires.
+> The root launcher now lists bundled Arkini plus validated persistent local arkpacks, and `/game/$packageId` restores the package-namespaced save before rendering the live board. Review this launcher/package boundary with Marek, then choose the next concrete board interaction and add only the bridge facts and public engine commands it requires.
 
 ## Source topology
 
@@ -33,14 +33,17 @@ Next action:
 ## Browser shell foundation
 
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
-- The client uses hash history for static-host compatibility; typed route `/game` is reached at `/#/game`.
-- `/game` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- `GameShell` loads the generated compressed Arkini pack through `bridge/game/createGameFx`, owns exactly one live `Game`, and disposes it with the route subtree.
+- The client uses hash history for static-host and future Electron compatibility. Electron must host the renderer on one stable storage origin/partition so IndexedDB package and save catalogs survive restarts; hash routing alone does not define that persistence identity.
+- `/#/` is the local arkpack selector. Bundled Arkini and imported packages share one validated catalog; uploads never leave the device.
+- `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
+- `GameShell` loads the selected exact package through `bridge/game/createGameFx`, restores its separately namespaced save, owns exactly one live `Game`, and disposes it with the route subtree.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
-- `/game` currently renders the canonical current-space board. Inventory, commands, and final hard reset ownership remain future slices.
+- `/game/$packageId` currently renders the canonical current-space board. Inventory, commands, and final hard reset ownership remain future slices.
 
 ## Live bridge and tile foundation
 
+- `bridge/arkpack` validates compressed package bytes, derives SHA-256 identity, persists imported binaries, and exposes the bundled package through the same startup validation path.
+- `bridge/save` persists gameplay state separately from package binaries. Save hydration requires both route package identity and exact content hash; package removal never doubles as save deletion.
 - `bridge/runtime/useRuntimeSelector` uses `useSyncExternalStore` directly over `Game.getSnapshot` and `Game.subscribe`. It may memoize a selected value for one runtime root but never stores a second runtime or synchronizes through `useEffect`.
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
 - `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.

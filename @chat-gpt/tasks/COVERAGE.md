@@ -45,7 +45,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Visual planning and animation | Reference | Historical event-to-motion behavior remains | 14 |
 | Audio | Reference | Sound policy and synthesis remain | 15 |
 | Debug/explain tools | Reference | Explanation scenarios remain | 16 |
-| Persistent browser shell | Partial | Current save boundary exists; browser adapter and root factory are pending | Application-root ownership, atomic publication, truthful failure state, and single-flight hard reset belong to 12; final pruning belongs to 17 |
+| Persistent browser shell | Partial | Root arkpack selector, validated local package persistence, selected-package game factory, exact-content save restore, and live board shell exist | Atomic hard-reset publication, truthful failure recovery, and single-flight replacement remain in 12; final pruning belongs to 17 |
 
 ## Historical directory map
 
@@ -87,7 +87,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `selector/` | Superseded | Current query/selector compiler and runtime evaluation are canonical | Nothing architectural | 17 |
 | `stack/` | Superseded | Current placement stacking is canonical | Animation intent only | 14 |
 | `stash/` | Archive-ready | Generic line start/output/completion supersede runtime behavior | Product copy, animation, and audio only | 13–15, 17 |
-| `storage/` | Partial | Current save service boundary exists | Browser persistence and reset policy | 12, 17 |
+| `storage/` | Superseded | Active bridge now owns separate IndexedDB arkpack and package-namespaced save storage; package removal is isolated from save deletion | Final hard-reset and cleanup policy remain | 12, 17 |
 | `tile-engine/` | Reference | Its cyclic package topology is rejected | Pointer, DnD, hit testing, motion behavior | 11, 12, 14 |
 | `time/` | Superseded | Wall-clock jobs and hidden catch-up are rejected | Formatting only | 13, 17 |
 | `ui/` | Reference | No active renderer | Shared visual components and tokens | 12, 13 |

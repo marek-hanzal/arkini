@@ -21,6 +21,7 @@ export namespace useBoard {
 		readonly currentSpace: number;
 		readonly width: number;
 		readonly height: number;
+		readonly title: string;
 		readonly items: ReadonlyArray<Item>;
 	}
 }
@@ -44,6 +45,7 @@ export const useBoard = (): useBoard.Result => {
 			currentSpace: runtime.currentSpace,
 			width: game.config.meta.board.width,
 			height: game.config.meta.board.height,
+			title: game.config.meta.title,
 			items: runtime.items.flatMap((item): useBoard.Item[] => {
 				if (
 					item.location.scope !== "board" ||

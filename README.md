@@ -10,7 +10,7 @@ Arkini is a client-only, offline merge and production game built around a determ
 
 The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and live React bridge are implemented and covered by the repository check gate.
 
-The client uses TanStack Router file-based routing. The `/game` branch owns one replaceable live `Game`, loads the canonical Arkini pack, starts the engine, and renders the current board through a headless tile system. Inventory and gameplay commands remain future slices.
+The client uses TanStack Router file-based routing. The root route is a local arkpack launcher: bundled Arkini and validated imported packages share one catalog, imported binaries persist in IndexedDB, and each package opens under `/game/$packageId`. The selected game shell restores a separately namespaced save and renders the current board through a headless tile system. Inventory and gameplay commands remain future slices.
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
@@ -64,8 +64,9 @@ game source fragments + PNG resources
 → canonical compiler
 → schema + semantic + resource validation
 → compressed Arkini pack
+→ bundled or validated local package catalog
 
-loaded config + optional persisted state
+selected exact package + separately namespaced optional persisted state
 → hydrated runtime
 → serialized interruptible mutation planning
 → candidate validation
@@ -110,7 +111,7 @@ schema/       Completed game configuration root and JSON Schema generation.
 start/        Initial board/inventory planning.
 state/        Serializable state conversion.
 tick/         Clock adapter and deterministic fixed-step advancement.
-bridge/       Live game/session/runtime/save/event projections and adapters; never a second store.
+bridge/       Live arkpack/game/session/runtime/save/event projections and adapters; never a second gameplay store.
 ui/           React presentation and transient interaction state only.
 validation/   Schema-adjacent semantic and resource diagnostics.
 when/         Runtime condition evaluation.
@@ -155,7 +156,7 @@ npm run build
 npm run preview
 ```
 
-The active read-only board is available at `/#/game`; hash history preserves static-host compatibility while the typed route path remains `/game`.
+The local package selector is available at `/#/`. A selected package runs at `/#/game/<packageId>`; hash history avoids server rewrites while typed routing remains `/game/$packageId`. A future Electron host must keep one stable renderer storage origin/partition so IndexedDB package and save catalogs persist across launches.
 
 Useful focused commands:
 
@@ -174,6 +175,17 @@ npm run test:shard:1
 execution environment has a short process timeout. Each shard contains a smaller
 deterministic file partition and still runs with one worker from `vitest.config.ts`.
 When a chained runner fails to exit cleanly, run the affected shard independently.
+
+
+## Local packages and saves
+
+The launcher treats `.arkpack` as the playable package boundary:
+
+- bundled Arkini is listed beside local imports and passes the same decode/schema/semantic/resource validation before startup;
+- imported binaries are addressed by SHA-256, deduplicated, and persisted locally in the `arkini-arkpacks` IndexedDB database;
+- package binaries and gameplay saves are separate storage boundaries; removing an imported package does not silently delete its save;
+- saves live in `arkini-game-saves`, are keyed by route package identity, and additionally require the exact package content hash before hydration;
+- arkpacks remain data-only. The current format accepts completed config plus PNG resources, never JavaScript or HTML.
 
 ## Game authoring commands
 

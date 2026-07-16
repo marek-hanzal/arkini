@@ -70,6 +70,14 @@ const runtime = Effect.runSync(
 const unavailableRun: Game["run"] = () => Promise.reject(new Error("Not used by this test."));
 
 const game = {
+	arkpack: {
+		packageId: "test-package",
+		contentHash: "test-hash",
+		gameId: config.meta.id,
+		title: config.meta.title,
+		configVersion: config.version,
+		source: "imported" as const,
+	},
 	config,
 	instanceKey: "test-game",
 	getSnapshot: () => runtime,
@@ -85,13 +93,10 @@ const game = {
 describe("Board", () => {
 	it("renders the current canonical board through the headless tile system", () => {
 		const html = renderToStaticMarkup(
-			createElement(
-				GameProvider,
-				{
-					game,
-				},
-				createElement(TileSystemProvider, null, createElement(Board)),
-			),
+			createElement(GameProvider, {
+				game,
+				children: createElement(TileSystemProvider, null, createElement(Board)),
+			}),
 		);
 
 		expect(html).toContain("Board space 0");

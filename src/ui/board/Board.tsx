@@ -25,7 +25,7 @@ export const Board = () => {
 		>
 			<header className="text-center">
 				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
-					Arkini
+					{board.title}
 				</p>
 				<h1 className="mt-1 text-xl font-semibold text-white">
 					Board space {board.currentSpace}

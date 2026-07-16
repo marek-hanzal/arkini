@@ -1,62 +1,96 @@
 import { Effect } from "effect";
 
+import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
+import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import type { Game } from "~/bridge/game/Game";
+import type { GameSession } from "~/bridge/game/GameSession";
 import { createGameSession } from "~/bridge/game/createGameSession";
-import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { DexieGameSaveStorage } from "~/bridge/save/DexieGameSaveStorage";
+import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { startFx } from "~/engine/start/write/startFx";
 
 export namespace createGameFx {
 	export interface Props {
-		packUrl: string;
+		packageId: string;
+		arkpackStorage?: ArkpackStorage;
+		saveStorage?: GameSaveStorage;
 	}
 }
 
-const readCompressedPack = (packUrl: string) =>
-	Effect.tryPromise({
-		try: async () => {
-			const response = await fetch(packUrl);
-			if (!response.ok) {
-				throw new Error(
-					`Unable to load game pack: ${response.status} ${response.statusText}.`,
-				);
-			}
-
-			const compressed = await response.arrayBuffer();
-			const stream = new Blob([
-				compressed,
-			])
-				.stream()
-				.pipeThrough(new DecompressionStream("gzip"));
-			return new Uint8Array(await new Response(stream).arrayBuffer());
-		},
-		catch: (cause) => cause,
+/** Loads one selected package, restores its namespaced save and returns one live game. */
+export const createGameFx = Effect.fn("createGameFx")(function* ({
+	packageId,
+	arkpackStorage,
+	saveStorage: providedSaveStorage,
+}: createGameFx.Props) {
+	const loaded = yield* loadArkpackFx({
+		packageId,
+		...(arkpackStorage === undefined
+			? {}
+			: {
+					storage: arkpackStorage,
+				}),
 	});
-
-/** Loads one packed game and returns its single live browser-owned instance. */
-export const createGameFx = Effect.fn("createGameFx")(function* ({ packUrl }: createGameFx.Props) {
-	const bytes = yield* readCompressedPack(packUrl);
-	const payload = yield* decodeFx(bytes);
-	const session = yield* Effect.tryPromise({
-		try: () =>
-			createGameSession({
-				config: payload.config,
-			}),
-		catch: (cause) => cause,
-	});
+	const saveStorage = providedSaveStorage ?? new DexieGameSaveStorage();
 	const resourceUrls = new Map<string, string>();
+	let session: GameSession | undefined;
 
 	const revokeResources = () => {
 		for (const url of resourceUrls.values()) URL.revokeObjectURL(url);
 		resourceUrls.clear();
 	};
+	const closeSaveStorage = () => {
+		if (providedSaveStorage === undefined) saveStorage.close();
+	};
 	const discardFailedBootstrap = Effect.tryPromise({
-		try: () => session.disposeWithoutSave(),
+		try: async () => {
+			if (session !== undefined) await session.disposeWithoutSave();
+		},
 		catch: () => undefined,
-	}).pipe(Effect.ensuring(Effect.sync(revokeResources)), Effect.ignore);
+	}).pipe(
+		Effect.ensuring(
+			Effect.sync(() => {
+				revokeResources();
+				closeSaveStorage();
+			}),
+		),
+		Effect.ignore,
+	);
 
 	return yield* Effect.gen(function* () {
+		const saveScope = {
+			packageId: loaded.descriptor.packageId,
+			contentHash: loaded.descriptor.contentHash,
+		};
+		const state = yield* Effect.tryPromise({
+			try: () => saveStorage.read(saveScope),
+			catch: (cause) => cause,
+		});
+		session = yield* Effect.tryPromise({
+			try: () =>
+				createGameSession({
+					config: loaded.payload.config,
+					...(state === null
+						? {}
+						: {
+								state,
+							}),
+					save: {
+						write: (nextState) =>
+							Effect.tryPromise({
+								try: () =>
+									saveStorage.write({
+										...saveScope,
+										state: nextState,
+									}),
+								catch: (cause) => cause,
+							}),
+					},
+				}),
+			catch: (cause) => cause,
+		});
 		yield* Effect.sync(() => {
-			for (const resource of payload.resources) {
+			for (const resource of loaded.payload.resources) {
 				resourceUrls.set(
 					resource.id,
 					URL.createObjectURL(
@@ -72,26 +106,32 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({ packUrl }: cr
 				);
 			}
 		});
-		yield* Effect.tryPromise({
-			try: () => session.run(startFx()),
-			catch: (cause) => cause,
-		});
+		if (state === null) {
+			yield* Effect.tryPromise({
+				try: () =>
+					session?.run(startFx()) ?? Promise.reject(new Error("Game session missing.")),
+				catch: (cause) => cause,
+			});
+		}
 
+		const liveSession = session;
 		let disposePromise: Promise<void> | undefined;
-		const dispose = () => {
-			disposePromise ??= session.dispose().finally(revokeResources);
-			return disposePromise;
-		};
-		const disposeWithoutSave = () => {
-			disposePromise ??= session.disposeWithoutSave().finally(revokeResources);
+		const disposeWith = (mode: "save" | "discard") => {
+			disposePromise ??= (
+				mode === "save" ? liveSession.dispose() : liveSession.disposeWithoutSave()
+			).finally(() => {
+				revokeResources();
+				closeSaveStorage();
+			});
 			return disposePromise;
 		};
 
 		return {
-			...session,
-			config: payload.config,
-			dispose,
-			disposeWithoutSave,
+			...liveSession,
+			arkpack: loaded.descriptor,
+			config: loaded.payload.config,
+			dispose: () => disposeWith("save"),
+			disposeWithoutSave: () => disposeWith("discard"),
 			instanceKey: crypto.randomUUID(),
 			getResourceUrl: (resourceId) => {
 				const url = resourceUrls.get(resourceId);

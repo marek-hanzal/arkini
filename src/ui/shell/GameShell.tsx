@@ -1,11 +1,17 @@
 import { Effect } from "effect";
 import { type PropsWithChildren, useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 
-import ArkiniGamePackUrl from "../../../game/arkini.game.arkpack?url";
 import type { Game } from "~/bridge/game/Game";
 import { GameProvider } from "~/bridge/game/GameProvider";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+
+export namespace GameShell {
+	export interface Props extends PropsWithChildren {
+		packageId: string;
+	}
+}
 
 type GameShellState =
 	| {
@@ -20,17 +26,20 @@ type GameShellState =
 			readonly error: unknown;
 	  };
 
-/** Owns the replaceable live game instance for the `/game` route subtree. */
-export function GameShell({ children }: PropsWithChildren) {
+/** Owns the replaceable live game instance for one selected package route subtree. */
+export function GameShell({ children, packageId }: GameShell.Props) {
 	const [state, setState] = useState<GameShellState>({
 		type: "loading",
 	});
 
 	useEffect(() => {
 		let cancelled = false;
+		setState({
+			type: "loading",
+		});
 		const gamePromise = Effect.runPromise(
 			createGameFx({
-				packUrl: ArkiniGamePackUrl,
+				packageId,
 			}),
 		);
 
@@ -61,7 +70,9 @@ export function GameShell({ children }: PropsWithChildren) {
 				() => undefined,
 			);
 		};
-	}, []);
+	}, [
+		packageId,
+	]);
 
 	return (
 		<main
@@ -73,8 +84,14 @@ export function GameShell({ children }: PropsWithChildren) {
 					Loading game…
 				</div>
 			) : state.type === "failed" ? (
-				<div className="flex min-h-dvh items-center justify-center p-6 text-center text-sm text-red-300">
-					Game failed to start: {String(state.error)}
+				<div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center text-sm text-red-300">
+					<p>Game failed to start: {String(state.error)}</p>
+					<Link
+						to="/"
+						className="rounded-lg border border-white/15 px-3 py-2 text-slate-100"
+					>
+						Back to packages
+					</Link>
 				</div>
 			) : (
 				<GameProvider

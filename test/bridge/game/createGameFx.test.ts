@@ -1,10 +1,11 @@
 import { encode } from "@msgpack/msgpack";
-import { Effect } from "effect";
+import { Cause, Effect, Exit, Option } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
+import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import {
 	createTestArkpack,
@@ -46,7 +47,12 @@ const createStorages = async () => {
 	};
 	return {
 		arkpackStorage,
+		descriptor: record.descriptor,
 		packageId: record.descriptor.packageId,
+		saveKey: {
+			packageId: record.descriptor.packageId,
+			contentHash: record.descriptor.contentHash,
+		} satisfies GameSaveStorage.Key,
 		readSaved: () => saved,
 		setSaved: (bytes: Uint8Array | null) => {
 			saved = bytes?.slice() ?? null;
@@ -115,18 +121,49 @@ describe("createGameFx", () => {
 		);
 		const createObjectUrl = vi.spyOn(URL, "createObjectURL");
 
-		await expect(
-			Effect.runPromise(
-				createGameFx({
-					packageId: storages.packageId,
-					arkpackStorage: storages.arkpackStorage,
-					saveStorage: storages.saveStorage,
-				}),
-			),
-		).rejects.toThrow();
+		const exit = await Effect.runPromiseExit(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected invalid save failure.");
+		const failure = Cause.failureOption(exit.cause);
+		expect(Option.isSome(failure)).toBe(true);
+		if (Option.isNone(failure)) throw new Error("Expected typed save failure.");
+		expect(failure.value).toBeInstanceOf(GameSaveBootstrapError);
+		if (!(failure.value instanceof GameSaveBootstrapError))
+			throw new Error("Expected GameSaveBootstrapError.");
+		expect(failure.value.saveKey).toEqual(storages.saveKey);
 
 		expect(createObjectUrl).not.toHaveBeenCalled();
 		expect(storages.readSaved()).not.toBeNull();
+	});
+
+	it("does not mark package validation failures as clearable save failures", async () => {
+		const storages = await createStorages();
+		const corruptStorage: ArkpackStorage = {
+			...storages.arkpackStorage,
+			read: async () => ({
+				descriptor: storages.descriptor,
+				bytes: Uint8Array.of(1, 2, 3).buffer,
+			}),
+		};
+		const exit = await Effect.runPromiseExit(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: corruptStorage,
+				saveStorage: storages.saveStorage,
+			}),
+		);
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected package validation failure.");
+		const failure = Cause.failureOption(exit.cause);
+		expect(Option.isSome(failure)).toBe(true);
+		if (Option.isNone(failure)) throw new Error("Expected package failure.");
+		expect(failure.value).not.toBeInstanceOf(GameSaveBootstrapError);
 	});
 
 	it("disposes a partial game bootstrap and revokes created resources when resource setup fails", async () => {

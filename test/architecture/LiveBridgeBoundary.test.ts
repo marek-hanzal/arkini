@@ -51,6 +51,11 @@ describe("live game bridge boundary", () => {
 		expect(provider).toContain("lifecycle.requestClose");
 		expect(provider).toContain("lifecycle.forceClose");
 		expect(shell).toContain("owner.replace(packageId)");
+		expect(shell).toContain("state.saveRecoveryKey");
+		expect(shell).toContain("owner.clearFailedSaveAndRetry()");
+		expect(shell).toContain("Clear save and start fresh");
+		expect(shell).not.toContain("deleteGameSaveFx");
+		expect(shell).not.toContain("GameSaveStorage");
 		expect(shell).not.toContain("game.dispose");
 	});
 

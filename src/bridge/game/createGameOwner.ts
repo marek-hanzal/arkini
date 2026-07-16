@@ -1,4 +1,6 @@
 import type { Game } from "~/bridge/game/Game";
+import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
+import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 export namespace createGameOwner {
 	export type State =
@@ -15,16 +17,18 @@ export namespace createGameOwner {
 				readonly packageId: string | null;
 				readonly error: unknown;
 				readonly canForceShutdown: boolean;
+				readonly saveRecoveryKey?: GameSaveStorage.Key;
 		  };
 
 	export interface Props {
 		readonly create: (packageId: string) => Promise<Game>;
-		readonly clearSave: (game: Game) => Promise<void>;
+		readonly clearSave: (key: GameSaveStorage.Key) => Promise<void>;
 	}
 
 	export interface Owner {
 		readonly getSnapshot: () => State;
 		readonly replace: (packageId: string | null) => Promise<void>;
+		readonly clearFailedSaveAndRetry: () => Promise<void>;
 		readonly hardReset: () => Promise<void>;
 		readonly forceShutdown: () => Promise<void>;
 		readonly subscribe: (listener: () => void) => () => void;
@@ -40,6 +44,7 @@ export const createGameOwner = ({
 	let requestedPackageId: string | null = null;
 	let requestedHardReset = false;
 	let requestedForceShutdown = false;
+	let requestedSaveRecoveryKey: GameSaveStorage.Key | undefined;
 	let requestVersion = 0;
 	let settledVersion = 0;
 	let current: Game | undefined;
@@ -54,7 +59,7 @@ export const createGameOwner = ({
 		for (const listener of listeners) listener();
 	};
 
-	const fail = (version: number, error: unknown) => {
+	const fail = (version: number, error: unknown, saveRecoveryKey?: GameSaveStorage.Key) => {
 		settledVersion = version;
 		publish({
 			type: "failed",
@@ -62,6 +67,11 @@ export const createGameOwner = ({
 			error,
 			canForceShutdown:
 				requestedPackageId === null && current !== undefined && !requestedHardReset,
+			...(saveRecoveryKey === undefined
+				? {}
+				: {
+						saveRecoveryKey,
+					}),
 		});
 	};
 
@@ -77,7 +87,7 @@ export const createGameOwner = ({
 				try {
 					if (hardReset) {
 						await releasing.disposeWithoutSave();
-						await clearSave(releasing);
+						await clearSave(releasing.saveKey);
 						requestedHardReset = false;
 					} else if (forceShutdown) {
 						await releasing.disposeWithoutSave();
@@ -91,6 +101,20 @@ export const createGameOwner = ({
 					return;
 				}
 				continue;
+			}
+
+			if (requestedSaveRecoveryKey !== undefined) {
+				const recoveryKey = requestedSaveRecoveryKey;
+				try {
+					await clearSave(recoveryKey);
+				} catch (error) {
+					if (version !== requestVersion) continue;
+					requestedSaveRecoveryKey = undefined;
+					fail(version, error, recoveryKey);
+					return;
+				}
+				if (requestedSaveRecoveryKey === recoveryKey) requestedSaveRecoveryKey = undefined;
+				if (version !== requestVersion) continue;
 			}
 
 			if (packageId === null) {
@@ -111,7 +135,11 @@ export const createGameOwner = ({
 				created = await create(packageId);
 			} catch (error) {
 				if (version !== requestVersion) continue;
-				fail(version, error);
+				fail(
+					version,
+					error,
+					error instanceof GameSaveBootstrapError ? error.saveKey : undefined,
+				);
 				return;
 			}
 
@@ -165,12 +193,31 @@ export const createGameOwner = ({
 			requestedPackageId = packageId;
 			requestedHardReset = false;
 			requestedForceShutdown = false;
+			requestedSaveRecoveryKey = undefined;
 			requestVersion += 1;
 			if (packageId !== null)
 				publish({
 					type: "loading",
 					packageId,
 				});
+			return ensureRunning();
+		},
+		clearFailedSaveAndRetry: () => {
+			if (requestedSaveRecoveryKey !== undefined) return ensureRunning();
+			if (state.type !== "failed" || state.saveRecoveryKey === undefined) {
+				return Promise.reject(
+					new Error("A verified failed save is required for recovery."),
+				);
+			}
+			requestedPackageId = state.saveRecoveryKey.packageId;
+			requestedHardReset = false;
+			requestedForceShutdown = false;
+			requestedSaveRecoveryKey = state.saveRecoveryKey;
+			requestVersion += 1;
+			publish({
+				type: "loading",
+				packageId: requestedPackageId,
+			});
 			return ensureRunning();
 		},
 		hardReset: () => {
@@ -181,6 +228,7 @@ export const createGameOwner = ({
 			requestedPackageId = current.arkpack.packageId;
 			requestedHardReset = true;
 			requestedForceShutdown = false;
+			requestedSaveRecoveryKey = undefined;
 			requestVersion += 1;
 			publish({
 				type: "loading",
@@ -194,6 +242,7 @@ export const createGameOwner = ({
 			requestedPackageId = null;
 			requestedHardReset = false;
 			requestedForceShutdown = true;
+			requestedSaveRecoveryKey = undefined;
 			requestVersion += 1;
 			publish({
 				type: "loading",

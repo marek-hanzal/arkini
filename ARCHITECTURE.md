@@ -162,6 +162,22 @@ current Game.disposeWithoutSave()
 
 Concurrent hard-reset callers share one Promise and cannot create orphan sessions.
 
+Failed bootstrap recovery distinguishes trusted package identity from untrusted package bytes:
+
+```text
+package validation failure
+→ no verified save key
+→ retry/back only; no save-clear action
+
+verified package + save decode/hydration failure
+→ retain exact packageId + contentHash key in the owner failure
+→ explicit clear-save-and-retry through the same serialized owner
+→ clear only that exact save
+→ run the normal fresh bootstrap path
+```
+
+The save is never deleted automatically. UI requests recovery from `GameOwner`; it never calls save storage or constructs filesystem paths. Failed clear remains a truthful clearable failure, while successful clear followed by another bootstrap failure remains a normal retryable package failure.
+
 ### 4.1 Arkpack and save persistence
 
 Electron `userData` owns two separate opaque repositories:

@@ -224,6 +224,7 @@ The launcher treats `.arkpack` as the playable package boundary:
 - `pending.arksave` is temporary write state. A failed replacement leaves the previous successful `current.arksave` intact;
 - package binaries and gameplay saves are separate storage boundaries. Removing an imported package does not delete its save, and reinstalling the exact bytes may resume it;
 - package switching, HMR handoff, controlled close, and hard reset all pass through the same root game owner. No load mutates a running session in place. Failed final saves retain a frozen retryable game; only an explicit force-exit action discards that final save obligation;
+- package validation failures never expose save deletion because no save identity is trusted. When a verified package fails specifically during durable save decode or runtime hydration, the root owner retains its exact `packageId + contentHash` key and offers an explicit **Clear save and start fresh** action. Retry without clearing remains non-destructive; recovery clears only that exact save and reruns the normal bootstrap;
 - browser-only commands use explicit in-memory package/save adapters for diagnostics. IndexedDB/Dexie is not a product persistence backend;
 - Arkpacks remain data-only. The current format accepts completed config plus PNG resources, never JavaScript or HTML.
 

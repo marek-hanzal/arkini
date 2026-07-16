@@ -42,6 +42,7 @@ Next action:
 - `GameOwnerProvider` lives at the stable root shell above the route outlet and owns one `createGameOwner` lifecycle. `GameShell` requests the selected package and releases it on route cleanup; launcher ↔ game navigation and StrictMode replay therefore share the same serialization point.
 - Game replacement always awaits the current `Game.dispose()` final save before creating the latest requested package. Obsolete intermediate requests are coalesced, stale bootstraps are disposed exactly once before publication, and disposal/bootstrap failure becomes a truthful shell failure state.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
+- A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.
 - `/game/$packageId` currently renders the canonical current-space board. Inventory and commands remain future slices. The root owner already exposes single-flight hard reset: discard current session without final save → clear exact save key → normal fresh bootstrap.
 
 ## Live bridge and tile foundation

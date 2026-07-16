@@ -3,6 +3,7 @@ import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import type { Game } from "~/bridge/game/Game";
 import type { GameSession } from "~/bridge/game/GameSession";
+import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameSession } from "~/bridge/game/createGameSession";
 import { createGameSaveStorage } from "~/bridge/save/createGameSaveStorage";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
@@ -68,7 +69,17 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			catch: (cause) => cause,
 		});
 		const state =
-			savedBytes === null ? undefined : (yield* decodeArkiniSaveFx(savedBytes)).state;
+			savedBytes === null
+				? undefined
+				: (yield* decodeArkiniSaveFx(savedBytes).pipe(
+						Effect.mapError(
+							(cause) =>
+								new GameSaveBootstrapError({
+									cause,
+									saveKey,
+								}),
+						),
+					)).state;
 		session = yield* Effect.tryPromise({
 			try: () =>
 				createGameSession({
@@ -90,7 +101,13 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 							),
 					},
 				}),
-			catch: (cause) => cause,
+			catch: (cause) =>
+				savedBytes === null
+					? cause
+					: new GameSaveBootstrapError({
+							cause,
+							saveKey,
+						}),
 		});
 		yield* Effect.sync(() => {
 			for (const resource of loaded.payload.resources) {

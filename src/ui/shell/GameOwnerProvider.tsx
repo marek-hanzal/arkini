@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Cause, Effect, Exit, Option } from "effect";
 import { type ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
 import { createGameFx } from "~/bridge/game/createGameFx";
@@ -18,6 +18,18 @@ interface HotData {
 
 const previousHotShutdown = (import.meta.hot?.data as HotData | undefined)?.gameOwnerShutdown;
 let activeHotOwner: GameOwner.Owner | undefined;
+
+const runGameCreation = async (packageId: string) => {
+	const exit = await Effect.runPromiseExit(
+		createGameFx({
+			packageId,
+		}),
+	);
+	if (Exit.isSuccess(exit)) return exit.value;
+	const failure = Cause.failureOption(exit.cause);
+	if (Option.isSome(failure)) throw failure.value;
+	throw Cause.squash(exit.cause);
+};
 
 import.meta.hot?.dispose((data: HotData) => {
 	data.gameOwnerShutdown =
@@ -65,16 +77,12 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 		ownerRef.current = createGameOwner({
 			create: async (packageId) => {
 				await previousHotShutdown;
-				return Effect.runPromise(
-					createGameFx({
-						packageId,
-					}),
-				);
+				return runGameCreation(packageId);
 			},
-			clearSave: (game) =>
+			clearSave: (key) =>
 				Effect.runPromise(
 					deleteGameSaveFx({
-						key: game.saveKey,
+						key,
 					}),
 				),
 		});

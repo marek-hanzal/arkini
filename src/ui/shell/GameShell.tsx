@@ -40,13 +40,22 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 					<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-red-300">
 						<p>Game failed to start or close safely: {String(state.error)}</p>
 						<div className="flex flex-wrap justify-center gap-2">
+							{state.saveRecoveryKey === undefined ? null : (
+								<button
+									type="button"
+									className="rounded-lg bg-red-300 px-3 py-2 font-semibold text-slate-950"
+									onClick={() => void owner.clearFailedSaveAndRetry()}
+								>
+									Clear save and start fresh
+								</button>
+							)}
 							{state.packageId === null ? null : (
 								<button
 									type="button"
 									className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
 									onClick={() => void owner.replace(state.packageId)}
 								>
-									Retry
+									Retry without clearing
 								</button>
 							)}
 							<Link

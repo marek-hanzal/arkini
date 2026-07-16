@@ -12,7 +12,7 @@ export namespace importArkpackFx {
 	}
 }
 
-/** Validates and persists one local arkpack import under its exact content hash. */
+/** Validates and atomically persists one local arkpack descriptor and exact binary. */
 export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 	bytes,
 	filename,
@@ -28,11 +28,7 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 			source: "imported",
 		});
 		yield* Effect.tryPromise({
-			try: () =>
-				storage.write({
-					...loaded.descriptor,
-					bytes: bytes.slice().buffer,
-				}),
+			try: () => storage.write(loaded.descriptor, bytes.slice().buffer),
 			catch: (cause) => cause,
 		});
 		return loaded.descriptor;

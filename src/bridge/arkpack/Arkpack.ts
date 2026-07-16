@@ -2,13 +2,14 @@ import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 
 export type ArkpackSource = "built-in" | "imported";
 
-/** Stable catalog metadata for one playable Arkini package. */
+/** Stable metadata used by the package catalog without reading package payload bytes. */
 export interface ArkpackDescriptor {
 	readonly packageId: string;
 	readonly contentHash: string;
 	readonly gameId: string;
 	readonly title: string;
 	readonly configVersion: string;
+	readonly compressedSize: number;
 	readonly source: ArkpackSource;
 	readonly filename?: string;
 	readonly importedAtMs?: number;
@@ -18,9 +19,4 @@ export interface ArkpackDescriptor {
 export interface LoadedArkpack {
 	readonly descriptor: ArkpackDescriptor;
 	readonly payload: PayloadSchema.Type;
-}
-
-/** Persisted imported package record. */
-export interface StoredArkpackRecord extends ArkpackDescriptor {
-	readonly bytes: ArrayBuffer;
 }

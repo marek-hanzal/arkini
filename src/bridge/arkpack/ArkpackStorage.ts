@@ -1,10 +1,17 @@
-import type { StoredArkpackRecord } from "~/bridge/arkpack/Arkpack";
+import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 
-/** Durable storage contract for imported package binaries. */
+export namespace ArkpackStorage {
+	export interface LoadedRecord {
+		readonly descriptor: ArkpackDescriptor;
+		readonly bytes: ArrayBuffer;
+	}
+}
+
+/** Durable storage contract with metadata-only listing and exact binary reads. */
 export interface ArkpackStorage {
 	readonly close: () => void;
-	readonly list: () => Promise<ReadonlyArray<StoredArkpackRecord>>;
-	readonly read: (packageId: string) => Promise<StoredArkpackRecord | undefined>;
+	readonly list: () => Promise<ReadonlyArray<ArkpackDescriptor>>;
+	readonly read: (packageId: string) => Promise<ArkpackStorage.LoadedRecord | undefined>;
 	readonly remove: (packageId: string) => Promise<void>;
-	readonly write: (record: StoredArkpackRecord) => Promise<void>;
+	readonly write: (descriptor: ArkpackDescriptor, bytes: ArrayBuffer) => Promise<void>;
 }

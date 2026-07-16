@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
-import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
+import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
 
@@ -69,9 +69,8 @@ export const useArkpacks = (): useArkpacks.Result => {
 	const importFile = useCallback(
 		async (file: File) => {
 			const descriptor = await Effect.runPromise(
-				importArkpackFx({
-					filename: file.name,
-					bytes: new Uint8Array(await file.arrayBuffer()),
+				importArkpackFileFx({
+					file,
 				}),
 			);
 			await refresh();

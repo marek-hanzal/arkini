@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
@@ -38,6 +39,17 @@ describe("readArkpackFx", () => {
 		expect(first.descriptor.packageId).toMatch(/^[a-f0-9]{64}$/);
 		expect(second.descriptor.packageId).toBe(first.descriptor.packageId);
 		expect(first.payload.config).toEqual(testArkpackConfig);
+	});
+
+	it("rejects oversized non-File byte inputs at the reader boundary", async () => {
+		await expect(
+			Effect.runPromise(
+				readArkpackFx({
+					bytes: new Uint8Array(ArkpackLimits.maxCompressedBytes + 1),
+					source: "imported",
+				}),
+			),
+		).rejects.toThrow("compressed limit");
 	});
 
 	it("rejects semantically invalid packages before persistence", async () => {

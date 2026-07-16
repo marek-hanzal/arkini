@@ -48,7 +48,7 @@ Dependency direction is `@routes → page → ui → bridge → engine`. Route m
 
 The client uses standard browser history. Browser development uses Vite's HTTP SPA fallback; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://` and hash routing are not supported application modes. Persistent package/save ownership migrates from IndexedDB to typed Electron filesystem repositories under #226 and #217.
 
-The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. `GameShell` creates one complete live `Game` for the selected package through `createGameFx`; future hard reset replaces this whole game instance inside the same shell, leaving the router, package catalog, and non-game branches alive.
+The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` owns one serialized `createGameOwner`; `GameShell` only requests/releases the selected package. Replacement awaits final disposal/save, coalesces obsolete requests, and publishes only the latest completed `Game`. Future hard reset extends this same owner, leaving the router, package catalog, and non-game branches alive.
 
 ## Accepted hard-reset direction
 

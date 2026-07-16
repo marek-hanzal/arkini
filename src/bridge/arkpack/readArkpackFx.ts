@@ -1,13 +1,11 @@
 import { Effect } from "effect";
 
+import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
 import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
-
-const maxCompressedBytes = 64 * 1024 * 1024;
-const maxDecodedBytes = 256 * 1024 * 1024;
 
 export namespace readArkpackFx {
 	export interface Props {
@@ -31,8 +29,10 @@ const readContentHash = (bytes: Uint8Array) =>
 const decompress = (bytes: Uint8Array) =>
 	Effect.tryPromise({
 		try: async () => {
-			if (bytes.byteLength > maxCompressedBytes) {
-				throw new Error(`Arkpack exceeds the ${maxCompressedBytes} byte compressed limit.`);
+			if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
+				throw new Error(
+					`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
+				);
 			}
 			const reader = new Blob([
 				bytes.slice().buffer,
@@ -46,9 +46,11 @@ const decompress = (bytes: Uint8Array) =>
 				const next = await reader.read();
 				if (next.done) break;
 				length += next.value.byteLength;
-				if (length > maxDecodedBytes) {
+				if (length > ArkpackLimits.maxDecodedBytes) {
 					await reader.cancel();
-					throw new Error(`Arkpack exceeds the ${maxDecodedBytes} byte decoded limit.`);
+					throw new Error(
+						`Arkpack exceeds the ${ArkpackLimits.maxDecodedBytes} byte decoded limit.`,
+					);
 				}
 				chunks.push(next.value);
 			}
@@ -97,6 +99,13 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	packageId,
 	source,
 }: readArkpackFx.Props) {
+	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
+		return yield* Effect.fail(
+			new Error(
+				`Arkpack exceeds the ${ArkpackLimits.maxCompressedBytes} byte compressed limit.`,
+			),
+		);
+	}
 	const contentHash = yield* readContentHash(bytes);
 	const payload = yield* decodeFx(yield* decompress(bytes));
 	for (const resource of payload.resources) {
@@ -144,6 +153,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			gameId: payload.config.meta.id,
 			title: payload.config.meta.title,
 			configVersion: payload.config.version,
+			compressedSize: bytes.byteLength,
 			source,
 			...(filename === undefined
 				? {}

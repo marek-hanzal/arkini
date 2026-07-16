@@ -12,7 +12,7 @@ export namespace listArkpacksFx {
 	}
 }
 
-/** Lists the validated official Arkini package followed by every validated local import. */
+/** Lists official Arkini followed by imported metadata without reading imported payload bytes. */
 export const listArkpacksFx = Effect.fn("listArkpacksFx")(function* (
 	props: listArkpacksFx.Props = {},
 ) {
@@ -27,7 +27,7 @@ export const listArkpacksFx = Effect.fn("listArkpacksFx")(function* (
 		});
 		return [
 			arkini.descriptor,
-			...imported.map(({ bytes: _bytes, ...descriptor }) => descriptor),
+			...imported,
 		] satisfies ReadonlyArray<ArkpackDescriptor>;
 	}).pipe(Effect.ensuring(Effect.sync(() => props.storage === undefined && storage.close())));
 });

@@ -76,6 +76,7 @@ const game = {
 		gameId: config.meta.id,
 		title: config.meta.title,
 		configVersion: config.version,
+		compressedSize: 0,
 		source: "imported" as const,
 	},
 	config,

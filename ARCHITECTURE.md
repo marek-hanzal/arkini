@@ -123,7 +123,7 @@ The acquired queue is owned with `Effect.acquireRelease`, so scope cancellation 
 
 ## 4. Live game bridge boundary
 
-`GameSession` owns the Effect services, Tick, subscriptions, and save lifecycle of one loaded engine. The bridge-level `Game` adds the completed config, embedded resource URLs, and one replacement key owned by the `/game` shell. Neither object mirrors runtime state.
+`GameSession` owns the Effect services, Tick, subscriptions, and save lifecycle of one loaded engine. The bridge-level `Game` adds the completed config, embedded resource URLs, and one replacement key. A root-shell `createGameOwner` closure is the only publisher of live `Game` instances; route components request a package but never independently own overlapping sessions. Neither object mirrors runtime state.
 
 The live boundary exposes:
 
@@ -136,6 +136,18 @@ The live boundary exposes:
 - `disposeWithoutSave()` — destructive-reset shutdown that stops autosave and waits for in-flight persistence without writing a final snapshot.
 
 `GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
+
+Replacement follows one serialized ownership transition:
+
+```text
+latest requested package
+→ await current Game.dispose() and final save
+→ create only the latest still-requested package
+→ dispose stale bootstrap exactly once
+→ publish one ready Game, or one truthful failure state
+```
+
+The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal.
 
 ## 5. Runtime and event subscriptions
 
@@ -380,7 +392,7 @@ reject new commands
 → dispose ManagedRuntime
 ```
 
-Concurrent callers share the same cleanup Promise. Confirmed persisted-save nuke uses the separate destructive path:
+Concurrent callers share the same cleanup Promise. The root game owner awaits that Promise before any replacement bootstrap begins, so two sessions cannot write the same package save namespace concurrently. Confirmed persisted-save nuke uses the separate destructive path:
 
 ```text
 reject new commands

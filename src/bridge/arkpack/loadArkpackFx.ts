@@ -49,8 +49,8 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 		}
 		const loaded = yield* readArkpackFx({
 			bytes: new Uint8Array(record.bytes),
-			filename: record.filename,
-			importedAtMs: record.importedAtMs,
+			filename: record.descriptor.filename,
+			importedAtMs: record.descriptor.importedAtMs,
 			source: "imported",
 		});
 		if (loaded.descriptor.contentHash !== packageId) {

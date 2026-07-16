@@ -40,13 +40,14 @@ Next action:
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
 - `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- `GameShell` loads the selected exact package through `bridge/game/createGameFx`, restores its separately namespaced save, owns exactly one live `Game`, and disposes it with the route subtree.
+- `GameOwnerProvider` lives at the stable root shell above the route outlet and owns one `createGameOwner` lifecycle. `GameShell` requests the selected package and releases it on route cleanup; launcher ↔ game navigation and StrictMode replay therefore share the same serialization point.
+- Game replacement always awaits the current `Game.dispose()` final save before creating the latest requested package. Obsolete intermediate requests are coalesced, stale bootstraps are disposed exactly once before publication, and disposal/bootstrap failure becomes a truthful shell failure state.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
 - `/game/$packageId` currently renders the canonical current-space board. Inventory, commands, and final hard reset ownership remain future slices.
 
 ## Live bridge and tile foundation
 
-- `bridge/arkpack` validates compressed package bytes, derives SHA-256 identity, currently persists imported binaries in IndexedDB, and exposes the bundled package through the same startup validation path. #226 moves the persistent catalog to Electron filesystem storage.
+- `bridge/arkpack` validates compressed package bytes, derives SHA-256 identity, and currently persists imported packages in split IndexedDB metadata/payload tables. Catalog listing touches descriptors only; exact package load reads one binary and fully revalidates it. Browser `File.size` is checked before `arrayBuffer()`, while the reader keeps the compressed-byte guard for non-File callers. #226 moves the same contract to Electron filesystem storage.
 - `bridge/save` currently persists gameplay state separately in IndexedDB. Save hydration requires route package identity plus exact content hash; #217 moves this keyed save policy to Electron filesystem storage without changing the multi-package model.
 - `bridge/runtime/useRuntimeSelector` uses `useSyncExternalStore` directly over `Game.getSnapshot` and `Game.subscribe`. It may memoize a selected value for one runtime root but never stores a second runtime or synchronizes through `useEffect`.
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
@@ -180,6 +181,6 @@ Next action:
 
 - `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
 - `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
-- The current `nukeGameSessionFx` is only provisional low-level dispose/delete/create sequencing. It is not the final production hard-reset ownership boundary and must not be expanded in place before shell-owned game replacement is implemented.
-- Final hard reset is deferred to Task 12. `GameShell` must own one complete `Game` created by the same plain factory used for initial startup. Reset disposes that entire game root, deletes persisted state, creates a completely fresh `Game`, and only then atomically publishes it. Do not rename this gameplay root to an abstract “application”.
+- The current `nukeGameSessionFx` is only provisional low-level dispose/delete/create sequencing. It is not the final production hard-reset ownership boundary.
+- The root `createGameOwner` now provides serialized complete-Game replacement for route/package ownership. Final hard reset remains deferred to Task 12 and must extend that same owner with dispose-without-save → delete persisted state → create fresh `Game` → publish; it must not create a second reset owner or rename the gameplay root to an abstract “application”.
 - The root reset owner must single-flight the complete transition so concurrent callers share one result or one failure. Do not mutate the existing engine/session back to an initial state, hide correctness in React-local state, introduce a class solely for ownership, or use a module-global lock/map.

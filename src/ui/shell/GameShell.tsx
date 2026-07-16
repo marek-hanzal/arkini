@@ -1,10 +1,8 @@
-import { Effect } from "effect";
-import { type PropsWithChildren, useEffect, useState } from "react";
+import { type PropsWithChildren, useEffect, useSyncExternalStore } from "react";
 import { Link } from "@tanstack/react-router";
 
-import type { Game } from "~/bridge/game/Game";
 import { GameProvider } from "~/bridge/game/GameProvider";
-import { createGameFx } from "~/bridge/game/createGameFx";
+import { useGameOwner } from "~/bridge/game/useGameOwner";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
 export namespace GameShell {
@@ -13,64 +11,18 @@ export namespace GameShell {
 	}
 }
 
-type GameShellState =
-	| {
-			readonly type: "loading";
-	  }
-	| {
-			readonly type: "ready";
-			readonly game: Game;
-	  }
-	| {
-			readonly type: "failed";
-			readonly error: unknown;
-	  };
-
-/** Owns the replaceable live game instance for one selected package route subtree. */
+/** Requests one package from the root serialized game owner for this route subtree. */
 export function GameShell({ children, packageId }: GameShell.Props) {
-	const [state, setState] = useState<GameShellState>({
-		type: "loading",
-	});
+	const owner = useGameOwner();
+	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
 
 	useEffect(() => {
-		let cancelled = false;
-		setState({
-			type: "loading",
-		});
-		const gamePromise = Effect.runPromise(
-			createGameFx({
-				packageId,
-			}),
-		);
-
-		void gamePromise.then(
-			(game) => {
-				if (cancelled) {
-					void game.dispose();
-					return;
-				}
-				setState({
-					type: "ready",
-					game,
-				});
-			},
-			(error) => {
-				if (!cancelled)
-					setState({
-						type: "failed",
-						error,
-					});
-			},
-		);
-
+		void owner.replace(packageId);
 		return () => {
-			cancelled = true;
-			void gamePromise.then(
-				(game) => game.dispose(),
-				() => undefined,
-			);
+			void owner.replace(null);
 		};
 	}, [
+		owner,
 		packageId,
 	]);
 
@@ -85,13 +37,24 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 				</div>
 			) : state.type === "failed" ? (
 				<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-red-300">
-					<p>Game failed to start: {String(state.error)}</p>
-					<Link
-						to="/"
-						className="rounded-lg border border-white/15 px-3 py-2 text-slate-100"
-					>
-						Back to packages
-					</Link>
+					<p>Game failed to start or close safely: {String(state.error)}</p>
+					<div className="flex flex-wrap justify-center gap-2">
+						{state.packageId === null ? null : (
+							<button
+								type="button"
+								className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
+								onClick={() => void owner.replace(state.packageId)}
+							>
+								Retry
+							</button>
+						)}
+						<Link
+							to="/"
+							className="rounded-lg border border-white/15 px-3 py-2 text-slate-100"
+						>
+							Back to packages
+						</Link>
+					</div>
 				</div>
 			) : (
 				<GameProvider

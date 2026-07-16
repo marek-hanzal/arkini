@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { StoredArkpackRecord } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
@@ -22,15 +21,15 @@ const createStorages = async () => {
 		}),
 	);
 	const record = {
-		...loaded.descriptor,
+		descriptor: loaded.descriptor,
 		bytes: bytes.slice().buffer,
-	} satisfies StoredArkpackRecord;
+	};
 	const arkpackStorage: ArkpackStorage = {
 		close: () => undefined,
 		list: async () => [
-			record,
+			record.descriptor,
 		],
-		read: async (packageId) => (packageId === record.packageId ? record : undefined),
+		read: async (packageId) => (packageId === record.descriptor.packageId ? record : undefined),
 		remove: async () => undefined,
 		write: async () => undefined,
 	};
@@ -47,7 +46,7 @@ const createStorages = async () => {
 	};
 	return {
 		arkpackStorage,
-		packageId: record.packageId,
+		packageId: record.descriptor.packageId,
 		readSaved: () => saved,
 		saveStorage,
 	};

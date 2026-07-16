@@ -10,7 +10,7 @@ Arkini is a client-only, offline merge and production game built around a determ
 
 The engine, compiler, validator, binary packer, deterministic Tick model, runtime session speed control, jobs, queueing, reservations, placement, persistence boundary, and live React bridge are implemented and covered by the repository check gate.
 
-The client uses TanStack Router file-based routing. The root route is a local arkpack launcher: bundled Arkini and validated imported packages share one catalog, imported binaries persist in IndexedDB, and each package opens under `/game/$packageId`. The selected game shell restores a separately namespaced save and renders the current board through a headless tile system. Inventory and gameplay commands remain future slices.
+The client uses TanStack Router file-based routing. The root route is a local arkpack launcher: bundled Arkini and validated imported packages share one catalog, imported binaries persist in IndexedDB, and each package opens under `/game/$packageId`. One root-shell game owner serializes package replacement, final save/disposal, stale-bootstrap cleanup, and publication of the next live `Game`; the selected game renders the current board through a headless tile system. Inventory and gameplay commands remain future slices.
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
@@ -194,7 +194,8 @@ When a chained runner fails to exit cleanly, run the affected shard independentl
 The launcher treats `.arkpack` as the playable package boundary:
 
 - bundled Arkini is listed beside local imports and passes the same decode/schema/semantic/resource validation before startup;
-- imported binaries are addressed by SHA-256 and currently persist in the renderer `arkini-arkpacks` IndexedDB database;
+- imported binaries are addressed by SHA-256 and currently persist in the renderer `arkini-arkpacks` IndexedDB database; catalog listing reads descriptor metadata only, while exact package load reads one selected binary and revalidates its hash, config, resources, and identity;
+- browser import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
 - package binaries and gameplay saves are separate storage boundaries; removing an imported package does not silently delete its save;
 - saves currently live in `arkini-game-saves`, keyed by package identity plus exact content hash;
 - Electron filesystem migration is tracked by #226 for the Arkpack catalog and #217 for per-package saves. IndexedDB remains temporary implementation state until those tasks close;

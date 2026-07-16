@@ -2,6 +2,7 @@ import { app, BrowserWindow, protocol } from "electron";
 import { fileURLToPath } from "node:url";
 import { createMainWindow } from "./createMainWindow";
 import { registerArkiniProtocol } from "./registerArkiniProtocol";
+import { registerWindowLifecycle } from "./registerWindowLifecycle";
 
 protocol.registerSchemesAsPrivileged([
 	{
@@ -40,7 +41,5 @@ if (!hasSingleInstanceLock) {
 		});
 	});
 
-	app.on("window-all-closed", () => {
-		if (process.platform !== "darwin") app.quit();
-	});
+	registerWindowLifecycle(app);
 }

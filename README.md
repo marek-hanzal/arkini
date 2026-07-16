@@ -144,22 +144,27 @@ Biome format check
 → Dependency Cruiser architecture rules
 → source TypeScript check
 → test TypeScript check
-→ production browser build
+→ production Electron build
 → complete Vitest suite
 ```
 
-Renderer and desktop shell commands:
+Application commands:
 
 ```bash
 npm run dev
 npm run build
 npm run preview
-npm run dev:desktop
-npm run build:desktop
-npm run preview:desktop
 ```
 
-The first desktop development or preview run verifies the Electron executable and downloads the matching binary through Electron's own installer when npm has installed only the JavaScript package shell. Later runs reuse the installed/cached binary.
+These are the primary Electron commands. Browser-only diagnostics remain explicit:
+
+```bash
+npm run dev:browser
+npm run build:browser
+npm run preview:browser
+```
+
+`npm install` and `npm ci` run Electron's official `install-electron` binary through the project `postinstall`, so the matching native executable is prepared during dependency installation rather than during application startup. Closing the last Electron window quits the application and also terminates the owning `electron-vite` command and renderer development server.
 
 The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 

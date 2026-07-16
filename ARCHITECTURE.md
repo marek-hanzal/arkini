@@ -10,7 +10,7 @@ Electron is a thin sibling platform adapter, not another application or another 
 
 ```text
 electron/main + electron/preload
-→ BrowserWindow, custom protocol, future typed filesystem capabilities
+→ BrowserWindow, custom protocol, controlled close, typed Arkpack/save filesystem capabilities
 
 src/@routes → src/page → src/ui → src/bridge → src/engine
 → the only renderer, route tree, game bridge, and engine
@@ -18,7 +18,7 @@ src/@routes → src/page → src/ui → src/bridge → src/engine
 
 Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard browser history in both environments: `/` is the Arkpack selector and `/game/$packageId` owns one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
 
-Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The preload remains empty until a concrete typed platform capability is introduced.
+Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
 
 ## 1. Core model
 
@@ -147,7 +147,44 @@ latest requested package
 → publish one ready Game, or one truthful failure state
 ```
 
-The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal.
+The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal. HMR stores the old owner shutdown Promise in Vite hot data; replacement code waits for that Promise before creating another session. Electron close is also controlled by the same shutdown: the window closes only after final save succeeds, while failure leaves the window open in a truthful retryable state.
+
+Hard reset is the same owner transition with destructive save policy:
+
+```text
+current Game.disposeWithoutSave()
+→ clear only current packageId + contentHash save
+→ create the same package through the normal bootstrap path
+→ publish one fresh Game
+```
+
+Concurrent hard-reset callers share one Promise and cannot create orphan sessions.
+
+### 4.1 Arkpack and save persistence
+
+Electron `userData` owns two separate opaque repositories:
+
+```text
+<userData>/arkini/arkpacks/<sha256>/
+  package.arkpack
+  descriptor.json
+
+<userData>/arkini/saves/<packageId>/<contentHash>/
+  current.arksave
+  pending.arksave
+```
+
+The original validated Arkpack binary is canonical. Catalog list reads only derived descriptor files; exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
+
+The engine's existing `StateSchema` is the complete canonical save state; creating a separate alias schema would add a second name without a second contract. `fromRuntimeFx` produces a detached state, and session construction hydrates a fresh runtime from validated state. The save codec wraps that state in exactly:
+
+```text
+{ namespace: "arkini", format: 1, state }
+```
+
+Electron stores the resulting MessagePack bytes opaquely. Writes sync `pending.arksave` and atomically rename it over `current.arksave`; failed replacement preserves the previous successful save. Package identity and content hash select the repository path and are intentionally absent from engine state and the envelope.
+
+Browser-only diagnostics use process-local memory adapters. They are not a second persistent product backend.
 
 ## 5. Runtime and event subscriptions
 

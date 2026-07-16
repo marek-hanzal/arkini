@@ -87,7 +87,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `selector/` | Superseded | Current query/selector compiler and runtime evaluation are canonical | Nothing architectural | 17 |
 | `stack/` | Superseded | Current placement stacking is canonical | Animation intent only | 14 |
 | `stash/` | Archive-ready | Generic line start/output/completion supersede runtime behavior | Product copy, animation, and audio only | 13–15, 17 |
-| `storage/` | Superseded | Active bridge now owns separate IndexedDB arkpack and package-namespaced save storage; package removal is isolated from save deletion | Final hard-reset and cleanup policy remain | 12, 17 |
+| `storage/` | Superseded | Active bridge owns separate Electron filesystem Arkpack and package/hash save repositories; package removal is isolated from save deletion and hard reset is root-owner controlled | Initial UX only if needed | 12, 17 |
 | `tile-engine/` | Reference | Its cyclic package topology is rejected | Pointer, DnD, hit testing, motion behavior | 11, 12, 14 |
 | `time/` | Superseded | Wall-clock jobs and hidden catch-up are rejected | Formatting only | 13, 17 |
 | `ui/` | Reference | No active renderer | Shared visual components and tokens | 12, 13 |

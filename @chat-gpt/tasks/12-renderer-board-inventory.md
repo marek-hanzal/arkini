@@ -20,7 +20,7 @@ Create the active browser shell and render board/inventory directly from the can
 - the generated TanStack Router tree exists; `/` selects bundled or persistent local Arkpacks and `/game/$packageId` loads the selected package, restores its save, and renders the first read-only board slice;
 - `bridge/board/useBoard`, `ui/board`, and the headless `ui/tile` foundation exist;
 - UI may intentionally lag visually during animation, but canonical truth remains the live runtime;
-- `nukeGameSessionFx` currently provides provisional dispose/delete/create sequencing, but it is not a safe final production reset owner because the complete transition is not shell-owned.
+- the stable root `createGameOwner` now owns serialized package replacement and single-flight hard reset; no provisional parallel reset helper remains.
 
 
 ## Accepted router and page boundary
@@ -46,15 +46,15 @@ src/engine
 
 Dependency direction is `@routes → page → ui → bridge → engine`. Route modules point to standalone page components and contain no gameplay, session, or game composition. The `/game` file route is a layout branch whose page composes `GameShell` with an `Outlet`; future `/dev/**` routes remain outside this shell.
 
-The client uses standard browser history. Browser development uses Vite's HTTP SPA fallback; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://` and hash routing are not supported application modes. Persistent package/save ownership migrates from IndexedDB to typed Electron filesystem repositories under #226 and #217.
+The client uses standard browser history. Browser development uses Vite's HTTP SPA fallback; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://` and hash routing are not supported application modes. Persistent package/save ownership is implemented through typed Electron filesystem repositories. Browser diagnostics use memory-only adapters and are not a persistent product path.
 
-The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` owns one serialized `createGameOwner`; `GameShell` only requests/releases the selected package. Replacement awaits final disposal/save, coalesces obsolete requests, and publishes only the latest completed `Game`. Future hard reset extends this same owner, leaving the router, package catalog, and non-game branches alive.
+The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` owns one serialized `createGameOwner`; `GameShell` only requests/releases the selected package. Replacement awaits final disposal/save, coalesces obsolete requests, and publishes only the latest completed `Game`. Hard reset uses this same owner, leaving the router, package catalog, and non-game branches alive.
 
 ## Accepted hard-reset direction
 
 Hard reset is complete `Game` replacement, not an in-place engine mutation.
 
-The browser shell must own one complete running `Game` created by a plain factory/composition function. That game root includes every lifecycle-bearing resource introduced by the shell, such as the game session, Tick ownership, autosave, subscriptions, Effect scopes, browser listeners, read-model adapters, and persistence wiring.
+The root renderer shell owns one complete running `Game` created by a plain factory/composition function. That game root includes every lifecycle-bearing resource introduced by the shell, such as the game session, Tick ownership, autosave, subscriptions, Effect scopes, browser listeners, read-model adapters, and persistence wiring.
 
 Initial startup and post-reset startup must use the same factory path:
 

@@ -8,12 +8,67 @@
 	text-rendering: optimizeLegibility;
 }
 
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
 html,
 body,
 #root {
-	min-height: 100%;
+	width: 100%;
+	height: 100%;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
 }
 
 body {
 	margin: 0;
+	overscroll-behavior: none;
+}
+
+[data-ui="BoardViewport"] {
+	container-type: size;
+	display: grid;
+	place-items: center;
+}
+
+[data-ui="BoardGrid"] {
+	width: 100%;
+	max-width: 100%;
+	max-height: 100%;
+	gap: clamp(1px, 0.45vmin, 6px);
+	padding: clamp(2px, 0.55vmin, 7px);
+}
+
+@supports (width: 1cqw) {
+	[data-ui="BoardGrid"] {
+		width: min(100cqw, var(--board-width-from-height));
+		height: min(100cqh, var(--board-height-from-width));
+	}
+}
+
+[data-ui="BoardTile"] {
+	container-type: size;
+}
+
+[data-ui="BoardTileTitle"] {
+	font-size: clamp(0.35rem, 12cqw, 0.7rem);
+	line-height: 1.1;
+}
+
+[data-ui="BoardTileQuantity"] {
+	min-width: clamp(1rem, 24cqw, 1.5rem);
+	font-size: clamp(0.4rem, 14cqw, 0.75rem);
+	line-height: 1;
+}
+
+.scrollbar-hidden {
+	scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+	display: none;
 }

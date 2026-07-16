@@ -166,6 +166,8 @@ npm run preview:browser
 
 `npm install` and `npm ci` run Electron's official `install-electron` binary through the project `postinstall`, so the matching native executable is prepared during dependency installation rather than during application startup. Closing the last Electron window quits the application and also terminates the owning `electron-vite` command and renderer development server.
 
+The main window opens centered at 75% of the active monitor work area. `F11` and `Alt+Enter` toggle native fullscreen. One root renderer canvas owns the exact viewport, hides document scrollbars, and requires game/UI content to fit the available window rather than expanding it; the board continuously uses the largest rectangle that preserves its authored aspect ratio.
+
 The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 
 Useful focused commands:

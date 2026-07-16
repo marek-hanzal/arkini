@@ -33,15 +33,17 @@ export const ArkpackSelector = () => {
 
 	return (
 		<main
-			className="min-h-dvh bg-slate-950 px-5 py-10 text-slate-100"
+			className="size-full min-h-0 min-w-0 overflow-hidden bg-slate-950 p-[clamp(1rem,3vmin,2.5rem)] text-slate-100"
 			data-ui="ArkpackSelector"
 		>
-			<div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
+			<div className="mx-auto grid h-full min-h-0 w-full max-w-3xl grid-rows-[auto_auto_minmax(0,1fr)] gap-[clamp(0.75rem,2.5vmin,2rem)]">
 				<header>
 					<p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
 						Arkini launcher
 					</p>
-					<h1 className="mt-2 text-3xl font-semibold">Choose a game package</h1>
+					<h1 className="mt-2 text-[clamp(1.5rem,4vmin,1.875rem)] font-semibold">
+						Choose a game package
+					</h1>
 					<p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
 						Imported arkpacks stay on this device. Every package is validated before it
 						can run.
@@ -65,7 +67,7 @@ export const ArkpackSelector = () => {
 					)}
 				</section>
 
-				<section className="grid gap-3">
+				<section className="scrollbar-hidden grid min-h-0 content-start gap-3 overflow-y-auto overscroll-contain">
 					{state.type === "loading" ? (
 						<p className="text-sm text-slate-400">Reading local packages…</p>
 					) : state.type === "failed" ? (
@@ -76,7 +78,7 @@ export const ArkpackSelector = () => {
 						state.arkpacks.map((arkpack) => (
 							<article
 								key={arkpack.packageId}
-								className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/70 p-4"
+								className="flex min-w-0 flex-col items-stretch justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/70 p-4 sm:flex-row sm:items-center"
 							>
 								<div className="min-w-0">
 									<div className="flex items-center gap-2">
@@ -92,7 +94,7 @@ export const ArkpackSelector = () => {
 											`${arkpack.gameId} · config ${arkpack.configVersion}`}
 									</p>
 								</div>
-								<div className="flex shrink-0 items-center gap-2">
+								<div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
 									{arkpack.source === "imported" ? (
 										<button
 											type="button"

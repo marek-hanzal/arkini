@@ -76,15 +76,15 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 
 	return (
 		<main
-			className="min-h-dvh bg-slate-950 text-slate-100"
+			className="size-full min-h-0 min-w-0 overflow-hidden bg-slate-950 text-slate-100"
 			data-ui="GameShell"
 		>
 			{state.type === "loading" ? (
-				<div className="flex min-h-dvh items-center justify-center text-sm text-slate-300">
+				<div className="flex size-full min-h-0 min-w-0 items-center justify-center overflow-hidden text-sm text-slate-300">
 					Loading game…
 				</div>
 			) : state.type === "failed" ? (
-				<div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center text-sm text-red-300">
+				<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-red-300">
 					<p>Game failed to start: {String(state.error)}</p>
 					<Link
 						to="/"

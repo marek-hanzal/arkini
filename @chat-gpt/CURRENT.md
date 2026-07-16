@@ -52,6 +52,8 @@ Next action:
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
 - `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.
 - `BoardTile` receives canonical identity + revision from the live board projection. Revision change or unmount cancels stale pointer state; replacing `Game` remounts the complete tile system.
+- `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
+- Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
 - Animations added later must continuously target the latest bridge snapshot. They may be interrupted/replanned and never queue authoritative state behind presentation.
 
 ## Test execution

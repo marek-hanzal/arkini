@@ -1,12 +1,13 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow, screen } from "electron";
 import { fileURLToPath } from "node:url";
+import { calculateInitialWindowBounds } from "./calculateInitialWindowBounds";
+import { registerFullscreenShortcuts } from "./registerFullscreenShortcuts";
 
 export async function createMainWindow(): Promise<BrowserWindow> {
+	const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+	const bounds = calculateInitialWindowBounds(display.workArea);
 	const window = new BrowserWindow({
-		width: 1280,
-		height: 900,
-		minWidth: 720,
-		minHeight: 640,
+		...bounds,
 		show: false,
 		backgroundColor: "#0f172a",
 		webPreferences: {
@@ -17,6 +18,7 @@ export async function createMainWindow(): Promise<BrowserWindow> {
 		},
 	});
 
+	registerFullscreenShortcuts(window);
 	window.webContents.setWindowOpenHandler(() => ({
 		action: "deny",
 	}));

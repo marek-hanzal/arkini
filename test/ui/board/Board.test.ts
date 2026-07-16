@@ -99,7 +99,11 @@ describe("Board", () => {
 			}),
 		);
 
-		expect(html).toContain("Board space 0");
+		expect(html).toContain("board space 0");
+		expect(html).toContain('data-ui="BoardViewport"');
+		expect(html).toContain('data-ui="BoardGrid"');
+		expect(html).toContain("--board-width-from-height:150cqh");
+		expect(html).not.toContain("36rem");
 		expect(html).toContain('data-item-id="water"');
 		expect(html).toContain("data-runtime-revision=");
 		expect(html).toContain('src="resource:asset:water"');

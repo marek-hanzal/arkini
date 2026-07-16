@@ -76,15 +76,16 @@ export const createGameSession = async <SaveError>({
 		disposePromise = (async () => {
 			let flushError: unknown;
 			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
-			if (saveMode === "discard") await discardSave();
-			await managed.runPromise(Scope.close(sessionScope, Exit.void));
-			if (saveMode === "flush") {
+			if (saveMode === "discard") {
+				await discardSave();
+			} else {
 				try {
 					await flushSave();
 				} catch (error) {
 					flushError = error;
 				}
 			}
+			await managed.runPromise(Scope.close(sessionScope, Exit.void));
 			await managed.dispose();
 			if (flushError !== undefined) throw flushError;
 		})();

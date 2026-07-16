@@ -80,6 +80,10 @@ const game = {
 		source: "imported" as const,
 	},
 	config,
+	saveKey: {
+		packageId: "test-package",
+		contentHash: "0".repeat(64),
+	},
 	instanceKey: "test-game",
 	getSnapshot: () => runtime,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,

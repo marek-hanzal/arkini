@@ -1,23 +1,22 @@
 import { Effect } from "effect";
-
-import { DexieGameSaveStorage } from "~/bridge/save/DexieGameSaveStorage";
+import { createGameSaveStorage } from "~/bridge/save/createGameSaveStorage";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 export namespace deleteGameSaveFx {
 	export interface Props {
-		packageId: string;
+		key: GameSaveStorage.Key;
 		storage?: GameSaveStorage;
 	}
 }
 
-/** Deletes only the selected package save and never its installed arkpack binary. */
+/** Deletes only one exact package/hash save and never its installed Arkpack binary. */
 export const deleteGameSaveFx = Effect.fn("deleteGameSaveFx")(function* ({
-	packageId,
+	key,
 	storage: providedStorage,
 }: deleteGameSaveFx.Props) {
-	const storage = providedStorage ?? new DexieGameSaveStorage();
+	const storage = providedStorage ?? createGameSaveStorage();
 	return yield* Effect.tryPromise({
-		try: () => storage.remove(packageId),
+		try: () => storage.clear(key),
 		catch: (cause) => cause,
 	}).pipe(Effect.ensuring(Effect.sync(() => providedStorage === undefined && storage.close())));
 });

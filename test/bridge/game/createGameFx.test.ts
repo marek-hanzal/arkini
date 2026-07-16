@@ -1,3 +1,4 @@
+import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -5,7 +6,6 @@ import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import {
 	createTestArkpack,
 	testArkpackConfig,
@@ -33,21 +33,24 @@ const createStorages = async () => {
 		remove: async () => undefined,
 		write: async () => undefined,
 	};
-	let saved: StateSchema.Type | null = null;
+	let saved: Uint8Array | null = null;
 	const saveStorage: GameSaveStorage = {
 		close: () => undefined,
-		read: async () => saved,
-		remove: async () => {
+		read: async () => saved?.slice() ?? null,
+		clear: async () => {
 			saved = null;
 		},
-		write: async ({ state }) => {
-			saved = state;
+		write: async (_key, bytes) => {
+			saved = bytes.slice();
 		},
 	};
 	return {
 		arkpackStorage,
 		packageId: record.descriptor.packageId,
 		readSaved: () => saved,
+		setSaved: (bytes: Uint8Array | null) => {
+			saved = bytes?.slice() ?? null;
+		},
 		saveStorage,
 	};
 };
@@ -99,6 +102,31 @@ describe("createGameFx", () => {
 		} finally {
 			await restored.dispose();
 		}
+	});
+
+	it("rejects an invalid save before constructing or starting a partial game session", async () => {
+		const storages = await createStorages();
+		storages.setSaved(
+			encode({
+				namespace: "arkini",
+				format: 999,
+				state: {},
+			}),
+		);
+		const createObjectUrl = vi.spyOn(URL, "createObjectURL");
+
+		await expect(
+			Effect.runPromise(
+				createGameFx({
+					packageId: storages.packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
+				}),
+			),
+		).rejects.toThrow();
+
+		expect(createObjectUrl).not.toHaveBeenCalled();
+		expect(storages.readSaved()).not.toBeNull();
 	});
 
 	it("disposes a partial game bootstrap and revokes created resources when resource setup fails", async () => {

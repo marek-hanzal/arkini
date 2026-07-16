@@ -1,11 +1,12 @@
 import { Effect } from "effect";
-
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import type { Game } from "~/bridge/game/Game";
 import type { GameSession } from "~/bridge/game/GameSession";
 import { createGameSession } from "~/bridge/game/createGameSession";
-import { DexieGameSaveStorage } from "~/bridge/save/DexieGameSaveStorage";
+import { createGameSaveStorage } from "~/bridge/save/createGameSaveStorage";
+import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
+import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { startFx } from "~/engine/start/write/startFx";
 
@@ -17,7 +18,7 @@ export namespace createGameFx {
 	}
 }
 
-/** Loads one selected package, restores its namespaced save and returns one live game. */
+/** Loads one selected package, restores its exact save and returns one live game. */
 export const createGameFx = Effect.fn("createGameFx")(function* ({
 	packageId,
 	arkpackStorage,
@@ -31,7 +32,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					storage: arkpackStorage,
 				}),
 	});
-	const saveStorage = providedSaveStorage ?? new DexieGameSaveStorage();
+	const saveStorage = providedSaveStorage ?? createGameSaveStorage();
 	const resourceUrls = new Map<string, string>();
 	let session: GameSession | undefined;
 
@@ -58,33 +59,35 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	);
 
 	return yield* Effect.gen(function* () {
-		const saveScope = {
+		const saveKey: GameSaveStorage.Key = {
 			packageId: loaded.descriptor.packageId,
 			contentHash: loaded.descriptor.contentHash,
 		};
-		const state = yield* Effect.tryPromise({
-			try: () => saveStorage.read(saveScope),
+		const savedBytes = yield* Effect.tryPromise({
+			try: () => saveStorage.read(saveKey),
 			catch: (cause) => cause,
 		});
+		const state =
+			savedBytes === null ? undefined : (yield* decodeArkiniSaveFx(savedBytes)).state;
 		session = yield* Effect.tryPromise({
 			try: () =>
 				createGameSession({
 					config: loaded.payload.config,
-					...(state === null
+					...(state === undefined
 						? {}
 						: {
 								state,
 							}),
 					save: {
 						write: (nextState) =>
-							Effect.tryPromise({
-								try: () =>
-									saveStorage.write({
-										...saveScope,
-										state: nextState,
+							encodeArkiniSaveFx(nextState).pipe(
+								Effect.flatMap((bytes) =>
+									Effect.tryPromise({
+										try: () => saveStorage.write(saveKey, bytes),
+										catch: (cause) => cause,
 									}),
-								catch: (cause) => cause,
-							}),
+								),
+							),
 					},
 				}),
 			catch: (cause) => cause,
@@ -106,7 +109,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				);
 			}
 		});
-		if (state === null) {
+		if (state === undefined) {
 			yield* Effect.tryPromise({
 				try: () =>
 					session?.run(startFx()) ?? Promise.reject(new Error("Game session missing.")),
@@ -133,6 +136,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			dispose: () => disposeWith("save"),
 			disposeWithoutSave: () => disposeWith("discard"),
 			instanceKey: crypto.randomUUID(),
+			saveKey,
 			getResourceUrl: (resourceId) => {
 				const url = resourceUrls.get(resourceId);
 				if (url === undefined)

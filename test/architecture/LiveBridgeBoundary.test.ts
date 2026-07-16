@@ -36,6 +36,20 @@ describe("live game bridge boundary", () => {
 		expect(source).not.toContain("useEffect");
 	});
 
+	it("keeps one root owner across routes, HMR handoff, and controlled Electron close", () => {
+		const root = read("src/page/RootPage.tsx");
+		const provider = read("src/ui/shell/GameOwnerProvider.tsx");
+		const shell = read("src/ui/shell/GameShell.tsx");
+
+		expect(root).toContain("<GameOwnerProvider>");
+		expect(root).toContain("<Outlet />");
+		expect(provider).toContain("import.meta.hot?.dispose");
+		expect(provider).toContain("await previousHotShutdown");
+		expect(provider).toContain("lifecycle.onBeforeClose");
+		expect(shell).toContain("owner.replace(packageId)");
+		expect(shell).not.toContain("game.dispose");
+	});
+
 	it("keeps the headless tile domain independent from game and bridge truth", () => {
 		const offenders = readTypeScriptFiles("src/ui/tile").filter((path) =>
 			/~\/(?:engine|bridge)\//.test(read(path)),

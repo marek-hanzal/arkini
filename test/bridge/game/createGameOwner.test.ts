@@ -6,9 +6,10 @@ import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import type { Game } from "~/bridge/game/Game";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { createGameOwner } from "~/bridge/game/createGameOwner";
+import { shutdownGameOwner } from "~/bridge/game/shutdownGameOwner";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import {
 	createTestArkpack,
 	testArkpackConfig,
@@ -43,6 +44,10 @@ const createFakeGame = (
 		source: "imported",
 	},
 	config: testArkpackConfig,
+	saveKey: {
+		packageId,
+		contentHash: packageId,
+	},
 	instanceKey,
 	dispose,
 	disposeWithoutSave: dispose,
@@ -62,41 +67,69 @@ const expectReady = (owner: createGameOwner.Owner) => {
 };
 
 const createRealStorages = async () => {
-	const bytes = createTestArkpack();
-	const loaded = await Effect.runPromise(
-		readArkpackFx({
-			bytes,
-			filename: "owner.arkpack",
-			source: "imported",
+	const secondConfig = GameConfigSchema.parse({
+		...testArkpackConfig,
+		meta: {
+			...testArkpackConfig.meta,
+			id: "game:bridge-second",
+			title: "Bridge game second",
+		},
+	});
+	const records = await Promise.all(
+		[
+			{
+				config: testArkpackConfig,
+				filename: "owner-a.arkpack",
+			},
+			{
+				config: secondConfig,
+				filename: "owner-b.arkpack",
+			},
+		].map(async ({ config, filename }) => {
+			const bytes = createTestArkpack(config);
+			const loaded = await Effect.runPromise(
+				readArkpackFx({
+					bytes,
+					filename,
+					source: "imported",
+				}),
+			);
+			return {
+				descriptor: loaded.descriptor,
+				bytes: bytes.slice().buffer,
+			} satisfies ArkpackStorage.LoadedRecord;
 		}),
 	);
-	const record: ArkpackStorage.LoadedRecord = {
-		descriptor: loaded.descriptor,
-		bytes: bytes.slice().buffer,
-	};
+	const recordsById = new Map(
+		records.map((record) => [
+			record.descriptor.packageId,
+			record,
+		]),
+	);
 	const arkpackStorage: ArkpackStorage = {
 		close: () => undefined,
-		list: async () => [
-			record.descriptor,
-		],
-		read: async (packageId) => (packageId === record.descriptor.packageId ? record : undefined),
+		list: async () => records.map(({ descriptor }) => descriptor),
+		read: async (packageId) => recordsById.get(packageId),
 		remove: async () => undefined,
 		write: async () => undefined,
 	};
-	let saved: StateSchema.Type | null = null;
+	const saveKey = ({ packageId, contentHash }: GameSaveStorage.Key) =>
+		`${packageId}:${contentHash}`;
+	const saves = new Map<string, Uint8Array>();
 	const saveStorage: GameSaveStorage = {
 		close: () => undefined,
-		read: async () => saved,
-		remove: async () => {
-			saved = null;
+		read: async (key) => saves.get(saveKey(key))?.slice() ?? null,
+		clear: async (key) => {
+			saves.delete(saveKey(key));
 		},
-		write: async ({ state }) => {
-			saved = state;
+		write: async (key, bytes) => {
+			saves.set(saveKey(key), bytes.slice());
 		},
 	};
 	return {
 		arkpackStorage,
-		packageId: record.descriptor.packageId,
+		packageId: records[0]?.descriptor.packageId ?? "",
+		secondPackageId: records[1]?.descriptor.packageId ?? "",
 		saveStorage,
 	};
 };
@@ -106,6 +139,7 @@ describe("createGameOwner", () => {
 		const release = deferred<void>();
 		const creates: string[] = [];
 		const owner = createGameOwner({
+			clearSave: async () => undefined,
 			create: async (packageId) => {
 				creates.push(packageId);
 				return createFakeGame(
@@ -138,6 +172,7 @@ describe("createGameOwner", () => {
 		const creates: string[] = [];
 		let firstDisposeCalls = 0;
 		const owner = createGameOwner({
+			clearSave: async () => undefined,
 			create: async (packageId) => {
 				creates.push(packageId);
 				return createFakeGame(packageId, `${packageId}:${creates.length}`, async () => {
@@ -175,6 +210,7 @@ describe("createGameOwner", () => {
 		const staleDispose = vi.fn(() => Promise.resolve());
 		const creates: string[] = [];
 		const owner = createGameOwner({
+			clearSave: async () => undefined,
 			create: async (packageId) => {
 				creates.push(packageId);
 				if (packageId === "A") return firstCreate.promise;
@@ -203,6 +239,7 @@ describe("createGameOwner", () => {
 		const failure = new Error("final save failed");
 		const creates: string[] = [];
 		const owner = createGameOwner({
+			clearSave: async () => undefined,
 			create: async (packageId) => {
 				creates.push(packageId);
 				return createFakeGame(packageId, packageId, () => Promise.reject(failure));
@@ -222,9 +259,190 @@ describe("createGameOwner", () => {
 		});
 	});
 
+	it("runs hard reset as one shared discard, exact clear and fresh boot", async () => {
+		const calls: string[] = [];
+		let generation = 0;
+		const owner = createGameOwner({
+			clearSave: async (game) => {
+				calls.push(`clear:${game.instanceKey}`);
+			},
+			create: async (packageId) => {
+				generation += 1;
+				const instanceKey = `${packageId}:${generation}`;
+				calls.push(`create:${instanceKey}`);
+				return {
+					...createFakeGame(packageId, instanceKey),
+					dispose: async () => {
+						calls.push(`save:${instanceKey}`);
+					},
+					disposeWithoutSave: async () => {
+						calls.push(`discard:${instanceKey}`);
+					},
+				};
+			},
+		});
+
+		await owner.replace("A");
+		const first = owner.hardReset();
+		const second = owner.hardReset();
+		expect(second).toBe(first);
+		await first;
+
+		expect(calls).toEqual([
+			"create:A:1",
+			"discard:A:1",
+			"clear:A:1",
+			"create:A:2",
+		]);
+		expect(expectReady(owner).instanceKey).toBe("A:2");
+		await owner.replace(null);
+	});
+
+	it("does not boot a replacement when hard-reset clearing fails", async () => {
+		const failure = new Error("clear failed");
+		let creates = 0;
+		const owner = createGameOwner({
+			clearSave: async () => Promise.reject(failure),
+			create: async (packageId) => {
+				creates += 1;
+				return createFakeGame(packageId, String(creates));
+			},
+		});
+		await owner.replace("A");
+		await owner.hardReset();
+		expect(creates).toBe(1);
+		expect(owner.getSnapshot()).toEqual({
+			type: "failed",
+			packageId: "A",
+			error: failure,
+		});
+	});
+
+	it("hard resets a real selected package by discarding, clearing its exact save and booting fresh", async () => {
+		const storages = await createRealStorages();
+		const owner = createGameOwner({
+			clearSave: (game) => storages.saveStorage.clear(game.saveKey),
+			create: (packageId) =>
+				Effect.runPromise(
+					createGameFx({
+						packageId,
+						arkpackStorage: storages.arkpackStorage,
+						saveStorage: storages.saveStorage,
+					}),
+				),
+		});
+		await owner.replace(storages.packageId);
+		const beforeReset = expectReady(owner);
+		await beforeReset.run(
+			spawnItemFx({
+				id: "runtime:reset-progress",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+
+		await owner.hardReset();
+		const afterReset = expectReady(owner);
+		expect(afterReset.instanceKey).not.toBe(beforeReset.instanceKey);
+		expect(afterReset.getSnapshot().items).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					id: "runtime:reset-progress",
+				}),
+			]),
+		);
+		expect(afterReset.getSnapshot().items).toHaveLength(1);
+		await owner.replace(null);
+	});
+
+	it("keeps real package saves isolated while switching through one serialized owner", async () => {
+		const storages = await createRealStorages();
+		const owner = createGameOwner({
+			clearSave: (game) => storages.saveStorage.clear(game.saveKey),
+			create: (packageId) =>
+				Effect.runPromise(
+					createGameFx({
+						packageId,
+						arkpackStorage: storages.arkpackStorage,
+						saveStorage: storages.saveStorage,
+					}),
+				),
+		});
+		await owner.replace(storages.packageId);
+		await expectReady(owner).run(
+			spawnItemFx({
+				id: "runtime:first-package",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+		await owner.replace(storages.secondPackageId);
+		await expectReady(owner).run(
+			spawnItemFx({
+				id: "runtime:second-package",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+
+		await owner.replace(storages.packageId);
+		const firstRestoredIds = expectReady(owner)
+			.getSnapshot()
+			.items.map(({ id }) => id);
+		expect(firstRestoredIds).toContain("runtime:first-package");
+		expect(firstRestoredIds).not.toContain("runtime:second-package");
+
+		await owner.replace(storages.secondPackageId);
+		const secondRestoredIds = expectReady(owner)
+			.getSnapshot()
+			.items.map(({ id }) => id);
+		expect(secondRestoredIds).toContain("runtime:second-package");
+		expect(secondRestoredIds).not.toContain("runtime:first-package");
+		await owner.replace(null);
+	});
+
+	it("rejects a failed controlled shutdown and permits an explicit second close attempt", async () => {
+		const failure = new Error("final save failed");
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) =>
+				createFakeGame(packageId, packageId, () => Promise.reject(failure)),
+		});
+		await owner.replace("A");
+		await expect(shutdownGameOwner(owner)).rejects.toBe(failure);
+		expect(owner.getSnapshot().type).toBe("failed");
+		await expect(shutdownGameOwner(owner)).resolves.toBeUndefined();
+		expect(owner.getSnapshot()).toEqual({
+			type: "loading",
+			packageId: null,
+		});
+	});
+
 	it("restores the latest real saved runtime only after the previous owner releases it", async () => {
 		const storages = await createRealStorages();
 		const owner = createGameOwner({
+			clearSave: async () => undefined,
 			create: (packageId) =>
 				Effect.runPromise(
 					createGameFx({

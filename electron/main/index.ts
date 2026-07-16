@@ -2,6 +2,7 @@ import { app, BrowserWindow, protocol } from "electron";
 import { fileURLToPath } from "node:url";
 import { createMainWindow } from "./createMainWindow";
 import { registerArkiniProtocol } from "./registerArkiniProtocol";
+import { registerArkiniDesktopIpc } from "./registerArkiniDesktopIpc";
 import { registerWindowLifecycle } from "./registerWindowLifecycle";
 
 protocol.registerSchemesAsPrivileged([
@@ -32,6 +33,7 @@ if (!hasSingleInstanceLock) {
 	app.whenReady().then(async () => {
 		const rendererRoot = fileURLToPath(new URL("../renderer", import.meta.url));
 		await registerArkiniProtocol(rendererRoot);
+		registerArkiniDesktopIpc();
 		await createMainWindow();
 
 		app.on("activate", async () => {

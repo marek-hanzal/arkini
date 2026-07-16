@@ -135,12 +135,36 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "desktop-contract-only-through-bridge-or-electron",
+		comment:
+			"The shared desktop contract is consumed only by the renderer bridge and Electron platform adapters, never by engine, UI, pages, routes, or CLI.",
+		severity: "error",
+		from: {
+			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
+		},
+		to: {
+			path: "^desktop(?:/|$)",
+		},
+	},
+	{
+		name: "desktop-contract-is-pure",
+		comment:
+			"The shared desktop contract contains types and channel names only; it never imports renderer, engine, Electron, or CLI implementation code.",
+		severity: "error",
+		from: {
+			path: "^desktop(?:/|$)",
+		},
+		to: {
+			path: "^(?:src|electron|cli)(?:/|$)|^node_modules/electron(?:/|$)",
+		},
+	},
+	{
 		name: "active-code-no-archive-imports",
 		comment:
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli|test)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop|cli|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -202,7 +226,7 @@ module.exports = {
 				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],
@@ -226,7 +250,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop|cli)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

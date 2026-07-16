@@ -18,19 +18,25 @@ export namespace createGameOwner {
 
 	export interface Props {
 		readonly create: (packageId: string) => Promise<Game>;
+		readonly clearSave: (game: Game) => Promise<void>;
 	}
 
 	export interface Owner {
 		readonly getSnapshot: () => State;
 		readonly replace: (packageId: string | null) => Promise<void>;
+		readonly hardReset: () => Promise<void>;
 		readonly subscribe: (listener: () => void) => () => void;
 	}
 }
 
 /** Serializes one shell's exclusive ownership of replaceable live game instances. */
-export const createGameOwner = ({ create }: createGameOwner.Props): createGameOwner.Owner => {
+export const createGameOwner = ({
+	create,
+	clearSave,
+}: createGameOwner.Props): createGameOwner.Owner => {
 	const listeners = new Set<() => void>();
 	let requestedPackageId: string | null = null;
+	let requestedHardReset = false;
 	let requestVersion = 0;
 	let settledVersion = 0;
 	let current: Game | undefined;
@@ -62,8 +68,15 @@ export const createGameOwner = ({ create }: createGameOwner.Props): createGameOw
 			if (current !== undefined) {
 				const releasing = current;
 				current = undefined;
+				const hardReset = requestedHardReset && packageId === releasing.arkpack.packageId;
 				try {
-					await releasing.dispose();
+					if (hardReset) {
+						await releasing.disposeWithoutSave();
+						await clearSave(releasing);
+						requestedHardReset = false;
+					} else {
+						await releasing.dispose();
+					}
 				} catch (error) {
 					fail(requestVersion, error);
 					return;
@@ -73,6 +86,10 @@ export const createGameOwner = ({ create }: createGameOwner.Props): createGameOw
 
 			if (packageId === null) {
 				settledVersion = version;
+				publish({
+					type: "loading",
+					packageId: null,
+				});
 				return;
 			}
 
@@ -80,7 +97,6 @@ export const createGameOwner = ({ create }: createGameOwner.Props): createGameOw
 				type: "loading",
 				packageId,
 			});
-
 			let created: Game;
 			try {
 				created = await create(packageId);
@@ -123,24 +139,41 @@ export const createGameOwner = ({ create }: createGameOwner.Props): createGameOw
 		getSnapshot: () => state,
 		replace: (packageId) => {
 			if (
+				!requestedHardReset &&
 				packageId === requestedPackageId &&
 				settledVersion === requestVersion &&
-				((packageId === null && current === undefined) ||
+				((packageId === null &&
+					current === undefined &&
+					state.type === "loading" &&
+					state.packageId === null) ||
 					(packageId !== null &&
 						current?.arkpack.packageId === packageId &&
 						state.type === "ready"))
 			) {
 				return Promise.resolve();
 			}
-
 			requestedPackageId = packageId;
+			requestedHardReset = false;
 			requestVersion += 1;
-			if (packageId !== null) {
+			if (packageId !== null)
 				publish({
 					type: "loading",
 					packageId,
 				});
+			return ensureRunning();
+		},
+		hardReset: () => {
+			if (requestedHardReset) return ensureRunning();
+			if (current === undefined || state.type !== "ready") {
+				return Promise.reject(new Error("A ready game is required for hard reset."));
 			}
+			requestedPackageId = current.arkpack.packageId;
+			requestedHardReset = true;
+			requestVersion += 1;
+			publish({
+				type: "loading",
+				packageId: requestedPackageId,
+			});
 			return ensureRunning();
 		},
 		subscribe: (listener) => {

@@ -1,7 +1,8 @@
-import { BrowserWindow, screen } from "electron";
+import { BrowserWindow, ipcMain, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { calculateInitialWindowBounds } from "./calculateInitialWindowBounds";
 import { registerFullscreenShortcuts } from "./registerFullscreenShortcuts";
+import { registerControlledWindowClose } from "./registerControlledWindowClose";
 
 export async function createMainWindow(): Promise<BrowserWindow> {
 	const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
@@ -19,6 +20,7 @@ export async function createMainWindow(): Promise<BrowserWindow> {
 	});
 
 	registerFullscreenShortcuts(window);
+	registerControlledWindowClose(window, ipcMain);
 	window.webContents.setWindowOpenHandler(() => ({
 		action: "deny",
 	}));

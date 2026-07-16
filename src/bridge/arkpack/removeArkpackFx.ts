@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { DexieArkpackStorage } from "~/bridge/arkpack/DexieArkpackStorage";
+import { createArkpackStorage } from "~/bridge/arkpack/createArkpackStorage";
 
 export namespace removeArkpackFx {
 	export interface Props {
@@ -15,7 +15,7 @@ export const removeArkpackFx = Effect.fn("removeArkpackFx")(function* ({
 	packageId,
 	storage: providedStorage,
 }: removeArkpackFx.Props) {
-	const storage = providedStorage ?? new DexieArkpackStorage();
+	const storage = providedStorage ?? createArkpackStorage();
 	return yield* Effect.tryPromise({
 		try: () => storage.remove(packageId),
 		catch: (cause) => cause,

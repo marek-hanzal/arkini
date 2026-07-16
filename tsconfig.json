@@ -18,9 +18,13 @@
 				"./src/*"
 			]
 		},
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"types": [
+			"vite/client"
+		]
 	},
 	"include": [
+		"desktop",
 		"cli",
 		"src/engine",
 		"src/bridge",

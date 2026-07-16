@@ -256,6 +256,7 @@ describe("createGameOwner", () => {
 			type: "failed",
 			packageId: "B",
 			error: failure,
+			canForceShutdown: false,
 		});
 	});
 
@@ -315,6 +316,7 @@ describe("createGameOwner", () => {
 			type: "failed",
 			packageId: "A",
 			error: failure,
+			canForceShutdown: false,
 		});
 	});
 
@@ -422,17 +424,107 @@ describe("createGameOwner", () => {
 		await owner.replace(null);
 	});
 
-	it("rejects a failed controlled shutdown and permits an explicit second close attempt", async () => {
+	it("shares one in-flight final save across repeated close requests", async () => {
+		const release = deferred<void>();
+		const dispose = vi.fn(() => release.promise);
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => createFakeGame(packageId, packageId, dispose),
+		});
+		await owner.replace("A");
+
+		const first = shutdownGameOwner(owner);
+		const second = shutdownGameOwner(owner);
+		await Promise.resolve();
+		expect(dispose).toHaveBeenCalledOnce();
+
+		release.resolve();
+		await Promise.all([
+			first,
+			second,
+		]);
+		expect(dispose).toHaveBeenCalledOnce();
+	});
+
+	it("closes cleanly through the same protocol when no game is active", async () => {
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => createFakeGame(packageId, packageId),
+		});
+
+		await expect(shutdownGameOwner(owner)).resolves.toBeUndefined();
+		expect(owner.getSnapshot()).toEqual({
+			type: "loading",
+			packageId: null,
+		});
+	});
+
+	it("retries the same final save obligation after a controlled shutdown failure", async () => {
 		const failure = new Error("final save failed");
+		let disposeCalls = 0;
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create: async (packageId) =>
-				createFakeGame(packageId, packageId, () => Promise.reject(failure)),
+				createFakeGame(packageId, packageId, async () => {
+					disposeCalls += 1;
+					if (disposeCalls === 1) throw failure;
+				}),
+		});
+		await owner.replace("A");
+
+		await expect(shutdownGameOwner(owner)).rejects.toBe(failure);
+		expect(owner.getSnapshot()).toEqual({
+			type: "failed",
+			packageId: null,
+			error: failure,
+			canForceShutdown: true,
+		});
+
+		await expect(shutdownGameOwner(owner)).resolves.toBeUndefined();
+		expect(disposeCalls).toBe(2);
+		expect(owner.getSnapshot()).toEqual({
+			type: "loading",
+			packageId: null,
+		});
+	});
+
+	it("never converts a repeated final-save failure into a successful shutdown", async () => {
+		const failure = new Error("disk remains full");
+		const dispose = vi.fn(() => Promise.reject(failure));
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => createFakeGame(packageId, packageId, dispose),
+		});
+		await owner.replace("A");
+
+		await expect(shutdownGameOwner(owner)).rejects.toBe(failure);
+		await expect(shutdownGameOwner(owner)).rejects.toBe(failure);
+		expect(dispose).toHaveBeenCalledTimes(2);
+		expect(owner.getSnapshot()).toEqual({
+			type: "failed",
+			packageId: null,
+			error: failure,
+			canForceShutdown: true,
+		});
+	});
+
+	it("discards the retained game only after an explicit force-shutdown decision", async () => {
+		const failure = new Error("final save failed");
+		const dispose = vi.fn(() => Promise.reject(failure));
+		const discard = vi.fn(() => Promise.resolve());
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => ({
+				...createFakeGame(packageId, packageId, dispose),
+				disposeWithoutSave: discard,
+			}),
 		});
 		await owner.replace("A");
 		await expect(shutdownGameOwner(owner)).rejects.toBe(failure);
-		expect(owner.getSnapshot().type).toBe("failed");
-		await expect(shutdownGameOwner(owner)).resolves.toBeUndefined();
+
+		await expect(owner.forceShutdown()).resolves.toBeUndefined();
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(discard).toHaveBeenCalledOnce();
 		expect(owner.getSnapshot()).toEqual({
 			type: "loading",
 			packageId: null,

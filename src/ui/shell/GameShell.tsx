@@ -36,26 +36,28 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 					Loading game…
 				</div>
 			) : state.type === "failed" ? (
-				<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-red-300">
-					<p>Game failed to start or close safely: {String(state.error)}</p>
-					<div className="flex flex-wrap justify-center gap-2">
-						{state.packageId === null ? null : (
-							<button
-								type="button"
-								className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
-								onClick={() => void owner.replace(state.packageId)}
+				state.canForceShutdown ? null : (
+					<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-red-300">
+						<p>Game failed to start or close safely: {String(state.error)}</p>
+						<div className="flex flex-wrap justify-center gap-2">
+							{state.packageId === null ? null : (
+								<button
+									type="button"
+									className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
+									onClick={() => void owner.replace(state.packageId)}
+								>
+									Retry
+								</button>
+							)}
+							<Link
+								to="/"
+								className="rounded-lg border border-white/15 px-3 py-2 text-slate-100"
 							>
-								Retry
-							</button>
-						)}
-						<Link
-							to="/"
-							className="rounded-lg border border-white/15 px-3 py-2 text-slate-100"
-						>
-							Back to packages
-						</Link>
+								Back to packages
+							</Link>
+						</div>
 					</div>
-				</div>
+				)
 			) : (
 				<GameProvider
 					key={state.game.instanceKey}

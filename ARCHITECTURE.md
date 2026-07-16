@@ -132,8 +132,8 @@ The live boundary exposes:
 - `subscribe(listener)` — runtime invalidation subscription;
 - `subscribeEvents(listener)` — transient event batches for presentation;
 - `flushSave()` — explicit persistence flush;
-- `dispose()` — coordinated shutdown with a final save;
-- `disposeWithoutSave()` — destructive-reset shutdown that stops autosave and waits for in-flight persistence without writing a final snapshot.
+- `dispose()` — coordinated shutdown with a retryable final save. A failed flush freezes the session and retains the same canonical runtime for another disposal attempt; resources are released only after the save succeeds;
+- `disposeWithoutSave()` — explicit destructive shutdown used by hard reset or user-confirmed force exit. It stops autosave and releases the frozen session without writing a final snapshot.
 
 `GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
 
@@ -147,7 +147,7 @@ latest requested package
 → publish one ready Game, or one truthful failure state
 ```
 
-The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal. HMR stores the old owner shutdown Promise in Vite hot data; replacement code waits for that Promise before creating another session. Electron close is also controlled by the same shutdown: the window closes only after final save succeeds, while failure leaves the window open in a truthful retryable state.
+The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal. HMR stores the old owner shutdown Promise in Vite hot data; replacement code waits for that Promise before creating another session. Electron close is also controlled by the same shutdown: the window closes only after final save succeeds. A failed final save keeps the same frozen `Game` owned and retryable; repeating close retries that exact obligation. The shell exposes an explicit force-exit-without-saving decision. It starts best-effort discard cleanup and authorizes main to close immediately without pretending that the final save succeeded.
 
 Hard reset is the same owner transition with destructive save policy:
 

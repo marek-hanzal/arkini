@@ -46,6 +46,10 @@ describe("live game bridge boundary", () => {
 		expect(provider).toContain("import.meta.hot?.dispose");
 		expect(provider).toContain("await previousHotShutdown");
 		expect(provider).toContain("lifecycle.onBeforeClose");
+		expect(provider).toContain("Retry safe exit");
+		expect(provider).toContain("Force exit without saving");
+		expect(provider).toContain("lifecycle.requestClose");
+		expect(provider).toContain("lifecycle.forceClose");
 		expect(shell).toContain("owner.replace(packageId)");
 		expect(shell).not.toContain("game.dispose");
 	});

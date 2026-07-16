@@ -11,23 +11,41 @@ export function registerControlledWindowClose(
 	let closeAllowed = false;
 	let closeRequested = false;
 
-	const removeListeners = () => {
+	const removeResponseListeners = () => {
 		ipc.removeListener(ArkiniDesktopApi.channels.closeReady, onCloseReady);
 		ipc.removeListener(ArkiniDesktopApi.channels.closeFailed, onCloseFailed);
 	};
+	const removeAllListeners = () => {
+		removeResponseListeners();
+		ipc.removeListener(ArkiniDesktopApi.channels.requestClose, onRequestClose);
+		ipc.removeListener(ArkiniDesktopApi.channels.forceClose, onForceClose);
+	};
+	const ownsWindow = (event: IpcMainEvent) => event.sender.id === window.webContents.id;
 	const onCloseReady = (event: IpcMainEvent) => {
-		if (event.sender.id !== window.webContents.id) return;
+		if (!ownsWindow(event)) return;
 		closeAllowed = true;
-		removeListeners();
+		removeAllListeners();
 		if (!window.isDestroyed()) window.close();
 	};
 	const onCloseFailed = (event: IpcMainEvent, message: string) => {
-		if (event.sender.id !== window.webContents.id) return;
+		if (!ownsWindow(event)) return;
 		closeRequested = false;
-		removeListeners();
+		removeResponseListeners();
 		console.error("Arkini renderer refused to close after a failed final save:", message);
 	};
+	const onRequestClose = (event: IpcMainEvent) => {
+		if (!ownsWindow(event) || window.isDestroyed()) return;
+		window.close();
+	};
+	const onForceClose = (event: IpcMainEvent) => {
+		if (!ownsWindow(event)) return;
+		closeAllowed = true;
+		removeAllListeners();
+		if (!window.isDestroyed()) window.close();
+	};
 
+	ipc.on(ArkiniDesktopApi.channels.requestClose, onRequestClose);
+	ipc.on(ArkiniDesktopApi.channels.forceClose, onForceClose);
 	window.on("close", (event) => {
 		if (closeAllowed || window.webContents.isDestroyed()) return;
 		event.preventDefault();
@@ -39,8 +57,8 @@ export function registerControlledWindowClose(
 	});
 	window.webContents.once("render-process-gone", () => {
 		closeAllowed = true;
-		removeListeners();
+		removeAllListeners();
 		if (!window.isDestroyed()) window.destroy();
 	});
-	window.once("closed", removeListeners);
+	window.once("closed", removeAllListeners);
 }

@@ -14,6 +14,7 @@ export namespace createGameOwner {
 				readonly type: "failed";
 				readonly packageId: string | null;
 				readonly error: unknown;
+				readonly canForceShutdown: boolean;
 		  };
 
 	export interface Props {
@@ -25,6 +26,7 @@ export namespace createGameOwner {
 		readonly getSnapshot: () => State;
 		readonly replace: (packageId: string | null) => Promise<void>;
 		readonly hardReset: () => Promise<void>;
+		readonly forceShutdown: () => Promise<void>;
 		readonly subscribe: (listener: () => void) => () => void;
 	}
 }
@@ -37,6 +39,7 @@ export const createGameOwner = ({
 	const listeners = new Set<() => void>();
 	let requestedPackageId: string | null = null;
 	let requestedHardReset = false;
+	let requestedForceShutdown = false;
 	let requestVersion = 0;
 	let settledVersion = 0;
 	let current: Game | undefined;
@@ -57,6 +60,8 @@ export const createGameOwner = ({
 			type: "failed",
 			packageId: requestedPackageId,
 			error,
+			canForceShutdown:
+				requestedPackageId === null && current !== undefined && !requestedHardReset,
 		});
 	};
 
@@ -67,16 +72,20 @@ export const createGameOwner = ({
 
 			if (current !== undefined) {
 				const releasing = current;
-				current = undefined;
 				const hardReset = requestedHardReset && packageId === releasing.arkpack.packageId;
+				const forceShutdown = requestedForceShutdown && packageId === null;
 				try {
 					if (hardReset) {
 						await releasing.disposeWithoutSave();
 						await clearSave(releasing);
 						requestedHardReset = false;
+					} else if (forceShutdown) {
+						await releasing.disposeWithoutSave();
+						requestedForceShutdown = false;
 					} else {
 						await releasing.dispose();
 					}
+					current = undefined;
 				} catch (error) {
 					fail(requestVersion, error);
 					return;
@@ -140,6 +149,7 @@ export const createGameOwner = ({
 		replace: (packageId) => {
 			if (
 				!requestedHardReset &&
+				!requestedForceShutdown &&
 				packageId === requestedPackageId &&
 				settledVersion === requestVersion &&
 				((packageId === null &&
@@ -154,6 +164,7 @@ export const createGameOwner = ({
 			}
 			requestedPackageId = packageId;
 			requestedHardReset = false;
+			requestedForceShutdown = false;
 			requestVersion += 1;
 			if (packageId !== null)
 				publish({
@@ -169,10 +180,24 @@ export const createGameOwner = ({
 			}
 			requestedPackageId = current.arkpack.packageId;
 			requestedHardReset = true;
+			requestedForceShutdown = false;
 			requestVersion += 1;
 			publish({
 				type: "loading",
 				packageId: requestedPackageId,
+			});
+			return ensureRunning();
+		},
+		forceShutdown: () => {
+			if (requestedForceShutdown) return ensureRunning();
+			if (current === undefined) return Promise.resolve();
+			requestedPackageId = null;
+			requestedHardReset = false;
+			requestedForceShutdown = true;
+			requestVersion += 1;
+			publish({
+				type: "loading",
+				packageId: null,
 			});
 			return ensureRunning();
 		},

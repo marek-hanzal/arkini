@@ -63,11 +63,15 @@ const createHarness = () => {
 		});
 		return preventDefault;
 	};
+	const emitWebContents = (event: string) => {
+		webContentsListeners.get(event)?.();
+	};
 
 	return {
 		close,
 		destroy,
 		emitIpc,
+		emitWebContents,
 		requestClose,
 		send,
 	};
@@ -84,6 +88,8 @@ describe("registerControlledWindowClose", () => {
 
 		harness.emitIpc(ArkiniDesktopApi.channels.closeReady);
 		expect(harness.close).toHaveBeenCalledOnce();
+		const recursiveClose = harness.requestClose();
+		expect(recursiveClose).not.toHaveBeenCalled();
 	});
 
 	it("keeps the window open after a failed final save and permits an explicit retry", () => {
@@ -102,5 +108,33 @@ describe("registerControlledWindowClose", () => {
 		expect(harness.send).toHaveBeenCalledTimes(2);
 		harness.emitIpc(ArkiniDesktopApi.channels.closeReady);
 		expect(harness.close).toHaveBeenCalledOnce();
+	});
+	it("routes an explicit renderer retry through the same guarded close handshake", () => {
+		const harness = createHarness();
+		harness.emitIpc(ArkiniDesktopApi.channels.requestClose);
+		expect(harness.close).toHaveBeenCalledOnce();
+
+		const preventDefault = harness.requestClose();
+		expect(preventDefault).toHaveBeenCalledOnce();
+		expect(harness.send).toHaveBeenCalledWith(ArkiniDesktopApi.channels.beforeClose);
+	});
+
+	it("allows an explicit force-close decision without another save acknowledgement", () => {
+		const harness = createHarness();
+		harness.requestClose();
+		harness.emitIpc(ArkiniDesktopApi.channels.closeFailed, "disk full");
+
+		harness.emitIpc(ArkiniDesktopApi.channels.forceClose);
+		expect(harness.close).toHaveBeenCalledOnce();
+		const preventDefault = harness.requestClose();
+		expect(preventDefault).not.toHaveBeenCalled();
+	});
+	it("distinguishes renderer crash from an acknowledged clean close", () => {
+		const harness = createHarness();
+		harness.requestClose();
+
+		harness.emitWebContents("render-process-gone");
+		expect(harness.destroy).toHaveBeenCalledOnce();
+		expect(harness.close).not.toHaveBeenCalled();
 	});
 });

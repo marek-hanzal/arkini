@@ -61,36 +61,46 @@ export const createGameSession = async <SaveError>({
 	const runCommand = await managed.runPromise(
 		FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(sessionScope)),
 	);
+	let shutdownStarted = false;
 	let disposed = false;
+	let stopPromise: Promise<void> | undefined;
 	let disposePromise: Promise<void> | undefined;
 
 	const flushSave = () =>
 		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)));
 	const discardSave = () =>
 		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.discard)));
+	const stopGameLoop = () => {
+		if (stopPromise !== undefined) return stopPromise;
+		const pending = managed.runPromise(
+			GameLoopFx.pipe(Effect.flatMap((service) => service.stop)),
+		);
+		stopPromise = pending;
+		void pending.catch(() => {
+			if (stopPromise === pending) stopPromise = undefined;
+		});
+		return pending;
+	};
 
 	const disposeWithSaveMode = (saveMode: "flush" | "discard") => {
 		if (disposePromise !== undefined) return disposePromise;
+		if (disposed) return Promise.resolve();
 
-		disposed = true;
-		disposePromise = (async () => {
-			let flushError: unknown;
-			await managed.runPromise(GameLoopFx.pipe(Effect.flatMap((service) => service.stop)));
-			if (saveMode === "discard") {
-				await discardSave();
-			} else {
-				try {
-					await flushSave();
-				} catch (error) {
-					flushError = error;
-				}
-			}
+		shutdownStarted = true;
+		const pending = (async () => {
+			await stopGameLoop();
+			if (saveMode === "discard") await discardSave();
+			else await flushSave();
 			await managed.runPromise(Scope.close(sessionScope, Exit.void));
 			await managed.dispose();
-			if (flushError !== undefined) throw flushError;
+			disposed = true;
 		})();
+		disposePromise = pending;
+		void pending.catch(() => {
+			if (disposePromise === pending) disposePromise = undefined;
+		});
 
-		return disposePromise;
+		return pending;
 	};
 
 	const dispose = () => disposeWithSaveMode("flush");
@@ -115,14 +125,15 @@ export const createGameSession = async <SaveError>({
 		getSnapshot: () => managed.runSync(readRuntimeFx()),
 		run: (effect) => {
 			if (disposed) return Promise.reject(new Error("Game session is disposed."));
+			if (shutdownStarted) return Promise.reject(new Error("Game session is shutting down."));
 			return runCommand(effect);
 		},
 		subscribe: (listener) => {
-			if (disposed) return () => undefined;
+			if (shutdownStarted || disposed) return () => undefined;
 			return openSubscription(transitionSubscriptions.subscribe(listener));
 		},
 		subscribeEvents: (listener) => {
-			if (disposed) return () => undefined;
+			if (shutdownStarted || disposed) return () => undefined;
 			return openSubscription(transitionSubscriptions.subscribeEvents(listener));
 		},
 	};

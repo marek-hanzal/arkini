@@ -34,6 +34,8 @@ const api: ArkiniDesktopApi.Api = {
 			beforeCloseListeners.add(listener);
 			return () => beforeCloseListeners.delete(listener);
 		},
+		requestClose: () => ipcRenderer.send(ArkiniDesktopApi.channels.requestClose),
+		forceClose: () => ipcRenderer.send(ArkiniDesktopApi.channels.forceClose),
 	},
 };
 

@@ -10,6 +10,8 @@ export namespace ArkiniDesktopApi {
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
 		closeFailed: "arkini:lifecycle:close-failed",
+		requestClose: "arkini:lifecycle:request-close",
+		forceClose: "arkini:lifecycle:force-close",
 	} as const;
 
 	export interface ArkpackDescriptor {
@@ -48,6 +50,8 @@ export namespace ArkiniDesktopApi {
 		};
 		readonly lifecycle: {
 			readonly onBeforeClose: (listener: () => Promise<void>) => () => void;
+			readonly requestClose: () => void;
+			readonly forceClose: () => void;
 		};
 	}
 }

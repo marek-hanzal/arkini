@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 
@@ -10,6 +10,21 @@ export const ArkpackSelector = () => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [busy, setBusy] = useState(false);
 	const [actionError, setActionError] = useState<unknown>();
+
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key !== "Escape" || busy) return;
+			event.preventDefault();
+			void navigate({
+				to: "/main-menu",
+			});
+		};
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [
+		busy,
+		navigate,
+	]);
 
 	const upload = async (file: File | undefined) => {
 		if (file === undefined) return;
@@ -38,8 +53,14 @@ export const ArkpackSelector = () => {
 		>
 			<div className="mx-auto grid h-full min-h-0 w-full max-w-3xl grid-rows-[auto_auto_minmax(0,1fr)] gap-[clamp(0.75rem,2.5vmin,2rem)]">
 				<header>
+					<Link
+						to="/main-menu"
+						className="mb-4 inline-flex rounded-lg border border-line px-3 py-2 text-xs font-semibold text-muted transition-colors hover:border-line-strong hover:text-foreground"
+					>
+						← Main menu
+					</Link>
 					<p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
-						Arkini launcher
+						Arkini arkpacks
 					</p>
 					<h1 className="mt-2 text-[clamp(1.5rem,4vmin,1.875rem)] font-semibold">
 						Choose a game package

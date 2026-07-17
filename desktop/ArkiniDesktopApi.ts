@@ -1,3 +1,4 @@
+import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema";
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 
 export namespace ArkiniDesktopApi {
@@ -11,6 +12,8 @@ export namespace ArkiniDesktopApi {
 		saveClear: "arkini:save:clear",
 		appearanceRead: "arkini:appearance:read",
 		appearanceWrite: "arkini:appearance:write",
+		appearanceAccentRead: "arkini:appearance:accent:read",
+		appearanceAccentWrite: "arkini:appearance:accent:write",
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
 		closeFailed: "arkini:lifecycle:close-failed",
@@ -50,6 +53,8 @@ export namespace ArkiniDesktopApi {
 		readonly appearance: {
 			readonly read: () => Promise<AppearanceThemeSchema.Type>;
 			readonly write: (theme: AppearanceThemeSchema.Type) => Promise<void>;
+			readonly readAccent: () => Promise<AppearanceAccentSchema.Type>;
+			readonly writeAccent: (accent: AppearanceAccentSchema.Type) => Promise<void>;
 		};
 		readonly save: {
 			readonly read: (key: SaveKey) => Promise<Uint8Array | null>;
@@ -58,7 +63,7 @@ export namespace ArkiniDesktopApi {
 		};
 		readonly lifecycle: {
 			readonly onBeforeClose: (listener: () => Promise<void>) => () => void;
-			readonly requestClose: () => void;
+			readonly requestClose: () => Promise<void>;
 			readonly forceClose: () => void;
 		};
 	}

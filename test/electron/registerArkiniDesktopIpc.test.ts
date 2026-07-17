@@ -69,6 +69,16 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniDesktopApi.channels.appearanceAccentRead,
+		[],
+	],
+	[
+		ArkiniDesktopApi.channels.appearanceAccentWrite,
+		[
+			"rose",
+		],
+	],
+	[
 		ArkiniDesktopApi.channels.arkpackList,
 		[],
 	],
@@ -198,6 +208,15 @@ describe("registerArkiniDesktopIpcFx", () => {
 			await expect(
 				invoke(ArkiniDesktopApi.channels.appearanceRead, trustedEvent),
 			).resolves.toBe("light");
+			await expect(
+				invoke(ArkiniDesktopApi.channels.appearanceAccentRead, trustedEvent),
+			).resolves.toBe("rose");
+			await expect(
+				invoke(ArkiniDesktopApi.channels.appearanceAccentWrite, trustedEvent, "blue"),
+			).resolves.toBeUndefined();
+			await expect(
+				invoke(ArkiniDesktopApi.channels.appearanceAccentRead, trustedEvent),
+			).resolves.toBe("blue");
 
 			const arkpackBytes = new Uint8Array([
 				1,

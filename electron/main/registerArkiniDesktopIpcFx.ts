@@ -57,7 +57,7 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 				ipcMain.handle(ArkiniDesktopApi.channels.appearanceWrite, (event, theme) =>
 					runAuthorizedFx(
 						event,
-						appearancePreferences.writeFx(theme).pipe(
+						appearancePreferences.writeThemeFx(theme).pipe(
 							Effect.tap(() =>
 								Effect.sync(() => {
 									nativeTheme.themeSource = theme;
@@ -66,6 +66,12 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 							),
 						),
 					),
+				);
+				ipcMain.handle(ArkiniDesktopApi.channels.appearanceAccentRead, (event) =>
+					runAuthorizedFx(event, appearancePreferences.readAccentFx),
+				);
+				ipcMain.handle(ArkiniDesktopApi.channels.appearanceAccentWrite, (event, accent) =>
+					runAuthorizedFx(event, appearancePreferences.writeAccentFx(accent)),
 				);
 
 				ipcMain.handle(ArkiniDesktopApi.channels.arkpackList, (event) =>
@@ -105,6 +111,8 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 					for (const channel of [
 						ArkiniDesktopApi.channels.appearanceRead,
 						ArkiniDesktopApi.channels.appearanceWrite,
+						ArkiniDesktopApi.channels.appearanceAccentRead,
+						ArkiniDesktopApi.channels.appearanceAccentWrite,
 						ArkiniDesktopApi.channels.arkpackList,
 						ArkiniDesktopApi.channels.arkpackRead,
 						ArkiniDesktopApi.channels.arkpackInstall,

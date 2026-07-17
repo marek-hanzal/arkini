@@ -35,7 +35,15 @@ src/@routes → src/page → src/ui → src/bridge → src/engine
 → the only renderer, route tree, game bridge, and engine
 ```
 
-Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` is the Arkpack selector and `/game/$packageId` owns one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
+Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` owns the one-session startup splash, `/main-menu` the semantic launcher menu, `/arkpacks` the shared package selector, `/about` credits, and `/game/$packageId` one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
+
+### Renderer startup and launcher ownership
+
+One renderer-session `LauncherStartup` owner is created beside the router and one root-owned `ArkpackCatalog`. Bootstrap starts immediately while the visible route remains a pure-black splash for approximately 500 ms. Theme/accent reads publish early when available; trusted preload readiness, one catalog refresh, canonical built-in package resolution, and Hero preload complete the hard bootstrap. The startup owner exposes only synchronous snapshots, retry, and one idempotent splash-completion flag; it is not a query cache or a second persistence owner.
+
+After the black hold, the complete Hero composition fades in as one scene. Automatic exit requires both successful bootstrap and five seconds elapsed from startup. Escape is ignored before readiness, uses the same one-shot transition afterward, and reduced motion removes animation delay without changing lifecycle ordering. A failed bootstrap remains on `/` with explicit retry. Once completion is recorded, later client navigation to `/` redirects to `/main-menu` without replaying the splash.
+
+`/main-menu` reads the canonical built-in package identity from `LauncherStartup` and the current package list from the shared catalog. `/arkpacks` reuses that same catalog owner and the existing selector; no QueryClient catalog state or duplicate list exists. `/about` is standalone. Out-of-game routes never create a `Game`. Main-menu Exit and in-game Save and exit both request the trusted native controlled-close handshake; the latter is saved by the existing `GameOwner.shutdownFx` before Electron receives `closeReady`. Route release remains a distinct operation for ordinary route ownership changes.
 
 The renderer is also a strict authorization boundary. One main-process trusted-renderer capability owns the registered Arkini windows and parses every candidate URL with `URL`. Development allows only the exact configured loopback Vite origin; packaged mode ignores `ELECTRON_RENDERER_URL` and allows only the `arkini://app` origin. Main-frame navigation may remain within that origin, while external navigation, redirects, every subframe, `<webview>`, popup, and unused Chromium permission are denied before content is admitted. Every privileged invoke/send channel validates the registered `webContents`, exact main-frame identity, and trusted current frame URL. `webContents.id` alone is never authorization.
 
@@ -45,7 +53,7 @@ Packaged protocol responses set the production Content Security Policy. Developm
 
 Every production desktop build explicitly composes `packOfficialGameFx → buildDesktopOutputFx`; the generated official Arkpack is therefore available before Vite imports it, even in a fresh checkout. Local packaged preview composes clean → build once → stage → `electron-builder --dir` → launch the exact `release/mac-arm64/Arkini.app`. Release delivery composes clean → build once → stage → invoke `electron-builder` once for DMG/ZIP → stream SHA-256 values once → verify artifact and unpacked-app structure. The standalone verify command deliberately re-streams artifacts because it validates downloads or later changes; the combined package operation never rehashes files it just hashed. CI runs format, type, and source-validation gates before this same package command, then runs Dependency Cruiser and permanent tests against the generated package inputs. Fresh checkouts never require stale ignored output, and no top-level build, preview, or package operation packs the official game more than once.
 
-Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, one appearance preference, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
+Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, theme/accent preferences, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
 
 ## 1. Core model
 
@@ -243,6 +251,8 @@ Electron `userData` owns separate Arkpack, save, and appearance namespaces:
 <userData>/arkini/preferences/
   appearance.theme
   appearance.pending
+  appearance.accent
+  appearance-accent.pending
 ```
 
 The original validated Arkpack binary is canonical. Imported catalog listing reads only derived `descriptor.json` files. Official Arkini listing reads only its generated tracked metadata sidecar, which is emitted from the same validated pack operation as the bundled binary. Exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use; official exact load additionally rejects a binary whose validated descriptor differs from the sidecar. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
@@ -255,7 +265,7 @@ The engine's existing `StateSchema` is the complete canonical save state; creati
 
 Electron stores the resulting MessagePack bytes opaquely. Writes sync `pending.arksave` and atomically rename it over `current.arksave`; failed replacement preserves the previous successful save. Package identity and content hash select the repository path and are intentionally absent from engine state and the envelope.
 
-Appearance preference writes use the same pending-file atomic replacement grammar; missing or malformed committed data resolves to the dark default. Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
+Theme and accent preference writes use the same pending-file atomic replacement grammar; missing or malformed committed data resolves to dark and rose. Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
 
 Persistence is Effect-native on both sides of the IPC transport:
 
@@ -307,7 +317,7 @@ UI may own:
 - labels, icons, grouping, sorting, and interpolation;
 - presentation queues derived from transient events.
 
-UI appearance uses one semantic color-token source in `src/ui/styles.css`. Active components consume meaning-based utilities such as canvas, surface, foreground, accent, status, and overlay colors rather than palette-specific Tailwind classes or repeated `dark:` branches. The selected preference is `dark | light | system`; missing or malformed durable data defaults to `dark`, while `system` is respected only after explicit user selection. Electron persists and applies the selection through `nativeTheme`; CSS `color-scheme` and `light-dark()` resolve the renderer palette and follow later operating-system changes without a second resolved-theme store. Appearance remains outside engine runtime and gameplay saves.
+UI appearance uses one semantic color-token source in `src/ui/styles.css`. Active components consume meaning-based utilities such as canvas, surface, foreground, accent, status, and overlay colors rather than palette-specific Tailwind classes or repeated `dark:` branches. Theme is `dark | light | system`; accent is one explicit semantic palette. Missing or malformed durable data defaults to dark and rose, while `system` is respected only after explicit user selection. Electron persists theme and accent atomically and applies theme through `nativeTheme`; CSS `color-scheme`, `light-dark()`, and root accent tokens resolve the renderer palette without a second resolved-theme store. Appearance remains outside engine runtime and gameplay saves.
 
 UI may not own or reconstruct:
 

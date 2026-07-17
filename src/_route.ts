@@ -9,10 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./@routes/__root"
+import { Route as MainMenuRouteImport } from "./@routes/main-menu"
+import { Route as ArkpacksRouteImport } from "./@routes/arkpacks"
+import { Route as AboutRouteImport } from "./@routes/about"
 import { Route as IndexRouteImport } from "./@routes/index"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
 import { Route as GamePackageIdIndexRouteImport } from "./@routes/game/$packageId/index"
 
+const MainMenuRoute = MainMenuRouteImport.update({
+  id: "/main-menu",
+  path: "/main-menu",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArkpacksRoute = ArkpacksRouteImport.update({
+  id: "/arkpacks",
+  path: "/arkpacks",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: "/about",
+  path: "/about",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
@@ -31,34 +49,80 @@ const GamePackageIdIndexRoute = GamePackageIdIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/about": typeof AboutRoute
+  "/arkpacks": typeof ArkpacksRoute
+  "/main-menu": typeof MainMenuRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/": typeof GamePackageIdIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/about": typeof AboutRoute
+  "/arkpacks": typeof ArkpacksRoute
+  "/main-menu": typeof MainMenuRoute
   "/game/$packageId": typeof GamePackageIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
+  "/about": typeof AboutRoute
+  "/arkpacks": typeof ArkpacksRoute
+  "/main-menu": typeof MainMenuRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/": typeof GamePackageIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/game/$packageId" | "/game/$packageId/"
+  fullPaths:
+    | "/"
+    | "/about"
+    | "/arkpacks"
+    | "/main-menu"
+    | "/game/$packageId"
+    | "/game/$packageId/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/game/$packageId"
-  id: "__root__" | "/" | "/game/$packageId" | "/game/$packageId/"
+  to: "/" | "/about" | "/arkpacks" | "/main-menu" | "/game/$packageId"
+  id:
+    | "__root__"
+    | "/"
+    | "/about"
+    | "/arkpacks"
+    | "/main-menu"
+    | "/game/$packageId"
+    | "/game/$packageId/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ArkpacksRoute: typeof ArkpacksRoute
+  MainMenuRoute: typeof MainMenuRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/main-menu": {
+      id: "/main-menu"
+      path: "/main-menu"
+      fullPath: "/main-menu"
+      preLoaderRoute: typeof MainMenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/arkpacks": {
+      id: "/arkpacks"
+      path: "/arkpacks"
+      fullPath: "/arkpacks"
+      preLoaderRoute: typeof ArkpacksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/about": {
+      id: "/about"
+      path: "/about"
+      fullPath: "/about"
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/": {
       id: "/"
       path: "/"
@@ -97,6 +161,9 @@ const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ArkpacksRoute: ArkpacksRoute,
+  MainMenuRoute: MainMenuRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport

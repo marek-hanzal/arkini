@@ -3,6 +3,12 @@ import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 
 const beforeCloseListeners = new Set<() => Promise<void>>();
 let closing = false;
+let requestedClose:
+	| {
+			readonly promise: Promise<void>;
+			readonly reject: (error: unknown) => void;
+	  }
+	| undefined;
 
 ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
 	if (closing) return;
@@ -13,6 +19,8 @@ ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
 	} catch (error) {
 		closing = false;
 		ipcRenderer.send(ArkiniDesktopApi.channels.closeFailed, String(error));
+		requestedClose?.reject(error);
+		requestedClose = undefined;
 	}
 });
 
@@ -20,6 +28,9 @@ const api: ArkiniDesktopApi.Api = {
 	appearance: {
 		read: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceRead),
 		write: (theme) => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceWrite, theme),
+		readAccent: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceAccentRead),
+		writeAccent: (accent) =>
+			ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceAccentWrite, accent),
 	},
 	arkpack: {
 		list: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackList),
@@ -38,7 +49,19 @@ const api: ArkiniDesktopApi.Api = {
 			beforeCloseListeners.add(listener);
 			return () => beforeCloseListeners.delete(listener);
 		},
-		requestClose: () => ipcRenderer.send(ArkiniDesktopApi.channels.requestClose),
+		requestClose: () => {
+			if (requestedClose !== undefined) return requestedClose.promise;
+			let rejectRequest: (error: unknown) => void = () => undefined;
+			const promise = new Promise<void>((_resolve, reject) => {
+				rejectRequest = reject;
+			});
+			requestedClose = {
+				promise,
+				reject: rejectRequest,
+			};
+			ipcRenderer.send(ArkiniDesktopApi.channels.requestClose);
+			return promise;
+		},
 		forceClose: () => ipcRenderer.send(ArkiniDesktopApi.channels.forceClose),
 	},
 };

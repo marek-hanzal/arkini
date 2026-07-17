@@ -1,9 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
-import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
-import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
-import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
+import { useArkpackCatalog } from "~/bridge/arkpack/useArkpackCatalog";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 export namespace useArkpacks {
@@ -28,69 +26,26 @@ export namespace useArkpacks {
 	}
 }
 
-/** Owns only launcher catalog request state; package truth remains in persistent arkpack storage. */
+/** Reads and mutates the one root-owned Arkpack catalog without creating another cache. */
 export const useArkpacks = (): useArkpacks.Result => {
-	const [state, setState] = useState<useArkpacks.State>({
-		type: "loading",
-	});
-	const request = useRef(0);
-	const refresh = useCallback(async () => {
-		const requestId = ++request.current;
-		try {
-			setState({
-				type: "loading",
-			});
-			const arkpacks = await RendererRuntime.runPromise(listArkpacksFx());
-			if (request.current === requestId) {
-				setState({
-					type: "ready",
-					arkpacks,
-				});
-			}
-		} catch (error) {
-			if (request.current === requestId) {
-				setState({
-					type: "failed",
-					error,
-				});
-			}
-		}
-	}, []);
-
-	useEffect(() => {
-		void refresh();
-		return () => {
-			request.current += 1;
-		};
-	}, [
-		refresh,
-	]);
-
-	const importFile = useCallback(
-		async (file: File) => {
-			const descriptor = await RendererRuntime.runPromise(
-				importArkpackFileFx({
-					file,
-				}),
-			);
-			await refresh();
-			return descriptor;
-		},
+	const catalog = useArkpackCatalog();
+	const state = useSyncExternalStore(catalog.subscribe, catalog.getSnapshot, catalog.getSnapshot);
+	const refresh = useCallback(
+		() => RendererRuntime.runPromise(catalog.refreshFx),
 		[
-			refresh,
+			catalog,
+		],
+	);
+	const importFile = useCallback(
+		(file: File) => RendererRuntime.runPromise(catalog.importFileFx(file)),
+		[
+			catalog,
 		],
 	);
 	const remove = useCallback(
-		async (packageId: string) => {
-			await RendererRuntime.runPromise(
-				removeArkpackFx({
-					packageId,
-				}),
-			);
-			await refresh();
-		},
+		(packageId: string) => RendererRuntime.runPromise(catalog.removeFx(packageId)),
 		[
-			refresh,
+			catalog,
 		],
 	);
 

@@ -35,19 +35,13 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	subscribeEvents: () => () => undefined,
 });
 
-const createOwner = ({
-	releaseRouteGameFx = Effect.void,
-	hardResetFx = Effect.void,
-}: {
-	readonly releaseRouteGameFx?: Effect.Effect<void, unknown>;
-	readonly hardResetFx?: Effect.Effect<void, unknown>;
-} = {}): GameOwner => ({
+const createOwner = (hardResetFx: Effect.Effect<void, unknown>): GameOwner => ({
 	getSnapshot: () => ({
 		type: "loading",
 		packageId: null,
 	}),
 	selectPackageFx: () => Effect.void,
-	releaseRouteGameFx: () => releaseRouteGameFx,
+	releaseRouteGameFx: () => Effect.void,
 	shutdownFx: () => Effect.void,
 	clearFailedSaveAndRetryFx: () => Effect.void,
 	hardResetFx: () => hardResetFx,
@@ -85,20 +79,20 @@ describe("game menu mutation options", () => {
 		expect(flush).toHaveBeenCalledOnce();
 	});
 
-	it("owns safe route release without calling application shutdown", async () => {
-		const release = vi.fn();
-		const shutdown = vi.fn();
-		const game = createGame();
-		const owner = {
-			...createOwner({
-				releaseRouteGameFx: Effect.sync(release),
-			}),
-			shutdownFx: () => Effect.sync(shutdown),
-		} satisfies GameOwner;
-		const options = saveAndExitGameMutationOptions({
-			game,
-			owner,
+	it("owns the trusted native save-and-exit request for the exact game", async () => {
+		const requestClose = vi.fn(() => Promise.reject(new Error("close rejected")));
+		Object.defineProperty(globalThis, "window", {
+			configurable: true,
+			value: {
+				arkini: {
+					lifecycle: {
+						requestClose,
+					},
+				},
+			},
 		});
+		const game = createGame();
+		const options = saveAndExitGameMutationOptions(game);
 
 		expect(options.mutationKey).toEqual([
 			"game",
@@ -106,9 +100,9 @@ describe("game menu mutation options", () => {
 			game.saveKey.packageId,
 			game.saveKey.contentHash,
 		]);
-		await executeMutation(options);
-		expect(release).toHaveBeenCalledOnce();
-		expect(shutdown).not.toHaveBeenCalled();
+		await expect(executeMutation(options)).rejects.toThrow("close rejected");
+		expect(requestClose).toHaveBeenCalledOnce();
+		Reflect.deleteProperty(globalThis, "window");
 	});
 
 	it("owns the canonical hard reset and preserves its failure", async () => {
@@ -116,9 +110,7 @@ describe("game menu mutation options", () => {
 		const game = createGame();
 		const options = hardResetGameMutationOptions({
 			game,
-			owner: createOwner({
-				hardResetFx: Effect.fail(failure),
-			}),
+			owner: createOwner(Effect.fail(failure)),
 		});
 
 		expect(options.mutationKey).toEqual([

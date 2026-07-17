@@ -48,7 +48,9 @@ const GameShutdownFailure = () => (
 				<button
 					type="button"
 					className="rounded-lg bg-accent px-3 py-2 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
-					onClick={() => window.arkini.lifecycle.requestClose()}
+					onClick={() =>
+						void window.arkini.lifecycle.requestClose().catch(() => undefined)
+					}
 				>
 					Retry safe exit
 				</button>

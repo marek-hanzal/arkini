@@ -61,10 +61,10 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 						Retry without clearing
 					</button>
 					<Link
-						to="/"
+						to="/arkpacks"
 						className="rounded-lg border border-line px-3 py-2 text-foreground transition-colors hover:border-line-strong"
 					>
-						Back to packages
+						Back to Arkpacks
 					</Link>
 				</div>
 			</div>

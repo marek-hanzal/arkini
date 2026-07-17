@@ -16,14 +16,14 @@ TanStack Query owns transient async UI command status only. It never owns runtim
 Each command is standalone:
 
 - `saveGameMutationOptions` + `useSaveGameMutation` directly run `Game.flushSaveFx`;
-- `saveAndExitGameMutationOptions` + `useSaveAndExitGameMutation` directly run `GameOwner.releaseRouteGameFx`;
+- `saveAndExitGameMutationOptions` + `useSaveAndExitGameMutation` request trusted native controlled close; the registered `GameOwner.shutdownFx` listener performs the final save;
 - `hardResetGameMutationOptions` + `useHardResetGameMutation` directly run `GameOwner.hardResetFx`.
 
 Every options declaration owns its complete stable key, native Fx connection, and retry setting. There is no central mutation-key object, callback injection, generic mutation factory, lifecycle hook, or project-specific mutation-state helper. Caller-specific navigation and menu close behavior remain in `GameMenu`.
 
 ## Lifecycle seams
 
-- Route release keeps the published Game visible during final save. It navigates only after success; failure leaves the same retryable Game and menu error.
+- Save and exit is whole-application controlled shutdown, not route release. Native close waits for `GameOwner.shutdownFx`; failure rejects the mutation and leaves the same retryable Game and menu error. Route release remains a separate route-ownership operation.
 - Failed owner state exposes the still-owned Game when one exists, without exposing the save key.
 - Hard reset records private discard/clear progress. Retry resumes after the last successful destructive phase rather than repeating discard or clear.
 - During a failed reset after disposal, the old Game may identify the mutation while the menu remains mounted, but it is never supplied through `GameProvider` as a live gameplay root.

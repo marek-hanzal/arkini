@@ -73,11 +73,9 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 
 const createOwner = ({
 	game,
-	releaseRouteGameFx = Effect.void,
 	hardResetFx = Effect.void,
 }: {
 	readonly game: Game;
-	readonly releaseRouteGameFx?: Effect.Effect<void, unknown>;
 	readonly hardResetFx?: Effect.Effect<void, unknown>;
 }): GameOwner => ({
 	getSnapshot: () => ({
@@ -85,7 +83,7 @@ const createOwner = ({
 		game,
 	}),
 	selectPackageFx: () => Effect.void,
-	releaseRouteGameFx: () => releaseRouteGameFx,
+	releaseRouteGameFx: () => Effect.void,
 	shutdownFx: () => Effect.void,
 	clearFailedSaveAndRetryFx: () => Effect.void,
 	hardResetFx: () => hardResetFx,
@@ -108,11 +106,21 @@ const renderMenu = async ({
 		game,
 	}),
 	initialPath = "/game/package:menu",
+	requestClose = vi.fn(() => new Promise<void>(() => undefined)),
 }: {
 	readonly game?: Game;
 	readonly owner?: GameOwner;
 	readonly initialPath?: string;
+	readonly requestClose?: () => Promise<void>;
 } = {}) => {
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			lifecycle: {
+				requestClose,
+			},
+		},
+	});
 	const container = document.createElement("div");
 	document.body.append(container);
 	const queryClient = new QueryClient();
@@ -248,38 +256,32 @@ describe("GameMenu", () => {
 		});
 	});
 
-	it("navigates only after safe route release succeeds", async () => {
-		const gate = deferred();
-		const release = vi.fn(() => gate.promise);
+	it("requests one native save-and-exit without route navigation", async () => {
+		const requestClose = vi.fn(() => new Promise<void>(() => undefined));
 		const game = createGame();
 		const { container, router } = await renderMenu({
 			game,
 			owner: createOwner({
 				game,
-				releaseRouteGameFx: fromPromiseFx(release),
 			}),
+			requestClose,
 		});
 		await pressEscape();
 
 		await act(async () => buttonByText(container, "Save and exit").click());
+		expect(requestClose).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe("/game/package:menu");
-
-		await act(async () => {
-			gate.resolve();
-			await gate.promise;
-			await vi.waitFor(() => expect(router.state.location.pathname).toBe("/"));
-		});
+		expect(buttonByText(container, "Save and exit").disabled).toBe(true);
 	});
 
-	it("keeps the menu and route after save-and-exit fails", async () => {
-		const failure = new Error("disk full");
+	it("keeps the menu and route after native save-and-exit fails", async () => {
 		const game = createGame();
 		const { container, router } = await renderMenu({
 			game,
 			owner: createOwner({
 				game,
-				releaseRouteGameFx: Effect.fail(failure),
 			}),
+			requestClose: () => Promise.reject(new Error("disk full")),
 		});
 		await pressEscape();
 

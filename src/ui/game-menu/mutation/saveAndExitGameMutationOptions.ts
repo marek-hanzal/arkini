@@ -1,17 +1,11 @@
 import { mutationOptions } from "@tanstack/react-query";
 
 import type { Game } from "~/bridge/game/Game";
-import type { GameOwner } from "~/bridge/game/GameOwner";
+import { requestApplicationCloseFx } from "~/bridge/lifecycle/requestApplicationCloseFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
-/** Complete TanStack mutation contract for final save and safe route release. */
-export const saveAndExitGameMutationOptions = ({
-	game,
-	owner,
-}: {
-	readonly game: Game;
-	readonly owner: GameOwner;
-}) =>
+/** Complete mutation contract for saving the exact game through native controlled shutdown. */
+export const saveAndExitGameMutationOptions = (game: Game) =>
 	mutationOptions({
 		mutationKey: [
 			"game",
@@ -19,6 +13,6 @@ export const saveAndExitGameMutationOptions = ({
 			game.saveKey.packageId,
 			game.saveKey.contentHash,
 		] as const,
-		mutationFn: () => RendererRuntime.runPromise(owner.releaseRouteGameFx()),
+		mutationFn: () => RendererRuntime.runPromise(requestApplicationCloseFx()),
 		retry: false,
 	});

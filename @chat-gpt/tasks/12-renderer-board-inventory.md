@@ -66,7 +66,7 @@ confirm in the menu
 
 `GameOwner` serializes each explicit lifecycle operation under one semaphore. The menu disables duplicate mutation execution rather than introducing another owner scheduler or a queued second reset. If hard reset fails after discard or save clearing, private owner recovery records the completed phase; retry continues from the remaining phase without repeating destructive work or exposing the save key to UI. A disposed game may remain only as exact mutation identity while the retry UI is mounted; it is never supplied through `GameProvider` as a live gameplay root.
 
-Safe Save and exit uses `releaseRouteGameFx`, not application shutdown. The published game remains visible while final save runs; successful release navigates to the unchanged launcher, while failure keeps the same retryable game and truthful menu error.
+Save and exit means controlled whole-application shutdown. The menu requests the trusted native close handshake; `GameOwner.shutdownFx` performs the authoritative final save before Electron closes. Failure rejects the same mutation, keeps the current retryable game and menu visible, and does not navigate. Ordinary non-game route ownership still uses the distinct `releaseRouteGameFx`.
 
 ## Do not port
 

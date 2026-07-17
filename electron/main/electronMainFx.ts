@@ -30,7 +30,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
 		userDataPath: app.getPath("userData"),
 	});
-	const appearanceTheme = yield* appearancePreferences.readFx;
+	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
 		nativeTheme.themeSource = appearanceTheme;
 	});

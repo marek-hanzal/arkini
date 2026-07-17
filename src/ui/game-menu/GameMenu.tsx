@@ -1,5 +1,3 @@
-import { useNavigate } from "@tanstack/react-router";
-
 import type { Game } from "~/bridge/game/Game";
 import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState } from "react";
 
@@ -26,7 +24,6 @@ const GameMenuDialog = ({
 	readonly game: Game;
 	readonly gameAvailable: boolean;
 }) => {
-	const navigate = useNavigate();
 	const menu = useGameMenuControl();
 	const save = useSaveGameMutation(game);
 	const saveAndExit = useSaveAndExitGameMutation(game);
@@ -82,15 +79,7 @@ const GameMenuDialog = ({
 	};
 
 	const requestSaveAndExit = () => {
-		void saveAndExit
-			.mutateAsync()
-			.then(async () => {
-				menu.close();
-				await navigate({
-					to: "/",
-				});
-			})
-			.catch(() => undefined);
+		saveAndExit.mutate();
 	};
 
 	const requestHardReset = () => {
@@ -103,7 +92,7 @@ const GameMenuDialog = ({
 	const status = hardReset.isPending
 		? "Destroying current progress…"
 		: saveAndExit.isPending
-			? "Saving and returning to packages…"
+			? "Saving and exiting Arkini…"
 			: save.isPending
 				? "Saving…"
 				: hardReset.isError

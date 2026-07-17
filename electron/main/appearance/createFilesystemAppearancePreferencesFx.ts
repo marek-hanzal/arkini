@@ -2,7 +2,9 @@ import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
 import type { AppearancePreferences } from "./AppearancePreferences";
+import { readAppearanceAccentFx } from "./readAppearanceAccentFx";
 import { readAppearanceThemeFx } from "./readAppearanceThemeFx";
+import { writeAppearanceAccentFx } from "./writeAppearanceAccentFx";
 import { writeAppearanceThemeFx } from "./writeAppearanceThemeFx";
 
 export namespace createFilesystemAppearancePreferencesFx {
@@ -12,7 +14,7 @@ export namespace createFilesystemAppearancePreferencesFx {
 	}
 }
 
-/** Creates one narrow Effect-native capability over the Electron appearance preference. */
+/** Creates one narrow Effect-native capability over Electron appearance preferences. */
 export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	"createFilesystemAppearancePreferencesFx",
 )(function* ({
@@ -22,15 +24,25 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 	const root = join(userDataPath, "arkini", "preferences");
 	return {
-		readFx: readAppearanceThemeFx({
+		readThemeFx: readAppearanceThemeFx({
 			root,
 			fileSystem,
 		}),
-		writeFx: (theme) =>
+		writeThemeFx: (theme) =>
 			writeAppearanceThemeFx({
 				root,
 				fileSystem,
 				theme,
+			}),
+		readAccentFx: readAppearanceAccentFx({
+			root,
+			fileSystem,
+		}),
+		writeAccentFx: (accent) =>
+			writeAppearanceAccentFx({
+				root,
+				fileSystem,
+				accent,
 			}),
 	} satisfies AppearancePreferences;
 });

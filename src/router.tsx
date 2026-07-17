@@ -1,14 +1,19 @@
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "~/_route";
+import type { RootPage } from "~/page/RootPage";
 
-export const router = createRouter({
-	routeTree,
-	defaultPreload: "intent",
-	scrollRestoration: true,
-});
+export const createArkiniRouter = (context: RootPage.Context) =>
+	createRouter({
+		routeTree,
+		context,
+		defaultPreload: "intent",
+		scrollRestoration: true,
+	});
+
+export type ArkiniRouter = ReturnType<typeof createArkiniRouter>;
 
 declare module "@tanstack/react-router" {
 	interface Register {
-		router: typeof router;
+		router: ArkiniRouter;
 	}
 }

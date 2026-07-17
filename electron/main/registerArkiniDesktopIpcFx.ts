@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, nativeTheme, type IpcMainInvokeEvent } fro
 import { Effect } from "effect";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
-import { writeAppearanceThemeFx } from "./appearance/writeAppearanceThemeFx";
+import type { AppearancePreferences } from "./appearance/AppearancePreferences";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
@@ -12,12 +12,13 @@ let registered = false;
 export namespace registerArkiniDesktopIpcFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
+		readonly appearancePreferences: AppearancePreferences;
 	}
 }
 
 /** Registers the narrow Arkini desktop capabilities exposed through preload. */
 export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx")(
-	({ trustedRenderer }: registerArkiniDesktopIpcFx.Props) =>
+	({ trustedRenderer, appearancePreferences }: registerArkiniDesktopIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
 			registered = true;
@@ -56,10 +57,7 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 				ipcMain.handle(ArkiniDesktopApi.channels.appearanceWrite, (event, theme) =>
 					runAuthorizedFx(
 						event,
-						writeAppearanceThemeFx({
-							userDataPath,
-							theme,
-						}).pipe(
+						appearancePreferences.writeFx(theme).pipe(
 							Effect.tap(() =>
 								Effect.sync(() => {
 									nativeTheme.themeSource = theme;

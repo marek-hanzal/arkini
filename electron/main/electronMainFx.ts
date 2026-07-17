@@ -6,7 +6,7 @@ import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { registerArkiniDesktopIpcFx } from "./registerArkiniDesktopIpcFx";
 import { registerArkiniProtocolFx } from "./registerArkiniProtocolFx";
 import { registerWindowLifecycleFx } from "./registerWindowLifecycleFx";
-import { readAppearanceThemeFx } from "./appearance/readAppearanceThemeFx";
+import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
@@ -27,9 +27,10 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	yield* registerWindowLifecycleFx(app);
 	yield* Effect.promise(() => app.whenReady());
 
-	const appearanceTheme = yield* readAppearanceThemeFx({
+	const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
 		userDataPath: app.getPath("userData"),
 	});
+	const appearanceTheme = yield* appearancePreferences.readFx;
 	yield* Effect.sync(() => {
 		nativeTheme.themeSource = appearanceTheme;
 	});
@@ -42,6 +43,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	yield* registerArkiniProtocolFx(rendererRoot);
 	yield* registerArkiniDesktopIpcFx({
 		trustedRenderer,
+		appearancePreferences,
 	});
 	yield* createMainWindowFx({
 		trustedRenderer,

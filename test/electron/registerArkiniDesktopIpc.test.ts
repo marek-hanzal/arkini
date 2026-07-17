@@ -49,6 +49,7 @@ const electronHarness = vi.hoisted(() => {
 
 vi.mock("electron", () => electronHarness.module);
 
+import { createFilesystemAppearancePreferencesFx } from "../../electron/main/appearance/createFilesystemAppearancePreferencesFx";
 import { registerArkiniDesktopIpcFx } from "../../electron/main/registerArkiniDesktopIpcFx";
 
 const placeholderPackageId = "a".repeat(64);
@@ -165,8 +166,14 @@ describe("registerArkiniDesktopIpcFx", () => {
 
 		try {
 			await Effect.runPromise(
-				registerArkiniDesktopIpcFx({
-					trustedRenderer,
+				Effect.gen(function* () {
+					const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
+						userDataPath,
+					});
+					yield* registerArkiniDesktopIpcFx({
+						trustedRenderer,
+						appearancePreferences,
+					});
 				}).pipe(Effect.provide(NodeContext.layer)),
 			);
 			expect(Array.from(electronHarness.handlers.keys()).sort()).toEqual(

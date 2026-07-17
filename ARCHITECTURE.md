@@ -212,9 +212,9 @@ verified package + save decode/hydration failure
 
 The save is never deleted automatically. UI requests recovery from `GameOwner`; it never calls save storage or constructs filesystem paths. Failed clear remains a truthful clearable failure, while successful clear followed by another bootstrap failure remains a normal retryable package failure.
 
-### 4.1 Arkpack and save persistence
+### 4.1 Desktop persistence
 
-Electron `userData` owns two separate opaque repositories:
+Electron `userData` owns separate Arkpack, save, and appearance namespaces:
 
 ```text
 <userData>/arkini/arkpacks/<sha256>/
@@ -224,6 +224,10 @@ Electron `userData` owns two separate opaque repositories:
 <userData>/arkini/saves/<packageId>/<contentHash>/
   current.arksave
   pending.arksave
+
+<userData>/arkini/preferences/
+  appearance.theme
+  appearance.pending
 ```
 
 The original validated Arkpack binary is canonical. Imported catalog listing reads only derived `descriptor.json` files. Official Arkini listing reads only its generated tracked metadata sidecar, which is emitted from the same validated pack operation as the bundled binary. Exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use; official exact load additionally rejects a binary whose validated descriptor differs from the sidecar. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
@@ -236,13 +240,13 @@ The engine's existing `StateSchema` is the complete canonical save state; creati
 
 Electron stores the resulting MessagePack bytes opaquely. Writes sync `pending.arksave` and atomically rename it over `current.arksave`; failed replacement preserves the previous successful save. Package identity and content hash select the repository path and are intentionally absent from engine state and the envelope.
 
-Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
+Appearance preference writes use the same pending-file atomic replacement grammar; missing or malformed committed data resolves to the dark default. Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
 
 Persistence is Effect-native on both sides of the IPC transport:
 
 ```text
 renderer domain Effect
-→ ArkpackStorage / GameSaveStorage Effect capability
+→ ArkpackStorage / GameSaveStorage / appearance Effect capability
 → one typed preload Promise invocation
 → trusted Electron IPC handler
 → one ElectronMainRuntime execution

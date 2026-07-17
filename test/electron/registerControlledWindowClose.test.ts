@@ -1,7 +1,8 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent } from "electron";
+import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
-import { registerControlledWindowClose } from "../../electron/main/registerControlledWindowClose";
+import { registerControlledWindowCloseFx } from "../../electron/main/registerControlledWindowCloseFx";
 
 type CloseListener = (event: { preventDefault(): void }) => void;
 type IpcListener = (event: IpcMainEvent, ...args: unknown[]) => void;
@@ -47,7 +48,12 @@ const createHarness = () => {
 		},
 	} as unknown as Pick<IpcMain, "on" | "removeListener">;
 
-	registerControlledWindowClose(window, ipc);
+	Effect.runSync(
+		registerControlledWindowCloseFx({
+			window,
+			ipc,
+		}),
+	);
 	const emitIpc = (channel: string, ...args: unknown[]) => {
 		const event = {
 			sender: {
@@ -77,7 +83,7 @@ const createHarness = () => {
 	};
 };
 
-describe("registerControlledWindowClose", () => {
+describe("registerControlledWindowCloseFx", () => {
 	it("allows the window to close only after the renderer confirms a successful final flush", () => {
 		const harness = createHarness();
 		const preventDefault = harness.requestClose();

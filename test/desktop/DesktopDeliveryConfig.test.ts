@@ -18,17 +18,24 @@ describe("desktop delivery configuration", () => {
 		expect(config).toContain("- package.json");
 	});
 
-	it("keeps one local packaging command as the CI build path", () => {
-		expect(packageJson.scripts["package:mac"]).toContain("electron-builder");
-		expect(packageJson.scripts["package:mac"]).toContain("package:stage");
-		expect(packageJson.scripts["package:mac"]).toContain("--arm64");
-		expect(packageJson.scripts["package:mac"]).toContain("package:checksums");
-		expect(packageJson.scripts["package:mac"]).toContain("package:verify");
+	it("keeps one canonical Effect CLI packaging command as the CI build path", () => {
+		expect(packageJson.scripts["package:mac"]).toBe(
+			"tsx cli/arkini.ts desktop package --arch arm64",
+		);
+		expect(packageJson.scripts["package:clean"]).toContain("cli/arkini.ts desktop clean");
+		expect(packageJson.scripts["package:stage"]).toContain("cli/arkini.ts desktop stage");
+		expect(packageJson.scripts["package:checksums"]).toContain(
+			"cli/arkini.ts desktop checksums",
+		);
+		expect(packageJson.scripts["package:verify"]).toContain("cli/arkini.ts desktop verify");
 
 		const workflow = readFileSync(".github/workflows/macos-prerelease.yml", "utf8");
 		expect(workflow).toContain('tags:\n      - "v*-dev.*"');
 		expect(workflow).toContain("workflow_dispatch:");
 		expect(workflow).toContain("runs-on: macos-15");
+		expect(workflow).toContain("node-version: 24.18.0");
+		expect(workflow).toContain('test "$(node --version)" = "v24.18.0"');
+		expect(workflow).toContain('test "$(npm --version)" = "11.16.0"');
 		expect(workflow).toContain("run: npm run package:mac");
 		expect(workflow).toContain("gh release create");
 		expect(workflow).toContain("--prerelease");

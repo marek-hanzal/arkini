@@ -1,9 +1,13 @@
-import { Cause, Effect, Exit, Option } from "effect";
+import { Effect } from "effect";
 import { type ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
 import { createGameFx } from "~/bridge/game/createGameFx";
-import { createGameOwner, type createGameOwner as GameOwner } from "~/bridge/game/createGameOwner";
-import { shutdownGameOwner } from "~/bridge/game/shutdownGameOwner";
+import {
+	createGameOwnerFx,
+	type createGameOwnerFx as GameOwner,
+} from "~/bridge/game/createGameOwnerFx";
+import { shutdownGameOwnerFx } from "~/bridge/game/shutdownGameOwnerFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
 
 export namespace GameOwnerProvider {
@@ -19,21 +23,11 @@ interface HotData {
 const previousHotShutdown = (import.meta.hot?.data as HotData | undefined)?.gameOwnerShutdown;
 let activeHotOwner: GameOwner.Owner | undefined;
 
-const runGameCreation = async (packageId: string) => {
-	const exit = await Effect.runPromiseExit(
-		createGameFx({
-			packageId,
-		}),
-	);
-	if (Exit.isSuccess(exit)) return exit.value;
-	const failure = Cause.failureOption(exit.cause);
-	if (Option.isSome(failure)) throw failure.value;
-	throw Cause.squash(exit.cause);
-};
-
 import.meta.hot?.dispose((data: HotData) => {
 	data.gameOwnerShutdown =
-		activeHotOwner === undefined ? Promise.resolve() : shutdownGameOwner(activeHotOwner);
+		activeHotOwner === undefined
+			? Promise.resolve()
+			: RendererRuntime.runPromise(shutdownGameOwnerFx(activeHotOwner));
 	activeHotOwner = undefined;
 });
 
@@ -57,7 +51,7 @@ const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => 
 					type="button"
 					className="rounded-lg border border-red-300/40 px-3 py-2 font-semibold text-red-100"
 					onClick={() => {
-						void owner.forceShutdown().catch((error) => {
+						void RendererRuntime.runPromise(owner.forceShutdownFx()).catch((error) => {
 							console.error("Arkini force-shutdown cleanup failed.", error);
 						});
 						window.arkini?.lifecycle.forceClose();
@@ -74,18 +68,25 @@ const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => 
 export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 	const ownerRef = useRef<GameOwner.Owner | undefined>(undefined);
 	if (ownerRef.current === undefined) {
-		ownerRef.current = createGameOwner({
-			create: async (packageId) => {
-				await previousHotShutdown;
-				return runGameCreation(packageId);
-			},
-			clearSave: (key) =>
-				Effect.runPromise(
+		ownerRef.current = RendererRuntime.runSync(
+			createGameOwnerFx({
+				createFx: (packageId) =>
+					Effect.tryPromise({
+						try: () => previousHotShutdown ?? Promise.resolve(),
+						catch: (cause) => cause,
+					}).pipe(
+						Effect.zipRight(
+							createGameFx({
+								packageId,
+							}),
+						),
+					),
+				clearSaveFx: (key) =>
 					deleteGameSaveFx({
 						key,
 					}),
-				),
-		});
+			}),
+		);
 	}
 	const owner = ownerRef.current;
 	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
@@ -93,11 +94,11 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 
 	useEffect(() => {
 		const removeBeforeClose = window.arkini?.lifecycle.onBeforeClose(() =>
-			shutdownGameOwner(owner),
+			RendererRuntime.runPromise(shutdownGameOwnerFx(owner)),
 		);
 		return () => {
 			removeBeforeClose?.();
-			void shutdownGameOwner(owner).catch((error) => {
+			void RendererRuntime.runPromise(shutdownGameOwnerFx(owner)).catch((error) => {
 				console.error("Arkini game shutdown failed during renderer cleanup.", error);
 			});
 		};

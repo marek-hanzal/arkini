@@ -1,8 +1,9 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { readArkiniProtocolFilePath } from "../../electron/main/readArkiniProtocolFilePath";
+import { readArkiniProtocolFilePathFx } from "../../electron/protocol/readArkiniProtocolFilePathFx";
 
 let rendererRoot = "";
 
@@ -20,42 +21,78 @@ afterEach(async () => {
 	});
 });
 
-describe("readArkiniProtocolFilePath", () => {
+describe("readArkiniProtocolFilePathFx", () => {
 	it("serves the renderer entry at the canonical application root", async () => {
-		await expect(readArkiniProtocolFilePath("arkini://app/", rendererRoot)).resolves.toBe(
-			join(rendererRoot, "index.html"),
-		);
+		await expect(
+			Effect.runPromise(
+				readArkiniProtocolFilePathFx({
+					requestUrl: "arkini://app/",
+					rendererRoot,
+				}),
+			),
+		).resolves.toBe(join(rendererRoot, "index.html"));
 	});
 
 	it("serves existing renderer assets directly", async () => {
 		await expect(
-			readArkiniProtocolFilePath("arkini://app/assets/app.js", rendererRoot),
+			Effect.runPromise(
+				readArkiniProtocolFilePathFx({
+					requestUrl: "arkini://app/assets/app.js",
+					rendererRoot,
+				}),
+			),
 		).resolves.toBe(join(rendererRoot, "assets", "app.js"));
 	});
 
 	it("falls back to the renderer entry for TanStack Router paths", async () => {
 		await expect(
-			readArkiniProtocolFilePath("arkini://app/game/arkini", rendererRoot),
+			Effect.runPromise(
+				readArkiniProtocolFilePathFx({
+					requestUrl: "arkini://app/game/arkini",
+					rendererRoot,
+				}),
+			),
 		).resolves.toBe(join(rendererRoot, "index.html"));
 	});
 
 	it("rejects missing assets instead of hiding them behind SPA fallback", async () => {
 		await expect(
-			readArkiniProtocolFilePath("arkini://app/assets/missing.js", rendererRoot),
-		).rejects.toMatchObject({
+			Effect.runPromise(
+				Effect.flip(
+					readArkiniProtocolFilePathFx({
+						requestUrl: "arkini://app/assets/missing.js",
+						rendererRoot,
+					}),
+				),
+			),
+		).resolves.toMatchObject({
 			status: 404,
 		});
 	});
 
 	it("rejects unknown origins and encoded traversal", async () => {
 		await expect(
-			readArkiniProtocolFilePath("arkini://other/", rendererRoot),
-		).rejects.toMatchObject({
+			Effect.runPromise(
+				Effect.flip(
+					readArkiniProtocolFilePathFx({
+						requestUrl: "arkini://other/",
+						rendererRoot,
+					}),
+				),
+			),
+		).resolves.toMatchObject({
 			status: 404,
 		});
 		await expect(
-			readArkiniProtocolFilePath("arkini://app/%2e%2e%2fsecret.txt", rendererRoot),
-		).rejects.toMatchObject({
+			Effect.runPromise(
+				Effect.flip(
+					readArkiniProtocolFilePathFx({
+						requestUrl: "arkini://app/%2e%2e%2fsecret.txt",
+						rendererRoot,
+					}),
+				),
+			),
+		).resolves.toMatchObject({
 			status: 400,
 		});
 	});

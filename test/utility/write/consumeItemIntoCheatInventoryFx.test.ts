@@ -1,5 +1,6 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -7,7 +8,6 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/bridge/game/createGameSession";
 import { consumeItemIntoCheatInventoryFx } from "~/engine/utility/write/consumeItemIntoCheatInventoryFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 
@@ -98,7 +98,7 @@ const prepareIdleLoadedForgeFx = Effect.fn("prepareIdleLoadedForgeFx")(function*
 
 describe("consumeItemIntoCheatInventoryFx", () => {
 	it("consumes the complete source identity, preserves the sink and emits removal feedback", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createDestructiveUtilityTestConfig(),
 			tickIntervalMs: 60_000,
 		});

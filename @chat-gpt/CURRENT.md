@@ -4,19 +4,20 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**GitHub #200 — Electron desktop host**
+**GitHub review #232 — Electron persistence and lifecycle follow-up**
 
-Status: **#204, #205, #226, and save epic #217 are complete. Tasks #206 and #207 now have the local unsigned macOS arm64 package path and GitHub prerelease workflow implemented; native artifact/release smoke remains for the shared #208 integration pass.**
+Status: **#228, #230, #233, #229, #231, and related CLI epic #234 are complete. #225 remains the final review child before closing #227/#232; #208 native delivery validation follows afterward with Marek.**
 
 Read:
 
-1. GitHub epic #200;
-2. GitHub tasks #206 and #207 for the implemented packaging/release contracts;
-3. GitHub task #208 before the final collaborative Apple Silicon integration pass.
+1. GitHub review #232;
+2. GitHub task #231 for mandatory `*Fx` operation grammar and runtime roots;
+3. GitHub epic #234 for the canonical Effect CLI command tree;
+4. GitHub task #225 for the remaining official-Arkini metadata-only catalog fix.
 
 Next action:
 
-> Push the packaging commits, run `npm run package:mac` or manually dispatch the macOS prerelease workflow, inspect/open the unsigned DMG/ZIP on Apple Silicon, then complete #208 together.
+> Implement #225 as the final review task, then close #227/#232 and continue with the shared #208 Apple Silicon delivery pass.
 
 ## Source topology
 
@@ -39,7 +40,7 @@ Next action:
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
 - `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- `GameOwnerProvider` lives at the stable root shell above the route outlet and owns one `createGameOwner` lifecycle. `GameShell` requests the selected package and releases it on route cleanup; launcher ↔ game navigation and StrictMode replay therefore share the same serialization point.
+- `GameOwnerProvider` lives at the stable root shell above the route outlet and owns one `createGameOwnerFx` lifecycle. `GameShell` requests the selected package and releases it on route cleanup; launcher ↔ game navigation and StrictMode replay therefore share the same serialization point.
 - Game replacement always awaits the current `Game.dispose()` final save before creating the latest requested package. Obsolete intermediate requests are coalesced, stale bootstraps are disposed exactly once before publication, and disposal/bootstrap failure becomes a truthful shell failure state.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
 - A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.
@@ -57,6 +58,9 @@ Next action:
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
 - `npm run package:mac` is the sole local distribution path. It stages only `out/**` plus a minimal dependency-free manifest, then `electron-builder` emits unsigned arm64 DMG/ZIP artifacts and verifies `SHA256SUMS` plus the unpacked `Arkini.app` seam.
 - `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
+- The repository toolchain is pinned to Node `24.18.0`, npm `11.16.0`, and `npm-run-all2` `9.0.2`; `.nvmrc`, `engines`, the lockfile, and GitHub Actions must stay aligned.
+- Effect execution has one explicit root per physical process: `ElectronMainRuntime` in Electron main, `RendererRuntime` in the renderer, and the standard `NodeRuntime.runMain` boundary for the canonical Arkini CLI. `RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR cannot create a second renderer root. Each live `Game` owns exactly one child session `ManagedRuntime`; no active source may create direct `Effect.run*` islands.
+- `tsx cli/arkini.ts` is the sole project-tooling entry. Game and desktop subcommands own typed options, orchestration, failure rendering, and exits. npm scripts are thin aliases; `npm-run-all2` is allowed only for mechanical checks/shards.
 - Animations added later must continuously target the latest bridge snapshot. They may be interrupted/replanned and never queue authoritative state behind presentation.
 
 ## Test execution
@@ -183,7 +187,7 @@ Next action:
 
 - `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
 - `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
-- The root `createGameOwner` is the completed replacement and hard-reset ownership boundary. Hard reset single-flights dispose-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
-- Controlled Electron close and HMR handoff use `shutdownGameOwner`. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next close request; it never degrades into a successful empty-owner shutdown. The failure UI offers explicit safe retry or force exit without saving. Force exit starts best-effort discard cleanup and authorizes main to close immediately only after that deliberate renderer decision.
+- The root `createGameOwnerFx` is the completed replacement and hard-reset ownership boundary. Hard reset single-flights dispose-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
+- Controlled Electron close and HMR handoff use `shutdownGameOwnerFx`. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next close request; it never degrades into a successful empty-owner shutdown. The failure UI offers explicit safe retry or force exit without saving. Force exit starts best-effort discard cleanup and authorizes main to close immediately only after that deliberate renderer decision.
 - `GameOwner` subscriber delivery is synchronous but observational only: one stable snapshot is delivered per publication, callback throws/rejected Promise-like results are isolated per listener, and no observer can stop lifecycle work or starve later listeners.
 - Do not add another reset owner, mutate a running engine back to initial state, hide correctness in React-local state, or use a module-global lock/map.

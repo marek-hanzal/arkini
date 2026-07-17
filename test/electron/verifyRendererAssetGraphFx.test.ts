@@ -1,6 +1,7 @@
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { verifyRendererAssetGraphFx } from "../../electron/verify/verifyRendererAssetGraphFx";
 
@@ -27,7 +28,9 @@ describe("verifyRendererAssetGraphFx", () => {
 			'<base href="/"><script type="module" src="./assets/app.js"></script><link rel="stylesheet" href="./assets/app.css">',
 		);
 
-		await expect(verifyRendererAssetGraphFx(rendererRoot)).resolves.toBeUndefined();
+		await expect(
+			Effect.runPromise(verifyRendererAssetGraphFx(rendererRoot)),
+		).resolves.toBeUndefined();
 	});
 
 	it("rejects document-relative output without the root base contract", async () => {
@@ -36,7 +39,7 @@ describe("verifyRendererAssetGraphFx", () => {
 			'<script type="module" src="./assets/app.js"></script>',
 		);
 
-		await expect(verifyRendererAssetGraphFx(rendererRoot)).rejects.toThrow(
+		await expect(Effect.runPromise(verifyRendererAssetGraphFx(rendererRoot))).rejects.toThrow(
 			'The production renderer must declare <base href="/">.',
 		);
 	});
@@ -47,6 +50,6 @@ describe("verifyRendererAssetGraphFx", () => {
 			'<base href="/"><script type="module" src="./assets/missing.js"></script>',
 		);
 
-		await expect(verifyRendererAssetGraphFx(rendererRoot)).rejects.toThrow();
+		await expect(Effect.runPromise(verifyRendererAssetGraphFx(rendererRoot))).rejects.toThrow();
 	});
 });

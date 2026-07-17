@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { createArkpackStorage } from "~/bridge/arkpack/createArkpackStorage";
+import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
 export namespace importArkpackFx {
@@ -18,7 +18,7 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 	filename,
 	storage: providedStorage,
 }: importArkpackFx.Props) {
-	const storage = providedStorage ?? createArkpackStorage();
+	const storage = providedStorage ?? (yield* createArkpackStorageFx());
 	const importedAtMs = Date.now();
 	return yield* Effect.gen(function* () {
 		const loaded = yield* readArkpackFx({

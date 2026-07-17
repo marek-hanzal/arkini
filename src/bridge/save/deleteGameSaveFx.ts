@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { createGameSaveStorage } from "~/bridge/save/createGameSaveStorage";
+import { createGameSaveStorageFx } from "~/bridge/save/createGameSaveStorageFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 export namespace deleteGameSaveFx {
@@ -14,7 +14,7 @@ export const deleteGameSaveFx = Effect.fn("deleteGameSaveFx")(function* ({
 	key,
 	storage: providedStorage,
 }: deleteGameSaveFx.Props) {
-	const storage = providedStorage ?? createGameSaveStorage();
+	const storage = providedStorage ?? (yield* createGameSaveStorageFx());
 	return yield* Effect.tryPromise({
 		try: () => storage.clear(key),
 		catch: (cause) => cause,

@@ -1,6 +1,7 @@
 import type { BrowserWindow } from "electron";
+import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { registerFullscreenShortcuts } from "../../electron/main/registerFullscreenShortcuts";
+import { registerFullscreenShortcutsFx } from "../../electron/main/registerFullscreenShortcutsFx";
 
 type BeforeInputListener = (
 	event: {
@@ -28,7 +29,7 @@ const createWindow = () => {
 		setFullScreen,
 	} as unknown as BrowserWindow;
 
-	registerFullscreenShortcuts(window);
+	Effect.runSync(registerFullscreenShortcutsFx(window));
 	return {
 		getListener: () => listener,
 		isFullScreen,
@@ -36,7 +37,7 @@ const createWindow = () => {
 	};
 };
 
-describe("registerFullscreenShortcuts", () => {
+describe("registerFullscreenShortcutsFx", () => {
 	it.each([
 		{
 			key: "F11",

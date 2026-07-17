@@ -51,7 +51,7 @@ describe("Electron platform boundary", () => {
 	it("uses standard router history and the canonical custom origin", () => {
 		const routerSource = readFileSync("src/router.tsx", "utf8");
 		const mainSource = readFileSync("electron/main/index.ts", "utf8");
-		const windowSource = readFileSync("electron/main/createMainWindow.ts", "utf8");
+		const windowSource = readFileSync("electron/main/createMainWindowFx.ts", "utf8");
 
 		expect(routerSource).not.toContain("createHashHistory");
 		expect(mainSource).toContain('scheme: "arkini"');

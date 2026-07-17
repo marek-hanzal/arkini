@@ -1,10 +1,10 @@
 import { encode } from "@msgpack/msgpack";
 import { Effect } from "effect";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import type { ArkiniSaveSchema } from "~/bridge/save/ArkiniSaveSchema";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 /** Encodes one complete canonical gameplay state into the minimal format-1 envelope. */
-export const encodeArkiniSaveFx = (state: StateSchema.Type) =>
+export const encodeArkiniSaveFx = Effect.fn("encodeArkiniSaveFx")((state: StateSchema.Type) =>
 	Effect.try({
 		try: () =>
 			encode(
@@ -18,4 +18,5 @@ export const encodeArkiniSaveFx = (state: StateSchema.Type) =>
 				},
 			),
 		catch: (cause) => cause,
-	});
+	}),
+);

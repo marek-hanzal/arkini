@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
-import { createGameSession } from "~/bridge/game/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,7 +40,7 @@ const emitCompletedEventFx = (jobId: string) =>
 describe("RuntimeSaveLayerFx", () => {
 	it("debounces committed snapshots and ignores failed mutations", async () => {
 		const saves: StateSchema.Type[] = [];
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -106,7 +106,7 @@ describe("RuntimeSaveLayerFx", () => {
 
 	it("does not let event-only traffic wake or postpone runtime autosave", async () => {
 		const savedItemCounts: number[] = [];
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -170,7 +170,7 @@ describe("RuntimeSaveLayerFx", () => {
 		const firstSaveGate = new Promise<void>((resolve) => {
 			releaseFirstSave = resolve;
 		});
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -235,7 +235,7 @@ describe("RuntimeSaveLayerFx", () => {
 	it("keeps the autosave consumer alive when its reporting callback throws", async () => {
 		let writes = 0;
 		let reports = 0;
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -298,7 +298,7 @@ describe("RuntimeSaveLayerFx", () => {
 		process.on("unhandledRejection", onUnhandledRejection);
 		let writes = 0;
 		let reports = 0;
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -375,7 +375,7 @@ describe("RuntimeSaveLayerFx", () => {
 		const saveGate = new Promise<void>((resolve) => {
 			releaseSave = resolve;
 		});
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -423,7 +423,7 @@ describe("RuntimeSaveLayerFx", () => {
 		const saveGate = new Promise<void>((resolve) => {
 			releaseSave = resolve;
 		});
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 5,
 			save: {
@@ -462,7 +462,7 @@ describe("RuntimeSaveLayerFx", () => {
 
 	it("interrupts in-flight session commands before the final save", async () => {
 		const saves: StateSchema.Type[] = [];
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -506,7 +506,7 @@ describe("RuntimeSaveLayerFx", () => {
 
 	it("flushes the latest committed runtime when the session is disposed", async () => {
 		const saves: StateSchema.Type[] = [];
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {

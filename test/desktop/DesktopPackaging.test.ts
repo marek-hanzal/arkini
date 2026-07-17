@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { Effect } from "effect";
 import packageJson from "../../package.json" with { type: "json" };
 import { afterEach, describe, expect, it } from "vitest";
 import { createDesktopChecksumsFx } from "../../cli/desktop/createDesktopChecksumsFx";
@@ -44,8 +45,18 @@ afterEach(async () => {
 describe("desktop packaging artifacts", () => {
 	it("writes deterministic SHA-256 entries and verifies the packaged app seam", async () => {
 		const fixture = await createReleaseFixture();
-		await createDesktopChecksumsFx(fixture.directory);
-		await expect(verifyDesktopArtifactsFx(fixture.directory)).resolves.toBeUndefined();
+		await Effect.runPromise(
+			createDesktopChecksumsFx({
+				directory: fixture.directory,
+			}),
+		);
+		await expect(
+			Effect.runPromise(
+				verifyDesktopArtifactsFx({
+					directory: fixture.directory,
+				}),
+			),
+		).resolves.toBeUndefined();
 
 		const checksumText = await readFile(join(fixture.directory, "SHA256SUMS"), "utf8");
 		for (const artifact of fixture.artifacts) {
@@ -58,12 +69,28 @@ describe("desktop packaging artifacts", () => {
 
 	it("rejects a modified artifact", async () => {
 		const fixture = await createReleaseFixture();
-		await createDesktopChecksumsFx(fixture.directory);
+		await Effect.runPromise(
+			createDesktopChecksumsFx({
+				directory: fixture.directory,
+			}),
+		);
 		await writeFile(join(fixture.directory, fixture.artifacts[0]), "tampered");
 
-		await expect(verifyDesktopArtifactsFx(fixture.directory)).rejects.toThrow(
-			`Checksum mismatch for ${fixture.artifacts[0]}`,
-		);
+		await expect(
+			Effect.runPromise(
+				Effect.flip(
+					verifyDesktopArtifactsFx({
+						directory: fixture.directory,
+					}),
+				),
+			),
+		).resolves.toMatchObject({
+			_tag: "DesktopPackagingError",
+			operation: "verify desktop artifacts",
+			cause: expect.objectContaining({
+				message: `Checksum mismatch for ${fixture.artifacts[0]}`,
+			}),
+		});
 	});
 	it("stages only the production build and a dependency-free package manifest", async () => {
 		const source = await mkdtemp(join(tmpdir(), "arkini-desktop-build-"));
@@ -75,7 +102,12 @@ describe("desktop packaging artifacts", () => {
 		await writeFile(join(source, "main", "index.js"), "export {};\n");
 
 		const { stageDesktopPackageFx } = await import("../../cli/desktop/stageDesktopPackageFx");
-		await stageDesktopPackageFx(source, stage);
+		await Effect.runPromise(
+			stageDesktopPackageFx({
+				buildDirectory: source,
+				stageDirectory: stage,
+			}),
+		);
 
 		const stagedPackage = JSON.parse(await readFile(join(stage, "package.json"), "utf8"));
 		expect(stagedPackage).toEqual({

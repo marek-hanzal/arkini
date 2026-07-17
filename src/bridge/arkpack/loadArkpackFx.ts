@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
-import { createArkpackStorage } from "~/bridge/arkpack/createArkpackStorage";
+import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
 export namespace loadArkpackFx {
@@ -38,7 +38,7 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 		});
 	}
 
-	const storage = providedStorage ?? createArkpackStorage();
+	const storage = providedStorage ?? (yield* createArkpackStorageFx());
 	return yield* Effect.gen(function* () {
 		const record = yield* Effect.tryPromise({
 			try: () => storage.read(packageId),

@@ -1,11 +1,11 @@
 import { Deferred, Effect } from "effect";
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { createGameSession } from "~/bridge/game/createGameSession";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 
@@ -35,9 +35,9 @@ const emitCompletedEventFx = (jobId: string) =>
 		] as const),
 	);
 
-describe("createGameSession", () => {
+describe("createGameSessionFx", () => {
 	it("does not replay the initial committed transition to React subscribers", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -58,7 +58,7 @@ describe("createGameSession", () => {
 	});
 
 	it("opens runtime subscriptions synchronously while a mutation is still planning", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -108,7 +108,7 @@ describe("createGameSession", () => {
 	});
 
 	it("opens event subscriptions synchronously while a mutation is still planning", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -175,7 +175,7 @@ describe("createGameSession", () => {
 	});
 
 	it("exposes a committed command runtime synchronously when run resolves", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -213,7 +213,7 @@ describe("createGameSession", () => {
 	});
 
 	it("does not replay transitions committed before event subscription", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -251,7 +251,7 @@ describe("createGameSession", () => {
 	});
 
 	it("does not invalidate runtime subscribers for commits completed before registration", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -304,7 +304,7 @@ describe("createGameSession", () => {
 	});
 
 	it("does not notify runtime subscribers for event-only transitions", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -331,7 +331,7 @@ describe("createGameSession", () => {
 	});
 
 	it("does not notify React subscribers for a no-op Tick commit", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -355,7 +355,7 @@ describe("createGameSession", () => {
 	});
 
 	it("updates the canonical runtime before delivering transition events", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -387,7 +387,7 @@ describe("createGameSession", () => {
 	});
 
 	it("exposes the canonical runtime to every callback for a combined transition", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -434,7 +434,7 @@ describe("createGameSession", () => {
 	});
 
 	it("does not deliver the current transition to listeners registered during its callbacks", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -490,7 +490,7 @@ describe("createGameSession", () => {
 	});
 
 	it("stops subscriptions synchronously before later commits", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -510,7 +510,7 @@ describe("createGameSession", () => {
 	});
 
 	it("does not let pending async listeners block the remaining delivery", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -561,7 +561,7 @@ describe("createGameSession", () => {
 	});
 
 	it("disposes an in-flight planner without committing runtime or events", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -613,7 +613,7 @@ describe("createGameSession", () => {
 	});
 
 	it("publishes ordered committed job event batches to the session event source", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -665,7 +665,7 @@ describe("createGameSession", () => {
 	});
 
 	it("isolates throwing and rejected listeners without losing later transitions", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -730,7 +730,7 @@ describe("createGameSession", () => {
 		process.on("unhandledRejection", onUnhandledRejection);
 		let reports = 0;
 		const config = createTickFailureTestConfig();
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 5,
 			onTickError: async () => {
@@ -778,7 +778,7 @@ describe("createGameSession", () => {
 		const failure = new Error("save target unavailable");
 		let writes = 0;
 		const savedItemIds: string[][] = [];
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -837,7 +837,7 @@ describe("createGameSession", () => {
 
 	it("permits explicit discard cleanup after a failed final save", async () => {
 		const failure = new Error("save target unavailable");
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
@@ -856,7 +856,7 @@ describe("createGameSession", () => {
 		const forge = config.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
 		forge.lines[0]!.runtimeMs = 25;
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 5,
 		});

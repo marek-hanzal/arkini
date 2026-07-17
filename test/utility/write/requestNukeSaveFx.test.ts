@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/bridge/game/createGameSession";
 import { requestNukeSaveFx } from "~/engine/utility/write/requestNukeSaveFx";
 import { createDestructiveUtilityTestConfig } from "~test/utility/support/createDestructiveUtilityTestConfig";
 
@@ -18,7 +18,7 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 
 describe("requestNukeSaveFx", () => {
 	it("emits one confirmation request without changing runtime or requiring an item", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createDestructiveUtilityTestConfig(),
 			tickIntervalMs: 60_000,
 		});

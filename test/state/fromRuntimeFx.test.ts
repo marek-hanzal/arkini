@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { createGameSession } from "~/bridge/game/createGameSession";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { startFx } from "~/engine/start/write/startFx";
@@ -8,7 +8,7 @@ import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpac
 
 describe("fromRuntimeFx", () => {
 	it("creates a detached complete state that constructs one fresh session", async () => {
-		const first = await createGameSession({
+		const first = await createTestGameSession({
 			config: testArkpackConfig,
 			tickIntervalMs: 60_000,
 		});
@@ -35,7 +35,7 @@ describe("fromRuntimeFx", () => {
 			);
 			expect(state.items.some(({ id }) => id === "runtime:later")).toBe(false);
 
-			const restored = await createGameSession({
+			const restored = await createTestGameSession({
 				config: testArkpackConfig,
 				state,
 				tickIntervalMs: 60_000,

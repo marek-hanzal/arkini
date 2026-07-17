@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { GameProvider } from "~/bridge/game/GameProvider";
 import { useGameOwner } from "~/bridge/game/useGameOwner";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
 export namespace GameShell {
@@ -17,9 +18,9 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
 
 	useEffect(() => {
-		void owner.replace(packageId);
+		void RendererRuntime.runPromise(owner.replaceFx(packageId));
 		return () => {
-			void owner.replace(null);
+			void RendererRuntime.runPromise(owner.replaceFx(null));
 		};
 	}, [
 		owner,
@@ -44,7 +45,11 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 								<button
 									type="button"
 									className="rounded-lg bg-red-300 px-3 py-2 font-semibold text-slate-950"
-									onClick={() => void owner.clearFailedSaveAndRetry()}
+									onClick={() =>
+										void RendererRuntime.runPromise(
+											owner.clearFailedSaveAndRetryFx(),
+										)
+									}
 								>
 									Clear save and start fresh
 								</button>
@@ -53,7 +58,11 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 								<button
 									type="button"
 									className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
-									onClick={() => void owner.replace(state.packageId)}
+									onClick={() =>
+										void RendererRuntime.runPromise(
+											owner.replaceFx(state.packageId),
+										)
+									}
 								>
 									Retry without clearing
 								</button>

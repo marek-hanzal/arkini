@@ -113,13 +113,25 @@ const boundaryRules = [
 	{
 		name: "renderer-no-electron-imports",
 		comment:
-			"Renderer, engine, bridge, page, routes, and CLI stay independent from Electron and its platform source root.",
+			"Renderer, engine, bridge, page, and routes stay independent from Electron and its platform source root.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
 			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
+		},
+	},
+	{
+		name: "cli-no-electron-runtime-imports",
+		comment:
+			"CLI tooling may reuse explicit Electron build verification, but never Electron main/preload runtime adapters.",
+		severity: "error",
+		from: {
+			path: "^cli(?:/|$)",
+		},
+		to: {
+			path: "^electron/(?:main|preload)(?:/|$)|^node_modules/electron(?:/|$)",
 		},
 	},
 	{

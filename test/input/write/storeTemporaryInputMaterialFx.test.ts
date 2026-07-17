@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { createGameSession } from "~/bridge/game/createGameSession";
 
 const baseItem = (id: string) => ({
 	id,
@@ -81,7 +81,7 @@ const config = GameConfigSchema.parse({
 
 describe("temporary material input eligibility", () => {
 	it("rejects the source before mutation and publishes no event", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 60_000,
 		});

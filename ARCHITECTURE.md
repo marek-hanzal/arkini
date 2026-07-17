@@ -8,6 +8,23 @@ Engine paths are relative to `src/engine` unless written explicitly. `src/bridge
 
 Electron is a thin sibling platform adapter, not another application or another game owner.
 
+## Effect runtime roots
+
+Each physical process has one explicit Effect execution root:
+
+```text
+Electron main process
+→ ElectronMainRuntime
+
+renderer process
+→ RendererRuntime
+
+project CLI process
+→ NodeRuntime.runMain
+```
+
+`RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR reuses the same process root instead of creating another runtime island. Each live `Game` owns exactly one child session `ManagedRuntime` containing its engine services, Scope, Tick Fibers, subscriptions, and command runtime. Active source may re-enter these declared roots, but may not call direct `Effect.run*` helpers or create additional `ManagedRuntime` instances. Architecture tests enforce the allowed roots and the mandatory same-named `*Fx` operation grammar.
+
 ```text
 electron/main + electron/preload
 → BrowserWindow, custom protocol, controlled close, typed Arkpack/save filesystem capabilities

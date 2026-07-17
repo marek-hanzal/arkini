@@ -1,10 +1,10 @@
-import { Effect } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 export namespace useArkpacks {
 	export type State =
@@ -40,7 +40,7 @@ export const useArkpacks = (): useArkpacks.Result => {
 			setState({
 				type: "loading",
 			});
-			const arkpacks = await Effect.runPromise(listArkpacksFx());
+			const arkpacks = await RendererRuntime.runPromise(listArkpacksFx());
 			if (request.current === requestId) {
 				setState({
 					type: "ready",
@@ -68,7 +68,7 @@ export const useArkpacks = (): useArkpacks.Result => {
 
 	const importFile = useCallback(
 		async (file: File) => {
-			const descriptor = await Effect.runPromise(
+			const descriptor = await RendererRuntime.runPromise(
 				importArkpackFileFx({
 					file,
 				}),
@@ -82,7 +82,7 @@ export const useArkpacks = (): useArkpacks.Result => {
 	);
 	const remove = useCallback(
 		async (packageId: string) => {
-			await Effect.runPromise(
+			await RendererRuntime.runPromise(
 				removeArkpackFx({
 					packageId,
 				}),

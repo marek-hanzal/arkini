@@ -1,11 +1,11 @@
 import { Effect, Fiber, Option, Stream } from "effect";
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { GameLayerFx } from "~/engine/game/layer/GameLayerFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/bridge/game/createGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -62,7 +62,7 @@ describe("committed transition events", () => {
 	});
 
 	it("does not publish events for a candidate runtime that fails validation", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
@@ -119,7 +119,7 @@ describe("committed transition events", () => {
 	});
 
 	it("delivers concurrent event metadata in committed transition order", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});

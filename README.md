@@ -121,6 +121,8 @@ Do not introduce generic junk drawers such as `shared`, `utils`, `helpers`, or `
 
 ## Installation
 
+The repository pins Node `24.18.0` and npm `11.16.0` through `.nvmrc`, `engines`, `packageManager`, the lockfile, and GitHub Actions. Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
+
 The repository uses npm and commits `package-lock.json`.
 
 ```bash
@@ -128,6 +130,16 @@ npm ci
 ```
 
 Use `npm install` only when intentionally changing dependencies and updating the lockfile.
+
+Project tooling has one canonical Effect CLI entrypoint:
+
+```bash
+npm run arkini -- --help
+npm run arkini -- game --help
+npm run arkini -- desktop --help
+```
+
+Game authoring and desktop build/package workflows live in that command tree. npm scripts are thin convenience aliases; `npm-run-all2` is reserved for mechanical check and shard composition rather than domain orchestration.
 
 ## Required checks
 

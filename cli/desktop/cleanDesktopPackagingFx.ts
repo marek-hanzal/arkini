@@ -1,23 +1,36 @@
 import { rm } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { Effect } from "effect";
+import { DesktopPackagingError } from "./DesktopPackagingError";
 
-export async function cleanDesktopPackagingFx(
-	releaseDirectory = "release",
-	stageDirectory = "desktop-package",
-): Promise<void> {
-	await Promise.all(
-		[
-			releaseDirectory,
-			stageDirectory,
-		].map((directory) =>
-			rm(directory, {
-				recursive: true,
-				force: true,
-			}),
-		),
-	);
+export namespace cleanDesktopPackagingFx {
+	export interface Props {
+		readonly releaseDirectory?: string;
+		readonly stageDirectory?: string;
+	}
 }
 
-if (process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href) {
-	await cleanDesktopPackagingFx();
-}
+export const cleanDesktopPackagingFx = Effect.fn("cleanDesktopPackagingFx")(
+	({
+		releaseDirectory = "release",
+		stageDirectory = "desktop-package",
+	}: cleanDesktopPackagingFx.Props = {}) =>
+		Effect.tryPromise({
+			try: () =>
+				Promise.all(
+					[
+						releaseDirectory,
+						stageDirectory,
+					].map((directory) =>
+						rm(directory, {
+							recursive: true,
+							force: true,
+						}),
+					),
+				).then(() => undefined),
+			catch: (cause) =>
+				new DesktopPackagingError({
+					operation: "clean desktop packaging directories",
+					cause,
+				}),
+		}),
+);

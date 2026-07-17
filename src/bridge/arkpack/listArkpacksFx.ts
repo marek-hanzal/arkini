@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
-import { createArkpackStorage } from "~/bridge/arkpack/createArkpackStorage";
+import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 
 export namespace listArkpacksFx {
@@ -16,7 +16,7 @@ export namespace listArkpacksFx {
 export const listArkpacksFx = Effect.fn("listArkpacksFx")(function* (
 	props: listArkpacksFx.Props = {},
 ) {
-	const storage = props.storage ?? createArkpackStorage();
+	const storage = props.storage ?? (yield* createArkpackStorageFx());
 	return yield* Effect.gen(function* () {
 		const arkini = yield* loadArkpackFx({
 			packageId: ArkiniArkpack.packageId,

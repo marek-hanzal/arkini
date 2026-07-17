@@ -4,8 +4,8 @@ import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import type { Game } from "~/bridge/game/Game";
 import type { GameSession } from "~/bridge/game/GameSession";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
-import { createGameSession } from "~/bridge/game/createGameSession";
-import { createGameSaveStorage } from "~/bridge/save/createGameSaveStorage";
+import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
+import { createGameSaveStorageFx } from "~/bridge/save/createGameSaveStorageFx";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
@@ -33,7 +33,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 					storage: arkpackStorage,
 				}),
 	});
-	const saveStorage = providedSaveStorage ?? createGameSaveStorage();
+	const saveStorage = providedSaveStorage ?? (yield* createGameSaveStorageFx());
 	const resourceUrls = new Map<string, string>();
 	let session: GameSession | undefined;
 
@@ -80,35 +80,34 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 								}),
 						),
 					)).state;
-		session = yield* Effect.tryPromise({
-			try: () =>
-				createGameSession({
-					config: loaded.payload.config,
-					...(state === undefined
-						? {}
-						: {
-								state,
+		session = yield* createGameSessionFx({
+			config: loaded.payload.config,
+			...(state === undefined
+				? {}
+				: {
+						state,
+					}),
+			save: {
+				write: (nextState) =>
+					encodeArkiniSaveFx(nextState).pipe(
+						Effect.flatMap((bytes) =>
+							Effect.tryPromise({
+								try: () => saveStorage.write(saveKey, bytes),
+								catch: (cause) => cause,
 							}),
-					save: {
-						write: (nextState) =>
-							encodeArkiniSaveFx(nextState).pipe(
-								Effect.flatMap((bytes) =>
-									Effect.tryPromise({
-										try: () => saveStorage.write(saveKey, bytes),
-										catch: (cause) => cause,
-									}),
-								),
-							),
-					},
-				}),
-			catch: (cause) =>
+						),
+					),
+			},
+		}).pipe(
+			Effect.mapError((cause) =>
 				savedBytes === null
 					? cause
 					: new GameSaveBootstrapError({
 							cause,
 							saveKey,
 						}),
-		});
+			),
+		);
 		yield* Effect.sync(() => {
 			for (const resource of loaded.payload.resources) {
 				resourceUrls.set(

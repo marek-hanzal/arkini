@@ -1,12 +1,12 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createGameSession } from "~/bridge/game/createGameSession";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -252,7 +252,7 @@ describe("line start state owner isolation", () => {
 	});
 
 	it("replans against the latest capacity and publishes no transient start event", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 60_000,
 		});

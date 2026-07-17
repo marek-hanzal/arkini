@@ -1,5 +1,6 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
@@ -7,7 +8,6 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import { createGameSession } from "~/bridge/game/createGameSession";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -173,7 +173,7 @@ describe("setItemQuantityFx maxCount replacement", () => {
 	});
 
 	it("counts other live quantities while replacing only the target stack", async () => {
-		const session = await createGameSession({
+		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 60_000,
 		});

@@ -13,7 +13,7 @@ import {
 import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/bridge/save/RuntimeSaveLayerFx";
 
-export namespace createGameSession {
+export namespace createGameSessionFx {
 	export interface Props<SaveError = unknown> {
 		config: GameConfigSchema.Type;
 		state?: StateSchema.Type;
@@ -28,13 +28,13 @@ export namespace createGameSession {
 }
 
 /** Creates one long-lived browser session shared by React, Tick, save and event consumers. */
-export const createGameSession = async <SaveError>({
+const createGameSession = async <SaveError>({
 	config,
 	state,
 	tickIntervalMs,
 	onTickError,
 	save,
-}: createGameSession.Props<SaveError>): Promise<GameSession> => {
+}: createGameSessionFx.Props<SaveError>): Promise<GameSession> => {
 	const sessionLayer = GameSessionLayerFx({
 		config,
 		state,
@@ -138,3 +138,11 @@ export const createGameSession = async <SaveError>({
 		},
 	};
 };
+
+export const createGameSessionFx = Effect.fn("createGameSessionFx")(
+	<SaveError>(props: createGameSessionFx.Props<SaveError>) =>
+		Effect.tryPromise({
+			try: () => createGameSession(props),
+			catch: (cause) => cause,
+		}),
+);

@@ -6,11 +6,11 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Desktop boundary follow-up review #236**
 
-Status: **Open at P2 after follow-up verification. #237, #238, #239, and #241 are complete; #240 remaining source-text policy cleanup and #242 GameOwner lifecycle simplification remain.**
+Status: **Open at P2 after follow-up verification. #237, #238, #239, #240, and #241 are complete; #242 GameOwner lifecycle simplification remains.**
 
 Next action:
 
-> Continue the follow-up review in order: #240 → #242. Do not return to gameplay implementation until #236 is closed again.
+> Continue with #242: reduce GameOwner to the essential serialized lifecycle. Do not return to gameplay implementation until #236 is closed again.
 
 ## Source topology
 

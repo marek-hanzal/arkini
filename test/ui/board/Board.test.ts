@@ -104,13 +104,8 @@ describe("Board", () => {
 			}),
 		);
 
-		expect(html).toContain("board space 0");
-		expect(html).toContain('data-ui="BoardViewport"');
-		expect(html).toContain('data-ui="BoardGrid"');
-		expect(html).toContain("--board-width-from-height:150cqh");
-		expect(html).not.toContain("36rem");
+		expect(html.match(/aria-hidden="true"/g)).toHaveLength(6);
 		expect(html).toContain('data-item-id="water"');
-		expect(html).toContain("data-runtime-revision=");
 		expect(html).toContain('src="resource:asset:water"');
 		expect(html).toContain("grid-column-start:3");
 		expect(html).toContain("grid-row-start:2");
@@ -157,7 +152,6 @@ describe("Board", () => {
 		);
 
 		expect(html.match(/aria-hidden="true"/g)).toHaveLength(117);
-		expect(html).toContain("aspect-ratio:13 / 9");
 		expect(html).toContain("grid-column-start:13");
 		expect(html).toContain("grid-row-start:9");
 	});

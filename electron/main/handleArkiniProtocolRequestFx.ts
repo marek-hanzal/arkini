@@ -57,10 +57,10 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 				catch: (cause) =>
 					cause instanceof ArkiniProtocolError
 						? cause
-						: new ArkiniProtocolError(
-								500,
-								"Arkini renderer asset could not be served.",
-							),
+						: new ArkiniProtocolError({
+								status: 500,
+								message: "Arkini renderer asset could not be served.",
+							}),
 			});
 			return withProductionContentSecurityPolicy(response);
 		}),

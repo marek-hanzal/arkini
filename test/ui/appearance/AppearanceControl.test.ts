@@ -4,22 +4,41 @@ import { describe, expect, it } from "vitest";
 import { AppearanceContext } from "~/ui/appearance/AppearanceContext";
 import { AppearanceControl } from "~/ui/appearance/AppearanceControl";
 
-describe("AppearanceControl", () => {
-	it("offers dark, light, and explicit system preference modes", () => {
-		const html = renderToStaticMarkup(
-			createElement(AppearanceContext.Provider, {
-				value: {
-					theme: "system",
-					switching: false,
-					setTheme: () => undefined,
-				},
-				children: createElement(AppearanceControl),
-			}),
-		);
+const renderAppearanceControl = ({
+	theme,
+	switching = false,
+}: {
+	readonly theme: "dark" | "light" | "system";
+	readonly switching?: boolean;
+}) =>
+	renderToStaticMarkup(
+		createElement(AppearanceContext.Provider, {
+			value: {
+				theme,
+				switching,
+				setTheme: () => undefined,
+			},
+			children: createElement(AppearanceControl),
+		}),
+	);
 
-		expect(html).toContain('data-ui="AppearanceControl"');
-		expect(html).toContain('<option value="dark">Dark</option>');
-		expect(html).toContain('<option value="light">Light</option>');
-		expect(html).toContain('<option value="system" selected="">System</option>');
+describe("AppearanceControl", () => {
+	it("renders every supported theme and preserves the selected value", () => {
+		const html = renderAppearanceControl({
+			theme: "system",
+		});
+
+		expect(html).toContain('value="dark"');
+		expect(html).toContain('value="light"');
+		expect(html).toContain('value="system" selected=""');
+	});
+
+	it("disables theme changes while a preference switch is in flight", () => {
+		expect(
+			renderAppearanceControl({
+				theme: "dark",
+				switching: true,
+			}),
+		).toContain('disabled=""');
 	});
 });

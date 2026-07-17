@@ -25,6 +25,22 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "runtime-store-has-one-owner-boundary",
+		comment:
+			"The mutable runtime store is owned only by its layer, factory, and transaction helper.",
+		severity: "error",
+		from: {
+			path: "^src/engine(?:/|$)",
+			pathNot: [
+				"^src/engine/game/layer/GameCoreLayerFx[.]ts$",
+				"^src/engine/runtime/internal/(?:makeRuntimeStoreFx|modifyRuntimeFx)[.]ts$",
+			],
+		},
+		to: {
+			path: "^src/engine/runtime/internal/RuntimeStoreFx[.]ts$",
+		},
+	},
+	{
 		name: "engine-no-react-dependencies",
 		comment:
 			"The engine is framework-neutral. React and React-specific packages belong to the UI boundary.",

@@ -16,7 +16,10 @@ export const readArkiniProtocolFilePathFx = Effect.fn("readArkiniProtocolFilePat
 			const url = new URL(requestUrl);
 			if (url.protocol !== "arkini:" || url.host !== "app") {
 				return yield* Effect.fail(
-					new ArkiniProtocolError(404, "Unknown Arkini protocol origin."),
+					new ArkiniProtocolError({
+						status: 404,
+						message: "Unknown Arkini protocol origin.",
+					}),
 				);
 			}
 
@@ -25,7 +28,10 @@ export const readArkiniProtocolFilePathFx = Effect.fn("readArkiniProtocolFilePat
 				pathname = decodeURIComponent(url.pathname);
 			} catch {
 				return yield* Effect.fail(
-					new ArkiniProtocolError(400, "Malformed Arkini protocol path."),
+					new ArkiniProtocolError({
+						status: 400,
+						message: "Malformed Arkini protocol path.",
+					}),
 				);
 			}
 
@@ -37,7 +43,10 @@ export const readArkiniProtocolFilePathFx = Effect.fn("readArkiniProtocolFilePat
 				(!relativePath.startsWith("..") && !isAbsolute(relativePath));
 			if (!isSafe) {
 				return yield* Effect.fail(
-					new ArkiniProtocolError(400, "Arkini protocol path escapes the renderer root."),
+					new ArkiniProtocolError({
+						status: 400,
+						message: "Arkini protocol path escapes the renderer root.",
+					}),
 				);
 			}
 
@@ -48,7 +57,10 @@ export const readArkiniProtocolFilePathFx = Effect.fn("readArkiniProtocolFilePat
 			if (exists) return requestedPath;
 			if (extname(relativeRequestPath)) {
 				return yield* Effect.fail(
-					new ArkiniProtocolError(404, "Arkini renderer asset was not found."),
+					new ArkiniProtocolError({
+						status: 404,
+						message: "Arkini renderer asset was not found.",
+					}),
 				);
 			}
 			return resolve(rendererRoot, "index.html");

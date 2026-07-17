@@ -1,9 +1,6 @@
-export class ArkiniProtocolError extends Error {
-	readonly status: number;
+import { Data } from "effect";
 
-	constructor(status: number, message: string) {
-		super(message);
-		this.name = "ArkiniProtocolError";
-		this.status = status;
-	}
-}
+export class ArkiniProtocolError extends Data.TaggedError("ArkiniProtocolError")<{
+	readonly status: number;
+	readonly message: string;
+}> {}

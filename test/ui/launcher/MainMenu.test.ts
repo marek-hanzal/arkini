@@ -131,6 +131,7 @@ describe("MainMenu", () => {
 		);
 		expect(play?.getAttribute("href")).toContain("/game/canonical-built-in");
 		expect(container.textContent).toContain("Arkpacks");
+		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");
 
 		const exit = Array.from(container.querySelectorAll("button")).find(
@@ -138,8 +139,8 @@ describe("MainMenu", () => {
 		);
 		if (!(exit instanceof HTMLButtonElement)) throw new Error("Expected Exit button.");
 		await act(async () => exit.click());
+		await vi.waitFor(() => expect(exit.disabled).toBe(true));
 		exit.click();
 		expect(requestClose).toHaveBeenCalledOnce();
-		expect(exit.disabled).toBe(true);
 	});
 });

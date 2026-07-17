@@ -61,6 +61,12 @@ export const MainMenu = () => {
 					Arkpacks
 				</Link>
 				<Link
+					to="/settings"
+					className="rounded-xl border border-line bg-surface/75 px-5 py-3 text-center font-semibold shadow-lg backdrop-blur-md transition-colors hover:border-line-strong hover:bg-surface-raised"
+				>
+					Settings
+				</Link>
+				<Link
 					to="/about"
 					className="rounded-xl border border-line bg-surface/75 px-5 py-3 text-center font-semibold shadow-lg backdrop-blur-md transition-colors hover:border-line-strong hover:bg-surface-raised"
 				>

@@ -5,8 +5,9 @@ Issue #246 replaces the old root package selector with the out-of-game Arkini st
 ## Route ownership
 
 - `/` owns the one-renderer-session splash and transition.
-- `/main-menu` owns Play, Arkpacks, About, and trusted native Exit.
+- `/main-menu` owns Play, Arkpacks, Settings, About, and trusted native Exit.
 - `/arkpacks` is the moved existing selector over the same root catalog.
+- `/settings` owns the only System/Light/Dark control.
 - `/about` is a standalone credits page.
 - `/game/$packageId` remains the only live-game branch; `/dev/**` is unchanged.
 
@@ -26,13 +27,15 @@ The product meaning of in-game `Save and exit` is final save plus whole-applicat
 
 Theme and accent are separately validated and atomically persisted. Missing or malformed data resolves to dark and rose. The renderer applies both before the visible splash where practical; BrowserWindow and document startup backgrounds remain pure black.
 
+`/settings` is the sole theme-control surface. One complete `setAppearanceThemeMutationOptions` contract owns its stable key, direct `writeAppearanceThemeFx` call, immediate renderer application, active-value no-op, rollback, retry policy, and error propagation; `useSetAppearanceThemeMutation` only consumes those options. `system` sets Electron `nativeTheme.themeSource` and later native theme updates synchronize window backgrounds and renderer color-scheme resolution. The old floating theme/accent selector is deleted rather than duplicated.
+
 ## Validation
 
-- formatting: 1,234 files;
+- formatting: 1,239 files;
 - source, test, and Electron typechecks;
 - game validation;
 - production Electron build from a freshly generated official Arkpack;
-- Dependency Cruiser: 1,011 modules / 4,410 dependencies;
+- Dependency Cruiser: 1,016 modules / 4,427 dependencies;
 - executable clean-checkout desktop build;
-- focused launcher/catalog/appearance/native-close/game-menu tests: 12 files / 34 tests;
-- all ten permanent shards: 208 files / 650 tests.
+- focused launcher, Settings, appearance, native-close, and game-menu behavior tests;
+- all ten permanent shard contents passed across 209 test files; the shard-10 runner hang was closed by running the only unreported file, `LauncherRoutes.test.ts`, separately (4/4).

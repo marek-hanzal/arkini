@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./@routes/__root"
+import { Route as SettingsRouteImport } from "./@routes/settings"
 import { Route as MainMenuRouteImport } from "./@routes/main-menu"
 import { Route as ArkpacksRouteImport } from "./@routes/arkpacks"
 import { Route as AboutRouteImport } from "./@routes/about"
@@ -16,6 +17,11 @@ import { Route as IndexRouteImport } from "./@routes/index"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
 import { Route as GamePackageIdIndexRouteImport } from "./@routes/game/$packageId/index"
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: "/settings",
+  path: "/settings",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MainMenuRoute = MainMenuRouteImport.update({
   id: "/main-menu",
   path: "/main-menu",
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   "/about": typeof AboutRoute
   "/arkpacks": typeof ArkpacksRoute
   "/main-menu": typeof MainMenuRoute
+  "/settings": typeof SettingsRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/": typeof GamePackageIdIndexRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   "/about": typeof AboutRoute
   "/arkpacks": typeof ArkpacksRoute
   "/main-menu": typeof MainMenuRoute
+  "/settings": typeof SettingsRoute
   "/game/$packageId": typeof GamePackageIdIndexRoute
 }
 export interface FileRoutesById {
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   "/about": typeof AboutRoute
   "/arkpacks": typeof ArkpacksRoute
   "/main-menu": typeof MainMenuRoute
+  "/settings": typeof SettingsRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/": typeof GamePackageIdIndexRoute
 }
@@ -78,16 +87,24 @@ export interface FileRouteTypes {
     | "/about"
     | "/arkpacks"
     | "/main-menu"
+    | "/settings"
     | "/game/$packageId"
     | "/game/$packageId/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/about" | "/arkpacks" | "/main-menu" | "/game/$packageId"
+  to:
+    | "/"
+    | "/about"
+    | "/arkpacks"
+    | "/main-menu"
+    | "/settings"
+    | "/game/$packageId"
   id:
     | "__root__"
     | "/"
     | "/about"
     | "/arkpacks"
     | "/main-menu"
+    | "/settings"
     | "/game/$packageId"
     | "/game/$packageId/"
   fileRoutesById: FileRoutesById
@@ -97,11 +114,19 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ArkpacksRoute: typeof ArkpacksRoute
   MainMenuRoute: typeof MainMenuRoute
+  SettingsRoute: typeof SettingsRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/settings": {
+      id: "/settings"
+      path: "/settings"
+      fullPath: "/settings"
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/main-menu": {
       id: "/main-menu"
       path: "/main-menu"
@@ -164,6 +189,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ArkpacksRoute: ArkpacksRoute,
   MainMenuRoute: MainMenuRoute,
+  SettingsRoute: SettingsRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport

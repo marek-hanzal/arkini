@@ -6,15 +6,16 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Launcher startup and semantic main menu #246**
 
-Status: **Complete. The one-session black-hold splash, authoritative launcher bootstrap, shared catalog, semantic main menu, standalone Arkpacks/About routes, accent persistence, trusted native Exit, and corrected whole-application Save and exit are implemented and validated.**
+Status: **Complete. The one-session black-hold splash, authoritative launcher bootstrap, shared catalog, semantic main menu, standalone Arkpacks/Settings/About routes, persisted appearance, trusted native Exit, and corrected whole-application Save and exit are implemented and validated.**
 
 Current scope:
 
 - one renderer-session startup owner and one shared Arkpack catalog;
 - approximately 500 ms pure-black opening while bootstrap runs immediately;
 - theme/accent hydration, canonical built-in package resolution, Hero readiness, five-second minimum, legal Escape skip, retry, and session-only splash completion;
-- `/main-menu`, `/arkpacks`, and `/about` as standalone top-level destinations;
-- trusted native Exit and corrected whole-application Save and exit semantics.
+- `/main-menu`, `/arkpacks`, `/settings`, and `/about` as standalone top-level destinations;
+- trusted native Exit and corrected whole-application Save and exit semantics;
+- `/settings` as the sole System/Light/Dark theme surface, backed by one complete standalone mutation over the existing appearance owner; the former floating canvas selector is removed.
 
 Next action:
 
@@ -35,7 +36,7 @@ Next action:
 
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
 - TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
-- `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the moved shared package selector, `/about` contains credits, and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
+- `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the moved shared package selector, `/settings` owns the sole theme control, `/about` contains credits, and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
 - One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP; development adds only the exact HMR WebSocket endpoint.
 - Arkpack, save, and appearance persistence use narrow Effect-native object capabilities on both sides of typed IPC. Renderer adaptation from `ipcRenderer.invoke` happens once in domain transport operations; Electron handlers authorize once and run Effect-native `@effect/platform` filesystem operations through `ElectronMainRuntime`. No project-owned persistence classes or no-op close lifecycle remain.
@@ -49,6 +50,7 @@ Next action:
 - `GameSession` and `Game` lifecycle is Effect-native: `flushSaveFx`, `disposeFx`, and `disposeWithoutSaveFx` are the only public lifecycle operations. One session lifecycle state plus `Deferred` shares concurrent disposal, failed final save leaves the same frozen session retryable, and game-owned resource Scope closes only after successful save disposal or explicit discard. Never restore a cached disposal Promise wrapper.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
 - `GameMenuProvider` lives at the game-shell boundary only. It owns the synchronous `isOpen/open/close/toggle` overlay control, one game-scoped `Escape` listener, and focus restoration; launcher and `/dev/**` routes never mount it. The menu is not a route and opening it does not pause, replace, or duplicate the engine lifecycle.
+- The root `AppearanceProvider` owns only the hydrated renderer theme/accent snapshot. `/settings` uses one complete `setAppearanceThemeMutationOptions` contract connected directly to `writeAppearanceThemeFx`, plus its natural `useSetAppearanceThemeMutation` hook. It applies immediately, persists atomically, rolls back on failure, and no-ops for the active value. There is no floating game-canvas selector, second appearance store, callback-injection adapter, or project-specific mutation-state helper.
 - TanStack Query is present only as the standard lifecycle for asynchronous UI commands, never as gameplay/cache truth. Each command owns one complete standalone `mutationOptions` declaration connected directly to its native `Game`/`GameOwner` Fx and one natural `use*Mutation` hook that simply consumes those options. There is no shared mutation-key registry, callback-injection adapter, lifecycle mutation manager, or project-specific pending-state helper; other UI reads the native options key through TanStack APIs when cross-tree observation is actually needed.
 - Explicit save flush, controlled whole-application Save and exit, and hard reset are the first game-menu mutations. Save and exit requests the trusted native close handshake; the existing `GameOwner.shutdownFx` listener performs final save and rejects failure back to the same menu mutation. It never navigates or overloads `releaseRouteGameFx`. Hard-reset recovery stages remain private to `GameOwner`, so retry continues after the last completed discard/clear phase without exposing the exact save key or treating a disposed game as live UI state.
 - A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.

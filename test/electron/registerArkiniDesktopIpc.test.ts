@@ -13,12 +13,16 @@ import type { TrustedRenderer } from "../../electron/main/security/TrustedRender
 const electronHarness = vi.hoisted(() => {
 	const handlers = new Map<string, (event: unknown, ...args: unknown[]) => unknown>();
 	const appListeners = new Map<string, () => void>();
+	const nativeThemeListeners = new Map<string, () => void>();
+	const setBackgroundColor = vi.fn();
 	const userDataPath = {
 		value: "",
 	};
 	return {
 		appListeners,
 		handlers,
+		nativeThemeListeners,
+		setBackgroundColor,
 		userDataPath,
 		module: {
 			app: {
@@ -28,7 +32,11 @@ const electronHarness = vi.hoisted(() => {
 				},
 			},
 			BrowserWindow: {
-				getAllWindows: () => [],
+				getAllWindows: () => [
+					{
+						setBackgroundColor,
+					},
+				],
 			},
 			ipcMain: {
 				handle: (
@@ -38,8 +46,12 @@ const electronHarness = vi.hoisted(() => {
 				removeHandler: (channel: string) => handlers.delete(channel),
 			},
 			nativeTheme: {
-				on: vi.fn(),
-				removeListener: vi.fn(),
+				on: (event: string, listener: () => void) => {
+					nativeThemeListeners.set(event, listener);
+				},
+				removeListener: (event: string) => {
+					nativeThemeListeners.delete(event);
+				},
 				shouldUseDarkColors: true,
 				themeSource: "dark",
 			},
@@ -208,6 +220,17 @@ describe("registerArkiniDesktopIpcFx", () => {
 			await expect(
 				invoke(ArkiniDesktopApi.channels.appearanceRead, trustedEvent),
 			).resolves.toBe("light");
+			expect(electronHarness.module.nativeTheme.themeSource).toBe("light");
+			await expect(
+				invoke(ArkiniDesktopApi.channels.appearanceWrite, trustedEvent, "system"),
+			).resolves.toBeUndefined();
+			expect(electronHarness.module.nativeTheme.themeSource).toBe("system");
+			electronHarness.module.nativeTheme.shouldUseDarkColors = false;
+			electronHarness.nativeThemeListeners.get("updated")?.();
+			expect(electronHarness.setBackgroundColor).toHaveBeenLastCalledWith("#fbf8ff");
+			electronHarness.module.nativeTheme.shouldUseDarkColors = true;
+			electronHarness.nativeThemeListeners.get("updated")?.();
+			expect(electronHarness.setBackgroundColor).toHaveBeenLastCalledWith("#090711");
 			await expect(
 				invoke(ArkiniDesktopApi.channels.appearanceAccentRead, trustedEvent),
 			).resolves.toBe("rose");

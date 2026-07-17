@@ -55,6 +55,7 @@ describe("launcher routes", () => {
 
 	it.each([
 		"/arkpacks",
+		"/settings",
 		"/about",
 	])("keeps %s as a standalone top-level destination", async (path) => {
 		const router = await loadRoute(path);

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
+import { PrimaryButtonLink } from "~/ui/button/PrimaryButton";
 
 /** Selects a bundled or locally imported game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
@@ -51,14 +52,8 @@ export const ArkpackSelector = () => {
 			className="size-full min-h-0 min-w-0 overflow-hidden bg-canvas p-[clamp(1rem,3vmin,2.5rem)] text-foreground"
 			data-ui="ArkpackSelector"
 		>
-			<div className="mx-auto grid h-full min-h-0 w-full max-w-3xl grid-rows-[auto_auto_minmax(0,1fr)] gap-[clamp(0.75rem,2.5vmin,2rem)]">
+			<div className="mx-auto grid h-full min-h-0 w-full max-w-3xl grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-[clamp(0.75rem,2.5vmin,2rem)]">
 				<header>
-					<Link
-						to="/main-menu"
-						className="mb-4 inline-flex rounded-lg border border-line px-3 py-2 text-xs font-semibold text-muted transition-colors hover:border-line-strong hover:text-foreground"
-					>
-						← Main menu
-					</Link>
 					<p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
 						Arkini arkpacks
 					</p>
@@ -139,6 +134,10 @@ export const ArkpackSelector = () => {
 						))
 					)}
 				</section>
+
+				<footer className="flex justify-center pb-[env(safe-area-inset-bottom)]">
+					<PrimaryButtonLink to="/main-menu">Return to main menu</PrimaryButtonLink>
+				</footer>
 			</div>
 		</main>
 	);

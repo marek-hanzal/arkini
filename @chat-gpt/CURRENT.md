@@ -4,21 +4,22 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Native router View Transitions #268**
+**Unified primary navigation actions #273**
 
-Status: **Complete. The canonical TanStack Router enables the browser-native default View Transition with normal fallback and no project-owned animation layer.**
+Status: **Complete. About, Settings, and Arkpacks share one game-wide primary action primitive, with TanStack Router typing preserved for links.**
 
 Current scope:
 
-- `defaultViewTransition: true` lives only in `createArkiniRouter`;
-- supported browsers use `document.startViewTransition` for router commits;
-- unsupported browsers perform the same navigation update without error;
-- there are no route-specific transition types, names, timers, React state, engine API, or reduced-motion branch;
-- direct loads, launcher redirects, and GameOwner lifecycle behavior remain unchanged.
+- `PrimaryButton` is the canonical native-button primary action;
+- `PrimaryButtonLink` wraps the same host styling through TanStack Router `createLink` and `LinkComponent`;
+- About and Settings use the shared primary action without page-owned styling copies;
+- Arkpacks moves its return action from the header into a bottom-center footer while preserving the existing `/main-menu` destination;
+- the shared primitive owns hover, active, focus-visible, disabled, typography, spacing, and semantic accent tokens;
+- no launcher-specific button component or untyped `to: string` router wrapper exists.
 
 Next action:
 
-> Evaluate the native transition during ordinary use. Add custom styling only through a separate narrowly justified task.
+> Continue with the next explicitly selected gameplay or desktop task. Evaluate native View Transitions during ordinary use separately; #273 adds no transition behavior.
 
 ## Source topology
 

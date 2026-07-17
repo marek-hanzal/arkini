@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAppearanceThemeMutation";
+import { PrimaryButton } from "~/ui/button/PrimaryButton";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 
 const ThemeOptions: ReadonlyArray<{
@@ -109,9 +110,8 @@ export const Settings = () => {
 					) : null}
 				</div>
 
-				<button
-					type="button"
-					className="mx-auto rounded-lg border border-line px-5 py-2.5 font-semibold text-foreground transition-colors hover:border-line-strong hover:bg-surface-raised disabled:cursor-wait disabled:opacity-60"
+				<PrimaryButton
+					className="mx-auto"
 					disabled={setTheme.isPending}
 					onClick={() =>
 						void navigate({
@@ -120,7 +120,7 @@ export const Settings = () => {
 					}
 				>
 					Return to main menu
-				</button>
+				</PrimaryButton>
 			</section>
 		</LauncherScene>
 	);

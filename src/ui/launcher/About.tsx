@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { PrimaryButtonLink } from "~/ui/button/PrimaryButton";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 
 /** Renders concise project and authorship credits as a standalone launcher destination. */
@@ -33,12 +34,12 @@ export const About = () => {
 				<p className="text-sm text-subtle">
 					Created by Marek Hanzal with ChatGPT / OpenAI.
 				</p>
-				<Link
+				<PrimaryButtonLink
 					to="/main-menu"
-					className="mx-auto rounded-lg bg-accent px-5 py-2.5 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
+					className="mx-auto"
 				>
 					Return to main menu
-				</Link>
+				</PrimaryButtonLink>
 			</section>
 		</LauncherScene>
 	);

@@ -319,6 +319,8 @@ Forbidden:
 
 Presentation may lag runtime. Presentation is never authoritative.
 
+Cross-cutting UI actions use shared primitives under `src/ui`, not page-owned copies. The canonical primary action is `PrimaryButton` / `PrimaryButtonLink`; pages may add layout classes but do not recreate its visual interaction classes. Custom TanStack Router links must preserve registered-route typing through `createLink` and `LinkComponent`; never flatten router navigation into a hand-written `to: string` wrapper.
+
 ## 11. Configuration and compiler
 
 Game source files are authoring fragments, not runtime truth by themselves.

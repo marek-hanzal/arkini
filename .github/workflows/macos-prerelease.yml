@@ -45,18 +45,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run non-build repository gates
+      - name: Run source repository gates
         run: |
           npm run format:check
-          npm run dc
           npm run typecheck
           npm run game:validate
 
       - name: Package unsigned macOS arm64 application
         run: npm run package:mac
 
-      - name: Run permanent tests against the packaged build inputs
-        run: npm run test:shards
+      - name: Verify dependency graph and permanent tests against packaged build inputs
+        run: |
+          npm run dc
+          npm run test:shards
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v5

@@ -28,7 +28,7 @@
 		"test:shard:10": "vitest run --no-color --shard=10/10",
 		"test:shards": "run-s test:shard:*",
 		"dc": "depcruise src/engine src/bridge src/ui src/page src/@routes src/main.tsx src/router.tsx src/_route.ts electron desktop electron.vite.config.ts cli test --output-type err-long",
-		"check": "run-s format:check dc typecheck game:validate build test:shards",
+		"check": "run-s format:check typecheck game:validate build dc test:shards",
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"game:pack": "tsx cli/arkini.ts game pack",

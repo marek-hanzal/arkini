@@ -153,10 +153,10 @@ It runs:
 
 ```text
 Biome format check
-→ Dependency Cruiser architecture rules
 → source, test, and Electron TypeScript checks
 → game configuration validation
-→ production Electron build
+→ production Electron build (packs the official game once)
+→ Dependency Cruiser architecture rules against generated build inputs
 → all ten deterministic Vitest shards
 ```
 
@@ -203,7 +203,7 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-`.github/workflows/macos-prerelease.yml` uses the same `npm run package:mac` command on the GitHub-hosted `macos-15` Apple Silicon runner. CI runs formatting, dependency, type, and source-validation gates first, packages exactly once, then runs permanent tests against those package build inputs instead of running a second production build through `npm run check`. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+`.github/workflows/macos-prerelease.yml` uses the same `npm run package:mac` command on the GitHub-hosted `macos-15` Apple Silicon runner. CI runs formatting, type, and source-validation gates first, packages exactly once, then runs Dependency Cruiser and permanent tests against those exact generated package inputs instead of relying on stale ignored output or running a second production build through `npm run check`. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 
@@ -252,7 +252,7 @@ npm run game:pack
 
 - `game:schema` writes the authoring JSON Schema to `game/schema.json`.
 - `game:validate` runs the canonical compiler and all diagnostics.
-- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` plus its tracked metadata sidecar. `dev`, `build`, and Dependency Cruiser regenerate the ignored binary and refresh the sidecar before consuming them.
+- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` plus its tracked metadata sidecar. `dev` and `build` regenerate the ignored binary and refresh the sidecar. The local `check` order builds before Dependency Cruiser, and the macOS delivery workflow packages before Dependency Cruiser, so fresh checkouts never depend on stale generated output.
 
 The compiler, validator, tests, and packer must never assemble different versions of the game configuration.
 

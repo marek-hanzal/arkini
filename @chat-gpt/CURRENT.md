@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Desktop boundary review #236 completed**
+**Desktop boundary follow-up review #236**
 
-Status: **Completed and closed. Tasks #237 through #241 are implemented; trusted Electron security, Effect-native persistence, Effect-owned GameOwner concurrency, architecture-test cleanup, and single-pass desktop packaging are now canonical.**
+Status: **Open at P2 after follow-up verification. #237 and #239 remain complete. #241 clean-checkout desktop delivery is complete; #238 appearance persistence, #240 remaining source-text policy cleanup, and #242 GameOwner lifecycle simplification remain.**
 
 Next action:
 
-> Return to the current product roadmap and choose the next implementation slice; do not reopen the completed desktop boundary review without a new concrete regression.
+> Continue the follow-up review in order: #238 → #240 → #242. Do not return to gameplay implementation until #236 is closed again.
 
 ## Source topology
 
@@ -55,7 +55,7 @@ Next action:
 - `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
 - `npm run package:mac` is the sole local distribution path. It packs/builds once, stages only `out/**` plus a minimal dependency-free manifest, invokes one concrete `electron-builder` macOS operation, streams each large artifact once to create `SHA256SUMS`, and verifies artifact/app structure without rehashing. Standalone `desktop verify` re-streams artifacts when validating downloads or later changes.
-- `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Non-build gates run before packaging and permanent tests run after it, so the official pack and renderer build occur once in the delivery path. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
+- `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Format, type, and source-validation gates run before packaging; Dependency Cruiser and permanent tests run afterward against the generated package inputs. The official pack and renderer build therefore occur once in the delivery path without relying on stale ignored output. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
 - The repository toolchain is pinned to Node `24.18.0`, npm `11.16.0`, and `npm-run-all2` `9.0.2`; `.nvmrc`, `engines`, the lockfile, and GitHub Actions must stay aligned.
 - Effect execution has one explicit root per physical process: `ElectronMainRuntime` in Electron main, `RendererRuntime` in the renderer, and the standard `NodeRuntime.runMain` boundary for the canonical Arkini CLI. `RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR cannot create a second renderer root. Each live `Game` owns exactly one child session `ManagedRuntime`; no active source may create direct `Effect.run*` islands.
 - `tsx cli/arkini.ts` is the sole project-tooling entry. Game and desktop subcommands own typed options, orchestration, failure rendering, and exits. npm scripts are thin aliases; `npm-run-all2` is allowed only for mechanical checks/shards.

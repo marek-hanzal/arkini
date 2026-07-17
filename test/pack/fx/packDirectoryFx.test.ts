@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
+import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
 
 const png = new Uint8Array([
 	0x89,
@@ -28,6 +29,7 @@ describe("packDirectoryFx", () => {
 				const input = path.join(directory, "arkini");
 				const items = path.join(input, "items");
 				const assets = path.join(input, "assets");
+				const metadataOutput = path.join(directory, "arkini.game.arkpack.metadata.json");
 
 				yield* fileSystem.makeDirectory(items, {
 					recursive: true,
@@ -73,13 +75,21 @@ describe("packDirectoryFx", () => {
 
 				const result = yield* packDirectoryFx({
 					input,
+					metadata: {
+						output: metadataOutput,
+						packageId: "arkini",
+					},
 				});
 				const compressed = yield* fileSystem.readFile(result.output);
 				const payload = yield* decodeFx(new Uint8Array(gunzipSync(compressed)));
+				const metadata = ArkpackMetadataSchema.parse(
+					JSON.parse(yield* fileSystem.readFileString(metadataOutput)),
+				);
 
 				return {
 					result,
 					payload,
+					metadata,
 				} as const;
 			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
 		);
@@ -87,6 +97,16 @@ describe("packDirectoryFx", () => {
 		expect(packed.result).toMatchObject({
 			json: 2,
 			png: 2,
+		});
+		expect(packed.metadata).toEqual({
+			namespace: "arkini",
+			format: 1,
+			packageId: "arkini",
+			contentHash: packed.result.contentHash,
+			gameId: "arkini",
+			title: "Arkini",
+			configVersion: "1.0",
+			compressedSize: packed.result.bytes,
 		});
 		expect(packed.payload.resources).toEqual(
 			expect.arrayContaining([

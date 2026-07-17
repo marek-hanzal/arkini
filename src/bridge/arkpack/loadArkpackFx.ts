@@ -31,11 +31,24 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 	storage: providedStorage,
 }: loadArkpackFx.Props) {
 	if (packageId === ArkiniArkpack.packageId) {
-		return yield* readArkpackFx({
+		const loaded = yield* readArkpackFx({
 			bytes: yield* fetchArkiniBytes,
 			packageId,
 			source: "built-in",
 		});
+		const expected = ArkiniArkpack.descriptor;
+		if (
+			loaded.descriptor.contentHash !== expected.contentHash ||
+			loaded.descriptor.gameId !== expected.gameId ||
+			loaded.descriptor.title !== expected.title ||
+			loaded.descriptor.configVersion !== expected.configVersion ||
+			loaded.descriptor.compressedSize !== expected.compressedSize
+		) {
+			return yield* Effect.fail(
+				new Error("Bundled Arkini metadata does not match its exact package binary."),
+			);
+		}
+		return loaded;
 	}
 
 	const storage = providedStorage ?? (yield* createArkpackStorageFx());

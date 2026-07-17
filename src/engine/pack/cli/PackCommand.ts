@@ -7,13 +7,17 @@ import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagno
 export namespace PackCommand {
 	export interface Props {
 		input: string;
+		metadata?: {
+			readonly output: string;
+			readonly packageId: string;
+		};
 	}
 }
 
 /**
  * CLI command that packs one game source directory into an Arkini binary package.
  */
-export const PackCommand = ({ input }: PackCommand.Props) =>
+export const PackCommand = ({ input, metadata }: PackCommand.Props) =>
 	Command.make(
 		"pack",
 		{
@@ -25,6 +29,7 @@ export const PackCommand = ({ input }: PackCommand.Props) =>
 			Effect.gen(function* () {
 				const result = yield* packDirectoryFx({
 					input,
+					metadata,
 				}).pipe(
 					Effect.catchTag("GameValidationError", (error) =>
 						renderGameDiagnosticsFx(error.diagnostics).pipe(
@@ -38,6 +43,9 @@ export const PackCommand = ({ input }: PackCommand.Props) =>
 					`Packed ${result.json} JSON sources and ${result.png} PNG assets.`,
 				);
 				yield* Console.log(`Wrote ${result.output} (${result.bytes} bytes).`);
+				if (result.metadataOutput !== undefined) {
+					yield* Console.log(`Wrote ${result.metadataOutput}.`);
+				}
 			}),
 	).pipe(
 		Command.withDescription(

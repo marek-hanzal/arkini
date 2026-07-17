@@ -15,6 +15,10 @@ export const buildDesktopFx = Effect.fn("buildDesktopFx")(function* ({
 }: buildDesktopFx.Props = {}) {
 	const packed = yield* packDirectoryFx({
 		input: gameDirectory,
+		metadata: {
+			output: "game/arkini.game.arkpack.metadata.json",
+			packageId: "arkini",
+		},
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
 			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.zipRight(Effect.fail(error))),

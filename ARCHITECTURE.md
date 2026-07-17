@@ -211,7 +211,7 @@ Electron `userData` owns two separate opaque repositories:
   pending.arksave
 ```
 
-The original validated Arkpack binary is canonical. Catalog list reads only derived descriptor files; exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
+The original validated Arkpack binary is canonical. Imported catalog listing reads only derived `descriptor.json` files. Official Arkini listing reads only its generated tracked metadata sidecar, which is emitted from the same validated pack operation as the bundled binary. Exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use; official exact load additionally rejects a binary whose validated descriptor differs from the sidecar. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
 
 The engine's existing `StateSchema` is the complete canonical save state; creating a separate alias schema would add a second name without a second contract. `fromRuntimeFx` produces a detached state, and session construction hydrates a fresh runtime from validated state. The save codec wraps that state in exactly:
 

@@ -228,7 +228,7 @@ When a chained runner fails to exit cleanly, run the affected shard independentl
 
 The launcher treats `.arkpack` as the playable package boundary:
 
-- official Arkini is listed beside local imports and passes the same decode/schema/semantic/resource validation before startup;
+- official Arkini is listed from the generated `game/arkini.game.arkpack.metadata.json` sidecar, so launcher refresh never fetches, hashes, decompresses, or decodes its bundled payload; exact startup still reads the binary and verifies that the fully validated descriptor matches the sidecar;
 - imported binaries are addressed by their exact SHA-256 identity and persist under `<userData>/arkini/arkpacks/<packageId>/package.arkpack`; derived `descriptor.json` metadata is rebuildable and catalog listing never reads payload bytes;
 - exact package load reads one selected binary and revalidates its hash, config, resources, and identity before a game starts;
 - browser import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
@@ -252,7 +252,7 @@ npm run game:pack
 
 - `game:schema` writes the authoring JSON Schema to `game/schema.json`.
 - `game:validate` runs the canonical compiler and all diagnostics.
-- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` by default. `dev`, `build`, and Dependency Cruiser regenerate this ignored artifact before consuming it.
+- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` plus its tracked metadata sidecar. `dev`, `build`, and Dependency Cruiser regenerate the ignored binary and refresh the sidecar before consuming them.
 
 The compiler, validator, tests, and packer must never assemble different versions of the game configuration.
 

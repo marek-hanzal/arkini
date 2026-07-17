@@ -6,18 +6,18 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **GitHub review #232 — Electron persistence and lifecycle follow-up**
 
-Status: **#228, #230, #233, #229, #231, and related CLI epic #234 are complete. #225 remains the final review child before closing #227/#232; #208 native delivery validation follows afterward with Marek.**
+Status: **#228, #230, #233, #229, #231, related CLI epic #234, and #225 are complete. The Electron review findings are cleared; the next step is an independent review pass, then #208 native delivery validation with Marek.**
 
 Read:
 
 1. GitHub review #232;
 2. GitHub task #231 for mandatory `*Fx` operation grammar and runtime roots;
 3. GitHub epic #234 for the canonical Effect CLI command tree;
-4. GitHub task #225 for the remaining official-Arkini metadata-only catalog fix.
+4. GitHub task #225 for the completed official-Arkini metadata-only catalog fix.
 
 Next action:
 
-> Implement #225 as the final review task, then close #227/#232 and continue with the shared #208 Apple Silicon delivery pass.
+> Run an independent review pass over the completed Electron fixes. If clean, continue with the shared #208 Apple Silicon delivery pass.
 
 ## Source topology
 
@@ -48,7 +48,7 @@ Next action:
 
 ## Live bridge and tile foundation
 
-- `bridge/arkpack` validates compressed package bytes and derives SHA-256 identity. Electron persists the original imported binary plus rebuildable descriptor metadata under `userData/arkini/arkpacks/<sha256>` through narrow preload capabilities. Catalog listing reads descriptors only; exact package load reads one binary and fully revalidates it. Browser `File.size` is checked before `arrayBuffer()`, while the reader keeps the compressed-byte guard for non-File callers. Browser diagnostics use memory only.
+- `bridge/arkpack` validates compressed package bytes and derives SHA-256 identity. Electron persists the original imported binary plus rebuildable descriptor metadata under `userData/arkini/arkpacks/<sha256>` through narrow preload capabilities. Imported listing reads descriptor files only; official Arkini listing reads its generated tracked metadata sidecar only. Exact package load reads one binary, fully revalidates it, and rejects official metadata/binary mismatch. Browser `File.size` is checked before `arrayBuffer()`, while the reader keeps the compressed-byte guard for non-File callers. Browser diagnostics use memory only.
 - `bridge/save` encodes the canonical `StateSchema` as the strict MessagePack envelope `{ namespace: "arkini", format: 1, state }`. Electron stores opaque bytes atomically under `userData/arkini/saves/<packageId>/<contentHash>` through `pending.arksave → current.arksave`; browser diagnostics use memory only. Loads always construct a fresh session.
 - `bridge/runtime/useRuntimeSelector` uses `useSyncExternalStore` directly over `Game.getSnapshot` and `Game.subscribe`. It may memoize a selected value for one runtime root but never stores a second runtime or synchronizes through `useEffect`.
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.

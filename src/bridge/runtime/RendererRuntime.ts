@@ -8,11 +8,11 @@ interface HotData {
 	rendererRuntime?: RendererRuntime;
 }
 
-const hotData = import.meta.hot?.data as HotData | undefined;
+const hotData = (import.meta.hot?.data ?? {}) as HotData;
 
 /** One process-lifetime Effect root for renderer bridge and shell programs. */
-export const RendererRuntime = hotData?.rendererRuntime ?? makeRendererRuntime();
+export const RendererRuntime = hotData.rendererRuntime ?? makeRendererRuntime();
 
 if (import.meta.hot !== undefined) {
-	(import.meta.hot.data as HotData).rendererRuntime = RendererRuntime;
+	hotData.rendererRuntime = RendererRuntime;
 }

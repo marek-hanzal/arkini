@@ -50,6 +50,7 @@ Framework-required declarations are not named project operations and retain thei
 
 - React components;
 - React hooks beginning with `use`;
+- TanStack `queryOptions` / `mutationOptions` declarations and their natural React hooks;
 - Effect Context tags and Layer values;
 - Zod schemas;
 - TypeScript types, interfaces, namespaces, and constants;
@@ -90,6 +91,25 @@ Small files are acceptable when they make domain grammar predictable. Do not inl
 Arkini-owned reusable capabilities use readonly objects created by explicit Effect factories. Do not introduce project-owned classes, constructor-injected repositories, managers, services, adapters, or `new ProjectThing(...)` composition. State and dependencies belong in the closure of the owning factory; public behavior is exposed through narrow `*Fx` capability fields.
 
 External and framework constructors remain valid where their API requires them. Effect declaration forms such as `Data.TaggedError`, `Context.Tag`, and framework-owned classes are not project composition abstractions. Do not mechanically replace constructor injection with Layers or generic services unless a real scoped capability exists.
+
+### Asynchronous UI commands
+
+TanStack Query may own the transient lifecycle of asynchronous UI commands, but never canonical gameplay state, runtime reads, persistence truth, or lifecycle semantics.
+
+Each command stays standalone in its owning UI domain:
+
+```text
+saveGameMutationOptions
+→ complete stable mutation key
+→ direct connection to the native Game/GameOwner Fx
+→ retry/meta/error configuration
+
+useSaveGameMutation
+→ obtain only the required root capability
+→ useMutation(saveGameMutationOptions(...))
+```
+
+Do not create a central mutation-key object, mutation registry, generic mutation factory, callback-injection adapter, lifecycle mutation manager, or project-specific wrappers around `useIsMutating` / `useMutationState`. A caller that needs cross-tree status reuses the complete options declaration and native TanStack filtering APIs. Keep navigation, menu visibility, and other caller-specific success behavior at the composition site rather than coupling it into an otherwise reusable domain mutation.
 
 ### Enforcement strategy
 

@@ -319,6 +319,9 @@ describe("createGameOwnerFx", () => {
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			operation: "route-release",
+			game: {
+				instanceKey: "A",
+			},
 			canRecoverSave: false,
 		});
 
@@ -460,7 +463,6 @@ describe("createGameOwnerFx", () => {
 			"loading",
 			"ready",
 			"loading",
-			"loading",
 		]);
 		expect(report).toHaveBeenCalledWith(
 			"Arkini game-owner listener failed; authoritative lifecycle continues.",
@@ -505,15 +507,22 @@ describe("createGameOwnerFx", () => {
 		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("keeps a hard-reset discard failure truthful and retains the current game", async () => {
+	it("retries a hard-reset discard failure without clearing or replacing early", async () => {
 		const failure = new Error("discard failed");
 		const clearSave = vi.fn(() => Promise.resolve());
+		let discardCalls = 0;
+		let creates = 0;
 		const owner = createGameOwner({
 			clearSave,
-			create: async (packageId) =>
-				createFakeGame(packageId, packageId, {
-					discard: () => Promise.reject(failure),
-				}),
+			create: async (packageId) => {
+				creates += 1;
+				return createFakeGame(packageId, String(creates), {
+					discard: async () => {
+						discardCalls += 1;
+						if (discardCalls === 1) throw failure;
+					},
+				});
+			},
 		});
 		await runOwnerFx(owner.selectPackageFx("A"));
 
@@ -523,56 +532,91 @@ describe("createGameOwnerFx", () => {
 			type: "failed",
 			operation: "hard-reset",
 			packageId: "A",
+			game: {
+				instanceKey: "1",
+			},
 		});
 
-		await runOwnerFx(owner.selectPackageFx("A"));
-		expect(expectReady(owner).arkpack.packageId).toBe("A");
+		await runOwnerFx(owner.hardResetFx());
+		expect(discardCalls).toBe(2);
+		expect(clearSave).toHaveBeenCalledOnce();
+		expect(creates).toBe(2);
+		expect(expectReady(owner).instanceKey).toBe("2");
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("does not create a replacement when hard-reset clearing fails", async () => {
+	it("retries hard-reset clearing without discarding the game twice", async () => {
 		const failure = new Error("clear failed");
 		let creates = 0;
+		let clearCalls = 0;
+		const discard = vi.fn(() => Promise.resolve());
 		const owner = createGameOwner({
-			clearSave: async () => Promise.reject(failure),
+			clearSave: async () => {
+				clearCalls += 1;
+				if (clearCalls === 1) throw failure;
+			},
 			create: async (packageId) => {
 				creates += 1;
-				return createFakeGame(packageId, String(creates));
+				return createFakeGame(packageId, String(creates), {
+					discard,
+				});
 			},
 		});
 		await runOwnerFx(owner.selectPackageFx("A"));
 
 		await expect(runOwnerFx(owner.hardResetFx())).rejects.toBe(failure);
 		expect(creates).toBe(1);
+		expect(discard).toHaveBeenCalledOnce();
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			operation: "hard-reset",
 			packageId: "A",
+			game: null,
 		});
+
+		await runOwnerFx(owner.hardResetFx());
+		expect(clearCalls).toBe(2);
+		expect(discard).toHaveBeenCalledOnce();
+		expect(creates).toBe(2);
+		expect(expectReady(owner).instanceKey).toBe("2");
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("keeps a hard-reset recreate failure truthful after discard and clear", async () => {
+	it("retries hard-reset recreation without discarding or clearing twice", async () => {
 		const failure = new Error("fresh create failed");
 		let creates = 0;
 		const clearSave = vi.fn(() => Promise.resolve());
+		const discard = vi.fn(() => Promise.resolve());
 		const owner = createGameOwner({
 			clearSave,
 			create: async (packageId) => {
 				creates += 1;
 				if (creates === 2) throw failure;
-				return createFakeGame(packageId, String(creates));
+				return createFakeGame(packageId, String(creates), {
+					discard,
+				});
 			},
 		});
 		await runOwnerFx(owner.selectPackageFx("A"));
 
 		await expect(runOwnerFx(owner.hardResetFx())).rejects.toBe(failure);
 		expect(clearSave).toHaveBeenCalledOnce();
+		expect(discard).toHaveBeenCalledOnce();
 		expect(creates).toBe(2);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			operation: "hard-reset",
 			packageId: "A",
+			game: null,
 			canRecoverSave: false,
 		});
+
+		await runOwnerFx(owner.hardResetFx());
+		expect(clearSave).toHaveBeenCalledOnce();
+		expect(discard).toHaveBeenCalledOnce();
+		expect(creates).toBe(3);
+		expect(expectReady(owner).instanceKey).toBe("3");
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
 	it("hard resets a real selected package without restoring discarded progress", async () => {

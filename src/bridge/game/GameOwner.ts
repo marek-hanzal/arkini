@@ -23,6 +23,7 @@ export namespace GameOwner {
 		| {
 				readonly type: "failed";
 				readonly operation: Operation;
+				readonly game: Game | null;
 				readonly packageId: string | null;
 				readonly error: unknown;
 				readonly canRecoverSave: boolean;

@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Desktop packaged preview #245**
+**In-game main menu #243**
 
-Status: **Complete. Fresh-checkout build, unpacked macOS preview orchestration, and release stage reuse are implemented and validated.**
+Status: **Complete. The game-only Escape menu, explicit save, safe save-and-exit, confirmed hard reset, TanStack mutation grammar, and retryable lifecycle failure paths are implemented and validated.**
 
 Next action:
 
-> Return to gameplay implementation. Define the next playable vertical slice. Arkpack signing #210 and review codebook #209 remain intentionally deferred.
+> Return to the next playable gameplay slice. Arkpack signing #210 and review codebook #209 remain intentionally deferred.
 
 ## Source topology
 
@@ -39,6 +39,9 @@ Next action:
 - `GameOwner` owns one published Game, one private failed-save recovery identity, synchronous subscribers, and one transition Semaphore. Package selection, route release, shutdown, hard reset, and save recovery are explicit serialized operations. There is no command Queue, latest-intent interpreter, checkpoint protocol, or per-command Deferred list. A bootstrap interrupted before publication is discarded without final save.
 - `GameSession` and `Game` lifecycle is Effect-native: `flushSaveFx`, `disposeFx`, and `disposeWithoutSaveFx` are the only public lifecycle operations. One session lifecycle state plus `Deferred` shares concurrent disposal, failed final save leaves the same frozen session retryable, and game-owned resource Scope closes only after successful save disposal or explicit discard. Never restore a cached disposal Promise wrapper.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
+- `GameMenuProvider` lives at the game-shell boundary only. It owns the synchronous `isOpen/open/close/toggle` overlay control, one game-scoped `Escape` listener, and focus restoration; launcher and `/dev/**` routes never mount it. The menu is not a route and opening it does not pause, replace, or duplicate the engine lifecycle.
+- TanStack Query is present only as the standard lifecycle for asynchronous UI commands, never as gameplay/cache truth. Each command owns one complete standalone `mutationOptions` declaration connected directly to its native `Game`/`GameOwner` Fx and one natural `use*Mutation` hook that simply consumes those options. There is no shared mutation-key registry, callback-injection adapter, lifecycle mutation manager, or project-specific pending-state helper; other UI reads the native options key through TanStack APIs when cross-tree observation is actually needed.
+- Explicit save flush, safe route release, and hard reset are the first menu mutations. Route release keeps the published game visible while its final save is running and preserves the same retryable game on failure. Hard-reset recovery stages remain private to `GameOwner`, so retry continues after the last completed discard/clear phase without exposing the exact save key or treating a disposed game as live UI state.
 - A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.
 - `/game/$packageId` currently renders the canonical current-space board. Inventory and commands remain future slices. The root owner already exposes single-flight hard reset: discard current session without final save → clear exact save key → normal fresh bootstrap.
 

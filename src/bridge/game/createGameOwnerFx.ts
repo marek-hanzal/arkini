@@ -10,6 +10,13 @@ type FailedSaveRecovery = {
 	readonly saveCleared: boolean;
 };
 
+type HardResetRecovery = {
+	readonly packageId: string;
+	readonly saveKey: GameSaveStorage.Key;
+	readonly discarded: boolean;
+	readonly saveCleared: boolean;
+};
+
 const failureFromCause = (cause: Cause.Cause<unknown>) => {
 	const failure = Cause.failureOption(cause);
 	return Option.isSome(failure) ? failure.value : Cause.squash(cause);
@@ -23,6 +30,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 			const transitionLock = yield* Effect.makeSemaphore(1);
 			let current: Game | undefined;
 			let failedSaveRecovery: FailedSaveRecovery | undefined;
+			let hardResetRecovery: HardResetRecovery | undefined;
 			let state: GameOwner.State = {
 				type: "loading",
 				packageId: null,
@@ -87,6 +95,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 				publish({
 					type: "failed",
 					operation,
+					game: current ?? null,
 					packageId,
 					error,
 					canRecoverSave: failedSaveRecovery !== undefined,
@@ -114,6 +123,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 						Effect.sync(() => {
 							current = game;
 							failedSaveRecovery = undefined;
+							hardResetRecovery = undefined;
 							publish({
 								type: "ready",
 								game,
@@ -144,6 +154,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 						Effect.gen(function* () {
 							if (current?.arkpack.packageId === packageId) {
 								failedSaveRecovery = undefined;
+								hardResetRecovery = undefined;
 								publish({
 									type: "ready",
 									game: current,
@@ -151,6 +162,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 								return;
 							}
 							failedSaveRecovery = undefined;
+							hardResetRecovery = undefined;
 							publish({
 								type: "loading",
 								packageId,
@@ -164,12 +176,9 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 						"route-release",
 						() => null,
 						Effect.gen(function* () {
-							publish({
-								type: "loading",
-								packageId: null,
-							});
 							yield* releaseCurrentFx("save");
 							failedSaveRecovery = undefined;
+							hardResetRecovery = undefined;
 							publish({
 								type: "loading",
 								packageId: null,
@@ -187,44 +196,67 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 							});
 							yield* releaseCurrentFx("save");
 							failedSaveRecovery = undefined;
+							hardResetRecovery = undefined;
 							publish({
 								type: "loading",
 								packageId: null,
 							});
 						}),
 					),
-				hardResetFx: () => {
-					let resetPackageId: string | null = null;
-					return runTransitionFx(
+				hardResetFx: () =>
+					runTransitionFx(
 						"hard-reset",
-						() => resetPackageId,
+						() => hardResetRecovery?.packageId ?? current?.arkpack.packageId ?? null,
 						Effect.gen(function* () {
-							if (current === undefined || state.type !== "ready") {
-								return yield* Effect.fail(
-									new Error("A ready game is required for hard reset."),
-								);
+							let recovery = hardResetRecovery;
+							if (recovery === undefined) {
+								if (current === undefined) {
+									return yield* Effect.fail(
+										new Error(
+											"A current game or failed hard reset is required.",
+										),
+									);
+								}
+								recovery = {
+									packageId: current.arkpack.packageId,
+									saveKey: current.saveKey,
+									discarded: false,
+									saveCleared: false,
+								};
+								hardResetRecovery = recovery;
 							}
-							const resetting = current;
-							const packageId = resetting.arkpack.packageId;
-							resetPackageId = packageId;
-							const saveKey = resetting.saveKey;
 							failedSaveRecovery = undefined;
 							publish({
 								type: "loading",
-								packageId,
+								packageId: recovery.packageId,
 							});
-							yield* releaseCurrentFx("discard");
-							yield* clearSaveFx(saveKey);
-							yield* createAndPublishFx(packageId);
+							if (!recovery.discarded) {
+								yield* releaseCurrentFx("discard");
+								recovery = {
+									...recovery,
+									discarded: true,
+								};
+								hardResetRecovery = recovery;
+							}
+							if (!recovery.saveCleared) {
+								yield* clearSaveFx(recovery.saveKey);
+								recovery = {
+									...recovery,
+									saveCleared: true,
+								};
+								hardResetRecovery = recovery;
+							}
+							yield* createAndPublishFx(recovery.packageId);
+							hardResetRecovery = undefined;
 						}),
-					);
-				},
+					),
 				clearFailedSaveAndRetryFx: () =>
 					runTransitionFx(
 						"recover-save",
 						() => failedSaveRecovery?.key.packageId ?? null,
 						Effect.gen(function* () {
 							const recovery = failedSaveRecovery;
+							hardResetRecovery = undefined;
 							if (recovery === undefined) {
 								return yield* Effect.fail(
 									new Error("A verified failed save is required for recovery."),

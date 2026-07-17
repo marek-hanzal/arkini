@@ -1,6 +1,6 @@
 # 12 — Renderer shell, board, and inventory
 
-**Status:** Queued
+**Status:** Active renderer foundation implemented; gameplay UI slices continue incrementally
 
 ## Goal
 
@@ -50,34 +50,23 @@ The client uses standard history routing. Development Electron loads the rendere
 
 The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` declaratively maps the current router branch to one serialized `GameOwner`; `GameShell` only renders the matching published package. Selection awaits final disposal/save, duplicate identical requests become no-ops, and an unpublished candidate is discarded without save. Route release, controlled shutdown, hard reset, and invalid-save recovery remain explicit operations with distinct failure semantics.
 
-## Accepted hard-reset direction
+## Accepted game-menu and hard-reset direction
 
-Hard reset is complete `Game` replacement, not an in-place engine mutation.
+The game-only main menu is mounted at the `GameShell` boundary rather than in the board, a route, or a global application store. Its React Context owns only synchronous visibility control and the shell-owned `Escape`/focus boundary. Async Save, Save and exit, and Destroy actions are complete standalone TanStack mutation options connected directly to the authoritative `Game` / `GameOwner` Fx operations; TanStack tracks UI command state but never mirrors engine state.
 
-The root renderer shell owns one complete running `Game` created by a plain factory/composition function. That game root includes every lifecycle-bearing resource introduced by the shell, such as the game session, Tick ownership, autosave, subscriptions, Effect scopes, renderer listeners, read-model adapters, and persistence wiring.
-
-Initial startup and post-reset startup must use the same factory path:
+Hard reset is complete `Game` replacement, not an in-place engine mutation:
 
 ```text
-create Game
-→ publish running root
+confirm in the menu
+→ discard the current Game without final save
+→ clear only its exact package/content-hash save
+→ create and publish one fresh Game through the normal factory
+→ close the old menu with the replaced game shell
 ```
 
-Confirmed reset must be one shell-owned single-flight transition:
+`GameOwner` serializes each explicit lifecycle operation under one semaphore. The menu disables duplicate mutation execution rather than introducing another owner scheduler or a queued second reset. If hard reset fails after discard or save clearing, private owner recovery records the completed phase; retry continues from the remaining phase without repeating destructive work or exposing the save key to UI. A disposed game may remain only as exact mutation identity while the retry UI is mounted; it is never supplied through `GameProvider` as a live gameplay root.
 
-```text
-dispose complete current root without final save
-→ wait for in-flight persistence shutdown
-→ delete persisted state
-→ create a completely fresh root through the same factory
-→ atomically publish the fresh root
-```
-
-Concurrent confirmed resets join the same transition and receive the same fresh root object or the same failure. The confirmation component may disappear after invocation without cancelling the already-owned reset.
-
-Failure after disposal must produce a truthful shell recovery/error state. The shell must not resurrect or continue presenting the disposed root.
-
-Do not introduce a class merely to model this ownership. Prefer explicit factory/composition functions plus closure-owned current/reset state at the shell boundary.
+Safe Save and exit uses `releaseRouteGameFx`, not application shutdown. The published game remains visible while final save runs; successful release navigates to the unchanged launcher, while failure keeps the same retryable game and truthful menu error.
 
 ## Do not port
 
@@ -87,7 +76,7 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 - cyclic TileEngine package topology;
 - presentation state reconstructed into persistent gameplay truth;
 - in-place engine/session reset;
-- React-component-local reset ownership or disabled-button correctness;
+- React-component-local lifecycle semantics or a second reset scheduler;
 - module-global reset maps/locks;
 - a separate reset-only bootstrap path that diverges from initial game creation.
 
@@ -102,9 +91,11 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 - resize/responsive geometry does not affect engine coordinates;
 - persistence uses the current save boundary;
 - one plain game factory creates the complete root for both initial startup and post-reset startup;
+- the game-shell menu opens only on active game routes, traps/restores focus, and never creates another engine pause model;
+- explicit save, safe route release, and hard reset use complete standalone TanStack mutation contracts connected directly to their native Fx operations;
 - confirmed hard reset replaces the complete Game outside the engine instead of reinitializing it in place;
-- the complete dispose/delete/create/publish transition is single-flight and atomically publishes only a fully created fresh root;
-- reset failure exposes a truthful shell recovery state and never returns a disposed or partially initialized root.
+- reset retry resumes after the last privately recorded successful destructive phase and atomically publishes only a fully created fresh root;
+- reset failure exposes a truthful shell recovery state and never returns a disposed or partially initialized root as live gameplay context.
 
 ## Required tests
 
@@ -117,9 +108,11 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 - arkpack import/deduplication/reload and package-removal isolation;
 - Electron save persistence restore scoped to exact package identity/content;
 - initial startup and reset use the same game factory;
-- two concurrent confirmed resets dispose once, delete once, create once, publish once, and receive the exact same fresh root;
-- joined callers share delete/create failures and no fresh root is fabricated;
-- an already-started reset survives confirmation-component teardown;
+- Escape toggle, backdrop pointer ownership, focus trap, and focus restoration;
+- Save disables overlapping menu actions and reports durable success/failure;
+- Save and exit navigates only after successful safe route release and preserves retryable ownership on failure;
+- Destroy requires confirmation, invokes canonical hard reset once, and keeps truthful retry state after discard/clear/create failure;
+- hard-reset retry does not repeat already completed destructive phases;
 - cancellation before invoking reset changes nothing.
 
 ## Historical cleanup on closeout

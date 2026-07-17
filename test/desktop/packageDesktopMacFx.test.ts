@@ -13,15 +13,15 @@ vi.mock("../../cli/desktop/buildDesktopFx", () => ({
 vi.mock("../../cli/desktop/stageDesktopPackageFx", () => ({
 	stageDesktopPackageFx: () => Effect.sync(() => calls.push("stage")),
 }));
-vi.mock("../../cli/desktop/runDesktopCommandFx", () => ({
-	runDesktopCommandFx: ({ args }: { readonly args: ReadonlyArray<string> }) =>
-		Effect.sync(() => calls.push(`package:${args.join(" ")}`)),
+vi.mock("../../cli/desktop/packageDesktopMacArtifactsFx", () => ({
+	packageDesktopMacArtifactsFx: ({ arch }: { readonly arch: "arm64" }) =>
+		Effect.sync(() => calls.push(`package:${arch}`)),
 }));
 vi.mock("../../cli/desktop/createDesktopChecksumsFx", () => ({
 	createDesktopChecksumsFx: () => Effect.sync(() => calls.push("checksums")),
 }));
-vi.mock("../../cli/desktop/verifyDesktopArtifactsFx", () => ({
-	verifyDesktopArtifactsFx: () => Effect.sync(() => calls.push("verify")),
+vi.mock("../../cli/desktop/verifyDesktopPackageStructureFx", () => ({
+	verifyDesktopPackageStructureFx: () => Effect.sync(() => calls.push("verify-structure")),
 }));
 
 import { packageDesktopMacFx } from "../../cli/desktop/packageDesktopMacFx";
@@ -39,9 +39,9 @@ describe("packageDesktopMacFx", () => {
 			"clean",
 			"build",
 			"stage",
-			"package:--config electron-builder.yml --mac --arm64 --publish never",
+			"package:arm64",
 			"checksums",
-			"verify",
+			"verify-structure",
 		]);
 	});
 });

@@ -1,14 +1,10 @@
-import { createHash } from "node:crypto";
-import { access, readFile, stat } from "node:fs/promises";
+import { FileSystem } from "@effect/platform";
 import { join } from "node:path";
 import { Effect } from "effect";
-import packageJson from "../../package.json" with { type: "json" };
+import { DesktopMacArtifacts } from "./DesktopMacArtifacts";
 import { DesktopPackagingError } from "./DesktopPackagingError";
-
-const artifactNames = [
-	`Arkini-${packageJson.version}-mac-arm64.dmg`,
-	`Arkini-${packageJson.version}-mac-arm64.zip`,
-] as const;
+import { hashDesktopArtifactFx } from "./hashDesktopArtifactFx";
+import { verifyDesktopPackageStructureFx } from "./verifyDesktopPackageStructureFx";
 
 export namespace verifyDesktopArtifactsFx {
 	export interface Props {
@@ -16,57 +12,62 @@ export namespace verifyDesktopArtifactsFx {
 	}
 }
 
-export const verifyDesktopArtifactsFx = Effect.fn("verifyDesktopArtifactsFx")(
-	({ directory = "release" }: verifyDesktopArtifactsFx.Props = {}) =>
-		Effect.tryPromise({
-			try: async () => {
-				const checksumLines = (await readFile(join(directory, "SHA256SUMS"), "utf8"))
-					.trim()
-					.split("\n")
-					.filter(Boolean);
-				const expectedNames = new Set(artifactNames);
+export const verifyDesktopArtifactsFx = Effect.fn("verifyDesktopArtifactsFx")(function* ({
+	directory = "release",
+}: verifyDesktopArtifactsFx.Props = {}) {
+	const verification = Effect.gen(function* () {
+		const fileSystem = yield* FileSystem.FileSystem;
+		const checksumLines = (yield* fileSystem.readFileString(join(directory, "SHA256SUMS")))
+			.trim()
+			.split("\n")
+			.filter(Boolean);
+		const expectedNames = new Set<DesktopMacArtifacts.Name>(DesktopMacArtifacts.names);
 
-				if (checksumLines.length !== expectedNames.size) {
-					throw new Error(
-						"SHA256SUMS must contain exactly the macOS DMG and ZIP artifacts.",
-					);
-				}
+		if (checksumLines.length !== expectedNames.size) {
+			return yield* Effect.fail(
+				new Error("SHA256SUMS must contain exactly the macOS DMG and ZIP artifacts."),
+			);
+		}
 
-				for (const line of checksumLines) {
-					const match = /^([a-f0-9]{64})  (.+)$/.exec(line);
-					if (!match) throw new Error(`Invalid SHA256SUMS line: ${line}`);
-					const [, expectedHash, name] = match;
-					if (!expectedNames.delete(name as (typeof artifactNames)[number])) {
-						throw new Error(`Unexpected or duplicate desktop artifact: ${name}`);
-					}
-					const path = join(directory, name);
-					const file = await stat(path);
-					if (!file.isFile() || file.size === 0) {
-						throw new Error(`Desktop artifact is empty: ${name}`);
-					}
-					const actualHash = createHash("sha256")
-						.update(await readFile(path))
-						.digest("hex");
-					if (actualHash !== expectedHash)
-						throw new Error(`Checksum mismatch for ${name}`);
-				}
-
-				if (expectedNames.size > 0) {
-					throw new Error(
-						`Missing desktop artifact checksums: ${[
-							...expectedNames,
-						].join(", ")}`,
-					);
-				}
-
-				await access(
-					join(directory, "mac-arm64", "Arkini.app", "Contents", "Resources", "app.asar"),
+		for (const line of checksumLines) {
+			const match = /^([a-f0-9]{64})  (.+)$/.exec(line);
+			if (!match) return yield* Effect.fail(new Error(`Invalid SHA256SUMS line: ${line}`));
+			const [, expectedHash, name] = match;
+			if (!expectedNames.delete(name as DesktopMacArtifacts.Name)) {
+				return yield* Effect.fail(
+					new Error(`Unexpected or duplicate desktop artifact: ${name}`),
 				);
-			},
-			catch: (cause) =>
+			}
+			const actualHash = yield* hashDesktopArtifactFx({
+				path: join(directory, name),
+			});
+			if (actualHash !== expectedHash) {
+				return yield* Effect.fail(new Error(`Checksum mismatch for ${name}`));
+			}
+		}
+
+		if (expectedNames.size > 0) {
+			return yield* Effect.fail(
+				new Error(
+					`Missing desktop artifact checksums: ${[
+						...expectedNames,
+					].join(", ")}`,
+				),
+			);
+		}
+
+		yield* verifyDesktopPackageStructureFx({
+			directory,
+		}).pipe(Effect.mapError((error) => error.cause));
+	});
+
+	return yield* verification.pipe(
+		Effect.mapError(
+			(cause) =>
 				new DesktopPackagingError({
 					operation: "verify desktop artifacts",
 					cause,
 				}),
-		}),
-);
+		),
+	);
+});

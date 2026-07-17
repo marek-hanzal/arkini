@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { NodeContext } from "@effect/platform-node";
 import { Effect } from "effect";
 import packageJson from "../../package.json" with { type: "json" };
 import { afterEach, describe, expect, it } from "vitest";
@@ -48,13 +49,13 @@ describe("desktop packaging artifacts", () => {
 		await Effect.runPromise(
 			createDesktopChecksumsFx({
 				directory: fixture.directory,
-			}),
+			}).pipe(Effect.provide(NodeContext.layer)),
 		);
 		await expect(
 			Effect.runPromise(
 				verifyDesktopArtifactsFx({
 					directory: fixture.directory,
-				}),
+				}).pipe(Effect.provide(NodeContext.layer)),
 			),
 		).resolves.toBeUndefined();
 
@@ -72,7 +73,7 @@ describe("desktop packaging artifacts", () => {
 		await Effect.runPromise(
 			createDesktopChecksumsFx({
 				directory: fixture.directory,
-			}),
+			}).pipe(Effect.provide(NodeContext.layer)),
 		);
 		await writeFile(join(fixture.directory, fixture.artifacts[0]), "tampered");
 
@@ -81,7 +82,7 @@ describe("desktop packaging artifacts", () => {
 				Effect.flip(
 					verifyDesktopArtifactsFx({
 						directory: fixture.directory,
-					}),
+					}).pipe(Effect.provide(NodeContext.layer)),
 				),
 			),
 		).resolves.toMatchObject({

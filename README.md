@@ -168,7 +168,7 @@ npm run build
 npm run preview
 ```
 
-Arkini is an Electron-only product. `npm run dev` starts Electron with a Vite-powered renderer and HMR, `npm run preview` starts the built Electron application, and `npm run build` produces the production Electron build. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an Electron-only product. `npm run dev` starts Electron with a Vite-powered renderer and HMR, `npm run build` produces the production Electron build, and `npm run preview` starts that existing build without repacking or rebuilding it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
 Appearance is renderer-owned and exposed through semantic Tailwind color utilities backed by one CSS token palette. The user may explicitly select `dark`, `light`, or `system`; a missing or malformed preference always starts in dark mode. Electron persists the selection under `userData/arkini/preferences`, applies the same mode through `nativeTheme`, and exposes no browser-storage settings path.
 
@@ -192,7 +192,7 @@ The production distribution target is unsigned macOS Apple Silicon only. Build b
 npm run package:mac
 ```
 
-The command cleans old package output, builds the official Arkini pack plus Electron main/preload/renderer, stages only `out/**` with a dependency-free production manifest, runs `electron-builder` for arm64 DMG and ZIP targets, writes `SHA256SUMS`, and verifies the artifacts plus unpacked `Arkini.app` seam. Output lives under `release/`:
+The command cleans old package output, packs the official Arkini game once, builds Electron main/preload/renderer once, stages only `out/**` with a dependency-free production manifest, and runs one concrete `electron-builder` arm64 DMG/ZIP operation. SHA-256 values are streamed from the large artifacts once while `SHA256SUMS` is written; the combined package flow then verifies artifact presence and the unpacked `Arkini.app` seam without hashing the same files again. `npm run package:verify` remains the standalone full checksum verification path for downloaded or later-modified artifacts. Output lives under `release/`:
 
 ```text
 Arkini-<version>-mac-arm64.dmg
@@ -203,7 +203,7 @@ mac-arm64/Arkini.app
 
 Verify downloads with `shasum -a 256 -c SHA256SUMS`. These development artifacts are intentionally unsigned and unnotarized. macOS may require opening the application through Finder's **Open** action or allowing it from **System Settings → Privacy & Security**. Do not add ad-hoc signing, fake certificates, or notarization placeholders to this milestone.
 
-`.github/workflows/macos-prerelease.yml` uses the same `npm run package:mac` command on the GitHub-hosted `macos-15` Apple Silicon runner. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
+`.github/workflows/macos-prerelease.yml` uses the same `npm run package:mac` command on the GitHub-hosted `macos-15` Apple Silicon runner. CI runs formatting, dependency, type, and source-validation gates first, packages exactly once, then runs permanent tests against those package build inputs instead of running a second production build through `npm run check`. Manual dispatch uploads a normal workflow artifact only. Tags matching `v*-dev.*`, such as `v0.1.0-dev.1`, also create an immutable GitHub prerelease containing the DMG, ZIP, and `SHA256SUMS`. Normal source pushes do not spend macOS runner time.
 
 Useful focused commands:
 

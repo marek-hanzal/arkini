@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Review #236, task #240: architecture enforcement diet**
+**Review #236, task #241: desktop packaging cleanup**
 
-Status: **Implemented and fully validated locally. The complete 12-file / 790-line `test/architecture` source-text suite is deleted. Dependency Cruiser owns stable import boundaries; focused tests own behavior and generated output; `CODE_GUIDE.md` plus review own project grammar. No AST policy system replaced the deleted tests.**
+Status: **Implemented and fully validated locally. Generic command execution is gone, package/build ownership is concrete, CI builds once, DMG/ZIP checksum creation and standalone verification stream artifact bytes incrementally, and all 199 files / 627 tests pass.**
 
 Next action:
 
-> Close #240, then continue with #241 desktop packaging cleanup.
+> Close #241 and the completed review epic #236, then return to the next product task.
 
 ## Source topology
 
@@ -53,8 +53,8 @@ Next action:
 - Appearance is a UI/platform preference, never gameplay state. `src/ui/styles.css` is the sole semantic color-token source; active UI uses semantic Tailwind utilities and no palette-specific `dark:` branches. The stored mode is `dark | light | system`; absent or malformed preference data resolves to dark, and system is followed only when explicitly selected. Electron `nativeTheme` and renderer `color-scheme` stay aligned without another resolved-theme store.
 - `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
-- `npm run package:mac` is the sole local distribution path. It stages only `out/**` plus a minimal dependency-free manifest, then `electron-builder` emits unsigned arm64 DMG/ZIP artifacts and verifies `SHA256SUMS` plus the unpacked `Arkini.app` seam.
-- `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
+- `npm run package:mac` is the sole local distribution path. It packs/builds once, stages only `out/**` plus a minimal dependency-free manifest, invokes one concrete `electron-builder` macOS operation, streams each large artifact once to create `SHA256SUMS`, and verifies artifact/app structure without rehashing. Standalone `desktop verify` re-streams artifacts when validating downloads or later changes.
+- `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Non-build gates run before packaging and permanent tests run after it, so the official pack and renderer build occur once in the delivery path. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
 - The repository toolchain is pinned to Node `24.18.0`, npm `11.16.0`, and `npm-run-all2` `9.0.2`; `.nvmrc`, `engines`, the lockfile, and GitHub Actions must stay aligned.
 - Effect execution has one explicit root per physical process: `ElectronMainRuntime` in Electron main, `RendererRuntime` in the renderer, and the standard `NodeRuntime.runMain` boundary for the canonical Arkini CLI. `RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR cannot create a second renderer root. Each live `Game` owns exactly one child session `ManagedRuntime`; no active source may create direct `Effect.run*` islands.
 - `tsx cli/arkini.ts` is the sole project-tooling entry. Game and desktop subcommands own typed options, orchestration, failure rendering, and exits. npm scripts are thin aliases; `npm-run-all2` is allowed only for mechanical checks/shards.

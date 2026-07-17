@@ -28,6 +28,8 @@ describe("desktop delivery configuration", () => {
 			"cli/arkini.ts desktop checksums",
 		);
 		expect(packageJson.scripts["package:verify"]).toContain("cli/arkini.ts desktop verify");
+		expect("predc" in packageJson.scripts).toBe(false);
+		expect("prepreview" in packageJson.scripts).toBe(false);
 
 		const workflow = readFileSync(".github/workflows/macos-prerelease.yml", "utf8");
 		expect(workflow).toContain('tags:\n      - "v*-dev.*"');
@@ -36,7 +38,17 @@ describe("desktop delivery configuration", () => {
 		expect(workflow).toContain("node-version: 24.18.0");
 		expect(workflow).toContain('test "$(node --version)" = "v24.18.0"');
 		expect(workflow).toContain('test "$(npm --version)" = "11.16.0"');
+		expect(workflow).toContain("npm run format:check");
+		expect(workflow).toContain("npm run dc");
+		expect(workflow).toContain("npm run typecheck");
+		expect(workflow).toContain("npm run game:validate");
 		expect(workflow).toContain("run: npm run package:mac");
+		expect(workflow).toContain("run: npm run test:shards");
+		expect(workflow).not.toContain("run: npm run check");
+		expect(workflow.match(/npm run package:mac/g)).toHaveLength(1);
+		expect(workflow.indexOf("run: npm run package:mac")).toBeLessThan(
+			workflow.indexOf("run: npm run test:shards"),
+		);
 		expect(workflow).toContain("gh release create");
 		expect(workflow).toContain("--prerelease");
 		expect(workflow).toContain("release/SHA256SUMS");

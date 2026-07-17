@@ -1,10 +1,17 @@
 import { Link } from "@tanstack/react-router";
+import type { Effect } from "effect";
 import { type PropsWithChildren, useEffect, useSyncExternalStore } from "react";
 
 import { GameProvider } from "~/bridge/game/GameProvider";
 import { useGameOwner } from "~/bridge/game/useGameOwner";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+
+const runOwnerCommand = (command: Effect.Effect<void, unknown>) => {
+	void RendererRuntime.runPromise(command).catch(() => {
+		// GameOwner publishes the same authoritative failure for the shell UI.
+	});
+};
 
 export namespace GameShell {
 	export interface Props extends PropsWithChildren {
@@ -18,9 +25,9 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
 
 	useEffect(() => {
-		void RendererRuntime.runPromise(owner.replaceFx(packageId));
+		runOwnerCommand(owner.replaceFx(packageId));
 		return () => {
-			void RendererRuntime.runPromise(owner.replaceFx(null));
+			runOwnerCommand(owner.replaceFx(null));
 		};
 	}, [
 		owner,
@@ -46,9 +53,7 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 									type="button"
 									className="rounded-lg bg-danger px-3 py-2 font-semibold text-danger-contrast transition-opacity hover:opacity-90"
 									onClick={() =>
-										void RendererRuntime.runPromise(
-											owner.clearFailedSaveAndRetryFx(),
-										)
+										runOwnerCommand(owner.clearFailedSaveAndRetryFx())
 									}
 								>
 									Clear save and start fresh
@@ -59,9 +64,7 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 									type="button"
 									className="rounded-lg bg-accent px-3 py-2 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
 									onClick={() =>
-										void RendererRuntime.runPromise(
-											owner.replaceFx(state.packageId),
-										)
+										runOwnerCommand(owner.replaceFx(state.packageId))
 									}
 								>
 									Retry without clearing

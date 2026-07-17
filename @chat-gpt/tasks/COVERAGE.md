@@ -37,7 +37,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Speed cheat | Partial | Canonical root runtime session mode, 1×/30× Tick input, save reset, toggle command, and event are implemented | Read-model/asset projection, control UI, and audio remain | 10, 13, 15 |
 | Multi-space board runtime | Partial | Canonical spaces, persistent navigation, isolation, placement, Tick, save, explicit `any` versus `universe` query reach, and ownership-graph travel are implemented; renderer/navigation presentation remains | 10–14 |
 | Board memory | Rejected | Destructive snapshot/restore and active engine item authoring were removed in favor of multi-space boards | Done |
-| Cheat inventory sink and nuke-save confirmation | Partial | Canonical sink command, committed feedback event, nuke confirmation request, save-discard shutdown, and provisional dispose/delete/create sequencing are implemented | Final hard reset must be shell-owned complete Game replacement through one shared factory and complete-transition single-flight in 12; interaction, confirmation UI, animation, and debug wiring remain in 11–14/16 |
+| Cheat inventory sink and nuke-save confirmation | Partial | Canonical sink command, committed feedback event, nuke confirmation request, and shell-owned Effect-serialized dispose/delete/create hard reset are implemented | Interaction, confirmation UI, animation, and debug wiring remain in 11–14/16 |
 | Public board/inventory/line read models | Partial | Live board projection now exists through `bridge/board/useBoard`; historical bridge remains an information-requirement catalogue for inventory and line slices | 10 |
 | Drag/drop and activation orchestration | Reference | Historical interaction behavior remains | 11 |
 | React board/inventory renderer | Reference | Layout and UX remain; state topology is rejected | 12 |
@@ -45,7 +45,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Visual planning and animation | Reference | Historical event-to-motion behavior remains | 14 |
 | Audio | Reference | Sound policy and synthesis remain | 15 |
 | Debug/explain tools | Reference | Explanation scenarios remain | 16 |
-| Persistent Electron renderer shell | Partial | Root arkpack selector, validated local package persistence, selected-package game factory, exact-content save restore, and live board shell exist | Atomic hard-reset publication, truthful failure recovery, and single-flight replacement remain in 12; final pruning belongs to 17 |
+| Persistent Electron renderer shell | Partial | Root arkpack selector, validated local package persistence, selected-package game factory, exact-content save restore, live board shell, atomic hard reset, truthful recovery, and Effect-owned single-flight replacement exist | Product UI growth remains in 10–14; final pruning belongs to 17 |
 
 ## Historical directory map
 

@@ -54,7 +54,7 @@ describe("Effect runtime ownership", () => {
 		expect(offenders).toEqual([]);
 	});
 
-	it("only re-enters one explicitly captured Effect runtime inside the serialized game owner", () => {
+	it("does not re-enter captured Effect runtimes inside active source", () => {
 		const runtimeRunnerFiles = activeFiles
 			.filter((file) =>
 				/\bRuntime\.run(?:Promise|PromiseExit|Sync|SyncExit|Fork)\b/.test(
@@ -63,12 +63,10 @@ describe("Effect runtime ownership", () => {
 			)
 			.map(projectPath);
 
-		expect(runtimeRunnerFiles).toEqual([
-			"src/bridge/game/createGameOwnerFx.ts",
-		]);
+		expect(runtimeRunnerFiles).toEqual([]);
 		const owner = readFileSync("src/bridge/game/createGameOwnerFx.ts", "utf8");
-		expect(owner).toContain("yield* Effect.runtime<never>()");
-		expect(owner).toContain("Runtime.runPromiseExit(runtime)");
+		expect(owner).not.toContain("Effect.runtime");
+		expect(owner).not.toContain("Runtime.run");
 	});
 
 	it("keeps public game lifecycle authority in Effect programs", () => {
@@ -84,7 +82,9 @@ describe("Effect runtime ownership", () => {
 		expect(gameFactory).not.toContain("disposePromise");
 		expect(sessionFactory).toContain("Deferred.make<void, unknown>()");
 		expect(sessionFactory).toContain("Effect.makeSemaphore(1)");
-		expect(owner).toContain("runPromise(releasing.disposeFx)");
+		expect(owner).toContain("Queue.unbounded<Command>()");
+		expect(owner).toContain("Deferred.make<void, unknown>()");
+		expect(owner).toContain("Effect.makeSemaphore(1)");
 	});
 
 	it("keeps the process entrypoints on their one declared runtime boundary", () => {

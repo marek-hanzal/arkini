@@ -2,10 +2,8 @@ import { Effect } from "effect";
 import { type ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
 import { createGameFx } from "~/bridge/game/createGameFx";
-import {
-	createGameOwnerFx,
-	type createGameOwnerFx as GameOwner,
-} from "~/bridge/game/createGameOwnerFx";
+import type { GameOwner } from "~/bridge/game/GameOwner";
+import { createGameOwnerFx } from "~/bridge/game/createGameOwnerFx";
 import { shutdownGameOwnerFx } from "~/bridge/game/shutdownGameOwnerFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
@@ -21,7 +19,7 @@ interface HotData {
 }
 
 const previousHotShutdown = (import.meta.hot?.data as HotData | undefined)?.gameOwnerShutdown;
-let activeHotOwner: GameOwner.Owner | undefined;
+let activeHotOwner: GameOwner | undefined;
 
 import.meta.hot?.dispose((data: HotData) => {
 	data.gameOwnerShutdown =
@@ -31,7 +29,7 @@ import.meta.hot?.dispose((data: HotData) => {
 	activeHotOwner = undefined;
 });
 
-const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => (
+const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner }) => (
 	<div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/95 p-6 text-center text-sm text-danger">
 		<div className="flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-danger/25 bg-surface-raised p-6 shadow-2xl">
 			<h2 className="text-lg font-semibold text-danger">Final save failed</h2>
@@ -66,7 +64,7 @@ const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => 
 
 /** Keeps one serialized game owner alive across launcher, route and desktop lifecycle changes. */
 export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
-	const ownerRef = useRef<GameOwner.Owner | undefined>(undefined);
+	const ownerRef = useRef<GameOwner | undefined>(undefined);
 	if (ownerRef.current === undefined) {
 		ownerRef.current = RendererRuntime.runSync(
 			createGameOwnerFx({

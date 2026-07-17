@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Review #236, task #238: Effect-native desktop persistence**
+**Review #236, task #239: Effect-owned GameOwner concurrency**
 
-Status: **Implemented and fully validated locally. Renderer Arkpack/save capabilities and Electron-main filesystem persistence are Effect-native object factories; Promise remains only at typed IPC transport, class repositories/adapters and no-op close contracts are removed.**
+Status: **Implemented and fully validated locally. `GameOwner` uses one Effect Queue, Deferred acknowledgements, and one Semaphore-owned drain; captured runtime re-entry, cached lifecycle Promise state, request-version loops, and split command failure semantics are removed.**
 
 Next action:
 
-> Close #238, then continue with #239 Effect-owned GameOwner concurrency.
+> Close #239, then continue with #240 architecture-test reduction.
 
 ## Source topology
 
@@ -184,7 +184,7 @@ Next action:
 
 - `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
 - `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
-- The root `createGameOwnerFx` is the completed replacement and hard-reset ownership boundary. Hard reset single-flights dispose-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
-- Controlled Electron close and HMR handoff use `shutdownGameOwnerFx`. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next close request; it never degrades into a successful empty-owner shutdown. The failure UI offers explicit safe retry or force exit without saving. Force exit starts best-effort discard cleanup and authorizes main to close immediately only after that deliberate renderer decision.
+- The root `createGameOwnerFx` is the completed replacement and hard-reset ownership boundary. It owns one command Queue, per-command Deferred acknowledgements, and one Semaphore drain; it never captures a runtime or caches lifecycle Promises. Commands absorbed into one drain share the final winning intent outcome. Hard reset single-flights dispose-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
+- Controlled Electron close and HMR handoff use `shutdownGameOwnerFx`. Owner command failures fail the initiating Effect and publish the same failure snapshot. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next close request; it never degrades into a successful empty-owner shutdown. The failure UI offers explicit safe retry or force exit without saving. Force exit starts best-effort discard cleanup and authorizes main to close immediately only after that deliberate renderer decision.
 - `GameOwner` subscriber delivery is synchronous but observational only: one stable snapshot is delivered per publication, callback throws/rejected Promise-like results are isolated per listener, and no observer can stop lifecycle work or starve later listeners.
 - Do not add another reset owner, mutate a running engine back to initial state, hide correctness in React-local state, or use a module-global lock/map.

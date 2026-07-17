@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { createGameOwnerFx } from "~/bridge/game/createGameOwnerFx";
+import type { GameOwner } from "~/bridge/game/GameOwner";
 
 /** Root-shell context for the one serialized live-game owner. */
-export const GameOwnerContext = createContext<createGameOwnerFx.Owner | undefined>(undefined);
+export const GameOwnerContext = createContext<GameOwner | undefined>(undefined);

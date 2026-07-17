@@ -20,7 +20,7 @@ Create the active Electron renderer shell and render board/inventory directly fr
 - the generated TanStack Router tree exists; `/` selects bundled or persistent local Arkpacks and `/game/$packageId` loads the selected package, restores its save, and renders the first read-only board slice;
 - `bridge/board/useBoard`, `ui/board`, and the headless `ui/tile` foundation exist;
 - UI may intentionally lag visually during animation, but canonical truth remains the live runtime;
-- the stable root `createGameOwner` now owns serialized package replacement and single-flight hard reset; no provisional parallel reset helper remains.
+- the stable root `GameOwner` owns serialized package replacement and single-flight hard reset through Effect Queue/Deferred/Semaphore concurrency; no provisional parallel reset helper, captured runtime, or Promise scheduler remains.
 
 
 ## Accepted router and page boundary
@@ -48,7 +48,7 @@ Dependency direction is `@routes → page → ui → bridge → engine`. Route m
 
 The client uses standard history routing. Development Electron loads the renderer from Vite for HMR; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://`, hash routing, and a standalone web target are not supported application modes. Persistent package/save ownership is implemented through typed Electron filesystem repositories. In-memory adapters exist only as explicitly injected test doubles.
 
-The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` owns one serialized `createGameOwner`; `GameShell` only requests/releases the selected package. Replacement awaits final disposal/save, coalesces obsolete requests, and publishes only the latest completed `Game`. Hard reset uses this same owner, leaving the router, package catalog, and non-game branches alive.
+The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` owns one serialized `GameOwner`; `GameShell` only requests/releases the selected package. Replacement awaits final disposal/save, coalesces obsolete requests through Effect-owned command acknowledgements, fails commands honestly, and publishes only the latest completed `Game`. Hard reset uses this same owner, leaving the router, package catalog, and non-game branches alive.
 
 ## Accepted hard-reset direction
 

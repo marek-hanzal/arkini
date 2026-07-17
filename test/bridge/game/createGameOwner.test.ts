@@ -1,10 +1,11 @@
 import { encode } from "@msgpack/msgpack";
-import { Cause, Effect, Exit, Option } from "effect";
+import { Cause, Deferred, Effect, Exit, Fiber, Option } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import type { Game } from "~/bridge/game/Game";
+import type { GameOwner } from "~/bridge/game/GameOwner";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { createGameOwnerFx } from "~/bridge/game/createGameOwnerFx";
@@ -46,8 +47,7 @@ const runOwnerFx = async <Value, Error>(effect: Effect.Effect<Value, Error>) => 
 	throw Cause.squash(exit.cause);
 };
 
-const shutdownGameOwner = (owner: createGameOwnerFx.Owner) =>
-	runOwnerFx(shutdownGameOwnerFx(owner));
+const shutdownGameOwner = (owner: GameOwner) => runOwnerFx(shutdownGameOwnerFx(owner));
 
 const deferred = <Value>() => {
 	let resolve!: (value: Value | PromiseLike<Value>) => void;
@@ -101,7 +101,7 @@ const createFakeGame = (
 	subscribeEvents: () => () => undefined,
 });
 
-const expectReady = (owner: createGameOwnerFx.Owner) => {
+const expectReady = (owner: GameOwner) => {
 	const state = owner.getSnapshot();
 	expect(state.type).toBe("ready");
 	if (state.type !== "ready") throw new Error("Expected a ready game owner.");
@@ -308,6 +308,91 @@ describe("createGameOwnerFx", () => {
 		await runOwnerFx(owner.replaceFx(null));
 	});
 
+	it("shares one in-flight bootstrap across repeated identical requests", async () => {
+		const createA = deferred<Game>();
+		const create = vi.fn(() => createA.promise);
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create,
+		});
+
+		const first = runOwnerFx(owner.replaceFx("A"));
+		const second = runOwnerFx(owner.replaceFx("A"));
+		await Promise.resolve();
+		expect(create).toHaveBeenCalledOnce();
+
+		createA.resolve(createFakeGame("A", "shared"));
+		await Promise.all([
+			first,
+			second,
+		]);
+		expect(create).toHaveBeenCalledOnce();
+		expect(expectReady(owner).instanceKey).toBe("shared");
+		await runOwnerFx(owner.replaceFx(null));
+	});
+
+	it("ignores a superseded bootstrap failure and settles callers on the latest request", async () => {
+		const createA = deferred<Game>();
+		const failure = new Error("obsolete bootstrap failed");
+		const creates: string[] = [];
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => {
+				creates.push(packageId);
+				if (packageId === "A") return createA.promise;
+				return createFakeGame(packageId, packageId);
+			},
+		});
+
+		const first = runOwnerFx(owner.replaceFx("A"));
+		const second = runOwnerFx(owner.replaceFx("B"));
+		createA.reject(failure);
+		await Promise.all([
+			first,
+			second,
+		]);
+
+		expect(creates).toEqual([
+			"A",
+			"B",
+		]);
+		expect(expectReady(owner).arkpack.packageId).toBe("B");
+		await runOwnerFx(owner.replaceFx(null));
+	});
+
+	it("keeps interrupted lifecycle work inside Effect until the authoritative create settles", async () => {
+		const createGate = Effect.runSync(Deferred.make<Game>());
+		const owner = Effect.runSync(
+			createGameOwnerFx({
+				clearSaveFx: () => Effect.void,
+				createFx: () => Deferred.await(createGate),
+			}),
+		);
+		const created = createFakeGame("A", "authoritative");
+
+		const commandExit = await Effect.runPromise(
+			Effect.gen(function* () {
+				const commandFiber = yield* Effect.fork(owner.replaceFx("A"));
+				yield* Effect.yieldNow();
+				const interruptFiber = yield* Effect.fork(Fiber.interrupt(commandFiber));
+				yield* Effect.yieldNow();
+				expect(owner.getSnapshot()).toEqual({
+					type: "loading",
+					packageId: "A",
+				});
+				yield* Deferred.succeed(createGate, created);
+				return yield* Fiber.join(interruptFiber);
+			}),
+		);
+
+		expect(Exit.isFailure(commandExit)).toBe(true);
+		if (Exit.isFailure(commandExit)) {
+			expect(Cause.isInterruptedOnly(commandExit.cause)).toBe(true);
+		}
+		expect(expectReady(owner)).toBe(created);
+		await runOwnerFx(owner.replaceFx(null));
+	});
+
 	it("blocks replacement and publishes a truthful failure when final disposal rejects", async () => {
 		const failure = new Error("final save failed");
 		const creates: string[] = [];
@@ -320,7 +405,9 @@ describe("createGameOwnerFx", () => {
 		});
 
 		await runOwnerFx(owner.replaceFx("A"));
-		await runOwnerFx(owner.replaceFx("B"));
+		await expect(runOwnerFx(owner.replaceFx("B"))).rejects.toMatchObject({
+			message: failure.message,
+		});
 
 		expect(creates).toEqual([
 			"A",
@@ -339,7 +426,7 @@ describe("createGameOwnerFx", () => {
 		const listenerFailure = new Error("observer failed");
 		const report = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const disposed = vi.fn(() => Promise.resolve());
-		const deliveries: createGameOwnerFx.State["type"][] = [];
+		const deliveries: GameOwner.State["type"][] = [];
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create: async (packageId) =>
@@ -499,7 +586,9 @@ describe("createGameOwnerFx", () => {
 			},
 		});
 		await runOwnerFx(owner.replaceFx("A"));
-		await runOwnerFx(owner.hardResetFx());
+		await expect(runOwnerFx(owner.hardResetFx())).rejects.toMatchObject({
+			message: failure.message,
+		});
 		expect(creates).toBe(1);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
@@ -743,7 +832,9 @@ describe("createGameOwnerFx", () => {
 				}),
 		});
 
-		await runOwnerFx(owner.replaceFx(storages.packageId));
+		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
+			saveKey: storages.firstSaveKey,
+		});
 		const state = owner.getSnapshot();
 		expect(state).toMatchObject({
 			type: "failed",
@@ -783,8 +874,12 @@ describe("createGameOwnerFx", () => {
 				}),
 		});
 
-		await runOwnerFx(owner.replaceFx(storages.packageId));
-		await runOwnerFx(owner.replaceFx(storages.packageId));
+		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
+			saveKey: storages.firstSaveKey,
+		});
+		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
+			saveKey: storages.firstSaveKey,
+		});
 		expect(storages.clearedKeys).toEqual([]);
 
 		const first = runOwnerFx(owner.clearFailedSaveAndRetryFx());
@@ -845,7 +940,9 @@ describe("createGameOwnerFx", () => {
 				}),
 		});
 
-		await runOwnerFx(owner.replaceFx(storages.packageId));
+		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
+			saveKey: storages.firstSaveKey,
+		});
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			saveRecoveryKey: storages.firstSaveKey,
@@ -872,8 +969,8 @@ describe("createGameOwnerFx", () => {
 			create,
 		});
 
-		await runOwnerFx(owner.replaceFx("A"));
-		await runOwnerFx(owner.clearFailedSaveAndRetryFx());
+		await expect(runOwnerFx(owner.replaceFx("A"))).rejects.toBe(bootstrapFailure);
+		await expect(runOwnerFx(owner.clearFailedSaveAndRetryFx())).rejects.toBe(clearFailure);
 
 		expect(clearSave).toHaveBeenCalledOnce();
 		expect(create).toHaveBeenCalledOnce();
@@ -910,8 +1007,8 @@ describe("createGameOwnerFx", () => {
 			},
 		});
 
-		await runOwnerFx(owner.replaceFx("A"));
-		await runOwnerFx(owner.clearFailedSaveAndRetryFx());
+		await expect(runOwnerFx(owner.replaceFx("A"))).rejects.toBe(bootstrapFailure);
+		await expect(runOwnerFx(owner.clearFailedSaveAndRetryFx())).rejects.toBe(createFailure);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			packageId: "A",
@@ -934,7 +1031,7 @@ describe("createGameOwnerFx", () => {
 			create: async () => Promise.reject(packageFailure),
 		});
 
-		await runOwnerFx(owner.replaceFx("unverified"));
+		await expect(runOwnerFx(owner.replaceFx("unverified"))).rejects.toBe(packageFailure);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			packageId: "unverified",

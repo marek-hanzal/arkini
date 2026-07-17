@@ -23,7 +23,7 @@ Restore synth/audio feedback as a transient presentation consumer of engine even
 - audio consumes the existing event subscription;
 - callback failure/rejected promises remain isolated;
 - batches deduplicate or limit sounds deliberately;
-- user gesture/browser audio constraints are handled in the presentation layer;
+- user-gesture and Chromium audio constraints are handled in the presentation layer;
 - missing audio never blocks engine progress.
 
 ## Required tests

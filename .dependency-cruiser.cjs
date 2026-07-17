@@ -3,7 +3,7 @@ const boundaryRules = [
 	{
 		name: "engine-no-presentation-imports",
 		comment:
-			"The standalone engine never depends on UI, page composition, routes, or browser entrypoints.",
+			"The standalone engine never depends on UI, page composition, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: "^src/engine(?:/|$)",
@@ -27,7 +27,7 @@ const boundaryRules = [
 	{
 		name: "cli-no-presentation-imports",
 		comment:
-			"CLI tooling may use the engine but never bridge, UI, page, route, or browser entrypoint code.",
+			"CLI tooling may use the engine but never bridge, UI, page, route, or renderer entrypoint code.",
 		severity: "error",
 		from: {
 			path: "^cli(?:/|$)",
@@ -40,7 +40,7 @@ const boundaryRules = [
 	{
 		name: "bridge-no-presentation-imports",
 		comment:
-			"Bridge domains connect UI to public engine contracts and never depend on reusable UI, pages, routes, or browser entrypoints.",
+			"Bridge domains connect UI to public engine contracts and never depend on reusable UI, pages, routes, or renderer entrypoints.",
 		severity: "error",
 		from: {
 			path: "^src/bridge(?:/|$)",

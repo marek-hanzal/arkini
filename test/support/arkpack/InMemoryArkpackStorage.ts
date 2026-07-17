@@ -1,8 +1,8 @@
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 
-/** Non-persistent browser/test Arkpack storage used only outside Electron. */
-export class MemoryArkpackStorage implements ArkpackStorage {
+/** Explicit test double; never selected by product runtime. */
+export class InMemoryArkpackStorage implements ArkpackStorage {
 	readonly #records = new Map<string, ArkpackStorage.LoadedRecord>();
 
 	close = () => undefined;

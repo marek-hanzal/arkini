@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MemoryArkpackStorage } from "~/bridge/arkpack/MemoryArkpackStorage";
+import { InMemoryArkpackStorage } from "~test/support/arkpack/InMemoryArkpackStorage";
 
 const descriptor = {
 	packageId: "a".repeat(64),
@@ -13,9 +13,9 @@ const descriptor = {
 	importedAtMs: 1,
 };
 
-describe("MemoryArkpackStorage", () => {
+describe("InMemoryArkpackStorage", () => {
 	it("keeps metadata listing separate from exact copied payload reads", async () => {
-		const storage = new MemoryArkpackStorage();
+		const storage = new InMemoryArkpackStorage();
 		const bytes = new Uint8Array([
 			1,
 			2,

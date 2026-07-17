@@ -17,7 +17,7 @@ export namespace importArkpackFileFx {
 	}
 }
 
-/** Rejects oversized browser files before allocation, then validates and persists exact bytes. */
+/** Rejects oversized renderer-selected files before allocation, then validates and persists exact bytes. */
 export const importArkpackFileFx = Effect.fn("importArkpackFileFx")(function* ({
 	file,
 	storage,

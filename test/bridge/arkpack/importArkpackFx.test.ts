@@ -3,7 +3,7 @@ import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
-import { MemoryArkpackStorage } from "~/bridge/arkpack/MemoryArkpackStorage";
+import { InMemoryArkpackStorage } from "~test/support/arkpack/InMemoryArkpackStorage";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import {
 	createTestArkpack,
@@ -12,7 +12,7 @@ import {
 
 describe("importArkpackFx", () => {
 	it("persists only a fully validated binary and exact load revalidates it", async () => {
-		const storage = new MemoryArkpackStorage();
+		const storage = new InMemoryArkpackStorage();
 		const bytes = createTestArkpack();
 		const descriptor = await Effect.runPromise(
 			importArkpackFx({
@@ -32,7 +32,7 @@ describe("importArkpackFx", () => {
 	});
 
 	it("leaves no catalog or payload record after validation fails", async () => {
-		const storage = new MemoryArkpackStorage();
+		const storage = new InMemoryArkpackStorage();
 		const invalid = {
 			...testArkpackConfig,
 			items: {

@@ -2,8 +2,8 @@ import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 const readKey = ({ packageId, contentHash }: GameSaveStorage.Key) => `${packageId}:${contentHash}`;
 
-/** Non-persistent browser/test save storage used only outside Electron. */
-export class MemoryGameSaveStorage implements GameSaveStorage {
+/** Explicit test double; never selected by product runtime. */
+export class InMemoryGameSaveStorage implements GameSaveStorage {
 	readonly #records = new Map<string, Uint8Array>();
 
 	close = () => undefined;

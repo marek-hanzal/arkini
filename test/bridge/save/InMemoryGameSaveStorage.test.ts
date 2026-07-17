@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MemoryGameSaveStorage } from "~/bridge/save/MemoryGameSaveStorage";
+import { InMemoryGameSaveStorage } from "~test/support/save/InMemoryGameSaveStorage";
 
 const first = {
 	packageId: "arkini",
@@ -10,9 +10,9 @@ const second = {
 	contentHash: "b".repeat(64),
 };
 
-describe("MemoryGameSaveStorage", () => {
+describe("InMemoryGameSaveStorage", () => {
 	it("isolates exact package/hash keys and clears only the selected save", async () => {
-		const storage = new MemoryGameSaveStorage();
+		const storage = new InMemoryGameSaveStorage();
 		await storage.write(
 			first,
 			new Uint8Array([

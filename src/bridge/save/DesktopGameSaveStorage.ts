@@ -19,8 +19,7 @@ const execute = async <Value>(
 export class DesktopGameSaveStorage implements GameSaveStorage {
 	readonly #api: NonNullable<Window["arkini"]>["save"];
 
-	constructor(api = window.arkini?.save) {
-		if (api === undefined) throw new Error("Arkini desktop save capability is unavailable.");
+	constructor(api = window.arkini.save) {
 		this.#api = api;
 	}
 

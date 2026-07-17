@@ -33,7 +33,7 @@ src/@routes → src/page → src/ui → src/bridge → src/engine
 → the only renderer, route tree, game bridge, and engine
 ```
 
-Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard browser history in both environments: `/` is the Arkpack selector and `/game/$packageId` owns one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
+Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` is the Arkpack selector and `/game/$packageId` owns one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
 
 - The renderer entry declares `<base href="/">`, so generated relative assets resolve from the `arkini://app/` origin root even when the current history route is nested. Every production build verifies the generated `out/renderer/index.html` asset graph from root, game, and development routes.
 
@@ -223,7 +223,7 @@ The engine's existing `StateSchema` is the complete canonical save state; creati
 
 Electron stores the resulting MessagePack bytes opaquely. Writes sync `pending.arksave` and atomically rename it over `current.arksave`; failed replacement preserves the previous successful save. Package identity and content hash select the repository path and are intentionally absent from engine state and the envelope.
 
-Browser-only diagnostics use process-local memory adapters. They are not a second persistent product backend.
+Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
 
 ## 5. Runtime and event subscriptions
 

@@ -43,7 +43,7 @@ const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => 
 				<button
 					type="button"
 					className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
-					onClick={() => window.arkini?.lifecycle.requestClose()}
+					onClick={() => window.arkini.lifecycle.requestClose()}
 				>
 					Retry safe exit
 				</button>
@@ -54,7 +54,7 @@ const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => 
 						void RendererRuntime.runPromise(owner.forceShutdownFx()).catch((error) => {
 							console.error("Arkini force-shutdown cleanup failed.", error);
 						});
-						window.arkini?.lifecycle.forceClose();
+						window.arkini.lifecycle.forceClose();
 					}}
 				>
 					Force exit without saving
@@ -93,11 +93,11 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 	activeHotOwner = owner;
 
 	useEffect(() => {
-		const removeBeforeClose = window.arkini?.lifecycle.onBeforeClose(() =>
+		const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(() =>
 			RendererRuntime.runPromise(shutdownGameOwnerFx(owner)),
 		);
 		return () => {
-			removeBeforeClose?.();
+			removeBeforeClose();
 			void RendererRuntime.runPromise(shutdownGameOwnerFx(owner)).catch((error) => {
 				console.error("Arkini game shutdown failed during renderer cleanup.", error);
 			});

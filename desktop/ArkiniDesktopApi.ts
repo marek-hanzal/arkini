@@ -58,6 +58,6 @@ export namespace ArkiniDesktopApi {
 
 declare global {
 	interface Window {
-		readonly arkini?: ArkiniDesktopApi.Api;
+		readonly arkini: ArkiniDesktopApi.Api;
 	}
 }

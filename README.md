@@ -42,7 +42,7 @@ src/bridge
 → the only legal live connection from UI to public engine contracts, grouped as bridge/<domain>/<operation>
 
 src/ui
-→ reusable React presentation, gesture, geometry, animation, and browser components
+→ reusable React presentation, gesture, geometry, animation, and renderer components
 
 src/page
 → route-level screen and layout composition over UI components
@@ -168,19 +168,13 @@ npm run build
 npm run preview
 ```
 
-These are the primary Electron commands. Browser-only diagnostics remain explicit:
-
-```bash
-npm run dev:browser
-npm run build:browser
-npm run preview:browser
-```
+Arkini is an Electron-only product. `npm run dev` starts Electron with a Vite-powered renderer and HMR, `npm run preview` starts the built Electron application, and `npm run build` produces the production Electron build. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
 `npm install` and `npm ci` run Electron's official `install-electron` binary through the project `postinstall`, so the matching native executable is prepared during dependency installation rather than during application startup. Closing the last Electron window quits the application and also terminates the owning `electron-vite` command and renderer development server.
 
 The main window opens centered at 75% of the active monitor work area. `F11` and `Alt+Enter` toggle native fullscreen. One root renderer canvas owns the exact viewport, hides document scrollbars, and requires game/UI content to fit the available window rather than expanding it; the board continuously uses the largest rectangle that preserves its authored aspect ratio.
 
-The router uses standard browser history. The package selector is `/` and a selected package runs at `/game/<packageId>`. Browser development uses the Vite HTTP origin. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
+The router uses standard history routing. The package selector is `/` and a selected package runs at `/game/<packageId>`. During development Electron loads the renderer from the Vite HTTP origin for HMR. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 
 Packaged renderer assets are rooted through `<base href="/">`; `npm run build` verifies the generated asset graph from `/`, `/game/$packageId`, and nested `/dev/**` routes before succeeding.
 
@@ -231,13 +225,13 @@ The launcher treats `.arkpack` as the playable package boundary:
 - official Arkini is listed from the generated `game/arkini.game.arkpack.metadata.json` sidecar, so launcher refresh never fetches, hashes, decompresses, or decodes its bundled payload; exact startup still reads the binary and verifies that the fully validated descriptor matches the sidecar;
 - imported binaries are addressed by their exact SHA-256 identity and persist under `<userData>/arkini/arkpacks/<packageId>/package.arkpack`; derived `descriptor.json` metadata is rebuildable and catalog listing never reads payload bytes;
 - exact package load reads one selected binary and revalidates its hash, config, resources, and identity before a game starts;
-- browser import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
+- renderer import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
 - gameplay saves use the minimal MessagePack envelope `{ namespace: "arkini", format: 1, state }` and persist atomically under `<userData>/arkini/saves/<packageId>/<contentHash>/current.arksave`;
 - `pending.arksave` is temporary write state. A failed replacement leaves the previous successful `current.arksave` intact;
 - package binaries and gameplay saves are separate storage boundaries. Removing an imported package does not delete its save, and reinstalling the exact bytes may resume it;
 - package switching, HMR handoff, controlled close, and hard reset all pass through the same root game owner. No load mutates a running session in place. Failed final saves retain a frozen retryable game; only an explicit force-exit action discards that final save obligation;
 - package validation failures never expose save deletion because no save identity is trusted. When a verified package fails specifically during durable save decode or runtime hydration, the root owner retains its exact `packageId + contentHash` key and offers an explicit **Clear save and start fresh** action. Retry without clearing remains non-destructive; recovery clears only that exact save and reruns the normal bootstrap;
-- browser-only commands use explicit in-memory package/save adapters for diagnostics. IndexedDB/Dexie is not a product persistence backend;
+- product runtime always uses the mandatory Electron preload capabilities. In-memory package/save adapters exist only under `test/support` and are injected explicitly by tests;
 - Arkpacks remain data-only. The current format accepts completed config plus PNG resources, never JavaScript or HTML.
 
 ## Game authoring commands

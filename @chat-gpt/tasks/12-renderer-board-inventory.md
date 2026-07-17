@@ -4,14 +4,14 @@
 
 ## Goal
 
-Create the active browser shell and render board/inventory directly from the canonical session snapshot through thin adapters.
+Create the active Electron renderer shell and render board/inventory directly from the canonical session snapshot through thin adapters.
 
 ## Historical oracle
 
 - `src/_archive/app/` and `src/_archive/ui/`;
 - `src/_archive/board/` and `src/_archive/inventory/`;
 - generic geometry/pointer ideas from `src/_archive/tile-engine/`;
-- browser reset/storage behavior where still relevant.
+- Electron reset/storage behavior where still relevant.
 
 ## Current engine facts
 
@@ -25,7 +25,7 @@ Create the active browser shell and render board/inventory directly from the can
 
 ## Accepted router and page boundary
 
-The active browser uses TanStack Router file-based routing:
+The Electron renderer uses TanStack Router file-based routing:
 
 ```text
 src/@routes
@@ -46,7 +46,7 @@ src/engine
 
 Dependency direction is `@routes → page → ui → bridge → engine`. Route modules point to standalone page components and contain no gameplay, session, or game composition. The `/game` file route is a layout branch whose page composes `GameShell` with an `Outlet`; future `/dev/**` routes remain outside this shell.
 
-The client uses standard browser history. Browser development uses Vite's HTTP SPA fallback; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://` and hash routing are not supported application modes. Persistent package/save ownership is implemented through typed Electron filesystem repositories. Browser diagnostics use memory-only adapters and are not a persistent product path.
+The client uses standard history routing. Development Electron loads the renderer from Vite for HMR; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://`, hash routing, and a standalone web target are not supported application modes. Persistent package/save ownership is implemented through typed Electron filesystem repositories. In-memory adapters exist only as explicitly injected test doubles.
 
 The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` owns one serialized `createGameOwner`; `GameShell` only requests/releases the selected package. Replacement awaits final disposal/save, coalesces obsolete requests, and publishes only the latest completed `Game`. Hard reset uses this same owner, leaving the router, package catalog, and non-game branches alive.
 
@@ -54,7 +54,7 @@ The launcher validates bundled Arkini and local uploads through the same arkpack
 
 Hard reset is complete `Game` replacement, not an in-place engine mutation.
 
-The root renderer shell owns one complete running `Game` created by a plain factory/composition function. That game root includes every lifecycle-bearing resource introduced by the shell, such as the game session, Tick ownership, autosave, subscriptions, Effect scopes, browser listeners, read-model adapters, and persistence wiring.
+The root renderer shell owns one complete running `Game` created by a plain factory/composition function. That game root includes every lifecycle-bearing resource introduced by the shell, such as the game session, Tick ownership, autosave, subscriptions, Effect scopes, renderer listeners, read-model adapters, and persistence wiring.
 
 Initial startup and post-reset startup must use the same factory path:
 
@@ -95,7 +95,7 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 
 - root launcher lists bundled Arkini and persistent validated local packages;
 - local upload validates before persistence and exact package selection survives refresh through the route;
-- browser game entrypoint loads selected config/namespaced state and creates one session;
+- Electron renderer entrypoint loads selected config/namespaced state and creates one session;
 - board and inventory render canonical items;
 - `useSyncExternalStore` remains the runtime subscription path;
 - local UI state is limited to gesture, camera, panel, and animation state;
@@ -115,7 +115,7 @@ Do not introduce a class merely to model this ownership. Prefer explicit factory
 - interaction smoke tests;
 - responsive geometry and stable IDs;
 - arkpack import/deduplication/reload and package-removal isolation;
-- browser save persistence restore scoped to exact package identity/content;
+- Electron save persistence restore scoped to exact package identity/content;
 - initial startup and reset use the same game factory;
 - two concurrent confirmed resets dispose once, delete once, create once, publish once, and receive the exact same fresh root;
 - joined callers share delete/create failures and no fresh root is fabricated;

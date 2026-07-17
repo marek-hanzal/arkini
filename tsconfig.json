@@ -33,7 +33,6 @@
 		"src/@routes",
 		"src/main.tsx",
 		"src/router.tsx",
-		"src/_route.ts",
-		"vite.config.ts"
+		"src/_route.ts"
 	]
 }

@@ -55,7 +55,7 @@ type DisposeClaim =
 			readonly result: Deferred.Deferred<void, unknown>;
 	  };
 
-/** Creates one long-lived browser session shared by React, Tick, save and event consumers. */
+/** Creates one long-lived renderer session shared by React, Tick, save and event consumers. */
 export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 	<SaveError>({
 		config,

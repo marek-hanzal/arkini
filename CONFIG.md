@@ -280,7 +280,7 @@ Schema support and runtime support are different facts.
 ### Utility capabilities
 
 - `cheat:inventory` is a board sink. `consumeItemIntoCheatInventoryFx` consumes one complete revised board identity through ordinary owner removal, preserves the sink, and emits committed feedback.
-- `nuke` is a presentation control. `requestNukeSaveFx()` requests explicit confirmation; confirmed deletion belongs to the browser session/storage boundary and never to gameplay runtime mutation.
+- `nuke` is a presentation control. `requestNukeSaveFx()` requests explicit confirmation; confirmed deletion belongs to the renderer session and Electron storage boundary and never to gameplay runtime mutation.
 - `inventory` remains a presentation-only opener until renderer and interaction tasks wire it.
 
 A capability becomes implemented only when it has a canonical command/path and focused behavioral tests. Schema presence alone is not behavior.

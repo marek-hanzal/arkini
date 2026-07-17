@@ -19,8 +19,7 @@ const execute = async <Value>(
 export class DesktopArkpackStorage implements ArkpackStorage {
 	readonly #api: NonNullable<Window["arkini"]>["arkpack"];
 
-	constructor(api = window.arkini?.arkpack) {
-		if (api === undefined) throw new Error("Arkini desktop Arkpack capability is unavailable.");
+	constructor(api = window.arkini.arkpack) {
 		this.#api = api;
 	}
 

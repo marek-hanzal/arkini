@@ -4,20 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**GitHub review #232 — Electron persistence and lifecycle follow-up**
+**Electron-only product consolidation before UI token work**
 
-Status: **#228, #230, #233, #229, #231, related CLI epic #234, and #225 are complete. The Electron review findings are cleared; the next step is an independent review pass, then #208 native delivery validation with Marek.**
-
-Read:
-
-1. GitHub review #232;
-2. GitHub task #231 for mandatory `*Fx` operation grammar and runtime roots;
-3. GitHub epic #234 for the canonical Effect CLI command tree;
-4. GitHub task #225 for the completed official-Arkini metadata-only catalog fix.
+Status: **Standalone web scripts/configuration and runtime memory fallbacks are removed. Arkini has one Electron product path; renderer development uses Electron + Vite HMR and packaged delivery uses `arkini://app/*`.**
 
 Next action:
 
-> Run an independent review pass over the completed Electron fixes. If clean, continue with the shared #208 Apple Silicon delivery pass.
+> Complete the Electron-only delivery validation and close the desktop milestone, then implement GitHub #203 semantic design tokens without broadening the board-only + modal UI direction.
 
 ## Source topology
 
@@ -30,10 +23,10 @@ Next action:
 - Bridge paths remain shallow and concrete. `app` is reserved for genuinely Electron/router-wide application concerns; the loaded gameplay root is `Game`.
 - `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
 
-## Browser shell foundation
+## Electron renderer foundation
 
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
-- TanStack Router uses standard browser history. Browser development runs on the Vite HTTP origin; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
+- TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
 - `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, and controlled-close contracts implemented by #226/#220.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
@@ -49,8 +42,8 @@ Next action:
 
 ## Live bridge and tile foundation
 
-- `bridge/arkpack` validates compressed package bytes and derives SHA-256 identity. Electron persists the original imported binary plus rebuildable descriptor metadata under `userData/arkini/arkpacks/<sha256>` through narrow preload capabilities. Imported listing reads descriptor files only; official Arkini listing reads its generated tracked metadata sidecar only. Exact package load reads one binary, fully revalidates it, and rejects official metadata/binary mismatch. Browser `File.size` is checked before `arrayBuffer()`, while the reader keeps the compressed-byte guard for non-File callers. Browser diagnostics use memory only.
-- `bridge/save` encodes the canonical `StateSchema` as the strict MessagePack envelope `{ namespace: "arkini", format: 1, state }`. Electron stores opaque bytes atomically under `userData/arkini/saves/<packageId>/<contentHash>` through `pending.arksave → current.arksave`; browser diagnostics use memory only. Loads always construct a fresh session.
+- `bridge/arkpack` validates compressed package bytes and derives SHA-256 identity. Electron persists the original imported binary plus rebuildable descriptor metadata under `userData/arkini/arkpacks/<sha256>` through narrow preload capabilities. Imported listing reads descriptor files only; official Arkini listing reads its generated tracked metadata sidecar only. Exact package load reads one binary, fully revalidates it, and rejects official metadata/binary mismatch. Renderer `File.size` is checked before `arrayBuffer()`, while the reader keeps the compressed-byte guard for non-File callers. Product runtime always uses the mandatory Electron Arkpack capability; in-memory adapters are test-only and explicitly injected.
+- `bridge/save` encodes the canonical `StateSchema` as the strict MessagePack envelope `{ namespace: "arkini", format: 1, state }`. Electron stores opaque bytes atomically under `userData/arkini/saves/<packageId>/<contentHash>` through `pending.arksave → current.arksave`; in-memory save adapters are test-only and explicitly injected. Loads always construct a fresh session.
 - `bridge/runtime/useRuntimeSelector` uses `useSyncExternalStore` directly over `Game.getSnapshot` and `Game.subscribe`. It may memoize a selected value for one runtime root but never stores a second runtime or synchronizes through `useEffect`.
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
 - `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.

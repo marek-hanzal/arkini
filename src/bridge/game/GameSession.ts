@@ -10,7 +10,7 @@ export type GameSessionServices =
 	| LayerModule.Layer.Success<ReturnType<typeof GameSessionLayerFx>>
 	| RuntimeSaveFx;
 
-/** Stable browser-facing owner of one loaded game's Effect services and resources. */
+/** Stable renderer-facing owner of one loaded game's Effect services and resources. */
 export interface GameSession {
 	/** Saves and releases the session; a failed final save leaves it frozen and retryable. */
 	readonly disposeFx: Effect.Effect<void, unknown>;

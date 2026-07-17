@@ -45,7 +45,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | Visual planning and animation | Reference | Historical event-to-motion behavior remains | 14 |
 | Audio | Reference | Sound policy and synthesis remain | 15 |
 | Debug/explain tools | Reference | Explanation scenarios remain | 16 |
-| Persistent browser shell | Partial | Root arkpack selector, validated local package persistence, selected-package game factory, exact-content save restore, and live board shell exist | Atomic hard-reset publication, truthful failure recovery, and single-flight replacement remain in 12; final pruning belongs to 17 |
+| Persistent Electron renderer shell | Partial | Root arkpack selector, validated local package persistence, selected-package game factory, exact-content save restore, and live board shell exist | Atomic hard-reset publication, truthful failure recovery, and single-flight replacement remain in 12; final pruning belongs to 17 |
 
 ## Historical directory map
 
@@ -57,7 +57,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `audio/` | Reference | No current audio layer | Sound policy, batching, synth choices | 15 |
 | `board/` | Partial | Board runtime writes and canonical locations are superseded | Board layout, taps, drag feedback, visual state | 11, 12, 14 |
 | `board-memory/` | Rejected | Snapshot/restore semantics and active engine schema/content are rejected | Nothing; final coupled archive deletion belongs to task 17 |
-| `browser/` | Reference | No active browser shell | Hard reset behavior only | 12, 17 |
+| `browser/` | Reference | No active product shell; directory name is historical only | Hard reset behavior only | 12, 17 |
 | `capacity/` | Partial | Generic item charges, deterministic deposit input, depletion, and output are superseded | Detail/read-model feedback and depletion animation | 10, 13, 14, 17 |
 | `cheat/` | Partial | Root runtime speed mode and fixed-step acceleration supersede historical runtime/timestamp behavior | Board control, ordered asset projection, and sound intent only | 10, 13, 15, 17 |
 | `cli/` | Removed | Canonical compiler/validator/packer supersede it completely | Nothing; use Git only for archaeology | Done |
@@ -67,7 +67,7 @@ A status describes oracle value, not whether historical code still compiles. The
 | `effects/` | Partial | Current conditions/rules and temporary-item expiry supersede global effective-line recomputation plus persistent active-effect timing | Effect labels, concrete product behavior, presentation, and audio intent | 10, 13–15 |
 | `engine/` | Superseded | Save topology, action dispatch, adapter, readiness mutation, world catch-up are rejected | Tests only when extracting behavior for an open task | 17 |
 | `event/` | Partial | Current transitions own runtime events atomically | Event naming and presentation/audio intent | 14, 15 |
-| `hash/` | Superseded | Not engine architecture | Only if browser persistence needs compatible hashing | 17 |
+| `hash/` | Superseded | Not engine architecture | Nothing; Electron persistence uses exact package/content identity | 17 |
 | `inventory/` | Partial | Canonical inventory runtime and commands are superseded | Layout, slot UX, drag/drop behavior | 11, 12, 14 |
 | `item/` | Partial | Current item schemas own definitions | Product labels and UI presentation | 10, 13 |
 | `item-detail/` | Reference | No current detail UI | Panels, controls, copy, effect/input presentation | 13 |

@@ -13,6 +13,6 @@ export interface Game extends GameSession {
 	readonly instanceKey: string;
 	/** Immutable completed configuration used by this loaded game. */
 	readonly config: GameConfigSchema.Type;
-	/** Resolves one validated embedded resource to its browser object URL. */
+	/** Resolves one validated embedded resource to its renderer object URL. */
 	readonly getResourceUrl: (resourceId: string) => string;
 }

@@ -115,4 +115,50 @@ describe("Board", () => {
 		expect(html).toContain("grid-column-start:3");
 		expect(html).toContain("grid-row-start:2");
 	});
+	it("renders all 117 cells and the new maximum coordinate for a 13 by 9 board", () => {
+		const desktopConfig = GameConfigSchema.parse({
+			...config,
+			meta: {
+				...config.meta,
+				board: {
+					width: 13,
+					height: 9,
+				},
+			},
+			start: {
+				currentSpace: 0,
+				board: [
+					{
+						itemId: "water",
+						space: 0,
+						x: 12,
+						y: 8,
+					},
+				],
+			},
+		});
+		const desktopRuntime = Effect.runSync(
+			startFx().pipe(
+				useGameFx({
+					config: desktopConfig,
+				}),
+			),
+		);
+		const desktopGame = {
+			...game,
+			config: desktopConfig,
+			getSnapshot: () => desktopRuntime,
+		} satisfies Game;
+		const html = renderToStaticMarkup(
+			createElement(GameProvider, {
+				game: desktopGame,
+				children: createElement(TileSystemProvider, null, createElement(Board)),
+			}),
+		);
+
+		expect(html.match(/aria-hidden="true"/g)).toHaveLength(117);
+		expect(html).toContain("aspect-ratio:13 / 9");
+		expect(html).toContain("grid-column-start:13");
+		expect(html).toContain("grid-row-start:9");
+	});
 });

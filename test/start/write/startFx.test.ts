@@ -2,6 +2,7 @@ import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -233,20 +234,57 @@ describe("startFx", () => {
 	it("boots the current Arkini authoring config into a valid runtime", async () => {
 		const config = GameConfigSchema.parse(await readArkiniGameConfigSource());
 		expect(config.meta.board).toEqual({
-			width: 11,
+			width: 13,
+			height: 9,
+		});
+		expect(config.meta.inventory).toEqual({
+			width: 7,
 			height: 7,
 		});
 
-		const runtime = Effect.runSync(
-			startFx().pipe(
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtime = yield* startFx();
+				const edgeItem = yield* spawnItemFx({
+					id: "runtime:official-edge",
+					itemId: "item:tree",
+					location: {
+						space: 0,
+						position: {
+							x: 12,
+							y: 8,
+						},
+						scope: "board",
+					},
+					quantity: 1,
+				});
+				const queriedEdgeItem = yield* getItemAtFx({
+					location: edgeItem.location,
+				});
+
+				return {
+					edgeItem,
+					queriedEdgeItem,
+					runtime,
+				};
+			}).pipe(
 				useGameFx({
 					config,
 				}),
 			),
 		);
 
-		expect(runtime.items).toHaveLength(12);
-		expect(runtime.items).toEqual(
+		expect(result.runtime.items).toHaveLength(12);
+		expect(result.queriedEdgeItem).toBe(result.edgeItem);
+		expect(result.edgeItem.location).toEqual({
+			space: 0,
+			position: {
+				x: 12,
+				y: 8,
+			},
+			scope: "board",
+		});
+		expect(result.runtime.items).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					item: config.items["producer:townhall-t1"],

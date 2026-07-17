@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Review #236, task #239: Effect-owned GameOwner concurrency**
+**Review #236, task #240: architecture enforcement diet**
 
-Status: **Implemented and fully validated locally. `GameOwner` uses one Effect Queue, Deferred acknowledgements, and one Semaphore-owned drain; captured runtime re-entry, cached lifecycle Promise state, request-version loops, and split command failure semantics are removed.**
+Status: **Implemented and fully validated locally. The complete 12-file / 790-line `test/architecture` source-text suite is deleted. Dependency Cruiser owns stable import boundaries; focused tests own behavior and generated output; `CODE_GUIDE.md` plus review own project grammar. No AST policy system replaced the deleted tests.**
 
 Next action:
 
-> Close #239, then continue with #240 architecture-test reduction.
+> Close #240, then continue with #241 desktop packaging cleanup.
 
 ## Source topology
 
@@ -19,7 +19,7 @@ Next action:
 - `src/ui` owns reusable React presentation and transient gesture/geometry/animation state. It may depend on bridge domains but never imports `src/engine` directly, pages, or routes.
 - `src/page` owns route-level screen and layout composition over UI only.
 - `src/@routes` contains only TanStack Router file registrations pointing to standalone page components. `src/_route.ts` is generated and `src/router.tsx` owns router creation.
-- Dependency direction is `@routes → page → ui → bridge → engine`; Dependency Cruiser and permanent architecture tests enforce it.
+- Dependency direction is `@routes → page → ui → bridge → engine`; Dependency Cruiser is the single automated owner of this import graph.
 - Bridge paths remain shallow and concrete. `app` is reserved for genuinely Electron/router-wide application concerns; the loaded gameplay root is `Game`.
 - `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
 
@@ -66,6 +66,7 @@ Next action:
 - Every shard inherits `maxWorkers: 1` from `vitest.config.ts`.
 - Prefer running affected shards independently when the chained runner prints a green summary but fails to exit cleanly.
 - `npm run test` remains the canonical full-suite command; sharding changes execution shape, not test semantics.
+- Do not restore source-text policy suites. Stable imports belong in Dependency Cruiser, behavior and build contracts in focused tests, and project grammar in `CODE_GUIDE.md` plus review.
 
 ## Absolute code rules
 

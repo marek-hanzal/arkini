@@ -4,6 +4,8 @@ This document is the canonical technical architecture. It describes the implemen
 
 Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Renderer dependency direction is `@routes → page → ui → bridge → engine`. `electron/` owns only Electron main/preload/protocol concerns and may not import renderer or engine roots. The renderer may not import Electron. `src/_archive` is outside every active source root and may never be imported.
 
+Enforcement is deliberately split by contract: Dependency Cruiser owns stable import boundaries; focused tests own runtime, lifecycle, security, persistence, UI, compiler, CLI, and packaging behavior; generated-output tests inspect real renderer/release artifacts; TypeScript and Zod own type/schema validity. Project grammar such as same-name `*Fx`, object + factory composition, one `IdSchema`, and semantic token usage lives in `CODE_GUIDE.md` plus review. The repository does not maintain source-text recurrence tests or a custom AST style policy system.
+
 ## 0. Desktop host boundary
 
 Electron is a thin sibling platform adapter, not another application or another game owner.
@@ -23,7 +25,7 @@ project CLI process
 → NodeRuntime.runMain
 ```
 
-`RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR reuses the same process root instead of creating another runtime island. Each live `Game` owns exactly one child session `ManagedRuntime` containing its engine services, Scope, Tick Fibers, subscriptions, and command runtime. Active source may re-enter these declared roots, but may not call direct `Effect.run*` helpers or create additional `ManagedRuntime` instances. Architecture tests enforce the allowed roots and the mandatory same-named `*Fx` operation grammar.
+`RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR reuses the same process root instead of creating another runtime island. Each live `Game` owns exactly one child session `ManagedRuntime` containing its engine services, Scope, Tick Fibers, subscriptions, and command runtime. Active source may re-enter these declared roots, but may not call direct `Effect.run*` helpers or create additional `ManagedRuntime` instances. Runtime behavior is protected by focused lifecycle tests; the same-named `*Fx` grammar is maintained through `CODE_GUIDE.md` and review rather than source-text policy tests.
 
 ```text
 electron/main + electron/preload

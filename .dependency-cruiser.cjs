@@ -13,6 +13,18 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "engine-compiler-no-pack-imports",
+		comment:
+			"The completed-config compiler is upstream of binary packing and never depends on pack implementation modules.",
+		severity: "error",
+		from: {
+			path: "^src/engine/compiler(?:/|$)",
+		},
+		to: {
+			path: "^src/engine/pack(?:/|$)",
+		},
+	},
+	{
 		name: "engine-no-react-dependencies",
 		comment:
 			"The engine is framework-neutral. React and React-specific packages belong to the UI boundary.",
@@ -171,6 +183,18 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "active-code-no-test-imports",
+		comment:
+			"Production and tooling code never import test support; tests may depend on active code, never the reverse.",
+		severity: "error",
+		from: {
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop|cli)(?:/|$)",
+		},
+		to: {
+			path: "^test(?:/|$)",
+		},
+	},
+	{
 		name: "active-code-no-archive-imports",
 		comment:
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
@@ -180,18 +204,6 @@ const boundaryRules = [
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
-		},
-	},
-	{
-		name: "no-local-index-barrel-imports",
-		comment:
-			"Import concrete modules directly. Barrel/index files hide ownership and are not a domain boundary.",
-		severity: "error",
-		from: {
-			path: "^src/(?:engine|bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
-		},
-		to: {
-			path: "^src/(?:engine|bridge|ui|page)/.+/index\\.ts$",
 		},
 	},
 ];

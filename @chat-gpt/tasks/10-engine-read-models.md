@@ -70,7 +70,7 @@ src/ui/<domain>
 - read behavior across Tick boundaries;
 - queue, reservation, inventory pause, and special-item states;
 - no mutation during reads;
-- architecture guards for `ui → bridge → engine`, shallow bridge domains, and no UI runtime mirror.
+- Dependency Cruiser coverage for `ui → bridge → engine`; focused behavior tests for live snapshot delivery and absence of a UI-owned runtime mirror. Shallow bridge naming remains a review convention.
 
 ## Historical cleanup on closeout
 

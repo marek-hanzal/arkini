@@ -44,7 +44,7 @@ There is no exception for “this helper could stay pure.” Do not create a nam
 
 Existing plain project helpers are cleanup debt, not precedent. Do not copy their shape into new code.
 
-Private synchronous functions are allowed only as non-exported implementation details inside one Effect-operation file. Use them to keep hot collection loops local without creating a reusable plain-operation grammar. The exported project operation remains the same-named `*Fx` entry point, and architecture tests guard this boundary.
+Private synchronous functions are allowed only as non-exported implementation details inside one Effect-operation file. Use them to keep hot collection loops local without creating a reusable plain-operation grammar. The exported project operation remains the same-named `*Fx` entry point. This is a documented implementation and review rule, not a source-text test contract.
 
 Framework-required declarations are not named project operations and retain their framework grammar:
 
@@ -90,6 +90,18 @@ Small files are acceptable when they make domain grammar predictable. Do not inl
 Arkini-owned reusable capabilities use readonly objects created by explicit Effect factories. Do not introduce project-owned classes, constructor-injected repositories, managers, services, adapters, or `new ProjectThing(...)` composition. State and dependencies belong in the closure of the owning factory; public behavior is exposed through narrow `*Fx` capability fields.
 
 External and framework constructors remain valid where their API requires them. Effect declaration forms such as `Data.TaggedError`, `Context.Tag`, and framework-owned classes are not project composition abstractions. Do not mechanically replace constructor injection with Layers or generic services unless a real scoped capability exists.
+
+### Enforcement strategy
+
+Use the narrowest mechanism that proves the actual contract:
+
+- dependency direction and import isolation → Dependency Cruiser;
+- runtime, lifecycle, security, persistence, and UI behavior → focused public tests;
+- packaged renderer and release contracts → tests against generated output or artifacts;
+- type and schema validity → TypeScript, Zod, compiler, and validation tests;
+- code grammar and maintenance conventions in this guide → implementation review.
+
+Do not add source-text recurrence tests for naming, exact calls, UI copy, file counts, class names, token usage, or current implementation snippets. Do not replace such tests with a custom AST policy engine. A harmless refactor must not fail because spelling changed while architecture and behavior stayed correct. Add automation only when it observes a stable dependency, type, schema, behavior, or generated-output contract.
 
 ## 3. Domain ownership
 

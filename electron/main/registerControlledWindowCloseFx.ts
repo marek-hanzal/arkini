@@ -1,6 +1,7 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent } from "electron";
 import { Effect } from "effect";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import type { TrustedRenderer } from "./security/TrustedRenderer";
 
 type ControlledCloseIpc = Pick<IpcMain, "on" | "removeListener">;
 
@@ -8,12 +9,13 @@ export namespace registerControlledWindowCloseFx {
 	export interface Props {
 		readonly window: BrowserWindow;
 		readonly ipc: ControlledCloseIpc;
+		readonly trustedRenderer: TrustedRenderer;
 	}
 }
 
 /** Waits for the renderer's final game flush before allowing one window to close. */
 export const registerControlledWindowCloseFx = Effect.fn("registerControlledWindowCloseFx")(
-	({ window, ipc }: registerControlledWindowCloseFx.Props) =>
+	({ window, ipc, trustedRenderer }: registerControlledWindowCloseFx.Props) =>
 		Effect.sync(() => {
 			let closeAllowed = false;
 			let closeRequested = false;
@@ -27,15 +29,17 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 				ipc.removeListener(ArkiniDesktopApi.channels.requestClose, onRequestClose);
 				ipc.removeListener(ArkiniDesktopApi.channels.forceClose, onForceClose);
 			};
-			const ownsWindow = (event: IpcMainEvent) => event.sender.id === window.webContents.id;
+			const ownsTrustedWindow = (event: IpcMainEvent) =>
+				trustedRenderer.isTrustedIpcSender(event) &&
+				event.sender.id === window.webContents.id;
 			const onCloseReady = (event: IpcMainEvent) => {
-				if (!ownsWindow(event)) return;
+				if (!ownsTrustedWindow(event)) return;
 				closeAllowed = true;
 				removeAllListeners();
 				if (!window.isDestroyed()) window.close();
 			};
 			const onCloseFailed = (event: IpcMainEvent, message: string) => {
-				if (!ownsWindow(event)) return;
+				if (!ownsTrustedWindow(event)) return;
 				closeRequested = false;
 				removeResponseListeners();
 				console.error(
@@ -44,11 +48,11 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 				);
 			};
 			const onRequestClose = (event: IpcMainEvent) => {
-				if (!ownsWindow(event) || window.isDestroyed()) return;
+				if (!ownsTrustedWindow(event) || window.isDestroyed()) return;
 				window.close();
 			};
 			const onForceClose = (event: IpcMainEvent) => {
-				if (!ownsWindow(event)) return;
+				if (!ownsTrustedWindow(event)) return;
 				closeAllowed = true;
 				removeAllListeners();
 				if (!window.isDestroyed()) window.close();

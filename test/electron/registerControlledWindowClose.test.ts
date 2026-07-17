@@ -1,8 +1,9 @@
-import type { BrowserWindow, IpcMain, IpcMainEvent } from "electron";
+import type { BrowserWindow, IpcMain, IpcMainEvent, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import { registerControlledWindowCloseFx } from "../../electron/main/registerControlledWindowCloseFx";
+import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
 
 type CloseListener = (event: { preventDefault(): void }) => void;
 type IpcListener = (event: IpcMainEvent, ...args: unknown[]) => void;
@@ -12,6 +13,10 @@ const createHarness = () => {
 	const webContentsListeners = new Map<string, (...args: never[]) => void>();
 	const ipcListeners = new Map<string, Set<IpcListener>>();
 	const send = vi.fn();
+	const mainFrameState = {
+		url: "arkini://app/",
+	};
+	const mainFrame = mainFrameState as WebFrameMain;
 	const close = vi.fn();
 	const destroy = vi.fn();
 	const window = {
@@ -28,6 +33,7 @@ const createHarness = () => {
 		},
 		webContents: {
 			id: 17,
+			mainFrame,
 			isDestroyed: () => false,
 			once: (event: string, listener: (...args: never[]) => void) => {
 				webContentsListeners.set(event, listener);
@@ -48,17 +54,23 @@ const createHarness = () => {
 		},
 	} as unknown as Pick<IpcMain, "on" | "removeListener">;
 
+	const trustedRenderer = {
+		isTrustedIpcSender: (event: IpcMainEvent) =>
+			event.sender.id === 17 &&
+			event.senderFrame === mainFrame &&
+			mainFrame.url.startsWith("arkini://app/"),
+	} as TrustedRenderer;
 	Effect.runSync(
 		registerControlledWindowCloseFx({
 			window,
 			ipc,
+			trustedRenderer,
 		}),
 	);
 	const emitIpc = (channel: string, ...args: unknown[]) => {
 		const event = {
-			sender: {
-				id: 17,
-			},
+			sender: window.webContents,
+			senderFrame: mainFrame,
 		} as IpcMainEvent;
 		for (const listener of ipcListeners.get(channel) ?? []) listener(event, ...args);
 	};
@@ -77,6 +89,10 @@ const createHarness = () => {
 		close,
 		destroy,
 		emitIpc,
+		mainFrame,
+		setMainFrameUrl: (url: string) => {
+			mainFrameState.url = url;
+		},
 		emitWebContents,
 		requestClose,
 		send,
@@ -135,6 +151,18 @@ describe("registerControlledWindowCloseFx", () => {
 		const preventDefault = harness.requestClose();
 		expect(preventDefault).not.toHaveBeenCalled();
 	});
+
+	it("ignores lifecycle IPC from untrusted renderer content", () => {
+		const harness = createHarness();
+		harness.setMainFrameUrl("https://example.com/");
+
+		harness.emitIpc(ArkiniDesktopApi.channels.requestClose);
+		harness.emitIpc(ArkiniDesktopApi.channels.forceClose);
+		harness.emitIpc(ArkiniDesktopApi.channels.closeReady);
+
+		expect(harness.close).not.toHaveBeenCalled();
+	});
+
 	it("distinguishes renderer crash from an acknowledged clean close", () => {
 		const harness = createHarness();
 		harness.requestClose();

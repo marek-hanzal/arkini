@@ -5,50 +5,58 @@ import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
 import { registerFullscreenShortcutsFx } from "./registerFullscreenShortcutsFx";
+import type { TrustedRenderer } from "./security/TrustedRenderer";
 
-export const createMainWindowFx = Effect.fn("createMainWindowFx")(() =>
-	Effect.gen(function* () {
-		const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
-		const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
-		const window = new BrowserWindow({
-			...bounds,
-			show: false,
-			backgroundColor: nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff",
-			webPreferences: {
-				preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
-				contextIsolation: true,
-				nodeIntegration: false,
-				sandbox: true,
-			},
-		});
+export namespace createMainWindowFx {
+	export interface Props {
+		readonly trustedRenderer: TrustedRenderer;
+	}
+}
 
-		yield* registerFullscreenShortcutsFx(window);
-		yield* registerControlledWindowCloseFx({
-			window,
-			ipc: ipcMain,
-		});
-		window.webContents.setWindowOpenHandler(() => ({
-			action: "deny",
-		}));
-		window.once("ready-to-show", () => window.show());
+export const createMainWindowFx = Effect.fn("createMainWindowFx")(
+	({ trustedRenderer }: createMainWindowFx.Props) =>
+		Effect.gen(function* () {
+			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+			const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
+			const window = new BrowserWindow({
+				...bounds,
+				show: false,
+				backgroundColor: nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff",
+				webPreferences: {
+					preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
+					contextIsolation: true,
+					nodeIntegration: false,
+					sandbox: true,
+					navigateOnDragDrop: false,
+				},
+			});
 
-		yield* Effect.tryPromise({
-			try: async () => {
-				if (process.env.ELECTRON_RENDERER_URL) {
-					await window.loadURL(process.env.ELECTRON_RENDERER_URL);
-					window.webContents.openDevTools({
-						mode: "detach",
-					});
-				} else {
-					await window.loadURL("arkini://app/");
-				}
-			},
-			catch: (cause) =>
-				new ElectronMainError({
-					operation: "load the Arkini renderer",
-					cause,
-				}),
-		});
-		return window;
-	}),
+			yield* trustedRenderer.registerWindowFx(window);
+			yield* registerFullscreenShortcutsFx(window);
+			yield* registerControlledWindowCloseFx({
+				window,
+				ipc: ipcMain,
+				trustedRenderer,
+			});
+			window.once("ready-to-show", () => window.show());
+
+			yield* Effect.tryPromise({
+				try: async () => {
+					if (trustedRenderer.developmentRendererUrl !== undefined) {
+						await window.loadURL(trustedRenderer.developmentRendererUrl);
+						window.webContents.openDevTools({
+							mode: "detach",
+						});
+					} else {
+						await window.loadURL("arkini://app/");
+					}
+				},
+				catch: (cause) =>
+					new ElectronMainError({
+						operation: "load the Arkini renderer",
+						cause,
+					}),
+			});
+			return window;
+		}),
 );

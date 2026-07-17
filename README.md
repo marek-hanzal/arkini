@@ -178,6 +178,8 @@ The main window opens centered at 75% of the active monitor work area. `F11` and
 
 The router uses standard history routing. The package selector is `/` and a selected package runs at `/game/<packageId>`. During development Electron loads the renderer from the Vite HTTP origin for HMR. Packaged Electron serves the same renderer and route tree from `arkini://app/`, including `arkini://app/game/<packageId>` and future `arkini://app/dev/**`. Hash routing and `file://` are not supported route modes.
 
+Electron treats the renderer as one explicit trusted security boundary. Development accepts only the configured loopback Vite origin; packaged builds ignore development renderer environment overrides and accept only `arkini://app/*`. External navigation, redirects, subframes, webviews, popups, and Chromium permission requests are denied. Every Arkpack, save, appearance, and lifecycle IPC request must come from the registered Arkini `BrowserWindow`, its exact `webContents`, and its trusted main frame. Packaged protocol responses carry a restrictive CSP; the development server uses the same policy with only the exact HMR WebSocket origin added.
+
 Packaged renderer assets are rooted through `<base href="/">`; `npm run build` verifies the generated asset graph from `/`, `/game/$packageId`, and nested `/dev/**` routes before succeeding.
 
 ## macOS packaging and prereleases

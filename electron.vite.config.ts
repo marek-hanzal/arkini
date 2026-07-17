@@ -4,6 +4,10 @@ import viteReact from "@vitejs/plugin-react";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "electron-vite";
+import {
+	RendererContentSecurityPolicy,
+	RendererDevelopmentServer,
+} from "./desktop/security/RendererContentSecurityPolicy";
 
 export default defineConfig({
 	main: {
@@ -30,8 +34,12 @@ export default defineConfig({
 		base: process.env.VITE_BASE ?? "/",
 		clearScreen: false,
 		server: {
-			port: 4040,
+			host: RendererDevelopmentServer.host,
+			port: RendererDevelopmentServer.port,
 			strictPort: true,
+			headers: {
+				"Content-Security-Policy": RendererContentSecurityPolicy.development,
+			},
 		},
 		resolve: {
 			alias: {

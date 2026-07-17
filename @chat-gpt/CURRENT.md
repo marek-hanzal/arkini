@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Semantic design tokens and Electron appearance preference**
+**Review #236, task #237: trusted Electron renderer boundary**
 
-Status: **Implemented. Active UI uses one bounded semantic token palette with Arkini pink/violet accents and navy-violet informational color. Electron persists `dark | light | system`; missing or malformed data defaults to dark, while explicit system mode follows operating-system changes.**
+Status: **Completed locally and fully validated. Electron navigation, redirects, subframes, webviews, permissions, privileged IPC, lifecycle IPC, and packaged/development CSP share one trusted-renderer policy.**
 
 Next action:
 
-> Validate the final palette visually in Electron, close GitHub #203 after the implementation review, then choose the next board-only + modal UI slice without introducing a permanent workspace shell.
+> Close #237, downgrade review epic #236 from P1 to P2, then continue with #238 Effect-native persistence.
 
 ## Source topology
 
@@ -29,6 +29,7 @@ Next action:
 - TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
 - `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
+- One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP; development adds only the exact HMR WebSocket endpoint.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.

@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 import { usePrefersReducedMotion } from "~/ui/launcher/usePrefersReducedMotion";
@@ -116,13 +117,12 @@ export const StartupSplash = () => {
 						<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
 							<p className="font-semibold text-danger">Startup failed</p>
 							<p>{messageFromError(state.error)}</p>
-							<button
-								type="button"
-								className="mx-auto rounded-lg bg-accent px-4 py-2 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
+							<PrimaryButton
+								className="mx-auto"
 								onClick={retry}
 							>
 								Retry
-							</button>
+							</PrimaryButton>
 						</div>
 					) : (
 						<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">

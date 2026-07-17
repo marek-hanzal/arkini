@@ -35,7 +35,13 @@ afterEach(async () => {
 
 describe("MainMenu", () => {
 	it("plays the authoritative built-in package and requests native exit once", async () => {
-		const requestClose = vi.fn(() => new Promise<void>(() => undefined));
+		let resolveClose: (() => void) | undefined;
+		const requestClose = vi.fn(
+			() =>
+				new Promise<void>((resolve) => {
+					resolveClose = resolve;
+				}),
+		);
 		Object.defineProperty(window, "arkini", {
 			configurable: true,
 			value: {
@@ -138,9 +144,15 @@ describe("MainMenu", () => {
 			(button) => button.textContent === "Exit",
 		);
 		if (!(exit instanceof HTMLButtonElement)) throw new Error("Expected Exit button.");
+		await act(async () => {
+			exit.click();
+			await vi.waitFor(() => expect(exit.disabled).toBe(true));
+		});
 		await act(async () => exit.click());
-		await vi.waitFor(() => expect(exit.disabled).toBe(true));
-		exit.click();
 		expect(requestClose).toHaveBeenCalledOnce();
+		await act(async () => {
+			resolveClose?.();
+			await Promise.resolve();
+		});
 	});
 });

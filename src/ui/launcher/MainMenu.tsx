@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import { useSyncExternalStore } from "react";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
+import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 import { useExitApplicationMutation } from "~/ui/launcher/mutation/useExitApplicationMutation";
+import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 
 /** Renders the semantic out-of-game launcher menu over authoritative startup and catalog state. */
 export const MainMenu = () => {
@@ -34,52 +34,50 @@ export const MainMenu = () => {
 				aria-label="Main menu"
 			>
 				{builtInAvailable && builtInPackageId !== undefined ? (
-					<Link
+					<PrimaryButtonLink
 						to="/game/$packageId"
 						params={{
 							packageId: builtInPackageId,
 						}}
-						className="rounded-xl bg-accent px-5 py-3 text-center font-semibold text-accent-contrast shadow-lg transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						className="rounded-xl py-3"
 					>
 						Play
-					</Link>
+					</PrimaryButtonLink>
 				) : (
-					<button
-						type="button"
-						className="rounded-xl bg-accent px-5 py-3 font-semibold text-accent-contrast opacity-60"
+					<PrimaryButton
+						className="rounded-xl py-3"
 						disabled
 					>
 						{catalogState.type === "failed" || startupState.type === "failed"
 							? "Play unavailable"
 							: "Preparing Play…"}
-					</button>
+					</PrimaryButton>
 				)}
-				<Link
+				<ButtonLink
 					to="/arkpacks"
-					className="rounded-xl border border-line bg-surface/75 px-5 py-3 text-center font-semibold shadow-lg backdrop-blur-md transition-colors hover:border-line-strong hover:bg-surface-raised"
+					className="rounded-xl py-3"
 				>
 					Arkpacks
-				</Link>
-				<Link
+				</ButtonLink>
+				<ButtonLink
 					to="/settings"
-					className="rounded-xl border border-line bg-surface/75 px-5 py-3 text-center font-semibold shadow-lg backdrop-blur-md transition-colors hover:border-line-strong hover:bg-surface-raised"
+					className="rounded-xl py-3"
 				>
 					Settings
-				</Link>
-				<Link
+				</ButtonLink>
+				<ButtonLink
 					to="/about"
-					className="rounded-xl border border-line bg-surface/75 px-5 py-3 text-center font-semibold shadow-lg backdrop-blur-md transition-colors hover:border-line-strong hover:bg-surface-raised"
+					className="rounded-xl py-3"
 				>
 					About
-				</Link>
-				<button
-					type="button"
-					className="rounded-xl border border-line bg-surface/75 px-5 py-3 font-semibold shadow-lg backdrop-blur-md transition-colors hover:border-danger/45 hover:text-danger disabled:cursor-wait disabled:opacity-60"
+				</ButtonLink>
+				<Button
+					className="rounded-xl py-3"
 					disabled={exit.isPending}
 					onClick={() => exit.mutate()}
 				>
 					{exit.isPending ? "Exiting…" : "Exit"}
-				</button>
+				</Button>
 				{catalogState.type === "failed" ? (
 					<p className="text-center text-sm text-danger">
 						Catalog failed: {String(catalogState.error)}

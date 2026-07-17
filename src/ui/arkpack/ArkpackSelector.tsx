@@ -1,8 +1,8 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
-import { PrimaryButtonLink } from "~/ui/button/PrimaryButton";
+import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
 
 /** Selects a bundled or locally imported game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
@@ -110,25 +110,24 @@ export const ArkpackSelector = () => {
 								</div>
 								<div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
 									{arkpack.source === "imported" ? (
-										<button
-											type="button"
-											className="rounded-lg border border-line px-3 py-2 text-xs text-muted transition-colors hover:border-danger/50 hover:text-danger"
+										<DangerButton
+											className="min-h-0 px-3 py-2 text-xs shadow-none"
 											onClick={() =>
 												void remove(arkpack.packageId).catch(setActionError)
 											}
 										>
 											Remove
-										</button>
+										</DangerButton>
 									) : null}
-									<Link
+									<PrimaryButtonLink
 										to="/game/$packageId"
 										params={{
 											packageId: arkpack.packageId,
 										}}
-										className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
+										className="min-h-0 px-4 py-2 text-sm shadow-none"
 									>
 										Play
-									</Link>
+									</PrimaryButtonLink>
 								</div>
 							</article>
 						))

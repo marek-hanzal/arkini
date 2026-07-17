@@ -4,22 +4,23 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Unified primary navigation actions #273**
+**Game-wide button primitives**
 
-Status: **Complete. About, Settings, and Arkpacks share one game-wide primary action primitive, with TanStack Router typing preserved for links.**
+Status: **Complete. Neutral, primary, and destructive native/router actions share one typed UI primitive family.**
 
 Current scope:
 
-- `PrimaryButton` is the canonical native-button primary action;
-- `PrimaryButtonLink` wraps the same host styling through TanStack Router `createLink` and `LinkComponent`;
-- About and Settings use the shared primary action without page-owned styling copies;
-- Arkpacks moves its return action from the header into a bottom-center footer while preserving the existing `/main-menu` destination;
-- the shared primitive owns hover, active, focus-visible, disabled, typography, spacing, and semantic accent tokens;
-- no launcher-specific button component or untyped `to: string` router wrapper exists.
+- `Button` / `ButtonLink` own the canonical neutral game action;
+- `PrimaryButton` / `PrimaryButtonLink` own the canonical emphasized action;
+- `DangerButton` / `DangerButtonLink` own the canonical destructive action;
+- every router counterpart follows TanStack Router `createLink` plus `LinkComponent`, preserving registered-route inference;
+- `tailwind-merge` allows callsites to override layout and sizing without duplicating or conflicting with interaction styling;
+- launcher, startup retry, Settings, Arkpacks, and the in-game menu consume these primitives;
+- no page-specific button component, generic public `variant` prop, or untyped router wrapper exists.
 
 Next action:
 
-> Continue with the next explicitly selected gameplay or desktop task. Evaluate native View Transitions during ordinary use separately; #273 adds no transition behavior.
+> Continue with the next explicitly selected gameplay or desktop task. New repeated actions should consume the existing neutral, primary, or destructive primitive before adding another visual role.
 
 ## Source topology
 

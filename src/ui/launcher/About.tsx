@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { PrimaryButtonLink } from "~/ui/button/PrimaryButton";
+import { PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 
 /** Renders concise project and authorship credits as a standalone launcher destination. */

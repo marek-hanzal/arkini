@@ -7,22 +7,13 @@ import {
 	createRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
+import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
+import { ArkpackCatalogContext } from "~/bridge/arkpack/ArkpackCatalogContext";
 import { ArkpackSelector } from "~/ui/arkpack/ArkpackSelector";
-
-vi.mock("~/bridge/arkpack/useArkpacks", () => ({
-	useArkpacks: () => ({
-		state: {
-			type: "ready" as const,
-			arkpacks: [],
-		},
-		importFile: vi.fn(),
-		remove: vi.fn(),
-		refresh: vi.fn(),
-	}),
-}));
 
 (
 	globalThis as {
@@ -47,10 +38,28 @@ describe("ArkpackSelector", () => {
 			value: vi.fn(),
 		});
 		const rootRoute = createRootRoute();
+		const catalogState = {
+			type: "ready" as const,
+			arkpacks: [],
+		};
+		const catalog: ArkpackCatalog = {
+			getSnapshot: () => catalogState,
+			refreshFx: Effect.void,
+			importFileFx: () => Effect.die("unused"),
+			removeFx: () => Effect.die("unused"),
+			subscribe: () => () => undefined,
+		};
 		const arkpacksRoute = createRoute({
 			getParentRoute: () => rootRoute,
 			path: "/arkpacks",
-			component: ArkpackSelector,
+			component: () =>
+				createElement(
+					ArkpackCatalogContext.Provider,
+					{
+						value: catalog,
+					},
+					createElement(ArkpackSelector),
+				),
 		});
 		const mainMenuRoute = createRoute({
 			getParentRoute: () => rootRoute,

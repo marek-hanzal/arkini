@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAppearanceThemeMutation";
-import { PrimaryButton } from "~/ui/button/PrimaryButton";
+import { PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 
 const ThemeOptions: ReadonlyArray<{

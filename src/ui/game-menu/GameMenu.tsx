@@ -1,6 +1,7 @@
 import type { Game } from "~/bridge/game/Game";
 import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState } from "react";
 
+import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useHardResetGameMutation } from "~/ui/game-menu/mutation/useHardResetGameMutation";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
@@ -128,33 +129,30 @@ const GameMenuDialog = ({
 				</h2>
 
 				<div className="grid gap-2">
-					<button
-						type="button"
-						className="rounded-lg bg-accent px-4 py-3 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover disabled:cursor-wait disabled:opacity-60"
+					<PrimaryButton
+						className="w-full py-3"
 						disabled={gameActionDisabled}
 						onClick={menu.close}
 					>
 						Return to game
-					</button>
+					</PrimaryButton>
 
 					<div className="my-2 border-t border-line" />
 
-					<button
-						type="button"
-						className="rounded-lg border border-line px-4 py-3 font-semibold transition-colors hover:border-line-strong hover:bg-surface disabled:cursor-wait disabled:opacity-60"
+					<Button
+						className="w-full py-3 shadow-none backdrop-blur-none"
 						disabled={gameActionDisabled}
 						onClick={() => save.mutate()}
 					>
 						Save
-					</button>
-					<button
-						type="button"
-						className="rounded-lg border border-line px-4 py-3 font-semibold transition-colors hover:border-line-strong hover:bg-surface disabled:cursor-wait disabled:opacity-60"
+					</Button>
+					<Button
+						className="w-full py-3 shadow-none backdrop-blur-none"
 						disabled={gameActionDisabled}
 						onClick={requestSaveAndExit}
 					>
 						Save and exit
-					</button>
+					</Button>
 
 					<div className="my-2 border-t border-line" />
 
@@ -175,33 +173,30 @@ const GameMenuDialog = ({
 									restart from a fresh save.
 								</p>
 								<div className="grid grid-cols-2 gap-2">
-									<button
-										type="button"
-										className="rounded-lg border border-line px-3 py-2 font-semibold transition-colors hover:border-line-strong disabled:cursor-wait disabled:opacity-60"
+									<Button
+										className="min-h-0 px-3 py-2 shadow-none backdrop-blur-none"
 										disabled={pending}
 										onClick={() => setConfirmingDestroy(false)}
 									>
 										Cancel
-									</button>
-									<button
-										type="button"
-										className="rounded-lg bg-danger px-3 py-2 font-semibold text-danger-contrast transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
+									</Button>
+									<DangerButton
+										className="min-h-0 px-3 py-2 shadow-none"
 										disabled={pending}
 										onClick={requestHardReset}
 									>
 										Destroy permanently
-									</button>
+									</DangerButton>
 								</div>
 							</div>
 						) : (
-							<button
-								type="button"
-								className="w-full rounded-lg border border-danger/45 px-4 py-3 font-semibold text-danger transition-colors hover:bg-danger/10 disabled:cursor-wait disabled:opacity-60"
+							<DangerButton
+								className="w-full py-3 shadow-none"
 								disabled={pending}
 								onClick={() => setConfirmingDestroy(true)}
 							>
 								Destroy
-							</button>
+							</DangerButton>
 						)}
 					</section>
 				</div>

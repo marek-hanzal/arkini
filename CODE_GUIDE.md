@@ -319,7 +319,7 @@ Forbidden:
 
 Presentation may lag runtime. Presentation is never authoritative.
 
-Cross-cutting UI actions use shared primitives under `src/ui`, not page-owned copies. The canonical primary action is `PrimaryButton` / `PrimaryButtonLink`; pages may add layout classes but do not recreate its visual interaction classes. Custom TanStack Router links must preserve registered-route typing through `createLink` and `LinkComponent`; never flatten router navigation into a hand-written `to: string` wrapper.
+Cross-cutting UI actions use the game-wide button primitives under `src/ui/button`, not page-owned copies. `Button` / `ButtonLink` are the canonical neutral action, `PrimaryButton` / `PrimaryButtonLink` are the canonical emphasized action, and `DangerButton` / `DangerButtonLink` are the canonical destructive action. Pages may add layout or sizing classes but do not recreate visual interaction classes. Custom TanStack Router links must preserve registered-route typing through `createLink` and `LinkComponent`; never flatten router navigation into a hand-written `to: string` wrapper.
 
 ## 11. Configuration and compiler
 

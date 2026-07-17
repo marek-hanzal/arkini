@@ -37,7 +37,7 @@ Development Electron loads the Vite HTTP origin for HMR. Packaged Electron regis
 
 - The renderer entry declares `<base href="/">`, so generated relative assets resolve from the `arkini://app/` origin root even when the current history route is nested. Every production build verifies the generated `out/renderer/index.html` asset graph from root, game, and development routes.
 
-Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
+Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, one appearance preference, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
 
 ## 1. Core model
 
@@ -261,6 +261,8 @@ UI may own:
 - coordinate-to-pixel or coordinate-to-3D transforms;
 - labels, icons, grouping, sorting, and interpolation;
 - presentation queues derived from transient events.
+
+UI appearance uses one semantic color-token source in `src/ui/styles.css`. Active components consume meaning-based utilities such as canvas, surface, foreground, accent, status, and overlay colors rather than palette-specific Tailwind classes or repeated `dark:` branches. The selected preference is `dark | light | system`; missing or malformed durable data defaults to `dark`, while `system` is respected only after explicit user selection. Electron persists and applies the selection through `nativeTheme`; CSS `color-scheme` and `light-dark()` resolve the renderer palette and follow later operating-system changes without a second resolved-theme store. Appearance remains outside engine runtime and gameplay saves.
 
 UI may not own or reconstruct:
 

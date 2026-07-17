@@ -1,11 +1,67 @@
 @import "tailwindcss";
 
+@theme inline {
+	--color-canvas: var(--ak-canvas);
+	--color-surface: var(--ak-surface);
+	--color-surface-raised: var(--ak-surface-raised);
+	--color-foreground: var(--ak-foreground);
+	--color-muted: var(--ak-muted);
+	--color-subtle: var(--ak-subtle);
+	--color-line: var(--ak-line);
+	--color-line-strong: var(--ak-line-strong);
+	--color-accent: var(--ak-accent);
+	--color-accent-hover: var(--ak-accent-hover);
+	--color-accent-contrast: var(--ak-accent-contrast);
+	--color-info: var(--ak-info);
+	--color-info-contrast: var(--ak-info-contrast);
+	--color-success: var(--ak-success);
+	--color-warning: var(--ak-warning);
+	--color-danger: var(--ak-danger);
+	--color-danger-contrast: var(--ak-danger-contrast);
+	--color-overlay: var(--ak-overlay);
+	--color-overlay-foreground: var(--ak-overlay-foreground);
+}
+
 :root {
+	color-scheme: dark;
 	font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-	color: #f8fafc;
-	background: #020617;
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
+
+	--ak-canvas: light-dark(#fbf8ff, #090711);
+	--ak-surface: light-dark(#fffaff, #151020);
+	--ak-surface-raised: light-dark(#f3eafd, #231730);
+	--ak-foreground: light-dark(#2a1532, #fcf6ff);
+	--ak-muted: light-dark(#705d79, #bdaecc);
+	--ak-subtle: light-dark(#917f9a, #877792);
+	--ak-line: light-dark(#e4d7eb, #382744);
+	--ak-line-strong: light-dark(#c9b4d5, #654c75);
+	--ak-accent: light-dark(#b9247d, #f05bb8);
+	--ak-accent-hover: light-dark(#9e1969, #ff7ccc);
+	--ak-accent-contrast: light-dark(#fff9fc, #2a0a1d);
+	--ak-info: light-dark(#4b4da8, #8e90f8);
+	--ak-info-contrast: light-dark(#fff, #0c1030);
+	--ak-success: light-dark(#147864, #57d7b2);
+	--ak-warning: light-dark(#985a12, #f1b45e);
+	--ak-danger: light-dark(#b72b63, #ff6c9f);
+	--ak-danger-contrast: light-dark(#fff9fc, #310914);
+	--ak-overlay: light-dark(#1a1124, #090611);
+	--ak-overlay-foreground: light-dark(#fff9ff, #fff9ff);
+
+	color: var(--ak-foreground);
+	background: var(--ak-canvas);
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+	color-scheme: light;
+}
+
+:root[data-theme="system"] {
+	color-scheme: light dark;
 }
 
 *,
@@ -27,6 +83,18 @@ body,
 body {
 	margin: 0;
 	overscroll-behavior: none;
+	background: var(--ak-canvas);
+}
+
+button,
+input,
+select {
+	font: inherit;
+}
+
+::selection {
+	color: var(--ak-accent-contrast);
+	background: var(--ak-accent);
 }
 
 [data-ui="BoardViewport"] {

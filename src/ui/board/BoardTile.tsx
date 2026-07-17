@@ -24,10 +24,10 @@ export const BoardTile = ({ item }: BoardTile.Props) => {
 		<button
 			ref={tile.ref}
 			type="button"
-			className={`relative isolate min-h-0 min-w-0 touch-none overflow-hidden rounded-[22%] border bg-slate-800/95 shadow-lg transition-[transform,border-color,filter] duration-100 ${
+			className={`relative isolate min-h-0 min-w-0 touch-none overflow-hidden rounded-[22%] border bg-surface-raised/95 shadow-lg transition-[transform,border-color,filter] duration-100 ${
 				tile.pressed
-					? "scale-95 border-amber-300 brightness-110"
-					: "border-white/15 hover:border-white/35"
+					? "scale-95 border-accent brightness-110"
+					: "border-line-strong/60 hover:border-line-strong"
 			}`}
 			style={style}
 			aria-label={item.title}
@@ -52,14 +52,14 @@ export const BoardTile = ({ item }: BoardTile.Props) => {
 				/>
 			)}
 			<span
-				className="absolute inset-x-[6%] bottom-[6%] truncate rounded-md bg-slate-950/70 px-[6%] py-[2%] font-medium text-white backdrop-blur-sm"
+				className="absolute inset-x-[6%] bottom-[6%] truncate rounded-md bg-overlay/75 px-[6%] py-[2%] font-medium text-overlay-foreground backdrop-blur-sm"
 				data-ui="BoardTileTitle"
 			>
 				{item.title}
 			</span>
 			{item.quantity > 1 ? (
 				<span
-					className="absolute right-[6%] top-[6%] rounded-full bg-slate-950/80 px-[8%] py-[2%] font-bold text-white shadow"
+					className="absolute right-[6%] top-[6%] rounded-full bg-overlay/85 px-[8%] py-[2%] font-bold text-overlay-foreground shadow"
 					data-ui="BoardTileQuantity"
 				>
 					{item.quantity}

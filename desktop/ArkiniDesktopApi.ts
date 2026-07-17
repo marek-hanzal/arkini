@@ -1,3 +1,5 @@
+import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
+
 export namespace ArkiniDesktopApi {
 	export const channels = {
 		arkpackList: "arkini:arkpack:list",
@@ -7,6 +9,8 @@ export namespace ArkiniDesktopApi {
 		saveRead: "arkini:save:read",
 		saveWrite: "arkini:save:write",
 		saveClear: "arkini:save:clear",
+		appearanceRead: "arkini:appearance:read",
+		appearanceWrite: "arkini:appearance:write",
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
 		closeFailed: "arkini:lifecycle:close-failed",
@@ -42,6 +46,10 @@ export namespace ArkiniDesktopApi {
 			readonly read: (packageId: string) => Promise<ArkpackRecord | null>;
 			readonly install: (record: ArkpackRecord) => Promise<void>;
 			readonly remove: (packageId: string) => Promise<void>;
+		};
+		readonly appearance: {
+			readonly read: () => Promise<AppearanceThemeSchema.Type>;
+			readonly write: (theme: AppearanceThemeSchema.Type) => Promise<void>;
 		};
 		readonly save: {
 			readonly read: (key: SaveKey) => Promise<Uint8Array | null>;

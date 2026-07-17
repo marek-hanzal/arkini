@@ -1,5 +1,5 @@
-import { type PropsWithChildren, useEffect, useSyncExternalStore } from "react";
 import { Link } from "@tanstack/react-router";
+import { type PropsWithChildren, useEffect, useSyncExternalStore } from "react";
 
 import { GameProvider } from "~/bridge/game/GameProvider";
 import { useGameOwner } from "~/bridge/game/useGameOwner";
@@ -29,22 +29,22 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 
 	return (
 		<main
-			className="size-full min-h-0 min-w-0 overflow-hidden bg-slate-950 text-slate-100"
+			className="size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground"
 			data-ui="GameShell"
 		>
 			{state.type === "loading" ? (
-				<div className="flex size-full min-h-0 min-w-0 items-center justify-center overflow-hidden text-sm text-slate-300">
+				<div className="flex size-full min-h-0 min-w-0 items-center justify-center overflow-hidden text-sm text-muted">
 					Loading game…
 				</div>
 			) : state.type === "failed" ? (
 				state.canForceShutdown ? null : (
-					<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-red-300">
+					<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-danger">
 						<p>Game failed to start or close safely: {String(state.error)}</p>
 						<div className="flex flex-wrap justify-center gap-2">
 							{state.saveRecoveryKey === undefined ? null : (
 								<button
 									type="button"
-									className="rounded-lg bg-red-300 px-3 py-2 font-semibold text-slate-950"
+									className="rounded-lg bg-danger px-3 py-2 font-semibold text-danger-contrast transition-opacity hover:opacity-90"
 									onClick={() =>
 										void RendererRuntime.runPromise(
 											owner.clearFailedSaveAndRetryFx(),
@@ -57,7 +57,7 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 							{state.packageId === null ? null : (
 								<button
 									type="button"
-									className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
+									className="rounded-lg bg-accent px-3 py-2 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
 									onClick={() =>
 										void RendererRuntime.runPromise(
 											owner.replaceFx(state.packageId),
@@ -69,7 +69,7 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 							)}
 							<Link
 								to="/"
-								className="rounded-lg border border-white/15 px-3 py-2 text-slate-100"
+								className="rounded-lg border border-line px-3 py-2 text-foreground transition-colors hover:border-line-strong"
 							>
 								Back to packages
 							</Link>

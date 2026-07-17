@@ -32,9 +32,9 @@ import.meta.hot?.dispose((data: HotData) => {
 });
 
 const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => (
-	<div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-6 text-center text-sm text-red-200">
-		<div className="flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-red-300/20 bg-slate-900 p-6 shadow-2xl">
-			<h2 className="text-lg font-semibold text-red-100">Final save failed</h2>
+	<div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/95 p-6 text-center text-sm text-danger">
+		<div className="flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-danger/25 bg-surface-raised p-6 shadow-2xl">
+			<h2 className="text-lg font-semibold text-danger">Final save failed</h2>
 			<p>
 				Arkini is still holding the current game so the same final save can be retried.
 				Force exit discards that unsaved progress explicitly.
@@ -42,14 +42,14 @@ const GameShutdownFailure = ({ owner }: { readonly owner: GameOwner.Owner }) => 
 			<div className="flex flex-wrap justify-center gap-2">
 				<button
 					type="button"
-					className="rounded-lg bg-amber-300 px-3 py-2 font-semibold text-slate-950"
+					className="rounded-lg bg-accent px-3 py-2 font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
 					onClick={() => window.arkini.lifecycle.requestClose()}
 				>
 					Retry safe exit
 				</button>
 				<button
 					type="button"
-					className="rounded-lg border border-red-300/40 px-3 py-2 font-semibold text-red-100"
+					className="rounded-lg border border-danger/45 px-3 py-2 font-semibold text-danger transition-colors hover:bg-danger/10"
 					onClick={() => {
 						void RendererRuntime.runPromise(owner.forceShutdownFx()).catch((error) => {
 							console.error("Arkini force-shutdown cleanup failed.", error);

@@ -170,6 +170,8 @@ npm run preview
 
 Arkini is an Electron-only product. `npm run dev` starts Electron with a Vite-powered renderer and HMR, `npm run preview` starts the built Electron application, and `npm run build` produces the production Electron build. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
+Appearance is renderer-owned and exposed through semantic Tailwind color utilities backed by one CSS token palette. The user may explicitly select `dark`, `light`, or `system`; a missing or malformed preference always starts in dark mode. Electron persists the selection under `userData/arkini/preferences`, applies the same mode through `nativeTheme`, and exposes no browser-storage settings path.
+
 `npm install` and `npm ci` run Electron's official `install-electron` binary through the project `postinstall`, so the matching native executable is prepared during dependency installation rather than during application startup. Closing the last Electron window quits the application and also terminates the owning `electron-vite` command and renderer development server.
 
 The main window opens centered at 75% of the active monitor work area. `F11` and `Alt+Enter` toggle native fullscreen. One root renderer canvas owns the exact viewport, hides document scrollbars, and requires game/UI content to fit the available window rather than expanding it; the board continuously uses the largest rectangle that preserves its authored aspect ratio.

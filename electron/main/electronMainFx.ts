@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, nativeTheme } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
 import { createMainWindowFx } from "./createMainWindowFx";
@@ -6,6 +6,7 @@ import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { registerArkiniDesktopIpcFx } from "./registerArkiniDesktopIpcFx";
 import { registerArkiniProtocolFx } from "./registerArkiniProtocolFx";
 import { registerWindowLifecycleFx } from "./registerWindowLifecycleFx";
+import { readAppearanceThemeFx } from "./appearance/readAppearanceThemeFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -24,6 +25,13 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* registerWindowLifecycleFx(app);
 	yield* Effect.promise(() => app.whenReady());
+
+	const appearanceTheme = yield* readAppearanceThemeFx({
+		userDataPath: app.getPath("userData"),
+	});
+	yield* Effect.sync(() => {
+		nativeTheme.themeSource = appearanceTheme;
+	});
 
 	const rendererRoot = fileURLToPath(new URL("../renderer", import.meta.url));
 	yield* registerArkiniProtocolFx(rendererRoot);

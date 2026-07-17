@@ -1,8 +1,9 @@
-import { app, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import { Effect } from "effect";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { FilesystemArkpackCatalog } from "./arkpack/FilesystemArkpackCatalog";
+import { writeAppearanceThemeFx } from "./appearance/writeAppearanceThemeFx";
 import { FilesystemGameSaveRepository } from "./save/FilesystemGameSaveRepository";
 
 let registered = false;
@@ -15,7 +16,7 @@ const runPromise = <Value>(operation: () => Promise<Value>) =>
 		}),
 	);
 
-/** Registers the narrow Arkini filesystem capabilities exposed through preload. */
+/** Registers the narrow Arkini desktop capabilities exposed through preload. */
 export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx")(() =>
 	Effect.sync(() => {
 		if (registered) return;
@@ -23,6 +24,28 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 		const userDataPath = app.getPath("userData");
 		const arkpacks = new FilesystemArkpackCatalog(userDataPath);
 		const saves = new FilesystemGameSaveRepository(userDataPath);
+		const synchronizeWindowBackgrounds = () => {
+			const color = nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff";
+			for (const window of BrowserWindow.getAllWindows()) window.setBackgroundColor(color);
+		};
+
+		nativeTheme.on("updated", synchronizeWindowBackgrounds);
+		ipcMain.handle(ArkiniDesktopApi.channels.appearanceRead, () => nativeTheme.themeSource);
+		ipcMain.handle(ArkiniDesktopApi.channels.appearanceWrite, (_event, theme) =>
+			ElectronMainRuntime.runPromise(
+				writeAppearanceThemeFx({
+					userDataPath,
+					theme,
+				}).pipe(
+					Effect.tap(() =>
+						Effect.sync(() => {
+							nativeTheme.themeSource = theme;
+							synchronizeWindowBackgrounds();
+						}),
+					),
+				),
+			),
+		);
 
 		ipcMain.handle(ArkiniDesktopApi.channels.arkpackList, () =>
 			runPromise(() => arkpacks.list()),

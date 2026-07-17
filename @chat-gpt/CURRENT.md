@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Electron-only product consolidation before UI token work**
+**Semantic design tokens and Electron appearance preference**
 
-Status: **Standalone web scripts/configuration and runtime memory fallbacks are removed. Arkini has one Electron product path; renderer development uses Electron + Vite HMR and packaged delivery uses `arkini://app/*`.**
+Status: **Implemented. Active UI uses one bounded semantic token palette with Arkini pink/violet accents and navy-violet informational color. Electron persists `dark | light | system`; missing or malformed data defaults to dark, while explicit system mode follows operating-system changes.**
 
 Next action:
 
-> Complete the Electron-only delivery validation and close the desktop milestone, then implement GitHub #203 semantic design tokens without broadening the board-only + modal UI direction.
+> Validate the final palette visually in Electron, close GitHub #203 after the implementation review, then choose the next board-only + modal UI slice without introducing a permanent workspace shell.
 
 ## Source topology
 
@@ -28,7 +28,7 @@ Next action:
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
 - TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
 - `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
-- Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, and controlled-close contracts implemented by #226/#220.
+- Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
@@ -48,6 +48,7 @@ Next action:
 - `bridge/board/useBoard` projects board size, current space, live board identities/revisions, quantity, and resource URLs from that exact snapshot.
 - `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.
 - `BoardTile` receives canonical identity + revision from the live board projection. Revision change or unmount cancels stale pointer state; replacing `Game` remounts the complete tile system.
+- Appearance is a UI/platform preference, never gameplay state. `src/ui/styles.css` is the sole semantic color-token source; active UI uses semantic Tailwind utilities and no palette-specific `dark:` branches. The stored mode is `dark | light | system`; absent or malformed preference data resolves to dark, and system is followed only when explicitly selected. Electron `nativeTheme` and renderer `color-scheme` stay aligned without another resolved-theme store.
 - `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
 - `npm run package:mac` is the sole local distribution path. It stages only `out/**` plus a minimal dependency-free manifest, then `electron-builder` emits unsigned arm64 DMG/ZIP artifacts and verifies `SHA256SUMS` plus the unpacked `Arkini.app` seam.

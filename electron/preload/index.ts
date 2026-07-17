@@ -17,6 +17,10 @@ ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
 });
 
 const api: ArkiniDesktopApi.Api = {
+	appearance: {
+		read: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceRead),
+		write: (theme) => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceWrite, theme),
+	},
 	arkpack: {
 		list: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackList),
 		read: (packageId) => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackRead, packageId),

@@ -38,14 +38,14 @@ export const Board = () => {
 				data-ui="BoardViewport"
 			>
 				<div
-					className="grid overflow-hidden rounded-[clamp(0.75rem,2.5vmin,1.75rem)] border border-white/10 bg-slate-900/70 shadow-2xl"
+					className="grid overflow-hidden rounded-[clamp(0.75rem,2.5vmin,1.75rem)] border border-line bg-surface/75 shadow-2xl"
 					data-ui="BoardGrid"
 					style={gridStyle}
 				>
 					{cells.map((cell) => (
 						<div
 							key={cell}
-							className="min-h-0 min-w-0 rounded-[22%] border border-white/5 bg-white/[0.035]"
+							className="min-h-0 min-w-0 rounded-[22%] border border-line/60 bg-surface-raised/45"
 							aria-hidden="true"
 						/>
 					))}

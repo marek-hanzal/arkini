@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, screen } from "electron";
+import { BrowserWindow, ipcMain, nativeTheme, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
 import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx";
@@ -13,7 +13,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(() =>
 		const window = new BrowserWindow({
 			...bounds,
 			show: false,
-			backgroundColor: "#0f172a",
+			backgroundColor: nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff",
 			webPreferences: {
 				preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
 				contextIsolation: true,

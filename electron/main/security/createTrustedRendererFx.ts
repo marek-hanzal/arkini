@@ -9,7 +9,10 @@ import type {
 	WebContentsWillRedirectEventParams,
 } from "electron";
 import { Effect } from "effect";
-import { RendererDevelopmentServer } from "../../../desktop/security/RendererContentSecurityPolicy";
+import {
+	parseRendererDevelopmentUrl,
+	RendererDevelopmentServer,
+} from "../../../desktop/security/RendererDevelopmentUrl";
 import { ElectronMainError } from "../ElectronMainError";
 import type { TrustedRenderer } from "./TrustedRenderer";
 
@@ -25,17 +28,13 @@ const readDevelopmentRendererUrl = ({
 	developmentRendererUrl,
 }: createTrustedRendererFx.Props) => {
 	if (isPackaged || developmentRendererUrl === undefined) return undefined;
-	const parsed = new URL(developmentRendererUrl);
-	if (
-		parsed.username !== "" ||
-		parsed.password !== "" ||
-		parsed.origin !== RendererDevelopmentServer.origin
-	) {
+	const parsed = parseRendererDevelopmentUrl(developmentRendererUrl);
+	if (parsed.origin !== RendererDevelopmentServer.origin) {
 		throw new Error(
 			`Electron development renderer must use ${RendererDevelopmentServer.origin}.`,
 		);
 	}
-	return parsed.toString();
+	return parsed.href;
 };
 
 export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(

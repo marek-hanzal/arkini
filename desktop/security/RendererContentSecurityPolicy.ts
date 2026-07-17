@@ -1,6 +1,7 @@
+import type { RendererDevelopmentUrl } from "./RendererDevelopmentUrl";
+
 const commonDirectives = [
 	"default-src 'self'",
-	"script-src 'self'",
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' blob: data:",
 	"font-src 'self' data:",
@@ -13,20 +14,29 @@ const commonDirectives = [
 	"form-action 'none'",
 ] as const;
 
-export const RendererDevelopmentServer = {
-	host: "127.0.0.1",
-	port: 4040,
-	origin: "http://127.0.0.1:4040",
-	webSocketOrigin: "ws://127.0.0.1:4040",
-} as const;
+export namespace createRendererDevelopmentContentSecurityPolicy {
+	export interface Props {
+		readonly developmentUrl: RendererDevelopmentUrl;
+		readonly nonce: string;
+	}
+}
+
+export const createRendererDevelopmentContentSecurityPolicy = ({
+	developmentUrl,
+	nonce,
+}: createRendererDevelopmentContentSecurityPolicy.Props) =>
+	[
+		commonDirectives[0],
+		`script-src 'self' 'nonce-${nonce}'`,
+		...commonDirectives.slice(1),
+		`connect-src 'self' ${developmentUrl.webSocketEndpoint}`,
+	].join("; ");
 
 export const RendererContentSecurityPolicy = {
-	development: [
-		...commonDirectives,
-		`connect-src 'self' ${RendererDevelopmentServer.webSocketOrigin}`,
-	].join("; "),
 	production: [
-		...commonDirectives,
+		commonDirectives[0],
+		"script-src 'self'",
+		...commonDirectives.slice(1),
 		"connect-src 'self'",
 	].join("; "),
 } as const;

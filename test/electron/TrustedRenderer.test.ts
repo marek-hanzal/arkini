@@ -118,15 +118,22 @@ describe("trusted Electron renderer policy", () => {
 		expect(policy.isTrustedUrl("arkini://app/")).toBe(false);
 	});
 
-	it("rejects a development renderer origin other than the configured loopback server", async () => {
-		await expect(
-			Effect.runPromise(
-				createTrustedRendererFx({
-					isPackaged: false,
-					developmentRendererUrl: "http://localhost:4040/",
-				}),
-			),
-		).rejects.toThrow("configure the trusted Arkini renderer origin");
+	it("rejects development URLs outside the exact configured loopback origin", async () => {
+		for (const developmentRendererUrl of [
+			"http://localhost:4040/",
+			"http://127.0.0.1:4041/",
+			"http://192.168.1.50:4040/",
+			"http://127.0.0.1:4040/game",
+		]) {
+			await expect(
+				Effect.runPromise(
+					createTrustedRendererFx({
+						isPackaged: false,
+						developmentRendererUrl,
+					}),
+				),
+			).rejects.toThrow("configure the trusted Arkini renderer origin");
+		}
 	});
 
 	it("blocks external navigation, redirects, subframes, webviews, and permissions", async () => {

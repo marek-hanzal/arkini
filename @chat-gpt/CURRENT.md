@@ -4,18 +4,17 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Launcher startup and semantic main menu #246**
+**Development renderer CSP #267**
 
-Status: **Complete. The one-session black-hold splash, authoritative launcher bootstrap, shared catalog, semantic main menu, standalone Arkpacks/Settings/About routes, persisted appearance, trusted native Exit, and corrected whole-application Save and exit are implemented and validated.**
+Status: **Complete. Development now uses one parsed loopback renderer URL, one URL-derived HMR endpoint, and one per-server Vite CSP nonce; packaged CSP and trusted renderer authorization remain strict.**
 
 Current scope:
 
-- one renderer-session startup owner and one shared Arkpack catalog;
-- approximately 500 ms pure-black opening while bootstrap runs immediately;
-- theme/accent hydration, canonical built-in package resolution, Hero readiness, five-second minimum, legal Escape skip, retry, and session-only splash completion;
-- `/main-menu`, `/arkpacks`, `/settings`, and `/about` as standalone top-level destinations;
-- trusted native Exit and corrected whole-application Save and exit semantics;
-- `/settings` as the sole System/Light/Dark theme surface, backed by one complete standalone mutation over the existing appearance owner; the former floating canvas selector is removed.
+- one canonical `http://127.0.0.1:4040/` development URL parsed by shared security code;
+- trusted-renderer startup rejects credentials, non-loopback origins, alternate ports/hosts, and path/query/fragment variants;
+- development CSP permits only same-origin resources, the exact derived `vite-hmr` WebSocket endpoint, and scripts carrying the current server nonce;
+- Vite receives the same nonce through `html.cspNonce`, so the React Refresh preamble loads without `unsafe-inline` or `unsafe-eval`;
+- production `arkini://app` CSP is unchanged and receives no development nonce or WebSocket source.
 
 Next action:
 
@@ -38,7 +37,7 @@ Next action:
 - TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
 - `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the moved shared package selector, `/settings` owns the sole theme control, `/about` contains credits, and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
-- One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP; development adds only the exact HMR WebSocket endpoint.
+- One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP. Development derives the exact HMR WebSocket endpoint from the same parsed loopback URL and adds one per-server Vite nonce for the React Refresh preamble; neither development allowance enters packaged output.
 - Arkpack, save, and appearance persistence use narrow Effect-native object capabilities on both sides of typed IPC. Renderer adaptation from `ipcRenderer.invoke` happens once in domain transport operations; Electron handlers authorize once and run Effect-native `@effect/platform` filesystem operations through `ElectronMainRuntime`. No project-owned persistence classes or no-op close lifecycle remain.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.

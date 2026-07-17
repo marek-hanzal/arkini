@@ -160,28 +160,42 @@ The live boundary exposes:
 - `subscribeEvents(listener)` — transient event batches for presentation;
 - `flushSaveFx` — explicit persistence flush Effect;
 - `disposeFx` — coordinated shutdown Effect with a retryable final save. A failed flush freezes the session and retains the same canonical runtime for another disposal attempt; resources are released only after the save succeeds;
-- `disposeWithoutSaveFx` — explicit destructive shutdown Effect used by hard reset or user-confirmed force exit. It stops autosave and releases the frozen session without writing a final snapshot.
+- `disposeWithoutSaveFx` — explicit destructive disposal Effect used by hard reset or by a bootstrap that completed but was never published. It stops autosave and releases the session without writing a final snapshot.
 
 `GameSession` lifecycle operations are reusable Effect values rather than Promise-producing methods. One Effect-owned lifecycle state and one `Deferred` represent the active disposal attempt: concurrent fibers await that exact attempt, failure returns the session to a frozen retryable state, and a later disposal starts a new attempt. Promise exists only at explicit `ManagedRuntime`/process execution boundaries and is never cached as lifecycle state.
 
 `GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
 
-Replacement follows one Effect-owned serialized ownership transition:
+`GameOwner` is a small class-free resource lifecycle. It owns one published `Game`, one private failed-save recovery identity, synchronous external-store state, and one transition semaphore. Its public operations are explicit:
 
 ```text
-command + Deferred acknowledgement
-→ one Queue of requested owner intents
-→ one Semaphore-owned drain
-→ run current Game.disposeFx and await final save
-→ create only the latest still-requested package
-→ dispose stale bootstrap exactly once
-→ publish one ready Game, or one truthful failure state
-→ complete every absorbed command with the winning intent outcome
+selectPackageFx(packageId)
+releaseRouteGameFx
+shutdownFx
+hardResetFx
+clearFailedSaveAndRetryFx
 ```
 
-`GameOwner` does not capture an Effect runtime, cache a lifecycle Promise, or run a second async scheduler. Each public command remains an Effect. Invalid commands fail their own acknowledgement immediately; commands coalesced into one drain share the final winning intent's success or failure. Disposal, clear, bootstrap, and recovery failures both publish the matching failed snapshot and fail the initiating command Effect, so callers never inspect UI state to rediscover command failure. Authoritative lifecycle checkpoints are uninterruptible: caller interruption remains attached to the same Effect fiber until the current ownership transition reaches a coherent result, with no detached Promise work.
+Package selection runs one serialized transition:
 
-The owner lives above the route outlet so launcher ↔ game navigation and React StrictMode effect replay cannot create a second save owner. It coalesces obsolete intermediate requests but never skips final save/disposal. HMR stores the old owner shutdown Promise only at the renderer runtime execution boundary; replacement code waits for that boundary Promise before creating another session. Electron close is also controlled by the same shutdown: the window closes only after final save succeeds. A failed final save keeps the same frozen `Game` owned and retryable; repeating close retries that exact obligation. The shell exposes an explicit force-exit-without-saving decision. It starts best-effort discard cleanup and authorizes main to close immediately without pretending that the final save succeeded.
+```text
+same published package
+→ no-op and restore ready publication when needed
+
+new package
+→ publish loading target
+→ await current Game.disposeFx final save
+→ create one candidate Game
+→ publish that candidate as current
+```
+
+There is no generic `Command`, `Intent`, Queue drain, checkpoint protocol, latest-wins coalescing, or per-command `Deferred` acknowledgement. Concurrent requests wait on the semaphore in call order. Duplicate identical selections become no-ops after the first transition settles. A candidate that completes bootstrap but is interrupted before publication is never a save owner; it is released only through `disposeWithoutSaveFx` and cannot block the next serialized selection.
+
+The owner lives above the route outlet. One stable root binding maps `/game/$packageId` to `selectPackageFx(packageId)` and every non-game route to `releaseRouteGameFx()`. React cleanup is not a desired-game signal, so StrictMode replay does not manufacture `A → null → A`; repeated identical effects serialize into a no-op.
+
+Route release and application shutdown are separate operations even though both request a final save. Their failure states carry explicit operation identity. A route-release failure never exposes application-exit UI. HMR and controlled Electron close use `shutdownFx`; a failed final save retains the same frozen `Game`, and the next shutdown request retries that exact obligation. Explicit force close belongs to native process policy and does not run best-effort renderer discard or claim that save cleanup succeeded.
+
+Owner command failures both publish matching failed state and fail the initiating Effect. Save recovery identity stays private; UI receives only `canRecoverSave`. Interruption remains inside the owning Effect transition. Completed release is committed before ownership is cleared, and an unpublished candidate is destructively finalized before the transition semaphore is released.
 
 Owner state publication is synchronous for `useSyncExternalStore`, but observer delivery is never authoritative lifecycle work. Every publication iterates one stable listener snapshot; each callback throw and each rejected returned Promise-like value is isolated independently, later listeners still receive the same publication, and subscription changes affect only later publications. Observer defects can be reported, but they cannot create owner failure state or stop game creation, disposal, replacement, reset, or shutdown.
 
@@ -194,7 +208,7 @@ current Game.disposeWithoutSaveFx
 → publish one fresh Game
 ```
 
-Concurrent hard-reset callers share one Deferred-backed command outcome and cannot create orphan sessions.
+Hard reset is one explicit semaphore-owned operation. Separate callers execute sequentially; it is not represented as a generic intent or used to justify a scheduler.
 
 Failed bootstrap recovery distinguishes trusted package identity from untrusted package bytes:
 
@@ -204,13 +218,14 @@ package validation failure
 → retry/back only; no save-clear action
 
 verified package + save decode/hydration failure
-→ retain exact packageId + contentHash key in the owner failure
-→ explicit clear-save-and-retry through the same serialized owner
-→ clear only that exact save
+→ retain exact packageId + contentHash key privately in GameOwner
+→ expose only save-recovery capability in public state
+→ explicit clear-save-and-retry under the transition semaphore
+→ clear only that exact save once
 → run the normal fresh bootstrap path
 ```
 
-The save is never deleted automatically. UI requests recovery from `GameOwner`; it never calls save storage or constructs filesystem paths. Failed clear remains a truthful clearable failure, while successful clear followed by another bootstrap failure remains a normal retryable package failure.
+The save is never deleted automatically. UI requests recovery from `GameOwner`; it never receives the storage key, calls save storage, or constructs filesystem paths. Failed clear remains a truthful recoverable failure. If clear succeeds but fresh bootstrap fails for another reason, the same recovery operation retries bootstrap without deleting the key a second time.
 
 ### 4.1 Desktop persistence
 

@@ -14,7 +14,7 @@ export type GameSessionServices =
 export interface GameSession {
 	/** Saves and releases the session; a failed final save leaves it frozen and retryable. */
 	readonly disposeFx: Effect.Effect<void, unknown>;
-	/** Destructive shutdown for hard reset or explicit force exit without saving. */
+	/** Destructive disposal for hard reset or an unpublished bootstrap. */
 	readonly disposeWithoutSaveFx: Effect.Effect<void, unknown>;
 	readonly flushSaveFx: Effect.Effect<void, unknown>;
 	readonly getSnapshot: () => RuntimeSchema.Type;

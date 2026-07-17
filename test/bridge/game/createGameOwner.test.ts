@@ -9,7 +9,6 @@ import type { GameOwner } from "~/bridge/game/GameOwner";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { createGameOwnerFx } from "~/bridge/game/createGameOwnerFx";
-import { shutdownGameOwnerFx } from "~/bridge/game/shutdownGameOwnerFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -21,6 +20,11 @@ import {
 interface TestGameOwnerProps {
 	readonly create: (packageId: string) => Promise<Game>;
 	readonly clearSave: (key: GameSaveStorage.Key) => Promise<void>;
+}
+
+interface FakeGameLifecycle {
+	readonly dispose?: () => Promise<void>;
+	readonly discard?: () => Promise<void>;
 }
 
 const createGameOwner = ({ create, clearSave }: TestGameOwnerProps) =>
@@ -47,8 +51,6 @@ const runOwnerFx = async <Value, Error>(effect: Effect.Effect<Value, Error>) => 
 	throw Cause.squash(exit.cause);
 };
 
-const shutdownGameOwner = (owner: GameOwner) => runOwnerFx(shutdownGameOwnerFx(owner));
-
 const deferred = <Value>() => {
 	let resolve!: (value: Value | PromiseLike<Value>) => void;
 	let reject!: (reason?: unknown) => void;
@@ -74,7 +76,7 @@ const fromPromiseFx = (operation: () => Promise<void>) =>
 const createFakeGame = (
 	packageId: string,
 	instanceKey: string,
-	dispose: () => Promise<void> = () => Promise.resolve(),
+	lifecycle: FakeGameLifecycle = {},
 ): Game => ({
 	arkpack: {
 		packageId,
@@ -91,8 +93,8 @@ const createFakeGame = (
 		contentHash: packageId,
 	},
 	instanceKey,
-	disposeFx: fromPromiseFx(dispose),
-	disposeWithoutSaveFx: fromPromiseFx(dispose),
+	disposeFx: fromPromiseFx(lifecycle.dispose ?? (() => Promise.resolve())),
+	disposeWithoutSaveFx: fromPromiseFx(lifecycle.discard ?? (() => Promise.resolve())),
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
@@ -208,23 +210,21 @@ const createRealStorages = async () => {
 };
 
 describe("createGameOwnerFx", () => {
-	it("waits for the current final disposal before creating the replacement", async () => {
+	it("waits for the current final save before creating the replacement", async () => {
 		const release = deferred<void>();
 		const creates: string[] = [];
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create: async (packageId) => {
 				creates.push(packageId);
-				return createFakeGame(
-					packageId,
-					`${packageId}:${creates.length}`,
-					packageId === "A" ? () => release.promise : undefined,
-				);
+				return createFakeGame(packageId, `${packageId}:${creates.length}`, {
+					dispose: packageId === "A" ? () => release.promise : undefined,
+				});
 			},
 		});
 
-		await runOwnerFx(owner.replaceFx("A"));
-		const replacing = runOwnerFx(owner.replaceFx("B"));
+		await runOwnerFx(owner.selectPackageFx("A"));
+		const replacing = runOwnerFx(owner.selectPackageFx("B"));
 		await Promise.resolve();
 		expect(creates).toEqual([
 			"A",
@@ -237,345 +237,299 @@ describe("createGameOwnerFx", () => {
 			"B",
 		]);
 		expect(expectReady(owner).arkpack.packageId).toBe("B");
-		await runOwnerFx(owner.replaceFx(null));
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("coalesces rapid A to B to A requests without creating B or overlapping owners", async () => {
-		const release = deferred<void>();
-		const creates: string[] = [];
-		let firstDisposeCalls = 0;
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => {
-				creates.push(packageId);
-				return createFakeGame(packageId, `${packageId}:${creates.length}`, async () => {
-					if (creates.length !== 1) return;
-					firstDisposeCalls += 1;
-					await release.promise;
-				});
-			},
-		});
-
-		await runOwnerFx(owner.replaceFx("A"));
-		const toB = runOwnerFx(owner.replaceFx("B"));
-		const backToA = runOwnerFx(owner.replaceFx("A"));
-		await Promise.resolve();
-		expect(creates).toEqual([
-			"A",
-		]);
-
-		release.resolve();
-		await Promise.all([
-			toB,
-			backToA,
-		]);
-		expect(creates).toEqual([
-			"A",
-			"A",
-		]);
-		expect(firstDisposeCalls).toBe(1);
-		expect(expectReady(owner).instanceKey).toBe("A:2");
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("disposes a stale bootstrap exactly once before publishing the latest request", async () => {
-		const firstCreate = deferred<Game>();
-		const staleDispose = vi.fn(() => Promise.resolve());
-		const creates: string[] = [];
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => {
-				creates.push(packageId);
-				if (packageId === "A") return firstCreate.promise;
-				return createFakeGame(packageId, packageId);
-			},
-		});
-
-		const first = runOwnerFx(owner.replaceFx("A"));
-		const second = runOwnerFx(owner.replaceFx("B"));
-		firstCreate.resolve(createFakeGame("A", "stale", staleDispose));
-		await Promise.all([
-			first,
-			second,
-		]);
-
-		expect(staleDispose).toHaveBeenCalledTimes(1);
-		expect(creates).toEqual([
-			"A",
-			"B",
-		]);
-		expect(expectReady(owner).arkpack.packageId).toBe("B");
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("shares one in-flight bootstrap across repeated identical requests", async () => {
-		const createA = deferred<Game>();
-		const create = vi.fn(() => createA.promise);
+	it("serializes duplicate package selections into one bootstrap", async () => {
+		const createGate = deferred<Game>();
+		const create = vi.fn(() => createGate.promise);
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create,
 		});
 
-		const first = runOwnerFx(owner.replaceFx("A"));
-		const second = runOwnerFx(owner.replaceFx("A"));
+		const first = runOwnerFx(owner.selectPackageFx("A"));
+		const second = runOwnerFx(owner.selectPackageFx("A"));
 		await Promise.resolve();
 		expect(create).toHaveBeenCalledOnce();
 
-		createA.resolve(createFakeGame("A", "shared"));
+		createGate.resolve(createFakeGame("A", "shared"));
 		await Promise.all([
 			first,
 			second,
 		]);
 		expect(create).toHaveBeenCalledOnce();
 		expect(expectReady(owner).instanceKey).toBe("shared");
-		await runOwnerFx(owner.replaceFx(null));
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("ignores a superseded bootstrap failure and settles callers on the latest request", async () => {
-		const createA = deferred<Game>();
-		const failure = new Error("obsolete bootstrap failed");
-		const creates: string[] = [];
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => {
-				creates.push(packageId);
-				if (packageId === "A") return createA.promise;
-				return createFakeGame(packageId, packageId);
-			},
-		});
-
-		const first = runOwnerFx(owner.replaceFx("A"));
-		const second = runOwnerFx(owner.replaceFx("B"));
-		createA.reject(failure);
-		await Promise.all([
-			first,
-			second,
-		]);
-
-		expect(creates).toEqual([
-			"A",
-			"B",
-		]);
-		expect(expectReady(owner).arkpack.packageId).toBe("B");
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("keeps interrupted lifecycle work inside Effect until the authoritative create settles", async () => {
-		const createGate = Effect.runSync(Deferred.make<Game>());
-		const owner = Effect.runSync(
-			createGameOwnerFx({
-				clearSaveFx: () => Effect.void,
-				createFx: () => Deferred.await(createGate),
-			}),
-		);
-		const created = createFakeGame("A", "authoritative");
-
-		const commandExit = await Effect.runPromise(
-			Effect.gen(function* () {
-				const commandFiber = yield* Effect.fork(owner.replaceFx("A"));
-				yield* Effect.yieldNow();
-				const interruptFiber = yield* Effect.fork(Fiber.interrupt(commandFiber));
-				yield* Effect.yieldNow();
-				expect(owner.getSnapshot()).toEqual({
-					type: "loading",
-					packageId: "A",
-				});
-				yield* Deferred.succeed(createGate, created);
-				return yield* Fiber.join(interruptFiber);
-			}),
-		);
-
-		expect(Exit.isFailure(commandExit)).toBe(true);
-		if (Exit.isFailure(commandExit)) {
-			expect(Cause.isInterruptedOnly(commandExit.cause)).toBe(true);
-		}
-		expect(expectReady(owner)).toBe(created);
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("blocks replacement and publishes a truthful failure when final disposal rejects", async () => {
+	it("keeps failed final-save ownership retryable before replacement", async () => {
 		const failure = new Error("final save failed");
+		let disposeCalls = 0;
 		const creates: string[] = [];
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create: async (packageId) => {
 				creates.push(packageId);
-				return createFakeGame(packageId, packageId, () => Promise.reject(failure));
+				return createFakeGame(packageId, packageId, {
+					dispose: async () => {
+						if (packageId !== "A") return;
+						disposeCalls += 1;
+						if (disposeCalls === 1) throw failure;
+					},
+				});
 			},
 		});
 
-		await runOwnerFx(owner.replaceFx("A"));
-		await expect(runOwnerFx(owner.replaceFx("B"))).rejects.toMatchObject({
-			message: failure.message,
-		});
-
+		await runOwnerFx(owner.selectPackageFx("A"));
+		await expect(runOwnerFx(owner.selectPackageFx("B"))).rejects.toBe(failure);
 		expect(creates).toEqual([
 			"A",
 		]);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
+			operation: "select-package",
 			packageId: "B",
-			error: expect.objectContaining({
-				message: failure.message,
-			}),
-			canForceShutdown: false,
+			canRecoverSave: false,
 		});
+
+		await runOwnerFx(owner.selectPackageFx("B"));
+		expect(disposeCalls).toBe(2);
+		expect(creates).toEqual([
+			"A",
+			"B",
+		]);
+		expect(expectReady(owner).arkpack.packageId).toBe("B");
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("isolates throwing subscribers from creation, disposal and replacement", async () => {
-		const listenerFailure = new Error("observer failed");
-		const report = vi.spyOn(console, "error").mockImplementation(() => undefined);
-		const disposed = vi.fn(() => Promise.resolve());
-		const deliveries: GameOwner.State["type"][] = [];
+	it("publishes distinct route-release and application-shutdown failures", async () => {
+		const failure = new Error("disk full");
+		const dispose = vi.fn(() => Promise.reject(failure));
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create: async (packageId) =>
-				createFakeGame(packageId, packageId, packageId === "A" ? disposed : undefined),
+				createFakeGame(packageId, packageId, {
+					dispose,
+				}),
 		});
-		const unsubscribeBroken = owner.subscribe(() => {
-			throw listenerFailure;
-		});
-		const unsubscribeHealthy = owner.subscribe(() => {
-			deliveries.push(owner.getSnapshot().type);
+		await runOwnerFx(owner.selectPackageFx("A"));
+
+		await expect(runOwnerFx(owner.releaseRouteGameFx())).rejects.toBe(failure);
+		expect(owner.getSnapshot()).toMatchObject({
+			type: "failed",
+			operation: "route-release",
+			canRecoverSave: false,
 		});
 
-		await runOwnerFx(owner.replaceFx("A"));
-		await runOwnerFx(owner.replaceFx("B"));
-
-		expect(disposed).toHaveBeenCalledTimes(1);
-		expect(expectReady(owner).arkpack.packageId).toBe("B");
-		expect(deliveries).toEqual([
-			"loading",
-			"loading",
-			"ready",
-			"loading",
-			"loading",
-			"ready",
-		]);
-		expect(report).toHaveBeenCalledTimes(deliveries.length);
-		expect(report).toHaveBeenCalledWith(
-			"Arkini game-owner listener failed; authoritative lifecycle continues.",
-			listenerFailure,
-		);
-
-		unsubscribeBroken();
-		unsubscribeHealthy();
-		await runOwnerFx(owner.replaceFx(null));
-		report.mockRestore();
+		await runOwnerFx(owner.selectPackageFx("A"));
+		await expect(runOwnerFx(owner.shutdownFx())).rejects.toBe(failure);
+		expect(owner.getSnapshot()).toMatchObject({
+			type: "failed",
+			operation: "shutdown",
+			packageId: "A",
+			canRecoverSave: false,
+		});
+		expect(dispose).toHaveBeenCalledTimes(2);
 	});
 
-	it("publishes over a stable listener snapshot while subscriptions mutate", async () => {
-		const deliveries: string[] = [];
+	it("retries the same shutdown save obligation after a failure", async () => {
+		const failure = new Error("final save failed");
+		let disposeCalls = 0;
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
-			create: async (packageId) => createFakeGame(packageId, packageId),
+			create: async (packageId) =>
+				createFakeGame(packageId, packageId, {
+					dispose: async () => {
+						disposeCalls += 1;
+						if (disposeCalls === 1) throw failure;
+					},
+				}),
 		});
-		let changedSubscriptions = false;
-		let unsubscribeSecond: () => void = () => undefined;
-		let unsubscribeAdded: () => void = () => undefined;
-		const unsubscribeFirst = owner.subscribe(() => {
-			deliveries.push("first");
-			if (changedSubscriptions) return;
-			changedSubscriptions = true;
-			unsubscribeSecond();
-			unsubscribeAdded = owner.subscribe(() => {
-				deliveries.push("added");
-			});
-		});
-		unsubscribeSecond = owner.subscribe(() => {
-			deliveries.push("second");
+		await runOwnerFx(owner.selectPackageFx("A"));
+
+		await expect(runOwnerFx(owner.shutdownFx())).rejects.toBe(failure);
+		expect(owner.getSnapshot()).toMatchObject({
+			type: "failed",
+			operation: "shutdown",
+			packageId: "A",
 		});
 
-		await runOwnerFx(owner.replaceFx("A"));
-
-		expect(deliveries).toEqual([
-			"first",
-			"second",
-			"first",
-			"added",
-			"first",
-			"added",
-		]);
-		unsubscribeSecond();
-		unsubscribeSecond();
-		unsubscribeFirst();
-		unsubscribeFirst();
-		unsubscribeAdded();
-		unsubscribeAdded();
-		await runOwnerFx(owner.replaceFx(null));
+		await runOwnerFx(owner.shutdownFx());
+		expect(disposeCalls).toBe(2);
+		expect(owner.getSnapshot()).toEqual({
+			type: "loading",
+			packageId: null,
+		});
 	});
 
-	it("isolates rejected Promise-like subscriber work and still notifies later listeners", async () => {
-		const listenerFailure = new Error("async observer failed");
-		const report = vi.spyOn(console, "error").mockImplementation(() => undefined);
-		const laterListener = vi.fn();
+	it("completes repeated shutdown requests through one successful final save", async () => {
+		const release = deferred<void>();
+		const dispose = vi.fn(() => release.promise);
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
-			create: async (packageId) => createFakeGame(packageId, packageId),
+			create: async (packageId) =>
+				createFakeGame(packageId, packageId, {
+					dispose,
+				}),
 		});
-		const unsubscribeBroken = owner.subscribe(() => Promise.reject(listenerFailure));
-		const unsubscribeHealthy = owner.subscribe(laterListener);
+		await runOwnerFx(owner.selectPackageFx("A"));
 
-		await runOwnerFx(owner.replaceFx("A"));
+		const first = runOwnerFx(owner.shutdownFx());
+		const second = runOwnerFx(owner.shutdownFx());
 		await Promise.resolve();
-		await Promise.resolve();
+		expect(dispose).toHaveBeenCalledOnce();
 
-		expect(expectReady(owner).arkpack.packageId).toBe("A");
-		expect(laterListener).toHaveBeenCalledTimes(3);
-		expect(report).toHaveBeenCalledTimes(3);
-		expect(report).toHaveBeenCalledWith(
-			"Arkini game-owner listener failed; authoritative lifecycle continues.",
-			listenerFailure,
-		);
-
-		unsubscribeBroken();
-		unsubscribeHealthy();
-		await runOwnerFx(owner.replaceFx(null));
-		report.mockRestore();
-	});
-
-	it("runs hard reset as one shared discard, exact clear and fresh boot", async () => {
-		const calls: string[] = [];
-		let generation = 0;
-		const owner = createGameOwner({
-			clearSave: async (key) => {
-				calls.push(`clear:${key.packageId}:${key.contentHash}`);
-			},
-			create: async (packageId) => {
-				generation += 1;
-				const instanceKey = `${packageId}:${generation}`;
-				calls.push(`create:${instanceKey}`);
-				return {
-					...createFakeGame(packageId, instanceKey),
-					disposeFx: Effect.sync(() => {
-						calls.push(`save:${instanceKey}`);
-					}),
-					disposeWithoutSaveFx: Effect.sync(() => {
-						calls.push(`discard:${instanceKey}`);
-					}),
-				};
-			},
-		});
-
-		await runOwnerFx(owner.replaceFx("A"));
-		const first = runOwnerFx(owner.hardResetFx());
-		const second = runOwnerFx(owner.hardResetFx());
+		release.resolve();
 		await Promise.all([
 			first,
 			second,
 		]);
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(owner.getSnapshot()).toEqual({
+			type: "loading",
+			packageId: null,
+		});
+	});
 
-		expect(calls).toEqual([
+	it("discards an interrupted unpublished bootstrap without final save and unblocks the next package", async () => {
+		const createA = Effect.runSync(Deferred.make<Game>());
+		const staleDispose = vi.fn(() => Promise.resolve());
+		const staleDiscard = vi.fn(() => Promise.resolve());
+		const owner = Effect.runSync(
+			createGameOwnerFx({
+				clearSaveFx: () => Effect.void,
+				createFx: (packageId) =>
+					packageId === "A"
+						? Deferred.await(createA)
+						: Effect.succeed(createFakeGame(packageId, packageId)),
+			}),
+		);
+
+		const interrupted = await Effect.runPromise(
+			Effect.gen(function* () {
+				const first = yield* Effect.fork(owner.selectPackageFx("A"));
+				yield* Effect.yieldNow();
+				const interruption = yield* Effect.fork(Fiber.interrupt(first));
+				const second = yield* Effect.fork(owner.selectPackageFx("B"));
+				yield* Deferred.succeed(
+					createA,
+					createFakeGame("A", "stale", {
+						dispose: staleDispose,
+						discard: staleDiscard,
+					}),
+				);
+				const firstExit = yield* Fiber.join(interruption);
+				yield* Fiber.join(second);
+				return firstExit;
+			}),
+		);
+
+		expect(Exit.isFailure(interrupted)).toBe(true);
+		if (Exit.isFailure(interrupted)) {
+			expect(Cause.isInterruptedOnly(interrupted.cause)).toBe(true);
+		}
+		expect(staleDispose).not.toHaveBeenCalled();
+		expect(staleDiscard).toHaveBeenCalledOnce();
+		expect(expectReady(owner).arkpack.packageId).toBe("B");
+		await runOwnerFx(owner.releaseRouteGameFx());
+	});
+
+	it("isolates subscriber defects from lifecycle work and later subscribers", async () => {
+		const listenerFailure = new Error("observer failed");
+		const asyncFailure = new Error("async observer failed");
+		const report = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const deliveries: GameOwner.State["type"][] = [];
+		const owner = createGameOwner({
+			clearSave: async () => undefined,
+			create: async (packageId) => createFakeGame(packageId, packageId),
+		});
+		owner.subscribe(() => {
+			throw listenerFailure;
+		});
+		owner.subscribe(() => Promise.reject(asyncFailure));
+		owner.subscribe(() => {
+			deliveries.push(owner.getSnapshot().type);
+		});
+
+		await runOwnerFx(owner.selectPackageFx("A"));
+		await runOwnerFx(owner.releaseRouteGameFx());
+		await Promise.resolve();
+
+		expect(deliveries).toEqual([
+			"loading",
+			"ready",
+			"loading",
+			"loading",
+		]);
+		expect(report).toHaveBeenCalledWith(
+			"Arkini game-owner listener failed; authoritative lifecycle continues.",
+			listenerFailure,
+		);
+		expect(report).toHaveBeenCalledWith(
+			"Arkini game-owner listener failed; authoritative lifecycle continues.",
+			asyncFailure,
+		);
+		report.mockRestore();
+	});
+
+	it("hard resets by discarding, clearing the exact save and creating one fresh game", async () => {
+		const sequence: string[] = [];
+		let creates = 0;
+		const owner = createGameOwner({
+			clearSave: async (key) => {
+				sequence.push(`clear:${key.packageId}:${key.contentHash}`);
+			},
+			create: async (packageId) => {
+				creates += 1;
+				const instanceKey = `${packageId}:${creates}`;
+				sequence.push(`create:${instanceKey}`);
+				return createFakeGame(packageId, instanceKey, {
+					discard: async () => {
+						sequence.push(`discard:${instanceKey}`);
+					},
+				});
+			},
+		});
+		await runOwnerFx(owner.selectPackageFx("A"));
+
+		await runOwnerFx(owner.hardResetFx());
+
+		expect(sequence).toEqual([
 			"create:A:1",
 			"discard:A:1",
 			"clear:A:A",
 			"create:A:2",
 		]);
 		expect(expectReady(owner).instanceKey).toBe("A:2");
-		await runOwnerFx(owner.replaceFx(null));
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("does not boot a replacement when hard-reset clearing fails", async () => {
+	it("keeps a hard-reset discard failure truthful and retains the current game", async () => {
+		const failure = new Error("discard failed");
+		const clearSave = vi.fn(() => Promise.resolve());
+		const owner = createGameOwner({
+			clearSave,
+			create: async (packageId) =>
+				createFakeGame(packageId, packageId, {
+					discard: () => Promise.reject(failure),
+				}),
+		});
+		await runOwnerFx(owner.selectPackageFx("A"));
+
+		await expect(runOwnerFx(owner.hardResetFx())).rejects.toBe(failure);
+		expect(clearSave).not.toHaveBeenCalled();
+		expect(owner.getSnapshot()).toMatchObject({
+			type: "failed",
+			operation: "hard-reset",
+			packageId: "A",
+		});
+
+		await runOwnerFx(owner.selectPackageFx("A"));
+		expect(expectReady(owner).arkpack.packageId).toBe("A");
+	});
+
+	it("does not create a replacement when hard-reset clearing fails", async () => {
 		const failure = new Error("clear failed");
 		let creates = 0;
 		const owner = createGameOwner({
@@ -585,22 +539,43 @@ describe("createGameOwnerFx", () => {
 				return createFakeGame(packageId, String(creates));
 			},
 		});
-		await runOwnerFx(owner.replaceFx("A"));
-		await expect(runOwnerFx(owner.hardResetFx())).rejects.toMatchObject({
-			message: failure.message,
-		});
+		await runOwnerFx(owner.selectPackageFx("A"));
+
+		await expect(runOwnerFx(owner.hardResetFx())).rejects.toBe(failure);
 		expect(creates).toBe(1);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
+			operation: "hard-reset",
 			packageId: "A",
-			error: expect.objectContaining({
-				message: failure.message,
-			}),
-			canForceShutdown: false,
 		});
 	});
 
-	it("hard resets a real selected package by discarding, clearing its exact save and booting fresh", async () => {
+	it("keeps a hard-reset recreate failure truthful after discard and clear", async () => {
+		const failure = new Error("fresh create failed");
+		let creates = 0;
+		const clearSave = vi.fn(() => Promise.resolve());
+		const owner = createGameOwner({
+			clearSave,
+			create: async (packageId) => {
+				creates += 1;
+				if (creates === 2) throw failure;
+				return createFakeGame(packageId, String(creates));
+			},
+		});
+		await runOwnerFx(owner.selectPackageFx("A"));
+
+		await expect(runOwnerFx(owner.hardResetFx())).rejects.toBe(failure);
+		expect(clearSave).toHaveBeenCalledOnce();
+		expect(creates).toBe(2);
+		expect(owner.getSnapshot()).toMatchObject({
+			type: "failed",
+			operation: "hard-reset",
+			packageId: "A",
+			canRecoverSave: false,
+		});
+	});
+
+	it("hard resets a real selected package without restoring discarded progress", async () => {
 		const storages = await createRealStorages();
 		const owner = createGameOwner({
 			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
@@ -611,7 +586,7 @@ describe("createGameOwnerFx", () => {
 					saveStorage: storages.saveStorage,
 				}),
 		});
-		await runOwnerFx(owner.replaceFx(storages.packageId));
+		await runOwnerFx(owner.selectPackageFx(storages.packageId));
 		const beforeReset = expectReady(owner);
 		await beforeReset.run(
 			spawnItemFx({
@@ -638,215 +613,13 @@ describe("createGameOwnerFx", () => {
 				}),
 			]),
 		);
-		expect(afterReset.getSnapshot().items).toHaveLength(1);
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("keeps real package saves isolated while switching through one serialized owner", async () => {
-		const storages = await createRealStorages();
-		const owner = createGameOwner({
-			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
-			create: (packageId) =>
-				runCreateGame({
-					packageId,
-					arkpackStorage: storages.arkpackStorage,
-					saveStorage: storages.saveStorage,
-				}),
-		});
-		await runOwnerFx(owner.replaceFx(storages.packageId));
-		await expectReady(owner).run(
-			spawnItemFx({
-				id: "runtime:first-package",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			}),
-		);
-		await runOwnerFx(owner.replaceFx(storages.secondPackageId));
-		await expectReady(owner).run(
-			spawnItemFx({
-				id: "runtime:second-package",
-				itemId: "water",
-				location: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-			}),
-		);
-
-		await runOwnerFx(owner.replaceFx(storages.packageId));
-		const firstRestoredIds = expectReady(owner)
-			.getSnapshot()
-			.items.map(({ id }) => id);
-		expect(firstRestoredIds).toContain("runtime:first-package");
-		expect(firstRestoredIds).not.toContain("runtime:second-package");
-
-		await runOwnerFx(owner.replaceFx(storages.secondPackageId));
-		const secondRestoredIds = expectReady(owner)
-			.getSnapshot()
-			.items.map(({ id }) => id);
-		expect(secondRestoredIds).toContain("runtime:second-package");
-		expect(secondRestoredIds).not.toContain("runtime:first-package");
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("shares one in-flight final save across repeated close requests", async () => {
-		const release = deferred<void>();
-		const dispose = vi.fn(() => release.promise);
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => createFakeGame(packageId, packageId, dispose),
-		});
-		await runOwnerFx(owner.replaceFx("A"));
-
-		const first = shutdownGameOwner(owner);
-		const second = shutdownGameOwner(owner);
-		await Promise.resolve();
-		expect(dispose).toHaveBeenCalledOnce();
-
-		release.resolve();
-		await Promise.all([
-			first,
-			second,
+		expect(storages.clearedKeys).toEqual([
+			storages.firstSaveKey,
 		]);
-		expect(dispose).toHaveBeenCalledOnce();
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("closes cleanly through the same protocol when no game is active", async () => {
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => createFakeGame(packageId, packageId),
-		});
-
-		await expect(shutdownGameOwner(owner)).resolves.toBeUndefined();
-		expect(owner.getSnapshot()).toEqual({
-			type: "loading",
-			packageId: null,
-		});
-	});
-
-	it("retries the same final save obligation after a controlled shutdown failure", async () => {
-		const failure = new Error("final save failed");
-		let disposeCalls = 0;
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) =>
-				createFakeGame(packageId, packageId, async () => {
-					disposeCalls += 1;
-					if (disposeCalls === 1) throw failure;
-				}),
-		});
-		await runOwnerFx(owner.replaceFx("A"));
-
-		await expect(shutdownGameOwner(owner)).rejects.toMatchObject({
-			message: failure.message,
-		});
-		expect(owner.getSnapshot()).toEqual({
-			type: "failed",
-			packageId: null,
-			error: expect.objectContaining({
-				message: failure.message,
-			}),
-			canForceShutdown: true,
-		});
-
-		await expect(shutdownGameOwner(owner)).resolves.toBeUndefined();
-		expect(disposeCalls).toBe(2);
-		expect(owner.getSnapshot()).toEqual({
-			type: "loading",
-			packageId: null,
-		});
-	});
-
-	it("never converts a repeated final-save failure into a successful shutdown", async () => {
-		const failure = new Error("disk remains full");
-		const dispose = vi.fn(() => Promise.reject(failure));
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => createFakeGame(packageId, packageId, dispose),
-		});
-		await runOwnerFx(owner.replaceFx("A"));
-
-		await expect(shutdownGameOwner(owner)).rejects.toMatchObject({
-			message: failure.message,
-		});
-		await expect(shutdownGameOwner(owner)).rejects.toMatchObject({
-			message: failure.message,
-		});
-		expect(dispose).toHaveBeenCalledTimes(2);
-		expect(owner.getSnapshot()).toEqual({
-			type: "failed",
-			packageId: null,
-			error: expect.objectContaining({
-				message: failure.message,
-			}),
-			canForceShutdown: true,
-		});
-	});
-
-	it("discards the retained game only after an explicit force-shutdown decision", async () => {
-		const failure = new Error("final save failed");
-		const dispose = vi.fn(() => Promise.reject(failure));
-		const discard = vi.fn(() => Promise.resolve());
-		const owner = createGameOwner({
-			clearSave: async () => undefined,
-			create: async (packageId) => ({
-				...createFakeGame(packageId, packageId, dispose),
-				disposeWithoutSaveFx: fromPromiseFx(discard),
-			}),
-		});
-		await runOwnerFx(owner.replaceFx("A"));
-		await expect(shutdownGameOwner(owner)).rejects.toMatchObject({
-			message: failure.message,
-		});
-
-		await expect(runOwnerFx(owner.forceShutdownFx())).resolves.toBeUndefined();
-		expect(dispose).toHaveBeenCalledOnce();
-		expect(discard).toHaveBeenCalledOnce();
-		expect(owner.getSnapshot()).toEqual({
-			type: "loading",
-			packageId: null,
-		});
-	});
-
-	it("retains an exact recovery key for malformed durable save bytes", async () => {
-		const storages = await createRealStorages();
-		await writeStoredSave(storages.saveStorage, storages.firstSaveKey, Uint8Array.of(0xc1));
-		const owner = createGameOwner({
-			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
-			create: (packageId) =>
-				runCreateGame({
-					packageId,
-					arkpackStorage: storages.arkpackStorage,
-					saveStorage: storages.saveStorage,
-				}),
-		});
-
-		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
-			saveKey: storages.firstSaveKey,
-		});
-		const state = owner.getSnapshot();
-		expect(state).toMatchObject({
-			type: "failed",
-			packageId: storages.packageId,
-			saveRecoveryKey: storages.firstSaveKey,
-		});
-		if (state.type !== "failed") throw new Error("Expected failed save bootstrap.");
-		expect(state.error).toBeInstanceOf(GameSaveBootstrapError);
-		expect(storages.clearedKeys).toEqual([]);
-	});
-
-	it("clears only the exact unsupported save and boots one fresh game", async () => {
+	it("keeps invalid-save recovery identity private and clears only its exact key", async () => {
 		const storages = await createRealStorages();
 		const otherHashKey: GameSaveStorage.Key = {
 			packageId: storages.packageId,
@@ -874,21 +647,19 @@ describe("createGameOwnerFx", () => {
 				}),
 		});
 
-		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
+		await expect(runOwnerFx(owner.selectPackageFx(storages.packageId))).rejects.toMatchObject({
 			saveKey: storages.firstSaveKey,
 		});
-		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
-			saveKey: storages.firstSaveKey,
+		const failed = owner.getSnapshot();
+		expect(failed).toMatchObject({
+			type: "failed",
+			operation: "select-package",
+			packageId: storages.packageId,
+			canRecoverSave: true,
 		});
-		expect(storages.clearedKeys).toEqual([]);
+		expect(failed).not.toHaveProperty("saveRecoveryKey");
 
-		const first = runOwnerFx(owner.clearFailedSaveAndRetryFx());
-		const second = runOwnerFx(owner.clearFailedSaveAndRetryFx());
-		await Promise.all([
-			first,
-			second,
-		]);
-
+		await runOwnerFx(owner.clearFailedSaveAndRetryFx());
 		expect(storages.clearedKeys).toEqual([
 			storages.firstSaveKey,
 		]);
@@ -897,62 +668,10 @@ describe("createGameOwnerFx", () => {
 		expect(await readStoredSave(storages.saveStorage, storages.secondSaveKey)).toEqual(
 			untouchedBytes,
 		);
-		await runOwnerFx(owner.replaceFx(null));
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
-	it("offers the same exact recovery for schema-valid state that fails hydration", async () => {
-		const storages = await createRealStorages();
-		await writeStoredSave(
-			storages.saveStorage,
-			storages.firstSaveKey,
-			encode({
-				namespace: "arkini",
-				format: 1,
-				state: {
-					currentSpace: 0,
-					items: [
-						{
-							id: "runtime:missing-item",
-							itemId: "missing-item",
-							location: {
-								scope: "board",
-								space: 0,
-								position: {
-									x: 0,
-									y: 0,
-								},
-							},
-							quantity: 1,
-						},
-					],
-					jobs: [],
-					jobQueue: [],
-				},
-			}),
-		);
-		const owner = createGameOwner({
-			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
-			create: (packageId) =>
-				runCreateGame({
-					packageId,
-					arkpackStorage: storages.arkpackStorage,
-					saveStorage: storages.saveStorage,
-				}),
-		});
-
-		await expect(runOwnerFx(owner.replaceFx(storages.packageId))).rejects.toMatchObject({
-			saveKey: storages.firstSaveKey,
-		});
-		expect(owner.getSnapshot()).toMatchObject({
-			type: "failed",
-			saveRecoveryKey: storages.firstSaveKey,
-		});
-		await runOwnerFx(owner.clearFailedSaveAndRetryFx());
-		expect(expectReady(owner).arkpack.packageId).toBe(storages.packageId);
-		await runOwnerFx(owner.replaceFx(null));
-	});
-
-	it("keeps failed clear truthful and never starts a fresh game", async () => {
+	it("keeps failed recovery clearing truthful and does not create a fresh game", async () => {
 		const saveKey: GameSaveStorage.Key = {
 			packageId: "A",
 			contentHash: "hash-a",
@@ -969,23 +688,21 @@ describe("createGameOwnerFx", () => {
 			create,
 		});
 
-		await expect(runOwnerFx(owner.replaceFx("A"))).rejects.toBe(bootstrapFailure);
+		await expect(runOwnerFx(owner.selectPackageFx("A"))).rejects.toBe(bootstrapFailure);
 		await expect(runOwnerFx(owner.clearFailedSaveAndRetryFx())).rejects.toBe(clearFailure);
 
 		expect(clearSave).toHaveBeenCalledOnce();
 		expect(create).toHaveBeenCalledOnce();
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
+			operation: "recover-save",
 			packageId: "A",
-			error: expect.objectContaining({
-				message: clearFailure.message,
-			}),
-			canForceShutdown: false,
-			saveRecoveryKey: saveKey,
+			error: clearFailure,
+			canRecoverSave: true,
 		});
 	});
 
-	it("keeps a post-clear create failure truthful and retryable without another clear", async () => {
+	it("retries a failed post-clear create without clearing the save twice", async () => {
 		const saveKey: GameSaveStorage.Key = {
 			packageId: "A",
 			contentHash: "hash-a",
@@ -1007,20 +724,19 @@ describe("createGameOwnerFx", () => {
 			},
 		});
 
-		await expect(runOwnerFx(owner.replaceFx("A"))).rejects.toBe(bootstrapFailure);
+		await expect(runOwnerFx(owner.selectPackageFx("A"))).rejects.toBe(bootstrapFailure);
 		await expect(runOwnerFx(owner.clearFailedSaveAndRetryFx())).rejects.toBe(createFailure);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
+			operation: "recover-save",
 			packageId: "A",
-			error: expect.objectContaining({
-				message: createFailure.message,
-			}),
-			canForceShutdown: false,
+			canRecoverSave: true,
 		});
-		await runOwnerFx(owner.replaceFx("A"));
-		expect(expectReady(owner).arkpack.packageId).toBe("A");
+
+		await runOwnerFx(owner.clearFailedSaveAndRetryFx());
 		expect(clearSave).toHaveBeenCalledOnce();
-		await runOwnerFx(owner.replaceFx(null));
+		expect(expectReady(owner).arkpack.packageId).toBe("A");
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 
 	it("does not expose save recovery when package identity was never verified", async () => {
@@ -1031,14 +747,12 @@ describe("createGameOwnerFx", () => {
 			create: async () => Promise.reject(packageFailure),
 		});
 
-		await expect(runOwnerFx(owner.replaceFx("unverified"))).rejects.toBe(packageFailure);
+		await expect(runOwnerFx(owner.selectPackageFx("unverified"))).rejects.toBe(packageFailure);
 		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
+			operation: "select-package",
 			packageId: "unverified",
-			error: expect.objectContaining({
-				message: packageFailure.message,
-			}),
-			canForceShutdown: false,
+			canRecoverSave: false,
 		});
 		await expect(runOwnerFx(owner.clearFailedSaveAndRetryFx())).rejects.toThrow(
 			"A verified failed save is required for recovery.",
@@ -1046,7 +760,65 @@ describe("createGameOwnerFx", () => {
 		expect(clearSave).not.toHaveBeenCalled();
 	});
 
-	it("restores the latest real saved runtime only after the previous owner releases it", async () => {
+	it("keeps real package save ownership isolated across serialized switching", async () => {
+		const storages = await createRealStorages();
+		const owner = createGameOwner({
+			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
+			create: (packageId) =>
+				runCreateGame({
+					packageId,
+					arkpackStorage: storages.arkpackStorage,
+					saveStorage: storages.saveStorage,
+				}),
+		});
+		await runOwnerFx(owner.selectPackageFx(storages.packageId));
+		await expectReady(owner).run(
+			spawnItemFx({
+				id: "runtime:first-package",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+		await runOwnerFx(owner.selectPackageFx(storages.secondPackageId));
+		await expectReady(owner).run(
+			spawnItemFx({
+				id: "runtime:second-package",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+
+		await runOwnerFx(owner.selectPackageFx(storages.packageId));
+		const firstRestoredIds = expectReady(owner)
+			.getSnapshot()
+			.items.map(({ id }) => id);
+		expect(firstRestoredIds).toContain("runtime:first-package");
+		expect(firstRestoredIds).not.toContain("runtime:second-package");
+
+		await runOwnerFx(owner.selectPackageFx(storages.secondPackageId));
+		const secondRestoredIds = expectReady(owner)
+			.getSnapshot()
+			.items.map(({ id }) => id);
+		expect(secondRestoredIds).toContain("runtime:second-package");
+		expect(secondRestoredIds).not.toContain("runtime:first-package");
+		await runOwnerFx(owner.releaseRouteGameFx());
+	});
+
+	it("restores the latest saved runtime only after route release completes", async () => {
 		const storages = await createRealStorages();
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
@@ -1057,8 +829,7 @@ describe("createGameOwnerFx", () => {
 					saveStorage: storages.saveStorage,
 				}),
 		});
-
-		await runOwnerFx(owner.replaceFx(storages.packageId));
+		await runOwnerFx(owner.selectPackageFx(storages.packageId));
 		const first = expectReady(owner);
 		await first.run(
 			spawnItemFx({
@@ -1075,8 +846,8 @@ describe("createGameOwnerFx", () => {
 			}),
 		);
 
-		const release = runOwnerFx(owner.replaceFx(null));
-		const restore = runOwnerFx(owner.replaceFx(storages.packageId));
+		const release = runOwnerFx(owner.releaseRouteGameFx());
+		const restore = runOwnerFx(owner.selectPackageFx(storages.packageId));
 		await Promise.all([
 			release,
 			restore,
@@ -1090,6 +861,6 @@ describe("createGameOwnerFx", () => {
 				}),
 			]),
 		);
-		await runOwnerFx(owner.replaceFx(null));
+		await runOwnerFx(owner.releaseRouteGameFx());
 	});
 });

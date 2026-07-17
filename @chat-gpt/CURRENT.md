@@ -6,11 +6,11 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Desktop boundary follow-up review #236**
 
-Status: **Open at P2 after follow-up verification. #237, #238, #239, #240, and #241 are complete; #242 GameOwner lifecycle simplification remains.**
+Status: **Complete after #242. Trusted renderer, Effect-native persistence, explicit GameOwner lifecycle, semantic enforcement, and clean-checkout delivery are all closed.**
 
 Next action:
 
-> Continue with #242: reduce GameOwner to the essential serialized lifecycle. Do not return to gameplay implementation until #236 is closed again.
+> Return to gameplay implementation. Define the next playable vertical slice before opening another infrastructure epic. Arkpack signing #210 and review codebook #209 remain intentionally deferred.
 
 ## Source topology
 
@@ -35,8 +35,8 @@ Next action:
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.
 - `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- `GameOwnerProvider` lives at the stable root shell above the route outlet and owns one `createGameOwnerFx` lifecycle. `GameShell` requests the selected package and releases it on route cleanup; launcher ↔ game navigation and StrictMode replay therefore share the same serialization point.
-- Game replacement always runs and awaits the current `Game.disposeFx` final save before creating the latest requested package. Obsolete intermediate requests are coalesced, stale bootstraps are disposed exactly once before publication, and disposal/bootstrap failure becomes a truthful shell failure state.
+- `GameOwnerProvider` lives at the stable root shell above the route outlet and declaratively maps the active `/game/$packageId` route to `selectPackageFx`; every non-game route maps to `releaseRouteGameFx`. React cleanup is not a desired-game signal, so StrictMode never manufactures `A → null → A`.
+- `GameOwner` owns one published Game, one private failed-save recovery identity, synchronous subscribers, and one transition Semaphore. Package selection, route release, shutdown, hard reset, and save recovery are explicit serialized operations. There is no command Queue, latest-intent interpreter, checkpoint protocol, or per-command Deferred list. A bootstrap interrupted before publication is discarded without final save.
 - `GameSession` and `Game` lifecycle is Effect-native: `flushSaveFx`, `disposeFx`, and `disposeWithoutSaveFx` are the only public lifecycle operations. One session lifecycle state plus `Deferred` shares concurrent disposal, failed final save leaves the same frozen session retryable, and game-owned resource Scope closes only after successful save disposal or explicit discard. Never restore a cached disposal Promise wrapper.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
 - A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.
@@ -186,7 +186,7 @@ Next action:
 
 - `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
 - `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
-- The root `createGameOwnerFx` is the completed replacement and hard-reset ownership boundary. It owns one command Queue, per-command Deferred acknowledgements, and one Semaphore drain; it never captures a runtime or caches lifecycle Promises. Commands absorbed into one drain share the final winning intent outcome. Hard reset single-flights dispose-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
-- Controlled Electron close and HMR handoff use `shutdownGameOwnerFx`. Owner command failures fail the initiating Effect and publish the same failure snapshot. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next close request; it never degrades into a successful empty-owner shutdown. The failure UI offers explicit safe retry or force exit without saving. Force exit starts best-effort discard cleanup and authorizes main to close immediately only after that deliberate renderer decision.
+- The root `createGameOwnerFx` is the complete replacement, route-release, shutdown, recovery, and hard-reset ownership boundary. One Semaphore serializes direct named operations. Same-package selection is a no-op after serialization; sequential package transitions are deliberate. Hard reset is discard-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
+- Controlled Electron close and HMR handoff call `GameOwner.shutdownFx`; route exit calls the distinct `releaseRouteGameFx`. Owner command failures fail the initiating Effect and publish the same operation-tagged failure snapshot. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next shutdown request. Only real shutdown failure exposes exit UI. Force close is native process policy and does not run renderer best-effort discard or pretend final save succeeded.
 - `GameOwner` subscriber delivery is synchronous but observational only: one stable snapshot is delivered per publication, callback throws/rejected Promise-like results are isolated per listener, and no observer can stop lifecycle work or starve later listeners.
 - Do not add another reset owner, mutate a running engine back to initial state, hide correctness in React-local state, or use a module-global lock/map.

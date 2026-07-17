@@ -4,6 +4,13 @@ import type { Game } from "~/bridge/game/Game";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 
 export namespace GameOwner {
+	export type Operation =
+		| "select-package"
+		| "route-release"
+		| "shutdown"
+		| "hard-reset"
+		| "recover-save";
+
 	export type State =
 		| {
 				readonly type: "loading";
@@ -15,10 +22,10 @@ export namespace GameOwner {
 		  }
 		| {
 				readonly type: "failed";
+				readonly operation: Operation;
 				readonly packageId: string | null;
 				readonly error: unknown;
-				readonly canForceShutdown: boolean;
-				readonly saveRecoveryKey?: GameSaveStorage.Key;
+				readonly canRecoverSave: boolean;
 		  };
 
 	export interface Props {
@@ -30,9 +37,10 @@ export namespace GameOwner {
 /** Stable renderer-facing owner of one serialized, replaceable live game. */
 export interface GameOwner {
 	readonly getSnapshot: () => GameOwner.State;
-	readonly replaceFx: (packageId: string | null) => Effect.Effect<void, unknown>;
+	readonly selectPackageFx: (packageId: string) => Effect.Effect<void, unknown>;
+	readonly releaseRouteGameFx: () => Effect.Effect<void, unknown>;
+	readonly shutdownFx: () => Effect.Effect<void, unknown>;
 	readonly clearFailedSaveAndRetryFx: () => Effect.Effect<void, unknown>;
 	readonly hardResetFx: () => Effect.Effect<void, unknown>;
-	readonly forceShutdownFx: () => Effect.Effect<void, unknown>;
 	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
 }

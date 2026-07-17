@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Review #236, task #241: desktop packaging cleanup**
+**Desktop boundary review #236 completed**
 
-Status: **Implemented and fully validated locally. Generic command execution is gone, package/build ownership is concrete, CI builds once, DMG/ZIP checksum creation and standalone verification stream artifact bytes incrementally, and all 199 files / 627 tests pass.**
+Status: **Completed and closed. Tasks #237 through #241 are implemented; trusted Electron security, Effect-native persistence, Effect-owned GameOwner concurrency, architecture-test cleanup, and single-pass desktop packaging are now canonical.**
 
 Next action:
 
-> Close #241 and the completed review epic #236, then return to the next product task.
+> Return to the current product roadmap and choose the next implementation slice; do not reopen the completed desktop boundary review without a new concrete regression.
 
 ## Source topology
 

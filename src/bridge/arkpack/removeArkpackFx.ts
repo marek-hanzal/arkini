@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 
@@ -16,8 +15,5 @@ export const removeArkpackFx = Effect.fn("removeArkpackFx")(function* ({
 	storage: providedStorage,
 }: removeArkpackFx.Props) {
 	const storage = providedStorage ?? (yield* createArkpackStorageFx());
-	return yield* Effect.tryPromise({
-		try: () => storage.remove(packageId),
-		catch: (cause) => cause,
-	}).pipe(Effect.ensuring(Effect.sync(() => providedStorage === undefined && storage.close())));
+	yield* storage.removeFx(packageId);
 });

@@ -1,7 +1,20 @@
 import { Effect } from "effect";
-import { DesktopGameSaveStorage } from "~/bridge/save/DesktopGameSaveStorage";
+import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import { invokeGameSaveTransportFx } from "~/bridge/save/invokeGameSaveTransportFx";
 
-/** Creates the renderer adapter for Arkini's mandatory Electron save capability. */
-export const createGameSaveStorageFx = Effect.fn("createGameSaveStorageFx")(() =>
-	Effect.sync(() => new DesktopGameSaveStorage()),
+export namespace createGameSaveStorageFx {
+	export interface Props {
+		readonly api?: Window["arkini"]["save"];
+	}
+}
+
+/** Adapts the typed preload Promise transport once into an Effect-native save capability. */
+export const createGameSaveStorageFx = Effect.fn("createGameSaveStorageFx")(
+	({ api = window.arkini.save }: createGameSaveStorageFx.Props = {}) =>
+		Effect.succeed({
+			readFx: (key) => invokeGameSaveTransportFx("read", () => api.read(key)),
+			clearFx: (key) => invokeGameSaveTransportFx("clear", () => api.clear(key)),
+			writeFx: (key, bytes) =>
+				invokeGameSaveTransportFx("write", () => api.write(key, bytes)),
+		} satisfies GameSaveStorage),
 );

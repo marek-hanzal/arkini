@@ -85,6 +85,12 @@ Do not create:
 
 Small files are acceptable when they make domain grammar predictable. Do not inline them merely to reduce file count.
 
+### Object and factory composition
+
+Arkini-owned reusable capabilities use readonly objects created by explicit Effect factories. Do not introduce project-owned classes, constructor-injected repositories, managers, services, adapters, or `new ProjectThing(...)` composition. State and dependencies belong in the closure of the owning factory; public behavior is exposed through narrow `*Fx` capability fields.
+
+External and framework constructors remain valid where their API requires them. Effect declaration forms such as `Data.TaggedError`, `Context.Tag`, and framework-owned classes are not project composition abstractions. Do not mechanically replace constructor injection with Layers or generic services unless a real scoped capability exists.
+
 ## 3. Domain ownership
 
 Code is organized by the domain that owns the concept.

@@ -1,5 +1,6 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { InMemoryArkpackStorage } from "~test/support/arkpack/InMemoryArkpackStorage";
+import { createInMemoryArkpackStorageFx } from "~test/support/arkpack/createInMemoryArkpackStorageFx";
 
 const descriptor = {
 	packageId: "a".repeat(64),
@@ -13,19 +14,19 @@ const descriptor = {
 	importedAtMs: 1,
 };
 
-describe("InMemoryArkpackStorage", () => {
+describe("createInMemoryArkpackStorageFx", () => {
 	it("keeps metadata listing separate from exact copied payload reads", async () => {
-		const storage = new InMemoryArkpackStorage();
+		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const bytes = new Uint8Array([
 			1,
 			2,
 			3,
 		]).buffer;
-		await storage.write(descriptor, bytes);
-		expect(await storage.list()).toEqual([
+		await Effect.runPromise(storage.writeFx(descriptor, bytes));
+		expect(await Effect.runPromise(storage.listFx)).toEqual([
 			descriptor,
 		]);
-		const loaded = await storage.read(descriptor.packageId);
+		const loaded = await Effect.runPromise(storage.readFx(descriptor.packageId));
 		expect(new Uint8Array(loaded?.bytes ?? new ArrayBuffer())).toEqual(
 			new Uint8Array([
 				1,
@@ -36,7 +37,8 @@ describe("InMemoryArkpackStorage", () => {
 		new Uint8Array(loaded?.bytes ?? new ArrayBuffer())[0] = 9;
 		expect(
 			new Uint8Array(
-				(await storage.read(descriptor.packageId))?.bytes ?? new ArrayBuffer(),
+				(await Effect.runPromise(storage.readFx(descriptor.packageId)))?.bytes ??
+					new ArrayBuffer(),
 			)[0],
 		).toBe(1);
 	});

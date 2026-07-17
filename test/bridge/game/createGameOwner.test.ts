@@ -116,6 +116,12 @@ const runCreateGame = async (props: createGameFx.Props) => {
 	throw Cause.squash(exit.cause);
 };
 
+const writeStoredSave = (storage: GameSaveStorage, key: GameSaveStorage.Key, bytes: Uint8Array) =>
+	Effect.runPromise(storage.writeFx(key, bytes));
+
+const readStoredSave = (storage: GameSaveStorage, key: GameSaveStorage.Key) =>
+	Effect.runPromise(storage.readFx(key));
+
 const createRealStorages = async () => {
 	const secondConfig = GameConfigSchema.parse({
 		...testArkpackConfig,
@@ -157,28 +163,28 @@ const createRealStorages = async () => {
 		]),
 	);
 	const arkpackStorage: ArkpackStorage = {
-		close: () => undefined,
-		list: async () => records.map(({ descriptor }) => descriptor),
-		read: async (packageId) => recordsById.get(packageId),
-		remove: async () => undefined,
-		write: async () => undefined,
+		listFx: Effect.succeed(records.map(({ descriptor }) => descriptor)),
+		readFx: (packageId) => Effect.succeed(recordsById.get(packageId)),
+		removeFx: () => Effect.void,
+		writeFx: () => Effect.void,
 	};
 	const saveKey = ({ packageId, contentHash }: GameSaveStorage.Key) =>
 		`${packageId}:${contentHash}`;
 	const saves = new Map<string, Uint8Array>();
 	const clearedKeys: GameSaveStorage.Key[] = [];
 	const saveStorage: GameSaveStorage = {
-		close: () => undefined,
-		read: async (key) => saves.get(saveKey(key))?.slice() ?? null,
-		clear: async (key) => {
-			clearedKeys.push({
-				...key,
-			});
-			saves.delete(saveKey(key));
-		},
-		write: async (key, bytes) => {
-			saves.set(saveKey(key), bytes.slice());
-		},
+		readFx: (key) => Effect.sync(() => saves.get(saveKey(key))?.slice() ?? null),
+		clearFx: (key) =>
+			Effect.sync(() => {
+				clearedKeys.push({
+					...key,
+				});
+				saves.delete(saveKey(key));
+			}),
+		writeFx: (key, bytes) =>
+			Effect.sync(() => {
+				saves.set(saveKey(key), bytes.slice());
+			}),
 	};
 	const firstDescriptor = records[0]?.descriptor;
 	const secondDescriptor = records[1]?.descriptor;
@@ -508,7 +514,7 @@ describe("createGameOwnerFx", () => {
 	it("hard resets a real selected package by discarding, clearing its exact save and booting fresh", async () => {
 		const storages = await createRealStorages();
 		const owner = createGameOwner({
-			clearSave: (key) => storages.saveStorage.clear(key),
+			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
 			create: (packageId) =>
 				runCreateGame({
 					packageId,
@@ -550,7 +556,7 @@ describe("createGameOwnerFx", () => {
 	it("keeps real package saves isolated while switching through one serialized owner", async () => {
 		const storages = await createRealStorages();
 		const owner = createGameOwner({
-			clearSave: (key) => storages.saveStorage.clear(key),
+			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
 			create: (packageId) =>
 				runCreateGame({
 					packageId,
@@ -726,9 +732,9 @@ describe("createGameOwnerFx", () => {
 
 	it("retains an exact recovery key for malformed durable save bytes", async () => {
 		const storages = await createRealStorages();
-		await storages.saveStorage.write(storages.firstSaveKey, Uint8Array.of(0xc1));
+		await writeStoredSave(storages.saveStorage, storages.firstSaveKey, Uint8Array.of(0xc1));
 		const owner = createGameOwner({
-			clearSave: (key) => storages.saveStorage.clear(key),
+			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
 			create: (packageId) =>
 				runCreateGame({
 					packageId,
@@ -756,7 +762,8 @@ describe("createGameOwnerFx", () => {
 			contentHash: "other-content-hash",
 		};
 		const untouchedBytes = Uint8Array.of(1, 2, 3, 4);
-		await storages.saveStorage.write(
+		await writeStoredSave(
+			storages.saveStorage,
 			storages.firstSaveKey,
 			encode({
 				namespace: "arkini",
@@ -764,10 +771,10 @@ describe("createGameOwnerFx", () => {
 				state: {},
 			}),
 		);
-		await storages.saveStorage.write(otherHashKey, untouchedBytes);
-		await storages.saveStorage.write(storages.secondSaveKey, untouchedBytes);
+		await writeStoredSave(storages.saveStorage, otherHashKey, untouchedBytes);
+		await writeStoredSave(storages.saveStorage, storages.secondSaveKey, untouchedBytes);
 		const owner = createGameOwner({
-			clearSave: (key) => storages.saveStorage.clear(key),
+			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
 			create: (packageId) =>
 				runCreateGame({
 					packageId,
@@ -791,14 +798,17 @@ describe("createGameOwnerFx", () => {
 			storages.firstSaveKey,
 		]);
 		expect(expectReady(owner).arkpack.packageId).toBe(storages.packageId);
-		expect(await storages.saveStorage.read(otherHashKey)).toEqual(untouchedBytes);
-		expect(await storages.saveStorage.read(storages.secondSaveKey)).toEqual(untouchedBytes);
+		expect(await readStoredSave(storages.saveStorage, otherHashKey)).toEqual(untouchedBytes);
+		expect(await readStoredSave(storages.saveStorage, storages.secondSaveKey)).toEqual(
+			untouchedBytes,
+		);
 		await runOwnerFx(owner.replaceFx(null));
 	});
 
 	it("offers the same exact recovery for schema-valid state that fails hydration", async () => {
 		const storages = await createRealStorages();
-		await storages.saveStorage.write(
+		await writeStoredSave(
+			storages.saveStorage,
 			storages.firstSaveKey,
 			encode({
 				namespace: "arkini",
@@ -826,7 +836,7 @@ describe("createGameOwnerFx", () => {
 			}),
 		);
 		const owner = createGameOwner({
-			clearSave: (key) => storages.saveStorage.clear(key),
+			clearSave: (key) => Effect.runPromise(storages.saveStorage.clearFx(key)),
 			create: (packageId) =>
 				runCreateGame({
 					packageId,

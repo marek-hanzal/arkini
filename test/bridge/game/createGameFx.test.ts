@@ -28,24 +28,25 @@ const createStorages = async () => {
 		bytes: bytes.slice().buffer,
 	};
 	const arkpackStorage: ArkpackStorage = {
-		close: () => undefined,
-		list: async () => [
+		listFx: Effect.succeed([
 			record.descriptor,
-		],
-		read: async (packageId) => (packageId === record.descriptor.packageId ? record : undefined),
-		remove: async () => undefined,
-		write: async () => undefined,
+		]),
+		readFx: (packageId) =>
+			Effect.succeed(packageId === record.descriptor.packageId ? record : undefined),
+		removeFx: () => Effect.void,
+		writeFx: () => Effect.void,
 	};
 	let saved: Uint8Array | null = null;
 	const saveStorage: GameSaveStorage = {
-		close: () => undefined,
-		read: async () => saved?.slice() ?? null,
-		clear: async () => {
-			saved = null;
-		},
-		write: async (_key, bytes) => {
-			saved = bytes.slice();
-		},
+		readFx: () => Effect.sync(() => saved?.slice() ?? null),
+		clearFx: () =>
+			Effect.sync(() => {
+				saved = null;
+			}),
+		writeFx: (_key, bytes) =>
+			Effect.sync(() => {
+				saved = bytes.slice();
+			}),
 	};
 	return {
 		arkpackStorage,
@@ -118,11 +119,12 @@ describe("createGameFx", () => {
 		let writes = 0;
 		const saveStorage: GameSaveStorage = {
 			...storages.saveStorage,
-			write: async (key, bytes) => {
-				writes += 1;
-				if (writes === 1) throw failure;
-				await storages.saveStorage.write(key, bytes);
-			},
+			writeFx: (key, bytes) =>
+				Effect.suspend(() => {
+					writes += 1;
+					if (writes === 1) return Effect.fail(failure);
+					return storages.saveStorage.writeFx(key, bytes);
+				}),
 		};
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		const game = await Effect.runPromise(
@@ -186,9 +188,7 @@ describe("createGameFx", () => {
 		const storages = await createStorages();
 		const saveStorage: GameSaveStorage = {
 			...storages.saveStorage,
-			write: async () => {
-				throw new Error("disk still full");
-			},
+			writeFx: () => Effect.fail(new Error("disk still full")),
 		};
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		const game = await Effect.runPromise(
@@ -242,10 +242,11 @@ describe("createGameFx", () => {
 		const storages = await createStorages();
 		const corruptStorage: ArkpackStorage = {
 			...storages.arkpackStorage,
-			read: async () => ({
-				descriptor: storages.descriptor,
-				bytes: Uint8Array.of(1, 2, 3).buffer,
-			}),
+			readFx: () =>
+				Effect.succeed({
+					descriptor: storages.descriptor,
+					bytes: Uint8Array.of(1, 2, 3).buffer,
+				}),
 		};
 		const exit = await Effect.runPromiseExit(
 			createGameFx({

@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Review #236, task #237: trusted Electron renderer boundary**
+**Review #236, task #238: Effect-native desktop persistence**
 
-Status: **Completed locally and fully validated. Electron navigation, redirects, subframes, webviews, permissions, privileged IPC, lifecycle IPC, and packaged/development CSP share one trusted-renderer policy.**
+Status: **Implemented and fully validated locally. Renderer Arkpack/save capabilities and Electron-main filesystem persistence are Effect-native object factories; Promise remains only at typed IPC transport, class repositories/adapters and no-op close contracts are removed.**
 
 Next action:
 
-> Close #237, downgrade review epic #236 from P1 to P2, then continue with #238 Effect-native persistence.
+> Close #238, then continue with #239 Effect-owned GameOwner concurrency.
 
 ## Source topology
 
@@ -30,6 +30,7 @@ Next action:
 - `/` is the local Arkpack selector and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
 - One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP; development adds only the exact HMR WebSocket endpoint.
+- Arkpack and save persistence use narrow Effect-native object capabilities on both sides of typed IPC. Renderer adaptation from `ipcRenderer.invoke` happens once in domain transport operations; Electron handlers authorize once and run Effect-native `@effect/platform` filesystem operations through `ElectronMainRuntime`. No project-owned persistence classes or no-op close lifecycle remain.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one validated selector; uploads never leave the device.

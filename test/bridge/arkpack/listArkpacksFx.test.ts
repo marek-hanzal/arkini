@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
@@ -24,17 +23,23 @@ afterEach(() => {
 describe("listArkpacksFx", () => {
 	it("lists official and imported metadata without reading either package payload", async () => {
 		const fetch = vi.fn();
+		const list = vi.fn();
+		const read = vi.fn();
 		vi.stubGlobal("fetch", fetch);
 		const storage: ArkpackStorage = {
-			close: vi.fn(),
-			list: vi.fn().mockResolvedValue([
-				imported,
-			]),
-			read: vi.fn(() => {
-				throw new Error("catalog listing must not read an exact payload");
+			listFx: Effect.sync(() => {
+				list();
+				return [
+					imported,
+				];
 			}),
-			remove: vi.fn(),
-			write: vi.fn(),
+			readFx: () =>
+				Effect.sync(() => {
+					read();
+					throw new Error("catalog listing must not read an exact payload");
+				}),
+			removeFx: () => Effect.void,
+			writeFx: () => Effect.void,
 		};
 
 		await expect(
@@ -48,7 +53,7 @@ describe("listArkpacksFx", () => {
 			imported,
 		]);
 		expect(fetch).not.toHaveBeenCalled();
-		expect(storage.list).toHaveBeenCalledOnce();
-		expect(storage.read).not.toHaveBeenCalled();
+		expect(list).toHaveBeenCalledOnce();
+		expect(read).not.toHaveBeenCalled();
 	});
 });

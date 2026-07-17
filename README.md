@@ -180,6 +180,8 @@ The router uses standard history routing. The package selector is `/` and a sele
 
 Electron treats the renderer as one explicit trusted security boundary. Development accepts only the configured loopback Vite origin; packaged builds ignore development renderer environment overrides and accept only `arkini://app/*`. External navigation, redirects, subframes, webviews, popups, and Chromium permission requests are denied. Every Arkpack, save, appearance, and lifecycle IPC request must come from the registered Arkini `BrowserWindow`, its exact `webContents`, and its trusted main frame. Packaged protocol responses carry a restrictive CSP; the development server uses the same policy with only the exact HMR WebSocket origin added.
 
+Arkpack and game-save persistence are Effect-native inside the renderer bridge and Electron main. Promise is used only by the typed preload/IPC transport. Main filesystem behavior is composed from narrow object factories over `@effect/platform`; there are no project-owned repository/storage classes or no-op close contracts.
+
 Packaged renderer assets are rooted through `<base href="/">`; `npm run build` verifies the generated asset graph from `/`, `/game/$packageId`, and nested `/dev/**` routes before succeeding.
 
 ## macOS packaging and prereleases

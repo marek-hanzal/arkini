@@ -53,10 +53,7 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 
 	const storage = providedStorage ?? (yield* createArkpackStorageFx());
 	return yield* Effect.gen(function* () {
-		const record = yield* Effect.tryPromise({
-			try: () => storage.read(packageId),
-			catch: (cause) => cause,
-		});
+		const record = yield* storage.readFx(packageId);
 		if (record === undefined) {
 			return yield* Effect.fail(new Error(`Arkpack ${packageId} is not installed.`));
 		}
@@ -72,5 +69,5 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 			);
 		}
 		return loaded;
-	}).pipe(Effect.ensuring(Effect.sync(() => providedStorage === undefined && storage.close())));
+	});
 });

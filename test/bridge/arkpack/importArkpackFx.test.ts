@@ -3,16 +3,16 @@ import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
-import { InMemoryArkpackStorage } from "~test/support/arkpack/InMemoryArkpackStorage";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import {
 	createTestArkpack,
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
+import { createInMemoryArkpackStorageFx } from "~test/support/arkpack/createInMemoryArkpackStorageFx";
 
 describe("importArkpackFx", () => {
 	it("persists only a fully validated binary and exact load revalidates it", async () => {
-		const storage = new InMemoryArkpackStorage();
+		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const bytes = createTestArkpack();
 		const descriptor = await Effect.runPromise(
 			importArkpackFx({
@@ -32,7 +32,7 @@ describe("importArkpackFx", () => {
 	});
 
 	it("leaves no catalog or payload record after validation fails", async () => {
-		const storage = new InMemoryArkpackStorage();
+		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const invalid = {
 			...testArkpackConfig,
 			items: {
@@ -73,6 +73,6 @@ describe("importArkpackFx", () => {
 				}),
 			),
 		).rejects.toBeDefined();
-		expect(await storage.list()).toEqual([]);
+		expect(await Effect.runPromise(storage.listFx)).toEqual([]);
 	});
 });

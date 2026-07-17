@@ -1,3 +1,4 @@
+import { NodeContext } from "@effect/platform-node";
 import { createHash } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -163,10 +164,10 @@ describe("registerArkiniDesktopIpcFx", () => {
 		};
 
 		try {
-			Effect.runSync(
+			await Effect.runPromise(
 				registerArkiniDesktopIpcFx({
 					trustedRenderer,
-				}),
+				}).pipe(Effect.provide(NodeContext.layer)),
 			);
 			expect(Array.from(electronHarness.handlers.keys()).sort()).toEqual(
 				Array.from(invokeArguments.keys()).sort(),

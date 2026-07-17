@@ -43,7 +43,6 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		Effect.sync(() => {
 			for (const url of resourceUrls.values()) URL.revokeObjectURL(url);
 			resourceUrls.clear();
-			if (providedSaveStorage === undefined) saveStorage.close();
 		}),
 	);
 	const releaseResourcesFx = Scope.close(resourceScope, Exit.void);
@@ -57,10 +56,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			packageId: loaded.descriptor.packageId,
 			contentHash: loaded.descriptor.contentHash,
 		};
-		const savedBytes = yield* Effect.tryPromise({
-			try: () => saveStorage.read(saveKey),
-			catch: (cause) => cause,
-		});
+		const savedBytes = yield* saveStorage.readFx(saveKey);
 		const state =
 			savedBytes === null
 				? undefined
@@ -83,12 +79,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			save: {
 				write: (nextState) =>
 					encodeArkiniSaveFx(nextState).pipe(
-						Effect.flatMap((bytes) =>
-							Effect.tryPromise({
-								try: () => saveStorage.write(saveKey, bytes),
-								catch: (cause) => cause,
-							}),
-						),
+						Effect.flatMap((bytes) => saveStorage.writeFx(saveKey, bytes)),
 					),
 			},
 		}).pipe(

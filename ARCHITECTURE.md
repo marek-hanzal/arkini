@@ -229,6 +229,19 @@ Electron stores the resulting MessagePack bytes opaquely. Writes sync `pending.a
 
 Product runtime always uses the Electron filesystem capabilities exposed by preload. Process-local in-memory adapters exist only as explicit test doubles under `test/support`; runtime never selects them automatically.
 
+Persistence is Effect-native on both sides of the IPC transport:
+
+```text
+renderer domain Effect
+→ ArkpackStorage / GameSaveStorage Effect capability
+→ one typed preload Promise invocation
+→ trusted Electron IPC handler
+→ one ElectronMainRuntime execution
+→ Effect-native filesystem capability
+```
+
+Promise exists only as the Electron IPC transport contract. Main-process package/save logic uses `@effect/platform` filesystem operations; renderer domain operations consume Effects directly. Arkini-owned persistence uses object + factory composition, has no repository/storage classes, and exposes no no-op `close()` lifecycle.
+
 ## 5. Runtime and event subscriptions
 
 Each external listener owns its own scoped current-plus-tail subscription.

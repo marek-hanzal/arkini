@@ -15,8 +15,5 @@ export const deleteGameSaveFx = Effect.fn("deleteGameSaveFx")(function* ({
 	storage: providedStorage,
 }: deleteGameSaveFx.Props) {
 	const storage = providedStorage ?? (yield* createGameSaveStorageFx());
-	return yield* Effect.tryPromise({
-		try: () => storage.clear(key),
-		catch: (cause) => cause,
-	}).pipe(Effect.ensuring(Effect.sync(() => providedStorage === undefined && storage.close())));
+	yield* storage.clearFx(key);
 });

@@ -55,13 +55,13 @@ describe("Electron-only product boundary", () => {
 	});
 
 	it("keeps in-memory repositories confined to explicit test support", () => {
-		expect(existsSync("test/support/arkpack/InMemoryArkpackStorage.ts")).toBe(true);
-		expect(existsSync("test/support/save/InMemoryGameSaveStorage.ts")).toBe(true);
-		expect(read("test/support/arkpack/InMemoryArkpackStorage.ts")).toContain(
-			"never selected by product runtime",
+		expect(existsSync("test/support/arkpack/createInMemoryArkpackStorageFx.ts")).toBe(true);
+		expect(existsSync("test/support/save/createInMemoryGameSaveStorageFx.ts")).toBe(true);
+		expect(read("test/support/arkpack/createInMemoryArkpackStorageFx.ts")).toContain(
+			"tests only",
 		);
-		expect(read("test/support/save/InMemoryGameSaveStorage.ts")).toContain(
-			"never selected by product runtime",
+		expect(read("test/support/save/createInMemoryGameSaveStorageFx.ts")).toContain(
+			"tests only",
 		);
 	});
 });

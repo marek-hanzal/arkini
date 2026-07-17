@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
@@ -16,14 +15,9 @@ export const listArkpacksFx = Effect.fn("listArkpacksFx")(function* (
 	props: listArkpacksFx.Props = {},
 ) {
 	const storage = props.storage ?? (yield* createArkpackStorageFx());
-	return yield* Effect.gen(function* () {
-		const imported = yield* Effect.tryPromise({
-			try: () => storage.list(),
-			catch: (cause) => cause,
-		});
-		return [
-			ArkiniArkpack.descriptor,
-			...imported,
-		] satisfies ReadonlyArray<ArkpackDescriptor>;
-	}).pipe(Effect.ensuring(Effect.sync(() => props.storage === undefined && storage.close())));
+	const imported = yield* storage.listFx;
+	return [
+		ArkiniArkpack.descriptor,
+		...imported,
+	] satisfies ReadonlyArray<ArkpackDescriptor>;
 });

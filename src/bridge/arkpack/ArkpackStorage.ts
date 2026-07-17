@@ -1,3 +1,4 @@
+import type { Effect } from "effect";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 
 export namespace ArkpackStorage {
@@ -7,11 +8,15 @@ export namespace ArkpackStorage {
 	}
 }
 
-/** Durable storage contract with metadata-only listing and exact binary reads. */
+/** Effect-native renderer capability for installed Arkpack persistence. */
 export interface ArkpackStorage {
-	readonly close: () => void;
-	readonly list: () => Promise<ReadonlyArray<ArkpackDescriptor>>;
-	readonly read: (packageId: string) => Promise<ArkpackStorage.LoadedRecord | undefined>;
-	readonly remove: (packageId: string) => Promise<void>;
-	readonly write: (descriptor: ArkpackDescriptor, bytes: ArrayBuffer) => Promise<void>;
+	readonly listFx: Effect.Effect<ReadonlyArray<ArkpackDescriptor>, unknown>;
+	readonly readFx: (
+		packageId: string,
+	) => Effect.Effect<ArkpackStorage.LoadedRecord | undefined, unknown>;
+	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown>;
+	readonly writeFx: (
+		descriptor: ArkpackDescriptor,
+		bytes: ArrayBuffer,
+	) => Effect.Effect<void, unknown>;
 }

@@ -1,3 +1,5 @@
+import type { Effect } from "effect";
+
 export namespace GameSaveStorage {
 	export interface Key {
 		readonly packageId: string;
@@ -5,10 +7,9 @@ export namespace GameSaveStorage {
 	}
 }
 
-/** Opaque durable save-byte storage isolated from codecs and game semantics. */
+/** Effect-native renderer capability for opaque save-byte persistence. */
 export interface GameSaveStorage {
-	readonly close: () => void;
-	readonly read: (key: GameSaveStorage.Key) => Promise<Uint8Array | null>;
-	readonly clear: (key: GameSaveStorage.Key) => Promise<void>;
-	readonly write: (key: GameSaveStorage.Key, bytes: Uint8Array) => Promise<void>;
+	readonly readFx: (key: GameSaveStorage.Key) => Effect.Effect<Uint8Array | null, unknown>;
+	readonly clearFx: (key: GameSaveStorage.Key) => Effect.Effect<void, unknown>;
+	readonly writeFx: (key: GameSaveStorage.Key, bytes: Uint8Array) => Effect.Effect<void, unknown>;
 }

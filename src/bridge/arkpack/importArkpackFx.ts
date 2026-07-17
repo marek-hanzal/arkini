@@ -27,10 +27,7 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 			importedAtMs,
 			source: "imported",
 		});
-		yield* Effect.tryPromise({
-			try: () => storage.write(loaded.descriptor, bytes.slice().buffer),
-			catch: (cause) => cause,
-		});
+		yield* storage.writeFx(loaded.descriptor, bytes.slice().buffer);
 		return loaded.descriptor;
-	}).pipe(Effect.ensuring(Effect.sync(() => providedStorage === undefined && storage.close())));
+	});
 });

@@ -4,13 +4,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Desktop boundary follow-up review #236**
+**Desktop packaged preview #245**
 
-Status: **Complete after #242. Trusted renderer, Effect-native persistence, explicit GameOwner lifecycle, semantic enforcement, and clean-checkout delivery are all closed.**
+Status: **Complete. Fresh-checkout build, unpacked macOS preview orchestration, and release stage reuse are implemented and validated.**
 
 Next action:
 
-> Return to gameplay implementation. Define the next playable vertical slice before opening another infrastructure epic. Arkpack signing #210 and review codebook #209 remain intentionally deferred.
+> Return to gameplay implementation. Define the next playable vertical slice. Arkpack signing #210 and review codebook #209 remain intentionally deferred.
 
 ## Source topology
 
@@ -54,7 +54,7 @@ Next action:
 - Appearance is a UI/platform preference, never gameplay state. `src/ui/styles.css` is the sole semantic color-token source; active UI uses semantic Tailwind utilities and no palette-specific `dark:` branches. The stored mode is `dark | light | system`; absent or malformed preference data resolves to dark, and system is followed only when explicitly selected. Electron `nativeTheme` and renderer `color-scheme` stay aligned without another resolved-theme store.
 - `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
-- `npm run package:mac` is the sole local distribution path. It packs/builds once, stages only `out/**` plus a minimal dependency-free manifest, invokes one concrete `electron-builder` macOS operation, streams each large artifact once to create `SHA256SUMS`, and verifies artifact/app structure without rehashing. Standalone `desktop verify` re-streams artifacts when validating downloads or later changes.
+- Every production desktop build owns `packOfficialGameFx → buildDesktopOutputFx`, so renderer consumers never require a stale ignored Arkpack. `npm run preview:macos` cleans, builds once, stages, creates only `release/mac-arm64/Arkini.app` through `electron-builder --dir`, prints the exact path, and launches that bundle. `npm run package:mac` reuses the same one-time build stage, then creates DMG/ZIP, streams each large artifact once into `SHA256SUMS`, and verifies artifact/app structure without rehashing. Standalone `desktop verify` re-streams artifacts when validating downloads or later changes.
 - `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Format, type, and source-validation gates run before packaging; Dependency Cruiser and permanent tests run afterward against the generated package inputs. The official pack and renderer build therefore occur once in the delivery path without relying on stale ignored output. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.
 - The repository toolchain is pinned to Node `24.18.0`, npm `11.16.0`, and `npm-run-all2` `9.0.2`; `.nvmrc`, `engines`, the lockfile, and GitHub Actions must stay aligned.
 - Effect execution has one explicit root per physical process: `ElectronMainRuntime` in Electron main, `RendererRuntime` in the renderer, and the standard `NodeRuntime.runMain` boundary for the canonical Arkini CLI. `RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR cannot create a second renderer root. Each live `Game` owns exactly one child session `ManagedRuntime`; no active source may create direct `Effect.run*` islands.

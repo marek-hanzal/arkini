@@ -166,9 +166,10 @@ Application commands:
 npm run dev
 npm run build
 npm run preview
+npm run preview:macos
 ```
 
-Arkini is an Electron-only product. `npm run dev` starts Electron with a Vite-powered renderer and HMR, `npm run build` produces the production Electron build, and `npm run preview` starts that existing build without repacking or rebuilding it. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an Electron-only product. `npm run dev` starts Electron with a Vite-powered renderer and HMR. `npm run build` first generates the official Arkpack and then produces the production Electron build, so it works from a fresh checkout. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old package output, performs the same one-time pack/build stages, creates `release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
 Appearance is renderer-owned and exposed through semantic Tailwind color utilities backed by one CSS token palette. The user may explicitly select `dark`, `light`, or `system`; a missing or malformed preference always starts in dark mode. Electron persists the selection under `userData/arkini/preferences`, applies the same mode through `nativeTheme`, and exposes no browser-storage settings path.
 
@@ -185,6 +186,14 @@ Arkpack and game-save persistence are Effect-native inside the renderer bridge a
 Packaged renderer assets are rooted through `<base href="/">`; `npm run build` verifies the generated asset graph from `/`, `/game/$packageId`, and nested `/dev/**` routes before succeeding.
 
 ## macOS packaging and prereleases
+
+For a packaged local smoke test without release archives, run:
+
+```bash
+npm run preview:macos
+```
+
+This canonical Effect CLI command generates the official Arkpack once, builds Electron once, stages the production app, creates only the unpacked arm64 `release/mac-arm64/Arkini.app`, prints its path, and launches that exact bundle with macOS `open`. It does not create DMG, ZIP, checksums, signing, notarization, or release assets.
 
 The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:
 
@@ -252,7 +261,7 @@ npm run game:pack
 
 - `game:schema` writes the authoring JSON Schema to `game/schema.json`.
 - `game:validate` runs the canonical compiler and all diagnostics.
-- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` plus its tracked metadata sidecar. `dev` and `build` regenerate the ignored binary and refresh the sidecar. The local `check` order builds before Dependency Cruiser, and the macOS delivery workflow packages before Dependency Cruiser, so fresh checkouts never depend on stale generated output.
+- `game:pack` validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` plus its tracked metadata sidecar. `dev` prepares the same generated input before the development server starts. The canonical desktop build operation owns `packOfficialGameFx → buildDesktopOutputFx`, so `build`, `preview:macos`, and `package:mac` each generate the ignored binary exactly once before any renderer build that imports it. The local `check` order builds before Dependency Cruiser, and the macOS delivery workflow packages before Dependency Cruiser, so fresh checkouts never depend on stale generated output.
 
 The compiler, validator, tests, and packer must never assemble different versions of the game configuration.
 

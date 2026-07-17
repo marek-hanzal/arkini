@@ -53,7 +53,7 @@ const runNpmScript = async (cwd: string, script: string) => {
 };
 
 describe("fresh checkout desktop delivery inputs", () => {
-	it("packs the ignored official Arkpack before dependency analysis consumes it", async () => {
+	it("builds from a clean checkout before dependency analysis consumes generated inputs", async () => {
 		const workspace = await mkdtemp(join(tmpdir(), "arkini-clean-delivery-"));
 		try {
 			await copyTrackedWorkspace(workspace);
@@ -61,9 +61,11 @@ describe("fresh checkout desktop delivery inputs", () => {
 				code: "ENOENT",
 			});
 
-			await runNpmScript(workspace, "game:pack");
+			await runNpmScript(workspace, "build");
 			const packed = await stat(join(workspace, "game/arkini.game.arkpack"));
 			expect(packed.isFile()).toBe(true);
+			const renderer = await stat(join(workspace, "out/renderer/index.html"));
+			expect(renderer.isFile()).toBe(true);
 			await runNpmScript(workspace, "dc");
 		} finally {
 			await rm(workspace, {

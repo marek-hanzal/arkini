@@ -30,6 +30,7 @@ describe("Arkini Effect CLI", () => {
 		expect(output).toContain("desktop clean");
 		expect(output).toContain("desktop stage");
 		expect(output).toContain("desktop package [--arch arm64]");
+		expect(output).toContain("desktop preview-macos");
 		expect(output).toContain("desktop checksums");
 		expect(output).toContain("desktop verify");
 		expect(output).not.toContain("desktop desktop");

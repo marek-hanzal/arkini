@@ -11,6 +11,7 @@
 		"dev": "electron-vite dev",
 		"build": "tsx cli/arkini.ts desktop build",
 		"preview": "electron-vite preview",
+		"preview:macos": "tsx cli/arkini.ts desktop preview-macos",
 		"typecheck:src": "tsc -p tsconfig.json --noEmit --noUnusedLocals --noUnusedParameters",
 		"typecheck:test": "tsc -p tsconfig.test.json --noEmit --noUnusedLocals --noUnusedParameters",
 		"typecheck:electron": "tsc -p tsconfig.electron.json --noEmit --noUnusedLocals --noUnusedParameters",

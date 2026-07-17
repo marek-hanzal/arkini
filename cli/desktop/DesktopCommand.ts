@@ -3,6 +3,7 @@ import { DesktopBuildCommand } from "./DesktopBuildCommand";
 import { DesktopChecksumsCommand } from "./DesktopChecksumsCommand";
 import { DesktopCleanCommand } from "./DesktopCleanCommand";
 import { DesktopPackageCommand } from "./DesktopPackageCommand";
+import { DesktopPreviewMacosCommand } from "./DesktopPreviewMacosCommand";
 import { DesktopStageCommand } from "./DesktopStageCommand";
 import { DesktopVerifyCommand } from "./DesktopVerifyCommand";
 
@@ -13,6 +14,7 @@ export const DesktopCommand = Command.make("desktop")
 			DesktopCleanCommand,
 			DesktopStageCommand,
 			DesktopPackageCommand,
+			DesktopPreviewMacosCommand,
 			DesktopChecksumsCommand,
 			DesktopVerifyCommand,
 		]),

@@ -4,21 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Development renderer CSP #267**
+**Native router View Transitions #268**
 
-Status: **Complete. Development now uses one parsed loopback renderer URL, one URL-derived HMR endpoint, and one per-server Vite CSP nonce; packaged CSP and trusted renderer authorization remain strict.**
+Status: **Complete. The canonical TanStack Router enables the browser-native default View Transition with normal fallback and no project-owned animation layer.**
 
 Current scope:
 
-- one canonical `http://127.0.0.1:4040/` development URL parsed by shared security code;
-- trusted-renderer startup rejects credentials, non-loopback origins, alternate ports/hosts, and path/query/fragment variants;
-- development CSP permits only same-origin resources, the exact derived `vite-hmr` WebSocket endpoint, and scripts carrying the current server nonce;
-- Vite receives the same nonce through `html.cspNonce`, so the React Refresh preamble loads without `unsafe-inline` or `unsafe-eval`;
-- production `arkini://app` CSP is unchanged and receives no development nonce or WebSocket source.
+- `defaultViewTransition: true` lives only in `createArkiniRouter`;
+- supported browsers use `document.startViewTransition` for router commits;
+- unsupported browsers perform the same navigation update without error;
+- there are no route-specific transition types, names, timers, React state, engine API, or reduced-motion branch;
+- direct loads, launcher redirects, and GameOwner lifecycle behavior remain unchanged.
 
 Next action:
 
-> Return to the next playable gameplay slice. Arkpack signing #210 and review codebook #209 remain intentionally deferred.
+> Evaluate the native transition during ordinary use. Add custom styling only through a separate narrowly justified task.
 
 ## Source topology
 

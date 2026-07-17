@@ -7,6 +7,7 @@ export const createArkiniRouter = (context: RootPage.Context) =>
 		routeTree,
 		context,
 		defaultPreload: "intent",
+		defaultViewTransition: true,
 		scrollRestoration: true,
 	});
 

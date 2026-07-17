@@ -53,7 +53,7 @@ describe("createGameSessionFx", () => {
 			expect(notifications).toBe(0);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -103,7 +103,7 @@ describe("createGameSessionFx", () => {
 			}
 		} finally {
 			releasePlanning?.();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -170,7 +170,7 @@ describe("createGameSessionFx", () => {
 			}
 		} finally {
 			releasePlanning?.();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -208,7 +208,7 @@ describe("createGameSessionFx", () => {
 			await waitFor(() => notifications === 1);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -246,7 +246,7 @@ describe("createGameSessionFx", () => {
 				unsubscribe();
 			}
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -299,7 +299,7 @@ describe("createGameSessionFx", () => {
 				unsubscribe();
 			}
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -326,7 +326,7 @@ describe("createGameSessionFx", () => {
 		} finally {
 			unsubscribeRuntime();
 			unsubscribeEvents();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -350,7 +350,7 @@ describe("createGameSessionFx", () => {
 			expect(notifications).toBe(0);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -382,7 +382,7 @@ describe("createGameSessionFx", () => {
 			expect(observedStartedJob).toBe(true);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -429,7 +429,7 @@ describe("createGameSessionFx", () => {
 		} finally {
 			unsubscribeRuntime();
 			unsubscribeEvents();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -485,7 +485,7 @@ describe("createGameSessionFx", () => {
 		} finally {
 			nestedUnsubscribe?.();
 			unsubscribeRuntime();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -505,7 +505,7 @@ describe("createGameSessionFx", () => {
 			await new Promise((resolve) => setTimeout(resolve, 20));
 			expect(notifications).toBe(0);
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -556,7 +556,7 @@ describe("createGameSessionFx", () => {
 			unsubscribePending();
 			unsubscribeHealthy();
 			unsubscribeEvents();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -599,7 +599,7 @@ describe("createGameSessionFx", () => {
 
 		try {
 			await Effect.runPromise(Deferred.await(planningEntered));
-			const disposing = session.dispose();
+			const disposing = Effect.runPromise(session.disposeFx);
 
 			await expect(pending).rejects.toBeDefined();
 			await disposing;
@@ -608,7 +608,7 @@ describe("createGameSessionFx", () => {
 		} finally {
 			unsubscribeRuntime();
 			unsubscribeEvents();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -660,7 +660,7 @@ describe("createGameSessionFx", () => {
 			]);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -718,7 +718,7 @@ describe("createGameSessionFx", () => {
 			unsubscribeHealthyRuntime();
 			unsubscribeRejectedEvent();
 			unsubscribeHealthyEvent();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -764,13 +764,13 @@ describe("createGameSessionFx", () => {
 			delete (config.items as Record<string, unknown>).inventoryOutput;
 
 			await waitFor(() => reports >= 2, 2_000);
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 			await new Promise((resolve) => setTimeout(resolve, 20));
 			expect(reports).toBeGreaterThanOrEqual(2);
 			expect(unhandledRejections).toEqual([]);
 		} finally {
 			process.off("unhandledRejection", onUnhandledRejection);
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -806,7 +806,9 @@ describe("createGameSessionFx", () => {
 			}),
 		);
 
-		await expect(session.dispose()).rejects.toThrow("save target unavailable");
+		await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow(
+			"save target unavailable",
+		);
 		await expect(
 			session.run(
 				spawnItemFx({
@@ -823,7 +825,7 @@ describe("createGameSessionFx", () => {
 				}),
 			),
 		).rejects.toThrow("Game session is shutting down.");
-		await expect(session.dispose()).resolves.toBeUndefined();
+		await expect(Effect.runPromise(session.disposeFx)).resolves.toBeUndefined();
 		expect(writes).toBe(2);
 		expect(savedItemIds).toEqual([
 			[
@@ -846,9 +848,11 @@ describe("createGameSessionFx", () => {
 			},
 		});
 
-		await expect(session.dispose()).rejects.toThrow("save target unavailable");
-		await expect(session.disposeWithoutSave()).resolves.toBeUndefined();
-		await expect(session.disposeWithoutSave()).resolves.toBeUndefined();
+		await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow(
+			"save target unavailable",
+		);
+		await expect(Effect.runPromise(session.disposeWithoutSaveFx)).resolves.toBeUndefined();
+		await expect(Effect.runPromise(session.disposeWithoutSaveFx)).resolves.toBeUndefined();
 	});
 
 	it("runs the production Tick loop from Effect Clock and completes jobs", async () => {
@@ -879,7 +883,7 @@ describe("createGameSessionFx", () => {
 					),
 			).toBe(false);
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 });

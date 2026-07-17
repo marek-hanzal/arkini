@@ -114,7 +114,7 @@ describe("committed transition events", () => {
 			expect(batches).toEqual([]);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -196,7 +196,7 @@ describe("committed transition events", () => {
 		} finally {
 			releaseFirst?.();
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 });

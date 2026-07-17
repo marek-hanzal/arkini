@@ -48,10 +48,10 @@ describe("fromRuntimeFx", () => {
 						.map(({ id }) => id),
 				);
 			} finally {
-				await restored.disposeWithoutSave();
+				await Effect.runPromise(restored.disposeWithoutSaveFx);
 			}
 		} finally {
-			await first.disposeWithoutSave();
+			await Effect.runPromise(first.disposeWithoutSaveFx);
 		}
 	});
 });

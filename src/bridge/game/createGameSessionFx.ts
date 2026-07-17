@@ -1,10 +1,5 @@
-import { Effect, Exit, FiberSet, Layer, ManagedRuntime, Scope } from "effect";
+import { Deferred, Effect, Exit, FiberSet, Layer, ManagedRuntime, MutableRef, Scope } from "effect";
 
-import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
-import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
-import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import type { GameSession, GameSessionServices } from "~/bridge/game/GameSession";
 import {
 	type GameSessionTransitionSubscriptionCleanup,
@@ -12,6 +7,11 @@ import {
 } from "~/bridge/game/GameSessionTransitionSubscriptionsFx";
 import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/bridge/save/RuntimeSaveLayerFx";
+import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
+import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 export namespace createGameSessionFx {
 	export interface Props<SaveError = unknown> {
@@ -27,122 +27,186 @@ export namespace createGameSessionFx {
 	}
 }
 
+type SessionLifecycle =
+	| {
+			readonly type: "running";
+	  }
+	| {
+			readonly type: "disposing";
+			readonly result: Deferred.Deferred<void, unknown>;
+	  }
+	| {
+			readonly type: "frozen";
+	  }
+	| {
+			readonly type: "disposed";
+	  };
+
+type DisposeClaim =
+	| {
+			readonly type: "complete";
+	  }
+	| {
+			readonly type: "await";
+			readonly result: Deferred.Deferred<void, unknown>;
+	  }
+	| {
+			readonly type: "run";
+			readonly result: Deferred.Deferred<void, unknown>;
+	  };
+
 /** Creates one long-lived browser session shared by React, Tick, save and event consumers. */
-const createGameSession = async <SaveError>({
-	config,
-	state,
-	tickIntervalMs,
-	onTickError,
-	save,
-}: createGameSessionFx.Props<SaveError>): Promise<GameSession> => {
-	const sessionLayer = GameSessionLayerFx({
+export const createGameSessionFx = Effect.fn("createGameSessionFx")(
+	<SaveError>({
 		config,
 		state,
-		intervalMs: tickIntervalMs,
+		tickIntervalMs,
 		onTickError,
-	});
-	const saveLayer =
-		save === undefined
-			? Layer.succeed(RuntimeSaveFx, {
-					discard: Effect.void,
-					flush: Effect.void,
-				})
-			: RuntimeSaveLayerFx({
-					debounceMs: save.debounceMs,
-					onError: save.onError,
-					save: save.write,
-				}).pipe(Layer.provide(sessionLayer));
-	const layer = Layer.merge(sessionLayer, saveLayer);
-	const managed = ManagedRuntime.make(layer);
-	const sessionScope = await managed.runPromise(Scope.make());
-	const transitionSubscriptions = await managed.runPromise(
-		GameSessionTransitionSubscriptionsFx.pipe(Scope.extend(sessionScope)),
-	);
-	const runCommand = await managed.runPromise(
-		FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(sessionScope)),
-	);
-	let shutdownStarted = false;
-	let disposed = false;
-	let stopPromise: Promise<void> | undefined;
-	let disposePromise: Promise<void> | undefined;
+		save,
+	}: createGameSessionFx.Props<SaveError>) =>
+		Effect.gen(function* () {
+			const sessionLayer = GameSessionLayerFx({
+				config,
+				state,
+				intervalMs: tickIntervalMs,
+				onTickError,
+			});
+			const saveLayer =
+				save === undefined
+					? Layer.succeed(RuntimeSaveFx, {
+							discard: Effect.void,
+							flush: Effect.void,
+						})
+					: RuntimeSaveLayerFx({
+							debounceMs: save.debounceMs,
+							onError: save.onError,
+							save: save.write,
+						}).pipe(Layer.provide(sessionLayer));
+			const managed = ManagedRuntime.make(Layer.merge(sessionLayer, saveLayer));
+			const runManagedFx = <Result, Error>(
+				effect: Effect.Effect<Result, Error, GameSessionServices>,
+			): Effect.Effect<Result, unknown> =>
+				Effect.tryPromise({
+					try: () => managed.runPromise(effect),
+					catch: (cause) => cause,
+				});
+			const sessionScope = yield* runManagedFx(Scope.make());
+			const transitionSubscriptions = yield* runManagedFx(
+				GameSessionTransitionSubscriptionsFx.pipe(Scope.extend(sessionScope)),
+			);
+			const runCommand = yield* runManagedFx(
+				FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(sessionScope)),
+			);
+			const lifecycle = MutableRef.make<SessionLifecycle>({
+				type: "running",
+			});
+			const lifecycleLock = yield* Effect.makeSemaphore(1);
 
-	const flushSave = () =>
-		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)));
-	const discardSave = () =>
-		managed.runPromise(RuntimeSaveFx.pipe(Effect.flatMap((service) => service.discard)));
-	const stopGameLoop = () => {
-		if (stopPromise !== undefined) return stopPromise;
-		const pending = managed.runPromise(
-			GameLoopFx.pipe(Effect.flatMap((service) => service.stop)),
-		);
-		stopPromise = pending;
-		void pending.catch(() => {
-			if (stopPromise === pending) stopPromise = undefined;
-		});
-		return pending;
-	};
+			const flushSaveFx = runManagedFx(
+				RuntimeSaveFx.pipe(Effect.flatMap((service) => service.flush)),
+			);
+			const discardSaveFx = runManagedFx(
+				RuntimeSaveFx.pipe(Effect.flatMap((service) => service.discard)),
+			);
+			const stopGameLoopFx = runManagedFx(
+				GameLoopFx.pipe(Effect.flatMap((service) => service.stop)),
+			);
+			const releaseSessionFx = runManagedFx(Scope.close(sessionScope, Exit.void)).pipe(
+				Effect.zipRight(
+					Effect.tryPromise({
+						try: () => managed.dispose(),
+						catch: (cause) => cause,
+					}),
+				),
+			);
 
-	const disposeWithSaveMode = (saveMode: "flush" | "discard") => {
-		if (disposePromise !== undefined) return disposePromise;
-		if (disposed) return Promise.resolve();
+			const claimDisposeFx = lifecycleLock.withPermits(1)(
+				Effect.gen(function* () {
+					const current = MutableRef.get(lifecycle);
+					if (current.type === "disposed") {
+						return {
+							type: "complete",
+						} satisfies DisposeClaim;
+					}
+					if (current.type === "disposing") {
+						return {
+							type: "await",
+							result: current.result,
+						} satisfies DisposeClaim;
+					}
+					const result = yield* Deferred.make<void, unknown>();
+					MutableRef.set(lifecycle, {
+						type: "disposing",
+						result,
+					});
+					return {
+						type: "run",
+						result,
+					} satisfies DisposeClaim;
+				}),
+			);
 
-		shutdownStarted = true;
-		const pending = (async () => {
-			await stopGameLoop();
-			if (saveMode === "discard") await discardSave();
-			else await flushSave();
-			await managed.runPromise(Scope.close(sessionScope, Exit.void));
-			await managed.dispose();
-			disposed = true;
-		})();
-		disposePromise = pending;
-		void pending.catch(() => {
-			if (disposePromise === pending) disposePromise = undefined;
-		});
+			const disposeWithSaveModeFx = (saveMode: "flush" | "discard") =>
+				Effect.uninterruptibleMask((restore) =>
+					Effect.gen(function* () {
+						const claim = yield* claimDisposeFx;
+						if (claim.type === "complete") return;
+						if (claim.type === "await") {
+							return yield* restore(Deferred.await(claim.result));
+						}
 
-		return pending;
-	};
+						const attempt = stopGameLoopFx.pipe(
+							Effect.zipRight(saveMode === "discard" ? discardSaveFx : flushSaveFx),
+							Effect.zipRight(releaseSessionFx),
+						);
+						const exit = yield* Effect.exit(attempt);
+						yield* lifecycleLock.withPermits(1)(
+							Effect.sync(() => {
+								MutableRef.set(lifecycle, {
+									type: Exit.isSuccess(exit) ? "disposed" : "frozen",
+								});
+							}),
+						);
+						yield* Deferred.done(claim.result, exit);
+						if (Exit.isFailure(exit)) return yield* Effect.failCause(exit.cause);
+					}),
+				);
 
-	const dispose = () => disposeWithSaveMode("flush");
-	const disposeWithoutSave = () => disposeWithSaveMode("discard");
+			const ensureRunningFx = Effect.suspend(() => {
+				const current = MutableRef.get(lifecycle);
+				if (current.type === "disposed") {
+					return Effect.fail(new Error("Game session is disposed."));
+				}
+				if (current.type !== "running") {
+					return Effect.fail(new Error("Game session is shutting down."));
+				}
+				return Effect.void;
+			});
+			const openSubscription = (
+				effect: Effect.Effect<GameSessionTransitionSubscriptionCleanup>,
+			) => {
+				if (MutableRef.get(lifecycle).type !== "running") return () => undefined;
+				const cleanup = managed.runSync(effect);
+				let closed = false;
 
-	const openSubscription = (effect: Effect.Effect<GameSessionTransitionSubscriptionCleanup>) => {
-		const cleanup = managed.runSync(effect);
-		let closed = false;
+				return () => {
+					if (closed || MutableRef.get(lifecycle).type === "disposed") return;
+					closed = true;
+					managed.runSync(cleanup.shutdown);
+					managed.runFork(cleanup.release);
+				};
+			};
 
-		return () => {
-			if (closed || disposed) return;
-			closed = true;
-			managed.runSync(cleanup.shutdown);
-			managed.runFork(cleanup.release);
-		};
-	};
-
-	return {
-		dispose,
-		disposeWithoutSave,
-		flushSave,
-		getSnapshot: () => managed.runSync(readRuntimeFx()),
-		run: (effect) => {
-			if (disposed) return Promise.reject(new Error("Game session is disposed."));
-			if (shutdownStarted) return Promise.reject(new Error("Game session is shutting down."));
-			return runCommand(effect);
-		},
-		subscribe: (listener) => {
-			if (shutdownStarted || disposed) return () => undefined;
-			return openSubscription(transitionSubscriptions.subscribe(listener));
-		},
-		subscribeEvents: (listener) => {
-			if (shutdownStarted || disposed) return () => undefined;
-			return openSubscription(transitionSubscriptions.subscribeEvents(listener));
-		},
-	};
-};
-
-export const createGameSessionFx = Effect.fn("createGameSessionFx")(
-	<SaveError>(props: createGameSessionFx.Props<SaveError>) =>
-		Effect.tryPromise({
-			try: () => createGameSession(props),
-			catch: (cause) => cause,
+			return {
+				disposeFx: disposeWithSaveModeFx("flush"),
+				disposeWithoutSaveFx: disposeWithSaveModeFx("discard"),
+				flushSaveFx,
+				getSnapshot: () => managed.runSync(readRuntimeFx()),
+				run: (effect) => runCommand(ensureRunningFx.pipe(Effect.zipRight(effect))),
+				subscribe: (listener) =>
+					openSubscription(transitionSubscriptions.subscribe(listener)),
+				subscribeEvents: (listener) =>
+					openSubscription(transitionSubscriptions.subscribeEvents(listener)),
+			} satisfies GameSession;
 		}),
 );

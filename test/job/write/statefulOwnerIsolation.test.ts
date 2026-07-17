@@ -319,7 +319,7 @@ describe("line start state owner isolation", () => {
 				unsubscribe();
 			}
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 

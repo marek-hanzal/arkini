@@ -125,14 +125,14 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 						const forceShutdown = requestedForceShutdown && packageId === null;
 						try {
 							if (hardReset) {
-								await releasing.disposeWithoutSave();
+								await runPromise(releasing.disposeWithoutSaveFx);
 								await runPromise(clearSaveFx(releasing.saveKey));
 								requestedHardReset = false;
 							} else if (forceShutdown) {
-								await releasing.disposeWithoutSave();
+								await runPromise(releasing.disposeWithoutSaveFx);
 								requestedForceShutdown = false;
 							} else {
-								await releasing.dispose();
+								await runPromise(releasing.disposeFx);
 							}
 							current = undefined;
 						} catch (error) {
@@ -186,7 +186,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 
 					if (version !== requestVersion || requestedPackageId !== packageId) {
 						try {
-							await created.dispose();
+							await runPromise(created.disposeFx);
 						} catch (error) {
 							fail(requestVersion, error);
 							return;

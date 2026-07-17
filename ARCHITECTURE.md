@@ -150,9 +150,11 @@ The live boundary exposes:
 - `run(effect)` — execution of documented public engine Effects;
 - `subscribe(listener)` — runtime invalidation subscription;
 - `subscribeEvents(listener)` — transient event batches for presentation;
-- `flushSave()` — explicit persistence flush;
-- `dispose()` — coordinated shutdown with a retryable final save. A failed flush freezes the session and retains the same canonical runtime for another disposal attempt; resources are released only after the save succeeds;
-- `disposeWithoutSave()` — explicit destructive shutdown used by hard reset or user-confirmed force exit. It stops autosave and releases the frozen session without writing a final snapshot.
+- `flushSaveFx` — explicit persistence flush Effect;
+- `disposeFx` — coordinated shutdown Effect with a retryable final save. A failed flush freezes the session and retains the same canonical runtime for another disposal attempt; resources are released only after the save succeeds;
+- `disposeWithoutSaveFx` — explicit destructive shutdown Effect used by hard reset or user-confirmed force exit. It stops autosave and releases the frozen session without writing a final snapshot.
+
+`GameSession` lifecycle operations are reusable Effect values rather than Promise-producing methods. One Effect-owned lifecycle state and one `Deferred` represent the active disposal attempt: concurrent fibers await that exact attempt, failure returns the session to a frozen retryable state, and a later disposal starts a new attempt. Promise exists only at explicit `ManagedRuntime`/process execution boundaries and is never cached as lifecycle state.
 
 `GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
 
@@ -160,7 +162,7 @@ Replacement follows one serialized ownership transition:
 
 ```text
 latest requested package
-→ await current Game.dispose() and final save
+→ run current Game.disposeFx and await final save
 → create only the latest still-requested package
 → dispose stale bootstrap exactly once
 → publish one ready Game, or one truthful failure state
@@ -173,7 +175,7 @@ Owner state publication is synchronous for `useSyncExternalStore`, but observer 
 Hard reset is the same owner transition with destructive save policy:
 
 ```text
-current Game.disposeWithoutSave()
+current Game.disposeWithoutSaveFx
 → clear only current packageId + contentHash save
 → create the same package through the normal bootstrap path
 → publish one fresh Game

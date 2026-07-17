@@ -100,7 +100,7 @@ describe("RuntimeSaveLayerFx", () => {
 			await sleep(30);
 			expect(saves).toHaveLength(1);
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -156,7 +156,7 @@ describe("RuntimeSaveLayerFx", () => {
 				1,
 			]);
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -217,7 +217,7 @@ describe("RuntimeSaveLayerFx", () => {
 				}),
 			);
 
-			const flush = session.flushSave();
+			const flush = Effect.runPromise(session.flushSaveFx);
 			releaseFirstSave?.();
 			await flush;
 
@@ -228,7 +228,7 @@ describe("RuntimeSaveLayerFx", () => {
 			]);
 		} finally {
 			releaseFirstSave?.();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -286,7 +286,7 @@ describe("RuntimeSaveLayerFx", () => {
 			expect(writes).toBeGreaterThanOrEqual(2);
 			expect(reports).toBeGreaterThanOrEqual(2);
 		} finally {
-			await expect(session.dispose()).rejects.toThrow("save failed");
+			await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save failed");
 		}
 	});
 
@@ -357,7 +357,7 @@ describe("RuntimeSaveLayerFx", () => {
 			expect(unhandledRejections).toEqual([]);
 		} finally {
 			try {
-				await expect(session.dispose()).rejects.toThrow("save failed");
+				await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save failed");
 				await sleep(20);
 				expect(unhandledRejections).toEqual([]);
 			} finally {
@@ -369,6 +369,7 @@ describe("RuntimeSaveLayerFx", () => {
 	it("makes concurrent dispose callers await the same final cleanup", async () => {
 		let markSaveStarted: (() => void) | undefined;
 		let releaseSave: (() => void) | undefined;
+		let writes = 0;
 		const saveStarted = new Promise<void>((resolve) => {
 			markSaveStarted = resolve;
 		});
@@ -382,24 +383,25 @@ describe("RuntimeSaveLayerFx", () => {
 				debounceMs: 60_000,
 				write: () =>
 					Effect.promise(async () => {
+						writes += 1;
 						markSaveStarted?.();
 						await saveGate;
 					}),
 			},
 		});
 
-		const first = session.dispose();
+		const first = Effect.runPromise(session.disposeFx);
 		await saveStarted;
-		const second = session.dispose();
+		const second = Effect.runPromise(session.disposeFx);
 		let secondSettled = false;
 		void second.finally(() => {
 			secondSettled = true;
 		});
 
 		try {
-			expect(second).toBe(first);
 			await sleep(20);
 			expect(secondSettled).toBe(false);
+			expect(writes).toBe(1);
 		} finally {
 			releaseSave?.();
 			await Promise.all([
@@ -446,7 +448,7 @@ describe("RuntimeSaveLayerFx", () => {
 				}),
 			);
 
-			const dispose = session.dispose();
+			const dispose = Effect.runPromise(session.disposeFx);
 			await saveStarted;
 			await sleep(30);
 			releaseSave?.();
@@ -456,7 +458,7 @@ describe("RuntimeSaveLayerFx", () => {
 			expect(savedRemainingMs[0]).toBeGreaterThan(0);
 		} finally {
 			releaseSave?.();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
@@ -497,7 +499,7 @@ describe("RuntimeSaveLayerFx", () => {
 				() => "interrupted" as const,
 			);
 
-		await session.dispose();
+		await Effect.runPromise(session.disposeFx);
 
 		expect(await command).toBe("interrupted");
 		expect(saves).toHaveLength(1);
@@ -532,7 +534,7 @@ describe("RuntimeSaveLayerFx", () => {
 				quantity: 1,
 			}),
 		);
-		await session.dispose();
+		await Effect.runPromise(session.disposeFx);
 
 		expect(saves).toHaveLength(1);
 		expect(saves[0]?.items).toHaveLength(1);

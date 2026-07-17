@@ -90,9 +90,9 @@ const game = {
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,
 	run: unavailableRun,
-	dispose: () => Promise.resolve(),
-	disposeWithoutSave: () => Promise.resolve(),
-	flushSave: () => Promise.resolve(),
+	disposeFx: Effect.void,
+	disposeWithoutSaveFx: Effect.void,
+	flushSaveFx: Effect.void,
 } satisfies Game;
 
 describe("Board", () => {

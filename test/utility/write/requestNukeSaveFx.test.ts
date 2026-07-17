@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -69,7 +70,7 @@ describe("requestNukeSaveFx", () => {
 			expect(session.getSnapshot().items).toHaveLength(2);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 });

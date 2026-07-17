@@ -13,10 +13,10 @@ export type GameSessionServices =
 /** Stable browser-facing owner of one loaded game's Effect services and resources. */
 export interface GameSession {
 	/** Saves and releases the session; a failed final save leaves it frozen and retryable. */
-	readonly dispose: () => Promise<void>;
+	readonly disposeFx: Effect.Effect<void, unknown>;
 	/** Destructive shutdown for hard reset or explicit force exit without saving. */
-	readonly disposeWithoutSave: () => Promise<void>;
-	readonly flushSave: () => Promise<void>;
+	readonly disposeWithoutSaveFx: Effect.Effect<void, unknown>;
+	readonly flushSaveFx: Effect.Effect<void, unknown>;
 	readonly getSnapshot: () => RuntimeSchema.Type;
 	readonly run: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,

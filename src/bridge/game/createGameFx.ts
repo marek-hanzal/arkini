@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Exit, Scope } from "effect";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import type { Game } from "~/bridge/game/Game";
@@ -35,29 +35,22 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	});
 	const saveStorage = providedSaveStorage ?? (yield* createGameSaveStorageFx());
 	const resourceUrls = new Map<string, string>();
+	const resourceScope = yield* Scope.make();
 	let session: GameSession | undefined;
 
-	const revokeResources = () => {
-		for (const url of resourceUrls.values()) URL.revokeObjectURL(url);
-		resourceUrls.clear();
-	};
-	const closeSaveStorage = () => {
-		if (providedSaveStorage === undefined) saveStorage.close();
-	};
-	const discardFailedBootstrap = Effect.tryPromise({
-		try: async () => {
-			if (session !== undefined) await session.disposeWithoutSave();
-		},
-		catch: () => undefined,
-	}).pipe(
-		Effect.ensuring(
-			Effect.sync(() => {
-				revokeResources();
-				closeSaveStorage();
-			}),
-		),
-		Effect.ignore,
+	yield* Scope.addFinalizer(
+		resourceScope,
+		Effect.sync(() => {
+			for (const url of resourceUrls.values()) URL.revokeObjectURL(url);
+			resourceUrls.clear();
+			if (providedSaveStorage === undefined) saveStorage.close();
+		}),
 	);
+	const releaseResourcesFx = Scope.close(resourceScope, Exit.void);
+	const discardFailedBootstrapFx = Effect.gen(function* () {
+		if (session !== undefined) yield* session.disposeWithoutSaveFx.pipe(Effect.ignore);
+		yield* releaseResourcesFx;
+	}).pipe(Effect.ignore);
 
 	return yield* Effect.gen(function* () {
 		const saveKey: GameSaveStorage.Key = {
@@ -134,23 +127,14 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		}
 
 		const liveSession = session;
-		let disposePromise: Promise<void> | undefined;
-		const disposeWith = (mode: "save" | "discard") => {
-			disposePromise ??= (
-				mode === "save" ? liveSession.dispose() : liveSession.disposeWithoutSave()
-			).finally(() => {
-				revokeResources();
-				closeSaveStorage();
-			});
-			return disposePromise;
-		};
-
 		return {
 			...liveSession,
 			arkpack: loaded.descriptor,
 			config: loaded.payload.config,
-			dispose: () => disposeWith("save"),
-			disposeWithoutSave: () => disposeWith("discard"),
+			disposeFx: liveSession.disposeFx.pipe(Effect.zipRight(releaseResourcesFx)),
+			disposeWithoutSaveFx: liveSession.disposeWithoutSaveFx.pipe(
+				Effect.zipRight(releaseResourcesFx),
+			),
 			instanceKey: crypto.randomUUID(),
 			saveKey,
 			getResourceUrl: (resourceId) => {
@@ -160,5 +144,5 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 				return url;
 			},
 		} satisfies Game;
-	}).pipe(Effect.onError(() => discardFailedBootstrap));
+	}).pipe(Effect.onError(() => discardFailedBootstrapFx));
 });

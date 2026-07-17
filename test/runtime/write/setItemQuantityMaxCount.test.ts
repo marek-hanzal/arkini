@@ -227,7 +227,7 @@ describe("setItemQuantityFx maxCount replacement", () => {
 				unsubscribe();
 			}
 		} finally {
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 

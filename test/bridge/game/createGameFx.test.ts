@@ -6,7 +6,9 @@ import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
+import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
 	createTestArkpack,
 	testArkpackConfig,
@@ -92,7 +94,7 @@ describe("createGameFx", () => {
 			}),
 		]);
 		expect(first.getResourceUrl("asset:water")).toMatch(/^blob:/);
-		await first.dispose();
+		await Effect.runPromise(first.disposeFx);
 		expect(storages.readSaved()).not.toBeNull();
 
 		const restored = await Effect.runPromise(
@@ -106,8 +108,102 @@ describe("createGameFx", () => {
 			expect(restored.getSnapshot().items).toHaveLength(1);
 			expect(restored.getSnapshot().items[0]?.item.id).toBe("water");
 		} finally {
-			await restored.dispose();
+			await Effect.runPromise(restored.disposeFx);
 		}
+	});
+
+	it("retries failed public game disposal without releasing its retry resources", async () => {
+		const storages = await createStorages();
+		const failure = new Error("disk full");
+		let writes = 0;
+		const saveStorage: GameSaveStorage = {
+			...storages.saveStorage,
+			write: async (key, bytes) => {
+				writes += 1;
+				if (writes === 1) throw failure;
+				await storages.saveStorage.write(key, bytes);
+			},
+		};
+		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
+		const game = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage,
+			}),
+		);
+		const resourceUrl = game.getResourceUrl("asset:water");
+		await game.run(
+			spawnItemFx({
+				id: "runtime:public-disposal-retry",
+				itemId: "water",
+				location: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			}),
+		);
+
+		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk full");
+		expect(writes).toBe(1);
+		expect(game.getResourceUrl("asset:water")).toBe(resourceUrl);
+		expect(revokeObjectUrl).not.toHaveBeenCalled();
+		await expect(
+			game.run(
+				spawnItemFx({
+					id: "runtime:must-remain-frozen",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				}),
+			),
+		).rejects.toThrow("Game session is shutting down.");
+
+		await expect(Effect.runPromise(game.disposeFx)).resolves.toBeUndefined();
+		expect(writes).toBe(2);
+		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
+		expect(() => game.getResourceUrl("asset:water")).toThrow(
+			"Game resource asset:water is unavailable.",
+		);
+		const saved = storages.readSaved();
+		expect(saved).not.toBeNull();
+		if (saved === null) throw new Error("Expected the retried save bytes.");
+		const decoded = await Effect.runPromise(decodeArkiniSaveFx(saved));
+		expect(decoded.state.items.map(({ id }) => id)).toContain("runtime:public-disposal-retry");
+	});
+
+	it("releases public game resources after explicit discard of a failed save", async () => {
+		const storages = await createStorages();
+		const saveStorage: GameSaveStorage = {
+			...storages.saveStorage,
+			write: async () => {
+				throw new Error("disk still full");
+			},
+		};
+		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
+		const game = await Effect.runPromise(
+			createGameFx({
+				packageId: storages.packageId,
+				arkpackStorage: storages.arkpackStorage,
+				saveStorage,
+			}),
+		);
+		const resourceUrl = game.getResourceUrl("asset:water");
+
+		await expect(Effect.runPromise(game.disposeFx)).rejects.toThrow("disk still full");
+		expect(revokeObjectUrl).not.toHaveBeenCalled();
+		await expect(Effect.runPromise(game.disposeWithoutSaveFx)).resolves.toBeUndefined();
+		expect(revokeObjectUrl.mock.calls.filter(([url]) => url === resourceUrl)).toHaveLength(1);
 	});
 
 	it("rejects an invalid save before constructing or starting a partial game session", async () => {

@@ -149,7 +149,7 @@ describe("consumeItemIntoCheatInventoryFx", () => {
 			]);
 		} finally {
 			unsubscribe();
-			await session.dispose();
+			await Effect.runPromise(session.disposeFx);
 		}
 	});
 

@@ -71,6 +71,22 @@ describe("Effect runtime ownership", () => {
 		expect(owner).toContain("Runtime.runPromiseExit(runtime)");
 	});
 
+	it("keeps public game lifecycle authority in Effect programs", () => {
+		const contract = readFileSync("src/bridge/game/GameSession.ts", "utf8");
+		const gameFactory = readFileSync("src/bridge/game/createGameFx.ts", "utf8");
+		const sessionFactory = readFileSync("src/bridge/game/createGameSessionFx.ts", "utf8");
+		const owner = readFileSync("src/bridge/game/createGameOwnerFx.ts", "utf8");
+
+		expect(contract).toContain("readonly disposeFx: Effect.Effect<void, unknown>");
+		expect(contract).toContain("readonly disposeWithoutSaveFx: Effect.Effect<void, unknown>");
+		expect(contract).toContain("readonly flushSaveFx: Effect.Effect<void, unknown>");
+		expect(contract).not.toMatch(/readonly dispose(?:WithoutSave)?: \(\) => Promise/);
+		expect(gameFactory).not.toContain("disposePromise");
+		expect(sessionFactory).toContain("Deferred.make<void, unknown>()");
+		expect(sessionFactory).toContain("Effect.makeSemaphore(1)");
+		expect(owner).toContain("runPromise(releasing.disposeFx)");
+	});
+
 	it("keeps the process entrypoints on their one declared runtime boundary", () => {
 		const electronEntry = readFileSync("electron/main/index.ts", "utf8");
 		const rendererRuntime = readFileSync("src/bridge/runtime/RendererRuntime.ts", "utf8");

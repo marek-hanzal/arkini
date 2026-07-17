@@ -63,6 +63,14 @@ const deferred = <Value>() => {
 	};
 };
 
+const fromPromiseFx = (operation: () => Promise<void>) =>
+	Effect.async<void, unknown>((resume) => {
+		void operation().then(
+			() => resume(Effect.void),
+			(error) => resume(Effect.fail(error)),
+		);
+	});
+
 const createFakeGame = (
 	packageId: string,
 	instanceKey: string,
@@ -83,9 +91,9 @@ const createFakeGame = (
 		contentHash: packageId,
 	},
 	instanceKey,
-	dispose,
-	disposeWithoutSave: dispose,
-	flushSave: () => Promise.resolve(),
+	disposeFx: fromPromiseFx(dispose),
+	disposeWithoutSaveFx: fromPromiseFx(dispose),
+	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
@@ -311,10 +319,12 @@ describe("createGameOwnerFx", () => {
 		expect(creates).toEqual([
 			"A",
 		]);
-		expect(owner.getSnapshot()).toEqual({
+		expect(owner.getSnapshot()).toMatchObject({
 			type: "failed",
 			packageId: "B",
-			error: failure,
+			error: expect.objectContaining({
+				message: failure.message,
+			}),
 			canForceShutdown: false,
 		});
 	});
@@ -444,12 +454,12 @@ describe("createGameOwnerFx", () => {
 				calls.push(`create:${instanceKey}`);
 				return {
 					...createFakeGame(packageId, instanceKey),
-					dispose: async () => {
+					disposeFx: Effect.sync(() => {
 						calls.push(`save:${instanceKey}`);
-					},
-					disposeWithoutSave: async () => {
+					}),
+					disposeWithoutSaveFx: Effect.sync(() => {
 						calls.push(`discard:${instanceKey}`);
-					},
+					}),
 				};
 			},
 		});
@@ -697,7 +707,7 @@ describe("createGameOwnerFx", () => {
 			clearSave: async () => undefined,
 			create: async (packageId) => ({
 				...createFakeGame(packageId, packageId, dispose),
-				disposeWithoutSave: discard,
+				disposeWithoutSaveFx: fromPromiseFx(discard),
 			}),
 		});
 		await runOwnerFx(owner.replaceFx("A"));

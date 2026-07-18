@@ -95,6 +95,31 @@ const game = {
 	flushSaveFx: Effect.void,
 } satisfies Game;
 
+const readAttribute = (tag: string, name: string) => {
+	const value = tag.match(new RegExp(`${name}="([^"]*)"`))?.[1];
+	if (value === undefined) throw new Error(`Missing ${name} on rendered board cell.`);
+	return value;
+};
+
+const readBoardCells = (html: string) =>
+	[
+		...html.matchAll(/<div[^>]*data-ui="BoardCell"[^>]*><\/div>/g),
+	].map((match) => {
+		const tag = match[0];
+		const style = readAttribute(tag, "style");
+		const column = style.match(/grid-column-start:(\d+)/)?.[1];
+		const row = style.match(/grid-row-start:(\d+)/)?.[1];
+		if (column === undefined || row === undefined) {
+			throw new Error("Rendered board cell is missing explicit grid coordinates.");
+		}
+		return {
+			column: Number(column),
+			row: Number(row),
+			x: Number(readAttribute(tag, "data-board-x")),
+			y: Number(readAttribute(tag, "data-board-y")),
+		};
+	});
+
 describe("Board", () => {
 	it("renders the current canonical board through the headless tile system", () => {
 		const html = renderToStaticMarkup(
@@ -103,8 +128,50 @@ describe("Board", () => {
 				children: createElement(TileSystemProvider, null, createElement(Board)),
 			}),
 		);
+		const cells = readBoardCells(html);
 
-		expect(html.match(/aria-hidden="true"/g)).toHaveLength(6);
+		expect(cells).toHaveLength(6);
+		expect(html).toMatch(
+			/data-ui="BoardViewport"[^>]*><div[^>]*data-ui="BoardFrame"[^>]*><div[^>]*data-ui="BoardGrid"/,
+		);
+		expect(cells).toEqual([
+			{
+				column: 1,
+				row: 1,
+				x: 0,
+				y: 0,
+			},
+			{
+				column: 2,
+				row: 1,
+				x: 1,
+				y: 0,
+			},
+			{
+				column: 3,
+				row: 1,
+				x: 2,
+				y: 0,
+			},
+			{
+				column: 1,
+				row: 2,
+				x: 0,
+				y: 1,
+			},
+			{
+				column: 2,
+				row: 2,
+				x: 1,
+				y: 1,
+			},
+			{
+				column: 3,
+				row: 2,
+				x: 2,
+				y: 1,
+			},
+		]);
 		expect(html).toContain('data-item-id="water"');
 		expect(html).toContain('src="resource:asset:water"');
 		expect(html).toContain("grid-column-start:3");
@@ -150,8 +217,16 @@ describe("Board", () => {
 				children: createElement(TileSystemProvider, null, createElement(Board)),
 			}),
 		);
+		const cells = readBoardCells(html);
+		const lastCell = cells.find((cell) => cell.x === 12 && cell.y === 8);
 
-		expect(html.match(/aria-hidden="true"/g)).toHaveLength(117);
+		expect(cells).toHaveLength(117);
+		expect(lastCell).toEqual({
+			column: 13,
+			row: 9,
+			x: 12,
+			y: 8,
+		});
 		expect(html).toContain("grid-column-start:13");
 		expect(html).toContain("grid-row-start:9");
 	});

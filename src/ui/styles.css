@@ -127,22 +127,31 @@ select {
 	background: var(--ak-accent);
 }
 
+[data-ui="Board"] {
+	padding: clamp(1.25rem, 4vmin, 3rem);
+}
+
 [data-ui="BoardViewport"] {
 	container-type: size;
 	display: grid;
 	place-items: center;
 }
 
-[data-ui="BoardGrid"] {
+[data-ui="BoardFrame"] {
 	width: 100%;
 	max-width: 100%;
 	max-height: 100%;
+	box-shadow: 0 clamp(0.25rem, 0.8vmin, 0.6rem) clamp(0.75rem, 2.2vmin, 1.75rem)
+		color-mix(in srgb, var(--ak-overlay) 24%, transparent);
+}
+
+[data-ui="BoardGrid"] {
 	gap: clamp(1px, 0.45vmin, 6px);
 	padding: clamp(2px, 0.55vmin, 7px);
 }
 
 @supports (width: 1cqw) {
-	[data-ui="BoardGrid"] {
+	[data-ui="BoardFrame"] {
 		width: min(100cqw, var(--board-width-from-height));
 		height: min(100cqh, var(--board-height-from-width));
 	}

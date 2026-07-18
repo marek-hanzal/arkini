@@ -80,6 +80,9 @@ describe("createArkiniRouter", () => {
 		expect(resolveTypes("/game/built-in", "/settings")).toEqual([
 			"main-page-game",
 		]);
+		expect(resolveTypes("/game/built-in", "/main-menu")).toEqual([
+			"main-page-game",
+		]);
 		expect(resolveTypes("/game/built-in", "/dev/shell")).toBe(false);
 	});
 

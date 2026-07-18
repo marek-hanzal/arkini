@@ -6,7 +6,7 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Main-page layout and deliberate route View Transitions**
 
-Status: **Implemented and validated for issue #279; native macOS smoke pending.**
+Status: **Implemented and validated for issues #279 and #280; native macOS smoke pending.**
 
 Current contract:
 
@@ -19,10 +19,11 @@ Current contract:
 - `arkini-route-scene`, `arkini-main-page-panel`, and `arkini-launcher-hero` describe visual roles rather than destination names;
 - Hero artwork owns the shared-element identity while its former `drop-shadow` filter is replaced by a separate cheap gradient shadow layer outside the artwork snapshot, avoiding filter rerasterization during repeated transitions;
 - initial Loader → Board remains the separate local native View Transition owned by `GameLoadingGate`; no route animation state enters GameOwner or the engine.
+- GameMenu exposes direct `Settings` and `Main Menu` route actions; both navigate from the fully open menu without running its local WAAPI exit first, and the router's main-page ↔ game policy owns the native transition. Leaving the game route still uses the canonical GameOwner final-save/release lifecycle.
 
 Next action:
 
-> Native-smoke `/main-menu ↔ /settings`, `/main-menu ↔ /about`, `/main-menu ↔ /arkpacks`, GameMenu → Settings → Back, startup splash → MainMenu, and Loader → Board on macOS Electron. Verify especially that splash has no second fade and the separate Hero shadow does not kick after repeated navigation.
+> Native-smoke `/main-menu ↔ /settings`, `/main-menu ↔ /about`, `/main-menu ↔ /arkpacks`, GameMenu → Settings → Back, GameMenu → MainMenu, startup splash → MainMenu, and Loader → Board on macOS Electron. Verify especially that route actions preserve the fully open GameMenu snapshot, splash has no second fade, and the separate Hero shadow does not kick after repeated navigation.
 
 ## Source topology
 

@@ -69,9 +69,9 @@ const GameMenuDialog = ({
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
 	const animationGenerationRef = useRef(0);
-	const activeRequestRef = useRef<"save" | "save-and-exit" | "hard-reset" | "settings" | null>(
-		null,
-	);
+	const activeRequestRef = useRef<
+		"save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | null
+	>(null);
 	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
 	const pending = save.isPending || saveAndExit.isPending || hardReset.isPending;
 	const exiting = phase === "exiting";
@@ -234,6 +234,16 @@ const GameMenuDialog = ({
 		});
 	};
 
+	const requestMainMenu = () => {
+		if (activeRequestRef.current !== null || pending || exiting) return;
+		activeRequestRef.current = "main-menu";
+		void navigate({
+			to: "/main-menu",
+		}).finally(() => {
+			activeRequestRef.current = null;
+		});
+	};
+
 	const requestSave = () => {
 		if (activeRequestRef.current !== null) return;
 		activeRequestRef.current = "save";
@@ -337,6 +347,13 @@ const GameMenuDialog = ({
 						onClick={requestSettings}
 					>
 						Settings
+					</Button>
+					<Button
+						className="w-full py-3 shadow-none backdrop-blur-none"
+						disabled={pending || exiting}
+						onClick={requestMainMenu}
+					>
+						Main Menu
 					</Button>
 
 					<div className="my-2 border-t border-line" />

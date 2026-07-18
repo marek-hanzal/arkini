@@ -236,10 +236,15 @@ const renderMenu = async ({
 		getParentRoute: () => rootRoute,
 		path: "/settings",
 	});
+	const mainMenuRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/main-menu",
+	});
 	const router = createRouter({
 		routeTree: rootRoute.addChildren([
 			gameRoute,
 			settingsRoute,
+			mainMenuRoute,
 		]),
 		defaultViewTransition: true,
 		history: createMemoryHistory({
@@ -374,6 +379,23 @@ describe("GameMenu", () => {
 
 		await act(async () => buttonByText(container, "Settings").click());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));
+		expect(viewTransitionStartPhases).toEqual([
+			"open",
+		]);
+		expect(animations).toHaveLength(animationCount);
+	});
+
+	it("navigates directly to the main menu through the open-menu native snapshot", async () => {
+		const { container, router } = await renderMenu();
+		await openMenu(container);
+		const animationCount = animations.length;
+		viewTransitionStartPhases.splice(0);
+
+		await act(async () => {
+			buttonByText(container, "Main Menu").click();
+			buttonByText(container, "Main Menu").click();
+		});
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(viewTransitionStartPhases).toEqual([
 			"open",
 		]);

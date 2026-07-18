@@ -35,6 +35,7 @@ export const MainPageLayout = ({
 	<LauncherScene
 		compactHero
 		dataUi="MainPageLayout"
+		layout="fixed-hero"
 		viewTransitionName={routeSceneViewTransitionName}
 	>
 		<section

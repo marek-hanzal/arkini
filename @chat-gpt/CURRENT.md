@@ -4,12 +4,16 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Action-bound root loading lifecycle**
+**Main-page Hero compositor topology and action-bound root loading lifecycle**
 
 Status: **Implemented; final validation and native macOS smoke pending.**
 
 Current contract:
 
+- `MainPageLayout` is the only outer structure for `/main-menu`, `/settings`, `/about`, and `/arkpacks`; its `LauncherScene` uses one explicit two-row grid with a stable Hero slot and content slot, so panel height never moves or resizes the Hero;
+- `LauncherHero` is normal DOM inside the full route-scene snapshot. It must not own a `view-transition-name`, `will-change`, paint containment, or another forced compositor layer; the transparent artwork and semi-transparent shadow stay together in the route snapshot rather than becoming a nested rectangular bitmap;
+- main-page native transitions name only the full `arkini-route-scene` and, for geometrically corresponding compact/responsive pages, the naturally rectangular `arkini-main-page-panel`; `/arkpacks` deliberately leaves its viewport panel unnamed;
+- Chromium compositor validation must confirm no `arkini-launcher-hero` pseudo-elements and identical Hero geometry across MainMenu, Settings, About, and Arkpacks before changing this topology again;
 - `ActionLoadingProvider` lives above `GameOwnerProvider` and the route canvas, so one loading presentation can survive route replacement without becoming a second game or save owner;
 - every deliberate loading run receives the real asynchronous action, a stable dedupe key, a presentation label, a minimum visible duration, and a completed hold;
 - defaults are 2.5 seconds minimum visibility and a 350 ms fully completed hold after the 180 ms progress interpolation;
@@ -19,13 +23,13 @@ Current contract:
 - initial game entry, browser-history return to game, and game-to-main-menu all observe the exact `GameOwner` Promise; no create, save, release, or failure state is duplicated in React;
 - `Save and exit` uses `runNativeClose`: the existing Electron controlled-close request starts immediately, `GameOwner.shutdownFx` remains the sole final-save owner, native `beforeCloseReady` resolves the loader action only after that shutdown succeeds, and the renderer reports close-ready only after 100% has remained visible for the completed hold;
 - route-action failure hides the loader without claiming completion and leaves the authoritative `GameOwner` failure snapshot responsible for recovery UI;
-- while the root loader is active, underlying route, panel, Hero, shell, and board View Transition names are suppressed to prevent duplicate shared-element identities; the loader-to-target reveal waits for any active native transition animations and commits through one local native View Transition;
+- while the root loader is active, underlying route, panel, shell, and board View Transition names are suppressed to prevent duplicate shared-element identities; the loader-to-target reveal waits for any active native transition animations and commits through one local native View Transition;
 - the previous route-local `GameLoadingGate`, `GameLoadingScreen`, and `arkini-game-loading` identity are removed; `ActionLoadingScreen` is the single staged progress presentation and `arkini-action-loading` is its visual role;
 - startup splash, MainPage route policy, GameMenu local WAAPI, Settings navigation, and engine truth remain separate from loading presentation state.
 
 Next action:
 
-> Validate game entry, GameMenu → Main Menu, browser Back to game, GameMenu → Settings, Save and exit success/failure, and loader-to-board/main-page handoff on native macOS Electron. Verify the loader remains visible for at least 2.5 seconds, 100% is perceptible for roughly 350 ms, failures never flash 100%, and no underlying Hero or panel shared element leaks through the root overlay.
+> Validate MainMenu ↔ Settings/About/Arkpacks and loader-to-main-page/game handoffs on native macOS Electron. Confirm no rectangular Hero/shadow raster surface appears, Hero geometry remains fixed across every main page, the loader remains visible for at least 2.5 seconds, 100% is perceptible for roughly 350 ms, and failures never flash 100%.
 
 ## Source topology
 

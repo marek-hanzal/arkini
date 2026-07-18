@@ -151,7 +151,7 @@ describe("Settings", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-launcher-hero");
+		).toBe("");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
 		expect(radios).toHaveLength(3);
 		const light = radios.find(

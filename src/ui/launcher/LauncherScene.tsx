@@ -1,11 +1,31 @@
 import type { PropsWithChildren } from "react";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
 
+const layoutClassNames = {
+	centered:
+		"flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-[clamp(1rem,3vmin,2rem)]",
+	"fixed-hero":
+		"grid size-full min-h-0 min-w-0 justify-items-center gap-[clamp(1rem,3vmin,2rem)]",
+} as const;
+
+const heroSlotClassNames = {
+	centered: "flex shrink-0 items-center justify-center",
+	"fixed-hero": "flex min-h-0 w-full items-end justify-center",
+} as const;
+
+const contentSlotClassNames = {
+	centered: "flex min-h-0 min-w-0 flex-col items-center justify-center",
+	"fixed-hero": "flex size-full min-h-0 min-w-0 flex-col items-center justify-start",
+} as const;
+
 export namespace LauncherScene {
+	export type Layout = keyof typeof layoutClassNames;
+
 	export interface Props extends PropsWithChildren {
 		readonly className?: string;
 		readonly compactHero?: boolean;
 		readonly dataUi: string;
+		readonly layout?: Layout;
 		readonly viewTransitionName?: string;
 	}
 }
@@ -16,6 +36,7 @@ export const LauncherScene = ({
 	className,
 	compactHero = false,
 	dataUi,
+	layout = "centered",
 	viewTransitionName,
 }: LauncherScene.Props) => (
 	<main
@@ -33,9 +54,30 @@ export const LauncherScene = ({
 			className="launcher-scene__veil absolute inset-0"
 			aria-hidden="true"
 		/>
-		<div className="relative z-10 flex size-full min-h-0 flex-col items-center justify-center gap-[clamp(1rem,3vmin,2rem)] overflow-hidden p-[clamp(1rem,4vmin,3rem)]">
-			<LauncherHero compact={compactHero} />
-			{children}
+		<div
+			className={`relative z-10 overflow-hidden p-[clamp(1rem,4vmin,3rem)] ${layoutClassNames[layout]}`}
+			data-layout={layout}
+			data-ui="LauncherSceneLayout"
+			style={
+				layout === "fixed-hero"
+					? {
+							gridTemplateRows: "minmax(0, 2fr) minmax(0, 3fr)",
+						}
+					: undefined
+			}
+		>
+			<div
+				className={heroSlotClassNames[layout]}
+				data-ui="LauncherSceneHeroSlot"
+			>
+				<LauncherHero compact={compactHero} />
+			</div>
+			<div
+				className={contentSlotClassNames[layout]}
+				data-ui="LauncherSceneContentSlot"
+			>
+				{children}
+			</div>
 		</div>
 	</main>
 );

@@ -147,7 +147,7 @@ describe("MainMenu", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-launcher-hero");
+		).toBe("");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");

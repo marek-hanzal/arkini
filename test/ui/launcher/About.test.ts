@@ -28,7 +28,7 @@ afterEach(async () => {
 });
 
 describe("About", () => {
-	it("shares the launcher route, panel and Hero transition identities", async () => {
+	it("shares the launcher route and panel identities without a nested Hero snapshot", async () => {
 		const rootRoute = createRootRoute({
 			component: AboutPage,
 		});
@@ -64,7 +64,7 @@ describe("About", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-launcher-hero");
+		).toBe("");
 		expect(container.querySelector('[data-ui="About"]')).not.toBeNull();
 	});
 });

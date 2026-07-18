@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LauncherHero } from "~/ui/launcher/LauncherHero";
+import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { actionLoadingViewTransitionName } from "~/ui/navigation/actionLoadingViewTransitionName";
 
 export const defaultLoadingMinimumDurationMs = 2_500;
@@ -124,18 +124,16 @@ export const ActionLoadingScreen = ({
 	]);
 
 	return (
-		<section
-			className="relative flex size-full min-h-0 min-w-0 flex-col items-center justify-center overflow-hidden bg-canvas p-[clamp(1rem,4vmin,3rem)] text-foreground"
-			data-ui="ActionLoadingScreen"
-			style={{
-				viewTransitionName: actionLoadingViewTransitionName,
-			}}
+		<LauncherScene
+			compactHero
+			dataUi="ActionLoadingScreen"
+			layout="fixed-hero"
+			viewTransitionName={actionLoadingViewTransitionName}
 		>
 			<div
 				className="flex w-[min(80dvw,56rem)] max-w-full flex-col items-center gap-[clamp(1.25rem,4vmin,2.5rem)]"
 				data-ui="ActionLoadingScreenPanel"
 			>
-				<LauncherHero compact />
 				<div className="flex w-full flex-col items-center gap-3">
 					<div
 						className="h-2 w-[min(80%,28rem)] overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
@@ -163,6 +161,6 @@ export const ActionLoadingScreen = ({
 					</p>
 				</div>
 			</div>
-		</section>
+		</LauncherScene>
 	);
 };

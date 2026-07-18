@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import {
 	useCallback,
 	useEffect,
+	type RefObject,
 	useLayoutEffect,
 	useRef,
 	useState,
@@ -42,8 +43,12 @@ const persistFinalFrame = (animation: Animation) => {
 	}
 };
 
+interface StartupSplashProps {
+	readonly mainMenuRef: RefObject<HTMLDivElement | null>;
+}
+
 /** Runs the visible-window black hold, decoded Hero reveal and real main-menu cross-fade. */
-export const StartupSplash = () => {
+export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 	const startup = useLauncherStartup();
 	const state = useSyncExternalStore(startup.subscribe, startup.getSnapshot, startup.getSnapshot);
 	const navigate = useNavigate();
@@ -51,7 +56,7 @@ export const StartupSplash = () => {
 	const [blackHoldComplete, setBlackHoldComplete] = useState(false);
 	const [phase, setPhase] = useState<SplashPhase>("black");
 	const overlayRef = useRef<HTMLDivElement>(null);
-	const animationRef = useRef<Animation | undefined>(undefined);
+	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
 	const animationGenerationRef = useRef(0);
 	const exitRequestedRef = useRef(false);
 	const visualReady = state.appearance !== null && state.heroReady;
@@ -126,23 +131,32 @@ export const StartupSplash = () => {
 	useLayoutEffect(() => {
 		if (phase !== "entering" && phase !== "exiting") return;
 		const overlay = overlayRef.current;
+		const mainMenu = mainMenuRef.current;
 		if (overlay === null) return;
 		const generation = animationGenerationRef.current + 1;
 		animationGenerationRef.current = generation;
 		const frame = currentFrame(overlay);
-		animationRef.current?.cancel();
+		for (const animation of animationsRef.current) animation.cancel();
+		animationsRef.current = [];
 
-		if (typeof overlay.animate !== "function") {
-			if (phase === "entering") {
+		const entering = phase === "entering";
+		if (
+			typeof overlay.animate !== "function" ||
+			(!entering && (mainMenu === null || typeof mainMenu.animate !== "function"))
+		) {
+			if (entering) {
 				setPhase(exitRequestedRef.current ? "exiting" : "open");
 			} else {
+				if (mainMenu !== null) mainMenu.style.opacity = "1";
 				setPhase("completed");
 			}
 			return;
 		}
 
-		const entering = phase === "entering";
-		const animation = overlay.animate(
+		const easing = entering
+			? "cubic-bezier(0.22, 1, 0.36, 1)"
+			: "cubic-bezier(0.64, 0, 0.78, 0)";
+		const splashAnimation = overlay.animate(
 			entering
 				? [
 						{
@@ -166,25 +180,46 @@ export const StartupSplash = () => {
 					],
 			{
 				duration: entering ? enterTransitionMs : exitTransitionMs,
-				easing: entering
-					? "cubic-bezier(0.22, 1, 0.36, 1)"
-					: "cubic-bezier(0.64, 0, 0.78, 0)",
+				easing,
 				fill: "both",
 			},
 		);
-		animationRef.current = animation;
-		void animation.finished
-			.catch(() => undefined)
-			.then(() => {
-				if (animationGenerationRef.current !== generation) return;
-				if (persistFinalFrame(animation)) animationRef.current = undefined;
-				if (phase === "entering") {
-					setPhase(exitRequestedRef.current ? "exiting" : "open");
-					return;
-				}
-				setPhase("completed");
-			});
+		const animations: Array<Animation> = [
+			splashAnimation,
+		];
+		if (!entering && mainMenu !== null) {
+			animations.push(
+				mainMenu.animate(
+					[
+						{
+							opacity: 0,
+						},
+						{
+							opacity: 1,
+						},
+					],
+					{
+						duration: exitTransitionMs,
+						easing,
+						fill: "both",
+					},
+				),
+			);
+		}
+		animationsRef.current = animations;
+		void Promise.all(
+			animations.map((animation) => animation.finished.catch(() => undefined)),
+		).then(() => {
+			if (animationGenerationRef.current !== generation) return;
+			animationsRef.current = animations.filter((animation) => !persistFinalFrame(animation));
+			if (entering) {
+				setPhase(exitRequestedRef.current ? "exiting" : "open");
+				return;
+			}
+			setPhase("completed");
+		});
 	}, [
+		mainMenuRef,
 		phase,
 	]);
 
@@ -204,8 +239,8 @@ export const StartupSplash = () => {
 	useEffect(
 		() => () => {
 			animationGenerationRef.current += 1;
-			animationRef.current?.cancel();
-			animationRef.current = undefined;
+			for (const animation of animationsRef.current) animation.cancel();
+			animationsRef.current = [];
 		},
 		[],
 	);
@@ -246,54 +281,46 @@ export const StartupSplash = () => {
 	}
 
 	return (
-		<>
-			{phase === "entering" ? (
+		<div
+			ref={overlayRef}
+			className="absolute inset-0 z-20 size-full"
+			data-ui="StartupSplash"
+			data-phase={phase}
+			style={
+				phase === "entering"
+					? {
+							opacity: 0,
+							transform: "scale(0.985)",
+							filter: "blur(8px)",
+						}
+					: undefined
+			}
+		>
+			<LauncherScene dataUi="StartupSplashScene">
 				<div
-					className="absolute inset-0 z-10 size-full bg-black"
-					data-ui="StartupEnterUnderlay"
-				/>
-			) : null}
-			<div
-				ref={overlayRef}
-				className="absolute inset-0 z-20 size-full"
-				data-ui="StartupSplash"
-				data-phase={phase}
-				style={
-					phase === "entering"
-						? {
-								opacity: 0,
-								transform: "scale(0.985)",
-								filter: "blur(8px)",
-							}
-						: undefined
-				}
-			>
-				<LauncherScene dataUi="StartupSplashScene">
-					<div
-						className="min-h-14 text-center text-sm text-muted"
-						aria-live="polite"
-					>
-						{state.type === "loading" ? (
-							<p>Preparing Arkini…</p>
-						) : state.type === "failed" ? (
-							<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
-								<p className="font-semibold text-danger">Startup failed</p>
-								<p>{messageFromError(state.error)}</p>
-								<PrimaryButton
-									className="mx-auto"
-									onClick={retry}
-								>
-									Retry
-								</PrimaryButton>
-							</div>
-						) : (
-							<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
-								Press Esc to continue
-							</p>
-						)}
-					</div>
-				</LauncherScene>
-			</div>
-		</>
+					className="min-h-14 text-center text-sm text-muted"
+					aria-live="polite"
+				>
+					{state.type === "loading" ? (
+						<p>Preparing Arkini…</p>
+					) : state.type === "failed" ? (
+						<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
+							<p className="font-semibold text-danger">Startup failed</p>
+							<p>{messageFromError(state.error)}</p>
+							<PrimaryButton
+								className="mx-auto"
+								onClick={retry}
+							>
+								Retry
+							</PrimaryButton>
+						</div>
+					) : (
+						<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
+							Press Esc to continue
+						</p>
+					)}
+				</div>
+			</LauncherScene>
+		</div>
 	);
 };

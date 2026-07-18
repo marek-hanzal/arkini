@@ -9,7 +9,7 @@ import {
 	RouterProvider,
 } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { act, createElement } from "react";
+import { act, createElement, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
@@ -168,18 +168,25 @@ const renderSplash = async (startup: LauncherStartup) => {
 	const rootRoute = createRootRoute({
 		component: Root,
 	});
+	const StartupRoute = () => {
+		const mainMenuRef = useRef<HTMLDivElement>(null);
+		return createElement(
+			"div",
+			null,
+			createElement("div", {
+				ref: mainMenuRef,
+				className: "opacity-0",
+				"data-ui": "MountedMainMenu",
+			}),
+			createElement(StartupSplash, {
+				mainMenuRef,
+			}),
+		);
+	};
 	const indexRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/",
-		component: () =>
-			createElement(
-				"div",
-				null,
-				createElement("div", {
-					"data-ui": "MountedMainMenu",
-				}),
-				createElement(StartupSplash),
-			),
+		component: StartupRoute,
 	});
 	const mainMenuRoute = createRoute({
 		getParentRoute: () => rootRoute,
@@ -223,6 +230,13 @@ const finishAnimation = async (index: number) => {
 	});
 };
 
+const finishAnimations = async (...indexes: ReadonlyArray<number>) => {
+	await act(async () => {
+		for (const index of indexes) animations[index]?.finish();
+		await Promise.resolve();
+	});
+};
+
 const pressEscape = async () => {
 	await act(async () => {
 		window.dispatchEvent(
@@ -239,7 +253,9 @@ describe("StartupSplash", () => {
 		const harness = createStartup();
 		harness.publish(readyState());
 		const { container, visible } = await renderSplash(harness.startup);
-		expect(container.querySelector('[data-ui="MountedMainMenu"]')).not.toBeNull();
+		const mainMenu = container.querySelector<HTMLElement>('[data-ui="MountedMainMenu"]');
+		expect(mainMenu).not.toBeNull();
+		expect(mainMenu?.classList).toContain("opacity-0");
 		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
 
 		await act(async () => vi.advanceTimersByTime(10_000));
@@ -252,7 +268,7 @@ describe("StartupSplash", () => {
 		const splash = container.querySelector<HTMLElement>('[data-phase="entering"]');
 		expect(splash).not.toBeNull();
 		expect(splash?.style.opacity).toBe("0");
-		expect(container.querySelector('[data-ui="StartupEnterUnderlay"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="StartupEnterUnderlay"]')).toBeNull();
 		expect(animations).toHaveLength(1);
 		expect(animations[0]?.options).toMatchObject({
 			duration: 2_500,
@@ -283,7 +299,7 @@ describe("StartupSplash", () => {
 		expect(container.textContent).toContain("Preparing Arkini");
 	});
 
-	it("queues Escape during enter and exits from the same mounted scene", async () => {
+	it("reverses Escape during enter into a synchronized main-menu cross-fade", async () => {
 		const harness = createStartup();
 		harness.publish(readyState());
 		const { container, router, visible } = await renderSplash(harness.startup);
@@ -293,16 +309,27 @@ describe("StartupSplash", () => {
 
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(animations).toHaveLength(2);
+		expect(animations).toHaveLength(3);
 		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
 		expect(animations[1]?.options).toMatchObject({
 			duration: 2_500,
 		});
+		expect(animations[2]?.keyframes).toEqual([
+			{
+				opacity: 0,
+			},
+			{
+				opacity: 1,
+			},
+		]);
+		expect(animations[2]?.options).toEqual(animations[1]?.options);
 		expect(router.state.location.pathname).toBe("/");
 
-		await finishAnimation(1);
+		await finishAnimations(1, 2);
 		expect(animations[1]?.commitStyles).toHaveBeenCalledOnce();
 		expect(animations[1]?.cancel).toHaveBeenCalledOnce();
+		expect(animations[2]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[2]?.cancel).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
@@ -322,9 +349,18 @@ describe("StartupSplash", () => {
 		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 		await act(async () => vi.advanceTimersByTime(1));
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(animations).toHaveLength(3);
+		expect(animations[2]?.keyframes).toEqual([
+			{
+				opacity: 0,
+			},
+			{
+				opacity: 1,
+			},
+		]);
 		expect(router.state.location.pathname).toBe("/");
 
-		await finishAnimation(1);
+		await finishAnimations(1, 2);
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 

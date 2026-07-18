@@ -172,6 +172,8 @@ describe("Board", () => {
 				y: 1,
 			},
 		]);
+		expect(html).toContain('data-ui="Board"');
+		expect(html).toContain("view-transition-name:arkini-game-board");
 		expect(html).toContain('data-item-id="water"');
 		expect(html).toContain('src="resource:asset:water"');
 		expect(html).toContain("grid-column-start:3");

@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 
 import { useBoard } from "~/bridge/board/useBoard";
 import { BoardTile } from "~/ui/board/BoardTile";
+import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
 
 type BoardFrameStyle = CSSProperties & {
 	readonly "--board-width-from-height": string;
@@ -39,6 +40,9 @@ export const Board = () => {
 		<section
 			className="size-full min-h-0 min-w-0"
 			data-ui="Board"
+			style={{
+				viewTransitionName: gameBoardViewTransitionName,
+			}}
 		>
 			<h1 className="sr-only">
 				{board.title}, board space {board.currentSpace}

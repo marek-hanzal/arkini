@@ -4,21 +4,23 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Settings return View Transition composition**
+**Native View Transition audit and choreography**
 
-Status: **Implemented and locally validated for the #274 native-smoke follow-up.**
+Status: **Implemented and validated for review #276 with follow-ups #274, #277, and #278.**
 
-Current scope:
+Current contract:
 
-- Main menu, Settings, and GameShell retain one full-route native View Transition identity;
-- main-menu actions, the open GameMenu panel, and the Settings modal share `settings-modal` only for actual panel-to-panel transitions;
-- the initial game-loading panel no longer claims `settings-modal`, because morphing a Settings form into a wide Hero-plus-progress container produced an end-of-transition layout kick;
-- one reusable `LauncherHero` component now renders the same named `arkini-launcher-hero` element in launcher scenes and initial game loading, so Settings → game loading pairs Hero with Hero instead of reconciling two unrelated Hero snapshots;
-- Settings continues to use real browser history with the direct-entry `/main-menu` fallback, and leaving `/game` still releases/saves the Game normally.
+- TanStack Router remains the only route-transition owner and keeps `defaultViewTransition: true` as the unsupported-browser fallback boundary;
+- full launcher/game destinations that visually replace one another use `arkini-route-scene`;
+- corresponding compact launcher/menu panels use the semantic `arkini-launcher-panel` identity across MainMenu, Settings, About, and GameMenu, while the larger Arkpack catalog participates only at route-scene level;
+- `arkini-launcher-hero` remains one decoded Hero identity, with explicit pseudo-group layering above route and panel snapshots so the Hero cannot disappear behind the incoming full-screen route capture;
+- initial `GameLoadingScreen` and playable `Board` use separate `arkini-game-loading` and `arkini-game-board` surfaces; after the existing 100% + 150 ms hold, `GameLoadingGate` waits for any active route View Transition animations and wraps only the final loader-to-board state commit in one local native View Transition;
+- failure, retry, readiness loss, package replacement, and unmount invalidate stale pending reveals; GameOwner readiness and publication never wait for animation completion;
+- no transition registry, route animation store, modal manager, global lock, timer-based transition estimate, or engine-facing animation state exists.
 
 Next action:
 
-> Native-smoke GameMenu → Settings → Back on macOS Electron, checking that the Settings modal exits cleanly, the Hero remains continuous into initial loading, and no final-frame layout kick remains.
+> Native-smoke the complete launcher and game-loading route graph on macOS Electron, especially MainMenu ↔ About, GameMenu → Settings → Back → Loader, and Loader → Board. Any remaining compositor-specific defect should be recorded against review #276 with frame evidence rather than inferred from DOM structure.
 
 ## Source topology
 

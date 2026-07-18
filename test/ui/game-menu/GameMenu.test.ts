@@ -368,7 +368,7 @@ describe("GameMenu", () => {
 		const animationCount = animations.length;
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.style.viewTransitionName,
-		).toBe("settings-modal");
+		).toBe("arkini-launcher-panel");
 
 		await act(async () => buttonByText(container, "Settings").click());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));

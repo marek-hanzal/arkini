@@ -74,6 +74,10 @@ describe("GameLoadingScreen", () => {
 		expect(hero?.style.backgroundImage).toContain("hero.png");
 		expect(hero?.style.viewTransitionName).toBe("arkini-launcher-hero");
 		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameLoadingScreen"]')?.style
+				.viewTransitionName,
+		).toBe("arkini-game-loading");
+		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameLoadingScreenPanel"]')?.style
 				.viewTransitionName,
 		).toBe("");

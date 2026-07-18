@@ -90,6 +90,10 @@ describe("ArkpackSelector", () => {
 			);
 		});
 
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="ArkpackSelector"]')?.style
+				.viewTransitionName,
+		).toBe("arkini-route-scene");
 		const layout = container.querySelector('[data-ui="ArkpackSelector"] > div');
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");

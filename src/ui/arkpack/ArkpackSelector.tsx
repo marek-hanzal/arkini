@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
+import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 
 /** Selects a bundled or locally imported game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
@@ -51,6 +52,9 @@ export const ArkpackSelector = () => {
 		<main
 			className="size-full min-h-0 min-w-0 overflow-hidden bg-canvas p-[clamp(1rem,3vmin,2.5rem)] text-foreground"
 			data-ui="ArkpackSelector"
+			style={{
+				viewTransitionName: routeSceneViewTransitionName,
+			}}
 		>
 			<div className="mx-auto grid h-full min-h-0 w-full max-w-3xl grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-[clamp(0.75rem,2.5vmin,2rem)]">
 				<header>

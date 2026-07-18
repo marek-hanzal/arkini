@@ -2,6 +2,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
+import { launcherPanelViewTransitionName } from "~/ui/navigation/launcherPanelViewTransitionName";
+import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 
 /** Renders concise project and authorship credits as a standalone launcher destination. */
 export const About = () => {
@@ -24,8 +26,15 @@ export const About = () => {
 		<LauncherScene
 			compactHero
 			dataUi="About"
+			viewTransitionName={routeSceneViewTransitionName}
 		>
-			<section className="grid w-full max-w-xl gap-4 rounded-2xl border border-line bg-surface/80 p-6 text-center shadow-2xl backdrop-blur-xl">
+			<section
+				className="grid w-full max-w-xl gap-4 rounded-2xl border border-line bg-surface/80 p-6 text-center shadow-2xl backdrop-blur-xl"
+				data-ui="AboutPanel"
+				style={{
+					viewTransitionName: launcherPanelViewTransitionName,
+				}}
+			>
 				<h1 className="text-2xl font-semibold">About Arkini</h1>
 				<p className="leading-7 text-muted">
 					Arkini is a merge-economy game about building production chains, discovering

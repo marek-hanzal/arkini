@@ -198,3 +198,110 @@ select {
 	);
 	backdrop-filter: blur(0.5px);
 }
+
+[data-ui="LauncherHero"] {
+	contain: paint;
+	isolation: isolate;
+	will-change: transform, opacity;
+	backface-visibility: hidden;
+}
+
+@keyframes arkini-view-transition-old-fade {
+	0% {
+		opacity: 1;
+	}
+	78%,
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes arkini-view-transition-new-fade-hold {
+	0% {
+		opacity: 0;
+	}
+	72%,
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes arkini-game-loading-exit {
+	0% {
+		opacity: 1;
+		transform: scale(1);
+		filter: blur(0);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(1.012);
+		filter: blur(6px);
+	}
+}
+
+@keyframes arkini-game-board-enter {
+	0% {
+		opacity: 0;
+		transform: scale(0.985);
+		filter: blur(5px);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+		filter: blur(0);
+	}
+}
+
+::view-transition-group(arkini-route-scene),
+::view-transition-group(arkini-launcher-panel),
+::view-transition-group(arkini-launcher-hero) {
+	animation-duration: 300ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-group(arkini-route-scene) {
+	z-index: 0;
+}
+
+::view-transition-group(arkini-launcher-panel) {
+	z-index: 10;
+}
+
+::view-transition-group(arkini-launcher-hero) {
+	z-index: 20;
+}
+
+::view-transition-old(arkini-route-scene),
+::view-transition-old(arkini-launcher-panel),
+::view-transition-old(arkini-launcher-hero) {
+	animation: arkini-view-transition-old-fade 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-new(arkini-route-scene),
+::view-transition-new(arkini-launcher-panel),
+::view-transition-new(arkini-launcher-hero) {
+	animation: arkini-view-transition-new-fade-hold 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-group(arkini-game-loading),
+::view-transition-group(arkini-game-board) {
+	z-index: 10;
+	animation-duration: 420ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(arkini-game-loading) {
+	animation: arkini-game-loading-exit 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-new(arkini-game-loading) {
+	animation: arkini-view-transition-new-fade-hold 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-game-board) {
+	animation: arkini-view-transition-old-fade 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-new(arkini-game-board) {
+	animation: arkini-game-board-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}

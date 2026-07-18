@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
+import { gameLoadingViewTransitionName } from "~/ui/navigation/gameLoadingViewTransitionName";
 
 const initialProgress = 12;
 const pendingProgressTransitionMs = 220;
@@ -79,6 +80,9 @@ export const GameLoadingScreen = ({ onComplete, ready }: GameLoadingScreen.Props
 		<section
 			className="relative flex size-full min-h-0 min-w-0 flex-col items-center justify-center overflow-hidden bg-canvas p-[clamp(1rem,4vmin,3rem)] text-foreground"
 			data-ui="GameLoadingScreen"
+			style={{
+				viewTransitionName: gameLoadingViewTransitionName,
+			}}
 		>
 			<div
 				className="flex w-[min(80dvw,56rem)] max-w-full flex-col items-center gap-[clamp(1.25rem,4vmin,2.5rem)]"

@@ -4,7 +4,7 @@ import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { ResponsiveModal } from "~/ui/modal/ResponsiveModal";
 import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 import { Settings } from "~/ui/settings/Settings";
-import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
+import { launcherPanelViewTransitionName } from "~/ui/navigation/launcherPanelViewTransitionName";
 
 /** Composes standalone Settings with history-aware route navigation. */
 export const SettingsPage = () => {
@@ -32,7 +32,7 @@ export const SettingsPage = () => {
 		>
 			<ResponsiveModal
 				labelledBy="settings-title"
-				viewTransitionName={settingsModalViewTransitionName}
+				viewTransitionName={launcherPanelViewTransitionName}
 			>
 				<Settings onBack={goBack} />
 			</ResponsiveModal>

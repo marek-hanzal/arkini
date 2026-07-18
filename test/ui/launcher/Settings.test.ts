@@ -147,7 +147,7 @@ describe("Settings", () => {
 		expect(page?.style.viewTransitionName).toBe("arkini-route-scene");
 		const modal = container.querySelector<HTMLElement>('[data-ui="ResponsiveModal"]');
 		expect(modal).not.toBeNull();
-		expect(modal?.style.viewTransitionName).toBe("settings-modal");
+		expect(modal?.style.viewTransitionName).toBe("arkini-launcher-panel");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,

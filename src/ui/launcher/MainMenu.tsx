@@ -5,7 +5,7 @@ import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useExitApplicationMutation } from "~/ui/launcher/mutation/useExitApplicationMutation";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
-import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
+import { launcherPanelViewTransitionName } from "~/ui/navigation/launcherPanelViewTransitionName";
 
 /** Renders the semantic out-of-game launcher menu over authoritative startup and catalog state. */
 export const MainMenu = () => {
@@ -37,7 +37,7 @@ export const MainMenu = () => {
 				aria-label="Main menu"
 				data-ui="MainMenuActions"
 				style={{
-					viewTransitionName: settingsModalViewTransitionName,
+					viewTransitionName: launcherPanelViewTransitionName,
 				}}
 			>
 				{builtInAvailable && builtInPackageId !== undefined ? (

@@ -142,7 +142,7 @@ describe("MainMenu", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainMenuActions"]')?.style
 				.viewTransitionName,
-		).toBe("settings-modal");
+		).toBe("arkini-launcher-panel");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,

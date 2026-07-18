@@ -14,6 +14,7 @@ import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useHardResetGameMutation } from "~/ui/game-menu/mutation/useHardResetGameMutation";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
+import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
 
 const focusableSelector = [
 	"button:not([disabled])",
@@ -226,16 +227,12 @@ const GameMenuDialog = ({
 	const requestSettings = () => {
 		if (activeRequestRef.current !== null || pending || exiting) return;
 		activeRequestRef.current = "settings";
-		void menu
-			.close()
-			.then(() =>
-				navigate({
-					to: "/settings",
-				}),
-			)
-			.finally(() => {
-				activeRequestRef.current = null;
-			});
+		void navigate({
+			to: "/settings",
+			viewTransition: true,
+		}).finally(() => {
+			activeRequestRef.current = null;
+		});
 	};
 
 	const requestSave = () => {
@@ -308,15 +305,16 @@ const GameMenuDialog = ({
 				className="w-full max-w-sm rounded-2xl border border-line-strong bg-surface-raised p-5 text-foreground shadow-2xl outline-none"
 				data-ui="GameMenu"
 				tabIndex={-1}
-				style={
-					phase === "entering"
+				style={{
+					viewTransitionName: settingsModalViewTransitionName,
+					...(phase === "entering"
 						? {
 								opacity: 0,
 								transform: "scale(0.975) translateY(8px)",
 								filter: "blur(6px)",
 							}
-						: undefined
-				}
+						: {}),
+				}}
 				onKeyDown={keepFocusInside}
 			>
 				<h2

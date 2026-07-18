@@ -37,6 +37,7 @@ describe("modal presentation shells", () => {
 				ResponsiveModal,
 				{
 					labelledBy: "responsive-title",
+					viewTransitionName: "responsive-modal",
 				},
 				createElement(
 					"h2",
@@ -51,6 +52,7 @@ describe("modal presentation shells", () => {
 		const panel = container.querySelector('[data-ui="ResponsiveModal"]');
 		expect(panel?.getAttribute("role")).toBe("dialog");
 		expect(panel?.getAttribute("aria-labelledby")).toBe("responsive-title");
+		expect((panel as HTMLElement | null)?.style.viewTransitionName).toBe("responsive-modal");
 	});
 
 	it("renders a labelled viewport-sized modal boundary", async () => {
@@ -59,6 +61,7 @@ describe("modal presentation shells", () => {
 				ViewportModal,
 				{
 					labelledBy: "viewport-title",
+					viewTransitionName: "viewport-modal",
 				},
 				createElement(
 					"h2",
@@ -73,5 +76,6 @@ describe("modal presentation shells", () => {
 		const panel = container.querySelector('[data-ui="ViewportModal"]');
 		expect(panel?.getAttribute("role")).toBe("dialog");
 		expect(panel?.getAttribute("aria-labelledby")).toBe("viewport-title");
+		expect((panel as HTMLElement | null)?.style.viewTransitionName).toBe("viewport-modal");
 	});
 });

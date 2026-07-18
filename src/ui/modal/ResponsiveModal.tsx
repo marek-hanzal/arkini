@@ -5,11 +5,17 @@ export namespace ResponsiveModal {
 	export interface Props extends PropsWithChildren {
 		readonly labelledBy: string;
 		readonly className?: string;
+		readonly viewTransitionName?: string;
 	}
 }
 
 /** Renders a content-sized modal panel constrained by its current layout viewport. */
-export const ResponsiveModal = ({ children, className, labelledBy }: ResponsiveModal.Props) => (
+export const ResponsiveModal = ({
+	children,
+	className,
+	labelledBy,
+	viewTransitionName,
+}: ResponsiveModal.Props) => (
 	<section
 		role="dialog"
 		aria-modal="true"
@@ -20,6 +26,9 @@ export const ResponsiveModal = ({ children, className, labelledBy }: ResponsiveM
 			className,
 		)}
 		data-ui="ResponsiveModal"
+		style={{
+			viewTransitionName,
+		}}
 		tabIndex={-1}
 	>
 		{children}

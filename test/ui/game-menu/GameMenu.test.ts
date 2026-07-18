@@ -69,6 +69,7 @@ class TestAnimation {
 
 const animations: Array<TestAnimation> = [];
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const viewTransitionStartPhases: Array<string | null> = [];
 
 const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	arkpack: {
@@ -117,6 +118,31 @@ const createOwner = ({
 
 beforeEach(() => {
 	animations.splice(0);
+	viewTransitionStartPhases.splice(0);
+	Object.defineProperty(document, "startViewTransition", {
+		configurable: true,
+		value: vi.fn((options: unknown) => {
+			viewTransitionStartPhases.push(
+				document.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.parentElement?.dataset
+					.phase ?? null,
+			);
+			const update =
+				typeof options === "function"
+					? options
+					: (
+							options as {
+								readonly update: () => Promise<void> | void;
+							}
+						).update;
+			const updateCallbackDone = Promise.resolve().then(() => update());
+			return {
+				finished: updateCallbackDone,
+				ready: Promise.resolve(),
+				skipTransition: vi.fn(),
+				updateCallbackDone,
+			};
+		}),
+	});
 	Object.defineProperty(HTMLElement.prototype, "animate", {
 		configurable: true,
 		value: vi.fn(
@@ -336,17 +362,20 @@ describe("GameMenu", () => {
 		expect(container.querySelector('[data-ui="GameMenuBackdrop"]')).toBeNull();
 	});
 
-	it("finishes the menu exit before navigating to Settings", async () => {
+	it("navigates from the open menu through one native View Transition", async () => {
 		const { container, router } = await renderMenu();
 		await openMenu(container);
+		const animationCount = animations.length;
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.style.viewTransitionName,
+		).toBe("settings-modal");
 
 		await act(async () => buttonByText(container, "Settings").click());
-		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(router.state.location.pathname).toBe("/game/package:menu");
-
-		const exitStart = animations.length - 2;
-		await finishAnimations(exitStart, exitStart + 1);
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));
+		expect(viewTransitionStartPhases).toEqual([
+			"open",
+		]);
+		expect(animations).toHaveLength(animationCount);
 	});
 
 	it("runs one save while disabling overlapping menu actions", async () => {

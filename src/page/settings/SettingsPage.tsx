@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { ResponsiveModal } from "~/ui/modal/ResponsiveModal";
 import { Settings } from "~/ui/settings/Settings";
+import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
 
 /** Composes standalone Settings with history-aware route navigation. */
 export const SettingsPage = () => {
@@ -27,7 +28,10 @@ export const SettingsPage = () => {
 			compactHero
 			dataUi="SettingsPage"
 		>
-			<ResponsiveModal labelledBy="settings-title">
+			<ResponsiveModal
+				labelledBy="settings-title"
+				viewTransitionName={settingsModalViewTransitionName}
+			>
 				<Settings onBack={goBack} />
 			</ResponsiveModal>
 		</LauncherScene>

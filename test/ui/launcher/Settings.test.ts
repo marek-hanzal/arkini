@@ -143,7 +143,9 @@ describe("Settings", () => {
 			"/settings",
 		]);
 
-		expect(container.querySelector('[data-ui="ResponsiveModal"]')).not.toBeNull();
+		const modal = container.querySelector<HTMLElement>('[data-ui="ResponsiveModal"]');
+		expect(modal).not.toBeNull();
+		expect(modal?.style.viewTransitionName).toBe("settings-modal");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
 		expect(radios).toHaveLength(3);
 		const light = radios.find(

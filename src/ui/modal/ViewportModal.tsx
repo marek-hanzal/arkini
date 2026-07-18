@@ -5,11 +5,17 @@ export namespace ViewportModal {
 	export interface Props extends PropsWithChildren {
 		readonly labelledBy: string;
 		readonly className?: string;
+		readonly viewTransitionName?: string;
 	}
 }
 
 /** Renders a modal panel occupying approximately 85% of the current viewport. */
-export const ViewportModal = ({ children, className, labelledBy }: ViewportModal.Props) => (
+export const ViewportModal = ({
+	children,
+	className,
+	labelledBy,
+	viewTransitionName,
+}: ViewportModal.Props) => (
 	<section
 		role="dialog"
 		aria-modal="true"
@@ -20,6 +26,9 @@ export const ViewportModal = ({ children, className, labelledBy }: ViewportModal
 			className,
 		)}
 		data-ui="ViewportModal"
+		style={{
+			viewTransitionName,
+		}}
 		tabIndex={-1}
 	>
 		{children}

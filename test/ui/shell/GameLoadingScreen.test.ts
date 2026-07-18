@@ -72,7 +72,8 @@ describe("GameLoadingScreen", () => {
 		expect(artwork?.getAttribute("role")).toBe("img");
 		expect(artwork?.getAttribute("aria-label")).toBe("Arkini");
 		expect(artwork?.style.backgroundImage).toContain("hero.png");
-		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero");
+		expect(hero?.style.viewTransitionName).toBe("arkini-launcher-hero");
+		expect(artwork?.style.viewTransitionName).toBe("");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameLoadingScreen"]')?.style

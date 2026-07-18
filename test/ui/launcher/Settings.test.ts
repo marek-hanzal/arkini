@@ -149,7 +149,7 @@ describe("Settings", () => {
 		expect(panel).not.toBeNull();
 		expect(panel?.style.viewTransitionName).toBe("arkini-main-page-panel");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));

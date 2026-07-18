@@ -62,7 +62,7 @@ describe("About", () => {
 				.viewTransitionName,
 		).toBe("arkini-main-page-panel");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero");
 		expect(container.querySelector('[data-ui="About"]')).not.toBeNull();

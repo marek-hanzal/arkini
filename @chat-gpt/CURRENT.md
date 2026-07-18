@@ -17,13 +17,13 @@ Current contract:
 - browser Back/Forward uses the same route-pair policy; individual links and GameMenu do not force a second transition decision;
 - startup splash keeps its existing WAAPI crossfade into the already-mounted normalized MainMenu and receives no native route backfade;
 - `arkini-route-scene`, `arkini-main-page-panel`, and `arkini-launcher-hero` describe visual roles rather than destination names;
-- Hero artwork owns the shared-element identity while its former `drop-shadow` filter is replaced by a separate cheap gradient shadow layer outside the artwork snapshot, avoiding filter rerasterization during repeated transitions;
+- the complete `LauncherHero` composite owns the shared-element identity; its artwork and cheap gradient shadow are captured and handed off together, avoiding both expensive `drop-shadow` rerasterization and the rectangular live-shadow flash caused by splitting the shadow outside the snapshot;
 - initial Loader → Board remains the separate local native View Transition owned by `GameLoadingGate`; no route animation state enters GameOwner or the engine.
 - GameMenu exposes direct `Settings` and `Main Menu` route actions; both navigate from the fully open menu without running its local WAAPI exit first, and the router's main-page ↔ game policy owns the native transition. Leaving the game route still uses the canonical GameOwner final-save/release lifecycle.
 
 Next action:
 
-> Native-smoke `/main-menu ↔ /settings`, `/main-menu ↔ /about`, `/main-menu ↔ /arkpacks`, GameMenu → Settings → Back, GameMenu → MainMenu, startup splash → MainMenu, and Loader → Board on macOS Electron. Verify especially that route actions preserve the fully open GameMenu snapshot, splash has no second fade, and the separate Hero shadow does not kick after repeated navigation.
+> Native-smoke `/main-menu ↔ /settings`, `/main-menu ↔ /about`, `/main-menu ↔ /arkpacks`, GameMenu → Settings → Back, GameMenu → MainMenu, startup splash → MainMenu, and Loader → Board on macOS Electron. Verify especially that route actions preserve the fully open GameMenu snapshot, splash has no second fade, and the composite Hero artwork plus gradient shadow does not flash or expose rectangular raster bounds after repeated navigation.
 
 ## Source topology
 

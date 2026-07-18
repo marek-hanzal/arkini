@@ -11,13 +11,14 @@ export namespace LauncherHero {
 	}
 }
 
-/** Renders stable Hero artwork with a cheap shadow layer outside shared-element geometry. */
+/** Renders one stable shared Hero composite with artwork and its cheap shadow. */
 export const LauncherHero = ({ compact = false }: LauncherHero.Props) => (
 	<div
 		className="relative block shrink-0 isolation-isolate"
 		data-ui="LauncherHero"
 		style={{
 			aspectRatio: heroAspectRatio,
+			viewTransitionName,
 			width: compact ? compactWidth : fullWidth,
 		}}
 	>
@@ -33,7 +34,6 @@ export const LauncherHero = ({ compact = false }: LauncherHero.Props) => (
 			data-ui="LauncherHeroArtwork"
 			style={{
 				backgroundImage: `url(${JSON.stringify(LauncherHeroAsset.url)})`,
-				viewTransitionName,
 			}}
 		/>
 	</div>

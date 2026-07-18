@@ -201,12 +201,12 @@ select {
 
 [data-ui="LauncherHero"] {
 	isolation: isolate;
+	will-change: transform, opacity;
+	backface-visibility: hidden;
 }
 
 [data-ui="LauncherHeroArtwork"] {
 	contain: paint;
-	will-change: transform, opacity;
-	backface-visibility: hidden;
 }
 
 .launcher-hero__shadow {

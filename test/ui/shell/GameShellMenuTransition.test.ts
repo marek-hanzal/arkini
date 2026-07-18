@@ -207,6 +207,10 @@ describe("GameShell menu transition", () => {
 				}),
 			);
 		});
+		expect(container.querySelector('[data-ui="GameLoadingScreen"]')).not.toBeNull();
+		await act(async () => {
+			await new Promise((resolve) => window.setTimeout(resolve, 350));
+		});
 		expect(container.querySelector('[data-ui="Gameplay"]')?.getAttribute("data-instance")).toBe(
 			"game-instance:original",
 		);
@@ -223,5 +227,91 @@ describe("GameShell menu transition", () => {
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		await finishLatestPair();
 		expect(container.querySelector('[role="dialog"]')).toBeNull();
+	});
+
+	it("does not mount the Escape menu before the initial loading gate completes", async () => {
+		const game = createGame("game-instance:loading");
+		const listeners = new Set<() => void>();
+		let state: ReturnType<GameOwner["getSnapshot"]> = {
+			type: "loading",
+			packageId: "package:menu",
+		};
+		const owner: GameOwner = {
+			getSnapshot: () => state,
+			selectPackageFx: () => Effect.void,
+			releaseRouteGameFx: () => Effect.void,
+			shutdownFx: () => Effect.void,
+			clearFailedSaveAndRetryFx: () => Effect.void,
+			hardResetFx: () => Effect.void,
+			subscribe: (listener) => {
+				listeners.add(listener);
+				return () => listeners.delete(listener);
+			},
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const App = () =>
+			createElement(
+				QueryClientProvider,
+				{
+					client: new QueryClient(),
+				},
+				createElement(
+					GameOwnerContext.Provider,
+					{
+						value: owner,
+					},
+					createElement(
+						GameShell,
+						{
+							packageId: "package:menu",
+						},
+						createElement(Gameplay),
+					),
+				),
+			);
+		const rootRoute = createRootRoute({
+			component: App,
+		});
+		const router = createRouter({
+			routeTree: rootRoute,
+			history: createMemoryHistory({
+				initialEntries: [
+					"/game/package:menu",
+				],
+			}),
+		});
+		await router.load();
+		await act(async () => {
+			root.render(
+				createElement(RouterProvider, {
+					router,
+				}),
+			);
+		});
+		expect(container.querySelector('[data-ui="GameLoadingScreen"]')).not.toBeNull();
+		await pressEscape();
+		expect(animations).toHaveLength(0);
+
+		await act(async () => {
+			state = {
+				type: "ready",
+				game,
+			};
+			for (const listener of listeners) listener();
+		});
+		expect(container.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow")).toBe(
+			"100",
+		);
+		await act(async () => {
+			await new Promise((resolve) => window.setTimeout(resolve, 350));
+		});
+		expect(container.querySelector('[data-ui="Gameplay"]')?.getAttribute("data-instance")).toBe(
+			"game-instance:loading",
+		);
+		expect(container.querySelector('[role="dialog"]')).toBeNull();
+		expect(animations).toHaveLength(0);
 	});
 });

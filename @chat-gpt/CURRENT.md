@@ -4,23 +4,23 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Launcher continue-prompt truthfulness**
+**Game loading Hero and staged progress**
 
-Status: **Implemented and locally validated for #269.**
+Status: **Implemented and locally validated for #275.**
 
 Current scope:
 
-- hard bootstrap `state.type === "ready"` remains the owner-level data readiness signal;
-- splash continuation uses one derived `canContinue` contract requiring hard readiness, the interactive `entering | open` visual phases, and a minimum hold that has not already elapsed;
-- black hold and loading ignore Escape without queueing a later dismissal;
-- active enter remains immediately reversible after readiness;
-- exit hides `Press Esc to continue` immediately and rejects duplicate Escape input;
-- prompt rendering and keyboard handling share `canContinue`, while automatic and keyboard continuation converge on the same `requestExit` boundary;
-- no timeout, duplicate readiness store, or low-level resource inference was added.
+- `/game/$packageId` renders a dedicated Hero loading scene instead of the plain `Loading game…` placeholder;
+- pending progress follows deterministic presentation-only stages and never reaches 100% before authoritative GameOwner readiness;
+- readiness drives the bar to 100%, waits for the final interpolation, preserves a visible 150 ms completed hold, and only then reveals the first board;
+- same-package hard reset keeps its existing immediate fresh-game publication beneath the mounted game menu after the first board has already been revealed;
+- timers are component-owned and cancel on failure, unmount, route/package replacement, or retry;
+- reduced motion removes interpolation but preserves the 150 ms completion ordering;
+- fake percentage never enters GameOwner, engine state, persistence, or gameplay truth.
 
 Next action:
 
-> Native smoke the startup prompt once: it must be absent during black/loading, appear only when Escape is accepted, disappear at exit start, and never reappear during the splash-to-menu cross-fade.
+> Native-smoke the loading scene at normal and short Electron viewport sizes, checking Hero scale, staged progress, the visible 100% hold, and the board reveal.
 
 ## Source topology
 

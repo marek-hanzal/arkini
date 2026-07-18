@@ -8,6 +8,8 @@ import { useGameOwner } from "~/bridge/game/useGameOwner";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { GameLoadingGate } from "~/ui/shell/GameLoadingGate";
+import { GameLoadingScreen } from "~/ui/shell/GameLoadingScreen";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
 const runOwnerCommand = (command: Effect.Effect<void, unknown>) => {
@@ -39,9 +41,12 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 	const menuGame = menuGameRef.current;
 	const gameAvailable = activeGame?.instanceKey === menuGame?.instanceKey;
 
-	const fallback =
+	const failure =
 		state.type === "failed" && state.operation !== "shutdown" ? (
-			<div className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-danger">
+			<div
+				className="flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-4 overflow-hidden p-6 text-center text-sm text-danger"
+				data-ui="GameShellFailure"
+			>
 				<p>Game failed to start or close safely: {String(state.error)}</p>
 				<div className="flex flex-wrap justify-center gap-2">
 					{state.canRecoverSave ? (
@@ -68,11 +73,7 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 					</Link>
 				</div>
 			</div>
-		) : (
-			<div className="flex size-full min-h-0 min-w-0 items-center justify-center overflow-hidden text-sm text-muted">
-				Loading game…
-			</div>
-		);
+		) : null;
 
 	return (
 		<main
@@ -80,23 +81,27 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 			data-ui="GameShell"
 			tabIndex={-1}
 		>
-			{menuGame === undefined ? (
-				fallback
-			) : (
-				<GameMenuProvider key={packageId}>
-					{activeGame !== undefined && activeGame.instanceKey === menuGame.instanceKey ? (
-						<GameProvider game={activeGame}>
-							<TileSystemProvider>{children}</TileSystemProvider>
-						</GameProvider>
-					) : (
-						fallback
-					)}
-					<GameMenu
-						game={menuGame}
-						gameAvailable={gameAvailable}
-					/>
-				</GameMenuProvider>
-			)}
+			<GameLoadingGate
+				key={packageId}
+				ready={activeGame !== undefined}
+				failure={menuGame === undefined ? failure : null}
+			>
+				{menuGame !== undefined ? (
+					<GameMenuProvider key={packageId}>
+						{activeGame !== undefined ? (
+							<GameProvider game={activeGame}>
+								<TileSystemProvider>{children}</TileSystemProvider>
+							</GameProvider>
+						) : (
+							(failure ?? <GameLoadingScreen ready={false} />)
+						)}
+						<GameMenu
+							game={menuGame}
+							gameAvailable={gameAvailable}
+						/>
+					</GameMenuProvider>
+				) : null}
+			</GameLoadingGate>
 		</main>
 	);
 }

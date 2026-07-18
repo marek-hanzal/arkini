@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import type { Game } from "~/bridge/game/Game";
 import {
 	type KeyboardEvent as ReactKeyboardEvent,
@@ -58,6 +59,7 @@ const GameMenuDialog = ({
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
 	const menu = useGameMenuControl();
+	const navigate = useNavigate();
 	const save = useSaveGameMutation(game);
 	const saveAndExit = useSaveAndExitGameMutation(game);
 	const hardReset = useHardResetGameMutation(game);
@@ -66,7 +68,9 @@ const GameMenuDialog = ({
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
 	const animationGenerationRef = useRef(0);
-	const activeRequestRef = useRef<"save" | "save-and-exit" | "hard-reset" | null>(null);
+	const activeRequestRef = useRef<"save" | "save-and-exit" | "hard-reset" | "settings" | null>(
+		null,
+	);
 	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
 	const pending = save.isPending || saveAndExit.isPending || hardReset.isPending;
 	const exiting = phase === "exiting";
@@ -219,6 +223,21 @@ const GameMenuDialog = ({
 		}
 	};
 
+	const requestSettings = () => {
+		if (activeRequestRef.current !== null || pending || exiting) return;
+		activeRequestRef.current = "settings";
+		void menu
+			.close()
+			.then(() =>
+				navigate({
+					to: "/settings",
+				}),
+			)
+			.finally(() => {
+				activeRequestRef.current = null;
+			});
+	};
+
 	const requestSave = () => {
 		if (activeRequestRef.current !== null) return;
 		activeRequestRef.current = "save";
@@ -315,6 +334,13 @@ const GameMenuDialog = ({
 					>
 						Return to game
 					</PrimaryButton>
+					<Button
+						className="w-full py-3 shadow-none backdrop-blur-none"
+						disabled={pending || exiting}
+						onClick={requestSettings}
+					>
+						Settings
+					</Button>
 
 					<div className="my-2 border-t border-line" />
 

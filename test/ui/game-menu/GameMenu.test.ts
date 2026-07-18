@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
 	createMemoryHistory,
 	createRootRoute,
+	createRoute,
 	createRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
@@ -201,8 +202,19 @@ const renderMenu = async ({
 	const rootRoute = createRootRoute({
 		component: App,
 	});
+	const gameRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/game/$packageId",
+	});
+	const settingsRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/settings",
+	});
 	const router = createRouter({
-		routeTree: rootRoute,
+		routeTree: rootRoute.addChildren([
+			gameRoute,
+			settingsRoute,
+		]),
 		history: createMemoryHistory({
 			initialEntries: [
 				initialPath,
@@ -322,6 +334,19 @@ describe("GameMenu", () => {
 		const exitStart = animations.length - 2;
 		await finishAnimations(exitStart, exitStart + 1);
 		expect(container.querySelector('[data-ui="GameMenuBackdrop"]')).toBeNull();
+	});
+
+	it("finishes the menu exit before navigating to Settings", async () => {
+		const { container, router } = await renderMenu();
+		await openMenu(container);
+
+		await act(async () => buttonByText(container, "Settings").click());
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(router.state.location.pathname).toBe("/game/package:menu");
+
+		const exitStart = animations.length - 2;
+		await finishAnimations(exitStart, exitStart + 1);
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));
 	});
 
 	it("runs one save while disabling overlapping menu actions", async () => {

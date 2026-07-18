@@ -6,13 +6,14 @@ import {
 	createRootRoute,
 	createRoute,
 	createRouter,
+	Outlet,
 	RouterProvider,
 } from "@tanstack/react-router";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { SettingsPage } from "~/page/settings/SettingsPage";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
-import { Settings } from "~/ui/settings/Settings";
 
 (
 	globalThis as {
@@ -42,77 +43,107 @@ const createDeferred = () => {
 	};
 };
 
-describe("Settings", () => {
-	it("changes and persists the authoritative theme, then returns with Escape", async () => {
-		const deferred = createDeferred();
-		const write = vi.fn(() => deferred.promise);
-		Object.defineProperty(window, "scrollTo", {
-			configurable: true,
-			value: vi.fn(),
-		});
-		Object.defineProperty(window, "arkini", {
-			configurable: true,
-			value: {
-				appearance: {
-					write,
-				},
-			},
-		});
-		const queryClient = new QueryClient({
-			defaultOptions: {
-				mutations: {
-					retry: false,
-				},
-			},
-		});
-		const rootRoute = createRootRoute();
-		const settingsRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/settings",
-			component: () =>
-				createElement(
-					QueryClientProvider,
-					{
-						client: queryClient,
-					},
-					createElement(
-						AppearanceProvider,
-						{
-							initialTheme: "dark",
-						},
-						createElement(Settings),
-					),
-				),
-		});
-		const mainMenuRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/main-menu",
-			component: () => createElement("p", null, "Main menu destination"),
-		});
-		const router = createRouter({
-			routeTree: rootRoute.addChildren([
-				settingsRoute,
-				mainMenuRoute,
-			]),
-			history: createMemoryHistory({
-				initialEntries: [
-					"/settings",
-				],
-			}),
-		});
-		await router.load();
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				createElement(RouterProvider, {
-					router,
-				}),
-			);
-		});
+const buttonByText = (container: ParentNode, text: string) => {
+	const button = Array.from(container.querySelectorAll("button")).find(
+		(candidate) => candidate.textContent === text,
+	);
+	if (!(button instanceof HTMLButtonElement)) throw new Error(`Expected ${text}.`);
+	return button;
+};
 
+const renderSettings = async (initialEntries: ReadonlyArray<string>) => {
+	const deferred = createDeferred();
+	const write = vi.fn(() => deferred.promise);
+	Object.defineProperty(window, "scrollTo", {
+		configurable: true,
+		value: vi.fn(),
+	});
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			appearance: {
+				write,
+			},
+		},
+	});
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			mutations: {
+				retry: false,
+			},
+		},
+	});
+	const rootRoute = createRootRoute({
+		component: Outlet,
+	});
+	const settingsRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/settings",
+		component: () =>
+			createElement(
+				QueryClientProvider,
+				{
+					client: queryClient,
+				},
+				createElement(
+					AppearanceProvider,
+					{
+						initialTheme: "dark",
+					},
+					createElement(SettingsPage),
+				),
+			),
+	});
+	const mainMenuRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/main-menu",
+		component: () => createElement("p", null, "Main menu destination"),
+	});
+	const gameRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/game/$packageId",
+		component: () => createElement("p", null, "Game destination"),
+	});
+	const router = createRouter({
+		routeTree: rootRoute.addChildren([
+			settingsRoute,
+			mainMenuRoute,
+			gameRoute,
+		]),
+		history: createMemoryHistory({
+			initialEntries: [
+				...initialEntries,
+			],
+		}),
+	});
+	await router.load();
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(RouterProvider, {
+				router,
+			}),
+		);
+	});
+	return {
+		container,
+		deferred,
+		router,
+		write,
+	};
+};
+
+describe("Settings", () => {
+	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {
+		const { container, deferred, router, write } = await renderSettings([
+			"/main-menu",
+			"/settings",
+		]);
+
+		expect(container.querySelector('[data-ui="ResponsiveModal"]')).not.toBeNull();
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
 		expect(radios).toHaveLength(3);
 		const light = radios.find(
@@ -142,6 +173,25 @@ describe("Settings", () => {
 			);
 			await Promise.resolve();
 		});
-		expect(router.state.location.pathname).toBe("/main-menu");
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+	});
+
+	it("returns to the exact game route through the Back action", async () => {
+		const { container, router } = await renderSettings([
+			"/game/package:menu",
+			"/settings",
+		]);
+
+		await act(async () => buttonByText(container, "Back").click());
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/game/package:menu"));
+	});
+
+	it("falls back to the main menu when Settings was opened directly", async () => {
+		const { container, router } = await renderSettings([
+			"/settings",
+		]);
+
+		await act(async () => buttonByText(container, "Back").click());
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 });

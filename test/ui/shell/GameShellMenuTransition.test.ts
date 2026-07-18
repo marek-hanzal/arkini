@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+	createMemoryHistory,
+	createRootRoute,
+	createRouter,
+	RouterProvider,
+} from "@tanstack/react-router";
 import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
@@ -162,27 +168,43 @@ describe("GameShell menu transition", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		await act(async () => {
-			root.render(
+		const App = () =>
+			createElement(
+				QueryClientProvider,
+				{
+					client: new QueryClient(),
+				},
 				createElement(
-					QueryClientProvider,
+					GameOwnerContext.Provider,
 					{
-						client: new QueryClient(),
+						value: owner,
 					},
 					createElement(
-						GameOwnerContext.Provider,
+						GameShell,
 						{
-							value: owner,
+							packageId: "package:menu",
 						},
-						createElement(
-							GameShell,
-							{
-								packageId: "package:menu",
-							},
-							createElement(Gameplay),
-						),
+						createElement(Gameplay),
 					),
 				),
+			);
+		const rootRoute = createRootRoute({
+			component: App,
+		});
+		const router = createRouter({
+			routeTree: rootRoute,
+			history: createMemoryHistory({
+				initialEntries: [
+					"/game/package:menu",
+				],
+			}),
+		});
+		await router.load();
+		await act(async () => {
+			root.render(
+				createElement(RouterProvider, {
+					router,
+				}),
 			);
 		});
 		expect(container.querySelector('[data-ui="Gameplay"]')?.getAttribute("data-instance")).toBe(

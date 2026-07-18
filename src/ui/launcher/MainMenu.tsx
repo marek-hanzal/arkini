@@ -26,6 +26,7 @@ export const MainMenu = () => {
 
 	return (
 		<LauncherScene
+			className="launcher-main-menu"
 			compactHero
 			dataUi="MainMenu"
 		>

@@ -49,9 +49,13 @@ const deferred = () => {
 class TestAnimation {
 	readonly finished: Promise<void>;
 	readonly cancel = vi.fn();
+	readonly commitStyles = vi.fn();
 	private resolveFinished!: () => void;
 
-	constructor() {
+	constructor(
+		readonly keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+		readonly options?: number | KeyframeAnimationOptions,
+	) {
 		this.finished = new Promise<void>((resolve) => {
 			this.resolveFinished = resolve;
 		});
@@ -114,11 +118,16 @@ beforeEach(() => {
 	animations.splice(0);
 	Object.defineProperty(HTMLElement.prototype, "animate", {
 		configurable: true,
-		value: vi.fn(() => {
-			const animation = new TestAnimation();
-			animations.push(animation);
-			return animation as unknown as Animation;
-		}),
+		value: vi.fn(
+			(
+				keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+				options?: number | KeyframeAnimationOptions,
+			) => {
+				const animation = new TestAnimation(keyframes, options);
+				animations.push(animation);
+				return animation as unknown as Animation;
+			},
+		),
 	});
 });
 
@@ -264,6 +273,10 @@ describe("GameMenu", () => {
 		if (surface === null) throw new Error("Expected the game surface control.");
 		surface.focus();
 		await openMenu(container);
+		expect(animations[0]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[1]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
+		expect(animations[1]?.cancel).toHaveBeenCalledOnce();
 		expect(document.activeElement?.textContent).toBe("Return to game");
 
 		const destroy = buttonByText(container, "Destroy");
@@ -285,6 +298,10 @@ describe("GameMenu", () => {
 		expect(document.activeElement).not.toBe(surface);
 		const exitStart = animations.length - 2;
 		await finishAnimations(exitStart, exitStart + 1);
+		expect(animations[exitStart]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[exitStart + 1]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[exitStart]?.cancel).toHaveBeenCalledOnce();
+		expect(animations[exitStart + 1]?.cancel).toHaveBeenCalledOnce();
 		expect(container.querySelector('[role="dialog"]')).toBeNull();
 		expect(document.activeElement).toBe(surface);
 	});
@@ -292,7 +309,11 @@ describe("GameMenu", () => {
 	it("reverses rapid Escape during enter without duplicate overlays", async () => {
 		const { container } = await renderMenu();
 		await pressEscape();
+		const backdrop = container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]');
+		const dialog = container.querySelector<HTMLElement>('[data-ui="GameMenu"]');
 		expect(container.querySelectorAll('[data-ui="GameMenuBackdrop"]')).toHaveLength(1);
+		expect(backdrop?.style.opacity).toBe("0");
+		expect(dialog?.style.opacity).toBe("0");
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		expect(

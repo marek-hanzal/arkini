@@ -136,6 +136,9 @@ describe("MainMenu", () => {
 			(link) => link.textContent === "Play",
 		);
 		expect(play?.getAttribute("href")).toContain("/game/canonical-built-in");
+		expect(container.querySelector('[data-ui="MainMenu"]')?.classList).toContain(
+			"launcher-main-menu",
+		);
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

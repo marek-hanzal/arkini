@@ -14,8 +14,8 @@ import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 
 const blackHoldMs = 500;
 const minimumSplashMs = 5_000;
-const enterTransitionMs = 700;
-const exitTransitionMs = 650;
+const enterTransitionMs = 2_500;
+const exitTransitionMs = 2_500;
 
 type SplashPhase = "black" | "entering" | "open" | "exiting" | "completed";
 
@@ -29,6 +29,17 @@ const currentFrame = (element: HTMLElement) => {
 		transform: style.transform === "none" ? "scale(1)" : style.transform,
 		filter: style.filter === "none" ? "blur(0px)" : style.filter,
 	};
+};
+
+const persistFinalFrame = (animation: Animation) => {
+	if (typeof animation.commitStyles !== "function") return false;
+	try {
+		animation.commitStyles();
+		animation.cancel();
+		return true;
+	} catch {
+		return false;
+	}
 };
 
 /** Runs the visible-window black hold, decoded Hero reveal and real main-menu cross-fade. */
@@ -69,7 +80,7 @@ export const StartupSplash = () => {
 
 	useEffect(() => {
 		if (phase !== "black" || !blackHoldComplete || !visualReady) return;
-		setPhase("entering");
+		setPhase(exitRequestedRef.current ? "completed" : "entering");
 	}, [
 		blackHoldComplete,
 		phase,
@@ -78,11 +89,11 @@ export const StartupSplash = () => {
 
 	const requestExit = useCallback(() => {
 		if (state.type !== "ready" || phase === "completed" || phase === "exiting") return;
-		if (phase === "open") {
-			setPhase("exiting");
+		if (phase === "black") {
+			exitRequestedRef.current = true;
 			return;
 		}
-		exitRequestedRef.current = true;
+		setPhase("exiting");
 	}, [
 		phase,
 		state.type,
@@ -166,8 +177,7 @@ export const StartupSplash = () => {
 			.catch(() => undefined)
 			.then(() => {
 				if (animationGenerationRef.current !== generation) return;
-				animation.cancel();
-				animationRef.current = undefined;
+				if (persistFinalFrame(animation)) animationRef.current = undefined;
 				if (phase === "entering") {
 					setPhase(exitRequestedRef.current ? "exiting" : "open");
 					return;
@@ -183,7 +193,6 @@ export const StartupSplash = () => {
 		void RendererRuntime.runPromise(startup.completeSplashFx).then(() =>
 			navigate({
 				to: "/main-menu",
-				viewTransition: false,
 			}),
 		);
 	}, [
@@ -237,37 +246,54 @@ export const StartupSplash = () => {
 	}
 
 	return (
-		<div
-			ref={overlayRef}
-			className="absolute inset-0 z-20 size-full"
-			data-ui="StartupSplash"
-			data-phase={phase}
-		>
-			<LauncherScene dataUi="StartupSplashScene">
+		<>
+			{phase === "entering" ? (
 				<div
-					className="min-h-14 text-center text-sm text-muted"
-					aria-live="polite"
-				>
-					{state.type === "loading" ? (
-						<p>Preparing Arkini…</p>
-					) : state.type === "failed" ? (
-						<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
-							<p className="font-semibold text-danger">Startup failed</p>
-							<p>{messageFromError(state.error)}</p>
-							<PrimaryButton
-								className="mx-auto"
-								onClick={retry}
-							>
-								Retry
-							</PrimaryButton>
-						</div>
-					) : (
-						<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
-							Press Esc to continue
-						</p>
-					)}
-				</div>
-			</LauncherScene>
-		</div>
+					className="absolute inset-0 z-10 size-full bg-black"
+					data-ui="StartupEnterUnderlay"
+				/>
+			) : null}
+			<div
+				ref={overlayRef}
+				className="absolute inset-0 z-20 size-full"
+				data-ui="StartupSplash"
+				data-phase={phase}
+				style={
+					phase === "entering"
+						? {
+								opacity: 0,
+								transform: "scale(0.985)",
+								filter: "blur(8px)",
+							}
+						: undefined
+				}
+			>
+				<LauncherScene dataUi="StartupSplashScene">
+					<div
+						className="min-h-14 text-center text-sm text-muted"
+						aria-live="polite"
+					>
+						{state.type === "loading" ? (
+							<p>Preparing Arkini…</p>
+						) : state.type === "failed" ? (
+							<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
+								<p className="font-semibold text-danger">Startup failed</p>
+								<p>{messageFromError(state.error)}</p>
+								<PrimaryButton
+									className="mx-auto"
+									onClick={retry}
+								>
+									Retry
+								</PrimaryButton>
+							</div>
+						) : (
+							<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
+								Press Esc to continue
+							</p>
+						)}
+					</div>
+				</LauncherScene>
+			</div>
+		</>
 	);
 };

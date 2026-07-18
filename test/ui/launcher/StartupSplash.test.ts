@@ -40,9 +40,13 @@ const deferred = <T>() => {
 class TestAnimation {
 	readonly finished: Promise<void>;
 	readonly cancel = vi.fn();
+	readonly commitStyles = vi.fn();
 	private resolveFinished!: () => void;
 
-	constructor() {
+	constructor(
+		readonly keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+		readonly options?: number | KeyframeAnimationOptions,
+	) {
 		this.finished = new Promise<void>((resolve) => {
 			this.resolveFinished = resolve;
 		});
@@ -121,11 +125,16 @@ beforeEach(() => {
 	animations.splice(0);
 	Object.defineProperty(HTMLElement.prototype, "animate", {
 		configurable: true,
-		value: vi.fn(() => {
-			const animation = new TestAnimation();
-			animations.push(animation);
-			return animation as unknown as Animation;
-		}),
+		value: vi.fn(
+			(
+				keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
+				options?: number | KeyframeAnimationOptions,
+			) => {
+				const animation = new TestAnimation(keyframes, options);
+				animations.push(animation);
+				return animation as unknown as Animation;
+			},
+		),
 	});
 });
 
@@ -240,8 +249,14 @@ describe("StartupSplash", () => {
 		await act(async () => vi.advanceTimersByTime(499));
 		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
 		await act(async () => vi.advanceTimersByTime(1));
-		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
+		const splash = container.querySelector<HTMLElement>('[data-phase="entering"]');
+		expect(splash).not.toBeNull();
+		expect(splash?.style.opacity).toBe("0");
+		expect(container.querySelector('[data-ui="StartupEnterUnderlay"]')).not.toBeNull();
 		expect(animations).toHaveLength(1);
+		expect(animations[0]?.options).toMatchObject({
+			duration: 2_500,
+		});
 	});
 
 	it("reveals the decoded Hero while the remaining bootstrap is still loading", async () => {
@@ -277,13 +292,17 @@ describe("StartupSplash", () => {
 		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
 
 		await pressEscape();
-		expect(animations).toHaveLength(1);
-		await finishAnimation(0);
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		expect(animations).toHaveLength(2);
+		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
+		expect(animations[1]?.options).toMatchObject({
+			duration: 2_500,
+		});
 		expect(router.state.location.pathname).toBe("/");
 
 		await finishAnimation(1);
+		expect(animations[1]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[1]?.cancel).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
@@ -295,6 +314,8 @@ describe("StartupSplash", () => {
 		await act(async () => visible.resolve(performance.now()));
 		await act(async () => vi.advanceTimersByTime(500));
 		await finishAnimation(0);
+		expect(animations[0]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
 		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 
 		await act(async () => vi.advanceTimersByTime(4_499));

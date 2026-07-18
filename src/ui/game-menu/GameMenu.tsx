@@ -37,6 +37,17 @@ const currentFrame = (element: HTMLElement) => {
 	};
 };
 
+const persistFinalFrame = (animation: Animation) => {
+	if (typeof animation.commitStyles !== "function") return false;
+	try {
+		animation.commitStyles();
+		animation.cancel();
+		return true;
+	} catch {
+		return false;
+	}
+};
+
 const GameMenuDialog = ({
 	game,
 	gameAvailable,
@@ -159,8 +170,9 @@ const GameMenuDialog = ({
 			animationsRef.current.map((animation) => animation.finished.catch(() => undefined)),
 		).then(() => {
 			if (animationGenerationRef.current !== generation) return;
-			for (const animation of animationsRef.current) animation.cancel();
-			animationsRef.current = [];
+			animationsRef.current = animationsRef.current.filter(
+				(animation) => !persistFinalFrame(animation),
+			);
 			if (phase === "entering") menu.completeEnter();
 			else menu.completeExit();
 		});
@@ -261,6 +273,13 @@ const GameMenuDialog = ({
 			className="absolute inset-0 z-50 grid place-items-center bg-overlay/90 p-4 text-overlay-foreground backdrop-blur-sm"
 			data-ui="GameMenuBackdrop"
 			data-phase={phase}
+			style={
+				phase === "entering"
+					? {
+							opacity: 0,
+						}
+					: undefined
+			}
 		>
 			<div
 				ref={dialogRef}
@@ -270,6 +289,15 @@ const GameMenuDialog = ({
 				className="w-full max-w-sm rounded-2xl border border-line-strong bg-surface-raised p-5 text-foreground shadow-2xl outline-none"
 				data-ui="GameMenu"
 				tabIndex={-1}
+				style={
+					phase === "entering"
+						? {
+								opacity: 0,
+								transform: "scale(0.975) translateY(8px)",
+								filter: "blur(6px)",
+							}
+						: undefined
+				}
 				onKeyDown={keepFocusInside}
 			>
 				<h2

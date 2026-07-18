@@ -15,8 +15,8 @@ import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 
 const blackHoldMs = 500;
 const minimumSplashMs = 5_000;
-const enterTransitionMs = 2_500;
-const exitTransitionMs = 2_500;
+const enterTransitionMs = 1_500;
+const exitTransitionMs = 1_500;
 
 type SplashPhase = "black" | "entering" | "open" | "exiting" | "completed";
 

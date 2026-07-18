@@ -274,7 +274,7 @@ describe("StartupSplash", () => {
 		expect(container.querySelector('[data-ui="StartupEnterUnderlay"]')).toBeNull();
 		expect(animations).toHaveLength(1);
 		expect(animations[0]?.options).toMatchObject({
-			duration: 2_500,
+			duration: 1_500,
 		});
 	});
 
@@ -325,7 +325,7 @@ describe("StartupSplash", () => {
 		expect(animations).toHaveLength(3);
 		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
 		expect(animations[1]?.options).toMatchObject({
-			duration: 2_500,
+			duration: 1_500,
 		});
 		expect(animations[2]?.keyframes).toEqual([
 			{

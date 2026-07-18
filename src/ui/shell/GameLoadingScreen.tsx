@@ -84,10 +84,7 @@ export const GameLoadingScreen = ({ onComplete, ready }: GameLoadingScreen.Props
 				className="flex w-[min(80dvw,56rem)] max-w-full flex-col items-center gap-[clamp(1.25rem,4vmin,2.5rem)]"
 				data-ui="GameLoadingScreenPanel"
 			>
-				<LauncherHero
-					compact
-					eager
-				/>
+				<LauncherHero compact />
 				<div
 					className="h-2 w-[min(80%,28rem)] overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
 					data-ui="GameLoadingScreenProgress"

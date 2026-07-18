@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
+import { LauncherHero } from "~/ui/launcher/LauncherHero";
 
 export namespace LauncherScene {
 	export interface Props extends PropsWithChildren {
@@ -34,17 +34,7 @@ export const LauncherScene = ({
 			aria-hidden="true"
 		/>
 		<div className="relative z-10 flex size-full min-h-0 flex-col items-center justify-center gap-[clamp(1rem,3vmin,2rem)] overflow-hidden p-[clamp(1rem,4vmin,3rem)]">
-			<img
-				src={LauncherHeroAsset.url}
-				alt="Arkini"
-				className={
-					compactHero
-						? "max-h-[34vh] w-auto max-w-[min(76vw,48rem)] object-contain drop-shadow-2xl"
-						: "max-h-[58vh] w-auto max-w-[min(88vw,68rem)] object-contain drop-shadow-2xl"
-				}
-				decoding="async"
-				draggable={false}
-			/>
+			<LauncherHero compact={compactHero} />
 			{children}
 		</div>
 	</main>

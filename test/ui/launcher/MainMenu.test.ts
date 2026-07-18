@@ -143,6 +143,10 @@ describe("MainMenu", () => {
 			container.querySelector<HTMLElement>('[data-ui="MainMenuActions"]')?.style
 				.viewTransitionName,
 		).toBe("settings-modal");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
+				.viewTransitionName,
+		).toBe("arkini-launcher-hero");
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

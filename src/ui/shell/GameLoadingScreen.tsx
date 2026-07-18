@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
+import { LauncherHero } from "~/ui/launcher/LauncherHero";
 
 const initialProgress = 12;
 const pendingProgressTransitionMs = 220;
@@ -37,16 +37,11 @@ export namespace GameLoadingScreen {
 	export interface Props {
 		readonly onComplete?: () => void;
 		readonly ready: boolean;
-		readonly viewTransitionName?: string;
 	}
 }
 
 /** Presents deterministic fake progress while the authoritative GameOwner bootstrap runs. */
-export const GameLoadingScreen = ({
-	onComplete,
-	ready,
-	viewTransitionName,
-}: GameLoadingScreen.Props) => {
+export const GameLoadingScreen = ({ onComplete, ready }: GameLoadingScreen.Props) => {
 	const [progress, setProgress] = useState(initialProgress);
 	const reducedMotion =
 		typeof window.matchMedia === "function" &&
@@ -88,24 +83,11 @@ export const GameLoadingScreen = ({
 			<div
 				className="flex w-[min(80dvw,56rem)] max-w-full flex-col items-center gap-[clamp(1.25rem,4vmin,2.5rem)]"
 				data-ui="GameLoadingScreenPanel"
-				style={{
-					viewTransitionName,
-				}}
 			>
-				<div
-					className="h-[35dvh] min-h-28 w-full"
-					data-ui="GameLoadingScreenHero"
-				>
-					<img
-						src={LauncherHeroAsset.url}
-						alt="Arkini"
-						className="size-full object-contain drop-shadow-2xl"
-						decoding="async"
-						fetchPriority="high"
-						loading="eager"
-						draggable={false}
-					/>
-				</div>
+				<LauncherHero
+					compact
+					eager
+				/>
 				<div
 					className="h-2 w-[min(80%,28rem)] overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
 					data-ui="GameLoadingScreenProgress"

@@ -4,21 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Settings route View Transition coherence**
+**Settings return View Transition composition**
 
-Status: **Implemented and locally validated for the #274 follow-up.**
+Status: **Implemented and locally validated for the #274 native-smoke follow-up.**
 
 Current scope:
 
-- Main menu, Settings, and GameShell share one full-route native View Transition identity, so the browser no longer animates unmatched whole-page snapshots during Settings navigation;
-- main-menu actions, the open GameMenu panel, the Settings modal, and the initial game-loading panel share one `settings-modal` identity;
-- `MainMenu → Settings`, `GameMenu → Settings`, `Settings → MainMenu`, and `Settings → initial GameLoading` therefore have both a route-scene pair and a content-panel pair;
-- the game-loading panel claims the shared identity only inside the initial loading gate; the post-reveal hard-reset fallback stays unnamed so it cannot collide with the still-mounted GameMenu panel;
+- Main menu, Settings, and GameShell retain one full-route native View Transition identity;
+- main-menu actions, the open GameMenu panel, and the Settings modal share `settings-modal` only for actual panel-to-panel transitions;
+- the initial game-loading panel no longer claims `settings-modal`, because morphing a Settings form into a wide Hero-plus-progress container produced an end-of-transition layout kick;
+- one reusable `LauncherHero` component now renders the same named `arkini-launcher-hero` element in launcher scenes and initial game loading, so Settings → game loading pairs Hero with Hero instead of reconciling two unrelated Hero snapshots;
 - Settings continues to use real browser history with the direct-entry `/main-menu` fallback, and leaving `/game` still releases/saves the Game normally.
 
 Next action:
 
-> Native-smoke MainMenu → Settings → Back and GameMenu → Settings → Back on macOS Electron, checking that neither direction jumps for one or two frames and that GameMenu → Settings retains its existing shared-element quality.
+> Native-smoke GameMenu → Settings → Back on macOS Electron, checking that the Settings modal exits cleanly, the Hero remains continuous into initial loading, and no final-frame layout kick remains.
 
 ## Source topology
 

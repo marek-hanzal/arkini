@@ -148,6 +148,10 @@ describe("Settings", () => {
 		const modal = container.querySelector<HTMLElement>('[data-ui="ResponsiveModal"]');
 		expect(modal).not.toBeNull();
 		expect(modal?.style.viewTransitionName).toBe("settings-modal");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
+				.viewTransitionName,
+		).toBe("arkini-launcher-hero");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
 		expect(radios).toHaveLength(3);
 		const light = radios.find(

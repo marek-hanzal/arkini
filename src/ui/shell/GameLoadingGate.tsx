@@ -1,5 +1,4 @@
 import { type ReactNode, useCallback, useState } from "react";
-import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
 import { GameLoadingScreen } from "~/ui/shell/GameLoadingScreen";
 
 export namespace GameLoadingGate {
@@ -22,7 +21,6 @@ export const GameLoadingGate = ({ children, failure, ready }: GameLoadingGate.Pr
 		<GameLoadingScreen
 			ready={!initialLoadComplete && ready}
 			onComplete={initialLoadComplete ? undefined : completeInitialLoad}
-			viewTransitionName={settingsModalViewTransitionName}
 		/>
 	);
 };

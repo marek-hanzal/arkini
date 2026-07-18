@@ -25,7 +25,6 @@ const launcherStartup = RendererRuntime.runSync(
 	createLauncherStartupFx({
 		catalog,
 		heroUrl: LauncherHeroAsset.url,
-		startedAtMs: performance.now(),
 	}),
 );
 void RendererRuntime.runPromise(launcherStartup.startFx).catch(() => {

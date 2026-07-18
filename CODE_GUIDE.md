@@ -321,6 +321,8 @@ Presentation may lag runtime. Presentation is never authoritative.
 
 Cross-cutting UI actions use the game-wide button primitives under `src/ui/button`, not page-owned copies. `Button` / `ButtonLink` are the canonical neutral action, `PrimaryButton` / `PrimaryButtonLink` are the canonical emphasized action, and `DangerButton` / `DangerButtonLink` are the canonical destructive action. Pages may add layout or sizing classes but do not recreate visual interaction classes. Custom TanStack Router links must preserve registered-route typing through `createLink` and `LinkComponent`; never flatten router navigation into a hand-written `to: string` wrapper.
 
+Local visual lifecycles may own explicit presentation states and Web Animations API handles, but animation completion must come from the animation object rather than duplicated `setTimeout` values. Presentation never decides whether save, reset, route release, or shutdown succeeded. Keep the authoritative operation fully visible while pending; start a closing transition only after success, retain pointer/focus authority until actual completion, and leave failures in their truthful settled scene. Do not build a generic animation manager merely because two independent surfaces animate.
+
 ## 11. Configuration and compiler
 
 Game source files are authoring fragments, not runtime truth by themselves.

@@ -6,19 +6,26 @@ export namespace preloadLauncherHeroFx {
 	}
 }
 
-/** Preloads the launcher Hero image before startup may become ready. */
+/** Loads and decodes the launcher Hero before the visible splash may reveal it. */
 export const preloadLauncherHeroFx = Effect.fn("preloadLauncherHeroFx")(
 	({ url }: preloadLauncherHeroFx.Props) =>
 		Effect.tryPromise({
-			try: () =>
-				new Promise<void>((resolve, reject) => {
-					const image = new Image();
-					image.decoding = "async";
-					image.onload = () => resolve();
-					image.onerror = () => reject(new Error("Arkini Hero artwork failed to load."));
-					image.src = url;
-					if (image.complete && image.naturalWidth > 0) resolve();
-				}),
+			try: async () => {
+				const image = new Image();
+				image.decoding = "async";
+				image.src = url;
+				if (!(image.complete && image.naturalWidth > 0)) {
+					await new Promise<void>((resolve, reject) => {
+						image.onload = () => resolve();
+						image.onerror = () =>
+							reject(new Error("Arkini Hero artwork failed to load."));
+					});
+				}
+				if (image.naturalWidth <= 0) {
+					throw new Error("Arkini Hero artwork failed to load.");
+				}
+				await image.decode();
+			},
 			catch: (cause) => cause,
 		}),
 );

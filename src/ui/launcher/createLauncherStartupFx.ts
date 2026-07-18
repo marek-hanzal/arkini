@@ -7,7 +7,7 @@ import { preloadLauncherHeroFx } from "~/ui/launcher/preloadLauncherHeroFx";
 
 /** Creates the one renderer-session startup bootstrap and splash completion owner. */
 export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
-	({ catalog, heroUrl, startedAtMs, bootstrapFx }: LauncherStartup.Props) =>
+	({ catalog, heroUrl, bootstrapFx }: LauncherStartup.Props) =>
 		Effect.gen(function* () {
 			const listeners = new Set<() => void | PromiseLike<void>>();
 			const lock = yield* Effect.makeSemaphore(1);
@@ -15,6 +15,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 			let state: LauncherStartup.State = {
 				type: "loading",
 				appearance: null,
+				heroReady: false,
 				splashCompleted: false,
 			};
 
@@ -45,7 +46,20 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 						publish({
 							type: "loading",
 							appearance,
+							heroReady: state.heroReady,
 							splashCompleted: state.splashCompleted,
+						}),
+					),
+				),
+			);
+			const heroFx = preloadLauncherHeroFx({
+				url: heroUrl,
+			}).pipe(
+				Effect.tap(() =>
+					Effect.sync(() =>
+						publish({
+							...state,
+							heroReady: true,
 						}),
 					),
 				),
@@ -73,9 +87,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					appearance: appearanceFx,
 					builtIn: catalogFx,
 					bridge: bridgeReadyFx,
-					hero: preloadLauncherHeroFx({
-						url: heroUrl,
-					}),
+					hero: heroFx,
 				},
 				{
 					concurrency: "unbounded",
@@ -92,6 +104,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 				publish({
 					type: "loading",
 					appearance: state.appearance,
+					heroReady: state.heroReady,
 					splashCompleted: state.splashCompleted,
 				});
 				const result = yield* authoritativeBootstrapFx;
@@ -99,6 +112,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					type: "ready",
 					appearance: result.appearance,
 					builtInPackageId: result.builtInPackageId,
+					heroReady: true,
 					splashCompleted: state.splashCompleted,
 				});
 			}).pipe(
@@ -108,6 +122,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 							type: "failed",
 							appearance: state.appearance,
 							error,
+							heroReady: state.heroReady,
 							splashCompleted: state.splashCompleted,
 						}),
 					),
@@ -115,7 +130,6 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 			);
 
 			return {
-				startedAtMs,
 				getSnapshot: () => state,
 				startFx: lock.withPermits(1)(
 					Effect.gen(function* () {

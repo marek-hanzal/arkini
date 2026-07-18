@@ -14,10 +14,10 @@ const createStartup = (splashCompleted: boolean): LauncherStartup => {
 			accent: "rose",
 		},
 		builtInPackageId: "built-in",
+		heroReady: true,
 		splashCompleted,
 	};
 	return {
-		startedAtMs: 0,
 		getSnapshot: () => state,
 		startFx: Effect.void,
 		retryFx: Effect.void,

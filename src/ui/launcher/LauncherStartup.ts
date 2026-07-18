@@ -18,32 +18,33 @@ export namespace LauncherStartup {
 		| {
 				readonly type: "loading";
 				readonly appearance: Appearance | null;
+				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  }
 		| {
 				readonly type: "ready";
 				readonly appearance: Appearance;
 				readonly builtInPackageId: string;
+				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  }
 		| {
 				readonly type: "failed";
 				readonly appearance: Appearance | null;
 				readonly error: unknown;
+				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  };
 
 	export interface Props {
 		readonly catalog: ArkpackCatalog;
 		readonly heroUrl: string;
-		readonly startedAtMs: number;
 		readonly bootstrapFx?: Effect.Effect<Result, unknown>;
 	}
 }
 
 /** One renderer-session startup owner for bootstrap, retry and splash completion. */
 export interface LauncherStartup {
-	readonly startedAtMs: number;
 	readonly getSnapshot: () => LauncherStartup.State;
 	readonly startFx: Effect.Effect<void, unknown>;
 	readonly retryFx: Effect.Effect<void, unknown>;

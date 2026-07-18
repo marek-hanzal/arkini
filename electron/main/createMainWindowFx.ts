@@ -5,6 +5,8 @@ import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
 import { registerFullscreenShortcutsFx } from "./registerFullscreenShortcutsFx";
+import { showMainWindowFx } from "./showMainWindowFx";
+import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 
 export namespace createMainWindowFx {
@@ -38,7 +40,9 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				ipc: ipcMain,
 				trustedRenderer,
 			});
-			window.once("ready-to-show", () => window.show());
+			window.once("ready-to-show", () => {
+				ElectronMainRuntime.runSync(showMainWindowFx(window));
+			});
 
 			yield* Effect.tryPromise({
 				try: async () => {

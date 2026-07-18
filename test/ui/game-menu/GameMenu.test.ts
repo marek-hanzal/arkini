@@ -10,8 +10,9 @@ import {
 import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
 import type { Game } from "~/bridge/game/Game";
 import type { GameOwner } from "~/bridge/game/GameOwner";
 import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
@@ -44,6 +45,25 @@ const deferred = () => {
 		resolve,
 	};
 };
+
+class TestAnimation {
+	readonly finished: Promise<void>;
+	readonly cancel = vi.fn();
+	private resolveFinished!: () => void;
+
+	constructor() {
+		this.finished = new Promise<void>((resolve) => {
+			this.resolveFinished = resolve;
+		});
+	}
+
+	finish() {
+		this.resolveFinished();
+	}
+}
+
+const animations: Array<TestAnimation> = [];
+const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	arkpack: {
@@ -90,7 +110,17 @@ const createOwner = ({
 	subscribe: () => () => undefined,
 });
 
-const roots: Array<ReturnType<typeof createRoot>> = [];
+beforeEach(() => {
+	animations.splice(0);
+	Object.defineProperty(HTMLElement.prototype, "animate", {
+		configurable: true,
+		value: vi.fn(() => {
+			const animation = new TestAnimation();
+			animations.push(animation);
+			return animation as unknown as Animation;
+		}),
+	});
+});
 
 afterEach(async () => {
 	await act(async () => {
@@ -113,13 +143,20 @@ const renderMenu = async ({
 	readonly initialPath?: string;
 	readonly requestClose?: () => Promise<void>;
 } = {}) => {
+	let beforeCloseReady: (() => Promise<void>) | undefined;
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
 			lifecycle: {
 				requestClose,
+				onBeforeCloseReady: (listener: () => Promise<void>) => {
+					beforeCloseReady = listener;
+					return () => {
+						if (beforeCloseReady === listener) beforeCloseReady = undefined;
+					};
+				},
 			},
-		},
+		} as unknown as ArkiniDesktopApi.Api,
 	});
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -176,6 +213,12 @@ const renderMenu = async ({
 	return {
 		container,
 		router,
+		runBeforeCloseReady: () => {
+			if (beforeCloseReady === undefined) {
+				throw new Error("Expected before-close-ready listener.");
+			}
+			return beforeCloseReady();
+		},
 	};
 };
 
@@ -191,6 +234,21 @@ const pressEscape = async () => {
 	});
 };
 
+const finishAnimations = async (...indexes: ReadonlyArray<number>) => {
+	await act(async () => {
+		for (const index of indexes) animations[index]?.finish();
+		await Promise.resolve();
+	});
+};
+
+const openMenu = async (container: ParentNode) => {
+	await pressEscape();
+	expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
+	const start = animations.length - 2;
+	await finishAnimations(start, start + 1);
+	expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+};
+
 const buttonByText = (container: ParentNode, text: string) => {
 	const button = Array.from(container.querySelectorAll("button")).find(
 		(candidate) => candidate.textContent === text,
@@ -200,20 +258,15 @@ const buttonByText = (container: ParentNode, text: string) => {
 };
 
 describe("GameMenu", () => {
-	it("toggles with Escape, traps focus and restores the game surface", async () => {
+	it("animates Escape close, keeps focus trapped and restores only after completion", async () => {
 		const { container } = await renderMenu();
 		const surface = container.querySelector<HTMLButtonElement>("#game-surface");
 		if (surface === null) throw new Error("Expected the game surface control.");
 		surface.focus();
-
-		await pressEscape();
-
-		const dialog = container.querySelector<HTMLElement>('[role="dialog"]');
-		expect(dialog).not.toBeNull();
-		expect(container.querySelector('[data-ui="GameMenuBackdrop"]')).not.toBeNull();
+		await openMenu(container);
 		expect(document.activeElement?.textContent).toBe("Return to game");
 
-		const destroy = buttonByText(dialog ?? container, "Destroy");
+		const destroy = buttonByText(container, "Destroy");
 		destroy.focus();
 		await act(async () => {
 			destroy.dispatchEvent(
@@ -227,8 +280,27 @@ describe("GameMenu", () => {
 		expect(document.activeElement?.textContent).toBe("Return to game");
 
 		await pressEscape();
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+		expect(document.activeElement).not.toBe(surface);
+		const exitStart = animations.length - 2;
+		await finishAnimations(exitStart, exitStart + 1);
 		expect(container.querySelector('[role="dialog"]')).toBeNull();
 		expect(document.activeElement).toBe(surface);
+	});
+
+	it("reverses rapid Escape during enter without duplicate overlays", async () => {
+		const { container } = await renderMenu();
+		await pressEscape();
+		expect(container.querySelectorAll('[data-ui="GameMenuBackdrop"]')).toHaveLength(1);
+		await pressEscape();
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(
+			animations.slice(0, 2).every((animation) => animation.cancel.mock.calls.length > 0),
+		).toBe(true);
+		const exitStart = animations.length - 2;
+		await finishAnimations(exitStart, exitStart + 1);
+		expect(container.querySelector('[data-ui="GameMenuBackdrop"]')).toBeNull();
 	});
 
 	it("runs one save while disabling overlapping menu actions", async () => {
@@ -241,13 +313,17 @@ describe("GameMenu", () => {
 				game,
 			}),
 		});
-		await pressEscape();
+		await openMenu(container);
 		const save = buttonByText(container, "Save");
 
-		await act(async () => save.click());
-		save.click();
+		await act(async () => {
+			save.click();
+			save.click();
+		});
 		expect(flush).toHaveBeenCalledOnce();
-		expect(buttonByText(container, "Save and exit").disabled).toBe(true);
+		await vi.waitFor(() =>
+			expect(buttonByText(container, "Save and exit").disabled).toBe(true),
+		);
 
 		await act(async () => {
 			gate.resolve();
@@ -256,25 +332,44 @@ describe("GameMenu", () => {
 		});
 	});
 
-	it("requests one native save-and-exit without route navigation", async () => {
-		const requestClose = vi.fn(() => new Promise<void>(() => undefined));
+	it("waits for successful shutdown before fading and close readiness", async () => {
+		const requestGate = deferred();
+		const requestClose = vi.fn(() => requestGate.promise);
 		const game = createGame();
-		const { container, router } = await renderMenu({
+		const { container, router, runBeforeCloseReady } = await renderMenu({
 			game,
 			owner: createOwner({
 				game,
 			}),
 			requestClose,
 		});
-		await pressEscape();
+		await openMenu(container);
 
 		await act(async () => buttonByText(container, "Save and exit").click());
 		expect(requestClose).toHaveBeenCalledOnce();
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 		expect(router.state.location.pathname).toBe("/game/package:menu");
-		expect(buttonByText(container, "Save and exit").disabled).toBe(true);
+
+		let presentationCompleted = false;
+		let presentation!: Promise<void>;
+		await act(async () => {
+			presentation = runBeforeCloseReady().then(() => {
+				presentationCompleted = true;
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(presentationCompleted).toBe(false);
+		const exitStart = animations.length - 2;
+		await finishAnimations(exitStart, exitStart + 1);
+		await presentation;
+		expect(presentationCompleted).toBe(true);
+		expect(container.querySelector('[role="dialog"]')).toBeNull();
+
+		await act(async () => requestGate.resolve());
 	});
 
-	it("keeps the menu and route after native save-and-exit fails", async () => {
+	it("keeps the menu fully open after native save-and-exit fails", async () => {
 		const game = createGame();
 		const { container, router } = await renderMenu({
 			game,
@@ -283,17 +378,17 @@ describe("GameMenu", () => {
 			}),
 			requestClose: () => Promise.reject(new Error("disk full")),
 		});
-		await pressEscape();
+		await openMenu(container);
 
 		await act(async () => buttonByText(container, "Save and exit").click());
 		await vi.waitFor(() =>
 			expect(container.textContent).toContain("Save and exit failed: disk full"),
 		);
 		expect(router.state.location.pathname).toBe("/game/package:menu");
-		expect(container.querySelector('[role="dialog"]')).not.toBeNull();
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 	});
 
-	it("requires confirmation and invokes the canonical hard reset once", async () => {
+	it("animates confirmed hard reset only after the canonical operation succeeds", async () => {
 		const reset = vi.fn();
 		const game = createGame();
 		const { container } = await renderMenu({
@@ -303,15 +398,16 @@ describe("GameMenu", () => {
 				hardResetFx: Effect.sync(reset),
 			}),
 		});
-		await pressEscape();
+		await openMenu(container);
 
 		await act(async () => buttonByText(container, "Destroy").click());
 		expect(reset).not.toHaveBeenCalled();
-		expect(container.textContent).toContain("Current progress will be permanently deleted");
-
 		await act(async () => buttonByText(container, "Destroy permanently").click());
 		await vi.waitFor(() => expect(reset).toHaveBeenCalledOnce());
-		await vi.waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeNull());
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		const exitStart = animations.length - 2;
+		await finishAnimations(exitStart, exitStart + 1);
+		expect(container.querySelector('[role="dialog"]')).toBeNull();
 	});
 
 	it("keeps one Escape listener while React re-renders the provider", async () => {

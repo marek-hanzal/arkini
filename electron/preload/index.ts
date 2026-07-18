@@ -2,19 +2,35 @@ import { contextBridge, ipcRenderer } from "electron";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 
 const beforeCloseListeners = new Set<() => Promise<void>>();
+const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 let closing = false;
 let requestedClose:
 	| {
 			readonly promise: Promise<void>;
+			readonly resolve: () => void;
 			readonly reject: (error: unknown) => void;
 	  }
 	| undefined;
+let visibleAtMs: number | undefined;
+let resolveVisible!: (visibleAtMs: number) => void;
+const visiblePromise = new Promise<number>((resolve) => {
+	resolveVisible = resolve;
+});
+
+ipcRenderer.on(ArkiniDesktopApi.channels.windowVisible, () => {
+	if (visibleAtMs !== undefined) return;
+	visibleAtMs = performance.now();
+	resolveVisible(visibleAtMs);
+});
 
 ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
 	if (closing) return;
 	closing = true;
 	try {
 		await Promise.all(Array.from(beforeCloseListeners, (listener) => listener()));
+		await Promise.all(Array.from(beforeCloseReadyListeners, (listener) => listener()));
+		requestedClose?.resolve();
+		requestedClose = undefined;
 		ipcRenderer.send(ArkiniDesktopApi.channels.closeReady);
 	} catch (error) {
 		closing = false;
@@ -45,18 +61,26 @@ const api: ArkiniDesktopApi.Api = {
 		clear: (key) => ipcRenderer.invoke(ArkiniDesktopApi.channels.saveClear, key),
 	},
 	lifecycle: {
+		waitUntilVisible: () => visiblePromise,
 		onBeforeClose: (listener) => {
 			beforeCloseListeners.add(listener);
 			return () => beforeCloseListeners.delete(listener);
 		},
+		onBeforeCloseReady: (listener) => {
+			beforeCloseReadyListeners.add(listener);
+			return () => beforeCloseReadyListeners.delete(listener);
+		},
 		requestClose: () => {
 			if (requestedClose !== undefined) return requestedClose.promise;
+			let resolveRequest: () => void = () => undefined;
 			let rejectRequest: (error: unknown) => void = () => undefined;
-			const promise = new Promise<void>((_resolve, reject) => {
+			const promise = new Promise<void>((resolve, reject) => {
+				resolveRequest = resolve;
 				rejectRequest = reject;
 			});
 			requestedClose = {
 				promise,
+				resolve: resolveRequest,
 				reject: rejectRequest,
 			};
 			ipcRenderer.send(ArkiniDesktopApi.channels.requestClose);

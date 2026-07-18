@@ -78,10 +78,10 @@ describe("MainMenu", () => {
 				accent: "rose",
 			},
 			builtInPackageId: "canonical-built-in",
+			heroReady: true,
 			splashCompleted: true,
 		};
 		const startup: LauncherStartup = {
-			startedAtMs: 0,
 			getSnapshot: () => startupState,
 			startFx: Effect.void,
 			retryFx: Effect.void,

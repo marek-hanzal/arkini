@@ -4,23 +4,24 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Game-wide button primitives**
+**Launcher and game-menu visual lifecycle integration**
 
-Status: **Complete. Neutral, primary, and destructive native/router actions share one typed UI primitive family.**
+Status: **Implemented and locally validated. Native macOS visual smoke remains before closing #247, #272, and parent review #271.**
 
 Current scope:
 
-- `Button` / `ButtonLink` own the canonical neutral game action;
-- `PrimaryButton` / `PrimaryButtonLink` own the canonical emphasized action;
-- `DangerButton` / `DangerButtonLink` own the canonical destructive action;
-- every router counterpart follows TanStack Router `createLink` plus `LinkComponent`, preserving registered-route inference;
-- `tailwind-merge` allows callsites to override layout and sizing without duplicating or conflicting with interaction styling;
-- launcher, startup retry, Settings, Arkpacks, and the in-game menu consume these primitives;
-- no page-specific button component, generic public `variant` prop, or untyped router wrapper exists.
+- Electron main reports the actual `ready-to-show` window-visible moment through the typed preload lifecycle;
+- startup keeps the visible window pure black for approximately 500 ms, applies persisted appearance, waits for decoded Hero readiness, and then reveals the complete scene while the remaining catalog bootstrap may continue truthfully;
+- `/main-menu` is already mounted beneath the splash, so WAAPI exit is a real cross-fade and completion comes from `Animation.finished`, never a duplicate timeout;
+- the game menu owns `closed | entering | open | exiting`, remains interaction-authoritative through exit, reverses rapid Escape from the current visual frame, and restores focus only after actual completion;
+- controlled Save and exit runs `GameOwner.shutdownFx` first, then the shared menu exit, and sends Electron `closeReady` only after both succeed;
+- hard reset publishes the fresh same-package `Game` while the menu provider survives long enough to fade out over it;
+- one synchronous action guard prevents same-tick duplicate Save, Save and exit, or hard-reset requests before TanStack pending state reaches React;
+- no generic animation framework, JavaScript completion timer, route-owned menu animation, or reduced-motion branch exists.
 
 Next action:
 
-> Continue with the next explicitly selected gameplay or desktop task. New repeated actions should consume the existing neutral, primary, or destructive primitive before adding another visual role.
+> Run development or packaged Arkini on macOS and visually confirm: roughly 500 ms of visible black before the decoded/theme-correct Hero scene, direct splash-to-main-menu cross-fade, coherent rapid Escape during splash enter, game-menu fade in/out, hard-reset fade over the fresh game, and Save and exit fade before the native window closes. Then close #247, #272, and #271.
 
 ## Source topology
 
@@ -45,15 +46,15 @@ Next action:
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one root-owned `ArkpackCatalog`; uploads never leave the device. The startup owner refreshes it once, resolves exactly one built-in package, and `/arkpacks` reuses the same snapshot and mutation operations. TanStack Query never owns catalog data.
 - `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- One renderer-session `LauncherStartup` starts immediately under the initial pure-black frame. It publishes theme/accent as soon as available, completes trusted bridge/catalog/built-in/Hero bootstrap, owns retry and one idempotent splash-completion flag, and is never a Query cache. The visible Hero scene begins only after the approximately 500 ms black hold; automatic transition requires readiness plus five seconds elapsed, while legal Escape uses the same one-shot exit transition. Later `/` navigation redirects to `/main-menu`.
+- One renderer-session `LauncherStartup` starts immediately under the initial pure-black frame. Electron reports the actual `ready-to-show` visibility moment through preload; the approximately 500 ms black hold is anchored to that renderer timestamp rather than module evaluation. Appearance publishes early and `heroReady` is explicit after `HTMLImageElement.decode()`, so the complete Hero scene may reveal while the remaining catalog bootstrap still reports loading without a fallback-theme or missing-logo flash. `/main-menu` stays mounted beneath the splash and WAAPI completion owns the direct cross-fade; automatic exit requires hard readiness plus five visible seconds, while legal Escape queues coherently through enter. Later `/` navigation redirects to `/main-menu` without replay.
 - `GameOwnerProvider` lives at the stable root shell above the route outlet and declaratively maps the active `/game/$packageId` route to `selectPackageFx`; every non-game route maps to `releaseRouteGameFx`. React cleanup is not a desired-game signal, so StrictMode never manufactures `A → null → A`.
 - `GameOwner` owns one published Game, one private failed-save recovery identity, synchronous subscribers, and one transition Semaphore. Package selection, route release, shutdown, hard reset, and save recovery are explicit serialized operations. There is no command Queue, latest-intent interpreter, checkpoint protocol, or per-command Deferred list. A bootstrap interrupted before publication is discarded without final save.
 - `GameSession` and `Game` lifecycle is Effect-native: `flushSaveFx`, `disposeFx`, and `disposeWithoutSaveFx` are the only public lifecycle operations. One session lifecycle state plus `Deferred` shares concurrent disposal, failed final save leaves the same frozen session retryable, and game-owned resource Scope closes only after successful save disposal or explicit discard. Never restore a cached disposal Promise wrapper.
 - `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
-- `GameMenuProvider` lives at the game-shell boundary only. It owns the synchronous `isOpen/open/close/toggle` overlay control, one game-scoped `Escape` listener, and focus restoration; launcher and `/dev/**` routes never mount it. The menu is not a route and opening it does not pause, replace, or duplicate the engine lifecycle.
+- `GameMenuProvider` lives at the game-shell boundary only and is keyed by package identity, not `Game.instanceKey`, so same-package hard reset can publish the fresh game beneath the still-mounted overlay. It owns `closed | entering | open | exiting`, one game-scoped Escape listener, one shared asynchronous close completion, the focus trap, and focus restoration after actual WAAPI completion. Launcher and `/dev/**` routes never mount it; opening does not pause, replace, or duplicate the engine lifecycle.
 - The root `AppearanceProvider` owns only the hydrated renderer theme/accent snapshot. `/settings` uses one complete `setAppearanceThemeMutationOptions` contract connected directly to `writeAppearanceThemeFx`, plus its natural `useSetAppearanceThemeMutation` hook. It applies immediately, persists atomically, rolls back on failure, and no-ops for the active value. There is no floating game-canvas selector, second appearance store, callback-injection adapter, or project-specific mutation-state helper.
 - TanStack Query is present only as the standard lifecycle for asynchronous UI commands, never as gameplay/cache truth. Each command owns one complete standalone `mutationOptions` declaration connected directly to its native `Game`/`GameOwner` Fx and one natural `use*Mutation` hook that simply consumes those options. There is no shared mutation-key registry, callback-injection adapter, lifecycle mutation manager, or project-specific pending-state helper; other UI reads the native options key through TanStack APIs when cross-tree observation is actually needed.
-- Explicit save flush, controlled whole-application Save and exit, and hard reset are the first game-menu mutations. Save and exit requests the trusted native close handshake; the existing `GameOwner.shutdownFx` listener performs final save and rejects failure back to the same menu mutation. It never navigates or overloads `releaseRouteGameFx`. Hard-reset recovery stages remain private to `GameOwner`, so retry continues after the last completed discard/clear phase without exposing the exact save key or treating a disposed game as live UI state.
+- Explicit save flush, controlled whole-application Save and exit, and hard reset are the first game-menu mutations. Save and exit requests the trusted native close handshake: preload first waits for the existing `GameOwner.shutdownFx` final-save listener, then waits for the menu presentation listener to finish the shared exit animation, and only then sends `closeReady`. Failure before either completion remains visibly retryable. Hard-reset recovery stages remain private to `GameOwner`; retry resumes after the last completed discard/clear phase and successful reset fades over the newly published same-package game.
 - A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.
 - `/game/$packageId` currently renders the canonical current-space board. Inventory and commands remain future slices. The root owner already exposes single-flight hard reset: discard current session without final save → clear exact save key → normal fresh bootstrap.
 

@@ -20,7 +20,6 @@ describe("createLauncherStartupFx", () => {
 			createLauncherStartupFx({
 				catalog,
 				heroUrl: "hero.png",
-				startedAtMs: 42,
 				bootstrapFx: Effect.sync(() => {
 					bootstrap();
 					return {
@@ -37,7 +36,6 @@ describe("createLauncherStartupFx", () => {
 		await Effect.runPromise(startup.startFx);
 		await Effect.runPromise(startup.startFx);
 		expect(bootstrap).toHaveBeenCalledOnce();
-		expect(startup.startedAtMs).toBe(42);
 		expect(startup.getSnapshot()).toEqual({
 			type: "ready",
 			appearance: {
@@ -45,6 +43,7 @@ describe("createLauncherStartupFx", () => {
 				accent: "blue",
 			},
 			builtInPackageId: "built-in",
+			heroReady: true,
 			splashCompleted: false,
 		});
 
@@ -61,7 +60,6 @@ describe("createLauncherStartupFx", () => {
 			createLauncherStartupFx({
 				catalog,
 				heroUrl: "hero.png",
-				startedAtMs: 0,
 				bootstrapFx: Effect.suspend(() => {
 					attempt += 1;
 					return attempt === 1
@@ -82,6 +80,7 @@ describe("createLauncherStartupFx", () => {
 			type: "failed",
 			appearance: null,
 			error: failure,
+			heroReady: false,
 			splashCompleted: false,
 		});
 

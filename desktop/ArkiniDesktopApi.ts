@@ -14,6 +14,7 @@ export namespace ArkiniDesktopApi {
 		appearanceWrite: "arkini:appearance:write",
 		appearanceAccentRead: "arkini:appearance:accent:read",
 		appearanceAccentWrite: "arkini:appearance:accent:write",
+		windowVisible: "arkini:lifecycle:window-visible",
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
 		closeFailed: "arkini:lifecycle:close-failed",
@@ -62,7 +63,9 @@ export namespace ArkiniDesktopApi {
 			readonly clear: (key: SaveKey) => Promise<void>;
 		};
 		readonly lifecycle: {
+			readonly waitUntilVisible: () => Promise<number>;
 			readonly onBeforeClose: (listener: () => Promise<void>) => () => void;
+			readonly onBeforeCloseReady: (listener: () => Promise<void>) => () => void;
 			readonly requestClose: () => Promise<void>;
 			readonly forceClose: () => void;
 		};

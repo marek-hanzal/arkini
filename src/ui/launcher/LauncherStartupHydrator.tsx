@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { useLayoutEffect, useSyncExternalStore } from "react";
 import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 
@@ -8,7 +8,7 @@ export const LauncherStartupHydrator = () => {
 	const state = useSyncExternalStore(startup.subscribe, startup.getSnapshot, startup.getSnapshot);
 	const { hydrate } = useAppearance();
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (state.appearance !== null) hydrate(state.appearance);
 	}, [
 		hydrate,

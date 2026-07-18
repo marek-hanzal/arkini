@@ -83,7 +83,7 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 			{menuGame === undefined ? (
 				fallback
 			) : (
-				<GameMenuProvider key={menuGame.instanceKey}>
+				<GameMenuProvider key={packageId}>
 					{activeGame !== undefined && activeGame.instanceKey === menuGame.instanceKey ? (
 						<GameProvider game={activeGame}>
 							<TileSystemProvider>{children}</TileSystemProvider>

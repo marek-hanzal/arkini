@@ -47,6 +47,12 @@ const requestBeforeClose = async () => {
 	await handler();
 };
 
+const reportWindowVisible = () => {
+	const handler = electron.handlers.get(ArkiniDesktopContract.channels.windowVisible);
+	if (handler === undefined) throw new Error("Expected window-visible listener registration.");
+	handler();
+};
+
 describe("Electron preload lifecycle", () => {
 	beforeEach(() => {
 		electron.reset();
@@ -54,6 +60,22 @@ describe("Electron preload lifecycle", () => {
 		electron.ipcRenderer.invoke.mockReset();
 		electron.ipcRenderer.on.mockClear();
 		electron.ipcRenderer.send.mockReset();
+	});
+
+	it("publishes one renderer-clock timestamp after the main window becomes visible", async () => {
+		const api = await loadPreload();
+		const visible = api.lifecycle.waitUntilVisible();
+		let settled = false;
+		void visible.then(() => {
+			settled = true;
+		});
+		await Promise.resolve();
+		expect(settled).toBe(false);
+
+		reportWindowVisible();
+		const visibleAtMs = await visible;
+		expect(visibleAtMs).toBeTypeOf("number");
+		expect(await api.lifecycle.waitUntilVisible()).toBe(visibleAtMs);
 	});
 
 	it("shares one pending native close request", async () => {
@@ -89,17 +111,23 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
-	it("signals native close readiness after every listener succeeds", async () => {
+	it("runs final save before presentation and resolves only before close readiness", async () => {
 		const api = await loadPreload();
-		const first = vi.fn(async () => undefined);
-		const second = vi.fn(async () => undefined);
-		api.lifecycle.onBeforeClose(first);
-		api.lifecycle.onBeforeClose(second);
-		api.lifecycle.requestClose();
+		const order: Array<string> = [];
+		api.lifecycle.onBeforeClose(async () => {
+			order.push("save");
+		});
+		api.lifecycle.onBeforeCloseReady(async () => {
+			order.push("presentation");
+		});
+		const request = api.lifecycle.requestClose();
 
 		await requestBeforeClose();
-		expect(first).toHaveBeenCalledOnce();
-		expect(second).toHaveBeenCalledOnce();
+		await expect(request).resolves.toBeUndefined();
+		expect(order).toEqual([
+			"save",
+			"presentation",
+		]);
 		expect(electron.ipcRenderer.send).toHaveBeenLastCalledWith(
 			ArkiniDesktopContract.channels.closeReady,
 		);

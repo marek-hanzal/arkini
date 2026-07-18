@@ -11,18 +11,30 @@ export namespace LauncherHero {
 	}
 }
 
-/** Renders one stable, decoded Hero paint surface for native View Transition handoff. */
+/** Renders stable Hero artwork with a cheap shadow layer outside shared-element geometry. */
 export const LauncherHero = ({ compact = false }: LauncherHero.Props) => (
 	<div
-		role="img"
-		aria-label="Arkini"
-		className="block shrink-0 bg-contain bg-center bg-no-repeat drop-shadow-2xl"
+		className="relative block shrink-0 isolation-isolate"
 		data-ui="LauncherHero"
 		style={{
 			aspectRatio: heroAspectRatio,
-			backgroundImage: `url(${JSON.stringify(LauncherHeroAsset.url)})`,
-			viewTransitionName,
 			width: compact ? compactWidth : fullWidth,
 		}}
-	/>
+	>
+		<div
+			className="launcher-hero__shadow pointer-events-none absolute inset-x-[8%] bottom-[-4%] h-[28%]"
+			aria-hidden="true"
+			data-ui="LauncherHeroShadow"
+		/>
+		<div
+			role="img"
+			aria-label="Arkini"
+			className="absolute inset-0 z-10 bg-contain bg-center bg-no-repeat"
+			data-ui="LauncherHeroArtwork"
+			style={{
+				backgroundImage: `url(${JSON.stringify(LauncherHeroAsset.url)})`,
+				viewTransitionName,
+			}}
+		/>
+	</div>
 );

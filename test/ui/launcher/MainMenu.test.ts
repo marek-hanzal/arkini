@@ -15,7 +15,7 @@ import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogContext } from "~/bridge/arkpack/ArkpackCatalogContext";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherStartupContext } from "~/ui/launcher/LauncherStartupContext";
-import { MainMenu } from "~/ui/launcher/MainMenu";
+import { MainMenuPage } from "~/page/launcher/MainMenuPage";
 
 (
 	globalThis as {
@@ -104,7 +104,7 @@ describe("MainMenu", () => {
 						{
 							value: startup,
 						},
-						createElement(MainMenu),
+						createElement(MainMenuPage),
 					),
 				),
 			);
@@ -137,16 +137,18 @@ describe("MainMenu", () => {
 		);
 		expect(play?.getAttribute("href")).toContain("/game/canonical-built-in");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainMenu"]')?.style.viewTransitionName,
+			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
+				.viewTransitionName,
 		).toBe("arkini-route-scene");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainMenuActions"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-launcher-panel");
+		).toBe("arkini-main-page-panel");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero");
+		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

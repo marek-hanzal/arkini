@@ -1,13 +1,23 @@
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "~/_route";
 import type { RootPage } from "~/page/RootPage";
+import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteViewTransitionTypes";
+
+const supportsTypedViewTransitions = () =>
+	typeof window !== "undefined" &&
+	typeof window.CSS?.supports === "function" &&
+	window.CSS.supports("selector(:active-view-transition-type(arkini))");
 
 export const createArkiniRouter = (context: RootPage.Context) =>
 	createRouter({
 		routeTree,
 		context,
 		defaultPreload: "intent",
-		defaultViewTransition: true,
+		defaultViewTransition: supportsTypedViewTransitions()
+			? {
+					types: resolveRouteViewTransitionTypes,
+				}
+			: false,
 		scrollRestoration: true,
 	});
 

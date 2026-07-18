@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { MainMenu } from "~/ui/launcher/MainMenu";
+import { MainMenuPage } from "~/page/launcher/MainMenuPage";
 import { StartupSplash } from "~/ui/launcher/StartupSplash";
 
 /** Mounts the hidden main-menu destination beneath the one-session outgoing splash scene. */
@@ -14,7 +14,7 @@ export const StartupPage = () => {
 				aria-hidden="true"
 				inert
 			>
-				<MainMenu />
+				<MainMenuPage />
 			</div>
 			<StartupSplash mainMenuRef={mainMenuRef} />
 		</div>

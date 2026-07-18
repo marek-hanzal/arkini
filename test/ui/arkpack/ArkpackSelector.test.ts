@@ -13,7 +13,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogContext } from "~/bridge/arkpack/ArkpackCatalogContext";
-import { ArkpackSelector } from "~/ui/arkpack/ArkpackSelector";
+import { ArkpackSelectorPage } from "~/page/arkpack/ArkpackSelectorPage";
 
 (
 	globalThis as {
@@ -58,7 +58,7 @@ describe("ArkpackSelector", () => {
 					{
 						value: catalog,
 					},
-					createElement(ArkpackSelector),
+					createElement(ArkpackSelectorPage),
 				),
 		});
 		const mainMenuRoute = createRoute({
@@ -91,10 +91,14 @@ describe("ArkpackSelector", () => {
 		});
 
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="ArkpackSelector"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-route-scene");
-		const layout = container.querySelector('[data-ui="ArkpackSelector"] > div');
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
+				.viewTransitionName,
+		).toBe("");
+		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");
 		const returnLink = layout?.lastElementChild?.querySelector("a");

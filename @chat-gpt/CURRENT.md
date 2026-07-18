@@ -4,23 +4,25 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Native View Transition audit and choreography**
+**Main-page layout and deliberate route View Transitions**
 
-Status: **Implemented and validated for review #276 with follow-ups #274, #277, and #278.**
+Status: **Implemented and validated for issue #279; native macOS smoke pending.**
 
 Current contract:
 
-- TanStack Router remains the only route-transition owner and keeps `defaultViewTransition: true` as the unsupported-browser fallback boundary;
-- full launcher/game destinations that visually replace one another use `arkini-route-scene`;
-- corresponding compact launcher/menu panels use the semantic `arkini-launcher-panel` identity across MainMenu, Settings, About, and GameMenu, while the larger Arkpack catalog participates only at route-scene level;
-- `arkini-launcher-hero` remains one decoded Hero identity, with explicit pseudo-group layering above route and panel snapshots so the Hero cannot disappear behind the incoming full-screen route capture;
-- initial `GameLoadingScreen` and playable `Board` use separate `arkini-game-loading` and `arkini-game-board` surfaces; after the existing 100% + 150 ms hold, `GameLoadingGate` waits for any active route View Transition animations and wraps only the final loader-to-board state commit in one local native View Transition;
-- failure, retry, readiness loss, package replacement, and unmount invalidate stale pending reveals; GameOwner readiness and publication never wait for animation completion;
-- no transition registry, route animation store, modal manager, global lock, timer-based transition estimate, or engine-facing animation state exists.
+- `MainPageLayout` is the narrow shared shell for `/main-menu`, `/settings`, `/about`, and `/arkpacks` only; game, dev, startup splash, game loading, lifecycle failures, and the in-game menu remain outside it;
+- every main page uses one stable `MainPageLayout → LauncherHero → MainPagePanel` structure while page code supplies only route-local behavior and content;
+- compact/responsive/viewport panel modes change sizing, not the outer DOM hierarchy; the large Arkpack catalog deliberately does not share the compact-panel View Transition identity;
+- TanStack Router remains the sole route-transition owner, but blanket `defaultViewTransition: true` is gone; one small typed route-pair policy opts in only for main-page ↔ main-page and main-page ↔ game transitions and returns `false` for startup splash, dev, and unrelated routes;
+- browser Back/Forward uses the same route-pair policy; individual links and GameMenu do not force a second transition decision;
+- startup splash keeps its existing WAAPI crossfade into the already-mounted normalized MainMenu and receives no native route backfade;
+- `arkini-route-scene`, `arkini-main-page-panel`, and `arkini-launcher-hero` describe visual roles rather than destination names;
+- Hero artwork owns the shared-element identity while its former `drop-shadow` filter is replaced by a separate cheap gradient shadow layer outside the artwork snapshot, avoiding filter rerasterization during repeated transitions;
+- initial Loader → Board remains the separate local native View Transition owned by `GameLoadingGate`; no route animation state enters GameOwner or the engine.
 
 Next action:
 
-> Native-smoke the complete launcher and game-loading route graph on macOS Electron, especially MainMenu ↔ About, GameMenu → Settings → Back → Loader, and Loader → Board. Any remaining compositor-specific defect should be recorded against review #276 with frame evidence rather than inferred from DOM structure.
+> Native-smoke `/main-menu ↔ /settings`, `/main-menu ↔ /about`, `/main-menu ↔ /arkpacks`, GameMenu → Settings → Back, startup splash → MainMenu, and Loader → Board on macOS Electron. Verify especially that splash has no second fade and the separate Hero shadow does not kick after repeated navigation.
 
 ## Source topology
 

@@ -66,13 +66,14 @@ describe("GameLoadingScreen", () => {
 			ready: false,
 		});
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
+		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
 		expect(hero).not.toBeNull();
-		expect(hero?.tagName).toBe("DIV");
-		expect(hero?.getAttribute("role")).toBe("img");
-		expect(hero?.getAttribute("aria-label")).toBe("Arkini");
 		expect(hero?.style.aspectRatio).toBe("3345 / 1882");
-		expect(hero?.style.backgroundImage).toContain("hero.png");
-		expect(hero?.style.viewTransitionName).toBe("arkini-launcher-hero");
+		expect(artwork?.getAttribute("role")).toBe("img");
+		expect(artwork?.getAttribute("aria-label")).toBe("Arkini");
+		expect(artwork?.style.backgroundImage).toContain("hero.png");
+		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero");
+		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameLoadingScreen"]')?.style
 				.viewTransitionName,

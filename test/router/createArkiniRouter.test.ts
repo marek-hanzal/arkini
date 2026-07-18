@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createArkiniRouter } from "~/router";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
+import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteViewTransitionTypes";
 
 const createStartup = (): LauncherStartup => {
 	const state: LauncherStartup.State = {
@@ -27,8 +28,31 @@ const createStartup = (): LauncherStartup => {
 };
 
 const originalStartViewTransition = document.startViewTransition;
+const originalCss = window.CSS;
+
+const resolveTypes = (fromPathname: string | undefined, toPathname: string) =>
+	resolveRouteViewTransitionTypes({
+		fromLocation:
+			fromPathname === undefined
+				? undefined
+				: {
+						pathname: fromPathname,
+					},
+		toLocation: {
+			pathname: toPathname,
+		},
+	});
 
 afterEach(() => {
+	vi.restoreAllMocks();
+	if (originalCss === undefined) {
+		Reflect.deleteProperty(window, "CSS");
+	} else {
+		Object.defineProperty(window, "CSS", {
+			configurable: true,
+			value: originalCss,
+		});
+	}
 	if (originalStartViewTransition === undefined) {
 		Reflect.deleteProperty(document, "startViewTransition");
 		return;
@@ -41,26 +65,50 @@ afterEach(() => {
 });
 
 describe("createArkiniRouter", () => {
-	it("uses native view transitions when available", async () => {
+	it("opts into native transitions only for deliberate route pairs", () => {
+		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
+		expect(resolveTypes("/", "/main-menu")).toBe(false);
+		expect(resolveTypes("/main-menu", "/settings")).toEqual([
+			"main-page",
+		]);
+		expect(resolveTypes("/settings", "/main-menu")).toEqual([
+			"main-page",
+		]);
+		expect(resolveTypes("/main-menu", "/game/built-in")).toEqual([
+			"main-page-game",
+		]);
+		expect(resolveTypes("/game/built-in", "/settings")).toEqual([
+			"main-page-game",
+		]);
+		expect(resolveTypes("/game/built-in", "/dev/shell")).toBe(false);
+	});
+
+	it("uses the typed TanStack policy only when the renderer supports transition types", () => {
+		Object.defineProperty(window, "CSS", {
+			configurable: true,
+			value: {
+				supports: vi.fn(() => true),
+			},
+		});
 		const router = createArkiniRouter({
 			launcherStartup: createStartup(),
 		});
-		const update = vi.fn(async () => undefined);
-		const startViewTransition = vi.fn((callback: () => Promise<void>) => {
-			void callback();
-			return undefined as unknown as ViewTransition;
+		expect(router.options.defaultViewTransition).toEqual({
+			types: resolveRouteViewTransitionTypes,
 		});
+	});
 
-		Object.defineProperty(document, "startViewTransition", {
+	it("disables route transitions rather than falling back to blanket animation", () => {
+		Object.defineProperty(window, "CSS", {
 			configurable: true,
-			value: startViewTransition,
+			value: {
+				supports: vi.fn(() => false),
+			},
 		});
-
-		router.startViewTransition(update);
-		await vi.waitFor(() => expect(update).toHaveBeenCalledOnce());
-
-		expect(router.options.defaultViewTransition).toBe(true);
-		expect(startViewTransition).toHaveBeenCalledOnce();
+		const router = createArkiniRouter({
+			launcherStartup: createStartup(),
+		});
+		expect(router.options.defaultViewTransition).toBe(false);
 	});
 
 	it("falls back to a normal update when the browser API is unavailable", async () => {

@@ -9,7 +9,7 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { About } from "~/ui/launcher/About";
+import { AboutPage } from "~/page/launcher/AboutPage";
 
 (
 	globalThis as {
@@ -30,7 +30,7 @@ afterEach(async () => {
 describe("About", () => {
 	it("shares the launcher route, panel and Hero transition identities", async () => {
 		const rootRoute = createRootRoute({
-			component: About,
+			component: AboutPage,
 		});
 		const router = createRouter({
 			routeTree: rootRoute,
@@ -54,15 +54,17 @@ describe("About", () => {
 		});
 
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="About"]')?.style.viewTransitionName,
+			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
+				.viewTransitionName,
 		).toBe("arkini-route-scene");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="AboutPanel"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-launcher-panel");
+		).toBe("arkini-main-page-panel");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero");
+		expect(container.querySelector('[data-ui="About"]')).not.toBeNull();
 	});
 });

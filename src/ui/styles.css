@@ -200,10 +200,24 @@ select {
 }
 
 [data-ui="LauncherHero"] {
-	contain: paint;
 	isolation: isolate;
+}
+
+[data-ui="LauncherHeroArtwork"] {
+	contain: paint;
 	will-change: transform, opacity;
 	backface-visibility: hidden;
+}
+
+.launcher-hero__shadow {
+	z-index: 0;
+	background: radial-gradient(
+		ellipse at center,
+		color-mix(in srgb, var(--ak-overlay) 32%, transparent) 0%,
+		color-mix(in srgb, var(--ak-accent) 14%, transparent) 38%,
+		transparent 72%
+	);
+	transform: translateY(18%);
 }
 
 @keyframes arkini-view-transition-old-fade {
@@ -253,7 +267,7 @@ select {
 }
 
 ::view-transition-group(arkini-route-scene),
-::view-transition-group(arkini-launcher-panel),
+::view-transition-group(arkini-main-page-panel),
 ::view-transition-group(arkini-launcher-hero) {
 	animation-duration: 300ms;
 	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -263,7 +277,7 @@ select {
 	z-index: 0;
 }
 
-::view-transition-group(arkini-launcher-panel) {
+::view-transition-group(arkini-main-page-panel) {
 	z-index: 10;
 }
 
@@ -272,13 +286,13 @@ select {
 }
 
 ::view-transition-old(arkini-route-scene),
-::view-transition-old(arkini-launcher-panel),
+::view-transition-old(arkini-main-page-panel),
 ::view-transition-old(arkini-launcher-hero) {
 	animation: arkini-view-transition-old-fade 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-new(arkini-route-scene),
-::view-transition-new(arkini-launcher-panel),
+::view-transition-new(arkini-main-page-panel),
 ::view-transition-new(arkini-launcher-hero) {
 	animation: arkini-view-transition-new-fade-hold 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

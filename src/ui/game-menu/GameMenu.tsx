@@ -14,7 +14,7 @@ import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useHardResetGameMutation } from "~/ui/game-menu/mutation/useHardResetGameMutation";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
-import { launcherPanelViewTransitionName } from "~/ui/navigation/launcherPanelViewTransitionName";
+import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
 
 const focusableSelector = [
 	"button:not([disabled])",
@@ -229,7 +229,6 @@ const GameMenuDialog = ({
 		activeRequestRef.current = "settings";
 		void navigate({
 			to: "/settings",
-			viewTransition: true,
 		}).finally(() => {
 			activeRequestRef.current = null;
 		});
@@ -306,7 +305,7 @@ const GameMenuDialog = ({
 				data-ui="GameMenu"
 				tabIndex={-1}
 				style={{
-					viewTransitionName: launcherPanelViewTransitionName,
+					viewTransitionName: mainPagePanelViewTransitionName,
 					...(phase === "entering"
 						? {
 								opacity: 0,

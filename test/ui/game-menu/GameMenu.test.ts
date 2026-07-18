@@ -241,6 +241,7 @@ const renderMenu = async ({
 			gameRoute,
 			settingsRoute,
 		]),
+		defaultViewTransition: true,
 		history: createMemoryHistory({
 			initialEntries: [
 				initialPath,
@@ -366,9 +367,10 @@ describe("GameMenu", () => {
 		const { container, router } = await renderMenu();
 		await openMenu(container);
 		const animationCount = animations.length;
+		viewTransitionStartPhases.splice(0);
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.style.viewTransitionName,
-		).toBe("arkini-launcher-panel");
+		).toBe("arkini-main-page-panel");
 
 		await act(async () => buttonByText(container, "Settings").click());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));

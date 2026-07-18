@@ -298,7 +298,9 @@ describe("StartupSplash", () => {
 			}),
 		);
 		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
-		expect(container.querySelector('[data-ui="LauncherHero"][role="img"]')).not.toBeNull();
+		expect(
+			container.querySelector('[data-ui="LauncherHeroArtwork"][role="img"]'),
+		).not.toBeNull();
 		expect(container.textContent).toContain("Preparing Arkini");
 		expect(container.textContent).not.toContain("Press Esc to continue");
 

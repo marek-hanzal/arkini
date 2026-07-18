@@ -1,5 +1,15 @@
 import { ArkpackSelector } from "~/ui/arkpack/ArkpackSelector";
+import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
 
 export function ArkpackSelectorPage() {
-	return <ArkpackSelector />;
+	return (
+		<MainPageLayout
+			labelledBy="arkpack-selector-title"
+			page="arkpacks"
+			panelMode="viewport"
+			transitionPanel={false}
+		>
+			<ArkpackSelector />
+		</MainPageLayout>
+	);
 }

@@ -143,13 +143,13 @@ describe("Settings", () => {
 			"/settings",
 		]);
 
-		const page = container.querySelector<HTMLElement>('[data-ui="SettingsPage"]');
+		const page = container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]');
 		expect(page?.style.viewTransitionName).toBe("arkini-route-scene");
-		const modal = container.querySelector<HTMLElement>('[data-ui="ResponsiveModal"]');
-		expect(modal).not.toBeNull();
-		expect(modal?.style.viewTransitionName).toBe("arkini-launcher-panel");
+		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
+		expect(panel).not.toBeNull();
+		expect(panel?.style.viewTransitionName).toBe("arkini-main-page-panel");
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));

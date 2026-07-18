@@ -1,10 +1,7 @@
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback } from "react";
-import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { ResponsiveModal } from "~/ui/modal/ResponsiveModal";
-import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
+import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
 import { Settings } from "~/ui/settings/Settings";
-import { launcherPanelViewTransitionName } from "~/ui/navigation/launcherPanelViewTransitionName";
 
 /** Composes standalone Settings with history-aware route navigation. */
 export const SettingsPage = () => {
@@ -25,17 +22,11 @@ export const SettingsPage = () => {
 	]);
 
 	return (
-		<LauncherScene
-			compactHero
-			dataUi="SettingsPage"
-			viewTransitionName={routeSceneViewTransitionName}
+		<MainPageLayout
+			labelledBy="settings-title"
+			page="settings"
 		>
-			<ResponsiveModal
-				labelledBy="settings-title"
-				viewTransitionName={launcherPanelViewTransitionName}
-			>
-				<Settings onBack={goBack} />
-			</ResponsiveModal>
-		</LauncherScene>
+			<Settings onBack={goBack} />
+		</MainPageLayout>
 	);
 };

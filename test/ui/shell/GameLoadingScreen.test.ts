@@ -65,8 +65,9 @@ describe("GameLoadingScreen", () => {
 		const { container } = await renderScreen({
 			ready: false,
 		});
-		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
+		const hero = container.querySelector<HTMLImageElement>('[data-ui="LauncherHero"]');
 		expect(hero).not.toBeNull();
+		expect(hero?.getAttribute("decoding")).toBe("sync");
 		expect(hero?.style.viewTransitionName).toBe("arkini-launcher-hero");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameLoadingScreenPanel"]')?.style

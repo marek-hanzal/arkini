@@ -20,7 +20,7 @@ export const LauncherHero = ({ compact = false, eager = false }: LauncherHero.Pr
 				: "block max-h-[58vh] w-auto max-w-[min(88vw,68rem)] object-contain drop-shadow-2xl"
 		}
 		data-ui="LauncherHero"
-		decoding="async"
+		decoding="sync"
 		draggable={false}
 		fetchPriority={eager ? "high" : undefined}
 		loading={eager ? "eager" : undefined}

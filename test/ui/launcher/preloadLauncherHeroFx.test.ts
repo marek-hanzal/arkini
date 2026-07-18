@@ -9,16 +9,21 @@ describe("preloadLauncherHeroFx", () => {
 		vi.unstubAllGlobals();
 	});
 
-	it("does not complete until the Hero can be decoded for painting", async () => {
+	it("decodes one Hero image and retains it for the complete renderer session", async () => {
 		const decode = vi.fn(async () => undefined);
+		const images: Array<ReadyImage> = [];
 		class ReadyImage {
 			complete = true;
 			naturalWidth = 512;
 			decoding = "auto";
-			onload: (() => void) | null = null;
-			onerror: (() => void) | null = null;
+			fetchPriority = "auto";
+			loading = "auto";
 			src = "";
 			readonly decode = decode;
+			constructor() {
+				images.push(this);
+			}
+			addEventListener() {}
 		}
 		vi.stubGlobal("Image", ReadyImage);
 
@@ -27,6 +32,19 @@ describe("preloadLauncherHeroFx", () => {
 				url: "hero.png",
 			}),
 		);
+		await Effect.runPromise(
+			preloadLauncherHeroFx({
+				url: "hero.png",
+			}),
+		);
+
+		expect(images).toHaveLength(1);
+		expect(images[0]).toMatchObject({
+			decoding: "sync",
+			fetchPriority: "high",
+			loading: "eager",
+			src: "hero.png",
+		});
 		expect(decode).toHaveBeenCalledOnce();
 	});
 });

@@ -2,7 +2,7 @@
 
 This directory is the private working-memory area for the primary implementation model.
 
-## Required reading order
+## Implementation reading order
 
 Before changing code, read:
 
@@ -17,11 +17,16 @@ Before changing code, read:
 
 Do not begin with archived reviews. They explain history, not the current contract.
 
+## Review reading order
+
+Independent implementation reviews start with [`REVIEW_CODEBOOK.md`](REVIEW_CODEBOOK.md) and follow its authority, scope, validation, evidence, GitHub, and reporting protocol. The local numbered implementation queue is not a review backlog and must not manufacture review work.
+
 ## Active files
 
 ```text
-README.md       This index and maintenance policy.
-CURRENT.md      Compact durable project memory and non-obvious decisions.
+README.md           This index and maintenance policy.
+REVIEW_CODEBOOK.md  Authoritative operating manual for independent implementation reviews.
+CURRENT.md          Compact durable project memory and non-obvious decisions.
 tasks/README.md Ordered task queue and continuation protocol.
 tasks/COVERAGE.md Historical behavior coverage and pruning map.
 tasks/NN-*.md Numbered vertical slices; read only the current task unless planning dependencies.
@@ -54,16 +59,17 @@ The repository is exchanged as ZIP snapshots containing `.git`.
 - Deliver a fresh ZIP and SHA-256 after completing repository work.
 - Store project-specific notes here, not in random root scratch files.
 
+GitHub Issues are the active work tracker. Every root work item, simple or complex, uses `epic` + `chat-gpt`. Independently actionable child work uses `task` + `chat-gpt`; the root links every child and every child links back to its root.
+
 ## Review discipline
 
-Every substantial implementation pass checks:
+[`REVIEW_CODEBOOK.md`](REVIEW_CODEBOOK.md) is the authoritative protocol for independent Arkini reviews. In particular:
 
-- architecture conformity;
-- logical correctness and rollback;
-- cancellation and resource ownership;
-- engine/UI truth boundaries;
-- unnecessary synchronization or data forwarding;
-- LLM mental load;
-- mandatory `*Fx` grammar.
+- review passes are read-only and do not create repository commits or modified ZIPs unless explicitly requested;
+- findings and review history live in GitHub Issues, not a second active Markdown backlog under `@chat-gpt`;
+- every review root uses `epic` + `chat-gpt` + `review`, and each independently actionable child uses `task` + `chat-gpt` + `review` + `P1|P2`;
+- roots and children link bidirectionally;
+- a clean review is recorded and closed instead of manufacturing refactors;
+- stable architecture is protected as deliberately as defects are reported.
 
-Do not refactor stable core merely because another review cycle exists. Reviews are allowed to conclude that no code change is needed. Humanity will somehow survive the missing commit.
+The codebook owns the full review invariants, evidence standard, validation matrix, false-positive checks, and issue workflow. Do not duplicate it into `CURRENT.md` or the numbered implementation queue.

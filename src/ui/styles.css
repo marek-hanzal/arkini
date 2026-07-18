@@ -180,10 +180,6 @@ select {
 	display: none;
 }
 
-.launcher-main-menu {
-	view-transition-name: launcher-main-menu;
-}
-
 .launcher-scene__glow {
 	background:
 		radial-gradient(

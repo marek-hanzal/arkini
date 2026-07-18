@@ -136,9 +136,13 @@ describe("MainMenu", () => {
 			(link) => link.textContent === "Play",
 		);
 		expect(play?.getAttribute("href")).toContain("/game/canonical-built-in");
-		expect(container.querySelector('[data-ui="MainMenu"]')?.classList).toContain(
-			"launcher-main-menu",
-		);
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="MainMenu"]')?.style.viewTransitionName,
+		).toBe("arkini-route-scene");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="MainMenuActions"]')?.style
+				.viewTransitionName,
+		).toBe("settings-modal");
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

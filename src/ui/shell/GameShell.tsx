@@ -9,6 +9,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { GameLoadingGate } from "~/ui/shell/GameLoadingGate";
+import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 import { GameLoadingScreen } from "~/ui/shell/GameLoadingScreen";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
@@ -79,6 +80,9 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 		<main
 			className="relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground outline-none"
 			data-ui="GameShell"
+			style={{
+				viewTransitionName: routeSceneViewTransitionName,
+			}}
 			tabIndex={-1}
 		>
 			<GameLoadingGate

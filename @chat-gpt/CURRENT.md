@@ -4,23 +4,21 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Game loading Hero and staged progress**
+**Settings route View Transition coherence**
 
-Status: **Implemented and locally validated for #275.**
+Status: **Implemented and locally validated for the #274 follow-up.**
 
 Current scope:
 
-- `/game/$packageId` renders a dedicated Hero loading scene instead of the plain `Loading game…` placeholder;
-- pending progress follows deterministic presentation-only stages and never reaches 100% before authoritative GameOwner readiness;
-- readiness drives the bar to 100%, waits for the final interpolation, preserves a visible 150 ms completed hold, and only then reveals the first board;
-- same-package hard reset keeps its existing immediate fresh-game publication beneath the mounted game menu after the first board has already been revealed;
-- timers are component-owned and cancel on failure, unmount, route/package replacement, or retry;
-- reduced motion removes interpolation but preserves the 150 ms completion ordering;
-- fake percentage never enters GameOwner, engine state, persistence, or gameplay truth.
+- Main menu, Settings, and GameShell share one full-route native View Transition identity, so the browser no longer animates unmatched whole-page snapshots during Settings navigation;
+- main-menu actions, the open GameMenu panel, the Settings modal, and the initial game-loading panel share one `settings-modal` identity;
+- `MainMenu → Settings`, `GameMenu → Settings`, `Settings → MainMenu`, and `Settings → initial GameLoading` therefore have both a route-scene pair and a content-panel pair;
+- the game-loading panel claims the shared identity only inside the initial loading gate; the post-reveal hard-reset fallback stays unnamed so it cannot collide with the still-mounted GameMenu panel;
+- Settings continues to use real browser history with the direct-entry `/main-menu` fallback, and leaving `/game` still releases/saves the Game normally.
 
 Next action:
 
-> Native-smoke the loading scene at normal and short Electron viewport sizes, checking Hero scale, staged progress, the visible 100% hold, and the board reveal.
+> Native-smoke MainMenu → Settings → Back and GameMenu → Settings → Back on macOS Electron, checking that neither direction jumps for one or two frames and that GameMenu → Settings retains its existing shared-element quality.
 
 ## Source topology
 

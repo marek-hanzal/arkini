@@ -16,9 +16,11 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const renderScreen = async ({
 	onComplete,
 	ready,
+	viewTransitionName,
 }: {
 	readonly onComplete?: () => void;
 	readonly ready: boolean;
+	readonly viewTransitionName?: string;
 }) => {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -29,6 +31,7 @@ const renderScreen = async ({
 			createElement(GameLoadingScreen, {
 				onComplete,
 				ready,
+				viewTransitionName,
 			}),
 		);
 	});
@@ -64,8 +67,13 @@ describe("GameLoadingScreen", () => {
 	it("advances through deterministic pending stages without claiming completion", async () => {
 		const { container } = await renderScreen({
 			ready: false,
+			viewTransitionName: "settings-modal",
 		});
 		expect(container.querySelector('[data-ui="GameLoadingScreenHero"] img')).not.toBeNull();
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameLoadingScreenPanel"]')?.style
+				.viewTransitionName,
+		).toBe("settings-modal");
 		expect(progressValue(container)).toBe(12);
 
 		await act(async () => vi.advanceTimersByTime(180));

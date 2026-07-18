@@ -2,6 +2,7 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { ResponsiveModal } from "~/ui/modal/ResponsiveModal";
+import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 import { Settings } from "~/ui/settings/Settings";
 import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
 
@@ -27,6 +28,7 @@ export const SettingsPage = () => {
 		<LauncherScene
 			compactHero
 			dataUi="SettingsPage"
+			viewTransitionName={routeSceneViewTransitionName}
 		>
 			<ResponsiveModal
 				labelledBy="settings-title"

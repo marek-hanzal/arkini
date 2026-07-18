@@ -208,6 +208,9 @@ describe("GameShell menu transition", () => {
 			);
 		});
 		expect(container.querySelector('[data-ui="GameLoadingScreen"]')).not.toBeNull();
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameShell"]')?.style.viewTransitionName,
+		).toBe("arkini-route-scene");
 		await act(async () => {
 			await new Promise((resolve) => window.setTimeout(resolve, 350));
 		});

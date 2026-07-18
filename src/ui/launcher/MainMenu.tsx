@@ -4,6 +4,8 @@ import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/butto
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useExitApplicationMutation } from "~/ui/launcher/mutation/useExitApplicationMutation";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
+import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
+import { settingsModalViewTransitionName } from "~/ui/settings/settingsModalViewTransitionName";
 
 /** Renders the semantic out-of-game launcher menu over authoritative startup and catalog state. */
 export const MainMenu = () => {
@@ -26,13 +28,17 @@ export const MainMenu = () => {
 
 	return (
 		<LauncherScene
-			className="launcher-main-menu"
 			compactHero
 			dataUi="MainMenu"
+			viewTransitionName={routeSceneViewTransitionName}
 		>
 			<nav
 				className="grid w-full max-w-xs gap-2"
 				aria-label="Main menu"
+				data-ui="MainMenuActions"
+				style={{
+					viewTransitionName: settingsModalViewTransitionName,
+				}}
 			>
 				{builtInAvailable && builtInPackageId !== undefined ? (
 					<PrimaryButtonLink

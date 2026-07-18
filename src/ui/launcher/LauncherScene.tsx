@@ -6,6 +6,7 @@ export namespace LauncherScene {
 		readonly className?: string;
 		readonly compactHero?: boolean;
 		readonly dataUi: string;
+		readonly viewTransitionName?: string;
 	}
 }
 
@@ -15,10 +16,14 @@ export const LauncherScene = ({
 	className,
 	compactHero = false,
 	dataUi,
+	viewTransitionName,
 }: LauncherScene.Props) => (
 	<main
 		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${className === undefined ? "" : ` ${className}`}`}
 		data-ui={dataUi}
+		style={{
+			viewTransitionName,
+		}}
 	>
 		<div
 			className="launcher-scene__glow absolute inset-0"

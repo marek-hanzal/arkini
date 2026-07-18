@@ -4,26 +4,28 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Main-page layout and deliberate route View Transitions**
+**Action-bound root loading lifecycle**
 
-Status: **Implemented and validated for issues #279 and #280; native macOS smoke pending.**
+Status: **Implemented; final validation and native macOS smoke pending.**
 
 Current contract:
 
-- `MainPageLayout` is the narrow shared shell for `/main-menu`, `/settings`, `/about`, and `/arkpacks` only; game, dev, startup splash, game loading, lifecycle failures, and the in-game menu remain outside it;
-- every main page uses one stable `MainPageLayout → LauncherHero → MainPagePanel` structure while page code supplies only route-local behavior and content;
-- compact/responsive/viewport panel modes change sizing, not the outer DOM hierarchy; the large Arkpack catalog deliberately does not share the compact-panel View Transition identity;
-- TanStack Router remains the sole route-transition owner, but blanket `defaultViewTransition: true` is gone; one small typed route-pair policy opts in only for main-page ↔ main-page and main-page ↔ game transitions and returns `false` for startup splash, dev, and unrelated routes;
-- browser Back/Forward uses the same route-pair policy; individual links and GameMenu do not force a second transition decision;
-- startup splash keeps its existing WAAPI crossfade into the already-mounted normalized MainMenu and receives no native route backfade;
-- `arkini-route-scene`, `arkini-main-page-panel`, and `arkini-launcher-hero` describe visual roles rather than destination names;
-- the complete `LauncherHero` composite owns the shared-element identity; its artwork and cheap gradient shadow are captured and handed off together, avoiding both expensive `drop-shadow` rerasterization and the rectangular live-shadow flash caused by splitting the shadow outside the snapshot;
-- initial Loader → Board remains the separate local native View Transition owned by `GameLoadingGate`; no route animation state enters GameOwner or the engine.
-- GameMenu exposes direct `Settings` and `Main Menu` route actions; both navigate from the fully open menu without running its local WAAPI exit first, and the router's main-page ↔ game policy owns the native transition. Leaving the game route still uses the canonical GameOwner final-save/release lifecycle.
+- `ActionLoadingProvider` lives above `GameOwnerProvider` and the route canvas, so one loading presentation can survive route replacement without becoming a second game or save owner;
+- every deliberate loading run receives the real asynchronous action, a stable dedupe key, a presentation label, a minimum visible duration, and a completed hold;
+- defaults are 2.5 seconds minimum visibility and a 350 ms fully completed hold after the 180 ms progress interpolation;
+- staged pending progress tops out at 94%; 100% is published only after both the real action succeeds and the minimum duration has elapsed; failure waits out the same minimum but never displays a false completed state;
+- `GameOwnerRouteBinding` remains the declarative route-to-owner boundary, but game selection and an owned-game return to `/main-menu` run through the root loader; leaving game for `/settings` deliberately invokes the same canonical route release without the artificial delay;
+- one route-intent ref prevents React StrictMode effect replay from running the same owner command twice; provider unmount cleanup is microtask-confirmed so StrictMode cleanup/replay does not clear an active dedupe entry while a real unmount still releases close readiness;
+- initial game entry, browser-history return to game, and game-to-main-menu all observe the exact `GameOwner` Promise; no create, save, release, or failure state is duplicated in React;
+- `Save and exit` uses `runNativeClose`: the existing Electron controlled-close request starts immediately, `GameOwner.shutdownFx` remains the sole final-save owner, native `beforeCloseReady` resolves the loader action only after that shutdown succeeds, and the renderer reports close-ready only after 100% has remained visible for the completed hold;
+- route-action failure hides the loader without claiming completion and leaves the authoritative `GameOwner` failure snapshot responsible for recovery UI;
+- while the root loader is active, underlying route, panel, Hero, shell, and board View Transition names are suppressed to prevent duplicate shared-element identities; the loader-to-target reveal waits for any active native transition animations and commits through one local native View Transition;
+- the previous route-local `GameLoadingGate`, `GameLoadingScreen`, and `arkini-game-loading` identity are removed; `ActionLoadingScreen` is the single staged progress presentation and `arkini-action-loading` is its visual role;
+- startup splash, MainPage route policy, GameMenu local WAAPI, Settings navigation, and engine truth remain separate from loading presentation state.
 
 Next action:
 
-> Native-smoke `/main-menu ↔ /settings`, `/main-menu ↔ /about`, `/main-menu ↔ /arkpacks`, GameMenu → Settings → Back, GameMenu → MainMenu, startup splash → MainMenu, and Loader → Board on macOS Electron. Verify especially that route actions preserve the fully open GameMenu snapshot, splash has no second fade, and the composite Hero artwork plus gradient shadow does not flash or expose rectangular raster bounds after repeated navigation.
+> Validate game entry, GameMenu → Main Menu, browser Back to game, GameMenu → Settings, Save and exit success/failure, and loader-to-board/main-page handoff on native macOS Electron. Verify the loader remains visible for at least 2.5 seconds, 100% is perceptible for roughly 350 ms, failures never flash 100%, and no underlying Hero or panel shared element leaks through the root overlay.
 
 ## Source topology
 

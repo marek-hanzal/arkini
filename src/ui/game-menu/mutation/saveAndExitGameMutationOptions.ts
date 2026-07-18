@@ -5,7 +5,11 @@ import { requestApplicationCloseFx } from "~/bridge/lifecycle/requestApplication
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 /** Complete mutation contract for saving the exact game through native controlled shutdown. */
-export const saveAndExitGameMutationOptions = (game: Game) =>
+export const saveAndExitGameMutationOptions = (
+	game: Game,
+	requestClose: () => Promise<void> = () =>
+		RendererRuntime.runPromise(requestApplicationCloseFx()),
+) =>
 	mutationOptions({
 		mutationKey: [
 			"game",
@@ -13,6 +17,6 @@ export const saveAndExitGameMutationOptions = (game: Game) =>
 			game.saveKey.packageId,
 			game.saveKey.contentHash,
 		] as const,
-		mutationFn: () => RendererRuntime.runPromise(requestApplicationCloseFx()),
+		mutationFn: requestClose,
 		retry: false,
 	});

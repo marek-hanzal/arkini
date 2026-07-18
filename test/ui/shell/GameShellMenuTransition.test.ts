@@ -16,6 +16,7 @@ import type { Game } from "~/bridge/game/Game";
 import type { GameOwner } from "~/bridge/game/GameOwner";
 import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
 import { useGame } from "~/bridge/game/useGame";
+import { ActionLoadingProvider } from "~/ui/loading/ActionLoadingProvider";
 import { GameShell } from "~/ui/shell/GameShell";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
@@ -81,6 +82,16 @@ const Gameplay = () => {
 
 beforeEach(() => {
 	animations.splice(0);
+	Object.defineProperty(window, "matchMedia", {
+		configurable: true,
+		value: vi.fn(() => ({
+			matches: true,
+		})),
+	});
+	Object.defineProperty(document, "getAnimations", {
+		configurable: true,
+		value: vi.fn(() => []),
+	});
 	Object.defineProperty(HTMLElement.prototype, "animate", {
 		configurable: true,
 		value: vi.fn(() => {
@@ -170,21 +181,28 @@ describe("GameShell menu transition", () => {
 		roots.push(root);
 		const App = () =>
 			createElement(
-				QueryClientProvider,
+				ActionLoadingProvider,
 				{
-					client: new QueryClient(),
+					completedHoldMs: 0,
+					minimumDurationMs: 0,
 				},
 				createElement(
-					GameOwnerContext.Provider,
+					QueryClientProvider,
 					{
-						value: owner,
+						client: new QueryClient(),
 					},
 					createElement(
-						GameShell,
+						GameOwnerContext.Provider,
 						{
-							packageId: "package:menu",
+							value: owner,
 						},
-						createElement(Gameplay),
+						createElement(
+							GameShell,
+							{
+								packageId: "package:menu",
+							},
+							createElement(Gameplay),
+						),
 					),
 				),
 			);
@@ -207,17 +225,12 @@ describe("GameShell menu transition", () => {
 				}),
 			);
 		});
-		expect(container.querySelector('[data-ui="GameLoadingScreen"]')).not.toBeNull();
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="GameShell"]')?.style.viewTransitionName,
-		).toBe("arkini-route-scene");
-		await act(async () => {
-			await new Promise((resolve) => window.setTimeout(resolve, 350));
-		});
 		expect(container.querySelector('[data-ui="Gameplay"]')?.getAttribute("data-instance")).toBe(
 			"game-instance:original",
 		);
-
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameShell"]')?.style.viewTransitionName,
+		).toBe("arkini-route-scene");
 		await pressEscape();
 		await finishLatestPair();
 		await act(async () => buttonByText(container, "Destroy").click());
@@ -232,7 +245,7 @@ describe("GameShell menu transition", () => {
 		expect(container.querySelector('[role="dialog"]')).toBeNull();
 	});
 
-	it("does not mount the Escape menu before the initial loading gate completes", async () => {
+	it("does not mount the Escape menu before the root owner publishes a game", async () => {
 		const game = createGame("game-instance:loading");
 		const listeners = new Set<() => void>();
 		let state: ReturnType<GameOwner["getSnapshot"]> = {
@@ -257,21 +270,28 @@ describe("GameShell menu transition", () => {
 		roots.push(root);
 		const App = () =>
 			createElement(
-				QueryClientProvider,
+				ActionLoadingProvider,
 				{
-					client: new QueryClient(),
+					completedHoldMs: 0,
+					minimumDurationMs: 0,
 				},
 				createElement(
-					GameOwnerContext.Provider,
+					QueryClientProvider,
 					{
-						value: owner,
+						client: new QueryClient(),
 					},
 					createElement(
-						GameShell,
+						GameOwnerContext.Provider,
 						{
-							packageId: "package:menu",
+							value: owner,
 						},
-						createElement(Gameplay),
+						createElement(
+							GameShell,
+							{
+								packageId: "package:menu",
+							},
+							createElement(Gameplay),
+						),
 					),
 				),
 			);
@@ -294,7 +314,8 @@ describe("GameShell menu transition", () => {
 				}),
 			);
 		});
-		expect(container.querySelector('[data-ui="GameLoadingScreen"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="Gameplay"]')).toBeNull();
+		expect(container.querySelector('[role="dialog"]')).toBeNull();
 		await pressEscape();
 		expect(animations).toHaveLength(0);
 
@@ -304,12 +325,6 @@ describe("GameShell menu transition", () => {
 				game,
 			};
 			for (const listener of listeners) listener();
-		});
-		expect(container.querySelector('[role="progressbar"]')?.getAttribute("aria-valuenow")).toBe(
-			"100",
-		);
-		await act(async () => {
-			await new Promise((resolve) => window.setTimeout(resolve, 350));
 		});
 		expect(container.querySelector('[data-ui="Gameplay"]')?.getAttribute("data-instance")).toBe(
 			"game-instance:loading",

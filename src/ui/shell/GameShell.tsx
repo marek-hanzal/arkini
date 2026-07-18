@@ -8,9 +8,8 @@ import { useGameOwner } from "~/bridge/game/useGameOwner";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
-import { GameLoadingGate } from "~/ui/shell/GameLoadingGate";
 import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
-import { GameLoadingScreen } from "~/ui/shell/GameLoadingScreen";
+import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
 const runOwnerCommand = (command: Effect.Effect<void, unknown>) => {
@@ -85,27 +84,23 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 			}}
 			tabIndex={-1}
 		>
-			<GameLoadingGate
-				key={packageId}
-				ready={activeGame !== undefined}
-				failure={menuGame === undefined ? failure : null}
-			>
-				{menuGame !== undefined ? (
-					<GameMenuProvider key={packageId}>
-						{activeGame !== undefined ? (
-							<GameProvider game={activeGame}>
-								<TileSystemProvider>{children}</TileSystemProvider>
-							</GameProvider>
-						) : (
-							(failure ?? <GameLoadingScreen ready={false} />)
-						)}
-						<GameMenu
-							game={menuGame}
-							gameAvailable={gameAvailable}
-						/>
-					</GameMenuProvider>
-				) : null}
-			</GameLoadingGate>
+			{menuGame !== undefined ? (
+				<GameMenuProvider key={packageId}>
+					{activeGame !== undefined ? (
+						<GameProvider game={activeGame}>
+							<TileSystemProvider>{children}</TileSystemProvider>
+						</GameProvider>
+					) : (
+						(failure ?? <ActionLoadingScreen label="Restarting game…" />)
+					)}
+					<GameMenu
+						game={menuGame}
+						gameAvailable={gameAvailable}
+					/>
+				</GameMenuProvider>
+			) : (
+				failure
+			)}
 		</main>
 	);
 }

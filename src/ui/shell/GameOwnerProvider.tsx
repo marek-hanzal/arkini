@@ -1,4 +1,3 @@
-import { useMatchRoute } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { type ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 
@@ -8,6 +7,7 @@ import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
 import { createGameOwnerFx } from "~/bridge/game/createGameOwnerFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
+import { GameOwnerRouteBinding } from "~/ui/shell/GameOwnerRouteBinding";
 
 export namespace GameOwnerProvider {
 	export interface Props {
@@ -29,12 +29,6 @@ import.meta.hot?.dispose((data: HotData) => {
 			: RendererRuntime.runPromise(activeHotOwner.shutdownFx());
 	activeHotOwner = undefined;
 });
-
-const runOwnerCommand = (command: Effect.Effect<void, unknown>) => {
-	void RendererRuntime.runPromise(command).catch(() => {
-		// GameOwner publishes the same authoritative failure for renderer UI.
-	});
-};
 
 const GameShutdownFailure = () => (
 	<div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/95 p-6 text-center text-sm text-danger">
@@ -92,24 +86,7 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 	}
 	const owner = ownerRef.current;
 	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
-	const matchRoute = useMatchRoute();
-	const gameRoute = matchRoute({
-		to: "/game/$packageId",
-		fuzzy: true,
-	});
-	const desiredPackageId = gameRoute === false ? null : gameRoute.packageId;
 	activeHotOwner = owner;
-
-	useEffect(() => {
-		runOwnerCommand(
-			desiredPackageId === null
-				? owner.releaseRouteGameFx()
-				: owner.selectPackageFx(desiredPackageId),
-		);
-	}, [
-		desiredPackageId,
-		owner,
-	]);
 
 	useEffect(() => {
 		const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(() =>
@@ -122,6 +99,7 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 
 	return (
 		<GameOwnerContext.Provider value={owner}>
+			<GameOwnerRouteBinding owner={owner} />
 			{children}
 			{state.type === "failed" && state.operation === "shutdown" ? (
 				<GameShutdownFailure />

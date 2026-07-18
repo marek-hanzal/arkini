@@ -19,6 +19,7 @@ import type { GameOwner } from "~/bridge/game/GameOwner";
 import { GameOwnerContext } from "~/bridge/game/GameOwnerContext";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { ActionLoadingProvider } from "~/ui/loading/ActionLoadingProvider";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
 (
@@ -119,6 +120,16 @@ const createOwner = ({
 beforeEach(() => {
 	animations.splice(0);
 	viewTransitionStartPhases.splice(0);
+	Object.defineProperty(window, "matchMedia", {
+		configurable: true,
+		value: vi.fn(() => ({
+			matches: true,
+		})),
+	});
+	Object.defineProperty(document, "getAnimations", {
+		configurable: true,
+		value: vi.fn(() => []),
+	});
 	Object.defineProperty(document, "startViewTransition", {
 		configurable: true,
 		value: vi.fn((options: unknown) => {
@@ -179,17 +190,15 @@ const renderMenu = async ({
 	readonly initialPath?: string;
 	readonly requestClose?: () => Promise<void>;
 } = {}) => {
-	let beforeCloseReady: (() => Promise<void>) | undefined;
+	const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
 			lifecycle: {
 				requestClose,
 				onBeforeCloseReady: (listener: () => Promise<void>) => {
-					beforeCloseReady = listener;
-					return () => {
-						if (beforeCloseReady === listener) beforeCloseReady = undefined;
-					};
+					beforeCloseReadyListeners.add(listener);
+					return () => beforeCloseReadyListeners.delete(listener);
 				},
 			},
 		} as unknown as ArkiniDesktopApi.Api,
@@ -199,29 +208,36 @@ const renderMenu = async ({
 	const queryClient = new QueryClient();
 	const App = () =>
 		createElement(
-			QueryClientProvider,
+			ActionLoadingProvider,
 			{
-				client: queryClient,
+				completedHoldMs: 0,
+				minimumDurationMs: 0,
 			},
 			createElement(
-				GameOwnerContext.Provider,
+				QueryClientProvider,
 				{
-					value: owner,
+					client: queryClient,
 				},
 				createElement(
-					GameMenuProvider,
-					null,
+					GameOwnerContext.Provider,
+					{
+						value: owner,
+					},
 					createElement(
-						"button",
-						{
-							type: "button",
-							id: "game-surface",
-						},
-						"Game surface",
+						GameMenuProvider,
+						null,
+						createElement(
+							"button",
+							{
+								type: "button",
+								id: "game-surface",
+							},
+							"Game surface",
+						),
+						createElement(GameMenu, {
+							game,
+						}),
 					),
-					createElement(GameMenu, {
-						game,
-					}),
 				),
 			),
 		);
@@ -267,10 +283,12 @@ const renderMenu = async ({
 		container,
 		router,
 		runBeforeCloseReady: () => {
-			if (beforeCloseReady === undefined) {
-				throw new Error("Expected before-close-ready listener.");
+			if (beforeCloseReadyListeners.size === 0) {
+				throw new Error("Expected before-close-ready listeners.");
 			}
-			return beforeCloseReady();
+			return Promise.all(
+				Array.from(beforeCloseReadyListeners, (listener) => listener()),
+			).then(() => undefined);
 		},
 	};
 };

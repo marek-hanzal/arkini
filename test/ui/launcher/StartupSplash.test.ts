@@ -264,6 +264,9 @@ describe("StartupSplash", () => {
 		await act(async () => visible.resolve(performance.now()));
 		await act(async () => vi.advanceTimersByTime(499));
 		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
+		await pressEscape();
+		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
+		expect(animations).toHaveLength(0);
 		await act(async () => vi.advanceTimersByTime(1));
 		const splash = container.querySelector<HTMLElement>('[data-phase="entering"]');
 		expect(splash).not.toBeNull();
@@ -297,6 +300,14 @@ describe("StartupSplash", () => {
 		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
 		expect(container.querySelector("img")).not.toBeNull();
 		expect(container.textContent).toContain("Preparing Arkini");
+		expect(container.textContent).not.toContain("Press Esc to continue");
+
+		await pressEscape();
+		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
+		expect(animations).toHaveLength(1);
+
+		await act(async () => harness.publish(readyState()));
+		expect(container.textContent).toContain("Press Esc to continue");
 	});
 
 	it("reverses Escape during enter into a synchronized main-menu cross-fade", async () => {
@@ -306,9 +317,11 @@ describe("StartupSplash", () => {
 		await act(async () => visible.resolve(performance.now()));
 		await act(async () => vi.advanceTimersByTime(500));
 		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
+		expect(container.textContent).toContain("Press Esc to continue");
 
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(container.textContent).not.toContain("Press Esc to continue");
 		expect(animations).toHaveLength(3);
 		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
 		expect(animations[1]?.options).toMatchObject({
@@ -325,6 +338,9 @@ describe("StartupSplash", () => {
 		expect(animations[2]?.options).toEqual(animations[1]?.options);
 		expect(router.state.location.pathname).toBe("/");
 
+		await pressEscape();
+		expect(animations).toHaveLength(3);
+
 		await finishAnimations(1, 2);
 		expect(animations[1]?.commitStyles).toHaveBeenCalledOnce();
 		expect(animations[1]?.cancel).toHaveBeenCalledOnce();
@@ -332,6 +348,33 @@ describe("StartupSplash", () => {
 		expect(animations[2]?.cancel).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+	});
+
+	it("never flashes the continue prompt when readiness arrives after the minimum", async () => {
+		const harness = createStartup();
+		const { container, visible } = await renderSplash(harness.startup);
+		await act(async () => visible.resolve(performance.now()));
+		await act(async () => vi.advanceTimersByTime(500));
+		await act(async () =>
+			harness.publish({
+				type: "loading",
+				appearance: {
+					theme: "dark",
+					accent: "rose",
+				},
+				heroReady: true,
+				splashCompleted: false,
+			}),
+		);
+		await finishAnimation(0);
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+		expect(container.textContent).not.toContain("Press Esc to continue");
+
+		await act(async () => vi.advanceTimersByTime(4_500));
+		await act(async () => harness.publish(readyState()));
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		expect(container.textContent).not.toContain("Press Esc to continue");
+		expect(animations).toHaveLength(3);
 	});
 
 	it("automatically exits after five visible seconds and actual animation completion", async () => {

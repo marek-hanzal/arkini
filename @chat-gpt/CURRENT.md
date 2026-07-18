@@ -4,25 +4,23 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Launcher and game-menu visual lifecycle integration**
+**Launcher continue-prompt truthfulness**
 
-Status: **Implemented and locally validated. Native macOS visual smoke remains before closing #247, #272, and parent review #271.**
+Status: **Implemented and locally validated for #269.**
 
 Current scope:
 
-- Electron main reports the actual `ready-to-show` window-visible moment through the typed preload lifecycle;
-- startup keeps the visible window pure black for approximately 500 ms, applies persisted appearance, waits for decoded Hero readiness, and then reveals the complete scene while the remaining catalog bootstrap may continue truthfully;
-- splash enter and exit each last 2.5 seconds; the startup page itself stays black while its already-mounted main menu is held at opacity zero, and legal Escape reverses an active enter immediately from its current visual frame;
-- `/main-menu` is already mounted beneath the splash but remains invisible through black hold, enter, and open; WAAPI exit synchronously drives splash opacity down and main-menu opacity up as a literal cross-fade, completed frames are committed before animation cancellation, and the stable main-menu scene participates in the native named View Transition instead of opting out;
-- the game menu owns `closed | entering | open | exiting`, remains interaction-authoritative through exit, starts hidden before WAAPI can paint, preserves its final frame before unmount, reverses rapid Escape from the current visual frame, and restores focus only after actual completion;
-- controlled Save and exit runs `GameOwner.shutdownFx` first, then the shared menu exit, and sends Electron `closeReady` only after both succeed;
-- hard reset publishes the fresh same-package `Game` while the menu provider survives long enough to fade out over it;
-- one synchronous action guard prevents same-tick duplicate Save, Save and exit, or hard-reset requests before TanStack pending state reaches React;
-- no generic animation framework, JavaScript completion timer, route-owned menu animation, or reduced-motion branch exists.
+- hard bootstrap `state.type === "ready"` remains the owner-level data readiness signal;
+- splash continuation uses one derived `canContinue` contract requiring hard readiness, the interactive `entering | open` visual phases, and a minimum hold that has not already elapsed;
+- black hold and loading ignore Escape without queueing a later dismissal;
+- active enter remains immediately reversible after readiness;
+- exit hides `Press Esc to continue` immediately and rejects duplicate Escape input;
+- prompt rendering and keyboard handling share `canContinue`, while automatic and keyboard continuation converge on the same `requestExit` boundary;
+- no timeout, duplicate readiness store, or low-level resource inference was added.
 
 Next action:
 
-> Run development or packaged Arkini on macOS and visually confirm: roughly 500 ms of visible black, no main-menu leak during the 2.5-second splash enter, literal splash-to-menu opacity cross-fade during the 2.5-second exit, immediate Escape reversal after startup readiness, native View Transition handoff to the main menu, game-menu fade in/out without a post-exit flash, hard-reset fade over the fresh game, and Save and exit fade before the native window closes. Then close #247, #272, and #271.
+> Native smoke the startup prompt once: it must be absent during black/loading, appear only when Escape is accepted, disappear at exit start, and never reappear during the splash-to-menu cross-fade.
 
 ## Source topology
 

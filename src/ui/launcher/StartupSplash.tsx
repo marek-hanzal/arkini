@@ -54,12 +54,14 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 	const navigate = useNavigate();
 	const [visibleAtMs, setVisibleAtMs] = useState<number | null>(null);
 	const [blackHoldComplete, setBlackHoldComplete] = useState(false);
+	const [minimumSplashComplete, setMinimumSplashComplete] = useState(false);
 	const [phase, setPhase] = useState<SplashPhase>("black");
 	const overlayRef = useRef<HTMLDivElement>(null);
 	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
 	const animationGenerationRef = useRef(0);
-	const exitRequestedRef = useRef(false);
 	const visualReady = state.appearance !== null && state.heroReady;
+	const canExit = state.type === "ready" && (phase === "entering" || phase === "open");
+	const canContinue = canExit && !minimumSplashComplete;
 
 	useEffect(() => {
 		let active = true;
@@ -84,8 +86,17 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 	]);
 
 	useEffect(() => {
+		if (visibleAtMs === null) return;
+		const remainingMs = Math.max(0, minimumSplashMs - (performance.now() - visibleAtMs));
+		const timer = window.setTimeout(() => setMinimumSplashComplete(true), remainingMs);
+		return () => window.clearTimeout(timer);
+	}, [
+		visibleAtMs,
+	]);
+
+	useEffect(() => {
 		if (phase !== "black" || !blackHoldComplete || !visualReady) return;
-		setPhase(exitRequestedRef.current ? "completed" : "entering");
+		setPhase("entering");
 	}, [
 		blackHoldComplete,
 		phase,
@@ -93,39 +104,32 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 	]);
 
 	const requestExit = useCallback(() => {
-		if (state.type !== "ready" || phase === "completed" || phase === "exiting") return;
-		if (phase === "black") {
-			exitRequestedRef.current = true;
-			return;
-		}
+		if (!canExit) return;
 		setPhase("exiting");
 	}, [
-		phase,
-		state.type,
+		canExit,
 	]);
 
 	useEffect(() => {
-		if (visibleAtMs === null || state.type !== "ready") return;
-		const remainingMs = Math.max(0, minimumSplashMs - (performance.now() - visibleAtMs));
-		const timer = window.setTimeout(requestExit, remainingMs);
-		return () => window.clearTimeout(timer);
+		if (!minimumSplashComplete || !canExit) return;
+		requestExit();
 	}, [
+		canExit,
+		minimumSplashComplete,
 		requestExit,
-		state.type,
-		visibleAtMs,
 	]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape" || state.type !== "ready") return;
+			if (event.key !== "Escape" || !canContinue) return;
 			event.preventDefault();
 			requestExit();
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [
+		canContinue,
 		requestExit,
-		state.type,
 	]);
 
 	useLayoutEffect(() => {
@@ -145,7 +149,7 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 			(!entering && (mainMenu === null || typeof mainMenu.animate !== "function"))
 		) {
 			if (entering) {
-				setPhase(exitRequestedRef.current ? "exiting" : "open");
+				setPhase("open");
 			} else {
 				if (mainMenu !== null) mainMenu.style.opacity = "1";
 				setPhase("completed");
@@ -213,7 +217,7 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 			if (animationGenerationRef.current !== generation) return;
 			animationsRef.current = animations.filter((animation) => !persistFinalFrame(animation));
 			if (entering) {
-				setPhase(exitRequestedRef.current ? "exiting" : "open");
+				setPhase("open");
 				return;
 			}
 			setPhase("completed");
@@ -314,11 +318,11 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 								Retry
 							</PrimaryButton>
 						</div>
-					) : (
+					) : canContinue ? (
 						<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
 							Press Esc to continue
 						</p>
-					)}
+					) : null}
 				</div>
 			</LauncherScene>
 		</div>

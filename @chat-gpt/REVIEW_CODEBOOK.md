@@ -351,13 +351,13 @@ Current decision: in-game `Save and exit` performs controlled whole-application 
 
 ```text
 request close
-→ final GameOwner save/shutdown succeeds
-→ presentation exit transition completes
-→ renderer reports close-ready
+→ router enters the explicit exit action
+→ the cached GameEngineResource performs serialized final save/disposal
+→ the successful action reports close-ready
 → Electron closes the window
 ```
 
-Failure leaves the same game and menu visibly retryable. It does not navigate to `/main-menu` and does not use route release.
+Failure retains the same frozen cached game resource and exposes the route error page for retry. It does not navigate to `/main-menu` and does not pretend the final save succeeded.
 
 Ordinary route release remains a separate lifecycle operation.
 

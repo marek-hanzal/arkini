@@ -4,27 +4,28 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Route-owned Game Engine lifecycle and native action-page transitions**
+**Native View Transition page-system overhaul**
 
-Status: **Implemented; targeted validation passed, native macOS smoke pending.**
+Status: **Implemented; targeted automated validation and throttled Chromium validation passed, native macOS Electron smoke pending.**
 
 Current contract:
 
 - `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`.
-- `/game/$packageId` is a resource/layout boundary, never a visual page. Its `beforeLoad` obtains one stable `GameEngineResource` through `queryClient.ensureQueryData(...)`, returns the exact `Game` and resource through inherited TanStack Router context, and its loader exposes that same `Game` to React through `useGameEngine()`.
-- TanStack Query owns only the identity and lifetime of this explicitly route-scoped live resource. It does not own gameplay state, runtime reads, catalog state, saves, or another reactive game truth; gameplay UI must not call `useQuery()` for the engine.
-- `gameEngineQueryOptions` is the sole creation boundary. The exact package query uses infinite stale/GC time, disabled retry, and disabled structural sharing so repeated parent `beforeLoad` runs and child-route navigation return the same object rather than creating or rewriting a live engine.
-- `GameEngineResource` contains the canonical `Game` plus one private Effect semaphore. Every destructive route lifecycle action for that resource runs through `withLifecycleLockFx`, so leave, reset, exit, HMR shutdown, and competing navigation cannot overlap.
-- `/game/$packageId/board` is the visual gameplay leaf. `/game/$packageId/action/leave`, `/reset`, and `/exit` are standalone leaf pages whose loaders own their complete lifecycle operation; their pending/error components render the Hero action presentation and contain no domain orchestration.
-- The pathless launcher boundary redirects any launcher destination through the active game's `/action/leave` route. A transition to another package also releases the currently cached package first. No launcher page, React provider, component effect, or hidden overlay independently decides game ownership.
-- Successful release performs the retryable final save/disposal first and removes the exact Query resource only afterward. Failure retains the same frozen resource so the leaf error page can retry the identical save obligation.
-- Reset runs discard-without-save, clears only the exact package/content-hash save, removes the Query resource, and redirects to `/game/$packageId/board`; the next parent `beforeLoad` creates one fresh engine through the normal factory. Retry relies on idempotent session disposal/save clearing, never a second UI-owned reset state machine.
-- Controlled native close navigates to `/game/$packageId/action/exit` when a game exists or `/action/exit` otherwise. Electron preload waits for the router-owned close action before sending `closeReady`; native force close remains an explicit process policy and never pretends the final save succeeded.
-- `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. `GameOwner`, `GameOwnerProvider`, `GameOwnerRouteBinding`, `GameProvider`, root action-loading state, loader overlays, transition-name suppression, and local loader-unmount `document.startViewTransition()` orchestration are removed.
-- Startup is one standalone `/` page. It waits for real bootstrap and its minimum presentation lifetime, then navigates to `/main-menu` through the native router View Transition. Main Menu is not mounted beneath the splash and no transient Hero clone or manual cross-route WAAPI handoff exists.
-- Cross-page animation belongs to typed native TanStack Router View Transitions. WAAPI remains valid only for local same-page state such as GameMenu open/close.
-- `MainPageLayout` is the only outer structure for `/main-menu`, `/settings`, `/about`, and `/arkpacks`; its `LauncherScene` keeps one stable Hero slot and content slot, so panel height never moves or resizes the Hero.
-- Main-page native transitions name only the full `arkini-route-scene` and, for geometrically corresponding compact pages, `arkini-main-page-panel`; `/arkpacks` deliberately leaves its viewport panel unnamed and uses the typed `main-page-arkpacks` family to prevent Chromium panel cutouts.
+- `/game/$packageId` remains a non-visual resource/layout boundary. It requires the exact cached `GameEngineResource`, exposes the canonical `Game` through inherited TanStack Router context and loader data, and renders only `Outlet`.
+- `/action/load-game/$packageId` is the sole explicit creation page. Its loader calls `ensureQueryData(gameEngineQueryOptions(...))`, its pending/error components render the Hero action presentation, and success redirects to `/game/$packageId/board`. Direct Board entry repairs through this same action.
+- TanStack Query owns only the identity and lifetime of the route-scoped live resource. It does not own gameplay state or another reactive truth; gameplay UI reads the parent loader through `useGameEngine()` and must not call `useQuery()` for the engine.
+- `GameEngineResource` contains the canonical `Game` plus one private Effect semaphore. Leave, reset, exit, HMR shutdown, and competing navigation are serialized through the resource lifecycle lock.
+- Leave, reset, exit, recovery, and load are named leaf action routes whose loaders own complete operations. Their pending/error UI presents only Hero, label, progress, and retry/navigation affordances.
+- `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. No GameOwner provider, route binding, root loading overlay, hidden destination page, transition-name suppression mode, or nested `document.startViewTransition()` remains.
+- Cross-page animation belongs exclusively to typed native TanStack Router View Transitions. WAAPI/CSS animation may exist only for local same-page interaction and may not compete for route-owned opacity/transform.
+- Every unequal visible route pair resolves to an explicit family: `startup | launcher | action | board` → `startup | launcher | action | board`. Unknown visible paths fail loudly instead of silently receiving a default transition.
+- Native shared surfaces are deliberately granular: `arkini-launcher-backdrop`, `arkini-launcher-hero-shadow`, `arkini-launcher-hero-artwork`, `arkini-startup-content`, `arkini-route-content`, `arkini-game-board`, and `arkini-game-menu-backdrop`. No opaque full-page launcher snapshot is named.
+- Shared Hero pairs keep the old raster opaque while the native transition group performs geometry interpolation; the destination Hero raster stays hidden. This prevents Chromium's default `plus-lighter` cross-fade from dimming the logo or exposing rectangular textures around transparent artwork/shadows.
+- Typed pseudo-element selectors must attach directly to `:active-view-transition-type(...)` with no descendant whitespace. A regression test guards this exact compositor bug.
+- Startup content owns `arkini-startup-content`, separate from launcher/action `arkini-route-content`, so “Press Esc” cannot morph into a destination panel. Splash and Main Menu remain separate DOM pages; native shared-element geometry performs the Hero handoff.
+- The root transition does not cross-fade. A short opaque old-root handoff covers slow React update callbacks, then named surfaces own all visible animation.
+- Renderer route auto code splitting is intentionally disabled. Under CPU throttling, an unloaded lazy route produced a pure black frame before the View Transition began; Arkini is a desktop renderer with small route modules, so deterministic eager availability is the correct trade.
+- Throttled Chromium validation covered splash → Main Menu, launcher page navigation, Main Menu → load action → Board, GameMenu → leave action → Settings, and Settings → load action → Board. No Hero fade, logo rectangle, or lazy-route black frame remained in the captured filmstrips.
 
 Responsive viewport contract:
 
@@ -35,7 +36,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Run native macOS Electron smoke validation for `/ → /main-menu`, MainMenu ↔ Arkpacks, Arkpacks → `/game/$packageId/board`, Board → leave action → launcher, reset → fresh Board, and title-bar/menu exit. Confirm every pending Hero is a standalone route snapshot, no old Board/MainMenu DOM remains visibly mounted beneath it, no panel cutout returns, failures remain retryable, and tiny Canvas sizes stay usable.
+> Run native macOS Electron smoke validation for the same transition graph, including title-bar close, reduced motion, light/dark appearance changes, and tiny Canvas sizes. Treat any unnamed visible navigation, default Chromium fade, rectangular Hero raster, or route-chunk wait frame as a blocking regression.
 
 ## Source topology
 
@@ -229,9 +230,10 @@ Next action:
 
 ## Action-page transition ownership
 
-- Every blocking game lifecycle operation is a named leaf route with a loader, `pendingComponent`, and `errorComponent`. The UI presents Hero, label, and progress only; it never starts, sequences, or completes the domain action.
-- Pending pages are ordinary route surfaces using `arkini-route-scene`, not overlays. The source page is replaced through the native router View Transition, so Board/MainMenu roots are never intentionally double-mounted for a cross-page animation.
-- GameMenu owns only local `closed | entering | open | exiting` WAAPI state plus a short route-request lock that rejects duplicate UI requests while navigation settles. Settings/Main Menu/reset/exit requests navigate to their route destination; no provider-owned domain lifecycle, hidden close animation, or root loader remains.
+- Every blocking lifecycle operation is a named leaf route with a loader, `pendingComponent`, and `errorComponent`. The UI presents Hero, label, and progress only; it never starts, sequences, or completes the domain action.
+- `/action/load-game/$packageId` creates the engine before entering the `/game/$packageId` resource branch. This explicit action is required so both loader entry and action → Board completion receive native route transitions; a parent `pendingComponent` alone would not provide the second handoff.
+- Pending pages are ordinary Hero-bearing route surfaces, never overlays. The source page is replaced through the native router View Transition, so Board/MainMenu roots are not intentionally double-mounted.
+- GameMenu owns only local `closed | entering | open | exiting` state plus a short route-request lock. Settings/Main Menu/reset/exit requests navigate to their action destination; no provider-owned lifecycle, hidden close animation, or root loader remains.
 - Action navigation and game links disable intent preload. Hover/focus must never create a game or execute a destructive leaf loader.
 
 ## Blocking flow focus and route exits
@@ -242,5 +244,7 @@ Next action:
 ## Startup route transition
 
 - Startup and Main Menu are separate pages. Startup owns bootstrap, minimum timing, interruptible completion, and failure/retry; it never mounts Main Menu beneath itself.
-- Startup completion navigates through the typed native `startup-main-page` View Transition. The whole route scene is the transition surface; no cloned Hero, manual crossfade, or second `document.startViewTransition()` participates.
-- `LauncherHero` stays ordinary DOM inside the route-scene snapshot without a nested transition name, forced compositor layer, blur, or paint containment.
+- Startup completion navigates through the typed `startup-to-launcher` native View Transition. Backdrop, Hero shadow, and transparent Hero artwork are shared named layers whose group geometry interpolates to the compact launcher slot.
+- Startup copy owns the unique `arkini-startup-content` surface and exits independently. Launcher content owns `arkini-route-content` and enters independently; neither surface morphs into the other.
+- No cloned Hero, manual crossfade, hidden destination UI, CSS route entrance animation, or second `document.startViewTransition()` participates.
+- The Hero artwork remains an actual transparent image rather than an opaque scene capture. Its shadow is a separate layer so compositor raster bounds cannot flash as a rectangular panel around the logo.

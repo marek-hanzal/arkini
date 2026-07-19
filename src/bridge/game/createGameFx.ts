@@ -126,7 +126,6 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			disposeWithoutSaveFx: liveSession.disposeWithoutSaveFx.pipe(
 				Effect.zipRight(releaseResourcesFx),
 			),
-			instanceKey: crypto.randomUUID(),
 			saveKey,
 			getResourceUrl: (resourceId) => {
 				const url = resourceUrls.get(resourceId);

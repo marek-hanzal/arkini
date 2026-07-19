@@ -1,5 +1,10 @@
 import { Board } from "~/ui/board/Board";
+import { GameShell } from "~/ui/shell/GameShell";
 
 export function GamePage() {
-	return <Board />;
+	return (
+		<GameShell>
+			<Board />
+		</GameShell>
+	);
 }

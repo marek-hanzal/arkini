@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArkpackSelectorPage } from "~/page/arkpack/ArkpackSelectorPage";
 
-export const Route = createFileRoute("/arkpacks")({
+export const Route = createFileRoute("/_launcher/arkpacks")({
 	component: ArkpackSelectorPage,
 });

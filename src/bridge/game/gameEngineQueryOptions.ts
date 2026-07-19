@@ -1,18 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import type { Game } from "~/bridge/game/Game";
+import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
+import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-
-export const gameEngineQueryRootKey = [
-	"game-engine",
-] as const;
-
-export const gameEngineQueryKey = (packageId: string) =>
-	[
-		...gameEngineQueryRootKey,
-		packageId,
-	] as const;
 
 export namespace gameEngineQueryOptions {
 	export interface Props {
@@ -37,7 +29,8 @@ export const gameEngineQueryOptions = ({
 		queryKey: gameEngineQueryKey(packageId),
 		queryFn: async () => {
 			await awaitPreviousShutdown;
-			return create(packageId);
+			const game = await create(packageId);
+			return RendererRuntime.runPromise(createGameEngineResourceFx(game));
 		},
 		gcTime: Number.POSITIVE_INFINITY,
 		retry: false,

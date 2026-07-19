@@ -1,3 +1,4 @@
+import { QueryClient } from "@tanstack/react-query";
 // @vitest-environment jsdom
 
 import { createMemoryHistory, createRouter } from "@tanstack/react-router";
@@ -32,6 +33,8 @@ const loadRoute = async (path: string, splashCompleted = false) => {
 		isServer: false,
 		context: {
 			launcherStartup: createStartup(splashCompleted),
+			previousGameShutdown: Promise.resolve(),
+			queryClient: new QueryClient(),
 		},
 		history: createMemoryHistory({
 			initialEntries: [

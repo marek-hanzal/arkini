@@ -1,14 +1,14 @@
 import { useCallback, useRef, useSyncExternalStore } from "react";
 
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { useGame } from "~/bridge/game/useGame";
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 
 /** Selects a stable projection from the latest committed runtime snapshot. */
 export const useRuntimeSelector = <Selected>(
 	selector: (runtime: RuntimeSchema.Type) => Selected,
 	isEqual: (left: Selected, right: Selected) => boolean = Object.is,
 ): Selected => {
-	const game = useGame();
+	const game = useGameEngine();
 	const last = useRef<
 		| {
 				root: RuntimeSchema.Type;

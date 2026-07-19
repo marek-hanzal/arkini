@@ -1,3 +1,4 @@
+import { QueryClient } from "@tanstack/react-query";
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
@@ -67,7 +68,9 @@ afterEach(() => {
 describe("createArkiniRouter", () => {
 	it("opts into native transitions only for deliberate route pairs", () => {
 		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
-		expect(resolveTypes("/", "/main-menu")).toBe(false);
+		expect(resolveTypes("/", "/main-menu")).toEqual([
+			"startup-main-page",
+		]);
 		expect(resolveTypes("/main-menu", "/settings")).toEqual([
 			"main-page",
 		]);
@@ -82,16 +85,16 @@ describe("createArkiniRouter", () => {
 			"main-page",
 			"main-page-arkpacks",
 		]);
-		expect(resolveTypes("/main-menu", "/game/built-in")).toEqual([
+		expect(resolveTypes("/main-menu", "/game/built-in/board")).toEqual([
 			"main-page-game",
 		]);
-		expect(resolveTypes("/game/built-in", "/settings")).toEqual([
+		expect(resolveTypes("/game/built-in/board", "/settings")).toEqual([
 			"main-page-game",
 		]);
-		expect(resolveTypes("/game/built-in", "/main-menu")).toEqual([
+		expect(resolveTypes("/game/built-in/board", "/main-menu")).toEqual([
 			"main-page-game",
 		]);
-		expect(resolveTypes("/game/built-in", "/dev/shell")).toBe(false);
+		expect(resolveTypes("/game/built-in/board", "/dev/shell")).toBe(false);
 	});
 
 	it("uses the typed TanStack policy only when the renderer supports transition types", () => {
@@ -103,6 +106,8 @@ describe("createArkiniRouter", () => {
 		});
 		const router = createArkiniRouter({
 			launcherStartup: createStartup(),
+			previousGameShutdown: Promise.resolve(),
+			queryClient: new QueryClient(),
 		});
 		expect(router.options.defaultViewTransition).toEqual({
 			types: resolveRouteViewTransitionTypes,
@@ -118,6 +123,8 @@ describe("createArkiniRouter", () => {
 		});
 		const router = createArkiniRouter({
 			launcherStartup: createStartup(),
+			previousGameShutdown: Promise.resolve(),
+			queryClient: new QueryClient(),
 		});
 		expect(router.options.defaultViewTransition).toBe(false);
 	});
@@ -125,6 +132,8 @@ describe("createArkiniRouter", () => {
 	it("falls back to a normal update when the browser API is unavailable", async () => {
 		const router = createArkiniRouter({
 			launcherStartup: createStartup(),
+			previousGameShutdown: Promise.resolve(),
+			queryClient: new QueryClient(),
 		});
 		const update = vi.fn(async () => undefined);
 

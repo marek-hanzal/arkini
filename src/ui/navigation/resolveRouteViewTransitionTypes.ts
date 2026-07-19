@@ -6,6 +6,7 @@ const mainPagePathnames = new Set([
 ]);
 
 const isGamePathname = (pathname: string) => pathname.startsWith("/game/");
+const isActionPathname = (pathname: string) => pathname.startsWith("/action/");
 
 /** Selects the deliberate native route transition family for one location change. */
 export const resolveRouteViewTransitionTypes = ({
@@ -26,6 +27,11 @@ export const resolveRouteViewTransitionTypes = ({
 	const toMainPage = mainPagePathnames.has(toPathname);
 	const involvesArkpacks = fromPathname === "/arkpacks" || toPathname === "/arkpacks";
 
+	if (fromPathname === "/" && toMainPage) {
+		return [
+			"startup-main-page",
+		];
+	}
 	if (fromMainPage && toMainPage)
 		return [
 			"main-page",
@@ -36,8 +42,8 @@ export const resolveRouteViewTransitionTypes = ({
 				: []),
 		];
 	if (
-		(fromMainPage && isGamePathname(toPathname)) ||
-		(isGamePathname(fromPathname) && toMainPage)
+		(fromMainPage && (isGamePathname(toPathname) || isActionPathname(toPathname))) ||
+		((isGamePathname(fromPathname) || isActionPathname(fromPathname)) && toMainPage)
 	) {
 		return [
 			"main-page-game",

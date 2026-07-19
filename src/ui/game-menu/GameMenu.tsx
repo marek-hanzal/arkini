@@ -11,11 +11,8 @@ import {
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useHardResetGameMutation } from "~/ui/game-menu/mutation/useHardResetGameMutation";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
-import { useActionLoading } from "~/ui/loading/useActionLoading";
-import { defaultLoadingMinimumDurationMs } from "~/ui/loading/ActionLoadingScreen";
 import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
 
 const focusableSelector = [
@@ -54,19 +51,15 @@ const persistFinalFrame = (animation: Animation) => {
 
 const GameMenuDialog = ({
 	game,
-	gameAvailable,
 	phase,
 }: {
 	readonly game: Game;
-	readonly gameAvailable: boolean;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
 	const menu = useGameMenuControl();
-	const actionLoading = useActionLoading();
 	const navigate = useNavigate();
 	const save = useSaveGameMutation(game);
 	const saveAndExit = useSaveAndExitGameMutation(game);
-	const hardReset = useHardResetGameMutation(game);
 	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
 	const backdropRef = useRef<HTMLDivElement>(null);
@@ -77,11 +70,11 @@ const GameMenuDialog = ({
 		"save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | null
 	>(null);
 	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
-	const mutationPending = save.isPending || saveAndExit.isPending || hardReset.isPending;
+	const mutationPending = save.isPending || saveAndExit.isPending;
 	const pending = mutationPending || menu.routePending;
 	const exiting = phase === "exiting";
 	const actionDisabled = phase !== "open" || pending;
-	const gameActionDisabled = actionDisabled || !gameAvailable;
+	const gameActionDisabled = actionDisabled;
 
 	useEffect(() => {
 		previousFocusRef.current =
@@ -241,19 +234,9 @@ const GameMenuDialog = ({
 		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
 		activeRequestRef.current = destination === "/settings" ? "settings" : "main-menu";
 		setNavigationError(undefined);
-		const navigateToDestination = () =>
-			navigate({
-				to: destination,
-			});
-		const request =
-			destination === "/main-menu"
-				? actionLoading.run({
-						action: navigateToDestination,
-						key: "game-menu:navigate-main-menu",
-						label: "Returning to main menu…",
-						minimumDurationMs: defaultLoadingMinimumDurationMs,
-					})
-				: navigateToDestination();
+		const request = navigate({
+			to: destination,
+		});
 		void request.catch(setNavigationError).finally(() => {
 			activeRequestRef.current = null;
 			menu.completeRouteRequest();
@@ -284,36 +267,37 @@ const GameMenuDialog = ({
 	};
 
 	const requestHardReset = () => {
-		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
+		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
 		activeRequestRef.current = "hard-reset";
-		void hardReset
-			.mutateAsync()
-			.then(() => menu.close())
-			.catch(() => undefined)
+		setNavigationError(undefined);
+		void navigate({
+			to: "/game/$packageId/action/reset",
+			params: {
+				packageId: game.arkpack.packageId,
+			},
+		})
+			.catch(setNavigationError)
 			.finally(() => {
 				activeRequestRef.current = null;
+				menu.completeRouteRequest();
 			});
 	};
 
-	const status = hardReset.isPending
-		? "Destroying current progress…"
-		: saveAndExit.isPending
-			? "Saving and exiting Arkini…"
-			: save.isPending
-				? "Saving…"
-				: hardReset.isError
-					? `Destroy failed: ${errorMessage(hardReset.error)}`
-					: saveAndExit.isError
-						? `Save and exit failed: ${errorMessage(saveAndExit.error)}`
-						: save.isError
-							? `Save failed: ${errorMessage(save.error)}`
-							: navigationError !== undefined
-								? `Navigation failed: ${errorMessage(navigationError)}`
-								: menu.routePending
-									? "Opening destination…"
-									: save.isSuccess
-										? "Saved."
-										: null;
+	const status = saveAndExit.isPending
+		? "Saving and exiting Arkini…"
+		: save.isPending
+			? "Saving…"
+			: saveAndExit.isError
+				? `Save and exit failed: ${errorMessage(saveAndExit.error)}`
+				: save.isError
+					? `Save failed: ${errorMessage(save.error)}`
+					: navigationError !== undefined
+						? `Navigation failed: ${errorMessage(navigationError)}`
+						: menu.routePending
+							? "Opening action page…"
+							: save.isSuccess
+								? "Saved."
+								: null;
 
 	return (
 		<div
@@ -456,18 +440,11 @@ const GameMenuDialog = ({
 };
 
 /** Renders the active game overlay through one explicit enter/open/exit lifecycle. */
-export const GameMenu = ({
-	game,
-	gameAvailable = true,
-}: {
-	readonly game: Game;
-	readonly gameAvailable?: boolean;
-}) => {
+export const GameMenu = ({ game }: { readonly game: Game }) => {
 	const { phase } = useGameMenuControl();
 	return phase === "closed" ? null : (
 		<GameMenuDialog
 			game={game}
-			gameAvailable={gameAvailable}
 			phase={phase}
 		/>
 	);

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useGame } from "~/bridge/game/useGame";
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -39,7 +39,7 @@ const readPrimaryAssetId = (
 
 /** Projects the currently presented board directly from the latest canonical runtime. */
 export const useBoard = (): useBoard.Result => {
-	const game = useGame();
+	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useBoard.Result => ({
 			currentSpace: runtime.currentSpace,

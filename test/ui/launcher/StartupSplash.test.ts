@@ -9,13 +9,13 @@ import {
 	RouterProvider,
 } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { act, createElement, useRef } from "react";
+import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherStartupContext } from "~/ui/launcher/LauncherStartupContext";
-import { LauncherHero } from "~/ui/launcher/LauncherHero";
 import { StartupSplash } from "~/ui/launcher/StartupSplash";
 
 (
@@ -26,39 +26,15 @@ import { StartupSplash } from "~/ui/launcher/StartupSplash";
 
 const deferred = <T>() => {
 	let resolve!: (value: T) => void;
-	let reject!: (error: unknown) => void;
-	const promise = new Promise<T>((nextResolve, nextReject) => {
+	const promise = new Promise<T>((nextResolve) => {
 		resolve = nextResolve;
-		reject = nextReject;
 	});
 	return {
 		promise,
-		reject,
 		resolve,
 	};
 };
 
-class TestAnimation {
-	readonly finished: Promise<void>;
-	readonly cancel = vi.fn();
-	readonly commitStyles = vi.fn();
-	private resolveFinished!: () => void;
-
-	constructor(
-		readonly keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-		readonly options?: number | KeyframeAnimationOptions,
-	) {
-		this.finished = new Promise<void>((resolve) => {
-			this.resolveFinished = resolve;
-		});
-	}
-
-	finish() {
-		this.resolveFinished();
-	}
-}
-
-const animations: Array<TestAnimation> = [];
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const createStartup = () => {
@@ -76,22 +52,10 @@ const createStartup = () => {
 	const complete = vi.fn(() => {
 		publish({
 			...state,
-			heroReady: true,
 			splashCompleted: true,
 		});
 	});
-	const retry = vi.fn(() =>
-		publish({
-			type: "ready",
-			appearance: {
-				theme: "dark",
-				accent: "rose",
-			},
-			builtInPackageId: "canonical-built-in",
-			heroReady: true,
-			splashCompleted: false,
-		}),
-	);
+	const retry = vi.fn();
 	const startup: LauncherStartup = {
 		getSnapshot: () => state,
 		startFx: Effect.void,
@@ -123,41 +87,6 @@ const readyState = (): LauncherStartup.State => ({
 
 beforeEach(() => {
 	vi.useFakeTimers();
-	animations.splice(0);
-	Object.defineProperty(HTMLElement.prototype, "animate", {
-		configurable: true,
-		value: vi.fn(
-			(
-				keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-				options?: number | KeyframeAnimationOptions,
-			) => {
-				const animation = new TestAnimation(keyframes, options);
-				animations.push(animation);
-				return animation as unknown as Animation;
-			},
-		),
-	});
-	vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
-		this: HTMLElement,
-	) {
-		if (this.dataset.ui === "LauncherHero") {
-			if (this.closest('[data-ui="MountedMainMenu"]') !== null) {
-				return DOMRect.fromRect({
-					height: 270,
-					width: 480,
-					x: 350,
-					y: 60,
-				});
-			}
-			return DOMRect.fromRect({
-				height: 450,
-				width: 800,
-				x: 100,
-				y: 100,
-			});
-		}
-		return DOMRect.fromRect();
-	});
 });
 
 afterEach(async () => {
@@ -190,31 +119,10 @@ const renderSplash = async (startup: LauncherStartup) => {
 	const rootRoute = createRootRoute({
 		component: Root,
 	});
-	const StartupRoute = () => {
-		const mainMenuRef = useRef<HTMLDivElement>(null);
-		return createElement(
-			"div",
-			null,
-			createElement(
-				"div",
-				{
-					ref: mainMenuRef,
-					className: "opacity-0",
-					"data-ui": "MountedMainMenu",
-				},
-				createElement(LauncherHero, {
-					compact: true,
-				}),
-			),
-			createElement(StartupSplash, {
-				mainMenuRef,
-			}),
-		);
-	};
 	const indexRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/",
-		component: StartupRoute,
+		component: StartupSplash,
 	});
 	const mainMenuRoute = createRoute({
 		getParentRoute: () => rootRoute,
@@ -251,20 +159,6 @@ const renderSplash = async (startup: LauncherStartup) => {
 	};
 };
 
-const finishAnimation = async (index: number) => {
-	await act(async () => {
-		animations[index]?.finish();
-		await Promise.resolve();
-	});
-};
-
-const finishAnimations = async (...indexes: ReadonlyArray<number>) => {
-	await act(async () => {
-		for (const index of indexes) animations[index]?.finish();
-		await Promise.resolve();
-	});
-};
-
 const pressEscape = async () => {
 	await act(async () => {
 		window.dispatchEvent(
@@ -277,13 +171,10 @@ const pressEscape = async () => {
 };
 
 describe("StartupSplash", () => {
-	it("anchors the black hold to actual window visibility and waits for readiness", async () => {
+	it("anchors the black hold to actual window visibility", async () => {
 		const harness = createStartup();
 		harness.publish(readyState());
 		const { container, visible } = await renderSplash(harness.startup);
-		const mainMenu = container.querySelector<HTMLElement>('[data-ui="MountedMainMenu"]');
-		expect(mainMenu).not.toBeNull();
-		expect(mainMenu?.classList).toContain("opacity-0");
 		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
 
 		await act(async () => vi.advanceTimersByTime(10_000));
@@ -292,195 +183,55 @@ describe("StartupSplash", () => {
 		await act(async () => visible.resolve(performance.now()));
 		await act(async () => vi.advanceTimersByTime(499));
 		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
-		await pressEscape();
-		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
-		expect(animations).toHaveLength(0);
 		await act(async () => vi.advanceTimersByTime(1));
-		const splash = container.querySelector<HTMLElement>('[data-phase="entering"]');
-		expect(splash).not.toBeNull();
-		expect(splash?.style.opacity).toBe("0");
-		expect(container.querySelector('[data-ui="StartupEnterUnderlay"]')).toBeNull();
-		expect(animations).toHaveLength(1);
-		expect(animations[0]?.options).toMatchObject({
-			duration: 1_500,
-		});
-	});
-
-	it("reveals the decoded Hero while the remaining bootstrap is still loading", async () => {
-		const harness = createStartup();
-		const { container, visible } = await renderSplash(harness.startup);
-		await act(async () => visible.resolve(performance.now()));
-		await act(async () => vi.advanceTimersByTime(500));
-		expect(container.querySelector('[data-ui="StartupBlackHold"]')).not.toBeNull();
-		expect(container.querySelector("img")).toBeNull();
-
-		await act(async () =>
-			harness.publish({
-				type: "loading",
-				appearance: {
-					theme: "dark",
-					accent: "rose",
-				},
-				heroReady: true,
-				splashCompleted: false,
-			}),
-		);
-		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
-		expect(
-			container.querySelector('[data-ui="LauncherHeroArtwork"][role="img"]'),
-		).not.toBeNull();
-		expect(container.textContent).toContain("Preparing Arkini");
-		expect(container.textContent).not.toContain("Press Esc to continue");
-
-		await pressEscape();
-		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
-		expect(animations).toHaveLength(1);
-
-		await act(async () => harness.publish(readyState()));
+		expect(container.querySelector('[data-ui="StartupSplash"]')).not.toBeNull();
 		expect(container.textContent).toContain("Press Esc to continue");
 	});
 
-	it("reverses Escape during enter into a synchronized main-menu cross-fade", async () => {
+	it("uses Escape to finish the standalone startup page without hidden destination UI", async () => {
 		const harness = createStartup();
 		harness.publish(readyState());
 		const { container, router, visible } = await renderSplash(harness.startup);
 		await act(async () => visible.resolve(performance.now()));
 		await act(async () => vi.advanceTimersByTime(500));
-		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
-		expect(container.textContent).toContain("Press Esc to continue");
 
+		expect(container.querySelector('[data-ui="StartupHeroHandoff"]')).toBeNull();
+		expect(container.textContent).not.toContain("Main menu route");
 		await pressEscape();
-		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(container.textContent).not.toContain("Press Esc to continue");
-		expect(animations).toHaveLength(4);
-		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
-		expect(animations[1]?.options).toMatchObject({
-			duration: 1_500,
-		});
-		expect(animations[2]?.keyframes).toEqual([
-			{
-				opacity: 0,
-			},
-			{
-				opacity: 1,
-			},
-		]);
-		expect(animations[2]?.options).toEqual(animations[1]?.options);
-		expect(animations[3]?.keyframes).toEqual([
-			{
-				opacity: 1,
-				transform: "translate(0px, 0px) scale(1, 1)",
-			},
-			{
-				opacity: 1,
-				transform: "translate(250px, -40px) scale(0.6, 0.6)",
-			},
-		]);
-		const sourceHero = container.querySelector<HTMLElement>(
-			'[data-ui="StartupSplash"] [data-ui="LauncherHero"]',
-		);
-		const destinationHero = container.querySelector<HTMLElement>(
-			'[data-ui="MountedMainMenu"] [data-ui="LauncherHero"]',
-		);
-		const handoffHero = container.querySelector<HTMLElement>('[data-ui="StartupHeroHandoff"]');
-		expect(sourceHero?.style.visibility).toBe("hidden");
-		expect(destinationHero?.style.visibility).toBe("hidden");
-		expect(handoffHero?.style.visibility).toBe("visible");
-		expect(router.state.location.pathname).toBe("/");
-
-		await pressEscape();
-		expect(animations).toHaveLength(4);
-
-		await finishAnimations(1, 2, 3);
-		expect(animations[1]?.commitStyles).toHaveBeenCalledOnce();
-		expect(animations[1]?.cancel).toHaveBeenCalledOnce();
-		expect(animations[2]?.commitStyles).toHaveBeenCalledOnce();
-		expect(animations[2]?.cancel).toHaveBeenCalledOnce();
-		expect(animations[3]?.commitStyles).toHaveBeenCalledOnce();
-		expect(animations[3]?.cancel).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 
-	it("never flashes the continue prompt when readiness arrives after the minimum", async () => {
-		const harness = createStartup();
-		const { container, visible } = await renderSplash(harness.startup);
-		await act(async () => visible.resolve(performance.now()));
-		await act(async () => vi.advanceTimersByTime(500));
-		await act(async () =>
-			harness.publish({
-				type: "loading",
-				appearance: {
-					theme: "dark",
-					accent: "rose",
-				},
-				heroReady: true,
-				splashCompleted: false,
-			}),
-		);
-		await finishAnimation(0);
-		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
-		expect(container.textContent).not.toContain("Press Esc to continue");
-
-		await act(async () => vi.advanceTimersByTime(4_500));
-		await act(async () => harness.publish(readyState()));
-		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(container.textContent).not.toContain("Press Esc to continue");
-		expect(animations).toHaveLength(4);
-	});
-
-	it("automatically exits after five visible seconds and actual animation completion", async () => {
+	it("completes automatically after the minimum visible duration", async () => {
 		const harness = createStartup();
 		harness.publish(readyState());
-		const { container, router, visible } = await renderSplash(harness.startup);
+		const { router, visible } = await renderSplash(harness.startup);
 		await act(async () => visible.resolve(performance.now()));
-		await act(async () => vi.advanceTimersByTime(500));
-		await finishAnimation(0);
-		expect(animations[0]?.commitStyles).toHaveBeenCalledOnce();
-		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
-		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+		await act(async () => vi.advanceTimersByTime(5_000));
 
-		await act(async () => vi.advanceTimersByTime(4_499));
-		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
-		await act(async () => vi.advanceTimersByTime(1));
-		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(animations).toHaveLength(4);
-		expect(animations[2]?.keyframes).toEqual([
-			{
-				opacity: 0,
-			},
-			{
-				opacity: 1,
-			},
-		]);
-		expect(router.state.location.pathname).toBe("/");
-
-		await finishAnimations(1, 2, 3);
+		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 
-	it("shows failure after the visible hold and retries through the same owner", async () => {
+	it("keeps startup failures on the same page and retries through the owner", async () => {
 		const harness = createStartup();
+		harness.publish({
+			type: "failed",
+			appearance: null,
+			error: new Error("catalog failed"),
+			heroReady: false,
+			splashCompleted: false,
+		});
 		const { container, visible } = await renderSplash(harness.startup);
 		await act(async () => visible.resolve(performance.now()));
 		await act(async () => vi.advanceTimersByTime(500));
-		await act(async () =>
-			harness.publish({
-				type: "failed",
-				appearance: null,
-				error: new Error("catalog failed"),
-				heroReady: true,
-				splashCompleted: false,
-			}),
-		);
+
 		expect(container.textContent).toContain("catalog failed");
-		expect(container.querySelector("img")).toBeNull();
 		const retry = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Retry",
 		);
-		if (!(retry instanceof HTMLButtonElement)) throw new Error("Expected Retry.");
+		if (!(retry instanceof HTMLButtonElement)) throw new Error("Retry button missing.");
 		await act(async () => retry.click());
 		expect(harness.retry).toHaveBeenCalledOnce();
-		expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
 	});
 });

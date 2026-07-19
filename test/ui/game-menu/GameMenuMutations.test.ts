@@ -3,8 +3,6 @@ import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
-import type { GameOwner } from "~/bridge/game/GameOwner";
-import { hardResetGameMutationOptions } from "~/ui/game-menu/mutation/hardResetGameMutationOptions";
 import { saveAndExitGameMutationOptions } from "~/ui/game-menu/mutation/saveAndExitGameMutationOptions";
 import { saveGameMutationOptions } from "~/ui/game-menu/mutation/saveGameMutationOptions";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
@@ -24,7 +22,6 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 		packageId: "package:menu",
 		contentHash: "a".repeat(64),
 	},
-	instanceKey: "game-instance:menu",
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
@@ -35,24 +32,10 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	subscribeEvents: () => () => undefined,
 });
 
-const createOwner = (hardResetFx: Effect.Effect<void, unknown>): GameOwner => ({
-	getSnapshot: () => ({
-		type: "loading",
-		packageId: null,
-	}),
-	selectPackageFx: () => Effect.void,
-	releaseRouteGameFx: () => Effect.void,
-	shutdownFx: () => Effect.void,
-	clearFailedSaveAndRetryFx: () => Effect.void,
-	hardResetFx: () => hardResetFx,
-	subscribe: () => () => undefined,
-});
-
 const executeMutation = async (
 	options:
 		| ReturnType<typeof saveGameMutationOptions>
-		| ReturnType<typeof saveAndExitGameMutationOptions>
-		| ReturnType<typeof hardResetGameMutationOptions>,
+		| ReturnType<typeof saveAndExitGameMutationOptions>,
 ) => {
 	if (options.mutationFn === undefined) throw new Error("Expected a mutation function.");
 	return options.mutationFn(undefined, {
@@ -103,22 +86,5 @@ describe("game menu mutation options", () => {
 		await expect(executeMutation(options)).rejects.toThrow("close rejected");
 		expect(requestClose).toHaveBeenCalledOnce();
 		Reflect.deleteProperty(globalThis, "window");
-	});
-
-	it("owns the canonical hard reset and preserves its failure", async () => {
-		const failure = new Error("reset failed");
-		const game = createGame();
-		const options = hardResetGameMutationOptions({
-			game,
-			owner: createOwner(Effect.fail(failure)),
-		});
-
-		expect(options.mutationKey).toEqual([
-			"game",
-			"hard-reset",
-			game.saveKey.packageId,
-			game.saveKey.contentHash,
-		]);
-		await expect(executeMutation(options)).rejects.toThrow("reset failed");
 	});
 });

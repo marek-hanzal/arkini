@@ -104,7 +104,7 @@ describe("ActionLoadingScreen", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreen"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-action-loading");
+		).toBe("arkini-route-scene");
 		expect(container.textContent).toContain("Loading test…");
 		expect(progressValue(container)).toBe(12);
 

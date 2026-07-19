@@ -1,29 +1,32 @@
 import type { QueryClient } from "@tanstack/react-query";
 
 import type { Game } from "~/bridge/game/Game";
-import { gameEngineQueryRootKey } from "~/bridge/game/gameEngineQueryOptions";
+import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
+import { gameEngineQueryRootKey } from "~/bridge/game/gameEngineQueryKey";
 
 export interface CachedGameEngine {
 	readonly game: Game;
 	readonly packageId: string;
+	readonly resource: GameEngineResource;
 }
 
 /** Resolves the sole cached live Game and rejects an impossible multi-engine renderer state. */
 export const findCachedGameEngine = (queryClient: QueryClient): CachedGameEngine | null => {
 	const cached = queryClient
-		.getQueriesData<Game>({
+		.getQueriesData<GameEngineResource>({
 			queryKey: gameEngineQueryRootKey,
 		})
-		.flatMap(([queryKey, game]) => {
-			if (game === undefined) return [];
+		.flatMap(([queryKey, resource]) => {
+			if (resource === undefined) return [];
 			const packageId = queryKey[1];
 			if (typeof packageId !== "string") {
 				throw new Error("Cached Game query is missing its package identity.");
 			}
 			return [
 				{
-					game,
+					game: resource.game,
 					packageId,
+					resource,
 				} satisfies CachedGameEngine,
 			];
 		});

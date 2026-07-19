@@ -31,7 +31,8 @@ export const MainMenu = () => {
 		>
 			{builtInAvailable && builtInPackageId !== undefined ? (
 				<PrimaryButtonLink
-					to="/game/$packageId"
+					to="/game/$packageId/board"
+					preload={false}
 					params={{
 						packageId: builtInPackageId,
 					}}

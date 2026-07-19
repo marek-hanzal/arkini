@@ -1,15 +1,26 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
-import { GameProvider } from "~/bridge/game/GameProvider";
 import { startFx } from "~/engine/start/write/startFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+
+const gameEngineState = vi.hoisted(() => ({
+	game: undefined as Game | undefined,
+}));
+
+vi.mock("~/bridge/game/useGameEngine", () => ({
+	useGameEngine: () => {
+		const current = gameEngineState.game;
+		if (current === undefined) throw new Error("Test Game Engine is missing.");
+		return current;
+	},
+}));
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -84,7 +95,6 @@ const game = {
 		packageId: "test-package",
 		contentHash: "0".repeat(64),
 	},
-	instanceKey: "test-game",
 	getSnapshot: () => runtime,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: () => () => undefined,
@@ -122,11 +132,9 @@ const readBoardCells = (html: string) =>
 
 describe("Board", () => {
 	it("renders the current canonical board through the headless tile system", () => {
+		gameEngineState.game = game;
 		const html = renderToStaticMarkup(
-			createElement(GameProvider, {
-				game,
-				children: createElement(TileSystemProvider, null, createElement(Board)),
-			}),
+			createElement(TileSystemProvider, null, createElement(Board)),
 		);
 		const cells = readBoardCells(html);
 
@@ -213,11 +221,9 @@ describe("Board", () => {
 			config: desktopConfig,
 			getSnapshot: () => desktopRuntime,
 		} satisfies Game;
+		gameEngineState.game = desktopGame;
 		const html = renderToStaticMarkup(
-			createElement(GameProvider, {
-				game: desktopGame,
-				children: createElement(TileSystemProvider, null, createElement(Board)),
-			}),
+			createElement(TileSystemProvider, null, createElement(Board)),
 		);
 		const cells = readBoardCells(html);
 		const lastCell = cells.find((cell) => cell.x === 12 && cell.y === 8);

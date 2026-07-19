@@ -230,13 +230,6 @@ select {
 	backdrop-filter: blur(0.5px);
 }
 
-[data-action-loading-active="true"] [data-ui="Canvas"] [data-ui="MainPageLayout"],
-[data-action-loading-active="true"] [data-ui="Canvas"] [data-ui="MainPagePanel"],
-[data-action-loading-active="true"] [data-ui="Canvas"] [data-ui="GameShell"],
-[data-action-loading-active="true"] [data-ui="Canvas"] [data-ui="Board"] {
-	view-transition-name: none !important;
-}
-
 :root:active-view-transition-type(main-page-arkpacks) [data-ui="MainPagePanel"] {
 	view-transition-name: none !important;
 }
@@ -272,19 +265,6 @@ select {
 	}
 }
 
-@keyframes arkini-action-loading-exit {
-	0% {
-		opacity: 1;
-		transform: scale(1);
-		filter: blur(0);
-	}
-	100% {
-		opacity: 0;
-		transform: scale(1.012);
-		filter: blur(6px);
-	}
-}
-
 @keyframes arkini-game-board-enter {
 	0% {
 		opacity: 0;
@@ -296,21 +276,6 @@ select {
 		transform: scale(1);
 		filter: blur(0);
 	}
-}
-
-@keyframes arkini-action-loading-overlay-enter {
-	0% {
-		opacity: 0;
-		transform: scale(0.99);
-	}
-	100% {
-		opacity: 1;
-		transform: scale(1);
-	}
-}
-
-.action-loading-overlay {
-	animation: arkini-action-loading-overlay-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-group(arkini-route-scene),
@@ -337,19 +302,10 @@ select {
 	animation: arkini-view-transition-new-fade-hold 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-::view-transition-group(arkini-action-loading),
 ::view-transition-group(arkini-game-board) {
 	z-index: 10;
 	animation-duration: 420ms;
 	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-::view-transition-old(arkini-action-loading) {
-	animation: arkini-action-loading-exit 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-::view-transition-new(arkini-action-loading) {
-	animation: arkini-view-transition-new-fade-hold 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-old(arkini-game-board) {

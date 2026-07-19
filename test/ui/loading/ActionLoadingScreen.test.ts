@@ -66,10 +66,13 @@ describe("ActionLoadingScreen", () => {
 		expect(hero?.style.viewTransitionName).toBe("");
 		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero-artwork");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreenPanel"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-route-content");
+		const content = container.querySelector<HTMLElement>(
+			'[data-ui="ActionLoadingScreenContent"]',
+		);
+		expect(content?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(content?.className).not.toContain("rounded-2xl");
+		expect(content?.className).not.toContain("bg-surface");
+		expect(content?.className).not.toContain("shadow-2xl");
 		expect(container.textContent).toContain("Loading test…");
 		expect(progressValue(container)).toBe(12);
 

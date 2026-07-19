@@ -64,38 +64,36 @@ export const ActionLoadingScreen = ({ label }: { readonly label: string }) => {
 			layout="fixed-hero"
 		>
 			<div
-				className="flex w-[min(80cqw,56rem)] max-w-full flex-col items-center gap-[var(--ak-viewport-gap)] rounded-2xl border border-line bg-surface p-[var(--ak-panel-padding)] shadow-2xl"
-				data-ui="ActionLoadingScreenPanel"
+				className="flex w-[min(80cqw,28rem)] max-w-full flex-col items-center gap-3"
+				data-ui="ActionLoadingScreenContent"
 				style={{
 					viewTransitionName: routeContentViewTransitionName,
 				}}
 			>
-				<div className="flex w-full flex-col items-center gap-3">
+				<div
+					className="h-[clamp(0.375rem,1.25cqh,0.5rem)] w-full overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
+					data-ui="ActionLoadingScreenProgress"
+					role="progressbar"
+					aria-label={label}
+					aria-valuemin={0}
+					aria-valuemax={100}
+					aria-valuenow={progress}
+				>
 					<div
-						className="h-[clamp(0.375rem,1.25cqh,0.5rem)] w-[min(80%,28rem)] overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
-						data-ui="ActionLoadingScreenProgress"
-						role="progressbar"
-						aria-label={label}
-						aria-valuemin={0}
-						aria-valuemax={100}
-						aria-valuenow={progress}
-					>
-						<div
-							className="size-full origin-left rounded-full bg-accent transition-transform ease-out motion-reduce:transition-none"
-							data-ui="ActionLoadingScreenProgressFill"
-							style={{
-								transform: `scaleX(${progress / 100})`,
-								transitionDuration: `${pendingProgressTransitionMs}ms`,
-							}}
-						/>
-					</div>
-					<p
-						className="text-center text-sm font-medium text-muted"
-						data-ui="ActionLoadingScreenLabel"
-					>
-						{label}
-					</p>
+						className="size-full origin-left rounded-full bg-accent transition-transform ease-out motion-reduce:transition-none"
+						data-ui="ActionLoadingScreenProgressFill"
+						style={{
+							transform: `scaleX(${progress / 100})`,
+							transitionDuration: `${pendingProgressTransitionMs}ms`,
+						}}
+					/>
 				</div>
+				<p
+					className="text-center text-sm font-medium text-muted"
+					data-ui="ActionLoadingScreenLabel"
+				>
+					{label}
+				</p>
 			</div>
 		</LauncherScene>
 	);

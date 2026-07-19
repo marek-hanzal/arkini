@@ -1,17 +1,21 @@
 // @vitest-environment jsdom
 
-import React, { act, createElement, useMemo } from "react";
+import { act, createElement, useContext, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TileDropIntent } from "~/ui/tile/TileDropIntent";
+import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileSlot } from "~/ui/tile/TileSlot";
 import type { TileSurface } from "~/ui/tile/TileSurface";
+import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { useTile } from "~/ui/tile/useTile";
 import { useTileSlot } from "~/ui/tile/useTileSlot";
 import { useTileSurface } from "~/ui/tile/useTileSurface";
+
+vi.mock("~/bridge/tile/useTileActors", () => ({
+	useTileActors: () => [],
+}));
 
 (
 	globalThis as {
@@ -20,7 +24,6 @@ import { useTileSurface } from "~/ui/tile/useTileSurface";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const capturedPointers = new WeakMap<HTMLElement, Set<number>>();
 
 const rect = (left: number, top: number, width: number, height: number): DOMRect => ({
 	left,
@@ -33,36 +36,6 @@ const rect = (left: number, top: number, width: number, height: number): DOMRect
 	y: top,
 	toJSON: () => ({}),
 });
-
-const pointerEvent = (
-	type: string,
-	{
-		x,
-		y,
-		pointerId = 1,
-	}: {
-		readonly x: number;
-		readonly y: number;
-		readonly pointerId?: number;
-	},
-) => {
-	const event = new MouseEvent(type, {
-		bubbles: true,
-		button: 0,
-		cancelable: true,
-		clientX: x,
-		clientY: y,
-	});
-	Object.defineProperties(event, {
-		isPrimary: {
-			value: true,
-		},
-		pointerId: {
-			value: pointerId,
-		},
-	});
-	return event;
-};
 
 const boardSurface = {
 	id: "board:0",
@@ -96,17 +69,29 @@ const toolbarOccupant = {
 	id: "runtime:toolbar",
 	revision: "revision:toolbar",
 } satisfies TileIdentity;
+const source = {
+	id: "runtime:source",
+	revision: "revision:source",
+	location: {
+		scope: "board",
+		space: 0,
+		position: {
+			x: 0,
+			y: 0,
+		},
+	},
+	surface: boardSurface,
+	slot: sourceSlot,
+} satisfies TileDragSource;
 
 const Surface = ({
 	surface,
 	slot,
 	occupant = null,
-	children,
 }: {
 	readonly surface: TileSurface;
 	readonly slot: TileSlot;
 	readonly occupant?: TileIdentity | null;
-	readonly children?: React.ReactNode;
 }) => {
 	const surfaceRef = useTileSurface(surface);
 	const drop = useTileSlot({
@@ -120,58 +105,38 @@ const Surface = ({
 			ref: surfaceRef,
 			"data-surface": surface.kind,
 		},
-		createElement(
-			"div",
-			{
-				ref: drop.ref,
-				"data-slot": `${surface.kind}:${slot.id}`,
-				"data-over": drop.over ? "true" : "false",
-			},
-			children,
-		),
+		createElement("div", {
+			ref: drop.ref,
+			"data-slot": `${surface.kind}:${slot.id}`,
+			"data-over": drop.over ? "true" : "false",
+		}),
 	);
 };
 
-const HarnessContent = ({ onDrop }: { readonly onDrop: (intent: TileDropIntent) => void }) => {
-	const source = useMemo(
-		() => ({
-			id: "runtime:source",
-			revision: "revision:source",
+const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void }) => {
+	const system = useContext(TileSystemContext);
+	if (system === null) throw new Error("Missing TileSystemProvider.");
+	useEffect(
+		() => onSystem(system),
+		[
+			onSystem,
+			system,
+		],
+	);
+	return null;
+};
+
+const Harness = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void }) =>
+	createElement(
+		TileSystemProvider,
+		null,
+		createElement(Capture, {
+			onSystem,
+		}),
+		createElement(Surface, {
 			surface: boardSurface,
 			slot: sourceSlot,
 		}),
-		[],
-	);
-	const tile = useTile({
-		source,
-		onDrop: (intent) => {
-			onDrop(intent);
-			return {
-				kind: "accepted",
-			};
-		},
-	});
-
-	return createElement(
-		React.Fragment,
-		null,
-		createElement(
-			Surface,
-			{
-				surface: boardSurface,
-				slot: sourceSlot,
-			},
-			createElement(
-				"button",
-				{
-					ref: tile.ref,
-					type: "button",
-					"data-source-tile": "true",
-					...tile.pointerProps,
-				},
-				"Source",
-			),
-		),
 		createElement(Surface, {
 			surface: inventorySurface,
 			slot: inventorySlot,
@@ -182,58 +147,13 @@ const HarnessContent = ({ onDrop }: { readonly onDrop: (intent: TileDropIntent) 
 			occupant: toolbarOccupant,
 		}),
 	);
-};
-
-const Harness = ({ onDrop }: { readonly onDrop: (intent: TileDropIntent) => void }) =>
-	createElement(
-		TileSystemProvider,
-		null,
-		createElement(HarnessContent, {
-			onDrop,
-		}),
-	);
 
 beforeEach(() => {
-	Object.defineProperty(window, "requestAnimationFrame", {
-		configurable: true,
-		value: vi.fn(() => 1),
-	});
-	Object.defineProperty(window, "cancelAnimationFrame", {
-		configurable: true,
-		value: vi.fn(),
-	});
-	Object.defineProperty(HTMLElement.prototype, "setPointerCapture", {
-		configurable: true,
-		value(pointerId: number) {
-			const pointers = capturedPointers.get(this) ?? new Set<number>();
-			pointers.add(pointerId);
-			capturedPointers.set(this, pointers);
-		},
-	});
-	Object.defineProperty(HTMLElement.prototype, "hasPointerCapture", {
-		configurable: true,
-		value(pointerId: number) {
-			return capturedPointers.get(this)?.has(pointerId) ?? false;
-		},
-	});
-	Object.defineProperty(HTMLElement.prototype, "releasePointerCapture", {
-		configurable: true,
-		value(pointerId: number) {
-			capturedPointers.get(this)?.delete(pointerId);
-		},
-	});
-	Object.defineProperty(HTMLElement.prototype, "animate", {
-		configurable: true,
-		value: vi.fn(() => ({
-			cancel: vi.fn(),
-			finished: Promise.resolve(),
-		})),
-	});
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
 		configurable: true,
 		value() {
 			const element = this as HTMLElement;
-			if (element.dataset.sourceTile === "true") return rect(10, 10, 80, 80);
+			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 500, 200);
 			if (element.dataset.surface === "board") return rect(0, 0, 100, 100);
 			if (element.dataset.surface === "inventory") return rect(180, 0, 160, 120);
 			if (element.dataset.surface === "toolbar") return rect(380, 0, 120, 100);
@@ -249,22 +169,18 @@ beforeEach(() => {
 			if (x >= 200 && x < 280) {
 				return [
 					document.querySelector('[data-slot^="inventory:"]'),
-				];
+				].filter((element): element is Element => element !== null);
 			}
 			if (x >= 400 && x < 480) {
 				return [
 					document.querySelector('[data-slot^="toolbar:"]'),
-				];
+				].filter((element): element is Element => element !== null);
 			}
 			if (x >= 180 && x < 340) {
 				return [
 					document.querySelector('[data-surface="inventory"]'),
-				];
+				].filter((element): element is Element => element !== null);
 			}
-			if (x < 100)
-				return [
-					document.querySelector('[data-source-tile="true"]'),
-				];
 			return [];
 		}),
 	});
@@ -278,7 +194,8 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const renderHarness = async (onDrop: (intent: TileDropIntent) => void) => {
+const renderHarness = async () => {
+	let currentSystem: TileSystem | null = null;
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -286,76 +203,85 @@ const renderHarness = async (onDrop: (intent: TileDropIntent) => void) => {
 	await act(async () => {
 		root.render(
 			createElement(Harness, {
-				onDrop,
+				onSystem: (system) => {
+					currentSystem = system;
+				},
 			}),
 		);
 	});
-	const source = document.querySelector<HTMLElement>('[data-source-tile="true"]');
-	if (source === null) throw new Error("Missing source tile.");
-	return source;
+	const readSystem = () => {
+		if (currentSystem === null) throw new Error("Tile system was not captured.");
+		return currentSystem;
+	};
+	return {
+		readSystem,
+	};
 };
 
-const drag = async (source: HTMLElement, x: number, y: number) => {
+const startDrag = async (system: TileSystem, x: number, y: number) => {
+	const result: {
+		value: ReturnType<TileSystem["release"]>;
+	} = {
+		value: null,
+	};
 	await act(async () => {
-		source.dispatchEvent(
-			pointerEvent("pointerdown", {
-				x: 50,
-				y: 50,
-			}),
-		);
-		source.dispatchEvent(
-			pointerEvent("pointermove", {
-				x,
-				y,
-			}),
-		);
-		source.dispatchEvent(
-			pointerEvent("pointerup", {
-				x,
-				y,
-			}),
-		);
-		await Promise.resolve();
-		await Promise.resolve();
+		expect(system.press(source)).toBe(true);
+		system.startDrag(source);
+		system.moveDrag(source, x, y);
+		result.value = system.release(source.id);
 	});
+	return result.value;
 };
 
 describe("TileSystemProvider", () => {
 	it("reports a Board source dropped into one inventory slot", async () => {
-		const onDrop = vi.fn();
-		const source = await renderHarness(onDrop);
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 240, 50);
 
-		await drag(source, 240, 50);
-
-		expect(onDrop).toHaveBeenCalledWith({
-			source: {
-				id: "runtime:source",
-				revision: "revision:source",
-				surface: boardSurface,
-				slot: sourceSlot,
-			},
+		expect(released).toMatchObject({
 			target: {
 				kind: "slot",
 				surface: inventorySurface,
 				slot: inventorySlot,
 				occupant: null,
 			},
-			pointer: {
-				x: 240,
-				y: 50,
-			},
 		});
-		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
-		expect(source.style.visibility).toBe("");
+	});
+
+	it("freezes the exact source facts captured at pointer press", async () => {
+		const { readSystem } = await renderHarness();
+		const system = readSystem();
+		const changedSource = {
+			...source,
+			revision: "revision:changed",
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 9,
+					y: 9,
+				},
+			},
+		};
+
+		let released: ReturnType<TileSystem["release"]> = null;
+		await act(async () => {
+			expect(system.press(source)).toBe(true);
+			system.startDrag(changedSource);
+			system.moveDrag(changedSource, 240, 50);
+			released = system.release(source.id);
+		});
+
+		expect(released).toMatchObject({
+			source,
+		});
 	});
 
 	it("preserves an occupied toolbar target as a logical drop fact", async () => {
-		const onDrop = vi.fn();
-		const source = await renderHarness(onDrop);
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
 
-		await drag(source, 440, 50);
-
-		expect(onDrop.mock.calls[0]?.[0]).toMatchObject({
+		expect(released).toMatchObject({
 			target: {
 				kind: "slot",
 				surface: toolbarSurface,
@@ -366,28 +292,58 @@ describe("TileSystemProvider", () => {
 	});
 
 	it("distinguishes a surface gap and an unrelated topmost overlay from a slot", async () => {
-		const onDrop = vi.fn();
-		const source = await renderHarness(onDrop);
-
-		await drag(source, 300, 50);
-		expect(onDrop.mock.calls[0]?.[0]).toMatchObject({
+		const { readSystem } = await renderHarness();
+		const gap = await startDrag(readSystem(), 300, 50);
+		expect(gap).toMatchObject({
 			target: {
 				kind: "surface",
 				surface: inventorySurface,
 			},
 		});
+		await act(async () => {
+			if (gap !== null) readSystem().settle(gap.source, gap.generation, null);
+			if (gap !== null) readSystem().complete(source.id, gap.generation);
+		});
 
 		const overlay = document.createElement("div");
-		overlay.dataset.overlay = "true";
 		document.body.append(overlay);
 		vi.mocked(document.elementsFromPoint).mockReturnValue([
 			overlay,
 		]);
-		await drag(source, 20, 20);
-		expect(onDrop.mock.calls[1]?.[0]).toMatchObject({
+		const blocked = await startDrag(readSystem(), 20, 20);
+		expect(blocked).toMatchObject({
 			target: {
 				kind: "outside",
 			},
 		});
+	});
+
+	it("ignores stale completion generations and clears only the current settlement", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 240, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: "move",
+				itemId: source.id,
+				revision: "revision:moved",
+				previousLocation: source.location,
+				location: {
+					scope: "inventory",
+					position: {
+						x: inventorySlot.x,
+						y: inventorySlot.y,
+					},
+				},
+			});
+			readSystem().complete(source.id, released.generation - 1);
+		});
+		expect(readSystem().active?.phase).toBe("settling");
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+		});
+		expect(readSystem().active).toBeNull();
 	});
 });

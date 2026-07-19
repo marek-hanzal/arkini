@@ -6,11 +6,13 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
+import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -21,9 +23,11 @@ import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 const gameEngineState = vi.hoisted(() => ({
 	game: undefined as Game | undefined,
 }));
-const moveBoardItemState = vi.hoisted(() => ({
-	move: vi.fn(() => Promise.resolve()),
+const dropItemState = vi.hoisted(() => ({
+	drop: vi.fn<(_: dropItemFx.Props) => Promise<dropItemFx.Result>>(),
 }));
+
+vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
 vi.mock("~/bridge/game/useGameEngine", () => ({
 	useGameEngine: () => {
@@ -33,12 +37,11 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 	},
 }));
 
-vi.mock("~/bridge/board/useMoveBoardItem", () => ({
-	useMoveBoardItem: () => moveBoardItemState.move,
+vi.mock("~/bridge/tile/useDropItem", () => ({
+	useDropItem: () => dropItemState.drop,
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const capturedPointers = new WeakMap<HTMLElement, Set<number>>();
 
 const rect = (left: number, top: number, width: number, height: number): DOMRect => ({
 	left,
@@ -173,49 +176,15 @@ const game = {
 } satisfies Game;
 
 beforeEach(() => {
+	motionTestRuntime.reset();
 	gameEngineState.game = game;
-	moveBoardItemState.move.mockReset();
-	moveBoardItemState.move.mockResolvedValue(undefined);
-	Object.defineProperty(window, "requestAnimationFrame", {
-		configurable: true,
-		value: vi.fn(() => 1),
-	});
-	Object.defineProperty(window, "cancelAnimationFrame", {
-		configurable: true,
-		value: vi.fn(),
-	});
-	Object.defineProperty(HTMLElement.prototype, "setPointerCapture", {
-		configurable: true,
-		value(pointerId: number) {
-			const pointers = capturedPointers.get(this) ?? new Set<number>();
-			pointers.add(pointerId);
-			capturedPointers.set(this, pointers);
-		},
-	});
-	Object.defineProperty(HTMLElement.prototype, "hasPointerCapture", {
-		configurable: true,
-		value(pointerId: number) {
-			return capturedPointers.get(this)?.has(pointerId) ?? false;
-		},
-	});
-	Object.defineProperty(HTMLElement.prototype, "releasePointerCapture", {
-		configurable: true,
-		value(pointerId: number) {
-			capturedPointers.get(this)?.delete(pointerId);
-		},
-	});
-	Object.defineProperty(HTMLElement.prototype, "animate", {
-		configurable: true,
-		value: vi.fn(() => ({
-			cancel: vi.fn(),
-			finished: Promise.resolve(),
-		})),
-	});
+	dropItemState.drop.mockReset();
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
 		configurable: true,
 		value() {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 200);
+			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
 			const x = Number(element.dataset.boardX);
 			const y = Number(element.dataset.boardY);
 			if (Number.isFinite(x) && Number.isFinite(y)) return rect(x * 100, y * 100, 100, 100);
@@ -255,49 +224,148 @@ const renderBoard = async () => {
 	roots.push(root);
 	await act(async () => {
 		root.render(createElement(TileSystemProvider, null, createElement(Board)));
+		await Promise.resolve();
 	});
 	const source = document.querySelector<HTMLElement>(
-		'[data-ui="BoardTile"][data-board-x="2"][data-board-y="1"]',
+		'[data-ui="TileActor"][data-board-x="2"][data-board-y="1"]',
 	);
-	if (source === null) throw new Error("Missing draggable source tile.");
+	if (source === null) throw new Error("Missing draggable source actor.");
 	return source;
 };
 
 const dragTo = async (source: HTMLElement, x: number, y: number) => {
+	const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+	if (dragSurface === null) throw new Error("Missing drag surface.");
 	await act(async () => {
-		source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-		source.dispatchEvent(pointerEvent("pointermove", x, y));
-		source.dispatchEvent(pointerEvent("pointerup", x, y));
+		dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+		dragSurface.dispatchEvent(pointerEvent("pointermove", x, y));
+		dragSurface.dispatchEvent(pointerEvent("pointerup", x, y));
 		await Promise.resolve();
 		await Promise.resolve();
 	});
 };
 
 describe("Board drag", () => {
-	it("moves one revised Board item to an empty slot", async () => {
+	it("moves the one existing actor through the public atomic drop command", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;
 		const revision = source.dataset.runtimeRevision;
+		if (runtimeId === undefined || revision === undefined) throw new Error("Missing identity.");
+		dropItemState.drop.mockResolvedValue({
+			kind: "move",
+			itemId: runtimeId,
+			revision: "revision:moved",
+			previousLocation: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 2,
+					y: 1,
+				},
+			},
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		});
+
+		const title = source.querySelector<HTMLElement>('[data-ui="TileActorTitle"]');
+		expect(title?.textContent).toBe("Water");
 
 		await dragTo(source, 50, 50);
 
-		expect(moveBoardItemState.move).toHaveBeenCalledOnce();
-		expect(moveBoardItemState.move).toHaveBeenCalledWith({
-			itemId: runtimeId,
-			revision,
-			space: 0,
-			x: 0,
-			y: 0,
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+		expect(dropItemState.drop).toHaveBeenCalledWith({
+			sourceItemId: runtimeId,
+			sourceRevision: revision,
+			sourceLocation: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 2,
+					y: 1,
+				},
+			},
+			target: {
+				kind: "slot",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			},
 		});
+		const liveActor = document.querySelector(`[data-runtime-id="${runtimeId}"]`);
+		expect(document.querySelectorAll(`[data-runtime-id="${runtimeId}"]`)).toHaveLength(1);
+		expect(liveActor).toBe(source);
+		expect(source.querySelector('[data-ui="TileActorTitle"]')?.textContent).toBe("Water");
+		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
 	});
 
-	it("rejects an occupied target before selecting a merge, consume, or swap action", async () => {
+	it("sends an occupied Board slot to the engine and reconciles its explicit reject", async () => {
 		const source = await renderBoard();
+		const runtimeId = source.dataset.runtimeId;
+		if (runtimeId === undefined) throw new Error("Missing identity.");
+		dropItemState.drop.mockResolvedValue({
+			kind: "reject",
+			reason: "occupied",
+			itemId: runtimeId,
+			targetItemId: "runtime:stone",
+		});
 
 		await dragTo(source, 150, 50);
 
-		expect(moveBoardItemState.move).not.toHaveBeenCalled();
-		expect(source.style.visibility).toBe("");
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+		expect(dropItemState.drop.mock.calls[0]?.[0]).toMatchObject({
+			target: {
+				kind: "slot",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+			},
+		});
+		expect(document.querySelectorAll(`[data-runtime-id="${runtimeId}"]`)).toHaveLength(1);
 		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
+	});
+
+	it("uses a pronounced Motion-owned 1.15 preview hover and keeps drag larger", async () => {
+		const source = await renderBoard();
+		const visual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		if (visual === null) throw new Error("Missing actor visual shell.");
+		expect(visual.dataset.motionScale).toBe("1");
+
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+		if (dragSurface === null) throw new Error("Missing drag surface.");
+		await act(async () => {
+			dragSurface.dispatchEvent(
+				new MouseEvent("mouseover", {
+					bubbles: true,
+				}),
+			);
+		});
+		expect(visual.dataset.motionScale).toBe("1.15");
+
+		dropItemState.drop.mockResolvedValue({
+			kind: "reject",
+			reason: "unsupported-target",
+			itemId: source.dataset.runtimeId ?? "runtime:unknown",
+		});
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 275, 175));
+		});
+		expect(visual.dataset.motionScale).toBe("1.18");
 	});
 });

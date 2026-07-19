@@ -3,6 +3,7 @@ import type { PropsWithChildren } from "react";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
 /** Renders the one playable board leaf over its route-scoped Game Engine. */
@@ -15,7 +16,15 @@ export function GameShell({ children }: PropsWithChildren) {
 			tabIndex={-1}
 		>
 			<GameMenuProvider>
-				<TileSystemProvider>{children}</TileSystemProvider>
+				<div
+					className="relative size-full min-h-0 min-w-0"
+					data-ui="TileScene"
+					style={{
+						viewTransitionName: gameBoardViewTransitionName,
+					}}
+				>
+					<TileSystemProvider>{children}</TileSystemProvider>
+				</div>
 				<GameMenu game={gameEngine} />
 			</GameMenuProvider>
 		</main>

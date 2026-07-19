@@ -2,8 +2,6 @@ import { type CSSProperties, useMemo } from "react";
 
 import { useBoard } from "~/bridge/board/useBoard";
 import { BoardCell } from "~/ui/board/BoardCell";
-import { BoardTile } from "~/ui/board/BoardTile";
-import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
 import type { TileSurface } from "~/ui/tile/TileSurface";
 import { useTileSurface } from "~/ui/tile/useTileSurface";
 
@@ -69,9 +67,6 @@ export const Board = () => {
 		<section
 			className="size-full min-h-0 min-w-0"
 			data-ui="Board"
-			style={{
-				viewTransitionName: gameBoardViewTransitionName,
-			}}
 		>
 			<h1 className="sr-only">
 				{board.title}, board space {board.currentSpace}
@@ -100,13 +95,6 @@ export const Board = () => {
 								x={cell.x}
 								y={cell.y}
 								occupant={occupants.get(`${cell.x}:${cell.y}`) ?? null}
-							/>
-						))}
-						{board.items.map((item) => (
-							<BoardTile
-								key={item.id}
-								item={item}
-								surface={surface}
 							/>
 						))}
 					</div>

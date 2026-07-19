@@ -1,9 +1,11 @@
+import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileSlot } from "~/ui/tile/TileSlot";
 import type { TileSurface } from "~/ui/tile/TileSurface";
 
-/** Canonical presentation identity and origin facts captured when one drag starts. */
+/** Exact canonical and presentation origin facts captured when one gesture starts. */
 export interface TileDragSource extends TileIdentity {
+	readonly location: TileLocation;
 	readonly surface: TileSurface;
 	readonly slot: TileSlot;
 }

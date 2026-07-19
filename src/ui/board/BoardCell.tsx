@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { useMemo } from "react";
 
 import type { useBoard } from "~/bridge/board/useBoard";
@@ -18,7 +19,7 @@ export namespace BoardCell {
 	}
 }
 
-/** Registers one Board coordinate as a universal tile drop slot. */
+/** Registers one Board coordinate as a stable actor anchor and drop target. */
 export const BoardCell = ({ surface, x, y, occupant }: BoardCell.Props) => {
 	const slot = useMemo(
 		() => ({
@@ -52,11 +53,7 @@ export const BoardCell = ({ surface, x, y, occupant }: BoardCell.Props) => {
 	return (
 		<div
 			ref={drop.ref}
-			className={`min-h-0 min-w-0 rounded-[22%] border transition-[border-color,background-color,filter] duration-100 ${
-				drop.over
-					? "border-accent bg-accent/20 brightness-110"
-					: "border-line/60 bg-surface-raised/45"
-			}`}
+			className="relative min-h-0 min-w-0"
 			style={{
 				gridColumnStart: x + 1,
 				gridRowStart: y + 1,
@@ -66,6 +63,32 @@ export const BoardCell = ({ surface, x, y, occupant }: BoardCell.Props) => {
 			data-board-x={x}
 			data-board-y={y}
 			data-drop-over={drop.over ? "true" : "false"}
-		/>
+		>
+			<motion.span
+				className="pointer-events-none absolute inset-0 rounded-[22%] border"
+				initial={false}
+				animate={
+					drop.over
+						? {
+								borderColor: "var(--ak-accent)",
+								backgroundColor:
+									"color-mix(in srgb, var(--ak-accent) 20%, var(--ak-surface-raised))",
+								scale: 1.035,
+							}
+						: {
+								borderColor: "color-mix(in srgb, var(--ak-line) 60%, transparent)",
+								backgroundColor:
+									"color-mix(in srgb, var(--ak-surface-raised) 45%, transparent)",
+								scale: 1,
+							}
+				}
+				transition={{
+					type: "spring",
+					stiffness: 520,
+					damping: 38,
+					mass: 0.55,
+				}}
+			/>
+		</div>
 	);
 };

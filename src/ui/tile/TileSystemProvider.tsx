@@ -1,8 +1,9 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type { useDropItem } from "~/bridge/tile/useDropItem";
+import type { TileActorPlacement } from "~/ui/tile/TileActorPlacement";
+import { TileActorLayer } from "~/ui/tile/TileActorLayer";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
-import type { TileDropIntent } from "~/ui/tile/TileDropIntent";
-import type { TileDropOutcome } from "~/ui/tile/TileDropOutcome";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
@@ -22,36 +23,8 @@ interface TileSlotRegistration {
 	readonly node: HTMLElement;
 }
 
-interface ResolvedTileDrop {
-	readonly target: TileDropTarget;
-	readonly node: HTMLElement | null;
-}
-
-interface TileDragSession {
-	readonly source: TileDragSource;
-	readonly sourceNode: HTMLElement;
-	readonly pointerId: number;
-	readonly startX: number;
-	readonly startY: number;
-	readonly originRect: DOMRect;
-	readonly onDrop: (intent: TileDropIntent) => Promise<TileDropOutcome> | TileDropOutcome;
-	readonly previousVisibility: string;
-	readonly animations: Set<Animation>;
-	phase: TileInteractionState["phase"];
-	currentX: number;
-	currentY: number;
-	released: boolean;
-	frame: number | null;
-	ghost: HTMLElement | null;
-	resolved: ResolvedTileDrop;
-}
-
-const dragThresholdPx = 6;
-const acceptedDurationMs = 180;
-const rejectedDurationMs = 210;
-
-const isSameIdentity = (left: TileIdentity, right: TileIdentity) =>
-	left.id === right.id && left.revision === right.revision;
+const slotRegistrationKey = (surface: TileSurface, slot: TileSlot) =>
+	`${surface.id}\u0000${slot.id}`;
 
 const isPointInside = (rect: DOMRect, x: number, y: number) =>
 	x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
@@ -62,7 +35,6 @@ const isSameTarget = (left: TileDropTarget | null, right: TileDropTarget | null)
 	if (left.kind === "outside" || right.kind === "outside") return true;
 	if (left.surface.id !== right.surface.id) return false;
 	if (left.kind === "surface" || right.kind === "surface") return true;
-
 	return (
 		left.slot.id === right.slot.id &&
 		left.occupant?.id === right.occupant?.id &&
@@ -70,354 +42,90 @@ const isSameTarget = (left: TileDropTarget | null, right: TileDropTarget | null)
 	);
 };
 
-const slotRegistrationKey = (surface: TileSurface, slot: TileSlot) =>
-	`${surface.id}\u0000${slot.id}`;
-
-const removeElementIds = (element: HTMLElement) => {
-	element.removeAttribute("id");
-	for (const child of element.querySelectorAll<HTMLElement>("[id]")) {
-		child.removeAttribute("id");
-	}
-};
-
-/** Owns one unrestricted pointer drag session and registered Board/inventory/toolbar geometry. */
+/** Owns Canvas-local tile geometry and the one Arkini-authored interaction state. */
 export const TileSystemProvider = ({ children }: PropsWithChildren) => {
-	const mounted = useRef(true);
 	const surfaces = useRef(new Map<string, TileSurfaceRegistration>());
 	const slots = useRef(new Map<string, TileSlotRegistration>());
-	const session = useRef<TileDragSession | null>(null);
+	const actorLayer = useRef<HTMLElement | null>(null);
+	const resizeObserver = useRef<ResizeObserver | null>(null);
+	const nextGeneration = useRef(0);
+	const activeRef = useRef<TileInteractionState | null>(null);
+	const [geometryVersion, setGeometryVersion] = useState(0);
 	const [active, setActive] = useState<TileInteractionState | null>(null);
 
-	const publish = useCallback((next: TileInteractionState | null) => {
-		if (mounted.current) setActive(next);
+	const publishActive = useCallback((next: TileInteractionState | null) => {
+		activeRef.current = next;
+		setActive(next);
 	}, []);
 
-	const cancelAnimations = useCallback((current: TileDragSession) => {
-		for (const animation of current.animations) animation.cancel();
-		current.animations.clear();
+	const publishGeometry = useCallback(() => {
+		setGeometryVersion((current) => current + 1);
 	}, []);
 
-	const cleanup = useCallback(
-		(current: TileDragSession) => {
-			if (current.frame !== null) cancelAnimationFrame(current.frame);
-			cancelAnimations(current);
-			current.sourceNode.style.visibility = current.previousVisibility;
-			current.ghost?.remove();
-			if (session.current === current) session.current = null;
-			publish(null);
+	const observe = useCallback(
+		(node: HTMLElement) => {
+			if (typeof ResizeObserver === "undefined") return;
+			resizeObserver.current ??= new ResizeObserver(publishGeometry);
+			resizeObserver.current.observe(node);
 		},
 		[
-			cancelAnimations,
-			publish,
+			publishGeometry,
 		],
 	);
 
-	const runAnimation = useCallback(
-		async (
-			current: TileDragSession,
-			node: HTMLElement,
-			keyframes: Keyframe[] | PropertyIndexedKeyframes,
-			options: KeyframeAnimationOptions,
-		) => {
-			if (typeof node.animate !== "function") return;
-			const animation = node.animate(keyframes, options);
-			current.animations.add(animation);
-			try {
-				await animation.finished;
-			} catch {
-				// Cancellation is expected when the complete Game tree is replaced.
-			} finally {
-				current.animations.delete(animation);
-			}
-		},
-		[],
-	);
+	const unobserve = useCallback((node: HTMLElement) => {
+		resizeObserver.current?.unobserve(node);
+	}, []);
 
-	const createGhost = useCallback(
-		(current: TileDragSession) => {
-			const ghost = current.sourceNode.cloneNode(true) as HTMLElement;
-			removeElementIds(ghost);
-			ghost.dataset.ui = "TileDragGhost";
-			ghost.setAttribute("aria-hidden", "true");
-			ghost.removeAttribute("aria-label");
-			ghost.style.position = "fixed";
-			ghost.style.left = `${current.originRect.left}px`;
-			ghost.style.top = `${current.originRect.top}px`;
-			ghost.style.width = `${current.originRect.width}px`;
-			ghost.style.height = `${current.originRect.height}px`;
-			ghost.style.margin = "0";
-			ghost.style.pointerEvents = "none";
-			ghost.style.transform = "translate3d(0px, 0px, 0px)";
-			ghost.style.transformOrigin = "center";
-			ghost.style.willChange = "transform, opacity, filter";
-			ghost.style.zIndex = "2147483000";
-			document.body.append(ghost);
-			current.sourceNode.style.visibility = "hidden";
-			current.ghost = ghost;
-
-			void runAnimation(
-				current,
-				ghost,
-				[
-					{
-						opacity: 0.72,
-						filter: "brightness(1)",
-					},
-					{
-						opacity: 1,
-						filter: "brightness(1.12)",
-					},
-				],
-				{
-					duration: 110,
-					easing: "ease-out",
-					fill: "forwards",
-				},
-			);
-		},
-		[
-			runAnimation,
-		],
-	);
-
-	const registrationTarget = useCallback((registration: TileSlotRegistration): TileDropTarget => {
-		return {
-			kind: "slot",
-			surface: registration.surface,
-			slot: registration.slot,
-			occupant: registration.occupant,
+	useEffect(() => {
+		window.addEventListener("resize", publishGeometry);
+		return () => {
+			window.removeEventListener("resize", publishGeometry);
+			resizeObserver.current?.disconnect();
+			resizeObserver.current = null;
 		};
-	}, []);
+	}, [
+		publishGeometry,
+	]);
 
-	const resolveInsideSurface = useCallback(
-		(surface: TileSurfaceRegistration, x: number, y: number): ResolvedTileDrop => {
-			for (const registration of slots.current.values()) {
-				if (registration.surface.id !== surface.surface.id) continue;
-				if (!isPointInside(registration.node.getBoundingClientRect(), x, y)) continue;
-				return {
-					target: registrationTarget(registration),
-					node: registration.node,
-				};
-			}
-
-			return {
-				target: {
-					kind: "surface",
-					surface: surface.surface,
-				},
-				node: surface.node,
-			};
+	const registerActorLayer = useCallback(
+		(node: HTMLElement | null) => {
+			const previous = actorLayer.current;
+			if (previous === node) return;
+			if (previous !== null) unobserve(previous);
+			actorLayer.current = node;
+			if (node !== null) observe(node);
+			publishGeometry();
 		},
 		[
-			registrationTarget,
+			observe,
+			publishGeometry,
+			unobserve,
 		],
 	);
 
-	const resolve = useCallback(
-		(x: number, y: number): ResolvedTileDrop => {
-			const topElements = document.elementsFromPoint?.(x, y) ?? [];
-			if (topElements.length > 0) {
-				const topElement = topElements[0];
-				for (const registration of slots.current.values()) {
-					if (
-						registration.node !== topElement &&
-						!registration.node.contains(topElement)
-					) {
-						continue;
-					}
-					return {
-						target: registrationTarget(registration),
-						node: registration.node,
-					};
-				}
-
-				for (const surface of surfaces.current.values()) {
-					if (surface.node !== topElement && !surface.node.contains(topElement)) continue;
-					return resolveInsideSurface(surface, x, y);
-				}
-
-				return {
-					target: {
-						kind: "outside",
-					},
-					node: null,
-				};
-			}
-
-			for (const registration of slots.current.values()) {
-				if (!isPointInside(registration.node.getBoundingClientRect(), x, y)) continue;
-				return {
-					target: registrationTarget(registration),
-					node: registration.node,
-				};
-			}
-			for (const surface of surfaces.current.values()) {
-				if (!isPointInside(surface.node.getBoundingClientRect(), x, y)) continue;
-				return resolveInsideSurface(surface, x, y);
-			}
-
-			return {
-				target: {
-					kind: "outside",
-				},
-				node: null,
-			};
-		},
-		[
-			registrationTarget,
-			resolveInsideSurface,
-		],
-	);
-
-	const publishSession = useCallback(
-		(current: TileDragSession) => {
-			publish({
-				source: current.source,
-				phase: current.phase,
-				target: current.phase === "pressed" ? null : current.resolved.target,
-			});
-		},
-		[
-			publish,
-		],
-	);
-
-	const writeGhostPosition = useCallback((current: TileDragSession) => {
-		current.frame = null;
-		if (session.current !== current || current.ghost === null) return;
-		const x = current.currentX - current.startX;
-		const y = current.currentY - current.startY;
-		current.ghost.style.transform = `translate3d(${x}px, ${y}px, 0px)`;
-	}, []);
-
-	const scheduleGhostPosition = useCallback(
-		(current: TileDragSession) => {
-			if (current.frame !== null) return;
-			current.frame = requestAnimationFrame(() => writeGhostPosition(current));
-		},
-		[
-			writeGhostPosition,
-		],
-	);
-
-	const animateBack = useCallback(
-		async (current: TileDragSession) => {
-			const ghost = current.ghost;
-			if (ghost === null) return;
-			const x = current.currentX - current.startX;
-			const y = current.currentY - current.startY;
-			await runAnimation(
-				current,
-				ghost,
-				[
-					{
-						transform: `translate3d(${x}px, ${y}px, 0px)`,
-					},
-					{
-						transform: "translate3d(0px, 0px, 0px)",
-					},
-				],
-				{
-					duration: rejectedDurationMs,
-					easing: "cubic-bezier(0.2, 0.9, 0.2, 1)",
-					fill: "forwards",
-				},
-			);
-		},
-		[
-			runAnimation,
-		],
-	);
-
-	const animateAccepted = useCallback(
-		async (current: TileDragSession) => {
-			const ghost = current.ghost;
-			const targetNode = current.resolved.node;
-			if (ghost === null || targetNode === null) return;
-			const targetRect = targetNode.getBoundingClientRect();
-			const currentX = current.currentX - current.startX;
-			const currentY = current.currentY - current.startY;
-			const targetX =
-				targetRect.left -
-				current.originRect.left +
-				(targetRect.width - current.originRect.width) / 2;
-			const targetY =
-				targetRect.top -
-				current.originRect.top +
-				(targetRect.height - current.originRect.height) / 2;
-
-			await runAnimation(
-				current,
-				ghost,
-				[
-					{
-						transform: `translate3d(${currentX}px, ${currentY}px, 0px)`,
-						opacity: 1,
-					},
-					{
-						transform: `translate3d(${targetX}px, ${targetY}px, 0px)`,
-						opacity: 0.88,
-					},
-				],
-				{
-					duration: acceptedDurationMs,
-					easing: "cubic-bezier(0.2, 0.85, 0.25, 1)",
-					fill: "forwards",
-				},
-			);
-		},
-		[
-			runAnimation,
-		],
-	);
-
-	const settle = useCallback(
-		async (current: TileDragSession) => {
-			let outcome: TileDropOutcome = {
-				kind: "rejected",
-			};
-			try {
-				outcome = await current.onDrop({
-					source: current.source,
-					target: current.resolved.target,
-					pointer: {
-						x: current.currentX,
-						y: current.currentY,
-					},
-				});
-			} catch {
-				outcome = {
-					kind: "rejected",
-				};
-			}
-			if (session.current !== current) return;
-			cancelAnimations(current);
-
-			if (outcome.kind === "accepted") {
-				await animateAccepted(current);
+	const registerSurface = useCallback(
+		(surface: TileSurface, node: HTMLElement | null) => {
+			const previous = surfaces.current.get(surface.id);
+			if (previous?.node === node) return;
+			if (previous !== undefined) unobserve(previous.node);
+			if (node === null) {
+				surfaces.current.delete(surface.id);
 			} else {
-				await animateBack(current);
+				surfaces.current.set(surface.id, {
+					surface,
+					node,
+				});
+				observe(node);
 			}
-			if (session.current === current) cleanup(current);
+			publishGeometry();
 		},
 		[
-			animateAccepted,
-			animateBack,
-			cancelAnimations,
-			cleanup,
+			observe,
+			publishGeometry,
+			unobserve,
 		],
 	);
-
-	const registerSurface = useCallback((surface: TileSurface, node: HTMLElement | null) => {
-		if (node === null) {
-			surfaces.current.delete(surface.id);
-			return;
-		}
-		surfaces.current.set(surface.id, {
-			surface,
-			node,
-		});
-	}, []);
 
 	const registerSlot = useCallback(
 		(
@@ -429,180 +137,279 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			node: HTMLElement | null,
 		) => {
 			const key = slotRegistrationKey(registration.surface, registration.slot);
-			if (node === null) {
-				slots.current.delete(key);
+			const previous = slots.current.get(key);
+			if (
+				previous?.node === node &&
+				previous.occupant?.id === registration.occupant?.id &&
+				previous.occupant?.revision === registration.occupant?.revision
+			) {
 				return;
 			}
-			slots.current.set(key, {
-				...registration,
-				node,
-			});
-		},
-		[],
-	);
-
-	const press = useCallback<TileSystem["press"]>(
-		({ source, node, pointerId, x, y, onDrop }) => {
-			const previous = session.current;
-			if (previous !== null) cleanup(previous);
-			const current: TileDragSession = {
-				source,
-				sourceNode: node,
-				pointerId,
-				startX: x,
-				startY: y,
-				originRect: node.getBoundingClientRect(),
-				onDrop,
-				previousVisibility: node.style.visibility,
-				animations: new Set(),
-				phase: "pressed",
-				currentX: x,
-				currentY: y,
-				released: false,
-				frame: null,
-				ghost: null,
-				resolved: {
-					target: {
-						kind: "outside",
-					},
-					node: null,
-				},
-			};
-			session.current = current;
-			publishSession(current);
+			if (previous !== undefined && previous.node !== node) unobserve(previous.node);
+			if (node === null) {
+				slots.current.delete(key);
+			} else {
+				slots.current.set(key, {
+					...registration,
+					node,
+				});
+				if (previous?.node !== node) observe(node);
+			}
+			publishGeometry();
 		},
 		[
-			cleanup,
-			publishSession,
+			observe,
+			publishGeometry,
+			unobserve,
 		],
 	);
 
-	const move = useCallback(
-		({
-			pointerId,
-			x,
-			y,
-		}: {
-			readonly pointerId: number;
-			readonly x: number;
-			readonly y: number;
-		}) => {
-			const current = session.current;
-			if (current === null || current.pointerId !== pointerId || current.released) return;
-			current.currentX = x;
-			current.currentY = y;
+	const readPlacement = useCallback((source: TileDragSource): TileActorPlacement | null => {
+		const layer = actorLayer.current;
+		const registration = slots.current.get(slotRegistrationKey(source.surface, source.slot));
+		if (layer === null || registration === undefined) return null;
+		const layerRect = layer.getBoundingClientRect();
+		const slotRect = registration.node.getBoundingClientRect();
+		if (slotRect.width <= 0 || slotRect.height <= 0) return null;
+		return {
+			x: slotRect.left - layerRect.left,
+			y: slotRect.top - layerRect.top,
+			width: slotRect.width,
+			height: slotRect.height,
+		};
+	}, []);
 
-			if (current.phase === "pressed") {
-				const distance = Math.hypot(x - current.startX, y - current.startY);
-				if (distance <= dragThresholdPx) return;
-				current.phase = "dragging";
-				createGhost(current);
-			}
-			if (current.phase !== "dragging") return;
+	const registrationTarget = useCallback(
+		(registration: TileSlotRegistration): TileDropTarget => ({
+			kind: "slot",
+			surface: registration.surface,
+			slot: registration.slot,
+			occupant: registration.occupant,
+		}),
+		[],
+	);
 
-			scheduleGhostPosition(current);
-			const resolved = resolve(x, y);
-			if (!isSameTarget(current.resolved.target, resolved.target)) {
-				current.resolved = resolved;
-				publishSession(current);
-			} else {
-				current.resolved = resolved;
+	const resolveInsideSurface = useCallback(
+		(surface: TileSurfaceRegistration, x: number, y: number): TileDropTarget => {
+			for (const registration of slots.current.values()) {
+				if (registration.surface.id !== surface.surface.id) continue;
+				if (!isPointInside(registration.node.getBoundingClientRect(), x, y)) continue;
+				return registrationTarget(registration);
 			}
+			return {
+				kind: "surface",
+				surface: surface.surface,
+			};
 		},
 		[
-			createGhost,
-			publishSession,
-			resolve,
-			scheduleGhostPosition,
+			registrationTarget,
+		],
+	);
+
+	const resolveTarget = useCallback(
+		(x: number, y: number): TileDropTarget => {
+			const topElements = document.elementsFromPoint?.(x, y) ?? [];
+			for (const topElement of topElements) {
+				if (topElement.closest('[data-tile-actor="true"]') !== null) continue;
+				for (const registration of slots.current.values()) {
+					if (
+						registration.node === topElement ||
+						registration.node.contains(topElement)
+					) {
+						return registrationTarget(registration);
+					}
+				}
+				for (const surface of surfaces.current.values()) {
+					if (surface.node === topElement || surface.node.contains(topElement)) {
+						return resolveInsideSurface(surface, x, y);
+					}
+				}
+				return {
+					kind: "outside",
+				};
+			}
+
+			for (const registration of slots.current.values()) {
+				if (!isPointInside(registration.node.getBoundingClientRect(), x, y)) continue;
+				return registrationTarget(registration);
+			}
+			for (const surface of surfaces.current.values()) {
+				if (!isPointInside(surface.node.getBoundingClientRect(), x, y)) continue;
+				return resolveInsideSurface(surface, x, y);
+			}
+			return {
+				kind: "outside",
+			};
+		},
+		[
+			registrationTarget,
+			resolveInsideSurface,
+		],
+	);
+
+	const press = useCallback(
+		(source: TileDragSource) => {
+			if (activeRef.current !== null) return false;
+			const generation = ++nextGeneration.current;
+			publishActive({
+				source,
+				generation,
+				phase: "pressed",
+				target: null,
+				settleLocation: null,
+				feedback: null,
+			});
+			return true;
+		},
+		[
+			publishActive,
+		],
+	);
+
+	const startDrag = useCallback(
+		(source: TileDragSource) => {
+			const current = activeRef.current;
+			if (current?.source.id !== source.id || current.phase !== "pressed") return;
+			publishActive({
+				...current,
+				phase: "dragging",
+			});
+		},
+		[
+			publishActive,
+		],
+	);
+
+	const moveDrag = useCallback(
+		(source: TileDragSource, x: number, y: number) => {
+			const current = activeRef.current;
+			if (current?.source.id !== source.id || current.phase !== "dragging") return;
+			const target = resolveTarget(x, y);
+			if (isSameTarget(current.target, target)) return;
+			publishActive({
+				...current,
+				target,
+			});
+		},
+		[
+			publishActive,
+			resolveTarget,
 		],
 	);
 
 	const release = useCallback(
-		({
-			pointerId,
-			x,
-			y,
-		}: {
-			readonly pointerId: number;
-			readonly x: number;
-			readonly y: number;
-		}) => {
-			const current = session.current;
-			if (current === null || current.pointerId !== pointerId || current.released) return;
-			current.released = true;
-			current.currentX = x;
-			current.currentY = y;
-
-			if (current.phase === "pressed") {
-				cleanup(current);
-				return;
-			}
-			if (current.phase !== "dragging") return;
-
-			if (current.frame !== null) {
-				cancelAnimationFrame(current.frame);
-				current.frame = null;
-			}
-			writeGhostPosition(current);
-			current.resolved = resolve(x, y);
-			current.phase = "settling";
-			publishSession(current);
-			void settle(current);
+		(itemId: string) => {
+			const current = activeRef.current;
+			if (current?.source.id !== itemId || current.phase !== "dragging") return null;
+			const target = current.target ?? {
+				kind: "outside" as const,
+			};
+			publishActive({
+				...current,
+				phase: "awaiting-outcome",
+				target,
+			});
+			return {
+				source: current.source,
+				generation: current.generation,
+				target,
+			};
 		},
 		[
-			cleanup,
-			publishSession,
-			resolve,
-			settle,
-			writeGhostPosition,
+			publishActive,
+		],
+	);
+
+	const settle = useCallback(
+		(source: TileDragSource, generation: number, outcome: useDropItem.Result | null) => {
+			const current = activeRef.current;
+			if (
+				current?.source.id !== source.id ||
+				current.generation !== generation ||
+				current.phase !== "awaiting-outcome"
+			) {
+				return;
+			}
+			publishActive({
+				...current,
+				phase: "settling",
+				settleLocation: outcome?.kind === "move" ? outcome.location : null,
+				feedback:
+					outcome === null || outcome.kind === "reject"
+						? "rejected"
+						: outcome.kind === "ignored"
+							? "ignored"
+							: "accepted",
+			});
+		},
+		[
+			publishActive,
+		],
+	);
+
+	const complete = useCallback(
+		(itemId: string, generation: number) => {
+			const current = activeRef.current;
+			if (
+				current?.source.id !== itemId ||
+				current.generation !== generation ||
+				current.phase !== "settling"
+			) {
+				return;
+			}
+			publishActive(null);
+		},
+		[
+			publishActive,
 		],
 	);
 
 	const cancel = useCallback(
-		(identity: TileIdentity) => {
-			const current = session.current;
-			if (current === null || !isSameIdentity(current.source, identity)) return;
-			if (current.phase === "settling") return;
-			cleanup(current);
+		(itemId: string) => {
+			if (activeRef.current?.source.id === itemId) publishActive(null);
 		},
 		[
-			cleanup,
+			publishActive,
 		],
 	);
 
-	useEffect(() => {
-		mounted.current = true;
-		return () => {
-			mounted.current = false;
-			const current = session.current;
-			if (current !== null) cleanup(current);
-			surfaces.current.clear();
-			slots.current.clear();
-		};
-	}, [
-		cleanup,
-	]);
-
-	const value = useMemo(
+	const value = useMemo<TileSystem>(
 		() => ({
 			active,
+			geometryVersion,
+			registerActorLayer,
 			registerSurface,
 			registerSlot,
+			readPlacement,
 			press,
-			move,
+			startDrag,
+			moveDrag,
 			release,
+			settle,
+			complete,
 			cancel,
 		}),
 		[
 			active,
 			cancel,
-			move,
+			complete,
+			geometryVersion,
+			moveDrag,
 			press,
+			readPlacement,
+			registerActorLayer,
 			registerSlot,
 			registerSurface,
 			release,
+			settle,
+			startDrag,
 		],
 	);
 
-	return <TileSystemContext.Provider value={value}>{children}</TileSystemContext.Provider>;
+	return (
+		<TileSystemContext.Provider value={value}>
+			{children}
+			<TileActorLayer />
+		</TileSystemContext.Provider>
+	);
 };

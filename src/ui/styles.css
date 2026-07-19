@@ -188,16 +188,16 @@ select {
 	}
 }
 
-[data-ui="BoardTile"] {
+[data-ui="TileActorVisual"] {
 	container-type: size;
 }
 
-[data-ui="BoardTileTitle"] {
+[data-ui="TileActorTitle"] {
 	font-size: clamp(0.35rem, 12cqw, 0.7rem);
 	line-height: 1.1;
 }
 
-[data-ui="BoardTileQuantity"] {
+[data-ui="TileActorQuantity"] {
 	min-width: clamp(1rem, 24cqw, 1.5rem);
 	font-size: clamp(0.4rem, 14cqw, 0.75rem);
 	line-height: 1;

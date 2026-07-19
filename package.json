@@ -51,6 +51,7 @@
 		"@tanstack/react-router": "1.170.15",
 		"effect": "^3.21.3",
 		"fuse.js": "^7.4.2",
+		"motion": "^12.42.2",
 		"react": "19.2.7",
 		"react-dom": "19.2.7",
 		"tailwind-merge": "3.4.0",

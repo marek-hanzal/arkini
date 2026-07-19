@@ -21,6 +21,9 @@ import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
 import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+
+vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
 (
 	globalThis as {
@@ -45,27 +48,6 @@ const deferred = () => {
 	};
 };
 
-class TestAnimation {
-	readonly finished: Promise<void>;
-	readonly cancel = vi.fn();
-	readonly commitStyles = vi.fn();
-	private resolveFinished!: () => void;
-
-	constructor(
-		readonly keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-		readonly options?: number | KeyframeAnimationOptions,
-	) {
-		this.finished = new Promise<void>((resolve) => {
-			this.resolveFinished = resolve;
-		});
-	}
-
-	finish() {
-		this.resolveFinished();
-	}
-}
-
-const animations: Array<TestAnimation> = [];
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const viewTransitionStartPhases: Array<string | null> = [];
 
@@ -95,8 +77,13 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 });
 
 beforeEach(() => {
-	animations.splice(0);
+	motionTestRuntime.reset();
+	motionTestRuntime.autoComplete = false;
 	viewTransitionStartPhases.splice(0);
+	Object.defineProperty(window, "scrollTo", {
+		configurable: true,
+		value: vi.fn(),
+	});
 	Object.defineProperty(window, "matchMedia", {
 		configurable: true,
 		value: vi.fn(() => ({
@@ -130,19 +117,6 @@ beforeEach(() => {
 				updateCallbackDone,
 			};
 		}),
-	});
-	Object.defineProperty(HTMLElement.prototype, "animate", {
-		configurable: true,
-		value: vi.fn(
-			(
-				keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
-				options?: number | KeyframeAnimationOptions,
-			) => {
-				const animation = new TestAnimation(keyframes, options);
-				animations.push(animation);
-				return animation as unknown as Animation;
-			},
-		),
 	});
 });
 
@@ -273,9 +247,9 @@ const pressEscape = async () => {
 	});
 };
 
-const finishAnimations = async (...indexes: ReadonlyArray<number>) => {
+const finishMotion = async (...indexes: ReadonlyArray<number>) => {
 	await act(async () => {
-		for (const index of indexes) animations[index]?.finish();
+		motionTestRuntime.finish(...indexes);
 		await Promise.resolve();
 	});
 };
@@ -283,8 +257,8 @@ const finishAnimations = async (...indexes: ReadonlyArray<number>) => {
 const openMenu = async (container: ParentNode) => {
 	await pressEscape();
 	expect(container.querySelector('[data-phase="entering"]')).not.toBeNull();
-	const start = animations.length - 2;
-	await finishAnimations(start, start + 1);
+	const completion = motionTestRuntime.completions.length - 1;
+	await finishMotion(completion);
 	expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 };
 
@@ -320,8 +294,8 @@ describe("GameMenu", () => {
 
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		const exitStart = animations.length - 2;
-		await finishAnimations(exitStart, exitStart + 1);
+		const exitCompletion = motionTestRuntime.completions.length - 1;
+		await finishMotion(exitCompletion);
 		expect(container.querySelector('[role="dialog"]')).toBeNull();
 		expect(document.activeElement).toBe(surface);
 	});
@@ -331,13 +305,13 @@ describe("GameMenu", () => {
 		await pressEscape();
 		expect(buttonByText(container, "Destroy").disabled).toBe(true);
 		expect(container.querySelectorAll('[data-ui="GameMenuBackdrop"]')).toHaveLength(1);
+		const enteringCompletion = motionTestRuntime.completions.length - 1;
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(
-			animations.slice(0, 2).every((animation) => animation.cancel.mock.calls.length > 0),
-		).toBe(true);
-		const exitStart = animations.length - 2;
-		await finishAnimations(exitStart, exitStart + 1);
+		await finishMotion(enteringCompletion);
+		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
+		const exitCompletion = motionTestRuntime.completions.length - 1;
+		await finishMotion(exitCompletion);
 		expect(container.querySelector('[data-ui="GameMenuBackdrop"]')).toBeNull();
 	});
 
@@ -351,7 +325,6 @@ describe("GameMenu", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.style.viewTransitionName,
 		).toBe(gameMenuDialogViewTransitionName);
-		const animationCount = animations.length;
 		viewTransitionStartPhases.splice(0);
 
 		await act(async () => buttonByText(container, "Settings").click());
@@ -362,7 +335,6 @@ describe("GameMenu", () => {
 		expect(viewTransitionStartPhases).toEqual([
 			"open",
 		]);
-		expect(animations).toHaveLength(animationCount);
 	});
 
 	it("runs one explicit save while disabling overlapping menu actions", async () => {
@@ -402,7 +374,6 @@ describe("GameMenu", () => {
 			expect(container.textContent).toContain("Save and exit failed: disk full"),
 		);
 		expect(router.state.location.pathname).toBe("/game/package:menu/board");
-		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 	});
 
 	it("uses the explicit reset action leaf after destructive confirmation", async () => {

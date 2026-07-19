@@ -1,12 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
+import { motion } from "motion/react";
 import type { Game } from "~/bridge/game/Game";
-import {
-	type KeyboardEvent as ReactKeyboardEvent,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from "react";
+import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState } from "react";
 
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
@@ -25,30 +20,17 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-const transitionDurationMs = 500;
-const transitionEasing = "cubic-bezier(0.22, 1, 0.36, 1)";
+const transition = {
+	duration: 0.5,
+	ease: [
+		0.22,
+		1,
+		0.36,
+		1,
+	] as const,
+};
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
-const currentFrame = (element: HTMLElement) => {
-	const style = getComputedStyle(element);
-	return {
-		opacity: style.opacity,
-		transform: style.transform === "none" ? "scale(1)" : style.transform,
-		filter: style.filter === "none" ? "blur(0px)" : style.filter,
-	};
-};
-
-const persistFinalFrame = (animation: Animation) => {
-	if (typeof animation.commitStyles !== "function") return false;
-	try {
-		animation.commitStyles();
-		animation.cancel();
-		return true;
-	} catch {
-		return false;
-	}
-};
 
 const GameMenuDialog = ({
 	game,
@@ -63,14 +45,12 @@ const GameMenuDialog = ({
 	const saveAndExit = useSaveAndExitGameMutation(game);
 	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
-	const backdropRef = useRef<HTMLDivElement>(null);
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
-	const animationGenerationRef = useRef(0);
+	const completedPhaseRef = useRef<GameMenuPhase | null>(null);
 	const activeRequestRef = useRef<
 		"save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | null
 	>(null);
-	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
 	const mutationPending = save.isPending || saveAndExit.isPending;
 	const pending = mutationPending || menu.routePending;
 	const exiting = phase === "exiting";
@@ -99,108 +79,18 @@ const GameMenuDialog = ({
 		phase,
 	]);
 
-	useLayoutEffect(() => {
-		if (phase === "open") return;
-		const backdrop = backdropRef.current;
-		const dialog = dialogRef.current;
-		if (backdrop === null || dialog === null) return;
-
-		const generation = animationGenerationRef.current + 1;
-		animationGenerationRef.current = generation;
-		const backdropCurrent = currentFrame(backdrop);
-		const dialogCurrent = currentFrame(dialog);
-		for (const animation of animationsRef.current) animation.cancel();
-
-		if (typeof backdrop.animate !== "function" || typeof dialog.animate !== "function") {
-			if (phase === "entering") menu.completeEnter();
-			else menu.completeExit();
-			return;
-		}
-
-		const entering = phase === "entering";
-		const backdropAnimation = backdrop.animate(
-			entering
-				? [
-						{
-							opacity: 0,
-						},
-						{
-							opacity: 1,
-						},
-					]
-				: [
-						{
-							opacity: backdropCurrent.opacity,
-						},
-						{
-							opacity: 0,
-						},
-					],
-			{
-				duration: transitionDurationMs,
-				easing: transitionEasing,
-				fill: "both",
-			},
-		);
-		const dialogAnimation = dialog.animate(
-			entering
-				? [
-						{
-							opacity: 0,
-							transform: "scale(0.975) translateY(8px)",
-							filter: "blur(6px)",
-						},
-						{
-							opacity: 1,
-							transform: "scale(1) translateY(0)",
-							filter: "blur(0px)",
-						},
-					]
-				: [
-						{
-							opacity: dialogCurrent.opacity,
-							transform: dialogCurrent.transform,
-							filter: dialogCurrent.filter,
-						},
-						{
-							opacity: 0,
-							transform: "scale(0.985) translateY(6px)",
-							filter: "blur(5px)",
-						},
-					],
-			{
-				duration: transitionDurationMs,
-				easing: transitionEasing,
-				fill: "both",
-			},
-		);
-		animationsRef.current = [
-			backdropAnimation,
-			dialogAnimation,
-		];
-		void Promise.all(
-			animationsRef.current.map((animation) => animation.finished.catch(() => undefined)),
-		).then(() => {
-			if (animationGenerationRef.current !== generation) return;
-			animationsRef.current = animationsRef.current.filter(
-				(animation) => !persistFinalFrame(animation),
-			);
-			if (phase === "entering") menu.completeEnter();
-			else menu.completeExit();
-		});
+	useEffect(() => {
+		completedPhaseRef.current = null;
 	}, [
-		menu,
 		phase,
 	]);
 
-	useEffect(
-		() => () => {
-			animationGenerationRef.current += 1;
-			for (const animation of animationsRef.current) animation.cancel();
-			animationsRef.current = [];
-		},
-		[],
-	);
+	const completeMotionPhase = () => {
+		if (phase === "open" || completedPhaseRef.current === phase) return;
+		completedPhaseRef.current = phase;
+		if (phase === "entering") menu.completeEnter();
+		else menu.completeExit();
+	};
 
 	const keepFocusInside = (event: ReactKeyboardEvent<HTMLDivElement>) => {
 		if (event.key === "Escape" && (pending || exiting)) {
@@ -307,21 +197,22 @@ const GameMenuDialog = ({
 								: null;
 
 	return (
-		<div
-			ref={backdropRef}
+		<motion.div
 			className="absolute inset-0 z-50 grid place-items-center overflow-hidden bg-overlay/95 p-[var(--ak-viewport-padding)] text-overlay-foreground"
 			data-ui="GameMenuBackdrop"
 			data-phase={phase}
 			style={{
 				viewTransitionName: gameMenuBackdropViewTransitionName,
-				...(phase === "entering"
-					? {
-							opacity: 0,
-						}
-					: {}),
 			}}
+			initial={{
+				opacity: 0,
+			}}
+			animate={{
+				opacity: phase === "exiting" ? 0 : 1,
+			}}
+			transition={transition}
 		>
-			<div
+			<motion.div
 				ref={dialogRef}
 				role="dialog"
 				aria-modal="true"
@@ -331,14 +222,30 @@ const GameMenuDialog = ({
 				tabIndex={-1}
 				style={{
 					viewTransitionName: gameMenuDialogViewTransitionName,
-					...(phase === "entering"
+				}}
+				initial={{
+					opacity: 0,
+					scale: 0.975,
+					y: 8,
+					filter: "blur(6px)",
+				}}
+				animate={
+					phase === "exiting"
 						? {
 								opacity: 0,
-								transform: "scale(0.975) translateY(8px)",
-								filter: "blur(6px)",
+								scale: 0.985,
+								y: 6,
+								filter: "blur(5px)",
 							}
-						: {}),
-				}}
+						: {
+								opacity: 1,
+								scale: 1,
+								y: 0,
+								filter: "blur(0px)",
+							}
+				}
+				transition={transition}
+				onAnimationComplete={completeMotionPhase}
 				onKeyDown={keepFocusInside}
 			>
 				<h2
@@ -442,8 +349,8 @@ const GameMenuDialog = ({
 				>
 					{status}
 				</div>
-			</div>
-		</div>
+			</motion.div>
+		</motion.div>
 	);
 };
 

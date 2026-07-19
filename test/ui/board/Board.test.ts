@@ -113,7 +113,7 @@ const readAttribute = (tag: string, name: string) => {
 
 const readBoardCells = (html: string) =>
 	[
-		...html.matchAll(/<div[^>]*data-ui="BoardCell"[^>]*><\/div>/g),
+		...html.matchAll(/<div[^>]*data-ui="BoardCell"[^>]*>/g),
 	].map((match) => {
 		const tag = match[0];
 		const style = readAttribute(tag, "style");
@@ -181,7 +181,6 @@ describe("Board", () => {
 			},
 		]);
 		expect(html).toContain('data-ui="Board"');
-		expect(html).toContain("view-transition-name:arkini-game-board");
 		expect(html).toContain('data-item-id="water"');
 		expect(html).toContain('src="resource:asset:water"');
 		expect(html).toContain("grid-column-start:3");

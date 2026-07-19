@@ -517,6 +517,51 @@ select {
 	animation: arkini-vt-hero-in 400ms 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/*
+ * GameMenu leaves commit through a Board-origin navigation, but their terminal redirect is
+ * painted from the already-visible action Hero. Preserve that old launcher raster through
+ * Settings/Main Menu handoff instead of cross-fading it with an identical destination Hero.
+ */
+:root:active-view-transition-type(board-to-settings)::view-transition-old(arkini-launcher-backdrop),
+:root:active-view-transition-type(board-to-settings)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-settings)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(board-to-main-menu)::view-transition-old(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(board-to-main-menu)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-main-menu)::view-transition-old(
+	arkini-launcher-hero-artwork
+) {
+	animation: none;
+	opacity: 1;
+}
+
+:root:active-view-transition-type(board-to-settings)::view-transition-new(arkini-launcher-backdrop),
+:root:active-view-transition-type(board-to-settings)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-settings)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(board-to-main-menu)::view-transition-new(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(board-to-main-menu)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-main-menu)::view-transition-new(
+	arkini-launcher-hero-artwork
+) {
+	animation: none;
+	opacity: 0;
+}
+
 /* An open GameMenu is one old-only scene over Board; it never morphs into progress or a page card. */
 ::view-transition-old(arkini-game-menu-backdrop) {
 	animation: arkini-vt-fade-out 160ms cubic-bezier(0.4, 0, 1, 1) both;

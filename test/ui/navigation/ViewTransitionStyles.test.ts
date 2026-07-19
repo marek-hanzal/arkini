@@ -26,6 +26,21 @@ describe("View Transition styles", () => {
 		expect(styles).not.toContain("plus-lighter");
 	});
 
+	it("keeps GameMenu leave Hero raster stable through terminal launcher redirects", () => {
+		expect(styles).toContain(
+			":root:active-view-transition-type(board-to-settings)::view-transition-old(",
+		);
+		expect(styles).toContain(
+			":root:active-view-transition-type(board-to-main-menu)::view-transition-old(",
+		);
+		expect(styles).toContain(
+			":root:active-view-transition-type(board-to-settings)::view-transition-new(",
+		);
+		expect(styles).toContain(
+			":root:active-view-transition-type(board-to-main-menu)::view-transition-new(",
+		);
+	});
+
 	it("keeps page cards, action progress, and GameMenu on unrelated surfaces", () => {
 		expect(styles).toContain("::view-transition-old(arkini-panel-main-menu)");
 		expect(styles).toContain("::view-transition-new(arkini-panel-arkpacks)");

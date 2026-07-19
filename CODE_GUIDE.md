@@ -352,6 +352,8 @@ Cross-cutting UI actions use the game-wide button primitives under `src/ui/butto
 
 Local visual lifecycles may own explicit presentation states and Web Animations API handles, but animation completion must come from the animation object rather than duplicated `setTimeout` values. Presentation never decides whether save, reset, route release, or shutdown succeeded. Keep the authoritative operation fully visible while pending; start a closing transition only after success, retain pointer/focus authority until actual completion, and leave failures in their truthful settled scene. Do not build a generic animation manager merely because two independent surfaces animate.
 
+Route transitions use one pure route-pair classifier and native View Transition CSS. For an explicit Arkini transition, old/new `root` snapshots remain invisible and every painted route region must be represented by a deliberate named surface. Assign a shared name only to genuinely corresponding geometry, currently launcher backdrop and Hero layers. Give unrelated launcher panels, progress, action errors, Board, and GameMenu their own identities and sequence old exit before new entry. A whole card owns one snapshot including border, background, content, and shadow; do not split one visual card into nested independently animated chrome/content surfaces. Put the live shadow on the same outer named element so snapshot-to-live handoff cannot lose depth. Cross-route opacity/transform may not be coordinated through WAAPI, CSS component animations, React timers, or a second local `startViewTransition()`.
+
 ## 11. Configuration and compiler
 
 Game source files are authoring fragments, not runtime truth by themselves.

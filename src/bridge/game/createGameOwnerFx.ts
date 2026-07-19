@@ -29,6 +29,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 			const listeners = new Set<() => void | PromiseLike<void>>();
 			const transitionLock = yield* Effect.makeSemaphore(1);
 			let current: Game | undefined;
+			let currentPublishable = false;
 			let failedSaveRecovery: FailedSaveRecovery | undefined;
 			let hardResetRecovery: HardResetRecovery | undefined;
 			let state: GameOwner.State = {
@@ -62,7 +63,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 			};
 
 			const publishCurrentOrIdle = () => {
-				if (current === undefined) {
+				if (current === undefined || !currentPublishable) {
 					publish({
 						type: "loading",
 						packageId: null,
@@ -122,6 +123,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 					(game) =>
 						Effect.sync(() => {
 							current = game;
+							currentPublishable = true;
 							failedSaveRecovery = undefined;
 							hardResetRecovery = undefined;
 							publish({
@@ -138,10 +140,12 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 					Effect.gen(function* () {
 						if (current === undefined) return;
 						const releasing = current;
+						currentPublishable = false;
 						yield* release === "save"
 							? releasing.disposeFx
 							: releasing.disposeWithoutSaveFx;
 						current = undefined;
+						currentPublishable = false;
 					}),
 				);
 
@@ -152,7 +156,7 @@ export const createGameOwnerFx = Effect.fn("createGameOwnerFx")(
 						"select-package",
 						() => packageId,
 						Effect.gen(function* () {
-							if (current?.arkpack.packageId === packageId) {
+							if (currentPublishable && current?.arkpack.packageId === packageId) {
 								failedSaveRecovery = undefined;
 								hardResetRecovery = undefined;
 								publish({

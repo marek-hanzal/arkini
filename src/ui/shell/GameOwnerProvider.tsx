@@ -8,6 +8,7 @@ import { createGameOwnerFx } from "~/bridge/game/createGameOwnerFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
 import { GameOwnerRouteBinding } from "~/ui/shell/GameOwnerRouteBinding";
+import { GameRouteReleaseFailure } from "~/ui/shell/GameRouteReleaseFailure";
 
 export namespace GameOwnerProvider {
 	export interface Props {
@@ -101,6 +102,9 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 		<GameOwnerContext.Provider value={owner}>
 			<GameOwnerRouteBinding owner={owner} />
 			{children}
+			{state.type === "failed" && state.operation === "route-release" ? (
+				<GameRouteReleaseFailure owner={owner} state={state} />
+			) : null}
 			{state.type === "failed" && state.operation === "shutdown" ? (
 				<GameShutdownFailure />
 			) : null}

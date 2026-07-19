@@ -215,3 +215,9 @@ Next action:
 - Controlled Electron close and HMR handoff call `GameOwner.shutdownFx`; route exit calls the distinct `releaseRouteGameFx`. Owner command failures fail the initiating Effect and publish the same operation-tagged failure snapshot. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next shutdown request. Only real shutdown failure exposes exit UI. Force close is native process policy and does not run renderer best-effort discard or pretend final save succeeded.
 - `GameOwner` subscriber delivery is synchronous but observational only: one stable snapshot is delivered per publication, callback throws/rejected Promise-like results are isolated per listener, and no observer can stop lifecycle work or starve later listeners.
 - Do not add another reset owner, mutate a running engine back to initial state, hide correctness in React-local state, or use a module-global lock/map.
+
+## Route-release failure contract
+
+- A Game retained after failed final save is frozen and non-publishable. Same-package selection may fast-path only a genuinely live ready Game.
+- Non-game routes render one retryable `GameRouteReleaseFailure`; retry preserves the exact save obligation and returning to the package retries disposal before creating a fresh Game.
+- `GameShell` renders gameplay only from `GameOwner.State.type === "ready"`.

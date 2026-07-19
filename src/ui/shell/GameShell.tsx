@@ -34,9 +34,10 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 		menuPackageIdRef.current = packageId;
 		menuGameRef.current = undefined;
 	}
-	const ownedGame =
-		state.type === "ready" ? state.game : state.type === "failed" ? state.game : null;
-	const activeGame = ownedGame?.arkpack.packageId === packageId ? ownedGame : undefined;
+	const activeGame =
+		state.type === "ready" && state.game.arkpack.packageId === packageId
+			? state.game
+			: undefined;
 	if (activeGame !== undefined) menuGameRef.current = activeGame;
 	const menuGame = menuGameRef.current;
 	const gameAvailable = activeGame?.instanceKey === menuGame?.instanceKey;

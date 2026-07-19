@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 
@@ -15,14 +16,6 @@ export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsF
 	items,
 	locations,
 }: readGridLocationOccupantsFx.Props) {
-	const isSameGridLocation = (left: GridLocationSchema.Type, right: GridLocationSchema.Type) => {
-		if (left.scope !== right.scope) return false;
-		if (left.scope === "board" && right.scope === "board" && left.space !== right.space) {
-			return false;
-		}
-
-		return left.position.x === right.position.x && left.position.y === right.position.y;
-	};
 	const uniqueLocations = locations.filter((location, index) => {
 		return (
 			locations.findIndex((candidate) => isSameGridLocation(candidate, location)) === index

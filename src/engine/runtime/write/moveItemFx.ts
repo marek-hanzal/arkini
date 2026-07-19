@@ -2,8 +2,10 @@ import { Array, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
+import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -21,6 +23,7 @@ export namespace moveItemFx {
 		itemId: IdSchema.Type;
 		location: GridLocationSchema.Type;
 		revision: RevisionSchema.Type;
+		expectedLocation?: GridLocationSchema.Type;
 	}
 }
 
@@ -31,6 +34,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 	itemId,
 	location,
 	revision,
+	expectedLocation,
 }: moveItemFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
@@ -58,6 +62,28 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 						location: item.location,
 					}),
 				);
+			}
+
+			if (
+				expectedLocation !== undefined &&
+				!isSameGridLocation(item.location, expectedLocation)
+			) {
+				return yield* Effect.fail(
+					new ItemLocationConflictError({
+						itemId,
+						expectedLocation,
+						actualLocation: item.location,
+					}),
+				);
+			}
+			if (isSameGridLocation(item.location, location)) {
+				return [
+					{
+						item,
+						previousLocation: item.location,
+					} satisfies MoveItemResultSchema.Type,
+					runtime,
+				] as const;
 			}
 
 			if (

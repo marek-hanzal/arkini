@@ -71,87 +71,143 @@ describe("createArkiniRouter", () => {
 			[
 				"/",
 				"/main-menu",
-				"startup-to-launcher",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"startup-to-main-menu",
+				],
 			],
 			[
 				"/",
 				"/action/load-game/built-in",
-				"startup-to-action",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"startup-to-action",
+				],
 			],
 			[
 				"/",
 				"/game/built-in/board",
-				"startup-to-board",
+				[
+					"arkini-route",
+					"hero-to-board",
+					"startup-to-board",
+				],
 			],
 			[
 				"/main-menu",
 				"/",
-				"launcher-to-startup",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"main-menu-to-startup",
+				],
 			],
 			[
 				"/main-menu",
 				"/settings",
-				"launcher-to-launcher",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"main-menu-to-settings",
+				],
 			],
 			[
 				"/main-menu",
 				"/action/load-game/built-in",
-				"launcher-to-action",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"main-menu-to-action",
+				],
 			],
 			[
 				"/main-menu",
 				"/game/built-in/board",
-				"launcher-to-board",
+				[
+					"arkini-route",
+					"hero-to-board",
+					"main-menu-to-board",
+				],
 			],
 			[
 				"/game/built-in/board",
 				"/",
-				"board-to-startup",
+				[
+					"arkini-route",
+					"board-to-hero",
+					"board-to-startup",
+				],
 			],
 			[
 				"/game/built-in/board",
 				"/settings",
-				"board-to-launcher",
+				[
+					"arkini-route",
+					"board-to-hero",
+					"board-to-settings",
+				],
 			],
 			[
 				"/game/built-in/board",
 				"/game/built-in/action/leave",
-				"board-to-action",
+				[
+					"arkini-route",
+					"board-to-hero",
+					"board-to-action",
+				],
 			],
 			[
 				"/game/built-in/board",
 				"/game/other/board",
-				"board-to-board",
+				[
+					"arkini-route",
+					"board-to-board",
+				],
 			],
 			[
 				"/action/load-game/built-in",
 				"/",
-				"action-to-startup",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"action-to-startup",
+				],
 			],
 			[
 				"/game/built-in/action/leave",
 				"/settings",
-				"action-to-launcher",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"action-to-settings",
+				],
 			],
 			[
 				"/action/load-game/built-in",
 				"/game/built-in/board",
-				"action-to-board",
+				[
+					"arkini-route",
+					"hero-to-board",
+					"action-to-board",
+				],
 			],
 			[
 				"/game/built-in/action/reset",
 				"/action/load-game/built-in",
-				"action-to-action",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"action-to-action",
+				],
 			],
 		] as const;
 
 		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
 		expect(resolveTypes("/main-menu", "/main-menu")).toBe(false);
-		for (const [from, to, type] of pairs) {
-			expect(resolveTypes(from, to)).toEqual([
-				"arkini-route",
-				type,
-			]);
+		for (const [from, to, types] of pairs) {
+			expect(resolveTypes(from, to)).toEqual(types);
 		}
 		expect(() => resolveTypes("/game/built-in/board", "/dev/shell")).toThrow(
 			"Missing View Transition classification",

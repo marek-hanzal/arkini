@@ -97,15 +97,11 @@ describe("ArkpackSelector", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
 				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-route-panel");
+		).toBe("arkini-panel-arkpacks");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPagePanelContent"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-route-content");
+		).toBe("");
 		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");

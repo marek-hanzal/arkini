@@ -40,7 +40,7 @@ const renderLayout = async (props: Omit<MainPageLayout.Props, "children">) => {
 };
 
 describe("MainPageLayout", () => {
-	it("keeps Hero and content in stable main-page slots with independent Hero and content snapshots", async () => {
+	it("keeps Hero and content in stable main-page slots with one page-owned panel snapshot", async () => {
 		const container = await renderLayout({
 			page: "settings",
 		});
@@ -51,7 +51,6 @@ describe("MainPageLayout", () => {
 		);
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		const panelChrome = container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]');
 		const panelContent = container.querySelector<HTMLElement>(
 			'[data-ui="MainPagePanelContent"]',
 		);
@@ -65,12 +64,11 @@ describe("MainPageLayout", () => {
 			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero-artwork");
-		expect(panel?.style.viewTransitionName).toBe("");
-		expect(panelChrome?.style.viewTransitionName).toBe("arkini-route-panel");
-		expect(panelContent?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(panel?.style.viewTransitionName).toBe("arkini-panel-settings");
+		expect(panelContent?.style.viewTransitionName).toBe("");
 	});
 
-	it("keeps the same outer slots and one explicit content surface for the viewport catalog", async () => {
+	it("keeps the same outer slots and one page-owned panel surface for the viewport catalog", async () => {
 		const container = await renderLayout({
 			page: "arkpacks",
 			panelMode: "viewport",
@@ -82,7 +80,6 @@ describe("MainPageLayout", () => {
 		);
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		const panelChrome = container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]');
 		const panelContent = container.querySelector<HTMLElement>(
 			'[data-ui="MainPagePanelContent"]',
 		);
@@ -92,8 +89,7 @@ describe("MainPageLayout", () => {
 		expect(panel?.parentElement).toBe(contentSlot);
 		expect(panel?.className).toContain("size-full");
 		expect(panel?.className).not.toContain("85dvw");
-		expect(panel?.style.viewTransitionName).toBe("");
-		expect(panelChrome?.style.viewTransitionName).toBe("arkini-route-panel");
-		expect(panelContent?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(panel?.style.viewTransitionName).toBe("arkini-panel-arkpacks");
+		expect(panelContent?.style.viewTransitionName).toBe("");
 	});
 });

@@ -14,7 +14,7 @@ import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
 import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
-import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
+import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 
 const focusableSelector = [
 	"button:not([disabled])",
@@ -330,7 +330,7 @@ const GameMenuDialog = ({
 				data-ui="GameMenu"
 				tabIndex={-1}
 				style={{
-					viewTransitionName: routeContentViewTransitionName,
+					viewTransitionName: gameMenuDialogViewTransitionName,
 					...(phase === "entering"
 						? {
 								opacity: 0,

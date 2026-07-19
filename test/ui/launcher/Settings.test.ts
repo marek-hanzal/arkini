@@ -146,14 +146,12 @@ describe("Settings", () => {
 		const page = container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]');
 		expect(page?.style.viewTransitionName).toBe("");
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
-		const panelChrome = container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]');
 		const panelContent = container.querySelector<HTMLElement>(
 			'[data-ui="MainPagePanelContent"]',
 		);
 		expect(panel).not.toBeNull();
-		expect(panel?.style.viewTransitionName).toBe("");
-		expect(panelChrome?.style.viewTransitionName).toBe("arkini-route-panel");
-		expect(panelContent?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(panel?.style.viewTransitionName).toBe("arkini-panel-settings");
+		expect(panelContent?.style.viewTransitionName).toBe("");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,

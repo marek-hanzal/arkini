@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
+import { actionPanelViewTransitionName } from "~/ui/navigation/actionPanelViewTransitionName";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -35,7 +35,7 @@ export const ActionErrorPage = ({
 			className="grid max-w-lg gap-4 rounded-2xl border border-danger/35 bg-surface p-[var(--ak-panel-padding)] text-center shadow-2xl"
 			data-ui="ActionErrorPanel"
 			style={{
-				viewTransitionName: routeContentViewTransitionName,
+				viewTransitionName: actionPanelViewTransitionName,
 			}}
 		>
 			<h1 className="text-lg font-semibold text-danger">{title}</h1>

@@ -18,6 +18,8 @@ import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
 import type { Game } from "~/bridge/game/Game";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
+import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
 (
@@ -342,6 +344,13 @@ describe("GameMenu", () => {
 	it("navigates from the open menu through one native View Transition", async () => {
 		const { container, router } = await renderMenu();
 		await openMenu(container);
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]')?.style
+				.viewTransitionName,
+		).toBe(gameMenuBackdropViewTransitionName);
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="GameMenu"]')?.style.viewTransitionName,
+		).toBe(gameMenuDialogViewTransitionName);
 		const animationCount = animations.length;
 		viewTransitionStartPhases.splice(0);
 

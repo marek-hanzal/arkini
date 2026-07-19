@@ -1,24 +1,29 @@
-const launcherPathnames = new Set([
-	"/about",
-	"/arkpacks",
-	"/main-menu",
-	"/settings",
-]);
-
-type VisualRouteKind = "action" | "board" | "launcher" | "startup";
+type VisualRouteId =
+	| "about"
+	| "action"
+	| "arkpacks"
+	| "board"
+	| "main-menu"
+	| "settings"
+	| "startup";
 
 const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
 const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
 
-const resolveVisualRouteKind = (pathname: string): VisualRouteKind => {
+const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
-	if (launcherPathnames.has(pathname)) return "launcher";
+	if (pathname === "/main-menu") return "main-menu";
+	if (pathname === "/settings") return "settings";
+	if (pathname === "/about") return "about";
+	if (pathname === "/arkpacks") return "arkpacks";
 	if (gameBoardPattern.test(pathname)) return "board";
 	if (pathname.startsWith("/action/") || gameActionPattern.test(pathname)) return "action";
 	throw new Error(`Missing View Transition classification for route: ${pathname}`);
 };
 
-/** Selects one exhaustive typed native transition for every visible Arkini route pair. */
+const isHeroRoute = (route: VisualRouteId) => route !== "board";
+
+/** Selects one explicit pair plus one broad scene relationship for every visible route change. */
 export const resolveRouteViewTransitionTypes = ({
 	fromLocation,
 	toLocation,
@@ -31,10 +36,24 @@ export const resolveRouteViewTransitionTypes = ({
 	};
 }) => {
 	if (fromLocation === undefined || fromLocation.pathname === toLocation.pathname) return false;
-	const fromKind = resolveVisualRouteKind(fromLocation.pathname);
-	const toKind = resolveVisualRouteKind(toLocation.pathname);
-	return [
-		"arkini-route",
-		`${fromKind}-to-${toKind}`,
-	];
+	const from = resolveVisualRouteId(fromLocation.pathname);
+	const to = resolveVisualRouteId(toLocation.pathname);
+	const sceneRelationship = isHeroRoute(from)
+		? isHeroRoute(to)
+			? "hero-to-hero"
+			: "hero-to-board"
+		: isHeroRoute(to)
+			? "board-to-hero"
+			: "board-to-board";
+	const pair = `${from}-to-${to}`;
+	return pair === sceneRelationship
+		? [
+				"arkini-route",
+				sceneRelationship,
+			]
+		: [
+				"arkini-route",
+				sceneRelationship,
+				pair,
+			];
 };

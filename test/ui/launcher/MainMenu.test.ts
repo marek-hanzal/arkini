@@ -143,15 +143,11 @@ describe("MainMenu", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
 				.viewTransitionName,
-		).toBe("");
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]')?.style
-				.viewTransitionName,
-		).toBe("arkini-route-panel");
+		).toBe("arkini-panel-main-menu");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPagePanelContent"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-route-content");
+		).toBe("");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,

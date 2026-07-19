@@ -1,8 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
-import { routePanelViewTransitionName } from "~/ui/navigation/routePanelViewTransitionName";
+import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
 
 const panelModeClassNames = {
 	compact: "max-h-full w-full max-w-sm",
@@ -44,31 +43,23 @@ export const MainPageLayout = ({
 		<section
 			aria-labelledby={labelledBy}
 			className={twMerge(
-				"relative min-h-0 min-w-0 overflow-hidden rounded-2xl text-foreground outline-none",
+				"relative min-h-0 min-w-0 overflow-hidden rounded-2xl border border-line bg-surface text-foreground shadow-2xl outline-none",
 				panelModeClassNames[panelMode],
 				panelClassName,
 			)}
 			data-page={page}
 			data-ui="MainPagePanel"
 			tabIndex={-1}
+			style={{
+				viewTransitionName: mainPagePanelViewTransitionName(page),
+			}}
 		>
-			<div
-				aria-hidden="true"
-				className="pointer-events-none absolute inset-0 rounded-2xl border border-line bg-surface shadow-2xl"
-				data-ui="MainPagePanelChrome"
-				style={{
-					viewTransitionName: routePanelViewTransitionName,
-				}}
-			/>
 			<div
 				className={twMerge(
 					"relative z-10 min-h-0 min-w-0",
 					panelContentModeClassNames[panelMode],
 				)}
 				data-ui="MainPagePanelContent"
-				style={{
-					viewTransitionName: routeContentViewTransitionName,
-				}}
 			>
 				{children}
 			</div>

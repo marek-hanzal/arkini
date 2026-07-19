@@ -207,7 +207,7 @@ The live boundary exposes:
 
 The supported UI flow never requests two package creations concurrently and never replaces a published engine in place. Such a state is a contract violation, not a scheduler workflow. Controlled close and HMR may happen while creation is pending, so both join the singleton Query promise. If bootstrap fails before publishing a resource, there is no live Game to save; if it succeeds, shutdown follows the ordinary final-save lifecycle. Query cleanup compares object identity before removal so stale disposal can never delete a newer singleton.
 
-`GameEngineResource` contains one `Game` and one private Effect semaphore. The semaphore serializes every destructive route-owned lifecycle action for that session:
+`GameEngineResource` contains one `Game`, one private Effect semaphore, and one private first-critical-failure guard. The semaphore serializes every destructive route-owned lifecycle action for that session:
 
 ```text
 leave / exit / HMR
@@ -222,7 +222,7 @@ reset
 → normal parent beforeLoad creates one fresh Game
 ```
 
-A failed final save leaves the same frozen resource cached. The action error page retries the identical disposal obligation; no replacement game may be published and no query may be removed until disposal succeeds. Reset relies on idempotent session disposal and exact save clearing so retry can continue safely without a second UI-owned phase machine.
+A failed ordinary leave or hard reset leaves the exact resource cached but marks it permanently unusable for the current renderer. The original failure is preserved, the root fatal boundary replaces the application UI, and every later game-route publication check throws that same fatal error. No Board remount, package switch, retry action, or in-process recovery is allowed. The lower-level `GameSession` disposal remains idempotent and may retain a frozen save obligation for controlled-close policy, but route ownership is fail-stop.
 
 The pathless launcher boundary detects an active cached resource and redirects launcher navigation through `/game/$packageId/action/leave`. A request for another package first routes through the current package's leave action, then enters the destination `/board`. React cleanup, provider unmount, and component effects are never desired-game signals.
 

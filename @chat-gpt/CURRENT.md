@@ -6,13 +6,13 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Reference route-transition baseline with detail-level polish**
 
-Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. Issues #296 and #297 remain for later product discussion.**
+Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. #297 is complete: critical leave/reset/ownership/HMR failures now end the renderer through one root fatal boundary and a failed resource can never publish Board again. #296 controlled-close retry/outcome semantics remains.**
 
 Current contract:
 
 - `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`.
 - `/game/$packageId` remains a non-visual resource/layout boundary. `/action/load-game/$packageId` owns creation, while leave/reset/exit actions remain named leaves over the inherited singleton resource.
-- TanStack Query owns only the identity and lifetime of one renderer-wide `GameEngineResource` under `["game-engine"]`. Controlled close and HMR join pending creation; exact-identity cleanup prevents stale disposal from removing another resource.
+- TanStack Query owns only the identity and lifetime of one renderer-wide `GameEngineResource` under `["game-engine"]`. Controlled close and HMR join pending creation; exact-identity cleanup prevents stale disposal from removing another resource. The resource stores only the first critical lifecycle failure as a private fail-stop guard, not a public state machine.
 - `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. No GameOwner provider, root loading overlay, hidden destination page, transition-name suppression mode, or nested local View Transition remains.
 - Every unequal visible route pair resolves to `arkini-route`, one broad scene relationship (`hero-to-hero`, `hero-to-board`, `board-to-hero`, or `board-to-board`), and one exact directional pair such as `main-menu-to-settings`. Unknown visible paths fail loudly.
 - Chromium's old/new `root` screenshots are fully invisible for Arkini route transitions. Named surfaces are the complete visible frame; the browser never cross-fades a second full application screenshot underneath them.
@@ -37,7 +37,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Discuss and implement #296 controlled-close retry/outcome semantics and #297 root fatal lifecycle failure semantics without changing the working route/View Transition architecture.
+> Discuss and implement #296 controlled-close retry/outcome semantics without changing the working route/View Transition architecture or the #297 fail-stop boundary.
 
 ## Source topology
 
@@ -222,16 +222,16 @@ Next action:
 ## Route-owned Game Engine lifecycle
 
 - `GameSession` remains the authoritative runtime/save lifecycle. A failed final save freezes the same session and a later disposal retries the exact obligation; resources release only after save success.
-- `GameEngineResource` is one cached `Game` plus one private lifecycle semaphore. The Query cache contains zero or one canonical `["game-engine"]` entry and is an identity registry, not a canonical gameplay store.
+- `GameEngineResource` is one cached `Game` plus one private lifecycle semaphore and one first-failure fail-stop guard. The Query cache contains zero or one canonical `["game-engine"]` entry and is an identity registry, not a canonical gameplay store.
 - `/action/load-game/$packageId` creates a new engine when the singleton query resource does not exist. `/game/$packageId` only reads and validates that published resource; navigating among `/board` and `/action/*` keeps the same object identity.
 - The parent route returns `gameEngine` and `gameEngineResource` through TanStack Router context. Its loader returns the same `Game`; React consumers use the named `useGameEngine()` hook over route loader data, while child action loaders consume inherited context directly.
-- Successful leave/exit removes the singleton query only after final disposal succeeds and only when it still contains the exact resource. Failed disposal keeps the resource cached and frozen so retry uses the same canonical snapshot.
-- HMR shutdown and controlled close join a pending singleton Query promise before deciding whether a Game exists. A newly created resource waits for any previous HMR shutdown promise before bootstrap so two sessions cannot overlap during module replacement.
+- Successful leave/exit removes the singleton query only after final disposal succeeds and only when it still contains the exact resource. Failed ordinary leave or reset marks the exact cached resource permanently unusable and throws to the root fatal boundary; no retry, package switch, recovery page, or Board republish is allowed in that renderer. The lower-level session may retain its exact frozen obligation, but route/UI ownership ends.
+- HMR shutdown and controlled close join a pending singleton Query promise before deciding whether a Game exists. A newly created resource waits for any previous HMR shutdown promise before bootstrap so two sessions cannot overlap during module replacement. Rejected HMR ownership is surfaced by the root route before any launcher/game UI renders.
 - Global or broad Query invalidation must never be used as a game lifecycle command. Creation and removal happen only through the named game resource operations.
 
 ## Action-page transition ownership
 
-- Every blocking lifecycle operation is a named leaf route with a loader, `pendingComponent`, and `errorComponent`. The UI presents Hero, label, and progress only; it never starts, sequences, or completes the domain action.
+- Every blocking lifecycle operation is a named leaf route with a loader and `pendingComponent`. Recoverable bootstrap/save-recovery actions may own a local `errorComponent`; critical leave/reset/ownership failures deliberately bubble to the one root fatal boundary.
 - `/action/load-game/$packageId` creates the engine before entering the `/game/$packageId` resource branch. This explicit action is required so both loader entry and action → Board completion receive native route transitions; a parent `pendingComponent` alone would not provide the second handoff.
 - Pending pages are ordinary Hero-bearing route surfaces, never overlays. The source page is replaced through the native router View Transition, so Board/MainMenu roots are not intentionally double-mounted.
 - GameMenu owns only local `closed | entering | open | exiting` state plus a short route-request lock. Settings/Main Menu/reset/exit requests navigate to their action destination; no provider-owned lifecycle, hidden close animation, or root loader remains.

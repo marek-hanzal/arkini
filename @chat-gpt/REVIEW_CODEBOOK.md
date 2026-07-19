@@ -357,7 +357,7 @@ request close
 → Electron closes the window
 ```
 
-Failure retains the same frozen cached game resource and exposes the route error page for retry. It does not navigate to `/main-menu` and does not pretend the final save succeeded.
+This controlled-close failure policy is owned by #296 and remains distinct from ordinary leave/reset. Ordinary critical lifecycle failure is fail-stop: it marks the cached resource unusable and renders the root fatal boundary with no in-process retry or Board return.
 
 Ordinary route release remains a separate lifecycle operation.
 

@@ -66,44 +66,43 @@ afterEach(() => {
 });
 
 describe("createArkiniRouter", () => {
-	it("opts into native transitions only for deliberate route pairs", () => {
+	it("assigns one explicit native transition family to every visible route pair", () => {
 		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
 		expect(resolveTypes("/", "/main-menu")).toEqual([
-			"startup-main-page",
+			"arkini-route",
+			"startup-to-launcher",
 		]);
 		expect(resolveTypes("/main-menu", "/settings")).toEqual([
-			"main-page",
-		]);
-		expect(resolveTypes("/settings", "/main-menu")).toEqual([
-			"main-page",
+			"arkini-route",
+			"launcher-to-launcher",
 		]);
 		expect(resolveTypes("/main-menu", "/arkpacks")).toEqual([
-			"main-page",
-			"main-page-arkpacks",
+			"arkini-route",
+			"launcher-to-launcher",
 		]);
-		expect(resolveTypes("/arkpacks", "/about")).toEqual([
-			"main-page",
-			"main-page-arkpacks",
-		]);
-		expect(resolveTypes("/main-menu", "/game/built-in/board")).toEqual([
-			"main-page-game",
-		]);
-		expect(resolveTypes("/game/built-in/board", "/settings")).toEqual([
-			"main-page-game",
-		]);
-		expect(resolveTypes("/game/built-in/board", "/main-menu")).toEqual([
-			"main-page-game",
+		expect(resolveTypes("/main-menu", "/action/load-game/built-in")).toEqual([
+			"arkini-route",
+			"launcher-to-action",
 		]);
 		expect(resolveTypes("/game/built-in/board", "/game/built-in/action/leave")).toEqual([
-			"main-page-game",
+			"arkini-route",
+			"board-to-action",
 		]);
-		expect(resolveTypes("/game/built-in/action/reset", "/game/built-in/board")).toEqual([
-			"main-page-game",
+		expect(resolveTypes("/game/built-in/action/reset", "/action/load-game/built-in")).toEqual([
+			"arkini-route",
+			"action-to-action",
 		]);
-		expect(resolveTypes("/game/built-in", "/action/recover-game-save")).toEqual([
-			"main-page-game",
+		expect(resolveTypes("/action/load-game/built-in", "/game/built-in/board")).toEqual([
+			"arkini-route",
+			"action-to-board",
 		]);
-		expect(resolveTypes("/game/built-in/board", "/dev/shell")).toBe(false);
+		expect(resolveTypes("/game/built-in/action/leave", "/settings")).toEqual([
+			"arkini-route",
+			"action-to-launcher",
+		]);
+		expect(() => resolveTypes("/game/built-in/board", "/dev/shell")).toThrow(
+			"Missing View Transition classification",
+		);
 	});
 
 	it("uses the typed TanStack policy only when the renderer supports transition types", () => {

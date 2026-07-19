@@ -60,16 +60,16 @@ describe("ActionLoadingScreen", () => {
 		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
 		expect(hero).not.toBeNull();
 		expect(hero?.style.aspectRatio).toBe("3345 / 1882");
-		expect(artwork?.getAttribute("role")).toBe("img");
-		expect(artwork?.getAttribute("aria-label")).toBe("Arkini");
-		expect(artwork?.style.backgroundImage).toContain("hero.png");
+		expect(artwork).toBeInstanceOf(HTMLImageElement);
+		expect(artwork?.getAttribute("alt")).toBe("Arkini");
+		expect(artwork?.getAttribute("src")).toContain("hero.png");
 		expect(hero?.style.viewTransitionName).toBe("");
-		expect(artwork?.style.viewTransitionName).toBe("");
+		expect(artwork?.style.viewTransitionName).toBe("arkini-launcher-hero-artwork");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreen"]')?.style
+			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreenPanel"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-route-scene");
+		).toBe("arkini-route-content");
 		expect(container.textContent).toContain("Loading test…");
 		expect(progressValue(container)).toBe(12);
 

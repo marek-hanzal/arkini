@@ -19,6 +19,7 @@ import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-m
 import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
 import { Route as LauncherAboutRouteImport } from "./@routes/_launcher/about"
 import { Route as GamePackageIdBoardRouteImport } from "./@routes/game/$packageId/board"
+import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/load-game/$packageId"
 import { Route as GamePackageIdActionResetRouteImport } from "./@routes/game/$packageId/action/reset"
 import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$packageId/action/leave"
 import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
@@ -72,6 +73,11 @@ const GamePackageIdBoardRoute = GamePackageIdBoardRouteImport.update({
   path: "/board",
   getParentRoute: () => GamePackageIdRoute,
 } as any)
+const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
+  id: "/action/load-game/$packageId",
+  path: "/action/load-game/$packageId",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamePackageIdActionResetRoute =
   GamePackageIdActionResetRouteImport.update({
     id: "/action/reset",
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   "/action/exit": typeof ActionExitRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
+  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   "/action/exit": typeof ActionExitRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
+  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   "/action/exit": typeof ActionExitRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
+  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | "/action/exit"
     | "/action/recover-game-save"
     | "/game/$packageId"
+    | "/action/load-game/$packageId"
     | "/game/$packageId/board"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | "/action/exit"
     | "/action/recover-game-save"
     | "/game/$packageId"
+    | "/action/load-game/$packageId"
     | "/game/$packageId/board"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | "/action/exit"
     | "/action/recover-game-save"
     | "/game/$packageId"
+    | "/action/load-game/$packageId"
     | "/game/$packageId/board"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
@@ -186,6 +198,7 @@ export interface RootRouteChildren {
   ActionExitRoute: typeof ActionExitRoute
   ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
+  ActionLoadGamePackageIdRoute: typeof ActionLoadGamePackageIdRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -260,6 +273,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GamePackageIdBoardRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
+    "/action/load-game/$packageId": {
+      id: "/action/load-game/$packageId"
+      path: "/action/load-game/$packageId"
+      fullPath: "/action/load-game/$packageId"
+      preLoaderRoute: typeof ActionLoadGamePackageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/game/$packageId/action/reset": {
       id: "/game/$packageId/action/reset"
       path: "/action/reset"
@@ -326,6 +346,7 @@ const rootRouteChildren: RootRouteChildren = {
   ActionExitRoute: ActionExitRoute,
   ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
+  ActionLoadGamePackageIdRoute: ActionLoadGamePackageIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

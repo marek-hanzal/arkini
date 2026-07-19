@@ -1,16 +1,24 @@
-const mainPagePathnames = new Set([
+const launcherPathnames = new Set([
 	"/about",
 	"/arkpacks",
 	"/main-menu",
 	"/settings",
 ]);
 
-const isGamePathname = (pathname: string) => pathname.startsWith("/game/");
-const isActionPathname = (pathname: string) => pathname.startsWith("/action/");
-const isGameFlowPathname = (pathname: string) =>
-	isGamePathname(pathname) || isActionPathname(pathname);
+type VisualRouteKind = "action" | "board" | "launcher" | "startup";
 
-/** Selects the deliberate native route transition family for one location change. */
+const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
+const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
+
+const resolveVisualRouteKind = (pathname: string): VisualRouteKind => {
+	if (pathname === "/") return "startup";
+	if (launcherPathnames.has(pathname)) return "launcher";
+	if (gameBoardPattern.test(pathname)) return "board";
+	if (pathname.startsWith("/action/") || gameActionPattern.test(pathname)) return "action";
+	throw new Error(`Missing View Transition classification for route: ${pathname}`);
+};
+
+/** Selects one exhaustive typed native transition for every visible Arkini route pair. */
 export const resolveRouteViewTransitionTypes = ({
 	fromLocation,
 	toLocation,
@@ -22,37 +30,11 @@ export const resolveRouteViewTransitionTypes = ({
 		readonly pathname: string;
 	};
 }) => {
-	if (fromLocation === undefined) return false;
-	const fromPathname = fromLocation.pathname;
-	const toPathname = toLocation.pathname;
-	const fromMainPage = mainPagePathnames.has(fromPathname);
-	const toMainPage = mainPagePathnames.has(toPathname);
-	const involvesArkpacks = fromPathname === "/arkpacks" || toPathname === "/arkpacks";
-
-	if (fromPathname === "/" && toMainPage) {
-		return [
-			"startup-main-page",
-		];
-	}
-	if (fromMainPage && toMainPage)
-		return [
-			"main-page",
-			...(involvesArkpacks
-				? [
-						"main-page-arkpacks",
-					]
-				: []),
-		];
-	const fromGameFlow = isGameFlowPathname(fromPathname);
-	const toGameFlow = isGameFlowPathname(toPathname);
-	if (
-		(fromMainPage && toGameFlow) ||
-		(fromGameFlow && toMainPage) ||
-		(fromGameFlow && toGameFlow)
-	) {
-		return [
-			"main-page-game",
-		];
-	}
-	return false;
+	if (fromLocation === undefined || fromLocation.pathname === toLocation.pathname) return false;
+	const fromKind = resolveVisualRouteKind(fromLocation.pathname);
+	const toKind = resolveVisualRouteKind(toLocation.pathname);
+	return [
+		"arkini-route",
+		`${fromKind}-to-${toKind}`,
+	];
 };

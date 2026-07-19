@@ -61,7 +61,7 @@ export const ArkpackSelector = () => {
 		try {
 			const arkpack = await importFile(file);
 			await navigate({
-				to: "/game/$packageId/board",
+				to: "/action/load-game/$packageId",
 				params: {
 					packageId: arkpack.packageId,
 				},
@@ -149,7 +149,7 @@ export const ArkpackSelector = () => {
 									</DangerButton>
 								) : null}
 								<PrimaryButtonLink
-									to="/game/$packageId/board"
+									to="/action/load-game/$packageId"
 									preload={false}
 									params={{
 										packageId: arkpack.packageId,

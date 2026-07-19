@@ -56,11 +56,11 @@ describe("About", () => {
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-route-scene");
+		).toBe("");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]')?.style
 				.viewTransitionName,
-		).toBe("arkini-main-page-panel");
+		).toBe("arkini-route-content");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="LauncherHero"]')?.style
 				.viewTransitionName,

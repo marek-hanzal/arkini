@@ -20,7 +20,7 @@ export const Route = createFileRoute("/action/recover-game-save")({
 			),
 		);
 		throw redirect({
-			to: "/game/$packageId/board",
+			to: "/action/load-game/$packageId",
 			params: {
 				packageId: deps.packageId,
 			},

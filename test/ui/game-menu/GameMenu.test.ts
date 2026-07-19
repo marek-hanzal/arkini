@@ -210,6 +210,12 @@ const renderMenu = async ({
 		path: "/action/reset",
 		component: () => createElement("div", null, "Reset action"),
 	});
+	const leaveRoute = createRoute({
+		getParentRoute: () => gameRoute,
+		path: "/action/leave",
+		validateSearch: (search: Record<string, unknown>) => search,
+		component: () => createElement("div", null, "Leave action"),
+	});
 	const settingsRoute = createRoute({
 		getParentRoute: () => rootRoute,
 		path: "/settings",
@@ -225,6 +231,7 @@ const renderMenu = async ({
 			gameRoute.addChildren([
 				boardRoute,
 				resetRoute,
+				leaveRoute,
 			]),
 			settingsRoute,
 			mainMenuRoute,
@@ -339,7 +346,10 @@ describe("GameMenu", () => {
 		viewTransitionStartPhases.splice(0);
 
 		await act(async () => buttonByText(container, "Settings").click());
-		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));
+		await vi.waitFor(() => expect(router.state.location.pathname).toContain("/action/leave"));
+		expect(router.state.location.search).toEqual({
+			destination: "settings",
+		});
 		expect(viewTransitionStartPhases).toEqual([
 			"open",
 		]);

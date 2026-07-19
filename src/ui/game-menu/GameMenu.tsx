@@ -13,7 +13,8 @@ import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
-import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
+import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
+import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
 
 const focusableSelector = [
 	"button:not([disabled])",
@@ -230,12 +231,18 @@ const GameMenuDialog = ({
 		}
 	};
 
-	const requestRoute = (destination: "/settings" | "/main-menu") => {
+	const requestRoute = (destination: "settings" | "main-menu") => {
 		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = destination === "/settings" ? "settings" : "main-menu";
+		activeRequestRef.current = destination;
 		setNavigationError(undefined);
 		const request = navigate({
-			to: destination,
+			to: "/game/$packageId/action/leave",
+			params: {
+				packageId: game.arkpack.packageId,
+			},
+			search: {
+				destination,
+			},
 		});
 		void request.catch(setNavigationError).finally(() => {
 			activeRequestRef.current = null;
@@ -243,8 +250,8 @@ const GameMenuDialog = ({
 		});
 	};
 
-	const requestSettings = () => requestRoute("/settings");
-	const requestMainMenu = () => requestRoute("/main-menu");
+	const requestSettings = () => requestRoute("settings");
+	const requestMainMenu = () => requestRoute("main-menu");
 
 	const requestSave = () => {
 		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
@@ -302,16 +309,17 @@ const GameMenuDialog = ({
 	return (
 		<div
 			ref={backdropRef}
-			className="absolute inset-0 z-50 grid place-items-center overflow-hidden bg-overlay/90 p-[var(--ak-viewport-padding)] text-overlay-foreground backdrop-blur-sm"
+			className="absolute inset-0 z-50 grid place-items-center overflow-hidden bg-overlay/95 p-[var(--ak-viewport-padding)] text-overlay-foreground"
 			data-ui="GameMenuBackdrop"
 			data-phase={phase}
-			style={
-				phase === "entering"
+			style={{
+				viewTransitionName: gameMenuBackdropViewTransitionName,
+				...(phase === "entering"
 					? {
 							opacity: 0,
 						}
-					: undefined
-			}
+					: {}),
+			}}
 		>
 			<div
 				ref={dialogRef}
@@ -322,7 +330,7 @@ const GameMenuDialog = ({
 				data-ui="GameMenu"
 				tabIndex={-1}
 				style={{
-					viewTransitionName: mainPagePanelViewTransitionName,
+					viewTransitionName: routeContentViewTransitionName,
 					...(phase === "entering"
 						? {
 								opacity: 0,

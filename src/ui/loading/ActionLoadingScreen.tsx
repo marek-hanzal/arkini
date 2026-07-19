@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
+import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
 
 export const defaultLoadingMinimumDurationMs = 2_500;
 
@@ -62,11 +62,13 @@ export const ActionLoadingScreen = ({ label }: { readonly label: string }) => {
 			compactHero
 			dataUi="ActionLoadingScreen"
 			layout="fixed-hero"
-			viewTransitionName={routeSceneViewTransitionName}
 		>
 			<div
-				className="flex w-[min(80cqw,56rem)] max-w-full flex-col items-center gap-[var(--ak-viewport-gap)]"
+				className="flex w-[min(80cqw,56rem)] max-w-full flex-col items-center gap-[var(--ak-viewport-gap)] rounded-2xl border border-line bg-surface p-[var(--ak-panel-padding)] shadow-2xl"
 				data-ui="ActionLoadingScreenPanel"
+				style={{
+					viewTransitionName: routeContentViewTransitionName,
+				}}
 			>
 				<div className="flex w-full flex-col items-center gap-3">
 					<div

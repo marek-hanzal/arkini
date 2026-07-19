@@ -5,7 +5,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
-import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
+import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
 
 const blackHoldMs = 500;
 const minimumSplashMs = 5_000;
@@ -117,7 +117,7 @@ export const StartupSplash = () => {
 				className="grid size-full place-items-center bg-black p-6 text-white"
 				data-ui="StartupFailure"
 			>
-				<div className="grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 text-center text-foreground shadow-xl backdrop-blur-md">
+				<div className="grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface p-4 text-center text-foreground shadow-xl">
 					<p className="font-semibold text-danger">Startup failed</p>
 					<p>{messageFromError(state.error)}</p>
 					<PrimaryButton
@@ -132,18 +132,19 @@ export const StartupSplash = () => {
 	}
 
 	return (
-		<LauncherScene
-			dataUi="StartupSplash"
-			viewTransitionName={routeSceneViewTransitionName}
-		>
+		<LauncherScene dataUi="StartupSplash">
 			<div
 				className="min-h-14 text-center text-sm text-muted"
 				aria-live="polite"
+				data-ui="StartupSplashContent"
+				style={{
+					viewTransitionName: routeContentViewTransitionName,
+				}}
 			>
 				{state.type === "loading" ? (
 					<p>Preparing Arkini…</p>
 				) : state.type === "failed" ? (
-					<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
+					<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface p-4 shadow-xl">
 						<p className="font-semibold text-danger">Startup failed</p>
 						<p>{messageFromError(state.error)}</p>
 						<PrimaryButton
@@ -154,7 +155,7 @@ export const StartupSplash = () => {
 						</PrimaryButton>
 					</div>
 				) : !minimumSplashComplete ? (
-					<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
+					<p className="text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
 						Press Esc to continue
 					</p>
 				) : null}

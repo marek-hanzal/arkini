@@ -40,7 +40,7 @@ const renderLayout = async (props: Omit<MainPageLayout.Props, "children">) => {
 };
 
 describe("MainPageLayout", () => {
-	it("keeps Hero and content in stable main-page slots without a nested Hero snapshot", async () => {
+	it("keeps Hero and content in stable main-page slots with independent Hero and content snapshots", async () => {
 		const container = await renderLayout({
 			page: "settings",
 		});
@@ -57,14 +57,17 @@ describe("MainPageLayout", () => {
 		expect(hero?.parentElement).toBe(heroSlot);
 		expect(panel?.parentElement).toBe(contentSlot);
 		expect(hero?.style.viewTransitionName).toBe("");
-		expect(panel?.style.viewTransitionName).toBe("arkini-main-page-panel");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
+				.viewTransitionName,
+		).toBe("arkini-launcher-hero-artwork");
+		expect(panel?.style.viewTransitionName).toBe("arkini-route-content");
 	});
 
-	it("keeps the same outer slots for the viewport catalog without morphing its panel", async () => {
+	it("keeps the same outer slots and one explicit content surface for the viewport catalog", async () => {
 		const container = await renderLayout({
 			page: "arkpacks",
 			panelMode: "viewport",
-			transitionPanel: false,
 		});
 		const layout = container.querySelector<HTMLElement>('[data-ui="LauncherSceneLayout"]');
 		const heroSlot = container.querySelector<HTMLElement>('[data-ui="LauncherSceneHeroSlot"]');
@@ -79,6 +82,6 @@ describe("MainPageLayout", () => {
 		expect(panel?.parentElement).toBe(contentSlot);
 		expect(panel?.className).toContain("size-full");
 		expect(panel?.className).not.toContain("85dvw");
-		expect(panel?.style.viewTransitionName).toBe("");
+		expect(panel?.style.viewTransitionName).toBe("arkini-route-content");
 	});
 });

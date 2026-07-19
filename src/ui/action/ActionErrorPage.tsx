@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
+import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -30,9 +30,14 @@ export const ActionErrorPage = ({
 		compactHero
 		dataUi="ActionErrorPage"
 		layout="fixed-hero"
-		viewTransitionName={routeSceneViewTransitionName}
 	>
-		<section className="grid max-w-lg gap-4 rounded-2xl border border-danger/35 bg-surface/90 p-[var(--ak-panel-padding)] text-center shadow-2xl backdrop-blur-xl">
+		<section
+			className="grid max-w-lg gap-4 rounded-2xl border border-danger/35 bg-surface p-[var(--ak-panel-padding)] text-center shadow-2xl"
+			data-ui="ActionErrorPanel"
+			style={{
+				viewTransitionName: routeContentViewTransitionName,
+			}}
+		>
 			<h1 className="text-lg font-semibold text-danger">{title}</h1>
 			<p className="text-sm text-muted">{description}</p>
 			<p className="text-xs text-danger">{errorMessage(error)}</p>

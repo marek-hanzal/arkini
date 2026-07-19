@@ -7,7 +7,6 @@ export function ArkpackSelectorPage() {
 			labelledBy="arkpack-selector-title"
 			page="arkpacks"
 			panelMode="viewport"
-			transitionPanel={false}
 		>
 			<ArkpackSelector />
 		</MainPageLayout>

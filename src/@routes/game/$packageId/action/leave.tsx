@@ -31,7 +31,7 @@ const redirectToDestination = (destination: GameLeaveDestinationSchema.Type): ne
 			});
 		case "game":
 			throw redirect({
-				to: "/game/$packageId/board",
+				to: "/action/load-game/$packageId",
 				params: {
 					packageId: destination.packageId,
 				},

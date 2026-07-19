@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
+import { launcherBackdropViewTransitionName } from "~/ui/navigation/launcherBackdropViewTransitionName";
 
 const layoutClassNames = {
 	centered:
@@ -26,33 +27,28 @@ export namespace LauncherScene {
 		readonly compactHero?: boolean;
 		readonly dataUi: string;
 		readonly layout?: Layout;
-		readonly viewTransitionName?: string;
 	}
 }
 
-/** Shared theme-aware Hero composition for out-of-game launcher destinations. */
+/** Shared launcher/action composition with independently animated visual primitives. */
 export const LauncherScene = ({
 	children,
 	className,
 	compactHero = false,
 	dataUi,
 	layout = "centered",
-	viewTransitionName,
 }: LauncherScene.Props) => (
 	<main
 		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${className === undefined ? "" : ` ${className}`}`}
 		data-ui={dataUi}
-		style={{
-			viewTransitionName,
-		}}
 	>
 		<div
-			className="launcher-scene__glow absolute inset-0"
+			className="launcher-scene__backdrop absolute inset-0"
 			aria-hidden="true"
-		/>
-		<div
-			className="launcher-scene__veil absolute inset-0"
-			aria-hidden="true"
+			data-ui="LauncherSceneBackdrop"
+			style={{
+				viewTransitionName: launcherBackdropViewTransitionName,
+			}}
 		/>
 		<div
 			className={`relative z-10 overflow-hidden p-[var(--ak-viewport-padding)] ${layoutClassNames[layout]}`}

@@ -17,7 +17,7 @@ export const Route = createFileRoute("/game/$packageId/action/reset")({
 			),
 		);
 		throw redirect({
-			to: "/game/$packageId/board",
+			to: "/action/load-game/$packageId",
 			params,
 			replace: true,
 		});

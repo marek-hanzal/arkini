@@ -51,6 +51,10 @@ describe("MainPageLayout", () => {
 		);
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
+		const panelChrome = container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]');
+		const panelContent = container.querySelector<HTMLElement>(
+			'[data-ui="MainPagePanelContent"]',
+		);
 
 		expect(layout?.dataset.layout).toBe("fixed-hero");
 		expect(layout?.style.gridTemplateRows).toBe("");
@@ -61,7 +65,9 @@ describe("MainPageLayout", () => {
 			container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]')?.style
 				.viewTransitionName,
 		).toBe("arkini-launcher-hero-artwork");
-		expect(panel?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(panel?.style.viewTransitionName).toBe("");
+		expect(panelChrome?.style.viewTransitionName).toBe("arkini-route-panel");
+		expect(panelContent?.style.viewTransitionName).toBe("arkini-route-content");
 	});
 
 	it("keeps the same outer slots and one explicit content surface for the viewport catalog", async () => {
@@ -76,12 +82,18 @@ describe("MainPageLayout", () => {
 		);
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
+		const panelChrome = container.querySelector<HTMLElement>('[data-ui="MainPagePanelChrome"]');
+		const panelContent = container.querySelector<HTMLElement>(
+			'[data-ui="MainPagePanelContent"]',
+		);
 
 		expect(layout?.dataset.layout).toBe("fixed-hero");
 		expect(hero?.parentElement).toBe(heroSlot);
 		expect(panel?.parentElement).toBe(contentSlot);
 		expect(panel?.className).toContain("size-full");
 		expect(panel?.className).not.toContain("85dvw");
-		expect(panel?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(panel?.style.viewTransitionName).toBe("");
+		expect(panelChrome?.style.viewTransitionName).toBe("arkini-route-panel");
+		expect(panelContent?.style.viewTransitionName).toBe("arkini-route-content");
 	});
 });

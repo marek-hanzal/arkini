@@ -2,11 +2,18 @@ import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
+import { routePanelViewTransitionName } from "~/ui/navigation/routePanelViewTransitionName";
 
 const panelModeClassNames = {
-	compact: "max-h-full w-full max-w-sm overflow-y-auto p-[var(--ak-panel-padding)]",
-	responsive: "max-h-full w-full max-w-xl overflow-y-auto p-[var(--ak-panel-padding)]",
-	viewport: "size-full max-w-5xl overflow-hidden p-[var(--ak-panel-padding)]",
+	compact: "max-h-full w-full max-w-sm",
+	responsive: "max-h-full w-full max-w-xl",
+	viewport: "size-full max-w-5xl",
+} as const;
+
+const panelContentModeClassNames = {
+	compact: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+	responsive: "max-h-full overflow-y-auto p-[var(--ak-panel-padding)]",
+	viewport: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
 } as const;
 
 export namespace MainPageLayout {
@@ -37,18 +44,34 @@ export const MainPageLayout = ({
 		<section
 			aria-labelledby={labelledBy}
 			className={twMerge(
-				"min-h-0 min-w-0 rounded-2xl border border-line bg-surface text-foreground shadow-2xl outline-none",
+				"relative min-h-0 min-w-0 overflow-hidden rounded-2xl text-foreground outline-none",
 				panelModeClassNames[panelMode],
 				panelClassName,
 			)}
 			data-page={page}
 			data-ui="MainPagePanel"
 			tabIndex={-1}
-			style={{
-				viewTransitionName: routeContentViewTransitionName,
-			}}
 		>
-			{children}
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-0 rounded-2xl border border-line bg-surface shadow-2xl"
+				data-ui="MainPagePanelChrome"
+				style={{
+					viewTransitionName: routePanelViewTransitionName,
+				}}
+			/>
+			<div
+				className={twMerge(
+					"relative z-10 min-h-0 min-w-0",
+					panelContentModeClassNames[panelMode],
+				)}
+				data-ui="MainPagePanelContent"
+				style={{
+					viewTransitionName: routeContentViewTransitionName,
+				}}
+			>
+				{children}
+			</div>
 		</section>
 	</LauncherScene>
 );

@@ -22,9 +22,13 @@ describe("View Transition styles", () => {
 		expect(styles).not.toContain("plus-lighter");
 	});
 
-	it("gives startup copy its own surface instead of morphing into launcher content", () => {
+	it("keeps panel chrome, page content, and action progress on separate surfaces", () => {
 		expect(styles).toContain("::view-transition-old(arkini-startup-content)");
-		expect(styles).toContain("::view-transition-new(arkini-startup-content)");
+		expect(styles).toContain("::view-transition-old(arkini-route-panel)");
 		expect(styles).toContain("::view-transition-old(arkini-route-content)");
+		expect(styles).toContain("::view-transition-old(arkini-action-progress)");
+		expect(styles).toContain(
+			":root:active-view-transition-type(launcher-to-launcher)::view-transition-old(",
+		);
 	});
 });

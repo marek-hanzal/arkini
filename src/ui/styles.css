@@ -356,7 +356,9 @@ select {
 ::view-transition-group(arkini-launcher-backdrop),
 ::view-transition-group(arkini-launcher-hero-shadow),
 ::view-transition-group(arkini-launcher-hero-artwork),
+::view-transition-group(arkini-route-panel),
 ::view-transition-group(arkini-route-content),
+::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board),
 ::view-transition-group(arkini-game-menu-backdrop) {
@@ -382,7 +384,13 @@ select {
 	overflow: visible;
 }
 
+::view-transition-group(arkini-route-panel) {
+	z-index: 25;
+	overflow: visible;
+}
+
 ::view-transition-group(arkini-route-content),
+::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board) {
 	z-index: 30;
@@ -394,8 +402,12 @@ select {
 ::view-transition-new(arkini-launcher-hero-shadow),
 ::view-transition-old(arkini-launcher-hero-artwork),
 ::view-transition-new(arkini-launcher-hero-artwork),
+::view-transition-old(arkini-route-panel),
+::view-transition-new(arkini-route-panel),
 ::view-transition-old(arkini-route-content),
 ::view-transition-new(arkini-route-content),
+::view-transition-old(arkini-action-progress),
+::view-transition-new(arkini-action-progress),
 ::view-transition-old(arkini-startup-content),
 ::view-transition-new(arkini-startup-content),
 ::view-transition-old(arkini-game-board),
@@ -558,6 +570,17 @@ select {
 	animation-duration: 900ms;
 }
 
+/* Launcher panel chrome is one shared raster; page content transitions independently. */
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-old(arkini-route-panel) {
+	animation: none;
+	opacity: 1;
+}
+
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-new(arkini-route-panel) {
+	animation: none;
+	opacity: 0;
+}
+
 /* Hero-bearing page leaving for Board. */
 :root:active-view-transition-type(startup-to-board)::view-transition-old(arkini-launcher-backdrop),
 :root:active-view-transition-type(launcher-to-board)::view-transition-old(arkini-launcher-backdrop),
@@ -620,6 +643,22 @@ select {
 
 ::view-transition-new(arkini-startup-content) {
 	animation: arkini-vt-fade-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-route-panel) {
+	animation: arkini-vt-content-out 320ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-route-panel) {
+	animation: arkini-vt-content-in 480ms 60ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-action-progress) {
+	animation: arkini-vt-content-out 280ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-action-progress) {
+	animation: arkini-vt-content-in 440ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-old(arkini-route-content) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
+import { actionProgressViewTransitionName } from "~/ui/navigation/actionProgressViewTransitionName";
 
 export const defaultLoadingMinimumDurationMs = 2_500;
 
@@ -78,7 +78,7 @@ export const ActionLoadingScreen = ({
 				className="flex w-[min(80cqw,28rem)] max-w-full flex-col items-center gap-3"
 				data-ui="ActionLoadingScreenContent"
 				style={{
-					viewTransitionName: routeContentViewTransitionName,
+					viewTransitionName: actionProgressViewTransitionName,
 				}}
 			>
 				<div

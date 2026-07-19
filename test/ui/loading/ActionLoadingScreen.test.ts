@@ -82,7 +82,7 @@ describe("ActionLoadingScreen", () => {
 		const content = container.querySelector<HTMLElement>(
 			'[data-ui="ActionLoadingScreenContent"]',
 		);
-		expect(content?.style.viewTransitionName).toBe("arkini-route-content");
+		expect(content?.style.viewTransitionName).toBe("arkini-action-progress");
 		expect(content?.className).not.toContain("rounded-2xl");
 		expect(content?.className).not.toContain("bg-surface");
 		expect(content?.className).not.toContain("shadow-2xl");

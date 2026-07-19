@@ -227,3 +227,7 @@ Next action:
 - GameMenu route requests are accepted only from the fully open phase. One provider-owned `routePending` lock keeps the open menu snapshot visible and blocks Escape, Return, mutations, and competing route requests until navigation settles.
 - Controlled close has one visible owner: the root action loader. GameMenu does not run a hidden close animation beneath it. Title-bar close activates the same loader, and close failure removes it before authoritative shutdown failure UI is revealed.
 
+## Blocking flow focus and route exits
+
+- The root action loader is a real modal boundary: covered route content is inert and aria-hidden, the overlay owns focus for its visible lifetime, success focuses the settled route surface, and failure restores the still-connected source focus.
+- Settings, About, and Arkpacks each own one synchronous route-exit guard. Rapid Back/Escape cannot request multiple history or native transitions, and a rejected navigation unlocks the same source page.

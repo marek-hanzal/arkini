@@ -1,31 +1,51 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
-import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
+import { DangerButton, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 
 /** Selects a bundled or locally imported game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
 	const { state, importFile, remove } = useArkpacks();
 	const navigate = useNavigate();
 	const inputRef = useRef<HTMLInputElement>(null);
+	const mountedRef = useRef(false);
+	const exitPendingRef = useRef(false);
 	const [busy, setBusy] = useState(false);
+	const [exitPending, setExitPending] = useState(false);
 	const [actionError, setActionError] = useState<unknown>();
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape" || busy) return;
-			event.preventDefault();
-			void navigate({
-				to: "/main-menu",
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
+
+	const requestMainMenu = useCallback(() => {
+		if (busy || exitPendingRef.current) return;
+		exitPendingRef.current = true;
+		setExitPending(true);
+		setActionError(undefined);
+		void navigate({ to: "/main-menu" })
+			.catch((error) => {
+				if (mountedRef.current) setActionError(error);
+			})
+			.finally(() => {
+				exitPendingRef.current = false;
+				if (mountedRef.current) setExitPending(false);
 			});
+	}, [busy, navigate]);
+
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key !== "Escape") return;
+			event.preventDefault();
+			requestMainMenu();
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [
-		busy,
-		navigate,
-	]);
+	}, [requestMainMenu]);
 
 	const upload = async (file: File | undefined) => {
 		if (file === undefined) return;
@@ -74,7 +94,7 @@ export const ArkpackSelector = () => {
 					type="file"
 					accept=".arkpack,application/octet-stream"
 					className="block w-full text-sm text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
-					disabled={busy}
+					disabled={busy || exitPending}
 					onChange={(event) => void upload(event.currentTarget.files?.[0])}
 				/>
 				{busy ? <p className="mt-3 text-sm text-accent">Validating package…</p> : null}
@@ -137,7 +157,9 @@ export const ArkpackSelector = () => {
 			</section>
 
 			<footer className="flex justify-center pb-[env(safe-area-inset-bottom)]">
-				<PrimaryButtonLink to="/main-menu">Return to main menu</PrimaryButtonLink>
+				<PrimaryButton disabled={busy || exitPending} onClick={requestMainMenu}>
+					{exitPending ? "Returning…" : "Return to main menu"}
+				</PrimaryButton>
 			</footer>
 		</div>
 	);

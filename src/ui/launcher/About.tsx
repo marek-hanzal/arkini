@@ -1,33 +1,54 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { PrimaryButtonLink } from "~/ui/button/Button";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-/** Renders concise project and authorship credits for the normalized About page. */
+import { PrimaryButton } from "~/ui/button/Button";
+
+const errorMessage = (error: unknown) =>
+	error instanceof Error ? error.message : String(error);
+
+/** Renders project and authorship credits for the normalized About page. */
 export const About = () => {
 	const navigate = useNavigate();
+	const mountedRef = useRef(false);
+	const exitPendingRef = useRef(false);
+	const [exitPending, setExitPending] = useState(false);
+	const [navigationError, setNavigationError] = useState<unknown>();
+
+	useEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
+
+	const requestMainMenu = useCallback(() => {
+		if (exitPendingRef.current) return;
+		exitPendingRef.current = true;
+		setExitPending(true);
+		setNavigationError(undefined);
+		void navigate({ to: "/main-menu" })
+			.catch((error) => {
+				if (mountedRef.current) setNavigationError(error);
+			})
+			.finally(() => {
+				exitPendingRef.current = false;
+				if (mountedRef.current) setExitPending(false);
+			});
+	}, [navigate]);
+
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "Escape") return;
 			event.preventDefault();
-			void navigate({
-				to: "/main-menu",
-			});
+			requestMainMenu();
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [
-		navigate,
-	]);
+	}, [requestMainMenu]);
 
 	return (
-		<div
-			className="grid gap-4 text-center"
-			data-ui="About"
-		>
-			<h1
-				id="about-title"
-				className="text-2xl font-semibold"
-			>
+		<div className="grid gap-4 text-center" data-ui="About">
+			<h1 id="about-title" className="text-2xl font-semibold">
 				About Arkini
 			</h1>
 			<p className="leading-7 text-muted">
@@ -35,12 +56,14 @@ export const About = () => {
 				and shaping a living board-sized world.
 			</p>
 			<p className="text-sm text-subtle">Created by Marek Hanzal with ChatGPT / OpenAI.</p>
-			<PrimaryButtonLink
-				to="/main-menu"
-				className="mx-auto"
-			>
-				Return to main menu
-			</PrimaryButtonLink>
+			{navigationError === undefined ? null : (
+				<p className="text-sm text-danger">
+					Navigation failed: {errorMessage(navigationError)}
+				</p>
+			)}
+			<PrimaryButton className="mx-auto" disabled={exitPending} onClick={requestMainMenu}>
+				{exitPending ? "Returning…" : "Return to main menu"}
+			</PrimaryButton>
 		</div>
 	);
 };

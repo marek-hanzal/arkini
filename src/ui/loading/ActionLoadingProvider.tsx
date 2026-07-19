@@ -1,4 +1,12 @@
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type PropsWithChildren,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { flushSync } from "react-dom";
 import type { ActionLoadingControl } from "~/ui/loading/ActionLoadingControl";
 import { ActionLoadingContext } from "~/ui/loading/ActionLoadingContext";
@@ -70,10 +78,16 @@ export const ActionLoadingProvider = ({
 	const activeRef = useRef<ActiveAction | null>(null);
 	const generationRef = useRef(0);
 	const mountedRef = useRef(false);
+	const overlayRef = useRef<HTMLDivElement>(null);
+	const previousFocusRef = useRef<HTMLElement | null>(null);
 	activeRef.current = active;
 
 	const replaceActive = useCallback((entry: ActiveAction) => {
 		const previous = activeRef.current;
+		if (previous === null) {
+			previousFocusRef.current =
+				document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		}
 		if (previous !== null && previous !== entry) {
 			void previous.action.then(previous.result.resolve, previous.result.reject);
 			previous.presentation.resolve();
@@ -82,26 +96,45 @@ export const ActionLoadingProvider = ({
 		setActive(entry);
 	}, []);
 
-	const hide = useCallback(async (entry: ActiveAction) => {
-		if (activeRef.current?.generation !== entry.generation) return;
-		await waitForActiveNativeViewTransitions();
-		if (activeRef.current?.generation !== entry.generation) return;
-		const commit = () => {
-			if (activeRef.current?.generation !== entry.generation) return;
-			activeRef.current = null;
-			flushSync(() => setActive(null));
-		};
-		if (typeof document.startViewTransition !== "function") {
-			commit();
+	const focusSettledSurface = useCallback((restoreSource: boolean) => {
+		const previous = previousFocusRef.current;
+		previousFocusRef.current = null;
+		if (restoreSource && previous?.isConnected === true) {
+			previous.focus({ preventScroll: true });
 			return;
 		}
-		try {
-			const transition = document.startViewTransition(commit);
-			await transition.finished.catch(() => undefined);
-		} catch {
-			commit();
-		}
+		document
+			.querySelector<HTMLElement>(
+				'[data-ui="MainPagePanel"], [data-ui="GameShell"], [data-ui="MainPageLayout"], main',
+			)
+			?.focus({ preventScroll: true });
 	}, []);
+
+	const hide = useCallback(
+		async (entry: ActiveAction, restoreSource: boolean) => {
+			if (activeRef.current?.generation !== entry.generation) return;
+			await waitForActiveNativeViewTransitions();
+			if (activeRef.current?.generation !== entry.generation) return;
+			const commit = () => {
+				if (activeRef.current?.generation !== entry.generation) return;
+				activeRef.current = null;
+				flushSync(() => setActive(null));
+			};
+			if (typeof document.startViewTransition !== "function") {
+				commit();
+				focusSettledSurface(restoreSource);
+				return;
+			}
+			try {
+				const transition = document.startViewTransition(commit);
+				await transition.finished.catch(() => undefined);
+			} catch {
+				commit();
+			}
+			focusSettledSurface(restoreSource);
+		},
+		[focusSettledSurface],
+	);
 
 	const createEntry = useCallback(
 		({
@@ -210,6 +243,11 @@ export const ActionLoadingProvider = ({
 		return removeCloseFailed;
 	}, []);
 
+	useLayoutEffect(() => {
+		if (active === null) return;
+		overlayRef.current?.focus({ preventScroll: true });
+	}, [active]);
+
 	useEffect(() => {
 		if (active === null) return;
 		const blockInput = (event: KeyboardEvent) => {
@@ -240,7 +278,7 @@ export const ActionLoadingProvider = ({
 				entry.presentation.resolve();
 				return;
 			}
-			void hide(entry).then(() => {
+			void hide(entry, false).then(() => {
 				entry.presentation.resolve();
 				entry.result.resolve();
 			});
@@ -254,7 +292,7 @@ export const ActionLoadingProvider = ({
 				entry.result.reject(error);
 				return;
 			}
-			void hide(entry).then(() => {
+			void hide(entry, true).then(() => {
 				entry.presentation.resolve();
 				entry.result.reject(error);
 			});
@@ -273,11 +311,22 @@ export const ActionLoadingProvider = ({
 				className="contents"
 				data-action-loading-active={active === null ? undefined : "true"}
 			>
-				{children}
+				<div
+					aria-hidden={active === null ? undefined : true}
+					className="contents"
+					data-ui="ActionLoadingContent"
+					inert={active === null ? undefined : true}
+				>
+					{children}
+				</div>
 				{active === null ? null : (
 					<div
-						className="fixed inset-0 z-[100] size-full overflow-hidden"
+						ref={overlayRef}
+						aria-label={active.label}
+						className="fixed inset-0 z-[100] size-full overflow-hidden outline-none"
 						data-ui="ActionLoadingOverlay"
+						role="status"
+						tabIndex={-1}
 					>
 						<ActionLoadingScreen
 							action={active.action}

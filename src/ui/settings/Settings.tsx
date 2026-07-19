@@ -24,18 +24,24 @@ const ThemeOptions: ReadonlyArray<{
 
 export namespace Settings {
 	export interface Props {
+		readonly exitPending?: boolean;
+		readonly navigationError?: unknown;
 		readonly onBack: () => void;
 	}
 }
 
 /** Renders the reusable authoritative application settings content. */
-export const Settings = ({ onBack }: Settings.Props) => {
+export const Settings = ({
+	exitPending = false,
+	navigationError,
+	onBack,
+}: Settings.Props) => {
 	const appearance = useAppearance();
 	const setTheme = useSetAppearanceThemeMutation();
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape" || setTheme.isPending) return;
+			if (event.key !== "Escape" || setTheme.isPending || exitPending) return;
 			event.preventDefault();
 			onBack();
 		};
@@ -43,6 +49,7 @@ export const Settings = ({ onBack }: Settings.Props) => {
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [
 		onBack,
+		exitPending,
 		setTheme.isPending,
 	]);
 
@@ -108,7 +115,9 @@ export const Settings = ({ onBack }: Settings.Props) => {
 				aria-live="polite"
 				data-ui="SettingsStatus"
 			>
-				{setTheme.isPending ? (
+				{navigationError !== undefined ? (
+					<p className="text-danger">Navigation failed: {String(navigationError)}</p>
+				) : setTheme.isPending ? (
 					<p className="text-accent">Saving theme…</p>
 				) : setTheme.isError ? (
 					<p className="text-danger">Theme update failed: {String(setTheme.error)}</p>
@@ -119,10 +128,10 @@ export const Settings = ({ onBack }: Settings.Props) => {
 
 			<PrimaryButton
 				className="mx-auto"
-				disabled={setTheme.isPending}
+				disabled={setTheme.isPending || exitPending}
 				onClick={onBack}
 			>
-				Back
+				{exitPending ? "Returning…" : "Back"}
 			</PrimaryButton>
 		</section>
 	);

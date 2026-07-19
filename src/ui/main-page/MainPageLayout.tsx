@@ -47,6 +47,7 @@ export const MainPageLayout = ({
 			)}
 			data-page={page}
 			data-ui="MainPagePanel"
+			tabIndex={-1}
 			style={
 				transitionPanel
 					? {

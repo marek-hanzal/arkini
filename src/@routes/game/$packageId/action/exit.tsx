@@ -20,7 +20,12 @@ export const Route = createFileRoute("/game/$packageId/action/exit")({
 	pendingMs: 0,
 	pendingMinMs: 2_500,
 	pendingComponent: () => <ActionPendingPage label="Saving and exiting Arkini…" />,
-	component: () => <ActionPendingPage label="Saving and exiting Arkini…" />,
+	component: () => (
+		<ActionPendingPage
+			completed
+			label="Saving and exiting Arkini…"
+		/>
+	),
 	errorComponent: (props) => (
 		<ActionErrorPage
 			{...props}

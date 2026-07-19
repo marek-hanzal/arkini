@@ -16,7 +16,7 @@ import {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const renderScreen = async () => {
+const renderScreen = async (completed = false) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -24,11 +24,24 @@ const renderScreen = async () => {
 	await act(async () => {
 		root.render(
 			createElement(ActionLoadingScreen, {
+				completed,
 				label: "Loading test…",
 			}),
 		);
 	});
-	return container;
+	return {
+		container,
+		render: async (nextCompleted: boolean) => {
+			await act(async () => {
+				root.render(
+					createElement(ActionLoadingScreen, {
+						completed: nextCompleted,
+						label: "Loading test…",
+					}),
+				);
+			});
+		},
+	};
 };
 
 const progressValue = (container: ParentNode) =>
@@ -55,7 +68,7 @@ afterEach(async () => {
 
 describe("ActionLoadingScreen", () => {
 	it("renders one native route surface and advances without claiming completion", async () => {
-		const container = await renderScreen();
+		const { container } = await renderScreen();
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
 		expect(hero).not.toBeNull();
@@ -80,11 +93,24 @@ describe("ActionLoadingScreen", () => {
 		expect(progressValue(container)).toBe(94);
 	});
 
+	it("keeps the exit frame full after the route loader completes", async () => {
+		const { container, render } = await renderScreen();
+
+		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));
+		expect(progressValue(container)).toBe(94);
+
+		await render(true);
+		expect(progressValue(container)).toBe(100);
+
+		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));
+		expect(progressValue(container)).toBe(100);
+	});
+
 	it("keeps a stable initial frame when reduced motion is requested", async () => {
 		vi.mocked(window.matchMedia).mockReturnValue({
 			matches: true,
 		} as MediaQueryList);
-		const container = await renderScreen();
+		const { container } = await renderScreen();
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs * 2));
 		expect(progressValue(container)).toBe(12);

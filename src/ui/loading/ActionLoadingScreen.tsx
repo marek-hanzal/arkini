@@ -34,14 +34,24 @@ const pendingStages = [
 	},
 ] as const;
 
-/** Presents one deliberately incomplete progress curve while its route loader owns the real work. */
-export const ActionLoadingScreen = ({ label }: { readonly label: string }) => {
-	const [progress, setProgress] = useState(initialProgress);
+/** Presents one route-owned progress curve and keeps its terminal frame full until navigation or shutdown. */
+export const ActionLoadingScreen = ({
+	completed = false,
+	label,
+}: {
+	readonly completed?: boolean;
+	readonly label: string;
+}) => {
+	const [progress, setProgress] = useState(completed ? 100 : initialProgress);
 	const reducedMotion =
 		typeof window.matchMedia === "function" &&
 		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 	useEffect(() => {
+		if (completed) {
+			setProgress(100);
+			return;
+		}
 		setProgress(initialProgress);
 		if (reducedMotion) return;
 		const timers = pendingStages.map((stage) =>
@@ -54,6 +64,7 @@ export const ActionLoadingScreen = ({ label }: { readonly label: string }) => {
 			for (const timer of timers) window.clearTimeout(timer);
 		};
 	}, [
+		completed,
 		reducedMotion,
 	]);
 

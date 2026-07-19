@@ -8,5 +8,10 @@ export const Route = createFileRoute("/action/exit")({
 	pendingMs: 0,
 	pendingMinMs: 2_500,
 	pendingComponent: () => <ActionPendingPage label="Exiting Arkini…" />,
-	component: () => <ActionPendingPage label="Exiting Arkini…" />,
+	component: () => (
+		<ActionPendingPage
+			completed
+			label="Exiting Arkini…"
+		/>
+	),
 });

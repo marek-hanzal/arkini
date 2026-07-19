@@ -4,9 +4,9 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Native route-transition ownership rebuild after the singleton Game Engine follow-up**
+**Reference route-transition baseline with detail-level polish**
 
-Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. Issues #296 and #297 remain for later product discussion.**
+Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. Issues #296 and #297 remain for later product discussion.**
 
 Current contract:
 
@@ -21,11 +21,12 @@ Current contract:
 - The live main-page shadow belongs to the same outer panel element that owns the View Transition name. It is not painted by a clipped child layer, so the last snapshot and the settled live page have the same shadow.
 - `ActionLoadingScreen` owns only `arkini-action-progress`; action errors own `arkini-action-panel`; Board owns `arkini-game-board`; GameMenu owns separate `arkini-game-menu-backdrop` and `arkini-game-menu-dialog` surfaces. None may morph into a launcher card or into each other.
 - Old page/action/menu surfaces complete their exit before an unrelated destination surface begins entering. Progress therefore disappears before Settings/Main Menu/Board enters instead of becoming the destination's geometry or lingering beneath it.
+- GameMenu leave navigation remains logically Board-originated through the terminal redirect. For exact `board-to-settings` and `board-to-main-menu` transitions, the already-visible action backdrop/Hero raster remains opaque and the duplicate destination raster remains hidden; only progress exits and the destination panel enters, so identical logos never cross-fade at the final handoff.
 - Cross-page motion belongs exclusively to typed native TanStack Router View Transitions. WAAPI remains only for the local same-page GameMenu open/close lifecycle and cannot own route opacity/transform.
 - Typed pseudo-element selectors attach directly to `:active-view-transition-type(...)` with no descendant whitespace. A regression test guards the syntax that previously caused Chromium to ignore Arkini choreography.
 - Renderer route auto code splitting remains disabled. Under throttling, unloaded route chunks produced a black pre-transition frame; deterministic eager renderer routes are the correct desktop trade.
 - Blocking route actions wait for the entering View Transition before starting CPU-heavy bootstrap. This preserves the source-page exit while leaving the action page truthful and responsive enough for the current workload.
-- Throttled Chromium filmstrips cover Main Menu → About, Main Menu → Arkpacks, Main Menu → load action → Board, Board/GameMenu → leave action → Main Menu, and Board/GameMenu → leave action → Settings. The rebuilt graph shows one surface at a time, stable Hero geometry, retained live shadows, and no progress/card morph.
+- Throttled Chromium filmstrips cover Main Menu → About, Main Menu → Arkpacks, Main Menu → load action → Board, Board/GameMenu → leave action → Main Menu, and Board/GameMenu → leave action → Settings. The rebuilt graph shows one surface at a time, stable Hero geometry, retained live shadows, no progress/card morph, and no terminal Hero opacity animations on GameMenu leave destinations.
 
 Responsive viewport contract:
 

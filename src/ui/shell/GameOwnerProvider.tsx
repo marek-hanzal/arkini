@@ -103,7 +103,10 @@ export const GameOwnerProvider = ({ children }: GameOwnerProvider.Props) => {
 			<GameOwnerRouteBinding owner={owner} />
 			{children}
 			{state.type === "failed" && state.operation === "route-release" ? (
-				<GameRouteReleaseFailure owner={owner} state={state} />
+				<GameRouteReleaseFailure
+					owner={owner}
+					state={state}
+				/>
 			) : null}
 			{state.type === "failed" && state.operation === "shutdown" ? (
 				<GameShutdownFailure />

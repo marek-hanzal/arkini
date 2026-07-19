@@ -305,7 +305,11 @@ describe("createGameOwnerFx", () => {
 
 	it("publishes distinct route-release and application-shutdown failures", async () => {
 		const failure = new Error("disk full");
-		const dispose = vi.fn(() => Promise.reject(failure));
+		let disposeCalls = 0;
+		const dispose = vi.fn(async () => {
+			disposeCalls += 1;
+			if (disposeCalls === 1 || disposeCalls === 3) throw failure;
+		});
 		const owner = createGameOwner({
 			clearSave: async () => undefined,
 			create: async (packageId) =>
@@ -333,7 +337,7 @@ describe("createGameOwnerFx", () => {
 			packageId: "A",
 			canRecoverSave: false,
 		});
-		expect(dispose).toHaveBeenCalledTimes(2);
+		expect(dispose).toHaveBeenCalledTimes(3);
 	});
 
 	it("retries the same shutdown save obligation after a failure", async () => {

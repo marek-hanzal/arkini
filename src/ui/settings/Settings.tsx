@@ -31,11 +31,7 @@ export namespace Settings {
 }
 
 /** Renders the reusable authoritative application settings content. */
-export const Settings = ({
-	exitPending = false,
-	navigationError,
-	onBack,
-}: Settings.Props) => {
+export const Settings = ({ exitPending = false, navigationError, onBack }: Settings.Props) => {
 	const appearance = useAppearance();
 	const setTheme = useSetAppearanceThemeMutation();
 

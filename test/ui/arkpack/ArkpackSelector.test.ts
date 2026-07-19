@@ -101,11 +101,11 @@ describe("ArkpackSelector", () => {
 		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");
-		const returnLink = layout?.lastElementChild?.querySelector("a");
-		expect(returnLink?.textContent).toBe("Return to main menu");
-		expect(returnLink?.className).toContain("bg-accent");
+		const returnButton = layout?.lastElementChild?.querySelector("button");
+		expect(returnButton?.textContent).toBe("Return to main menu");
+		expect(returnButton?.className).toContain("bg-accent");
 
-		await act(async () => returnLink?.click());
+		await act(async () => returnButton?.click());
 		expect(router.state.location.pathname).toBe("/main-menu");
 	});
 });

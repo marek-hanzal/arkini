@@ -28,7 +28,10 @@ export const SettingsPage = () => {
 			router.history.back();
 			return;
 		}
-		void navigate({ to: "/main-menu", replace: true })
+		void navigate({
+			to: "/main-menu",
+			replace: true,
+		})
 			.catch((error) => {
 				if (mountedRef.current) setNavigationError(error);
 			})
@@ -36,10 +39,16 @@ export const SettingsPage = () => {
 				exitPendingRef.current = false;
 				if (mountedRef.current) setExitPending(false);
 			});
-	}, [navigate, router]);
+	}, [
+		navigate,
+		router,
+	]);
 
 	return (
-		<MainPageLayout labelledBy="settings-title" page="settings">
+		<MainPageLayout
+			labelledBy="settings-title"
+			page="settings"
+		>
 			<Settings
 				exitPending={exitPending}
 				navigationError={navigationError}

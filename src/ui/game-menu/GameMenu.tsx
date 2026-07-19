@@ -83,8 +83,7 @@ const GameMenuDialog = ({
 	useEffect(() => {
 		previousFocusRef.current =
 			document.activeElement instanceof HTMLElement ? document.activeElement : null;
-		const firstControl = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
-		(firstControl ?? dialogRef.current)?.focus();
+		dialogRef.current?.focus();
 		return () => {
 			const previousFocus = previousFocusRef.current;
 			if (previousFocus?.isConnected === true) {
@@ -94,6 +93,14 @@ const GameMenuDialog = ({
 			document.querySelector<HTMLElement>('[data-ui="GameShell"]')?.focus();
 		};
 	}, []);
+
+	useEffect(() => {
+		if (phase !== "open") return;
+		const firstControl = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
+		firstControl?.focus();
+	}, [
+		phase,
+	]);
 
 	useLayoutEffect(() => {
 		if (phase === "open") return;
@@ -231,7 +238,9 @@ const GameMenuDialog = ({
 		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
 		activeRequestRef.current = destination === "/settings" ? "settings" : "main-menu";
 		setNavigationError(undefined);
-		void navigate({ to: destination })
+		void navigate({
+			to: destination,
+		})
 			.catch(setNavigationError)
 			.finally(() => {
 				activeRequestRef.current = null;
@@ -396,14 +405,14 @@ const GameMenuDialog = ({
 								<div className="grid grid-cols-2 gap-2">
 									<Button
 										className="min-h-0 px-3 py-2 shadow-none backdrop-blur-none"
-										disabled={pending || exiting}
+										disabled={actionDisabled}
 										onClick={() => setConfirmingDestroy(false)}
 									>
 										Cancel
 									</Button>
 									<DangerButton
 										className="min-h-0 px-3 py-2 shadow-none"
-										disabled={pending || exiting}
+										disabled={gameActionDisabled}
 										onClick={requestHardReset}
 									>
 										Destroy permanently
@@ -413,7 +422,7 @@ const GameMenuDialog = ({
 						) : (
 							<DangerButton
 								className="w-full py-3 shadow-none"
-								disabled={pending || exiting}
+								disabled={gameActionDisabled}
 								onClick={() => setConfirmingDestroy(true)}
 							>
 								Destroy

@@ -371,6 +371,7 @@ describe("GameMenu", () => {
 	it("reverses rapid Escape during enter without duplicate overlays", async () => {
 		const { container } = await renderMenu();
 		await pressEscape();
+		expect(buttonByText(container, "Destroy").disabled).toBe(true);
 		const backdrop = container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]');
 		const dialog = container.querySelector<HTMLElement>('[data-ui="GameMenu"]');
 		expect(container.querySelectorAll('[data-ui="GameMenuBackdrop"]')).toHaveLength(1);
@@ -449,7 +450,7 @@ describe("GameMenu", () => {
 		});
 	});
 
-	it("waits for successful shutdown before fading and close readiness", async () => {
+	it("lets the root loader exclusively own successful native-close presentation", async () => {
 		const requestGate = deferred();
 		const requestClose = vi.fn(() => requestGate.promise);
 		const game = createGame();
@@ -461,27 +462,21 @@ describe("GameMenu", () => {
 			requestClose,
 		});
 		await openMenu(container);
+		const animationCount = animations.length;
 
 		await act(async () => buttonByText(container, "Save and exit").click());
 		expect(requestClose).toHaveBeenCalledOnce();
 		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="ActionLoadingOverlay"]')).not.toBeNull();
 		expect(router.state.location.pathname).toBe("/game/package:menu");
 
-		let presentationCompleted = false;
-		let presentation!: Promise<void>;
 		await act(async () => {
-			presentation = runBeforeCloseReady().then(() => {
-				presentationCompleted = true;
-			});
-			await Promise.resolve();
+			await runBeforeCloseReady();
 		});
-		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(presentationCompleted).toBe(false);
-		const exitStart = animations.length - 2;
-		await finishAnimations(exitStart, exitStart + 1);
-		await presentation;
-		expect(presentationCompleted).toBe(true);
-		expect(container.querySelector('[role="dialog"]')).toBeNull();
+		expect(animations).toHaveLength(animationCount);
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+		expect(container.querySelector('[data-phase="exiting"]')).toBeNull();
+		expect(container.querySelector('[data-ui="ActionLoadingOverlay"]')).not.toBeNull();
 
 		await act(async () => requestGate.resolve());
 	});

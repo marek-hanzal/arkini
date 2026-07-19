@@ -8,18 +8,19 @@ import { Button, PrimaryButton } from "~/ui/button/Button";
 export namespace GameRouteReleaseFailure {
 	export interface Props {
 		readonly owner: GameOwner;
-		readonly state: Extract<GameOwner.State, { readonly type: "failed" }>;
+		readonly state: Extract<
+			GameOwner.State,
+			{
+				readonly type: "failed";
+			}
+		>;
 	}
 }
 
-const errorMessage = (error: unknown) =>
-	error instanceof Error ? error.message : String(error);
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /** Keeps a failed route release visible until its exact final-save obligation is resolved. */
-export const GameRouteReleaseFailure = ({
-	owner,
-	state,
-}: GameRouteReleaseFailure.Props) => {
+export const GameRouteReleaseFailure = ({ owner, state }: GameRouteReleaseFailure.Props) => {
 	const navigate = useNavigate();
 	const pendingRef = useRef(false);
 	const [pending, setPending] = useState(false);
@@ -46,7 +47,9 @@ export const GameRouteReleaseFailure = ({
 		setRetryError(undefined);
 		void navigate({
 			to: "/game/$packageId",
-			params: { packageId },
+			params: {
+				packageId,
+			},
 		}).catch((error) => {
 			pendingRef.current = false;
 			setPending(false);
@@ -71,11 +74,17 @@ export const GameRouteReleaseFailure = ({
 					<p className="text-xs text-danger">Retry failed: {errorMessage(retryError)}</p>
 				)}
 				<div className="flex flex-wrap justify-center gap-2">
-					<PrimaryButton disabled={pending} onClick={retry}>
+					<PrimaryButton
+						disabled={pending}
+						onClick={retry}
+					>
 						{pending ? "Retrying final save…" : "Retry final save"}
 					</PrimaryButton>
 					{packageId === null ? null : (
-						<Button disabled={pending} onClick={returnToGame}>
+						<Button
+							disabled={pending}
+							onClick={returnToGame}
+						>
 							Return to game
 						</Button>
 					)}

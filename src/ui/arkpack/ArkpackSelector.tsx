@@ -27,7 +27,9 @@ export const ArkpackSelector = () => {
 		exitPendingRef.current = true;
 		setExitPending(true);
 		setActionError(undefined);
-		void navigate({ to: "/main-menu" })
+		void navigate({
+			to: "/main-menu",
+		})
 			.catch((error) => {
 				if (mountedRef.current) setActionError(error);
 			})
@@ -35,7 +37,10 @@ export const ArkpackSelector = () => {
 				exitPendingRef.current = false;
 				if (mountedRef.current) setExitPending(false);
 			});
-	}, [busy, navigate]);
+	}, [
+		busy,
+		navigate,
+	]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -45,7 +50,9 @@ export const ArkpackSelector = () => {
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [requestMainMenu]);
+	}, [
+		requestMainMenu,
+	]);
 
 	const upload = async (file: File | undefined) => {
 		if (file === undefined) return;
@@ -157,7 +164,10 @@ export const ArkpackSelector = () => {
 			</section>
 
 			<footer className="flex justify-center pb-[env(safe-area-inset-bottom)]">
-				<PrimaryButton disabled={busy || exitPending} onClick={requestMainMenu}>
+				<PrimaryButton
+					disabled={busy || exitPending}
+					onClick={requestMainMenu}
+				>
 					{exitPending ? "Returning…" : "Return to main menu"}
 				</PrimaryButton>
 			</footer>

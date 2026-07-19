@@ -29,7 +29,11 @@ const deferred = (): Deferred => {
 		resolve = complete;
 		reject = fail;
 	});
-	return { promise, reject, resolve };
+	return {
+		promise,
+		reject,
+		resolve,
+	};
 };
 
 interface ActiveAction {
@@ -49,7 +53,9 @@ const activeNativeViewTransitionAnimations = () => {
 	if (typeof document.getAnimations !== "function") return [];
 	return document.getAnimations().filter((animation) => {
 		const effect = animation.effect as
-			| (AnimationEffect & { readonly pseudoElement?: string })
+			| (AnimationEffect & {
+					readonly pseudoElement?: string;
+			  })
 			| null;
 		return effect?.pseudoElement?.startsWith("::view-transition-") === true;
 	});
@@ -100,14 +106,18 @@ export const ActionLoadingProvider = ({
 		const previous = previousFocusRef.current;
 		previousFocusRef.current = null;
 		if (restoreSource && previous?.isConnected === true) {
-			previous.focus({ preventScroll: true });
+			previous.focus({
+				preventScroll: true,
+			});
 			return;
 		}
 		document
 			.querySelector<HTMLElement>(
 				'[data-ui="MainPagePanel"], [data-ui="GameShell"], [data-ui="MainPageLayout"], main',
 			)
-			?.focus({ preventScroll: true });
+			?.focus({
+				preventScroll: true,
+			});
 	}, []);
 
 	const hide = useCallback(
@@ -133,7 +143,9 @@ export const ActionLoadingProvider = ({
 			}
 			focusSettledSurface(restoreSource);
 		},
-		[focusSettledSurface],
+		[
+			focusSettledSurface,
+		],
 	);
 
 	const createEntry = useCallback(
@@ -166,7 +178,10 @@ export const ActionLoadingProvider = ({
 				signalNativeCloseReady,
 			} satisfies ActiveAction;
 		},
-		[defaultCompletedHoldMs, defaultMinimumDurationMs],
+		[
+			defaultCompletedHoldMs,
+			defaultMinimumDurationMs,
+		],
 	);
 
 	const createNativeCloseEntry = useCallback(
@@ -182,7 +197,10 @@ export const ActionLoadingProvider = ({
 			replaceActive(entry);
 			return entry;
 		},
-		[createEntry, replaceActive],
+		[
+			createEntry,
+			replaceActive,
+		],
 	);
 
 	const run = useCallback<ActionLoadingControl.Type["run"]>(
@@ -190,12 +208,18 @@ export const ActionLoadingProvider = ({
 			const current = activeRef.current;
 			if (current?.key === options.key) return current.result.promise;
 			if (current?.mode === "native-close") return current.result.promise;
-			const entry = createEntry({ ...options, mode: "normal" });
+			const entry = createEntry({
+				...options,
+				mode: "normal",
+			});
 			generationRef.current = entry.generation;
 			replaceActive(entry);
 			return entry.result.promise;
 		},
-		[createEntry, replaceActive],
+		[
+			createEntry,
+			replaceActive,
+		],
 	);
 
 	const runNativeClose = useCallback<ActionLoadingControl.Type["runNativeClose"]>(
@@ -209,7 +233,9 @@ export const ActionLoadingProvider = ({
 				.catch((error) => entry.signalNativeCloseReady?.reject(error));
 			return entry.result.promise;
 		},
-		[createNativeCloseEntry],
+		[
+			createNativeCloseEntry,
+		],
 	);
 
 	useEffect(() => {
@@ -222,7 +248,9 @@ export const ActionLoadingProvider = ({
 			return Promise.resolve();
 		});
 		return removeBeforeClose;
-	}, [createNativeCloseEntry]);
+	}, [
+		createNativeCloseEntry,
+	]);
 
 	useEffect(() => {
 		const removeBeforeCloseReady = window.arkini.lifecycle.onBeforeCloseReady?.(() => {
@@ -245,8 +273,12 @@ export const ActionLoadingProvider = ({
 
 	useLayoutEffect(() => {
 		if (active === null) return;
-		overlayRef.current?.focus({ preventScroll: true });
-	}, [active]);
+		overlayRef.current?.focus({
+			preventScroll: true,
+		});
+	}, [
+		active,
+	]);
 
 	useEffect(() => {
 		if (active === null) return;
@@ -256,7 +288,9 @@ export const ActionLoadingProvider = ({
 		};
 		window.addEventListener("keydown", blockInput, true);
 		return () => window.removeEventListener("keydown", blockInput, true);
-	}, [active]);
+	}, [
+		active,
+	]);
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -283,7 +317,9 @@ export const ActionLoadingProvider = ({
 				entry.result.resolve();
 			});
 		},
-		[hide],
+		[
+			hide,
+		],
 	);
 
 	const fail = useCallback(
@@ -297,12 +333,22 @@ export const ActionLoadingProvider = ({
 				entry.result.reject(error);
 			});
 		},
-		[hide],
+		[
+			hide,
+		],
 	);
 
 	const control = useMemo<ActionLoadingControl.Type>(
-		() => ({ active: active !== null, run, runNativeClose }),
-		[active, run, runNativeClose],
+		() => ({
+			active: active !== null,
+			run,
+			runNativeClose,
+		}),
+		[
+			active,
+			run,
+			runNativeClose,
+		],
 	);
 
 	return (

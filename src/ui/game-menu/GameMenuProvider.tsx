@@ -33,7 +33,10 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 		const promise = new Promise<void>((resolve) => {
 			resolveExit = resolve;
 		});
-		exitCompletionRef.current = { promise, resolve: resolveExit };
+		exitCompletionRef.current = {
+			promise,
+			resolve: resolveExit,
+		};
 		phaseRef.current = "exiting";
 		setPhase("exiting");
 		return promise;
@@ -48,7 +51,10 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 		if (phaseRef.current === "entering" || phaseRef.current === "open") {
 			void close();
 		}
-	}, [close, open]);
+	}, [
+		close,
+		open,
+	]);
 
 	const beginRouteRequest = useCallback(() => {
 		if (routePendingRef.current || phaseRef.current !== "open") return false;
@@ -89,7 +95,9 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [toggle]);
+	}, [
+		toggle,
+	]);
 
 	useEffect(
 		() => () => {

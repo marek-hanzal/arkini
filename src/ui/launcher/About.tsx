@@ -3,8 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PrimaryButton } from "~/ui/button/Button";
 
-const errorMessage = (error: unknown) =>
-	error instanceof Error ? error.message : String(error);
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /** Renders project and authorship credits for the normalized About page. */
 export const About = () => {
@@ -26,7 +25,9 @@ export const About = () => {
 		exitPendingRef.current = true;
 		setExitPending(true);
 		setNavigationError(undefined);
-		void navigate({ to: "/main-menu" })
+		void navigate({
+			to: "/main-menu",
+		})
 			.catch((error) => {
 				if (mountedRef.current) setNavigationError(error);
 			})
@@ -34,7 +35,9 @@ export const About = () => {
 				exitPendingRef.current = false;
 				if (mountedRef.current) setExitPending(false);
 			});
-	}, [navigate]);
+	}, [
+		navigate,
+	]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -44,11 +47,19 @@ export const About = () => {
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [requestMainMenu]);
+	}, [
+		requestMainMenu,
+	]);
 
 	return (
-		<div className="grid gap-4 text-center" data-ui="About">
-			<h1 id="about-title" className="text-2xl font-semibold">
+		<div
+			className="grid gap-4 text-center"
+			data-ui="About"
+		>
+			<h1
+				id="about-title"
+				className="text-2xl font-semibold"
+			>
 				About Arkini
 			</h1>
 			<p className="leading-7 text-muted">
@@ -61,7 +72,11 @@ export const About = () => {
 					Navigation failed: {errorMessage(navigationError)}
 				</p>
 			)}
-			<PrimaryButton className="mx-auto" disabled={exitPending} onClick={requestMainMenu}>
+			<PrimaryButton
+				className="mx-auto"
+				disabled={exitPending}
+				onClick={requestMainMenu}
+			>
 				{exitPending ? "Returning…" : "Return to main menu"}
 			</PrimaryButton>
 		</div>

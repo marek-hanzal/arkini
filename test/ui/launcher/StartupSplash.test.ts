@@ -197,6 +197,9 @@ describe("StartupSplash", () => {
 
 		expect(container.querySelector('[data-ui="StartupHeroHandoff"]')).toBeNull();
 		expect(container.textContent).not.toContain("Main menu route");
+		const content = container.querySelector('[data-ui="StartupSplashContent"]');
+		if (!(content instanceof HTMLElement)) throw new Error("Startup content missing.");
+		expect(content.style.viewTransitionName).toBe("arkini-startup-content");
 		await pressEscape();
 		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));

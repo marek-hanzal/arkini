@@ -326,17 +326,30 @@ select {
 }
 
 /* The root is deliberately not cross-faded. Every visible Arkini surface owns a named layer. */
+@keyframes arkini-vt-root-handoff {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+::view-transition-group(root) {
+	animation: none;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
-	animation: none;
 	mix-blend-mode: normal;
 }
 
 ::view-transition-old(root) {
-	opacity: 0;
+	animation: arkini-vt-root-handoff 80ms linear both;
 }
 
 ::view-transition-new(root) {
+	animation: none;
 	opacity: 1;
 }
 
@@ -344,6 +357,7 @@ select {
 ::view-transition-group(arkini-launcher-hero-shadow),
 ::view-transition-group(arkini-launcher-hero-artwork),
 ::view-transition-group(arkini-route-content),
+::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board),
 ::view-transition-group(arkini-game-menu-backdrop) {
 	animation-duration: 560ms;
@@ -369,6 +383,7 @@ select {
 }
 
 ::view-transition-group(arkini-route-content),
+::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board) {
 	z-index: 30;
 }
@@ -381,6 +396,8 @@ select {
 ::view-transition-new(arkini-launcher-hero-artwork),
 ::view-transition-old(arkini-route-content),
 ::view-transition-new(arkini-route-content),
+::view-transition-old(arkini-startup-content),
+::view-transition-new(arkini-startup-content),
 ::view-transition-old(arkini-game-board),
 ::view-transition-new(arkini-game-board),
 ::view-transition-old(arkini-game-menu-backdrop),
@@ -389,152 +406,220 @@ select {
 }
 
 /* Shared Hero pairs keep exactly one raster alive while the native group moves to the target geometry. */
-:root:active-view-transition-type(startup-to-launcher)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(startup-to-launcher)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(startup-to-launcher)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(startup-to-action)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(startup-to-action)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(startup-to-action)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-startup)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-startup)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-startup)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-launcher)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-launcher)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-launcher)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-action)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-action)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-action)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-startup)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-startup)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-startup)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-launcher)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-launcher)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-launcher)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-action) ::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-action)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-action)
-	::view-transition-old(arkini-launcher-hero-artwork) {
+:root:active-view-transition-type(startup-to-launcher)::view-transition-old(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(startup-to-launcher)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(startup-to-launcher)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(startup-to-action)::view-transition-old(arkini-launcher-backdrop),
+:root:active-view-transition-type(startup-to-action)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(startup-to-action)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-startup)::view-transition-old(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(launcher-to-startup)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-startup)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-old(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-action)::view-transition-old(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(launcher-to-action)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-action)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-startup)::view-transition-old(arkini-launcher-backdrop),
+:root:active-view-transition-type(action-to-startup)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-startup)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-launcher)::view-transition-old(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(action-to-launcher)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-launcher)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-action)::view-transition-old(arkini-launcher-backdrop),
+:root:active-view-transition-type(action-to-action)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-action)::view-transition-old(
+	arkini-launcher-hero-artwork
+) {
 	animation: none;
 	opacity: 1;
 }
 
-:root:active-view-transition-type(startup-to-launcher)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(startup-to-launcher)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(startup-to-launcher)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(startup-to-action)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(startup-to-action)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(startup-to-action)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-startup)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-startup)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-startup)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-launcher)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-launcher)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-launcher)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-action)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-action)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-action)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-startup)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-startup)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-startup)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-launcher)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-launcher)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-launcher)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-action) ::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-action)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-action)
-	::view-transition-new(arkini-launcher-hero-artwork) {
+:root:active-view-transition-type(startup-to-launcher)::view-transition-new(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(startup-to-launcher)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(startup-to-launcher)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(startup-to-action)::view-transition-new(arkini-launcher-backdrop),
+:root:active-view-transition-type(startup-to-action)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(startup-to-action)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-startup)::view-transition-new(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(launcher-to-startup)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-startup)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-new(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-launcher)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-action)::view-transition-new(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(launcher-to-action)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-action)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-startup)::view-transition-new(arkini-launcher-backdrop),
+:root:active-view-transition-type(action-to-startup)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-startup)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-launcher)::view-transition-new(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(action-to-launcher)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-launcher)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-action)::view-transition-new(arkini-launcher-backdrop),
+:root:active-view-transition-type(action-to-action)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-action)::view-transition-new(
+	arkini-launcher-hero-artwork
+) {
 	animation: none;
 	opacity: 0;
 }
 
+:root:active-view-transition-type(startup-to-launcher)::view-transition-group(
+	arkini-launcher-backdrop
+),
+:root:active-view-transition-type(startup-to-launcher)::view-transition-group(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(startup-to-launcher)::view-transition-group(
+	arkini-launcher-hero-artwork
+) {
+	animation-duration: 900ms;
+}
+
 /* Hero-bearing page leaving for Board. */
-:root:active-view-transition-type(startup-to-board) ::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(launcher-to-board)
-	::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(action-to-board) ::view-transition-old(arkini-launcher-backdrop) {
+:root:active-view-transition-type(startup-to-board)::view-transition-old(arkini-launcher-backdrop),
+:root:active-view-transition-type(launcher-to-board)::view-transition-old(arkini-launcher-backdrop),
+:root:active-view-transition-type(action-to-board)::view-transition-old(arkini-launcher-backdrop) {
 	animation: arkini-vt-fade-out 360ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 
-:root:active-view-transition-type(startup-to-board)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(startup-to-board)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(launcher-to-board)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(launcher-to-board)
-	::view-transition-old(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(action-to-board)
-	::view-transition-old(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(action-to-board)
-	::view-transition-old(arkini-launcher-hero-artwork) {
+:root:active-view-transition-type(startup-to-board)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(startup-to-board)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(launcher-to-board)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(launcher-to-board)::view-transition-old(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(action-to-board)::view-transition-old(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(action-to-board)::view-transition-old(
+	arkini-launcher-hero-artwork
+) {
 	animation: arkini-vt-hero-out 360ms cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 /* Board entering any Hero-bearing page. */
-:root:active-view-transition-type(board-to-startup) ::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(board-to-launcher)
-	::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(board-to-action) ::view-transition-new(arkini-launcher-backdrop) {
+:root:active-view-transition-type(board-to-startup)::view-transition-new(arkini-launcher-backdrop),
+:root:active-view-transition-type(board-to-launcher)::view-transition-new(arkini-launcher-backdrop),
+:root:active-view-transition-type(board-to-action)::view-transition-new(arkini-launcher-backdrop) {
 	animation: arkini-vt-fade-in 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-:root:active-view-transition-type(board-to-startup)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(board-to-startup)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(board-to-launcher)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(board-to-launcher)
-	::view-transition-new(arkini-launcher-hero-artwork),
-:root:active-view-transition-type(board-to-action)
-	::view-transition-new(arkini-launcher-hero-shadow),
-:root:active-view-transition-type(board-to-action)
-	::view-transition-new(arkini-launcher-hero-artwork) {
+:root:active-view-transition-type(board-to-startup)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-startup)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(board-to-launcher)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-launcher)::view-transition-new(
+	arkini-launcher-hero-artwork
+),
+:root:active-view-transition-type(board-to-action)::view-transition-new(
+	arkini-launcher-hero-shadow
+),
+:root:active-view-transition-type(board-to-action)::view-transition-new(
+	arkini-launcher-hero-artwork
+) {
 	animation: arkini-vt-hero-in 560ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-startup-content) {
+	animation: arkini-vt-fade-out 220ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-startup-content) {
+	animation: arkini-vt-fade-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-old(arkini-route-content) {

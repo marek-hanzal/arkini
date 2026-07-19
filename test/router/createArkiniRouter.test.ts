@@ -67,39 +67,92 @@ afterEach(() => {
 
 describe("createArkiniRouter", () => {
 	it("assigns one explicit native transition family to every visible route pair", () => {
+		const pairs = [
+			[
+				"/",
+				"/main-menu",
+				"startup-to-launcher",
+			],
+			[
+				"/",
+				"/action/load-game/built-in",
+				"startup-to-action",
+			],
+			[
+				"/",
+				"/game/built-in/board",
+				"startup-to-board",
+			],
+			[
+				"/main-menu",
+				"/",
+				"launcher-to-startup",
+			],
+			[
+				"/main-menu",
+				"/settings",
+				"launcher-to-launcher",
+			],
+			[
+				"/main-menu",
+				"/action/load-game/built-in",
+				"launcher-to-action",
+			],
+			[
+				"/main-menu",
+				"/game/built-in/board",
+				"launcher-to-board",
+			],
+			[
+				"/game/built-in/board",
+				"/",
+				"board-to-startup",
+			],
+			[
+				"/game/built-in/board",
+				"/settings",
+				"board-to-launcher",
+			],
+			[
+				"/game/built-in/board",
+				"/game/built-in/action/leave",
+				"board-to-action",
+			],
+			[
+				"/game/built-in/board",
+				"/game/other/board",
+				"board-to-board",
+			],
+			[
+				"/action/load-game/built-in",
+				"/",
+				"action-to-startup",
+			],
+			[
+				"/game/built-in/action/leave",
+				"/settings",
+				"action-to-launcher",
+			],
+			[
+				"/action/load-game/built-in",
+				"/game/built-in/board",
+				"action-to-board",
+			],
+			[
+				"/game/built-in/action/reset",
+				"/action/load-game/built-in",
+				"action-to-action",
+			],
+		] as const;
+
 		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
-		expect(resolveTypes("/", "/main-menu")).toEqual([
-			"arkini-route",
-			"startup-to-launcher",
-		]);
-		expect(resolveTypes("/main-menu", "/settings")).toEqual([
-			"arkini-route",
-			"launcher-to-launcher",
-		]);
-		expect(resolveTypes("/main-menu", "/arkpacks")).toEqual([
-			"arkini-route",
-			"launcher-to-launcher",
-		]);
-		expect(resolveTypes("/main-menu", "/action/load-game/built-in")).toEqual([
-			"arkini-route",
-			"launcher-to-action",
-		]);
-		expect(resolveTypes("/game/built-in/board", "/game/built-in/action/leave")).toEqual([
-			"arkini-route",
-			"board-to-action",
-		]);
-		expect(resolveTypes("/game/built-in/action/reset", "/action/load-game/built-in")).toEqual([
-			"arkini-route",
-			"action-to-action",
-		]);
-		expect(resolveTypes("/action/load-game/built-in", "/game/built-in/board")).toEqual([
-			"arkini-route",
-			"action-to-board",
-		]);
-		expect(resolveTypes("/game/built-in/action/leave", "/settings")).toEqual([
-			"arkini-route",
-			"action-to-launcher",
-		]);
+		expect(resolveTypes("/main-menu", "/main-menu")).toBe(false);
+		for (const [from, to, type] of pairs) {
+			expect(resolveTypes(from, to)).toEqual([
+				"arkini-route",
+				type,
+			]);
+		}
 		expect(() => resolveTypes("/game/built-in/board", "/dev/shell")).toThrow(
 			"Missing View Transition classification",
 		);

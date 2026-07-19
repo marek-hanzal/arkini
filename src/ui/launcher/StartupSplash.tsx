@@ -5,7 +5,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
-import { routeContentViewTransitionName } from "~/ui/navigation/routeContentViewTransitionName";
+import { startupContentViewTransitionName } from "~/ui/navigation/startupContentViewTransitionName";
 
 const blackHoldMs = 500;
 const minimumSplashMs = 5_000;
@@ -138,7 +138,7 @@ export const StartupSplash = () => {
 				aria-live="polite"
 				data-ui="StartupSplashContent"
 				style={{
-					viewTransitionName: routeContentViewTransitionName,
+					viewTransitionName: startupContentViewTransitionName,
 				}}
 			>
 				{state.type === "loading" ? (

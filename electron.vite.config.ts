@@ -67,7 +67,7 @@ export default defineConfig(({ command }) => {
 					target: "react",
 					routesDirectory: "./src/@routes",
 					generatedRouteTree: "./src/_route.ts",
-					autoCodeSplitting: true,
+					autoCodeSplitting: false,
 					quoteStyle: "double",
 				}),
 				tailwindcss(),

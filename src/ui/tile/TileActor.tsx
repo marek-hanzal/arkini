@@ -103,7 +103,14 @@ export const TileActor = ({ item }: TileActor.Props) => {
 
 	useLayoutEffect(() => {
 		const interaction = ownsActive ? active : null;
-		if (interaction?.phase === "dragging" || interaction?.phase === "awaiting-outcome") {
+		if (
+			interaction?.phase === "pressed" ||
+			interaction?.phase === "dragging" ||
+			interaction?.phase === "awaiting-outcome"
+		) {
+			// Motion may already have centered the actor under the pointer. Do not let
+			// canonical anchor reconciliation erase that gesture-owned offset before
+			// the drag threshold is crossed.
 			return;
 		}
 		if (placement === null) {

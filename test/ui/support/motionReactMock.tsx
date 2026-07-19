@@ -18,6 +18,29 @@ interface MockMotionValue<T> {
 	jump: (value: T) => void;
 }
 
+interface MockDragBinding {
+	readonly node: HTMLElement;
+	readonly x: MockMotionValue<number>;
+	readonly y: MockMotionValue<number>;
+}
+
+interface MockDragControls {
+	bind: (binding: MockDragBinding) => void;
+	start: (
+		event: {
+			readonly clientX: number;
+			readonly clientY: number;
+		},
+		options?: {
+			readonly snapToCursor?: boolean;
+		},
+	) => void;
+	stop: () => void;
+	cancel: () => void;
+}
+
+let activeDragBinding: MockDragBinding | null = null;
+
 interface MockAnimationControls extends PromiseLike<void> {
 	stop: () => void;
 }
@@ -32,6 +55,15 @@ export const motionTestRuntime = {
 	reset() {
 		this.autoComplete = true;
 		this.completions.splice(0);
+		activeDragBinding = null;
+	},
+	readDragOffset() {
+		return activeDragBinding === null
+			? null
+			: {
+					x: activeDragBinding.x.get(),
+					y: activeDragBinding.y.get(),
+				};
 	},
 	finish(...indexes: ReadonlyArray<number>) {
 		for (const index of indexes) this.completions[index]?.complete();
@@ -64,14 +96,23 @@ export const animate = <T,>(value: MockMotionValue<T>, target: T): MockAnimation
 };
 
 export const useDragControls = () =>
-	useMemo(
-		() => ({
-			start: () => undefined,
+	useMemo<MockDragControls>(() => {
+		let binding: MockDragBinding | null = null;
+		return {
+			bind: (next) => {
+				binding = next;
+				activeDragBinding = next;
+			},
+			start: (event, options) => {
+				if (binding === null || options?.snapToCursor !== true) return;
+				const rect = binding.node.getBoundingClientRect();
+				binding.x.set(binding.x.get() + event.clientX - (rect.left + rect.width / 2));
+				binding.y.set(binding.y.get() + event.clientY - (rect.top + rect.height / 2));
+			},
 			stop: () => undefined,
 			cancel: () => undefined,
-		}),
-		[],
-	);
+		};
+	}, []);
 
 interface PanInfoLike {
 	readonly point: {
@@ -169,7 +210,7 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 			initial: _initial,
 			transition: _transition,
 			drag: _drag,
-			dragControls: _dragControls,
+			dragControls,
 			dragListener: _dragListener,
 			dragMomentum: _dragMomentum,
 			dragElastic: _dragElastic,
@@ -227,12 +268,33 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 				? String(animateTarget.scale)
 				: undefined;
 
+		const motionStyle = style as
+			| (CSSProperties & {
+					readonly x?: MockMotionValue<number>;
+					readonly y?: MockMotionValue<number>;
+			  })
+			| undefined;
+
 		return createElement(element, {
 			...props,
 			ref,
 			style: readStyle(style),
 			"data-motion-scale": motionScale,
 			onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
+				if (
+					typeof dragControls === "object" &&
+					dragControls !== null &&
+					"bind" in dragControls &&
+					typeof dragControls.bind === "function" &&
+					motionStyle?.x !== undefined &&
+					motionStyle.y !== undefined
+				) {
+					(dragControls as MockDragControls).bind({
+						node: event.currentTarget,
+						x: motionStyle.x,
+						y: motionStyle.y,
+					});
+				}
 				onPointerDown?.(event as never);
 				gesture.current = {
 					start: {

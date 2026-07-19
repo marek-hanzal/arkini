@@ -185,6 +185,13 @@ beforeEach(() => {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 200);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
+			if (element.dataset.ui === "TileActorDragSurface") {
+				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
+				const x = Number(actor?.dataset.boardX);
+				const y = Number(actor?.dataset.boardY);
+				if (Number.isFinite(x) && Number.isFinite(y))
+					return rect(x * 100, y * 100, 100, 100);
+			}
 			const x = Number(element.dataset.boardX);
 			const y = Number(element.dataset.boardY);
 			if (Number.isFinite(x) && Number.isFinite(y)) return rect(x * 100, y * 100, 100, 100);
@@ -246,6 +253,31 @@ const dragTo = async (source: HTMLElement, x: number, y: number) => {
 };
 
 describe("Board drag", () => {
+	it("keeps the real actor centered under an off-center pointer while pressed", async () => {
+		const source = await renderBoard();
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+		if (dragSurface === null) throw new Error("Missing drag surface.");
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 210, 110));
+			await Promise.resolve();
+		});
+
+		expect(motionTestRuntime.readDragOffset()).toEqual({
+			x: -40,
+			y: -40,
+		});
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 210, 110));
+			await Promise.resolve();
+		});
+
+		expect(motionTestRuntime.readDragOffset()).toEqual({
+			x: 0,
+			y: 0,
+		});
+	});
 	it("moves the one existing actor through the public atomic drop command", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;

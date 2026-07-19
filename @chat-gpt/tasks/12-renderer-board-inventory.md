@@ -66,9 +66,9 @@ confirm in the menu
 → create one fresh Game through the normal parent query factory
 ```
 
-A failed reset keeps the action error page and exact resource available for retry; idempotent disposal/save clearing resumes safely without exposing the save key or introducing another reset scheduler.
+A failed reset marks the exact resource permanently unusable and bubbles to the root fatal boundary; no action retry, Board remount, or package switch is allowed in that renderer.
 
-Save and exit means controlled whole-application shutdown. The menu requests native close; preload navigates to `/game/$packageId/action/exit`, whose loader performs the authoritative final save/disposal. Failure retains the same frozen retryable resource and does not send `closeReady`. Ordinary launcher navigation uses the distinct `/game/$packageId/action/leave` leaf.
+Save and exit means controlled whole-application shutdown. The menu requests native close; preload joins any pending Game creation, attempts one direct final save/disposal, logs failure best-effort, and sends `closeReady` regardless. No exit route or retry page participates. Ordinary launcher navigation uses the distinct `/game/$packageId/action/leave` leaf.
 
 ## Do not port
 
@@ -112,7 +112,7 @@ Save and exit means controlled whole-application shutdown. The menu requests nat
 - initial startup and reset use the same game factory;
 - Escape toggle, backdrop pointer ownership, focus trap, and focus restoration;
 - Save disables overlapping menu actions and reports durable success/failure;
-- Save and exit navigates only after successful safe route release and preserves retryable ownership on failure;
+- Save and exit requests native close, performs one best-effort final save/disposal, and never keeps the application open for retry;
 - Destroy requires confirmation, invokes canonical hard reset once, and keeps truthful retry state after discard/clear/create failure;
 - hard-reset retry does not repeat already completed destructive phases;
 - cancellation before invoking reset changes nothing.

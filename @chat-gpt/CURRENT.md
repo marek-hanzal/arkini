@@ -6,12 +6,12 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Reference route-transition baseline with detail-level polish**
 
-Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. #297 is complete: critical leave/reset/ownership/HMR failures now end the renderer through one root fatal boundary and a failed resource can never publish Board again. #296 controlled-close retry/outcome semantics remains.**
+Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. #297 is complete: critical leave/reset/ownership/HMR failures end the renderer through one root fatal boundary and a failed resource can never publish Board again. #296 is complete with the simplified product decision: controlled close joins pending creation, attempts one direct final save/disposal, logs failure, and closes anyway without routes or retries.**
 
 Current contract:
 
 - `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`.
-- `/game/$packageId` remains a non-visual resource/layout boundary. `/action/load-game/$packageId` owns creation, while leave/reset/exit actions remain named leaves over the inherited singleton resource.
+- `/game/$packageId` remains a non-visual resource/layout boundary. `/action/load-game/$packageId` owns creation, while leave/reset actions remain named leaves over the inherited singleton resource. Controlled application close is direct native lifecycle work, not a route.
 - TanStack Query owns only the identity and lifetime of one renderer-wide `GameEngineResource` under `["game-engine"]`. Controlled close and HMR join pending creation; exact-identity cleanup prevents stale disposal from removing another resource. The resource stores only the first critical lifecycle failure as a private fail-stop guard, not a public state machine.
 - `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. No GameOwner provider, root loading overlay, hidden destination page, transition-name suppression mode, or nested local View Transition remains.
 - Every unequal visible route pair resolves to `arkini-route`, one broad scene relationship (`hero-to-hero`, `hero-to-board`, `board-to-hero`, or `board-to-board`), and one exact directional pair such as `main-menu-to-settings`. Unknown visible paths fail loudly.
@@ -37,7 +37,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Discuss and implement #296 controlled-close retry/outcome semantics without changing the working route/View Transition architecture or the #297 fail-stop boundary.
+> Revalidate #295, #296, and #297 together, then close parent review #294 without changing the accepted transition baseline.
 
 ## Source topology
 
@@ -67,8 +67,8 @@ Next action:
 - `gameEngineQueryOptions` creates one `GameEngineResource` in the canonical renderer-wide `["game-engine"]` Query slot. The resource contains the canonical `Game` and one private Effect semaphore; Query stores identity/lifetime only and `useGameEngine()` reads the parent route loader rather than observing Query state.
 - `GameMenuProvider` lives only at the Board shell and owns local `closed | entering | open | exiting`, Escape, focus trap/restoration, and a short route-request lock that prevents duplicate clicks while TanStack accepts navigation. It never owns save, release, reset, engine replacement, or cross-page animation.
 - The root `AppearanceProvider` owns only the hydrated renderer theme/accent snapshot. `/settings` uses one complete `setAppearanceThemeMutationOptions` contract connected directly to `writeAppearanceThemeFx`, plus its natural `useSetAppearanceThemeMutation` hook. It applies immediately, persists atomically, rolls back on failure, and no-ops for the active value. There is no floating game-canvas selector, second appearance store, callback-injection adapter, or project-specific mutation-state helper.
-- TanStack Query owns ordinary asynchronous UI mutation state plus the exceptional stable identity of the singleton Game resource. It never mirrors runtime, catalog, save, or gameplay state. Save remains a standalone mutation over `Game`; leave/reset/exit/recovery are loader-owned action pages.
-- Controlled whole-application exit requests the native close handshake. Preload navigates to the appropriate exit action and sends `closeReady` only after its loader succeeds. Failure keeps the same frozen resource and route error page retryable; no hidden GameMenu exit animation participates.
+- TanStack Query owns ordinary asynchronous UI mutation state plus the exceptional stable identity of the singleton Game resource. It never mirrors runtime, catalog, save, or gameplay state. Save remains a standalone mutation over `Game`; leave/reset/recovery are loader-owned action pages, while application close stays in the trusted native lifecycle handshake.
+- Controlled whole-application exit requests the native close handshake. Preload joins pending Game creation, attempts one direct final save/disposal when a resource exists, logs failure best-effort, and sends `closeReady` regardless. There is no exit route, retry page, second save attempt, or hidden GameMenu exit animation.
 - A bootstrap failure exposes destructive recovery only when `createGameFx` raises `GameSaveBootstrapError` with a verified exact save key. `GameEngineErrorPage` only links to `/action/recover-game-save`; that action loader resolves the failed exact Query error, clears only its verified save, removes the failed query, and redirects through the normal fresh `/board` bootstrap. Package validation failures expose no recovery action.
 
 ## Live bridge and tile foundation

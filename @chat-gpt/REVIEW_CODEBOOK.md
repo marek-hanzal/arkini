@@ -347,19 +347,18 @@ Reject arbitrary filesystem deletion, package removal, launcher detours, exposed
 
 ### 5.7 Save and exit
 
-Current decision: in-game `Save and exit` performs controlled whole-application shutdown.
+Current decision: in-game `Save and exit`, Main Menu Exit, title-bar close, and Ctrl+W all use one controlled whole-application shutdown handshake.
 
 ```text
 request close
-→ router enters the explicit exit action
-→ the cached GameEngineResource performs serialized final save/disposal
-→ the successful action reports close-ready
+→ join pending or published singleton Game resource
+→ when a Game exists, attempt one direct final save/disposal
+→ log save failure best-effort without retry or recovery UI
+→ report close-ready regardless
 → Electron closes the window
 ```
 
-This controlled-close failure policy is owned by #296 and remains distinct from ordinary leave/reset. Ordinary critical lifecycle failure is fail-stop: it marks the cached resource unusable and renders the root fatal boundary with no in-process retry or Board return.
-
-Ordinary route release remains a separate lifecycle operation.
+Controlled close is terminal process policy, not a route action and not an in-process recovery workflow. It remains distinct from ordinary leave/reset, where critical failure marks the cached resource unusable and renders the root fatal boundary. Ordinary route release remains a separate lifecycle operation.
 
 ### 5.8 Appearance
 

@@ -10,6 +10,7 @@ import {
 } from "react";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButton } from "~/ui/button/Button";
+import { LauncherHero } from "~/ui/launcher/LauncherHero";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
 
@@ -28,9 +29,20 @@ const currentFrame = (element: HTMLElement) => {
 	return {
 		opacity: style.opacity,
 		transform: style.transform === "none" ? "scale(1)" : style.transform,
-		filter: style.filter === "none" ? "blur(0px)" : style.filter,
 	};
 };
+
+const numericOpacity = (element: HTMLElement) => {
+	const opacity = Number.parseFloat(getComputedStyle(element).opacity);
+	return Number.isFinite(opacity) ? opacity : 1;
+};
+
+interface HeroHandoffState {
+	readonly destination: HTMLElement;
+	readonly destinationVisibility: string;
+	readonly source: HTMLElement;
+	readonly sourceVisibility: string;
+}
 
 const persistFinalFrame = (animation: Animation) => {
 	if (typeof animation.commitStyles !== "function") return false;
@@ -57,6 +69,8 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 	const [minimumSplashComplete, setMinimumSplashComplete] = useState(false);
 	const [phase, setPhase] = useState<SplashPhase>("black");
 	const overlayRef = useRef<HTMLDivElement>(null);
+	const heroHandoffRef = useRef<HTMLDivElement>(null);
+	const heroHandoffStateRef = useRef<HeroHandoffState | null>(null);
 	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
 	const animationGenerationRef = useRef(0);
 	const visualReady = state.appearance !== null && state.heroReady;
@@ -140,14 +154,33 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 		const generation = animationGenerationRef.current + 1;
 		animationGenerationRef.current = generation;
 		const frame = currentFrame(overlay);
+		const entering = phase === "entering";
+		const sourceHero = entering
+			? null
+			: overlay.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
+		const destinationHero = entering
+			? null
+			: (mainMenu?.querySelector<HTMLElement>('[data-ui="LauncherHero"]') ?? null);
+		const handoffHero = entering ? null : heroHandoffRef.current;
+		const sourceRect = sourceHero?.getBoundingClientRect();
+		const destinationRect = destinationHero?.getBoundingClientRect();
+		const sourceOpacity =
+			sourceHero === null ? 1 : numericOpacity(overlay) * numericOpacity(sourceHero);
+
 		for (const animation of animationsRef.current) animation.cancel();
 		animationsRef.current = [];
 
-		const entering = phase === "entering";
-		if (
-			typeof overlay.animate !== "function" ||
-			(!entering && (mainMenu === null || typeof mainMenu.animate !== "function"))
-		) {
+		const canAnimateExit =
+			mainMenu !== null &&
+			typeof mainMenu.animate === "function" &&
+			sourceHero !== null &&
+			destinationHero !== null &&
+			handoffHero !== null &&
+			typeof handoffHero.animate === "function" &&
+			sourceRect !== undefined &&
+			destinationRect !== undefined;
+
+		if (typeof overlay.animate !== "function" || (!entering && !canAnimateExit)) {
 			if (entering) {
 				setPhase("open");
 			} else {
@@ -160,18 +193,21 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 		const easing = entering
 			? "cubic-bezier(0.22, 1, 0.36, 1)"
 			: "cubic-bezier(0.64, 0, 0.78, 0)";
+		const options: KeyframeAnimationOptions = {
+			duration: entering ? enterTransitionMs : exitTransitionMs,
+			easing,
+			fill: "both",
+		};
 		const splashAnimation = overlay.animate(
 			entering
 				? [
 						{
 							opacity: 0,
 							transform: "scale(0.985)",
-							filter: "blur(8px)",
 						},
 						{
 							opacity: 1,
 							transform: "scale(1)",
-							filter: "blur(0px)",
 						},
 					]
 				: [
@@ -179,19 +215,46 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 						{
 							opacity: 0,
 							transform: "scale(1.01)",
-							filter: "blur(8px)",
 						},
 					],
-			{
-				duration: entering ? enterTransitionMs : exitTransitionMs,
-				easing,
-				fill: "both",
-			},
+			options,
 		);
 		const animations: Array<Animation> = [
 			splashAnimation,
 		];
-		if (!entering && mainMenu !== null) {
+		let successfulHandoff: HeroHandoffState | null = null;
+
+		if (
+			!entering &&
+			mainMenu !== null &&
+			sourceHero !== null &&
+			destinationHero !== null &&
+			handoffHero !== null &&
+			sourceRect !== undefined &&
+			destinationRect !== undefined
+		) {
+			const handoffState: HeroHandoffState = {
+				destination: destinationHero,
+				destinationVisibility: destinationHero.style.visibility,
+				source: sourceHero,
+				sourceVisibility: sourceHero.style.visibility,
+			};
+			heroHandoffStateRef.current = handoffState;
+			sourceHero.style.visibility = "hidden";
+			destinationHero.style.visibility = "hidden";
+			Object.assign(handoffHero.style, {
+				height: `${sourceRect.height}px`,
+				left: `${sourceRect.left}px`,
+				opacity: String(sourceOpacity),
+				top: `${sourceRect.top}px`,
+				visibility: "visible",
+				width: `${sourceRect.width}px`,
+			});
+			const scaleX = sourceRect.width === 0 ? 1 : destinationRect.width / sourceRect.width;
+			const scaleY = sourceRect.height === 0 ? 1 : destinationRect.height / sourceRect.height;
+			const translateX = destinationRect.left - sourceRect.left;
+			const translateY = destinationRect.top - sourceRect.top;
+
 			animations.push(
 				mainMenu.animate(
 					[
@@ -202,14 +265,25 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 							opacity: 1,
 						},
 					],
-					{
-						duration: exitTransitionMs,
-						easing,
-						fill: "both",
-					},
+					options,
+				),
+				handoffHero.animate(
+					[
+						{
+							opacity: sourceOpacity,
+							transform: "translate(0px, 0px) scale(1, 1)",
+						},
+						{
+							opacity: 1,
+							transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+						},
+					],
+					options,
 				),
 			);
+			successfulHandoff = handoffState;
 		}
+
 		animationsRef.current = animations;
 		void Promise.all(
 			animations.map((animation) => animation.finished.catch(() => undefined)),
@@ -219,6 +293,13 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 			if (entering) {
 				setPhase("open");
 				return;
+			}
+			if (successfulHandoff !== null && handoffHero !== null) {
+				successfulHandoff.destination.style.visibility =
+					successfulHandoff.destinationVisibility;
+				successfulHandoff.source.style.visibility = "hidden";
+				handoffHero.style.visibility = "hidden";
+				heroHandoffStateRef.current = null;
 			}
 			setPhase("completed");
 		});
@@ -245,6 +326,18 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 			animationGenerationRef.current += 1;
 			for (const animation of animationsRef.current) animation.cancel();
 			animationsRef.current = [];
+			const handoffState = heroHandoffStateRef.current;
+			if (handoffState !== null) {
+				if (handoffState.source.isConnected) {
+					handoffState.source.style.visibility = handoffState.sourceVisibility;
+				}
+				if (handoffState.destination.isConnected) {
+					handoffState.destination.style.visibility = handoffState.destinationVisibility;
+				}
+			}
+			const handoffHero = heroHandoffRef.current;
+			if (handoffHero !== null) handoffHero.style.visibility = "hidden";
+			heroHandoffStateRef.current = null;
 		},
 		[],
 	);
@@ -285,46 +378,63 @@ export const StartupSplash = ({ mainMenuRef }: StartupSplashProps) => {
 	}
 
 	return (
-		<div
-			ref={overlayRef}
-			className="absolute inset-0 z-20 size-full"
-			data-ui="StartupSplash"
-			data-phase={phase}
-			style={
-				phase === "entering"
-					? {
-							opacity: 0,
-							transform: "scale(0.985)",
-							filter: "blur(8px)",
-						}
-					: undefined
-			}
-		>
-			<LauncherScene dataUi="StartupSplashScene">
-				<div
-					className="min-h-14 text-center text-sm text-muted"
-					aria-live="polite"
-				>
-					{state.type === "loading" ? (
-						<p>Preparing Arkini…</p>
-					) : state.type === "failed" ? (
-						<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
-							<p className="font-semibold text-danger">Startup failed</p>
-							<p>{messageFromError(state.error)}</p>
-							<PrimaryButton
-								className="mx-auto"
-								onClick={retry}
-							>
-								Retry
-							</PrimaryButton>
-						</div>
-					) : canContinue ? (
-						<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
-							Press Esc to continue
-						</p>
-					) : null}
-				</div>
-			</LauncherScene>
-		</div>
+		<>
+			<div
+				ref={heroHandoffRef}
+				className="pointer-events-none fixed left-0 top-0 z-30 invisible origin-top-left"
+				aria-hidden="true"
+				data-ui="StartupHeroHandoff"
+				style={{
+					transformOrigin: "top left",
+					willChange: "transform, opacity",
+				}}
+			>
+				<LauncherHero
+					style={{
+						width: "100%",
+					}}
+				/>
+			</div>
+			<div
+				ref={overlayRef}
+				className="absolute inset-0 z-20 size-full"
+				data-ui="StartupSplash"
+				data-phase={phase}
+				style={
+					phase === "entering"
+						? {
+								opacity: 0,
+								transform: "scale(0.985)",
+							}
+						: undefined
+				}
+			>
+				<LauncherScene dataUi="StartupSplashScene">
+					<div
+						className="min-h-14 text-center text-sm text-muted"
+						aria-live="polite"
+					>
+						{state.type === "loading" ? (
+							<p>Preparing Arkini…</p>
+						) : state.type === "failed" ? (
+							<div className="mx-auto grid max-w-lg gap-3 rounded-2xl border border-danger/35 bg-surface/85 p-4 shadow-xl backdrop-blur-md">
+								<p className="font-semibold text-danger">Startup failed</p>
+								<p>{messageFromError(state.error)}</p>
+								<PrimaryButton
+									className="mx-auto"
+									onClick={retry}
+								>
+									Retry
+								</PrimaryButton>
+							</div>
+						) : canContinue ? (
+							<p className="animate-pulse text-xs font-semibold uppercase tracking-[0.24em] text-subtle">
+								Press Esc to continue
+							</p>
+						) : null}
+					</div>
+				</LauncherScene>
+			</div>
+		</>
 	);
 };

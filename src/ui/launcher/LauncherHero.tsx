@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
 
 const heroAspectRatio = "3345 / 1882";
@@ -7,17 +8,19 @@ const fullWidth = "min(88vw, 68rem, 103.0872vh)";
 export namespace LauncherHero {
 	export interface Props {
 		readonly compact?: boolean;
+		readonly style?: CSSProperties;
 	}
 }
 
 /** Renders the normal-DOM Hero composite without a nested View Transition snapshot. */
-export const LauncherHero = ({ compact = false }: LauncherHero.Props) => (
+export const LauncherHero = ({ compact = false, style }: LauncherHero.Props) => (
 	<div
 		className="relative block shrink-0 isolation-isolate"
 		data-ui="LauncherHero"
 		style={{
 			aspectRatio: heroAspectRatio,
 			width: compact ? compactWidth : fullWidth,
+			...style,
 		}}
 	>
 		<div

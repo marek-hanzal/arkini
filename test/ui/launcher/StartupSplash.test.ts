@@ -15,6 +15,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherStartupContext } from "~/ui/launcher/LauncherStartupContext";
+import { LauncherHero } from "~/ui/launcher/LauncherHero";
 import { StartupSplash } from "~/ui/launcher/StartupSplash";
 
 (
@@ -136,6 +137,27 @@ beforeEach(() => {
 			},
 		),
 	});
+	vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+		this: HTMLElement,
+	) {
+		if (this.dataset.ui === "LauncherHero") {
+			if (this.closest('[data-ui="MountedMainMenu"]') !== null) {
+				return DOMRect.fromRect({
+					height: 270,
+					width: 480,
+					x: 350,
+					y: 60,
+				});
+			}
+			return DOMRect.fromRect({
+				height: 450,
+				width: 800,
+				x: 100,
+				y: 100,
+			});
+		}
+		return DOMRect.fromRect();
+	});
 });
 
 afterEach(async () => {
@@ -173,11 +195,17 @@ const renderSplash = async (startup: LauncherStartup) => {
 		return createElement(
 			"div",
 			null,
-			createElement("div", {
-				ref: mainMenuRef,
-				className: "opacity-0",
-				"data-ui": "MountedMainMenu",
-			}),
+			createElement(
+				"div",
+				{
+					ref: mainMenuRef,
+					className: "opacity-0",
+					"data-ui": "MountedMainMenu",
+				},
+				createElement(LauncherHero, {
+					compact: true,
+				}),
+			),
 			createElement(StartupSplash, {
 				mainMenuRef,
 			}),
@@ -324,7 +352,7 @@ describe("StartupSplash", () => {
 		await pressEscape();
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		expect(container.textContent).not.toContain("Press Esc to continue");
-		expect(animations).toHaveLength(3);
+		expect(animations).toHaveLength(4);
 		expect(animations[0]?.cancel).toHaveBeenCalledOnce();
 		expect(animations[1]?.options).toMatchObject({
 			duration: 1_500,
@@ -338,16 +366,38 @@ describe("StartupSplash", () => {
 			},
 		]);
 		expect(animations[2]?.options).toEqual(animations[1]?.options);
+		expect(animations[3]?.keyframes).toEqual([
+			{
+				opacity: 1,
+				transform: "translate(0px, 0px) scale(1, 1)",
+			},
+			{
+				opacity: 1,
+				transform: "translate(250px, -40px) scale(0.6, 0.6)",
+			},
+		]);
+		const sourceHero = container.querySelector<HTMLElement>(
+			'[data-ui="StartupSplash"] [data-ui="LauncherHero"]',
+		);
+		const destinationHero = container.querySelector<HTMLElement>(
+			'[data-ui="MountedMainMenu"] [data-ui="LauncherHero"]',
+		);
+		const handoffHero = container.querySelector<HTMLElement>('[data-ui="StartupHeroHandoff"]');
+		expect(sourceHero?.style.visibility).toBe("hidden");
+		expect(destinationHero?.style.visibility).toBe("hidden");
+		expect(handoffHero?.style.visibility).toBe("visible");
 		expect(router.state.location.pathname).toBe("/");
 
 		await pressEscape();
-		expect(animations).toHaveLength(3);
+		expect(animations).toHaveLength(4);
 
-		await finishAnimations(1, 2);
+		await finishAnimations(1, 2, 3);
 		expect(animations[1]?.commitStyles).toHaveBeenCalledOnce();
 		expect(animations[1]?.cancel).toHaveBeenCalledOnce();
 		expect(animations[2]?.commitStyles).toHaveBeenCalledOnce();
 		expect(animations[2]?.cancel).toHaveBeenCalledOnce();
+		expect(animations[3]?.commitStyles).toHaveBeenCalledOnce();
+		expect(animations[3]?.cancel).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.complete).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
@@ -376,7 +426,7 @@ describe("StartupSplash", () => {
 		await act(async () => harness.publish(readyState()));
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		expect(container.textContent).not.toContain("Press Esc to continue");
-		expect(animations).toHaveLength(3);
+		expect(animations).toHaveLength(4);
 	});
 
 	it("automatically exits after five visible seconds and actual animation completion", async () => {
@@ -394,7 +444,7 @@ describe("StartupSplash", () => {
 		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 		await act(async () => vi.advanceTimersByTime(1));
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
-		expect(animations).toHaveLength(3);
+		expect(animations).toHaveLength(4);
 		expect(animations[2]?.keyframes).toEqual([
 			{
 				opacity: 0,
@@ -405,7 +455,7 @@ describe("StartupSplash", () => {
 		]);
 		expect(router.state.location.pathname).toBe("/");
 
-		await finishAnimations(1, 2);
+		await finishAnimations(1, 2, 3);
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 

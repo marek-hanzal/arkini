@@ -231,3 +231,11 @@ Next action:
 
 - The root action loader is a real modal boundary: covered route content is inert and aria-hidden, the overlay owns focus for its visible lifetime, success focuses the settled route surface, and failure restores the still-connected source focus.
 - Settings, About, and Arkpacks each own one synchronous route-exit guard. Rapid Back/Escape cannot request multiple history or native transitions, and a rejected navigation unlocks the same source page.
+
+## Startup Hero handoff
+
+- Startup → Main Menu remains owned by the existing WAAPI startup lifecycle and deliberately opts out of native route View Transitions.
+- During splash exit, the live splash Hero and the already-mounted Main Menu Hero are hidden before paint. One transient fixed-position handoff Hero moves from the currently painted splash geometry to the exact destination Hero geometry while the surrounding scenes cross-fade.
+- Actual animation completion atomically replaces the transient handoff with the geometrically identical live Main Menu Hero. At no exit frame may two readable Hero silhouettes be painted.
+- Escape during the splash enter animation captures the currently painted Hero rectangle and continues through the same handoff path without restarting from an authored full-opacity/full-scale frame.
+- The transient Hero must not use blur/filter effects or a named native View Transition surface. Do not return to cross-fading two complete Hero compositions or introduce a generic shared-element manager.

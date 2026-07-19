@@ -1,8 +1,11 @@
-import type { CSSProperties } from "react";
+import { type CSSProperties, useMemo } from "react";
 
 import { useBoard } from "~/bridge/board/useBoard";
+import { BoardCell } from "~/ui/board/BoardCell";
 import { BoardTile } from "~/ui/board/BoardTile";
 import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
+import type { TileSurface } from "~/ui/tile/TileSurface";
+import { useTileSurface } from "~/ui/tile/useTileSurface";
 
 type BoardFrameStyle = CSSProperties & {
 	readonly "--board-width-from-height": string;
@@ -14,6 +17,23 @@ type BoardGridStyle = CSSProperties;
 /** Renders the current board directly from the bridge's live runtime projection. */
 export const Board = () => {
 	const board = useBoard();
+	const surface = useMemo(
+		() =>
+			({
+				id: `board:${board.currentSpace}`,
+				kind: "board",
+				space: board.currentSpace,
+			}) satisfies Extract<
+				TileSurface,
+				{
+					readonly kind: "board";
+				}
+			>,
+		[
+			board.currentSpace,
+		],
+	);
+	const surfaceRef = useTileSurface(surface);
 	// Runtime tiles occupy explicit grid cells, so backing cells must overlap them explicitly
 	// rather than auto-flowing around them into implicit rows.
 	const cells = Array.from(
@@ -25,6 +45,15 @@ export const Board = () => {
 			x: index % board.width,
 			y: Math.floor(index / board.width),
 		}),
+	);
+	const occupants = new Map(
+		board.items.map(
+			(item) =>
+				[
+					`${item.x}:${item.y}`,
+					item,
+				] as const,
+		),
 	);
 	const frameStyle = {
 		aspectRatio: `${board.width} / ${board.height}`,
@@ -57,28 +86,27 @@ export const Board = () => {
 					style={frameStyle}
 				>
 					<div
+						ref={surfaceRef}
 						className="grid size-full overflow-hidden rounded-[inherit]"
 						data-ui="BoardGrid"
+						data-tile-surface="board"
+						data-tile-surface-id={surface.id}
 						style={gridStyle}
 					>
 						{cells.map((cell) => (
-							<div
+							<BoardCell
 								key={cell.index}
-								className="min-h-0 min-w-0 rounded-[22%] border border-line/60 bg-surface-raised/45"
-								style={{
-									gridColumnStart: cell.x + 1,
-									gridRowStart: cell.y + 1,
-								}}
-								aria-hidden="true"
-								data-ui="BoardCell"
-								data-board-x={cell.x}
-								data-board-y={cell.y}
+								surface={surface}
+								x={cell.x}
+								y={cell.y}
+								occupant={occupants.get(`${cell.x}:${cell.y}`) ?? null}
 							/>
 						))}
 						{board.items.map((item) => (
 							<BoardTile
 								key={item.id}
 								item={item}
+								surface={surface}
 							/>
 						))}
 					</div>

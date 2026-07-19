@@ -1,16 +1,23 @@
-import { type PointerEventHandler, useCallback, useContext, useEffect } from "react";
+import { type PointerEventHandler, useCallback, useContext, useEffect, useRef } from "react";
 
-import type { TileIdentity } from "~/ui/tile/TileIdentity";
+import type { TileDragSource } from "~/ui/tile/TileDragSource";
+import type { TileDropIntent } from "~/ui/tile/TileDropIntent";
+import type { TileDropOutcome } from "~/ui/tile/TileDropOutcome";
 import { TileSystemContext } from "~/ui/tile/TileSystemContext";
 
 export namespace useTile {
-	export interface Props extends TileIdentity {}
+	export interface Props {
+		readonly source: TileDragSource;
+		readonly onDrop: (intent: TileDropIntent) => Promise<TileDropOutcome> | TileDropOutcome;
+	}
 
 	export interface Result {
 		readonly ref: (node: HTMLElement | null) => void;
 		readonly pressed: boolean;
+		readonly dragging: boolean;
 		readonly pointerProps: {
 			readonly onPointerDown: PointerEventHandler<HTMLElement>;
+			readonly onPointerMove: PointerEventHandler<HTMLElement>;
 			readonly onPointerUp: PointerEventHandler<HTMLElement>;
 			readonly onPointerCancel: PointerEventHandler<HTMLElement>;
 			readonly onLostPointerCapture: PointerEventHandler<HTMLElement>;
@@ -18,97 +25,110 @@ export namespace useTile {
 	}
 }
 
-/** Binds one rendered tile to shared transient interaction state without mirroring engine data. */
-export const useTile = ({ id, revision }: useTile.Props): useTile.Result => {
+/** Binds one rendered tile to the shared unrestricted pointer controller. */
+export const useTile = ({ source, onDrop }: useTile.Props): useTile.Result => {
 	const system = useContext(TileSystemContext);
 	if (system === null) throw new Error("TileSystemProvider is missing.");
-	const { active, register, press, release: releasePointer, cancel: cancelPointer } = system;
+	const { active, press, move, release, cancel } = system;
+	const node = useRef<HTMLElement | null>(null);
 
-	const ref = useCallback(
-		(node: HTMLElement | null) =>
-			register(
-				{
-					id,
-					revision,
-				},
-				node,
-			),
-		[
-			id,
-			revision,
-			register,
-		],
-	);
+	const ref = useCallback((nextNode: HTMLElement | null) => {
+		node.current = nextNode;
+	}, []);
 
 	useEffect(
-		() => () =>
-			cancelPointer({
-				id,
-				revision,
-			}),
+		() => () => cancel(source),
 		[
-			id,
-			revision,
-			cancelPointer,
+			cancel,
+			source,
 		],
 	);
 
 	const onPointerDown = useCallback<PointerEventHandler<HTMLElement>>(
 		(event) => {
 			if (!event.isPrimary || event.button !== 0) return;
-			event.currentTarget.setPointerCapture(event.pointerId);
+			event.preventDefault();
+			const currentNode = node.current;
+			if (currentNode === null) return;
+			currentNode.setPointerCapture?.(event.pointerId);
 			press({
-				id,
-				revision,
+				source,
+				node: currentNode,
 				pointerId: event.pointerId,
+				x: event.clientX,
+				y: event.clientY,
+				onDrop,
 			});
 		},
 		[
-			id,
-			revision,
+			onDrop,
 			press,
+			source,
 		],
 	);
 
-	const release = useCallback<PointerEventHandler<HTMLElement>>(
+	const onPointerMove = useCallback<PointerEventHandler<HTMLElement>>(
 		(event) => {
-			releasePointer({
-				id,
-				revision,
+			event.preventDefault();
+			move({
 				pointerId: event.pointerId,
+				x: event.clientX,
+				y: event.clientY,
 			});
-			if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-				event.currentTarget.releasePointerCapture(event.pointerId);
+		},
+		[
+			move,
+		],
+	);
+
+	const onPointerUp = useCallback<PointerEventHandler<HTMLElement>>(
+		(event) => {
+			event.preventDefault();
+			release({
+				pointerId: event.pointerId,
+				x: event.clientX,
+				y: event.clientY,
+			});
+			if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+				event.currentTarget.releasePointerCapture?.(event.pointerId);
 			}
 		},
 		[
-			id,
-			revision,
-			releasePointer,
+			release,
 		],
 	);
 
-	const cancel = useCallback<PointerEventHandler<HTMLElement>>(
-		() =>
-			cancelPointer({
-				id,
-				revision,
-			}),
+	const cancelPointer = useCallback<PointerEventHandler<HTMLElement>>(
+		(event) => {
+			const current = active;
+			if (current?.source.id !== source.id || current.source.revision !== source.revision)
+				return;
+			if (current.phase === "settling") return;
+			cancel(source);
+			if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+				event.currentTarget.releasePointerCapture?.(event.pointerId);
+			}
+		},
 		[
-			id,
-			revision,
-			cancelPointer,
+			active,
+			cancel,
+			source,
 		],
 	);
+
+	const ownsActive =
+		active?.source.id === source.id && active.source.revision === source.revision;
 
 	return {
 		ref,
-		pressed: active?.id === id && active.revision === revision,
+		pressed: ownsActive && active.phase === "pressed",
+		dragging: ownsActive && active.phase !== "pressed",
 		pointerProps: {
 			onPointerDown,
-			onPointerUp: release,
-			onPointerCancel: cancel,
-			onLostPointerCapture: cancel,
+			onPointerMove,
+			onPointerUp,
+			onPointerCancel: cancelPointer,
+			onLostPointerCapture: cancelPointer,
 		},
 	};
 };

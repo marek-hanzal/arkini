@@ -221,3 +221,9 @@ Next action:
 - A Game retained after failed final save is frozen and non-publishable. Same-package selection may fast-path only a genuinely live ready Game.
 - Non-game routes render one retryable `GameRouteReleaseFailure`; retry preserves the exact save obligation and returning to the package retries disposal before creating a fresh Game.
 - `GameShell` renders gameplay only from `GameOwner.State.type === "ready"`.
+
+## UI transition ownership
+
+- GameMenu route requests are accepted only from the fully open phase. One provider-owned `routePending` lock keeps the open menu snapshot visible and blocks Escape, Return, mutations, and competing route requests until navigation settles.
+- Controlled close has one visible owner: the root action loader. GameMenu does not run a hidden close animation beneath it. Title-bar close activates the same loader, and close failure removes it before authoritative shutdown failure UI is revealed.
+

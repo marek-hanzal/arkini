@@ -3,6 +3,7 @@ import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
+const closeFailedListeners = new Set<(error: unknown) => void>();
 let closing = false;
 let requestedClose:
 	| {
@@ -34,6 +35,7 @@ ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
 		ipcRenderer.send(ArkiniDesktopApi.channels.closeReady);
 	} catch (error) {
 		closing = false;
+		for (const listener of Array.from(closeFailedListeners)) listener(error);
 		ipcRenderer.send(ArkiniDesktopApi.channels.closeFailed, String(error));
 		requestedClose?.reject(error);
 		requestedClose = undefined;
@@ -69,6 +71,10 @@ const api: ArkiniDesktopApi.Api = {
 		onBeforeCloseReady: (listener) => {
 			beforeCloseReadyListeners.add(listener);
 			return () => beforeCloseReadyListeners.delete(listener);
+		},
+		onCloseFailed: (listener) => {
+			closeFailedListeners.add(listener);
+			return () => closeFailedListeners.delete(listener);
 		},
 		requestClose: () => {
 			if (requestedClose !== undefined) return requestedClose.promise;

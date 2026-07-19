@@ -10,6 +10,7 @@ import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 import { ActionLoadingScreen } from "~/ui/loading/ActionLoadingScreen";
+import { useActionLoading } from "~/ui/loading/useActionLoading";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 
 const runOwnerCommand = (command: Effect.Effect<void, unknown>) => {
@@ -27,6 +28,7 @@ export namespace GameShell {
 /** Renders the game selected declaratively by the stable root owner binding. */
 export function GameShell({ children, packageId }: GameShell.Props) {
 	const owner = useGameOwner();
+	const actionLoading = useActionLoading();
 	const state = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
 	const menuGameRef = useRef<Game | undefined>(undefined);
 	const menuPackageIdRef = useRef(packageId);
@@ -87,8 +89,8 @@ export function GameShell({ children, packageId }: GameShell.Props) {
 		>
 			{menuGame !== undefined ? (
 				<GameMenuProvider key={packageId}>
-					{activeGame !== undefined ? (
-						<GameProvider game={activeGame}>
+					{activeGame !== undefined || (actionLoading.active && failure === null) ? (
+						<GameProvider game={activeGame ?? menuGame}>
 							<TileSystemProvider>{children}</TileSystemProvider>
 						</GameProvider>
 					) : (

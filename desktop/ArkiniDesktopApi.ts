@@ -66,6 +66,7 @@ export namespace ArkiniDesktopApi {
 			readonly waitUntilVisible: () => Promise<number>;
 			readonly onBeforeClose: (listener: () => Promise<void>) => () => void;
 			readonly onBeforeCloseReady: (listener: () => Promise<void>) => () => void;
+			readonly onCloseFailed: (listener: (error: unknown) => void) => () => void;
 			readonly requestClose: () => Promise<void>;
 			readonly forceClose: () => void;
 		};

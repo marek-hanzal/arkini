@@ -65,6 +65,7 @@ const GameMenuDialog = ({
 	const saveAndExit = useSaveAndExitGameMutation(game);
 	const hardReset = useHardResetGameMutation(game);
 	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
+	const [navigationError, setNavigationError] = useState<unknown>();
 	const backdropRef = useRef<HTMLDivElement>(null);
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -73,9 +74,11 @@ const GameMenuDialog = ({
 		"save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | null
 	>(null);
 	const animationsRef = useRef<ReadonlyArray<Animation>>([]);
-	const pending = save.isPending || saveAndExit.isPending || hardReset.isPending;
+	const mutationPending = save.isPending || saveAndExit.isPending || hardReset.isPending;
+	const pending = mutationPending || menu.routePending;
 	const exiting = phase === "exiting";
-	const gameActionDisabled = pending || exiting || !gameAvailable;
+	const actionDisabled = phase !== "open" || pending;
+	const gameActionDisabled = actionDisabled || !gameAvailable;
 
 	useEffect(() => {
 		previousFocusRef.current =
@@ -224,28 +227,23 @@ const GameMenuDialog = ({
 		}
 	};
 
-	const requestSettings = () => {
-		if (activeRequestRef.current !== null || pending || exiting) return;
-		activeRequestRef.current = "settings";
-		void navigate({
-			to: "/settings",
-		}).finally(() => {
-			activeRequestRef.current = null;
-		});
+	const requestRoute = (destination: "/settings" | "/main-menu") => {
+		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
+		activeRequestRef.current = destination === "/settings" ? "settings" : "main-menu";
+		setNavigationError(undefined);
+		void navigate({ to: destination })
+			.catch(setNavigationError)
+			.finally(() => {
+				activeRequestRef.current = null;
+				menu.completeRouteRequest();
+			});
 	};
 
-	const requestMainMenu = () => {
-		if (activeRequestRef.current !== null || pending || exiting) return;
-		activeRequestRef.current = "main-menu";
-		void navigate({
-			to: "/main-menu",
-		}).finally(() => {
-			activeRequestRef.current = null;
-		});
-	};
+	const requestSettings = () => requestRoute("/settings");
+	const requestMainMenu = () => requestRoute("/main-menu");
 
 	const requestSave = () => {
-		if (activeRequestRef.current !== null) return;
+		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
 		activeRequestRef.current = "save";
 		save.mutate(undefined, {
 			onSettled: () => {
@@ -255,7 +253,7 @@ const GameMenuDialog = ({
 	};
 
 	const requestSaveAndExit = () => {
-		if (activeRequestRef.current !== null) return;
+		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
 		activeRequestRef.current = "save-and-exit";
 		saveAndExit.mutate(undefined, {
 			onSettled: () => {
@@ -265,7 +263,7 @@ const GameMenuDialog = ({
 	};
 
 	const requestHardReset = () => {
-		if (activeRequestRef.current !== null) return;
+		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
 		activeRequestRef.current = "hard-reset";
 		void hardReset
 			.mutateAsync()
@@ -288,9 +286,13 @@ const GameMenuDialog = ({
 						? `Save and exit failed: ${errorMessage(saveAndExit.error)}`
 						: save.isError
 							? `Save failed: ${errorMessage(save.error)}`
-							: save.isSuccess
-								? "Saved."
-								: null;
+							: navigationError !== undefined
+								? `Navigation failed: ${errorMessage(navigationError)}`
+								: menu.routePending
+									? "Opening destination…"
+									: save.isSuccess
+										? "Saved."
+										: null;
 
 	return (
 		<div
@@ -343,14 +345,14 @@ const GameMenuDialog = ({
 					</PrimaryButton>
 					<Button
 						className="w-full py-3 shadow-none backdrop-blur-none"
-						disabled={pending || exiting}
+						disabled={actionDisabled}
 						onClick={requestSettings}
 					>
 						Settings
 					</Button>
 					<Button
 						className="w-full py-3 shadow-none backdrop-blur-none"
-						disabled={pending || exiting}
+						disabled={actionDisabled}
 						onClick={requestMainMenu}
 					>
 						Main Menu

@@ -2,7 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { Effect } from "effect";
 
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
+import { removeGameEngineResource } from "~/bridge/game/removeGameEngineResource";
 
 export namespace releaseGameEngineResourceFx {
 	export interface Props {
@@ -18,9 +18,9 @@ export const releaseGameEngineResourceFx = Effect.fn("releaseGameEngineResourceF
 			resource.game.disposeFx.pipe(
 				Effect.tap(() =>
 					Effect.sync(() =>
-						queryClient.removeQueries({
-							exact: true,
-							queryKey: gameEngineQueryKey(resource.game.arkpack.packageId),
+						removeGameEngineResource({
+							queryClient,
+							resource,
 						}),
 					),
 				),

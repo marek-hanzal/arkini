@@ -1,16 +1,16 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { resolveLauncherLeaveDestination } from "~/ui/navigation/resolveLauncherLeaveDestination";
 
 export const Route = createFileRoute("/_launcher")({
 	beforeLoad: ({ context, location }) => {
-		const cached = findCachedGameEngine(context.queryClient);
-		if (cached === null) return;
+		const resource = getCachedGameEngineResource(context.queryClient);
+		if (resource === null) return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {
-				packageId: cached.packageId,
+				packageId: resource.game.arkpack.packageId,
 			},
 			search: resolveLauncherLeaveDestination(location.pathname),
 			replace: true,

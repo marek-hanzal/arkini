@@ -4,8 +4,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkpackCatalogProvider } from "~/bridge/arkpack/ArkpackCatalogProvider";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
+import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { createArkiniRouter } from "~/router";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
@@ -45,8 +45,8 @@ const router = createArkiniRouter({
 });
 
 const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
-	const cached = findCachedGameEngine(queryClient);
-	if (cached === null) {
+	const resource = await waitForGameEngineResource(queryClient);
+	if (resource === null) {
 		await router.navigate({
 			to: "/action/exit",
 			replace: true,
@@ -56,7 +56,7 @@ const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
 	await router.navigate({
 		to: "/game/$packageId/action/exit",
 		params: {
-			packageId: cached.packageId,
+			packageId: resource.game.arkpack.packageId,
 		},
 		replace: true,
 	});
@@ -64,16 +64,16 @@ const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
 
 import.meta.hot?.dispose((data: HotData) => {
 	removeBeforeClose();
-	const cached = findCachedGameEngine(queryClient);
-	data.gameEngineShutdown =
-		cached === null
-			? Promise.resolve()
+	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then((resource) =>
+		resource === null
+			? undefined
 			: RendererRuntime.runPromise(
 					releaseGameEngineResourceFx({
 						queryClient,
-						resource: cached.resource,
+						resource,
 					}),
-				);
+				),
+	);
 });
 
 createRoot(rootElement).render(

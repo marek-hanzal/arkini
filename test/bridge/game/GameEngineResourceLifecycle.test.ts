@@ -4,21 +4,23 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
 const createGame = ({
+	packageId = "package:lifecycle",
 	disposeFx = Effect.void,
 	disposeWithoutSaveFx = Effect.void,
 }: {
+	readonly packageId?: string;
 	readonly disposeFx?: Game["disposeFx"];
 	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
 } = {}): Game => ({
 	arkpack: {
-		packageId: "package:lifecycle",
+		packageId,
 		contentHash: "content:lifecycle",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
@@ -34,7 +36,7 @@ const createGame = ({
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
-		packageId: "package:lifecycle",
+		packageId,
 		contentHash: "0".repeat(64),
 	},
 	subscribe: () => () => undefined,
@@ -44,7 +46,7 @@ const createGame = ({
 const createHarness = (game: Game) => {
 	const queryClient = new QueryClient();
 	const resource = Effect.runSync(createGameEngineResourceFx(game));
-	queryClient.setQueryData(gameEngineQueryKey(game.arkpack.packageId), resource);
+	queryClient.setQueryData(gameEngineQueryKey, resource);
 	return {
 		queryClient,
 		resource,
@@ -67,7 +69,7 @@ describe("GameEngineResource lifecycle", () => {
 		);
 
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(findCachedGameEngine(queryClient)).toBeNull();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 	});
 
 	it("retains the exact frozen Game when final save fails", async () => {
@@ -85,7 +87,39 @@ describe("GameEngineResource lifecycle", () => {
 				}),
 			),
 		).rejects.toThrow("disk full");
-		expect(findCachedGameEngine(queryClient)?.resource).toBe(resource);
+		expect(getCachedGameEngineResource(queryClient)).toBe(resource);
+	});
+
+	it("does not let stale cleanup remove a newer singleton resource", async () => {
+		const disposeOld = vi.fn();
+		const oldResource = Effect.runSync(
+			createGameEngineResourceFx(
+				createGame({
+					packageId: "package:old",
+					disposeFx: Effect.sync(disposeOld),
+				}),
+			),
+		);
+		const newResource = Effect.runSync(
+			createGameEngineResourceFx(
+				createGame({
+					packageId: "package:new",
+				}),
+			),
+		);
+		const queryClient = new QueryClient();
+		queryClient.setQueryData(gameEngineQueryKey, newResource);
+
+		await expect(
+			Effect.runPromise(
+				releaseGameEngineResourceFx({
+					queryClient,
+					resource: oldResource,
+				}),
+			),
+		).rejects.toThrow("cannot remove a different or missing singleton resource");
+		expect(disposeOld).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(queryClient)).toBe(newResource);
 	});
 
 	it("keeps a spent reset resource retryable until exact save clearing succeeds", async () => {
@@ -110,7 +144,7 @@ describe("GameEngineResource lifecycle", () => {
 				}),
 			),
 		).rejects.toThrow("clear failed");
-		expect(findCachedGameEngine(queryClient)?.resource).toBe(resource);
+		expect(getCachedGameEngineResource(queryClient)).toBe(resource);
 
 		await Effect.runPromise(
 			resetGameEngineResourceFx({
@@ -125,6 +159,6 @@ describe("GameEngineResource lifecycle", () => {
 			"discard",
 			"clear:2",
 		]);
-		expect(findCachedGameEngine(queryClient)).toBeNull();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 	});
 });

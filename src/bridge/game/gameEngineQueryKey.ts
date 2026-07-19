@@ -1,10 +1,4 @@
-export const gameEngineQueryRootKey = [
+/** The renderer-wide cache identity of Arkini's sole live Game Engine resource. */
+export const gameEngineQueryKey = [
 	"game-engine",
 ] as const;
-
-/** Returns the exact cache identity of one route-owned Game session. */
-export const gameEngineQueryKey = (packageId: string) =>
-	[
-		...gameEngineQueryRootKey,
-		packageId,
-	] as const;

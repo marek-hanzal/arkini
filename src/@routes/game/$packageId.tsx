@@ -1,11 +1,11 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 
 export const Route = createFileRoute("/game/$packageId")({
 	beforeLoad: ({ context, params }) => {
-		const cached = findCachedGameEngine(context.queryClient);
-		if (cached === null || cached.packageId !== params.packageId) {
+		const resource = getCachedGameEngineResource(context.queryClient);
+		if (resource === null || resource.game.arkpack.packageId !== params.packageId) {
 			throw redirect({
 				to: "/action/load-game/$packageId",
 				params,
@@ -13,8 +13,8 @@ export const Route = createFileRoute("/game/$packageId")({
 			});
 		}
 		return {
-			gameEngine: cached.game,
-			gameEngineResource: cached.resource,
+			gameEngine: resource.game,
+			gameEngineResource: resource,
 		};
 	},
 	loader: ({ context }) => context.gameEngine,

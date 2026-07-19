@@ -10,14 +10,16 @@ export namespace gameEngineQueryOptions {
 	export interface Props {
 		readonly packageId: string;
 		readonly awaitPreviousShutdown?: Promise<void>;
+		readonly beforeCreate?: () => Promise<void>;
 		readonly create?: (packageId: string) => Promise<Game>;
 	}
 }
 
-/** Owns one stable live Game instance for the exact package until explicit route release. */
+/** Creates the one renderer-wide live Game Engine resource after prior HMR ownership settles. */
 export const gameEngineQueryOptions = ({
 	packageId,
 	awaitPreviousShutdown = Promise.resolve(),
+	beforeCreate = () => Promise.resolve(),
 	create = (selectedPackageId) =>
 		RendererRuntime.runPromise(
 			createGameFx({
@@ -26,10 +28,17 @@ export const gameEngineQueryOptions = ({
 		),
 }: gameEngineQueryOptions.Props) =>
 	queryOptions({
-		queryKey: gameEngineQueryKey(packageId),
+		queryKey: gameEngineQueryKey,
 		queryFn: async () => {
 			await awaitPreviousShutdown;
+			await beforeCreate();
 			const game = await create(packageId);
+			if (game.arkpack.packageId !== packageId) {
+				await RendererRuntime.runPromise(game.disposeWithoutSaveFx);
+				throw new Error(
+					`Game Engine creation returned package ${game.arkpack.packageId} for requested package ${packageId}.`,
+				);
+			}
 			return RendererRuntime.runPromise(createGameEngineResourceFx(game));
 		},
 		gcTime: Number.POSITIVE_INFINITY,

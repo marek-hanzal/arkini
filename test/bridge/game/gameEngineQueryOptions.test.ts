@@ -3,13 +3,20 @@ import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
-import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
+import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
-const createGame = (packageId = "package:test"): Game => ({
+const createGame = (
+	packageId = "package:test",
+	{
+		disposeWithoutSaveFx = Effect.void,
+	}: {
+		readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
+	} = {},
+): Game => ({
 	arkpack: {
 		packageId,
 		contentHash: "content:test",
@@ -21,7 +28,7 @@ const createGame = (packageId = "package:test"): Game => ({
 	},
 	config: testArkpackConfig,
 	disposeFx: Effect.void,
-	disposeWithoutSaveFx: Effect.void,
+	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
@@ -34,8 +41,6 @@ const createGame = (packageId = "package:test"): Game => ({
 	subscribeEvents: () => () => undefined,
 });
 
-const createResource = (game: Game) => Effect.runSync(createGameEngineResourceFx(game));
-
 const createClient = () =>
 	new QueryClient({
 		defaultOptions: {
@@ -46,7 +51,7 @@ const createClient = () =>
 	});
 
 describe("gameEngineQueryOptions", () => {
-	it("deduplicates repeated route acquisition to one stable Game instance", async () => {
+	it("deduplicates repeated route acquisition through one renderer-wide query slot", async () => {
 		const game = createGame();
 		const create = vi.fn(async () => game);
 		const client = createClient();
@@ -58,17 +63,14 @@ describe("gameEngineQueryOptions", () => {
 		const first = await client.ensureQueryData(options);
 		const second = await client.ensureQueryData(options);
 
+		expect(options.queryKey).toBe(gameEngineQueryKey);
 		expect(first.game).toBe(game);
 		expect(second).toBe(first);
 		expect(create).toHaveBeenCalledOnce();
-		expect(findCachedGameEngine(client)).toEqual({
-			game,
-			packageId: "package:test",
-			resource: first,
-		});
+		expect(getCachedGameEngineResource(client)).toBe(first);
 	});
 
-	it("creates a fresh Game only after explicit cache removal", async () => {
+	it("creates a fresh Game only after explicit singleton cache removal", async () => {
 		const first = createGame();
 		const second = createGame();
 		const create = vi.fn().mockResolvedValueOnce(first).mockResolvedValueOnce(second);
@@ -81,10 +83,75 @@ describe("gameEngineQueryOptions", () => {
 		expect((await client.ensureQueryData(options)).game).toBe(first);
 		client.removeQueries({
 			exact: true,
-			queryKey: gameEngineQueryKey("package:test"),
+			queryKey: gameEngineQueryKey,
 		});
 		expect((await client.ensureQueryData(options)).game).toBe(second);
 		expect(create).toHaveBeenCalledTimes(2);
+	});
+
+	it("lets controlled close and HMR join creation before heavy bootstrap starts", async () => {
+		let allowCreate!: () => void;
+		const beforeCreate = new Promise<void>((resolve) => {
+			allowCreate = resolve;
+		});
+		const game = createGame();
+		const create = vi.fn(async () => game);
+		const client = createClient();
+		const acquisition = client.ensureQueryData(
+			gameEngineQueryOptions({
+				packageId: "package:test",
+				beforeCreate: () => beforeCreate,
+				create,
+			}),
+		);
+
+		const joined = waitForGameEngineResource(client);
+		expect(create).not.toHaveBeenCalled();
+		allowCreate();
+
+		expect(await joined).toBe(await acquisition);
+		expect(create).toHaveBeenCalledOnce();
+	});
+
+	it("treats a failed pending creation as no live resource", async () => {
+		let rejectCreate!: (error: Error) => void;
+		const creation = new Promise<Game>((_resolve, reject) => {
+			rejectCreate = reject;
+		});
+		const client = createClient();
+		const acquisition = client
+			.ensureQueryData(
+				gameEngineQueryOptions({
+					packageId: "package:test",
+					create: () => creation,
+				}),
+			)
+			.catch(() => undefined);
+
+		const joined = waitForGameEngineResource(client);
+		rejectCreate(new Error("bootstrap failed"));
+
+		expect(await joined).toBeNull();
+		await acquisition;
+	});
+
+	it("discards a contract-breaking Game returned for another package", async () => {
+		const discard = vi.fn();
+		const client = createClient();
+		const game = createGame("package:wrong", {
+			disposeWithoutSaveFx: Effect.sync(discard),
+		});
+
+		await expect(
+			client.ensureQueryData(
+				gameEngineQueryOptions({
+					packageId: "package:expected",
+					create: async () => game,
+				}),
+			),
+		).rejects.toThrow("returned package package:wrong");
+		expect(discard).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(client)).toBeNull();
 	});
 
 	it("serializes overlapping route lifecycle actions for one cached Game", async () => {
@@ -131,21 +198,5 @@ describe("gameEngineQueryOptions", () => {
 			"first:end",
 			"second",
 		]);
-	});
-
-	it("rejects an impossible cache containing multiple live Games", () => {
-		const client = createClient();
-		client.setQueryData(
-			gameEngineQueryKey("package:first"),
-			createResource(createGame("package:first")),
-		);
-		client.setQueryData(
-			gameEngineQueryKey("package:second"),
-			createResource(createGame("package:second")),
-		);
-
-		expect(() => findCachedGameEngine(client)).toThrow(
-			"Arkini cannot own more than one cached live Game.",
-		);
 	});
 });

@@ -7,7 +7,7 @@ import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { recoverFailedGameSaveFx } from "~/bridge/game/recoverFailedGameSaveFx";
 
 const packageId = "package-recovery";
-const queryKey = gameEngineQueryKey(packageId);
+const queryKey = gameEngineQueryKey;
 const saveKey = {
 	packageId,
 	contentHash: "a".repeat(64),

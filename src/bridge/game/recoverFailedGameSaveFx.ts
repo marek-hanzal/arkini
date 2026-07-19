@@ -18,8 +18,9 @@ export namespace recoverFailedGameSaveFx {
 export const recoverFailedGameSaveFx = Effect.fn("recoverFailedGameSaveFx")(
 	({ clearSaveFx, packageId, queryClient }: recoverFailedGameSaveFx.Props) =>
 		Effect.gen(function* () {
-			const queryKey = gameEngineQueryKey(packageId);
-			const error = queryClient.getQueryState<GameEngineResource, unknown>(queryKey)?.error;
+			const error = queryClient.getQueryState<GameEngineResource, unknown>(
+				gameEngineQueryKey,
+			)?.error;
 			if (!(error instanceof GameSaveBootstrapError)) {
 				return yield* Effect.fail(
 					new Error(
@@ -41,7 +42,7 @@ export const recoverFailedGameSaveFx = Effect.fn("recoverFailedGameSaveFx")(
 			yield* Effect.sync(() =>
 				queryClient.removeQueries({
 					exact: true,
-					queryKey,
+					queryKey: gameEngineQueryKey,
 				}),
 			);
 		}),

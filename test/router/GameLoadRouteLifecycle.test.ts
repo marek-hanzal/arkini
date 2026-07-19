@@ -13,7 +13,7 @@ vi.mock("~/bridge/game/createGameFx", () => ({
 
 import { routeTree } from "~/_route";
 import type { Game } from "~/bridge/game/Game";
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
@@ -104,7 +104,7 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(findCachedGameEngine(queryClient)?.game).toBe(game);
+		expect(getCachedGameEngineResource(queryClient)?.game).toBe(game);
 	});
 
 	it("repairs a direct Board entry through the same explicit load action", async () => {
@@ -118,6 +118,6 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(findCachedGameEngine(queryClient)?.game).toBe(game);
+		expect(getCachedGameEngineResource(queryClient)?.game).toBe(game);
 	});
 });

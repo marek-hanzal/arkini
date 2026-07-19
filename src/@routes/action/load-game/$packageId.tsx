@@ -1,19 +1,20 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRoute } from "~/page/action/runActionRoute";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
+import { waitForActiveViewTransition } from "~/ui/navigation/waitForActiveViewTransition";
 
 export const Route = createFileRoute("/action/load-game/$packageId")({
 	beforeLoad: ({ context, params }) => {
-		const cached = findCachedGameEngine(context.queryClient);
-		if (cached === null || cached.packageId === params.packageId) return;
+		const resource = getCachedGameEngineResource(context.queryClient);
+		if (resource === null || resource.game.arkpack.packageId === params.packageId) return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {
-				packageId: cached.packageId,
+				packageId: resource.game.arkpack.packageId,
 			},
 			search: {
 				destination: "game",
@@ -22,15 +23,23 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 			replace: true,
 		});
 	},
-	loader: async ({ context, params }) => {
-		await runActionRoute(() =>
-			context.queryClient.ensureQueryData(
-				gameEngineQueryOptions({
-					packageId: params.packageId,
-					awaitPreviousShutdown: context.previousGameShutdown,
-				}),
-			),
+	loader: async ({ abortController, context, params }) => {
+		const acquisition = context.queryClient.ensureQueryData(
+			gameEngineQueryOptions({
+				packageId: params.packageId,
+				awaitPreviousShutdown: context.previousGameShutdown,
+				beforeCreate: async () => {
+					await waitForActiveViewTransition();
+					abortController.signal.throwIfAborted();
+				},
+			}),
 		);
+		const resource = await runActionRoute(() => acquisition);
+		if (resource.game.arkpack.packageId !== params.packageId) {
+			throw new Error(
+				`Game Engine singleton owns package ${resource.game.arkpack.packageId}, not requested package ${params.packageId}.`,
+			);
+		}
 		throw redirect({
 			to: "/game/$packageId/board",
 			params,

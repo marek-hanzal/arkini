@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { routeTree } from "~/_route";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { findCachedGameEngine } from "~/bridge/game/findCachedGameEngine";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
@@ -58,7 +58,7 @@ const createGame = (disposeFx: Game["disposeFx"] = Effect.void): Game => ({
 const createHarness = (initialPath: string, game: Game) => {
 	const queryClient = new QueryClient();
 	const resource = Effect.runSync(createGameEngineResourceFx(game));
-	queryClient.setQueryData(gameEngineQueryKey(game.arkpack.packageId), resource);
+	queryClient.setQueryData(gameEngineQueryKey, resource);
 	const router = createRouter({
 		routeTree,
 		isServer: false,
@@ -111,7 +111,7 @@ describe("game route lifecycle", () => {
 
 		expect(router.state.location.pathname).toBe("/settings");
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(findCachedGameEngine(queryClient)).toBeNull();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 	});
 
 	it("keeps one parent Game while moving from board into its action sibling", async () => {
@@ -135,7 +135,7 @@ describe("game route lifecycle", () => {
 
 		expect(dispose).toHaveBeenCalledOnce();
 		expect(resource.game).toBe(game);
-		expect(findCachedGameEngine(queryClient)).toBeNull();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 		expect(router.state.location.pathname).toBe("/main-menu");
 	});
 });

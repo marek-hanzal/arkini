@@ -2,7 +2,7 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router file registrations live under `src/@routes`. Renderer dependency direction is `@routes → page → ui → bridge → engine`. `electron/` owns only Electron main/preload/protocol concerns and may not import renderer or engine roots. The renderer may not import Electron. `src/_archive` is outside every active source root and may never be imported.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration and route lifecycle orchestration live under `src/@routes`. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; routes may call public bridge Effects but never import the engine directly. `electron/` owns only Electron main/preload/protocol concerns and may not import renderer or engine roots. The renderer may not import Electron. `src/_archive` is outside every active source root and may never be imported.
 
 Enforcement is deliberately split by contract: Dependency Cruiser owns stable import boundaries; focused tests own runtime, lifecycle, security, persistence, UI, compiler, CLI, and packaging behavior; generated-output tests inspect real renderer/release artifacts; TypeScript and Zod own type/schema validity. Project grammar such as same-name `*Fx`, object + factory composition, one `IdSchema`, and semantic token usage lives in `CODE_GUIDE.md` plus review. The repository does not maintain source-text recurrence tests or a custom AST style policy system.
 
@@ -31,19 +31,20 @@ project CLI process
 electron/main + electron/preload
 → BrowserWindow, custom protocol, controlled close, typed Arkpack/save filesystem capabilities
 
-src/@routes → src/page → src/ui → src/bridge → src/engine
-→ the only renderer, route tree, game bridge, and engine
+src/@routes → src/page / src/ui / src/bridge → src/engine
+             src/page → src/ui → src/bridge
+→ the only renderer, route lifecycle, presentation, game bridge, and engine
 ```
 
-Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` owns the one-session startup splash, `/main-menu` the semantic launcher menu, `/arkpacks` the shared package selector, `/settings` the application theme control, `/about` credits, and `/game/$packageId` one live game. Electron does not interpret routes beyond static resource serving and SPA fallback.
+Development Electron loads the Vite HTTP origin for HMR. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` owns the one-session startup splash, `/main-menu` the semantic launcher menu, `/arkpacks` the shared package selector, `/settings` the application theme control, `/about` credits, `/game/$packageId` the non-visual live resource boundary, and `/game/$packageId/board` the explicit gameplay page. Electron does not interpret routes beyond static resource serving and SPA fallback.
 
 ### Renderer startup and launcher ownership
 
 One renderer-session `LauncherStartup` owner is created beside the router and one root-owned `ArkpackCatalog`. Bootstrap starts immediately, while Electron main reports the actual `ready-to-show` moment through the typed preload lifecycle. The visible window stays pure black for approximately 500 ms from that renderer timestamp. Appearance publishes early and Hero readiness is explicit only after `HTMLImageElement.decode()`; trusted preload readiness, one catalog refresh, and canonical built-in package resolution complete the remaining hard bootstrap. The owner exposes synchronous snapshots, retry, and one idempotent splash-completion flag; it is not a query cache or second persistence owner.
 
-After the visible black hold and visual readiness, the complete Hero composition fades in as one scene even when the remaining catalog bootstrap is still truthfully loading. `/main-menu` is already mounted beneath the splash, so the outgoing WAAPI animation cross-fades directly into the destination and releases ownership from `Animation.finished`, not a duplicated JavaScript timer. Automatic exit requires hard bootstrap readiness and five seconds from visible-window readiness. One derived `canContinue` contract combines hard readiness, the interactive `entering | open` splash phases, and a still-skippable minimum hold: black hold and loading ignore Escape without queueing, active enter may reverse into the shared exit, the prompt disappears as soon as exit begins, and late readiness after the five-second minimum proceeds automatically without flashing a useless prompt. A failed bootstrap remains on `/` with explicit retry. Once completion is recorded, later client navigation to `/` redirects to `/main-menu` without replaying the splash. No reduced-motion branch or generic transition subsystem exists.
+After the visible black hold and visual readiness, the complete Hero composition fades in as one scene even when the remaining catalog bootstrap is still truthfully loading. Automatic completion requires hard bootstrap readiness and five seconds from visible-window readiness; legal Escape may continue once readiness exists without queueing an earlier request. A failed bootstrap remains on `/` with explicit retry. Completion records the one-session splash and navigates to `/main-menu` through the typed native `startup-main-page` View Transition. Main Menu is not mounted beneath Startup, and no cloned Hero, manual destination crossfade, or second local View Transition participates. Later client navigation to `/` redirects to `/main-menu` without replaying the splash.
 
-`/main-menu` reads the canonical built-in package identity from `LauncherStartup` and the current package list from the shared catalog. `/arkpacks` reuses that same catalog owner and the existing selector; no QueryClient catalog state or duplicate list exists. `/settings` is the only theme-control surface and adapts the existing root appearance owner through one complete standalone TanStack mutation; `/about` is standalone. Out-of-game routes never create a `Game`. Main-menu Exit and in-game Save and exit both request the trusted native controlled-close handshake. For the in-game path, preload first waits for `GameOwner.shutdownFx` to complete the final save, then waits for the game-menu exit animation, and only afterward sends `closeReady` to Electron. Route release remains a distinct operation for ordinary route ownership changes. The game menu owns one local `closed | entering | open | exiting` lifecycle, stays mounted and interaction-authoritative through exit, and survives same-package hard reset long enough to fade over the fresh game.
+`/main-menu` reads the canonical built-in package identity from `LauncherStartup` and the current package list from the shared catalog. `/arkpacks` reuses that same catalog owner and the existing selector; no QueryClient catalog state or duplicate list exists. `/settings` is the only theme-control surface and adapts the existing root appearance owner through one complete standalone TanStack mutation; `/about` is standalone. Out-of-game routes never create a `Game`. `/game/$packageId` is the route-scoped resource boundary, `/game/$packageId/board` is the explicit gameplay leaf, and blocking lifecycle operations are sibling `action/*` leaves. Main-menu Exit and in-game Save and exit request the trusted native controlled-close handshake; preload waits for the router-owned exit action before sending `closeReady`. The game menu owns only local `closed | entering | open | exiting` WAAPI state and does not survive navigation as a hidden lifecycle owner.
 
 The renderer is also a strict authorization boundary. One main-process trusted-renderer capability owns the registered Arkini windows and parses every candidate URL with `URL`. Development allows only the exact configured loopback Vite origin; packaged mode ignores `ELECTRON_RENDERER_URL` and allows only the `arkini://app` origin. Main-frame navigation may remain within that origin, while external navigation, redirects, every subframe, `<webview>`, popup, and unused Chromium permission are denied before content is admitted. Every privileged invoke/send channel validates the registered `webContents`, exact main-frame identity, and trusted current frame URL. `webContents.id` alone is never authorization.
 
@@ -158,7 +159,7 @@ The acquired queue is owned with `Effect.acquireRelease`, so scope cancellation 
 
 ## 4. Live game bridge boundary
 
-`GameSession` owns the Effect services, Tick, subscriptions, and save lifecycle of one loaded engine. The bridge-level `Game` adds the completed config, embedded resource URLs, and one replacement key. The root-shell `GameOwner` is the only publisher of live `Game` instances; route components request a package but never independently own overlapping sessions. Neither object mirrors runtime state.
+`GameSession` owns the Effect services, Tick, subscriptions, canonical runtime, and save lifecycle of one loaded engine. The bridge-level `Game` adds completed config and embedded resource URLs. Neither object mirrors runtime state, and React never owns the engine lifecycle.
 
 The live boundary exposes:
 
@@ -168,74 +169,59 @@ The live boundary exposes:
 - `subscribeEvents(listener)` — transient event batches for presentation;
 - `flushSaveFx` — explicit persistence flush Effect;
 - `disposeFx` — coordinated shutdown Effect with a retryable final save. A failed flush freezes the session and retains the same canonical runtime for another disposal attempt; resources are released only after the save succeeds;
-- `disposeWithoutSaveFx` — explicit destructive disposal Effect used by hard reset or by a bootstrap that completed but was never published. It stops autosave and releases the session without writing a final snapshot.
+- `disposeWithoutSaveFx` — explicit destructive disposal Effect used by hard reset or a bootstrap that must be abandoned without writing a final snapshot.
 
 `GameSession` lifecycle operations are reusable Effect values rather than Promise-producing methods. One Effect-owned lifecycle state and one `Deferred` represent the active disposal attempt: concurrent fibers await that exact attempt, failure returns the session to a frozen retryable state, and a later disposal starts a new attempt. Promise exists only at explicit `ManagedRuntime`/process execution boundaries and is never cached as lifecycle state.
 
 `GameSession.run()` remains generic by deliberate soft contract. Bridge domains may run public commands and reads only. UI never imports the engine directly and may not reach runtime-store services through the generic runner.
 
-`GameOwner` is a small class-free resource lifecycle. It owns one published `Game`, one private failed-save recovery identity, synchronous external-store state, and one transition semaphore. Its public operations are explicit:
+### 4.1 Route-owned Game resource
+
+`/game/$packageId` is a non-visual TanStack Router resource boundary. It always creates a new `Game` when the exact resource query is absent, but parent `beforeLoad` replay during child navigation must return the same existing resource:
 
 ```text
-selectPackageFx(packageId)
-releaseRouteGameFx
-shutdownFx
-hardResetFx
-clearFailedSaveAndRetryFx
+/game/$packageId beforeLoad
+→ queryClient.ensureQueryData(gameEngineQueryOptions(packageId))
+→ return { gameEngine, gameEngineResource } through route context
+
+/game/$packageId loader
+→ return the exact same Game for UI loader data
+
+/game/$packageId/board
+→ render GameShell and Board
+
+/game/$packageId/action/*
+→ run lifecycle Effects against inherited gameEngineResource
 ```
 
-Package selection runs one serialized transition:
+`gameEngineQueryOptions` is the sole creation boundary. Its exact package key has infinite stale and garbage-collection time, disabled retry, and disabled structural sharing. TanStack Query therefore owns only the stable identity and lifetime of the live route resource; canonical gameplay state, subscriptions, persistence, and commands remain inside `GameSession`. Gameplay components never use `useQuery()` for the engine. They call `useGameEngine()`, a named typed hook over the parent route loader data.
+
+`GameEngineResource` contains one `Game` and one private Effect semaphore. The semaphore serializes every destructive route-owned lifecycle action for that session:
 
 ```text
-same published package
-→ no-op and restore ready publication when needed
+leave / exit / HMR
+→ Game.disposeFx
+→ remove exact Query resource only after success
 
-new package
-→ publish loading target
-→ await current Game.disposeFx final save
-→ create one candidate Game
-→ publish that candidate as current
+reset
+→ Game.disposeWithoutSaveFx
+→ clear exact packageId + contentHash save
+→ remove exact Query resource
+→ redirect to /game/$packageId/board
+→ normal parent beforeLoad creates one fresh Game
 ```
 
-There is no generic `Command`, `Intent`, Queue drain, checkpoint protocol, latest-wins coalescing, or per-command `Deferred` acknowledgement. Concurrent requests wait on the semaphore in call order. Duplicate identical selections become no-ops after the first transition settles. A candidate that completes bootstrap but is interrupted before publication is never a save owner; it is released only through `disposeWithoutSaveFx` and cannot block the next serialized selection.
+A failed final save leaves the same frozen resource cached. The action error page retries the identical disposal obligation; no replacement game may be published and no query may be removed until disposal succeeds. Reset relies on idempotent session disposal and exact save clearing so retry can continue safely without a second UI-owned phase machine.
 
-The owner lives above the route outlet. One stable root binding maps `/game/$packageId` to `selectPackageFx(packageId)` and every non-game route to `releaseRouteGameFx()`. React cleanup is not a desired-game signal, so StrictMode replay does not manufacture `A → null → A`; repeated identical effects serialize into a no-op.
+The pathless launcher boundary detects an active cached resource and redirects launcher navigation through `/game/$packageId/action/leave`. A request for another package first routes through the current package's leave action, then enters the destination `/board`. React cleanup, provider unmount, and component effects are never desired-game signals.
 
-Route release and application shutdown are separate operations even though both request a final save. Their failure states carry explicit operation identity. A route-release failure never exposes application-exit UI. HMR and controlled Electron close use `shutdownFx`; a failed final save retains the same frozen `Game`, and the next shutdown request retries that exact obligation. Explicit force close belongs to native process policy and does not run best-effort renderer discard or claim that save cleanup succeeded.
+Controlled Electron close navigates to `/game/$packageId/action/exit` when a resource exists or `/action/exit` otherwise. Preload waits for the router navigation/loader to settle before sending `closeReady`. HMR uses the same release operation, and a newly created resource waits for the previous HMR shutdown promise so sessions cannot overlap across module replacement. Explicit native force close remains process policy and never claims renderer cleanup or save success.
 
-Owner command failures both publish matching failed state and fail the initiating Effect. Save recovery identity stays private; UI receives only `canRecoverSave`. Interruption remains inside the owning Effect transition. Completed release is committed before ownership is cleared, and an unpublished candidate is destructively finalized before the transition semaphore is released.
+Action routes own their operation in leaf loaders. `pendingComponent` and `errorComponent` are complete Hero pages and contain no domain orchestration. They are ordinary native View Transition destinations, not overlays over a still-mounted Board or launcher root.
 
-Owner state publication is synchronous for `useSyncExternalStore`, but observer delivery is never authoritative lifecycle work. Every publication iterates one stable listener snapshot; each callback throw and each rejected returned Promise-like value is isolated independently, later listeners still receive the same publication, and subscription changes affect only later publications. Observer defects can be reported, but they cannot create owner failure state or stop game creation, disposal, replacement, reset, or shutdown.
+Bootstrap save recovery is necessarily top-level because the failing `/game/$packageId` resource boundary cannot load a child action. `GameEngineErrorPage` only links to `/action/recover-game-save` with the public package identity. The action loader resolves the exact failed Query state, requires `GameSaveBootstrapError`, clears its verified private save key, removes that failed query only after success, and redirects to the ordinary `/game/$packageId/board` bootstrap. Package validation failures and unrelated query errors cannot invoke save deletion.
 
-Hard reset is the same owner transition with destructive save policy:
-
-```text
-current Game.disposeWithoutSaveFx
-→ clear only current packageId + contentHash save
-→ create the same package through the normal bootstrap path
-→ publish one fresh Game
-```
-
-Hard reset is one explicit semaphore-owned operation. Separate callers execute sequentially; it is not represented as a generic intent or used to justify a scheduler.
-
-Failed bootstrap recovery distinguishes trusted package identity from untrusted package bytes:
-
-```text
-package validation failure
-→ no verified save key
-→ retry/back only; no save-clear action
-
-verified package + save decode/hydration failure
-→ retain exact packageId + contentHash key privately in GameOwner
-→ expose only save-recovery capability in public state
-→ explicit clear-save-and-retry under the transition semaphore
-→ clear only that exact save once
-→ run the normal fresh bootstrap path
-```
-
-The save is never deleted automatically. UI requests recovery from `GameOwner`; it never receives the storage key, calls save storage, or constructs filesystem paths. Failed clear remains a truthful recoverable failure. If clear succeeds but fresh bootstrap fails for another reason, the same recovery operation retries bootstrap without deleting the key a second time.
-
-### 4.1 Desktop persistence
+### 4.2 Desktop persistence
 
 Electron `userData` owns separate Arkpack, save, and appearance namespaces:
 

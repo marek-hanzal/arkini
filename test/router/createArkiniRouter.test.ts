@@ -94,6 +94,15 @@ describe("createArkiniRouter", () => {
 		expect(resolveTypes("/game/built-in/board", "/main-menu")).toEqual([
 			"main-page-game",
 		]);
+		expect(resolveTypes("/game/built-in/board", "/game/built-in/action/leave")).toEqual([
+			"main-page-game",
+		]);
+		expect(resolveTypes("/game/built-in/action/reset", "/game/built-in/board")).toEqual([
+			"main-page-game",
+		]);
+		expect(resolveTypes("/game/built-in", "/action/recover-game-save")).toEqual([
+			"main-page-game",
+		]);
 		expect(resolveTypes("/game/built-in/board", "/dev/shell")).toBe(false);
 	});
 

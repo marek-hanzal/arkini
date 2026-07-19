@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { ActionErrorPage } from "~/page/action/ActionErrorPage";
+import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRoute } from "~/page/action/runActionRoute";
 

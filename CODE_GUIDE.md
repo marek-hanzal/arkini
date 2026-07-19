@@ -2,7 +2,7 @@
 
 This document is mandatory. It is not a collection of optional style preferences.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level composition lives under `src/page`; TanStack Router registrations live under `src/@routes`. `electron/` is the explicit main/preload platform boundary and may not import renderer or engine roots; renderer code may not import Electron. `src/_archive` is historical reference only and may never be imported by active code or tests.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration plus `beforeLoad`/loader/redirect/context orchestration lives under `src/@routes`. `electron/` is the explicit main/preload platform boundary and may not import renderer or engine roots; renderer code may not import Electron. `src/_archive` is historical reference only and may never be imported by active code or tests.
 
 ## 1. The `*Fx` rule is absolute
 
@@ -92,24 +92,46 @@ Arkini-owned reusable capabilities use readonly objects created by explicit Effe
 
 External and framework constructors remain valid where their API requires them. Effect declaration forms such as `Data.TaggedError`, `Context.Tag`, and framework-owned classes are not project composition abstractions. Do not mechanically replace constructor injection with Layers or generic services unless a real scoped capability exists.
 
-### Asynchronous UI commands
+### TanStack asynchronous boundaries
 
-TanStack Query may own the transient lifecycle of asynchronous UI commands, but never canonical gameplay state, runtime reads, persistence truth, or lifecycle semantics.
+TanStack Query may own the transient lifecycle of asynchronous UI commands and the stable identity/lifetime of an explicitly route-scoped live resource. It never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics.
 
-Each command stays standalone in its owning UI domain:
+The live Game resource is the narrow exception to ordinary mutation-only use:
+
+```text
+gameEngineQueryOptions(packageId)
+→ one exact Query key for one live route session
+→ queryFn is the sole Game creation boundary
+→ infinite stale/GC time, retry disabled, structural sharing disabled
+
+/game/$packageId beforeLoad
+→ ensureQueryData(...)
+→ expose the exact Game/resource through inherited route context
+
+/game/$packageId loader
+→ expose the same Game to React
+
+useGameEngine
+→ typed useLoaderData adapter
+→ never useQuery for gameplay
+```
+
+Query owns object identity and deduplication only. `GameSession` remains the canonical runtime/save owner, and explicit named route operations dispose/reset the resource and remove its exact Query entry. Do not invalidate broad Query prefixes as a lifecycle command, add observers merely to keep the engine alive, or allow UI components to create/reload the Game.
+
+Ordinary asynchronous UI commands stay standalone in their owning UI domain:
 
 ```text
 saveGameMutationOptions
 → complete stable mutation key
-→ direct connection to the native Game/GameOwner Fx
+→ direct connection to the native Game Fx
 → retry/meta/error configuration
 
 useSaveGameMutation
-→ obtain only the required root capability
+→ obtain only the required route capability
 → useMutation(saveGameMutationOptions(...))
 ```
 
-Do not create a central mutation-key object, mutation registry, generic mutation factory, callback-injection adapter, lifecycle mutation manager, or project-specific wrappers around `useIsMutating` / `useMutationState`. A caller that needs cross-tree status reuses the complete options declaration and native TanStack filtering APIs. Keep navigation, menu visibility, and other caller-specific success behavior at the composition site rather than coupling it into an otherwise reusable domain mutation.
+Blocking lifecycle commands are not mutations mounted in UI. They are explicit `action/*` leaf route loaders that consume inherited TanStack Router context; their pending/error pages only render presentation. Do not create a central mutation-key object, mutation registry, generic mutation factory, callback-injection adapter, lifecycle mutation manager, or project-specific wrappers around `useIsMutating` / `useMutationState`. Keep navigation, menu visibility, and other caller-specific success behavior at the composition site unless the route itself is the lifecycle boundary.
 
 ### Enforcement strategy
 
@@ -298,7 +320,7 @@ Error precedence is observable behavior. Refactors must preserve it unless the c
 
 ## 10. UI boundary
 
-`src/engine` is standalone and framework-neutral. `src/bridge` owns concrete live adapters and snapshot projections grouped as `bridge/<domain>/<operation>`; it may use public engine modules but never engine internals or UI. `src/ui` owns reusable presentation and transient gesture/geometry/animation state. `src/page` composes route-level screens from UI components. `src/@routes` contains only TanStack Router registration seams that point at standalone page components. Renderer dependency direction is `@routes → page → ui → bridge → engine`. `electron/` owns only actual Electron main/preload/protocol capabilities and is not part of that chain. Do not import renderer/game modules into Electron or Electron/Node APIs into renderer domains.
+`src/engine` is standalone and framework-neutral. `src/bridge` owns concrete live adapters and snapshot projections grouped as `bridge/<domain>/<operation>`; it may use public engine modules but never engine internals or UI. `src/ui` owns reusable presentation and transient gesture/geometry/animation state. `src/page` composes route-level screens from UI components and may not access bridge or engine contracts directly. `src/@routes` owns TanStack registration plus route lifecycle orchestration; it may render page/UI surfaces and call public bridge capabilities, but never imports the engine or another route module. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`. `electron/` owns only actual Electron main/preload/protocol capabilities and is not part of that chain. Do not import renderer/game modules into Electron or Electron/Node APIs into renderer domains.
 
 Allowed:
 

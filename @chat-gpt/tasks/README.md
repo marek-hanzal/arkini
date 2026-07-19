@@ -16,7 +16,7 @@ Tasks 00–09 are complete. A new thread must:
 
 Do not read every queued task before starting. The queue is an ordered backlog, not a mandatory context dump.
 
-Tasks 10–13 are implemented as vertical UI slices rather than four isolated horizontal phases. A concrete page/component need drives the smallest engine-owned read/command addition, its agreement tests, and the thin UI consumer in the same slice. Task 10 remains the current coverage owner until its read-model obligations are satisfied; the TanStack Router root now selects bundled or persistent local arkpacks, `/game/$packageId` owns one live `Game`, and the first read-only board/headless-tile slice remains the active vertical foundation.
+Tasks 10–13 are implemented as vertical UI slices rather than four isolated horizontal phases. A concrete page/component need drives the smallest engine-owned read/command addition, its agreement tests, and the thin UI consumer in the same slice. Task 10 remains the current coverage owner until its read-model obligations are satisfied; the TanStack Router root now selects bundled or persistent local arkpacks, `/game/$packageId` owns one stable route-scoped `Game` resource, `/game/$packageId/board` is the explicit gameplay leaf, and the first read-only board/headless-tile slice remains the active vertical foundation.
 
 ## Queue
 

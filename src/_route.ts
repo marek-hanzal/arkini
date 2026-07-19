@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from "./@routes/__root"
 import { Route as LauncherRouteImport } from "./@routes/_launcher"
 import { Route as IndexRouteImport } from "./@routes/index"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
+import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
 import { Route as ActionExitRouteImport } from "./@routes/action/exit"
 import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settings"
 import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-menu"
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const GamePackageIdRoute = GamePackageIdRouteImport.update({
   id: "/game/$packageId",
   path: "/game/$packageId",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActionRecoverGameSaveRoute = ActionRecoverGameSaveRouteImport.update({
+  id: "/action/recover-game-save",
+  path: "/action/recover-game-save",
   getParentRoute: () => rootRouteImport,
 } as any)
 const ActionExitRoute = ActionExitRouteImport.update({
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   "/main-menu": typeof LauncherMainMenuRoute
   "/settings": typeof LauncherSettingsRoute
   "/action/exit": typeof ActionExitRoute
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   "/main-menu": typeof LauncherMainMenuRoute
   "/settings": typeof LauncherSettingsRoute
   "/action/exit": typeof ActionExitRoute
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   "/_launcher/main-menu": typeof LauncherMainMenuRoute
   "/_launcher/settings": typeof LauncherSettingsRoute
   "/action/exit": typeof ActionExitRoute
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | "/main-menu"
     | "/settings"
     | "/action/exit"
+    | "/action/recover-game-save"
     | "/game/$packageId"
     | "/game/$packageId/board"
     | "/game/$packageId/action/exit"
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | "/main-menu"
     | "/settings"
     | "/action/exit"
+    | "/action/recover-game-save"
     | "/game/$packageId"
     | "/game/$packageId/board"
     | "/game/$packageId/action/exit"
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | "/_launcher/main-menu"
     | "/_launcher/settings"
     | "/action/exit"
+    | "/action/recover-game-save"
     | "/game/$packageId"
     | "/game/$packageId/board"
     | "/game/$packageId/action/exit"
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LauncherRoute: typeof LauncherRouteWithChildren
   ActionExitRoute: typeof ActionExitRoute
+  ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
 }
 
@@ -196,6 +209,13 @@ declare module "@tanstack/react-router" {
       path: "/game/$packageId"
       fullPath: "/game/$packageId"
       preLoaderRoute: typeof GamePackageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/action/recover-game-save": {
+      id: "/action/recover-game-save"
+      path: "/action/recover-game-save"
+      fullPath: "/action/recover-game-save"
+      preLoaderRoute: typeof ActionRecoverGameSaveRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/action/exit": {
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LauncherRoute: LauncherRouteWithChildren,
   ActionExitRoute: ActionExitRoute,
+  ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport

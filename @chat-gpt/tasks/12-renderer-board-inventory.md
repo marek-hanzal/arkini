@@ -20,7 +20,7 @@ Create the active Electron renderer shell and render board/inventory directly fr
 - the generated TanStack Router tree exists; `/` selects bundled or persistent local Arkpacks and `/game/$packageId` loads the selected package, restores its save, and renders the first read-only board slice;
 - `bridge/board/useBoard`, `ui/board`, and the headless `ui/tile` foundation exist;
 - UI may intentionally lag visually during animation, but canonical truth remains the live runtime;
-- the stable root `GameOwner` owns explicit package selection, route release, shutdown, hard reset, and save recovery under one Effect semaphore; no command Queue, latest-intent interpreter, captured runtime, or Promise scheduler remains.
+- `/game/$packageId` owns one stable Query-backed `GameEngineResource`; its private Effect semaphore serializes leave, reset, exit, and HMR lifecycle actions, while `/game/$packageId/board` is the explicit gameplay leaf.
 
 
 ## Accepted router and page boundary
@@ -29,7 +29,7 @@ The Electron renderer uses TanStack Router file-based routing:
 
 ```text
 src/@routes
-→ thin route registrations only
+→ route registration plus beforeLoad/loader/redirect/context orchestration
 
 src/page
 → route-level screen and layout composition
@@ -44,29 +44,31 @@ src/engine
 → standalone game engine
 ```
 
-Dependency direction is `@routes → page → ui → bridge → engine`. Route modules point to standalone page components and contain no gameplay, session, or game composition. The `/game` file route is a layout branch whose page composes `GameShell` with an `Outlet`; future `/dev/**` routes remain outside this shell.
+Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`. Route modules may coordinate public bridge lifecycle operations but contain no gameplay implementation and never import the engine directly. `/game/$packageId` is the non-visual resource/layout boundary, `/game/$packageId/board` composes `GameShell`, and future `/dev/**` routes remain outside this scope.
 
 The client uses standard history routing. Development Electron loads the renderer from Vite for HMR; packaged Electron serves the same route tree from `arkini://app/*` with protocol-owned SPA fallback. `file://`, hash routing, and a standalone web target are not supported application modes. Persistent package/save ownership is implemented through typed Electron filesystem repositories. In-memory adapters exist only as explicitly injected test doubles.
 
-The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. The stable root `GameOwnerProvider` declaratively maps the current router branch to one serialized `GameOwner`; `GameShell` only renders the matching published package. Selection awaits final disposal/save, duplicate identical requests become no-ops, and an unpublished candidate is discarded without save. Route release, controlled shutdown, hard reset, and invalid-save recovery remain explicit operations with distinct failure semantics.
+The launcher validates bundled Arkini and local uploads through the same arkpack decode/schema/semantic/resource boundary. Imported binaries persist separately from package-namespaced saves. `/game/$packageId` is a non-visual route resource boundary: `beforeLoad` obtains one exact `GameEngineResource` through `ensureQueryData`, the parent loader exposes its `Game` to UI, and `/game/$packageId/board` renders `GameShell`. Launcher navigation and package replacement pass through explicit action leaf loaders so final disposal/save completes before the resource query is removed.
 
 ## Accepted game-menu and hard-reset direction
 
-The game-only main menu is mounted at the `GameShell` boundary rather than in the board, a route, or a global application store. Its React Context owns only synchronous visibility control and the shell-owned `Escape`/focus boundary. Async Save, Save and exit, and Destroy actions are complete standalone TanStack mutation options connected directly to the authoritative `Game` / `GameOwner` Fx operations; TanStack tracks UI command state but never mirrors engine state.
+The game-only main menu is mounted at the `GameShell` boundary rather than in the board, a route, or a global application store. Its React Context owns only synchronous visibility control and the shell-owned `Escape`/focus boundary. Ordinary Save remains a standalone TanStack mutation over the authoritative `Game`; Main Menu, reset, and exit navigate to explicit action leaf routes whose loaders own lifecycle work. TanStack Query tracks the stable identity of the route resource but never mirrors engine state.
 
 Hard reset is complete `Game` replacement, not an in-place engine mutation:
 
 ```text
 confirm in the menu
-→ discard the current Game without final save
+→ navigate to /game/$packageId/action/reset
+→ discard the current Game without final save under the resource semaphore
 → clear only its exact package/content-hash save
-→ create and publish one fresh Game through the normal factory
-→ close the old menu with the replaced game shell
+→ remove the exact Query resource
+→ redirect to /game/$packageId/board
+→ create one fresh Game through the normal parent query factory
 ```
 
-`GameOwner` serializes each explicit lifecycle operation under one semaphore. The menu disables duplicate mutation execution rather than introducing another owner scheduler or a queued second reset. If hard reset fails after discard or save clearing, private owner recovery records the completed phase; retry continues from the remaining phase without repeating destructive work or exposing the save key to UI. A disposed game may remain only as exact mutation identity while the retry UI is mounted; it is never supplied through `GameProvider` as a live gameplay root.
+A failed reset keeps the action error page and exact resource available for retry; idempotent disposal/save clearing resumes safely without exposing the save key or introducing another reset scheduler.
 
-Save and exit means controlled whole-application shutdown. The menu requests the trusted native close handshake; `GameOwner.shutdownFx` performs the authoritative final save before Electron closes. Failure rejects the same mutation, keeps the current retryable game and menu visible, and does not navigate. Ordinary non-game route ownership still uses the distinct `releaseRouteGameFx`.
+Save and exit means controlled whole-application shutdown. The menu requests native close; preload navigates to `/game/$packageId/action/exit`, whose loader performs the authoritative final save/disposal. Failure retains the same frozen retryable resource and does not send `closeReady`. Ordinary launcher navigation uses the distinct `/game/$packageId/action/leave` leaf.
 
 ## Do not port
 
@@ -92,10 +94,10 @@ Save and exit means controlled whole-application shutdown. The menu requests the
 - persistence uses the current save boundary;
 - one plain game factory creates the complete root for both initial startup and post-reset startup;
 - the game-shell menu opens only on active game routes, traps/restores focus, and never creates another engine pause model;
-- explicit save, safe route release, and hard reset use complete standalone TanStack mutation contracts connected directly to their native Fx operations;
+- explicit save uses one standalone TanStack mutation; safe route release, hard reset, and exit use named action leaf loaders connected directly to their native Fx operations;
 - confirmed hard reset replaces the complete Game outside the engine instead of reinitializing it in place;
-- reset retry resumes after the last privately recorded successful destructive phase and atomically publishes only a fully created fresh root;
-- reset failure exposes a truthful shell recovery state and never returns a disposed or partially initialized root as live gameplay context.
+- reset retry relies on idempotent destructive operations, removes the exact resource only after its required phase succeeds, and creates the fresh root only through normal route entry;
+- reset failure exposes a truthful action-page recovery state and never returns a disposed or partially initialized root as live gameplay context.
 
 ## Required tests
 

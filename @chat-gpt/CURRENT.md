@@ -4,41 +4,38 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Responsive root canvas and explicit main-page/loading transition topology**
+**Route-owned Game Engine lifecycle and native action-page transitions**
 
-Status: **Implemented; final validation and native macOS smoke pending.**
+Status: **Implemented; targeted validation passed, native macOS smoke pending.**
 
 Current contract:
 
-- `MainPageLayout` is the only outer structure for `/main-menu`, `/settings`, `/about`, and `/arkpacks`; its `LauncherScene` uses one explicit two-row grid with a stable Hero slot and content slot, so panel height never moves or resizes the Hero;
-- `LauncherHero` is normal DOM inside the full route-scene snapshot. It must not own a `view-transition-name`, `will-change`, paint containment, or another forced compositor layer; the transparent artwork and semi-transparent shadow stay together in the route snapshot rather than becoming a nested rectangular bitmap;
-- main-page native transitions name only the full `arkini-route-scene` and, for geometrically corresponding compact/responsive pages, the naturally rectangular `arkini-main-page-panel`; `/arkpacks` deliberately leaves its viewport panel unnamed;
-- any transition involving `/arkpacks` receives the typed `main-page-arkpacks` route family; while that type is active, `MainPagePanel` naming is disabled on both source and destination so Chromium never cuts an old-only panel rectangle out of the full route snapshot;
-- Chromium compositor validation must confirm no `arkini-launcher-hero` pseudo-elements and identical Hero geometry across MainMenu, Settings, About, and Arkpacks before changing this topology again;
-- `ActionLoadingProvider` lives above `GameOwnerProvider` and the route canvas, so one loading presentation can survive route replacement without becoming a second game or save owner;
-- every deliberate loading run receives the real asynchronous action, a stable dedupe key, a presentation label, a minimum visible duration, and a completed hold;
-- defaults are 2.5 seconds minimum visibility and a 350 ms fully completed hold after the 180 ms progress interpolation;
-- staged pending progress tops out at 94%; 100% is published only after both the real action succeeds and the minimum duration has elapsed; failure waits out the same minimum but never displays a false completed state;
-- `GameOwnerRouteBinding` remains the declarative route-to-owner boundary, but game selection and an owned-game return to `/main-menu` run through the root loader; leaving game for `/settings` deliberately invokes the same canonical route release without the artificial delay;
-- GameMenu → Main Menu activates the root loader before navigation, keeps the open menu input-locked beneath it, and lets the destination route binding replace that presentation with the real release/save action; the loader overlay owns an explicit 300 ms entrance rather than depending on whether the router happened to capture its mount;
-- one route-intent ref prevents React StrictMode effect replay from running the same owner command twice; provider unmount cleanup is microtask-confirmed so StrictMode cleanup/replay does not clear an active dedupe entry while a real unmount still releases close readiness;
-- initial game entry, browser-history return to game, and game-to-main-menu all observe the exact `GameOwner` Promise; no create, save, release, or failure state is duplicated in React;
-- `Save and exit` uses `runNativeClose`: the existing Electron controlled-close request starts immediately, `GameOwner.shutdownFx` remains the sole final-save owner, native `beforeCloseReady` resolves the loader action only after that shutdown succeeds, and the renderer reports close-ready only after 100% has remained visible for the completed hold;
-- route-action failure hides the loader without claiming completion and leaves the authoritative `GameOwner` failure snapshot responsible for recovery UI;
-- while the root loader is active, underlying route, panel, shell, and board View Transition names are suppressed to prevent duplicate shared-element identities; the loader-to-target reveal waits for any active native transition animations and commits through one local native View Transition;
-- the previous route-local `GameLoadingGate`, `GameLoadingScreen`, and `arkini-game-loading` identity are removed; `ActionLoadingScreen` is the single staged progress presentation and `arkini-action-loading` is its visual role;
-- startup splash, MainPage route policy, GameMenu local WAAPI, Settings navigation, and engine truth remain separate from loading presentation state.
+- `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`.
+- `/game/$packageId` is a resource/layout boundary, never a visual page. Its `beforeLoad` obtains one stable `GameEngineResource` through `queryClient.ensureQueryData(...)`, returns the exact `Game` and resource through inherited TanStack Router context, and its loader exposes that same `Game` to React through `useGameEngine()`.
+- TanStack Query owns only the identity and lifetime of this explicitly route-scoped live resource. It does not own gameplay state, runtime reads, catalog state, saves, or another reactive game truth; gameplay UI must not call `useQuery()` for the engine.
+- `gameEngineQueryOptions` is the sole creation boundary. The exact package query uses infinite stale/GC time, disabled retry, and disabled structural sharing so repeated parent `beforeLoad` runs and child-route navigation return the same object rather than creating or rewriting a live engine.
+- `GameEngineResource` contains the canonical `Game` plus one private Effect semaphore. Every destructive route lifecycle action for that resource runs through `withLifecycleLockFx`, so leave, reset, exit, HMR shutdown, and competing navigation cannot overlap.
+- `/game/$packageId/board` is the visual gameplay leaf. `/game/$packageId/action/leave`, `/reset`, and `/exit` are standalone leaf pages whose loaders own their complete lifecycle operation; their pending/error components render the Hero action presentation and contain no domain orchestration.
+- The pathless launcher boundary redirects any launcher destination through the active game's `/action/leave` route. A transition to another package also releases the currently cached package first. No launcher page, React provider, component effect, or hidden overlay independently decides game ownership.
+- Successful release performs the retryable final save/disposal first and removes the exact Query resource only afterward. Failure retains the same frozen resource so the leaf error page can retry the identical save obligation.
+- Reset runs discard-without-save, clears only the exact package/content-hash save, removes the Query resource, and redirects to `/game/$packageId/board`; the next parent `beforeLoad` creates one fresh engine through the normal factory. Retry relies on idempotent session disposal/save clearing, never a second UI-owned reset state machine.
+- Controlled native close navigates to `/game/$packageId/action/exit` when a game exists or `/action/exit` otherwise. Electron preload waits for the router-owned close action before sending `closeReady`; native force close remains an explicit process policy and never pretends the final save succeeded.
+- `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. `GameOwner`, `GameOwnerProvider`, `GameOwnerRouteBinding`, `GameProvider`, root action-loading state, loader overlays, transition-name suppression, and local loader-unmount `document.startViewTransition()` orchestration are removed.
+- Startup is one standalone `/` page. It waits for real bootstrap and its minimum presentation lifetime, then navigates to `/main-menu` through the native router View Transition. Main Menu is not mounted beneath the splash and no transient Hero clone or manual cross-route WAAPI handoff exists.
+- Cross-page animation belongs to typed native TanStack Router View Transitions. WAAPI remains valid only for local same-page state such as GameMenu open/close.
+- `MainPageLayout` is the only outer structure for `/main-menu`, `/settings`, `/about`, and `/arkpacks`; its `LauncherScene` keeps one stable Hero slot and content slot, so panel height never moves or resizes the Hero.
+- Main-page native transitions name only the full `arkini-route-scene` and, for geometrically corresponding compact pages, `arkini-main-page-panel`; `/arkpacks` deliberately leaves its viewport panel unnamed and uses the typed `main-page-arkpacks` family to prevent Chromium panel cutouts.
 
 Responsive viewport contract:
 
-- `ui/canvas/Canvas` owns the exact renderer viewport and is the one CSS size container for every route, board, loader, and overlay;
-- shared `cqw`/`cqh` variables on Canvas own viewport padding, gaps, panel padding, control dimensions, and Hero width; child surfaces must consume those variables instead of introducing unrelated `vw`/`vh` sizing;
-- short viewports reduce the fixed Hero allocation and compact Hero width while preserving the same two-slot MainPage structure; panels and GameMenu fit the viewport and use deliberate internal scrolling when their semantic content cannot shrink further;
+- `ui/canvas/Canvas` owns the exact renderer viewport and is the one CSS size container for every route, board, pending page, and menu.
+- shared `cqw`/`cqh` variables on Canvas own viewport padding, gaps, panel padding, control dimensions, and Hero width; child surfaces must consume those variables instead of introducing unrelated `vw`/`vh` sizing.
+- short viewports reduce the fixed Hero allocation and compact Hero width while preserving the same two-slot MainPage structure; panels and GameMenu fit the viewport and use deliberate internal scrolling when their semantic content cannot shrink further.
 - document roots never scroll, and measured route surfaces must remain within Canvas at `1200×900`, `900×600`, `700×500`, `600×400`, and `480×320`; a tiny viewport may scroll inside its panel but may not grow or clip the document.
 
 Next action:
 
-> Validate MainMenu ↔ Arkpacks and GameMenu → loader → MainMenu on native macOS Electron. Confirm the Arkpacks typed transition produces no panel cutout, the loader visibly enters before route replacement and exits through its local transition, and main pages/GameMenu remain usable from the normal window down to intentionally tiny viewports.
+> Run native macOS Electron smoke validation for `/ → /main-menu`, MainMenu ↔ Arkpacks, Arkpacks → `/game/$packageId/board`, Board → leave action → launcher, reset → fresh Board, and title-bar/menu exit. Confirm every pending Hero is a standalone route snapshot, no old Board/MainMenu DOM remains visibly mounted beneath it, no panel cutout returns, failures remain retryable, and tiny Canvas sizes stay usable.
 
 ## Source topology
 
@@ -46,34 +43,31 @@ Next action:
 - `src/bridge/<domain>/<operation>` is the only legal UI connection to public engine contracts. It owns the loaded `Game`, runtime subscriptions, save/event adapters, and concrete snapshot projections without caching a second truth. Bridge domains may not import UI/pages/routes or `src/engine/**/internal`.
 - `src/ui` owns reusable React presentation and transient gesture/geometry/animation state. It may depend on bridge domains but never imports `src/engine` directly, pages, or routes.
 - `src/page` owns route-level screen and layout composition over UI only.
-- `src/@routes` contains only TanStack Router file registrations pointing to standalone page components. `src/_route.ts` is generated and `src/router.tsx` owns router creation.
-- Dependency direction is `@routes → page → ui → bridge → engine`; Dependency Cruiser is the single automated owner of this import graph.
+- `src/@routes` owns TanStack Router registration and route lifecycle orchestration (`beforeLoad`, loaders, redirects, context composition). It may render standalone page/UI surfaces and invoke public bridge operations, but never imports engine modules or another route module. `src/_route.ts` is generated and `src/router.tsx` owns router creation.
+- Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; Dependency Cruiser is the automated owner of these boundaries.
 - Bridge paths remain shallow and concrete. `app` is reserved for genuinely Electron/router-wide application concerns; the loaded gameplay root is `Game`.
 - `src/_archive` is historical reference only, excluded from TypeScript, tests, bundling, Dependency Cruiser roots, and formatting. Active source, CLI, and tests may never import it.
 
 ## Electron renderer foundation
 
-- TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Route modules remain thin registrations over standalone page components.
+- TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Visual components remain standalone, while route modules own only router-specific lifecycle composition over public contracts, never gameplay implementation.
 - TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
-- `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the moved shared package selector, `/settings` owns the sole theme control, `/about` contains credits, and `/game/$packageId` is the game branch. Hash routes and `file://` are not supported application modes.
+- `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the shared package selector, `/settings` owns the sole theme control, `/about` contains credits, `/game/$packageId` is the live resource boundary, and `/game/$packageId/board` is the explicit gameplay page. Hash routes, implicit game index pages, and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
 - One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP. Development derives the exact HMR WebSocket endpoint from the same parsed loopback URL and adds one per-server Vite nonce for the React Refresh preamble; neither development allowance enters packaged output.
 - Arkpack, save, and appearance persistence use narrow Effect-native object capabilities on both sides of typed IPC. Renderer adaptation from `ipcRenderer.invoke` happens once in domain transport operations; Electron handlers authorize once and run Effect-native `@effect/platform` filesystem operations through `ElectronMainRuntime`. No project-owned persistence classes or no-op close lifecycle remain.
 - `electron-vite` is pinned to `6.0.0-beta.1` because the renderer is already on Vite 8; the stable v5 peer range does not support Vite 8. Re-evaluate only when a stable v6-compatible release exists.
 - Electron 43 exposes the official `install-electron` binary but does not install its native executable from its own package lifecycle. The project runs `install-electron` from the root `postinstall`, so `npm install` / `npm ci` prepare Electron once and runtime scripts stay clean. Closing the last Electron window always quits the application so the owning `electron-vite` command and renderer server terminate as well.
 - Bundled Arkini and imported packages share one root-owned `ArkpackCatalog`; uploads never leave the device. The startup owner refreshes it once, resolves exactly one built-in package, and `/arkpacks` reuses the same snapshot and mutation operations. TanStack Query never owns catalog data.
-- `/game/$packageId` is a layout branch composed by `GameShellPage → GameShell → Outlet`; future `/dev/**` routes remain outside the game shell.
-- One renderer-session `LauncherStartup` starts immediately under the initial pure-black frame. Electron reports the actual `ready-to-show` visibility moment through preload; the approximately 500 ms black hold is anchored to that renderer timestamp rather than module evaluation. Appearance publishes early and `heroReady` is explicit after `HTMLImageElement.decode()`, so the complete Hero scene may reveal while the remaining catalog bootstrap still reports loading without a fallback-theme or missing-logo flash. `/main-menu` stays mounted beneath the splash and WAAPI completion owns the direct cross-fade; automatic exit requires hard readiness plus five visible seconds, while legal Escape reverses an active enter immediately from its current frame. Later `/` navigation redirects to `/main-menu` without replay.
-- `GameOwnerProvider` lives at the stable root shell above the route outlet and declaratively maps the active `/game/$packageId` route to `selectPackageFx`; every non-game route maps to `releaseRouteGameFx`. React cleanup is not a desired-game signal, so StrictMode never manufactures `A → null → A`.
-- `GameOwner` owns one published Game, one private failed-save recovery identity, synchronous subscribers, and one transition Semaphore. Package selection, route release, shutdown, hard reset, and save recovery are explicit serialized operations. There is no command Queue, latest-intent interpreter, checkpoint protocol, or per-command Deferred list. A bootstrap interrupted before publication is discarded without final save.
+- `/game/$packageId` is a non-visual resource branch whose component is only `Outlet`; `/game/$packageId/board` composes `GameShell` and the canonical current-space Board. Future `/dev/**` routes remain outside this resource and shell.
+- One renderer-session `LauncherStartup` starts immediately under the initial pure-black frame. Electron reports the actual `ready-to-show` visibility moment through preload; the approximately 500 ms black hold is anchored to that renderer timestamp rather than module evaluation. Appearance publishes early and `heroReady` is explicit after `HTMLImageElement.decode()`. Automatic completion requires hard readiness plus five visible seconds; legal Escape may continue once readiness exists. Startup then navigates to `/main-menu` and never mounts that destination beneath itself.
 - `GameSession` and `Game` lifecycle is Effect-native: `flushSaveFx`, `disposeFx`, and `disposeWithoutSaveFx` are the only public lifecycle operations. One session lifecycle state plus `Deferred` shares concurrent disposal, failed final save leaves the same frozen session retryable, and game-owned resource Scope closes only after successful save disposal or explicit discard. Never restore a cached disposal Promise wrapper.
-- `GameProvider` is keyed by `game.instanceKey`; replacing the complete `Game` remounts every game-local React provider while router and future `/dev/**` branches survive.
-- `GameMenuProvider` lives at the game-shell boundary only and is keyed by package identity, not `Game.instanceKey`, so same-package hard reset can publish the fresh game beneath the still-mounted overlay. It owns `closed | entering | open | exiting`, one game-scoped Escape listener, one shared asynchronous close completion, the focus trap, and focus restoration after actual WAAPI completion. Launcher and `/dev/**` routes never mount it; opening does not pause, replace, or duplicate the engine lifecycle.
+- `gameEngineQueryOptions` creates one `GameEngineResource` for one exact package query. The resource contains the canonical `Game` and one private Effect semaphore; Query stores identity/lifetime only and `useGameEngine()` reads the parent route loader rather than observing Query state.
+- `GameMenuProvider` lives only at the Board shell and owns local `closed | entering | open | exiting`, Escape, focus trap/restoration, and a short route-request lock that prevents duplicate clicks while TanStack accepts navigation. It never owns save, release, reset, engine replacement, or cross-page animation.
 - The root `AppearanceProvider` owns only the hydrated renderer theme/accent snapshot. `/settings` uses one complete `setAppearanceThemeMutationOptions` contract connected directly to `writeAppearanceThemeFx`, plus its natural `useSetAppearanceThemeMutation` hook. It applies immediately, persists atomically, rolls back on failure, and no-ops for the active value. There is no floating game-canvas selector, second appearance store, callback-injection adapter, or project-specific mutation-state helper.
-- TanStack Query is present only as the standard lifecycle for asynchronous UI commands, never as gameplay/cache truth. Each command owns one complete standalone `mutationOptions` declaration connected directly to its native `Game`/`GameOwner` Fx and one natural `use*Mutation` hook that simply consumes those options. There is no shared mutation-key registry, callback-injection adapter, lifecycle mutation manager, or project-specific pending-state helper; other UI reads the native options key through TanStack APIs when cross-tree observation is actually needed.
-- Explicit save flush, controlled whole-application Save and exit, and hard reset are the first game-menu mutations. Save and exit requests the trusted native close handshake: preload first waits for the existing `GameOwner.shutdownFx` final-save listener, then waits for the menu presentation listener to finish the shared exit animation, and only then sends `closeReady`. Failure before either completion remains visibly retryable. Hard-reset recovery stages remain private to `GameOwner`; retry resumes after the last completed discard/clear phase and successful reset fades over the newly published same-package game.
-- A bootstrap failure exposes save recovery only after package validation has produced the exact `packageId + contentHash` key and save decode/hydration then fails. The root owner owns explicit clear-and-retry; UI never calls save storage directly, invalid package bytes expose no clear action, and retry without clearing never deletes data.
-- `/game/$packageId` currently renders the canonical current-space board. Inventory and commands remain future slices. The root owner already exposes single-flight hard reset: discard current session without final save → clear exact save key → normal fresh bootstrap.
+- TanStack Query owns ordinary asynchronous UI mutation state plus the exceptional stable identity of the route-scoped Game resource. It never mirrors runtime, catalog, save, or gameplay state. Save remains a standalone mutation over `Game`; leave/reset/exit/recovery are loader-owned action pages.
+- Controlled whole-application exit requests the native close handshake. Preload navigates to the appropriate exit action and sends `closeReady` only after its loader succeeds. Failure keeps the same frozen resource and route error page retryable; no hidden GameMenu exit animation participates.
+- A bootstrap failure exposes destructive recovery only when `createGameFx` raises `GameSaveBootstrapError` with a verified exact save key. `GameEngineErrorPage` only links to `/action/recover-game-save`; that action loader resolves the failed exact Query error, clears only its verified save, removes the failed query, and redirects through the normal fresh `/board` bootstrap. Package validation failures expose no recovery action.
 
 ## Live bridge and tile foundation
 
@@ -220,31 +214,33 @@ Next action:
 
 - `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
 - `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
-- The root `createGameOwnerFx` is the complete replacement, route-release, shutdown, recovery, and hard-reset ownership boundary. One Semaphore serializes direct named operations. Same-package selection is a no-op after serialization; sequential package transitions are deliberate. Hard reset is discard-without-save → clear exact persisted package/hash state → create the same package through `createGameFx` → publish one fresh `Game`.
-- Controlled Electron close and HMR handoff call `GameOwner.shutdownFx`; route exit calls the distinct `releaseRouteGameFx`. Owner command failures fail the initiating Effect and publish the same operation-tagged failure snapshot. Final-save failure retains the same frozen Game and retries the exact final snapshot on the next shutdown request. Only real shutdown failure exposes exit UI. Force close is native process policy and does not run renderer best-effort discard or pretend final save succeeded.
-- `GameOwner` subscriber delivery is synchronous but observational only: one stable snapshot is delivered per publication, callback throws/rejected Promise-like results are isolated per listener, and no observer can stop lifecycle work or starve later listeners.
-- Do not add another reset owner, mutate a running engine back to initial state, hide correctness in React-local state, or use a module-global lock/map.
+- Hard reset is route-owned complete replacement: `disposeWithoutSaveFx` → clear the exact package/content-hash save → remove the exact Query resource → redirect to `/game/$packageId/board` → create one fresh `Game` through the normal query factory.
+- Never mutate a running engine back to initial state, add another reset scheduler, expose persistence keys to UI, or represent reset progress as gameplay state.
 
-## Route-release failure contract
+## Route-owned Game Engine lifecycle
 
-- A Game retained after failed final save is frozen and non-publishable. Same-package selection may fast-path only a genuinely live ready Game.
-- Non-game routes render one retryable `GameRouteReleaseFailure`; retry preserves the exact save obligation and returning to the package retries disposal before creating a fresh Game.
-- `GameShell` renders gameplay only from `GameOwner.State.type === "ready"`.
+- `GameSession` remains the authoritative runtime/save lifecycle. A failed final save freezes the same session and a later disposal retries the exact obligation; resources release only after save success.
+- `GameEngineResource` is one cached `Game` plus one private lifecycle semaphore. The Query cache is an identity registry for that live route resource, not a canonical gameplay store.
+- `/game/$packageId` always creates a new engine when its exact query resource does not exist. Re-running parent `beforeLoad` while navigating among `/board` and `/action/*` returns the same resource through `ensureQueryData`.
+- The parent route returns `gameEngine` and `gameEngineResource` through TanStack Router context. Its loader returns the same `Game`; React consumers use the named `useGameEngine()` hook over route loader data, while child action loaders consume inherited context directly.
+- Successful leave/exit removes the exact query only after final disposal succeeds. Failed disposal keeps the resource cached and frozen so retry uses the same canonical snapshot.
+- HMR shutdown uses the same resource release operation. A newly created resource waits for any previous HMR shutdown promise before bootstrap so two sessions cannot overlap during module replacement.
+- Global or broad Query invalidation must never be used as a game lifecycle command. Creation and removal happen only through the named game resource operations.
 
-## UI transition ownership
+## Action-page transition ownership
 
-- GameMenu route requests are accepted only from the fully open phase. One provider-owned `routePending` lock keeps the open menu snapshot visible and blocks Escape, Return, mutations, and competing route requests until navigation settles.
-- Controlled close has one visible owner: the root action loader. GameMenu does not run a hidden close animation beneath it. Title-bar close activates the same loader, and close failure removes it before authoritative shutdown failure UI is revealed.
+- Every blocking game lifecycle operation is a named leaf route with a loader, `pendingComponent`, and `errorComponent`. The UI presents Hero, label, and progress only; it never starts, sequences, or completes the domain action.
+- Pending pages are ordinary route surfaces using `arkini-route-scene`, not overlays. The source page is replaced through the native router View Transition, so Board/MainMenu roots are never intentionally double-mounted for a cross-page animation.
+- GameMenu owns only local `closed | entering | open | exiting` WAAPI state plus a short route-request lock that rejects duplicate UI requests while navigation settles. Settings/Main Menu/reset/exit requests navigate to their route destination; no provider-owned domain lifecycle, hidden close animation, or root loader remains.
+- Action navigation and game links disable intent preload. Hover/focus must never create a game or execute a destructive leaf loader.
 
 ## Blocking flow focus and route exits
 
-- The root action loader is a real modal boundary: covered route content is inert and aria-hidden, the overlay owns focus for its visible lifetime, success focuses the settled route surface, and failure restores the still-connected source focus.
-- Settings, About, and Arkpacks each own one synchronous route-exit guard. Rapid Back/Escape cannot request multiple history or native transitions, and a rejected navigation unlocks the same source page.
+- Action pending and error pages are complete pages and own their own focus surface. They do not inert or aria-hide another live route beneath an overlay because no covered route is part of the intended visual tree.
+- Settings, About, and Arkpacks retain one synchronous route-exit guard. Rapid Back/Escape cannot request multiple history or native transitions, and a rejected navigation unlocks the same source page.
 
-## Startup Hero handoff
+## Startup route transition
 
-- Startup → Main Menu remains owned by the existing WAAPI startup lifecycle and deliberately opts out of native route View Transitions.
-- During splash exit, the live splash Hero and the already-mounted Main Menu Hero are hidden before paint. One transient fixed-position handoff Hero moves from the currently painted splash geometry to the exact destination Hero geometry while the surrounding scenes cross-fade.
-- Actual animation completion atomically replaces the transient handoff with the geometrically identical live Main Menu Hero. At no exit frame may two readable Hero silhouettes be painted.
-- Escape during the splash enter animation captures the currently painted Hero rectangle and continues through the same handoff path without restarting from an authored full-opacity/full-scale frame.
-- The transient Hero must not use blur/filter effects or a named native View Transition surface. Do not return to cross-fading two complete Hero compositions or introduce a generic shared-element manager.
+- Startup and Main Menu are separate pages. Startup owns bootstrap, minimum timing, interruptible completion, and failure/retry; it never mounts Main Menu beneath itself.
+- Startup completion navigates through the typed native `startup-main-page` View Transition. The whole route scene is the transition surface; no cloned Hero, manual crossfade, or second `document.startViewTransition()` participates.
+- `LauncherHero` stays ordinary DOM inside the route-scene snapshot without a nested transition name, forced compositor layer, blur, or paint containment.

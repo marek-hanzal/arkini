@@ -7,6 +7,8 @@ const mainPagePathnames = new Set([
 
 const isGamePathname = (pathname: string) => pathname.startsWith("/game/");
 const isActionPathname = (pathname: string) => pathname.startsWith("/action/");
+const isGameFlowPathname = (pathname: string) =>
+	isGamePathname(pathname) || isActionPathname(pathname);
 
 /** Selects the deliberate native route transition family for one location change. */
 export const resolveRouteViewTransitionTypes = ({
@@ -41,9 +43,12 @@ export const resolveRouteViewTransitionTypes = ({
 					]
 				: []),
 		];
+	const fromGameFlow = isGameFlowPathname(fromPathname);
+	const toGameFlow = isGameFlowPathname(toPathname);
 	if (
-		(fromMainPage && (isGamePathname(toPathname) || isActionPathname(toPathname))) ||
-		((isGamePathname(fromPathname) || isActionPathname(fromPathname)) && toMainPage)
+		(fromMainPage && toGameFlow) ||
+		(fromGameFlow && toMainPage) ||
+		(fromGameFlow && toGameFlow)
 	) {
 		return [
 			"main-page-game",

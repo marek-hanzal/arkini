@@ -3,11 +3,9 @@ import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 
 export const defaultLoadingMinimumDurationMs = 2_500;
-export const defaultLoadingCompletedHoldMs = 350;
 
 const initialProgress = 12;
 const pendingProgressTransitionMs = 220;
-const finalProgressTransitionMs = 180;
 
 const pendingStages = [
 	{
@@ -36,90 +34,26 @@ const pendingStages = [
 	},
 ] as const;
 
-export namespace ActionLoadingScreen {
-	export interface Props {
-		readonly action?: Promise<void>;
-		readonly completedHoldMs?: number;
-		readonly label: string;
-		readonly minimumDurationMs?: number;
-		readonly onComplete?: () => void;
-		readonly onError?: (error: unknown) => void;
-	}
-}
-
-/** Presents staged progress over one real asynchronous action without claiming early completion. */
-export const ActionLoadingScreen = ({
-	action,
-	completedHoldMs = defaultLoadingCompletedHoldMs,
-	label,
-	minimumDurationMs = defaultLoadingMinimumDurationMs,
-	onComplete,
-	onError,
-}: ActionLoadingScreen.Props) => {
+/** Presents one deliberately incomplete progress curve while its route loader owns the real work. */
+export const ActionLoadingScreen = ({ label }: { readonly label: string }) => {
 	const [progress, setProgress] = useState(initialProgress);
 	const reducedMotion =
 		typeof window.matchMedia === "function" &&
 		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 	useEffect(() => {
-		let cancelled = false;
-		const timers = new Set<number>();
-		const schedule = (callback: () => void, afterMs: number) => {
-			const timer = window.setTimeout(() => {
-				timers.delete(timer);
-				callback();
-			}, afterMs);
-			timers.add(timer);
-			return timer;
-		};
-		const clearTimers = () => {
-			for (const timer of timers) window.clearTimeout(timer);
-			timers.clear();
-		};
-
 		setProgress(initialProgress);
-		if (!reducedMotion) {
-			for (const stage of pendingStages) {
-				schedule(() => setProgress(stage.progress), minimumDurationMs * stage.at);
-			}
-		}
-		if (action === undefined) {
-			return () => {
-				cancelled = true;
-				clearTimers();
-			};
-		}
-
-		const minimumDuration = new Promise<void>((resolve) => {
-			schedule(resolve, minimumDurationMs);
-		});
-		void Promise.allSettled([
-			action,
-			minimumDuration,
-		]).then(([actionResult]) => {
-			if (cancelled) return;
-			clearTimers();
-			if (actionResult?.status === "rejected") {
-				onError?.(actionResult.reason);
-				return;
-			}
-			setProgress(100);
-			schedule(
-				() => onComplete?.(),
-				(reducedMotion ? 0 : finalProgressTransitionMs) + completedHoldMs,
-			);
-		});
-
+		if (reducedMotion) return;
+		const timers = pendingStages.map((stage) =>
+			window.setTimeout(
+				() => setProgress(stage.progress),
+				defaultLoadingMinimumDurationMs * stage.at,
+			),
+		);
 		return () => {
-			cancelled = true;
-			clearTimers();
+			for (const timer of timers) window.clearTimeout(timer);
 		};
 	}, [
-		action,
-		completedHoldMs,
-		minimumDurationMs,
-		onComplete,
-		onError,
 		reducedMotion,
 	]);
 
@@ -149,7 +83,7 @@ export const ActionLoadingScreen = ({
 							data-ui="ActionLoadingScreenProgressFill"
 							style={{
 								transform: `scaleX(${progress / 100})`,
-								transitionDuration: `${progress === 100 ? finalProgressTransitionMs : pendingProgressTransitionMs}ms`,
+								transitionDuration: `${pendingProgressTransitionMs}ms`,
 							}}
 						/>
 					</div>

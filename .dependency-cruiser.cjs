@@ -126,15 +126,15 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "routes-only-compose-pages",
+		name: "routes-enter-public-renderer-seams",
 		comment:
-			"File routes are registration seams. Active application code enters them through standalone page components.",
+			"File routes own TanStack registration and lifecycle orchestration through pages, reusable UI contracts, and public bridge capabilities, but never engine internals or other route modules.",
 		severity: "error",
 		from: {
 			path: "^src/@routes(?:/|$)",
 		},
 		to: {
-			path: "^src/(?:engine|bridge|ui|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
+			path: "^src/(?:engine|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$",
 		},
 	},
 

@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
+import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
@@ -142,16 +143,33 @@ describe("gameEngineQueryOptions", () => {
 			disposeWithoutSaveFx: Effect.sync(discard),
 		});
 
-		await expect(
-			client.ensureQueryData(
-				gameEngineQueryOptions({
-					packageId: "package:expected",
-					create: async () => game,
-				}),
-			),
-		).rejects.toThrow("returned package package:wrong");
+		const acquisition = client.ensureQueryData(
+			gameEngineQueryOptions({
+				packageId: "package:expected",
+				create: async () => game,
+			}),
+		);
+		await expect(acquisition).rejects.toBeInstanceOf(CriticalGameLifecycleError);
+		await expect(acquisition).rejects.toThrow("returned package package:wrong");
 		expect(discard).toHaveBeenCalledOnce();
 		expect(getCachedGameEngineResource(client)).toBeNull();
+	});
+
+	it("turns a rejected previous HMR shutdown into one fatal lifecycle error", async () => {
+		const client = createClient();
+		const create = vi.fn(async () => createGame());
+		const acquisition = client.ensureQueryData(
+			gameEngineQueryOptions({
+				packageId: "package:test",
+				awaitPreviousShutdown: Promise.reject(new Error("shutdown failed")),
+				create,
+			}),
+		);
+
+		await expect(acquisition).rejects.toMatchObject({
+			operation: "hmr-handoff",
+		});
+		expect(create).not.toHaveBeenCalled();
 	});
 
 	it("serializes overlapping route lifecycle actions for one cached Game", async () => {

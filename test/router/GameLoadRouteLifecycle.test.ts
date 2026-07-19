@@ -1,8 +1,10 @@
 // @vitest-environment jsdom
 
 import { QueryClient } from "@tanstack/react-query";
-import { createMemoryHistory, createRouter } from "@tanstack/react-router";
+import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { Effect } from "effect";
+import { act, createElement } from "react";
+import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const createGameFxMock = vi.hoisted(() => vi.fn());
@@ -12,12 +14,14 @@ vi.mock("~/bridge/game/createGameFx", () => ({
 }));
 
 import { routeTree } from "~/_route";
+import type { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import type { Game } from "~/bridge/game/Game";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
 const packageId = "package-route-load";
+const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const createStartup = (): LauncherStartup => ({
 	getSnapshot: () => ({
@@ -36,9 +40,15 @@ const createStartup = (): LauncherStartup => ({
 	subscribe: () => () => undefined,
 });
 
-const createGame = (): Game => ({
+const createGame = ({
+	createdPackageId = packageId,
+	disposeWithoutSaveFx = Effect.void,
+}: {
+	readonly createdPackageId?: string;
+	readonly disposeWithoutSaveFx?: Game["disposeWithoutSaveFx"];
+} = {}): Game => ({
 	arkpack: {
-		packageId,
+		packageId: createdPackageId,
 		contentHash: "content-route-load",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
@@ -48,7 +58,7 @@ const createGame = (): Game => ({
 	},
 	config: testArkpackConfig,
 	disposeFx: Effect.void,
-	disposeWithoutSaveFx: Effect.void,
+	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
@@ -83,13 +93,47 @@ const createHarness = (initialPath: string) => {
 	};
 };
 
+const renderRouter = async (router: ReturnType<typeof createHarness>["router"]) => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(RouterProvider, {
+				router,
+			}),
+		);
+	});
+	return container;
+};
+
 beforeEach(() => {
 	vi.useFakeTimers();
+	vi.spyOn(console, "error").mockImplementation(() => undefined);
+	vi.spyOn(console, "warn").mockImplementation(() => undefined);
 	createGameFxMock.mockReset();
+	Object.defineProperty(window, "scrollTo", {
+		configurable: true,
+		value: vi.fn(),
+	});
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			lifecycle: {
+				forceClose: vi.fn(),
+			},
+		} as unknown as ArkiniDesktopApi.Api,
+	});
 });
 
-afterEach(() => {
+afterEach(async () => {
+	await act(async () => {
+		for (const root of roots.splice(0)) root.unmount();
+	});
 	vi.useRealTimers();
+	vi.restoreAllMocks();
+	document.body.replaceChildren();
 });
 
 describe("game load action lifecycle", () => {
@@ -119,5 +163,40 @@ describe("game load action lifecycle", () => {
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
 		expect(getCachedGameEngineResource(queryClient)?.game).toBe(game);
+	});
+	it("keeps an ordinary bootstrap failure on the local retryable load page", async () => {
+		createGameFxMock.mockReturnValue(Effect.fail(new Error("bootstrap failed")));
+		const { router } = createHarness(`/action/load-game/${packageId}`);
+
+		const loading = router.load();
+		await vi.advanceTimersByTimeAsync(2_500);
+		await loading;
+		const container = await renderRouter(router);
+
+		expect(container.querySelector('[data-ui="ActionErrorPage"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="RootFatalErrorPage"]')).toBeNull();
+		expect(container.textContent).toContain("Retry");
+	});
+
+	it("bubbles a package identity violation from the load error page to the root fatal boundary", async () => {
+		const discard = vi.fn();
+		createGameFxMock.mockReturnValue(
+			Effect.succeed(
+				createGame({
+					createdPackageId: "package-wrong",
+					disposeWithoutSaveFx: Effect.sync(discard),
+				}),
+			),
+		);
+		const { router } = createHarness(`/action/load-game/${packageId}`);
+
+		const loading = router.load();
+		await vi.advanceTimersByTimeAsync(2_500);
+		await loading;
+		const container = await renderRouter(router);
+
+		expect(discard).toHaveBeenCalled();
+		expect(container.querySelector('[data-ui="RootFatalErrorPage"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="ActionErrorPage"]')).toBeNull();
 	});
 });

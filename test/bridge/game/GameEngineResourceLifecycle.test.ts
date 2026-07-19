@@ -54,6 +54,17 @@ const createHarness = (game: Game) => {
 };
 
 describe("GameEngineResource lifecycle", () => {
+	it("keeps the first critical failure as a permanent publication guard", () => {
+		const { resource } = createHarness(createGame());
+		const firstCause = new Error("final save failed");
+		const first = resource.markCriticalFailure("game-leave", firstCause);
+		const second = resource.markCriticalFailure("game-reset", new Error("later failure"));
+
+		expect(second).toBe(first);
+		expect(first.cause).toBe(firstCause);
+		expect(() => resource.assertUsable()).toThrow(first);
+	});
+
 	it("removes the cached Game only after final save and disposal succeed", async () => {
 		const dispose = vi.fn();
 		const game = createGame({

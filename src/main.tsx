@@ -64,16 +64,20 @@ const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
 
 import.meta.hot?.dispose((data: HotData) => {
 	removeBeforeClose();
-	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then((resource) =>
-		resource === null
-			? undefined
-			: RendererRuntime.runPromise(
-					releaseGameEngineResourceFx({
-						queryClient,
-						resource,
-					}),
-				),
-	);
+	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then(async (resource) => {
+		if (resource === null) return;
+		resource.assertUsable();
+		try {
+			await RendererRuntime.runPromise(
+				releaseGameEngineResourceFx({
+					queryClient,
+					resource,
+				}),
+			);
+		} catch (cause) {
+			throw resource.markCriticalFailure("hmr-handoff", cause);
+		}
+	});
 });
 
 createRoot(rootElement).render(

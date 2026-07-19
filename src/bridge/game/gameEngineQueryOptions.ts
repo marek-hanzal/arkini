@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 
+import { toCriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
@@ -30,14 +31,24 @@ export const gameEngineQueryOptions = ({
 	queryOptions({
 		queryKey: gameEngineQueryKey,
 		queryFn: async () => {
-			await awaitPreviousShutdown;
+			try {
+				await awaitPreviousShutdown;
+			} catch (cause) {
+				throw toCriticalGameLifecycleError({
+					operation: "hmr-handoff",
+					cause,
+				});
+			}
 			await beforeCreate();
 			const game = await create(packageId);
 			if (game.arkpack.packageId !== packageId) {
 				await RendererRuntime.runPromise(game.disposeWithoutSaveFx);
-				throw new Error(
-					`Game Engine creation returned package ${game.arkpack.packageId} for requested package ${packageId}.`,
-				);
+				throw toCriticalGameLifecycleError({
+					operation: "engine-ownership",
+					cause: new Error(
+						`Game Engine creation returned package ${game.arkpack.packageId} for requested package ${packageId}.`,
+					),
+				});
 			}
 			return RendererRuntime.runPromise(createGameEngineResourceFx(game));
 		},

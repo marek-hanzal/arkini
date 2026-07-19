@@ -116,6 +116,37 @@ body {
 	background: var(--ak-canvas);
 }
 
+[data-ui="Canvas"] {
+	--ak-viewport-padding: clamp(0.625rem, 4cqmin, 3rem);
+	--ak-viewport-gap: clamp(0.5rem, 2.75cqmin, 2rem);
+	--ak-panel-padding: clamp(0.75rem, 3cqmin, 1.5rem);
+	--ak-control-min-height: clamp(2.25rem, 7cqh, 2.75rem);
+	--ak-control-padding-inline: clamp(0.75rem, 3cqw, 1.25rem);
+	--ak-control-padding-block: clamp(0.375rem, 1.5cqh, 0.625rem);
+	--ak-control-font-size: clamp(0.8125rem, 2.4cqmin, 1rem);
+	--ak-compact-hero-width: min(76cqw, 48rem, 60.4304cqh);
+	--ak-full-hero-width: min(88cqw, 68rem, 103.0872cqh);
+}
+
+[data-ui="LauncherSceneLayout"][data-layout="fixed-hero"] {
+	grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
+}
+
+@container (max-height: 36rem) {
+	[data-ui="LauncherSceneLayout"] {
+		--ak-compact-hero-width: min(76cqw, 48rem, 51cqh);
+	}
+
+	[data-ui="LauncherSceneLayout"][data-layout="fixed-hero"] {
+		grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
+	}
+
+	[data-ui="MainMenu"],
+	[data-ui="GameMenu"] > .grid {
+		gap: clamp(0.25rem, 1cqh, 0.5rem);
+	}
+}
+
 button,
 input,
 select {
@@ -128,7 +159,7 @@ select {
 }
 
 [data-ui="Board"] {
-	padding: clamp(1.25rem, 4vmin, 3rem);
+	padding: var(--ak-viewport-padding);
 }
 
 [data-ui="BoardViewport"] {
@@ -206,6 +237,10 @@ select {
 	view-transition-name: none !important;
 }
 
+:root:active-view-transition-type(main-page-arkpacks) [data-ui="MainPagePanel"] {
+	view-transition-name: none !important;
+}
+
 .launcher-hero__shadow {
 	z-index: 0;
 	background: radial-gradient(
@@ -261,6 +296,21 @@ select {
 		transform: scale(1);
 		filter: blur(0);
 	}
+}
+
+@keyframes arkini-action-loading-overlay-enter {
+	0% {
+		opacity: 0;
+		transform: scale(0.99);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.action-loading-overlay {
+	animation: arkini-action-loading-overlay-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-group(arkini-route-scene),

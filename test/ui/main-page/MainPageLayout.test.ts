@@ -53,7 +53,7 @@ describe("MainPageLayout", () => {
 		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
 
 		expect(layout?.dataset.layout).toBe("fixed-hero");
-		expect(layout?.style.gridTemplateRows).toBe("minmax(0, 2fr) minmax(0, 3fr)");
+		expect(layout?.style.gridTemplateRows).toBe("");
 		expect(hero?.parentElement).toBe(heroSlot);
 		expect(panel?.parentElement).toBe(contentSlot);
 		expect(hero?.style.viewTransitionName).toBe("");
@@ -77,7 +77,8 @@ describe("MainPageLayout", () => {
 		expect(layout?.dataset.layout).toBe("fixed-hero");
 		expect(hero?.parentElement).toBe(heroSlot);
 		expect(panel?.parentElement).toBe(contentSlot);
-		expect(panel?.className).toContain("flex-1");
+		expect(panel?.className).toContain("size-full");
+		expect(panel?.className).not.toContain("85dvw");
 		expect(panel?.style.viewTransitionName).toBe("");
 	});
 });

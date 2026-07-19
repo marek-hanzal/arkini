@@ -2,8 +2,8 @@ import type { CSSProperties } from "react";
 import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
 
 const heroAspectRatio = "3345 / 1882";
-const compactWidth = "min(76vw, 48rem, 60.4304vh)";
-const fullWidth = "min(88vw, 68rem, 103.0872vh)";
+const compactWidth = "var(--ak-compact-hero-width)";
+const fullWidth = "var(--ak-full-hero-width)";
 
 export namespace LauncherHero {
 	export interface Props {

@@ -414,6 +414,7 @@ describe("GameMenu", () => {
 			buttonByText(container, "Main Menu").click();
 			buttonByText(container, "Main Menu").click();
 		});
+		expect(container.querySelector('[data-ui="ActionLoadingOverlay"]')).not.toBeNull();
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(viewTransitionStartPhases).toEqual([
 			"open",

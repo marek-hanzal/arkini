@@ -3,7 +3,7 @@ import { forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from
 import { twMerge } from "tailwind-merge";
 
 const ButtonBaseClassName =
-	"inline-flex min-h-11 items-center justify-center rounded-lg px-5 py-2.5 text-center font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-60";
+	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-60";
 
 const ButtonVariantClassNames = {
 	default:

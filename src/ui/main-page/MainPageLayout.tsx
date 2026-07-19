@@ -5,9 +5,9 @@ import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelVi
 import { routeSceneViewTransitionName } from "~/ui/navigation/routeSceneViewTransitionName";
 
 const panelModeClassNames = {
-	compact: "max-h-full w-full max-w-sm overflow-y-auto p-5",
-	responsive: "max-h-full w-full max-w-xl overflow-y-auto p-6",
-	viewport: "w-[85dvw] max-w-5xl flex-1 overflow-hidden p-6",
+	compact: "max-h-full w-full max-w-sm overflow-y-auto p-[var(--ak-panel-padding)]",
+	responsive: "max-h-full w-full max-w-xl overflow-y-auto p-[var(--ak-panel-padding)]",
+	viewport: "size-full max-w-5xl overflow-hidden p-[var(--ak-panel-padding)]",
 } as const;
 
 export namespace MainPageLayout {

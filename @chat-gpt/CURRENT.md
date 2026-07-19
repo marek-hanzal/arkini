@@ -4,7 +4,7 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Main-page Hero compositor topology and action-bound root loading lifecycle**
+**Responsive root canvas and explicit main-page/loading transition topology**
 
 Status: **Implemented; final validation and native macOS smoke pending.**
 
@@ -13,12 +13,14 @@ Current contract:
 - `MainPageLayout` is the only outer structure for `/main-menu`, `/settings`, `/about`, and `/arkpacks`; its `LauncherScene` uses one explicit two-row grid with a stable Hero slot and content slot, so panel height never moves or resizes the Hero;
 - `LauncherHero` is normal DOM inside the full route-scene snapshot. It must not own a `view-transition-name`, `will-change`, paint containment, or another forced compositor layer; the transparent artwork and semi-transparent shadow stay together in the route snapshot rather than becoming a nested rectangular bitmap;
 - main-page native transitions name only the full `arkini-route-scene` and, for geometrically corresponding compact/responsive pages, the naturally rectangular `arkini-main-page-panel`; `/arkpacks` deliberately leaves its viewport panel unnamed;
+- any transition involving `/arkpacks` receives the typed `main-page-arkpacks` route family; while that type is active, `MainPagePanel` naming is disabled on both source and destination so Chromium never cuts an old-only panel rectangle out of the full route snapshot;
 - Chromium compositor validation must confirm no `arkini-launcher-hero` pseudo-elements and identical Hero geometry across MainMenu, Settings, About, and Arkpacks before changing this topology again;
 - `ActionLoadingProvider` lives above `GameOwnerProvider` and the route canvas, so one loading presentation can survive route replacement without becoming a second game or save owner;
 - every deliberate loading run receives the real asynchronous action, a stable dedupe key, a presentation label, a minimum visible duration, and a completed hold;
 - defaults are 2.5 seconds minimum visibility and a 350 ms fully completed hold after the 180 ms progress interpolation;
 - staged pending progress tops out at 94%; 100% is published only after both the real action succeeds and the minimum duration has elapsed; failure waits out the same minimum but never displays a false completed state;
 - `GameOwnerRouteBinding` remains the declarative route-to-owner boundary, but game selection and an owned-game return to `/main-menu` run through the root loader; leaving game for `/settings` deliberately invokes the same canonical route release without the artificial delay;
+- GameMenu → Main Menu activates the root loader before navigation, keeps the open menu input-locked beneath it, and lets the destination route binding replace that presentation with the real release/save action; the loader overlay owns an explicit 300 ms entrance rather than depending on whether the router happened to capture its mount;
 - one route-intent ref prevents React StrictMode effect replay from running the same owner command twice; provider unmount cleanup is microtask-confirmed so StrictMode cleanup/replay does not clear an active dedupe entry while a real unmount still releases close readiness;
 - initial game entry, browser-history return to game, and game-to-main-menu all observe the exact `GameOwner` Promise; no create, save, release, or failure state is duplicated in React;
 - `Save and exit` uses `runNativeClose`: the existing Electron controlled-close request starts immediately, `GameOwner.shutdownFx` remains the sole final-save owner, native `beforeCloseReady` resolves the loader action only after that shutdown succeeds, and the renderer reports close-ready only after 100% has remained visible for the completed hold;
@@ -27,9 +29,16 @@ Current contract:
 - the previous route-local `GameLoadingGate`, `GameLoadingScreen`, and `arkini-game-loading` identity are removed; `ActionLoadingScreen` is the single staged progress presentation and `arkini-action-loading` is its visual role;
 - startup splash, MainPage route policy, GameMenu local WAAPI, Settings navigation, and engine truth remain separate from loading presentation state.
 
+Responsive viewport contract:
+
+- `ui/canvas/Canvas` owns the exact renderer viewport and is the one CSS size container for every route, board, loader, and overlay;
+- shared `cqw`/`cqh` variables on Canvas own viewport padding, gaps, panel padding, control dimensions, and Hero width; child surfaces must consume those variables instead of introducing unrelated `vw`/`vh` sizing;
+- short viewports reduce the fixed Hero allocation and compact Hero width while preserving the same two-slot MainPage structure; panels and GameMenu fit the viewport and use deliberate internal scrolling when their semantic content cannot shrink further;
+- document roots never scroll, and measured route surfaces must remain within Canvas at `1200×900`, `900×600`, `700×500`, `600×400`, and `480×320`; a tiny viewport may scroll inside its panel but may not grow or clip the document.
+
 Next action:
 
-> Validate MainMenu ↔ Settings/About/Arkpacks and loader-to-main-page/game handoffs on native macOS Electron. Confirm no rectangular Hero/shadow raster surface appears, Hero geometry remains fixed across every main page, the loader remains visible for at least 2.5 seconds, 100% is perceptible for roughly 350 ms, and failures never flash 100%.
+> Validate MainMenu ↔ Arkpacks and GameMenu → loader → MainMenu on native macOS Electron. Confirm the Arkpacks typed transition produces no panel cutout, the loader visibly enters before route replacement and exits through its local transition, and main pages/GameMenu remain usable from the normal window down to intentionally tiny viewports.
 
 ## Source topology
 
@@ -77,7 +86,7 @@ Next action:
 - `ui/tile` is headless and independent from bridge/engine domains. It owns only mounted DOM nodes and one transient pointer session.
 - `BoardTile` receives canonical identity + revision from the live board projection. Revision change or unmount cancels stale pointer state; replacing `Game` remounts the complete tile system.
 - Appearance is a UI/platform preference, never gameplay state. `src/ui/styles.css` is the sole semantic color-token source; active UI uses semantic Tailwind utilities and no palette-specific `dark:` branches. Stored theme is `dark | light | system` and stored accent is one explicit semantic palette; absent or malformed preferences resolve to dark and rose. Electron `nativeTheme`, renderer `color-scheme`, and root accent tokens stay aligned without another resolved-theme store.
-- `ui/canvas/Canvas` owns one fixed renderer viewport. Document roots never scroll; pages must fit or use intentional scrollbar-hidden internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives board size.
+- `ui/canvas/Canvas` owns one fixed renderer viewport and one CSS size-container coordinate system. Document roots never scroll; pages consume shared container-relative spacing/control/Hero variables and fit or use intentional internal scrolling. The board fits the largest available rectangle while preserving the canonical board aspect ratio, so window size always drives every presentation surface rather than only the board.
 - Electron opens centered at 75% of the current display work area. `F11` and `Alt+Enter` toggle native fullscreen, and every resize/fullscreen transition is presentation geometry only.
 - Every production desktop build owns `packOfficialGameFx → buildDesktopOutputFx`, so renderer consumers never require a stale ignored Arkpack. `npm run preview:macos` cleans, builds once, stages, creates only `release/mac-arm64/Arkini.app` through `electron-builder --dir`, prints the exact path, and launches that bundle. `npm run package:mac` reuses the same one-time build stage, then creates DMG/ZIP, streams each large artifact once into `SHA256SUMS`, and verifies artifact/app structure without rehashing. Standalone `desktop verify` re-streams artifacts when validating downloads or later changes.
 - `.github/workflows/macos-prerelease.yml` runs the same package command on `macos-15`. Format, type, and source-validation gates run before packaging; Dependency Cruiser and permanent tests run afterward against the generated package inputs. The official pack and renderer build therefore occur once in the delivery path without relying on stale ignored output. Manual dispatch uploads an Actions artifact; `v*-dev.*` tags additionally create an immutable GitHub prerelease. Signing/notarization remain explicitly absent.

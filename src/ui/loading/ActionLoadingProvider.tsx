@@ -369,7 +369,7 @@ export const ActionLoadingProvider = ({
 					<div
 						ref={overlayRef}
 						aria-label={active.label}
-						className="fixed inset-0 z-[100] size-full overflow-hidden outline-none"
+						className="action-loading-overlay fixed inset-0 z-[100] size-full overflow-hidden outline-none"
 						data-ui="ActionLoadingOverlay"
 						role="status"
 						tabIndex={-1}

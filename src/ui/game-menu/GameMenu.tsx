@@ -14,6 +14,8 @@ import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useHardResetGameMutation } from "~/ui/game-menu/mutation/useHardResetGameMutation";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
+import { useActionLoading } from "~/ui/loading/useActionLoading";
+import { defaultLoadingMinimumDurationMs } from "~/ui/loading/ActionLoadingScreen";
 import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
 
 const focusableSelector = [
@@ -60,6 +62,7 @@ const GameMenuDialog = ({
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
 	const menu = useGameMenuControl();
+	const actionLoading = useActionLoading();
 	const navigate = useNavigate();
 	const save = useSaveGameMutation(game);
 	const saveAndExit = useSaveAndExitGameMutation(game);
@@ -238,14 +241,23 @@ const GameMenuDialog = ({
 		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
 		activeRequestRef.current = destination === "/settings" ? "settings" : "main-menu";
 		setNavigationError(undefined);
-		void navigate({
-			to: destination,
-		})
-			.catch(setNavigationError)
-			.finally(() => {
-				activeRequestRef.current = null;
-				menu.completeRouteRequest();
+		const navigateToDestination = () =>
+			navigate({
+				to: destination,
 			});
+		const request =
+			destination === "/main-menu"
+				? actionLoading.run({
+						action: navigateToDestination,
+						key: "game-menu:navigate-main-menu",
+						label: "Returning to main menu…",
+						minimumDurationMs: defaultLoadingMinimumDurationMs,
+					})
+				: navigateToDestination();
+		void request.catch(setNavigationError).finally(() => {
+			activeRequestRef.current = null;
+			menu.completeRouteRequest();
+		});
 	};
 
 	const requestSettings = () => requestRoute("/settings");
@@ -306,7 +318,7 @@ const GameMenuDialog = ({
 	return (
 		<div
 			ref={backdropRef}
-			className="absolute inset-0 z-50 grid place-items-center bg-overlay/90 p-4 text-overlay-foreground backdrop-blur-sm"
+			className="absolute inset-0 z-50 grid place-items-center overflow-hidden bg-overlay/90 p-[var(--ak-viewport-padding)] text-overlay-foreground backdrop-blur-sm"
 			data-ui="GameMenuBackdrop"
 			data-phase={phase}
 			style={
@@ -322,7 +334,7 @@ const GameMenuDialog = ({
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="game-menu-title"
-				className="w-full max-w-sm rounded-2xl border border-line-strong bg-surface-raised p-5 text-foreground shadow-2xl outline-none"
+				className="max-h-full w-full max-w-sm overflow-y-auto rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-2xl outline-none"
 				data-ui="GameMenu"
 				tabIndex={-1}
 				style={{
@@ -346,21 +358,21 @@ const GameMenuDialog = ({
 
 				<div className="grid gap-2">
 					<PrimaryButton
-						className="w-full py-3"
+						className="w-full"
 						disabled={gameActionDisabled}
 						onClick={() => void menu.close()}
 					>
 						Return to game
 					</PrimaryButton>
 					<Button
-						className="w-full py-3 shadow-none backdrop-blur-none"
+						className="w-full shadow-none backdrop-blur-none"
 						disabled={actionDisabled}
 						onClick={requestSettings}
 					>
 						Settings
 					</Button>
 					<Button
-						className="w-full py-3 shadow-none backdrop-blur-none"
+						className="w-full shadow-none backdrop-blur-none"
 						disabled={actionDisabled}
 						onClick={requestMainMenu}
 					>
@@ -370,14 +382,14 @@ const GameMenuDialog = ({
 					<div className="my-2 border-t border-line" />
 
 					<Button
-						className="w-full py-3 shadow-none backdrop-blur-none"
+						className="w-full shadow-none backdrop-blur-none"
 						disabled={gameActionDisabled}
 						onClick={requestSave}
 					>
 						Save
 					</Button>
 					<Button
-						className="w-full py-3 shadow-none backdrop-blur-none"
+						className="w-full shadow-none backdrop-blur-none"
 						disabled={gameActionDisabled}
 						onClick={requestSaveAndExit}
 					>
@@ -421,7 +433,7 @@ const GameMenuDialog = ({
 							</div>
 						) : (
 							<DangerButton
-								className="w-full py-3 shadow-none"
+								className="w-full shadow-none"
 								disabled={gameActionDisabled}
 								onClick={() => setConfirmingDestroy(true)}
 							>

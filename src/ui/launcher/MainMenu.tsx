@@ -35,13 +35,13 @@ export const MainMenu = () => {
 					params={{
 						packageId: builtInPackageId,
 					}}
-					className="rounded-xl py-3"
+					className="rounded-xl"
 				>
 					Play
 				</PrimaryButtonLink>
 			) : (
 				<PrimaryButton
-					className="rounded-xl py-3"
+					className="rounded-xl"
 					disabled
 				>
 					{catalogState.type === "failed" || startupState.type === "failed"
@@ -51,24 +51,24 @@ export const MainMenu = () => {
 			)}
 			<ButtonLink
 				to="/arkpacks"
-				className="rounded-xl py-3"
+				className="rounded-xl"
 			>
 				Arkpacks
 			</ButtonLink>
 			<ButtonLink
 				to="/settings"
-				className="rounded-xl py-3"
+				className="rounded-xl"
 			>
 				Settings
 			</ButtonLink>
 			<ButtonLink
 				to="/about"
-				className="rounded-xl py-3"
+				className="rounded-xl"
 			>
 				About
 			</ButtonLink>
 			<Button
-				className="rounded-xl py-3"
+				className="rounded-xl"
 				disabled={exit.isPending}
 				onClick={() => exit.mutate()}
 			>

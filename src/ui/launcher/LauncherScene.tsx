@@ -3,9 +3,9 @@ import { LauncherHero } from "~/ui/launcher/LauncherHero";
 
 const layoutClassNames = {
 	centered:
-		"flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-[clamp(1rem,3vmin,2rem)]",
+		"flex size-full min-h-0 min-w-0 flex-col items-center justify-center gap-[var(--ak-viewport-gap)]",
 	"fixed-hero":
-		"grid size-full min-h-0 min-w-0 justify-items-center gap-[clamp(1rem,3vmin,2rem)]",
+		"grid size-full min-h-0 min-w-0 justify-items-center gap-[var(--ak-viewport-gap)]",
 } as const;
 
 const heroSlotClassNames = {
@@ -55,16 +55,9 @@ export const LauncherScene = ({
 			aria-hidden="true"
 		/>
 		<div
-			className={`relative z-10 overflow-hidden p-[clamp(1rem,4vmin,3rem)] ${layoutClassNames[layout]}`}
+			className={`relative z-10 overflow-hidden p-[var(--ak-viewport-padding)] ${layoutClassNames[layout]}`}
 			data-layout={layout}
 			data-ui="LauncherSceneLayout"
-			style={
-				layout === "fixed-hero"
-					? {
-							gridTemplateRows: "minmax(0, 2fr) minmax(0, 3fr)",
-						}
-					: undefined
-			}
 		>
 			<div
 				className={heroSlotClassNames[layout]}

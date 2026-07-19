@@ -76,7 +76,7 @@ export const ArkpackSelector = () => {
 
 	return (
 		<div
-			className="grid h-full min-h-0 w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-[clamp(0.75rem,2.5vmin,2rem)]"
+			className="grid h-full min-h-0 w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-[var(--ak-viewport-gap)]"
 			data-ui="ArkpackSelector"
 		>
 			<header>
@@ -85,7 +85,7 @@ export const ArkpackSelector = () => {
 				</p>
 				<h1
 					id="arkpack-selector-title"
-					className="mt-2 text-[clamp(1.5rem,4vmin,1.875rem)] font-semibold"
+					className="mt-2 text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold"
 				>
 					Choose a game package
 				</h1>
@@ -100,7 +100,7 @@ export const ArkpackSelector = () => {
 					ref={inputRef}
 					type="file"
 					accept=".arkpack,application/octet-stream"
-					className="block w-full text-sm text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
+					className="block min-w-0 w-full text-sm text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
 					disabled={busy || exitPending}
 					onChange={(event) => void upload(event.currentTarget.files?.[0])}
 				/>

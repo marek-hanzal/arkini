@@ -74,6 +74,14 @@ describe("createArkiniRouter", () => {
 		expect(resolveTypes("/settings", "/main-menu")).toEqual([
 			"main-page",
 		]);
+		expect(resolveTypes("/main-menu", "/arkpacks")).toEqual([
+			"main-page",
+			"main-page-arkpacks",
+		]);
+		expect(resolveTypes("/arkpacks", "/about")).toEqual([
+			"main-page",
+			"main-page-arkpacks",
+		]);
 		expect(resolveTypes("/main-menu", "/game/built-in")).toEqual([
 			"main-page-game",
 		]);

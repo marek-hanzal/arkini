@@ -6,6 +6,9 @@ export function Canvas({ children }: PropsWithChildren) {
 		<div
 			className="relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground"
 			data-ui="Canvas"
+			style={{
+				containerType: "size",
+			}}
 		>
 			{children}
 		</div>

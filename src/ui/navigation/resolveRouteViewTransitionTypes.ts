@@ -24,10 +24,16 @@ export const resolveRouteViewTransitionTypes = ({
 	const toPathname = toLocation.pathname;
 	const fromMainPage = mainPagePathnames.has(fromPathname);
 	const toMainPage = mainPagePathnames.has(toPathname);
+	const involvesArkpacks = fromPathname === "/arkpacks" || toPathname === "/arkpacks";
 
 	if (fromMainPage && toMainPage)
 		return [
 			"main-page",
+			...(involvesArkpacks
+				? [
+						"main-page-arkpacks",
+					]
+				: []),
 		];
 	if (
 		(fromMainPage && isGamePathname(toPathname)) ||

@@ -135,6 +135,9 @@ describe("ActionLoadingProvider", () => {
 		});
 
 		expect(container.querySelector('[data-ui="ActionLoadingOverlay"]')).not.toBeNull();
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="ActionLoadingOverlay"]')?.className,
+		).toContain("action-loading-overlay");
 		expect(container.querySelector('[data-action-loading-active="true"]')).not.toBeNull();
 
 		await act(async () => {

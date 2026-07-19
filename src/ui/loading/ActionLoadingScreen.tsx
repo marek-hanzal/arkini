@@ -131,12 +131,12 @@ export const ActionLoadingScreen = ({
 			viewTransitionName={actionLoadingViewTransitionName}
 		>
 			<div
-				className="flex w-[min(80dvw,56rem)] max-w-full flex-col items-center gap-[clamp(1.25rem,4vmin,2.5rem)]"
+				className="flex w-[min(80cqw,56rem)] max-w-full flex-col items-center gap-[var(--ak-viewport-gap)]"
 				data-ui="ActionLoadingScreenPanel"
 			>
 				<div className="flex w-full flex-col items-center gap-3">
 					<div
-						className="h-2 w-[min(80%,28rem)] overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
+						className="h-[clamp(0.375rem,1.25cqh,0.5rem)] w-[min(80%,28rem)] overflow-hidden rounded-full border border-line bg-surface-raised/60 shadow-inner"
 						data-ui="ActionLoadingScreenProgress"
 						role="progressbar"
 						aria-label={label}

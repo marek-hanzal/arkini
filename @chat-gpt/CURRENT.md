@@ -4,16 +4,17 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Native View Transition page-system overhaul**
+**Singleton Game Engine query review follow-up**
 
-Status: **Implemented; targeted automated validation and throttled Chromium validation passed, native macOS Electron smoke pending.**
+Status: **Issue #295 implemented; targeted lifecycle/router validation passed. Issues #296 and #297 remain for product discussion and implementation.**
 
 Current contract:
 
 - `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`.
-- `/game/$packageId` remains a non-visual resource/layout boundary. It requires the exact cached `GameEngineResource`, exposes the canonical `Game` through inherited TanStack Router context and loader data, and renders only `Outlet`.
-- `/action/load-game/$packageId` is the sole explicit creation page. Its loader calls `ensureQueryData(gameEngineQueryOptions(...))`, its pending/error components render the Hero action presentation, and success redirects to `/game/$packageId/board`. Direct Board entry repairs through this same action.
-- TanStack Query owns only the identity and lifetime of the route-scoped live resource. It does not own gameplay state or another reactive truth; gameplay UI reads the parent loader through `useGameEngine()` and must not call `useQuery()` for the engine.
+- `/game/$packageId` remains a non-visual resource/layout boundary. It requires the exact published singleton `GameEngineResource`, exposes the canonical `Game` through inherited TanStack Router context and loader data, and renders only `Outlet`.
+- `/action/load-game/$packageId` is the sole explicit creation page. Its loader registers `ensureQueryData(gameEngineQueryOptions(...))` immediately, while the query's `beforeCreate` gate delays heavy bootstrap until the entering View Transition finishes. Its pending/error components render the Hero action presentation, and success redirects to `/game/$packageId/board`. Direct Board entry repairs through this same action.
+- TanStack Query owns only the identity and lifetime of one renderer-wide singleton resource under `["game-engine"]`. `packageId` is creation/context data, never cache identity. Query does not own gameplay state or another reactive truth; gameplay UI reads the parent loader through `useGameEngine()` and must not call `useQuery()` for the engine.
+- Controlled close and HMR join the singleton Query promise even before heavy creation starts. Failed bootstrap resolves as no live resource; successful bootstrap proceeds through ordinary final-save disposal. Cleanup removes the singleton only after checking that it still publishes the exact resource being released.
 - `GameEngineResource` contains the canonical `Game` plus one private Effect semaphore. Leave, reset, exit, HMR shutdown, and competing navigation are serialized through the resource lifecycle lock.
 - Leave, reset, exit, recovery, and load are named leaf action routes whose loaders own complete operations. Their pending/error UI presents only Hero, label, progress, and retry/navigation affordances.
 - `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. No GameOwner provider, route binding, root loading overlay, hidden destination page, transition-name suppression mode, or nested `document.startViewTransition()` remains.
@@ -36,7 +37,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Run native macOS Electron smoke validation for the same transition graph, including title-bar close, reduced motion, light/dark appearance changes, and tiny Canvas sizes. Treat any unnamed visible navigation, default Chromium fade, rectangular Hero raster, or route-chunk wait frame as a blocking regression.
+> Discuss and implement #296 controlled-close retry/outcome semantics and #297 root fatal lifecycle failure semantics without changing the working route/View Transition architecture.
 
 ## Source topology
 
@@ -63,10 +64,10 @@ Next action:
 - `/game/$packageId` is a non-visual resource branch whose component is only `Outlet`; `/game/$packageId/board` composes `GameShell` and the canonical current-space Board. Future `/dev/**` routes remain outside this resource and shell.
 - One renderer-session `LauncherStartup` starts immediately under the initial pure-black frame. Electron reports the actual `ready-to-show` visibility moment through preload; the approximately 500 ms black hold is anchored to that renderer timestamp rather than module evaluation. Appearance publishes early and `heroReady` is explicit after `HTMLImageElement.decode()`. Automatic completion requires hard readiness plus five visible seconds; legal Escape may continue once readiness exists. Startup then navigates to `/main-menu` and never mounts that destination beneath itself.
 - `GameSession` and `Game` lifecycle is Effect-native: `flushSaveFx`, `disposeFx`, and `disposeWithoutSaveFx` are the only public lifecycle operations. One session lifecycle state plus `Deferred` shares concurrent disposal, failed final save leaves the same frozen session retryable, and game-owned resource Scope closes only after successful save disposal or explicit discard. Never restore a cached disposal Promise wrapper.
-- `gameEngineQueryOptions` creates one `GameEngineResource` for one exact package query. The resource contains the canonical `Game` and one private Effect semaphore; Query stores identity/lifetime only and `useGameEngine()` reads the parent route loader rather than observing Query state.
+- `gameEngineQueryOptions` creates one `GameEngineResource` in the canonical renderer-wide `["game-engine"]` Query slot. The resource contains the canonical `Game` and one private Effect semaphore; Query stores identity/lifetime only and `useGameEngine()` reads the parent route loader rather than observing Query state.
 - `GameMenuProvider` lives only at the Board shell and owns local `closed | entering | open | exiting`, Escape, focus trap/restoration, and a short route-request lock that prevents duplicate clicks while TanStack accepts navigation. It never owns save, release, reset, engine replacement, or cross-page animation.
 - The root `AppearanceProvider` owns only the hydrated renderer theme/accent snapshot. `/settings` uses one complete `setAppearanceThemeMutationOptions` contract connected directly to `writeAppearanceThemeFx`, plus its natural `useSetAppearanceThemeMutation` hook. It applies immediately, persists atomically, rolls back on failure, and no-ops for the active value. There is no floating game-canvas selector, second appearance store, callback-injection adapter, or project-specific mutation-state helper.
-- TanStack Query owns ordinary asynchronous UI mutation state plus the exceptional stable identity of the route-scoped Game resource. It never mirrors runtime, catalog, save, or gameplay state. Save remains a standalone mutation over `Game`; leave/reset/exit/recovery are loader-owned action pages.
+- TanStack Query owns ordinary asynchronous UI mutation state plus the exceptional stable identity of the singleton Game resource. It never mirrors runtime, catalog, save, or gameplay state. Save remains a standalone mutation over `Game`; leave/reset/exit/recovery are loader-owned action pages.
 - Controlled whole-application exit requests the native close handshake. Preload navigates to the appropriate exit action and sends `closeReady` only after its loader succeeds. Failure keeps the same frozen resource and route error page retryable; no hidden GameMenu exit animation participates.
 - A bootstrap failure exposes destructive recovery only when `createGameFx` raises `GameSaveBootstrapError` with a verified exact save key. `GameEngineErrorPage` only links to `/action/recover-game-save`; that action loader resolves the failed exact Query error, clears only its verified save, removes the failed query, and redirects through the normal fresh `/board` bootstrap. Package validation failures expose no recovery action.
 
@@ -221,11 +222,11 @@ Next action:
 ## Route-owned Game Engine lifecycle
 
 - `GameSession` remains the authoritative runtime/save lifecycle. A failed final save freezes the same session and a later disposal retries the exact obligation; resources release only after save success.
-- `GameEngineResource` is one cached `Game` plus one private lifecycle semaphore. The Query cache is an identity registry for that live route resource, not a canonical gameplay store.
-- `/game/$packageId` always creates a new engine when its exact query resource does not exist. Re-running parent `beforeLoad` while navigating among `/board` and `/action/*` returns the same resource through `ensureQueryData`.
+- `GameEngineResource` is one cached `Game` plus one private lifecycle semaphore. The Query cache contains zero or one canonical `["game-engine"]` entry and is an identity registry, not a canonical gameplay store.
+- `/action/load-game/$packageId` creates a new engine when the singleton query resource does not exist. `/game/$packageId` only reads and validates that published resource; navigating among `/board` and `/action/*` keeps the same object identity.
 - The parent route returns `gameEngine` and `gameEngineResource` through TanStack Router context. Its loader returns the same `Game`; React consumers use the named `useGameEngine()` hook over route loader data, while child action loaders consume inherited context directly.
-- Successful leave/exit removes the exact query only after final disposal succeeds. Failed disposal keeps the resource cached and frozen so retry uses the same canonical snapshot.
-- HMR shutdown uses the same resource release operation. A newly created resource waits for any previous HMR shutdown promise before bootstrap so two sessions cannot overlap during module replacement.
+- Successful leave/exit removes the singleton query only after final disposal succeeds and only when it still contains the exact resource. Failed disposal keeps the resource cached and frozen so retry uses the same canonical snapshot.
+- HMR shutdown and controlled close join a pending singleton Query promise before deciding whether a Game exists. A newly created resource waits for any previous HMR shutdown promise before bootstrap so two sessions cannot overlap during module replacement.
 - Global or broad Query invalidation must never be used as a game lifecycle command. Creation and removal happen only through the named game resource operations.
 
 ## Action-page transition ownership

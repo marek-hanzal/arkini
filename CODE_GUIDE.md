@@ -94,18 +94,23 @@ External and framework constructors remain valid where their API requires them. 
 
 ### TanStack asynchronous boundaries
 
-TanStack Query may own the transient lifecycle of asynchronous UI commands and the stable identity/lifetime of an explicitly route-scoped live resource. It never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics.
+TanStack Query may own the transient lifecycle of asynchronous UI commands and the stable identity/lifetime of the renderer-wide singleton live Game resource. It never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics.
 
 The live Game resource is the narrow exception to ordinary mutation-only use:
 
 ```text
 gameEngineQueryOptions(packageId)
-→ one exact Query key for one live route session
+→ one canonical Query key ["game-engine"] for the renderer
+→ packageId is creation data, never cache identity
 → queryFn is the sole Game creation boundary
 → infinite stale/GC time, retry disabled, structural sharing disabled
 
-/game/$packageId beforeLoad
+/action/load-game/$packageId loader
 → ensureQueryData(...)
+→ register the pending singleton before transition-delayed bootstrap starts
+
+/game/$packageId beforeLoad
+→ read the exact published singleton
 → expose the exact Game/resource through inherited route context
 
 /game/$packageId loader
@@ -116,7 +121,7 @@ useGameEngine
 → never useQuery for gameplay
 ```
 
-Query owns object identity and deduplication only. `GameSession` remains the canonical runtime/save owner, and explicit named route operations dispose/reset the resource and remove its exact Query entry. Do not invalidate broad Query prefixes as a lifecycle command, add observers merely to keep the engine alive, or allow UI components to create/reload the Game.
+Query owns object identity and same-key single-flight only. `GameSession` remains the canonical runtime/save owner, and explicit named route operations dispose/reset the resource and remove the singleton entry only when it still contains that exact resource. Controlled close and HMR join a pending singleton creation instead of treating an unpublished engine as absent. Do not invalidate broad Query prefixes as a lifecycle command, add observers merely to keep the engine alive, or allow UI components to create/reload the Game.
 
 Ordinary asynchronous UI commands stay standalone in their owning UI domain:
 

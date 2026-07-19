@@ -177,11 +177,18 @@ The live boundary exposes:
 
 ### 4.1 Route-owned Game resource
 
-`/game/$packageId` is a non-visual TanStack Router resource boundary. It always creates a new `Game` when the exact resource query is absent, but parent `beforeLoad` replay during child navigation must return the same existing resource:
+`/game/$packageId` is a non-visual TanStack Router resource boundary over the renderer-wide singleton Game Engine query. Creation belongs to the explicit load action; the game branch only accepts the already published resource for its exact package:
 
 ```text
-/game/$packageId beforeLoad
+/action/load-game/$packageId loader
 → queryClient.ensureQueryData(gameEngineQueryOptions(packageId))
+→ one canonical ["game-engine"] slot
+→ register pending ownership immediately
+→ delay CPU-heavy bootstrap until the entering View Transition settles
+
+/game/$packageId beforeLoad
+→ read the published singleton resource
+→ require resource.game.arkpack.packageId === route packageId
 → return { gameEngine, gameEngineResource } through route context
 
 /game/$packageId loader
@@ -194,19 +201,21 @@ The live boundary exposes:
 → run lifecycle Effects against inherited gameEngineResource
 ```
 
-`gameEngineQueryOptions` is the sole creation boundary. Its exact package key has infinite stale and garbage-collection time, disabled retry, and disabled structural sharing. TanStack Query therefore owns only the stable identity and lifetime of the live route resource; canonical gameplay state, subscriptions, persistence, and commands remain inside `GameSession`. Gameplay components never use `useQuery()` for the engine. They call `useGameEngine()`, a named typed hook over the parent route loader data.
+`gameEngineQueryOptions` is the sole creation boundary. The query key is always `["game-engine"]`; `packageId` is creation/context data and never part of cache identity. The singleton has infinite stale and garbage-collection time, disabled retry, and disabled structural sharing. TanStack Query therefore owns only stable renderer-wide identity and same-key single-flight; canonical gameplay state, subscriptions, persistence, and commands remain inside `GameSession`. Gameplay components never use `useQuery()` for the engine. They call `useGameEngine()`, a named typed hook over the parent route loader data.
+
+The supported UI flow never requests two package creations concurrently and never replaces a published engine in place. Such a state is a contract violation, not a scheduler workflow. Controlled close and HMR may happen while creation is pending, so both join the singleton Query promise. If bootstrap fails before publishing a resource, there is no live Game to save; if it succeeds, shutdown follows the ordinary final-save lifecycle. Query cleanup compares object identity before removal so stale disposal can never delete a newer singleton.
 
 `GameEngineResource` contains one `Game` and one private Effect semaphore. The semaphore serializes every destructive route-owned lifecycle action for that session:
 
 ```text
 leave / exit / HMR
 → Game.disposeFx
-→ remove exact Query resource only after success
+→ remove singleton Query resource only after success and exact identity match
 
 reset
 → Game.disposeWithoutSaveFx
 → clear exact packageId + contentHash save
-→ remove exact Query resource
+→ remove singleton Query resource after exact identity match
 → redirect to /game/$packageId/board
 → normal parent beforeLoad creates one fresh Game
 ```

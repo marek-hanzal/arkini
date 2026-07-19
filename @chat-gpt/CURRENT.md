@@ -6,7 +6,7 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Reference route-transition baseline with detail-level polish**
 
-Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. #297 is complete: critical leave/reset/ownership/HMR failures end the renderer through one root fatal boundary and a failed resource can never publish Board again. #296 is complete with the simplified product decision: controlled close joins pending creation, attempts one direct final save/disposal, logs failure, and closes anyway without routes or retries.**
+Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. #297 is complete: critical leave/reset/ownership/HMR failures end the renderer through one root fatal boundary and a failed resource can never publish Board again. #296 is complete with the simplified product decision: controlled close joins pending creation, attempts one direct final save/disposal, logs failure, and closes anyway without routes or retries. Parent lifecycle review #294 is closed after joint validation of #295, #296, and #297.**
 
 Current contract:
 
@@ -37,7 +37,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Revalidate #295, #296, and #297 together, then close parent review #294 without changing the accepted transition baseline.
+> Continue from the next user-selected task. The route-owned Game lifecycle review branch (#294–#297) is complete and the accepted transition baseline remains unchanged.
 
 ## Source topology
 

@@ -4,9 +4,9 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Reference route-transition baseline with detail-level polish**
+**Universal tile drag foundation over the accepted transition baseline**
 
-Status: **The route-owned singleton Game Engine from #295 remains intact. The transition surface graph was rebuilt and validated under 6× Chromium CPU throttling after broad card/progress/shadow regressions. The user accepted `arkini-route-transition-rebuild-7f63d84d-c775c19dd372.zip` / `7f63d84d7b74f222e54ecee82dadef8cf81e5d5f` as the reference snapshot; later transition work is detail tuning rather than another architecture rewrite. #297 is complete: critical leave/reset/ownership/HMR failures end the renderer through one root fatal boundary and a failed resource can never publish Board again. #296 is complete with the simplified product decision: controlled close joins pending creation, attempts one direct final save/disposal, logs failure, and closes anyway without routes or retries. Parent lifecycle review #294 is closed after joint validation of #295, #296, and #297.**
+Status: **`v0` is the immutable pre-interaction backup of `4c25f6d2cd1aa3e9d0b2efc63f54abfc2e14d82f`; feature work continues on `main`. The accepted route-transition baseline and completed singleton/fatal/controlled-close lifecycle remain intact. The current slice introduces one manual Pointer Events tile-drag foundation shared by Board, inventory, and toolbar. Board is the first consumer and currently accepts only an occupied Board source dropped onto an empty slot of the same Board surface; occupied slots and every other destination reject without selecting merge, consume, swap, storage, or drop behavior.**
 
 Current contract:
 
@@ -27,6 +27,9 @@ Current contract:
 - Renderer route auto code splitting remains disabled. Under throttling, unloaded route chunks produced a black pre-transition frame; deterministic eager renderer routes are the correct desktop trade.
 - Blocking route actions wait for the entering View Transition before starting CPU-heavy bootstrap. This preserves the source-page exit while leaving the action page truthful and responsive enough for the current workload.
 - Throttled Chromium filmstrips cover Main Menu → About, Main Menu → Arkpacks, Main Menu → load action → Board, Board/GameMenu → leave action → Main Menu, and Board/GameMenu → leave action → Settings. The rebuilt graph shows one surface at a time, stable Hero geometry, retained live shadows, no progress/card morph, and no terminal Hero opacity animations on GameMenu leave destinations.
+- One renderer-wide `TileSystemProvider` owns transient pointer drag state and registered `board | inventory | toolbar` geometry. Consumers register surfaces and concrete slots; the controller reports a topmost `slot | surface | outside` drop fact with source surface/slot, runtime identity/revision, and release coordinates. It never chooses a gameplay command.
+- Dragging uses Pointer Events and pointer capture. Pointer coordinates and the unrestricted body-level ghost remain outside React; `requestAnimationFrame` owns direct ghost transforms. WAAPI is reserved for pickup, accepted settle, and rejected/ignored snap-back. Animation never delays or decides the engine mutation.
+- Surface adapters translate universal drop facts into public bridge commands. The initial Board adapter invokes the existing atomic `moveItemFx` only for an empty slot on the same Board surface. Same-slot drops are ignored; occupied slots, surface gaps, inventory, toolbar, and outside drops reject and snap back until their explicit domain behavior exists.
 
 Responsive viewport contract:
 
@@ -37,7 +40,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Continue from the next user-selected task. The route-owned Game lifecycle review branch (#294–#297) is complete and the accepted transition baseline remains unchanged.
+> Continue the tile interaction stack from this shared foundation: inventory and toolbar register the same surfaces/slots, then explicit domain adapters may add storage, toolbar transfer, merge, consume, and other occupied-target actions without changing pointer ownership.
 
 ## Source topology
 

@@ -235,6 +235,8 @@ Next action:
 - Pending pages are ordinary Hero-bearing route surfaces, never overlays. The source page is replaced through the native router View Transition, so Board/MainMenu roots are not intentionally double-mounted.
 - GameMenu owns only local `closed | entering | open | exiting` state plus a short route-request lock. Settings/Main Menu/reset/exit requests navigate to their action destination; no provider-owned lifecycle, hidden close animation, or root loader remains.
 - Action navigation and game links disable intent preload. Hover/focus must never create a game or execute a destructive leaf loader.
+- `ActionLoadingScreen` owns `arkini-action-progress`; launcher page content owns `arkini-route-content`. Progress must never morph into a destination panel or Board surface.
+- `runActionRoute` waits for the currently entering native View Transition to finish before starting blocking action work. The minimum pending duration starts immediately, so the source page can leave smoothly without extending the deliberate loader more than necessary.
 
 ## Blocking flow focus and route exits
 
@@ -248,3 +250,5 @@ Next action:
 - Startup copy owns the unique `arkini-startup-content` surface and exits independently. Launcher content owns `arkini-route-content` and enters independently; neither surface morphs into the other.
 - No cloned Hero, manual crossfade, hidden destination UI, CSS route entrance animation, or second `document.startViewTransition()` participates.
 - The Hero artwork remains an actual transparent image rather than an opaque scene capture. Its shadow is a separate layer so compositor raster bounds cannot flash as a rectangular panel around the logo.
+- Main Menu, Settings, About, and Arkpacks share one `arkini-route-panel` chrome raster while their actual page bodies use `arkini-route-content`. The card border/background/shadow therefore interpolate once; old and new page content never produce doubled panel edges.
+- A Chromium 6× CPU profile of Main Menu → Play found one approximately 2.8 s throttled main-thread task dominated by Arkpack decode/schema validation, Game session bootstrap, and resource Blob URL creation. Route-action deferral keeps this work off the entrance transition. A worker remains a separate optimization only if the standalone loading page itself needs further responsiveness.

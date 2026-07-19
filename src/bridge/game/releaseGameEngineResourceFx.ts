@@ -11,7 +11,7 @@ export namespace releaseGameEngineResourceFx {
 	}
 }
 
-/** Final-saves one route-owned Game and removes its resource only after success. */
+/** Final-saves one owned Game and removes its singleton resource only after success. */
 export const releaseGameEngineResourceFx = Effect.fn("releaseGameEngineResourceFx")(
 	({ queryClient, resource }: releaseGameEngineResourceFx.Props) =>
 		resource.withLifecycleLockFx(

@@ -13,7 +13,7 @@ export namespace registerControlledWindowCloseFx {
 	}
 }
 
-/** Waits for the renderer's final game flush before allowing one window to close. */
+/** Waits for one best-effort renderer final-save attempt before allowing the window to close. */
 export const registerControlledWindowCloseFx = Effect.fn("registerControlledWindowCloseFx")(
 	({ window, ipc, trustedRenderer }: registerControlledWindowCloseFx.Props) =>
 		Effect.sync(() => {

@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
+import { Button, PrimaryButton } from "~/ui/button/Button";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { actionPanelViewTransitionName } from "~/ui/navigation/actionPanelViewTransitionName";
 
@@ -10,17 +10,15 @@ export namespace ActionErrorPage {
 		readonly error: unknown;
 		readonly reset: () => void;
 		readonly description: string;
-		readonly forceExit?: boolean;
 		readonly onBack?: () => void;
 		readonly title: string;
 	}
 }
 
-/** Keeps one failed route action visible until retry or explicit native process policy. */
+/** Keeps one recoverable route-action failure visible until retry or navigation back. */
 export const ActionErrorPage = ({
 	description,
 	error,
-	forceExit = false,
 	onBack,
 	reset,
 	title,
@@ -45,11 +43,6 @@ export const ActionErrorPage = ({
 				{children}
 				<PrimaryButton onClick={reset}>Retry</PrimaryButton>
 				{onBack === undefined ? null : <Button onClick={onBack}>Back</Button>}
-				{forceExit ? (
-					<DangerButton onClick={() => window.arkini.lifecycle.forceClose()}>
-						Force exit without saving
-					</DangerButton>
-				) : null}
 			</div>
 		</section>
 	</LauncherScene>

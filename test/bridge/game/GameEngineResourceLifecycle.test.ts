@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
+import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
@@ -99,6 +100,49 @@ describe("GameEngineResource lifecycle", () => {
 			),
 		).rejects.toThrow("disk full");
 		expect(getCachedGameEngineResource(queryClient)).toBe(resource);
+	});
+
+	it("reports a failed close save without blocking native shutdown", async () => {
+		const failure = new Error("disk full");
+		const game = createGame({
+			disposeFx: Effect.fail(failure),
+		});
+		const { queryClient, resource } = createHarness(game);
+
+		const result = await Effect.runPromise(
+			closeGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+
+		expect(result.type).toBe("finalization-failed");
+		if (result.type === "finalization-failed") {
+			expect(result.cause).toBeInstanceOf(Error);
+			expect((result.cause as Error).message).toBe(failure.message);
+		}
+		expect(getCachedGameEngineResource(queryClient)).toBe(resource);
+	});
+
+	it("removes the singleton after a successful close save", async () => {
+		const dispose = vi.fn();
+		const game = createGame({
+			disposeFx: Effect.sync(dispose),
+		});
+		const { queryClient, resource } = createHarness(game);
+
+		const result = await Effect.runPromise(
+			closeGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+
+		expect(result).toEqual({
+			type: "saved",
+		});
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 	});
 
 	it("does not let stale cleanup remove a newer singleton resource", async () => {

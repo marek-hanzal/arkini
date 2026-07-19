@@ -4,6 +4,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkpackCatalogProvider } from "~/bridge/arkpack/ArkpackCatalogProvider";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
+import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -46,20 +47,16 @@ const router = createArkiniRouter({
 
 const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
 	const resource = await waitForGameEngineResource(queryClient);
-	if (resource === null) {
-		await router.navigate({
-			to: "/action/exit",
-			replace: true,
-		});
-		return;
+	if (resource === null) return;
+	const result = await RendererRuntime.runPromise(
+		closeGameEngineResourceFx({
+			queryClient,
+			resource,
+		}),
+	);
+	if (result.type === "finalization-failed") {
+		console.error("Arkini controlled close finalization failed; closing anyway.", result.cause);
 	}
-	await router.navigate({
-		to: "/game/$packageId/action/exit",
-		params: {
-			packageId: resource.game.arkpack.packageId,
-		},
-		replace: true,
-	});
 });
 
 import.meta.hot?.dispose((data: HotData) => {

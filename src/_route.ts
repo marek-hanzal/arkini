@@ -13,7 +13,6 @@ import { Route as LauncherRouteImport } from "./@routes/_launcher"
 import { Route as IndexRouteImport } from "./@routes/index"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
 import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
-import { Route as ActionExitRouteImport } from "./@routes/action/exit"
 import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settings"
 import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-menu"
 import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
@@ -22,7 +21,6 @@ import { Route as GamePackageIdBoardRouteImport } from "./@routes/game/$packageI
 import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/load-game/$packageId"
 import { Route as GamePackageIdActionResetRouteImport } from "./@routes/game/$packageId/action/reset"
 import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$packageId/action/leave"
-import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
 
 const LauncherRoute = LauncherRouteImport.update({
   id: "/_launcher",
@@ -41,11 +39,6 @@ const GamePackageIdRoute = GamePackageIdRouteImport.update({
 const ActionRecoverGameSaveRoute = ActionRecoverGameSaveRouteImport.update({
   id: "/action/recover-game-save",
   path: "/action/recover-game-save",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ActionExitRoute = ActionExitRouteImport.update({
-  id: "/action/exit",
-  path: "/action/exit",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LauncherSettingsRoute = LauncherSettingsRouteImport.update({
@@ -90,11 +83,6 @@ const GamePackageIdActionLeaveRoute =
     path: "/action/leave",
     getParentRoute: () => GamePackageIdRoute,
   } as any)
-const GamePackageIdActionExitRoute = GamePackageIdActionExitRouteImport.update({
-  id: "/action/exit",
-  path: "/action/exit",
-  getParentRoute: () => GamePackageIdRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -102,12 +90,10 @@ export interface FileRoutesByFullPath {
   "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
   "/settings": typeof LauncherSettingsRoute
-  "/action/exit": typeof ActionExitRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
 }
@@ -117,12 +103,10 @@ export interface FileRoutesByTo {
   "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
   "/settings": typeof LauncherSettingsRoute
-  "/action/exit": typeof ActionExitRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
 }
@@ -134,12 +118,10 @@ export interface FileRoutesById {
   "/_launcher/arkpacks": typeof LauncherArkpacksRoute
   "/_launcher/main-menu": typeof LauncherMainMenuRoute
   "/_launcher/settings": typeof LauncherSettingsRoute
-  "/action/exit": typeof ActionExitRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/game/$packageId/board": typeof GamePackageIdBoardRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
 }
@@ -151,12 +133,10 @@ export interface FileRouteTypes {
     | "/arkpacks"
     | "/main-menu"
     | "/settings"
-    | "/action/exit"
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
     | "/game/$packageId/board"
-    | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
     | "/game/$packageId/action/reset"
   fileRoutesByTo: FileRoutesByTo
@@ -166,12 +146,10 @@ export interface FileRouteTypes {
     | "/arkpacks"
     | "/main-menu"
     | "/settings"
-    | "/action/exit"
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
     | "/game/$packageId/board"
-    | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
     | "/game/$packageId/action/reset"
   id:
@@ -182,12 +160,10 @@ export interface FileRouteTypes {
     | "/_launcher/arkpacks"
     | "/_launcher/main-menu"
     | "/_launcher/settings"
-    | "/action/exit"
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
     | "/game/$packageId/board"
-    | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
     | "/game/$packageId/action/reset"
   fileRoutesById: FileRoutesById
@@ -195,7 +171,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LauncherRoute: typeof LauncherRouteWithChildren
-  ActionExitRoute: typeof ActionExitRoute
   ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
   ActionLoadGamePackageIdRoute: typeof ActionLoadGamePackageIdRoute
@@ -229,13 +204,6 @@ declare module "@tanstack/react-router" {
       path: "/action/recover-game-save"
       fullPath: "/action/recover-game-save"
       preLoaderRoute: typeof ActionRecoverGameSaveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    "/action/exit": {
-      id: "/action/exit"
-      path: "/action/exit"
-      fullPath: "/action/exit"
-      preLoaderRoute: typeof ActionExitRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/_launcher/settings": {
@@ -294,13 +262,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GamePackageIdActionLeaveRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
-    "/game/$packageId/action/exit": {
-      id: "/game/$packageId/action/exit"
-      path: "/action/exit"
-      fullPath: "/game/$packageId/action/exit"
-      preLoaderRoute: typeof GamePackageIdActionExitRouteImport
-      parentRoute: typeof GamePackageIdRoute
-    }
   }
 }
 
@@ -324,14 +285,12 @@ const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
 
 interface GamePackageIdRouteChildren {
   GamePackageIdBoardRoute: typeof GamePackageIdBoardRoute
-  GamePackageIdActionExitRoute: typeof GamePackageIdActionExitRoute
   GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
   GamePackageIdActionResetRoute: typeof GamePackageIdActionResetRoute
 }
 
 const GamePackageIdRouteChildren: GamePackageIdRouteChildren = {
   GamePackageIdBoardRoute: GamePackageIdBoardRoute,
-  GamePackageIdActionExitRoute: GamePackageIdActionExitRoute,
   GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,
   GamePackageIdActionResetRoute: GamePackageIdActionResetRoute,
 }
@@ -343,7 +302,6 @@ const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LauncherRoute: LauncherRouteWithChildren,
-  ActionExitRoute: ActionExitRoute,
   ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
   ActionLoadGamePackageIdRoute: ActionLoadGamePackageIdRoute,

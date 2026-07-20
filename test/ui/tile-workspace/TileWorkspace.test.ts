@@ -50,13 +50,14 @@ const config = GameConfigSchema.parse({
 		id: "game:tile-info",
 		title: "Tile info",
 		board: {
-			width: 1,
+			width: 2,
 			height: 1,
 		},
 		inventory: {
-			width: 1,
+			width: 2,
 			height: 1,
 		},
+		toolbarSize: 1,
 	},
 	start: {
 		currentSpace: 0,
@@ -67,12 +68,27 @@ const config = GameConfigSchema.parse({
 				x: 0,
 				y: 0,
 			},
+			{
+				itemId: "workshop",
+				space: 0,
+				x: 1,
+				y: 0,
+			},
+		],
+		inventory: [
+			{
+				itemId: "permit",
+			},
 		],
 	},
 	categories: {
 		resource: {
 			id: "resource",
 			title: "Resource",
+		},
+		building: {
+			id: "building",
+			title: "Building",
 		},
 	},
 	items: {
@@ -90,6 +106,69 @@ const config = GameConfigSchema.parse({
 			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
+		},
+		permit: {
+			id: "permit",
+			type: "simple",
+			title: "Permit",
+			description: "Keeps the workshop enabled.",
+			asset: {
+				source: [
+					"asset:permit",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "any",
+			maxStackSize: 1,
+		},
+		workshop: {
+			id: "workshop",
+			type: "producer",
+			title: "Workshop",
+			description: "Runs one inspected production line.",
+			asset: {
+				source: [
+					"asset:workshop",
+				],
+			},
+			tags: [],
+			categoryId: "building",
+			scope: "any",
+			maxStackSize: 1,
+			maxQueueSize: 1,
+			lines: [
+				{
+					id: "line:workshop:run",
+					title: "Run",
+					description: "Runs the workshop.",
+					show: true,
+					enable: false,
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					rules: [
+						{
+							type: "enable",
+							when: [
+								{
+									type: "exists",
+									query: {
+										scope: "any",
+										selector: {
+											type: "item",
+											itemId: "permit",
+										},
+									},
+								},
+							],
+						},
+					],
+				},
+			],
 		},
 	},
 });
@@ -271,5 +350,89 @@ describe("TileWorkspace Info", () => {
 		expect(container.querySelector('[data-phase="exiting"]')).not.toBeNull();
 		await finishLatestMotion();
 		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBeNull();
+	});
+});
+
+describe("TileWorkspace Status", () => {
+	it("updates one open modal across ready, working, dependency-paused, and stored states", async () => {
+		const { container, readControl } = await renderWorkspace();
+		const workshop = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (workshop === undefined) throw new Error("Missing workshop runtime item.");
+
+		await act(async () => {
+			expect(readControl().openStatus(workshop.id, null)).toBe(true);
+		});
+		const modal = container.querySelector<HTMLElement>('[data-ui="TileWorkspaceModal"]');
+		if (modal === null) throw new Error("Missing Status workspace modal.");
+		expect(modal.dataset.capability).toBe("status");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Ready");
+		expect(modal.textContent).toContain("available for work");
+		await finishLatestMotion();
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				jobs: [
+					{
+						id: "job:workshop",
+						ownerItemId: workshop.id,
+						lineId: "line:workshop:run",
+						durationMs: 1_000,
+						remainingMs: 500,
+					},
+				],
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Working");
+		expect(modal.textContent).toContain("currently running");
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.filter((item) => item.item.id !== "permit"),
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Paused");
+		expect(modal.textContent).toContain("dependencies are no longer satisfied");
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.map((item) =>
+					item.id === workshop.id
+						? {
+								...item,
+								revision: "revision:workshop:toolbar",
+								location: {
+									scope: "toolbar" as const,
+									position: {
+										x: 0,
+										y: 0,
+									},
+								},
+							}
+						: item,
+				),
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Paused");
+		expect(modal.textContent).toContain("while this item is in the Toolbar");
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				jobs: [],
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Stored");
+		expect(modal.textContent).toContain("Move it back to the Board");
 	});
 });

@@ -77,7 +77,7 @@ export const useTileHoverActions = ({
 }) => {
 	const game = useGameEngine();
 	const capabilities = useTileCapabilities(itemId);
-	const { isOpen: workspaceOpen, openInfo } = useTileWorkspaceControl();
+	const { isOpen: workspaceOpen, openInfo, openStatus } = useTileWorkspaceControl();
 	const { active } = useTileActorSystem();
 	const { open, claimHover, releaseHover } = useTileHoverSystem(itemId);
 	const availableActionDefinitions = useMemo(
@@ -127,7 +127,8 @@ export const useTileHoverActions = ({
 				releaseHover();
 				match(action.capability)
 					.with("info", () => openInfo(itemId, origin))
-					.with("status", "lines", "effects", () => false)
+					.with("status", () => openStatus(itemId, origin))
+					.with("lines", "effects", () => false)
 					.exhaustive();
 			},
 		}));
@@ -138,6 +139,7 @@ export const useTileHoverActions = ({
 		itemId,
 		releaseHover,
 		openInfo,
+		openStatus,
 	]);
 	const hover = useHover(floating.context, {
 		enabled: !suppressed,

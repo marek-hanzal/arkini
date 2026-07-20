@@ -1,9 +1,14 @@
 import { motion } from "motion/react";
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { match, P } from "ts-pattern";
 
 import { useTileInfo } from "~/bridge/tile/useTileInfo";
+import { useTileStatus } from "~/bridge/tile/useTileStatus";
 import { TileInfoWorkspace } from "~/ui/tile-workspace/TileInfoWorkspace";
+import {
+	readTileStatusPresentation,
+	TileStatusWorkspace,
+} from "~/ui/tile-workspace/TileStatusWorkspace";
 import type {
 	TileWorkspacePhase,
 	TileWorkspaceTarget,
@@ -22,6 +27,165 @@ const transition = {
 	] as const,
 };
 
+const TileWorkspaceChrome = ({
+	children,
+	closeLabel,
+	disabled,
+	subtitle,
+	title,
+}: {
+	readonly children: ReactNode;
+	readonly closeLabel: string;
+	readonly disabled: boolean;
+	readonly subtitle?: string;
+	readonly title: string;
+}) => {
+	const workspace = useTileWorkspaceControl();
+	return (
+		<>
+			<header className="mb-[var(--ak-panel-padding)] flex min-w-0 items-start justify-between gap-4 border-b border-line pb-4">
+				<div className="min-w-0">
+					<h2
+						id="tile-workspace-title"
+						className="truncate text-xl font-semibold"
+					>
+						{title}
+						{subtitle === undefined ? null : (
+							<span className="font-normal text-muted"> · {subtitle}</span>
+						)}
+					</h2>
+				</div>
+				<button
+					type="button"
+					className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+					aria-label={closeLabel}
+					disabled={disabled}
+					onClick={() => void workspace.close()}
+				>
+					×
+				</button>
+			</header>
+			{children}
+		</>
+	);
+};
+
+const UnavailableWorkspace = ({
+	closeLabel,
+	disabled,
+}: {
+	readonly closeLabel: string;
+	readonly disabled: boolean;
+}) => (
+	<TileWorkspaceChrome
+		closeLabel={closeLabel}
+		disabled={disabled}
+		title="Unavailable"
+	>
+		<div className="grid flex-1 place-items-center text-muted">
+			Item is no longer available.
+		</div>
+	</TileWorkspaceChrome>
+);
+
+const TileInfoWorkspaceContent = ({
+	itemId,
+	phase,
+}: {
+	readonly itemId: TileWorkspaceTarget["itemId"];
+	readonly phase: Exclude<TileWorkspacePhase, "closed">;
+}) => {
+	const workspace = useTileWorkspaceControl();
+	const info = useTileInfo(itemId);
+	useEffect(() => {
+		if (info.kind === "available") return;
+		void workspace.close();
+	}, [
+		info.kind,
+		workspace,
+	]);
+	if (info.kind === "unavailable") {
+		return (
+			<UnavailableWorkspace
+				closeLabel="Close Info"
+				disabled={phase === "exiting"}
+			/>
+		);
+	}
+	return (
+		<TileWorkspaceChrome
+			closeLabel="Close Info"
+			disabled={phase === "exiting"}
+			subtitle={info.subtitle}
+			title={info.title}
+		>
+			<TileInfoWorkspace info={info} />
+		</TileWorkspaceChrome>
+	);
+};
+
+const TileStatusWorkspaceContent = ({
+	itemId,
+	phase,
+}: {
+	readonly itemId: TileWorkspaceTarget["itemId"];
+	readonly phase: Exclude<TileWorkspacePhase, "closed">;
+}) => {
+	const workspace = useTileWorkspaceControl();
+	const status = useTileStatus(itemId);
+	useEffect(() => {
+		if (status.kind === "available") return;
+		void workspace.close();
+	}, [
+		status.kind,
+		workspace,
+	]);
+	if (status.kind === "unavailable") {
+		return (
+			<UnavailableWorkspace
+				closeLabel="Close Status"
+				disabled={phase === "exiting"}
+			/>
+		);
+	}
+	const presentation = readTileStatusPresentation(status.state);
+	return (
+		<TileWorkspaceChrome
+			closeLabel="Close Status"
+			disabled={phase === "exiting"}
+			subtitle={presentation.label}
+			title={status.title}
+		>
+			<TileStatusWorkspace
+				status={status}
+				presentation={presentation}
+			/>
+		</TileWorkspaceChrome>
+	);
+};
+
+const TileWorkspaceCapabilityContent = ({
+	phase,
+	target,
+}: {
+	readonly phase: Exclude<TileWorkspacePhase, "closed">;
+	readonly target: TileWorkspaceTarget;
+}) =>
+	match(target.capability)
+		.with("info", () => (
+			<TileInfoWorkspaceContent
+				itemId={target.itemId}
+				phase={phase}
+			/>
+		))
+		.with("status", () => (
+			<TileStatusWorkspaceContent
+				itemId={target.itemId}
+				phase={phase}
+			/>
+		))
+		.exhaustive();
+
 const TileWorkspaceDialog = ({
 	phase,
 	target,
@@ -30,7 +194,6 @@ const TileWorkspaceDialog = ({
 	readonly target: TileWorkspaceTarget;
 }) => {
 	const workspace = useTileWorkspaceControl();
-	const info = useTileInfo(target.itemId);
 	const motionState = useTileWorkspaceMotion({
 		phase,
 		generation: target.generation,
@@ -39,17 +202,6 @@ const TileWorkspaceDialog = ({
 		phase,
 		origin: target.origin,
 	});
-
-	useEffect(() => {
-		if (info.kind === "available") return;
-		void workspace.close();
-	}, [
-		info.kind,
-		workspace,
-	]);
-
-	const title = info.kind === "available" ? info.title : "Unavailable";
-	const subtitle = info.kind === "available" ? info.subtitle : undefined;
 
 	return (
 		<motion.div
@@ -87,35 +239,10 @@ const TileWorkspaceDialog = ({
 				onAnimationComplete={motionState.completeMotionPhase}
 				onKeyDown={focus.keepFocusInside}
 			>
-				<header className="mb-[var(--ak-panel-padding)] flex min-w-0 items-start justify-between gap-4 border-b border-line pb-4">
-					<div className="min-w-0">
-						<h2
-							id="tile-workspace-title"
-							className="truncate text-xl font-semibold"
-						>
-							{title}
-							{subtitle === undefined ? null : (
-								<span className="font-normal text-muted"> · {subtitle}</span>
-							)}
-						</h2>
-					</div>
-					<button
-						type="button"
-						className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-						aria-label="Close Info"
-						disabled={phase === "exiting"}
-						onClick={() => void workspace.close()}
-					>
-						×
-					</button>
-				</header>
-				{info.kind === "available" ? (
-					<TileInfoWorkspace info={info} />
-				) : (
-					<div className="grid flex-1 place-items-center text-muted">
-						Item is no longer available.
-					</div>
-				)}
+				<TileWorkspaceCapabilityContent
+					phase={phase}
+					target={target}
+				/>
 			</motion.div>
 		</motion.div>
 	);

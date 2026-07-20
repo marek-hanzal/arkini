@@ -23,21 +23,42 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 	phaseRef.current = phase;
 	targetRef.current = target;
 
-	const openInfo = useCallback((itemId: IdSchema.Type, origin: HTMLElement | null) => {
-		if (phaseRef.current !== "closed") return false;
-		generationRef.current += 1;
-		const nextTarget = {
-			capability: "info",
-			itemId,
-			origin,
-			generation: generationRef.current,
-		} as const satisfies TileWorkspaceTarget;
-		targetRef.current = nextTarget;
-		phaseRef.current = "entering";
-		setTarget(nextTarget);
-		setPhase("entering");
-		return true;
-	}, []);
+	const openTarget = useCallback(
+		(
+			capability: TileWorkspaceTarget["capability"],
+			itemId: IdSchema.Type,
+			origin: HTMLElement | null,
+		) => {
+			if (phaseRef.current !== "closed") return false;
+			generationRef.current += 1;
+			const nextTarget = {
+				capability,
+				itemId,
+				origin,
+				generation: generationRef.current,
+			} as const satisfies TileWorkspaceTarget;
+			targetRef.current = nextTarget;
+			phaseRef.current = "entering";
+			setTarget(nextTarget);
+			setPhase("entering");
+			return true;
+		},
+		[],
+	);
+
+	const openInfo = useCallback(
+		(itemId: IdSchema.Type, origin: HTMLElement | null) => openTarget("info", itemId, origin),
+		[
+			openTarget,
+		],
+	);
+
+	const openStatus = useCallback(
+		(itemId: IdSchema.Type, origin: HTMLElement | null) => openTarget("status", itemId, origin),
+		[
+			openTarget,
+		],
+	);
 
 	const close = useCallback(() => {
 		if (phaseRef.current === "closed") return Promise.resolve();
@@ -102,6 +123,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 			isOpen: phase !== "closed",
 			target,
 			openInfo,
+			openStatus,
 			close,
 			completeEnter,
 			completeExit,
@@ -111,6 +133,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 			completeEnter,
 			completeExit,
 			openInfo,
+			openStatus,
 			phase,
 			target,
 		],

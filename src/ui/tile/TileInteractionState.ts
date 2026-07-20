@@ -12,5 +12,6 @@ export interface TileInteractionState {
 	readonly settleLocation: TileLocation | null;
 	readonly feedback: "accepted" | "rejected" | "ignored" | null;
 	readonly outcome: useDropItem.Result | null;
+	readonly mergeStage: "approach" | "resolve" | null;
 	readonly pendingActorIds: ReadonlyArray<string>;
 }

@@ -106,6 +106,12 @@ const config = GameConfigSchema.parse({
 				x: 1,
 				y: 0,
 			},
+			{
+				itemId: "tree",
+				space: 0,
+				x: 0,
+				y: 1,
+			},
 		],
 	},
 	categories: {},
@@ -124,6 +130,16 @@ const config = GameConfigSchema.parse({
 			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
+			merge: [
+				{
+					target: {
+						type: "item",
+						itemId: "tree",
+					},
+					action: "consume",
+					effect: "keep",
+				},
+			],
 		},
 		stone: {
 			id: "stone",
@@ -139,6 +155,21 @@ const config = GameConfigSchema.parse({
 			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
+		},
+		tree: {
+			id: "tree",
+			type: "simple",
+			title: "Tree",
+			description: "Tree",
+			asset: {
+				source: [
+					"asset:tree",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "any",
+			maxStackSize: 1,
 		},
 	},
 });
@@ -496,6 +527,302 @@ describe("Board drag", () => {
 		expect(document.querySelectorAll(`[data-runtime-id="${sourceId}"]`)).toHaveLength(1);
 		expect(document.querySelectorAll(`[data-runtime-id="${targetId}"]`)).toHaveLength(1);
 		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
+	});
+
+	it("retains a consumed source actor through merge approach and exits it after target impact", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		if (target === null) throw new Error("Missing merge target actor.");
+		const sourceId = source.dataset.runtimeId;
+		const sourceRevision = source.dataset.runtimeRevision;
+		const targetId = target.dataset.runtimeId;
+		const targetRevision = target.dataset.runtimeRevision;
+		if (
+			sourceId === undefined ||
+			sourceRevision === undefined ||
+			targetId === undefined ||
+			targetRevision === undefined
+		) {
+			throw new Error("Missing merge identities.");
+		}
+		const sourceLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 2,
+				y: 1,
+			},
+		};
+		const targetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 0,
+				y: 1,
+			},
+		};
+		const mergeOutcome: Extract<
+			dropItemFx.Result,
+			{
+				readonly kind: "merge";
+			}
+		> = {
+			kind: "merge",
+			action: "consume",
+			effect: "keep",
+			source: {
+				itemId: sourceId,
+				previousRevision: sourceRevision,
+				previousLocation: sourceLocation,
+				previousQuantity: 1,
+				current: null,
+			},
+			target: {
+				itemId: targetId,
+				previousRevision: targetRevision,
+				previousLocation: targetLocation,
+				previousQuantity: 1,
+				current: {
+					itemId: targetId,
+					canonicalItemId: "tree",
+					revision: targetRevision,
+					location: targetLocation,
+					quantity: 1,
+				},
+			},
+		};
+		dropItemState.drop.mockImplementation(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.filter((item) => item.id !== sourceId),
+			});
+			return mergeOutcome;
+		});
+
+		await dragTo(source, 50, 150);
+
+		expect(dropItemState.drop).toHaveBeenCalledWith({
+			sourceItemId: sourceId,
+			sourceRevision,
+			sourceLocation,
+			target: {
+				kind: "slot",
+				location: targetLocation,
+				occupant: {
+					itemId: targetId,
+					revision: targetRevision,
+				},
+			},
+		});
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(
+			source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
+		).toBe("exiting");
+		expect(
+			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
+		).toBe("impact");
+
+		await act(async () => {
+			motionTestRuntime.finish(
+				...motionTestRuntime.completions.map((_completion, index) => index),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(
+			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
+		).toBe("stable");
+	});
+
+	it("reuses the exact target actor identity when a merge replaces its canonical item", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		if (target === null) throw new Error("Missing replacement target actor.");
+		const sourceId = source.dataset.runtimeId;
+		const sourceRevision = source.dataset.runtimeRevision;
+		const targetId = target.dataset.runtimeId;
+		const targetRevision = target.dataset.runtimeRevision;
+		if (
+			sourceId === undefined ||
+			sourceRevision === undefined ||
+			targetId === undefined ||
+			targetRevision === undefined
+		) {
+			throw new Error("Missing replacement identities.");
+		}
+		const sourceLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 2,
+				y: 1,
+			},
+		};
+		const targetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 0,
+				y: 1,
+			},
+		};
+		const replacedRevision = "revision:tree-replaced";
+		dropItemState.drop.mockImplementation(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items
+					.filter((item) => item.id !== sourceId)
+					.map((item) =>
+						item.id === targetId
+							? {
+									...item,
+									item: config.items.stone,
+									revision: replacedRevision,
+								}
+							: item,
+					),
+			});
+			return {
+				kind: "merge",
+				action: "consume",
+				effect: "replace",
+				resultCanonicalItemId: "stone",
+				source: {
+					itemId: sourceId,
+					previousRevision: sourceRevision,
+					previousLocation: sourceLocation,
+					previousQuantity: 1,
+					current: null,
+				},
+				target: {
+					itemId: targetId,
+					previousRevision: targetRevision,
+					previousLocation: targetLocation,
+					previousQuantity: 1,
+					current: {
+						itemId: targetId,
+						canonicalItemId: "stone",
+						revision: replacedRevision,
+						location: targetLocation,
+						quantity: 1,
+					},
+				},
+			};
+		});
+
+		await dragTo(source, 50, 150);
+
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(target.querySelector('[data-ui="TileActorTitle"]')?.textContent).toBe("Stone");
+		expect(target.dataset.runtimeRevision).toBe(replacedRevision);
+		expect(
+			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
+		).toBe("impact");
+
+		await act(async () => {
+			motionTestRuntime.finish(
+				...motionTestRuntime.completions.map((_completion, index) => index),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(target.querySelector('[data-ui="TileActorTitle"]')?.textContent).toBe("Stone");
+	});
+
+	it("keeps both removed merge actors alive only through their owned exit generation", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		if (target === null) throw new Error("Missing removal target actor.");
+		const sourceId = source.dataset.runtimeId;
+		const sourceRevision = source.dataset.runtimeRevision;
+		const targetId = target.dataset.runtimeId;
+		const targetRevision = target.dataset.runtimeRevision;
+		if (
+			sourceId === undefined ||
+			sourceRevision === undefined ||
+			targetId === undefined ||
+			targetRevision === undefined
+		) {
+			throw new Error("Missing removal identities.");
+		}
+		const sourceLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 2,
+				y: 1,
+			},
+		};
+		const targetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 0,
+				y: 1,
+			},
+		};
+		dropItemState.drop.mockImplementation(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.filter(
+					(item) => item.id !== sourceId && item.id !== targetId,
+				),
+			});
+			return {
+				kind: "merge",
+				action: "consume",
+				effect: "remove",
+				source: {
+					itemId: sourceId,
+					previousRevision: sourceRevision,
+					previousLocation: sourceLocation,
+					previousQuantity: 1,
+					current: null,
+				},
+				target: {
+					itemId: targetId,
+					previousRevision: targetRevision,
+					previousLocation: targetLocation,
+					previousQuantity: 1,
+					current: null,
+				},
+			};
+		});
+
+		await dragTo(source, 50, 150);
+
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(
+			source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
+		).toBe("exiting");
+		expect(
+			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
+		).toBe("exiting");
+
+		await act(async () => {
+			motionTestRuntime.finish(
+				...motionTestRuntime.completions.map((_completion, index) => index),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
 	});
 
 	it("uses a pronounced Motion-owned 1.15 preview hover and keeps drag larger", async () => {

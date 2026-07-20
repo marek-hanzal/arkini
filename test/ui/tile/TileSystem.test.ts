@@ -370,6 +370,70 @@ describe("TileSystemProvider", () => {
 		expect(readSystem().active).toBeNull();
 	});
 
+	it("advances one merge generation from approach into source and target resolution", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+		const targetLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: toolbarSlot.x,
+				y: toolbarSlot.y,
+			},
+		};
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: "merge",
+				action: "consume",
+				effect: "keep",
+				source: {
+					itemId: source.id,
+					previousRevision: source.revision,
+					previousLocation: source.location,
+					previousQuantity: 1,
+					current: null,
+				},
+				target: {
+					itemId: toolbarOccupant.id,
+					previousRevision: toolbarOccupant.revision,
+					previousLocation: targetLocation,
+					previousQuantity: 1,
+					current: {
+						itemId: toolbarOccupant.id,
+						canonicalItemId: "item:target",
+						revision: toolbarOccupant.revision,
+						location: targetLocation,
+						quantity: 1,
+					},
+				},
+			});
+		});
+		expect(readSystem().active).toMatchObject({
+			mergeStage: "approach",
+			pendingActorIds: [
+				source.id,
+			],
+		});
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+		});
+		expect(readSystem().active).toMatchObject({
+			mergeStage: "resolve",
+			pendingActorIds: [
+				source.id,
+				toolbarOccupant.id,
+			],
+		});
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+			readSystem().complete(toolbarOccupant.id, released.generation);
+		});
+		expect(readSystem().active).toBeNull();
+	});
+
 	it("ignores stale completion generations and clears only the current settlement", async () => {
 		const { readSystem } = await renderHarness();
 		const released = await startDrag(readSystem(), 240, 50);

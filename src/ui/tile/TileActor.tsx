@@ -91,14 +91,28 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		active.outcome.target.itemId === item.id
 			? active.outcome.target
 			: null;
+	const mergeOutcome =
+		active?.phase === "settling" && active.outcome?.kind === "merge" ? active.outcome : null;
+	const mergeStage =
+		active?.phase === "settling" && active.outcome?.kind === "merge" ? active.mergeStage : null;
+	const mergeSource = mergeOutcome?.source.itemId === item.id ? mergeOutcome.source : null;
+	const mergeTarget = mergeOutcome?.target.itemId === item.id ? mergeOutcome.target : null;
 	const settlement =
 		active?.phase === "settling" && active.pendingActorIds.includes(item.id) ? active : null;
+	const mergeTargetLocation =
+		mergeOutcome?.target.current?.location ?? mergeOutcome?.target.previousLocation ?? null;
 	const desiredLocation =
-		ownsActive &&
-		settlement?.settleLocation !== null &&
-		settlement?.settleLocation !== undefined
-			? settlement.settleLocation
-			: (swapTarget?.location ?? item.location);
+		mergeSource !== null && mergeStage === "approach" && mergeTargetLocation !== null
+			? mergeTargetLocation
+			: mergeSource !== null && mergeStage === "resolve"
+				? (mergeSource.current?.location ?? mergeTargetLocation ?? item.location)
+				: mergeTarget !== null
+					? (mergeTarget.current?.location ?? mergeTarget.previousLocation)
+					: ownsActive &&
+							settlement?.settleLocation !== null &&
+							settlement?.settleLocation !== undefined
+						? settlement.settleLocation
+						: (swapTarget?.location ?? item.location);
 	const desiredSource = useMemo<TileDragSource>(() => {
 		const surface = tileSurfaceForLocation(desiredLocation);
 		return {
@@ -115,6 +129,30 @@ export const TileActor = ({ item }: TileActor.Props) => {
 	]);
 	const placement = readPlacement(desiredSource);
 	void geometryVersion;
+	const mergeApproachPositionOwned = mergeSource !== null && mergeStage === "approach";
+	const mergeResolveSourcePositionOwned =
+		mergeSource !== null && mergeStage === "resolve" && mergeSource.current !== null;
+	const mergeResolveVisualOwned =
+		settlement !== null &&
+		mergeStage === "resolve" &&
+		((mergeSource !== null && mergeSource.current === null) || mergeTarget !== null);
+	const positionOwnedSettlement =
+		settlement !== null &&
+		(mergeOutcome === null || mergeApproachPositionOwned || mergeResolveSourcePositionOwned);
+	const canCompletePosition = useCallback(() => {
+		if (!positionOwnedSettlement) return false;
+		if (mergeApproachPositionOwned) return true;
+		if (mergeResolveSourcePositionOwned && mergeSource?.current !== null) {
+			return isSameTileLocation(itemRef.current.location, mergeSource.current.location);
+		}
+		return isSameTileLocation(itemRef.current.location, desiredLocation);
+	}, [
+		desiredLocation,
+		mergeApproachPositionOwned,
+		mergeResolveSourcePositionOwned,
+		mergeSource,
+		positionOwnedSettlement,
+	]);
 
 	useLayoutEffect(() => {
 		const pointerOwned =
@@ -144,10 +182,7 @@ export const TileActor = ({ item }: TileActor.Props) => {
 			height.jump(placement.height);
 			initialized.current = true;
 			setVisible(true);
-			if (
-				interaction?.phase === "settling" &&
-				isSameTileLocation(itemRef.current.location, desiredLocation)
-			) {
+			if (interaction?.phase === "settling" && canCompletePosition()) {
 				complete(item.id, interaction.generation);
 			}
 			return;
@@ -180,10 +215,7 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		);
 		void Promise.all(animations).then(() => {
 			if (localMotionGeneration.current !== generation) return;
-			if (
-				interaction?.phase === "settling" &&
-				isSameTileLocation(itemRef.current.location, desiredLocation)
-			) {
+			if (interaction?.phase === "settling" && canCompletePosition()) {
 				complete(item.id, interaction.generation);
 			}
 		});
@@ -194,6 +226,7 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		active,
 		anchorX,
 		anchorY,
+		canCompletePosition,
 		complete,
 		desiredLocation,
 		dragX,
@@ -208,6 +241,16 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		placement?.x,
 		placement?.y,
 		width,
+	]);
+
+	const onVisualAnimationComplete = useCallback(() => {
+		if (!mergeResolveVisualOwned || active?.phase !== "settling") return;
+		complete(item.id, active.generation);
+	}, [
+		active,
+		complete,
+		item.id,
+		mergeResolveVisualOwned,
 	]);
 
 	useEffect(
@@ -281,9 +324,11 @@ export const TileActor = ({ item }: TileActor.Props) => {
 
 	const onDragEnd = useCallback(
 		async (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
-			dragStarted.current = false;
 			const released = release(item.id);
-			if (released === null) return;
+			if (released === null) {
+				dragStarted.current = false;
+				return;
+			}
 			const targetLocation = tileLocationForTarget(released.target);
 			try {
 				const outcome = await dropItem({
@@ -311,6 +356,8 @@ export const TileActor = ({ item }: TileActor.Props) => {
 			} catch (error) {
 				console.error("Tile drop failed.", error);
 				settle(released.source, released.generation, null);
+			} finally {
+				dragStarted.current = false;
 			}
 		},
 		[
@@ -321,25 +368,38 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		],
 	);
 
-	const phase = ownsActive
-		? active?.phase === "pressed"
-			? "pressed"
-			: active?.phase === "dragging" || active?.phase === "awaiting-outcome"
-				? "dragging"
-				: settlement !== null
-					? "settling"
-					: "stable"
-		: settlement !== null
-			? "settling"
-			: targeted
-				? "targeted"
-				: hovered
-					? "hovered"
-					: "stable";
+	const phase =
+		settlement !== null &&
+		mergeStage === "resolve" &&
+		mergeSource !== null &&
+		mergeSource.current === null
+			? "exiting"
+			: settlement !== null &&
+					mergeStage === "resolve" &&
+					mergeTarget !== null &&
+					mergeTarget.current === null
+				? "exiting"
+				: settlement !== null && mergeStage === "resolve" && mergeTarget !== null
+					? "impact"
+					: ownsActive
+						? active?.phase === "pressed"
+							? "pressed"
+							: active?.phase === "dragging" || active?.phase === "awaiting-outcome"
+								? "dragging"
+								: settlement !== null
+									? "settling"
+									: "stable"
+						: settlement !== null
+							? "settling"
+							: targeted || (mergeStage === "approach" && mergeTarget !== null)
+								? "targeted"
+								: hovered
+									? "hovered"
+									: "stable";
 	const zIndex =
 		phase === "dragging"
 			? 40
-			: phase === "settling"
+			: phase === "settling" || phase === "impact" || phase === "exiting"
 				? 30
 				: phase === "targeted"
 					? 25
@@ -396,6 +456,9 @@ export const TileActor = ({ item }: TileActor.Props) => {
 					item={item}
 					phase={phase}
 					feedback={settlement !== null ? (active?.feedback ?? null) : null}
+					onAnimationComplete={
+						mergeResolveVisualOwned ? onVisualAnimationComplete : undefined
+					}
 				/>
 			</motion.span>
 		</motion.button>

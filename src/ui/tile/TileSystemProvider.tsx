@@ -57,6 +57,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 		activeRef.current = next;
 		setActive(next);
 	}, []);
+	const readActive = useCallback(() => activeRef.current, []);
 
 	const publishGeometry = useCallback(() => {
 		setGeometryVersion((current) => current + 1);
@@ -259,6 +260,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 				settleLocation: null,
 				feedback: null,
 				outcome: null,
+				mergeStage: null,
 				pendingActorIds: [],
 			});
 			return true;
@@ -337,7 +339,9 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 					? outcome.location
 					: outcome?.kind === "swap"
 						? outcome.source.location
-						: null;
+						: outcome?.kind === "merge"
+							? (outcome.target.current?.location ?? outcome.target.previousLocation)
+							: null;
 			const pendingActorIds =
 				outcome?.kind === "swap"
 					? [
@@ -358,6 +362,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 							? "ignored"
 							: "accepted",
 				outcome,
+				mergeStage: outcome?.kind === "merge" ? "approach" : null,
 				pendingActorIds,
 			});
 		},
@@ -371,6 +376,21 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			const current = activeRef.current;
 			if (current?.generation !== generation || current.phase !== "settling") return;
 			if (!current.pendingActorIds.includes(itemId)) return;
+			if (
+				current.outcome?.kind === "merge" &&
+				current.mergeStage === "approach" &&
+				itemId === current.source.id
+			) {
+				publishActive({
+					...current,
+					mergeStage: "resolve",
+					pendingActorIds: [
+						current.outcome.source.itemId,
+						current.outcome.target.itemId,
+					],
+				});
+				return;
+			}
 			const pendingActorIds = current.pendingActorIds.filter(
 				(pendingItemId) => pendingItemId !== itemId,
 			);
@@ -433,7 +453,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 	return (
 		<TileSystemContext.Provider value={value}>
 			{children}
-			<TileActorLayer />
+			<TileActorLayer readActive={readActive} />
 		</TileSystemContext.Provider>
 	);
 };

@@ -15,11 +15,9 @@
 	},
 	"resources": {
 		"hero": "hero",
-		"credits": {
-			"chatGpt": "chat-gpt",
-			"marek": "marek",
-			"sarka": "sarka"
-		},
+		"chatGpt": "chat-gpt",
+		"marek": "marek",
+		"sarka": "sarka",
 		"tileCapabilities": {
 			"info": "tile-capability-info",
 			"status": "tile-capability-status",

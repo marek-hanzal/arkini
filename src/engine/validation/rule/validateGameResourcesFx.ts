@@ -57,18 +57,21 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 			source: provenance.resources,
 		},
 	];
-	if (config.resources.credits !== undefined) {
-		for (const [credit, id] of Object.entries(config.resources.credits)) {
-			references.push({
-				id,
-				path: [
-					"resources",
-					"credits",
-					credit,
-				],
-				source: provenance.resources,
-			});
-		}
+	for (const role of [
+		"chatGpt",
+		"marek",
+		"sarka",
+	] as const) {
+		const id = config.resources[role];
+		if (id === undefined) continue;
+		references.push({
+			id,
+			path: [
+				"resources",
+				role,
+			],
+			source: provenance.resources,
+		});
 	}
 	if (config.resources.tileCapabilities !== undefined) {
 		for (const [capability, id] of Object.entries(config.resources.tileCapabilities)) {

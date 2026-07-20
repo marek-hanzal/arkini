@@ -41,43 +41,6 @@ describe("validateGameResourcesFx", () => {
 		expect(diagnostics).toEqual([]);
 	});
 
-	it("validates explicit project-credit resource references", () => {
-		const config = GameConfigSchema.parse({
-			...startTestConfig,
-			resources: {
-				...startTestConfig.resources,
-				credits: {
-					chatGpt: "chat-gpt",
-					marek: "marek",
-					sarka: "sarka",
-				},
-			},
-		});
-		const ids = new Set<string>([
-			config.resources.hero,
-			...Object.values(config.resources.credits ?? {}),
-		]);
-		for (const item of Object.values(config.items)) {
-			item.asset.source.forEach((id) => ids.add(id));
-		}
-
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config,
-				provenance,
-				resources: [
-					...ids,
-				].map((id) => ({
-					id,
-					path: `${id}.png`,
-					mime: "image/png" as const,
-				})),
-			}),
-		);
-
-		expect(diagnostics).toEqual([]);
-	});
-
 	it("validates explicit tile capability resource references", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,

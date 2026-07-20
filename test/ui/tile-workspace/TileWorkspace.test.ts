@@ -154,9 +154,53 @@ const config = GameConfigSchema.parse({
 					runtimeMs: 1_000,
 					input: [
 						{
-							type: "simple",
+							type: "materials",
+							selector: {
+								type: "item",
+								itemId: "stone",
+							},
+							quantity: {
+								type: "value",
+								value: 2,
+							},
+							capacity: 1,
 						},
 					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										type: "guaranteed",
+										drop: [
+											{
+												itemId: "stone",
+												quantity: {
+													type: "value",
+													value: 1,
+												},
+												rules: [],
+											},
+										],
+									},
+									{
+										type: "chance",
+										chance: 0.5,
+										drop: [
+											{
+												itemId: "permit",
+												quantity: {
+													type: "value",
+													value: 1,
+												},
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
 					rules: [
 						{
 							type: "enable",
@@ -481,6 +525,79 @@ describe("TileWorkspace Status", () => {
 		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
 		expect(modal.textContent).toContain("Building · Stored");
 		expect(modal.textContent).toContain("Move it back to the Board");
+	});
+});
+
+describe("TileWorkspace Lines", () => {
+	it("renders live line readiness, inputs, outputs, runtime, and active work", async () => {
+		const { container, readControl } = await renderWorkspace();
+		const workshop = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (workshop === undefined) throw new Error("Missing workshop runtime item.");
+
+		await act(async () => {
+			expect(readControl().openLines(workshop.id, null)).toBe(true);
+		});
+		const modal = container.querySelector<HTMLElement>('[data-ui="TileWorkspaceModal"]');
+		if (modal === null) throw new Error("Missing Lines workspace modal.");
+		expect(modal.dataset.capability).toBe("lines");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(modal.textContent).toContain("1 visible line");
+		expect(modal.textContent).toContain("Run");
+		expect(modal.textContent).toContain("Missing inputs");
+		expect(modal.textContent).toContain("0 / 2 stored");
+		expect(modal.textContent).toContain("2 still needed");
+		expect(modal.textContent).toContain("Guaranteed");
+		expect(modal.textContent).toContain("Stone");
+		expect(modal.textContent).toContain("50% chance");
+		expect(modal.textContent).toContain("Permit");
+		expect(modal.textContent).toContain("1 s");
+		await finishLatestMotion();
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: [
+					...currentRuntime.items,
+					{
+						id: "runtime:stone:input",
+						item: config.items.stone,
+						location: {
+							scope: "input" as const,
+							ownerItemId: workshop.id,
+							lineId: "line:workshop:run",
+							inputIndex: 0,
+						},
+						quantity: 2,
+						revision: "revision:stone:input",
+					},
+				],
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
+		expect(modal.textContent).toContain("Ready");
+		expect(modal.textContent).toContain("2 / 2 stored");
+		expect(modal.textContent).toContain("1 buffer space");
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				jobs: [
+					{
+						id: "job:workshop:run",
+						ownerItemId: workshop.id,
+						lineId: "line:workshop:run",
+						durationMs: 1_000,
+						remainingMs: 500,
+					},
+				],
+			});
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
+		expect(modal.textContent).toContain("Active");
+		expect(modal.textContent).toContain("Current work");
+		expect(modal.textContent).toContain("0.5 s remaining of 1 s");
 	});
 });
 

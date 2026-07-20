@@ -5,9 +5,11 @@ import { match, P } from "ts-pattern";
 import { useTileIdentity } from "~/bridge/tile/useTileIdentity";
 import { useTileInfo } from "~/bridge/tile/useTileInfo";
 import { useTileEffects } from "~/bridge/tile/useTileEffects";
+import { useTileLines } from "~/bridge/tile/useTileLines";
 import { useTileStatus } from "~/bridge/tile/useTileStatus";
 import { TileEffectsWorkspace } from "~/ui/tile-workspace/TileEffectsWorkspace";
 import { TileInfoWorkspace } from "~/ui/tile-workspace/TileInfoWorkspace";
+import { TileLinesWorkspace } from "~/ui/tile-workspace/TileLinesWorkspace";
 import {
 	readTileStatusPresentation,
 	TileStatusWorkspace,
@@ -195,6 +197,48 @@ const TileInfoWorkspaceContent = ({
 	);
 };
 
+const TileLinesWorkspaceContent = ({
+	identity,
+	itemId,
+	phase,
+}: {
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
+	readonly itemId: TileWorkspaceTarget["itemId"];
+	readonly phase: Exclude<TileWorkspacePhase, "closed">;
+}) => {
+	const workspace = useTileWorkspaceControl();
+	const lines = useTileLines(itemId);
+	useEffect(() => {
+		if (lines.kind === "available") return;
+		void workspace.close();
+	}, [
+		lines.kind,
+		workspace,
+	]);
+	if (lines.kind === "unavailable") {
+		return (
+			<UnavailableWorkspace
+				closeLabel="Close Lines"
+				disabled={phase === "exiting"}
+			/>
+		);
+	}
+	return (
+		<TileWorkspaceChrome
+			closeLabel="Close Lines"
+			disabled={phase === "exiting"}
+			identity={identity}
+		>
+			<TileLinesWorkspace lines={lines} />
+		</TileWorkspaceChrome>
+	);
+};
+
 const TileEffectsWorkspaceContent = ({
 	identity,
 	itemId,
@@ -308,6 +352,13 @@ const TileWorkspaceCapabilityContent = ({
 		))
 		.with("status", () => (
 			<TileStatusWorkspaceContent
+				identity={identity}
+				itemId={target.itemId}
+				phase={phase}
+			/>
+		))
+		.with("lines", () => (
+			<TileLinesWorkspaceContent
 				identity={identity}
 				itemId={target.itemId}
 				phase={phase}

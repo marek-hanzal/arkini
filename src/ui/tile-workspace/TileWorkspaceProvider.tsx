@@ -60,6 +60,13 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 		],
 	);
 
+	const openLines = useCallback(
+		(itemId: TileItemId, origin: HTMLElement | null) => openTarget("lines", itemId, origin),
+		[
+			openTarget,
+		],
+	);
+
 	const openEffects = useCallback(
 		(itemId: TileItemId, origin: HTMLElement | null) => openTarget("effects", itemId, origin),
 		[
@@ -131,6 +138,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 			target,
 			openInfo,
 			openStatus,
+			openLines,
 			openEffects,
 			close,
 			completeEnter,
@@ -142,6 +150,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 			completeExit,
 			openInfo,
 			openStatus,
+			openLines,
 			openEffects,
 			phase,
 			target,

@@ -11,6 +11,7 @@ const infoCapability: readonly TileCapabilityEnumSchema.Type[] = [
 const lineOwnerCapabilities: readonly TileCapabilityEnumSchema.Type[] = [
 	"info",
 	"status",
+	"lines",
 	"effects",
 ];
 const infoAndEffectsCapabilities: readonly TileCapabilityEnumSchema.Type[] = [

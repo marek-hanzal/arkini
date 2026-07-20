@@ -31,6 +31,7 @@ describe("readTileStatusFx", () => {
 		expect(readTileCapabilities(runtime.items[0], runtime)).toEqual([
 			"info",
 			"status",
+			"lines",
 			"effects",
 		]);
 		expect(

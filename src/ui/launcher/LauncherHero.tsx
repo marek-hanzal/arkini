@@ -3,7 +3,7 @@ import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
 import { launcherHeroArtworkViewTransitionName } from "~/ui/navigation/launcherHeroArtworkViewTransitionName";
 import { launcherHeroShadowViewTransitionName } from "~/ui/navigation/launcherHeroShadowViewTransitionName";
 
-const heroAspectRatio = "3345 / 1882";
+const heroAspectRatio = "1535 / 1024";
 const compactWidth = "var(--ak-compact-hero-width)";
 const fullWidth = "var(--ak-full-hero-width)";
 

@@ -14,17 +14,17 @@ export const ArkpackSelector = () => {
 		>
 			<header>
 				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
-					Arkini arkpacks
+					Packages
 				</p>
 				<h1
 					id="arkpack-selector-title"
 					className="mt-2 text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold"
 				>
-					Choose a game package
+					Choose an installed package
 				</h1>
 				<p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-					Imported arkpacks stay on this device. Every package is validated before it can
-					run.
+					The built-in Arkini package already includes Choose The Path. Imported arkpacks
+					stay on this device and every package is validated before it can run.
 				</p>
 			</header>
 

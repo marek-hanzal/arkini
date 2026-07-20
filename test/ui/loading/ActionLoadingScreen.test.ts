@@ -72,7 +72,7 @@ describe("ActionLoadingScreen", () => {
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
 		expect(hero).not.toBeNull();
-		expect(hero?.style.aspectRatio).toBe("3345 / 1882");
+		expect(hero?.style.aspectRatio).toBe("1535 / 1024");
 		expect(artwork).toBeInstanceOf(HTMLImageElement);
 		expect(artwork?.getAttribute("alt")).toBe("Arkini");
 		expect(artwork?.getAttribute("src")).toContain("hero.png");

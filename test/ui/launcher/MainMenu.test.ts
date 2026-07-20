@@ -133,7 +133,7 @@ describe("MainMenu", () => {
 		);
 
 		const play = Array.from(container.querySelectorAll("a")).find(
-			(link) => link.textContent === "Play",
+			(link) => link.textContent === "Play included pack",
 		);
 		expect(play?.getAttribute("href")).toContain("/action/load-game/canonical-built-in");
 		expect(
@@ -153,6 +153,8 @@ describe("MainMenu", () => {
 				.viewTransitionName,
 		).toBe("");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
+		expect(container.textContent).toContain("Included package");
+		expect(container.textContent).toContain("Choose The Path is included");
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

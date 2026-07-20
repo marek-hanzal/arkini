@@ -24,68 +24,86 @@ export const MainMenu = () => {
 		);
 
 	return (
-		<nav
-			className="grid w-full gap-2"
-			aria-label="Main menu"
+		<div
+			className="grid w-full gap-4"
 			data-ui="MainMenu"
 		>
-			{builtInAvailable && builtInPackageId !== undefined ? (
-				<PrimaryButtonLink
-					to="/action/load-game/$packageId"
-					preload={false}
-					params={{
-						packageId: builtInPackageId,
-					}}
+			<header className="grid gap-2 rounded-2xl border border-line bg-surface/80 p-4 text-center shadow-lg">
+				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
+					Included package
+				</p>
+				<h1 className="text-[clamp(1.25rem,4cqmin,1.875rem)] font-semibold">
+					Choose The Path is included
+				</h1>
+				<p className="text-sm leading-6 text-muted">
+					The bundled Arkini package already includes the Choose The Path expansion pack.
+					Jump in directly or manage local arkpacks below.
+				</p>
+			</header>
+			<nav
+				className="grid w-full gap-2"
+				aria-label="Main menu"
+			>
+				{builtInAvailable && builtInPackageId !== undefined ? (
+					<PrimaryButtonLink
+						to="/action/load-game/$packageId"
+						preload={false}
+						params={{
+							packageId: builtInPackageId,
+						}}
+						className="rounded-xl"
+					>
+						Play included pack
+					</PrimaryButtonLink>
+				) : (
+					<PrimaryButton
+						className="rounded-xl"
+						disabled
+					>
+						{catalogState.type === "failed" || startupState.type === "failed"
+							? "Included pack unavailable"
+							: "Preparing included pack…"}
+					</PrimaryButton>
+				)}
+				<ButtonLink
+					to="/arkpacks"
 					className="rounded-xl"
 				>
-					Play
-				</PrimaryButtonLink>
-			) : (
-				<PrimaryButton
+					Arkpacks
+				</ButtonLink>
+				<ButtonLink
+					to="/settings"
 					className="rounded-xl"
-					disabled
 				>
-					{catalogState.type === "failed" || startupState.type === "failed"
-						? "Play unavailable"
-						: "Preparing Play…"}
-				</PrimaryButton>
-			)}
-			<ButtonLink
-				to="/arkpacks"
-				className="rounded-xl"
-			>
-				Arkpacks
-			</ButtonLink>
-			<ButtonLink
-				to="/settings"
-				className="rounded-xl"
-			>
-				Settings
-			</ButtonLink>
-			<ButtonLink
-				to="/about"
-				className="rounded-xl"
-			>
-				About
-			</ButtonLink>
-			<Button
-				className="rounded-xl"
-				disabled={exit.isPending}
-				onClick={() => exit.mutate()}
-			>
-				{exit.isPending ? "Exiting…" : "Exit"}
-			</Button>
-			{catalogState.type === "failed" ? (
-				<p className="text-center text-sm text-danger">
-					Catalog failed: {String(catalogState.error)}
-				</p>
-			) : startupState.type === "failed" ? (
-				<p className="text-center text-sm text-danger">
-					Startup failed: {String(startupState.error)}
-				</p>
-			) : exit.isError ? (
-				<p className="text-center text-sm text-danger">Exit failed: {String(exit.error)}</p>
-			) : null}
-		</nav>
+					Settings
+				</ButtonLink>
+				<ButtonLink
+					to="/about"
+					className="rounded-xl"
+				>
+					About
+				</ButtonLink>
+				<Button
+					className="rounded-xl"
+					disabled={exit.isPending}
+					onClick={() => exit.mutate()}
+				>
+					{exit.isPending ? "Exiting…" : "Exit"}
+				</Button>
+				{catalogState.type === "failed" ? (
+					<p className="text-center text-sm text-danger">
+						Catalog failed: {String(catalogState.error)}
+					</p>
+				) : startupState.type === "failed" ? (
+					<p className="text-center text-sm text-danger">
+						Startup failed: {String(startupState.error)}
+					</p>
+				) : exit.isError ? (
+					<p className="text-center text-sm text-danger">
+						Exit failed: {String(exit.error)}
+					</p>
+				) : null}
+			</nav>
+		</div>
 	);
 };

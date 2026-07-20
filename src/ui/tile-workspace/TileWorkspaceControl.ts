@@ -3,7 +3,7 @@ import type { TileItemId } from "~/bridge/tile/TileItemId";
 export type TileWorkspacePhase = "closed" | "entering" | "open" | "exiting";
 
 export interface TileWorkspaceTarget {
-	readonly capability: "info" | "status";
+	readonly capability: "info" | "status" | "effects";
 	readonly itemId: TileItemId;
 	readonly origin: HTMLElement | null;
 	readonly generation: number;
@@ -16,6 +16,7 @@ export interface TileWorkspaceControl {
 	readonly target: TileWorkspaceTarget | null;
 	readonly openInfo: (itemId: TileItemId, origin: HTMLElement | null) => boolean;
 	readonly openStatus: (itemId: TileItemId, origin: HTMLElement | null) => boolean;
+	readonly openEffects: (itemId: TileItemId, origin: HTMLElement | null) => boolean;
 	readonly close: () => Promise<void>;
 	readonly completeEnter: (generation: number) => void;
 	readonly completeExit: (generation: number) => void;

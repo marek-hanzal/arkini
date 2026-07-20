@@ -28,15 +28,19 @@ const readStatus = (runtime: RuntimeSchema.Type) =>
 describe("readTileStatusFx", () => {
 	it("adds Status only for canonical line owners", () => {
 		const runtime = lineRunRuntime({});
-		expect(readTileCapabilities(runtime.items[0])).toEqual([
+		expect(readTileCapabilities(runtime.items[0], runtime)).toEqual([
 			"info",
 			"status",
+			"effects",
 		]);
 		expect(
-			readTileCapabilities({
-				...runtime.items[0],
-				item: lineRunTestConfig.items.water,
-			}),
+			readTileCapabilities(
+				{
+					...runtime.items[0],
+					item: lineRunTestConfig.items.water,
+				},
+				runtime,
+			),
 		).toEqual([
 			"info",
 		]);

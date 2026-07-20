@@ -60,6 +60,13 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 		],
 	);
 
+	const openEffects = useCallback(
+		(itemId: TileItemId, origin: HTMLElement | null) => openTarget("effects", itemId, origin),
+		[
+			openTarget,
+		],
+	);
+
 	const close = useCallback(() => {
 		if (phaseRef.current === "closed") return Promise.resolve();
 		if (phaseRef.current === "exiting") {
@@ -124,6 +131,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 			target,
 			openInfo,
 			openStatus,
+			openEffects,
 			close,
 			completeEnter,
 			completeExit,
@@ -134,6 +142,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 			completeExit,
 			openInfo,
 			openStatus,
+			openEffects,
 			phase,
 			target,
 		],

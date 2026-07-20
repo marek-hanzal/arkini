@@ -483,3 +483,64 @@ describe("TileWorkspace Status", () => {
 		expect(modal.textContent).toContain("Move it back to the Board");
 	});
 });
+
+describe("TileWorkspace Effects", () => {
+	it("renders incoming and outgoing effect conditions and updates them live", async () => {
+		const { container, readControl } = await renderWorkspace();
+		const workshop = currentRuntime.items.find((item) => item.item.id === "workshop");
+		const permit = currentRuntime.items.find((item) => item.item.id === "permit");
+		if (workshop === undefined || permit === undefined) {
+			throw new Error("Missing workshop or permit runtime item.");
+		}
+
+		await act(async () => {
+			expect(readControl().openEffects(workshop.id, null)).toBe(true);
+		});
+		const modal = container.querySelector<HTMLElement>('[data-ui="TileWorkspaceModal"]');
+		if (modal === null) throw new Error("Missing Effects workspace modal.");
+		expect(modal.dataset.capability).toBe("effects");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(modal.textContent).toContain("Incoming");
+		expect(modal.textContent).toContain("Outgoing");
+		expect(modal.textContent).toContain("Run reacts to permit");
+		expect(modal.textContent).toContain("Enable line");
+		expect(modal.textContent).toContain("Active");
+		expect(modal.textContent).toContain("Permit");
+		await finishLatestMotion();
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.filter((item) => item.item.id !== "permit"),
+			});
+			await Promise.resolve();
+		});
+		expect(modal.textContent).toContain("Inactive");
+		expect(modal.textContent).toContain("No matching live items satisfy this condition.");
+
+		await act(async () => {
+			void readControl().close();
+		});
+		await finishLatestMotion();
+
+		await act(async () => {
+			publishRuntime(initialRuntime);
+			await Promise.resolve();
+		});
+		const livePermit = currentRuntime.items.find((item) => item.item.id === "permit");
+		if (livePermit === undefined) throw new Error("Missing restored permit runtime item.");
+
+		await act(async () => {
+			expect(readControl().openEffects(livePermit.id, null)).toBe(true);
+		});
+		const outgoingModal = container.querySelector<HTMLElement>(
+			'[data-ui="TileWorkspaceModal"]',
+		);
+		if (outgoingModal === null) throw new Error("Missing outgoing Effects workspace modal.");
+		expect(outgoingModal.textContent).toContain("Live conditions on other tiles");
+		expect(outgoingModal.textContent).toContain("Workshop · Run");
+		expect(outgoingModal.textContent).toContain(
+			"This tile currently participates in another tile's line condition.",
+		);
+	});
+});

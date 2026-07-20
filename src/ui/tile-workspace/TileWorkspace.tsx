@@ -4,7 +4,9 @@ import { match, P } from "ts-pattern";
 
 import { useTileIdentity } from "~/bridge/tile/useTileIdentity";
 import { useTileInfo } from "~/bridge/tile/useTileInfo";
+import { useTileEffects } from "~/bridge/tile/useTileEffects";
 import { useTileStatus } from "~/bridge/tile/useTileStatus";
+import { TileEffectsWorkspace } from "~/ui/tile-workspace/TileEffectsWorkspace";
 import { TileInfoWorkspace } from "~/ui/tile-workspace/TileInfoWorkspace";
 import {
 	readTileStatusPresentation,
@@ -193,6 +195,48 @@ const TileInfoWorkspaceContent = ({
 	);
 };
 
+const TileEffectsWorkspaceContent = ({
+	identity,
+	itemId,
+	phase,
+}: {
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
+	readonly itemId: TileWorkspaceTarget["itemId"];
+	readonly phase: Exclude<TileWorkspacePhase, "closed">;
+}) => {
+	const workspace = useTileWorkspaceControl();
+	const effects = useTileEffects(itemId);
+	useEffect(() => {
+		if (effects.kind === "available") return;
+		void workspace.close();
+	}, [
+		effects.kind,
+		workspace,
+	]);
+	if (effects.kind === "unavailable") {
+		return (
+			<UnavailableWorkspace
+				closeLabel="Close Effects"
+				disabled={phase === "exiting"}
+			/>
+		);
+	}
+	return (
+		<TileWorkspaceChrome
+			closeLabel="Close Effects"
+			disabled={phase === "exiting"}
+			identity={identity}
+		>
+			<TileEffectsWorkspace effects={effects} />
+		</TileWorkspaceChrome>
+	);
+};
+
 const TileStatusWorkspaceContent = ({
 	identity,
 	itemId,
@@ -264,6 +308,13 @@ const TileWorkspaceCapabilityContent = ({
 		))
 		.with("status", () => (
 			<TileStatusWorkspaceContent
+				identity={identity}
+				itemId={target.itemId}
+				phase={phase}
+			/>
+		))
+		.with("effects", () => (
+			<TileEffectsWorkspaceContent
 				identity={identity}
 				itemId={target.itemId}
 				phase={phase}

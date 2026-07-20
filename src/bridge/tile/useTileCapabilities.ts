@@ -17,7 +17,10 @@ export const useTileCapabilities = (
 ): readonly useTileCapabilities.Capability[] => {
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type) =>
-			readTileCapabilities(runtime.items.find((item) => item.id === itemId)),
+			readTileCapabilities(
+				runtime.items.find((item) => item.id === itemId),
+				runtime,
+			),
 		[
 			itemId,
 		],

@@ -84,6 +84,12 @@ const config = GameConfigSchema.parse({
 	version: "1.0",
 	resources: {
 		hero: "hero",
+		tileCapabilities: {
+			info: "tile-capability-info",
+			status: "tile-capability-status",
+			lines: "tile-capability-lines",
+			effects: "tile-capability-effects",
+		},
 	},
 	meta: {
 		id: "game:board-drag",
@@ -1062,29 +1068,29 @@ describe("Board drag", () => {
 			actionElements.map((action) => {
 				const icon = action.querySelector<HTMLImageElement>("img");
 				return {
-					file: icon?.src.split("/").at(-1),
+					src: icon?.getAttribute("src"),
 					height: icon?.height,
 					width: icon?.width,
 				};
 			}),
 		).toEqual([
 			{
-				file: "tile-capability-info.png",
+				src: "resource:tile-capability-info",
 				height: 24,
 				width: 24,
 			},
 			{
-				file: "tile-capability-status.png",
+				src: "resource:tile-capability-status",
 				height: 24,
 				width: 24,
 			},
 			{
-				file: "tile-capability-lines.png",
+				src: "resource:tile-capability-lines",
 				height: 24,
 				width: 24,
 			},
 			{
-				file: "tile-capability-effects.png",
+				src: "resource:tile-capability-effects",
 				height: 24,
 				width: 24,
 			},

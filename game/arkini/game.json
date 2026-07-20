@@ -14,7 +14,13 @@
 		"toolbarSize": 13
 	},
 	"resources": {
-		"hero": "hero"
+		"hero": "hero",
+		"tileCapabilities": {
+			"info": "tile-capability-info",
+			"status": "tile-capability-status",
+			"lines": "tile-capability-lines",
+			"effects": "tile-capability-effects"
+		}
 	},
 	"start": {
 		"board": [

@@ -8,38 +8,31 @@ import {
 	useHover,
 	useInteractions,
 } from "@floating-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
-import TileCapabilityEffectsIconUrl from "~/ui/tile/resource/tile-capability-effects.png";
-import TileCapabilityInfoIconUrl from "~/ui/tile/resource/tile-capability-info.png";
-import TileCapabilityLinesIconUrl from "~/ui/tile/resource/tile-capability-lines.png";
-import TileCapabilityStatusIconUrl from "~/ui/tile/resource/tile-capability-status.png";
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { TileHoverActionBar } from "~/ui/tile/TileHoverActionBar";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 
 const ActionBarMainAxisOffset = -8;
 
-const actions = [
+const actionDefinitions = [
 	{
 		capability: "info",
-		iconUrl: TileCapabilityInfoIconUrl,
 		label: "Info",
 	},
 	{
 		capability: "status",
-		iconUrl: TileCapabilityStatusIconUrl,
 		label: "Status",
 	},
 	{
 		capability: "lines",
-		iconUrl: TileCapabilityLinesIconUrl,
 		label: "Lines",
 	},
 	{
 		capability: "effects",
-		iconUrl: TileCapabilityEffectsIconUrl,
 		label: "Effects",
 	},
 ] as const;
@@ -77,8 +70,19 @@ export const useTileHoverActions = ({
 	readonly live: boolean;
 	readonly onHoverChange: (hovered: boolean) => void;
 }) => {
+	const game = useGameEngine();
 	const { active } = useTileActorSystem();
-	const suppressed = !live || interactionSuppressesHover(active);
+	const actions = useMemo(() => {
+		const resources = game.config.resources.tileCapabilities;
+		if (resources === undefined) return [];
+		return actionDefinitions.map((action) => ({
+			...action,
+			iconUrl: game.getResourceUrl(resources[action.capability]),
+		}));
+	}, [
+		game,
+	]);
+	const suppressed = !live || actions.length === 0 || interactionSuppressesHover(active);
 	const [open, setOpen] = useState(false);
 	const floating = useFloating({
 		open,

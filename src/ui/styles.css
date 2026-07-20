@@ -74,6 +74,47 @@
 	);
 	--ak-scrollbar-corner: var(--ak-scrollbar-track);
 
+	--ak-list-row-surface-a: light-dark(
+		color-mix(in srgb, var(--ak-surface) 92%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-surface) 90%, var(--ak-surface-raised))
+	);
+	--ak-list-row-surface-b: light-dark(
+		color-mix(in srgb, var(--ak-surface-raised) 42%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 34%, var(--ak-surface))
+	);
+	--ak-list-row-hover-surface: light-dark(
+		color-mix(in srgb, var(--ak-accent) 10%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-accent) 13%, var(--ak-surface-raised))
+	);
+	--ak-list-row-focus-surface: light-dark(
+		color-mix(in srgb, var(--ak-accent) 14%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-accent) 18%, var(--ak-surface-raised))
+	);
+	--ak-list-row-active-surface: light-dark(
+		color-mix(in srgb, var(--ak-accent) 14%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-accent) 18%, var(--ak-surface))
+	);
+	--ak-list-row-selected-surface: var(--ak-accent);
+	--ak-list-row-pending-surface: light-dark(
+		color-mix(in srgb, var(--ak-info) 16%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-info) 20%, var(--ak-surface))
+	);
+	--ak-list-row-danger-surface: light-dark(
+		color-mix(in srgb, var(--ak-danger) 82%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-danger) 78%, var(--ak-surface))
+	);
+	--ak-list-row-disabled-surface: light-dark(
+		color-mix(in srgb, var(--ak-surface) 86%, var(--ak-muted)),
+		color-mix(in srgb, var(--ak-surface) 88%, var(--ak-muted))
+	);
+	--ak-list-row-emphasis-border: light-dark(
+		color-mix(in srgb, var(--ak-accent) 44%, var(--ak-line)),
+		color-mix(in srgb, var(--ak-accent) 52%, var(--ak-line))
+	);
+	--ak-list-row-shadow: 0 0.45rem 1rem light-dark(rgb(67 33 82 / 14%), rgb(0 0 0 / 34%));
+	--ak-list-row-transition-duration: 140ms;
+	--ak-list-row-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
 	--ak-game-shell-field-primary: light-dark(
 		color-mix(in srgb, var(--ak-accent) 24%, transparent),
 		color-mix(in srgb, var(--ak-accent) 26%, transparent)
@@ -308,6 +349,112 @@ select {
 ::selection {
 	color: var(--ak-accent-contrast);
 	background: var(--ak-accent);
+}
+
+.ak-list {
+	isolation: isolate;
+}
+
+.ak-list > .ak-list-row:nth-child(odd of .ak-list-row) {
+	--ak-list-row-base-surface: var(--ak-list-row-surface-a);
+}
+
+.ak-list > .ak-list-row:nth-child(even of .ak-list-row) {
+	--ak-list-row-base-surface: var(--ak-list-row-surface-b);
+}
+
+.ak-list-row {
+	position: relative;
+	background-color: var(--ak-list-row-base-surface, var(--ak-list-row-surface-a));
+	box-shadow: inset 0 0 0 1px transparent;
+	transition:
+		transform var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		box-shadow var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
+}
+
+.ak-list-row-interactive {
+	transform-origin: center;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ak-list-row-interactive:not(:disabled):not([aria-disabled="true"]):not(
+		.ak-list-row-disabled
+	):hover {
+		z-index: 1;
+		background-color: var(--ak-list-row-hover-surface);
+		box-shadow:
+			inset 0 0 0 1px var(--ak-list-row-emphasis-border),
+			var(--ak-list-row-shadow);
+		transform: translateY(-1px) scale(1.006);
+	}
+}
+
+.ak-list-row-interactive:focus-visible,
+.ak-list-row-interactive:focus-within {
+	z-index: 2;
+	background-color: var(--ak-list-row-focus-surface);
+	box-shadow:
+		inset 0 0 0 2px var(--ak-list-row-emphasis-border),
+		var(--ak-list-row-shadow);
+	transform: translateY(-1px) scale(1.006);
+}
+
+.ak-list-row-pending {
+	background-color: var(--ak-list-row-pending-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-info) 40%, transparent);
+	transform: none;
+}
+
+.ak-list-row-danger {
+	background-color: var(--ak-list-row-danger-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-danger) 50%, transparent);
+}
+
+.ak-list-row-active {
+	background-color: var(--ak-list-row-active-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-accent) 34%, transparent);
+}
+
+.ak-list-row-selected {
+	background-color: var(--ak-list-row-selected-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-accent-contrast) 18%, transparent);
+}
+
+.ak-list-row-interactive.ak-list-row-selected:focus-visible,
+.ak-list-row-interactive.ak-list-row-selected:focus-within {
+	box-shadow:
+		inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 58%, transparent),
+		var(--ak-list-row-shadow);
+}
+
+.ak-list-row-interactive.ak-list-row-danger:focus-visible,
+.ak-list-row-interactive.ak-list-row-danger:focus-within {
+	box-shadow:
+		inset 0 0 0 2px color-mix(in srgb, var(--ak-danger-contrast) 58%, transparent),
+		var(--ak-list-row-shadow);
+}
+
+.ak-list-row-disabled,
+.ak-list-row:disabled:not(.ak-list-row-pending),
+.ak-list-row[aria-disabled="true"]:not(.ak-list-row-pending) {
+	background-color: var(--ak-list-row-disabled-surface);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-line) 58%, transparent);
+	opacity: 0.62;
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ak-list-row {
+		transition-duration: 0.01ms;
+	}
+
+	.ak-list-row-interactive:hover,
+	.ak-list-row-interactive:focus-visible,
+	.ak-list-row-interactive:focus-within {
+		transform: none;
+	}
 }
 
 [data-ui="GameShell"] {

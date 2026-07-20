@@ -237,7 +237,7 @@ const LineRow = ({ line }: { readonly line: useTileLines.Line }) => {
 	const runtimeChanged = line.baseRuntimeMs !== line.effectiveRuntimeMs;
 	return (
 		<article
-			className={`border-b border-line py-5 first:pt-0 last:border-b-0 last:pb-0 ${line.activeJob === undefined ? "" : "border-l-2 border-l-accent pl-4"}`}
+			className={`ak-list-row rounded-xl border-b border-line px-3 py-5 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "" : "ak-list-row-active border-l-2 border-l-accent pl-4"}`}
 			data-ui="TileLine"
 			data-line-id={line.lineId}
 			data-active={line.activeJob === undefined ? "false" : "true"}
@@ -379,7 +379,10 @@ export const TileLinesWorkspace = ({
 					No product line is currently visible.
 				</div>
 			) : (
-				<div data-ui="TileLinesList">
+				<div
+					className="ak-list grid gap-1"
+					data-ui="TileLinesList"
+				>
 					{lines.line.map((line) => (
 						<LineRow
 							key={line.lineId}

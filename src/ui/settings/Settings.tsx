@@ -61,7 +61,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 			>
 				<legend className="text-sm font-semibold text-foreground">Theme</legend>
 				<div
-					className="grid grid-cols-3 rounded-xl border border-line bg-surface-raised/65 p-1"
+					className="ak-list grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
 					role="radiogroup"
 					aria-label="Theme"
 					data-ui="SettingsThemeOptions"
@@ -71,11 +71,9 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 						return (
 							<label
 								key={option.value}
-								className={`relative ${model.blocked ? "cursor-progress" : "cursor-pointer"} rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors focus-within:ring-2 focus-within:ring-accent ${
-									selected
-										? "bg-accent text-accent-contrast shadow-md"
-										: "text-muted hover:bg-surface hover:text-foreground"
-								}`}
+								className={`ak-list-row ak-list-row-interactive relative ${model.blocked ? "ak-list-row-pending cursor-progress" : "cursor-pointer"} ${selected ? "ak-list-row-selected text-accent-contrast" : "text-muted"} rounded-lg px-3 py-2.5 text-center text-sm font-semibold`}
+								data-selected={selected ? "true" : "false"}
+								data-pending={model.blocked ? "true" : "false"}
 							>
 								<input
 									type="radio"

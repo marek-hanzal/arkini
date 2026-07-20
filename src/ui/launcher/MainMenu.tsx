@@ -25,7 +25,7 @@ export const MainMenu = () => {
 
 	return (
 		<nav
-			className="grid w-full gap-2"
+			className="ak-list grid w-full gap-2"
 			aria-label="Main menu"
 			data-ui="MainMenu"
 		>
@@ -36,13 +36,13 @@ export const MainMenu = () => {
 					params={{
 						packageId: builtInPackageId,
 					}}
-					className="rounded-xl"
+					className="ak-list-row ak-list-row-interactive ak-list-row-selected rounded-xl"
 				>
 					Play
 				</PrimaryButtonLink>
 			) : (
 				<PrimaryButton
-					className="rounded-xl"
+					className={`ak-list-row ak-list-row-interactive ak-list-row-selected rounded-xl ${catalogState.type === "failed" || startupState.type === "failed" ? "ak-list-row-disabled" : "ak-list-row-pending"}`}
 					cursorIntent={
 						catalogState.type === "failed" || startupState.type === "failed"
 							? "not-allowed"
@@ -57,24 +57,24 @@ export const MainMenu = () => {
 			)}
 			<ButtonLink
 				to="/arkpacks"
-				className="rounded-xl"
+				className="ak-list-row ak-list-row-interactive rounded-xl"
 			>
 				Arkpacks
 			</ButtonLink>
 			<ButtonLink
 				to="/settings"
-				className="rounded-xl"
+				className="ak-list-row ak-list-row-interactive rounded-xl"
 			>
 				Settings
 			</ButtonLink>
 			<ButtonLink
 				to="/about"
-				className="rounded-xl"
+				className="ak-list-row ak-list-row-interactive rounded-xl"
 			>
 				About
 			</ButtonLink>
 			<Button
-				className="rounded-xl"
+				className={`ak-list-row ak-list-row-interactive rounded-xl ${exit.isPending ? "ak-list-row-pending" : ""}`}
 				cursorIntent={exit.isPending ? "progress" : undefined}
 				disabled={exit.isPending}
 				onClick={() => exit.mutate()}

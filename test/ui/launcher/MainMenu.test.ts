@@ -153,6 +153,14 @@ describe("MainMenu", () => {
 				.viewTransitionName,
 		).toBe("");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
+		const menu = container.querySelector<HTMLElement>('[data-ui="MainMenu"]');
+		expect(menu?.className).toContain("ak-list");
+		expect(play?.className).toContain("ak-list-row-selected");
+		expect(
+			Array.from(menu?.querySelectorAll("a, button") ?? []).every((control) =>
+				control.className.includes("ak-list-row-interactive"),
+			),
+		).toBe(true);
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

@@ -40,7 +40,27 @@ describe("ArkpackSelector", () => {
 		const rootRoute = createRootRoute();
 		const catalogState = {
 			type: "ready" as const,
-			arkpacks: [],
+			arkpacks: [
+				{
+					packageId: "package:built-in",
+					contentHash: "a".repeat(64),
+					gameId: "arkini",
+					title: "Arkini",
+					configVersion: "1",
+					compressedSize: 1,
+					source: "built-in" as const,
+				},
+				{
+					packageId: "package:local",
+					contentHash: "b".repeat(64),
+					gameId: "local",
+					title: "Local package",
+					configVersion: "1",
+					compressedSize: 1,
+					source: "imported" as const,
+					filename: "local.arkpack",
+				},
+			],
 		};
 		const catalog: ArkpackCatalog = {
 			getSnapshot: () => catalogState,
@@ -66,10 +86,16 @@ describe("ArkpackSelector", () => {
 			path: "/main-menu",
 			component: () => createElement("p", null, "Main menu destination"),
 		});
+		const loadRoute = createRoute({
+			getParentRoute: () => rootRoute,
+			path: "/action/load-game/$packageId",
+			component: () => createElement("p", null, "Load destination"),
+		});
 		const router = createRouter({
 			routeTree: rootRoute.addChildren([
 				arkpacksRoute,
 				mainMenuRoute,
+				loadRoute,
 			]),
 			history: createMemoryHistory({
 				initialEntries: [
@@ -103,6 +129,16 @@ describe("ArkpackSelector", () => {
 				.viewTransitionName,
 		).toBe("");
 		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
+		const catalogList = container.querySelector<HTMLElement>('[data-ui="ArkpackCatalogList"]');
+		expect(catalogList?.className).toContain("ak-list");
+		const catalogRows = Array.from(
+			catalogList?.querySelectorAll<HTMLElement>('[data-ui="ArkpackCatalogRow"]') ?? [],
+		);
+		expect(catalogRows).toHaveLength(2);
+		expect(catalogRows.every((row) => row.className.includes("ak-list-row"))).toBe(true);
+		expect(catalogRows.every((row) => !row.className.includes("ak-list-row-interactive"))).toBe(
+			true,
+		);
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");
 		const returnButton = layout?.lastElementChild?.querySelector("button");

@@ -549,6 +549,11 @@ describe("TileWorkspace Lines", () => {
 		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
 		expect(modal.textContent).toContain("1 visible line");
 		expect(modal.textContent).toContain("Run");
+		const linesList = modal.querySelector<HTMLElement>('[data-ui="TileLinesList"]');
+		expect(linesList?.className).toContain("ak-list");
+		const lineRow = linesList?.querySelector<HTMLElement>('[data-ui="TileLine"]');
+		expect(lineRow?.className).toContain("ak-list-row");
+		expect(lineRow?.className).not.toContain("ak-list-row-interactive");
 		expect(modal.textContent).toContain("Missing inputs");
 		expect(modal.textContent).toContain("0 / 2 stored");
 		expect(modal.textContent).toContain("2 still needed");
@@ -602,6 +607,7 @@ describe("TileWorkspace Lines", () => {
 		});
 		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
 		expect(modal.textContent).toContain("Active");
+		expect(lineRow?.className).toContain("ak-list-row-active");
 		expect(modal.textContent).toContain("Current work");
 		expect(modal.textContent).toContain("0.5 s remaining of 1 s");
 	});

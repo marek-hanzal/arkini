@@ -158,6 +158,18 @@ describe("Settings", () => {
 		).toBe("");
 		const radios = Array.from(container.querySelectorAll('input[name="appearance-theme"]'));
 		expect(radios).toHaveLength(3);
+		const themeOptions = container.querySelector<HTMLElement>(
+			'[data-ui="SettingsThemeOptions"]',
+		);
+		expect(themeOptions?.className).toContain("ak-list");
+		const themeRows = Array.from(themeOptions?.querySelectorAll("label") ?? []);
+		expect(themeRows).toHaveLength(3);
+		expect(themeRows.every((row) => row.className.includes("ak-list-row-interactive"))).toBe(
+			true,
+		);
+		expect(themeRows.find((row) => row.dataset.selected === "true")?.className).toContain(
+			"ak-list-row-selected",
+		);
 		const light = radios.find(
 			(input) => input instanceof HTMLInputElement && input.value === "light",
 		);
@@ -171,6 +183,11 @@ describe("Settings", () => {
 		const fieldset = container.querySelector("fieldset");
 		expect(fieldset).toBeInstanceOf(HTMLFieldSetElement);
 		expect((fieldset as HTMLFieldSetElement).disabled).toBe(true);
+		expect(
+			Array.from(themeOptions?.querySelectorAll("label") ?? []).every((row) =>
+				row.className.includes("ak-list-row-pending"),
+			),
+		).toBe(true);
 
 		await act(async () => deferred.resolve());
 		await act(async () => {

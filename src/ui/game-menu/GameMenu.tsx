@@ -84,9 +84,9 @@ const GameMenuDialog = ({
 					Game menu
 				</h2>
 
-				<div className="grid gap-2">
+				<div className="ak-list grid gap-2">
 					<PrimaryButton
-						className="w-full"
+						className={`ak-list-row ak-list-row-interactive ak-list-row-selected w-full ${actions.pending ? "ak-list-row-pending" : ""}`}
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={() => void actions.close()}
@@ -94,7 +94,7 @@ const GameMenuDialog = ({
 						Return to game
 					</PrimaryButton>
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className={`ak-list-row ak-list-row-interactive w-full shadow-none backdrop-blur-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSettings}
@@ -102,7 +102,7 @@ const GameMenuDialog = ({
 						Settings
 					</Button>
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className={`ak-list-row ak-list-row-interactive w-full shadow-none backdrop-blur-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestMainMenu}
@@ -113,7 +113,7 @@ const GameMenuDialog = ({
 					<div className="my-2 border-t border-line" />
 
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className={`ak-list-row ak-list-row-interactive w-full shadow-none backdrop-blur-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSave}
@@ -121,7 +121,7 @@ const GameMenuDialog = ({
 						Save
 					</Button>
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className={`ak-list-row ak-list-row-interactive w-full shadow-none backdrop-blur-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSaveAndExit}
@@ -149,7 +149,7 @@ const GameMenuDialog = ({
 								</p>
 								<div className="grid grid-cols-2 gap-2">
 									<Button
-										className="min-h-0 px-3 py-2 shadow-none backdrop-blur-none"
+										className={`ak-list-row ak-list-row-interactive min-h-0 px-3 py-2 shadow-none backdrop-blur-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
 										onClick={() => actions.setConfirmingDestroy(false)}
@@ -157,7 +157,7 @@ const GameMenuDialog = ({
 										Cancel
 									</Button>
 									<DangerButton
-										className="min-h-0 px-3 py-2 shadow-none"
+										className={`ak-list-row ak-list-row-interactive ak-list-row-danger min-h-0 px-3 py-2 shadow-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
 										onClick={actions.requestHardReset}
@@ -168,7 +168,7 @@ const GameMenuDialog = ({
 							</div>
 						) : (
 							<DangerButton
-								className="w-full shadow-none"
+								className={`ak-list-row ak-list-row-interactive ak-list-row-danger w-full shadow-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 								cursorIntent={actionCursorIntent}
 								disabled={actions.actionDisabled}
 								onClick={() => actions.setConfirmingDestroy(true)}

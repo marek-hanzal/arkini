@@ -322,6 +322,10 @@ describe("GameMenu", () => {
 			container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]')?.className,
 		).toContain("cursor-default");
 		expect(buttonByText(container, "Settings").className).toContain("cursor-pointer");
+		expect(buttonByText(container, "Settings").className).toContain("ak-list-row-interactive");
+		expect(buttonByText(container, "Return to game").className).toContain(
+			"ak-list-row-selected",
+		);
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="GameMenuBackdrop"]')?.style
 				.viewTransitionName,
@@ -360,6 +364,7 @@ describe("GameMenu", () => {
 			expect(buttonByText(container, "Save and exit").disabled).toBe(true),
 		);
 		expect(buttonByText(container, "Save and exit").className).toContain("cursor-progress");
+		expect(buttonByText(container, "Save and exit").className).toContain("ak-list-row-pending");
 
 		await act(async () => {
 			gate.resolve();

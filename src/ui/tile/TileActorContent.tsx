@@ -1,95 +1,132 @@
 import { motion } from "motion/react";
+import { match } from "ts-pattern";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
+import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
+import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
 
 export namespace TileActorContent {
 	export interface Props {
 		readonly item: useTileActors.Item;
-		readonly phase:
-			| "stable"
-			| "hovered"
-			| "targeted"
-			| "dragging"
-			| "settling"
-			| "impact"
-			| "exiting";
-		readonly feedback: "accepted" | "rejected" | "ignored" | null;
+		readonly phase: TileActorPhaseSchema.Type;
+		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly onAnimationComplete?: () => void;
 	}
 }
 
-const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" | "feedback">) => {
-	if (phase === "exiting") {
-		return {
-			scale: 0.72,
-			opacity: 0,
-			filter: "brightness(1.14)",
-			borderColor: "var(--ak-accent)",
-			boxShadow: "0 0.5rem 1rem color-mix(in srgb, var(--ak-overlay) 18%, transparent)",
-		};
-	}
-	if (phase === "impact") {
-		return {
-			scale: 1.12,
-			opacity: 1,
-			filter: "brightness(1.12)",
-			borderColor: "var(--ak-accent)",
-			boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-accent) 30%, transparent)",
-		};
-	}
-	if (phase === "dragging") {
-		return {
-			scale: 1.18,
-			opacity: 1,
-			filter: "brightness(1.08)",
-			borderColor: "var(--ak-accent)",
-			boxShadow: "0 1.35rem 2.5rem color-mix(in srgb, var(--ak-overlay) 58%, transparent)",
-		};
-	}
-	if (phase === "hovered") {
-		return {
-			scale: 1.15,
-			opacity: 1,
-			filter: "brightness(1.06)",
-			borderColor: "var(--ak-line-strong)",
-			boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-overlay) 48%, transparent)",
-		};
-	}
-	if (phase === "targeted") {
-		return {
-			scale: 1.08,
-			opacity: 1,
-			filter: "brightness(1.08)",
-			borderColor: "var(--ak-accent)",
-			boxShadow: "0 0.9rem 1.8rem color-mix(in srgb, var(--ak-accent) 24%, transparent)",
-		};
-	}
-	if (phase === "settling" && feedback === "rejected") {
-		return {
-			scale: 1.04,
-			opacity: 1,
-			filter: "brightness(1.03)",
-			borderColor: "var(--ak-danger)",
-			boxShadow: "0 0.75rem 1.5rem color-mix(in srgb, var(--ak-danger) 22%, transparent)",
-		};
-	}
-	if (phase === "settling" && feedback === "accepted") {
-		return {
-			scale: 1.06,
-			opacity: 1,
-			filter: "brightness(1.06)",
-			borderColor: "var(--ak-accent)",
-			boxShadow: "0 0.8rem 1.6rem color-mix(in srgb, var(--ak-accent) 20%, transparent)",
-		};
-	}
-	return {
-		scale: 1,
-		opacity: 1,
-		filter: "brightness(1)",
-		borderColor: "var(--ak-line-strong)",
-		boxShadow: "0 0.55rem 1.2rem color-mix(in srgb, var(--ak-overlay) 34%, transparent)",
-	};
+const settledVisualTarget = {
+	scale: 1,
+	opacity: 1,
+	filter: "brightness(1)",
+	borderColor: "var(--ak-line-strong)",
+	boxShadow: "0 0.55rem 1.2rem color-mix(in srgb, var(--ak-overlay) 34%, transparent)",
 };
+
+const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" | "feedback">) =>
+	match({
+		phase,
+		feedback,
+	})
+		.with(
+			{
+				phase: "exiting",
+			},
+			() => ({
+				scale: 0.72,
+				opacity: 0,
+				filter: "brightness(1.14)",
+				borderColor: "var(--ak-accent)",
+				boxShadow: "0 0.5rem 1rem color-mix(in srgb, var(--ak-overlay) 18%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "impact",
+			},
+			() => ({
+				scale: 1.12,
+				opacity: 1,
+				filter: "brightness(1.12)",
+				borderColor: "var(--ak-accent)",
+				boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-accent) 30%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "dragging",
+			},
+			() => ({
+				scale: 1.18,
+				opacity: 1,
+				filter: "brightness(1.08)",
+				borderColor: "var(--ak-accent)",
+				boxShadow:
+					"0 1.35rem 2.5rem color-mix(in srgb, var(--ak-overlay) 58%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "hovered",
+			},
+			() => ({
+				scale: 1.15,
+				opacity: 1,
+				filter: "brightness(1.06)",
+				borderColor: "var(--ak-line-strong)",
+				boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-overlay) 48%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "targeted",
+			},
+			() => ({
+				scale: 1.08,
+				opacity: 1,
+				filter: "brightness(1.08)",
+				borderColor: "var(--ak-accent)",
+				boxShadow: "0 0.9rem 1.8rem color-mix(in srgb, var(--ak-accent) 24%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "settling",
+				feedback: "rejected",
+			},
+			() => ({
+				scale: 1.04,
+				opacity: 1,
+				filter: "brightness(1.03)",
+				borderColor: "var(--ak-danger)",
+				boxShadow: "0 0.75rem 1.5rem color-mix(in srgb, var(--ak-danger) 22%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "settling",
+				feedback: "accepted",
+			},
+			() => ({
+				scale: 1.06,
+				opacity: 1,
+				filter: "brightness(1.06)",
+				borderColor: "var(--ak-accent)",
+				boxShadow: "0 0.8rem 1.6rem color-mix(in srgb, var(--ak-accent) 20%, transparent)",
+			}),
+		)
+		.with(
+			{
+				phase: "settling",
+			},
+			() => settledVisualTarget,
+		)
+		.with(
+			{
+				phase: "stable",
+			},
+			() => settledVisualTarget,
+		)
+		.exhaustive();
 
 /** Renders the exact live tile content inside one Motion-owned visual shell. */
 export const TileActorContent = ({

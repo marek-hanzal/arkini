@@ -1,14 +1,11 @@
-import { useCallback, useContext } from "react";
+import { useCallback } from "react";
 
 import type { TileSurface } from "~/ui/tile/TileSurface";
-import { TileSystemContext } from "~/ui/tile/TileSystemContext";
+import { useTileSurfaceSystem } from "~/ui/tile/useTileSurfaceSystem";
 
-/** Registers one top-level Board, inventory, or toolbar drop surface. */
+/** Registers one concrete tile surface with the Canvas-local geometry owner. */
 export const useTileSurface = (surface: TileSurface) => {
-	const system = useContext(TileSystemContext);
-	if (system === null) throw new Error("TileSystemProvider is missing.");
-	const { registerSurface } = system;
-
+	const { registerSurface } = useTileSurfaceSystem();
 	return useCallback(
 		(node: HTMLElement | null) => registerSurface(surface, node),
 		[

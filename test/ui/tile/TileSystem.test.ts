@@ -352,17 +352,29 @@ describe("TileSystemProvider", () => {
 				},
 			});
 		});
-		expect(readSystem().active?.pendingActorIds).toEqual([
-			source.id,
-			toolbarOccupant.id,
-		]);
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: "swap",
+				pendingActorIds: [
+					source.id,
+					toolbarOccupant.id,
+				],
+			},
+		});
 
 		await act(async () => {
 			readSystem().complete(source.id, released.generation);
 		});
-		expect(readSystem().active?.pendingActorIds).toEqual([
-			toolbarOccupant.id,
-		]);
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: "swap",
+				pendingActorIds: [
+					toolbarOccupant.id,
+				],
+			},
+		});
 
 		await act(async () => {
 			readSystem().complete(toolbarOccupant.id, released.generation);
@@ -410,21 +422,29 @@ describe("TileSystemProvider", () => {
 			});
 		});
 		expect(readSystem().active).toMatchObject({
-			mergeStage: "approach",
-			pendingActorIds: [
-				source.id,
-			],
+			phase: "settling",
+			settlement: {
+				kind: "merge",
+				stage: "approach",
+				pendingActorIds: [
+					source.id,
+				],
+			},
 		});
 
 		await act(async () => {
 			readSystem().complete(source.id, released.generation);
 		});
 		expect(readSystem().active).toMatchObject({
-			mergeStage: "resolve",
-			pendingActorIds: [
-				source.id,
-				toolbarOccupant.id,
-			],
+			phase: "settling",
+			settlement: {
+				kind: "merge",
+				stage: "resolve",
+				pendingActorIds: [
+					source.id,
+					toolbarOccupant.id,
+				],
+			},
 		});
 
 		await act(async () => {

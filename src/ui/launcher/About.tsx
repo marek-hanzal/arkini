@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PrimaryButton } from "~/ui/button/Button";
+import { AboutEasterEgg } from "~/ui/launcher/AboutEasterEgg";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -53,47 +54,50 @@ export const About = () => {
 
 	return (
 		<div
-			className="grid gap-4 text-center"
+			className="relative isolate"
 			data-ui="About"
 		>
-			<h1
-				id="about-title"
-				className="text-2xl font-semibold"
-			>
-				About Arkini
-			</h1>
-			<p className="leading-7 text-muted">
-				Arkini is a merge-economy game about building production chains, discovering recipes
-				and shaping a living board-sized world.
-			</p>
-			<section
-				className="border-t border-line pt-4 text-left"
-				aria-label="Project credits"
-			>
-				<p className="text-xs font-semibold uppercase tracking-[0.2em] text-subtle">
-					Project credits
+			<AboutEasterEgg />
+			<div className="relative z-10 grid gap-4 text-center">
+				<h1
+					id="about-title"
+					className="text-2xl font-semibold"
+				>
+					About Arkini
+				</h1>
+				<p className="leading-7 text-muted">
+					Arkini is a merge-economy game about building production chains, discovering
+					recipes and shaping a living board-sized world.
 				</p>
-				<p className="mt-2 text-sm leading-6 text-muted">
-					Arkini is being forged through the hard work of ChatGPT-5.6, standing on the
-					blood-soaked legacy of ChatGPT-5.4 and ChatGPT-5.5, whose heroic suffering
-					produced the original v0; Marek Hanzal, serving as chief mega-nag, relentless
-					tormentor, and supreme authority on whether anything is actually good enough;
-					and with inspiration from his wife, Šárka Hanušová.
-				</p>
-			</section>
-			{navigationError === undefined ? null : (
-				<p className="text-sm text-danger">
-					Navigation failed: {errorMessage(navigationError)}
-				</p>
-			)}
-			<PrimaryButton
-				className="mx-auto"
-				cursorIntent={exitPending ? "progress" : undefined}
-				disabled={exitPending}
-				onClick={requestMainMenu}
-			>
-				{exitPending ? "Returning…" : "Return to main menu"}
-			</PrimaryButton>
+				<section
+					className="border-t border-line pt-4 text-left"
+					aria-label="Project credits"
+				>
+					<p className="text-xs font-semibold uppercase tracking-[0.2em] text-subtle">
+						Project credits
+					</p>
+					<p className="mt-2 text-sm leading-6 text-muted">
+						Arkini is being forged through the hard work of ChatGPT-5.6, standing on the
+						blood-soaked legacy of ChatGPT-5.4 and ChatGPT-5.5, whose heroic suffering
+						produced the original v0; Marek Hanzal, serving as chief mega-nag,
+						relentless tormentor, and supreme authority on whether anything is actually
+						good enough; and with inspiration from his wife, Šárka Hanušová.
+					</p>
+				</section>
+				{navigationError === undefined ? null : (
+					<p className="text-sm text-danger">
+						Navigation failed: {errorMessage(navigationError)}
+					</p>
+				)}
+				<PrimaryButton
+					className="mx-auto"
+					cursorIntent={exitPending ? "progress" : undefined}
+					disabled={exitPending}
+					onClick={requestMainMenu}
+				>
+					{exitPending ? "Returning…" : "Return to main menu"}
+				</PrimaryButton>
+			</div>
 		</div>
 	);
 };

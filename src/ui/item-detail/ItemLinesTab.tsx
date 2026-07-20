@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { match } from "ts-pattern";
 
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
+import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { PrimaryButton } from "~/ui/button/Button";
 
 const formatQuantity = ({ min, max }: useItemDetailLines.QuantityBounds) =>
 	min === max ? `${min}` : `${min}–${max}`;
@@ -242,7 +245,16 @@ const OutputRoll = ({ roll }: { readonly roll: useItemDetailLines.OutputRoll }) 
 		)
 		.exhaustive();
 
-const LineRow = ({ line }: { readonly line: useItemDetailLines.Line }) => {
+const LineRow = ({
+	line,
+	ownerItemId,
+}: {
+	readonly line: useItemDetailLines.Line;
+	readonly ownerItemId: string;
+}) => {
+	const startLine = useStartItemDetailLine();
+	const [pending, setPending] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const readiness = readinessLabel(line.availability);
 	const runtimeChanged = line.baseRuntimeMs !== line.effectiveRuntimeMs;
 	return (
@@ -273,20 +285,61 @@ const LineRow = ({ line }: { readonly line: useItemDetailLines.Line }) => {
 						{line.description}
 					</p>
 				</div>
-				<div className="shrink-0 text-right">
-					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
-						Runtime
-					</p>
-					<p className="mt-1 font-semibold text-foreground">
-						{formatDuration(line.effectiveRuntimeMs)}
-					</p>
-					{runtimeChanged ? (
-						<p className="mt-0.5 text-xs text-muted">
-							Base {formatDuration(line.baseRuntimeMs)}
+				<div className="flex shrink-0 items-start gap-4">
+					<div className="text-right">
+						<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
+							Runtime
 						</p>
-					) : null}
+						<p className="mt-1 font-semibold text-foreground">
+							{formatDuration(line.effectiveRuntimeMs)}
+						</p>
+						{runtimeChanged ? (
+							<p className="mt-0.5 text-xs text-muted">
+								Base {formatDuration(line.baseRuntimeMs)}
+							</p>
+						) : null}
+					</div>
+					<PrimaryButton
+						className="min-w-24"
+						cursorIntent={pending ? "progress" : undefined}
+						disabled={line.availability.kind !== "ready" || pending}
+						onClick={async () => {
+							setPending(true);
+							setError(null);
+							try {
+								await startLine({
+									ownerItemId,
+									lineId: line.lineId,
+								});
+							} catch (cause) {
+								setError(
+									cause instanceof Error
+										? cause.message
+										: "Work could not be started.",
+								);
+							} finally {
+								setPending(false);
+							}
+						}}
+					>
+						{pending
+							? line.startMode === "enqueue"
+								? "Queueing…"
+								: "Starting…"
+							: line.startMode === "enqueue"
+								? "Enqueue"
+								: "Start"}
+					</PrimaryButton>
 				</div>
 			</div>
+			{error === null ? null : (
+				<p
+					className="mt-3 text-sm text-danger"
+					role="status"
+				>
+					{error}
+				</p>
+			)}
 
 			{line.activeJob === undefined ? null : (
 				<div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 border-y border-line/70 py-3 text-sm">
@@ -397,6 +450,7 @@ export const ItemLinesTab = ({
 						<LineRow
 							key={line.lineId}
 							line={line}
+							ownerItemId={lines.itemId}
 						/>
 					))}
 				</div>

@@ -96,6 +96,7 @@ export namespace useItemDetailLines {
 		readonly baseRuntimeMs: number;
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
+		readonly startMode: "start" | "enqueue";
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
@@ -381,6 +382,7 @@ const sameLine = (left: useItemDetailLines.Line, right: useItemDetailLines.Line)
 	left.description === right.description &&
 	left.baseRuntimeMs === right.baseRuntimeMs &&
 	left.effectiveRuntimeMs === right.effectiveRuntimeMs &&
+	left.startMode === right.startMode &&
 	sameAvailability(left.availability, right.availability) &&
 	left.input.length === right.input.length &&
 	left.input.every(
@@ -418,7 +420,7 @@ const sameProjection = (
 	);
 };
 
-/** Projects the current visible read-only product lines of one exact line owner. */
+/** Projects the current visible product lines and authoritative action readiness of one exact line owner. */
 export const useItemDetailLines = (itemId: TileItemId): useItemDetailLines.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(

@@ -111,6 +111,7 @@ export namespace readItemDetailLinesFx {
 		readonly baseRuntimeMs: TimeSchema.Type;
 		readonly effectiveRuntimeMs: TimeSchema.Type;
 		readonly availability: Availability;
+		readonly startMode: "start" | "enqueue";
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
@@ -399,6 +400,7 @@ const storedLine = ({
 		kind: "blocked",
 		reason: "stored",
 	},
+	startMode: "start",
 	input: readInputs({
 		configured: line.input,
 		lineId: line.id,
@@ -424,6 +426,9 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined || !isLineOwnerItem(owner.item)) return unavailable;
 	const lines = readLineOwnerLines(owner.item);
+	const ownerHasWork =
+		runtime.jobs.some((job) => job.ownerItemId === owner.id) ||
+		(runtime.jobQueue ?? []).some((request) => request.ownerItemId === owner.id);
 	const projected: readItemDetailLinesFx.Line[] = [];
 
 	for (const line of lines) {
@@ -470,6 +475,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 								? "inputs"
 								: "queue",
 					},
+			startMode: ownerHasWork ? "enqueue" : "start",
 			input: readInputs({
 				configured: line.input,
 				lineId: line.id,

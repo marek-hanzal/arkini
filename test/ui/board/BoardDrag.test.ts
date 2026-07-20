@@ -150,6 +150,12 @@ const runtime = Effect.runSync(
 		}),
 	),
 );
+let currentRuntime = runtime;
+const runtimeListeners = new Set<() => void>();
+const publishRuntime = (next: typeof runtime) => {
+	currentRuntime = next;
+	for (const listener of runtimeListeners) listener();
+};
 const game = {
 	arkpack: {
 		packageId: "test-package",
@@ -165,9 +171,12 @@ const game = {
 		packageId: "test-package",
 		contentHash: "0".repeat(64),
 	},
-	getSnapshot: () => runtime,
+	getSnapshot: () => currentRuntime,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
-	subscribe: () => () => undefined,
+	subscribe: (listener: () => void) => {
+		runtimeListeners.add(listener);
+		return () => runtimeListeners.delete(listener);
+	},
 	subscribeEvents: () => () => undefined,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	disposeFx: Effect.void,
@@ -177,6 +186,8 @@ const game = {
 
 beforeEach(() => {
 	motionTestRuntime.reset();
+	currentRuntime = runtime;
+	runtimeListeners.clear();
 	gameEngineState.game = game;
 	dropItemState.drop.mockReset();
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
@@ -332,6 +343,7 @@ describe("Board drag", () => {
 						y: 0,
 					},
 				},
+				occupant: null,
 			},
 		});
 		const liveActor = document.querySelector(`[data-runtime-id="${runtimeId}"]`);
@@ -341,21 +353,124 @@ describe("Board drag", () => {
 		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
 	});
 
-	it("sends an occupied Board slot to the engine and reconciles its explicit reject", async () => {
+	it("previews and swaps both existing actors without remounting", async () => {
 		const source = await renderBoard();
-		const runtimeId = source.dataset.runtimeId;
-		if (runtimeId === undefined) throw new Error("Missing identity.");
-		dropItemState.drop.mockResolvedValue({
-			kind: "reject",
-			reason: "occupied",
-			itemId: runtimeId,
-			targetItemId: "runtime:stone",
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
+		);
+		if (target === null) throw new Error("Missing swap target actor.");
+		const sourceId = source.dataset.runtimeId;
+		const sourceRevision = source.dataset.runtimeRevision;
+		const targetId = target.dataset.runtimeId;
+		const targetRevision = target.dataset.runtimeRevision;
+		if (
+			sourceId === undefined ||
+			sourceRevision === undefined ||
+			targetId === undefined ||
+			targetRevision === undefined
+		) {
+			throw new Error("Missing swap identities.");
+		}
+		const swapOutcome: Extract<
+			dropItemFx.Result,
+			{
+				readonly kind: "swap";
+			}
+		> = {
+			kind: "swap",
+			source: {
+				itemId: sourceId,
+				revision: "revision:source-swapped",
+				previousLocation: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 2,
+						y: 1,
+					},
+				},
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+			},
+			target: {
+				itemId: targetId,
+				revision: "revision:target-swapped",
+				previousLocation: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 2,
+						y: 1,
+					},
+				},
+			},
+		};
+		dropItemState.drop.mockImplementation(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.map((item) => {
+					if (item.id === sourceId) {
+						return {
+							...item,
+							revision: swapOutcome.source.revision,
+							location: swapOutcome.source.location,
+						};
+					}
+					if (item.id === targetId) {
+						return {
+							...item,
+							revision: swapOutcome.target.revision,
+							location: swapOutcome.target.location,
+						};
+					}
+					return item;
+				}),
+			});
+			return swapOutcome;
 		});
 
-		await dragTo(source, 150, 50);
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+		if (dragSurface === null) throw new Error("Missing drag surface.");
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
+		});
+		expect(
+			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
+		).toBe("1.08");
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 150, 50));
+			await Promise.resolve();
+			await Promise.resolve();
+		});
 
 		expect(dropItemState.drop).toHaveBeenCalledOnce();
-		expect(dropItemState.drop.mock.calls[0]?.[0]).toMatchObject({
+		expect(dropItemState.drop).toHaveBeenCalledWith({
+			sourceItemId: sourceId,
+			sourceRevision,
+			sourceLocation: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 2,
+					y: 1,
+				},
+			},
 			target: {
 				kind: "slot",
 				location: {
@@ -366,9 +481,20 @@ describe("Board drag", () => {
 						y: 0,
 					},
 				},
+				occupant: {
+					itemId: targetId,
+					revision: targetRevision,
+				},
 			},
 		});
-		expect(document.querySelectorAll(`[data-runtime-id="${runtimeId}"]`)).toHaveLength(1);
+		expect(source.dataset.boardX).toBe("1");
+		expect(source.dataset.boardY).toBe("0");
+		expect(target.dataset.boardX).toBe("2");
+		expect(target.dataset.boardY).toBe("1");
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(document.querySelectorAll(`[data-runtime-id="${sourceId}"]`)).toHaveLength(1);
+		expect(document.querySelectorAll(`[data-runtime-id="${targetId}"]`)).toHaveLength(1);
 		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
 	});
 

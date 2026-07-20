@@ -80,10 +80,25 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		item.revision,
 	]);
 	const ownsActive = active?.source.id === item.id;
+	const targetItemId =
+		active?.target?.kind === "slot" ? (active.target.occupant?.id ?? null) : null;
+	const targeted =
+		targetItemId === item.id &&
+		(active?.phase === "dragging" || active?.phase === "awaiting-outcome");
+	const swapTarget =
+		active?.phase === "settling" &&
+		active.outcome?.kind === "swap" &&
+		active.outcome.target.itemId === item.id
+			? active.outcome.target
+			: null;
+	const settlement =
+		active?.phase === "settling" && active.pendingActorIds.includes(item.id) ? active : null;
 	const desiredLocation =
-		ownsActive && active?.phase === "settling" && active.settleLocation !== null
-			? active.settleLocation
-			: item.location;
+		ownsActive &&
+		settlement?.settleLocation !== null &&
+		settlement?.settleLocation !== undefined
+			? settlement.settleLocation
+			: (swapTarget?.location ?? item.location);
 	const desiredSource = useMemo<TileDragSource>(() => {
 		const surface = tileSurfaceForLocation(desiredLocation);
 		return {
@@ -102,17 +117,18 @@ export const TileActor = ({ item }: TileActor.Props) => {
 	void geometryVersion;
 
 	useLayoutEffect(() => {
-		const interaction = ownsActive ? active : null;
-		if (
-			interaction?.phase === "pressed" ||
-			interaction?.phase === "dragging" ||
-			interaction?.phase === "awaiting-outcome"
-		) {
-			// Motion may already have centered the actor under the pointer. Do not let
-			// canonical anchor reconciliation erase that gesture-owned offset before
-			// the drag threshold is crossed.
+		const pointerOwned =
+			ownsActive &&
+			(active?.phase === "pressed" ||
+				active?.phase === "dragging" ||
+				active?.phase === "awaiting-outcome");
+		const frozenAwaitingTarget = targeted && active?.phase === "awaiting-outcome";
+		if (pointerOwned || frozenAwaitingTarget) {
+			// Motion owns the source pose while the pointer is active. The exact occupied
+			// target also stays at its release pose until the engine outcome arrives.
 			return;
 		}
+		const interaction = settlement;
 		if (placement === null) {
 			if (interaction === null) setVisible(false);
 			return;
@@ -185,6 +201,8 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		height,
 		item.id,
 		ownsActive,
+		settlement,
+		targeted,
 		placement?.height,
 		placement?.width,
 		placement?.x,
@@ -273,13 +291,20 @@ export const TileActor = ({ item }: TileActor.Props) => {
 					sourceRevision: released.source.revision,
 					sourceLocation: released.source.location,
 					target:
-						targetLocation === null
+						targetLocation === null || released.target.kind !== "slot"
 							? {
 									kind: "unsupported",
 								}
 							: {
 									kind: "slot",
 									location: targetLocation,
+									occupant:
+										released.target.occupant === null
+											? null
+											: {
+													itemId: released.target.occupant.id,
+													revision: released.target.occupant.revision,
+												},
 								},
 				});
 				settle(released.source, released.generation, outcome);
@@ -301,14 +326,26 @@ export const TileActor = ({ item }: TileActor.Props) => {
 			? "pressed"
 			: active?.phase === "dragging" || active?.phase === "awaiting-outcome"
 				? "dragging"
-				: active?.phase === "settling"
+				: settlement !== null
 					? "settling"
 					: "stable"
-		: hovered
-			? "hovered"
-			: "stable";
+		: settlement !== null
+			? "settling"
+			: targeted
+				? "targeted"
+				: hovered
+					? "hovered"
+					: "stable";
 	const zIndex =
-		phase === "dragging" ? 40 : phase === "settling" ? 30 : phase === "hovered" ? 20 : 10;
+		phase === "dragging"
+			? 40
+			: phase === "settling"
+				? 30
+				: phase === "targeted"
+					? 25
+					: phase === "hovered"
+						? 20
+						: 10;
 	const boardLocation = item.location.scope === "board" ? item.location : null;
 
 	return (
@@ -358,7 +395,7 @@ export const TileActor = ({ item }: TileActor.Props) => {
 				<TileActorContent
 					item={item}
 					phase={phase}
-					feedback={ownsActive ? (active?.feedback ?? null) : null}
+					feedback={settlement !== null ? (active?.feedback ?? null) : null}
 				/>
 			</motion.span>
 		</motion.button>

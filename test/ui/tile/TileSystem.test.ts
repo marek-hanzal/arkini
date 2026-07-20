@@ -318,6 +318,58 @@ describe("TileSystemProvider", () => {
 		});
 	});
 
+	it("keeps one swap generation active until both actor settlements complete", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: "swap",
+				source: {
+					itemId: source.id,
+					revision: "revision:source-swapped",
+					previousLocation: source.location,
+					location: {
+						scope: "inventory",
+						position: {
+							x: toolbarSlot.x,
+							y: toolbarSlot.y,
+						},
+					},
+				},
+				target: {
+					itemId: toolbarOccupant.id,
+					revision: "revision:target-swapped",
+					previousLocation: {
+						scope: "inventory",
+						position: {
+							x: toolbarSlot.x,
+							y: toolbarSlot.y,
+						},
+					},
+					location: source.location,
+				},
+			});
+		});
+		expect(readSystem().active?.pendingActorIds).toEqual([
+			source.id,
+			toolbarOccupant.id,
+		]);
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+		});
+		expect(readSystem().active?.pendingActorIds).toEqual([
+			toolbarOccupant.id,
+		]);
+
+		await act(async () => {
+			readSystem().complete(toolbarOccupant.id, released.generation);
+		});
+		expect(readSystem().active).toBeNull();
+	});
+
 	it("ignores stale completion generations and clears only the current settlement", async () => {
 		const { readSystem } = await renderHarness();
 		const released = await startDrag(readSystem(), 240, 50);

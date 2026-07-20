@@ -1,3 +1,4 @@
+import type { useDropItem } from "~/bridge/tile/useDropItem";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
@@ -10,4 +11,6 @@ export interface TileInteractionState {
 	readonly target: TileDropTarget | null;
 	readonly settleLocation: TileLocation | null;
 	readonly feedback: "accepted" | "rejected" | "ignored" | null;
+	readonly outcome: useDropItem.Result | null;
+	readonly pendingActorIds: ReadonlyArray<string>;
 }

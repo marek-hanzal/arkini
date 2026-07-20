@@ -258,6 +258,8 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 				target: null,
 				settleLocation: null,
 				feedback: null,
+				outcome: null,
+				pendingActorIds: [],
 			});
 			return true;
 		},
@@ -330,16 +332,33 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			) {
 				return;
 			}
+			const settleLocation =
+				outcome?.kind === "move"
+					? outcome.location
+					: outcome?.kind === "swap"
+						? outcome.source.location
+						: null;
+			const pendingActorIds =
+				outcome?.kind === "swap"
+					? [
+							source.id,
+							outcome.target.itemId,
+						]
+					: [
+							source.id,
+						];
 			publishActive({
 				...current,
 				phase: "settling",
-				settleLocation: outcome?.kind === "move" ? outcome.location : null,
+				settleLocation,
 				feedback:
 					outcome === null || outcome.kind === "reject"
 						? "rejected"
 						: outcome.kind === "ignored"
 							? "ignored"
 							: "accepted",
+				outcome,
+				pendingActorIds,
 			});
 		},
 		[
@@ -350,14 +369,19 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 	const complete = useCallback(
 		(itemId: string, generation: number) => {
 			const current = activeRef.current;
-			if (
-				current?.source.id !== itemId ||
-				current.generation !== generation ||
-				current.phase !== "settling"
-			) {
+			if (current?.generation !== generation || current.phase !== "settling") return;
+			if (!current.pendingActorIds.includes(itemId)) return;
+			const pendingActorIds = current.pendingActorIds.filter(
+				(pendingItemId) => pendingItemId !== itemId,
+			);
+			if (pendingActorIds.length === 0) {
+				publishActive(null);
 				return;
 			}
-			publishActive(null);
+			publishActive({
+				...current,
+				pendingActorIds,
+			});
 		},
 		[
 			publishActive,

@@ -5,7 +5,7 @@ import type { useTileActors } from "~/bridge/tile/useTileActors";
 export namespace TileActorContent {
 	export interface Props {
 		readonly item: useTileActors.Item;
-		readonly phase: "stable" | "pressed" | "hovered" | "dragging" | "settling";
+		readonly phase: "stable" | "pressed" | "hovered" | "targeted" | "dragging" | "settling";
 		readonly feedback: "accepted" | "rejected" | "ignored" | null;
 	}
 }
@@ -33,6 +33,14 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			filter: "brightness(1.06)",
 			borderColor: "var(--ak-line-strong)",
 			boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-overlay) 48%, transparent)",
+		};
+	}
+	if (phase === "targeted") {
+		return {
+			scale: 1.08,
+			filter: "brightness(1.08)",
+			borderColor: "var(--ak-accent)",
+			boxShadow: "0 0.9rem 1.8rem color-mix(in srgb, var(--ak-accent) 24%, transparent)",
 		};
 	}
 	if (phase === "settling" && feedback === "rejected") {

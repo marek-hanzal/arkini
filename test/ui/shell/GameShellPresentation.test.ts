@@ -10,14 +10,22 @@ describe("Game shell presentation", () => {
 		expect(styles).toContain("--ak-game-shell-background-ambient:");
 		expect(styles).toContain("--ak-game-shell-base-start: light-dark(");
 		expect(styles).toContain("--ak-game-shell-base-end: light-dark(");
+		expect(styles).toContain("--ak-game-shell-intro-delay: 2500ms;");
+		expect(styles).toContain("--ak-game-shell-ambient-cycle: 24s;");
+		expect(styles).toContain("--ak-game-shell-field-quaternary: light-dark(");
 		expect(styles).toContain('[data-ui="GameShell"] {');
-		expect(styles).toContain("background-image: var(--ak-game-shell-background);");
-		expect(styles).toContain('[data-ui="GameShell"]::before {');
+		expect(styles).toContain('[data-ui="GameShell"]::before,');
+		expect(styles).toContain('[data-ui="GameShell"]::after {');
 		expect(styles).toContain("background-image: var(--ak-game-shell-background-ambient);");
+		expect(styles).toContain("background-image: var(--ak-game-shell-background);");
 		expect(styles).toContain(
-			"animation: ak-game-shell-ambient-crossfade 48s ease-in-out infinite;",
+			"ak-game-shell-intro-fade-in var(--ak-game-shell-intro-duration) ease-out",
+		);
+		expect(styles).toContain(
+			"ak-game-shell-ambient-crossfade var(--ak-game-shell-ambient-cycle) ease-in-out",
 		);
 		expect(styles).toContain("pointer-events: none;");
+		expect(styles).toContain("@keyframes ak-game-shell-intro-fade-in");
 		expect(styles).toContain("@media (prefers-reduced-motion: reduce)");
 		expect(styles).toContain("animation: none;");
 	});

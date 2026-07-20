@@ -15,17 +15,24 @@ export namespace useBoardView {
 /** Projects the live board read model into stable surface, cell, and layout presentation facts. */
 export const useBoardView = () => {
 	const board = useBoard();
+	const surface = useMemo(
+		() =>
+			({
+				id: `board:${board.currentSpace}`,
+				kind: "board",
+				space: board.currentSpace,
+			}) satisfies Extract<
+				TileSurface,
+				{
+					readonly kind: "board";
+				}
+			>,
+		[
+			board.currentSpace,
+		],
+	);
+
 	return useMemo(() => {
-		const surface = {
-			id: `board:${board.currentSpace}`,
-			kind: "board",
-			space: board.currentSpace,
-		} satisfies Extract<
-			TileSurface,
-			{
-				readonly kind: "board";
-			}
-		>;
 		const occupants = new Map(
 			board.items.map(
 				(item) =>
@@ -67,5 +74,6 @@ export const useBoardView = () => {
 		};
 	}, [
 		board,
+		surface,
 	]);
 };

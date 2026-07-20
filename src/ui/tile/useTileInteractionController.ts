@@ -171,7 +171,19 @@ export const useTileInteractionController = ({
 						});
 					},
 				)
-				.otherwise(() => undefined);
+				.with(
+					{
+						phase: "dragging",
+					},
+					{
+						phase: "awaiting-outcome",
+					},
+					{
+						phase: "settling",
+					},
+					() => undefined,
+				)
+				.exhaustive();
 		},
 		[
 			publishActive,
@@ -196,7 +208,19 @@ export const useTileInteractionController = ({
 						});
 					},
 				)
-				.otherwise(() => undefined);
+				.with(
+					{
+						phase: "pressed",
+					},
+					{
+						phase: "awaiting-outcome",
+					},
+					{
+						phase: "settling",
+					},
+					() => undefined,
+				)
+				.exhaustive();
 		},
 		[
 			publishActive,
@@ -230,7 +254,19 @@ export const useTileInteractionController = ({
 						};
 					},
 				)
-				.otherwise(() => null);
+				.with(
+					{
+						phase: "pressed",
+					},
+					{
+						phase: "awaiting-outcome",
+					},
+					{
+						phase: "settling",
+					},
+					() => null,
+				)
+				.exhaustive();
 		},
 		[
 			publishActive,
@@ -255,7 +291,19 @@ export const useTileInteractionController = ({
 						});
 					},
 				)
-				.otherwise(() => undefined);
+				.with(
+					{
+						phase: "pressed",
+					},
+					{
+						phase: "dragging",
+					},
+					{
+						phase: "settling",
+					},
+					() => undefined,
+				)
+				.exhaustive();
 		},
 		[
 			publishActive,
@@ -294,11 +342,45 @@ export const useTileInteractionController = ({
 											}
 										: settling,
 							)
-							.otherwise(() => removePendingActor(settling, itemId));
+							.with(
+								{
+									kind: "merge",
+									stage: "resolve",
+								},
+								{
+									kind: "failed",
+								},
+								{
+									kind: "reject",
+								},
+								{
+									kind: "ignored",
+								},
+								{
+									kind: "move",
+								},
+								{
+									kind: "swap",
+								},
+								() => removePendingActor(settling, itemId),
+							)
+							.exhaustive();
 						publishActive(next);
 					},
 				)
-				.otherwise(() => undefined);
+				.with(
+					{
+						phase: "pressed",
+					},
+					{
+						phase: "dragging",
+					},
+					{
+						phase: "awaiting-outcome",
+					},
+					() => undefined,
+				)
+				.exhaustive();
 		},
 		[
 			publishActive,

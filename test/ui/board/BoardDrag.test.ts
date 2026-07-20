@@ -844,6 +844,38 @@ describe("Board drag", () => {
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
 	});
 
+	it("keeps an active drag actor targeted through an unrelated runtime publication", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const runtimeId = source.dataset.runtimeId;
+		const visual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+		if (runtimeId === undefined || visual === null || dragSurface === null) {
+			throw new Error("Missing active drag actor facts.");
+		}
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
+		});
+		expect(visual.dataset.motionPhase).toBe("dragging");
+		const dragOffset = motionTestRuntime.readDragOffset();
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				session: {
+					...currentRuntime.session,
+				},
+			});
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${runtimeId}"]`)).toBe(source);
+		expect(visual.dataset.motionPhase).toBe("dragging");
+		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
+	});
+
 	it("keeps artwork-only visuals through hover, drag, and rejected return", async () => {
 		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();

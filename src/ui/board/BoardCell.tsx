@@ -32,16 +32,19 @@ export const BoardCell = ({ surface, x, y, occupant }: BoardCell.Props) => {
 			y,
 		],
 	);
+	const occupantId = occupant?.id ?? null;
+	const occupantRevision = occupant?.revision ?? null;
 	const occupantIdentity = useMemo(
 		() =>
-			occupant === null
+			occupantId === null || occupantRevision === null
 				? null
 				: {
-						id: occupant.id,
-						revision: occupant.revision,
+						id: occupantId,
+						revision: occupantRevision,
 					},
 		[
-			occupant,
+			occupantId,
+			occupantRevision,
 		],
 	);
 	const drop = useTileSlot({

@@ -8,7 +8,7 @@ import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { useItemDetailStatus } from "~/bridge/item-detail/useItemDetailStatus";
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
@@ -33,7 +33,7 @@ const tabLabel = {
 	status: "Status",
 	lines: "Lines",
 	queue: "Queue",
-} as const satisfies Record<ItemDetailTabEnumSchema.Type, string>;
+} as const satisfies Record<ItemDetailTab, string>;
 
 const ItemDetailHeaderArtwork = ({
 	identity,
@@ -113,9 +113,9 @@ const ItemDetailTabs = ({
 	itemId,
 	tabs,
 }: {
-	readonly active: ItemDetailTabEnumSchema.Type;
+	readonly active: ItemDetailTab;
 	readonly itemId: string;
-	readonly tabs: readonly ItemDetailTabEnumSchema.Type[];
+	readonly tabs: readonly ItemDetailTab[];
 }) => {
 	const itemDetail = useItemDetailControl();
 	return (
@@ -218,7 +218,7 @@ const ItemDetailContent = ({
 	tab,
 }: {
 	readonly itemId: string;
-	readonly tab: ItemDetailTabEnumSchema.Type;
+	readonly tab: ItemDetailTab;
 }) =>
 	match(tab)
 		.with("info", () => <ItemInfoContent itemId={itemId} />)

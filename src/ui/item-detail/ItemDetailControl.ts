@@ -1,9 +1,8 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
 
 export interface ItemDetailTarget {
-	readonly itemId: IdSchema.Type;
-	readonly tab: ItemDetailTabEnumSchema.Type;
+	readonly itemId: string;
+	readonly tab: ItemDetailTab;
 	readonly origin: HTMLElement | null;
 }
 
@@ -33,8 +32,8 @@ export interface CloseItemDetailProps {
 }
 
 export interface OpenItemDetailProps {
-	readonly itemId: IdSchema.Type;
-	readonly tab: ItemDetailTabEnumSchema.Type;
+	readonly itemId: string;
+	readonly tab: ItemDetailTab;
 	readonly origin?: HTMLElement | null;
 }
 

@@ -45,7 +45,7 @@ export const ArkpackSelector = () => {
 				)}
 			</section>
 
-			<section className="scrollbar-hidden grid min-h-0 content-start gap-3 overflow-y-auto overscroll-contain">
+			<section className="grid min-h-0 content-start gap-3 overflow-y-auto overscroll-contain">
 				<ArkpackCatalogList
 					state={actions.state}
 					onRemove={actions.removeArkpack}

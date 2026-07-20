@@ -140,15 +140,35 @@ export const useTileInteractionController = ({
 	}, []);
 
 	const press = useCallback(
-		(source: TileDragSource) => {
-			if (activeRef.current !== null) return false;
-			publishActive({
-				source,
-				generation: ++nextGeneration.current,
-				phase: "pressed",
-			});
-			return true;
-		},
+		(source: TileDragSource) =>
+			match(activeRef.current)
+				.with(
+					null,
+					{
+						phase: "settling",
+					},
+					() => {
+						publishActive({
+							source,
+							generation: ++nextGeneration.current,
+							phase: "pressed",
+						});
+						return true;
+					},
+				)
+				.with(
+					{
+						phase: "pressed",
+					},
+					{
+						phase: "dragging",
+					},
+					{
+						phase: "awaiting-outcome",
+					},
+					() => false,
+				)
+				.exhaustive(),
 		[
 			publishActive,
 		],

@@ -482,4 +482,64 @@ describe("TileSystemProvider", () => {
 		});
 		expect(readSystem().active).toBeNull();
 	});
+
+	it("unlocks a surviving actor at the authoritative outcome and ignores the interrupted settle completion", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 240, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+		const movedSource = {
+			...source,
+			revision: "revision:moved",
+			location: {
+				scope: "inventory" as const,
+				position: {
+					x: inventorySlot.x,
+					y: inventorySlot.y,
+				},
+			},
+			surface: inventorySurface,
+			slot: inventorySlot,
+		} satisfies TileDragSource;
+
+		expect(readSystem().press(movedSource)).toBe(false);
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: "move",
+				itemId: source.id,
+				revision: movedSource.revision,
+				previousLocation: source.location,
+				location: movedSource.location,
+			});
+			expect(readSystem().press(movedSource)).toBe(true);
+			readSystem().complete(source.id, released.generation);
+		});
+
+		expect(readSystem().active).toMatchObject({
+			phase: "pressed",
+			source: movedSource,
+		});
+		expect(readSystem().active?.generation).toBeGreaterThan(released.generation);
+
+		const chainedRelease: {
+			value: ReturnType<TileSystem["release"]>;
+		} = {
+			value: null,
+		};
+		await act(async () => {
+			readSystem().startDrag(movedSource);
+			readSystem().moveDrag(movedSource, 440, 50);
+			chainedRelease.value = readSystem().release(movedSource.id);
+		});
+
+		expect(chainedRelease.value).toMatchObject({
+			source: movedSource,
+			target: {
+				kind: "slot",
+				surface: toolbarSurface,
+				slot: toolbarSlot,
+			},
+		});
+		expect(chainedRelease.value?.generation).toBeGreaterThan(released.generation);
+	});
 });

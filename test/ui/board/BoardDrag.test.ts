@@ -844,6 +844,152 @@ describe("Board drag", () => {
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
 	});
 
+	it("allows the surviving merge actor to interrupt impact and issue the next command immediately", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		if (target === null) throw new Error("Missing merge survivor actor.");
+		const sourceId = source.dataset.runtimeId;
+		const sourceRevision = source.dataset.runtimeRevision;
+		const targetId = target.dataset.runtimeId;
+		const targetRevision = target.dataset.runtimeRevision;
+		if (
+			sourceId === undefined ||
+			sourceRevision === undefined ||
+			targetId === undefined ||
+			targetRevision === undefined
+		) {
+			throw new Error("Missing merge survivor identities.");
+		}
+		const sourceLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 2,
+				y: 1,
+			},
+		};
+		const targetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 0,
+				y: 1,
+			},
+		};
+		const chainedLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 2,
+				y: 0,
+			},
+		};
+		const chainedRevision = "revision:tree-chained";
+
+		dropItemState.drop
+			.mockImplementationOnce(async () => {
+				publishRuntime({
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== sourceId),
+				});
+				return {
+					kind: "merge",
+					action: "consume",
+					effect: "keep",
+					source: {
+						itemId: sourceId,
+						previousRevision: sourceRevision,
+						previousLocation: sourceLocation,
+						previousQuantity: 1,
+						current: null,
+					},
+					target: {
+						itemId: targetId,
+						previousRevision: targetRevision,
+						previousLocation: targetLocation,
+						previousQuantity: 1,
+						current: {
+							itemId: targetId,
+							canonicalItemId: "tree",
+							revision: targetRevision,
+							location: targetLocation,
+							quantity: 1,
+						},
+					},
+				};
+			})
+			.mockImplementationOnce(async () => {
+				publishRuntime({
+					...currentRuntime,
+					items: currentRuntime.items.map((item) =>
+						item.id === targetId
+							? {
+									...item,
+									revision: chainedRevision,
+									location: chainedLocation,
+								}
+							: item,
+					),
+				});
+				return {
+					kind: "move",
+					itemId: targetId,
+					revision: chainedRevision,
+					previousLocation: targetLocation,
+					location: chainedLocation,
+				};
+			});
+
+		await dragTo(source, 50, 150);
+
+		const targetVisual = target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		const targetDragSurface = target.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		if (targetVisual === null || targetDragSurface === null) {
+			throw new Error("Missing merge survivor presentation.");
+		}
+		expect(targetVisual.dataset.motionPhase).toBe("impact");
+		expect(source.style.pointerEvents).toBe("none");
+
+		await act(async () => {
+			targetDragSurface.dispatchEvent(pointerEvent("pointerdown", 50, 150));
+			targetDragSurface.dispatchEvent(pointerEvent("pointermove", 250, 50));
+			motionTestRuntime.finish(
+				...motionTestRuntime.completions.map((_completion, index) => index),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(targetVisual.dataset.motionPhase).toBe("dragging");
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+
+		await act(async () => {
+			targetDragSurface.dispatchEvent(pointerEvent("pointerup", 250, 50));
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(dropItemState.drop).toHaveBeenCalledTimes(2);
+		expect(dropItemState.drop).toHaveBeenLastCalledWith({
+			sourceItemId: targetId,
+			sourceRevision: targetRevision,
+			sourceLocation: targetLocation,
+			target: {
+				kind: "slot",
+				location: chainedLocation,
+				occupant: null,
+			},
+		});
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(target.dataset.boardX).toBe("2");
+		expect(target.dataset.boardY).toBe("0");
+	});
+
 	it("keeps an active drag actor targeted through an unrelated runtime publication", async () => {
 		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();

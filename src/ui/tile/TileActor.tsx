@@ -439,7 +439,9 @@ export const TileActor = ({ item }: TileActor.Props) => {
 					? "impact"
 					: ownsActive
 						? active?.phase === "pressed"
-							? "pressed"
+							? hovered
+								? "hovered"
+								: "stable"
 							: active?.phase === "dragging" || active?.phase === "awaiting-outcome"
 								? "dragging"
 								: settlement !== null

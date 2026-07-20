@@ -853,13 +853,19 @@ describe("Board drag", () => {
 		});
 		expect(visual.dataset.motionScale).toBe("1.15");
 
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			await Promise.resolve();
+		});
+		expect(visual.dataset.motionScale).toBe("1.15");
+		expect(visual.dataset.motionPhase).toBe("hovered");
+
 		dropItemState.drop.mockResolvedValue({
 			kind: "reject",
 			reason: "unsupported-target",
 			itemId: source.dataset.runtimeId ?? "runtime:unknown",
 		});
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
 			dragSurface.dispatchEvent(pointerEvent("pointermove", 275, 175));
 		});
 		expect(visual.dataset.motionScale).toBe("1.18");

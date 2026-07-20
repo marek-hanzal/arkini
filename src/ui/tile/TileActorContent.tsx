@@ -7,7 +7,6 @@ export namespace TileActorContent {
 		readonly item: useTileActors.Item;
 		readonly phase:
 			| "stable"
-			| "pressed"
 			| "hovered"
 			| "targeted"
 			| "dragging"
@@ -45,15 +44,6 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			filter: "brightness(1.08)",
 			borderColor: "var(--ak-accent)",
 			boxShadow: "0 1.35rem 2.5rem color-mix(in srgb, var(--ak-overlay) 58%, transparent)",
-		};
-	}
-	if (phase === "pressed") {
-		return {
-			scale: 1.1,
-			opacity: 1,
-			filter: "brightness(1.05)",
-			borderColor: "var(--ak-accent)",
-			boxShadow: "0 0.8rem 1.6rem color-mix(in srgb, var(--ak-overlay) 42%, transparent)",
 		};
 	}
 	if (phase === "hovered") {

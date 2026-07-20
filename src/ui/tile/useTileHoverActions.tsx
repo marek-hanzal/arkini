@@ -8,13 +8,14 @@ import {
 	useHover,
 	useInteractions,
 } from "@floating-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { match } from "ts-pattern";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { TileHoverActionBar } from "~/ui/tile/TileHoverActionBar";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
+import { useTileHoverSystem } from "~/ui/tile/useTileHoverSystem";
 
 const ActionBarMainAxisOffset = -8;
 
@@ -72,6 +73,7 @@ export const useTileHoverActions = ({
 }) => {
 	const game = useGameEngine();
 	const { active } = useTileActorSystem();
+	const { open, claimHover, releaseHover } = useTileHoverSystem(itemId);
 	const actions = useMemo(() => {
 		const resources = game.config.resources.tileCapabilities;
 		if (resources === undefined) return [];
@@ -83,13 +85,12 @@ export const useTileHoverActions = ({
 		game,
 	]);
 	const suppressed = !live || actions.length === 0 || interactionSuppressesHover(active);
-	const [open, setOpen] = useState(false);
 	const floating = useFloating({
 		open,
 		onOpenChange: (nextOpen) => {
 			if (suppressed && nextOpen) return;
-			setOpen(nextOpen);
-			onHoverChange(nextOpen);
+			if (nextOpen) claimHover();
+			else releaseHover();
 		},
 		placement: "bottom",
 		strategy: "fixed",
@@ -107,18 +108,28 @@ export const useTileHoverActions = ({
 	});
 	const hover = useHover(floating.context, {
 		enabled: !suppressed,
+		delay: {
+			close: 150,
+		},
 	});
 	const interactions = useInteractions([
 		hover,
 	]);
 
 	useEffect(() => {
-		if (!suppressed || !open) return;
-		setOpen(false);
-		onHoverChange(false);
+		onHoverChange(open && !suppressed);
 	}, [
 		onHoverChange,
 		open,
+		suppressed,
+	]);
+
+	useEffect(() => {
+		if (!suppressed || !open) return;
+		releaseHover();
+	}, [
+		open,
+		releaseHover,
 		suppressed,
 	]);
 

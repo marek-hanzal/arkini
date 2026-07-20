@@ -233,6 +233,22 @@ beforeEach(() => {
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 	dropItemState.drop.mockReset();
+	Object.defineProperty(document.documentElement, "clientWidth", {
+		configurable: true,
+		value: 800,
+	});
+	Object.defineProperty(document.documentElement, "clientHeight", {
+		configurable: true,
+		value: 600,
+	});
+	Object.defineProperty(window, "innerWidth", {
+		configurable: true,
+		value: 800,
+	});
+	Object.defineProperty(window, "innerHeight", {
+		configurable: true,
+		value: 600,
+	});
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
 		configurable: true,
 		value() {
@@ -245,6 +261,15 @@ beforeEach(() => {
 				const y = Number(actor?.dataset.boardY);
 				if (Number.isFinite(x) && Number.isFinite(y))
 					return rect(x * 100, y * 100, 100, 100);
+			}
+			if (element.dataset.ui === "TileHoverActionBar") {
+				const actor = document.querySelector<HTMLElement>(
+					`[data-ui="TileActor"][data-runtime-id="${element.dataset.referenceId}"]`,
+				);
+				const x = Number(actor?.dataset.boardX);
+				const y = Number(actor?.dataset.boardY);
+				if (Number.isFinite(x) && Number.isFinite(y))
+					return rect(x * 100 - 20, y * 100 + 92, 140, 40);
 			}
 			const x = Number(element.dataset.boardX);
 			const y = Number(element.dataset.boardY);
@@ -1097,6 +1122,18 @@ describe("Board drag", () => {
 		]);
 		const infoAction = actionBar.querySelector<HTMLElement>('[data-capability="info"]');
 		if (infoAction === null) throw new Error("Missing temporary Info hover action.");
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("mouseleave", 150, 96));
+			actionBar.dispatchEvent(
+				new MouseEvent("mouseenter", {
+					bubbles: true,
+					clientX: 150,
+					clientY: 102,
+				}),
+			);
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBe(actionBar);
 		await act(async () => {
 			infoAction.dispatchEvent(pointerEvent("pointerdown", 150, 110));
 			infoAction.dispatchEvent(

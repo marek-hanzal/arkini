@@ -5,6 +5,7 @@ import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
 
 export namespace useTileActors {
 	export interface Item {
@@ -19,16 +20,6 @@ export namespace useTileActors {
 	}
 }
 
-const readPrimaryAssetId = (
-	runtime: RuntimeSchema.Type,
-	item: RuntimeSchema.Type["items"][number]["item"],
-) => {
-	if (item.type === "cheat:speed") {
-		return item.asset.source[runtime.session.speedMode === "accelerated" ? 0 : 1];
-	}
-	return item.asset.source[0];
-};
-
 /** Projects every live grid item for the one Canvas-wide stable actor layer. */
 export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 	const game = useGameEngine();
@@ -41,7 +32,7 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 				title: item.item.title,
 				quantity: item.quantity,
 				location: item.location,
-				sourceUrl: game.getResourceUrl(readPrimaryAssetId(runtime, item.item)),
+				sourceUrl: game.getResourceUrl(readRuntimeItemPrimaryAssetId(runtime, item.item)),
 				...(item.item.asset.composite === undefined
 					? {}
 					: {

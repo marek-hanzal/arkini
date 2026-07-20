@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readItemDetailIdentity } from "~/engine/item-detail/read/readItemDetailIdentity";
 
@@ -10,7 +10,7 @@ export namespace useItemDetailIdentity {
 	export type Projection =
 		| {
 				readonly kind: "available";
-				readonly itemId: TileItemId;
+				readonly itemId: IdSchema.Type;
 				readonly title: string;
 				readonly subtitle?: string;
 				readonly sourceUrl: string;
@@ -41,7 +41,7 @@ const sameProjection = (
 };
 
 /** Resolves the shared live identity rendered by the shared Item Detail header. */
-export const useItemDetailIdentity = (itemId: TileItemId): useItemDetailIdentity.Projection => {
+export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdentity.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailIdentity.Projection => {

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
@@ -12,7 +12,7 @@ export namespace useItemDetailInfo {
 	export type Projection =
 		| {
 				readonly kind: "available";
-				readonly itemId: TileItemId;
+				readonly itemId: IdSchema.Type;
 				readonly description: string;
 				readonly itemType: ItemEnumSchema.Type;
 				readonly categoryTitle?: string;
@@ -68,7 +68,7 @@ const sameProjection = (
 };
 
 /** Projects the common authored and live facts rendered by the Item Detail Info tab. */
-export const useItemDetailInfo = (itemId: TileItemId): useItemDetailInfo.Projection => {
+export const useItemDetailInfo = (itemId: IdSchema.Type): useItemDetailInfo.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailInfo.Projection => {

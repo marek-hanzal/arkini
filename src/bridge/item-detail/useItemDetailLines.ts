@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -112,7 +112,7 @@ export namespace useItemDetailLines {
 	export type Projection =
 		| {
 				readonly kind: "available";
-				readonly itemId: TileItemId;
+				readonly itemId: IdSchema.Type;
 				readonly line: readonly Line[];
 		  }
 		| {
@@ -425,7 +425,7 @@ const sameProjection = (
 };
 
 /** Projects the current visible product lines and authoritative action readiness of one exact line owner. */
-export const useItemDetailLines = (itemId: TileItemId): useItemDetailLines.Projection => {
+export const useItemDetailLines = (itemId: IdSchema.Type): useItemDetailLines.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailLines.Projection => {

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailQueue } from "~/engine/item-detail/read/readItemDetailQueue";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -36,7 +36,7 @@ const sameProjection = (
 };
 
 /** Projects the authoritative FIFO queue for one exact Item Detail target. */
-export const useItemDetailQueue = (itemId: TileItemId): useItemDetailQueue.Projection => {
+export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Projection => {
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type) =>
 			readItemDetailQueue({

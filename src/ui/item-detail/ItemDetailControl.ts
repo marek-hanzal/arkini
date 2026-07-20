@@ -1,8 +1,8 @@
-import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 
 export interface ItemDetailTarget {
-	readonly itemId: TileItemId;
+	readonly itemId: IdSchema.Type;
 	readonly tab: ItemDetailTabEnumSchema.Type;
 	readonly origin: HTMLElement | null;
 }
@@ -33,7 +33,7 @@ export interface CloseItemDetailProps {
 }
 
 export interface OpenItemDetailProps {
-	readonly itemId: TileItemId;
+	readonly itemId: IdSchema.Type;
 	readonly tab: ItemDetailTabEnumSchema.Type;
 	readonly origin?: HTMLElement | null;
 }

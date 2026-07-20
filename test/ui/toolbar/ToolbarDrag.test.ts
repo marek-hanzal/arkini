@@ -13,6 +13,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/game/testGameRead";
@@ -306,6 +307,7 @@ const renderGameBoard = async () => {
 				ItemDetailProvider,
 				null,
 				createElement(TileSystemProvider, null, createElement(GameBoardLayout)),
+				createElement(ItemDetailModal),
 			),
 		);
 		await Promise.resolve();
@@ -594,5 +596,32 @@ describe("Toolbar drag", () => {
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
 		expect(source.dataset.toolbarX).toBe("1");
 		expect(target.dataset.toolbarX).toBe("0");
+	});
+	it("opens the same Item Detail modal from an exact Toolbar actor", async () => {
+		await renderGameBoard();
+		const actor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-location-scope="toolbar"]',
+		);
+		if (actor === null) throw new Error("Missing Toolbar actor.");
+		const itemId = actor.dataset.runtimeId;
+		if (itemId === undefined) throw new Error("Missing Toolbar actor identity.");
+
+		await act(async () => {
+			actor.dispatchEvent(
+				new MouseEvent("dblclick", {
+					bubbles: true,
+					button: 0,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		expect(modal).not.toBeNull();
+		expect(modal?.dataset.runtimeId).toBe(itemId);
+		expect(modal?.dataset.tab).toBe("info");
+		expect(document.querySelectorAll('[data-ui="ItemDetailModal"]')).toHaveLength(1);
 	});
 });

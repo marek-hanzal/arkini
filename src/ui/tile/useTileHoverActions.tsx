@@ -18,6 +18,8 @@ import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 import { useTileHoverSystem } from "~/ui/tile/useTileHoverSystem";
 
 const ActionBarMainAxisOffset = -8;
+const ActionBarOpenDelayMs = 150;
+const ActionBarCloseDelayMs = 150;
 
 const actionDefinitions = [
 	{
@@ -109,7 +111,8 @@ export const useTileHoverActions = ({
 	const hover = useHover(floating.context, {
 		enabled: !suppressed,
 		delay: {
-			close: 150,
+			open: ActionBarOpenDelayMs,
+			close: ActionBarCloseDelayMs,
 		},
 	});
 	const interactions = useInteractions([
@@ -141,6 +144,7 @@ export const useTileHoverActions = ({
 				<FloatingPortal>
 					<TileHoverActionBar
 						actions={actions}
+						openDelayMs={ActionBarOpenDelayMs}
 						mainAxisOffset={ActionBarMainAxisOffset}
 						placement={floating.placement}
 						referenceId={itemId}

@@ -298,6 +298,7 @@ afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
+	vi.useRealTimers();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 	gameEngineState.game = undefined;
@@ -1054,6 +1055,7 @@ describe("Board drag", () => {
 	});
 
 	it("shows one overlapping image action bar and suppresses it throughout DnD", async () => {
+		vi.useFakeTimers();
 		motionTestRuntime.autoComplete = false;
 		await renderBoard();
 		const source = document.querySelector<HTMLElement>(
@@ -1074,12 +1076,22 @@ describe("Board drag", () => {
 				}),
 			);
 		});
+		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
+		await act(async () => {
+			await vi.advanceTimersByTimeAsync(149);
+		});
+		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
+		await act(async () => {
+			await vi.advanceTimersByTimeAsync(1);
+		});
 		expect(visual.dataset.motionScale).toBe("1.15");
 		expectArtworkOnlyVisual(visual);
 		const actionBar = document.querySelector<HTMLElement>('[data-ui="TileHoverActionBar"]');
 		if (actionBar === null) throw new Error("Missing tile hover action bar.");
 		expect(actionBar.dataset.referenceId).toBe(source.dataset.runtimeId);
 		expect(actionBar.dataset.mainAxisOffset).toBe("-8");
+		expect(actionBar.dataset.openDelayMs).toBe("150");
+		expect(actionBar.classList).toContain("shadow-2xl");
 		const actionElements = Array.from(
 			actionBar.querySelectorAll<HTMLElement>('[data-ui="TileHoverAction"]'),
 		);
@@ -1118,6 +1130,45 @@ describe("Board drag", () => {
 				src: "resource:tile-capability-effects",
 				height: 24,
 				width: 24,
+			},
+		]);
+		expect(
+			actionElements.map((action) => {
+				const icon = action.querySelector<HTMLImageElement>("img");
+				const tooltip = action.querySelector<HTMLElement>(
+					'[data-ui="TileHoverActionTooltip"]',
+				);
+				return {
+					hasNativeTitle: action.hasAttribute("title"),
+					iconScalesOnHover: icon?.classList.contains("group-hover:scale-[1.15]"),
+					tooltipDelay: tooltip?.dataset.openDelayMs,
+					tooltipText: tooltip?.textContent,
+				};
+			}),
+		).toEqual([
+			{
+				hasNativeTitle: false,
+				iconScalesOnHover: true,
+				tooltipDelay: "250",
+				tooltipText: "Info",
+			},
+			{
+				hasNativeTitle: false,
+				iconScalesOnHover: true,
+				tooltipDelay: "250",
+				tooltipText: "Status",
+			},
+			{
+				hasNativeTitle: false,
+				iconScalesOnHover: true,
+				tooltipDelay: "250",
+				tooltipText: "Lines",
+			},
+			{
+				hasNativeTitle: false,
+				iconScalesOnHover: true,
+				tooltipDelay: "250",
+				tooltipText: "Effects",
 			},
 		]);
 		const infoAction = actionBar.querySelector<HTMLElement>('[data-capability="info"]');
@@ -1166,7 +1217,7 @@ describe("Board drag", () => {
 					bubbles: true,
 				}),
 			);
-			await Promise.resolve();
+			await vi.advanceTimersByTimeAsync(150);
 		});
 		const switchedActionBars = document.querySelectorAll<HTMLElement>(
 			'[data-ui="TileHoverActionBar"]',
@@ -1185,7 +1236,7 @@ describe("Board drag", () => {
 					bubbles: true,
 				}),
 			);
-			await Promise.resolve();
+			await vi.advanceTimersByTimeAsync(150);
 		});
 
 		await act(async () => {

@@ -1,0 +1,444 @@
+import { Effect } from "effect";
+import { useCallback } from "react";
+import { match } from "ts-pattern";
+
+import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
+import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
+import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { readTileLinesFx } from "~/engine/tile/read/readTileLinesFx";
+
+export namespace useTileLines {
+	export interface QuantityBounds {
+		readonly min: number;
+		readonly max: number;
+	}
+
+	export interface ChargeCost {
+		readonly cost: number;
+		readonly from: InputChargeFromEnumSchema.Type;
+	}
+
+	export interface Selector {
+		readonly kind: SelectorSchema.Type["type"];
+		readonly label: string;
+	}
+
+	export type Input =
+		| {
+				readonly kind: "materials";
+				readonly selector: Selector;
+				readonly mode: InputModeEnumSchema.Type;
+				readonly required: QuantityBounds;
+				readonly storedQuantity: number;
+				readonly maxStoredQuantity: number;
+				readonly missingQuantity: number;
+				readonly availableCapacity: number;
+				readonly ready: boolean;
+				readonly charges?: ChargeCost;
+		  }
+		| {
+				readonly kind: "deposit";
+				readonly selector: Selector;
+				readonly distance: "close" | "near" | "far";
+				readonly requiredTargets: number;
+				readonly readyTargets: number;
+				readonly targetTitles: readonly string[];
+				readonly ready: boolean;
+				readonly charges?: ChargeCost;
+		  }
+		| {
+				readonly kind: "simple";
+				readonly count: number;
+				readonly ready: boolean;
+				readonly charges: ChargeCost;
+		  };
+
+	export interface OutputItem {
+		readonly itemId: string;
+		readonly title: string;
+		readonly quantity: QuantityBounds;
+	}
+
+	export type OutputRoll =
+		| {
+				readonly kind: "guaranteed";
+				readonly item: readonly OutputItem[];
+		  }
+		| {
+				readonly kind: "chance";
+				readonly chance: number;
+				readonly item: readonly OutputItem[];
+		  }
+		| {
+				readonly kind: "weight";
+				readonly selections: QuantityBounds;
+				readonly option: readonly {
+					readonly weight: number;
+					readonly item: readonly OutputItem[];
+				}[];
+		  };
+
+	export interface OutputSet {
+		readonly weight: number;
+		readonly roll: readonly OutputRoll[];
+	}
+
+	export type Availability = readTileLinesFx.Availability;
+
+	export interface Line {
+		readonly lineId: string;
+		readonly title: string;
+		readonly description: string;
+		readonly baseRuntimeMs: number;
+		readonly effectiveRuntimeMs: number;
+		readonly availability: Availability;
+		readonly input: readonly Input[];
+		readonly output: readonly OutputSet[];
+		readonly activeJob?: {
+			readonly durationMs: number;
+			readonly remainingMs: number;
+		};
+	}
+
+	export type Projection =
+		| {
+				readonly kind: "available";
+				readonly itemId: TileItemId;
+				readonly line: readonly Line[];
+		  }
+		| {
+				readonly kind: "unavailable";
+		  };
+}
+
+const unavailable = {
+	kind: "unavailable",
+} as const satisfies useTileLines.Projection;
+
+const selectorLabel = (
+	selector: SelectorSchema.Type,
+	items: ReturnType<typeof useGameEngine>["config"]["items"],
+): useTileLines.Selector =>
+	match(selector)
+		.with(
+			{
+				type: "item",
+			},
+			({ itemId }) => ({
+				kind: "item" as const,
+				label: items[itemId]?.title ?? itemId,
+			}),
+		)
+		.with(
+			{
+				type: "tag",
+			},
+			({ tag }) => ({
+				kind: "tag" as const,
+				label: tag,
+			}),
+		)
+		.exhaustive();
+
+const mapOutputItem = (
+	item: readTileLinesFx.OutputItem,
+	items: ReturnType<typeof useGameEngine>["config"]["items"],
+): useTileLines.OutputItem => ({
+	itemId: item.itemId,
+	title: items[item.itemId]?.title ?? item.itemId,
+	quantity: item.quantity,
+});
+
+const mapOutputRoll = (
+	roll: readTileLinesFx.OutputRoll,
+	items: ReturnType<typeof useGameEngine>["config"]["items"],
+): useTileLines.OutputRoll =>
+	match(roll)
+		.with(
+			{
+				kind: "guaranteed",
+			},
+			({ item }) => ({
+				kind: "guaranteed" as const,
+				item: item.map((entry) => mapOutputItem(entry, items)),
+			}),
+		)
+		.with(
+			{
+				kind: "chance",
+			},
+			({ chance, item }) => ({
+				kind: "chance" as const,
+				chance,
+				item: item.map((entry) => mapOutputItem(entry, items)),
+			}),
+		)
+		.with(
+			{
+				kind: "weight",
+			},
+			({ selections, option }) => ({
+				kind: "weight" as const,
+				selections,
+				option: option.map((candidate) => ({
+					weight: candidate.weight,
+					item: candidate.item.map((entry) => mapOutputItem(entry, items)),
+				})),
+			}),
+		)
+		.exhaustive();
+
+const mapInput = ({
+	input,
+	items,
+	runtime,
+}: {
+	readonly input: readTileLinesFx.Input;
+	readonly items: ReturnType<typeof useGameEngine>["config"]["items"];
+	readonly runtime: RuntimeSchema.Type;
+}): useTileLines.Input =>
+	match(input)
+		.with(
+			{
+				kind: "materials",
+			},
+			(input) => ({
+				...input,
+				selector: selectorLabel(input.selector, items),
+			}),
+		)
+		.with(
+			{
+				kind: "deposit",
+			},
+			(input) => ({
+				kind: input.kind,
+				selector: selectorLabel(input.selector, items),
+				distance: input.distance,
+				requiredTargets: input.requiredTargets,
+				readyTargets: input.readyTargets,
+				targetTitles: input.targetItemIds.map(
+					(itemId) =>
+						runtime.items.find((item) => item.id === itemId)?.item.title ?? itemId,
+				),
+				ready: input.ready,
+				...(input.charges === undefined
+					? {}
+					: {
+							charges: input.charges,
+						}),
+			}),
+		)
+		.with(
+			{
+				kind: "simple",
+			},
+			(input) => input,
+		)
+		.exhaustive();
+
+const sameBounds = (left: useTileLines.QuantityBounds, right: useTileLines.QuantityBounds) =>
+	left.min === right.min && left.max === right.max;
+
+const sameCharge = (
+	left: useTileLines.ChargeCost | undefined,
+	right: useTileLines.ChargeCost | undefined,
+) => left?.cost === right?.cost && left?.from === right?.from;
+
+const sameSelector = (left: useTileLines.Selector, right: useTileLines.Selector) =>
+	left.kind === right.kind && left.label === right.label;
+
+const sameStringArray = (left: readonly string[], right: readonly string[]) =>
+	left.length === right.length && left.every((value, index) => value === right[index]);
+
+const sameInput = (left: useTileLines.Input, right: useTileLines.Input) => {
+	if (left.kind !== right.kind) return false;
+	return match(left)
+		.with(
+			{
+				kind: "materials",
+			},
+			(left) => {
+				if (right.kind !== "materials") return false;
+				return (
+					sameSelector(left.selector, right.selector) &&
+					left.mode === right.mode &&
+					sameBounds(left.required, right.required) &&
+					left.storedQuantity === right.storedQuantity &&
+					left.maxStoredQuantity === right.maxStoredQuantity &&
+					left.missingQuantity === right.missingQuantity &&
+					left.availableCapacity === right.availableCapacity &&
+					left.ready === right.ready &&
+					sameCharge(left.charges, right.charges)
+				);
+			},
+		)
+		.with(
+			{
+				kind: "deposit",
+			},
+			(left) => {
+				if (right.kind !== "deposit") return false;
+				return (
+					sameSelector(left.selector, right.selector) &&
+					left.distance === right.distance &&
+					left.requiredTargets === right.requiredTargets &&
+					left.readyTargets === right.readyTargets &&
+					sameStringArray(left.targetTitles, right.targetTitles) &&
+					left.ready === right.ready &&
+					sameCharge(left.charges, right.charges)
+				);
+			},
+		)
+		.with(
+			{
+				kind: "simple",
+			},
+			(left) => {
+				if (right.kind !== "simple") return false;
+				return (
+					left.count === right.count &&
+					left.ready === right.ready &&
+					sameCharge(left.charges, right.charges)
+				);
+			},
+		)
+		.exhaustive();
+};
+
+const sameOutputItem = (left: useTileLines.OutputItem, right: useTileLines.OutputItem) =>
+	left.itemId === right.itemId &&
+	left.title === right.title &&
+	sameBounds(left.quantity, right.quantity);
+
+const sameOutputItems = (
+	left: readonly useTileLines.OutputItem[],
+	right: readonly useTileLines.OutputItem[],
+) =>
+	left.length === right.length &&
+	left.every((item, index) => right[index] !== undefined && sameOutputItem(item, right[index]));
+
+const sameOutputRoll = (left: useTileLines.OutputRoll, right: useTileLines.OutputRoll) => {
+	if (left.kind !== right.kind) return false;
+	return match(left)
+		.with(
+			{
+				kind: "guaranteed",
+			},
+			(left) => right.kind === "guaranteed" && sameOutputItems(left.item, right.item),
+		)
+		.with(
+			{
+				kind: "chance",
+			},
+			(left) =>
+				right.kind === "chance" &&
+				left.chance === right.chance &&
+				sameOutputItems(left.item, right.item),
+		)
+		.with(
+			{
+				kind: "weight",
+			},
+			(left) =>
+				right.kind === "weight" &&
+				sameBounds(left.selections, right.selections) &&
+				left.option.length === right.option.length &&
+				left.option.every((option, index) => {
+					const candidate = right.option[index];
+					return (
+						candidate !== undefined &&
+						option.weight === candidate.weight &&
+						sameOutputItems(option.item, candidate.item)
+					);
+				}),
+		)
+		.exhaustive();
+};
+
+const sameAvailability = (left: useTileLines.Availability, right: useTileLines.Availability) =>
+	left.kind === right.kind &&
+	(left.kind !== "blocked" || right.kind !== "blocked" || left.reason === right.reason);
+
+const sameLine = (left: useTileLines.Line, right: useTileLines.Line) =>
+	left.lineId === right.lineId &&
+	left.title === right.title &&
+	left.description === right.description &&
+	left.baseRuntimeMs === right.baseRuntimeMs &&
+	left.effectiveRuntimeMs === right.effectiveRuntimeMs &&
+	sameAvailability(left.availability, right.availability) &&
+	left.input.length === right.input.length &&
+	left.input.every(
+		(input, index) => right.input[index] !== undefined && sameInput(input, right.input[index]),
+	) &&
+	left.output.length === right.output.length &&
+	left.output.every((set, index) => {
+		const candidate = right.output[index];
+		return (
+			candidate !== undefined &&
+			set.weight === candidate.weight &&
+			set.roll.length === candidate.roll.length &&
+			set.roll.every(
+				(roll, rollIndex) =>
+					candidate.roll[rollIndex] !== undefined &&
+					sameOutputRoll(roll, candidate.roll[rollIndex]),
+			)
+		);
+	}) &&
+	left.activeJob?.durationMs === right.activeJob?.durationMs &&
+	left.activeJob?.remainingMs === right.activeJob?.remainingMs;
+
+const sameProjection = (left: useTileLines.Projection, right: useTileLines.Projection) => {
+	if (left.kind !== right.kind) return false;
+	if (left.kind === "unavailable" || right.kind === "unavailable") return true;
+	return (
+		left.itemId === right.itemId &&
+		left.line.length === right.line.length &&
+		left.line.every(
+			(line, index) => right.line[index] !== undefined && sameLine(line, right.line[index]),
+		)
+	);
+};
+
+/** Projects the current visible read-only product lines of one exact line owner. */
+export const useTileLines = (itemId: TileItemId): useTileLines.Projection => {
+	const game = useGameEngine();
+	const selector = useCallback(
+		(runtime: RuntimeSchema.Type): useTileLines.Projection => {
+			const lines = Effect.runSync(
+				readTileLinesFx({
+					itemId,
+					runtime,
+				}),
+			);
+			if (lines.kind === "unavailable") return unavailable;
+			return {
+				kind: "available",
+				itemId: lines.itemId,
+				line: lines.line.map((line) => ({
+					...line,
+					input: line.input.map((input) =>
+						mapInput({
+							input,
+							items: game.config.items,
+							runtime,
+						}),
+					),
+					output: line.output.map((set) => ({
+						weight: set.weight,
+						roll: set.roll.map((roll) => mapOutputRoll(roll, game.config.items)),
+					})),
+				})),
+			};
+		},
+		[
+			game.config.items,
+			itemId,
+		],
+	);
+	return useRuntimeSelector(selector, sameProjection);
+};

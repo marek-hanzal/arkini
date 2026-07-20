@@ -70,5 +70,13 @@ describe("About", () => {
 				.viewTransitionName,
 		).toBe("");
 		expect(container.querySelector('[data-ui="About"]')).not.toBeNull();
+		expect(container.textContent).toContain("ChatGPT-5.6");
+		expect(container.textContent).toContain("ChatGPT-5.4");
+		expect(container.textContent).toContain("ChatGPT-5.5");
+		expect(container.textContent).toContain("blood-soaked legacy");
+		expect(container.textContent).toContain("original v0");
+		expect(container.textContent).toContain("Marek Hanzal");
+		expect(container.textContent).toContain("chief mega-nag");
+		expect(container.textContent).toContain("Šárka Hanušová");
 	});
 });

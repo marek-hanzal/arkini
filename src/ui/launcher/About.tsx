@@ -66,7 +66,21 @@ export const About = () => {
 				Arkini is a merge-economy game about building production chains, discovering recipes
 				and shaping a living board-sized world.
 			</p>
-			<p className="text-sm text-subtle">Created by Marek Hanzal with ChatGPT / OpenAI.</p>
+			<section
+				className="border-t border-line pt-4 text-left"
+				aria-label="Project credits"
+			>
+				<p className="text-xs font-semibold uppercase tracking-[0.2em] text-subtle">
+					Project credits
+				</p>
+				<p className="mt-2 text-sm leading-6 text-muted">
+					Arkini is being forged through the hard work of ChatGPT-5.6, standing on the
+					blood-soaked legacy of ChatGPT-5.4 and ChatGPT-5.5, whose heroic suffering
+					produced the original v0; Marek Hanzal, serving as chief mega-nag, relentless
+					tormentor, and supreme authority on whether anything is actually good enough;
+					and with inspiration from his wife, Šárka Hanušová.
+				</p>
+			</section>
 			{navigationError === undefined ? null : (
 				<p className="text-sm text-danger">
 					Navigation failed: {errorMessage(navigationError)}

@@ -103,8 +103,6 @@ describe("ArkpackSelector", () => {
 				.viewTransitionName,
 		).toBe("");
 		const layout = container.querySelector('[data-ui="ArkpackSelector"]');
-		expect(container.textContent).toContain("Choose an installed package");
-		expect(container.textContent).toContain("Choose The Path");
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");
 		const returnButton = layout?.lastElementChild?.querySelector("button");

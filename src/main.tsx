@@ -67,6 +67,7 @@ import.meta.hot?.dispose((data: HotData) => {
 		try {
 			await RendererRuntime.runPromise(
 				releaseGameEngineResourceFx({
+					allowAlreadyFinalized: true,
 					queryClient,
 					resource,
 				}),

@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { Effect } from "effect";
 
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
+import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { removeGameEngineResource } from "~/bridge/game/removeGameEngineResource";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
 
@@ -17,21 +18,30 @@ export namespace resetGameEngineResourceFx {
 export const resetGameEngineResourceFx = Effect.fn("resetGameEngineResourceFx")(
 	({ clearSaveFx, queryClient, resource }: resetGameEngineResourceFx.Props) =>
 		resource.withLifecycleLockFx(
-			resource.game.disposeWithoutSaveFx.pipe(
-				Effect.zipRight(
-					clearSaveFx ??
-						deleteGameSaveFx({
-							key: resource.game.saveKey,
-						}),
-				),
-				Effect.tap(() =>
-					Effect.sync(() =>
-						removeGameEngineResource({
-							queryClient,
-							resource,
-						}),
+			Effect.suspend(() => {
+				if (getCachedGameEngineResource(queryClient) !== resource) {
+					return Effect.fail(
+						new Error(
+							"Game Engine cleanup cannot remove a different or missing singleton resource.",
+						),
+					);
+				}
+				return resource.game.disposeWithoutSaveFx.pipe(
+					Effect.zipRight(
+						clearSaveFx ??
+							deleteGameSaveFx({
+								key: resource.game.saveKey,
+							}),
 					),
-				),
-			),
+					Effect.tap(() =>
+						Effect.sync(() =>
+							removeGameEngineResource({
+								queryClient,
+								resource,
+							}),
+						),
+					),
+				);
+			}),
 		),
 );

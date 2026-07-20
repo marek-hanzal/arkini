@@ -24,6 +24,7 @@ export namespace closeGameEngineResourceFx {
 export const closeGameEngineResourceFx = Effect.fn("closeGameEngineResourceFx")(
 	({ queryClient, resource }: closeGameEngineResourceFx.Props) =>
 		releaseGameEngineResourceFx({
+			allowAlreadyFinalized: true,
 			queryClient,
 			resource,
 		}).pipe(

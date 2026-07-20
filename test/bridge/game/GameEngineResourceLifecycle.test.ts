@@ -11,6 +11,17 @@ import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineReso
 import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 
+const createDeferred = () => {
+	let resolve!: () => void;
+	const promise = new Promise<void>((resolvePromise) => {
+		resolve = resolvePromise;
+	});
+	return {
+		promise,
+		resolve,
+	};
+};
+
 const createGame = ({
 	packageId = "package:lifecycle",
 	disposeFx = Effect.void,
@@ -173,7 +184,237 @@ describe("GameEngineResource lifecycle", () => {
 				}),
 			),
 		).rejects.toThrow("cannot remove a different or missing singleton resource");
-		expect(disposeOld).toHaveBeenCalledOnce();
+		expect(disposeOld).not.toHaveBeenCalled();
+		expect(getCachedGameEngineResource(queryClient)).toBe(newResource);
+	});
+
+	it("lets native close join a successful leave without disposing twice", async () => {
+		const disposeStarted = createDeferred();
+		const continueDispose = createDeferred();
+		const dispose = vi.fn();
+		const game = createGame({
+			disposeFx: Effect.promise(async () => {
+				dispose();
+				disposeStarted.resolve();
+				await continueDispose.promise;
+			}),
+		});
+		const { queryClient, resource } = createHarness(game);
+		const leave = Effect.runPromise(
+			releaseGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+		await disposeStarted.promise;
+		const close = Effect.runPromise(
+			closeGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+
+		continueDispose.resolve();
+		await leave;
+		await expect(close).resolves.toEqual({
+			type: "saved",
+		});
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("lets native close join a successful reset without final-saving twice", async () => {
+		const discardStarted = createDeferred();
+		const continueDiscard = createDeferred();
+		const discard = vi.fn();
+		const finalSave = vi.fn();
+		const clearSave = vi.fn();
+		const game = createGame({
+			disposeFx: Effect.sync(finalSave),
+			disposeWithoutSaveFx: Effect.promise(async () => {
+				discard();
+				discardStarted.resolve();
+				await continueDiscard.promise;
+			}),
+		});
+		const { queryClient, resource } = createHarness(game);
+		const reset = Effect.runPromise(
+			resetGameEngineResourceFx({
+				clearSaveFx: Effect.sync(clearSave),
+				queryClient,
+				resource,
+			}),
+		);
+		await discardStarted.promise;
+		const close = Effect.runPromise(
+			closeGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+
+		continueDiscard.resolve();
+		await reset;
+		await expect(close).resolves.toEqual({
+			type: "saved",
+		});
+		expect(discard).toHaveBeenCalledOnce();
+		expect(clearSave).toHaveBeenCalledOnce();
+		expect(finalSave).not.toHaveBeenCalled();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("lets HMR join a successful leave without disposing twice", async () => {
+		const disposeStarted = createDeferred();
+		const continueDispose = createDeferred();
+		const dispose = vi.fn();
+		const game = createGame({
+			disposeFx: Effect.promise(async () => {
+				dispose();
+				disposeStarted.resolve();
+				await continueDispose.promise;
+			}),
+		});
+		const { queryClient, resource } = createHarness(game);
+		const leave = Effect.runPromise(
+			releaseGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+		await disposeStarted.promise;
+		const hmr = Effect.runPromise(
+			releaseGameEngineResourceFx({
+				allowAlreadyFinalized: true,
+				queryClient,
+				resource,
+			}),
+		);
+
+		continueDispose.resolve();
+		await expect(
+			Promise.all([
+				leave,
+				hmr,
+			]),
+		).resolves.toEqual([
+			undefined,
+			undefined,
+		]);
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("does not let a waiting leave dispose after native close wins", async () => {
+		const disposeStarted = createDeferred();
+		const continueDispose = createDeferred();
+		const dispose = vi.fn();
+		const game = createGame({
+			disposeFx: Effect.promise(async () => {
+				dispose();
+				disposeStarted.resolve();
+				await continueDispose.promise;
+			}),
+		});
+		const { queryClient, resource } = createHarness(game);
+		const close = Effect.runPromise(
+			closeGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+		await disposeStarted.promise;
+		const leave = Effect.runPromise(
+			releaseGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+
+		continueDispose.resolve();
+		await expect(close).resolves.toEqual({
+			type: "saved",
+		});
+		await expect(leave).rejects.toThrow(
+			"cannot remove a different or missing singleton resource",
+		);
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("does not let a waiting reset discard or clear after native close wins", async () => {
+		const disposeStarted = createDeferred();
+		const continueDispose = createDeferred();
+		const finalSave = vi.fn();
+		const discard = vi.fn();
+		const clearSave = vi.fn();
+		const game = createGame({
+			disposeFx: Effect.promise(async () => {
+				finalSave();
+				disposeStarted.resolve();
+				await continueDispose.promise;
+			}),
+			disposeWithoutSaveFx: Effect.sync(discard),
+		});
+		const { queryClient, resource } = createHarness(game);
+		const close = Effect.runPromise(
+			closeGameEngineResourceFx({
+				queryClient,
+				resource,
+			}),
+		);
+		await disposeStarted.promise;
+		const reset = Effect.runPromise(
+			resetGameEngineResourceFx({
+				clearSaveFx: Effect.sync(clearSave),
+				queryClient,
+				resource,
+			}),
+		);
+
+		continueDispose.resolve();
+		await expect(close).resolves.toEqual({
+			type: "saved",
+		});
+		await expect(reset).rejects.toThrow(
+			"cannot remove a different or missing singleton resource",
+		);
+		expect(finalSave).toHaveBeenCalledOnce();
+		expect(discard).not.toHaveBeenCalled();
+		expect(clearSave).not.toHaveBeenCalled();
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("does not treat a replacement singleton as already finalized", async () => {
+		const disposeOld = vi.fn();
+		const oldResource = Effect.runSync(
+			createGameEngineResourceFx(
+				createGame({
+					packageId: "package:old",
+					disposeFx: Effect.sync(disposeOld),
+				}),
+			),
+		);
+		const newResource = Effect.runSync(
+			createGameEngineResourceFx(
+				createGame({
+					packageId: "package:new",
+				}),
+			),
+		);
+		const queryClient = new QueryClient();
+		queryClient.setQueryData(gameEngineQueryKey, newResource);
+
+		await expect(
+			Effect.runPromise(
+				releaseGameEngineResourceFx({
+					allowAlreadyFinalized: true,
+					queryClient,
+					resource: oldResource,
+				}),
+			),
+		).rejects.toThrow("cannot remove a different or missing singleton resource");
+		expect(disposeOld).not.toHaveBeenCalled();
 		expect(getCachedGameEngineResource(queryClient)).toBe(newResource);
 	});
 

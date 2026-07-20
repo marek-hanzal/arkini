@@ -34,6 +34,8 @@ Current contract:
 - Every release invokes public atomic `dropItemFx`. UI never authorizes or infers gameplay behavior. The command revalidates exact source and occupied-target revision/location and returns explicit `move | swap | merge | ignored | reject`. Authored merge outcomes expose source/target before and current identity, revision, location, quantity, action, effect, and replacement canonical ID without mutable runtime objects.
 - Merge presentation is one generation with `approach → resolve`. A surviving source stack returns toward its newest live anchor; consumed/removed source and target identities remain visually alive only for their owned exit; a kept or same-ID replaced target receives one restrained impact. Each actor completes independently, and stale callbacks cannot release or remove a newer generation.
 - `TileActorLayer` renders ordinary actors directly from the live bridge projection and keeps only the last renderable snapshot of identities explicitly protected by the immediate presentation generation. Retention is established before the authoritative drop command and live/retained actors share one flat keyed child list, so engine removal cannot remount or gap the real actor before settlement. `dragStarted` remains true through async command handoff so the subsequent pointer-up cannot misclassify an accepted drag as a click and cancel it.
+- Toolbar #300 is complete. `meta.toolbarSize` owns an optional exact `0..64` one-row capacity; bundled Arkini uses 13. Toolbar is a global passive storage grid with canonical `scope: "toolbar"`, exact ordered locations persisted directly on runtime/state items, no jobs/ticking/effects/proximity, and exact query/placement participation (`any` includes current Board + Inventory + Toolbar; `universe` includes all Boards + both passive stores). Saves are build-bound to one Arkpack content hash; config changes do not migrate or resize an existing game.
+- Board and Toolbar render through the same `TileGridFrame`, `TileGridCell`, Canvas-wide actor layer, slot registry, Motion actor, and public atomic drop command. Toolbar is literally a one-row tile surface below Board, with no alternate item renderer or visual skin. Board ↔ Toolbar move/swap/reorder/reject is implemented now; disabled Toolbar renders no shell, spacer, or layout row. Inventory cross-surface DnD and final storage-motion hardening remain #308.
 
 Responsive viewport contract:
 
@@ -44,7 +46,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Review root #310 and children #311–#315 are implemented. Continue epic #302 with live-target retargeting and interruption hardening from #306, then implement Toolbar #300 and finish Inventory/Toolbar/space plus stack/use boomerang integration in #308. Preserve the exhaustive tile interaction vocabulary, focused component ownership, one flat keyed actor list, and the no-ghost/no-second-truth contract.
+> Toolbar #300 is implemented with the shared Board tile surface and Board ↔ Toolbar DnD. Continue epic #302 with live-target retargeting and interruption hardening from #306, then finish Inventory ↔ Board/Toolbar, surface lifecycle, spaces, stack/split/use boomerang behavior, and final motion hardening in #308. Preserve the exhaustive tile interaction vocabulary, focused component ownership, one flat keyed actor list, and the no-ghost/no-second-truth contract.
 
 ## Source topology
 
@@ -211,6 +213,7 @@ Next action:
 - Compiler, validator, tests, and packer share one completed-config compiler.
 - Duplicate providers and IDs are diagnostics; later files never overwrite silently.
 - Blueprint assets are explicit standard assets. No target, output, or visual is inferred from item type or file name.
+- A save is valid only for the exact Arkpack package/content hash that created it. Config or content changes create a new game; no runtime/save migration, toolbar resize compatibility, overflow relocation, or cross-build fallback is supported.
 
 ## Migration policy
 

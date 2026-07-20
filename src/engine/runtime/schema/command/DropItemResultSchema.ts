@@ -14,6 +14,23 @@ const DropItemMovedResultSchema = z
 	})
 	.strict();
 
+const DropItemSwappedActorSchema = z
+	.object({
+		itemId: IdSchema,
+		revision: RevisionSchema,
+		previousLocation: GridLocationSchema,
+		location: GridLocationSchema,
+	})
+	.strict();
+
+const DropItemSwappedResultSchema = z
+	.object({
+		kind: z.literal("swap"),
+		source: DropItemSwappedActorSchema,
+		target: DropItemSwappedActorSchema,
+	})
+	.strict();
+
 const DropItemIgnoredResultSchema = z
 	.object({
 		kind: z.literal("ignored"),
@@ -30,6 +47,7 @@ const DropItemRejectedResultSchema = z
 			"unsupported-target",
 			"occupied",
 			"stale-source",
+			"stale-target",
 			"invalid-source",
 			"invalid-target",
 		]),
@@ -42,6 +60,7 @@ const DropItemRejectedResultSchema = z
 export const DropItemResultSchema = z
 	.discriminatedUnion("kind", [
 		DropItemMovedResultSchema,
+		DropItemSwappedResultSchema,
 		DropItemIgnoredResultSchema,
 		DropItemRejectedResultSchema,
 	])

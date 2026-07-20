@@ -7,7 +7,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 
-const config = GameConfigSchema.parse({
+const configInput = {
 	version: "1.0",
 	resources: {
 		hero: "hero",
@@ -60,6 +60,31 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 		},
 	},
+} as const;
+
+const config = GameConfigSchema.parse(configInput);
+const mergeConfig = GameConfigSchema.parse({
+	...configInput,
+	meta: {
+		...configInput.meta,
+		id: "game:drop-item-merge",
+	},
+	items: {
+		...configInput.items,
+		water: {
+			...configInput.items.water,
+			merge: [
+				{
+					target: {
+						type: "item",
+						itemId: "stone",
+					},
+					action: "consume",
+					effect: "keep",
+				},
+			],
+		},
+	},
 });
 
 const sourceLocation = {
@@ -87,11 +112,11 @@ const occupiedLocation = {
 	},
 };
 
-const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+const run = <A, E, R>(effect: Effect.Effect<A, E, R>, gameConfig: GameConfigSchema.Type = config) =>
 	Effect.runSync(
 		effect.pipe(
 			useGameFx({
-				config,
+				config: gameConfig,
 			}),
 		) as Effect.Effect<A, E, never>,
 	);
@@ -113,6 +138,7 @@ describe("dropItemFx", () => {
 					target: {
 						kind: "slot",
 						location: emptyLocation,
+						occupant: null,
 					},
 				});
 				const runtime = yield* readRuntimeFx();
@@ -132,7 +158,7 @@ describe("dropItemFx", () => {
 		expect(result.runtime.items[0]?.location).toEqual(emptyLocation);
 	});
 
-	it("rejects an occupied destination without mutating either item", () => {
+	it("swaps two non-mergeable occupied Board items and returns both actor identities", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
@@ -154,21 +180,81 @@ describe("dropItemFx", () => {
 					target: {
 						kind: "slot",
 						location: occupiedLocation,
+						occupant: {
+							itemId: target.id,
+							revision: target.revision,
+						},
 					},
 				});
-				const runtime = yield* readRuntimeFx();
 				return {
 					outcome,
-					runtime,
-					source,
-					target,
+					runtime: yield* readRuntimeFx(),
 				};
 			}),
 		);
 
+		expect(result.outcome).toMatchObject({
+			kind: "swap",
+			source: {
+				itemId: "runtime:water",
+				previousLocation: sourceLocation,
+				location: occupiedLocation,
+			},
+			target: {
+				itemId: "runtime:stone",
+				previousLocation: occupiedLocation,
+				location: sourceLocation,
+			},
+		});
+		expect(result.runtime.items.find((item) => item.id === "runtime:water")?.location).toEqual(
+			occupiedLocation,
+		);
+		expect(result.runtime.items.find((item) => item.id === "runtime:stone")?.location).toEqual(
+			sourceLocation,
+		);
+	});
+
+	it("does not swap a matching authored merge interaction before merge presentation exists", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:stone",
+					itemId: "stone",
+					location: occupiedLocation,
+					quantity: 1,
+				});
+				const outcome = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation,
+					target: {
+						kind: "slot",
+						location: occupiedLocation,
+						occupant: {
+							itemId: target.id,
+							revision: target.revision,
+						},
+					},
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+					source,
+					target,
+				};
+			}),
+			mergeConfig,
+		);
+
 		expect(result.outcome).toEqual({
 			kind: "reject",
-			reason: "occupied",
+			reason: "unsupported-target",
 			itemId: "runtime:water",
 			targetItemId: "runtime:stone",
 		});
@@ -194,6 +280,10 @@ describe("dropItemFx", () => {
 					target: {
 						kind: "slot",
 						location: sourceLocation,
+						occupant: {
+							itemId: source.id,
+							revision: source.revision,
+						},
 					},
 				});
 				const runtime = yield* readRuntimeFx();
@@ -232,6 +322,7 @@ describe("dropItemFx", () => {
 					target: {
 						kind: "slot",
 						location: emptyLocation,
+						occupant: null,
 					},
 				});
 				const runtime = yield* readRuntimeFx();
@@ -250,6 +341,55 @@ describe("dropItemFx", () => {
 		});
 		expect(result.runtime.items).toEqual([
 			result.source,
+		]);
+	});
+
+	it("rejects a stale occupied target without swapping either actor", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:stone",
+					itemId: "stone",
+					location: occupiedLocation,
+					quantity: 1,
+				});
+				const outcome = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation,
+					target: {
+						kind: "slot",
+						location: occupiedLocation,
+						occupant: {
+							itemId: target.id,
+							revision: "revision:stale",
+						},
+					},
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+					source,
+					target,
+				};
+			}),
+		);
+
+		expect(result.outcome).toEqual({
+			kind: "reject",
+			reason: "stale-target",
+			itemId: "runtime:water",
+			targetItemId: "runtime:stone",
+		});
+		expect(result.runtime.items).toEqual([
+			result.source,
+			result.target,
 		]);
 	});
 });

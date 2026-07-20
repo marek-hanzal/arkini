@@ -1022,9 +1022,13 @@ describe("Board drag", () => {
 		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
 	});
 
-	it("keeps artwork-only visuals through hover, drag, and rejected return", async () => {
+	it("shows hover actions below artwork and suppresses them throughout DnD", async () => {
 		motionTestRuntime.autoComplete = false;
-		const source = await renderBoard();
+		await renderBoard();
+		const source = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
+		);
+		if (source === null) throw new Error("Missing hover action source actor.");
 		const visual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
 		if (visual === null) throw new Error("Missing actor visual shell.");
 		expect(visual.dataset.motionScale).toBe("1");
@@ -1034,18 +1038,45 @@ describe("Board drag", () => {
 		if (dragSurface === null) throw new Error("Missing drag surface.");
 		await act(async () => {
 			dragSurface.dispatchEvent(
-				new MouseEvent("mouseover", {
+				new MouseEvent("mouseenter", {
 					bubbles: true,
 				}),
 			);
 		});
 		expect(visual.dataset.motionScale).toBe("1.15");
 		expectArtworkOnlyVisual(visual);
+		const actionBar = document.querySelector<HTMLElement>('[data-ui="TileHoverActionBar"]');
+		if (actionBar === null) throw new Error("Missing tile hover action bar.");
+		expect(actionBar.dataset.referenceId).toBe(source.dataset.runtimeId);
+		expect(
+			Array.from(actionBar.querySelectorAll<HTMLElement>('[data-ui="TileHoverAction"]')).map(
+				(action) => action.dataset.capability,
+			),
+		).toEqual([
+			"info",
+			"status",
+			"lines",
+			"effects",
+		]);
+		const infoAction = actionBar.querySelector<HTMLElement>('[data-capability="info"]');
+		if (infoAction === null) throw new Error("Missing temporary Info hover action.");
+		await act(async () => {
+			infoAction.dispatchEvent(pointerEvent("pointerdown", 150, 110));
+			infoAction.dispatchEvent(
+				new MouseEvent("click", {
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		expect(dropItemState.drop).not.toHaveBeenCalled();
+		expect(visual.dataset.motionPhase).toBe("hovered");
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 275, 175));
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 150, 50));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 175, 75));
 		});
+		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
 		expect(visual.dataset.motionScale).toBe("1.18");
 		expect(visual.dataset.motionPhase).toBe("dragging");
 		expectArtworkOnlyVisual(visual);
@@ -1056,12 +1087,13 @@ describe("Board drag", () => {
 			itemId: source.dataset.runtimeId ?? "runtime:unknown",
 		});
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 275, 175));
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 175, 75));
 			await Promise.resolve();
 			await Promise.resolve();
 		});
 		expect(dropItemState.drop).toHaveBeenCalledOnce();
-		expect(visual.dataset.motionPhase).toBe("hovered");
+		expect(visual.dataset.motionPhase).toBe("stable");
+		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
 		expectArtworkOnlyVisual(visual);
 	});
 });

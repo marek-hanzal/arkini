@@ -24,6 +24,7 @@ describe("Game shell presentation", () => {
 		expect(styles).toContain(
 			"ak-game-shell-ambient-crossfade var(--ak-game-shell-ambient-cycle) ease-in-out",
 		);
+		expect(styles).toContain("z-index: -1;");
 		expect(styles).toContain("pointer-events: none;");
 		expect(styles).toContain("@keyframes ak-game-shell-intro-fade-in");
 		expect(styles).toContain("@media (prefers-reduced-motion: reduce)");

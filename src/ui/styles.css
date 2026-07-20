@@ -257,6 +257,7 @@ select {
 [data-ui="GameShell"]::before,
 [data-ui="GameShell"]::after {
 	position: absolute;
+	z-index: -1;
 	inset: -8%;
 	content: "";
 	pointer-events: none;

@@ -26,6 +26,7 @@ export namespace LauncherScene {
 		readonly className?: string;
 		readonly compactHero?: boolean;
 		readonly dataUi: string;
+		readonly foregroundOverlay?: ReactNode;
 		readonly layout?: Layout;
 		readonly overlay?: ReactNode;
 	}
@@ -37,6 +38,7 @@ export const LauncherScene = ({
 	className,
 	compactHero = false,
 	dataUi,
+	foregroundOverlay,
 	layout = "centered",
 	overlay,
 }: LauncherScene.Props) => (
@@ -76,6 +78,14 @@ export const LauncherScene = ({
 				data-ui="LauncherSceneOverlay"
 			>
 				{overlay}
+			</div>
+		)}
+		{foregroundOverlay === undefined ? null : (
+			<div
+				className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+				data-ui="LauncherSceneForegroundOverlay"
+			>
+				{foregroundOverlay}
 			</div>
 		)}
 	</main>

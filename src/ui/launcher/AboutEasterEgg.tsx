@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import { CornerPortraitPeek } from "~/ui/launcher/CornerPortraitPeek";
 import { FallingPortrait } from "~/ui/launcher/FallingPortrait";
-import { useAboutEasterEggDelay } from "~/ui/launcher/useAboutEasterEggDelay";
 
 const fallingPortraitPool = Array.from(
 	{
@@ -21,8 +20,7 @@ const corners = [
 ] as const satisfies readonly CornerPortraitPeek.Corner[];
 
 /** Renders the delayed About-page portrait easter egg without replacing its stable DOM pool. */
-export const AboutEasterEgg = () => {
-	const active = useAboutEasterEggDelay();
+export const AboutEasterEgg = ({ active }: { readonly active: boolean }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	return (

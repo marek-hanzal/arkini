@@ -62,7 +62,7 @@ export const useFallingPortraitMotion = ({
 
 				const bounds = container.getBoundingClientRect();
 				const depth = Math.random();
-				const sizePx = Math.round(randomBetween(42, 60) + depth * 48);
+				const sizePx = Math.round(92 + depth * 164);
 				const opacity = randomBetween(0.36, 0.48) + depth * 0.45;
 				const durationSeconds = randomBetween(8.5, 11.5) - depth * 2.25;
 				const cycleDurationSeconds = randomBetween(11.5, 13.5);

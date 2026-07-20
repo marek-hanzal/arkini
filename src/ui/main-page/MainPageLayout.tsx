@@ -20,6 +20,7 @@ export namespace MainPageLayout {
 	export type PanelMode = keyof typeof panelModeClassNames;
 
 	export interface Props extends PropsWithChildren {
+		readonly foregroundOverlay?: ReactNode;
 		readonly labelledBy?: string;
 		readonly overlay?: ReactNode;
 		readonly page: Page;
@@ -31,6 +32,7 @@ export namespace MainPageLayout {
 /** Normalizes launcher leaves around one shared Hero and one explicit content surface. */
 export const MainPageLayout = ({
 	children,
+	foregroundOverlay,
 	labelledBy,
 	overlay,
 	page,
@@ -40,6 +42,7 @@ export const MainPageLayout = ({
 	<LauncherScene
 		compactHero
 		dataUi="MainPageLayout"
+		foregroundOverlay={foregroundOverlay}
 		layout="fixed-hero"
 		overlay={overlay}
 	>

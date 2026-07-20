@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readTileCapabilities } from "~/engine/tile/read/readTileCapabilities";
-import { readTileStatusFx } from "~/engine/tile/read/readTileStatusFx";
+import { readItemDetailTabs } from "~/engine/item-detail/read/readItemDetailTabs";
+import { readItemDetailStatusFx } from "~/engine/item-detail/read/readItemDetailStatusFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 
@@ -19,29 +19,26 @@ const activeJob = {
 
 const readStatus = (runtime: RuntimeSchema.Type) =>
 	Effect.runSync(
-		readTileStatusFx({
+		readItemDetailStatusFx({
 			itemId: ownerId,
 			runtime,
 		}),
 	);
 
-describe("readTileStatusFx", () => {
+describe("readItemDetailStatusFx", () => {
 	it("adds Status only for canonical line owners", () => {
 		const runtime = lineRunRuntime({});
-		expect(readTileCapabilities(runtime.items[0], runtime)).toEqual([
+		expect(readItemDetailTabs(runtime.items[0])).toEqual([
 			"info",
 			"status",
 			"lines",
-			"effects",
+			"queue",
 		]);
 		expect(
-			readTileCapabilities(
-				{
-					...runtime.items[0],
-					item: lineRunTestConfig.items.water,
-				},
-				runtime,
-			),
+			readItemDetailTabs({
+				...runtime.items[0],
+				item: lineRunTestConfig.items.water,
+			}),
 		).toEqual([
 			"info",
 		]);
@@ -145,7 +142,7 @@ describe("readTileStatusFx", () => {
 		const runtime = lineRunRuntime({});
 		expect(
 			Effect.runSync(
-				readTileStatusFx({
+				readItemDetailStatusFx({
 					itemId: "runtime:missing",
 					runtime,
 				}),
@@ -157,7 +154,7 @@ describe("readTileStatusFx", () => {
 		if (simple !== undefined) {
 			expect(
 				Effect.runSync(
-					readTileStatusFx({
+					readItemDetailStatusFx({
 						itemId: simple.id,
 						runtime,
 					}),

@@ -6,7 +6,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
  * Explicit non-item resources used by the game runtime or presentation shell.
  *
  * Item visuals remain declared on each item. This root config owns only named
- * non-item roles such as the splash hero and capability icons so no filesystem convention is needed.
+ * non-item roles such as the splash hero so no filesystem convention is needed.
  */
 export const ResourceConfigSchema = z
 	.object({
@@ -14,18 +14,6 @@ export const ResourceConfigSchema = z
 		chatGpt: IdSchema.optional(),
 		marek: IdSchema.optional(),
 		sarka: IdSchema.optional(),
-		tileCapabilities: z
-			.object({
-				info: IdSchema,
-				status: IdSchema,
-				lines: IdSchema,
-				effects: IdSchema,
-			})
-			.strict()
-			.optional()
-			.describe(
-				"Explicit Arkpack resource IDs for the initial tile capability action icons.",
-			),
 	})
 	.strict()
 	.meta({

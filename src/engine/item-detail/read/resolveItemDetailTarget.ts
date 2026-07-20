@@ -1,0 +1,46 @@
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readItemDetailTabs } from "~/engine/item-detail/read/readItemDetailTabs";
+import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+
+export namespace resolveItemDetailTarget {
+	export interface Props {
+		readonly itemId: IdSchema.Type;
+		readonly requestedTab: ItemDetailTabEnumSchema.Type;
+		readonly runtime: RuntimeSchema.Type;
+	}
+
+	export type Result =
+		| {
+				readonly kind: "available";
+				readonly itemId: IdSchema.Type;
+				readonly tab: ItemDetailTabEnumSchema.Type;
+				readonly tabs: readonly ItemDetailTabEnumSchema.Type[];
+		  }
+		| {
+				readonly kind: "unavailable";
+		  };
+}
+
+const unavailable = {
+	kind: "unavailable",
+} as const satisfies resolveItemDetailTarget.Result;
+
+/** Validates one exact Item Detail target and deterministically resolves its active tab. */
+export const resolveItemDetailTarget = ({
+	itemId,
+	requestedTab,
+	runtime,
+}: resolveItemDetailTarget.Props): resolveItemDetailTarget.Result => {
+	const item = runtime.items.find((candidate) => candidate.id === itemId);
+	const tabs = readItemDetailTabs(item);
+	if (item === undefined || tabs.length === 0) return unavailable;
+	const fallback = tabs.includes("info") ? "info" : tabs[0];
+	if (fallback === undefined) return unavailable;
+	return {
+		kind: "available",
+		itemId: item.id,
+		tab: tabs.includes(requestedTab) ? requestedTab : fallback,
+		tabs,
+	};
+};

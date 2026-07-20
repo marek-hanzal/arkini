@@ -41,44 +41,6 @@ describe("validateGameResourcesFx", () => {
 		expect(diagnostics).toEqual([]);
 	});
 
-	it("validates explicit tile capability resource references", () => {
-		const config = GameConfigSchema.parse({
-			...startTestConfig,
-			resources: {
-				...startTestConfig.resources,
-				tileCapabilities: {
-					info: "tile-capability-info",
-					status: "tile-capability-status",
-					lines: "tile-capability-lines",
-					effects: "tile-capability-effects",
-				},
-			},
-		});
-		const ids = new Set<string>([
-			config.resources.hero,
-			...Object.values(config.resources.tileCapabilities ?? {}),
-		]);
-		for (const item of Object.values(config.items)) {
-			item.asset.source.forEach((id) => ids.add(id));
-		}
-
-		const diagnostics = Effect.runSync(
-			validateGameResourcesFx({
-				config,
-				provenance,
-				resources: [
-					...ids,
-				].map((id) => ({
-					id,
-					path: `${id}.png`,
-					mime: "image/png" as const,
-				})),
-			}),
-		);
-
-		expect(diagnostics).toEqual([]);
-	});
-
 	it("reports duplicate and missing exact resource IDs", () => {
 		const diagnostics = Effect.runSync(
 			validateGameResourcesFx({

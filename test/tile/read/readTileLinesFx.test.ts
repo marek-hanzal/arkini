@@ -4,19 +4,19 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
-import { readTileLinesFx } from "~/engine/tile/read/readTileLinesFx";
+import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 
 const readLines = (runtime: RuntimeSchema.Type, itemId = "runtime:workshop") =>
 	Effect.runSync(
-		readTileLinesFx({
+		readItemDetailLinesFx({
 			itemId,
 			runtime,
 		}),
 	);
 
-describe("readTileLinesFx", () => {
+describe("readItemDetailLinesFx", () => {
 	it("uses canonical visibility, enable, input readiness, and effective runtime", () => {
 		const blocked = readLines(
 			lineRunRuntime({

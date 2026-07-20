@@ -17,13 +17,7 @@
 		"hero": "hero",
 		"chatGpt": "chat-gpt",
 		"marek": "marek",
-		"sarka": "sarka",
-		"tileCapabilities": {
-			"info": "tile-capability-info",
-			"status": "tile-capability-status",
-			"lines": "tile-capability-lines",
-			"effects": "tile-capability-effects"
-		}
+		"sarka": "sarka"
 	},
 	"start": {
 		"board": [

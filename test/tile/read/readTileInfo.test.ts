@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { readTileIdentity } from "~/engine/tile/read/readTileIdentity";
-import { readTileInfo } from "~/engine/tile/read/readTileInfo";
+import { readItemDetailIdentity } from "~/engine/item-detail/read/readItemDetailIdentity";
+import { readItemDetailInfo } from "~/engine/item-detail/read/readItemDetailInfo";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
 
@@ -46,7 +46,7 @@ describe("tile identity and Info projections", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			readTileIdentity({
+			readItemDetailIdentity({
 				itemId: owner.id,
 				runtime,
 			}),
@@ -58,7 +58,7 @@ describe("tile identity and Info projections", () => {
 			sourceResourceId: "asset:workshop",
 		});
 		expect(
-			readTileInfo({
+			readItemDetailInfo({
 				itemId: owner.id,
 				runtime,
 			}),
@@ -91,7 +91,7 @@ describe("tile identity and Info projections", () => {
 	it("returns one unavailable result for a stale runtime identity", () => {
 		const runtime = lineRunRuntime({});
 		expect(
-			readTileIdentity({
+			readItemDetailIdentity({
 				itemId: "runtime:missing",
 				runtime,
 			}),
@@ -99,7 +99,7 @@ describe("tile identity and Info projections", () => {
 			kind: "unavailable",
 		});
 		expect(
-			readTileInfo({
+			readItemDetailInfo({
 				itemId: "runtime:missing",
 				runtime,
 			}),

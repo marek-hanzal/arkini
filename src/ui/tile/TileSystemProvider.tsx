@@ -3,13 +3,11 @@ import { type PropsWithChildren, useMemo } from "react";
 import { TileActorLayer } from "~/ui/tile/TileActorLayer";
 import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
 import { useTileGeometry } from "~/ui/tile/useTileGeometry";
-import { useTileHoverController } from "~/ui/tile/useTileHoverController";
 import { useTileInteractionController } from "~/ui/tile/useTileInteractionController";
 
 /** Composes the focused Canvas-local geometry and interaction owners. */
 export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 	const geometry = useTileGeometry();
-	const hover = useTileHoverController();
 	const interaction = useTileInteractionController({
 		resolveTarget: geometry.resolveTarget,
 	});
@@ -21,7 +19,6 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			registerSlot: geometry.registerSlot,
 			readPlacement: geometry.readPlacement,
 			...interaction,
-			...hover,
 		}),
 		[
 			geometry.geometryVersion,
@@ -29,7 +26,6 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			geometry.registerActorLayer,
 			geometry.registerSlot,
 			geometry.registerSurface,
-			hover,
 			interaction,
 		],
 	);

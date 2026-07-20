@@ -13,7 +13,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
+import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/game/testGameRead";
 
@@ -303,7 +303,7 @@ const renderGameBoard = async () => {
 	await act(async () => {
 		root.render(
 			createElement(
-				TileWorkspaceProvider,
+				ItemDetailProvider,
 				null,
 				createElement(TileSystemProvider, null, createElement(GameBoardLayout)),
 			),

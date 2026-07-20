@@ -9,7 +9,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
+import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { testGameRead } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
@@ -138,7 +138,7 @@ describe("Board", () => {
 		gameEngineState.game = game;
 		const html = renderToStaticMarkup(
 			createElement(
-				TileWorkspaceProvider,
+				ItemDetailProvider,
 				null,
 				createElement(TileSystemProvider, null, createElement(Board)),
 			),
@@ -229,7 +229,7 @@ describe("Board", () => {
 		gameEngineState.game = desktopGame;
 		const html = renderToStaticMarkup(
 			createElement(
-				TileWorkspaceProvider,
+				ItemDetailProvider,
 				null,
 				createElement(TileSystemProvider, null, createElement(Board)),
 			),

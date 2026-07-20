@@ -1,0 +1,48 @@
+import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+
+export namespace readItemDetailIdentity {
+	export interface Props {
+		readonly itemId: IdSchema.Type;
+		readonly runtime: RuntimeSchema.Type;
+	}
+
+	export type Result =
+		| {
+				readonly kind: "available";
+				readonly itemId: IdSchema.Type;
+				readonly title: string;
+				readonly categoryId: IdSchema.Type;
+				readonly sourceResourceId: IdSchema.Type;
+				readonly compositeResourceId?: IdSchema.Type;
+		  }
+		| {
+				readonly kind: "unavailable";
+		  };
+}
+
+const unavailable = {
+	kind: "unavailable",
+} as const satisfies readItemDetailIdentity.Result;
+
+/** Projects the shared authored identity rendered by the shared Item Detail header. */
+export const readItemDetailIdentity = ({
+	itemId,
+	runtime,
+}: readItemDetailIdentity.Props): readItemDetailIdentity.Result => {
+	const item = runtime.items.find((candidate) => candidate.id === itemId);
+	if (item === undefined) return unavailable;
+	return {
+		kind: "available",
+		itemId: item.id,
+		title: item.item.title,
+		categoryId: item.item.categoryId,
+		sourceResourceId: readRuntimeItemPrimaryAssetId(runtime, item.item),
+		...(item.item.asset.composite === undefined
+			? {}
+			: {
+					compositeResourceId: item.item.asset.composite,
+				}),
+	};
+};

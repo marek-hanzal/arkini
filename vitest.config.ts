@@ -12,7 +12,7 @@ export default defineConfig({
 		clearMocks: true,
 		environment: "node",
 		fileParallelism: false,
-		isolate: false,
+		isolate: true,
 		include: [
 			"test/**/*.test.ts",
 		],

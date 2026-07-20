@@ -8,7 +8,7 @@ const toolbar = readFileSync(
 	"utf8",
 );
 const lines = readFileSync(
-	new URL("../../../src/ui/tile-workspace/TileLinesWorkspace.tsx", import.meta.url),
+	new URL("../../../src/ui/item-detail/ItemLinesTab.tsx", import.meta.url),
 	"utf8",
 );
 const catalog = readFileSync(

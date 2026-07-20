@@ -3,10 +3,10 @@ import type { PropsWithChildren } from "react";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
+import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { TileWorkspace } from "~/ui/tile-workspace/TileWorkspace";
-import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 
 /** Renders the one playable board leaf over its route-scoped Game Engine. */
 export function GameShell({ children }: PropsWithChildren) {
@@ -18,7 +18,7 @@ export function GameShell({ children }: PropsWithChildren) {
 			tabIndex={-1}
 		>
 			<GameMenuProvider>
-				<TileWorkspaceProvider>
+				<ItemDetailProvider>
 					<div
 						className="relative size-full min-h-0 min-w-0"
 						data-ui="TileScene"
@@ -28,8 +28,8 @@ export function GameShell({ children }: PropsWithChildren) {
 					>
 						<TileSystemProvider>{children}</TileSystemProvider>
 					</div>
-					<TileWorkspace />
-				</TileWorkspaceProvider>
+					<ItemDetailModal />
+				</ItemDetailProvider>
 				<GameMenu game={gameEngine} />
 			</GameMenuProvider>
 		</main>

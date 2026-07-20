@@ -8,7 +8,7 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
-import { readTileStatusFx } from "~/engine/tile/read/readTileStatusFx";
+import { readItemDetailStatusFx } from "~/engine/item-detail/read/readItemDetailStatusFx";
 
 export namespace useTileActors {
 	export interface Item {
@@ -35,7 +35,7 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 					!activeOwnerIds.has(item.id) || !isLineOwnerItem(item.item)
 						? undefined
 						: game.read(
-								readTileStatusFx({
+								readItemDetailStatusFx({
 									itemId: item.id,
 									runtime,
 								}),

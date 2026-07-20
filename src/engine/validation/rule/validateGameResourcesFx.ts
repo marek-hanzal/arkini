@@ -73,19 +73,7 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 			source: provenance.resources,
 		});
 	}
-	if (config.resources.tileCapabilities !== undefined) {
-		for (const [capability, id] of Object.entries(config.resources.tileCapabilities)) {
-			references.push({
-				id,
-				path: [
-					"resources",
-					"tileCapabilities",
-					capability,
-				],
-				source: provenance.resources,
-			});
-		}
-	}
+
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
 		item.asset.source.forEach((id, index) => {

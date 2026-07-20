@@ -12,8 +12,8 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { TileWorkspace } from "~/ui/tile-workspace/TileWorkspace";
-import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
+import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
+import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/game/testGameRead";
 
@@ -87,12 +87,6 @@ const config = GameConfigSchema.parse({
 	version: "1.0",
 	resources: {
 		hero: "hero",
-		tileCapabilities: {
-			info: "tile-capability-info",
-			status: "tile-capability-status",
-			lines: "tile-capability-lines",
-			effects: "tile-capability-effects",
-		},
 	},
 	meta: {
 		id: "game:board-drag",
@@ -266,15 +260,6 @@ beforeEach(() => {
 				if (Number.isFinite(x) && Number.isFinite(y))
 					return rect(x * 100, y * 100, 100, 100);
 			}
-			if (element.dataset.ui === "TileHoverActionBar") {
-				const actor = document.querySelector<HTMLElement>(
-					`[data-ui="TileActor"][data-runtime-id="${element.dataset.referenceId}"]`,
-				);
-				const x = Number(actor?.dataset.boardX);
-				const y = Number(actor?.dataset.boardY);
-				if (Number.isFinite(x) && Number.isFinite(y))
-					return rect(x * 100 - 20, y * 100 + 92, 140, 40);
-			}
 			const x = Number(element.dataset.boardX);
 			const y = Number(element.dataset.boardY);
 			if (Number.isFinite(x) && Number.isFinite(y)) return rect(x * 100, y * 100, 100, 100);
@@ -316,10 +301,10 @@ const renderBoard = async () => {
 	await act(async () => {
 		root.render(
 			createElement(
-				TileWorkspaceProvider,
+				ItemDetailProvider,
 				null,
 				createElement(TileSystemProvider, null, createElement(Board)),
-				createElement(TileWorkspace),
+				createElement(ItemDetailModal),
 			),
 		);
 		await Promise.resolve();
@@ -1067,206 +1052,28 @@ describe("Board drag", () => {
 		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
 	});
 
-	it("shows one overlapping image action bar and suppresses it throughout DnD", async () => {
-		vi.useFakeTimers();
-		motionTestRuntime.autoComplete = false;
-		await renderBoard();
-		const source = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
-		);
-		if (source === null) throw new Error("Missing hover action source actor.");
-		const visual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		if (visual === null) throw new Error("Missing actor visual shell.");
-		expect(visual.dataset.motionScale).toBe("1");
-		expectArtworkOnlyVisual(visual);
+	it("opens one Item Detail modal from the exact live actor double-click", async () => {
+		const source = await renderBoard();
+		const runtimeId = source.dataset.runtimeId;
+		if (runtimeId === undefined) throw new Error("Missing source runtime identity.");
 
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (dragSurface === null) throw new Error("Missing drag surface.");
 		await act(async () => {
-			dragSurface.dispatchEvent(
-				new MouseEvent("mouseenter", {
+			source.dispatchEvent(
+				new MouseEvent("dblclick", {
 					bubbles: true,
-				}),
-			);
-		});
-		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
-		await act(async () => {
-			await vi.advanceTimersByTimeAsync(249);
-		});
-		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
-		await act(async () => {
-			await vi.advanceTimersByTimeAsync(1);
-		});
-		expect(visual.dataset.motionScale).toBe("1.15");
-		expectArtworkOnlyVisual(visual);
-		const actionBar = document.querySelector<HTMLElement>('[data-ui="TileHoverActionBar"]');
-		if (actionBar === null) throw new Error("Missing tile hover action bar.");
-		expect(actionBar.dataset.referenceId).toBe(source.dataset.runtimeId);
-		expect(actionBar.dataset.mainAxisOffset).toBe("-8");
-		expect(actionBar.dataset.openDelayMs).toBe("250");
-		expect(actionBar.classList).not.toContain("shadow-2xl");
-		const actionElements = Array.from(
-			actionBar.querySelectorAll<HTMLElement>('[data-ui="TileHoverAction"]'),
-		);
-		expect(actionElements.map((action) => action.dataset.capability)).toEqual([
-			"info",
-		]);
-		expect(
-			actionElements.map((action) => {
-				const icon = action.querySelector<HTMLImageElement>("img");
-				return {
-					src: icon?.getAttribute("src"),
-					height: icon?.height,
-					width: icon?.width,
-				};
-			}),
-		).toEqual([
-			{
-				src: "resource:tile-capability-info",
-				height: 24,
-				width: 24,
-			},
-		]);
-		expect(
-			actionElements.map((action) => {
-				const icon = action.querySelector<HTMLImageElement>("img");
-				const tooltip = action.querySelector<HTMLElement>(
-					'[data-ui="TileHoverActionTooltip"]',
-				);
-				return {
-					hasNativeTitle: action.hasAttribute("title"),
-					iconScalesOnHover: icon?.classList.contains("group-hover:scale-150"),
-					tooltipDelay: tooltip?.dataset.openDelayMs,
-					tooltipText: tooltip?.textContent,
-				};
-			}),
-		).toEqual([
-			{
-				hasNativeTitle: false,
-				iconScalesOnHover: true,
-				tooltipDelay: "250",
-				tooltipText: "Info",
-			},
-		]);
-		const infoAction = actionBar.querySelector<HTMLElement>('[data-capability="info"]');
-		if (infoAction === null) throw new Error("Missing temporary Info hover action.");
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("mouseleave", 150, 96));
-			actionBar.dispatchEvent(
-				new MouseEvent("mouseenter", {
-					bubbles: true,
-					clientX: 150,
-					clientY: 102,
-				}),
-			);
-			await Promise.resolve();
-		});
-		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBe(actionBar);
-		await act(async () => {
-			infoAction.dispatchEvent(pointerEvent("pointerdown", 150, 110));
-			infoAction.dispatchEvent(
-				new MouseEvent("click", {
-					bubbles: true,
+					button: 0,
 					cancelable: true,
 				}),
 			);
-		});
-		expect(dropItemState.drop).not.toHaveBeenCalled();
-		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
-		const workspaceModal = document.querySelector<HTMLElement>(
-			'[data-ui="TileWorkspaceModal"]',
-		);
-		if (workspaceModal === null) throw new Error("Missing Info workspace modal.");
-		expect(workspaceModal.dataset.capability).toBe("info");
-		expect(workspaceModal.dataset.runtimeId).toBe(source.dataset.runtimeId);
-		expect(workspaceModal.querySelector("h2")?.textContent).toContain("Stone");
-		expect(workspaceModal.textContent).toContain("Stone");
-		expect(
-			workspaceModal
-				.querySelector<HTMLImageElement>('[data-ui="TileWorkspaceHeaderArtwork"] img')
-				?.getAttribute("src"),
-		).toBe("resource:asset:stone");
-		expect(workspaceModal.querySelector('[data-ui="TileInfoArtwork"]')).toBeNull();
-		await act(async () => {
-			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
 			await Promise.resolve();
-		});
-		const closeWorkspace = workspaceModal.querySelector<HTMLButtonElement>(
-			'button[aria-label="Close Info"]',
-		);
-		if (closeWorkspace === null) throw new Error("Missing Info workspace close action.");
-		await act(async () => {
-			closeWorkspace.click();
 			await Promise.resolve();
-			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
-			await Promise.resolve();
-		});
-		expect(document.querySelector('[data-ui="TileWorkspaceModal"]')).toBeNull();
-
-		const otherActor = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		const otherDragSurface = otherActor?.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
-		if (otherActor === null || otherDragSurface === null || otherDragSurface === undefined) {
-			throw new Error("Missing alternate hover actor.");
-		}
-		await act(async () => {
-			dragSurface.dispatchEvent(
-				new MouseEvent("mouseleave", {
-					bubbles: true,
-				}),
-			);
-			otherDragSurface.dispatchEvent(
-				new MouseEvent("mouseenter", {
-					bubbles: true,
-				}),
-			);
-			await vi.advanceTimersByTimeAsync(250);
-		});
-		const switchedActionBars = document.querySelectorAll<HTMLElement>(
-			'[data-ui="TileHoverActionBar"]',
-		);
-		expect(switchedActionBars).toHaveLength(1);
-		expect(switchedActionBars[0]?.dataset.referenceId).toBe(otherActor.dataset.runtimeId);
-
-		await act(async () => {
-			otherDragSurface.dispatchEvent(
-				new MouseEvent("mouseleave", {
-					bubbles: true,
-				}),
-			);
-			dragSurface.dispatchEvent(
-				new MouseEvent("mouseenter", {
-					bubbles: true,
-				}),
-			);
-			await vi.advanceTimersByTimeAsync(250);
 		});
 
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 150, 50));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 175, 75));
-		});
-		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
-		expect(visual.dataset.motionScale).toBe("1.18");
-		expect(visual.dataset.motionPhase).toBe("dragging");
-		expectArtworkOnlyVisual(visual);
-
-		dropItemState.drop.mockResolvedValue({
-			kind: "reject",
-			reason: "unsupported-target",
-			itemId: source.dataset.runtimeId ?? "runtime:unknown",
-		});
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 175, 75));
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-		expect(dropItemState.drop).toHaveBeenCalledOnce();
-		expect(visual.dataset.motionPhase).toBe("stable");
-		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
-		expectArtworkOnlyVisual(visual);
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		expect(modal).not.toBeNull();
+		expect(modal?.dataset.runtimeId).toBe(runtimeId);
+		expect(modal?.dataset.tab).toBe("info");
+		expect(document.querySelectorAll('[data-ui="ItemDetailModal"]')).toHaveLength(1);
+		expect(source.style.pointerEvents).toBe("none");
 	});
 });

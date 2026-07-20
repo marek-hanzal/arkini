@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
 import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
@@ -21,6 +21,7 @@ export namespace MainPageLayout {
 
 	export interface Props extends PropsWithChildren {
 		readonly labelledBy?: string;
+		readonly overlay?: ReactNode;
 		readonly page: Page;
 		readonly panelClassName?: string;
 		readonly panelMode?: PanelMode;
@@ -31,6 +32,7 @@ export namespace MainPageLayout {
 export const MainPageLayout = ({
 	children,
 	labelledBy,
+	overlay,
 	page,
 	panelClassName,
 	panelMode = "responsive",
@@ -39,6 +41,7 @@ export const MainPageLayout = ({
 		compactHero
 		dataUi="MainPageLayout"
 		layout="fixed-hero"
+		overlay={overlay}
 	>
 		<section
 			aria-labelledby={labelledBy}

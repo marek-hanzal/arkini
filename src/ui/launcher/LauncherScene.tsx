@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
 import { launcherBackdropViewTransitionName } from "~/ui/navigation/launcherBackdropViewTransitionName";
 
@@ -27,6 +27,7 @@ export namespace LauncherScene {
 		readonly compactHero?: boolean;
 		readonly dataUi: string;
 		readonly layout?: Layout;
+		readonly overlay?: ReactNode;
 	}
 }
 
@@ -37,6 +38,7 @@ export const LauncherScene = ({
 	compactHero = false,
 	dataUi,
 	layout = "centered",
+	overlay,
 }: LauncherScene.Props) => (
 	<main
 		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${className === undefined ? "" : ` ${className}`}`}
@@ -68,5 +70,13 @@ export const LauncherScene = ({
 				{children}
 			</div>
 		</div>
+		{overlay === undefined ? null : (
+			<div
+				className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+				data-ui="LauncherSceneOverlay"
+			>
+				{overlay}
+			</div>
+		)}
 	</main>
 );

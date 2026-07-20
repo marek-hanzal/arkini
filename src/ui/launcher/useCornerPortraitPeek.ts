@@ -4,14 +4,27 @@ import { AboutPortraitAssets } from "~/ui/launcher/AboutPortraitAssets";
 const randomBetween = (minimum: number, maximum: number) =>
 	minimum + Math.random() * (maximum - minimum);
 
+interface CornerPortraitPeekState {
+	readonly activePortraitIndex: number | undefined;
+	readonly sizePx: number;
+}
+
+const initialState: CornerPortraitPeekState = {
+	activePortraitIndex: undefined,
+	sizePx: 104,
+};
+
 /** Randomly selects which pre-rendered portrait peeks from one About-page corner. */
 export const useCornerPortraitPeek = (active: boolean) => {
-	const [activePortraitIndex, setActivePortraitIndex] = useState<number>();
+	const [peek, setPeek] = useState(initialState);
 	const previousPortraitIndexRef = useRef<number | undefined>(undefined);
 
 	useEffect(() => {
 		if (!active) {
-			setActivePortraitIndex(undefined);
+			setPeek((current) => ({
+				...current,
+				activePortraitIndex: undefined,
+			}));
 			return;
 		}
 
@@ -29,12 +42,18 @@ export const useCornerPortraitPeek = (active: boolean) => {
 					const nextIndex =
 						candidates[Math.floor(Math.random() * candidates.length)] ?? 0;
 					previousPortraitIndexRef.current = nextIndex;
-					setActivePortraitIndex(nextIndex);
+					setPeek({
+						activePortraitIndex: nextIndex,
+						sizePx: Math.round(randomBetween(88, 124)),
+					});
 
 					timeout = window.setTimeout(
 						() => {
 							if (disposed) return;
-							setActivePortraitIndex(undefined);
+							setPeek((current) => ({
+								...current,
+								activePortraitIndex: undefined,
+							}));
 							timeout = window.setTimeout(schedulePeek, randomBetween(700, 3_200));
 						},
 						randomBetween(1_100, 2_300),
@@ -53,5 +72,5 @@ export const useCornerPortraitPeek = (active: boolean) => {
 		active,
 	]);
 
-	return activePortraitIndex;
+	return peek;
 };

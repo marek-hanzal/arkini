@@ -2,7 +2,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PrimaryButton } from "~/ui/button/Button";
-import { AboutEasterEgg } from "~/ui/launcher/AboutEasterEgg";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
@@ -57,7 +56,6 @@ export const About = () => {
 			className="relative isolate"
 			data-ui="About"
 		>
-			<AboutEasterEgg />
 			<div className="relative z-10 grid gap-4 text-center">
 				<h1
 					id="about-title"

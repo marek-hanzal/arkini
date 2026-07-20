@@ -5,11 +5,11 @@ import { useAboutEasterEggDelay } from "~/ui/launcher/useAboutEasterEggDelay";
 
 const fallingPortraitPool = Array.from(
 	{
-		length: 12,
+		length: 8,
 	},
 	(_, index) => ({
 		id: `falling-portrait-${index}`,
-		initialDelayMs: (index % 4) * 420 + Math.floor(index / 4) * 190,
+		initialDelayMs: index * 1_500,
 	}),
 );
 
@@ -28,13 +28,10 @@ export const AboutEasterEgg = () => {
 	return (
 		<div
 			aria-hidden="true"
-			className="pointer-events-none absolute z-20 overflow-hidden"
+			className="pointer-events-none relative size-full overflow-hidden"
 			data-active={active ? "true" : "false"}
 			data-ui="AboutEasterEgg"
 			ref={containerRef}
-			style={{
-				inset: "calc(-1 * var(--ak-panel-padding))",
-			}}
 		>
 			{fallingPortraitPool.map(({ id, initialDelayMs }) => (
 				<FallingPortrait

@@ -65,6 +65,7 @@ export const useFallingPortraitMotion = ({
 				const sizePx = Math.round(randomBetween(42, 60) + depth * 48);
 				const opacity = randomBetween(0.36, 0.48) + depth * 0.45;
 				const durationSeconds = randomBetween(8.5, 11.5) - depth * 2.25;
+				const cycleDurationSeconds = randomBetween(11.5, 13.5);
 				const startX = randomBetween(
 					-sizePx * 0.15,
 					Math.max(0, bounds.width - sizePx * 0.85),
@@ -115,7 +116,7 @@ export const useFallingPortraitMotion = ({
 					},
 				});
 
-				await wait(randomBetween(120, 1_100));
+				await wait(Math.max(0.9, cycleDurationSeconds - durationSeconds) * 1_000);
 			}
 		};
 

@@ -1,10 +1,10 @@
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { TileItemId } from "~/bridge/tile/TileItemId";
 
 export type TileWorkspacePhase = "closed" | "entering" | "open" | "exiting";
 
 export interface TileWorkspaceTarget {
 	readonly capability: "info" | "status";
-	readonly itemId: IdSchema.Type;
+	readonly itemId: TileItemId;
 	readonly origin: HTMLElement | null;
 	readonly generation: number;
 }
@@ -14,8 +14,8 @@ export interface TileWorkspaceControl {
 	readonly phase: TileWorkspacePhase;
 	readonly isOpen: boolean;
 	readonly target: TileWorkspaceTarget | null;
-	readonly openInfo: (itemId: IdSchema.Type, origin: HTMLElement | null) => boolean;
-	readonly openStatus: (itemId: IdSchema.Type, origin: HTMLElement | null) => boolean;
+	readonly openInfo: (itemId: TileItemId, origin: HTMLElement | null) => boolean;
+	readonly openStatus: (itemId: TileItemId, origin: HTMLElement | null) => boolean;
 	readonly close: () => Promise<void>;
 	readonly completeEnter: (generation: number) => void;
 	readonly completeExit: (generation: number) => void;

@@ -1,6 +1,6 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { TileItemId } from "~/bridge/tile/TileItemId";
 import { TileWorkspaceContext } from "~/ui/tile-workspace/TileWorkspaceContext";
 import type {
 	TileWorkspacePhase,
@@ -26,7 +26,7 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 	const openTarget = useCallback(
 		(
 			capability: TileWorkspaceTarget["capability"],
-			itemId: IdSchema.Type,
+			itemId: TileItemId,
 			origin: HTMLElement | null,
 		) => {
 			if (phaseRef.current !== "closed") return false;
@@ -47,14 +47,14 @@ export const TileWorkspaceProvider = ({ children }: PropsWithChildren) => {
 	);
 
 	const openInfo = useCallback(
-		(itemId: IdSchema.Type, origin: HTMLElement | null) => openTarget("info", itemId, origin),
+		(itemId: TileItemId, origin: HTMLElement | null) => openTarget("info", itemId, origin),
 		[
 			openTarget,
 		],
 	);
 
 	const openStatus = useCallback(
-		(itemId: IdSchema.Type, origin: HTMLElement | null) => openTarget("status", itemId, origin),
+		(itemId: TileItemId, origin: HTMLElement | null) => openTarget("status", itemId, origin),
 		[
 			openTarget,
 		],

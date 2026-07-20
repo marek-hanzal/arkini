@@ -244,6 +244,7 @@ describe("ItemDetailProvider", () => {
 		expect(readGameMenu().phase).toBe("entering");
 		expect(readItemDetail().state).toMatchObject({
 			phase: "exiting",
+			restoreFocus: false,
 			target: {
 				itemId: "runtime:first",
 			},

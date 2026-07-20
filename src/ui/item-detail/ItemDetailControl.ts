@@ -25,7 +25,12 @@ export type ItemDetailState =
 			readonly phase: "exiting";
 			readonly target: ItemDetailTarget;
 			readonly generation: number;
+			readonly restoreFocus: boolean;
 	  };
+
+export interface CloseItemDetailProps {
+	readonly restoreFocus?: boolean;
+}
 
 export interface OpenItemDetailProps {
 	readonly itemId: TileItemId;
@@ -38,7 +43,7 @@ export interface ItemDetailControl {
 	readonly state: ItemDetailState;
 	readonly isOpen: boolean;
 	readonly openItemDetail: (props: OpenItemDetailProps) => boolean;
-	readonly close: () => Promise<void>;
+	readonly close: (props?: CloseItemDetailProps) => Promise<void>;
 	readonly completeEnter: (generation: number) => void;
 	readonly completeExit: (generation: number) => void;
 }

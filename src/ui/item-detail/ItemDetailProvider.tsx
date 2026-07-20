@@ -88,30 +88,40 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		],
 	);
 
-	const close = useCallback(() => {
-		const current = stateRef.current;
-		if (current.phase === "closed") return Promise.resolve();
-		if (current.phase === "exiting") {
-			return exitCompletionRef.current?.promise ?? Promise.resolve();
-		}
-		let resolve: () => void = () => undefined;
-		const promise = new Promise<void>((complete) => {
-			resolve = complete;
-		});
-		exitCompletionRef.current = {
-			generation: current.generation,
-			promise,
-			resolve,
-		};
-		publishState({
-			phase: "exiting",
-			target: current.target,
-			generation: current.generation,
-		});
-		return promise;
-	}, [
-		publishState,
-	]);
+	const close = useCallback(
+		({ restoreFocus = true } = {}) => {
+			const current = stateRef.current;
+			if (current.phase === "closed") return Promise.resolve();
+			if (current.phase === "exiting") {
+				if (!restoreFocus && current.restoreFocus) {
+					publishState({
+						...current,
+						restoreFocus: false,
+					});
+				}
+				return exitCompletionRef.current?.promise ?? Promise.resolve();
+			}
+			let resolve: () => void = () => undefined;
+			const promise = new Promise<void>((complete) => {
+				resolve = complete;
+			});
+			exitCompletionRef.current = {
+				generation: current.generation,
+				promise,
+				resolve,
+			};
+			publishState({
+				phase: "exiting",
+				target: current.target,
+				generation: current.generation,
+				restoreFocus,
+			});
+			return promise;
+		},
+		[
+			publishState,
+		],
+	);
 
 	const completeEnter = useCallback(
 		(generation: number) => {

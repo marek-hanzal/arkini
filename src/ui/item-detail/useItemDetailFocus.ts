@@ -15,6 +15,7 @@ const focusableSelector = [
 export const useItemDetailFocus = ({
 	phase,
 	origin,
+	restoreFocus,
 }: {
 	readonly phase: Exclude<
 		ItemDetailState,
@@ -23,21 +24,26 @@ export const useItemDetailFocus = ({
 		}
 	>["phase"];
 	readonly origin: HTMLElement | null;
+	readonly restoreFocus: boolean;
 }) => {
 	const dialogRef = useRef<HTMLDivElement>(null);
+	const originRef = useRef(origin);
+	const restoreFocusRef = useRef(restoreFocus);
+	originRef.current = origin;
+	restoreFocusRef.current = restoreFocus;
 
 	useEffect(() => {
 		dialogRef.current?.focus();
 		return () => {
-			if (origin?.isConnected === true) {
-				origin.focus();
+			if (!restoreFocusRef.current) return;
+			const latestOrigin = originRef.current;
+			if (latestOrigin?.isConnected === true) {
+				latestOrigin.focus();
 				return;
 			}
 			document.querySelector<HTMLElement>('[data-ui="GameShell"]')?.focus();
 		};
-	}, [
-		origin,
-	]);
+	}, []);
 
 	useEffect(() => {
 		if (phase !== "open") return;

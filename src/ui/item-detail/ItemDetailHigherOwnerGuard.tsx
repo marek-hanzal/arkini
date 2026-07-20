@@ -10,7 +10,9 @@ export const ItemDetailHigherOwnerGuard = () => {
 
 	useEffect(() => {
 		if (gameMenu.phase === "closed" || !itemDetail.isOpen) return;
-		void itemDetail.close();
+		void itemDetail.close({
+			restoreFocus: false,
+		});
 	}, [
 		gameMenu.phase,
 		itemDetail.close,

@@ -246,6 +246,7 @@ const ItemDetailDialog = ({
 	const focus = useItemDetailFocus({
 		phase: state.phase,
 		origin: state.target.origin,
+		restoreFocus: state.phase === "exiting" ? state.restoreFocus : true,
 	});
 
 	useEffect(() => {

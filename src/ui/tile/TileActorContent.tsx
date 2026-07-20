@@ -17,9 +17,7 @@ export namespace TileActorContent {
 const settledVisualTarget = {
 	scale: 1,
 	opacity: 1,
-	filter: "brightness(1)",
-	borderColor: "var(--ak-line-strong)",
-	boxShadow: "0 0.55rem 1.2rem color-mix(in srgb, var(--ak-overlay) 34%, transparent)",
+	filter: "brightness(1) drop-shadow(0 0.45rem 0.65rem color-mix(in srgb, var(--ak-overlay) 34%, transparent))",
 };
 
 const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" | "feedback">) =>
@@ -34,9 +32,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 0.72,
 				opacity: 0,
-				filter: "brightness(1.14)",
-				borderColor: "var(--ak-accent)",
-				boxShadow: "0 0.5rem 1rem color-mix(in srgb, var(--ak-overlay) 18%, transparent)",
+				filter: "brightness(1.14) drop-shadow(0 0.4rem 0.55rem color-mix(in srgb, var(--ak-overlay) 18%, transparent))",
 			}),
 		)
 		.with(
@@ -46,9 +42,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 1.12,
 				opacity: 1,
-				filter: "brightness(1.12)",
-				borderColor: "var(--ak-accent)",
-				boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-accent) 30%, transparent)",
+				filter: "brightness(1.12) drop-shadow(0 0.8rem 1rem color-mix(in srgb, var(--ak-accent) 30%, transparent))",
 			}),
 		)
 		.with(
@@ -58,10 +52,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 1.18,
 				opacity: 1,
-				filter: "brightness(1.08)",
-				borderColor: "var(--ak-accent)",
-				boxShadow:
-					"0 1.35rem 2.5rem color-mix(in srgb, var(--ak-overlay) 58%, transparent)",
+				filter: "brightness(1.08) drop-shadow(0 1rem 1.35rem color-mix(in srgb, var(--ak-overlay) 58%, transparent))",
 			}),
 		)
 		.with(
@@ -71,9 +62,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 1.15,
 				opacity: 1,
-				filter: "brightness(1.06)",
-				borderColor: "var(--ak-line-strong)",
-				boxShadow: "0 1rem 2rem color-mix(in srgb, var(--ak-overlay) 48%, transparent)",
+				filter: "brightness(1.06) drop-shadow(0 0.8rem 1rem color-mix(in srgb, var(--ak-overlay) 48%, transparent))",
 			}),
 		)
 		.with(
@@ -83,9 +72,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 1.08,
 				opacity: 1,
-				filter: "brightness(1.08)",
-				borderColor: "var(--ak-accent)",
-				boxShadow: "0 0.9rem 1.8rem color-mix(in srgb, var(--ak-accent) 24%, transparent)",
+				filter: "brightness(1.08) drop-shadow(0 0.7rem 0.9rem color-mix(in srgb, var(--ak-accent) 24%, transparent))",
 			}),
 		)
 		.with(
@@ -96,9 +83,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 1.04,
 				opacity: 1,
-				filter: "brightness(1.03)",
-				borderColor: "var(--ak-danger)",
-				boxShadow: "0 0.75rem 1.5rem color-mix(in srgb, var(--ak-danger) 22%, transparent)",
+				filter: "brightness(1.03) drop-shadow(0 0.6rem 0.8rem color-mix(in srgb, var(--ak-danger) 30%, transparent))",
 			}),
 		)
 		.with(
@@ -109,9 +94,7 @@ const visualTarget = ({ phase, feedback }: Pick<TileActorContent.Props, "phase" 
 			() => ({
 				scale: 1.06,
 				opacity: 1,
-				filter: "brightness(1.06)",
-				borderColor: "var(--ak-accent)",
-				boxShadow: "0 0.8rem 1.6rem color-mix(in srgb, var(--ak-accent) 20%, transparent)",
+				filter: "brightness(1.06) drop-shadow(0 0.65rem 0.85rem color-mix(in srgb, var(--ak-accent) 24%, transparent))",
 			}),
 		)
 		.with(
@@ -136,7 +119,7 @@ export const TileActorContent = ({
 	onAnimationComplete,
 }: TileActorContent.Props) => (
 	<motion.span
-		className="absolute inset-0 isolate overflow-hidden rounded-[22%] border bg-surface-raised/95"
+		className="absolute inset-0 isolate overflow-hidden rounded-[22%] bg-transparent"
 		data-ui="TileActorVisual"
 		data-motion-phase={phase}
 		initial={false}

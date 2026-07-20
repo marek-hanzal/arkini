@@ -55,6 +55,12 @@ const rect = (left: number, top: number, width: number, height: number): DOMRect
 	toJSON: () => ({}),
 });
 
+const expectArtworkOnlyVisual = (visual: HTMLElement) => {
+	expect(visual.classList).toContain("bg-transparent");
+	expect(visual.classList).not.toContain("bg-surface-raised/95");
+	expect(visual.classList).not.toContain("border");
+};
+
 const pointerEvent = (type: string, x: number, y: number) => {
 	const event = new MouseEvent(type, {
 		bubbles: true,
@@ -630,12 +636,14 @@ describe("Board drag", () => {
 		});
 		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		expect(
-			source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
-		).toBe("exiting");
-		expect(
-			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
-		).toBe("impact");
+		const sourceVisual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		const targetVisual = target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		if (sourceVisual === null || targetVisual === null)
+			throw new Error("Missing merge visuals.");
+		expect(sourceVisual.dataset.motionPhase).toBe("exiting");
+		expect(targetVisual.dataset.motionPhase).toBe("impact");
+		expectArtworkOnlyVisual(sourceVisual);
+		expectArtworkOnlyVisual(targetVisual);
 
 		await act(async () => {
 			motionTestRuntime.finish(
@@ -836,11 +844,13 @@ describe("Board drag", () => {
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
 	});
 
-	it("uses a pronounced Motion-owned 1.15 preview hover and keeps drag larger", async () => {
+	it("keeps artwork-only visuals through hover, drag, and rejected return", async () => {
+		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();
 		const visual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
 		if (visual === null) throw new Error("Missing actor visual shell.");
 		expect(visual.dataset.motionScale).toBe("1");
+		expectArtworkOnlyVisual(visual);
 
 		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
 		if (dragSurface === null) throw new Error("Missing drag surface.");
@@ -852,13 +862,15 @@ describe("Board drag", () => {
 			);
 		});
 		expect(visual.dataset.motionScale).toBe("1.15");
+		expectArtworkOnlyVisual(visual);
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			await Promise.resolve();
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 275, 175));
 		});
-		expect(visual.dataset.motionScale).toBe("1.15");
-		expect(visual.dataset.motionPhase).toBe("hovered");
+		expect(visual.dataset.motionScale).toBe("1.18");
+		expect(visual.dataset.motionPhase).toBe("dragging");
+		expectArtworkOnlyVisual(visual);
 
 		dropItemState.drop.mockResolvedValue({
 			kind: "reject",
@@ -866,8 +878,12 @@ describe("Board drag", () => {
 			itemId: source.dataset.runtimeId ?? "runtime:unknown",
 		});
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 275, 175));
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 275, 175));
+			await Promise.resolve();
+			await Promise.resolve();
 		});
-		expect(visual.dataset.motionScale).toBe("1.18");
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+		expect(visual.dataset.motionPhase).toBe("hovered");
+		expectArtworkOnlyVisual(visual);
 	});
 });

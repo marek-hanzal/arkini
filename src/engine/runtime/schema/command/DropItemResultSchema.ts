@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
+import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 
 const DropItemMovedResultSchema = z
@@ -31,6 +34,43 @@ const DropItemSwappedResultSchema = z
 	})
 	.strict();
 
+const DropItemMergeActorStateSchema = z
+	.object({
+		itemId: IdSchema,
+		canonicalItemId: IdSchema,
+		revision: RevisionSchema,
+		location: GridLocationSchema,
+		quantity: PositiveIntegerSchema,
+	})
+	.strict();
+
+const DropItemMergedResultSchema = z
+	.object({
+		kind: z.literal("merge"),
+		action: ActionEnumSchema,
+		effect: EffectEnumSchema,
+		resultCanonicalItemId: IdSchema.optional(),
+		source: z
+			.object({
+				itemId: IdSchema,
+				previousRevision: RevisionSchema,
+				previousLocation: GridLocationSchema,
+				previousQuantity: PositiveIntegerSchema,
+				current: DropItemMergeActorStateSchema.nullable(),
+			})
+			.strict(),
+		target: z
+			.object({
+				itemId: IdSchema,
+				previousRevision: RevisionSchema,
+				previousLocation: GridLocationSchema,
+				previousQuantity: PositiveIntegerSchema,
+				current: DropItemMergeActorStateSchema.nullable(),
+			})
+			.strict(),
+	})
+	.strict();
+
 const DropItemIgnoredResultSchema = z
 	.object({
 		kind: z.literal("ignored"),
@@ -46,6 +86,7 @@ const DropItemRejectedResultSchema = z
 		reason: z.enum([
 			"unsupported-target",
 			"occupied",
+			"blocked",
 			"stale-source",
 			"stale-target",
 			"invalid-source",
@@ -61,6 +102,7 @@ export const DropItemResultSchema = z
 	.discriminatedUnion("kind", [
 		DropItemMovedResultSchema,
 		DropItemSwappedResultSchema,
+		DropItemMergedResultSchema,
 		DropItemIgnoredResultSchema,
 		DropItemRejectedResultSchema,
 	])

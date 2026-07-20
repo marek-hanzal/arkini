@@ -4,10 +4,12 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
+import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
+import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
@@ -118,6 +120,14 @@ const readOccupiedDropPreflightFx = Effect.fn("readOccupiedDropPreflightFx")(fun
 	return {
 		kind: "swap",
 	} satisfies OccupiedDropPreflight;
+});
+
+const mergeActorState = (item: GridRuntimeItemSchema.Type) => ({
+	itemId: item.id,
+	canonicalItemId: item.item.id,
+	revision: item.revision,
+	location: item.location,
+	quantity: item.quantity,
 });
 
 const rejectForItemError = ({
@@ -235,12 +245,95 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		} satisfies dropItemFx.Result;
 	}
 	if (preflight.kind === "merge") {
-		return {
-			kind: "reject",
-			reason: "unsupported-target",
-			itemId: sourceItemId,
+		return yield* commitMergeItemsFx({
+			sourceItemId,
+			sourceRevision,
 			targetItemId,
-		} satisfies dropItemFx.Result;
+			targetRevision: target.occupant.revision,
+		}).pipe(
+			Effect.map(
+				(result): dropItemFx.Result => ({
+					kind: "merge",
+					action: result.event.action,
+					effect: result.event.effect,
+					resultCanonicalItemId: result.event.resultCanonicalItemId,
+					source: {
+						itemId: result.sourceBefore.id,
+						previousRevision: result.sourceBefore.revision,
+						previousLocation: result.sourceBefore.location,
+						previousQuantity: result.sourceBefore.quantity,
+						current:
+							result.sourceAfter === undefined
+								? null
+								: mergeActorState(result.sourceAfter),
+					},
+					target: {
+						itemId: result.targetBefore.id,
+						previousRevision: result.targetBefore.revision,
+						previousLocation: result.targetBefore.location,
+						previousQuantity: result.targetBefore.quantity,
+						current:
+							result.targetAfter === undefined
+								? null
+								: mergeActorState(result.targetAfter),
+					},
+				}),
+			),
+			Effect.catchTags({
+				ItemNotFoundError: (error) =>
+					Effect.succeed(
+						rejectForItemError({
+							errorItemId: error.itemId,
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				RevisionConflictError: (error) =>
+					Effect.succeed(
+						rejectForItemError({
+							errorItemId: error.entityId,
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				ItemNotOnGridError: () =>
+					Effect.succeed({
+						kind: "reject" as const,
+						reason: "invalid-source" as const,
+						itemId: sourceItemId,
+						targetItemId,
+					}),
+				ItemNotOnBoardError: () =>
+					Effect.succeed({
+						kind: "reject" as const,
+						reason: "invalid-target" as const,
+						itemId: sourceItemId,
+						targetItemId,
+					}),
+				CrossSpaceBoardOperationError: () =>
+					Effect.succeed({
+						kind: "reject" as const,
+						reason: "invalid-target" as const,
+						itemId: sourceItemId,
+						targetItemId,
+					}),
+				MergeRuleNotFoundError: () =>
+					Effect.succeed({
+						kind: "reject" as const,
+						reason: "invalid-target" as const,
+						itemId: sourceItemId,
+						targetItemId,
+					}),
+			}),
+			Effect.catchAll(() =>
+				Effect.succeed({
+					kind: "reject" as const,
+					reason: "blocked" as const,
+					itemId: sourceItemId,
+					targetItemId,
+				}),
+			),
+		);
 	}
 
 	return yield* swapItemsFx({

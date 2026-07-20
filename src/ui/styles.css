@@ -20,6 +20,9 @@
 	--color-danger-contrast: var(--ak-danger-contrast);
 	--color-overlay: var(--ak-overlay);
 	--color-overlay-foreground: var(--ak-overlay-foreground);
+	--background-image-game-shell: var(--ak-game-shell-background);
+	--shadow-board-surface: var(--ak-board-surface-shadow);
+	--shadow-toolbar-surface: var(--ak-toolbar-surface-shadow);
 }
 
 :root {
@@ -47,6 +50,71 @@
 	--ak-danger-contrast: light-dark(#fff9fc, #310914);
 	--ak-overlay: light-dark(#1a1124, #090611);
 	--ak-overlay-foreground: light-dark(#fff9ff, #fff9ff);
+
+	--ak-game-shell-field-primary: light-dark(
+		color-mix(in srgb, var(--ak-accent) 18%, transparent),
+		color-mix(in srgb, var(--ak-accent) 16%, transparent)
+	);
+	--ak-game-shell-field-secondary: light-dark(
+		color-mix(in srgb, var(--ak-info) 15%, transparent),
+		color-mix(in srgb, var(--ak-info) 11%, transparent)
+	);
+	--ak-game-shell-field-tertiary: light-dark(
+		color-mix(in srgb, var(--ak-success) 8%, transparent),
+		color-mix(in srgb, var(--ak-success) 6%, transparent)
+	);
+	--ak-game-shell-highlight: light-dark(rgb(255 255 255 / 52%), rgb(255 255 255 / 3.5%));
+	--ak-game-shell-vignette: light-dark(rgb(62 35 78 / 10%), rgb(0 0 0 / 48%));
+	--ak-game-shell-base-start: light-dark(#fdfaff, #0d0913);
+	--ak-game-shell-base-end: light-dark(#eee8f6, #08060d);
+	--ak-game-shell-background:
+		radial-gradient(
+			ellipse 92% 78% at 50% 48%,
+			transparent 46%,
+			var(--ak-game-shell-vignette) 100%
+		),
+		radial-gradient(
+			ellipse 58% 46% at 13% 11%,
+			var(--ak-game-shell-field-primary) 0%,
+			transparent 72%
+		),
+		radial-gradient(
+			ellipse 46% 38% at 88% 20%,
+			var(--ak-game-shell-field-secondary) 0%,
+			transparent 74%
+		),
+		radial-gradient(
+			ellipse 52% 30% at 55% 104%,
+			var(--ak-game-shell-field-tertiary) 0%,
+			transparent 76%
+		),
+		linear-gradient(132deg, var(--ak-game-shell-highlight) 0%, transparent 34%),
+		linear-gradient(148deg, var(--ak-game-shell-base-start), var(--ak-game-shell-base-end));
+	--ak-game-shell-background-ambient:
+		radial-gradient(
+			ellipse 54% 42% at 82% 82%,
+			var(--ak-game-shell-field-primary) 0%,
+			transparent 74%
+		),
+		radial-gradient(
+			ellipse 46% 38% at 16% 70%,
+			var(--ak-game-shell-field-secondary) 0%,
+			transparent 76%
+		),
+		radial-gradient(
+			ellipse 38% 30% at 62% 4%,
+			var(--ak-game-shell-field-tertiary) 0%,
+			transparent 78%
+		),
+		linear-gradient(318deg, var(--ak-game-shell-highlight) 0%, transparent 30%);
+	--ak-board-surface-shadow:
+		0 0.35rem 0.85rem light-dark(rgb(70 42 85 / 18%), rgb(0 0 0 / 52%)),
+		0 1.55rem 4.25rem light-dark(rgb(78 45 98 / 20%), rgb(0 0 0 / 46%)),
+		0 0 0 1px light-dark(rgb(255 255 255 / 58%), rgb(255 255 255 / 5%));
+	--ak-toolbar-surface-shadow:
+		0 0.2rem 0.42rem light-dark(rgb(70 42 85 / 22%), rgb(0 0 0 / 58%)),
+		0 0.72rem 1.45rem light-dark(rgb(78 45 98 / 16%), rgb(0 0 0 / 34%)),
+		0 0 0 1px light-dark(rgb(255 255 255 / 48%), rgb(255 255 255 / 4%));
 
 	color: var(--ak-foreground);
 	background: var(--ak-canvas);
@@ -159,6 +227,42 @@ select {
 	background: var(--ak-accent);
 }
 
+[data-ui="GameShell"] {
+	background-color: var(--ak-canvas);
+	background-image: var(--ak-game-shell-background);
+	isolation: isolate;
+}
+
+[data-ui="GameShell"]::before {
+	position: absolute;
+	inset: -8%;
+	content: "";
+	pointer-events: none;
+	background-image: var(--ak-game-shell-background-ambient);
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	opacity: 0.08;
+	animation: ak-game-shell-ambient-crossfade 48s ease-in-out infinite;
+}
+
+@keyframes ak-game-shell-ambient-crossfade {
+	0%,
+	100% {
+		opacity: 0.08;
+	}
+
+	50% {
+		opacity: 0.72;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-ui="GameShell"]::before {
+		animation: none;
+		opacity: 0.28;
+	}
+}
+
 [data-ui="GameBoardLayout"] {
 	padding: var(--ak-viewport-padding);
 }
@@ -177,9 +281,14 @@ select {
 	gap: clamp(0.25rem, 1.2vmin, 0.75rem);
 }
 
-[data-tile-grid-frame="true"] {
-	box-shadow: 0 clamp(0.25rem, 0.8vmin, 0.6rem) clamp(0.75rem, 2.2vmin, 1.75rem)
-		color-mix(in srgb, var(--ak-overlay) 24%, transparent);
+[data-ui="BoardFrame"] {
+	box-shadow: var(--ak-board-surface-shadow);
+}
+
+/* The Toolbar scroll owner carries its depth so the frame shadow is not clipped vertically. */
+[data-ui="Toolbar"] {
+	border-radius: clamp(0.75rem, 2.5vmin, 1.75rem);
+	box-shadow: var(--ak-toolbar-surface-shadow);
 }
 
 [data-tile-grid="true"] {

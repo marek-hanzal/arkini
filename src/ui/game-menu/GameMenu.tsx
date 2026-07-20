@@ -1,24 +1,15 @@
-import { useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
-import type { Game } from "~/bridge/game/Game";
-import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState } from "react";
+import { match } from "ts-pattern";
 
+import type { Game } from "~/bridge/game/Game";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
+import { useGameMenuActions } from "~/ui/game-menu/useGameMenuActions";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
-import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
+import { useGameMenuFocus } from "~/ui/game-menu/useGameMenuFocus";
+import { useGameMenuMotion } from "~/ui/game-menu/useGameMenuMotion";
 import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
 import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
-
-const focusableSelector = [
-	"button:not([disabled])",
-	"[href]",
-	"input:not([disabled])",
-	"select:not([disabled])",
-	"textarea:not([disabled])",
-	'[tabindex]:not([tabindex="-1"])',
-].join(",");
 
 const transition = {
 	duration: 0.5,
@@ -30,8 +21,6 @@ const transition = {
 	] as const,
 };
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
 const GameMenuDialog = ({
 	game,
 	phase,
@@ -39,162 +28,15 @@ const GameMenuDialog = ({
 	readonly game: Game;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
-	const menu = useGameMenuControl();
-	const navigate = useNavigate();
-	const save = useSaveGameMutation(game);
-	const saveAndExit = useSaveAndExitGameMutation(game);
-	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
-	const [navigationError, setNavigationError] = useState<unknown>();
-	const dialogRef = useRef<HTMLDivElement>(null);
-	const previousFocusRef = useRef<HTMLElement | null>(null);
-	const completedPhaseRef = useRef<GameMenuPhase | null>(null);
-	const activeRequestRef = useRef<
-		"save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | null
-	>(null);
-	const mutationPending = save.isPending || saveAndExit.isPending;
-	const pending = mutationPending || menu.routePending;
-	const exiting = phase === "exiting";
-	const actionDisabled = phase !== "open" || pending;
-	const gameActionDisabled = actionDisabled;
-
-	useEffect(() => {
-		previousFocusRef.current =
-			document.activeElement instanceof HTMLElement ? document.activeElement : null;
-		dialogRef.current?.focus();
-		return () => {
-			const previousFocus = previousFocusRef.current;
-			if (previousFocus?.isConnected === true) {
-				previousFocus.focus();
-				return;
-			}
-			document.querySelector<HTMLElement>('[data-ui="GameShell"]')?.focus();
-		};
-	}, []);
-
-	useEffect(() => {
-		if (phase !== "open") return;
-		const firstControl = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
-		firstControl?.focus();
-	}, [
+	const actions = useGameMenuActions({
+		game,
 		phase,
-	]);
-
-	useEffect(() => {
-		completedPhaseRef.current = null;
-	}, [
+	});
+	const actorMotion = useGameMenuMotion(phase);
+	const focus = useGameMenuFocus({
 		phase,
-	]);
-
-	const completeMotionPhase = () => {
-		if (phase === "open" || completedPhaseRef.current === phase) return;
-		completedPhaseRef.current = phase;
-		if (phase === "entering") menu.completeEnter();
-		else menu.completeExit();
-	};
-
-	const keepFocusInside = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-		if (event.key === "Escape" && (pending || exiting)) {
-			event.preventDefault();
-			event.stopPropagation();
-			return;
-		}
-		if (event.key !== "Tab") return;
-		const controls = Array.from(
-			dialogRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
-		);
-		if (controls.length === 0) {
-			event.preventDefault();
-			dialogRef.current?.focus();
-			return;
-		}
-		const first = controls[0];
-		const last = controls.at(-1);
-		if (first === undefined || last === undefined) return;
-		if (event.shiftKey && document.activeElement === first) {
-			event.preventDefault();
-			last.focus();
-			return;
-		}
-		if (!event.shiftKey && document.activeElement === last) {
-			event.preventDefault();
-			first.focus();
-		}
-	};
-
-	const requestRoute = (destination: "settings" | "main-menu") => {
-		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = destination;
-		setNavigationError(undefined);
-		const request = navigate({
-			to: "/game/$packageId/action/leave",
-			params: {
-				packageId: game.arkpack.packageId,
-			},
-			search: {
-				destination,
-			},
-		});
-		void request.catch(setNavigationError).finally(() => {
-			activeRequestRef.current = null;
-			menu.completeRouteRequest();
-		});
-	};
-
-	const requestSettings = () => requestRoute("settings");
-	const requestMainMenu = () => requestRoute("main-menu");
-
-	const requestSave = () => {
-		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
-		activeRequestRef.current = "save";
-		save.mutate(undefined, {
-			onSettled: () => {
-				activeRequestRef.current = null;
-			},
-		});
-	};
-
-	const requestSaveAndExit = () => {
-		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
-		activeRequestRef.current = "save-and-exit";
-		saveAndExit.mutate(undefined, {
-			onSettled: () => {
-				activeRequestRef.current = null;
-			},
-		});
-	};
-
-	const requestHardReset = () => {
-		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = "hard-reset";
-		setNavigationError(undefined);
-		void navigate({
-			to: "/game/$packageId/action/reset",
-			params: {
-				packageId: game.arkpack.packageId,
-			},
-		})
-			.catch(setNavigationError)
-			.finally(() => {
-				activeRequestRef.current = null;
-				menu.completeRouteRequest();
-			});
-	};
-
-	const status = saveAndExit.isPending
-		? "Saving and exiting Arkini…"
-		: save.isPending
-			? "Saving…"
-			: saveAndExit.isError
-				? `Save and exit failed: ${errorMessage(saveAndExit.error)}`
-				: save.isError
-					? `Save failed: ${errorMessage(save.error)}`
-					: navigationError !== undefined
-						? `Navigation failed: ${errorMessage(navigationError)}`
-						: menu.routePending
-							? "Opening action page…"
-							: save.isSuccess
-								? "Saved."
-								: null;
+		blocked: actions.pending || phase === "exiting",
+	});
 
 	return (
 		<motion.div
@@ -208,12 +50,12 @@ const GameMenuDialog = ({
 				opacity: 0,
 			}}
 			animate={{
-				opacity: phase === "exiting" ? 0 : 1,
+				opacity: actorMotion.backdropOpacity,
 			}}
 			transition={transition}
 		>
 			<motion.div
-				ref={dialogRef}
+				ref={focus.dialogRef}
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="game-menu-title"
@@ -229,24 +71,10 @@ const GameMenuDialog = ({
 					y: 8,
 					filter: "blur(6px)",
 				}}
-				animate={
-					phase === "exiting"
-						? {
-								opacity: 0,
-								scale: 0.985,
-								y: 6,
-								filter: "blur(5px)",
-							}
-						: {
-								opacity: 1,
-								scale: 1,
-								y: 0,
-								filter: "blur(0px)",
-							}
-				}
+				animate={actorMotion.dialog}
 				transition={transition}
-				onAnimationComplete={completeMotionPhase}
-				onKeyDown={keepFocusInside}
+				onAnimationComplete={actorMotion.completeMotionPhase}
+				onKeyDown={focus.keepFocusInside}
 			>
 				<h2
 					id="game-menu-title"
@@ -258,22 +86,22 @@ const GameMenuDialog = ({
 				<div className="grid gap-2">
 					<PrimaryButton
 						className="w-full"
-						disabled={gameActionDisabled}
-						onClick={() => void menu.close()}
+						disabled={actions.actionDisabled}
+						onClick={() => void actions.close()}
 					>
 						Return to game
 					</PrimaryButton>
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
-						disabled={actionDisabled}
-						onClick={requestSettings}
+						disabled={actions.actionDisabled}
+						onClick={actions.requestSettings}
 					>
 						Settings
 					</Button>
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
-						disabled={actionDisabled}
-						onClick={requestMainMenu}
+						disabled={actions.actionDisabled}
+						onClick={actions.requestMainMenu}
 					>
 						Main Menu
 					</Button>
@@ -282,15 +110,15 @@ const GameMenuDialog = ({
 
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
-						disabled={gameActionDisabled}
-						onClick={requestSave}
+						disabled={actions.actionDisabled}
+						onClick={actions.requestSave}
 					>
 						Save
 					</Button>
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
-						disabled={gameActionDisabled}
-						onClick={requestSaveAndExit}
+						disabled={actions.actionDisabled}
+						onClick={actions.requestSaveAndExit}
 					>
 						Save and exit
 					</Button>
@@ -307,7 +135,7 @@ const GameMenuDialog = ({
 						>
 							Developer
 						</h3>
-						{confirmingDestroy ? (
+						{actions.confirmingDestroy ? (
 							<div className="grid gap-2">
 								<p className="text-sm text-muted">
 									Current progress will be permanently deleted and the game will
@@ -316,15 +144,15 @@ const GameMenuDialog = ({
 								<div className="grid grid-cols-2 gap-2">
 									<Button
 										className="min-h-0 px-3 py-2 shadow-none backdrop-blur-none"
-										disabled={actionDisabled}
-										onClick={() => setConfirmingDestroy(false)}
+										disabled={actions.actionDisabled}
+										onClick={() => actions.setConfirmingDestroy(false)}
 									>
 										Cancel
 									</Button>
 									<DangerButton
 										className="min-h-0 px-3 py-2 shadow-none"
-										disabled={gameActionDisabled}
-										onClick={requestHardReset}
+										disabled={actions.actionDisabled}
+										onClick={actions.requestHardReset}
 									>
 										Destroy permanently
 									</DangerButton>
@@ -333,8 +161,8 @@ const GameMenuDialog = ({
 						) : (
 							<DangerButton
 								className="w-full shadow-none"
-								disabled={gameActionDisabled}
-								onClick={() => setConfirmingDestroy(true)}
+								disabled={actions.actionDisabled}
+								onClick={() => actions.setConfirmingDestroy(true)}
 							>
 								Destroy
 							</DangerButton>
@@ -347,7 +175,7 @@ const GameMenuDialog = ({
 					aria-live="polite"
 					data-ui="GameMenuStatus"
 				>
-					{status}
+					{actions.status}
 				</div>
 			</motion.div>
 		</motion.div>
@@ -357,10 +185,13 @@ const GameMenuDialog = ({
 /** Renders the active game overlay through one explicit enter/open/exit lifecycle. */
 export const GameMenu = ({ game }: { readonly game: Game }) => {
 	const { phase } = useGameMenuControl();
-	return phase === "closed" ? null : (
-		<GameMenuDialog
-			game={game}
-			phase={phase}
-		/>
-	);
+	return match(phase)
+		.with("closed", () => null)
+		.with("entering", "open", "exiting", (activePhase) => (
+			<GameMenuDialog
+				game={game}
+				phase={activePhase}
+			/>
+		))
+		.exhaustive();
 };

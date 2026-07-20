@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { match } from "ts-pattern";
+
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { useAppearance } from "~/ui/appearance/useAppearance";
-import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAppearanceThemeMutation";
 import { PrimaryButton } from "~/ui/button/Button";
+import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
 const ThemeOptions: ReadonlyArray<{
 	readonly value: AppearanceTheme;
@@ -32,22 +32,11 @@ export namespace Settings {
 
 /** Renders the reusable authoritative application settings content. */
 export const Settings = ({ exitPending = false, navigationError, onBack }: Settings.Props) => {
-	const appearance = useAppearance();
-	const setTheme = useSetAppearanceThemeMutation();
-
-	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape" || setTheme.isPending || exitPending) return;
-			event.preventDefault();
-			onBack();
-		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [
-		onBack,
+	const model = useSettingsModel({
 		exitPending,
-		setTheme.isPending,
-	]);
+		navigationError,
+		onBack,
+	});
 
 	return (
 		<section
@@ -68,7 +57,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 
 			<fieldset
 				className="grid gap-3"
-				disabled={setTheme.isPending}
+				disabled={model.blocked}
 			>
 				<legend className="text-sm font-semibold text-foreground">Theme</legend>
 				<div
@@ -78,7 +67,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 					data-ui="SettingsThemeOptions"
 				>
 					{ThemeOptions.map((option) => {
-						const selected = appearance.theme === option.value;
+						const selected = model.theme === option.value;
 						return (
 							<label
 								key={option.value}
@@ -94,7 +83,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 									value={option.value}
 									checked={selected}
 									className="sr-only"
-									onChange={() => setTheme.mutate(option.value)}
+									onChange={() => model.selectTheme(option.value)}
 								/>
 								{option.label}
 							</label>
@@ -111,23 +100,50 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 				aria-live="polite"
 				data-ui="SettingsStatus"
 			>
-				{navigationError !== undefined ? (
-					<p className="text-danger">Navigation failed: {String(navigationError)}</p>
-				) : setTheme.isPending ? (
-					<p className="text-accent">Saving theme…</p>
-				) : setTheme.isError ? (
-					<p className="text-danger">Theme update failed: {String(setTheme.error)}</p>
-				) : setTheme.isSuccess ? (
-					<p className="text-muted">Theme saved.</p>
-				) : null}
+				{match(model.status)
+					.with(
+						{
+							kind: "navigation-error",
+						},
+						({ message }) => (
+							<p className="text-danger">Navigation failed: {message}</p>
+						),
+					)
+					.with(
+						{
+							kind: "saving",
+						},
+						() => <p className="text-accent">Saving theme…</p>,
+					)
+					.with(
+						{
+							kind: "save-error",
+						},
+						({ message }) => (
+							<p className="text-danger">Theme update failed: {message}</p>
+						),
+					)
+					.with(
+						{
+							kind: "saved",
+						},
+						() => <p className="text-muted">Theme saved.</p>,
+					)
+					.with(
+						{
+							kind: "idle",
+						},
+						() => null,
+					)
+					.exhaustive()}
 			</div>
 
 			<PrimaryButton
 				className="mx-auto"
-				disabled={setTheme.isPending || exitPending}
+				disabled={model.blocked}
 				onClick={onBack}
 			>
-				{exitPending ? "Returning…" : "Back"}
+				{model.exitPending ? "Returning…" : "Back"}
 			</PrimaryButton>
 		</section>
 	);

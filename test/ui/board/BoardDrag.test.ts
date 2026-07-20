@@ -1040,12 +1040,14 @@ describe("Board drag", () => {
 		if (runtimeId === undefined || visual === null || dragSurface === null) {
 			throw new Error("Missing active drag actor facts.");
 		}
+		expect(source.className).toContain("cursor-grab");
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
 			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
 		});
 		expect(visual.dataset.motionPhase).toBe("dragging");
+		expect(source.className).toContain("cursor-grabbing");
 		const dragOffset = motionTestRuntime.readDragOffset();
 
 		await act(async () => {

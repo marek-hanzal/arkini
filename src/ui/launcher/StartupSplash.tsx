@@ -29,7 +29,7 @@ export const StartupSplash = () => {
 			},
 			() => (
 				<main
-					className="size-full bg-black"
+					className="size-full cursor-wait bg-black"
 					data-ui="StartupBlackHold"
 				/>
 			),
@@ -40,7 +40,7 @@ export const StartupSplash = () => {
 			},
 			({ message }) => (
 				<main
-					className="grid size-full place-items-center bg-black p-6 text-white"
+					className="grid size-full cursor-default place-items-center bg-black p-6 text-white"
 					data-ui="StartupFailure"
 				>
 					<Failure
@@ -55,7 +55,10 @@ export const StartupSplash = () => {
 				kind: "scene",
 			},
 			({ content }) => (
-				<LauncherScene dataUi="StartupSplash">
+				<LauncherScene
+					className={content.kind === "loading" ? "cursor-wait" : "cursor-default"}
+					dataUi="StartupSplash"
+				>
 					<div
 						className="min-h-14 text-center text-sm text-muted"
 						aria-live="polite"

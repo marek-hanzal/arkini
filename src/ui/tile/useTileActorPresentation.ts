@@ -31,6 +31,7 @@ export namespace useTileActorPresentation {
 		readonly desiredSource: TileDragSource;
 		readonly phase: TileActorPhaseSchema.Type;
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
+		readonly forbiddenDrop: boolean;
 		readonly zIndex: number;
 		readonly placementFrozen: boolean;
 		readonly positionCompletion: PositionCompletion;
@@ -44,6 +45,7 @@ interface TileActorPresentationView {
 	readonly desiredLocation: TileLocation;
 	readonly phase: TileActorPhaseSchema.Type;
 	readonly feedback: TileInteractionFeedbackSchema.Type | null;
+	readonly forbiddenDrop: boolean;
 	readonly placementFrozen: boolean;
 	readonly positionCompletion: useTileActorPresentation.PositionCompletion;
 	readonly visualCompletionGeneration: number | null;
@@ -74,6 +76,7 @@ const passiveView = (
 	desiredLocation: item.location,
 	phase: live && hovered ? "hovered" : "stable",
 	feedback: null,
+	forbiddenDrop: false,
 	placementFrozen: false,
 	positionCompletion: {
 		kind: "none",
@@ -258,6 +261,7 @@ const interactionView = (
 					return {
 						...passive,
 						phase: "dragging" as const,
+						forbiddenDrop: dragging.target?.kind !== "slot",
 						placementFrozen: true,
 					};
 				}
@@ -279,6 +283,7 @@ const interactionView = (
 					return {
 						...passive,
 						phase: "dragging" as const,
+						forbiddenDrop: awaiting.target.kind !== "slot",
 						placementFrozen: true,
 					};
 				}
@@ -338,6 +343,7 @@ export const useTileActorPresentation = ({
 		desiredSource,
 		phase: view.phase,
 		feedback: view.feedback,
+		forbiddenDrop: view.forbiddenDrop,
 		zIndex: zIndexForPhase(view.phase),
 		placementFrozen: view.placementFrozen,
 		positionCompletion: view.positionCompletion,

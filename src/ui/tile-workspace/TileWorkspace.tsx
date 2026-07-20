@@ -105,7 +105,7 @@ const TileWorkspaceChrome = ({
 				</div>
 				<button
 					type="button"
-					className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+					className="grid size-9 shrink-0 cursor-pointer place-items-center disabled:cursor-not-allowed rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 					aria-label={closeLabel}
 					disabled={disabled}
 					onClick={() => void workspace.close()}
@@ -137,7 +137,7 @@ const UnavailableWorkspace = ({
 				</h2>
 				<button
 					type="button"
-					className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+					className="grid size-9 shrink-0 cursor-pointer place-items-center disabled:cursor-not-allowed rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 					aria-label={closeLabel}
 					disabled={disabled}
 					onClick={() => void workspace.close()}
@@ -400,7 +400,7 @@ const TileWorkspaceDialog = ({
 
 	return (
 		<motion.div
-			className="absolute inset-0 z-[70] grid place-items-center overflow-hidden bg-overlay/70 p-[var(--ak-viewport-padding)] text-overlay-foreground"
+			className="absolute inset-0 z-[70] grid cursor-default place-items-center overflow-hidden bg-overlay/70 p-[var(--ak-viewport-padding)] text-overlay-foreground"
 			data-ui="TileWorkspaceBackdrop"
 			data-phase={phase}
 			initial={{
@@ -420,7 +420,7 @@ const TileWorkspaceDialog = ({
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="tile-workspace-title"
-				className="flex h-[min(46rem,100%)] max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)] outline-none"
+				className="flex h-[min(46rem,100%)] cursor-default max-h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)] outline-none"
 				data-ui="TileWorkspaceModal"
 				data-capability={target.capability}
 				data-runtime-id={target.itemId}

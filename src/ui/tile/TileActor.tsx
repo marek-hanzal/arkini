@@ -1,9 +1,11 @@
 import { motion } from "motion/react";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
+import { CursorClassName } from "~/ui/cursor/CursorSemantic";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
+import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 import { useTileHoverActions } from "~/ui/tile/useTileHoverActions";
 
@@ -41,12 +43,21 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 	});
 	const boardLocation = item.location.scope === "board" ? item.location : null;
 	const visible = actorMotion.visible;
+	const cursor = readTileActorCursorSemantic({
+		feedback: presentation.feedback,
+		forbiddenDrop: presentation.forbiddenDrop,
+		hovered: presentation.hovered,
+		live,
+		phase: presentation.phase,
+		running: item.running,
+		visible,
+	});
 
 	return (
 		<>
 			<motion.button
 				type="button"
-				className="absolute left-0 top-0 overflow-visible border-0 bg-transparent p-0 text-inherit outline-none"
+				className={`absolute left-0 top-0 overflow-visible border-0 bg-transparent p-0 text-inherit outline-none ${CursorClassName[cursor]}`}
 				style={{
 					left: actorMotion.anchorX,
 					top: actorMotion.anchorY,

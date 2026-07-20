@@ -55,7 +55,7 @@ export const TileHoverActionBar = ({
 			<button
 				type="button"
 				key={action.capability}
-				className="group relative grid size-8 place-items-center overflow-visible rounded-lg border-0 bg-transparent leading-none outline-none transition-colors hover:bg-accent/15 focus-visible:bg-accent/20 focus-visible:ring-2 focus-visible:ring-accent"
+				className="group relative grid size-8 cursor-pointer place-items-center overflow-visible rounded-lg border-0 bg-transparent leading-none outline-none transition-colors hover:bg-accent/15 focus-visible:bg-accent/20 focus-visible:ring-2 focus-visible:ring-accent"
 				aria-label={action.label}
 				data-ui="TileHoverAction"
 				data-capability={action.capability}

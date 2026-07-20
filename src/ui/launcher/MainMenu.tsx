@@ -58,6 +58,11 @@ export const MainMenu = () => {
 				) : (
 					<PrimaryButton
 						className="rounded-xl"
+						cursorIntent={
+							catalogState.type === "failed" || startupState.type === "failed"
+								? "not-allowed"
+								: "progress"
+						}
 						disabled
 					>
 						{catalogState.type === "failed" || startupState.type === "failed"
@@ -85,6 +90,7 @@ export const MainMenu = () => {
 				</ButtonLink>
 				<Button
 					className="rounded-xl"
+					cursorIntent={exit.isPending ? "progress" : undefined}
 					disabled={exit.isPending}
 					onClick={() => exit.mutate()}
 				>

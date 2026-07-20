@@ -355,6 +355,12 @@ describe("TileWorkspace Info", () => {
 		});
 		const modal = container.querySelector<HTMLElement>('[data-ui="TileWorkspaceModal"]');
 		if (modal === null) throw new Error("Missing tile workspace modal.");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="TileWorkspaceBackdrop"]')?.className,
+		).toContain("cursor-default");
+		expect(
+			modal.querySelector<HTMLButtonElement>('button[aria-label="Close Info"]')?.className,
+		).toContain("cursor-pointer");
 		expect(modal.dataset.runtimeId).toBe(runtimeId);
 		expect(modal.querySelector("h2")?.textContent).toBe("Stone");
 		expect(modal.textContent).toContain("Resource");

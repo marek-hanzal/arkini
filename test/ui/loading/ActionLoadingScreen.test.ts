@@ -69,6 +69,9 @@ afterEach(async () => {
 describe("ActionLoadingScreen", () => {
 	it("renders one native route surface and advances without claiming completion", async () => {
 		const { container } = await renderScreen();
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="ActionLoadingScreen"]')?.className,
+		).toContain("cursor-wait");
 		const hero = container.querySelector<HTMLElement>('[data-ui="LauncherHero"]');
 		const artwork = container.querySelector<HTMLElement>('[data-ui="LauncherHeroArtwork"]');
 		expect(hero).not.toBeNull();

@@ -71,7 +71,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 						return (
 							<label
 								key={option.value}
-								className={`relative cursor-pointer rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors focus-within:ring-2 focus-within:ring-accent ${
+								className={`relative ${model.blocked ? "cursor-progress" : "cursor-pointer"} rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors focus-within:ring-2 focus-within:ring-accent ${
 									selected
 										? "bg-accent text-accent-contrast shadow-md"
 										: "text-muted hover:bg-surface hover:text-foreground"
@@ -140,6 +140,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 
 			<PrimaryButton
 				className="mx-auto"
+				cursorIntent={model.blocked ? "progress" : undefined}
 				disabled={model.blocked}
 				onClick={onBack}
 			>

@@ -64,6 +64,14 @@ describe("Button primitives", () => {
 						"Neutral link",
 					),
 					createElement(
+						ButtonLink,
+						{
+							"aria-disabled": true,
+							to: "/about",
+						},
+						"Disabled link",
+					),
+					createElement(
 						Button,
 						{
 							disabled: true,
@@ -78,6 +86,14 @@ describe("Button primitives", () => {
 						"Primary link",
 					),
 					createElement(PrimaryButton, null, "Primary button"),
+					createElement(
+						PrimaryButton,
+						{
+							cursorIntent: "progress",
+							disabled: true,
+						},
+						"Pending button",
+					),
 					createElement(
 						DangerButtonLink,
 						{
@@ -118,6 +134,7 @@ describe("Button primitives", () => {
 		});
 
 		const neutralLink = elementByText<HTMLAnchorElement>(container, "a", "Neutral link");
+		const disabledLink = elementByText<HTMLAnchorElement>(container, "a", "Disabled link");
 		const neutralButton = elementByText<HTMLButtonElement>(
 			container,
 			"button",
@@ -129,20 +146,33 @@ describe("Button primitives", () => {
 			"button",
 			"Primary button",
 		);
+		const pendingButton = elementByText<HTMLButtonElement>(
+			container,
+			"button",
+			"Pending button",
+		);
 		const dangerLink = elementByText<HTMLAnchorElement>(container, "a", "Danger link");
 		const dangerButton = elementByText<HTMLButtonElement>(container, "button", "Danger button");
 
-		expect(neutralLink.className).toBe(neutralButton.className);
+		expect(neutralLink.className).toContain("bg-surface/75");
+		expect(neutralButton.className).toContain("bg-surface/75");
 		expect(primaryLink.className).toBe(primaryButton.className);
 		expect(dangerLink.className).toBe(dangerButton.className);
 		expect(neutralLink.className).not.toBe(primaryLink.className);
 		expect(dangerLink.className).not.toBe(primaryLink.className);
-		expect(neutralLink.className).toContain("bg-surface/75");
+		expect(neutralLink.className).toContain("cursor-pointer");
+		expect(neutralButton.className).toContain("cursor-not-allowed");
+		expect(disabledLink.className).toContain("cursor-not-allowed");
+		expect(primaryButton.className).toContain("cursor-pointer");
+		expect(pendingButton.className).toContain("cursor-progress");
 		expect(primaryLink.className).toContain("bg-accent");
 		expect(dangerLink.className).toContain("bg-danger");
 		expect(neutralLink.getAttribute("href")).toBe("/about");
 		expect(neutralButton.type).toBe("button");
 		expect(neutralButton.disabled).toBe(true);
+
+		await act(async () => disabledLink.click());
+		expect(router.state.location.pathname).toBe("/");
 
 		await act(async () => primaryLink.click());
 		expect(router.state.location.pathname).toBe("/about");

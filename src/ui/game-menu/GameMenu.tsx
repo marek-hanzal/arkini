@@ -33,6 +33,7 @@ const GameMenuDialog = ({
 		phase,
 	});
 	const actorMotion = useGameMenuMotion(phase);
+	const actionCursorIntent = actions.pending ? "progress" : undefined;
 	const focus = useGameMenuFocus({
 		phase,
 		blocked: actions.pending || phase === "exiting",
@@ -40,7 +41,7 @@ const GameMenuDialog = ({
 
 	return (
 		<motion.div
-			className="absolute inset-0 z-50 grid place-items-center overflow-hidden bg-overlay/95 p-[var(--ak-viewport-padding)] text-overlay-foreground"
+			className="absolute inset-0 z-50 grid cursor-default place-items-center overflow-hidden bg-overlay/95 p-[var(--ak-viewport-padding)] text-overlay-foreground"
 			data-ui="GameMenuBackdrop"
 			data-phase={phase}
 			style={{
@@ -59,7 +60,7 @@ const GameMenuDialog = ({
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="game-menu-title"
-				className="max-h-full w-full max-w-sm overflow-y-auto rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-2xl outline-none"
+				className="max-h-full w-full max-w-sm cursor-default overflow-y-auto rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-2xl outline-none"
 				data-ui="GameMenu"
 				tabIndex={-1}
 				style={{
@@ -86,6 +87,7 @@ const GameMenuDialog = ({
 				<div className="grid gap-2">
 					<PrimaryButton
 						className="w-full"
+						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={() => void actions.close()}
 					>
@@ -93,6 +95,7 @@ const GameMenuDialog = ({
 					</PrimaryButton>
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
+						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSettings}
 					>
@@ -100,6 +103,7 @@ const GameMenuDialog = ({
 					</Button>
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
+						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestMainMenu}
 					>
@@ -110,6 +114,7 @@ const GameMenuDialog = ({
 
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
+						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSave}
 					>
@@ -117,6 +122,7 @@ const GameMenuDialog = ({
 					</Button>
 					<Button
 						className="w-full shadow-none backdrop-blur-none"
+						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSaveAndExit}
 					>
@@ -144,6 +150,7 @@ const GameMenuDialog = ({
 								<div className="grid grid-cols-2 gap-2">
 									<Button
 										className="min-h-0 px-3 py-2 shadow-none backdrop-blur-none"
+										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
 										onClick={() => actions.setConfirmingDestroy(false)}
 									>
@@ -151,6 +158,7 @@ const GameMenuDialog = ({
 									</Button>
 									<DangerButton
 										className="min-h-0 px-3 py-2 shadow-none"
+										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
 										onClick={actions.requestHardReset}
 									>
@@ -161,6 +169,7 @@ const GameMenuDialog = ({
 						) : (
 							<DangerButton
 								className="w-full shadow-none"
+								cursorIntent={actionCursorIntent}
 								disabled={actions.actionDisabled}
 								onClick={() => actions.setConfirmingDestroy(true)}
 							>

@@ -70,6 +70,7 @@ export const ActionLoadingScreen = ({
 
 	return (
 		<LauncherScene
+			className="cursor-wait"
 			compactHero
 			dataUi="ActionLoadingScreen"
 			layout="fixed-hero"

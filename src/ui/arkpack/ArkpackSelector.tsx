@@ -33,7 +33,7 @@ export const ArkpackSelector = () => {
 					ref={actions.inputRef}
 					type="file"
 					accept=".arkpack,application/octet-stream"
-					className="block min-w-0 w-full text-sm text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
+					className="block min-w-0 w-full cursor-pointer text-sm disabled:cursor-progress file:cursor-pointer text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
 					disabled={blocked}
 					onChange={(event) => void actions.upload(event.currentTarget.files?.[0])}
 				/>
@@ -54,6 +54,7 @@ export const ArkpackSelector = () => {
 
 			<footer className="flex justify-center pb-[env(safe-area-inset-bottom)]">
 				<PrimaryButton
+					cursorIntent={blocked ? "progress" : undefined}
 					disabled={blocked}
 					onClick={actions.requestMainMenu}
 				>

@@ -74,6 +74,7 @@ export const About = () => {
 			)}
 			<PrimaryButton
 				className="mx-auto"
+				cursorIntent={exitPending ? "progress" : undefined}
 				disabled={exitPending}
 				onClick={requestMainMenu}
 			>

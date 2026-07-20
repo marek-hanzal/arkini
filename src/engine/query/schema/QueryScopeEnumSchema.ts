@@ -15,7 +15,7 @@ export const QueryScopeEnumSchema = z
 	.meta({
 		id: "QueryScopeEnumSchema",
 		description:
-			"The board, inventory, local combined, or universe-wide reach of one gameplay query.",
+			"The board, exact passive storage, local combined, or universe-wide reach of one gameplay query.",
 	});
 
 export type QueryScopeEnumSchema = typeof QueryScopeEnumSchema;

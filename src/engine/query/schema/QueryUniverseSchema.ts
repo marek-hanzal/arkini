@@ -4,7 +4,7 @@ import { BaseQuerySchema } from "./BaseQuerySchema";
 import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 
 /**
- * A query that searches every board space plus the shared inventory.
+ * A query that searches every board space plus both passive storage surfaces.
  *
  * It intentionally has no distance because candidates may belong to different
  * board spaces or have no board position at all.
@@ -14,13 +14,13 @@ export const QueryUniverseSchema = z
 		...BaseQuerySchema.shape,
 		scope: QueryScopeEnumSchema.extract([
 			"universe",
-		]).describe("Searches every board space plus the shared inventory."),
+		]).describe("Searches every board space plus both passive storage surfaces."),
 	})
 	.strict()
 	.meta({
 		id: "QueryUniverseSchema",
 		description:
-			"A universe-wide item query across every board space and the shared inventory without distance.",
+			"A universe-wide item query across every board space and both passive storage surfaces without distance.",
 	});
 
 export type QueryUniverseSchema = typeof QueryUniverseSchema;

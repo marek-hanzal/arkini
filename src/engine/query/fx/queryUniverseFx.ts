@@ -11,7 +11,7 @@ export namespace queryUniverseFx {
 	}
 }
 
-/** Selects matching items from every board space plus the shared inventory. */
+/** Selects matching items from every board space plus both passive storage surfaces. */
 export const queryUniverseFx = Effect.fn("queryUniverseFx")(function* ({
 	query,
 }: queryUniverseFx.Props) {

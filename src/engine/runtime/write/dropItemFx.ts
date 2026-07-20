@@ -223,6 +223,12 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						reason: "invalid-target" as const,
 						itemId: sourceItemId,
 					}),
+				RuntimeInvalidError: () =>
+					Effect.succeed({
+						kind: "reject" as const,
+						reason: "invalid-target" as const,
+						itemId: sourceItemId,
+					}),
 			}),
 		);
 	}
@@ -387,6 +393,13 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					targetItemId,
 				}),
 			CrossSpaceBoardOperationError: () =>
+				Effect.succeed({
+					kind: "reject" as const,
+					reason: "invalid-target" as const,
+					itemId: sourceItemId,
+					targetItemId,
+				}),
+			RuntimeInvalidError: () =>
 				Effect.succeed({
 					kind: "reject" as const,
 					reason: "invalid-target" as const,

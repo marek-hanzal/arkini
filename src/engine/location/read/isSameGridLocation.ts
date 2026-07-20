@@ -1,6 +1,6 @@
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
-/** Compares two concrete board/inventory locations without relying on object identity. */
+/** Compares two concrete board/inventory/toolbar locations without relying on object identity. */
 export const isSameGridLocation = (
 	left: GridLocationSchema.Type,
 	right: GridLocationSchema.Type,

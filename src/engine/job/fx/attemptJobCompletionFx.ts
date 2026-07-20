@@ -27,6 +27,7 @@ const isExpectedCompletionBlock = (error: PlacementUnavailableError) => {
 	switch (error.reason) {
 		case "board:full":
 		case "inventory:full":
+		case "toolbar:full":
 		case "item:max-count":
 			return true;
 	}

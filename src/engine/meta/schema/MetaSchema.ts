@@ -3,6 +3,7 @@ import { z } from "zod";
 import { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
+import { ToolbarSizeSchema } from "./ToolbarSizeSchema";
 
 /**
  * Core metadata that defines the game and the layouts available to the player.
@@ -26,6 +27,12 @@ export const MetaSchema = z
 		 */
 		inventory: GridSizeSchema.describe(
 			"The size of the inventory grid available to the player.",
+		),
+		/**
+		 * Optional number of slots in the one-row passive toolbar. Zero disables it.
+		 */
+		toolbarSize: ToolbarSizeSchema.optional().describe(
+			"The optional one-row toolbar slot count; zero or undefined disables it.",
 		),
 	})
 	.strict()

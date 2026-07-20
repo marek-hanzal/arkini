@@ -47,6 +47,10 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 		const size = match(item.location.scope)
 			.with("board", () => config.meta.board)
 			.with("inventory", () => config.meta.inventory)
+			.with("toolbar", () => ({
+				width: config.meta.toolbarSize ?? 0,
+				height: 1,
+			}))
 			.exhaustive();
 		const insideBounds =
 			item.location.position.x < size.width && item.location.position.y < size.height;

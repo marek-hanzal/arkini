@@ -28,6 +28,7 @@ const config = GameConfigSchema.parse({
 			width: 2,
 			height: 2,
 		},
+		toolbarSize: 2,
 	},
 	start: {
 		currentSpace: 0,
@@ -239,6 +240,16 @@ describe("queryFx", () => {
 						},
 					},
 				});
+				yield* placeTreeFx({
+					id: "toolbar",
+					location: {
+						scope: "toolbar",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
 				const inventory = yield* queryFx({
 					origin: {
 						scope: "board",
@@ -247,6 +258,20 @@ describe("queryFx", () => {
 					},
 					query: {
 						scope: "inventory",
+						selector: {
+							itemId: "tree",
+							type: "item",
+						},
+					},
+				});
+				const toolbar = yield* queryFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					query: {
+						scope: "toolbar",
 						selector: {
 							itemId: "tree",
 							type: "item",
@@ -300,6 +325,7 @@ describe("queryFx", () => {
 					any,
 					empty,
 					inventory,
+					toolbar,
 					universe,
 				};
 			}).pipe(
@@ -312,14 +338,19 @@ describe("queryFx", () => {
 		expect(readIds(result.inventory)).toEqual([
 			"inventory",
 		]);
+		expect(readIds(result.toolbar)).toEqual([
+			"toolbar",
+		]);
 		expect(readIds(result.any)).toEqual([
 			"board",
 			"inventory",
+			"toolbar",
 		]);
 		expect(readIds(result.universe)).toEqual([
 			"board",
 			"other-space",
 			"inventory",
+			"toolbar",
 		]);
 		expect(result.empty).toEqual([]);
 	});

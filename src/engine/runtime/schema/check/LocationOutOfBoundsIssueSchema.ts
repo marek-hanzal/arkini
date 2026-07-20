@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
+import { GridBoundsSchema } from "~/engine/grid/schema/GridBoundsSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
 /**
@@ -11,7 +11,7 @@ export const LocationOutOfBoundsIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The live item outside its grid bounds."),
 		location: GridLocationSchema.describe("The invalid concrete item location."),
-		size: GridSizeSchema.describe("The configured size of the targeted grid."),
+		size: GridBoundsSchema.describe("The configured bounds of the targeted grid."),
 		type: z.literal("location:out-of-bounds"),
 	})
 	.strict()

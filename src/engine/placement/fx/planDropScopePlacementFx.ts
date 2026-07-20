@@ -8,8 +8,9 @@ import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
-import { planBoardThenInventoryPlacementFx } from "./planBoardThenInventoryPlacementFx";
+import { planBoardThenStoragePlacementFx } from "./planBoardThenStoragePlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
+import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
 
 export namespace planDropScopePlacementFx {
 	export interface Props {
@@ -64,8 +65,24 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
+		.with("toolbar", () => {
+			return Effect.gen(function* () {
+				const plan = yield* planToolbarPlacementFx({
+					item,
+					quantity,
+					runtime,
+				});
+
+				return yield* assertPlacementPlanCompleteFx({
+					drop,
+					plan,
+					quantity,
+					reason: "toolbar:full",
+				});
+			});
+		})
 		.with("any", () => {
-			return planBoardThenInventoryPlacementFx({
+			return planBoardThenStoragePlacementFx({
 				drop,
 				item,
 				origin,

@@ -2,16 +2,18 @@ import { z } from "zod";
 
 import { BoardLocationSchema } from "./BoardLocationSchema";
 import { InventoryLocationSchema } from "./InventoryLocationSchema";
+import { ToolbarLocationSchema } from "./ToolbarLocationSchema";
 
-/** One concrete location on a board space or in the universe-wide inventory. */
+/** One concrete location on a board space or in passive universe-wide storage. */
 export const GridLocationSchema = z
 	.discriminatedUnion("scope", [
 		BoardLocationSchema,
 		InventoryLocationSchema,
+		ToolbarLocationSchema,
 	])
 	.meta({
 		id: "GridLocationSchema",
-		description: "One concrete board-space or inventory location.",
+		description: "One concrete board-space, inventory, or toolbar location.",
 	});
 
 export type GridLocationSchema = typeof GridLocationSchema;

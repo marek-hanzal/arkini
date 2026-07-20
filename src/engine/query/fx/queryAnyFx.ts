@@ -14,7 +14,7 @@ export namespace queryAnyFx {
 	}
 }
 
-/** Selects global inventory plus board items from the origin space. */
+/** Selects both passive storage surfaces plus board items from the origin space. */
 export const queryAnyFx = Effect.fn("queryAnyFx")(function* ({ origin, query }: queryAnyFx.Props) {
 	const items = yield* getItemsFx();
 

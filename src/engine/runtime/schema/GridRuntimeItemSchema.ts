@@ -4,7 +4,7 @@ import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema"
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /**
- * One live runtime item currently placed on the board or in inventory.
+ * One live runtime item currently placed on the board, inventory, or toolbar.
  */
 export const GridRuntimeItemSchema = RuntimeItemSchema.extend({
 	location: GridLocationSchema,

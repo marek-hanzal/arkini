@@ -99,7 +99,7 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			if (
-				item.location.scope === "inventory" &&
+				(item.location.scope === "inventory" || item.location.scope === "toolbar") &&
 				location.scope === "board" &&
 				location.space !== runtime.currentSpace
 			) {

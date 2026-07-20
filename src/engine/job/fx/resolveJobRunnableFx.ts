@@ -9,6 +9,7 @@ import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { isPassiveStorageLocation } from "~/engine/location/read/isPassiveStorageLocation";
 export namespace resolveJobRunnableFx {
 	export interface Props {
 		job: JobSchema.Type;
@@ -24,7 +25,7 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 		itemId: job.ownerItemId,
 		runtime,
 	});
-	if (owner.location.scope === "inventory") return false;
+	if (isPassiveStorageLocation(owner.location)) return false;
 	if (!isBoardRuntimeItem(owner))
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({

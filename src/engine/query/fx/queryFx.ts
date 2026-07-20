@@ -6,6 +6,7 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import { queryAnyFx } from "./queryAnyFx";
 import { queryBoardFx } from "./queryBoardFx";
 import { queryInventoryFx } from "./queryInventoryFx";
+import { queryToolbarFx } from "./queryToolbarFx";
 import { queryUniverseFx } from "./queryUniverseFx";
 
 export namespace queryFx {
@@ -41,6 +42,18 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 			},
 			({ query }) => {
 				return queryInventoryFx({
+					query,
+				});
+			},
+		)
+		.with(
+			{
+				query: {
+					scope: "toolbar",
+				},
+			},
+			({ query }) => {
+				return queryToolbarFx({
 					query,
 				});
 			},

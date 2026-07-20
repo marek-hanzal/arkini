@@ -4,6 +4,7 @@ import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
 import type { JobResolutionSchema } from "~/engine/job/schema/read/JobResolutionSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import { isPassiveStorageLocation } from "~/engine/location/read/isPassiveStorageLocation";
 export namespace readOwnerJobQueueFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
@@ -21,7 +22,7 @@ export const readOwnerJobQueueFx = Effect.fn("readOwnerJobQueueFx")(function* ({
 	});
 	return yield* Effect.forEach(jobs, (job) =>
 		Effect.gen(function* () {
-			if (owner.location.scope === "inventory")
+			if (isPassiveStorageLocation(owner.location))
 				return {
 					job,
 					status: "paused",

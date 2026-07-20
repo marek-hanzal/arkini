@@ -11,7 +11,7 @@ export namespace readGridLocationOccupantsFx {
 	}
 }
 
-/** Groups live grid items by one explicit set of concrete board or inventory cells. */
+/** Groups live grid items by one explicit set of concrete board, inventory, or toolbar cells. */
 export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsFx")(function* ({
 	items,
 	locations,

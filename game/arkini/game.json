@@ -10,7 +10,8 @@
 		"inventory": {
 			"width": 7,
 			"height": 7
-		}
+		},
+		"toolbarSize": 13
 	},
 	"resources": {
 		"hero": "hero"

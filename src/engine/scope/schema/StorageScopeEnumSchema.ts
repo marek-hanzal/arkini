@@ -14,7 +14,11 @@ export const StorageScopeEnumSchema = z
 		 */
 		"inventory",
 		/**
-		 * The item may exist on a board or in the shared inventory.
+		 * The item may exist only in the shared toolbar.
+		 */
+		"toolbar",
+		/**
+		 * The item may exist on a board or in either passive storage surface.
 		 */
 		"any",
 	])

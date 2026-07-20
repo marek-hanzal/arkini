@@ -8,6 +8,7 @@ export const PlacementFailureReasonEnumSchema = z
 		"item:max-count",
 		"board:full",
 		"inventory:full",
+		"toolbar:full",
 	])
 	.meta({
 		id: "PlacementFailureReasonEnumSchema",

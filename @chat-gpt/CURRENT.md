@@ -6,7 +6,7 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Motion-driven stable tile actors over the accepted transition baseline**
 
-Status: **`v0` is the immutable pre-interaction backup of `4c25f6d2cd1aa3e9d0b2efc63f54abfc2e14d82f`; feature work continues on `main`. The accepted route-transition baseline and completed singleton/fatal/controlled-close lifecycle remain intact. Epic #302 supersedes the earlier manual ghost/WAAPI DnD attempt. The current vertical slice uses one Canvas-wide Motion actor layer, one real stable DOM actor per runtime item, pronounced `1.15×` preview hover, exact pointer drag, and one atomic engine drop command. Board → empty Board slot moves; same slot is ignored; occupied, surface-only, outside, inventory, and toolbar targets explicitly reject until their later #302 semantics exist.**
+Status: **`v0` is the immutable pre-interaction backup of `4c25f6d2cd1aa3e9d0b2efc63f54abfc2e14d82f`; feature work continues on `main`. The accepted route-transition baseline and completed singleton/fatal/controlled-close lifecycle remain intact. Epic #302 supersedes the earlier manual ghost/WAAPI DnD attempt. The current Board vertical slice uses one Canvas-wide Motion actor layer, one real stable DOM actor per runtime item, pronounced `1.15×` preview hover, exact pointer drag, and one atomic engine drop command. Empty Board slots move, non-mergeable occupied slots swap, authored directional consume merges animate keep/replace/remove outcomes, the same slot is ignored, and unsupported surfaces explicitly reject.**
 
 Current contract:
 
@@ -30,7 +30,9 @@ Current contract:
 - One renderer-wide `TileSystemProvider` owns Arkini-authored actor phases, operation generation, registered `board | inventory | toolbar` geometry, topmost `slot | surface | outside` hit testing, frozen source/target facts, z-order, and reconciliation targets. Motion receives those targets and owns drag tracking, frame batching, scale, opacity, springs, and transform interpolation.
 - Board, Inventory, and Toolbar render stable slot anchors only. `TileActorLayer` renders exactly one visible stable actor per live runtime instance, keyed by the shared exact ID. No ghost, preview, clone, portal duplicate, hidden canonical tile, or second per-surface actor tree exists.
 - Actor position uses a Motion-owned outer anchor (`left/top`) plus an inner Motion drag/settle transform. This avoids transformed-ancestor pointer math, preserves exact cursor centering under abrupt movement and 6× CPU throttling, and keeps hover/impact scale independent from placement. The complete `TileScene`, not the empty Board grid alone, owns `arkini-game-board` route snapshot geometry.
-- Every release invokes public atomic `dropItemFx`. UI never authorizes or infers gameplay behavior. The command revalidates exact source revision/location and returns explicit `move | ignored | reject`; Board empty-slot move is implemented, while occupied and unsupported targets truthfully reject and return toward the newest canonical anchor.
+- Every release invokes public atomic `dropItemFx`. UI never authorizes or infers gameplay behavior. The command revalidates exact source and occupied-target revision/location and returns explicit `move | swap | merge | ignored | reject`. Authored merge outcomes expose source/target before and current identity, revision, location, quantity, action, effect, and replacement canonical ID without mutable runtime objects.
+- Merge presentation is one generation with `approach → resolve`. A surviving source stack returns toward its newest live anchor; consumed/removed source and target identities remain visually alive only for their owned exit; a kept or same-ID replaced target receives one restrained impact. Each actor completes independently, and stale callbacks cannot release or remove a newer generation.
+- `TileActorLayer` keeps only the last renderable snapshot of identities protected by the immediate active generation. It reads the provider's canonical `activeRef` during synchronous engine publication so removed actors cannot unmount in the one render before React commits the corresponding outcome phase. `dragStarted` remains true through async command handoff so the subsequent pointer-up cannot misclassify an accepted drag as a click and cancel it.
 
 Responsive viewport contract:
 
@@ -41,7 +43,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Continue epic #302 from this Motion foundation. Add the remaining engine outcome vocabulary and live reconciliation cases before Board swap/merge/consume, then implement Toolbar #300 and finish Inventory/Toolbar/space integration in #308. Do not reintroduce the discarded manual ghost/WAAPI controller.
+> Continue epic #302 with live-target retargeting and interruption hardening from #306, then implement Toolbar #300 and finish Inventory/Toolbar/space plus stack/use boomerang integration in #308. Board move/swap/consume-merge/ignore/reject are now one atomic outcome path. Do not reintroduce the discarded manual ghost/WAAPI controller.
 
 ## Source topology
 

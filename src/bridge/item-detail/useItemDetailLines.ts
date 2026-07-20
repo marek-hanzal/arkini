@@ -97,6 +97,10 @@ export namespace useItemDetailLines {
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
+		readonly actions: {
+			readonly canAutofill: boolean;
+			readonly canWithdraw: boolean;
+		};
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { match } from "ts-pattern";
 
+import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
-import { PrimaryButton } from "~/ui/button/Button";
+import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
+import { Button, PrimaryButton } from "~/ui/button/Button";
 
 const formatQuantity = ({ min, max }: useItemDetailLines.QuantityBounds) =>
 	min === max ? `${min}` : `${min}–${max}`;
@@ -252,9 +254,32 @@ const LineRow = ({
 	readonly line: useItemDetailLines.Line;
 	readonly ownerItemId: string;
 }) => {
+	const autofillLine = useAutofillItemDetailLine();
 	const startLine = useStartItemDetailLine();
-	const [pending, setPending] = useState(false);
+	const withdrawLine = useWithdrawItemDetailLine();
+	const [pendingAction, setPendingAction] = useState<"autofill" | "start" | "withdraw" | null>(
+		null,
+	);
 	const [error, setError] = useState<string | null>(null);
+	const runAction = async ({
+		action,
+		failureMessage,
+		run,
+	}: {
+		readonly action: "autofill" | "start" | "withdraw";
+		readonly failureMessage: string;
+		readonly run: () => Promise<unknown>;
+	}) => {
+		setPendingAction(action);
+		setError(null);
+		try {
+			await run();
+		} catch (cause) {
+			setError(cause instanceof Error ? cause.message : failureMessage);
+		} finally {
+			setPendingAction(null);
+		}
+	};
 	const readiness = readinessLabel(line.availability);
 	const runtimeChanged = line.baseRuntimeMs !== line.effectiveRuntimeMs;
 	return (
@@ -285,7 +310,7 @@ const LineRow = ({
 						{line.description}
 					</p>
 				</div>
-				<div className="flex shrink-0 items-start gap-4">
+				<div className="flex shrink-0 flex-col items-end gap-3">
 					<div className="text-right">
 						<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 							Runtime
@@ -299,37 +324,66 @@ const LineRow = ({
 							</p>
 						) : null}
 					</div>
-					<PrimaryButton
-						className="min-w-24"
-						cursorIntent={pending ? "progress" : undefined}
-						disabled={line.availability.kind !== "ready" || pending}
-						onClick={async () => {
-							setPending(true);
-							setError(null);
-							try {
-								await startLine({
-									ownerItemId,
-									lineId: line.lineId,
-								});
-							} catch (cause) {
-								setError(
-									cause instanceof Error
-										? cause.message
-										: "Work could not be started.",
-								);
-							} finally {
-								setPending(false);
+					<div className="flex flex-wrap justify-end gap-2">
+						<Button
+							cursorIntent={pendingAction === "autofill" ? "progress" : undefined}
+							disabled={!line.actions.canAutofill || pendingAction !== null}
+							onClick={() =>
+								runAction({
+									action: "autofill",
+									failureMessage: "Inputs could not be autofilled.",
+									run: () =>
+										autofillLine({
+											ownerItemId,
+											lineId: line.lineId,
+										}),
+								})
 							}
-						}}
-					>
-						{pending
-							? line.startMode === "enqueue"
-								? "Queueing…"
-								: "Starting…"
-							: line.startMode === "enqueue"
-								? "Enqueue"
-								: "Start"}
-					</PrimaryButton>
+						>
+							{pendingAction === "autofill" ? "Filling…" : "Autofill"}
+						</Button>
+						<Button
+							cursorIntent={pendingAction === "withdraw" ? "progress" : undefined}
+							disabled={!line.actions.canWithdraw || pendingAction !== null}
+							onClick={() =>
+								runAction({
+									action: "withdraw",
+									failureMessage: "Inputs could not be withdrawn.",
+									run: () =>
+										withdrawLine({
+											ownerItemId,
+											lineId: line.lineId,
+										}),
+								})
+							}
+						>
+							{pendingAction === "withdraw" ? "Withdrawing…" : "Withdraw"}
+						</Button>
+						<PrimaryButton
+							className="min-w-24"
+							cursorIntent={pendingAction === "start" ? "progress" : undefined}
+							disabled={line.availability.kind !== "ready" || pendingAction !== null}
+							onClick={() =>
+								runAction({
+									action: "start",
+									failureMessage: "Work could not be started.",
+									run: () =>
+										startLine({
+											ownerItemId,
+											lineId: line.lineId,
+										}),
+								})
+							}
+						>
+							{pendingAction === "start"
+								? line.startMode === "enqueue"
+									? "Queueing…"
+									: "Starting…"
+								: line.startMode === "enqueue"
+									? "Enqueue"
+									: "Start"}
+						</PrimaryButton>
+					</div>
 				</div>
 			</div>
 			{error === null ? null : (

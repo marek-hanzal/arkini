@@ -5,6 +5,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
@@ -112,6 +113,10 @@ export namespace readItemDetailLinesFx {
 		readonly effectiveRuntimeMs: TimeSchema.Type;
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
+		readonly actions: {
+			readonly canAutofill: boolean;
+			readonly canWithdraw: boolean;
+		};
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
@@ -401,6 +406,10 @@ const storedLine = ({
 		reason: "stored",
 	},
 	startMode: "start",
+	actions: {
+		canAutofill: false,
+		canWithdraw: false,
+	},
 	input: readInputs({
 		configured: line.input,
 		lineId: line.id,
@@ -457,6 +466,17 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		const resolution = start.run;
 		if (!resolution.show && activeJob === undefined) continue;
 		const allInputsReady = resolution.input.every((input) => input.resolution.ready);
+		const autofillPlan = yield* planLineInputAutofillFx({
+			ownerItemId: owner.id,
+			lineId: line.id,
+			runtime,
+		});
+		const canWithdraw = runtime.items.some(
+			(item) =>
+				item.location.scope === "input" &&
+				item.location.ownerItemId === owner.id &&
+				item.location.lineId === line.id,
+		);
 		projected.push({
 			lineId: line.id,
 			title: line.title,
@@ -476,6 +496,10 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 								: "queue",
 					},
 			startMode: ownerHasWork ? "enqueue" : "start",
+			actions: {
+				canAutofill: autofillPlan.entry.length > 0,
+				canWithdraw,
+			},
 			input: readInputs({
 				configured: line.input,
 				lineId: line.id,

@@ -1078,7 +1078,7 @@ describe("Board drag", () => {
 		});
 		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
 		await act(async () => {
-			await vi.advanceTimersByTimeAsync(149);
+			await vi.advanceTimersByTimeAsync(249);
 		});
 		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
 		await act(async () => {
@@ -1090,8 +1090,8 @@ describe("Board drag", () => {
 		if (actionBar === null) throw new Error("Missing tile hover action bar.");
 		expect(actionBar.dataset.referenceId).toBe(source.dataset.runtimeId);
 		expect(actionBar.dataset.mainAxisOffset).toBe("-8");
-		expect(actionBar.dataset.openDelayMs).toBe("150");
-		expect(actionBar.classList).toContain("shadow-2xl");
+		expect(actionBar.dataset.openDelayMs).toBe("250");
+		expect(actionBar.classList).not.toContain("shadow-2xl");
 		const actionElements = Array.from(
 			actionBar.querySelectorAll<HTMLElement>('[data-ui="TileHoverAction"]'),
 		);
@@ -1140,7 +1140,7 @@ describe("Board drag", () => {
 				);
 				return {
 					hasNativeTitle: action.hasAttribute("title"),
-					iconScalesOnHover: icon?.classList.contains("group-hover:scale-[1.15]"),
+					iconScalesOnHover: icon?.classList.contains("group-hover:scale-150"),
 					tooltipDelay: tooltip?.dataset.openDelayMs,
 					tooltipText: tooltip?.textContent,
 				};
@@ -1217,7 +1217,7 @@ describe("Board drag", () => {
 					bubbles: true,
 				}),
 			);
-			await vi.advanceTimersByTimeAsync(150);
+			await vi.advanceTimersByTimeAsync(250);
 		});
 		const switchedActionBars = document.querySelectorAll<HTMLElement>(
 			'[data-ui="TileHoverActionBar"]',
@@ -1236,7 +1236,7 @@ describe("Board drag", () => {
 					bubbles: true,
 				}),
 			);
-			await vi.advanceTimersByTimeAsync(150);
+			await vi.advanceTimersByTimeAsync(250);
 		});
 
 		await act(async () => {

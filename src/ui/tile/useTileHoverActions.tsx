@@ -18,7 +18,7 @@ import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 import { useTileHoverSystem } from "~/ui/tile/useTileHoverSystem";
 
 const ActionBarMainAxisOffset = -8;
-const ActionBarOpenDelayMs = 150;
+const ActionBarOpenDelayMs = 250;
 const ActionBarCloseDelayMs = 150;
 
 const actionDefinitions = [

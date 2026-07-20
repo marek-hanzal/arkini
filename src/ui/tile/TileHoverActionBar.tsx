@@ -39,7 +39,7 @@ export const TileHoverActionBar = ({
 	<div
 		ref={setFloating}
 		style={style}
-		className="z-50 flex items-center gap-1 overflow-visible rounded-xl border border-line-strong bg-surface-raised/95 p-1 shadow-2xl backdrop-blur-sm"
+		className="z-50 flex items-center gap-1 overflow-visible rounded-xl border border-line-strong bg-surface-raised/95 p-1 backdrop-blur-sm"
 		role="toolbar"
 		aria-label="Tile actions"
 		data-ui="TileHoverActionBar"
@@ -64,7 +64,7 @@ export const TileHoverActionBar = ({
 					src={action.iconUrl}
 					width={24}
 					height={24}
-					className="size-6 object-contain transition-transform duration-150 ease-out will-change-transform group-hover:scale-[1.15] group-focus-visible:scale-[1.15]"
+					className="size-6 object-contain transition-transform duration-150 ease-out will-change-transform group-hover:scale-150 group-focus-visible:scale-150"
 					alt=""
 					aria-hidden="true"
 					draggable={false}

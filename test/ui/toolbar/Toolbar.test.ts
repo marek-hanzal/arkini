@@ -10,6 +10,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 
 const gameEngineState = vi.hoisted(() => ({
 	game: undefined as Game | undefined,
@@ -126,7 +127,11 @@ const createGame = (toolbarSize?: number, stored = false): Game => {
 const renderGameBoard = (game: Game) => {
 	gameEngineState.game = game;
 	return renderToStaticMarkup(
-		createElement(TileSystemProvider, null, createElement(GameBoardLayout)),
+		createElement(
+			TileWorkspaceProvider,
+			null,
+			createElement(TileSystemProvider, null, createElement(GameBoardLayout)),
+		),
 	);
 };
 

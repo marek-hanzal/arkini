@@ -5,6 +5,8 @@ import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { TileWorkspace } from "~/ui/tile-workspace/TileWorkspace";
+import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 
 /** Renders the one playable board leaf over its route-scoped Game Engine. */
 export function GameShell({ children }: PropsWithChildren) {
@@ -16,15 +18,18 @@ export function GameShell({ children }: PropsWithChildren) {
 			tabIndex={-1}
 		>
 			<GameMenuProvider>
-				<div
-					className="relative size-full min-h-0 min-w-0"
-					data-ui="TileScene"
-					style={{
-						viewTransitionName: gameBoardViewTransitionName,
-					}}
-				>
-					<TileSystemProvider>{children}</TileSystemProvider>
-				</div>
+				<TileWorkspaceProvider>
+					<div
+						className="relative size-full min-h-0 min-w-0"
+						data-ui="TileScene"
+						style={{
+							viewTransitionName: gameBoardViewTransitionName,
+						}}
+					>
+						<TileSystemProvider>{children}</TileSystemProvider>
+					</div>
+					<TileWorkspace />
+				</TileWorkspaceProvider>
 				<GameMenu game={gameEngine} />
 			</GameMenuProvider>
 		</main>

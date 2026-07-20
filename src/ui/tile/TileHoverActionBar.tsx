@@ -1,10 +1,12 @@
+import type { useTileCapabilities } from "~/bridge/tile/useTileCapabilities";
 import type { CSSProperties, PointerEventHandler } from "react";
 
 export namespace TileHoverActionBar {
 	export interface Action {
-		readonly capability: "info" | "status" | "lines" | "effects";
+		readonly capability: useTileCapabilities.Capability;
 		readonly iconUrl: string;
 		readonly label: string;
+		readonly onSelect: () => void;
 	}
 
 	export interface Props {
@@ -58,7 +60,10 @@ export const TileHoverActionBar = ({
 				data-ui="TileHoverAction"
 				data-capability={action.capability}
 				onPointerDown={stopPointerDown}
-				onClick={(event) => event.preventDefault()}
+				onClick={(event) => {
+					event.preventDefault();
+					action.onSelect();
+				}}
 			>
 				<img
 					src={action.iconUrl}

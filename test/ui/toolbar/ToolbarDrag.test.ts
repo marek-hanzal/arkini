@@ -13,6 +13,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
@@ -298,7 +299,13 @@ const renderGameBoard = async () => {
 	const root = createRoot(container);
 	roots.push(root);
 	await act(async () => {
-		root.render(createElement(TileSystemProvider, null, createElement(GameBoardLayout)));
+		root.render(
+			createElement(
+				TileWorkspaceProvider,
+				null,
+				createElement(TileSystemProvider, null, createElement(GameBoardLayout)),
+			),
+		);
 		await Promise.resolve();
 	});
 };

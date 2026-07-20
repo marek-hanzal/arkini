@@ -12,10 +12,12 @@ import { useEffect, useMemo } from "react";
 import { match } from "ts-pattern";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { useTileCapabilities } from "~/bridge/tile/useTileCapabilities";
 import { TileHoverActionBar } from "~/ui/tile/TileHoverActionBar";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 import { useTileHoverSystem } from "~/ui/tile/useTileHoverSystem";
+import { useTileWorkspaceControl } from "~/ui/tile-workspace/useTileWorkspaceControl";
 
 const ActionBarMainAxisOffset = -8;
 const ActionBarOpenDelayMs = 250;
@@ -74,19 +76,21 @@ export const useTileHoverActions = ({
 	readonly onHoverChange: (hovered: boolean) => void;
 }) => {
 	const game = useGameEngine();
+	const capabilities = useTileCapabilities(itemId);
+	const { isOpen: workspaceOpen, openInfo } = useTileWorkspaceControl();
 	const { active } = useTileActorSystem();
 	const { open, claimHover, releaseHover } = useTileHoverSystem(itemId);
-	const actions = useMemo(() => {
-		const resources = game.config.resources.tileCapabilities;
-		if (resources === undefined) return [];
-		return actionDefinitions.map((action) => ({
-			...action,
-			iconUrl: game.getResourceUrl(resources[action.capability]),
-		}));
-	}, [
-		game,
-	]);
-	const suppressed = !live || actions.length === 0 || interactionSuppressesHover(active);
+	const availableActionDefinitions = useMemo(
+		() => actionDefinitions.filter((action) => capabilities.includes(action.capability)),
+		[
+			capabilities,
+		],
+	);
+	const suppressed =
+		!live ||
+		workspaceOpen ||
+		availableActionDefinitions.length === 0 ||
+		interactionSuppressesHover(active);
 	const floating = useFloating({
 		open,
 		onOpenChange: (nextOpen) => {
@@ -108,6 +112,33 @@ export const useTileHoverActions = ({
 				animationFrame: true,
 			}),
 	});
+	const actions = useMemo(() => {
+		const resources = game.config.resources.tileCapabilities;
+		if (resources === undefined) return [];
+		return availableActionDefinitions.map((action) => ({
+			...action,
+			iconUrl: game.getResourceUrl(resources[action.capability]),
+			onSelect: () => {
+				const reference = floating.refs.domReference.current;
+				const origin =
+					reference instanceof HTMLElement
+						? reference.closest<HTMLElement>('[data-ui="TileActor"]')
+						: null;
+				releaseHover();
+				match(action.capability)
+					.with("info", () => openInfo(itemId, origin))
+					.with("status", "lines", "effects", () => false)
+					.exhaustive();
+			},
+		}));
+	}, [
+		availableActionDefinitions,
+		floating.refs.domReference,
+		game,
+		itemId,
+		releaseHover,
+		openInfo,
+	]);
 	const hover = useHover(floating.context, {
 		enabled: !suppressed,
 		delay: {

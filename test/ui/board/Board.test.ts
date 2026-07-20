@@ -9,6 +9,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 
 const gameEngineState = vi.hoisted(() => ({
 	game: undefined as Game | undefined,
@@ -134,7 +135,11 @@ describe("Board", () => {
 	it("renders the current canonical board through the headless tile system", () => {
 		gameEngineState.game = game;
 		const html = renderToStaticMarkup(
-			createElement(TileSystemProvider, null, createElement(Board)),
+			createElement(
+				TileWorkspaceProvider,
+				null,
+				createElement(TileSystemProvider, null, createElement(Board)),
+			),
 		);
 		const cells = readBoardCells(html);
 
@@ -221,7 +226,11 @@ describe("Board", () => {
 		} satisfies Game;
 		gameEngineState.game = desktopGame;
 		const html = renderToStaticMarkup(
-			createElement(TileSystemProvider, null, createElement(Board)),
+			createElement(
+				TileWorkspaceProvider,
+				null,
+				createElement(TileSystemProvider, null, createElement(Board)),
+			),
 		);
 		const cells = readBoardCells(html);
 		const lastCell = cells.find((cell) => cell.x === 12 && cell.y === 8);

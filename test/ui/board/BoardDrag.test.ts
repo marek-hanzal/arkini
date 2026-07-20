@@ -12,6 +12,8 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { TileWorkspace } from "~/ui/tile-workspace/TileWorkspace";
+import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
@@ -310,7 +312,14 @@ const renderBoard = async () => {
 	const root = createRoot(container);
 	roots.push(root);
 	await act(async () => {
-		root.render(createElement(TileSystemProvider, null, createElement(Board)));
+		root.render(
+			createElement(
+				TileWorkspaceProvider,
+				null,
+				createElement(TileSystemProvider, null, createElement(Board)),
+				createElement(TileWorkspace),
+			),
+		);
 		await Promise.resolve();
 	});
 	const source = document.querySelector<HTMLElement>(
@@ -1097,9 +1106,6 @@ describe("Board drag", () => {
 		);
 		expect(actionElements.map((action) => action.dataset.capability)).toEqual([
 			"info",
-			"status",
-			"lines",
-			"effects",
 		]);
 		expect(
 			actionElements.map((action) => {
@@ -1113,21 +1119,6 @@ describe("Board drag", () => {
 		).toEqual([
 			{
 				src: "resource:tile-capability-info",
-				height: 24,
-				width: 24,
-			},
-			{
-				src: "resource:tile-capability-status",
-				height: 24,
-				width: 24,
-			},
-			{
-				src: "resource:tile-capability-lines",
-				height: 24,
-				width: 24,
-			},
-			{
-				src: "resource:tile-capability-effects",
 				height: 24,
 				width: 24,
 			},
@@ -1151,24 +1142,6 @@ describe("Board drag", () => {
 				iconScalesOnHover: true,
 				tooltipDelay: "250",
 				tooltipText: "Info",
-			},
-			{
-				hasNativeTitle: false,
-				iconScalesOnHover: true,
-				tooltipDelay: "250",
-				tooltipText: "Status",
-			},
-			{
-				hasNativeTitle: false,
-				iconScalesOnHover: true,
-				tooltipDelay: "250",
-				tooltipText: "Lines",
-			},
-			{
-				hasNativeTitle: false,
-				iconScalesOnHover: true,
-				tooltipDelay: "250",
-				tooltipText: "Effects",
 			},
 		]);
 		const infoAction = actionBar.querySelector<HTMLElement>('[data-capability="info"]');
@@ -1195,7 +1168,35 @@ describe("Board drag", () => {
 			);
 		});
 		expect(dropItemState.drop).not.toHaveBeenCalled();
-		expect(visual.dataset.motionPhase).toBe("hovered");
+		expect(document.querySelector('[data-ui="TileHoverActionBar"]')).toBeNull();
+		const workspaceModal = document.querySelector<HTMLElement>(
+			'[data-ui="TileWorkspaceModal"]',
+		);
+		if (workspaceModal === null) throw new Error("Missing Info workspace modal.");
+		expect(workspaceModal.dataset.capability).toBe("info");
+		expect(workspaceModal.dataset.runtimeId).toBe(source.dataset.runtimeId);
+		expect(workspaceModal.querySelector("h2")?.textContent).toContain("Stone");
+		expect(workspaceModal.textContent).toContain("Stone");
+		expect(
+			workspaceModal
+				.querySelector<HTMLImageElement>('[data-ui="TileInfoArtwork"] img')
+				?.getAttribute("src"),
+		).toBe("resource:asset:stone");
+		await act(async () => {
+			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
+			await Promise.resolve();
+		});
+		const closeWorkspace = workspaceModal.querySelector<HTMLButtonElement>(
+			'button[aria-label="Close Info"]',
+		);
+		if (closeWorkspace === null) throw new Error("Missing Info workspace close action.");
+		await act(async () => {
+			closeWorkspace.click();
+			await Promise.resolve();
+			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="TileWorkspaceModal"]')).toBeNull();
 
 		const otherActor = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',

@@ -4,8 +4,9 @@ import { match } from "ts-pattern";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
-import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
+import type { TileInteractionState, TileSettlingInteraction } from "~/ui/tile/TileInteractionState";
 import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
+import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
 import { tileSlotForLocation } from "~/ui/tile/tileSlotForLocation";
 import { tileSurfaceForLocation } from "~/ui/tile/tileSurfaceForLocation";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
@@ -39,6 +40,15 @@ export namespace useTileActorPresentation {
 	}
 }
 
+interface TileActorPresentationView {
+	readonly desiredLocation: TileLocation;
+	readonly phase: TileActorPhaseSchema.Type;
+	readonly feedback: TileInteractionFeedbackSchema.Type | null;
+	readonly placementFrozen: boolean;
+	readonly positionCompletion: useTileActorPresentation.PositionCompletion;
+	readonly visualCompletionGeneration: number | null;
+}
+
 const actorSource = (item: useTileActors.Item, location: TileLocation): TileDragSource => ({
 	id: item.id,
 	revision: item.revision,
@@ -54,6 +64,240 @@ const zIndexForPhase = (phase: TileActorPhaseSchema.Type) =>
 		.with("targeted", () => 25)
 		.with("hovered", () => 20)
 		.with("stable", () => 10)
+		.exhaustive();
+
+const passiveView = (
+	item: useTileActors.Item,
+	live: boolean,
+	hovered: boolean,
+): TileActorPresentationView => ({
+	desiredLocation: item.location,
+	phase: live && hovered ? "hovered" : "stable",
+	feedback: null,
+	placementFrozen: false,
+	positionCompletion: {
+		kind: "none",
+	},
+	visualCompletionGeneration: null,
+});
+
+const settlingView = (
+	settling: TileSettlingInteraction,
+	item: useTileActors.Item,
+	passive: TileActorPresentationView,
+): TileActorPresentationView =>
+	match(settling.settlement)
+		.with(
+			{
+				kind: "failed",
+			},
+			{
+				kind: "reject",
+			},
+			{
+				kind: "ignored",
+			},
+			(settlement) =>
+				settling.source.id === item.id
+					? {
+							...passive,
+							phase: "settling" as const,
+							feedback: settlement.feedback,
+							positionCompletion: {
+								kind: "location" as const,
+								generation: settling.generation,
+								location: item.location,
+							},
+						}
+					: passive,
+		)
+		.with(
+			{
+				kind: "move",
+			},
+			(settlement) =>
+				settling.source.id === item.id
+					? {
+							...passive,
+							desiredLocation: settlement.location,
+							phase: "settling" as const,
+							feedback: settlement.feedback,
+							positionCompletion: {
+								kind: "location" as const,
+								generation: settling.generation,
+								location: settlement.location,
+							},
+						}
+					: passive,
+		)
+		.with(
+			{
+				kind: "swap",
+			},
+			(settlement) => {
+				let location: TileLocation | null = null;
+				if (settlement.outcome.source.itemId === item.id) {
+					location = settlement.sourceLocation;
+				} else if (settlement.outcome.target.itemId === item.id) {
+					location = settlement.outcome.target.location;
+				}
+				if (location === null) return passive;
+				return {
+					...passive,
+					desiredLocation: location,
+					phase: "settling" as const,
+					feedback: settlement.feedback,
+					positionCompletion: {
+						kind: "location" as const,
+						generation: settling.generation,
+						location,
+					},
+				};
+			},
+		)
+		.with(
+			{
+				kind: "merge",
+				stage: "approach",
+			},
+			(settlement) => {
+				const targetLocation =
+					settlement.outcome.target.current?.location ??
+					settlement.outcome.target.previousLocation;
+				if (settlement.outcome.source.itemId === item.id) {
+					return {
+						...passive,
+						desiredLocation: targetLocation,
+						phase: "settling" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "always" as const,
+							generation: settling.generation,
+						},
+					};
+				}
+				return settlement.outcome.target.itemId === item.id
+					? {
+							...passive,
+							phase: "targeted" as const,
+						}
+					: passive;
+			},
+		)
+		.with(
+			{
+				kind: "merge",
+				stage: "resolve",
+			},
+			(settlement) => {
+				if (!settlement.pendingActorIds.includes(item.id)) return passive;
+				const targetLocation =
+					settlement.outcome.target.current?.location ??
+					settlement.outcome.target.previousLocation;
+				if (settlement.outcome.source.itemId === item.id) {
+					const current = settlement.outcome.source.current;
+					if (current === null) {
+						return {
+							...passive,
+							desiredLocation: targetLocation,
+							phase: "exiting" as const,
+							feedback: settlement.feedback,
+							visualCompletionGeneration: settling.generation,
+						};
+					}
+					return {
+						...passive,
+						desiredLocation: current.location,
+						phase: "settling" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "location" as const,
+							generation: settling.generation,
+							location: current.location,
+						},
+					};
+				}
+				if (settlement.outcome.target.itemId !== item.id) return passive;
+				const current = settlement.outcome.target.current;
+				return {
+					...passive,
+					desiredLocation: current?.location ?? targetLocation,
+					phase: current === null ? ("exiting" as const) : ("impact" as const),
+					feedback: settlement.feedback,
+					visualCompletionGeneration: settling.generation,
+				};
+			},
+		)
+		.exhaustive();
+
+const interactionView = (
+	active: TileInteractionState | null,
+	item: useTileActors.Item,
+	passive: TileActorPresentationView,
+): TileActorPresentationView =>
+	match(active)
+		.with(null, () => passive)
+		.with(
+			{
+				phase: "pressed",
+			},
+			(pressed) =>
+				pressed.source.id === item.id
+					? {
+							...passive,
+							placementFrozen: true,
+						}
+					: passive,
+		)
+		.with(
+			{
+				phase: "dragging" as const,
+			},
+			(dragging) => {
+				if (dragging.source.id === item.id) {
+					return {
+						...passive,
+						phase: "dragging" as const,
+						placementFrozen: true,
+					};
+				}
+				if (dragging.target?.kind === "slot" && dragging.target.occupant?.id === item.id) {
+					return {
+						...passive,
+						phase: "targeted" as const,
+					};
+				}
+				return passive;
+			},
+		)
+		.with(
+			{
+				phase: "awaiting-outcome",
+			},
+			(awaiting) => {
+				if (awaiting.source.id === item.id) {
+					return {
+						...passive,
+						phase: "dragging" as const,
+						placementFrozen: true,
+					};
+				}
+				if (awaiting.target.kind === "slot" && awaiting.target.occupant?.id === item.id) {
+					return {
+						...passive,
+						phase: "targeted" as const,
+						placementFrozen: true,
+					};
+				}
+				return passive;
+			},
+		)
+		.with(
+			{
+				phase: "settling" as const,
+			},
+			(settling) => settlingView(settling, item, passive),
+		)
 		.exhaustive();
 
 /** Derives one exhaustive actor-owned presentation view from the shared interaction vocabulary. */
@@ -72,275 +316,15 @@ export const useTileActorPresentation = ({
 			item,
 		],
 	);
-
-	const view = useMemo(() => {
-		const passive = {
-			desiredLocation: item.location,
-			phase: live && hovered ? ("hovered" as const) : ("stable" as const),
-			feedback: null,
-			placementFrozen: false,
-			positionCompletion: {
-				kind: "none" as const,
-			},
-			visualCompletionGeneration: null,
-		};
-
-		return match(active)
-			.with(null, () => passive)
-			.with(
-				{
-					phase: "pressed",
-				},
-				(pressed) =>
-					pressed.source.id === item.id
-						? {
-								...passive,
-								placementFrozen: true,
-							}
-						: passive,
-			)
-			.with(
-				{
-					phase: "dragging",
-				},
-				(dragging) => {
-					if (dragging.source.id === item.id) {
-						return {
-							...passive,
-							phase: "dragging" as const,
-							placementFrozen: true,
-						};
-					}
-					if (
-						dragging.target?.kind === "slot" &&
-						dragging.target.occupant?.id === item.id
-					) {
-						return {
-							...passive,
-							phase: "targeted" as const,
-						};
-					}
-					return passive;
-				},
-			)
-			.with(
-				{
-					phase: "awaiting-outcome",
-				},
-				(awaiting) => {
-					if (awaiting.source.id === item.id) {
-						return {
-							...passive,
-							phase: "dragging" as const,
-							placementFrozen: true,
-						};
-					}
-					if (
-						awaiting.target.kind === "slot" &&
-						awaiting.target.occupant?.id === item.id
-					) {
-						return {
-							...passive,
-							phase: "targeted" as const,
-							placementFrozen: true,
-						};
-					}
-					return passive;
-				},
-			)
-			.with(
-				{
-					phase: "settling",
-				},
-				(settling) =>
-					match(settling.settlement)
-						.with(
-							{
-								kind: "failed",
-							},
-							(settlement) =>
-								settling.source.id === item.id
-									? {
-											...passive,
-											phase: "settling" as const,
-											feedback: settlement.feedback,
-											positionCompletion: {
-												kind: "location" as const,
-												generation: settling.generation,
-												location: item.location,
-											},
-										}
-									: passive,
-						)
-						.with(
-							{
-								kind: "reject",
-							},
-							(settlement) =>
-								settling.source.id === item.id
-									? {
-											...passive,
-											phase: "settling" as const,
-											feedback: settlement.feedback,
-											positionCompletion: {
-												kind: "location" as const,
-												generation: settling.generation,
-												location: item.location,
-											},
-										}
-									: passive,
-						)
-						.with(
-							{
-								kind: "ignored",
-							},
-							(settlement) =>
-								settling.source.id === item.id
-									? {
-											...passive,
-											phase: "settling" as const,
-											feedback: settlement.feedback,
-											positionCompletion: {
-												kind: "location" as const,
-												generation: settling.generation,
-												location: item.location,
-											},
-										}
-									: passive,
-						)
-						.with(
-							{
-								kind: "move",
-							},
-							(settlement) =>
-								settling.source.id === item.id
-									? {
-											...passive,
-											desiredLocation: settlement.location,
-											phase: "settling" as const,
-											feedback: settlement.feedback,
-											positionCompletion: {
-												kind: "location" as const,
-												generation: settling.generation,
-												location: settlement.location,
-											},
-										}
-									: passive,
-						)
-						.with(
-							{
-								kind: "swap",
-							},
-							(settlement) => {
-								const location =
-									settlement.outcome.source.itemId === item.id
-										? settlement.sourceLocation
-										: settlement.outcome.target.itemId === item.id
-											? settlement.outcome.target.location
-											: null;
-								return location === null
-									? passive
-									: {
-											...passive,
-											desiredLocation: location,
-											phase: "settling" as const,
-											feedback: settlement.feedback,
-											positionCompletion: {
-												kind: "location" as const,
-												generation: settling.generation,
-												location,
-											},
-										};
-							},
-						)
-						.with(
-							{
-								kind: "merge",
-								stage: "approach",
-							},
-							(settlement) => {
-								const targetLocation =
-									settlement.outcome.target.current?.location ??
-									settlement.outcome.target.previousLocation;
-								if (settlement.outcome.source.itemId === item.id) {
-									return {
-										...passive,
-										desiredLocation: targetLocation,
-										phase: "settling" as const,
-										feedback: settlement.feedback,
-										positionCompletion: {
-											kind: "always" as const,
-											generation: settling.generation,
-										},
-									};
-								}
-								return settlement.outcome.target.itemId === item.id
-									? {
-											...passive,
-											phase: "targeted" as const,
-										}
-									: passive;
-							},
-						)
-						.with(
-							{
-								kind: "merge",
-								stage: "resolve",
-							},
-							(settlement) => {
-								if (!settlement.pendingActorIds.includes(item.id)) return passive;
-								const targetLocation =
-									settlement.outcome.target.current?.location ??
-									settlement.outcome.target.previousLocation;
-								if (settlement.outcome.source.itemId === item.id) {
-									const current = settlement.outcome.source.current;
-									return current === null
-										? {
-												...passive,
-												desiredLocation: targetLocation,
-												phase: "exiting" as const,
-												feedback: settlement.feedback,
-												visualCompletionGeneration: settling.generation,
-											}
-										: {
-												...passive,
-												desiredLocation: current.location,
-												phase: "settling" as const,
-												feedback: settlement.feedback,
-												positionCompletion: {
-													kind: "location" as const,
-													generation: settling.generation,
-													location: current.location,
-												},
-											};
-								}
-								if (settlement.outcome.target.itemId === item.id) {
-									const current = settlement.outcome.target.current;
-									return {
-										...passive,
-										desiredLocation: current?.location ?? targetLocation,
-										phase:
-											current === null
-												? ("exiting" as const)
-												: ("impact" as const),
-										feedback: settlement.feedback,
-										visualCompletionGeneration: settling.generation,
-									};
-								}
-								return passive;
-							},
-						)
-						.exhaustive(),
-			)
-			.exhaustive();
-	}, [
-		active,
-		hovered,
-		item.id,
-		item.location,
-		live,
-	]);
-
+	const view = useMemo(
+		() => interactionView(active, item, passiveView(item, live, hovered)),
+		[
+			active,
+			hovered,
+			item,
+			live,
+		],
+	);
 	const desiredSource = useMemo(
 		() => actorSource(item, view.desiredLocation),
 		[

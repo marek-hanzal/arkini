@@ -52,7 +52,12 @@ export const useTileActorMotion = ({
 	const pickupAnimationY = useRef<ReturnType<typeof animate> | null>(null);
 	const itemRef = useRef(item);
 	const [visible, setVisible] = useState(false);
-	itemRef.current = item;
+
+	useLayoutEffect(() => {
+		itemRef.current = item;
+	}, [
+		item,
+	]);
 
 	const stopPickupCorrection = useCallback(() => {
 		pickupAnimationX.current?.stop();

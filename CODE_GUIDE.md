@@ -346,6 +346,26 @@ Forbidden:
 
 Presentation may lag runtime. Presentation is never authoritative.
 
+### Component ownership and exhaustive UI decisions
+
+A non-trivial React component normally has this shape:
+
+```text
+props
+→ a small number of focused ownership-specific hooks
+→ direct attributes and markup
+```
+
+Named `use*` hooks own effects, timers, focus and pointer lifecycle, async command or navigation orchestration, Motion coordination, and non-trivial presentation projection. Each hook owns one concrete concern. Do not move a component body wholesale into one equally large `usePageModel`, `useFoo`, manager, registry, or generic UI framework merely to make the JSX file shorter. Markup, simple event forwarding, direct attributes, and small local booleans remain in the component.
+
+Use `ts-pattern` with `.exhaustive()` for discriminated unions, phase or outcome combinations, mutation/catalog/startup status variants, and other decisions where adding a new variant must produce a compile error. Nested ternary chains may not encode a state machine. Ordinary booleans remain appropriate for optional images, binary classes, disabled attributes, simple labels, and other genuinely two-way presentation choices. Do not wrap trivial conditions in `match()` as ceremony.
+
+UI-owned discriminated state and reusable presentation vocabularies may use the same canonical Zod schema pattern as engine domains. Place them under the owning UI domain, for example `src/ui/<domain>/schema/FooSchema.ts`, and infer TypeScript types from that schema. Do not duplicate a schema-backed union independently across components, and do not introduce runtime schemas for one-off booleans that have no shared contract.
+
+UI may own gesture facts, pointer geometry, hover and focus, menu visibility, animation generations, pending or error presentation, frozen source/target facts for one gesture, transient authoritative command outcomes, and narrow retained visual snapshots for an owned exit. These are presentation workflow data. UI may not own copied canonical item locations or revisions as a continuously synchronized truth, command validity, readiness, placement viability, queue or job state, or a full live runtime projection maintained beside the engine. Live actors render directly from the bridge projection; only identities explicitly protected by the current presentation generation may retain the minimal snapshot needed to finish their visual lifecycle.
+
+Enforce these conventions through types, discriminated schemas, exhaustive matching, focused behavior tests, dependency rules, and implementation review. Do not add source-text or custom AST guardrails for hook names, component line counts, `match()` spelling, ternary counts, or file topology.
+
 Tile dragging is one reusable Motion actor system under `src/ui/tile`, not separate Board, Inventory, and Toolbar implementations. Surfaces render stable slot anchors; one Canvas-wide `TileActorLayer` renders one stable actor keyed by the exact shared runtime item ID. The visible static tile and the dragged tile are the same DOM node. Never create a preview, ghost, clone, screenshot, portal duplicate, hidden canonical tile, or second per-surface actor tree.
 
 Arkini is the presentation source of truth. It owns actor phase, operation generation, source/target identities, topmost `slot | surface | outside` hit testing, z-order, engine handoff, and live reconciliation targets. Motion listens to that state and owns physical drag tracking, frame batching, transforms, scale, opacity, velocity continuity, and spring interpolation. Do not derive gameplay or presentation truth back from Motion. Pointer-frequency Motion updates must not drive a React render loop. Pointer press only arms the interaction and must preserve the current stable or hover visual pose; do not animate pickup, scale, shadow, or position before the drag threshold is crossed. After threshold, use an outer Motion-owned anchor shell (`left/top`), an exact pointer drag shell (`x/y`), and a nested short pickup-correction shell that eases an off-center grab toward the actor center without filtering pointer movement. Settlement must fold both local offsets into the current visual pose before resetting them, so placement and gesture transforms never overwrite each other or snap on release.

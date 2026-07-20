@@ -11,7 +11,7 @@ interface CornerPortraitPeekState {
 
 const initialState: CornerPortraitPeekState = {
 	activePortraitIndex: undefined,
-	sizePx: 104,
+	sizePx: 208,
 };
 
 /** Randomly selects which pre-rendered portrait peeks from one About-page corner. */
@@ -44,7 +44,7 @@ export const useCornerPortraitPeek = (active: boolean) => {
 					previousPortraitIndexRef.current = nextIndex;
 					setPeek({
 						activePortraitIndex: nextIndex,
-						sizePx: Math.round(randomBetween(88, 124)),
+						sizePx: Math.round(randomBetween(176, 248)),
 					});
 
 					timeout = window.setTimeout(

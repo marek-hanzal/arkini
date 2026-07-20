@@ -72,7 +72,7 @@ export const LauncherScene = ({
 		</div>
 		{overlay === undefined ? null : (
 			<div
-				className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+				className="pointer-events-none absolute inset-0 z-[5] overflow-hidden"
 				data-ui="LauncherSceneOverlay"
 			>
 				{overlay}

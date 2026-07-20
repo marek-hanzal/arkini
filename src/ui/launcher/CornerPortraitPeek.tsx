@@ -44,7 +44,7 @@ export const CornerPortraitPeek = ({
 	const { activePortraitIndex, sizePx } = useCornerPortraitPeek(active);
 	const presentation = cornerPresentation[corner];
 	const hiddenOffsetPx = sizePx * 1.05;
-	const peekOffsetPx = sizePx * 0.28;
+	const peekOffsetPx = sizePx * 0.2;
 
 	return AboutPortraitAssets.map((portraitUrl, portraitIndex) => {
 		const visible = activePortraitIndex === portraitIndex;

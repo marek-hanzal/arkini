@@ -47,9 +47,22 @@ describe("readTileStatusFx", () => {
 		]);
 	});
 
-	it("classifies ready, working, stored, and paused owner states", () => {
+	it("classifies idle, ready, working, stored, and paused owner states", () => {
+		const idle = lineRunRuntime({
+			permit: true,
+		});
+		expect(readStatus(idle)).toMatchObject({
+			kind: "available",
+			state: {
+				kind: "idle",
+			},
+		});
+
 		const ready = lineRunRuntime({
 			permit: true,
+			water: [
+				3,
+			],
 		});
 		expect(readStatus(ready)).toMatchObject({
 			kind: "available",

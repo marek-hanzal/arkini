@@ -61,6 +61,16 @@ const readinessLabel = (availability: useTileLines.Availability) =>
 		.with(
 			{
 				kind: "blocked",
+				reason: "queue",
+			},
+			() => ({
+				label: "Queue full",
+				className: "border-warning/35 bg-warning/10 text-foreground",
+			}),
+		)
+		.with(
+			{
+				kind: "blocked",
 				reason: "stored",
 			},
 			() => ({

@@ -6,6 +6,7 @@ import type { Game } from "~/bridge/game/Game";
 import { saveAndExitGameMutationOptions } from "~/ui/game-menu/mutation/saveAndExitGameMutationOptions";
 import { saveGameMutationOptions } from "~/ui/game-menu/mutation/saveGameMutationOptions";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	arkpack: {
@@ -27,6 +28,7 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	flushSaveFx,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,

@@ -1,4 +1,4 @@
-import type { Effect } from "effect";
+import type { Effect, Exit } from "effect";
 import type * as LayerModule from "effect/Layer";
 
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
@@ -18,6 +18,10 @@ export interface GameSession {
 	readonly disposeWithoutSaveFx: Effect.Effect<void, unknown>;
 	readonly flushSaveFx: Effect.Effect<void, unknown>;
 	readonly getSnapshot: () => RuntimeSchema.Type;
+	/** Executes one synchronous live read inside this Game's existing session runtime. */
+	readonly read: <Result, Error, Requirements extends GameSessionServices>(
+		effect: Effect.Effect<Result, Error, Requirements>,
+	) => Exit.Exit<Result, Error | unknown>;
 	readonly run: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
 	) => Promise<Result>;

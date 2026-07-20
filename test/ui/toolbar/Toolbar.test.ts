@@ -11,6 +11,7 @@ import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
 	game: undefined as Game | undefined,
@@ -117,6 +118,7 @@ const createGame = (toolbarSize?: number, stored = false): Game => {
 		getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 		subscribe: () => () => undefined,
 		subscribeEvents: () => () => undefined,
+		read: testGameRead,
 		run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 		disposeFx: Effect.void,
 		disposeWithoutSaveFx: Effect.void,

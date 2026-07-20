@@ -8,12 +8,12 @@ import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSch
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
-import { resolveLineRunFx } from "~/engine/line/fx/run/resolveLineRunFx";
+import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
+import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
@@ -101,7 +101,7 @@ export namespace readTileLinesFx {
 		  }
 		| {
 				readonly kind: "blocked";
-				readonly reason: "disabled" | "inputs" | "stored";
+				readonly reason: "disabled" | "inputs" | "queue" | "stored";
 		  };
 
 	export interface Line {
@@ -133,20 +133,6 @@ export namespace readTileLinesFx {
 const unavailable = {
 	kind: "unavailable",
 } as const satisfies readTileLinesFx.Result;
-
-const readOwnerLines = (
-	item: Extract<
-		RuntimeItemSchema.Type["item"],
-		{
-			readonly type: "blueprint" | "craft" | "producer" | "stash";
-		}
-	>,
-): readonly LineSchema.Type[] =>
-	item.type === "producer"
-		? item.lines
-		: [
-				item.line,
-			];
 
 const quantityBounds = (quantity: QuantitySchema.Type): readTileLinesFx.QuantityBounds =>
 	match(quantity)
@@ -435,7 +421,7 @@ export const readTileLinesFx = Effect.fn("readTileLinesFx")(function* ({
 }: readTileLinesFx.Props) {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined || !isLineOwnerItem(owner.item)) return unavailable;
-	const lines = readOwnerLines(owner.item);
+	const lines = readLineOwnerLines(owner.item);
 	const projected: readTileLinesFx.Line[] = [];
 
 	for (const line of lines) {
@@ -456,11 +442,12 @@ export const readTileLinesFx = Effect.fn("readTileLinesFx")(function* ({
 			continue;
 		}
 
-		const resolution = yield* resolveLineRunFx({
+		const start = yield* resolveLineStartFx({
 			lineId: line.id,
 			ownerItemId: owner.id,
 			runtime,
 		});
+		const resolution = start.run;
 		if (!resolution.show && activeJob === undefined) continue;
 		const allInputsReady = resolution.input.every((input) => input.resolution.ready);
 		projected.push({
@@ -469,18 +456,17 @@ export const readTileLinesFx = Effect.fn("readTileLinesFx")(function* ({
 			description: line.description,
 			baseRuntimeMs: line.runtimeMs,
 			effectiveRuntimeMs: resolution.runtimeMs,
-			availability: resolution.enable
-				? allInputsReady
-					? {
-							kind: "ready",
-						}
-					: {
-							kind: "blocked",
-							reason: "inputs",
-						}
+			availability: start.ready
+				? {
+						kind: "ready",
+					}
 				: {
 						kind: "blocked",
-						reason: "disabled",
+						reason: !resolution.enable
+							? "disabled"
+							: !allInputsReady
+								? "inputs"
+								: "queue",
 					},
 			input: readInputs({
 				configured: line.input,

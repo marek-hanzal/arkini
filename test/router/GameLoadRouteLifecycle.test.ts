@@ -19,6 +19,7 @@ import type { Game } from "~/bridge/game/Game";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const packageId = "package-route-load";
 const roots: Array<ReturnType<typeof createRoot>> = [];
@@ -62,6 +63,7 @@ const createGame = ({
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId,

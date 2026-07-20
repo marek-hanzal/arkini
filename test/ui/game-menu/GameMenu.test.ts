@@ -22,6 +22,7 @@ import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBack
 import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
@@ -71,6 +72,7 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	flushSaveFx,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,

@@ -15,6 +15,7 @@ import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { TileWorkspace } from "~/ui/tile-workspace/TileWorkspace";
 import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 (
 	globalThis as {
@@ -223,6 +224,7 @@ const game = {
 		return () => runtimeListeners.delete(listener);
 	},
 	subscribeEvents: () => () => undefined,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

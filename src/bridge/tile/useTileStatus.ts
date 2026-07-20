@@ -1,6 +1,7 @@
-import { Effect } from "effect";
+import { Exit } from "effect";
 import { useCallback } from "react";
 
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readTileStatusFx } from "~/engine/tile/read/readTileStatusFx";
@@ -51,15 +52,17 @@ const sameProjection = (left: useTileStatus.Projection, right: useTileStatus.Pro
 
 /** Projects one exact line owner's current player-facing operational condition. */
 export const useTileStatus = (itemId: IdSchema.Type): useTileStatus.Projection => {
+	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useTileStatus.Projection => {
-			const status = Effect.runSync(
+			const exit = game.read(
 				readTileStatusFx({
 					itemId,
 					runtime,
 				}),
 			);
-			if (status.kind === "unavailable") return unavailable;
+			if (Exit.isFailure(exit) || exit.value.kind === "unavailable") return unavailable;
+			const status = exit.value;
 			return {
 				kind: "available",
 				itemId: status.itemId,
@@ -68,6 +71,7 @@ export const useTileStatus = (itemId: IdSchema.Type): useTileStatus.Projection =
 			};
 		},
 		[
+			game,
 			itemId,
 		],
 	);

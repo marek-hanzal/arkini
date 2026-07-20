@@ -14,6 +14,7 @@ import { TileWorkspaceContext } from "~/ui/tile-workspace/TileWorkspaceContext";
 import type { TileWorkspaceControl } from "~/ui/tile-workspace/TileWorkspaceControl";
 import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 
@@ -260,6 +261,7 @@ const game = {
 		return () => listeners.delete(listener);
 	},
 	subscribeEvents: () => () => undefined,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -441,7 +443,7 @@ describe("TileWorkspace Info", () => {
 });
 
 describe("TileWorkspace Status", () => {
-	it("updates one open modal across ready, working, dependency-paused, and stored states", async () => {
+	it("updates one open modal across idle, working, dependency-paused, and stored states", async () => {
 		const { container, readControl } = await renderWorkspace();
 		const workshop = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (workshop === undefined) throw new Error("Missing workshop runtime item.");
@@ -458,8 +460,8 @@ describe("TileWorkspace Status", () => {
 				.querySelector<HTMLImageElement>('[data-ui="TileWorkspaceHeaderArtwork"] img')
 				?.getAttribute("src"),
 		).toBe("resource:asset:workshop");
-		expect(modal.textContent).toContain("Building · Ready");
-		expect(modal.textContent).toContain("available for work");
+		expect(modal.textContent).toContain("Building · Idle");
+		expect(modal.textContent).toContain("No line can start");
 		await finishLatestMotion();
 
 		await act(async () => {

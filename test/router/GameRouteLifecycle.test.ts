@@ -12,6 +12,7 @@ import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineRe
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const createStartup = (): LauncherStartup => ({
 	getSnapshot: () => ({
@@ -46,6 +47,7 @@ const createGame = (disposeFx: Game["disposeFx"] = Effect.void): Game => ({
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId: "package-route",

@@ -2,7 +2,9 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
+import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
+import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
 import { isPassiveStorageLocation } from "~/engine/location/read/isPassiveStorageLocation";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -15,6 +17,9 @@ export namespace readTileStatusFx {
 	export type PassiveLocation = "inventory" | "toolbar";
 
 	export type OperationalState =
+		| {
+				readonly kind: "idle";
+		  }
 		| {
 				readonly kind: "ready";
 		  }
@@ -96,8 +101,20 @@ export const readTileStatusFx = Effect.fn("readTileStatusFx")(function* ({
 			location: passiveLocation(item.location.scope),
 		};
 	} else {
+		let ready = false;
+		for (const line of readLineOwnerLines(item.item)) {
+			const start = yield* resolveLineStartFx({
+				lineId: line.id,
+				ownerItemId: item.id,
+				runtime,
+			});
+			if (start.run.show && start.ready) {
+				ready = true;
+				break;
+			}
+		}
 		state = {
-			kind: "ready",
+			kind: ready ? "ready" : "idle",
 		};
 	}
 

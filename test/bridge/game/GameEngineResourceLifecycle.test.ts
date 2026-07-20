@@ -10,6 +10,7 @@ import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const createDeferred = () => {
 	let resolve!: () => void;
@@ -46,6 +47,7 @@ const createGame = ({
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId,

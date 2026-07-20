@@ -12,6 +12,7 @@ import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
 import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 (
 	globalThis as {
@@ -116,6 +117,7 @@ const game = {
 		return () => runtimeListeners.delete(listener);
 	},
 	subscribeEvents: () => () => undefined,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

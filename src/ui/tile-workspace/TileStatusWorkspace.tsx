@@ -19,11 +19,21 @@ export const readTileStatusPresentation = (
 	match(state)
 		.with(
 			{
+				kind: "idle",
+			},
+			() => ({
+				label: "Idle",
+				summary: "No line can start with the current inputs and conditions.",
+				tone: "neutral" as const,
+			}),
+		)
+		.with(
+			{
 				kind: "ready",
 			},
 			() => ({
 				label: "Ready",
-				summary: "This item is on the Board and available for work.",
+				summary: "At least one line can start immediately.",
 				tone: "positive" as const,
 			}),
 		)

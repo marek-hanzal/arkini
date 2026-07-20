@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Exit } from "effect";
 import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
@@ -31,15 +31,19 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 		(runtime: RuntimeSchema.Type): ReadonlyArray<useTileActors.Item> => {
 			const activeOwnerIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
 			return runtime.items.filter(isGridRuntimeItem).map((item) => {
-				const status =
+				const statusExit =
 					!activeOwnerIds.has(item.id) || !isLineOwnerItem(item.item)
 						? undefined
-						: Effect.runSync(
+						: game.read(
 								readTileStatusFx({
 									itemId: item.id,
 									runtime,
 								}),
 							);
+				const status =
+					statusExit === undefined || Exit.isFailure(statusExit)
+						? undefined
+						: statusExit.value;
 				return {
 					id: item.id,
 					revision: item.revision,

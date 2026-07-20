@@ -10,6 +10,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { TileWorkspaceProvider } from "~/ui/tile-workspace/TileWorkspaceProvider";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
 	game: undefined as Game | undefined,
@@ -100,6 +101,7 @@ const game = {
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,
+	read: testGameRead,
 	run: unavailableRun,
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

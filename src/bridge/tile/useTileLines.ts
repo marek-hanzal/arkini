@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Exit } from "effect";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -409,13 +409,14 @@ export const useTileLines = (itemId: TileItemId): useTileLines.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useTileLines.Projection => {
-			const lines = Effect.runSync(
+			const exit = game.read(
 				readTileLinesFx({
 					itemId,
 					runtime,
 				}),
 			);
-			if (lines.kind === "unavailable") return unavailable;
+			if (Exit.isFailure(exit) || exit.value.kind === "unavailable") return unavailable;
+			const lines = exit.value;
 			return {
 				kind: "available",
 				itemId: lines.itemId,
@@ -436,7 +437,7 @@ export const useTileLines = (itemId: TileItemId): useTileLines.Projection => {
 			};
 		},
 		[
-			game.config.items,
+			game,
 			itemId,
 		],
 	);

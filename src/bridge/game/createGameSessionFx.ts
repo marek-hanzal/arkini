@@ -202,6 +202,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				disposeWithoutSaveFx: disposeWithSaveModeFx("discard"),
 				flushSaveFx,
 				getSnapshot: () => managed.runSync(readRuntimeFx()),
+				read: (effect) => managed.runSyncExit(effect),
 				run: (effect) => runCommand(ensureRunningFx.pipe(Effect.zipRight(effect))),
 				subscribe: (listener) =>
 					openSubscription(transitionSubscriptions.subscribe(listener)),

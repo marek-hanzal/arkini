@@ -9,6 +9,7 @@ import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
 import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 const createGame = (
 	packageId = "package:test",
@@ -33,6 +34,7 @@ const createGame = (
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
 	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
 		packageId,

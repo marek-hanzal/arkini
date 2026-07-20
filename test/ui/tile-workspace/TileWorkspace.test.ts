@@ -102,10 +102,17 @@ const config = GameConfigSchema.parse({
 					"asset:stone",
 				],
 			},
-			tags: [],
+			tags: [
+				"material",
+				"era:I",
+			],
 			categoryId: "resource",
 			scope: "any",
+			maxCount: 12,
 			maxStackSize: 10,
+			charges: {
+				amount: 3,
+			},
 		},
 		permit: {
 			id: "permit",
@@ -289,7 +296,7 @@ const finishLatestMotion = async () => {
 };
 
 describe("TileWorkspace Info", () => {
-	it("shows a large Arkpack visual and restores focus after Escape close", async () => {
+	it("shows the compact shared header and structured common item facts", async () => {
 		const { container, readControl } = await renderWorkspace();
 		const origin = document.createElement("button");
 		origin.type = "button";
@@ -305,13 +312,43 @@ describe("TileWorkspace Info", () => {
 		const modal = container.querySelector<HTMLElement>('[data-ui="TileWorkspaceModal"]');
 		if (modal === null) throw new Error("Missing tile workspace modal.");
 		expect(modal.dataset.runtimeId).toBe(runtimeId);
-		expect(modal.querySelector("h2")?.textContent).toBe("Stone · Resource");
+		expect(modal.querySelector("h2")?.textContent).toBe("Stone");
+		expect(modal.textContent).toContain("Resource");
 		expect(modal.textContent).toContain("worth inspecting up close");
+		const headerArtwork = modal.querySelector<HTMLElement>(
+			'[data-ui="TileWorkspaceHeaderArtwork"]',
+		);
+		expect(headerArtwork?.classList.contains("size-16")).toBe(true);
+		expect(headerArtwork?.querySelector("img")?.getAttribute("src")).toBe(
+			"resource:asset:stone",
+		);
+		const facts = Object.fromEntries(
+			Array.from(modal.querySelectorAll<HTMLElement>('[data-ui="TileInfoFact"]')).map(
+				(fact) => [
+					fact.dataset.label,
+					fact.querySelector("dd")?.textContent,
+				],
+			),
+		);
+		expect(facts).toMatchObject({
+			Category: "Resource",
+			Type: "Simple item",
+			Location: "Board · Space 1",
+			Storage: "Board, Inventory & Toolbar",
+			"Current stack": "1 item",
+			"Stack capacity": "10 items",
+			Owned: "1 / 12",
+			"Game limit": "12",
+			Charges: "3 / 3",
+		});
 		expect(
-			modal
-				.querySelector<HTMLImageElement>('[data-ui="TileInfoArtwork"] img')
-				?.getAttribute("src"),
-		).toBe("resource:asset:stone");
+			Array.from(modal.querySelectorAll<HTMLElement>('[data-ui="TileInfoTraits"] span')).map(
+				(trait) => trait.textContent,
+			),
+		).toEqual([
+			"Material",
+			"Era I",
+		]);
 		expect(modal.className).toContain("max-w-5xl");
 
 		await finishLatestMotion();
@@ -365,7 +402,13 @@ describe("TileWorkspace Status", () => {
 		const modal = container.querySelector<HTMLElement>('[data-ui="TileWorkspaceModal"]');
 		if (modal === null) throw new Error("Missing Status workspace modal.");
 		expect(modal.dataset.capability).toBe("status");
-		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Ready");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(
+			modal
+				.querySelector<HTMLImageElement>('[data-ui="TileWorkspaceHeaderArtwork"] img')
+				?.getAttribute("src"),
+		).toBe("resource:asset:workshop");
+		expect(modal.textContent).toContain("Building · Ready");
 		expect(modal.textContent).toContain("available for work");
 		await finishLatestMotion();
 
@@ -385,7 +428,8 @@ describe("TileWorkspace Status", () => {
 			await Promise.resolve();
 		});
 		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
-		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Working");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(modal.textContent).toContain("Building · Working");
 		expect(modal.textContent).toContain("currently running");
 
 		await act(async () => {
@@ -396,7 +440,8 @@ describe("TileWorkspace Status", () => {
 			await Promise.resolve();
 		});
 		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
-		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Paused");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(modal.textContent).toContain("Building · Paused");
 		expect(modal.textContent).toContain("dependencies are no longer satisfied");
 
 		await act(async () => {
@@ -421,7 +466,8 @@ describe("TileWorkspace Status", () => {
 			await Promise.resolve();
 		});
 		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
-		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Paused");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(modal.textContent).toContain("Building · Paused");
 		expect(modal.textContent).toContain("while this item is in the Toolbar");
 
 		await act(async () => {
@@ -432,7 +478,8 @@ describe("TileWorkspace Status", () => {
 			await Promise.resolve();
 		});
 		expect(container.querySelector('[data-ui="TileWorkspaceModal"]')).toBe(modal);
-		expect(modal.querySelector("h2")?.textContent).toBe("Workshop · Stored");
+		expect(modal.querySelector("h2")?.textContent).toBe("Workshop");
+		expect(modal.textContent).toContain("Building · Stored");
 		expect(modal.textContent).toContain("Move it back to the Board");
 	});
 });

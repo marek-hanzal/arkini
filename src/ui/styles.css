@@ -610,14 +610,3 @@ select {
 [data-ui="TileWorkspaceModal"] {
 	container-type: size;
 }
-
-[data-ui="TileInfoWorkspace"] {
-	grid-template-columns: minmax(0, 1.35fr) minmax(15rem, 0.65fr);
-}
-
-@container (max-width: 44rem) {
-	[data-ui="TileInfoWorkspace"] {
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: minmax(0, 1fr) auto;
-	}
-}

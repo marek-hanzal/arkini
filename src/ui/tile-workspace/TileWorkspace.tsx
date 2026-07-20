@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { type ReactNode, useEffect } from "react";
 import { match, P } from "ts-pattern";
 
+import { useTileIdentity } from "~/bridge/tile/useTileIdentity";
 import { useTileInfo } from "~/bridge/tile/useTileInfo";
 import { useTileStatus } from "~/bridge/tile/useTileStatus";
 import { TileInfoWorkspace } from "~/ui/tile-workspace/TileInfoWorkspace";
@@ -27,33 +28,76 @@ const transition = {
 	] as const,
 };
 
+const TileWorkspaceHeaderArtwork = ({
+	identity,
+}: {
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
+}) => (
+	<div
+		className="relative size-16 shrink-0"
+		data-ui="TileWorkspaceHeaderArtwork"
+	>
+		<img
+			className="absolute inset-0 size-full object-contain drop-shadow-[0_0.45rem_0.65rem_color-mix(in_srgb,var(--ak-overlay)_35%,transparent)]"
+			src={identity.sourceUrl}
+			alt=""
+			draggable={false}
+		/>
+		{identity.compositeUrl === undefined ? null : (
+			<img
+				className="absolute inset-0 size-full object-contain drop-shadow-[0_0.45rem_0.65rem_color-mix(in_srgb,var(--ak-overlay)_35%,transparent)]"
+				src={identity.compositeUrl}
+				alt=""
+				draggable={false}
+			/>
+		)}
+	</div>
+);
+
 const TileWorkspaceChrome = ({
 	children,
 	closeLabel,
+	contextLabel,
 	disabled,
-	subtitle,
-	title,
+	identity,
 }: {
 	readonly children: ReactNode;
 	readonly closeLabel: string;
+	readonly contextLabel?: string;
 	readonly disabled: boolean;
-	readonly subtitle?: string;
-	readonly title: string;
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
 }) => {
 	const workspace = useTileWorkspaceControl();
+	const meta = [
+		identity.subtitle,
+		contextLabel,
+	].filter((value): value is string => value !== undefined);
 	return (
 		<>
-			<header className="mb-[var(--ak-panel-padding)] flex min-w-0 items-start justify-between gap-4 border-b border-line pb-4">
-				<div className="min-w-0">
-					<h2
-						id="tile-workspace-title"
-						className="truncate text-xl font-semibold"
-					>
-						{title}
-						{subtitle === undefined ? null : (
-							<span className="font-normal text-muted"> · {subtitle}</span>
+			<header className="mb-5 flex min-w-0 items-center justify-between gap-4 border-b border-line pb-3">
+				<div className="flex min-w-0 items-center gap-3">
+					<TileWorkspaceHeaderArtwork identity={identity} />
+					<div className="min-w-0">
+						<h2
+							id="tile-workspace-title"
+							className="truncate text-lg font-semibold leading-tight"
+						>
+							{identity.title}
+						</h2>
+						{meta.length === 0 ? null : (
+							<p className="mt-1 truncate text-sm text-muted">{meta.join(" · ")}</p>
 						)}
-					</h2>
+					</div>
 				</div>
 				<button
 					type="button"
@@ -76,22 +120,45 @@ const UnavailableWorkspace = ({
 }: {
 	readonly closeLabel: string;
 	readonly disabled: boolean;
-}) => (
-	<TileWorkspaceChrome
-		closeLabel={closeLabel}
-		disabled={disabled}
-		title="Unavailable"
-	>
-		<div className="grid flex-1 place-items-center text-muted">
-			Item is no longer available.
-		</div>
-	</TileWorkspaceChrome>
-);
+}) => {
+	const workspace = useTileWorkspaceControl();
+	return (
+		<>
+			<header className="mb-5 flex min-w-0 items-center justify-between gap-4 border-b border-line pb-3">
+				<h2
+					id="tile-workspace-title"
+					className="text-lg font-semibold"
+				>
+					Unavailable
+				</h2>
+				<button
+					type="button"
+					className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+					aria-label={closeLabel}
+					disabled={disabled}
+					onClick={() => void workspace.close()}
+				>
+					×
+				</button>
+			</header>
+			<div className="grid flex-1 place-items-center text-muted">
+				Item is no longer available.
+			</div>
+		</>
+	);
+};
 
 const TileInfoWorkspaceContent = ({
+	identity,
 	itemId,
 	phase,
 }: {
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
 	readonly itemId: TileWorkspaceTarget["itemId"];
 	readonly phase: Exclude<TileWorkspacePhase, "closed">;
 }) => {
@@ -116,18 +183,27 @@ const TileInfoWorkspaceContent = ({
 		<TileWorkspaceChrome
 			closeLabel="Close Info"
 			disabled={phase === "exiting"}
-			subtitle={info.subtitle}
-			title={info.title}
+			identity={identity}
 		>
-			<TileInfoWorkspace info={info} />
+			<TileInfoWorkspace
+				identity={identity}
+				info={info}
+			/>
 		</TileWorkspaceChrome>
 	);
 };
 
 const TileStatusWorkspaceContent = ({
+	identity,
 	itemId,
 	phase,
 }: {
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
 	readonly itemId: TileWorkspaceTarget["itemId"];
 	readonly phase: Exclude<TileWorkspacePhase, "closed">;
 }) => {
@@ -152,9 +228,9 @@ const TileStatusWorkspaceContent = ({
 	return (
 		<TileWorkspaceChrome
 			closeLabel="Close Status"
+			contextLabel={presentation.label}
 			disabled={phase === "exiting"}
-			subtitle={presentation.label}
-			title={status.title}
+			identity={identity}
 		>
 			<TileStatusWorkspace
 				status={status}
@@ -165,21 +241,30 @@ const TileStatusWorkspaceContent = ({
 };
 
 const TileWorkspaceCapabilityContent = ({
+	identity,
 	phase,
 	target,
 }: {
+	readonly identity: Extract<
+		useTileIdentity.Projection,
+		{
+			readonly kind: "available";
+		}
+	>;
 	readonly phase: Exclude<TileWorkspacePhase, "closed">;
 	readonly target: TileWorkspaceTarget;
 }) =>
 	match(target.capability)
 		.with("info", () => (
 			<TileInfoWorkspaceContent
+				identity={identity}
 				itemId={target.itemId}
 				phase={phase}
 			/>
 		))
 		.with("status", () => (
 			<TileStatusWorkspaceContent
+				identity={identity}
 				itemId={target.itemId}
 				phase={phase}
 			/>
@@ -194,6 +279,14 @@ const TileWorkspaceDialog = ({
 	readonly target: TileWorkspaceTarget;
 }) => {
 	const workspace = useTileWorkspaceControl();
+	const identity = useTileIdentity(target.itemId);
+	useEffect(() => {
+		if (identity.kind === "available") return;
+		void workspace.close();
+	}, [
+		identity.kind,
+		workspace,
+	]);
 	const motionState = useTileWorkspaceMotion({
 		phase,
 		generation: target.generation,
@@ -239,10 +332,18 @@ const TileWorkspaceDialog = ({
 				onAnimationComplete={motionState.completeMotionPhase}
 				onKeyDown={focus.keepFocusInside}
 			>
-				<TileWorkspaceCapabilityContent
-					phase={phase}
-					target={target}
-				/>
+				{identity.kind === "available" ? (
+					<TileWorkspaceCapabilityContent
+						identity={identity}
+						phase={phase}
+						target={target}
+					/>
+				) : (
+					<UnavailableWorkspace
+						closeLabel={`Close ${target.capability}`}
+						disabled={phase === "exiting"}
+					/>
+				)}
 			</motion.div>
 		</motion.div>
 	);

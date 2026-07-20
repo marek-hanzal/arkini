@@ -2,20 +2,31 @@ import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readTileInfo } from "~/engine/tile/read/readTileInfo";
+import type { TileItemId } from "~/bridge/tile/TileItemId";
+import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { readTileInfo } from "~/engine/tile/read/readTileInfo";
 
 export namespace useTileInfo {
 	export type Projection =
 		| {
 				readonly kind: "available";
-				readonly itemId: IdSchema.Type;
-				readonly title: string;
-				readonly subtitle?: string;
+				readonly itemId: TileItemId;
 				readonly description: string;
-				readonly sourceUrl: string;
-				readonly compositeUrl?: string;
+				readonly itemType: ItemEnumSchema.Type;
+				readonly categoryTitle?: string;
+				readonly tags: readonly string[];
+				readonly storageScope: StorageScopeEnumSchema.Type;
+				readonly location: readTileInfo.Location;
+				readonly quantity: number;
+				readonly maxStackSize: number;
+				readonly ownedQuantity: number;
+				readonly maxCount?: number;
+				readonly charges?: {
+					readonly remaining: number;
+					readonly total: number;
+				};
 		  }
 		| {
 				readonly kind: "unavailable";
@@ -26,21 +37,35 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies useTileInfo.Projection;
 
+const sameLocation = (left: readTileInfo.Location, right: readTileInfo.Location) =>
+	left.kind === right.kind &&
+	(left.kind !== "board" || right.kind !== "board" || left.space === right.space);
+
+const sameTags = (left: readonly string[], right: readonly string[]) =>
+	left.length === right.length && left.every((tag, index) => tag === right[index]);
+
 const sameProjection = (left: useTileInfo.Projection, right: useTileInfo.Projection) => {
 	if (left.kind !== right.kind) return false;
 	if (left.kind === "unavailable" || right.kind === "unavailable") return true;
 	return (
 		left.itemId === right.itemId &&
-		left.title === right.title &&
-		left.subtitle === right.subtitle &&
 		left.description === right.description &&
-		left.sourceUrl === right.sourceUrl &&
-		left.compositeUrl === right.compositeUrl
+		left.itemType === right.itemType &&
+		left.categoryTitle === right.categoryTitle &&
+		sameTags(left.tags, right.tags) &&
+		left.storageScope === right.storageScope &&
+		sameLocation(left.location, right.location) &&
+		left.quantity === right.quantity &&
+		left.maxStackSize === right.maxStackSize &&
+		left.ownedQuantity === right.ownedQuantity &&
+		left.maxCount === right.maxCount &&
+		left.charges?.remaining === right.charges?.remaining &&
+		left.charges?.total === right.charges?.total
 	);
 };
 
-/** Projects the minimal live identity and authored visual needed by the Info workspace. */
-export const useTileInfo = (itemId: IdSchema.Type): useTileInfo.Projection => {
+/** Projects the common authored and live facts rendered by the Info workspace. */
+export const useTileInfo = (itemId: TileItemId): useTileInfo.Projection => {
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useTileInfo.Projection => {
@@ -49,27 +74,37 @@ export const useTileInfo = (itemId: IdSchema.Type): useTileInfo.Projection => {
 				runtime,
 			});
 			if (info.kind === "unavailable") return unavailable;
-			const subtitle = game.config.categories[info.categoryId]?.title;
+			const categoryTitle = game.config.categories[info.categoryId]?.title;
 			return {
 				kind: "available",
 				itemId: info.itemId,
-				title: info.title,
-				...(subtitle === undefined
-					? {}
-					: {
-							subtitle,
-						}),
 				description: info.description,
-				sourceUrl: game.getResourceUrl(info.sourceResourceId),
-				...(info.compositeResourceId === undefined
+				itemType: info.itemType,
+				...(categoryTitle === undefined
 					? {}
 					: {
-							compositeUrl: game.getResourceUrl(info.compositeResourceId),
+							categoryTitle,
+						}),
+				tags: info.tags,
+				storageScope: info.storageScope,
+				location: info.location,
+				quantity: info.quantity,
+				maxStackSize: info.maxStackSize,
+				ownedQuantity: info.ownedQuantity,
+				...(info.maxCount === undefined
+					? {}
+					: {
+							maxCount: info.maxCount,
+						}),
+				...(info.charges === undefined
+					? {}
+					: {
+							charges: info.charges,
 						}),
 			};
 		},
 		[
-			game,
+			game.config.categories,
 			itemId,
 		],
 	);

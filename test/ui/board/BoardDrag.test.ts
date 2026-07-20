@@ -1179,9 +1179,10 @@ describe("Board drag", () => {
 		expect(workspaceModal.textContent).toContain("Stone");
 		expect(
 			workspaceModal
-				.querySelector<HTMLImageElement>('[data-ui="TileInfoArtwork"] img')
+				.querySelector<HTMLImageElement>('[data-ui="TileWorkspaceHeaderArtwork"] img')
 				?.getAttribute("src"),
 		).toBe("resource:asset:stone");
+		expect(workspaceModal.querySelector('[data-ui="TileInfoArtwork"]')).toBeNull();
 		await act(async () => {
 			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
 			await Promise.resolve();

@@ -159,33 +159,42 @@ select {
 	background: var(--ak-accent);
 }
 
-[data-ui="Board"] {
+[data-ui="GameBoardLayout"] {
 	padding: var(--ak-viewport-padding);
 }
 
-[data-ui="BoardViewport"] {
+[data-ui="GameBoardViewport"] {
 	container-type: size;
 	display: grid;
 	place-items: center;
 }
 
-[data-ui="BoardFrame"] {
+[data-ui="GameBoardStack"] {
 	width: 100%;
+	height: 100%;
 	max-width: 100%;
 	max-height: 100%;
+	gap: clamp(0.25rem, 1.2vmin, 0.75rem);
+}
+
+[data-tile-grid-frame="true"] {
 	box-shadow: 0 clamp(0.25rem, 0.8vmin, 0.6rem) clamp(0.75rem, 2.2vmin, 1.75rem)
 		color-mix(in srgb, var(--ak-overlay) 24%, transparent);
 }
 
-[data-ui="BoardGrid"] {
+[data-tile-grid="true"] {
 	gap: clamp(1px, 0.45vmin, 6px);
 	padding: clamp(2px, 0.55vmin, 7px);
 }
 
+[data-ui="ToolbarTrack"] {
+	min-width: calc(100% / var(--game-board-columns));
+}
+
 @supports (width: 1cqw) {
-	[data-ui="BoardFrame"] {
-		width: min(100cqw, var(--board-width-from-height));
-		height: min(100cqh, var(--board-height-from-width));
+	[data-ui="GameBoardStack"] {
+		width: min(100cqw, var(--game-board-width-from-height));
+		height: min(100cqh, var(--game-board-height-from-width));
 	}
 }
 

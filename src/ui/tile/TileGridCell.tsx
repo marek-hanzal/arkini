@@ -1,26 +1,22 @@
 import { motion } from "motion/react";
 import { useMemo } from "react";
 
-import type { useBoard } from "~/bridge/board/useBoard";
+import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileSurface } from "~/ui/tile/TileSurface";
 import { useTileSlot } from "~/ui/tile/useTileSlot";
 
-export namespace BoardCell {
+export namespace TileGridCell {
 	export interface Props {
-		readonly surface: Extract<
-			TileSurface,
-			{
-				readonly kind: "board";
-			}
-		>;
+		readonly surface: TileSurface;
 		readonly x: number;
 		readonly y: number;
-		readonly occupant: useBoard.Item | null;
+		readonly occupant: TileIdentity | null;
+		readonly dataUi: string;
 	}
 }
 
-/** Registers one Board coordinate as a stable actor anchor and drop target. */
-export const BoardCell = ({ surface, x, y, occupant }: BoardCell.Props) => {
+/** Registers and renders one stable coordinate shared by every tile grid surface. */
+export const TileGridCell = ({ surface, x, y, occupant, dataUi }: TileGridCell.Props) => {
 	const slot = useMemo(
 		() => ({
 			id: `${x}:${y}`,
@@ -62,9 +58,12 @@ export const BoardCell = ({ surface, x, y, occupant }: BoardCell.Props) => {
 				gridRowStart: y + 1,
 			}}
 			aria-hidden="true"
-			data-ui="BoardCell"
-			data-board-x={x}
-			data-board-y={y}
+			data-ui={dataUi}
+			data-tile-x={x}
+			data-tile-y={y}
+			data-board-x={surface.kind === "board" ? x : undefined}
+			data-board-y={surface.kind === "board" ? y : undefined}
+			data-toolbar-x={surface.kind === "toolbar" ? x : undefined}
 			data-drop-over={drop.over ? "true" : "false"}
 		>
 			<motion.span

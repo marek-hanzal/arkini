@@ -8,11 +8,14 @@ export namespace useBoardView {
 		readonly index: number;
 		readonly x: number;
 		readonly y: number;
-		readonly occupant: useBoard.Item | null;
+		readonly occupant: {
+			readonly id: string;
+			readonly revision: string;
+		} | null;
 	}
 }
 
-/** Projects the live board read model into stable surface, cell, and layout presentation facts. */
+/** Projects the live board read model into one stable surface and ordered cells. */
 export const useBoardView = () => {
 	const board = useBoard();
 	const surface = useMemo(
@@ -38,7 +41,10 @@ export const useBoardView = () => {
 				(item) =>
 					[
 						`${item.x}:${item.y}`,
-						item,
+						{
+							id: item.id,
+							revision: item.revision,
+						},
 					] as const,
 			),
 		);
@@ -60,17 +66,10 @@ export const useBoardView = () => {
 		return {
 			title: board.title,
 			currentSpace: board.currentSpace,
+			width: board.width,
+			height: board.height,
 			surface,
 			cells,
-			frameStyle: {
-				aspectRatio: `${board.width} / ${board.height}`,
-				"--board-width-from-height": `${(board.width / board.height) * 100}cqh`,
-				"--board-height-from-width": `${(board.height / board.width) * 100}cqw`,
-			},
-			gridStyle: {
-				gridTemplateColumns: `repeat(${board.width}, minmax(0, 1fr))`,
-				gridTemplateRows: `repeat(${board.height}, minmax(0, 1fr))`,
-			},
 		};
 	}, [
 		board,

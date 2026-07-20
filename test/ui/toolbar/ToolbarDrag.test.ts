@@ -1,0 +1,589 @@
+// @vitest-environment jsdom
+
+import { Effect } from "effect";
+import { act, createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { Game } from "~/bridge/game/Game";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { startFx } from "~/engine/start/write/startFx";
+import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
+import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+
+const gameEngineState = vi.hoisted(() => ({
+	game: undefined as Game | undefined,
+}));
+const dropItemState = vi.hoisted(() => ({
+	drop: vi.fn<(_: dropItemFx.Props) => Promise<dropItemFx.Result>>(),
+}));
+
+vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
+
+vi.mock("~/bridge/game/useGameEngine", () => ({
+	useGameEngine: () => {
+		const current = gameEngineState.game;
+		if (current === undefined) throw new Error("Test Game Engine is missing.");
+		return current;
+	},
+}));
+
+vi.mock("~/bridge/tile/useDropItem", () => ({
+	useDropItem: () => dropItemState.drop,
+}));
+
+const roots: Array<ReturnType<typeof createRoot>> = [];
+const runtimeListeners = new Set<() => void>();
+
+const rect = (left: number, top: number, width: number, height: number): DOMRect => ({
+	left,
+	top,
+	width,
+	height,
+	right: left + width,
+	bottom: top + height,
+	x: left,
+	y: top,
+	toJSON: () => ({}),
+});
+
+const pointerEvent = (type: string, x: number, y: number) => {
+	const event = new MouseEvent(type, {
+		bubbles: true,
+		button: 0,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+	});
+	Object.defineProperties(event, {
+		isPrimary: {
+			value: true,
+		},
+		pointerId: {
+			value: 1,
+		},
+	});
+	return event;
+};
+
+const board = (x: number, y: number) => ({
+	scope: "board" as const,
+	space: 0,
+	position: {
+		x,
+		y,
+	},
+});
+const toolbar = (x: number) => ({
+	scope: "toolbar" as const,
+	position: {
+		x,
+		y: 0,
+	},
+});
+
+const config = GameConfigSchema.parse({
+	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:toolbar-drag",
+		title: "Toolbar drag",
+		board: {
+			width: 2,
+			height: 2,
+		},
+		inventory: {
+			width: 1,
+			height: 1,
+		},
+		toolbarSize: 2,
+	},
+	start: {
+		currentSpace: 0,
+		board: [
+			{
+				itemId: "water",
+				space: 0,
+				x: 1,
+				y: 1,
+			},
+			{
+				itemId: "stone",
+				space: 0,
+				x: 0,
+				y: 0,
+			},
+		],
+	},
+	categories: {},
+	items: {
+		water: {
+			id: "water",
+			type: "simple",
+			title: "Water",
+			description: "Water",
+			asset: {
+				source: [
+					"asset:water",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "any",
+			maxStackSize: 10,
+		},
+		stone: {
+			id: "stone",
+			type: "simple",
+			title: "Stone",
+			description: "Stone",
+			asset: {
+				source: [
+					"asset:stone",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "any",
+			maxStackSize: 10,
+		},
+	},
+});
+
+const initialRuntime = Effect.runSync(
+	startFx().pipe(
+		useGameFx({
+			config,
+		}),
+	),
+);
+const roundTripRuntime = RuntimeSchema.parse({
+	...initialRuntime,
+	items: initialRuntime.items.map((item) =>
+		item.item.id === "stone"
+			? {
+					...item,
+					location: toolbar(1),
+				}
+			: item,
+	),
+});
+let currentRuntime = roundTripRuntime;
+
+const publishRuntime = (next: RuntimeSchema.Type) => {
+	currentRuntime = next;
+	for (const listener of runtimeListeners) listener();
+};
+
+const game = {
+	arkpack: {
+		packageId: "test-package",
+		contentHash: "test-hash",
+		gameId: config.meta.id,
+		title: config.meta.title,
+		configVersion: config.version,
+		compressedSize: 0,
+		source: "imported" as const,
+	},
+	config,
+	saveKey: {
+		packageId: "test-package",
+		contentHash: "0".repeat(64),
+	},
+	getSnapshot: () => currentRuntime,
+	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+	subscribe: (listener: () => void) => {
+		runtimeListeners.add(listener);
+		return () => runtimeListeners.delete(listener);
+	},
+	subscribeEvents: () => () => undefined,
+	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	disposeFx: Effect.void,
+	disposeWithoutSaveFx: Effect.void,
+	flushSaveFx: Effect.void,
+} satisfies Game;
+
+beforeEach(() => {
+	motionTestRuntime.reset();
+	currentRuntime = roundTripRuntime;
+	runtimeListeners.clear();
+	gameEngineState.game = game;
+	dropItemState.drop.mockReset();
+	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
+		configurable: true,
+		value() {
+			const element = this as HTMLElement;
+			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 200);
+			if (element.dataset.ui === "ToolbarGrid") return rect(0, 220, 200, 100);
+			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 320);
+			if (element.dataset.ui === "TileActorDragSurface") {
+				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
+				if (actor?.dataset.locationScope === "toolbar") {
+					const x = Number(actor.dataset.toolbarX);
+					if (Number.isFinite(x)) return rect(x * 100, 220, 100, 100);
+				}
+				const x = Number(actor?.dataset.boardX);
+				const y = Number(actor?.dataset.boardY);
+				if (Number.isFinite(x) && Number.isFinite(y)) {
+					return rect(x * 100, y * 100, 100, 100);
+				}
+			}
+			if (element.dataset.ui === "ToolbarCell") {
+				const x = Number(element.dataset.toolbarX);
+				if (Number.isFinite(x)) return rect(x * 100, 220, 100, 100);
+			}
+			const x = Number(element.dataset.boardX);
+			const y = Number(element.dataset.boardY);
+			if (Number.isFinite(x) && Number.isFinite(y)) {
+				return rect(x * 100, y * 100, 100, 100);
+			}
+			return rect(0, 0, 0, 0);
+		},
+	});
+	Object.defineProperty(document, "elementsFromPoint", {
+		configurable: true,
+		value: vi.fn((x: number, y: number) => {
+			if (y >= 220 && y < 320) {
+				const toolbarX = Math.floor(x / 100);
+				const cell = document.querySelector(
+					`[data-ui="ToolbarCell"][data-toolbar-x="${toolbarX}"]`,
+				);
+				return cell === null
+					? []
+					: [
+							cell,
+						];
+			}
+			if (y >= 0 && y < 200) {
+				const boardX = Math.floor(x / 100);
+				const boardY = Math.floor(y / 100);
+				const cell = document.querySelector(
+					`[data-ui="BoardCell"][data-board-x="${boardX}"][data-board-y="${boardY}"]`,
+				);
+				return cell === null
+					? []
+					: [
+							cell,
+						];
+			}
+			return [];
+		}),
+	});
+});
+
+afterEach(async () => {
+	await act(async () => {
+		for (const root of roots.splice(0)) root.unmount();
+	});
+	vi.restoreAllMocks();
+	document.body.replaceChildren();
+	gameEngineState.game = undefined;
+});
+
+const renderGameBoard = async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(createElement(TileSystemProvider, null, createElement(GameBoardLayout)));
+		await Promise.resolve();
+	});
+};
+
+const drag = async ({
+	actor,
+	from,
+	to,
+}: {
+	readonly actor: HTMLElement;
+	readonly from: readonly [
+		number,
+		number,
+	];
+	readonly to: readonly [
+		number,
+		number,
+	];
+}) => {
+	const dragSurface = actor.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+	if (dragSurface === null) throw new Error("Missing actor drag surface.");
+	await act(async () => {
+		dragSurface.dispatchEvent(pointerEvent("pointerdown", from[0], from[1]));
+		dragSurface.dispatchEvent(pointerEvent("pointermove", to[0], to[1]));
+		dragSurface.dispatchEvent(pointerEvent("pointerup", to[0], to[1]));
+		await Promise.resolve();
+		await Promise.resolve();
+	});
+};
+
+describe("Toolbar drag", () => {
+	it("moves one real actor Board to Toolbar and back through exact slot targets", async () => {
+		await renderGameBoard();
+		const actor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-item-id="water"]',
+		);
+		if (actor === null) throw new Error("Missing Board source actor.");
+		const itemId = actor.dataset.runtimeId;
+		const initialRevision = actor.dataset.runtimeRevision;
+		if (itemId === undefined || initialRevision === undefined) {
+			throw new Error("Missing Board source identity.");
+		}
+		const firstRevision = "revision:toolbar-stored";
+		const secondRevision = "revision:board-restored";
+		dropItemState.drop
+			.mockImplementationOnce(async () => {
+				publishRuntime(
+					RuntimeSchema.parse({
+						...currentRuntime,
+						items: currentRuntime.items.map((item) =>
+							item.id === itemId
+								? {
+										...item,
+										revision: firstRevision,
+										location: toolbar(0),
+									}
+								: item,
+						),
+					}),
+				);
+				return {
+					kind: "move",
+					itemId,
+					revision: firstRevision,
+					previousLocation: board(1, 1),
+					location: toolbar(0),
+				};
+			})
+			.mockImplementationOnce(async () => {
+				publishRuntime(
+					RuntimeSchema.parse({
+						...currentRuntime,
+						items: currentRuntime.items.map((item) =>
+							item.id === itemId
+								? {
+										...item,
+										revision: secondRevision,
+										location: board(0, 1),
+									}
+								: item,
+						),
+					}),
+				);
+				return {
+					kind: "move",
+					itemId,
+					revision: secondRevision,
+					previousLocation: toolbar(0),
+					location: board(0, 1),
+				};
+			});
+
+		await drag({
+			actor,
+			from: [
+				150,
+				150,
+			],
+			to: [
+				50,
+				270,
+			],
+		});
+
+		expect(dropItemState.drop).toHaveBeenNthCalledWith(1, {
+			sourceItemId: itemId,
+			sourceRevision: initialRevision,
+			sourceLocation: board(1, 1),
+			target: {
+				kind: "slot",
+				location: toolbar(0),
+				occupant: null,
+			},
+		});
+		expect(document.querySelector(`[data-runtime-id="${itemId}"]`)).toBe(actor);
+		expect(actor.dataset.locationScope).toBe("toolbar");
+		expect(actor.dataset.toolbarX).toBe("0");
+
+		await drag({
+			actor,
+			from: [
+				50,
+				270,
+			],
+			to: [
+				50,
+				150,
+			],
+		});
+
+		expect(dropItemState.drop).toHaveBeenNthCalledWith(2, {
+			sourceItemId: itemId,
+			sourceRevision: firstRevision,
+			sourceLocation: toolbar(0),
+			target: {
+				kind: "slot",
+				location: board(0, 1),
+				occupant: null,
+			},
+		});
+		expect(document.querySelector(`[data-runtime-id="${itemId}"]`)).toBe(actor);
+		expect(actor.dataset.locationScope).toBe("board");
+		expect(actor.dataset.boardX).toBe("0");
+		expect(actor.dataset.boardY).toBe("1");
+		expect(document.querySelectorAll(`[data-runtime-id="${itemId}"]`)).toHaveLength(1);
+	});
+
+	it("keeps the toolbar surface and actor stable while the active Board space changes", async () => {
+		currentRuntime = RuntimeSchema.parse({
+			...initialRuntime,
+			items: initialRuntime.items.map((item) =>
+				item.item.id === "water"
+					? {
+							...item,
+							location: toolbar(0),
+						}
+					: item,
+			),
+		});
+		await renderGameBoard();
+		const toolbarGrid = document.querySelector<HTMLElement>('[data-ui="ToolbarGrid"]');
+		const actor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-item-id="water"]',
+		);
+		if (toolbarGrid === null || actor === null) throw new Error("Missing toolbar scene.");
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					currentSpace: 7,
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ToolbarGrid"]')).toBe(toolbarGrid);
+		expect(document.querySelector(`[data-runtime-id="${actor.dataset.runtimeId}"]`)).toBe(
+			actor,
+		);
+		expect(toolbarGrid.dataset.tileSurfaceId).toBe("toolbar");
+		expect(actor.dataset.locationScope).toBe("toolbar");
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="BoardGrid"]')?.dataset.tileSurfaceId,
+		).toBe("board:7");
+	});
+
+	it("reorders occupied toolbar slots through the same swap target contract", async () => {
+		currentRuntime = RuntimeSchema.parse({
+			...initialRuntime,
+			items: initialRuntime.items.map((item) => ({
+				...item,
+				location: item.item.id === "water" ? toolbar(0) : toolbar(1),
+			})),
+		});
+		await renderGameBoard();
+		const source = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-item-id="water"]',
+		);
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-item-id="stone"]',
+		);
+		if (source === null || target === null) throw new Error("Missing toolbar actors.");
+		const sourceId = source.dataset.runtimeId;
+		const sourceRevision = source.dataset.runtimeRevision;
+		const targetId = target.dataset.runtimeId;
+		const targetRevision = target.dataset.runtimeRevision;
+		if (
+			sourceId === undefined ||
+			sourceRevision === undefined ||
+			targetId === undefined ||
+			targetRevision === undefined
+		) {
+			throw new Error("Missing toolbar actor identities.");
+		}
+		dropItemState.drop.mockImplementation(async () => {
+			const sourceNextRevision = "revision:toolbar-source-swapped";
+			const targetNextRevision = "revision:toolbar-target-swapped";
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.map((item) => {
+						if (item.id === sourceId) {
+							return {
+								...item,
+								revision: sourceNextRevision,
+								location: toolbar(1),
+							};
+						}
+						if (item.id === targetId) {
+							return {
+								...item,
+								revision: targetNextRevision,
+								location: toolbar(0),
+							};
+						}
+						return item;
+					}),
+				}),
+			);
+			return {
+				kind: "swap",
+				source: {
+					itemId: sourceId,
+					revision: sourceNextRevision,
+					previousLocation: toolbar(0),
+					location: toolbar(1),
+				},
+				target: {
+					itemId: targetId,
+					revision: targetNextRevision,
+					previousLocation: toolbar(1),
+					location: toolbar(0),
+				},
+			};
+		});
+
+		await drag({
+			actor: source,
+			from: [
+				50,
+				270,
+			],
+			to: [
+				150,
+				270,
+			],
+		});
+
+		expect(dropItemState.drop).toHaveBeenCalledWith({
+			sourceItemId: sourceId,
+			sourceRevision,
+			sourceLocation: toolbar(0),
+			target: {
+				kind: "slot",
+				location: toolbar(1),
+				occupant: {
+					itemId: targetId,
+					revision: targetRevision,
+				},
+			},
+		});
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(source.dataset.toolbarX).toBe("1");
+		expect(target.dataset.toolbarX).toBe("0");
+	});
+});

@@ -139,9 +139,8 @@ describe("Board", () => {
 		const cells = readBoardCells(html);
 
 		expect(cells).toHaveLength(6);
-		expect(html).toMatch(
-			/data-ui="BoardViewport"[^>]*><div[^>]*data-ui="BoardFrame"[^>]*><div[^>]*data-ui="BoardGrid"/,
-		);
+		expect(html).toContain('data-ui="BoardFrame" data-tile-grid-frame="true"');
+		expect(html).toContain('data-ui="BoardGrid" data-tile-grid="true"');
 		expect(cells).toEqual([
 			{
 				column: 1,

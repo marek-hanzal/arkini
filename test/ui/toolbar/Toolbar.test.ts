@@ -1,0 +1,173 @@
+import { Effect } from "effect";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
+
+import type { Game } from "~/bridge/game/Game";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { startFx } from "~/engine/start/write/startFx";
+import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
+import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+
+const gameEngineState = vi.hoisted(() => ({
+	game: undefined as Game | undefined,
+}));
+
+vi.mock("~/bridge/game/useGameEngine", () => ({
+	useGameEngine: () => {
+		const current = gameEngineState.game;
+		if (current === undefined) throw new Error("Test Game Engine is missing.");
+		return current;
+	},
+}));
+
+const createConfig = (toolbarSize?: number) =>
+	GameConfigSchema.parse({
+		version: "1.0",
+		resources: {
+			hero: "hero",
+		},
+		meta: {
+			id: `game:toolbar-ui:${toolbarSize ?? "disabled"}`,
+			title: "Toolbar UI",
+			board: {
+				width: 3,
+				height: 2,
+			},
+			inventory: {
+				width: 1,
+				height: 1,
+			},
+			toolbarSize,
+		},
+		start: {
+			currentSpace: 0,
+			board: [
+				{
+					itemId: "water",
+					space: 0,
+					x: 2,
+					y: 1,
+				},
+			],
+		},
+		categories: {},
+		items: {
+			water: {
+				id: "water",
+				type: "simple",
+				title: "Water",
+				description: "Water",
+				asset: {
+					source: [
+						"asset:water",
+					],
+				},
+				tags: [],
+				categoryId: "resource",
+				scope: "any",
+				maxStackSize: 10,
+			},
+		},
+	});
+
+const createGame = (toolbarSize?: number, stored = false): Game => {
+	const config = createConfig(toolbarSize);
+	const initialRuntime = Effect.runSync(
+		startFx().pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+	const runtime = stored
+		? RuntimeSchema.parse({
+				...initialRuntime,
+				items: initialRuntime.items.map((item) => ({
+					...item,
+					location: {
+						scope: "toolbar",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+				})),
+			})
+		: initialRuntime;
+	return {
+		arkpack: {
+			packageId: "test-package",
+			contentHash: "test-hash",
+			gameId: config.meta.id,
+			title: config.meta.title,
+			configVersion: config.version,
+			compressedSize: 0,
+			source: "imported" as const,
+		},
+		config,
+		saveKey: {
+			packageId: "test-package",
+			contentHash: "0".repeat(64),
+		},
+		getSnapshot: () => runtime,
+		getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+		subscribe: () => () => undefined,
+		subscribeEvents: () => () => undefined,
+		run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+		disposeFx: Effect.void,
+		disposeWithoutSaveFx: Effect.void,
+		flushSaveFx: Effect.void,
+	};
+};
+
+const renderGameBoard = (game: Game) => {
+	gameEngineState.game = game;
+	return renderToStaticMarkup(
+		createElement(TileSystemProvider, null, createElement(GameBoardLayout)),
+	);
+};
+
+describe("Toolbar", () => {
+	it("renders no toolbar shell or layout row when disabled", () => {
+		const html = renderGameBoard(createGame(0));
+
+		expect(html).toContain('data-ui="GameBoardLayout"');
+		expect(html).toContain('data-toolbar-enabled="false"');
+		expect(html).toContain("grid-template-rows:minmax(0, 1fr)");
+		expect(html).not.toContain('data-ui="Toolbar"');
+		expect(html).not.toContain('data-ui="ToolbarFrame"');
+		expect(html).not.toContain('data-ui="ToolbarCell"');
+	});
+
+	it("renders one shared styled row with the configured slot count and live actor", () => {
+		const html = renderGameBoard(createGame(3, true));
+		const toolbarCells = [
+			...html.matchAll(/data-ui="ToolbarCell"/g),
+		];
+
+		expect(toolbarCells).toHaveLength(3);
+		expect(html).toContain('data-toolbar-enabled="true"');
+		expect(html).toContain('data-ui="BoardFrame" data-tile-grid-frame="true"');
+		expect(html).toContain('data-ui="ToolbarFrame" data-tile-grid-frame="true"');
+		expect(html).toContain('data-ui="ToolbarGrid" data-tile-grid="true"');
+		expect(html).toContain('data-tile-surface="toolbar"');
+		expect(html).toContain('data-toolbar-x="1"');
+		expect(html).toContain('data-location-scope="toolbar"');
+		expect(html).toContain('data-item-id="water"');
+	});
+
+	it("renders the full supported sixty-four-slot row without wrapping the grid", () => {
+		const html = renderGameBoard(createGame(64));
+
+		expect([
+			...html.matchAll(/data-ui="ToolbarCell"/g),
+		]).toHaveLength(64);
+		expect(html).toContain(
+			"grid-template-columns:repeat(64, minmax(0, 1fr));grid-template-rows:repeat(1, minmax(0, 1fr))",
+		);
+		expect(html).toContain("width:calc(100% * 64 / var(--game-board-columns))");
+	});
+});

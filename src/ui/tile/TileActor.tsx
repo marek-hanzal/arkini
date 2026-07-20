@@ -50,8 +50,12 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 			data-item-id={item.itemId}
 			data-runtime-id={item.id}
 			data-runtime-revision={item.revision}
+			data-location-scope={item.location.scope}
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
+			data-toolbar-x={
+				item.location.scope === "toolbar" ? item.location.position.x : undefined
+			}
 			data-dragging={presentation.phase === "dragging" ? "true" : "false"}
 		>
 			<motion.span

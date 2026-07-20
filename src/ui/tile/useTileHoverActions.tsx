@@ -3,7 +3,6 @@ import {
 	flip,
 	FloatingPortal,
 	offset,
-	safePolygon,
 	shift,
 	useFloating,
 	useHover,
@@ -12,29 +11,35 @@ import {
 import { useEffect, useState } from "react";
 import { match } from "ts-pattern";
 
+import TileCapabilityEffectsIconUrl from "~/ui/tile/resource/tile-capability-effects.png";
+import TileCapabilityInfoIconUrl from "~/ui/tile/resource/tile-capability-info.png";
+import TileCapabilityLinesIconUrl from "~/ui/tile/resource/tile-capability-lines.png";
+import TileCapabilityStatusIconUrl from "~/ui/tile/resource/tile-capability-status.png";
 import { TileHoverActionBar } from "~/ui/tile/TileHoverActionBar";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 
+const ActionBarMainAxisOffset = -8;
+
 const actions = [
 	{
 		capability: "info",
-		icon: "ℹ️",
+		iconUrl: TileCapabilityInfoIconUrl,
 		label: "Info",
 	},
 	{
 		capability: "status",
-		icon: "📊",
+		iconUrl: TileCapabilityStatusIconUrl,
 		label: "Status",
 	},
 	{
 		capability: "lines",
-		icon: "⚙️",
+		iconUrl: TileCapabilityLinesIconUrl,
 		label: "Lines",
 	},
 	{
 		capability: "effects",
-		icon: "✨",
+		iconUrl: TileCapabilityEffectsIconUrl,
 		label: "Effects",
 	},
 ] as const;
@@ -85,7 +90,7 @@ export const useTileHoverActions = ({
 		placement: "bottom",
 		strategy: "fixed",
 		middleware: [
-			offset(8),
+			offset(ActionBarMainAxisOffset),
 			flip(),
 			shift({
 				padding: 8,
@@ -98,9 +103,6 @@ export const useTileHoverActions = ({
 	});
 	const hover = useHover(floating.context, {
 		enabled: !suppressed,
-		handleClose: safePolygon({
-			buffer: 1,
-		}),
 	});
 	const interactions = useInteractions([
 		hover,
@@ -124,6 +126,7 @@ export const useTileHoverActions = ({
 				<FloatingPortal>
 					<TileHoverActionBar
 						actions={actions}
+						mainAxisOffset={ActionBarMainAxisOffset}
 						placement={floating.placement}
 						referenceId={itemId}
 						style={floating.floatingStyles}

@@ -1022,7 +1022,7 @@ describe("Board drag", () => {
 		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
 	});
 
-	it("shows hover actions below artwork and suppresses them throughout DnD", async () => {
+	it("shows one overlapping image action bar and suppresses it throughout DnD", async () => {
 		motionTestRuntime.autoComplete = false;
 		await renderBoard();
 		const source = document.querySelector<HTMLElement>(
@@ -1048,15 +1048,46 @@ describe("Board drag", () => {
 		const actionBar = document.querySelector<HTMLElement>('[data-ui="TileHoverActionBar"]');
 		if (actionBar === null) throw new Error("Missing tile hover action bar.");
 		expect(actionBar.dataset.referenceId).toBe(source.dataset.runtimeId);
-		expect(
-			Array.from(actionBar.querySelectorAll<HTMLElement>('[data-ui="TileHoverAction"]')).map(
-				(action) => action.dataset.capability,
-			),
-		).toEqual([
+		expect(actionBar.dataset.mainAxisOffset).toBe("-8");
+		const actionElements = Array.from(
+			actionBar.querySelectorAll<HTMLElement>('[data-ui="TileHoverAction"]'),
+		);
+		expect(actionElements.map((action) => action.dataset.capability)).toEqual([
 			"info",
 			"status",
 			"lines",
 			"effects",
+		]);
+		expect(
+			actionElements.map((action) => {
+				const icon = action.querySelector<HTMLImageElement>("img");
+				return {
+					file: icon?.src.split("/").at(-1),
+					height: icon?.height,
+					width: icon?.width,
+				};
+			}),
+		).toEqual([
+			{
+				file: "tile-capability-info.png",
+				height: 24,
+				width: 24,
+			},
+			{
+				file: "tile-capability-status.png",
+				height: 24,
+				width: 24,
+			},
+			{
+				file: "tile-capability-lines.png",
+				height: 24,
+				width: 24,
+			},
+			{
+				file: "tile-capability-effects.png",
+				height: 24,
+				width: 24,
+			},
 		]);
 		const infoAction = actionBar.querySelector<HTMLElement>('[data-capability="info"]');
 		if (infoAction === null) throw new Error("Missing temporary Info hover action.");
@@ -1071,6 +1102,48 @@ describe("Board drag", () => {
 		});
 		expect(dropItemState.drop).not.toHaveBeenCalled();
 		expect(visual.dataset.motionPhase).toBe("hovered");
+
+		const otherActor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		const otherDragSurface = otherActor?.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		if (otherActor === null || otherDragSurface === null || otherDragSurface === undefined) {
+			throw new Error("Missing alternate hover actor.");
+		}
+		await act(async () => {
+			dragSurface.dispatchEvent(
+				new MouseEvent("mouseleave", {
+					bubbles: true,
+				}),
+			);
+			otherDragSurface.dispatchEvent(
+				new MouseEvent("mouseenter", {
+					bubbles: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+		const switchedActionBars = document.querySelectorAll<HTMLElement>(
+			'[data-ui="TileHoverActionBar"]',
+		);
+		expect(switchedActionBars).toHaveLength(1);
+		expect(switchedActionBars[0]?.dataset.referenceId).toBe(otherActor.dataset.runtimeId);
+
+		await act(async () => {
+			otherDragSurface.dispatchEvent(
+				new MouseEvent("mouseleave", {
+					bubbles: true,
+				}),
+			);
+			dragSurface.dispatchEvent(
+				new MouseEvent("mouseenter", {
+					bubbles: true,
+				}),
+			);
+			await Promise.resolve();
+		});
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerdown", 150, 50));

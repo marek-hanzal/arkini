@@ -3,12 +3,13 @@ import type { CSSProperties, PointerEventHandler } from "react";
 export namespace TileHoverActionBar {
 	export interface Action {
 		readonly capability: "info" | "status" | "lines" | "effects";
-		readonly icon: string;
+		readonly iconUrl: string;
 		readonly label: string;
 	}
 
 	export interface Props {
 		readonly actions: ReadonlyArray<Action>;
+		readonly mainAxisOffset: number;
 		readonly placement: string;
 		readonly referenceId: string;
 		readonly style: CSSProperties;
@@ -24,6 +25,7 @@ const stopPointerDown: PointerEventHandler<HTMLButtonElement> = (event) => {
 /** Renders the temporary capability affordances without owning their future workspace actions. */
 export const TileHoverActionBar = ({
 	actions,
+	mainAxisOffset,
 	placement,
 	referenceId,
 	style,
@@ -39,13 +41,14 @@ export const TileHoverActionBar = ({
 		data-ui="TileHoverActionBar"
 		data-reference-id={referenceId}
 		data-placement={placement}
+		data-main-axis-offset={mainAxisOffset}
 		{...getFloatingProps()}
 	>
 		{actions.map((action) => (
 			<button
 				type="button"
 				key={action.capability}
-				className="grid size-8 place-items-center rounded-lg border-0 bg-transparent text-base leading-none outline-none transition-colors hover:bg-accent/15 focus-visible:bg-accent/20 focus-visible:ring-2 focus-visible:ring-accent"
+				className="grid size-8 place-items-center rounded-lg border-0 bg-transparent leading-none outline-none transition-colors hover:bg-accent/15 focus-visible:bg-accent/20 focus-visible:ring-2 focus-visible:ring-accent"
 				aria-label={action.label}
 				title={action.label}
 				data-ui="TileHoverAction"
@@ -53,7 +56,15 @@ export const TileHoverActionBar = ({
 				onPointerDown={stopPointerDown}
 				onClick={(event) => event.preventDefault()}
 			>
-				<span aria-hidden="true">{action.icon}</span>
+				<img
+					src={action.iconUrl}
+					width={24}
+					height={24}
+					className="size-6 object-contain"
+					alt=""
+					aria-hidden="true"
+					draggable={false}
+				/>
 			</button>
 		))}
 	</div>

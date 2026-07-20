@@ -11,6 +11,15 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 export const ResourceConfigSchema = z
 	.object({
 		hero: IdSchema.describe("The explicit resource ID used by the game splash hero."),
+		credits: z
+			.object({
+				chatGpt: IdSchema,
+				marek: IdSchema,
+				sarka: IdSchema,
+			})
+			.strict()
+			.optional()
+			.describe("Explicit Arkpack resource IDs for the project-credit portraits."),
 		tileCapabilities: z
 			.object({
 				info: IdSchema,

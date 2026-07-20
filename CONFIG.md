@@ -69,7 +69,7 @@ The completed game config contains:
 
 ```text
 meta        Game ID, title, board size, inventory size.
-resources   Explicit non-item resource roles used by the shell.
+resources   Explicit non-item resource roles used by the shell, including project-credit portraits.
 start       Initial explicit-space board coordinates, inventory quantities, and current space.
 categories  UI-facing category records keyed by stable ID.
 version     Configuration schema version.
@@ -158,7 +158,7 @@ Attached ownership state has no historical or independent space. Moving an owner
 
 ### Assets
 
-Assets are explicit IDs resolved against PNG resources.
+Assets are explicit IDs resolved against PNG resources. Named shell resources are also explicit: `resources.credits` maps the `chatGpt`, `marek`, and `sarka` credit roles to their PNG resource IDs.
 
 Blueprint assets are an explicit tuple:
 

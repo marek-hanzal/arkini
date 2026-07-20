@@ -295,10 +295,12 @@ const dragTo = async (source: HTMLElement, x: number, y: number) => {
 };
 
 describe("Board drag", () => {
-	it("keeps the real actor centered under an off-center pointer while pressed", async () => {
+	it("animates an off-center pickup toward the pointer instead of snapping on press", async () => {
 		const source = await renderBoard();
+		const runtimeId = source.dataset.runtimeId;
 		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (dragSurface === null) throw new Error("Missing drag surface.");
+		if (runtimeId === undefined || dragSurface === null)
+			throw new Error("Missing draggable actor identity.");
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerdown", 210, 110));
@@ -306,18 +308,27 @@ describe("Board drag", () => {
 		});
 
 		expect(motionTestRuntime.readDragOffset()).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 217, 117));
+			await Promise.resolve();
+		});
+
+		expect(motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId)).toEqual({
 			x: -40,
 			y: -40,
 		});
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 210, 110));
+			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
 			await Promise.resolve();
-		});
-
-		expect(motionTestRuntime.readDragOffset()).toEqual({
-			x: 0,
-			y: 0,
 		});
 	});
 	it("moves the one existing actor through the public atomic drop command", async () => {

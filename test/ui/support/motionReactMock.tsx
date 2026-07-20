@@ -40,6 +40,7 @@ interface MockDragControls {
 }
 
 let activeDragBinding: MockDragBinding | null = null;
+const motionOffsetBindings = new Map<string, MockDragBinding>();
 
 interface MockAnimationControls extends PromiseLike<void> {
 	stop: () => void;
@@ -56,6 +57,16 @@ export const motionTestRuntime = {
 		this.autoComplete = true;
 		this.completions.splice(0);
 		activeDragBinding = null;
+		motionOffsetBindings.clear();
+	},
+	readMotionOffset(ui: string, runtimeId: string) {
+		const binding = motionOffsetBindings.get(`${ui}:${runtimeId}`);
+		return binding === undefined
+			? null
+			: {
+					x: binding.x.get(),
+					y: binding.y.get(),
+				};
 	},
 	readDragOffset() {
 		return activeDragBinding === null
@@ -274,6 +285,34 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 					readonly y?: MockMotionValue<number>;
 			  })
 			| undefined;
+		const ui = typeof props["data-ui"] === "string" ? props["data-ui"] : null;
+		const runtimeId =
+			typeof props["data-motion-id"] === "string" ? props["data-motion-id"] : null;
+
+		useEffect(() => {
+			if (
+				ui === null ||
+				runtimeId === null ||
+				motionStyle?.x === undefined ||
+				motionStyle.y === undefined
+			)
+				return;
+			const key = `${ui}:${runtimeId}`;
+			const binding = {
+				node: document.createElement("span"),
+				x: motionStyle.x,
+				y: motionStyle.y,
+			};
+			motionOffsetBindings.set(key, binding);
+			return () => {
+				if (motionOffsetBindings.get(key) === binding) motionOffsetBindings.delete(key);
+			};
+		}, [
+			motionStyle?.x,
+			motionStyle?.y,
+			runtimeId,
+			ui,
+		]);
 
 		return createElement(element, {
 			...props,

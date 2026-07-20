@@ -33,6 +33,17 @@ const settleTransition = {
 	mass: 0.62,
 };
 
+const pickupTransition = {
+	type: "tween" as const,
+	duration: 0.11,
+	ease: [
+		0.22,
+		1,
+		0.36,
+		1,
+	] as const,
+};
+
 /** Renders and physically moves one stable runtime-item actor through Motion. */
 export const TileActor = ({ item }: TileActor.Props) => {
 	const system = useContext(TileSystemContext);
@@ -55,15 +66,30 @@ export const TileActor = ({ item }: TileActor.Props) => {
 	const anchorY = useMotionValue(0);
 	const dragX = useMotionValue(0);
 	const dragY = useMotionValue(0);
+	const pickupX = useMotionValue(0);
+	const pickupY = useMotionValue(0);
 	const width = useMotionValue(0);
 	const height = useMotionValue(0);
 	const initialized = useRef(false);
 	const localMotionGeneration = useRef(0);
 	const dragStarted = useRef(false);
+	const pickupTarget = useRef({
+		x: 0,
+		y: 0,
+	});
+	const pickupAnimationX = useRef<ReturnType<typeof animate> | null>(null);
+	const pickupAnimationY = useRef<ReturnType<typeof animate> | null>(null);
 	const itemRef = useRef(item);
 	const [visible, setVisible] = useState(false);
 	const [hovered, setHovered] = useState(false);
 	itemRef.current = item;
+
+	const stopPickupAnimation = useCallback(() => {
+		pickupAnimationX.current?.stop();
+		pickupAnimationY.current?.stop();
+		pickupAnimationX.current = null;
+		pickupAnimationY.current = null;
+	}, []);
 
 	const canonicalSource = useMemo<TileDragSource>(() => {
 		const surface = tileSurfaceForLocation(item.location);
@@ -178,6 +204,8 @@ export const TileActor = ({ item }: TileActor.Props) => {
 			anchorY.jump(placement.y);
 			dragX.jump(0);
 			dragY.jump(0);
+			pickupX.jump(0);
+			pickupY.jump(0);
 			width.jump(placement.width);
 			height.jump(placement.height);
 			initialized.current = true;
@@ -189,14 +217,17 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		}
 
 		setVisible(true);
+		stopPickupAnimation();
 		const animations: Array<ReturnType<typeof animate>> = [];
 		if (interaction?.phase === "settling") {
-			const currentVisualX = anchorX.get() + dragX.get();
-			const currentVisualY = anchorY.get() + dragY.get();
+			const currentVisualX = anchorX.get() + dragX.get() + pickupX.get();
+			const currentVisualY = anchorY.get() + dragY.get() + pickupY.get();
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
 			dragX.jump(currentVisualX - placement.x);
 			dragY.jump(currentVisualY - placement.y);
+			pickupX.jump(0);
+			pickupY.jump(0);
 			animations.push(
 				animate(dragX, 0, settleTransition),
 				animate(dragY, 0, settleTransition),
@@ -207,6 +238,8 @@ export const TileActor = ({ item }: TileActor.Props) => {
 				animate(anchorY, placement.y, settleTransition),
 				animate(dragX, 0, settleTransition),
 				animate(dragY, 0, settleTransition),
+				animate(pickupX, 0, settleTransition),
+				animate(pickupY, 0, settleTransition),
 			);
 		}
 		animations.push(
@@ -231,10 +264,13 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		desiredLocation,
 		dragX,
 		dragY,
+		pickupX,
+		pickupY,
 		height,
 		item.id,
 		ownsActive,
 		settlement,
+		stopPickupAnimation,
 		targeted,
 		placement?.height,
 		placement?.width,
@@ -256,6 +292,7 @@ export const TileActor = ({ item }: TileActor.Props) => {
 	useEffect(
 		() => () => {
 			localMotionGeneration.current += 1;
+			stopPickupAnimation();
 			dragControls.cancel();
 			cancel(item.id);
 		},
@@ -263,6 +300,7 @@ export const TileActor = ({ item }: TileActor.Props) => {
 			cancel,
 			dragControls,
 			item.id,
+			stopPickupAnimation,
 		],
 	);
 
@@ -270,9 +308,16 @@ export const TileActor = ({ item }: TileActor.Props) => {
 		(event) => {
 			if (!event.isPrimary || event.button !== 0) return;
 			if (!press(canonicalSource)) return;
+			const bounds = event.currentTarget.getBoundingClientRect();
+			pickupTarget.current = {
+				x: event.clientX - (bounds.left + bounds.width / 2),
+				y: event.clientY - (bounds.top + bounds.height / 2),
+			};
 			dragStarted.current = false;
+			stopPickupAnimation();
+			pickupX.jump(0);
+			pickupY.jump(0);
 			dragControls.start(event, {
-				snapToCursor: true,
 				distanceThreshold: 6,
 			});
 		},
@@ -280,6 +325,9 @@ export const TileActor = ({ item }: TileActor.Props) => {
 			canonicalSource,
 			dragControls,
 			press,
+			pickupX,
+			pickupY,
+			stopPickupAnimation,
 		],
 	);
 
@@ -291,24 +339,32 @@ export const TileActor = ({ item }: TileActor.Props) => {
 	]);
 
 	const onPointerCancel = useCallback(() => {
+		stopPickupAnimation();
 		dragControls.cancel();
 		cancel(item.id);
 	}, [
 		cancel,
 		dragControls,
 		item.id,
+		stopPickupAnimation,
 	]);
 
 	const onDragStart = useCallback(
 		(_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
 			dragStarted.current = true;
 			startDrag(canonicalSource);
+			stopPickupAnimation();
+			pickupAnimationX.current = animate(pickupX, pickupTarget.current.x, pickupTransition);
+			pickupAnimationY.current = animate(pickupY, pickupTarget.current.y, pickupTransition);
 			moveDrag(canonicalSource, info.point.x, info.point.y);
 		},
 		[
 			canonicalSource,
 			moveDrag,
+			pickupX,
+			pickupY,
 			startDrag,
+			stopPickupAnimation,
 		],
 	);
 
@@ -452,14 +508,24 @@ export const TileActor = ({ item }: TileActor.Props) => {
 				onDragEnd={onDragEnd}
 				data-ui="TileActorDragSurface"
 			>
-				<TileActorContent
-					item={item}
-					phase={phase}
-					feedback={settlement !== null ? (active?.feedback ?? null) : null}
-					onAnimationComplete={
-						mergeResolveVisualOwned ? onVisualAnimationComplete : undefined
-					}
-				/>
+				<motion.span
+					className="absolute inset-0"
+					style={{
+						x: pickupX,
+						y: pickupY,
+					}}
+					data-ui="TileActorPickup"
+					data-motion-id={item.id}
+				>
+					<TileActorContent
+						item={item}
+						phase={phase}
+						feedback={settlement !== null ? (active?.feedback ?? null) : null}
+						onAnimationComplete={
+							mergeResolveVisualOwned ? onVisualAnimationComplete : undefined
+						}
+					/>
+				</motion.span>
 			</motion.span>
 		</motion.button>
 	);

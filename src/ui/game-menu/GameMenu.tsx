@@ -41,7 +41,7 @@ const GameMenuDialog = ({
 
 	return (
 		<motion.div
-			className="absolute inset-0 z-50 grid cursor-default place-items-center overflow-hidden bg-overlay/95 p-[var(--ak-viewport-padding)] text-overlay-foreground"
+			className="absolute inset-0 z-[80] grid cursor-default place-items-center overflow-hidden bg-overlay/95 p-[var(--ak-viewport-padding)] text-overlay-foreground"
 			data-ui="GameMenuBackdrop"
 			data-phase={phase}
 			style={{

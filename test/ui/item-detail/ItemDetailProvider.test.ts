@@ -4,7 +4,11 @@ import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { GameMenuControl } from "~/ui/game-menu/GameMenuControl";
+import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import type { ItemDetailControl } from "~/ui/item-detail/ItemDetailControl";
+import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
@@ -54,6 +58,18 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 	return null;
 };
 
+const MenuProbe = ({ onControl }: { readonly onControl: (control: GameMenuControl) => void }) => {
+	const control = useGameMenuControl();
+	useEffect(
+		() => onControl(control),
+		[
+			control,
+			onControl,
+		],
+	);
+	return null;
+};
+
 const renderProvider = async () => {
 	let control: ItemDetailControl | undefined;
 	const container = document.createElement("div");
@@ -80,6 +96,48 @@ const renderProvider = async () => {
 			return control;
 		},
 		root,
+	};
+};
+
+const renderGuardedProvider = async () => {
+	let itemDetail: ItemDetailControl | undefined;
+	let gameMenu: GameMenuControl | undefined;
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(
+				GameMenuProvider,
+				null,
+				createElement(
+					ItemDetailProvider,
+					null,
+					createElement(ItemDetailHigherOwnerGuard),
+					createElement(Probe, {
+						onControl: (next) => {
+							itemDetail = next;
+						},
+					}),
+					createElement(MenuProbe, {
+						onControl: (next) => {
+							gameMenu = next;
+						},
+					}),
+				),
+			),
+		);
+	});
+	return {
+		readItemDetail: () => {
+			if (itemDetail === undefined) throw new Error("Missing Item Detail control.");
+			return itemDetail;
+		},
+		readGameMenu: () => {
+			if (gameMenu === undefined) throw new Error("Missing Game Menu control.");
+			return gameMenu;
+		},
 	};
 };
 
@@ -168,6 +226,27 @@ describe("ItemDetailProvider", () => {
 		).toBe(false);
 		expect(readControl().state).toEqual({
 			phase: "closed",
+		});
+	});
+	it("yields interaction ownership to the higher-priority game menu", async () => {
+		const { readGameMenu, readItemDetail } = await renderGuardedProvider();
+		await act(async () => {
+			readItemDetail().openItemDetail({
+				itemId: "runtime:first",
+				tab: "info",
+			});
+		});
+		const entering = readItemDetail().state;
+		if (entering.phase !== "entering") throw new Error("Expected entering state.");
+		await act(async () => readItemDetail().completeEnter(entering.generation));
+
+		await act(async () => readGameMenu().open());
+		expect(readGameMenu().phase).toBe("entering");
+		expect(readItemDetail().state).toMatchObject({
+			phase: "exiting",
+			target: {
+				itemId: "runtime:first",
+			},
 		});
 	});
 });

@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
+import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
@@ -31,6 +32,7 @@ export function GameShell({ children }: PropsWithChildren) {
 						<TileSystemProvider>{children}</TileSystemProvider>
 					</div>
 					<ItemDetailModal />
+					<CheatItemSpotlight game={gameEngine} />
 				</ItemDetailProvider>
 				<GameMenu game={gameEngine} />
 			</GameMenuProvider>

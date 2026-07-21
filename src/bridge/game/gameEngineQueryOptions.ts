@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import { Cause, Exit, Option } from "effect";
 
 import { toCriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
@@ -21,15 +22,23 @@ export const gameEngineQueryOptions = ({
 	packageId,
 	awaitPreviousShutdown = Promise.resolve(),
 	beforeCreate = () => Promise.resolve(),
-	create = (selectedPackageId) =>
-		RendererRuntime.runPromise(
+	create = async (selectedPackageId) => {
+		const exit = await RendererRuntime.runPromiseExit(
 			createGameFx({
 				packageId: selectedPackageId,
 			}),
-		),
+		);
+		if (Exit.isSuccess(exit)) return exit.value;
+		const failure = Cause.failureOption(exit.cause);
+		if (Option.isSome(failure)) throw failure.value;
+		throw Cause.squash(exit.cause);
+	},
 }: gameEngineQueryOptions.Props) =>
 	queryOptions({
 		queryKey: gameEngineQueryKey,
+		meta: {
+			packageId,
+		},
 		queryFn: async () => {
 			try {
 				await awaitPreviousShutdown;

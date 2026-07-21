@@ -13,6 +13,7 @@ import { Route as LauncherRouteImport } from "./@routes/_launcher"
 import { Route as IndexRouteImport } from "./@routes/index"
 import { Route as GamePackageIdRouteImport } from "./@routes/game/$packageId"
 import { Route as ActionRecoverGameSaveRouteImport } from "./@routes/action/recover-game-save"
+import { Route as ActionDiscardFailedGameRouteImport } from "./@routes/action/discard-failed-game"
 import { Route as LauncherSettingsRouteImport } from "./@routes/_launcher/settings"
 import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-menu"
 import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
@@ -40,6 +41,11 @@ const GamePackageIdRoute = GamePackageIdRouteImport.update({
 const ActionRecoverGameSaveRoute = ActionRecoverGameSaveRouteImport.update({
   id: "/action/recover-game-save",
   path: "/action/recover-game-save",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActionDiscardFailedGameRoute = ActionDiscardFailedGameRouteImport.update({
+  id: "/action/discard-failed-game",
+  path: "/action/discard-failed-game",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LauncherSettingsRoute = LauncherSettingsRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
   "/settings": typeof LauncherSettingsRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   "/arkpacks": typeof LauncherArkpacksRoute
   "/main-menu": typeof LauncherMainMenuRoute
   "/settings": typeof LauncherSettingsRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   "/_launcher/arkpacks": typeof LauncherArkpacksRoute
   "/_launcher/main-menu": typeof LauncherMainMenuRoute
   "/_launcher/settings": typeof LauncherSettingsRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | "/arkpacks"
     | "/main-menu"
     | "/settings"
+    | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | "/arkpacks"
     | "/main-menu"
     | "/settings"
+    | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | "/_launcher/arkpacks"
     | "/_launcher/main-menu"
     | "/_launcher/settings"
+    | "/action/discard-failed-game"
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
@@ -183,6 +195,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LauncherRoute: typeof LauncherRouteWithChildren
+  ActionDiscardFailedGameRoute: typeof ActionDiscardFailedGameRoute
   ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
   ActionLoadGamePackageIdRoute: typeof ActionLoadGamePackageIdRoute
@@ -216,6 +229,13 @@ declare module "@tanstack/react-router" {
       path: "/action/recover-game-save"
       fullPath: "/action/recover-game-save"
       preLoaderRoute: typeof ActionRecoverGameSaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/action/discard-failed-game": {
+      id: "/action/discard-failed-game"
+      path: "/action/discard-failed-game"
+      fullPath: "/action/discard-failed-game"
+      preLoaderRoute: typeof ActionDiscardFailedGameRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/_launcher/settings": {
@@ -323,6 +343,7 @@ const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LauncherRoute: LauncherRouteWithChildren,
+  ActionDiscardFailedGameRoute: ActionDiscardFailedGameRoute,
   ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
   ActionLoadGamePackageIdRoute: ActionLoadGamePackageIdRoute,

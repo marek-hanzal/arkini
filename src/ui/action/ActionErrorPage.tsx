@@ -8,19 +8,21 @@ const errorMessage = (error: unknown) => (error instanceof Error ? error.message
 export namespace ActionErrorPage {
 	export interface Props extends PropsWithChildren {
 		readonly error: unknown;
-		readonly reset: () => void;
+		readonly reset?: () => void;
+		readonly resetLabel?: string;
 		readonly description: string;
 		readonly onBack?: () => void;
 		readonly title: string;
 	}
 }
 
-/** Keeps one recoverable route-action failure visible until retry or navigation back. */
+/** Keeps one route-action failure visible with only its explicitly supplied actions. */
 export const ActionErrorPage = ({
 	description,
 	error,
 	onBack,
 	reset,
+	resetLabel = "Retry",
 	title,
 	children,
 }: ActionErrorPage.Props) => (
@@ -41,7 +43,9 @@ export const ActionErrorPage = ({
 			<p className="text-xs text-danger">{errorMessage(error)}</p>
 			<div className="flex flex-wrap justify-center gap-2">
 				{children}
-				<PrimaryButton onClick={reset}>Retry</PrimaryButton>
+				{reset === undefined ? null : (
+					<PrimaryButton onClick={reset}>{resetLabel}</PrimaryButton>
+				)}
 				{onBack === undefined ? null : <Button onClick={onBack}>Back</Button>}
 			</div>
 		</section>

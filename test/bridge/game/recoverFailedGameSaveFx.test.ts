@@ -70,6 +70,30 @@ describe("recoverFailedGameSaveFx", () => {
 		expect(queryClient.getQueryState(queryKey)?.error).toBeInstanceOf(GameSaveBootstrapError);
 	});
 
+	it("retains the exact failed query when the route package does not match", async () => {
+		const queryClient = new QueryClient();
+		const clear = vi.fn();
+		await cacheFailure(
+			queryClient,
+			new GameSaveBootstrapError({
+				cause: new Error("invalid save"),
+				saveKey,
+			}),
+		);
+
+		const exit = await Effect.runPromiseExit(
+			recoverFailedGameSaveFx({
+				clearSaveFx: Effect.sync(clear),
+				packageId: "package-other",
+				queryClient,
+			}),
+		);
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		expect(clear).not.toHaveBeenCalled();
+		expect(queryClient.getQueryState(queryKey)?.error).toBeInstanceOf(GameSaveBootstrapError);
+	});
+
 	it("rejects recovery without a verified bootstrap save failure", async () => {
 		const queryClient = new QueryClient();
 		await cacheFailure(queryClient, new Error("package failure"));

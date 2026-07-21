@@ -67,7 +67,10 @@ describe("gameEngineQueryOptions", () => {
 		const second = await client.ensureQueryData(options);
 
 		expect(options.queryKey).toBe(gameEngineQueryKey);
-		expect(first.game).toBe(game);
+		expect(options.meta).toEqual({
+			packageId: "package:test",
+		});
+		expect(first.game.arkpack).toBe(game.arkpack);
 		expect(second).toBe(first);
 		expect(create).toHaveBeenCalledOnce();
 		expect(getCachedGameEngineResource(client)).toBe(first);
@@ -83,12 +86,12 @@ describe("gameEngineQueryOptions", () => {
 			create,
 		});
 
-		expect((await client.ensureQueryData(options)).game).toBe(first);
+		expect((await client.ensureQueryData(options)).game.arkpack).toBe(first.arkpack);
 		client.removeQueries({
 			exact: true,
 			queryKey: gameEngineQueryKey,
 		});
-		expect((await client.ensureQueryData(options)).game).toBe(second);
+		expect((await client.ensureQueryData(options)).game.arkpack).toBe(second.arkpack);
 		expect(create).toHaveBeenCalledTimes(2);
 	});
 

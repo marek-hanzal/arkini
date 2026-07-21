@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, type ErrorComponentProps } from "@tanstack/react-router";
 
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
@@ -55,5 +55,15 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 	pendingMs: 0,
 	pendingMinMs: 2_500,
 	pendingComponent: () => <ActionPendingPage label="Loading game…" />,
-	errorComponent: GameEngineErrorPage,
+	errorComponent: GameLoadErrorPage,
 });
+
+function GameLoadErrorPage(props: ErrorComponentProps) {
+	const { packageId } = Route.useParams();
+	return (
+		<GameEngineErrorPage
+			{...props}
+			packageId={packageId}
+		/>
+	);
+}

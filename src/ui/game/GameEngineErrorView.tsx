@@ -1,45 +1,55 @@
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
-import { PrimaryButtonLink } from "~/ui/button/Button";
+import { DangerButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 
 export namespace GameEngineErrorView {
 	export interface Props {
 		readonly error: unknown;
-		readonly retry: () => void;
+		readonly packageId: string;
 	}
 }
 
-/** Presents one bootstrap failure without owning recovery or Game lifecycle work. */
-export const GameEngineErrorView = ({ error, retry }: GameEngineErrorView.Props) => {
+/** Presents one bootstrap failure with an explicit safe exit instead of replaying the same load. */
+export const GameEngineErrorView = ({ error, packageId }: GameEngineErrorView.Props) => {
 	if (error instanceof CriticalGameLifecycleError) throw error;
 	if (!(error instanceof GameSaveBootstrapError)) {
 		return (
 			<ActionErrorPage
 				description="The selected package could not create a playable Game Engine."
 				error={error}
-				reset={retry}
 				title="Game failed to load"
-			/>
+			>
+				<PrimaryButtonLink
+					to="/action/discard-failed-game"
+					search={{
+						packageId,
+					}}
+					preload={false}
+					replace
+				>
+					Exit to Main Menu
+				</PrimaryButtonLink>
+			</ActionErrorPage>
 		);
 	}
 
 	return (
 		<ActionErrorPage
-			description="The persisted save is invalid. Retry the exact load or open the dedicated recovery action to delete only this verified package save."
-			error={error}
-			reset={retry}
+			description="This save is incompatible or corrupted. Cleaning it will permanently delete progress for this exact package build and return to the Main Menu."
+			error={error.cause}
 			title="Saved game could not be restored"
 		>
-			<PrimaryButtonLink
+			<DangerButtonLink
 				to="/action/recover-game-save"
 				search={{
 					packageId: error.saveKey.packageId,
 				}}
 				preload={false}
+				replace
 			>
-				Recover with a fresh save
-			</PrimaryButtonLink>
+				Clean &amp; Exit
+			</DangerButtonLink>
 		</ActionErrorPage>
 	);
 };

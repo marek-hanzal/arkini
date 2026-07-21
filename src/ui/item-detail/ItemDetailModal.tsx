@@ -15,6 +15,7 @@ import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
 import { useItemDetailMotion } from "~/ui/item-detail/useItemDetailMotion";
+import { useRetainedItemDetailProjection } from "~/ui/item-detail/useRetainedItemDetailProjection";
 
 const transition = {
 	duration: 0.22,
@@ -66,6 +67,7 @@ const ItemDetailHeaderArtwork = ({
 const ItemDetailHeader = ({
 	disabled,
 	identity,
+	stale,
 }: {
 	readonly disabled: boolean;
 	readonly identity: Extract<
@@ -74,6 +76,7 @@ const ItemDetailHeader = ({
 			readonly kind: "available";
 		}
 	>;
+	readonly stale: boolean;
 }) => {
 	const itemDetail = useItemDetailControl();
 	return (
@@ -90,6 +93,11 @@ const ItemDetailHeader = ({
 					{identity.subtitle === undefined ? null : (
 						<p className="mt-1 truncate text-sm text-muted">{identity.subtitle}</p>
 					)}
+					{stale ? (
+						<p className="mt-1 text-xs font-medium text-warning">
+							This item no longer exists. Showing the last known detail.
+						</p>
+					) : null}
 				</div>
 			</div>
 			<button
@@ -107,10 +115,12 @@ const ItemDetailHeader = ({
 
 const ItemDetailTabs = ({
 	active,
+	disabled,
 	itemId,
 	tabs,
 }: {
 	readonly active: ItemDetailTab;
+	readonly disabled: boolean;
 	readonly itemId: string;
 	readonly tabs: readonly ItemDetailTab[];
 }) => {
@@ -127,6 +137,7 @@ const ItemDetailTabs = ({
 					type="button"
 					className="shrink-0 cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/15 aria-selected:text-foreground"
 					aria-selected={tab === active}
+					disabled={disabled}
 					data-tab={tab}
 					onClick={() =>
 						itemDetail.openItemDetail({
@@ -142,66 +153,133 @@ const ItemDetailTabs = ({
 	);
 };
 
-const ItemInfoContent = ({ itemId }: { readonly itemId: string }) => {
-	const itemDetail = useItemDetailControl();
-	const identity = useItemDetailIdentity(itemId);
-	const info = useItemDetailInfo(itemId);
-	useEffect(() => {
-		if (identity.kind === "available" && info.kind === "available") return;
-		void itemDetail.close();
-	}, [
-		identity.kind,
-		info.kind,
-		itemDetail,
-	]);
-	if (identity.kind === "unavailable" || info.kind === "unavailable") return null;
+const ItemInfoContent = ({
+	disabled,
+	itemId,
+}: {
+	readonly disabled: boolean;
+	readonly itemId: string;
+}) => {
+	const liveIdentity = useItemDetailIdentity(itemId);
+	const liveInfo = useItemDetailInfo(itemId);
+	const identity = useRetainedItemDetailProjection({
+		available: liveIdentity.kind === "available",
+		targetKey: itemId,
+		value: liveIdentity,
+	});
+	const info = useRetainedItemDetailProjection({
+		available: liveInfo.kind === "available",
+		targetKey: itemId,
+		value: liveInfo,
+	});
+	if (identity.value?.kind !== "available" || info.value?.kind !== "available") {
+		return (
+			<div className="grid flex-1 place-items-center text-sm text-muted">
+				Item detail is unavailable.
+			</div>
+		);
+	}
 	return (
-		<ItemInfoTab
-			identity={identity}
-			info={info}
+		<div
+			className={
+				disabled || identity.stale || info.stale
+					? "min-h-0 flex-1 opacity-70"
+					: "min-h-0 flex-1"
+			}
+			inert={disabled || identity.stale || info.stale}
+		>
+			<ItemInfoTab
+				identity={identity.value}
+				info={info.value}
+			/>
+		</div>
+	);
+};
+
+const ItemLinesContent = ({
+	disabled,
+	itemId,
+}: {
+	readonly disabled: boolean;
+	readonly itemId: string;
+}) => {
+	const liveLines = useItemDetailLines(itemId);
+	const lines = useRetainedItemDetailProjection({
+		available: liveLines.kind === "available",
+		targetKey: itemId,
+		value: liveLines,
+	});
+	if (lines.value?.kind !== "available") {
+		return (
+			<div className="grid flex-1 place-items-center text-sm text-muted">
+				Line detail is unavailable.
+			</div>
+		);
+	}
+	return (
+		<ItemLinesTab
+			disabled={disabled || lines.stale}
+			lines={lines.value}
 		/>
 	);
 };
 
-const ItemLinesContent = ({ itemId }: { readonly itemId: string }) => {
-	const itemDetail = useItemDetailControl();
-	const lines = useItemDetailLines(itemId);
-	useEffect(() => {
-		if (lines.kind === "available") return;
-		void itemDetail.close();
-	}, [
-		itemDetail,
-		lines.kind,
-	]);
-	if (lines.kind === "unavailable") return null;
-	return <ItemLinesTab lines={lines} />;
-};
-
-const ItemQueueContent = ({ itemId }: { readonly itemId: string }) => {
-	const itemDetail = useItemDetailControl();
-	const queue = useItemDetailQueue(itemId);
-	useEffect(() => {
-		if (queue.kind === "available") return;
-		void itemDetail.close();
-	}, [
-		itemDetail,
-		queue.kind,
-	]);
-	if (queue.kind === "unavailable") return null;
-	return <ItemQueueTab queue={queue} />;
+const ItemQueueContent = ({
+	disabled,
+	itemId,
+}: {
+	readonly disabled: boolean;
+	readonly itemId: string;
+}) => {
+	const liveQueue = useItemDetailQueue(itemId);
+	const queue = useRetainedItemDetailProjection({
+		available: liveQueue.kind === "available",
+		targetKey: itemId,
+		value: liveQueue,
+	});
+	if (queue.value?.kind !== "available") {
+		return (
+			<div className="grid flex-1 place-items-center text-sm text-muted">
+				Queue detail is unavailable.
+			</div>
+		);
+	}
+	return (
+		<ItemQueueTab
+			disabled={disabled || queue.stale}
+			queue={queue.value}
+		/>
+	);
 };
 
 const ItemDetailContent = ({
+	disabled,
 	itemId,
 	tab,
 }: {
+	readonly disabled: boolean;
 	readonly itemId: string;
 	readonly tab: ItemDetailTab;
 }) =>
 	match(tab)
-		.with("info", () => <ItemInfoContent itemId={itemId} />)
-		.with("lines", () => <ItemLinesContent itemId={itemId} />)
-		.with("queue", () => <ItemQueueContent itemId={itemId} />)
+		.with("info", () => (
+			<ItemInfoContent
+				disabled={disabled}
+				itemId={itemId}
+			/>
+		))
+		.with("lines", () => (
+			<ItemLinesContent
+				disabled={disabled}
+				itemId={itemId}
+			/>
+		))
+		.with("queue", () => (
+			<ItemQueueContent
+				disabled={disabled}
+				itemId={itemId}
+			/>
+		))
 		.exhaustive();
 
 const ItemDetailDialog = ({
@@ -215,8 +293,21 @@ const ItemDetailDialog = ({
 	>;
 }) => {
 	const itemDetail = useItemDetailControl();
-	const identity = useItemDetailIdentity(state.target.itemId);
-	const tabs = useItemDetailTabs(state.target.itemId);
+	const liveIdentity = useItemDetailIdentity(state.target.itemId);
+	const liveTabs = useItemDetailTabs(state.target.itemId);
+	const retainedIdentity = useRetainedItemDetailProjection({
+		available: liveIdentity.kind === "available",
+		targetKey: state.target.itemId,
+		value: liveIdentity,
+	});
+	const retainedTabs = useRetainedItemDetailProjection({
+		available: liveTabs.length > 0,
+		targetKey: state.target.itemId,
+		value: liveTabs,
+	});
+	const identity = retainedIdentity.value;
+	const tabs = retainedTabs.value ?? [];
+	const stale = retainedIdentity.stale || retainedTabs.stale;
 	const motionState = useItemDetailMotion({
 		state,
 	});
@@ -227,16 +318,7 @@ const ItemDetailDialog = ({
 	});
 
 	useEffect(() => {
-		if (identity.kind === "available" && tabs.length > 0) return;
-		void itemDetail.close();
-	}, [
-		identity.kind,
-		itemDetail,
-		tabs.length,
-	]);
-
-	useEffect(() => {
-		if (tabs.includes(state.target.tab)) return;
+		if (stale || liveTabs.includes(state.target.tab)) return;
 		itemDetail.openItemDetail({
 			itemId: state.target.itemId,
 		});
@@ -244,7 +326,8 @@ const ItemDetailDialog = ({
 		itemDetail,
 		state.target.itemId,
 		state.target.tab,
-		tabs,
+		liveTabs,
+		stale,
 	]);
 
 	return (
@@ -283,25 +366,58 @@ const ItemDetailDialog = ({
 				onAnimationComplete={motionState.completeMotionPhase}
 				onKeyDown={focus.keepFocusInside}
 			>
-				{identity.kind === "available" ? (
-					<>
+				<motion.div
+					key={`${state.target.itemId}:${state.target.tab}`}
+					className="flex min-h-0 flex-1 flex-col"
+					data-ui="ItemDetailContentScene"
+					data-stale={stale ? "true" : "false"}
+					initial={{
+						opacity: 0,
+						y: 6,
+					}}
+					animate={{
+						opacity: 1,
+						y: 0,
+					}}
+					transition={transition}
+				>
+					{identity?.kind === "available" ? (
 						<ItemDetailHeader
 							disabled={state.phase === "exiting"}
 							identity={identity}
+							stale={stale}
 						/>
-						<ItemDetailTabs
-							active={state.target.tab}
+					) : (
+						<header className="flex items-center justify-between border-b border-line pb-3">
+							<h2
+								id="item-detail-title"
+								className="text-lg font-semibold"
+							>
+								Item unavailable
+							</h2>
+							<button
+								type="button"
+								className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
+								onClick={() => void itemDetail.close()}
+							>
+								×
+							</button>
+						</header>
+					)}
+					<ItemDetailTabs
+						active={state.target.tab}
+						disabled={stale || state.phase === "exiting"}
+						itemId={state.target.itemId}
+						tabs={tabs}
+					/>
+					<div className="flex min-h-0 flex-1 overflow-hidden pt-4">
+						<ItemDetailContent
+							disabled={stale || state.phase === "exiting"}
 							itemId={state.target.itemId}
-							tabs={tabs}
+							tab={state.target.tab}
 						/>
-						<div className="flex min-h-0 flex-1 overflow-hidden pt-4">
-							<ItemDetailContent
-								itemId={state.target.itemId}
-								tab={state.target.tab}
-							/>
-						</div>
-					</>
-				) : null}
+					</div>
+				</motion.div>
 			</motion.div>
 		</motion.div>
 	);

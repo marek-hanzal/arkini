@@ -63,6 +63,12 @@ const config = GameConfigSchema.parse({
 				x: 0,
 				y: 0,
 			},
+			{
+				itemId: "water",
+				space: 0,
+				x: 1,
+				y: 0,
+			},
 		],
 	},
 	categories: {},
@@ -293,6 +299,48 @@ describe("ItemDetailModal", () => {
 		});
 	});
 
+	it("keeps the modal shell stable when an output artwork opens another exact item", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		const output = currentRuntime.items.find((item) => item.item.id === "water");
+		if (owner === undefined || output === undefined)
+			throw new Error("Missing detail fixtures.");
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		const shellGeneration = readControl().state;
+		if (modal === null || shellGeneration.phase !== "open") {
+			throw new Error("Missing open Item Detail modal.");
+		}
+		const outputLink = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineOutputDetailLink"][data-detail-available="true"]',
+		);
+		if (outputLink === null) throw new Error("Missing clickable output artwork.");
+
+		await act(async () => {
+			outputLink.click();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			generation: shellGeneration.generation,
+			target: {
+				itemId: output.id,
+				tab: "info",
+			},
+		});
+		expect(modal.dataset.runtimeId).toBe(output.id);
+		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
+	});
+
 	it("counts active work down in the fixed runtime slot without adding a layout row", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
@@ -456,7 +504,7 @@ describe("ItemDetailModal", () => {
 		expect(document.activeElement).toBe(shell);
 	});
 
-	it("closes the exact stale target without retargeting another item", async () => {
+	it("retains the last exact target snapshot and disables its interactions after removal", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
@@ -464,12 +512,12 @@ describe("ItemDetailModal", () => {
 		await act(async () => {
 			readControl().openItemDetail({
 				itemId: owner.id,
-				tab: "info",
 			});
 			await Promise.resolve();
 			await Promise.resolve();
 		});
-		expect(document.querySelector('[data-ui="ItemDetailModal"]')).not.toBeNull();
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		expect(modal).not.toBeNull();
 
 		await act(async () => {
 			publishRuntime(
@@ -480,9 +528,22 @@ describe("ItemDetailModal", () => {
 			);
 			await Promise.resolve();
 			await Promise.resolve();
-			await Promise.resolve();
 		});
-		expect(readControl().state.phase).toBe("closed");
-		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBeNull();
+
+		expect(readControl().state.phase).toBe("open");
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailContentScene"]')?.dataset
+				.stale,
+		).toBe("true");
+		expect(document.body.textContent).toContain("This item no longer exists");
+		expect(
+			Array.from(
+				document.querySelectorAll<HTMLButtonElement>('[data-ui="ItemDetailTabs"] button'),
+			).every((button) => button.disabled),
+		).toBe(true);
+		expect(
+			document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]')?.disabled,
+		).toBe(true);
 	});
 });

@@ -7,8 +7,10 @@ import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 /** Renders authoritative queued intents without treating active work as cancellable. */
 export const ItemQueueTab = ({
+	disabled = false,
 	queue,
 }: {
+	readonly disabled?: boolean;
 	readonly queue: Extract<
 		useItemDetailQueue.Projection,
 		{
@@ -32,7 +34,7 @@ export const ItemQueueTab = ({
 				</p>
 				<Button
 					type="button"
-					disabled={queue.request.length === 0 || pending}
+					disabled={disabled || queue.request.length === 0 || pending}
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={async () => {
 						setPending(true);

@@ -186,6 +186,22 @@ describe("ItemDetailProvider", () => {
 			},
 		});
 
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: "runtime:second",
+				tab: "info",
+			});
+		});
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			generation: entering.generation,
+			target: {
+				itemId: "runtime:second",
+				tab: "info",
+				origin,
+			},
+		});
+
 		let firstClose: Promise<void> | undefined;
 		await act(async () => {
 			firstClose = readControl().close();

@@ -70,8 +70,7 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 					{
 						phase: "exiting",
 					},
-					(state) =>
-						state.target.itemId === resolved.itemId ? state.target.origin : origin,
+					(state) => state.target.origin,
 				)
 				.exhaustive();
 			const target: ItemDetailTarget = {
@@ -103,8 +102,10 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 						phase: "open",
 					},
 					(current) => {
-						if (current.target.itemId !== target.itemId) return enter();
-						if (current.target.tab !== target.tab) {
+						if (
+							current.target.itemId !== target.itemId ||
+							current.target.tab !== target.tab
+						) {
 							publishState({
 								...current,
 								target,

@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { useState } from "react";
 import { match } from "ts-pattern";
 
@@ -6,6 +7,7 @@ import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
+import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const formatQuantity = ({ min, max }: useItemDetailLines.QuantityBounds) =>
@@ -206,22 +208,109 @@ const InputRow = ({ input }: { readonly input: useItemDetailLines.Input }) =>
 		)
 		.exhaustive();
 
-const OutputItems = ({ items }: { readonly items: readonly useItemDetailLines.OutputItem[] }) => (
+const OutputItemVisual = ({
+	disabled,
+	item,
+}: {
+	readonly disabled: boolean;
+	readonly item: useItemDetailLines.OutputItem;
+}) => {
+	const itemDetail = useItemDetailControl();
+	const [hovered, setHovered] = useState(false);
+	const canOpen = !disabled && item.detailItemId !== undefined;
+	const artwork =
+		item.sourceUrl === undefined ? null : (
+			<span className="relative block size-11 shrink-0">
+				<img
+					className="absolute inset-0 size-full object-contain drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
+					src={item.sourceUrl}
+					alt=""
+					draggable={false}
+				/>
+				{item.compositeUrl === undefined ? null : (
+					<img
+						className="absolute inset-0 size-full object-contain drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
+						src={item.compositeUrl}
+						alt=""
+						draggable={false}
+					/>
+				)}
+			</span>
+		);
+	return (
+		<motion.button
+			type="button"
+			className="flex min-w-0 flex-1 items-center gap-3 text-left outline-none disabled:cursor-default"
+			disabled={!canOpen}
+			data-ui="TileLineOutputDetailLink"
+			data-detail-available={canOpen ? "true" : "false"}
+			aria-label={canOpen ? `Open ${item.title} detail` : undefined}
+			animate={{
+				scale: hovered && canOpen ? 1.055 : 1,
+			}}
+			transition={{
+				duration: 0.14,
+				ease: [
+					0.22,
+					1,
+					0.36,
+					1,
+				],
+			}}
+			onHoverStart={() => setHovered(true)}
+			onHoverEnd={() => setHovered(false)}
+			onClick={() => {
+				if (item.detailItemId === undefined) return;
+				itemDetail.openItemDetail({
+					itemId: item.detailItemId,
+				});
+			}}
+		>
+			{artwork}
+			<span
+				className={
+					canOpen
+						? "truncate font-medium text-foreground transition-colors hover:text-accent"
+						: "truncate font-medium text-foreground"
+				}
+			>
+				{item.title}
+			</span>
+		</motion.button>
+	);
+};
+
+const OutputItems = ({
+	disabled,
+	items,
+}: {
+	readonly disabled: boolean;
+	readonly items: readonly useItemDetailLines.OutputItem[];
+}) => (
 	<div className="space-y-1.5">
 		{items.map((item) => (
 			<div
 				key={item.itemId}
-				className="flex min-w-0 items-baseline justify-between gap-4 text-sm"
+				className="flex min-w-0 items-center justify-between gap-4 text-sm"
 				data-ui="TileLineOutputItem"
 			>
-				<span className="truncate font-medium text-foreground">{item.title}</span>
+				<OutputItemVisual
+					disabled={disabled}
+					item={item}
+				/>
 				<span className="shrink-0 text-muted">×{formatQuantity(item.quantity)}</span>
 			</div>
 		))}
 	</div>
 );
 
-const OutputRoll = ({ roll }: { readonly roll: useItemDetailLines.OutputRoll }) =>
+const OutputRoll = ({
+	disabled,
+	roll,
+}: {
+	readonly disabled: boolean;
+	readonly roll: useItemDetailLines.OutputRoll;
+}) =>
 	match(roll)
 		.with(
 			{
@@ -236,7 +325,10 @@ const OutputRoll = ({ roll }: { readonly roll: useItemDetailLines.OutputRoll }) 
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 						Guaranteed
 					</p>
-					<OutputItems items={roll.item} />
+					<OutputItems
+						disabled={disabled}
+						items={roll.item}
+					/>
 				</div>
 			),
 		)
@@ -253,7 +345,10 @@ const OutputRoll = ({ roll }: { readonly roll: useItemDetailLines.OutputRoll }) 
 					<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 						{Math.round(roll.chance * 100)}% chance
 					</p>
-					<OutputItems items={roll.item} />
+					<OutputItems
+						disabled={disabled}
+						items={roll.item}
+					/>
 				</div>
 			),
 		)
@@ -277,7 +372,10 @@ const OutputRoll = ({ roll }: { readonly roll: useItemDetailLines.OutputRoll }) 
 							className="border-l border-line pl-3"
 						>
 							<p className="mb-1.5 text-xs text-muted">Weight {option.weight}</p>
-							<OutputItems items={option.item} />
+							<OutputItems
+								disabled={disabled}
+								items={option.item}
+							/>
 						</div>
 					))}
 				</div>
@@ -286,9 +384,11 @@ const OutputRoll = ({ roll }: { readonly roll: useItemDetailLines.OutputRoll }) 
 		.exhaustive();
 
 const LineRow = ({
+	disabled,
 	line,
 	ownerItemId,
 }: {
+	readonly disabled: boolean;
 	readonly line: useItemDetailLines.Line;
 	readonly ownerItemId: string;
 }) => {
@@ -374,7 +474,9 @@ const LineRow = ({
 					<div className="flex flex-wrap justify-end gap-2">
 						<Button
 							cursorIntent={pendingAction === "autofill" ? "progress" : undefined}
-							disabled={!line.actions.canAutofill || pendingAction !== null}
+							disabled={
+								disabled || !line.actions.canAutofill || pendingAction !== null
+							}
 							onClick={() =>
 								runAction({
 									action: "autofill",
@@ -391,7 +493,9 @@ const LineRow = ({
 						</Button>
 						<Button
 							cursorIntent={pendingAction === "withdraw" ? "progress" : undefined}
-							disabled={!line.actions.canWithdraw || pendingAction !== null}
+							disabled={
+								disabled || !line.actions.canWithdraw || pendingAction !== null
+							}
 							onClick={() =>
 								runAction({
 									action: "withdraw",
@@ -411,7 +515,11 @@ const LineRow = ({
 							cursorIntent={pendingAction === "start" ? "progress" : undefined}
 							data-ui="TileLineStartButton"
 							data-start-mode={line.startMode}
-							disabled={line.availability.kind !== "ready" || pendingAction !== null}
+							disabled={
+								disabled ||
+								line.availability.kind !== "ready" ||
+								pendingAction !== null
+							}
 							onClick={() =>
 								runAction({
 									action: "start",
@@ -487,6 +595,7 @@ const LineRow = ({
 										{set.roll.map((roll, rollIndex) => (
 											<OutputRoll
 												key={`${roll.kind}:${rollIndex}`}
+												disabled={disabled}
 												roll={roll}
 											/>
 										))}
@@ -503,8 +612,10 @@ const LineRow = ({
 
 /** Renders the authoritative visible product-line overview inside Item Detail. */
 export const ItemLinesTab = ({
+	disabled = false,
 	lines,
 }: {
+	readonly disabled?: boolean;
 	readonly lines: Extract<
 		useItemDetailLines.Projection,
 		{
@@ -542,6 +653,7 @@ export const ItemLinesTab = ({
 					{lines.line.map((line) => (
 						<LineRow
 							key={line.lineId}
+							disabled={disabled}
 							line={line}
 							ownerItemId={lines.itemId}
 						/>

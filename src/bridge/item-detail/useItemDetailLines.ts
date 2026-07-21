@@ -4,6 +4,8 @@ import { match } from "ts-pattern";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
+import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -60,6 +62,9 @@ export namespace useItemDetailLines {
 		readonly itemId: string;
 		readonly title: string;
 		readonly quantity: QuantityBounds;
+		readonly sourceUrl?: string;
+		readonly compositeUrl?: string;
+		readonly detailItemId?: string;
 	}
 
 	export type OutputRoll =
@@ -149,19 +154,52 @@ const selectorLabel = (
 		)
 		.exhaustive();
 
-const mapOutputItem = (
-	item: readItemDetailLinesFx.OutputItem,
-	items: ReturnType<typeof useGameEngine>["config"]["items"],
-): useItemDetailLines.OutputItem => ({
-	itemId: item.itemId,
-	title: items[item.itemId]?.title ?? item.itemId,
-	quantity: item.quantity,
-});
+const mapOutputItem = ({
+	game,
+	item,
+	runtime,
+}: {
+	readonly game: ReturnType<typeof useGameEngine>;
+	readonly item: readItemDetailLinesFx.OutputItem;
+	readonly runtime: RuntimeSchema.Type;
+}): useItemDetailLines.OutputItem => {
+	const configured = game.config.items[item.itemId];
+	const detailItemId = runtime.items.find(
+		(candidate) => isGridRuntimeItem(candidate) && candidate.item.id === item.itemId,
+	)?.id;
+	return {
+		itemId: item.itemId,
+		title: configured?.title ?? item.itemId,
+		quantity: item.quantity,
+		...(configured === undefined
+			? {}
+			: {
+					sourceUrl: game.getResourceUrl(
+						readRuntimeItemPrimaryAssetId(runtime, configured),
+					),
+					...(configured.asset.composite === undefined
+						? {}
+						: {
+								compositeUrl: game.getResourceUrl(configured.asset.composite),
+							}),
+				}),
+		...(detailItemId === undefined
+			? {}
+			: {
+					detailItemId,
+				}),
+	};
+};
 
-const mapOutputRoll = (
-	roll: readItemDetailLinesFx.OutputRoll,
-	items: ReturnType<typeof useGameEngine>["config"]["items"],
-): useItemDetailLines.OutputRoll =>
+const mapOutputRoll = ({
+	game,
+	roll,
+	runtime,
+}: {
+	readonly game: ReturnType<typeof useGameEngine>;
+	readonly roll: readItemDetailLinesFx.OutputRoll;
+	readonly runtime: RuntimeSchema.Type;
+}): useItemDetailLines.OutputRoll =>
 	match(roll)
 		.with(
 			{
@@ -169,7 +207,13 @@ const mapOutputRoll = (
 			},
 			({ item }) => ({
 				kind: "guaranteed" as const,
-				item: item.map((entry) => mapOutputItem(entry, items)),
+				item: item.map((entry) =>
+					mapOutputItem({
+						game,
+						item: entry,
+						runtime,
+					}),
+				),
 			}),
 		)
 		.with(
@@ -179,7 +223,13 @@ const mapOutputRoll = (
 			({ chance, item }) => ({
 				kind: "chance" as const,
 				chance,
-				item: item.map((entry) => mapOutputItem(entry, items)),
+				item: item.map((entry) =>
+					mapOutputItem({
+						game,
+						item: entry,
+						runtime,
+					}),
+				),
 			}),
 		)
 		.with(
@@ -191,7 +241,13 @@ const mapOutputRoll = (
 				selections,
 				option: option.map((candidate) => ({
 					weight: candidate.weight,
-					item: candidate.item.map((entry) => mapOutputItem(entry, items)),
+					item: candidate.item.map((entry) =>
+						mapOutputItem({
+							game,
+							item: entry,
+							runtime,
+						}),
+					),
 				})),
 			}),
 		)
@@ -323,6 +379,9 @@ const sameOutputItem = (
 ) =>
 	left.itemId === right.itemId &&
 	left.title === right.title &&
+	left.sourceUrl === right.sourceUrl &&
+	left.compositeUrl === right.compositeUrl &&
+	left.detailItemId === right.detailItemId &&
 	sameBounds(left.quantity, right.quantity);
 
 const sameOutputItems = (
@@ -451,7 +510,13 @@ export const useItemDetailLines = (itemId: IdSchema.Type): useItemDetailLines.Pr
 					),
 					output: line.output.map((set) => ({
 						weight: set.weight,
-						roll: set.roll.map((roll) => mapOutputRoll(roll, game.config.items)),
+						roll: set.roll.map((roll) =>
+							mapOutputRoll({
+								game,
+								roll,
+								runtime,
+							}),
+						),
 					})),
 				})),
 			};

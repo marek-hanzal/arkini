@@ -7,7 +7,7 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
-import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
+import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 
 export namespace useTileActors {
 	export interface Item {
@@ -36,11 +36,11 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 			);
 			return runtime.items.filter(isGridRuntimeItem).map((item) => {
 				const activeJob = activeJobs.get(item.id);
-				const runnableExit =
-					activeJob === undefined || activeJob.remainingMs === 0
+				const statusExit =
+					activeJob === undefined
 						? undefined
 						: game.read(
-								resolveJobRunnableFx({
+								resolveActiveJobStatusFx({
 									job: activeJob,
 									runtime,
 								}),
@@ -53,9 +53,9 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 					quantity: item.quantity,
 					location: item.location,
 					running:
-						runnableExit !== undefined &&
-						Exit.isSuccess(runnableExit) &&
-						runnableExit.value,
+						statusExit !== undefined &&
+						Exit.isSuccess(statusExit) &&
+						statusExit.value === "running",
 					sourceUrl: game.getResourceUrl(
 						readRuntimeItemPrimaryAssetId(runtime, item.item),
 					),

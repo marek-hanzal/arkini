@@ -3,11 +3,11 @@ export const JobStatusSchema = z
 	.enum([
 		"running",
 		"paused",
-		"ready",
+		"awaiting-output",
 	])
 	.meta({
 		id: "JobStatusSchema",
-		description: "The current derived execution state of one active job.",
+		description: "The canonical running, paused, or output-awaiting state of one active job.",
 	});
 export type JobStatusSchema = typeof JobStatusSchema;
 export namespace JobStatusSchema {

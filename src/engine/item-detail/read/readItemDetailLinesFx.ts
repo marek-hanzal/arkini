@@ -11,7 +11,7 @@ import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
 import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
-import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
+import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
@@ -121,7 +121,7 @@ export namespace readItemDetailLinesFx {
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
-			readonly status: "running" | "paused" | "ready";
+			readonly status: "running" | "paused" | "awaiting-output";
 			readonly durationMs: TimeSchema.Type;
 			readonly remainingMs: TimeSchema.Type;
 		};
@@ -483,14 +483,10 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		const activeJobStatus =
 			activeJob === undefined
 				? undefined
-				: activeJob.remainingMs === 0
-					? "ready"
-					: (yield* resolveJobRunnableFx({
-								job: activeJob,
-								runtime,
-							}))
-						? "running"
-						: "paused";
+				: yield* resolveActiveJobStatusFx({
+						job: activeJob,
+						runtime,
+					});
 		projected.push({
 			lineId: line.id,
 			title: line.title,

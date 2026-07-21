@@ -170,7 +170,7 @@ describe("readItemDetailLinesFx", () => {
 		}
 		expect(running.line[0]?.activeJob?.status).toBe("running");
 		expect(paused.line[0]?.activeJob?.status).toBe("paused");
-		expect(ready.line[0]?.activeJob?.status).toBe("ready");
+		expect(ready.line[0]?.activeJob?.status).toBe("awaiting-output");
 	});
 
 	it("keeps single-slot owners on a disabled Start action while work is active", () => {

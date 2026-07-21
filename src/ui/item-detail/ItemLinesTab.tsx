@@ -37,7 +37,7 @@ const activeJobLabel = (activeJob: NonNullable<useItemDetailLines.Line["activeJo
 	match(activeJob.status)
 		.with("running", () => "Running")
 		.with("paused", () => "Paused")
-		.with("ready", () => "Awaiting output")
+		.with("awaiting-output", () => "Awaiting output")
 		.exhaustive();
 
 const runtimePresentation = ({
@@ -63,7 +63,7 @@ const runtimePresentation = ({
 			value: formatDuration(activeJob.remainingMs),
 			detail: `Paused · of ${formatDuration(activeJob.durationMs)}`,
 		}))
-		.with("ready", () => ({
+		.with("awaiting-output", () => ({
 			value: "Complete",
 			detail: "Awaiting output",
 		}))

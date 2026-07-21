@@ -104,7 +104,7 @@ export namespace useItemDetailLines {
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
-			readonly status: "running" | "paused" | "ready";
+			readonly status: "running" | "paused" | "awaiting-output";
 			readonly durationMs: number;
 			readonly remainingMs: number;
 		};

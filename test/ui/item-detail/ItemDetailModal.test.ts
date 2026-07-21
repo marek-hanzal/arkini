@@ -362,7 +362,7 @@ describe("ItemDetailModal", () => {
 		});
 
 		expect(document.querySelector('[data-ui="TileLineRuntime"]')).toBe(runtime);
-		expect(runtime.dataset.jobStatus).toBe("ready");
+		expect(runtime.dataset.jobStatus).toBe("awaiting-output");
 		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
 			"Complete",
 		);

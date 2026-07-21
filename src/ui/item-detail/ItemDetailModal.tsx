@@ -318,7 +318,7 @@ const ItemDetailDialog = ({
 							itemId={state.target.itemId}
 							tabs={tabs}
 						/>
-						<div className="min-h-0 flex-1 overflow-hidden pt-4">
+						<div className="flex min-h-0 flex-1 overflow-hidden pt-4">
 							<ItemDetailContent
 								itemId={state.target.itemId}
 								tab={state.target.tab}

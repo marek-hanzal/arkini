@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { Button } from "~/ui/button/Button";
+import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 /** Renders authoritative queued intents without treating active work as cancellable. */
 export const ItemQueueTab = ({
@@ -67,7 +68,7 @@ export const ItemQueueTab = ({
 					Queue is empty.
 				</div>
 			) : (
-				<div className="min-h-0 flex-1 overflow-y-auto">
+				<Scrollable className="flex-1">
 					{queue.request.map((request, index) => (
 						<div
 							key={request.requestId}
@@ -83,7 +84,7 @@ export const ItemQueueTab = ({
 							</div>
 						</div>
 					))}
-				</div>
+				</Scrollable>
 			)}
 		</div>
 	);

@@ -6,6 +6,7 @@ import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
+import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const formatQuantity = ({ min, max }: useItemDetailLines.QuantityBounds) =>
 	min === max ? `${min}` : `${min}–${max}`;
@@ -509,7 +510,7 @@ export const ItemLinesTab = ({
 				{lines.line.length} visible line{lines.line.length === 1 ? "" : "s"}
 			</p>
 		</div>
-		<div className="min-h-0 flex-1 overflow-y-auto pr-1">
+		<Scrollable className="flex-1 pr-1">
 			{lines.line.length === 0 ? (
 				<div className="grid min-h-48 place-items-center border border-dashed border-line text-sm text-muted">
 					No product line is currently visible.
@@ -528,6 +529,6 @@ export const ItemLinesTab = ({
 					))}
 				</div>
 			)}
-		</div>
+		</Scrollable>
 	</div>
 );

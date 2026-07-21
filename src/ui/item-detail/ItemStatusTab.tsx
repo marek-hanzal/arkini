@@ -1,6 +1,7 @@
 import { match } from "ts-pattern";
 
 import type { useItemDetailStatus } from "~/bridge/item-detail/useItemDetailStatus";
+import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 export interface ItemStatusPresentation {
 	readonly label: string;
@@ -107,26 +108,28 @@ export const ItemStatusTab = ({
 	>;
 	readonly presentation: ItemStatusPresentation;
 }) => (
-	<div
-		className="flex min-h-0 flex-1 flex-col justify-center gap-6 py-6"
+	<Scrollable
+		className="h-full"
 		data-ui="ItemStatusTab"
 		data-status-kind={status.state.kind}
 	>
-		<div className="flex items-start gap-4">
-			<span
-				className={`mt-2 size-3 shrink-0 rounded-full ${toneClass[presentation.tone]}`}
-				aria-hidden="true"
-			/>
-			<div className="min-w-0 space-y-2">
-				<p className="text-pretty text-2xl font-semibold leading-tight">
-					{presentation.summary}
-				</p>
-				{presentation.detail === undefined ? null : (
-					<p className="max-w-3xl text-pretty text-base leading-relaxed text-muted">
-						{presentation.detail}
+		<div className="flex min-h-full items-center py-6">
+			<div className="flex items-start gap-4">
+				<span
+					className={`mt-2 size-3 shrink-0 rounded-full ${toneClass[presentation.tone]}`}
+					aria-hidden="true"
+				/>
+				<div className="min-w-0 space-y-2">
+					<p className="text-pretty text-2xl font-semibold leading-tight">
+						{presentation.summary}
 					</p>
-				)}
+					{presentation.detail === undefined ? null : (
+						<p className="max-w-3xl text-pretty text-base leading-relaxed text-muted">
+							{presentation.detail}
+						</p>
+					)}
+				</div>
 			</div>
 		</div>
-	</div>
+	</Scrollable>
 );

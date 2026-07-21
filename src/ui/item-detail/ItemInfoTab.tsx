@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 
 import type { useItemDetailIdentity } from "~/bridge/item-detail/useItemDetailIdentity";
 import type { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
+import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const itemTypeLabel = {
 	blueprint: "Blueprint",
@@ -128,8 +129,8 @@ export const ItemInfoTab = ({
 		}
 	>;
 }) => (
-	<div
-		className="min-h-0 flex-1 overflow-y-auto pr-1"
+	<Scrollable
+		className="h-full pr-1"
 		data-ui="ItemInfoTab"
 	>
 		<section className="pb-5">
@@ -202,5 +203,5 @@ export const ItemInfoTab = ({
 				</div>
 			</section>
 		)}
-	</div>
+	</Scrollable>
 );

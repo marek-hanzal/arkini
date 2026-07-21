@@ -546,6 +546,8 @@ const sameLine = (left: useItemDetailLines.Line, right: useItemDetailLines.Line)
 	left.effectiveRuntimeMs === right.effectiveRuntimeMs &&
 	left.startMode === right.startMode &&
 	left.isDefault === right.isDefault &&
+	left.actions.canAutofill === right.actions.canAutofill &&
+	left.actions.canWithdraw === right.actions.canWithdraw &&
 	sameAvailability(left.availability, right.availability) &&
 	left.input.length === right.input.length &&
 	left.input.every(

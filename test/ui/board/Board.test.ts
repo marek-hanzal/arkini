@@ -3,17 +3,17 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { startFx } from "~/engine/start/write/startFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
-	game: undefined as Game | undefined,
+	game: undefined as GameEngine | undefined,
 }));
 
 vi.mock("~/bridge/game/useGameEngine", () => ({
@@ -80,7 +80,7 @@ const runtime = Effect.runSync(
 	),
 );
 
-const unavailableRun: Game["run"] = () => Promise.reject(new Error("Not used by this test."));
+const unavailableRun: GameEngine["run"] = () => Promise.reject(new Error("Not used by this test."));
 
 const game = {
 	arkpack: {
@@ -102,11 +102,12 @@ const game = {
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
+	readOrThrow: testGameReadOrThrow,
 	run: unavailableRun,
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
-} satisfies Game;
+} satisfies GameEngine;
 
 const readAttribute = (tag: string, name: string) => {
 	const value = tag.match(new RegExp(`${name}="([^"]*)"`))?.[1];
@@ -225,7 +226,7 @@ describe("Board", () => {
 			...game,
 			config: desktopConfig,
 			getSnapshot: () => desktopRuntime,
-		} satisfies Game;
+		} satisfies GameEngine;
 		gameEngineState.game = desktopGame;
 		const html = renderToStaticMarkup(
 			createElement(

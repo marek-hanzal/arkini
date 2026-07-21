@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
+import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
@@ -77,6 +78,24 @@ describe("GameEngineResource lifecycle", () => {
 		expect(second).toBe(first);
 		expect(first.cause).toBe(firstCause);
 		expect(() => resource.assertUsable()).toThrow(first);
+	});
+
+	it("marks unexpected live read failures critical and preserves the same fail-stop error", () => {
+		const { resource } = createHarness(createGame());
+		const failure = new Error("line projection invariant failed");
+
+		expect(() => resource.game.readOrThrow(Effect.fail(failure))).toThrow(
+			CriticalGameLifecycleError,
+		);
+		let critical: unknown;
+		try {
+			resource.assertUsable();
+		} catch (cause) {
+			critical = cause;
+		}
+		expect(critical).toBeInstanceOf(CriticalGameLifecycleError);
+		expect((critical as CriticalGameLifecycleError).operation).toBe("game-read");
+		expect((critical as CriticalGameLifecycleError).cause).toBe(failure);
 	});
 
 	it("removes the cached Game only after final save and disposal succeed", async () => {

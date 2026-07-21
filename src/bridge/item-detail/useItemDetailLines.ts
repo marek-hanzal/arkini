@@ -1,4 +1,3 @@
-import { Exit } from "effect";
 import { useCallback } from "react";
 import { match } from "ts-pattern";
 
@@ -431,14 +430,13 @@ export const useItemDetailLines = (itemId: IdSchema.Type): useItemDetailLines.Pr
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailLines.Projection => {
-			const exit = game.read(
+			const lines = game.readOrThrow(
 				readItemDetailLinesFx({
 					itemId,
 					runtime,
 				}),
 			);
-			if (Exit.isFailure(exit) || exit.value.kind === "unavailable") return unavailable;
-			const lines = exit.value;
+			if (lines.kind === "unavailable") return unavailable;
 			return {
 				kind: "available",
 				itemId: lines.itemId,

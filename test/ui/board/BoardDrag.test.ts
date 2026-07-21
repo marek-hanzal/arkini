@@ -5,7 +5,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -15,7 +15,7 @@ import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 (
 	globalThis as {
@@ -24,7 +24,7 @@ import { testGameRead } from "~test/support/game/testGameRead";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const gameEngineState = vi.hoisted(() => ({
-	game: undefined as Game | undefined,
+	game: undefined as GameEngine | undefined,
 }));
 const dropItemState = vi.hoisted(() => ({
 	drop: vi.fn<(_: dropItemFx.Props) => Promise<dropItemFx.Result>>(),
@@ -219,11 +219,12 @@ const game = {
 	},
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
-	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+	readOrThrow: testGameReadOrThrow,
+	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
-} satisfies Game;
+} satisfies GameEngine;
 
 beforeEach(() => {
 	motionTestRuntime.reset();

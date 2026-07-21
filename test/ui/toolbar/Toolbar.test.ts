@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -11,10 +11,10 @@ import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { testGameRead } from "~test/support/game/testGameRead";
+import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
-	game: undefined as Game | undefined,
+	game: undefined as GameEngine | undefined,
 }));
 
 vi.mock("~/bridge/game/useGameEngine", () => ({
@@ -75,7 +75,7 @@ const createConfig = (toolbarSize?: number) =>
 		},
 	});
 
-const createGame = (toolbarSize?: number, stored = false): Game => {
+const createGame = (toolbarSize?: number, stored = false): GameEngine => {
 	const config = createConfig(toolbarSize);
 	const initialRuntime = Effect.runSync(
 		startFx().pipe(
@@ -119,14 +119,15 @@ const createGame = (toolbarSize?: number, stored = false): Game => {
 		subscribe: () => () => undefined,
 		subscribeEvents: () => () => undefined,
 		read: testGameRead,
-		run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
+		readOrThrow: testGameReadOrThrow,
+		run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 		disposeFx: Effect.void,
 		disposeWithoutSaveFx: Effect.void,
 		flushSaveFx: Effect.void,
 	};
 };
 
-const renderGameBoard = (game: Game) => {
+const renderGameBoard = (game: GameEngine) => {
 	gameEngineState.game = game;
 	return renderToStaticMarkup(
 		createElement(

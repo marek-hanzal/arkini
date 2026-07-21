@@ -1,5 +1,6 @@
 export type CriticalGameLifecycleOperation =
 	| "engine-ownership"
+	| "game-read"
 	| "game-leave"
 	| "game-reset"
 	| "hmr-handoff";

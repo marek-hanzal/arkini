@@ -1,4 +1,3 @@
-import { Exit } from "effect";
 import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
@@ -36,10 +35,10 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 			);
 			return runtime.items.filter(isGridRuntimeItem).map((item) => {
 				const activeJob = activeJobs.get(item.id);
-				const statusExit =
+				const activeJobStatus =
 					activeJob === undefined
 						? undefined
-						: game.read(
+						: game.readOrThrow(
 								resolveActiveJobStatusFx({
 									job: activeJob,
 									runtime,
@@ -52,10 +51,7 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 					title: item.item.title,
 					quantity: item.quantity,
 					location: item.location,
-					running:
-						statusExit !== undefined &&
-						Exit.isSuccess(statusExit) &&
-						statusExit.value === "running",
+					running: activeJobStatus === "running",
 					sourceUrl: game.getResourceUrl(
 						readRuntimeItemPrimaryAssetId(runtime, item.item),
 					),

@@ -4,11 +4,11 @@ import type {
 	CriticalGameLifecycleError,
 	CriticalGameLifecycleOperation,
 } from "~/bridge/game/CriticalGameLifecycleError";
-import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
 
 /** One cached Game plus the private lock and fail-stop guard for route lifecycle actions. */
 export interface GameEngineResource {
-	readonly game: Game;
+	readonly game: GameEngine;
 	/** Throws the first critical ownership failure once this resource can no longer publish gameplay. */
 	readonly assertUsable: () => void;
 	/** Permanently marks this resource unusable and returns the canonical fatal error. */

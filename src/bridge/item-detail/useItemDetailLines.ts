@@ -104,6 +104,7 @@ export namespace useItemDetailLines {
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
+			readonly status: "running" | "paused" | "ready";
 			readonly durationMs: number;
 			readonly remainingMs: number;
 		};
@@ -406,6 +407,7 @@ const sameLine = (left: useItemDetailLines.Line, right: useItemDetailLines.Line)
 			)
 		);
 	}) &&
+	left.activeJob?.status === right.activeJob?.status &&
 	left.activeJob?.durationMs === right.activeJob?.durationMs &&
 	left.activeJob?.remainingMs === right.activeJob?.remainingMs;
 

@@ -292,6 +292,41 @@ describe("ItemDetailModal", () => {
 		});
 	});
 
+	it("restores focus only to a still-focusable exact origin", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+		const shell = document.createElement("div");
+		shell.dataset.ui = "GameShell";
+		shell.tabIndex = -1;
+		document.body.append(shell);
+		const origin = document.createElement("button");
+		document.body.append(origin);
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: owner.id,
+				tab: "info",
+				origin,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		origin.disabled = true;
+		const closeButton = document.querySelector<HTMLButtonElement>(
+			'button[aria-label="Close item detail"]',
+		);
+		if (closeButton === null) throw new Error("Missing Item Detail close button.");
+		await act(async () => {
+			closeButton.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(readControl().state.phase).toBe("closed");
+		expect(document.activeElement).toBe(shell);
+	});
+
 	it("closes the exact stale target without retargeting another item", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

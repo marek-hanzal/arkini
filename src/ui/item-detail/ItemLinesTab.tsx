@@ -32,6 +32,22 @@ const selectorLabel = (selector: useItemDetailLines.Selector) =>
 const chargeLabel = (charges: useItemDetailLines.ChargeCost) =>
 	`${charges.cost} charge${charges.cost === 1 ? "" : "s"} from ${charges.from === "self" ? "owner" : "target"}`;
 
+const activeJobLabel = (activeJob: NonNullable<useItemDetailLines.Line["activeJob"]>) =>
+	match(activeJob.status)
+		.with("running", () => ({
+			label: "Running",
+			detail: `${formatDuration(activeJob.remainingMs)} remaining of ${formatDuration(activeJob.durationMs)}`,
+		}))
+		.with("paused", () => ({
+			label: "Paused",
+			detail: `${formatDuration(activeJob.remainingMs)} remaining`,
+		}))
+		.with("ready", () => ({
+			label: "Awaiting output",
+			detail: "Work is complete and waiting to finalize.",
+		}))
+		.exhaustive();
+
 const readinessLabel = (availability: useItemDetailLines.Availability) =>
 	match(availability)
 		.with(
@@ -281,6 +297,7 @@ const LineRow = ({
 		}
 	};
 	const readiness = readinessLabel(line.availability);
+	const activeWork = line.activeJob === undefined ? undefined : activeJobLabel(line.activeJob);
 	const runtimeChanged = line.baseRuntimeMs !== line.effectiveRuntimeMs;
 	return (
 		<article
@@ -295,9 +312,9 @@ const LineRow = ({
 						<h3 className="text-lg font-semibold leading-tight text-foreground">
 							{line.title}
 						</h3>
-						{line.activeJob === undefined ? null : (
+						{activeWork === undefined ? null : (
 							<span className="rounded-full border border-accent/40 bg-accent/12 px-2.5 py-1 text-xs font-semibold text-foreground">
-								Active
+								{activeWork.label}
 							</span>
 						)}
 						<span
@@ -395,13 +412,15 @@ const LineRow = ({
 				</p>
 			)}
 
-			{line.activeJob === undefined ? null : (
-				<div className="mt-4 flex flex-wrap items-baseline justify-between gap-3 border-y border-line/70 py-3 text-sm">
-					<span className="font-medium text-foreground">Current work</span>
-					<span className="text-muted">
-						{formatDuration(line.activeJob.remainingMs)} remaining of{" "}
-						{formatDuration(line.activeJob.durationMs)}
+			{activeWork === undefined ? null : (
+				<div
+					className="mt-4 flex flex-wrap items-baseline justify-between gap-3 border-y border-line/70 py-3 text-sm"
+					data-job-status={line.activeJob?.status}
+				>
+					<span className="font-medium text-foreground">
+						Current work · {activeWork.label}
 					</span>
+					<span className="text-muted">{activeWork.detail}</span>
 				</div>
 			)}
 

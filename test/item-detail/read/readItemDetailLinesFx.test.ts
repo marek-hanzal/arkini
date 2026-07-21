@@ -110,10 +110,67 @@ describe("readItemDetailLinesFx", () => {
 					reason: "stored",
 				},
 				activeJob: {
+					status: "paused",
 					remainingMs: 400,
 				},
 			},
 		]);
+	});
+
+	it("projects active work as running, paused, or ready from canonical job truth", () => {
+		const job = {
+			id: "job:workshop",
+			ownerItemId: "runtime:workshop",
+			lineId: "line:workshop:build",
+			durationMs: 1_000,
+			remainingMs: 400,
+		} as const;
+		const running = readLines({
+			...lineRunRuntime({
+				permit: true,
+			}),
+			jobs: [
+				job,
+			],
+		});
+		const paused = readLines({
+			...lineRunRuntime({
+				blocker: true,
+				permit: true,
+			}),
+			jobs: [
+				job,
+			],
+		});
+		const ready = readLines({
+			...lineRunRuntime({
+				permit: true,
+			}),
+			jobs: [
+				{
+					...job,
+					remainingMs: 0,
+				},
+			],
+		});
+
+		for (const projection of [
+			running,
+			paused,
+			ready,
+		]) {
+			expect(projection.kind).toBe("available");
+		}
+		if (
+			running.kind !== "available" ||
+			paused.kind !== "available" ||
+			ready.kind !== "available"
+		) {
+			throw new Error("Expected available lines.");
+		}
+		expect(running.line[0]?.activeJob?.status).toBe("running");
+		expect(paused.line[0]?.activeJob?.status).toBe("paused");
+		expect(ready.line[0]?.activeJob?.status).toBe("ready");
 	});
 
 	it("groups duplicate drops without flattening guaranteed and chance rolls", () => {

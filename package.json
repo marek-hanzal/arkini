@@ -60,6 +60,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.16",
+		"@iconify-json/lucide": "1.2.118",
+		"@iconify/tailwind4": "1.2.3",
 		"@tailwindcss/vite": "4.3.0",
 		"@tanstack/router-plugin": "1.168.18",
 		"@types/node": "24.10.9",
